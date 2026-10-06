@@ -33,9 +33,16 @@
 
    La fila IDEA se escribe en la forma de la cola de cada app: tabla de
    tres columnas (Gestor), de cuatro (con Notas) o apartados «## N. …».
+
+   Fila 268 (docs/VIGILANTE-Y-CORREOS.md): además, el VIGILANTE (al final de
+   este fichero). Una función, `vigilar`, que un disparador ejecuta cada
+   diez minutos: mira las colas de todos los proyectos, manda correos a
+   Francisco cuando algo le obliga a hacer algo, comprueba que cada app
+   abre, contesta por correo a quien envió un aviso cuando queda resuelto
+   y deja el fichero ESTADO-VIGILANTE.json para el Centro de mando.
    ============================================================ */
 
-var VERSION_SCRIPT = '4-oct-2026 · fila 262';
+var VERSION_SCRIPT = '6-oct-2026 · fila 268';
 
 /* Los repositorios que pueden mandar avisos (fila 261: todas las apps de
    Francisco). Que uno esté aquí no hace nada por sí solo: hasta que esa app
@@ -96,6 +103,7 @@ function doPost(e) {
     try { cola = apuntarEnCola(datos, guardado.enlace); }
     catch (err) { cola = { ok: false, motivo: textoDe(err) }; }
     if (!cola.ok) avisarPorCorreo(datos, guardado.enlace, cola.motivo);
+    vigilanteAvisoNuevo(datos, guardado.enlace, cola);
 
     return respuesta({
       ok: true,
@@ -127,6 +135,9 @@ function normalizar(d) {
   if (!d || typeof d !== 'object') return;
   d.capturaTipo = 'image/jpeg';
   d.capturaExt = 'jpg';
+  /* Fila 268: el correo de quien avisa es opcional. Con mala forma se trata
+     como vacío; nunca se rechaza un aviso por esto. */
+  d.correo = correoValido(d.correo);
   if (typeof d.captura === 'string') {
     var m = /^data:image\/([A-Za-z0-9.+-]+);base64,/.exec(d.captura);
     if (m) {
@@ -190,13 +201,14 @@ function guardarEnDrive(d) {
     'App: ' + cadena(d.app, 100),
     'Repositorio: ' + cadena(d.repo, 100),
     'Pantalla: ' + cadena(d.pantalla, 120),
-    'Quién lo envía: ' + cadena(d.quien, 120),
+    'Quién lo envía: ' + cadena(d.quien, 120)
+  ].concat(d.correo ? ['Correo: ' + d.correo] : []).concat([
     'Fecha: ' + cadena(d.fecha, 60),
     'Versión de la app: ' + cadena(d.version, 60),
     '',
     'Texto:',
     d.texto
-  ];
+  ]);
   if (d.errores) { lineas.push('', 'Últimos errores de la consola:', cadena(d.errores, MAX_ERRORES)); }
   var tieneCaptura = !!d.captura;
   var extCaptura = d.capturaExt || 'jpg';
@@ -395,9 +407,718 @@ function prepararTodo() {
   });
   var resumen = 'Resumen: ' + bien + ' bien, ' + ojo + ' con OJO, de ' + REPOS_PERMITIDOS.length + ' repositorios.';
   Logger.log(resumen);
+  var vigilante = prepararVigilante();
   try {
     MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Soporte: prueba del buzón', resumen +
-      '\n\nSi te llega este correo, el permiso de correo del buzón está autorizado.');
+      '\n\nSi te llega este correo, el permiso de correo del buzón está autorizado.' + vigilante);
   } catch (err) { Logger.log('OJO: no he podido mandar el correo de prueba: ' + textoDe(err)); }
   return 'Versión del buzón: ' + VERSION_SCRIPT + ' · ' + resumen;
+}
+
+
+/* ============================================================
+   EL VIGILANTE (fila 268, docs/VIGILANTE-Y-CORREOS.md)
+   ============================================================ */
+
+var CENTRO_DE_MANDO = 'https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E';
+var PROPIETARIO = 'fmargon780';
+var CADA_MINUTOS = 10;
+var PARADA_MINUTOS = 90;            /* una fila EN CURSO sin pasos en este tiempo está a medias */
+var SILENCIO_DESDE = 23;            /* de 23:00 a 7:00, hora de Madrid, no sale ningún correo */
+var SILENCIO_HASTA = 7;
+var RELEER_CADA_HORAS = 6;          /* lista de repositorios y direcciones de las apps */
+var QUIETO_DIAS = 14;               /* un proyecto sin cambios en tantos días se mira una vez por hora */
+var GUARDAR_DIAS = 60;
+var CARPETA_VIGILANTE = '_VIGILANTE';
+var FICHERO_MEMORIA = 'memoria.json';
+var FICHERO_ESTADO = 'ESTADO-VIGILANTE.json';
+/* Lo que Vercel deja como «fallo» y no lo es: el proyecto se salta a propósito la
+   publicación, o se ha acabado el tope diario de la cuenta. */
+var NO_ES_FALLO = /ignored build|canceled by ignored|resource is limited|rate limit|limit(ed)? reached|exceeded|too many deployments/i;
+/* La página de error que da Google cuando un script de Apps Script falla. */
+var PAGINA_DE_ERROR_DE_GOOGLE = /Script function not found|No se ha podido abrir el archivo|Se ha producido un error|Error \(TypeError|Exception: |<title>\s*Error\s*<\/title>|userCodeAppPanel[^>]*error|El script ha finalizado pero/i;
+var PANTALLA_DE_ENTRADA_DE_GOOGLE = /accounts\.google\.com|ServiceLogin|Inicia sesión con Google|Sign in - Google|Iniciar sesión: Cuentas de Google/i;
+var MESES_LARGOS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/* ---------- utilidades ---------- */
+
+function correoValido(v) {
+  if (typeof v !== 'string') return '';
+  var t = v.trim();
+  if (!t || t.length > 120) return '';
+  return /^[^\s@<>,;"]+@[^\s@<>,;"]+\.[^\s@<>,;"]+$/.test(t) ? t : '';
+}
+
+function horaDeMadrid(f) { return Utilities.formatDate(f, 'Europe/Madrid', 'HH:mm'); }
+function enSilencio(f) {
+  var h = parseInt(Utilities.formatDate(f, 'Europe/Madrid', 'H'), 10);
+  return h >= SILENCIO_DESDE || h < SILENCIO_HASTA;
+}
+function minutosEntre(a, b) { return Math.round((b.getTime() - a.getTime()) / 60000); }
+function duracionEnLlano(min) {
+  if (min < 90) return min + ' minutos';
+  var h = Math.round(min / 6) / 10;
+  return (h >= 48 ? Math.round(h / 24) + ' días' : String(h).replace('.', ',') + ' horas');
+}
+function nombreCortoDeRepo(repo) { return String(repo).split('/').pop().replace(/[-_]+/g, ' '); }
+function nombreDeApp(mem, repo) { return (mem.nombres && mem.nombres[repo]) || nombreCortoDeRepo(repo); }
+function fechaLarga(iso) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
+  return m ? parseInt(m[3], 10) + ' de ' + MESES_LARGOS[parseInt(m[2], 10) - 1] : 'hace unos días';
+}
+
+/* ---------- las direcciones de Francisco ---------- */
+
+function correosDeFrancisco() {
+  var lista = [];
+  var prop = PropertiesService.getScriptProperties().getProperty('CORREO_AVISOS');
+  if (prop) {
+    lista = String(prop).split(/[,;\s]+/);
+  } else {
+    lista.push(Session.getEffectiveUser().getEmail());
+    try {
+      var c = carpetaRaiz();
+      ['getEditors', 'getViewers'].forEach(function (m) {
+        (c[m]() || []).forEach(function (u) { lista.push(u.getEmail()); });
+      });
+    } catch (err) { /* sin la carpeta, vale el dueño */ }
+  }
+  var vistas = {}, salida = [];
+  lista.forEach(function (x) {
+    var v = correoValido(x);
+    if (v && !vistas[v.toLowerCase()]) { vistas[v.toLowerCase()] = 1; salida.push(v); }
+  });
+  return salida;
+}
+
+/* ---------- la memoria (JSON en Drive: SOPORTE-AVISOS/_VIGILANTE) ---------- */
+
+function memoriaVacia() {
+  return { v: 1, avisados: {}, noche: [], apps: {}, avisos: {}, direcciones: {}, filas: {}, nombres: {},
+           repos: { leida: null, lista: [], sinCola: {}, mirada: {} } };
+}
+
+function ficheroDe(carpeta, nombre) {
+  var it = carpeta.getFilesByName(nombre);
+  return it.hasNext() ? it.next() : null;
+}
+
+function escribirFichero(carpeta, nombre, texto) {
+  var f = ficheroDe(carpeta, nombre);
+  if (f) f.setContent(texto); else carpeta.createFile(nombre, texto, 'text/plain');
+}
+
+function cargarMemoria() {
+  var f = ficheroDe(carpetaHija(carpetaRaiz(), CARPETA_VIGILANTE), FICHERO_MEMORIA);
+  var m = null;
+  if (f) { try { m = JSON.parse(f.getBlob().getDataAsString('UTF-8')); } catch (err) { m = null; } }
+  var v = memoriaVacia();
+  if (!m || typeof m !== 'object') return v;
+  Object.keys(v).forEach(function (k) { if (m[k] === undefined || m[k] === null) m[k] = v[k]; });
+  ['lista', 'sinCola', 'mirada'].forEach(function (k) { if (m.repos[k] === undefined) m.repos[k] = v.repos[k]; });
+  return m;
+}
+
+function guardarMemoria(m) {
+  escribirFichero(carpetaHija(carpetaRaiz(), CARPETA_VIGILANTE), FICHERO_MEMORIA, JSON.stringify(m));
+}
+
+/* Lo ya cerrado con más de 60 días se borra. */
+function podarMemoria(m, ahora) {
+  var tope = ahora.getTime() - GUARDAR_DIAS * 86400000;
+  Object.keys(m.avisados).forEach(function (k) { if (new Date(m.avisados[k]).getTime() < tope) delete m.avisados[k]; });
+  Object.keys(m.avisos).forEach(function (k) {
+    var a = m.avisos[k];
+    if (a.estado !== 'esperando' && a.fecha && new Date(a.fecha).getTime() < tope) delete m.avisos[k];
+  });
+}
+
+/* ---------- GitHub y la web, varias llamadas a la vez ---------- */
+
+function peticionApi(url, token, crudo) {
+  return { url: url, method: 'get', muteHttpExceptions: true, followRedirects: true,
+    headers: { Authorization: 'Bearer ' + token,
+      Accept: crudo ? 'application/vnd.github.raw+json' : 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'gestor-soporte' } };
+}
+
+function peticionWeb(url) {
+  return { url: url, method: 'get', muteHttpExceptions: true, followRedirects: true,
+    headers: { 'User-Agent': 'gestor-vigilante' } };
+}
+
+function resultadoDe(r) {
+  var texto = '';
+  try { texto = r.getContentText(); } catch (err) { texto = ''; }
+  return { codigo: r.getResponseCode(), texto: texto, fallo: false };
+}
+
+/* fetchAll tira todo el lote si una sola dirección ni siquiera conecta: entonces
+   se repite una a una, y la que no conecta queda como `fallo`. */
+function traerTodo(peticiones) {
+  if (!peticiones.length) return [];
+  try {
+    return UrlFetchApp.fetchAll(peticiones).map(resultadoDe);
+  } catch (err) {
+    return peticiones.map(function (p) {
+      try { return resultadoDe(UrlFetchApp.fetch(p.url, p)); }
+      catch (e) { return { codigo: 0, texto: '', fallo: true }; }
+    });
+  }
+}
+
+function jsonDe(r) { try { return JSON.parse(r.texto); } catch (err) { return null; } }
+
+/* ---------- la cola ---------- */
+
+function estadoDeTexto(t) {
+  var x = String(t || '').trim().replace(/^[*_\s]+/, '');
+  if (/^EN CURSO/i.test(x)) return 'EN CURSO';
+  if (/^BLOQUEADA/i.test(x)) return 'BLOQUEADA';
+  if (/^SIN PUBLICACI[OÓ]N COMPROBADA/i.test(x)) return 'SIN PUBLICACION';
+  var m = /^(HECHA|DESCARTADA|SUSTITUIDA|PENDIENTE|DEVUELTA|IDEA|EN DISE[ÑN]O)/i.exec(x);
+  return m ? m[1].toUpperCase().replace('DISEÑO', 'DISENO') : 'OTRO';
+}
+
+/* Las filas de la cola: tabla de tres o cuatro columnas, o apartados «## N. …». */
+function filasDeCola(texto) {
+  var filas = [];
+  String(texto || '').split('\n').forEach(function (l) {
+    var m;
+    if (l.charAt(0) === '|') {
+      var c = l.split('|');
+      if (c.length >= 4 && /^\d+$/.test(c[1].trim())) {
+        filas.push({ n: c[1].trim(), estado: estadoDeTexto(c[3]), texto: l });
+      }
+    } else if ((m = /^##\s+(\d+)\.\s+(.*)$/.exec(l))) {
+      var partes = m[2].split(/\s[—–-]\s/);
+      filas.push({ n: m[1], estado: estadoDeTexto(partes.length > 1 ? partes[partes.length - 1] : ''), texto: l });
+    }
+  });
+  return filas;
+}
+
+function enlaceDeConversacion(texto) {
+  var m = /https:\/\/claude\.ai\/code\/session_[A-Za-z0-9_]+/.exec(texto || '');
+  return m ? m[0] : '';
+}
+
+/* ---------- las direcciones de las apps ---------- */
+
+var LINEA_DE_DIRECCION = /^[\s>*#-]*\**\s*(Direcci[oó]n publicada|Producci[oó]n|Publicada en|Direcci[oó]n|D[oó]nde se usa)\b/i;
+var LINEA_QUE_HABLA_DE_DIRECCION = /direcci[oó]n|publica/i;
+
+function direccionesDe(linea) {
+  var salida = [];
+  (String(linea).match(/https?:\/\/[^\s)>\]*`"']+/g) || []).forEach(function (u) {
+    u = u.replace(/[.,;:*]+$/, '');
+    if (!/pruebas|demo|preview|localhost/i.test(u)) salida.push(u);
+  });
+  return salida;
+}
+
+function buscarDireccion(corto, claude) {
+  var lineas = String(corto || '').split('\n');
+  for (var i = 0; i < lineas.length; i++) {
+    if (LINEA_DE_DIRECCION.test(lineas[i])) {
+      var d = direccionesDe(lineas[i]);
+      if (d.length) return d[0];
+    }
+  }
+  lineas = String(claude || '').split('\n');
+  for (var j = 0; j < lineas.length; j++) {
+    if (LINEA_QUE_HABLA_DE_DIRECCION.test(lineas[j])) {
+      var e = direccionesDe(lineas[j]);
+      if (e.length) return e[0];
+    }
+  }
+  return '';
+}
+
+/* ¿Responde la app? bien (entera o solo la entrada de Google) o mal. */
+function mirarApp(r) {
+  if (!r || r.fallo || !r.codigo) return { bien: false };
+  var cuerpo = r.texto || '';
+  if (PAGINA_DE_ERROR_DE_GOOGLE.test(cuerpo) && !PANTALLA_DE_ENTRADA_DE_GOOGLE.test(cuerpo)) return { bien: false };
+  if (PANTALLA_DE_ENTRADA_DE_GOOGLE.test(cuerpo)) return { bien: true, alcance: 'entrada' };
+  if (r.codigo === 404 || r.codigo >= 500) return { bien: false };
+  return { bien: true, alcance: 'entera' };
+}
+
+/* ---------- los correos ---------- */
+
+function mandar(para, asunto, cuerpo, responderA) {
+  var o = { to: para, subject: asunto, body: cuerpo };
+  if (responderA) o.replyTo = responderA;
+  MailApp.sendEmail(o);
+}
+
+function pieDeCorreo(s) {
+  var t = '\n\nCentro de mando: ' + CENTRO_DE_MANDO;
+  if (s.conv) t += '\nConversación de Claude Code: ' + s.conv;
+  return t;
+}
+
+/* Un suceso: { tipo, repo, clave, vig, asunto, cuerpo, conv, siempre }.
+   `clave` evita repetirlo; `vig` es la clave del estado que lo causa: sirve para
+   comprobar a las 7:00 que sigue siendo verdad. Devuelve 'enviado', 'noche' o
+   'ya' (ya avisado) o 'prueba'. */
+function suceso(ctx, s) {
+  var mem = ctx.mem;
+  if (mem.avisados[s.clave]) return 'ya';
+  if (ctx.prueba) return 'prueba';
+  if (ctx.silencio) {
+    mem.avisados[s.clave] = ctx.iso;
+    mem.noche.push({ tipo: s.tipo, repo: s.repo, clave: s.clave, vig: s.vig || '', siempre: !!s.siempre,
+      app: nombreDeApp(mem, s.repo), asunto: s.asunto, cuerpo: s.cuerpo, conv: s.conv || '' });
+    return 'noche';
+  }
+  /* Si el correo falla, no se apunta como avisado: la siguiente pasada lo vuelve a intentar. */
+  try {
+    mandar(ctx.francisco.join(','), 'Centro de mando · ' + nombreDeApp(mem, s.repo) + ': ' + s.asunto, s.cuerpo + pieDeCorreo(s));
+  } catch (err) { return 'fallo'; }
+  mem.avisados[s.clave] = ctx.iso;
+  return 'enviado';
+}
+
+/* A las 7:00: un solo correo con lo guardado de noche que siga siendo verdad. */
+function vaciarNoche(ctx) {
+  var mem = ctx.mem;
+  if (!mem.noche.length) return;
+  /* Lo que no se ha podido comprobar en esta pasada (GitHub no ha respondido) espera a la siguiente. */
+  var verificable = function (x) { return x.siempre || (x.tipo === 'caida' ? ctx.examinados[x.repo] : ctx.leidos[x.repo]); };
+  var quedan = mem.noche.filter(function (x) { return verificable(x) && (x.siempre || ctx.vigentes[x.vig]); });
+  var siguen = mem.noche.filter(function (x) { return !verificable(x); });
+  if (quedan.length) {
+    var cuerpo = quedan.map(function (x) {
+      return '• ' + x.app + ': ' + x.asunto + '\n  ' + x.cuerpo.replace(/\n+/g, ' ');
+    }).join('\n\n') + '\n\nCentro de mando: ' + CENTRO_DE_MANDO;
+    try {
+      mandar(ctx.francisco.join(','), 'Centro de mando · resumen de la noche', 'Esto ha pasado de noche y sigue sin resolver:\n\n' + cuerpo);
+    } catch (err) { return; }                      /* se guarda todo y se repite en la siguiente pasada */
+  }
+  quedan.forEach(function (x) {
+    if (x.tipo === 'caida' && mem.apps[x.repo]) { mem.apps[x.repo].avisada = true; mem.apps[x.repo].enNoche = null; }
+  });
+  mem.noche = siguen;
+}
+
+/* ---------- el aviso de un usuario (doPost) ---------- */
+
+function vigilanteAvisoNuevo(d, enlace, cola) {
+  try {
+    var bloqueo = LockService.getScriptLock();
+    bloqueo.waitLock(20000);
+    var mem = null;
+    try {
+      mem = cargarMemoria();
+      var ahora = new Date();
+      var iso = ahora.toISOString();
+      var ctx = { mem: mem, ahora: ahora, iso: iso, silencio: enSilencio(ahora), prueba: false,
+                  vigentes: {}, francisco: correosDeFrancisco() };
+      mem.nombres[d.repo] = cadena(d.app, 60);
+      var fila = cola && cola.ok ? String(cola.numero) : '';
+      if (fila) {
+        var correo = d.correo || '';
+        var propio = correo && ctx.francisco.map(function (x) { return x.toLowerCase(); }).indexOf(correo.toLowerCase()) !== -1;
+        mem.avisos[d.repo + '#' + fila] = {
+          repo: d.repo, fila: fila, app: cadena(d.app, 60), tipo: d.tipo, pantalla: pantallaLimpia(d.pantalla),
+          fecha: Utilities.formatDate(ahora, 'Europe/Madrid', 'yyyy-MM-dd'), correo: correo, enlace: enlace,
+          estado: !correo ? 'sin-correo' : (propio ? 'propio' : 'esperando'), historia: false
+        };
+      }
+      suceso(ctx, {
+        tipo: 'aviso', repo: d.repo, clave: d.repo + '|aviso|' + enlace, siempre: true,
+        asunto: 'aviso nuevo de un usuario',
+        cuerpo: 'Un usuario ha enviado un aviso desde el botón de soporte de ' + nombreDeApp(mem, d.repo) + '.\n' +
+          'Tipo: ' + (d.tipo === 'error' ? 'algo no funciona' : 'propuesta de mejora') +
+          '. Pantalla: ' + pantallaLimpia(d.pantalla) + '.' + (fila ? ' Fila de la cola: ' + fila + '.' : '') +
+          '\nAviso completo en Drive: ' + enlace
+      });
+      guardarMemoria(mem);
+    } finally { bloqueo.releaseLock(); }
+  } catch (err) { /* el vigilante nunca estropea la respuesta al usuario */ }
+}
+
+/* ---------- la pasada ---------- */
+
+function vigilar() { return pasadaDelVigilante({}); }
+
+function pasadaDelVigilante(op) {
+  var bloqueo = LockService.getScriptLock();
+  if (!bloqueo.tryLock(10000)) return { ocupado: true };
+  var mem = null;
+  try {
+    mem = cargarMemoria();
+    return correrPasada(mem, op || {});
+  } finally {
+    if (mem) { try { guardarMemoria(mem); } catch (err) { /* la siguiente pasada lo repite */ } }
+    bloqueo.releaseLock();
+  }
+}
+
+/* Los repositorios que se miran en esta pasada. La lista se averigua con el propio
+   permiso y se vuelve a mirar cada seis horas; si no se puede, vale REPOS_PERMITIDOS. */
+function elegirRepos(ctx, token) {
+  var mem = ctx.mem, r = mem.repos;
+  var vieja = !r.leida || minutosEntre(new Date(r.leida), ctx.ahora) >= RELEER_CADA_HORAS * 60;
+  if (vieja || !r.lista.length) {
+    var rs = traerTodo([peticionApi('https://api.github.com/user/repos?per_page=100&sort=pushed&affiliation=owner', token)])[0];
+    var js = rs.codigo === 200 ? jsonDe(rs) : null;
+    var lista = [];
+    if (js && js.length) {
+      js.forEach(function (x) {
+        if (x && x.full_name && x.full_name.indexOf(PROPIETARIO + '/') === 0 && !x.archived) lista.push({ n: x.full_name, pushed: x.pushed_at || '' });
+      });
+    }
+    if (!lista.length) lista = REPOS_PERMITIDOS.map(function (n) { return { n: n, pushed: '' }; });
+    r.lista = lista; r.leida = ctx.iso; r.sinCola = {};
+    ctx.relistado = true;
+  }
+  return r.lista.filter(function (x) { return !r.sinCola[x.n]; });
+}
+
+function estaQuieto(ctx, repo, pushed) {
+  var mem = ctx.mem;
+  if (!pushed || ctx.ahora.getTime() - new Date(pushed).getTime() < QUIETO_DIAS * 86400000) return false;
+  var filas = mem.filas[repo.n] || {};
+  for (var k in filas) { if (filas[k] === 'EN CURSO') return false; }
+  var app = mem.apps[repo.n];
+  if (app && (app.fallos || app.caida)) return false;
+  if (mem.noche.some(function (x) { return x.repo === repo.n; })) return false;
+  for (var a in mem.avisos) { if (mem.avisos[a].repo === repo.n && mem.avisos[a].estado === 'esperando') return false; }
+  return true;
+}
+
+function correrPasada(mem, op) {
+  var ahora = new Date();
+  var ctx = { mem: mem, ahora: ahora, iso: ahora.toISOString(), silencio: enSilencio(ahora), prueba: !!op.prueba,
+              vigentes: {}, examinados: {}, leidos: {}, francisco: correosDeFrancisco() };
+  var token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
+  var informe = { repos: [], vigilados: [] };
+  if (!token) return informe;
+  podarMemoria(mem, ahora);
+
+  /* Qué repositorios se miran ahora (los quietos, una vez por hora). */
+  var repos = elegirRepos(ctx, token).filter(function (x) {
+    var vista = mem.repos.mirada[x.n];
+    if (!ctx.relistado && estaQuieto(ctx, x, x.pushed) && vista && minutosEntre(new Date(vista), ahora) < 55) return false;
+    return true;
+  });
+
+  /* Primera tanda: la cola, el estado de la última publicación, ESPERANDO.json, las
+     direcciones (si toca releerlas) y la propia app. */
+  var peticiones = [], donde = [];
+  function pedir(repo, que, p) { peticiones.push(p); donde.push({ repo: repo, que: que }); }
+  repos.forEach(function (x) {
+    var base = 'https://api.github.com/repos/' + x.n;
+    pedir(x.n, 'cola', peticionApi(base + '/contents/docs/COLA.md?ref=main', token, true));
+    pedir(x.n, 'estado', peticionApi(base + '/commits/main/status', token));
+    pedir(x.n, 'esperando', peticionApi(base + '/contents/ESPERANDO.json?ref=avisos', token, true));
+    var dir = mem.direcciones[x.n];
+    if (!dir || minutosEntre(new Date(dir.leida), ahora) >= RELEER_CADA_HORAS * 60) {
+      pedir(x.n, 'corto', peticionApi(base + '/contents/docs/CONTEXTO-CORTO.md?ref=main', token, true));
+      pedir(x.n, 'claude', peticionApi(base + '/contents/CLAUDE.md?ref=main', token, true));
+    } else if (dir.url) {
+      pedir(x.n, 'app', peticionWeb(dir.url));
+    }
+  });
+  var rs = traerTodo(peticiones);
+  var por = {};
+  rs.forEach(function (r, i) { (por[donde[i].repo] = por[donde[i].repo] || {})[donde[i].que] = r; });
+
+  /* Las direcciones recién leídas: se piden también las apps (segunda tanda corta). */
+  var segunda = [], dondeSegunda = [];
+  repos.forEach(function (x) {
+    var g = por[x.n];
+    if (g.corto || g.claude) {
+      var url = buscarDireccion(g.corto && g.corto.codigo === 200 ? g.corto.texto : '',
+                                g.claude && g.claude.codigo === 200 ? g.claude.texto : '');
+      if ((g.corto && g.corto.codigo !== 200 && g.corto.codigo !== 404) || (g.claude && g.claude.codigo !== 200 && g.claude.codigo !== 404)) {
+        /* GitHub no ha respondido bien: se deja la dirección que había y se vuelve a intentar. */
+        if (!mem.direcciones[x.n]) mem.direcciones[x.n] = { url: '', leida: new Date(0).toISOString() };
+      } else {
+        mem.direcciones[x.n] = { url: url, leida: ctx.iso };
+      }
+      var u = mem.direcciones[x.n].url;
+      if (u) { segunda.push(peticionWeb(u)); dondeSegunda.push(x.n); }
+    }
+  });
+  traerTodo(segunda).forEach(function (r, i) { por[dondeSegunda[i]].app = r; });
+
+  /* Segunda tanda de GitHub: la actividad (solo donde hay una fila EN CURSO) y la historia
+     (solo para un aviso cuya fila ya no está en la cola). */
+  var tercera = [], dondeTercera = [];
+  var datos = {};
+  repos.forEach(function (x) {
+    var g = por[x.n];
+    var d = datos[x.n] = { ok: !!g.cola && g.cola.codigo === 200, filas: [] };
+    if (!d.ok) return;
+    d.filas = filasDeCola(g.cola.texto);
+    var base = 'https://api.github.com/repos/' + x.n;
+    if (d.filas.some(function (f) { return f.estado === 'EN CURSO'; })) {
+      tercera.push(peticionApi(base + '/activity?per_page=50', token)); dondeTercera.push({ repo: x.n, que: 'actividad' });
+    }
+    var espera = Object.keys(mem.avisos).some(function (k) {
+      var a = mem.avisos[k];
+      return a.repo === x.n && a.estado === 'esperando' && !a.historia && !d.filas.some(function (f) { return f.n === a.fila; });
+    });
+    if (espera) { tercera.push(peticionApi(base + '/contents/docs/HISTORIA.md?ref=main', token, true)); dondeTercera.push({ repo: x.n, que: 'historia' }); }
+  });
+  traerTodo(tercera).forEach(function (r, i) { por[dondeTercera[i].repo][dondeTercera[i].que] = r; });
+
+  /* Lo de cada repositorio. */
+  repos.forEach(function (x) {
+    var d = datos[x.n], g = por[x.n];
+    mem.repos.mirada[x.n] = ctx.iso;
+    ctx.examinados[x.n] = true;
+    if (g.cola && g.cola.codigo === 404) {
+      var yaSabido = (g.estado && g.estado.codigo === 200);
+      if (yaSabido) mem.repos.sinCola[x.n] = true;       /* el repositorio existe pero no tiene cola */
+    }
+    comprobarApp(ctx, x.n, g.app);
+    if (!d.ok) return;                                    /* GitHub no ha respondido: nada se deduce de este repositorio */
+    informe.vigilados.push(x.n);
+    ctx.leidos[x.n] = true;
+    deducirDeLaCola(ctx, x.n, d, g);
+    contestarAvisos(ctx, x.n, d, g);
+  });
+
+  /* Las 7:00: lo guardado de noche; y el fichero para la página. */
+  if (!ctx.silencio && !ctx.prueba) vaciarNoche(ctx);
+  escribirEstado(ctx);
+  informe.apps = mem.apps;
+  informe.direcciones = mem.direcciones;
+  informe.francisco = ctx.francisco;
+  return informe;
+}
+
+/* ---------- lo que se deduce de la cola, la publicación y ESPERANDO.json ---------- */
+
+function deducirDeLaCola(ctx, repo, d, g) {
+  var mem = ctx.mem;
+  var filas = d.filas;
+  var estados = {};
+  filas.forEach(function (f) { estados[f.n] = f.estado; });
+  var previas = mem.filas[repo];
+
+  /* Caso 1: Claude Code espera su respuesta. */
+  var espera = g.esperando && g.esperando.codigo === 200 ? jsonDe(g.esperando) : null;
+  var esperando = false;
+  if (espera && espera.estado === 'esperando') {
+    var fila = String(espera.fila || '');
+    var filaEnCurso = filas.filter(function (f) { return f.n === fila && f.estado === 'EN CURSO'; })[0];
+    if (!fila || filaEnCurso) {
+      esperando = true;
+      var vig = repo + '|espera|' + fila + '|' + espera.desde;
+      ctx.vigentes[vig] = true;
+      suceso(ctx, { tipo: 'espera', repo: repo, clave: vig, vig: vig,
+        asunto: 'Claude Code espera tu respuesta' + (fila ? ' (fila ' + fila + ')' : ''),
+        cuerpo: 'Claude Code se ha parado y espera que le contestes' + (fila ? ' en la fila ' + fila : '') +
+          ', desde las ' + (espera.desde ? horaDeMadrid(new Date(espera.desde)) : '—') + '. Abre su conversación y contesta.',
+        conv: filaEnCurso ? enlaceDeConversacion(filaEnCurso.texto) : '' });
+    }
+  }
+
+  /* Caso 2: una tarea a medias (EN CURSO sin pasos desde hace más de 90 minutos). */
+  var enCurso = filas.filter(function (f) { return f.estado === 'EN CURSO'; });
+  if (enCurso.length && !esperando) {
+    var ultimo = ultimoPaso(g.actividad, enCurso[0].n);
+    if (ultimo) {
+      enCurso.forEach(function (f) {
+        if (minutosEntre(ultimo, ctx.ahora) <= PARADA_MINUTOS) return;
+        var v = repo + '|parada|' + f.n + '|' + ultimo.toISOString();
+        ctx.vigentes[v] = true;
+        suceso(ctx, { tipo: 'parada', repo: repo, clave: v, vig: v,
+          asunto: 'la fila ' + f.n + ' lleva parada desde las ' + horaDeMadrid(ultimo),
+          cuerpo: 'La fila ' + f.n + ' está EN CURSO, pero no ha habido ningún paso de trabajo desde las ' + horaDeMadrid(ultimo) +
+            ' (hace ' + duracionEnLlano(minutosEntre(ultimo, ctx.ahora)) + '). Puede que Claude Code se haya quedado a medias.',
+          conv: enlaceDeConversacion(f.texto) });
+      });
+    }
+  }
+
+  /* Casos 2 y 3: filas que pasan a BLOQUEADA o a SIN PUBLICACIÓN COMPROBADA. */
+  filas.forEach(function (f) {
+    var v = repo + '|' + f.estado + '|' + f.n;
+    if (f.estado === 'BLOQUEADA' || f.estado === 'SIN PUBLICACION') ctx.vigentes[v] = true;
+    if (!previas || previas[f.n] === f.estado) return;
+    if (f.estado === 'BLOQUEADA') {
+      suceso(ctx, { tipo: 'bloqueada', repo: repo, clave: v + '|' + ctx.iso, vig: v,
+        asunto: 'la fila ' + f.n + ' se ha quedado BLOQUEADA',
+        cuerpo: 'La fila ' + f.n + ' ha pasado a BLOQUEADA: Claude Code no ha podido terminarla y sigue con la siguiente.',
+        conv: enlaceDeConversacion(f.texto) });
+    } else if (f.estado === 'SIN PUBLICACION') {
+      suceso(ctx, { tipo: 'publicacion', repo: repo, clave: v + '|' + ctx.iso, vig: v,
+        asunto: 'la fila ' + f.n + ' no se ha podido comprobar publicada',
+        cuerpo: 'La fila ' + f.n + ' está SIN PUBLICACIÓN COMPROBADA: el cambio está hecho, pero no se ha podido comprobar que esté publicado.',
+        conv: enlaceDeConversacion(f.texto) });
+    }
+  });
+  if (!ctx.prueba || !previas) mem.filas[repo] = estados;
+
+  /* Caso 3: la última publicación de main ha fallado. */
+  var est = g.estado && g.estado.codigo === 200 ? jsonDe(g.estado) : null;
+  if (est && est.statuses) {
+    var vercel = est.statuses.filter(function (s) { return /vercel/i.test(s.context || ''); })[0];
+    if (vercel && (vercel.state === 'failure' || vercel.state === 'error') && !NO_ES_FALLO.test(vercel.description || '')) {
+      var vp = repo + '|publicacion|' + est.sha;
+      ctx.vigentes[vp] = true;
+      suceso(ctx, { tipo: 'publicacion', repo: repo, clave: vp, vig: vp,
+        asunto: 'la última publicación ha fallado',
+        cuerpo: 'Vercel no ha podido publicar el último cambio de main (' + String(est.sha || '').slice(0, 7) + '): ' +
+          cadena(vercel.description, 120) + '. La web puede seguir con la versión anterior.' });
+    }
+  }
+}
+
+function ultimoPaso(actividad, fila) {
+  var js = actividad && actividad.codigo === 200 ? jsonDe(actividad) : null;
+  if (!js || !js.length) return null;
+  var mejor = null;
+  js.forEach(function (a) {
+    var ref = String(a.ref || '').replace(/^refs\/heads\//, '');
+    if (ref === 'main' || ref === 'pruebas' || ref === 'fila-' + fila || ref.indexOf('claude/') === 0) {
+      var t = new Date(a.timestamp);
+      if (!isNaN(t.getTime()) && (!mejor || t.getTime() > mejor.getTime())) mejor = t;
+    }
+  });
+  return mejor;
+}
+
+/* ---------- la app abre ---------- */
+
+function comprobarApp(ctx, repo, respuesta) {
+  var mem = ctx.mem;
+  var dir = mem.direcciones[repo];
+  var a = mem.apps[repo] = mem.apps[repo] || { url: '', estado: 'sin-vigilar', alcance: null, desde: null, comprobado: null,
+                                                 fallos: 0, primerFallo: null, caida: false, avisada: false, enNoche: null };
+  if (!dir || !dir.url) {
+    if (dir && dir.leida && dir.leida !== new Date(0).toISOString()) { a.url = ''; a.estado = 'sin-vigilar'; a.alcance = null; a.desde = null; a.caida = false; a.fallos = 0; }
+    return;
+  }
+  a.url = dir.url;
+  if (!respuesta) return;                          /* esta pasada no se ha pedido (acaba de leerse la dirección) */
+  var m = mirarApp(respuesta);
+  a.comprobado = ctx.iso;
+  if (m.bien) {
+    if (a.caida) {
+      if (a.avisada) {
+        var min = minutosEntre(new Date(a.desde), ctx.ahora);
+        suceso(ctx, { tipo: 'recuperada', repo: repo, clave: repo + '|recuperada|' + a.desde, siempre: true,
+          asunto: 'la app ya funciona',
+          cuerpo: 'La app vuelve a abrir (' + a.url + '). Estuvo caída desde las ' + horaDeMadrid(new Date(a.desde)) + ', unos ' + duracionEnLlano(min) + '.' });
+      } else if (a.enNoche) {
+        mem.noche = mem.noche.filter(function (x) { return x.clave !== a.enNoche; });   /* se arregló antes de avisar: nada que contar */
+      }
+    }
+    a.estado = 'bien'; a.alcance = m.alcance; a.desde = null;
+    a.fallos = 0; a.primerFallo = null; a.caida = false; a.avisada = false; a.enNoche = null;
+    return;
+  }
+  a.fallos = (a.fallos || 0) + 1;
+  if (a.fallos === 1) a.primerFallo = ctx.iso;
+  if (a.fallos >= 2) {
+    a.caida = true; a.estado = 'caida'; a.desde = a.primerFallo;
+    ctx.vigentes[repo + '|caida|' + a.desde] = true;
+    var r = suceso(ctx, { tipo: 'caida', repo: repo, clave: repo + '|caida|' + a.desde, vig: repo + '|caida|' + a.desde,
+      asunto: 'la app no abre',
+      cuerpo: 'La app no responde (' + a.url + ') desde las ' + horaDeMadrid(new Date(a.desde)) + '. Dos comprobaciones seguidas han fallado.' });
+    if (r === 'enviado') a.avisada = true;
+    if (r === 'noche') a.enNoche = repo + '|caida|' + a.desde;
+  }
+}
+
+/* ---------- contestar a quien envió un aviso ---------- */
+
+function contestarAvisos(ctx, repo, d, g) {
+  var mem = ctx.mem;
+  Object.keys(mem.avisos).forEach(function (k) {
+    var a = mem.avisos[k];
+    if (a.repo !== repo || a.estado !== 'esperando') return;
+    var fila = d.filas.filter(function (f) { return f.n === a.fila; })[0];
+    var hecha = false;
+    if (fila) {
+      if (fila.estado === 'DESCARTADA' || fila.estado === 'SUSTITUIDA') { if (!ctx.prueba) a.estado = 'descartado'; return; }
+      hecha = fila.estado === 'HECHA';
+    } else if (g.historia && g.historia.codigo === 200) {
+      a.historia = true;
+      hecha = constaHechaEnLaHistoria(g.historia.texto, a.fila);
+      if (!hecha) { if (!ctx.prueba) a.estado = 'no-encontrada'; return; }
+    } else if (g.historia) {
+      return;                                         /* GitHub no ha dado la historia: se vuelve a intentar */
+    } else if (a.historia) {
+      a.estado = 'no-encontrada'; return;
+    } else {
+      return;
+    }
+    if (!hecha || ctx.silencio || ctx.prueba) return;
+    var enLlano = a.tipo === 'error';
+    var pantalla = a.pantalla ? ' en la pantalla «' + a.pantalla + '»' : '';
+    var asunto = a.app + ': ' + (enLlano ? 'tu aviso ya está resuelto' : 'tu propuesta ya está hecha');
+    var cuerpo = enLlano
+      ? 'Hola. Tu aviso del ' + fechaLarga(a.fecha) + pantalla + ' de ' + a.app + ' ya está resuelto. Ábrela y compruébalo. ' +
+        'Si sigue fallando, vuelve a pulsar el botón de soporte. Este correo sale solo; si respondes, le llega a Francisco.'
+      : 'Hola. Tu propuesta del ' + fechaLarga(a.fecha) + pantalla + ' de ' + a.app + ' ya está hecha. Ábrela y mírala. ' +
+        'Si no es lo que pedías, vuelve a pulsar el botón de soporte. Este correo sale solo; si respondes, le llega a Francisco.';
+    try { mandar(a.correo, asunto, cuerpo, ctx.francisco[0] || ''); } catch (err) { return; }
+    a.estado = 'contestado';
+    a.fecha = Utilities.formatDate(ctx.ahora, 'Europe/Madrid', 'yyyy-MM-dd');
+  });
+}
+
+function constaHechaEnLaHistoria(texto, fila) {
+  var re = new RegExp('(?:\\bfilas?\\s+|^\\|\\s*|^#+\\s*)' + fila + '\\b', 'i');
+  return String(texto || '').split('\n').some(function (l) { return re.test(l) && /HECHA|hecha|publicad/.test(l); });
+}
+
+/* ---------- el fichero para la página ---------- */
+
+function escribirEstado(ctx) {
+  var mem = ctx.mem;
+  var repos = {};
+  Object.keys(mem.apps).forEach(function (r) {
+    var a = mem.apps[r];
+    if (!mem.filas[r] && !a.comprobado) return;
+    repos[r] = { app: { url: a.url || null, estado: a.estado, alcance: a.alcance || null,
+      desde: a.estado === 'caida' ? a.desde : null, comprobado: a.comprobado || null } };
+  });
+  Object.keys(mem.filas).forEach(function (r) {
+    if (!repos[r]) repos[r] = { app: { url: null, estado: 'sin-vigilar', alcance: null, desde: null, comprobado: null } };
+  });
+  var avisos = {};
+  Object.keys(mem.avisos).forEach(function (k) { avisos[k] = { estado: mem.avisos[k].estado, fecha: mem.avisos[k].fecha }; });
+  var texto = JSON.stringify({ version: VERSION_SCRIPT, actualizado: ctx.iso, cadaMinutos: CADA_MINUTOS, repos: repos, avisos: avisos });
+  escribirFichero(carpetaRaiz(), FICHERO_ESTADO, texto);
+}
+
+/* ---------- el disparador y la prueba de prepararTodo ---------- */
+
+/* Pone el disparador (una sola vez, sin duplicarlo) y hace una pasada de prueba SIN
+   mandar avisos. Devuelve el texto que se añade al correo de resumen. */
+function prepararVigilante() {
+  try {
+    var hay = ScriptApp.getProjectTriggers().filter(function (t) { return t.getHandlerFunction() === 'vigilar'; });
+    var texto = '\n\n— El vigilante —\n';
+    if (!hay.length) {
+      ScriptApp.newTrigger('vigilar').timeBased().everyMinutes(CADA_MINUTOS).create();
+      texto += 'Disparador puesto: cada ' + CADA_MINUTOS + ' minutos.\n';
+    } else {
+      texto += 'El disparador ya estaba puesto.\n';
+    }
+    var inf = pasadaDelVigilante({ prueba: true });
+    if (inf.ocupado) return texto + 'La pasada de prueba no se ha hecho: había otra en marcha.\n';
+    texto += 'Los avisos llegarán a: ' + (inf.francisco && inf.francisco.length ? inf.francisco.join(', ') : '(ninguna dirección)') + '\n';
+    texto += 'Repositorios vigilados (' + inf.vigilados.length + '): ' + (inf.vigilados.join(', ') || 'ninguno') + '\n';
+    texto += 'Apps:\n';
+    inf.vigilados.forEach(function (r) {
+      var a = inf.apps[r];
+      var que = !a || a.estado === 'sin-vigilar' ? 'sin vigilar (no tiene dirección escrita)'
+        : a.url + ' — ' + (a.alcance === 'entrada' ? 'solo se llega a la entrada de Google' : (a.estado === 'bien' ? 'se llega a la app entera' : (a.fallos ? 'no responde' : 'aún sin comprobar')));
+      texto += '  · ' + r + ': ' + que + '\n';
+    });
+    return texto;
+  } catch (err) {
+    return '\n\nNo he podido poner el vigilante: ' + textoDe(err) + '\n';
+  }
 }

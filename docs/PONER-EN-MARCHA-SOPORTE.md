@@ -78,3 +78,58 @@ Si alguna vez se cambia `apps-script/soporte.gs`, hay que:
 
 **Si un aviso se guarda en Drive pero no sale en el Centro de mando,** te llega un correo (como mucho
 uno por app y día) con el motivo y el enlace al aviso; no lleva el texto de quien lo escribió.
+
+## El vigilante (fila 268, `docs/VIGILANTE-Y-CORREOS.md`)
+
+El mismo script lleva, desde la fila 268, un **vigilante**: la función `vigilar`, que un disparador
+ejecuta **cada diez minutos**. No gasta cuota de Claude. Hace tres cosas:
+
+1. **Te manda un correo** cuando algo te obliga a hacer algo: Claude Code espera tu respuesta, una
+   fila lleva más de 90 minutos EN CURSO sin pasos (o pasa a BLOQUEADA o a SIN PUBLICACIÓN
+   COMPROBADA), la última publicación de `main` ha fallado, llega un aviso de un usuario, o una app
+   no abre (dos comprobaciones seguidas mal) y cuando vuelve a abrir. De lo que sale bien no avisa.
+   De 23:00 a 7:00 (Madrid) calla; a las 7:00 manda un solo correo, «resumen de la noche», con lo que
+   sigue sin resolver.
+2. **Comprueba que cada app abre**: entra en su dirección (la de «Dirección publicada» de su
+   `docs/CONTEXTO-CORTO.md`, que relee cada seis horas) y la da por buena si responde. Si solo llega
+   a la pantalla de entrada de Google, también, y lo apunta. Las que no tienen dirección escrita
+   salen «sin vigilar».
+3. **Contesta a quien envió un aviso** (si el botón de su app manda su correo, fila 269) cuando su
+   fila queda HECHA: «tu aviso ya está resuelto» (o «tu propuesta ya está hecha»). Si la descartas
+   no escribe a nadie. Si quien avisó eres tú, tampoco.
+
+**Qué vigila:** todos los repositorios `fmargon780/…` a los que llega el permiso de GitHub y que
+tienen `docs/COLA.md` (lo relee cada seis horas; si no puede, usa `REPOS_PERMITIDOS`). No hay nada
+que configurar.
+
+**A qué dirección te escribe:** a la propiedad opcional del script **`CORREO_AVISOS`** (una o varias
+direcciones separadas por comas). Si no la pones, al dueño del script y a las cuentas con las que
+está compartida la carpeta `SOPORTE-AVISOS`.
+
+**Qué es «publicación fallada»:** el estado «Vercel» del último cambio de `main` en GitHub. Con
+ejemplos reales de este repositorio: un cambio solo de documentos queda `success` con «Canceled by
+Ignored Build Step» y uno publicado `success` con «Deployment has completed». Es fallo solo un
+estado `failure` o `error` cuya descripción no sea de las que se saltan a propósito («Ignored Build
+Step») ni del tope diario de la cuenta («Resource is limited», «limit», «rate limit»). Los
+proyectos que no publican en Vercel no tienen esta señal.
+
+**Qué recuerda y dónde:** su memoria es un fichero privado en Drive, `SOPORTE-AVISOS/_VIGILANTE/memoria.json`
+(no lo toques). Para la página del Centro de mando escribe `SOPORTE-AVISOS/ESTADO-VIGILANTE.json`,
+sin nombres, correos ni textos de avisos.
+
+**Cuántas llamadas hace una pasada:** por proyecto activo, 4: la cola, el estado de la publicación,
+`ESPERANDO.json` y la dirección de la app; +1 si tiene una fila EN CURSO (la actividad de las ramas);
+cada seis horas, además, 1 para la lista de repositorios y 2 por proyecto para leer su dirección. Van
+juntas con `UrlFetchApp.fetchAll`. Con 13 proyectos son unas 52 por pasada (65 como mucho): unas 7.500
+al día de las 20.000 que admite una cuenta personal (el tope que se ha puesto es 12.000). Los
+proyectos sin cambios en 14 días y sin nada pendiente se miran una vez por hora. Google no deja fijar
+un plazo a cada petición: una app que no responde acaba en error por el límite propio de Google y
+cuenta como «mal».
+
+**Cómo pararlo:** en el proyecto de Google, «Activadores» (el reloj de la izquierda) → borrar el
+activador de `vigilar`. Para volver a ponerlo, ejecutar `prepararTodo`.
+
+**Para ponerlo en marcha:** pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (Google pide un
+permiso nuevo, una sola vez), leer el correo de resumen y hacer «Implementar» → «Administrar
+implementaciones» → «Nueva versión». `prepararTodo` pone el disparador (una sola vez, aunque se
+ejecute varias) y hace una pasada de prueba sin mandar ningún aviso.

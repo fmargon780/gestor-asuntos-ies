@@ -362,6 +362,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/salir-de-elegir-asunto.mjs` | Prueba de la fila 230: ✕, Cancelar, Escape y «No está: crear un asunto nuevo» de «Guardar en un asunto» (documento y correo) |
 | `pruebas/soporte.mjs` | Prueba en navegador (fila 213): botón, validación, buzón sin configurar, dirección en Ajustes, envío con buzón de mentira, fallo sin perder el texto, captura reducida, cierre |
+| `pruebas/vigilante-script.mjs` | Prueba (con `vm`, fila 268): el vigilante de `soporte.gs` con GitHub, Drive, correo, reloj, cerrojo y disparadores falsos: los cinco casos de aviso, el silencio de 23:00 a 7:00, las apps caídas, la respuesta a quien avisó y el fichero de estado |
 | `pruebas/soporte-script.mjs` | Prueba (con `vm`, fila 213): `apps-script/soporte.gs` con Drive y GitHub falsos: rechazos, carpeta, fila de la cola sin datos del usuario, conflicto y reintento |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/lector-documentos.mjs` | `LectorDocumentos.analizar`, puro, sin pdf.js ni navegador: sello, DNI de un tercero, dos terceros o dos tipos empatados, DNI con la letra mal, texto vacío (17-sep-2026, fila 41) |
@@ -427,7 +428,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |
 | `pruebas/documentos-en-la-tarjeta.mjs` | Prueba (navegador de verdad, fila 114, 24-sep-2026): con 8 documentos, la tarjeta cerrada enseña como mucho 5 nombres y «y N más», sin la línea «8 documentos», sin renglones aplastados ni cortados, con `title`, y «y N más» abre la tarjeta |
 | `apps-script/gestor-correos.gs` | El script de Gmail: recoger correos, y, desde la fila 115, la aplicación web (`doPost`) que el navegador llama directamente para enviar de verdad (`enviarCorreo`, `hiloParaResponder`, `prepararEnvio`) |
-| `apps-script/soporte.gs` | El buzón de soporte (fila 213): `doPost` guarda el aviso en Drive (`SOPORTE-AVISOS/<app>`) y apunta una IDEA en `docs/COLA.md` con la API de GitHub (`GITHUB_TOKEN` en las propiedades del script); `prepararTodo` |
+| `apps-script/soporte.gs` | El buzón de soporte (fila 213): `doPost` guarda el aviso en Drive (`SOPORTE-AVISOS/<app>`) y apunta una IDEA en `docs/COLA.md` con la API de GitHub (`GITHUB_TOKEN` en las propiedades del script); `prepararTodo`; desde la fila 268, el vigilante (`vigilar`, cada 10 minutos: correos de aviso, apps que abren, respuesta a quien avisó, `ESTADO-VIGILANTE.json`) |
 | `docs/BOTON-DE-SOPORTE.md`, `docs/PONER-EN-MARCHA-SOPORTE.md` | El diseño de la fila 213 y los cinco pasos de Francisco para poner en marcha el buzón |
 | `pruebas/preguntas-en-el-guion.mjs` | Prueba (sin navegador, fila 116, 24-sep-2026): preguntas en el guion de un hito — normalizar (un solo nivel), `guionDe` sin y con respuesta, cambiar de respuesta con líneas marcadas (plegadas), la cuenta y el marcado automático dentro de la respuesta elegida |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
