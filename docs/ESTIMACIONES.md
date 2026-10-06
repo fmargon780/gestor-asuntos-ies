@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 278 | 110 | Un fichero nuevo con el cálculo de los bloques (uno o dos niveles, meses, «Sin dato», sumas por bloque), dos desplegables en la ventana de exportar que siguen a las columnas marcadas, el informe en PDF pintado por bloques con el corte de páginas cuidando títulos y líneas de cierre, una prueba nueva y el revisor con 14 puntos |
 | 279 | 100 | Un cuadro común de parecidos que mira también nombres antiguos y cortos, siete puertas que lo usan (tres ya avisaban, cuatro no), «Cambiar el nombre» que ofrece unir, una prueba nueva con navegador y otra de dos ventanas, pruebas viejas que cambian de texto y el revisor con 14 puntos |
 | 280 | 210 | Función nueva y delicada que cambia texto dentro de un Word aunque esté partido en trozos, las propuestas de cuatro grupos (datos, quien firma, formas dobles, quitar), una pantalla completa de dos pasos con selección a mano y comparación con el original, el guardado (fichero, plantilla y tarea en la guía), documentos nuevos en la copia de demostración, dos pruebas nuevas y el revisor con 22 puntos |
 | 281 | 110 | Dos funciones nuevas (del PDF a párrafos y de párrafos a un Word con el aspecto de las plantillas del centro), tres comprobaciones antes de abrir, propuestas de «Quitar» propias del PDF, el PDF en la columna del original, dos PDF nuevos en la copia de demostración, una prueba nueva y el revisor con 12 puntos |
