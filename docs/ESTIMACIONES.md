@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 285 | 210 | Un módulo nuevo que recorre las tareas con acción del hito (generar con PDF guardado solo, parada en el registro, correo con adjunto), el apunte compartido en el hito, la pasada de fondo que reconoce el PDF sellado sin preguntar, el aviso de Inicio y sus dos coletillas, dos asuntos nuevos en la demostración, una prueba nueva con trece casos y el revisor con 12 puntos |
 | 286 | 100 | Un módulo nuevo y pequeño: la casilla en el cuadro de nombre, terminar la espera con «Deshacer», el botón «No ha llegado nada» y la marca «sin respuesta» en cuatro sitios, dos asuntos en la demostración, una prueba nueva con once casos y el revisor con 11 puntos |
 | 287 | 240 | Un fichero y un módulo nuevos (el perfil), la sección de Ajustes, leer el perfil antes de proteger las carpetas, la sesión de directivo protegida con una sola puerta para escribir, `Perfil.veAsunto` en Inicio, buscador, Archivo y ficha de persona, el menú recortado, tres nombres y asuntos de todos los órganos en la demostración, una prueba nueva con nueve casos y el revisor con 12 puntos |
 | 288 | 270 | Dos ficheros nuevos (el reparto de unas cuarenta secciones en cuatro pestañas con una sola tabla, y el buscador con sus otras palabras), ocho secciones mudadas a Herramientas, tres cambios de nombre, el salto común a una sección, unas treinta pruebas que entran en Ajustes por su pestaña, una prueba nueva y el revisor con 17 puntos |
