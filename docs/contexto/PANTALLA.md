@@ -280,6 +280,14 @@ La hoja (`js/exportar-hoja.js`, `ExportarHoja`) es un `.xlsx` escrito con JSZip 
 total, y «Hitos»). El informe (`js/exportar-informe.js`, `ExportarInforme`, `css/exportar.css`) usa la capa del
 Word: membrete de la Junta, tabla paginada midiendo (apaisada con más de 5 columnas), «Guardar PDF» (imagen de
 cada página a 200 ppp, se descarga), «Imprimir» y «Cerrar». Prueba: `pruebas/exportar-asuntos.mjs`.
+**Informe agrupado** (fila 278, `docs/INFORME-AGRUPADO.md`): en la ventana del PDF, «Agrupar por» e «Y dentro, por»
+(`#exp-agrupar-1/2`, hasta dos columnas de las marcadas; se recuerda en `gestor-exportar-agrupar-pdf`). El cálculo
+(`js/exportar-agrupar.js`, `ExportarAgrupar.agrupar(tabla, ids)`) agrupa sobre lo que se lee en cada celda (un reservado va a
+«Reservado»): texto por valor sin mayúsculas/tildes, fechas por mes («Octubre de 2026»), «Sin dato» siempre el último, y
+devuelve bloques con posiciones de fila, número de asuntos y sumas. El informe pinta título de bloque, una tabla por
+bloque del último nivel sin las columnas por las que se agrupa, y línea de cierre («Tipo: 12 asuntos · Total Importe: …»); sin
+saltos de página entre bloques, título + fila de títulos + primer asunto juntos, cierre con el último asunto y «(continúa)»
+al repetir el título. El total general no cambia. La hoja de cálculo, tampoco. Prueba: `pruebas/informe-agrupado.mjs`.
 
 ### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
 ### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
