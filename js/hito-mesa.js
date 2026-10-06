@@ -286,6 +286,7 @@ var HitoMesa = (function () {
           '<button type="button" class="mesa-meta mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
         '</div>' +
         '<div class="mesa-acciones">' +
+          (abierto && window.HacerEsteHito ? HacerEsteHito.botonHTML(a, h) : '') +   /* fila 285 */
           (abierto ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="generar" aria-expanded="false">Generar documento ▾</button>' +
             '<div class="mesa-panel mesa-panel-generar oculto"><div class="mesa-plantillas"></div>' +
             (window.Formularios ? Formularios.listaHTML(h.formularios, 'Impresos') : '') + '</div></div>' : '') +
@@ -298,6 +299,7 @@ var HitoMesa = (function () {
           (abierto ? '<button type="button" class="boton mesa-mas" title="Crear, cambiar o borrar el hito">Hito ▾</button>' : '') +
         '</div>' +
       '</div>' +
+      (abierto && window.HacerEsteHito ? HacerEsteHito.lineaHTML(a, h) : '') +
       (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
         /* Fila 249: en un tipo que hay que liquidar, no se archiva: se pasa a «Por liquidar». */
         (window.PorLiquidar && PorLiquidar.exige(a) && PorLiquidar.estaPorLiquidar(a)
@@ -312,6 +314,7 @@ var HitoMesa = (function () {
     var volverHitos = cab.querySelector('#mesa-volver-hitos');
     if (volverHitos) volverHitos.onclick = cerrar;
     engancharPaneles(cab, a, h);
+    if (abierto && window.HacerEsteHito) HacerEsteHito.enganchar(cab, a, h);
     var archivarBtn = cab.querySelector('.mesa-archivar-asunto');
     if (archivarBtn) archivarBtn.onclick = function () {
       /* Lo mismo que el botón de la cabecera de la ficha (fila 106,
@@ -321,7 +324,7 @@ var HitoMesa = (function () {
       if (real) { real.click(); return; }
       U.mientrasGuarda(archivarBtn, function () { return App.cerrarAsunto(a); });
     };
-    if (abierto && completo && !completoAntes) preguntarGuionCompleto(a, h, fila);
+    if (abierto && completo && !completoAntes && !(window.HacerEsteHito && HacerEsteHito.enCurso(a, h))) preguntarGuionCompleto(a, h, fila);
     if (!abierto || !window.FichaMenus) return;
 
     /* "Marcar como hecho": pulsa por debajo la misma casilla de siempre

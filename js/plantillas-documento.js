@@ -242,7 +242,12 @@
 
     if (typeof App.abrirFicha === 'function') App.abrirFicha(asunto, modo);
     /* Fila 155, B: el Word recién hecho, en grande dentro de la aplicación. */
-    if (window.WordVisor) WordVisor.abrir({ blob: resultado.blob, nombre: nombreDoc, carpeta: asunto.handle, asunto: asunto, hito: hito });
+    if (window.WordVisor) {
+      var abierto = WordVisor.abrir({ blob: resultado.blob, nombre: nombreDoc, carpeta: asunto.handle, asunto: asunto, hito: hito });
+      /* Fila 285 («Hacer este hito»): quien lo pide hace algo con el visor ya pintado (guardar el PDF solo). */
+      if (opciones && opciones.alAbrirVisor) await opciones.alAbrirVisor(nombreDoc, abierto);
+    }
+    return { nombre: nombreDoc };
   }
 
   /* ==========================================================

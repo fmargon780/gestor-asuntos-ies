@@ -249,7 +249,7 @@ await comprobar('10. dice que usa el Word del PDF', pagina.locator('.cep-aviso-g
 await comprobar('10. propone cambiar el nombre de Marta', (await lineas()).some((l) => /Marta Otero Campos/.test(l)), true);
 await pagina.click('.cep-pie-botones >> text=Cancelar');
 await pagina.waitForSelector('#convertir-plantilla', { state: 'detached' });
-await comprobar('10. cancelar sin haber cambiado nada: sale sin preguntar y no hay plantillas nuevas', [await pagina.locator('#capa:not(.oculto)').count(), await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.length)], [0, 1]);
+await comprobar('10. cancelar sin haber cambiado nada: sale sin preguntar y no hay plantillas nuevas', [await pagina.locator('#capa:not(.oculto)').count(), await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.length)], [0, 2]);   /* la plantilla de la copia de pruebas de la fila 285 y la de la fila 280 */
 const entradaDoc = await menuDe('notas antiguas.doc');
 await comprobar('10. un .doc viejo: apagada, con su motivo', [await entradaDoc.isDisabled(), await entradaDoc.getAttribute('title')], [true, 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.']);
 await pagina.keyboard.press('Escape');

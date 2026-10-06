@@ -60,6 +60,9 @@
       ['Jimenez Rubio, Mateo', '2100011', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculado', '21/12/2010', '600111333', 'tutor.mateo@correo-demo.es'],
       ['Klein Soto, Ana', '2100012', '1º de E.S.O.', '1º C', '20' + anoMatricula, 'Matriculada', '09/09/2014', '600222444', 'tutor.ana@correo-demo.es'],
       ['Lara Quintero, Bruno', '2100013', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculado', '15/10/2012', '600333555', 'tutor.bruno@correo-demo.es'],
+      /* Fila 285: las dos alumnas y alumnos de «Hacer este hito», con correo del tutor para poder enviarles el certificado. */
+      ['Vidal Soto, Irene', '2100030', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculada', '12/05/2010', '600121212', 'tutor.irene@correo-demo.es'],
+      ['Moreno Sanz, Hugo', '2100031', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculado', '30/01/2010', '600131313', 'tutor.hugo@correo-demo.es'],
       /* aspirante sin matricular: sin fila propia hasta que se dé de alta a mano */
       /* un alumno antiguo (ya no está matriculado este curso) */
       ['Moya Santana, Elena', '2099998', '4º de E.S.O.', '4º A', '20' + (parseInt(anoMatricula, 10) - 1), 'Baja', '02/02/2010', '600444888', 'tutor.elena@correo-demo.es']
@@ -202,12 +205,22 @@
     consejo.nombreCorto = 'CertConsEsc';
     await App.guardarTipos();
 
+    /* Fila 285: el tipo cuyo primer hito tiene tareas de generar, registrar y comunicar (js/demo/datos-hacer-hito.js). */
+    var notas = null;
+    if (window.Demo.hacer) {
+      var idPlantilla = await Demo.hacer.crearPlantilla();
+      notas = await crearTipoConGuia('CERTIFICADO DE NOTAS', 'ALUMNADO', [
+        { titulo: 'Preparar y enviar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo', guion: Demo.hacer.guion(idPlantilla) },
+        { titulo: 'Archivar el expediente', cuerpo: '<p>Dejar la copia en la carpeta.</p>', responsable: 'yo' }
+      ], null);
+    }
+
     /* Fila 284: una guía de la tabla de plazos legales (Reclamación de calificaciones), con sus tres hitos
        sacados de la biblioteca y SIN plazo: el que se lo pone es la pasada de js/plazos-del-centro.js. */
     await crearReclamacion();
 
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
-             'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo };
+             'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo, 'CERTIFICADO DE NOTAS': notas };
   }
 
   /* ---------- plantilla de correo ---------- */
@@ -382,6 +395,11 @@
       datos: { campos: { 'propio:p-importe-factura': { valor: '125,5', enNombre: false },
                          'propio:p-fecha-factura': { valor: hace(58), enNombre: false } } }
     });
+
+    /* Fila 285: dos asuntos para «Hacer este hito» (uno sin tocar y otro esperando el PDF sellado). */
+    if (window.Demo.hacer && tipos['CERTIFICADO DE NOTAS']) {
+      await Demo.hacer.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });
+    }
 
     /* 6d. fila 244: dos facturas más, con un importe negativo y uno que no es una cifra
        («unos 30 euros»), para probar el cambio de clase de «Importe de la factura». */
@@ -571,6 +589,11 @@
     if (window.PlazosDelCentro) {
       var plazos = await PlazosDelCentro.pasada({ forzar: true });
       if (plazos) PlazosDelCentro.avisar(plazos);
+    }
+    /* Fila 285: ya recargado, la pasada que coloca el PDF sellado (sale «1 listos para enviar»). */
+    if (window.Demo.hacer) {
+      if (window.Gestor && Gestor.recargar) await Gestor.recargar();
+      await Demo.hacer.alAcabar();
     }
   }
 

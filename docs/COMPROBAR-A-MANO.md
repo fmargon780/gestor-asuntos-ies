@@ -217,3 +217,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 284 — plazos legales en la biblioteca (6-oct-2026)
 
 - En el centro, al abrir la app tras actualizarse, sale una vez la línea verde «Plazos legales puestos en N hitos de M guías…». En Ajustes, la guía de «Reclamación de calificaciones»: «Remitir el expediente a la Delegación Territorial» dice «3 días hábiles desde «Registrar la reclamación a la Delegación»». Si faltan los festivos, sale debajo el aviso ámbar con «Ponerlos».
+
+## Fila 285 — «Hacer este hito» (6-oct-2026)
+
+- En el centro, con un certificado de verdad: «Hacer este hito», firmar, registrar en Séneca y guardar el PDF sellado en la carpeta del asunto. La app lo reconoce sin preguntar y el correo sale preparado con ese PDF.

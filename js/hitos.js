@@ -144,6 +144,7 @@ var Hitos = (function () {
       salida.avisarLoPidePlantilla = String(h.avisarLoPidePlantilla || '');
     }
     if (h && h.avisoLoPideHecho) salida.avisoLoPideHecho = true;
+    if (h && h.cadena && h.cadena.estado && salida.estado !== 'hecho') salida.cadena = Object.assign({}, h.cadena);   /* fila 285 */
     /* La fecha en que se dio por hecho (fila 102, para {hecho:...}).
        Solo si la hay: los hitos de antes no la tienen, y no se inventa. */
     if (h && h.hechoEl) salida.hechoEl = String(h.hechoEl);

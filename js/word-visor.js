@@ -114,6 +114,8 @@ var WordVisor = (function () {
     capa.classList.add('oculto');
     document.body.classList.remove('con-word-visor');
     capa.querySelector('.word-visor-hoja').innerHTML = '';
+    var f = capa.querySelector('.word-visor-franja');
+    if (f) f.remove();
     actual = null;
   }
 
@@ -159,14 +161,15 @@ var WordVisor = (function () {
     try { await carpeta.getFileHandle(nombre); return true; } catch (e) { return false; }
   }
 
-  async function guardarPdf(boton) {
-    if (!actual || !actual.carpeta) return;
+  /* Devuelve si el PDF se ha guardado. `opciones.sinCerrar` (fila 285): el visor se queda abierto. */
+  async function guardarPdf(boton, opciones) {
+    if (!actual || !actual.carpeta) return false;
     var nombre = nombrePdf(actual.nombre);
     var mismo = actual;
     if (await yaExiste(mismo.carpeta, nombre)) {
       var ok = await U.preguntar('Ya hay un PDF con ese nombre',
         '<p>En la carpeta ya está «' + U.escapar(nombre) + '». ¿Lo sustituyo por este?</p>', 'Sustituirlo');
-      if (!ok) return;
+      if (!ok) return false;
     }
     try {
       await U.mientrasGuarda(boton, async function () {
@@ -176,7 +179,7 @@ var WordVisor = (function () {
         await w.write(blob);
         await w.close();
       });
-    } catch (e) { U.fallo('No he podido guardar el PDF', e); return; }
+    } catch (e) { U.fallo('No he podido guardar el PDF', e); return false; }
     U.aviso('PDF guardado en la carpeta del asunto: ' + nombre, 'bueno');
     /* Fila 160: con su PDF, el Word pasa a «Versiones previas». */
     if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(mismo.carpeta);
@@ -194,10 +197,25 @@ var WordVisor = (function () {
     /* Fila 173, punto 7: guardado ya el PDF, se vuelve a la mesa del
        hito sin tener que pulsar "Cerrar". Si algo principal ha fallado
        arriba, ya se ha salido antes con `return` y el visor sigue abierto. */
-    cerrar();
+    if (!(opciones && opciones.sinCerrar)) cerrar();
+    return true;
+  }
+
+  /* Fila 285: una franja verde bajo la barra del visor (la quita `cerrar`). */
+  function franja(texto) {
+    if (!capa) return;
+    var f = capa.querySelector('.word-visor-franja');
+    if (!f) {
+      f = document.createElement('div');
+      f.className = 'word-visor-franja aviso aviso-verde';
+      capa.insertBefore(f, capa.querySelector('.word-visor-hoja'));
+    }
+    f.textContent = texto;
+    return f;
   }
 
   return { abrir: abrir, cerrar: cerrar, cerrarSiAbierto: cerrarSiAbierto, abierto: abierto,
-           nombrePdf: nombrePdf, hacerPdf: hacerPdf, pintarEn: pintarEn };
+           nombrePdf: nombrePdf, hacerPdf: hacerPdf, pintarEn: pintarEn,
+           guardarPdfAhora: function (opciones) { return guardarPdf(null, opciones); }, franja: franja };
 })();
 window.WordVisor = WordVisor;

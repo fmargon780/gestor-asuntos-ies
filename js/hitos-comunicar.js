@@ -192,8 +192,11 @@
       extra.documentoSeneca = opciones.documentoSeneca;
     }
 
+    /* Fila 285: «Todavía no» en vez de «Cerrar», si lo pide «Hacer este hito». */
+    if (opciones && opciones.cerrarTexto) extra.cerrarTexto = opciones.cerrarTexto;
     if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
-    window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', extra);
+    /* La promesa acaba al cerrarse el cuadro (la cadena de «Hacer este hito» espera a eso). */
+    return window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', extra);
   }
 
   /* Fila 153: «Enviar ▾» de un documento del hito, por correo o por
