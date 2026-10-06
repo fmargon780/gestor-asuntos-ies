@@ -95,6 +95,14 @@ await pagina.evaluate(async () => { App.E.tipos.push({ tipo: 'FIN NUEVO', catego
 const antesAvisos = (await avisos()).length;
 await pagina.evaluate(() => TiposParecidos._pasada());
 await comprobar('3. en solo consulta no se une nada y no sale el trozo del aviso', pagina.evaluate(() => [App.E.tipos.some((t) => t.tipo === 'FIN ANTIGUO'), !!document.body.textContent.match(/tipos de asunto parecidos|Tipos de asunto parecidos/)]), [true, false]);
+await comprobar('3. también con la marca puesta pero pausada (la copia de pruebas la pausa al montar sus datos)', pagina.evaluate(async () => {
+  SoloConsulta.activo = () => false;
+  localStorage.setItem('gestor.soloConsulta', '1');
+  await TiposParecidos._pasada();
+  const r = [App.E.tipos.some((t) => t.tipo === 'FIN ANTIGUO'), !!document.body.textContent.match(/tipos de asunto parecidos|Tipos de asunto parecidos/)];
+  localStorage.removeItem('gestor.soloConsulta');
+  return r;
+}), [true, false]);
 await pagina.evaluate(() => { SoloConsulta.activo = window.__sc; });
 
 console.log('--- 4. con un guardado en marcha, espera ---');

@@ -230,6 +230,12 @@ var TiposParecidos = (function () {
     return unidas;
   }
 
+  /* En solo consulta, también con la marca puesta pero pausada (la copia de pruebas la pausa mientras monta sus datos). */
+  function soloConsulta() {
+    if (window.SoloConsulta && SoloConsulta.activo()) return true;
+    try { return window.localStorage.getItem('gestor.soloConsulta') === '1'; } catch (e) { return false; }
+  }
+
   /* ---------- el aviso de Inicio ---------- */
 
   var ultimas = [];
@@ -238,7 +244,7 @@ var TiposParecidos = (function () {
     if (!window.AvisosLinea) return;
     var texto = '';
     ultimas = [];
-    if (!(window.SoloConsulta && SoloConsulta.activo())) {
+    if (!soloConsulta()) {
       try { ultimas = await parejas(); } catch (e) { ultimas = []; }
       if (ultimas.length) texto = ultimas.length === 1 ? '2 tipos de asunto parecidos' : 'Tipos de asunto parecidos: ' + ultimas.length + ' parejas';
     }
@@ -276,7 +282,7 @@ var TiposParecidos = (function () {
     trabajando = true;
     var unidas = 0;
     try {
-      if (!(window.SoloConsulta && SoloConsulta.activo())) {
+      if (!soloConsulta()) {
         unidas = await unirSolos();
         if (unidas) ultimaFirma = firma();
       }
