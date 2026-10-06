@@ -467,3 +467,4 @@ de `App` va después del fichero que lo define.
 | `pruebas/datos-favoritos.mjs` | Prueba de la fila 272: la unidad del alumnado, elegir hasta 3, una elección por clase, guardado en `_GESTOR`, archivo, modo consulta, cabecera encogida y 1280 px |
 | `js/plantilla-de-lo-escrito.js` | Fila 270: «Guardar como plantilla nueva» de los cuadros de Correo y de Séneca (quitar saludo y firma, cambiar datos por huecos, abrir el editor con lo escrito) |
 | `pruebas/plantilla-de-lo-escrito.mjs` | Prueba de la fila 270: la parte pura y el recorrido en los dos cuadros |
+| `pruebas/guia-siempre-al-dia.mjs` | Prueba de la fila 273 (sin navegador): `GuiasDelCentro.ponerAlDia` — asunto nuevo con la guía guardada, asunto sin hitos de más, hitos nuevos que llegan, sin lecturas de más, guardado en marcha, lectura que falla |

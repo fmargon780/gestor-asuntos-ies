@@ -139,7 +139,9 @@
      crea nada y no lo marca de ninguna forma: el próximo repintado
      lo volverá a intentar solo. */
   async function crearSiToca(a, clave, tipo, abierto) {
-    if (!abierto || enConsulta() || creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
+    if (!abierto || enConsulta()) return null;
+    if (window.GuiasDelCentro) await GuiasDelCentro.ponerAlDia();   /* fila 273 */
+    if (creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
     var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
     if (!pasos.length) return null;
     creandoDesdeGuia[clave] = true;
@@ -156,7 +158,9 @@
 
   /* Fila 118 (js/hitos-sincronizar.js): como crearSiToca, pero añade los pasos nuevos de la guía. */
   async function completarSiToca(clave, entrada, tipo, abierto) {
-    if (!abierto || enConsulta() || creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
+    if (!abierto || enConsulta()) return null;
+    if (window.GuiasDelCentro) await GuiasDelCentro.ponerAlDia();   /* fila 273 */
+    if (creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
     if (!Hitos.completarAsuntoConGuia) return null;
     var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
     if (!pasos.length) return null;

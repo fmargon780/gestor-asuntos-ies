@@ -9,6 +9,15 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 Cada tipo de asunto puede llevar una lista de pasos, con título y explicación (negrita, viñetas,
 enlaces), en el orden del trámite, guardados en `_GESTOR/guias.json`.
 
+**La guía que se usa es siempre la guardada** (fila 273, `docs/GUIA-SIEMPRE-AL-DIA.md`): `guias.json` se lee
+al arrancar, y además `GuiasDelCentro.ponerAlDia()` (`js/guias-enganche.js`) la vuelve a leer, barata (mira la
+fecha del fichero; sin fecha, como mucho cada 3 s), callada (si falla se queda la copia) y sin leer con un
+guardado en marcha, **antes de crear los hitos de un asunto** (`pasosOMinima`, `js/hitos.js`), **antes de
+añadir hitos a uno ya creado** (`crearSiToca`/`completarSiToca`, `js/hitos-panel.js`), **al entrar en «Nuevo
+asunto»** (`App.prepararNuevo`, repinta el resumen si cambió) y **al abrir Ajustes de un tipo**
+(`App.abrirTipoDeAsunto`). Así una ventana abierta desde hace horas no usa una guía vieja. Prueba:
+`pruebas/guia-siempre-al-dia.mjs`.
+
 **Desde el 17-sep-2026 (fila 26, `docs/HITOS-SON-LA-GUIA.md`) los pasos de la guía SON los hitos
 del asunto** (ver la sección siguiente): la guía ya no se lee como texto con casillas dentro de
 la ficha, solo se escribe y se edita. `pasosHechos`/`pasosElegidos` (en `asuntos.json`) solo se

@@ -292,8 +292,10 @@
   }
 
   /* Los tres ficheros que App mantiene en memoria se recargan solos.
-     Los demás (guías, recurrentes, frescura) se leen justo al abrir su
-     propia pantalla, así que basta con avisar. */
+     Recurrentes y frescura se leen justo al abrir su propia pantalla, así
+     que basta con avisar. Las guías se ponen al día solas (fila 273,
+     GuiasDelCentro.ponerAlDia) al crear o completar hitos, al entrar en
+     «Nuevo asunto» y al abrir Ajustes de un tipo. */
   async function refrescarTrasResolver(real) {
     if (real === App.FICHERO_TIPOS) { await App.cargarTipos(); App.pintarAjustes(); }
     else if (real === App.FICHERO_TIPOS_DOC) { await App.cargarTiposDocumento(); App.pintarAjustes(); }

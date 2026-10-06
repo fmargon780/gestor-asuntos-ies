@@ -113,6 +113,7 @@ App.prepararNuevo = function () {
      clic de verdad sobre un botón de tipo (delegado en #tipos-lista):
      al repintar la parrilla desde aquí, sin ningún tipo elegido, no
      hay clic que lo repinte solo, así que se deja limpio a mano. */
+  if (window.GuiasDelCentro && GuiasDelCentro.alEntrarEnNuevo) GuiasDelCentro.alEntrarEnNuevo();   /* fila 273: sin esperarla */
   var resumenGuia = $('guia-resumen-nuevo');
   if (resumenGuia) { resumenGuia.className = 'guia-resumen oculto'; resumenGuia.textContent = ''; resumenGuia.onclick = null; }
   var cajaGuia = $('guia-nuevo');

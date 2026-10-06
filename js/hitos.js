@@ -511,7 +511,7 @@ var Hitos = (function () {
   /* La guía del tipo; si no tiene, la guía mínima (fila 129,
      js/estado-hito.js), que se guarda como guía normal del tipo. */
   async function pasosOMinima(tipo) {
-    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    var pasos = (window.GuiasDelCentro && (await window.GuiasDelCentro.ponerAlDia(), window.GuiasDelCentro.pasosDe(tipo))) || [];   /* fila 273: la guardada, no la de al arrancar */
     if (pasos.length || !tipo || !window.EstadoHito || !EstadoHito.guiaMinima) return pasos;
     try { return (await EstadoHito.guiaMinima(tipo)) || []; } catch (e) { return []; }
   }

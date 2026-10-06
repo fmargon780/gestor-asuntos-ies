@@ -35,6 +35,7 @@ App.abrirTipoDeAsunto = async function (tipo) {
      cambiado desde el otro ordenador mientras tanto (igual que hacía
      el cuadro de "Campos" antes de este cambio). */
   try { App.E.campos = await Campos.leer(App.E.gestor); } catch (e) { /* se sigue con lo que había */ }
+  if (window.GuiasDelCentro) await GuiasDelCentro.ponerAlDia();   /* fila 273: la guía guardada, no la de al arrancar */
   App.ir('tipo-asunto');
   await App.pintarTipoDeAsunto();
 };
