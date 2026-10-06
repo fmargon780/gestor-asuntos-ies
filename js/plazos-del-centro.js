@@ -92,6 +92,12 @@ var PlazosDelCentro = (function () {
     return datosLeidos;
   }
 
+  function tieneBiblioteca(modelos, datos) {
+    var conPlazo = {};
+    (datos.modelos || []).forEach(function (m) { if (m && m.plazo && m.plazo.dias && !esNuevo(m)) conPlazo[m.id] = true; });
+    return modelos.some(function (m) { return conPlazo[m.id]; });
+  }
+
   /* La pasada entera. `opciones.datos`: el contenido ya leído (lo pasa el botón de Mantenimiento). `forzar`: el botón de Mantenimiento, aunque la marca ya esté puesta.
      Devuelve el resumen, o null si no ha corrido. */
   async function pasada(opciones) {
@@ -104,10 +110,11 @@ var PlazosDelCentro = (function () {
     try {
       var biblioteca = await HitosBiblioteca.leer();
       if (!forzar && biblioteca.plazosDelCentro >= VERSION) return null;
-      /* Un centro que no ha cargado nunca su biblioteca (ninguna hito modelo) no tiene nada que completar:
-         ahí no se hace nada, ni se pone la marca; el botón de Mantenimiento lo trae todo. */
-      if (!forzar && !biblioteca.modelos.length) return null;
       var datos = (opciones && opciones.datos) || await leerDatos();
+      /* Un centro que no ha cargado nunca su biblioteca (ninguno de los hitos modelo que llevan plazo, aunque tenga
+         los dos de firma de siempre) no tiene nada que completar: ahí no se hace nada, ni se pone la marca; el botón de
+         Mantenimiento lo trae todo. */
+      if (!forzar && !tieneBiblioteca(biblioteca.modelos, datos)) return null;
       var resumen = { modelosNuevos: 0, modelosConPlazo: 0, pasos: 0, guias: 0 };
 
       await HitosBiblioteca.cambiar(function (d) {

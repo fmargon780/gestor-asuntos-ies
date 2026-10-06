@@ -5,6 +5,16 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 285: «Hacer este hito»
+
+De la auditoría de procedimiento: la app lo prepara todo pero espera un clic en cada paso. Un botón en la mesa del hito
+recorre las tareas con acción (generar y guardar el PDF solo, pararse en el registro de Séneca, preparar el correo con el
+documento adjunto) y, al enviar, da el hito por hecho y abre el siguiente. El PDF sellado que deja Séneca se reconoce solo
+cuando no hay dudas. Decisiones: el apunte `cadena` va en el propio hito (compartido); como el cuadro de Correo termina su
+promesa antes de cerrarse, la cadena espera a que se cierre la capa; la copia de pruebas lleva dos asuntos de un tipo nuevo
+(uno sin tocar y otro esperando el sello) y, para que se vea el aviso de Inicio, hace una pasada al acabar de montar. Pruebas:
+`pruebas/hacer-este-hito.mjs` y `pruebas/hacer-este-hito-sello.mjs`.
+
 ## 6-oct-2026 — Fila 284: los plazos legales, ya puestos en la biblioteca
 
 De la auditoría de procedimiento: la app sabía contar plazos, pero ningún modelo de la biblioteca traía uno (estaban

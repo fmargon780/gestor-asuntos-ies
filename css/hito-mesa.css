@@ -313,3 +313,11 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-campos-hito .mesa-campo-hito > .etiqueta { flex: 0 0 100%; font-size: 12px; }
 .mesa-campos-hito .mesa-campo-hito > .campo { flex: 1 1 140px; }
 .ficha-consulta .mesa-campo-hito-anadir, .ficha-consulta .campo-hito-menu { display: none; }
+
+/* Fila 285 («Hacer este hito», docs/HACER-ESTE-HITO.md): el botón de la cabecera, la línea de lo que hará y la franja del visor. */
+.mesa-hacer-linea { font-size: 12px; color: #5d6b7a; margin: 2px 0 6px; }
+.mesa-hacer-enviar { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+.mesa-hacer-enviar:hover { background: #256628; }
+.mesa-hacer-dejar { font-size: 12px; margin-left: 4px; }
+.marca-cadena { white-space: nowrap; }
+.word-visor-franja { margin: 0; border-radius: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

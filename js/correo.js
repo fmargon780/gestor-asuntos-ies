@@ -258,7 +258,7 @@
     }
     var esperar = U.preguntar(I.porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>',
-      I.avisoLoPide ? 'Esta vez no' : 'Cerrar', true);
+      (extra && extra.cerrarTexto) || (I.avisoLoPide ? 'Esta vez no' : 'Cerrar'), true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }

@@ -110,7 +110,7 @@ await comprobar('ningún paso del guion lleva botón de acción',
 await comprobar('la cabecera lleva Generar, Comunicar, Registrar, Marcar y ···',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button.boton'))
     .filter(b => b.offsetParent).map(b => b.textContent.trim())),
-  ['Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', 'Hito ▾']);
+  ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', 'Hito ▾']);   /* fila 285 */
 await comprobar('con hitos, la barra de arriba no enseña «Comunicar»',
   pagina.evaluate(() => { const b = document.querySelector('#ficha-acciones .boton-comunicar'); return !!(b && b.offsetParent); }), false);
 

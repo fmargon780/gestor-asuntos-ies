@@ -112,6 +112,8 @@
          solo informativo", del menú del propio hito. Afecta solo a este
          hito de este asunto, nunca a la guía del tipo. */
       if ('soloInformativo' in cambios) h.soloInformativo = !!cambios.soloInformativo;
+      /* Fila 285 («Hacer este hito»): dónde está parada la cadena de tareas, o nada. */
+      if ('cadena' in cambios) { if (cambios.cadena) h.cadena = cambios.cadena; else delete h.cadena; }
     });
   }
 

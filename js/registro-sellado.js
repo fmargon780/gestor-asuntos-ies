@@ -212,7 +212,7 @@ var RegistroSellado = (function () {
         ? await VersionesPrevias.nombreDeCarpeta(asunto.handle) : '_Previas';
       U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «' + carpetaPrevias + '».'
         : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
-      return true;
+      return nombreFinal;   /* fila 285: el nombre con el que queda el sellado */
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');
       return false;
@@ -261,7 +261,7 @@ var RegistroSellado = (function () {
 
       U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «Versiones previas».'
         : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
-      return true;
+      return nombreNuevo;   /* fila 285 */
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');
       return false;

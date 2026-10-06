@@ -451,6 +451,7 @@ App.filaTablaAsunto = function (a, opciones) {
   var tdHito = document.createElement('td');
   tdHito.className = 'inicio-tabla-hito';
   tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
+  if (window.HacerEsteHitoSello) tdHito.insertAdjacentHTML('beforeend', HacerEsteHitoSello.coletillaHTML(a));   /* fila 285 */
   tr.appendChild(tdHito);
   if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
 

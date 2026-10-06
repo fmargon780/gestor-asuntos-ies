@@ -146,5 +146,5 @@
   }
 
   window.Demo = window.Demo || {};
-  window.Demo.plantilla = { construir: construir, construirPdf: construirPdf };
+  window.Demo.plantilla = { construir: construir, construirPdf: construirPdf, docx: docx, p: p, r: r, WORD: WORD };
 })();

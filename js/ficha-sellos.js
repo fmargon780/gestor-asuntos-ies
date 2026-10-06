@@ -31,6 +31,9 @@
     try { detectados = await RegistroSellado.detectar(a); }
     catch (e) { detectados = []; }
     if (N.actual !== a) return;   /* se ha cambiado de ficha mientras se leía */
+    /* Fila 285: con un hito esperando su PDF sellado, se coloca solo sin preguntar (si no hay dudas). */
+    if (window.HacerEsteHitoSello) detectados = await HacerEsteHitoSello.alDetectar(a, detectados);
+    if (N.actual !== a) return;
 
     if (!detectados.length) { caja.innerHTML = ''; return; }
 
