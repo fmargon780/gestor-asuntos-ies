@@ -28,6 +28,7 @@ window.Soporte = (function () {
   var APP = 'Gestor de Asuntos';
   var REPO = 'fmargon780/gestor-asuntos-ies';
   var CLAVE_NOMBRE = 'gestor-soporte-nombre';
+  var CLAVE_CORREO = 'gestor-soporte-correo';
   var ANCHO_MAXIMO = 1500;
   var LIMITE_MS = 45000;
   var MAX_ERRORES = 10;
@@ -100,6 +101,22 @@ window.Soporte = (function () {
 
   function recordarNombre(n) {
     try { localStorage.setItem(CLAVE_NOMBRE, n); } catch (e) { /* sin memoria, se pregunta otra vez */ }
+  }
+
+  /* Fila 269 (docs/SOPORTE-MANDA-EL-CORREO.md): el correo de quien avisa, para poder
+     escribirle cuando quede resuelto. Se pide una sola vez en cada ordenador. */
+  function correoSabido() {
+    try { return localStorage.getItem(CLAVE_CORREO) || ''; } catch (e) { return ''; }
+  }
+
+  function recordarCorreo(c) {
+    try { localStorage.setItem(CLAVE_CORREO, c); } catch (e) { /* sin memoria, se pregunta otra vez */ }
+  }
+
+  /* PURA. ¿Tiene forma de dirección de correo? */
+  function correoBueno(c) {
+    c = String(c || '').trim();
+    return c.length <= 120 && /^[^\s@<>,;"]+@[^\s@<>,;"]+\.[^\s@<>,;"]+$/.test(c);
   }
 
   function fechaHora() {
@@ -285,6 +302,13 @@ window.Soporte = (function () {
       quien = campoNombre ? campoNombre.value.trim() : '';
       if (!quien) { decir('Escribe tu nombre para que sepamos quién avisa.', true); return; }
     }
+    var campoCorreo = document.getElementById('soporte-correo');
+    var correo = correoSabido();
+    if (campoCorreo) {
+      correo = campoCorreo.value.trim();
+      if (!correo) { decir('Escribe tu correo para avisarte cuando esté resuelto.', true); return; }
+      if (!correoBueno(correo)) { decir('Ese correo no parece correcto. Revísalo.', true); return; }
+    }
     var boton = document.getElementById('soporte-enviar');
     estado.enviando = true;
     boton.disabled = true;
@@ -292,7 +316,7 @@ window.Soporte = (function () {
     decir('');
     var datos = {
       app: APP, repo: REPO, tipo: estado.tipo, texto: texto,
-      pantalla: estado.pantalla, quien: quien, fecha: fechaHora(),
+      pantalla: estado.pantalla, quien: quien, correo: correo, fecha: fechaHora(),
       version: (window.App && App.VERSION) || ''
     };
     if (estado.tipo === 'error' && errores.length) datos.errores = errores.join('\n');
@@ -307,8 +331,36 @@ window.Soporte = (function () {
       return;
     }
     if (!quienSabido()) recordarNombre(quien);
+    recordarCorreo(correo);
     cerrar();
     if (window.U && U.aviso) U.aviso('Recibido. Gracias', 'bueno');
+  }
+
+  /* El campo «Tu correo» (la primera vez, o tras «Cambiar») o la línea «Te avisaremos en …». */
+  function pintarCorreo(bloque, sabido, previo) {
+    bloque.textContent = '';
+    if (sabido) {
+      var linea = el('p', 'soporte-pie');
+      linea.id = 'soporte-correo-sabido';
+      linea.appendChild(document.createTextNode('Te avisaremos en '));
+      linea.appendChild(el('strong', null, sabido));
+      linea.appendChild(document.createTextNode(' · '));
+      var cambiar = el('button', 'enlace', 'Cambiar');
+      cambiar.type = 'button'; cambiar.id = 'soporte-cambiar-correo';
+      cambiar.onclick = function () { pintarCorreo(bloque, '', sabido); };
+      linea.appendChild(cambiar);
+      bloque.appendChild(linea);
+      return;
+    }
+    var campo = el('input', 'campo soporte-nombre');
+    campo.id = 'soporte-correo'; campo.type = 'email';
+    campo.placeholder = 'Tu correo';
+    campo.setAttribute('aria-label', 'Tu correo');
+    campo.autocomplete = 'email';
+    if (previo) campo.value = previo;
+    bloque.appendChild(campo);
+    bloque.appendChild(el('p', 'suave soporte-pie', 'Te escribiremos a esta dirección cuando tu aviso esté resuelto.'));
+    if (previo) campo.focus();
   }
 
   function abrir() {
@@ -366,6 +418,11 @@ window.Soporte = (function () {
       nombre.placeholder = 'Tu nombre';
       cuadro.appendChild(nombre);
     }
+
+    var bloqueCorreo = el('div', 'soporte-correo');
+    bloqueCorreo.id = 'soporte-bloque-correo';
+    cuadro.appendChild(bloqueCorreo);
+    pintarCorreo(bloqueCorreo, correoSabido());
 
     var zona = el('div', 'soporte-captura');
     zona.id = 'soporte-captura';
@@ -449,7 +506,7 @@ window.Soporte = (function () {
   else ponerBoton();
 
   return {
-    contarPalabras: contarPalabras, textoPalabras: textoPalabras, GUION: GUION, abrir: abrir, cerrar: cerrar, enviar: enviar, direccion: direccion, pintarAjustes: pintarAjustes,
+    correoBueno: correoBueno, contarPalabras: contarPalabras, textoPalabras: textoPalabras, GUION: GUION, abrir: abrir, cerrar: cerrar, enviar: enviar, direccion: direccion, pintarAjustes: pintarAjustes,
     errores: function () { return errores.slice(); }, reducir: reducir
   };
 })();
