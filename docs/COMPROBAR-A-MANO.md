@@ -6,6 +6,15 @@ para ir tachando.
 
 ---
 
+- [ ] **El vigilante (fila 268, `docs/VIGILANTE-Y-CORREOS.md`).** Volver a pegar
+      `apps-script/soporte.gs`, ejecutar `prepararTodo` y aceptar el permiso nuevo que pida Google
+      (una sola vez). Llega un correo de resumen que dice a qué direcciones llegarán los avisos,
+      qué repositorios vigila y, de cada app, su dirección y si se llega a la app entera o solo a
+      la entrada de Google. Después «Implementar» → «Administrar implementaciones» → «Nueva
+      versión». A los veinte minutos, en tu Drive, en `SOPORTE-AVISOS`, está `ESTADO-VIGILANTE.json`
+      con una hora de hace menos de veinte minutos. Y envía un aviso de prueba desde cualquier app,
+      de día: te llega «aviso nuevo de un usuario» en menos de un minuto. Para pararlo: en el
+      proyecto de Google, «Activadores», borrar el de `vigilar`.
 - [ ] **Buzón de soporte para todas las apps (fila 261, `docs/BUZON-PARA-TODAS-LAS-APPS.md`).**
       Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (autorizar el permiso de
       correo y leer el registro: ningún repositorio en «OJO»; llega el correo de prueba) e
