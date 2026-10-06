@@ -179,7 +179,7 @@ var ExportarAsuntos = (function () {
     try { visibles = window.Hitos ? Hitos.visibles(lista || []) : (lista || []); } catch (e) { visibles = lista || []; }
     return visibles.map(function (h, i) {
       return {
-        n: i + 1, titulo: h.titulo || '', estado: TEXTO_ESTADO[h.estado] || h.estado || '',
+        n: i + 1, titulo: h.titulo || '', estado: (h.estado === 'hecho' && h.sinRespuesta ? 'Hecho · sin respuesta' : TEXTO_ESTADO[h.estado]) || h.estado || '',
         responsable: nombreDeResponsable(h.responsable, ajustes),
         plazo: /^\d{4}-\d{2}-\d{2}/.test(h.fecha || '') ? String(h.fecha).slice(0, 10) : '',
         terminado: /^\d{4}-\d{2}-\d{2}/.test(h.hechoEl || '') ? String(h.hechoEl).slice(0, 10) : ''

@@ -491,3 +491,8 @@ queda marcada** (`Hitos.tareaMarcadaPorDocumento`, en `js/hitos-guion.js`): el a
 «Desmarcar» (`HitosRequisitos.desmarcarPorDocumento`); nada se deshace sin que se vea. «Mover a otro hito» ya no deja
 un documento en dos hitos (sale del hito en el que esté de verdad; «Este hito» es un destino si algún marcado no es
 suyo). La función repinta la tarjeta de documentos de la ficha: quien la llama no vuelve a repintarla a la vez.
+
+## La casilla «Es lo que se esperaba» (6-oct-2026, fila 286, `docs/ESPERAS-QUE-SE-CIERRAN.md`)
+
+Al ponerle nombre a un documento que entra en un asunto en espera (desde «Ver todo», «+ Añadir documento» o soltando un fichero), `Esperas.casillaHTML` (llamada por `pintarFormulario`, `js/documentos-formulario.js`) añade encima de los botones una casilla ya marcada que, al guardar (`Esperas.alGuardar`, tras apuntar al hito en `js/documentos-guardar.js`), termina la espera. No sale al renombrar uno que ya estaba, con el PDF sellado de un registro, si el cuadro viene de otro hito, ni en el segundo documento de una tanda.
+

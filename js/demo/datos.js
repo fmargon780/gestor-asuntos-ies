@@ -159,7 +159,9 @@
 
     var bajaMedica = await crearTipoConGuia('BAJA MEDICA', 'PERSONAL', [
       { titulo: 'Recibir el parte de baja', cuerpo: '<p>Del interesado o de la mutua.</p>', responsable: 'yo' },
-      { titulo: 'Esperar el parte de alta', cuerpo: '<p>Hasta que el interesado lo traiga.</p>', toca: 'espera', tocaA: 'Interesado' }
+      { titulo: 'Esperar el parte de alta', cuerpo: '<p>Hasta que el interesado lo traiga.</p>', toca: 'espera', tocaA: 'Interesado' },
+      /* Fila 286: un hito después de la espera, para que «Espera terminada» diga qué toca ahora. */
+      { titulo: 'Archivar el parte de alta', cuerpo: '<p>Dejar el parte en la carpeta.</p>', responsable: 'yo' }
     ], null);
 
     var factura = await crearTipoConGuia('FACTURA', 'EMPRESAS', [
@@ -398,7 +400,7 @@
 
     /* Fila 285: dos asuntos para «Hacer este hito» (uno sin tocar y otro esperando el PDF sellado). */
     if (window.Demo.hacer && tipos['CERTIFICADO DE NOTAS']) {
-      await Demo.hacer.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });
+      await Demo.hacer.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], tipoBaja: tipos['BAJA MEDICA'], crearAsunto: crearAsunto, hace: hace });
     }
 
     /* 6d. fila 244: dos facturas más, con un importe negativo y uno que no es una cifra

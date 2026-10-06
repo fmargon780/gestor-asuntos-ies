@@ -122,6 +122,7 @@ var HitosPanelLista = (function () {
 
   function metaDeHito(h, ajustes, contexto) {
     var trozos = [];
+    if (h.estado === 'hecho' && h.sinRespuesta) trozos.push('<span class="hito-sin-respuesta">Hecho · sin respuesta</span>');   /* fila 286 */
     if (h.fecha) trozos.push('<span class="hito-fecha">' + U.escapar(Plazos.legible(h.fecha)) + '</span>');
     if (h.responsable) {
       var r = Hitos.resolverResponsable(h.responsable, ajustes, contexto);

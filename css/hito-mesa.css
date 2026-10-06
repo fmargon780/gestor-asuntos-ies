@@ -321,3 +321,7 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-hacer-dejar { font-size: 12px; margin-left: 4px; }
 .marca-cadena { white-space: nowrap; }
 .word-visor-franja { margin: 0; border-radius: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Fila 286 (docs/ESPERAS-QUE-SE-CIERRAN.md): la casilla del cuadro de nombre y «Hecho · sin respuesta». */
+.doc-termina-espera { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 4px; font-weight: 600; }
+.hito-sin-respuesta { color: #8a5a00; }

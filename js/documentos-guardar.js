@@ -210,6 +210,8 @@
         U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e2b);
       }
     }
+    /* Fila 286: «Es lo que se esperaba. Termina la espera…», si la casilla sigue marcada. */
+    if (window.Esperas) await Esperas.alGuardar(N.asuntoActual, nombre);
     N.soltarVisor();
     /* Abierto directo para ponerle nombre (opciones.ponerNombre, fila
        174, punto 3): cierra el cuadro entero al terminar, en vez de

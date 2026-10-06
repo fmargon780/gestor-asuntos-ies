@@ -114,6 +114,8 @@
       if ('soloInformativo' in cambios) h.soloInformativo = !!cambios.soloInformativo;
       /* Fila 285 («Hacer este hito»): dónde está parada la cadena de tareas, o nada. */
       if ('cadena' in cambios) { if (cambios.cadena) h.cadena = cambios.cadena; else delete h.cadena; }
+      /* Fila 286: «No ha llegado nada» (el hito se da por hecho sin respuesta). */
+      if ('sinRespuesta' in cambios) { if (cambios.sinRespuesta) h.sinRespuesta = true; else delete h.sinRespuesta; }
     });
   }
 
