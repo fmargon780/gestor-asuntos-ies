@@ -98,6 +98,7 @@ comprobar('6. un hito viejo con «meses» lo conserva', Hitos.normalizarHito({ i
 Hitos.aplicarPlazosDependientes(hitosM, 'm1', { festivos: [], noLectivos: [] });
 comprobar('6. al hacerse el de arriba, la fecha es el mismo día del mes siguiente (o el hábil siguiente)',
   hitosM[1].fecha, Plazos.sumarPlazo(hoy, 1, 'meses', [], []));
+comprobar('6. lo que queda de un plazo en meses se lee en días', Plazos.textoDias(31, 'naturales'), '31 días naturales');
 
 if (fallos) { console.log('\n' + fallos + ' fallo(s)'); process.exit(1); }
 console.log('\nTodo bien.');
