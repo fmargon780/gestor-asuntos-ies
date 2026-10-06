@@ -30,10 +30,16 @@
     return (guias && guias[tipo]) ? guias[tipo] : [];
   }
 
+  var fechaVista = 0;          /* fecha de guias.json cuando se leyó por última vez (fila 273) */
+  var ultimaLectura = 0;       /* cuándo, por si el disco no da fechas */
+  var lecturaCompartida = null;
+
   async function cargar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
     try {
+      fechaVista = await Carpetas.fechaFichero(g, FICHERO);
+      ultimaLectura = Date.now();
       var leido = await Carpetas.leerJson(g, FICHERO);
       guias = (leido && typeof leido === 'object') ? leido : {};
     } catch (e) {
@@ -43,6 +49,38 @@
       if (!guias || typeof guias !== 'object') guias = {};
       U.aviso('No he podido leer las guías: ' + U.mensajeDeError(e), 'malo');
     }
+  }
+
+  /* Fila 273 (docs/GUIA-SIEMPRE-AL-DIA.md): pone la copia en memoria igual que
+     el disco, para que una ventana abierta desde hace horas no cree ni
+     complete hitos con una guía vieja. Barata (mira la fecha del fichero y solo
+     lee si ha cambiado; sin fecha, como mucho una lectura cada 3 s), callada
+     (si falla, se queda la copia que había) y sin pisar un guardado en marcha.
+     Dos llamadas a la vez comparten la misma lectura. Devuelve si ha cambiado algo. */
+  function ponerAlDia() {
+    if (lecturaCompartida) return lecturaCompartida;
+    var lectura = (async function () {
+      try {
+        var g = window.Gestor && window.Gestor.carpetaGestor();
+        if (!g || (window.ColaGuardado && ColaGuardado.hayGuardado())) return false;
+        var fecha = await Carpetas.fechaFichero(g, FICHERO);
+        if (fecha ? fecha === fechaVista : Date.now() - ultimaLectura < 3000) return false;
+        var leido = await Carpetas.leerJson(g, FICHERO);
+        var nuevas = (leido && typeof leido === 'object') ? leido : {};
+        var cambio = JSON.stringify(nuevas) !== JSON.stringify(guias);
+        guias = nuevas; fechaVista = fecha; ultimaLectura = Date.now();
+        return cambio;
+      } catch (e) { return false; }
+    })();
+    lecturaCompartida = lectura;
+    var soltar = function () { if (lecturaCompartida === lectura) lecturaCompartida = null; };
+    lectura.then(soltar, soltar);
+    return lectura;
+  }
+
+  /* Al entrar en «Nuevo asunto»: si la guía había cambiado, se repinta su resumen. */
+  async function alEntrarEnNuevo() {
+    if (await ponerAlDia()) pintarGuiaNuevo();
   }
 
   /* Fila 176, punto 4: releer justo antes de escribir y tocar solo el
@@ -300,6 +338,7 @@
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,
+    ponerAlDia: ponerAlDia, alEntrarEnNuevo: alEntrarEnNuevo,   /* fila 273 */
     recargar: cargar,   /* fila 138: tras pasar «lo que hay que reunir» al guion */
     asegurarGuia: asegurarGuia,
     _guardarTipo: guardarTipo   /* para pruebas/datos-entre-ordenadores.mjs (fila 176) */
