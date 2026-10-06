@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 274 | 45 | Un apartado nuevo en Ajustes de un tipo, en un fichero nuevo y pequeño, al que se mudan dos casillas que ya existen (sin datos que migrar); una línea de resumen, cuatro pruebas que retocar, una nueva y el revisor con 14 puntos |
 | 276 | 60 | Arreglo en el panel de campos y en «+ Añadir campo» del asunto (botón «Rellenar», el motivo a la vista, cuadro del valor sin «¿Dónde se guarda?»), una regla de estilo para los botones apagados de toda la app, una prueba nueva con navegador y el revisor con 15 puntos |
 | 278 | 110 | Un fichero nuevo con el cálculo de los bloques (uno o dos niveles, meses, «Sin dato», sumas por bloque), dos desplegables en la ventana de exportar que siguen a las columnas marcadas, el informe en PDF pintado por bloques con el corte de páginas cuidando títulos y líneas de cierre, una prueba nueva y el revisor con 14 puntos |
 | 277 | 110 | Un módulo nuevo (la pasada que une sola al entrar y al cambiar la lista de tipos, la regla de «se parecen», el fichero de parejas «No son el mismo»), un aviso más en Inicio y su cuadro con «Unir» en dos pasos, sacar a una función común lo de después de unir, una prueba nueva con siete casos y el revisor con 17 puntos |
