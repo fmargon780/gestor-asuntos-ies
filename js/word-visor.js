@@ -51,6 +51,18 @@ var WordVisor = (function () {
     return cargarScript('js/lib/docx-preview.min.js', 'docx');
   }
 
+  var OPCIONES_DE_PINTADO = {
+    className: 'docx', inWrapper: true, ignoreWidth: false, ignoreHeight: false, breakPages: true,
+    ignoreLastRenderedPageBreak: true, renderHeaders: true, renderFooters: true, useBase64URL: true
+  };
+
+  /* Fila 280 («Convertir en plantilla»): pintar un Word en cualquier contenedor, sin la capa del visor. */
+  async function pintarEn(contenedor, blob) {
+    var docx = await librerias();
+    contenedor.innerHTML = '';
+    await docx.renderAsync(blob, contenedor, null, OPCIONES_DE_PINTADO);
+  }
+
   function construir() {
     if (capa) return;
     capa = document.createElement('div');
@@ -89,10 +101,7 @@ var WordVisor = (function () {
     try {
       var docx = await librerias();
       hoja.innerHTML = '';
-      await docx.renderAsync(blob, hoja, null, {
-        className: 'docx', inWrapper: true, ignoreWidth: false, ignoreHeight: false, breakPages: true,
-        ignoreLastRenderedPageBreak: true, renderHeaders: true, renderFooters: true, useBase64URL: true
-      });
+      await docx.renderAsync(blob, hoja, null, OPCIONES_DE_PINTADO);
     } catch (e) {
       hoja.innerHTML = '<p class="explica">No he podido enseñar este Word: ' + U.escapar(U.mensajeDeError(e)) + '</p>';
     }
@@ -189,6 +198,6 @@ var WordVisor = (function () {
   }
 
   return { abrir: abrir, cerrar: cerrar, cerrarSiAbierto: cerrarSiAbierto, abierto: abierto,
-           nombrePdf: nombrePdf, hacerPdf: hacerPdf };
+           nombrePdf: nombrePdf, hacerPdf: hacerPdf, pintarEn: pintarEn };
 })();
 window.WordVisor = WordVisor;

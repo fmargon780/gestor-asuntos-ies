@@ -112,11 +112,17 @@
       return null;
     }
 
-    /* El membrete (20-sep-2026, fila 81): se mete ANTES de rellenar,
-       porque `Docx.ponerImagen` busca el hueco `{{MEMBRETE}}` en el
-       XML tal cual viene de la plantilla, no en el texto ya relleno.
-       Si no se puede dibujar, `Membrete.montar()` da `null` y no se toca
-       nada: el documento sale igual que si no existiera este paso. */
+    return await ponerMembrete(buffer, plantillaDoc);
+  }
+
+  /* El membrete (20-sep-2026, fila 81): se mete ANTES de rellenar,
+     porque `Docx.ponerImagen` busca el hueco `{{MEMBRETE}}` en el
+     XML tal cual viene de la plantilla, no en el texto ya relleno.
+     Si no se puede dibujar, `Membrete.montar()` da `null` y no se toca
+     nada: el documento sale igual que si no existiera este paso.
+     Fila 280: aparte, para que «Convertir en plantilla» lo use sobre un
+     Word que aún está en memoria. */
+  async function ponerMembrete(buffer, plantillaDoc) {
     if (window.Membrete) {
       try {
         /* Fila 149: cada plantilla dice si lleva el logo del centro (sin la clave, sí). */
@@ -398,7 +404,7 @@
     nombreDelDocumentoGenerado: nombreDelDocumentoGenerado,
     /* pintarDeTipo y abrirCuadroDePlantillaDoc los pone
        js/plantillas-documento-ajustes.js (fila 133). */
-    _interno: { carpetaDePlantillas: carpetaDePlantillas, leerConMembrete: leerConMembrete,
+    _interno: { carpetaDePlantillas: carpetaDePlantillas, leerConMembrete: leerConMembrete, ponerMembrete: ponerMembrete,
       guardarBlobEnCarpeta: guardarBlobEnCarpeta },
     /* Para js/hitos-generar.js (fila 102). */
     generar: generarDocumento, elegir: elegirPlantilla, plantillasDelAsunto: plantillasDelAsunto,
