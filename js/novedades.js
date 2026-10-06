@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '277', fecha: '2026-10-06', texto: 'Si un tipo de asunto es el nombre antiguo de otro, la app los une sola y lo dice. Y si dos tipos se parecen, lo avisa en Inicio para unirlos o decir que no son el mismo.' },
   { id: '276', fecha: '2026-10-06', texto: 'En «+ Añadir campo» de un asunto, un campo que el asunto ya tiene pero está vacío lleva el botón «Rellenar»: pide el valor ahí mismo. Y los botones apagados ahora se ven en gris.' },
   { id: '274', fecha: '2026-10-06', texto: 'En Ajustes de un tipo de asunto hay un apartado nuevo, «Al terminar el asunto»: sin abrirlo dice si el asunto se archiva o pasa a «Por liquidar». Ahí están ahora esa casilla y la de avisar a quien lo pide.' },
   { id: '270', fecha: '2026-10-06', texto: 'En el cuadro de Correo y en el de Séneca hay un botón nuevo, «Guardar como plantilla nueva»: convierte lo que has escrito en una plantilla, con los datos del asunto ya cambiados por su hueco.' },

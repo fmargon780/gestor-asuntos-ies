@@ -232,7 +232,44 @@ var TiposUnir = (function () {
     return { gestor: gestor, asuntos: asuntos };
   }
 
-  return { unir: unir };
+  /* Fila 277: lo que se enseña y se hace después de unir, común al botón de
+     Ajustes, a la unión sola (js/tipos-parecidos.js) y al cuadro de tipos parecidos. */
+
+  /* El resumen de «Unir»: quién desaparece, a qué pasan los asuntos y que el ARCHIVO no se toca. */
+  function textoResumen(desaparece, seQueda) {
+    var afectados = (App.E.listaAbiertos || []).filter(function (a) { return App.tipoDeAsunto(a) === desaparece.tipo; }).length;
+    return '«' + U.escapar(desaparece.tipo) + '» desaparece y todo pasa a «' + U.escapar(seQueda.tipo) + '». ' +
+      'Se van a pasar ' + afectados + (afectados === 1 ? ' asunto abierto' : ' asuntos abiertos') +
+      ' (su carpeta cambia de nombre). La guía que vale desde ahora es la de «' + U.escapar(seQueda.tipo) +
+      '». El ARCHIVO no se toca.';
+  }
+
+  /* Repintar lo que depende de los tipos. Cierra la pantalla del tipo que ha desaparecido, si estaba abierta. */
+  async function despuesDeUnir(desaparece, seQueda) {
+    await App.verAbiertos();
+    if (App.E.tipoAjustesActual === desaparece) App.cerrarTipoDeAsunto();
+    App.pintarAjustes();
+    /* Fila 253: los asuntos que han pasado al tipo que se queda y hay que liquidar. */
+    if (window.PorLiquidar && seQueda.liquidar) await PorLiquidar.alMarcarCasilla(seQueda);
+  }
+
+  /* El aviso de «Unidos. N asuntos abiertos pasados a «Y».» (verde, o ámbar si alguno no se pudo cambiar). */
+  function avisarUnidos(seQueda, resultado) {
+    var pasados = resultado.asuntos.pasados, saltados = resultado.asuntos.saltados || [];
+    var base = 'Unidos. ' + pasados + (pasados === 1 ? ' asunto abierto pasado a «' : ' asuntos abiertos pasados a «') +
+      seQueda.tipo + '».';
+    if (saltados.length) {
+      U.aviso(base + ' ' + saltados.length + (saltados.length === 1 ? ' no se ha podido cambiar: ' : ' no se han podido cambiar: ') +
+        saltados.join('; '), 'ambar');
+    } else {
+      U.aviso(base, 'bueno');
+    }
+    if (resultado.asuntos.error) {
+      U.accesorio('El tipo ya está unido, pero no he podido terminar de pasar sus asuntos abiertos', resultado.asuntos.error);
+    }
+  }
+
+  return { unir: unir, textoResumen: textoResumen, despuesDeUnir: despuesDeUnir, avisarUnidos: avisarUnidos };
 })();
 window.TiposUnir = TiposUnir;
 
@@ -248,7 +285,6 @@ App.unirTipoConOtro = async function (tipo) {
     .sort(function (a, b) { return a.tipo < b.tipo ? -1 : (a.tipo > b.tipo ? 1 : 0); });
   if (!otros.length) { U.aviso('No hay otro tipo con el que unir «' + tipo.tipo + '».', 'ambar'); return; }
 
-  var afectados = (App.E.listaAbiertos || []).filter(function (a) { return App.tipoDeAsunto(a) === tipo.tipo; }).length;
   var elegido = null;
 
   var botones = otros.map(function (t, i) {
@@ -272,10 +308,7 @@ App.unirTipoConOtro = async function (tipo) {
   function pintarResumen() {
     if (!resumen) return;
     if (!elegido) { resumen.textContent = ''; return; }
-    resumen.innerHTML = '«' + U.escapar(tipo.tipo) + '» desaparece y todo pasa a «' + U.escapar(elegido.tipo) + '». ' +
-      'Se van a pasar ' + afectados + (afectados === 1 ? ' asunto abierto' : ' asuntos abiertos') +
-      ' (su carpeta cambia de nombre). La guía que vale desde ahora es la de «' + U.escapar(elegido.tipo) +
-      '». El ARCHIVO no se toca.';
+    resumen.innerHTML = TiposUnir.textoResumen(tipo, elegido);
   }
 
   if (lista) {
@@ -315,22 +348,6 @@ App.unirTipoConOtro = async function (tipo) {
     return;
   }
 
-  await App.verAbiertos();
-  App.cerrarTipoDeAsunto();
-  App.pintarAjustes();
-  /* Fila 253: los asuntos que han pasado al tipo que se queda y hay que liquidar. */
-  if (window.PorLiquidar && elegido.liquidar) await PorLiquidar.alMarcarCasilla(elegido);
-
-  var pasados = resultado.asuntos.pasados, saltados = resultado.asuntos.saltados || [];
-  var base = 'Unidos. ' + pasados + (pasados === 1 ? ' asunto abierto pasado a «' : ' asuntos abiertos pasados a «') +
-    elegido.tipo + '».';
-  if (saltados.length) {
-    U.aviso(base + ' ' + saltados.length + (saltados.length === 1 ? ' no se ha podido cambiar: ' : ' no se han podido cambiar: ') +
-      saltados.join('; '), 'ambar');
-  } else {
-    U.aviso(base, 'bueno');
-  }
-  if (resultado.asuntos.error) {
-    U.accesorio('El tipo ya está unido, pero no he podido terminar de pasar sus asuntos abiertos', resultado.asuntos.error);
-  }
+  await TiposUnir.despuesDeUnir(tipo, elegido);
+  TiposUnir.avisarUnidos(elegido, resultado);
 };

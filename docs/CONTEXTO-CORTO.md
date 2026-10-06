@@ -108,7 +108,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   «crear» si ninguno encaja; igual en «Nuevo asunto» cuando llega con el tipo reconocido. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
   ofrece traer la guía del tipo nuevo. «Unir con otro tipo» (fila 207): el tipo se funde en otro
   (guía, campos, plantillas, recurrentes, alias); sus asuntos abiertos pasan al que se queda, sin
-  recibir su guía nueva; el ARCHIVO no se toca.
+  recibir su guía nueva; el ARCHIVO no se toca. Fila 277: si un tipo es el nombre antiguo de otro (`alias`) y no tiene nada propio, la app los une sola al entrar (`js/tipos-parecidos.js`); si dos tipos solo se parecen, trozo «tipos de asunto parecidos» en el aviso de Inicio, con «Unir» y «No son el mismo» (`_GESTOR/tipos-distintos.json`).
 - Nombre comercial de empresas; cambiar un tercero dado de alta a mano, también desde la ficha del asunto: si cambia su NIF o nombre, las carpetas de sus asuntos abiertos y la suya del archivo cambian solas (fila 266).
 - Tutores legales (del RegAlum, sin alta) y Administraciones (organismos y centros, con departamentos) como tercero.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
