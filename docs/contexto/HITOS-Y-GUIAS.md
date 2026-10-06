@@ -573,6 +573,21 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   `festivos` y `noLectivos` de Ajustes › Hitos (dos cajas; sin festivos, el título plegado avisa
   en ámbar «Faltan los festivos»), salvo que Francisco la haya tocado a mano. El mapa y la
   biblioteca dicen el modo («10 días hábiles», `Plazos.textoPlazo`).
+  Fila 284 (`docs/PLAZOS-LEGALES-EN-LA-BIBLIOTECA.md`): cuarta cuenta, `meses` (mismo día del mes
+  siguiente; si no existe, el último del mes; si no es hábil, el siguiente hábil; «1 mes», «2 meses»);
+  las tres listas escritas a mano (`js/guias.js`, `js/hitos-biblioteca.js`, `cuentaDePlazo` de
+  `js/hitos.js`) usan `Plazos.cuentaValida`. Un **modelo** de la biblioteca lleva `plazo.dias` y
+  `plazo.cuenta` y nunca el «desde» (`plazo.desde` vacío; su editor dice «desde que se termine el
+  hito de arriba, en cada guía», `opciones.esModelo` de `Guias.editar`); al traerlo a una guía
+  (`+ Traer de la biblioteca`, «Usarlo», hito desde el asunto) `modeloAPaso(modelo, desde)` lo deja
+  contando desde el de arriba, o sin plazo si no hay ninguno. `HitosBiblioteca.diferencias` ignora
+  el «desde». Contenido: `datos-biblioteca/biblioteca-centro.json` versión 2 (cinco plazos en
+  modelos que ya estaban —b15, b32, b120, b121, b157—, tabla `plazosPorTipo` y los siete modelos
+  `b-comun-…`; se cambió con `herramientas/plazos-legales.py`, no se regenera desde
+  `docs/contenido/`). Llega al centro con `PlazosDelCentro.pasada` (`js/plazos-del-centro.js`): una
+  vez al entrar (marca `plazosDelCentro` en `hitos-biblioteca.json`) o con el botón «Cargar la
+  biblioteca del centro»; nunca pisa un plazo puesto, nunca sube una `revision`, no toca asuntos
+  abiertos. Prueba: `pruebas/plazos-del-centro.mjs`.
 - **Estado del asunto**: es el hito actual (fila 129, ver "El hito es el estado del asunto");
   la única función que lo decide es `Hitos.estadoDelAsunto` (`js/hitos.js`).
 - **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya

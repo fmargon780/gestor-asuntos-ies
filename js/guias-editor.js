@@ -225,7 +225,7 @@
     if (window.GuiasBiblioteca) {
       GuiasBiblioteca.engancharPanelTraer(cuadro, $('guia-traer-biblioteca'), function (modelo) {
         recoger();
-        nivel.push(HitosBiblioteca.modeloAPaso(modelo));
+        nivel.push(HitosBiblioteca.modeloAPaso(modelo, nivel.length ? nivel[nivel.length - 1].id : ''));
         plegado.abrir(nivel[nivel.length - 1].id);   /* fila 122: sale abierto */
         pintar();
         plegado.alTitulo(nivel[nivel.length - 1].id);
@@ -255,16 +255,20 @@
           (window.GuiasToca ? GuiasToca.html(p, opcionesResp) : '') +
           '<label class="etiqueta">Plazo</label>' +
           '<div class="paso-plazo-fila">' +
-            '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="días" value="' +
+            '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="' +
+            (p.plazo && p.plazo.cuenta === 'meses' ? 'meses' : 'días') + '" value="' +
             (p.plazo ? p.plazo.dias : '') + '">' +
             (window.GuiasPlazo ? GuiasPlazo.html(p) : '<span class="suave">días</span>') +   /* fila 131 */
-            '<span class="suave">desde</span>' +
-            '<select class="campo paso-plazo-desde"><option value="">(sin plazo)</option>' +
-            otros.map(function (o) {
-              return '<option value="' + U.escapar(o.id) + '"' +
-                (p.plazo && p.plazo.desde === o.id ? ' selected' : '') + '>' +
-                U.escapar(o.titulo || 'Hito sin título') + '</option>';
-            }).join('') + '</select>' +
+            (opciones && opciones.esModelo
+              /* Fila 284: un modelo de la biblioteca no dice desde qué hito; cada guía lo decide al traerlo. */
+              ? '<span class="suave paso-plazo-desde-fijo">desde que se termine el hito de arriba, en cada guía</span>'
+              : '<span class="suave">desde</span>' +
+                '<select class="campo paso-plazo-desde"><option value="">(sin plazo)</option>' +
+                otros.map(function (o) {
+                  return '<option value="' + U.escapar(o.id) + '"' +
+                    (p.plazo && p.plazo.desde === o.id ? ' selected' : '') + '>' +
+                    U.escapar(o.titulo || 'Hito sin título') + '</option>';
+                }).join('') + '</select>') +
           '</div>' +
         '</div>' +
       '</details>';
@@ -318,8 +322,9 @@
         var diasInp = caja.querySelector(':scope > .paso-extra .paso-plazo-dias');
         var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
         var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
-        nivel[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
-          ? { dias: dias, desde: desdeSel.value, cuenta: window.GuiasPlazo ? GuiasPlazo.leer(caja) : 'habiles' } : null;
+        var desdeValor = desdeSel ? desdeSel.value : ((opciones && opciones.esModelo) ? '-' : '');
+        nivel[i].plazo = (!isNaN(dias) && dias > 0 && desdeValor)
+          ? { dias: dias, desde: desdeSel ? desdeSel.value : '', cuenta: window.GuiasPlazo ? GuiasPlazo.leer(caja) : 'habiles' } : null;
 
         /* "Lo que hay que reunir" (18-sep-2026, fila 59): solo en los
            hitos que no son pregunta (ver pintar()), así que un hito que

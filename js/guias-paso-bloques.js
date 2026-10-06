@@ -89,7 +89,7 @@ var GuiasPasoBloques = (function () {
               '<button type="button" class="enlace paso-titulo-usarlo">Usarlo</button>';
             aviso.querySelector('.paso-titulo-usarlo').onclick = function () {
               ctx.recoger();
-              ctx.nivel()[indice] = HitosBiblioteca.modeloAPaso(modelo);
+              ctx.nivel()[indice] = HitosBiblioteca.modeloAPaso(modelo, indice > 0 ? ctx.nivel()[indice - 1].id : '');
               ctx.plegado.abrir(ctx.nivel()[indice].id);
               ctx.pintar();
             };

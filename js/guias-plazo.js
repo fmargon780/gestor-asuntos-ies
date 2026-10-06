@@ -37,6 +37,14 @@ var GuiasPlazo = (function () {
     return Plazos.cuentaValida(sel && sel.value);
   }
 
+  /* Fila 284: con «Meses» elegido, el recuadro de al lado dice «meses», no «días» (se lee «1 mes desde…»). */
+  document.addEventListener('change', function (ev) {
+    var sel = ev.target;
+    if (!sel || !sel.classList || !sel.classList.contains('paso-plazo-cuenta') || !sel.parentNode) return;
+    var dias = sel.parentNode.querySelector('input[type="number"]');
+    if (dias) dias.placeholder = sel.value === 'meses' ? 'meses' : 'días';
+  });
+
   return { html: html, htmlConId: htmlConId, leer: leer, leerSelect: leerSelect };
 })();
 window.GuiasPlazo = GuiasPlazo;

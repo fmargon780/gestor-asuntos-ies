@@ -191,7 +191,7 @@ window.HitosDesdeElAsunto = (function () {
       }).join('') + (window.ResponsableOrganismo ? ResponsableOrganismo.opcionesExtra({ responsable: opts.responsable }) : '') + '</select>' +
       '<label class="etiqueta">Plazo <span class="suave">(opcional)</span></label>' +
       '<div class="paso-plazo-fila">' +
-        '<input type="number" min="1" id="hda-plazo-dias" class="campo" placeholder="días" value="' +
+        '<input type="number" min="1" id="hda-plazo-dias" class="campo" placeholder="' + (opts.plazo && opts.plazo.cuenta === 'meses' ? 'meses' : 'días') + '" value="' +
         (opts.plazo ? opts.plazo.dias : '') + '">' +
         (window.GuiasPlazo ? GuiasPlazo.htmlConId(opts, 'hda-plazo-cuenta') : '') +
         '<span class="suave">desde</span>' +
@@ -416,7 +416,7 @@ window.HitosDesdeElAsunto = (function () {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
     var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
-    var nuevoPaso = HitosBiblioteca.modeloAPaso(modelo);
+    var nuevoPaso = HitosBiblioteca.modeloAPaso(modelo, idPasoAncla);   /* fila 284: cuenta desde el de arriba */
     /* Fila 228: si se ha cambiado la explicación antes de guardar, el paso
        lleva el texto cambiado; la biblioteca no se toca. */
     if (window.Guias && typeof datos.cuerpo === 'string') nuevoPaso.cuerpo = datos.cuerpo;

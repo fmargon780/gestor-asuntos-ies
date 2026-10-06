@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '284', fecha: '2026-10-06', texto: 'La biblioteca de hitos trae los plazos legales ya puestos (y siete hitos comunes nuevos: requerir, audiencia, informe y la espera de cada uno), y los plazos se pueden contar en meses. Llegan solos al centro, una vez, y solo valen para los asuntos nuevos.' },
   { id: '282', fecha: '2026-10-06', texto: 'Un documento se puede quitar de su hito, o traer a otro, desde la pantalla de cualquier hito (el «⋯» de los documentos «De otros hitos» y «sin hito»). En la ficha, «Ninguno» pasa a llamarse «Quitar del hito». La tarea que se marcó sola con ese documento se queda marcada, con un aviso que deja desmarcarla.' },
   { id: '281', fecha: '2026-10-06', texto: '«Convertir en plantilla» vale también con un PDF que no tiene su Word: la app copia el texto y monta la plantilla con el membrete. Las tablas no se copian.' },
   { id: '280', fecha: '2026-10-06', texto: 'En el menú ⋮ de un documento Word hay una opción nueva, «Convertir en plantilla»: la app cambia sola los datos del asunto por su hueco, pone el membrete y te enseña el resultado junto al original antes de guardar.' },

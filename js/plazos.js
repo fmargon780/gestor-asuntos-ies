@@ -117,12 +117,16 @@ var Plazos = (function () {
      - `lectivos`: sin sábados, domingos, festivos ni días no lectivos.
      - `naturales`: todos; pero si el último cae en sábado, domingo o
        festivo, pasa al siguiente hábil.
+     - `meses` (fila 284): el mismo número de día, tantos meses después (si
+       ese mes no tiene ese día, su último día); si cae en sábado, domingo o
+       festivo, al siguiente hábil (Ley 39/2015, art. 30.4 y 30.5).
      Se empieza a contar el día siguiente al de partida. Un plazo sin
      `cuenta` (todos los de antes) se cuenta en hábiles. */
   var CUENTAS = [
     { valor: 'habiles', texto: 'Días hábiles', corto: 'hábiles' },
     { valor: 'lectivos', texto: 'Días lectivos', corto: 'lectivos' },
-    { valor: 'naturales', texto: 'Días naturales', corto: 'naturales' }
+    { valor: 'naturales', texto: 'Días naturales', corto: 'naturales' },
+    { valor: 'meses', texto: 'Meses', corto: 'meses' }
   ];
 
   function cuentaValida(c) {
@@ -159,6 +163,15 @@ var Plazos = (function () {
     if (isNaN(d.getTime())) return '';
     cuenta = cuentaValida(cuenta);
     var fest = conjunto(festivos), noLect = conjunto(noLectivos);
+    if (cuenta === 'meses') {
+      /* El mismo día del mes, `n` meses después; si ese mes es más corto, su último día. */
+      var objetivo = new Date(+p[0], +p[1] - 1 + n, 1);
+      var ultimo = new Date(objetivo.getFullYear(), objetivo.getMonth() + 1, 0).getDate();
+      objetivo.setDate(Math.min(+p[2], ultimo));
+      var porSi = 0;
+      while (!diaCuenta(objetivo, 'habiles', fest, noLect) && porSi++ < 60) objetivo.setDate(objetivo.getDate() + 1);
+      return aIso(objetivo);
+    }
     var contados = 0;
     while (contados < n) {
       d.setDate(d.getDate() + 1);
@@ -176,7 +189,7 @@ var Plazos = (function () {
      ha llegado), para «quedan N días hábiles» de la mesa del hito. */
   function diasQueQuedan(hoy, fecha, cuenta, festivos, noLectivos) {
     cuenta = cuentaValida(cuenta);
-    if (cuenta === 'naturales') {
+    if (cuenta === 'naturales' || cuenta === 'meses') {
       var d = diasHasta(fecha);
       return d === null ? 0 : Math.max(d, 0);
     }
@@ -192,6 +205,7 @@ var Plazos = (function () {
   }
 
   function textoDias(n, cuenta) {
+    if (cuentaValida(cuenta) === 'meses') return n + (n === 1 ? ' mes' : ' meses');   /* fila 284: «1 mes», no «1 días» */
     var c = CUENTAS.filter(function (x) { return x.valor === cuentaValida(cuenta); })[0];
     return n + (n === 1 ? ' día ' + c.corto.replace(/es$/, '').replace(/s$/, '') : ' días ' + c.corto);
   }
