@@ -184,6 +184,10 @@
 .campos-catalogo-rejilla-ancha .nombre-tipo { flex: 1 1 auto; min-width: 60px; }
 .campos-catalogo-rejilla-ancha .suave { flex: 0 1 90px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .campos-catalogo-rejilla .suave { font-size: 12px; }
+/* Fila 276: el motivo de un botón apagado («ya está en este asunto») se lee entero, sin puntos suspensivos. */
+/* Va en su propia línea, debajo del nombre y los botones. */
+.campos-catalogo-rejilla .fila-tipo:has(.campo-motivo) { flex-wrap: wrap; }
+.campos-catalogo-rejilla-ancha .suave.campo-motivo { order: 5; flex: 1 0 100%; white-space: normal; overflow: visible; text-overflow: clip; }
 @media (max-width: 700px) {
   .campos-catalogo-rejilla, .campos-catalogo-rejilla-ancha { grid-template-columns: 1fr; }
 }

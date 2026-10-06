@@ -121,7 +121,7 @@ var CamposCatalogo = (function () {
     /* Fila 255: desde un hito, arriba «Ya están en este asunto» (los campos del asunto sin hito). */
     var yaEstan = (opciones.yaEstan || []);
     interior.innerHTML = (yaEstan.length
-      ? '<div class="campos-catalogo-grupo" id="campos-catalogo-yaestan"><div class="etiqueta">Ya están en este asunto</div>' +
+      ? '<div class="campos-catalogo-grupo" id="campos-catalogo-yaestan"><div class="etiqueta">' + U.escapar(opciones.tituloYaEstan || 'Ya están en este asunto') + '</div>' +
         '<div class="campos-catalogo-rejilla" id="campos-catalogo-yaestan-lista"></div></div>' : '') +
       '<div id="campos-catalogo-ficha-lista" class="campos-catalogo-rejilla"></div>';
     var cajaYa = interior.querySelector('#campos-catalogo-yaestan-lista');
@@ -136,7 +136,7 @@ var CamposCatalogo = (function () {
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(nombre) + '">' + U.escapar(nombre) + '</span>';
         var b = document.createElement('button');
-        b.type = 'button'; b.className = 'boton'; b.textContent = 'Añadir';
+        b.type = 'button'; b.className = 'boton'; b.textContent = opciones.textoBotonYaEstan || 'Añadir';
         b.onclick = function () { if (opciones.onYaEsta) opciones.onYaEsta(c); };
         f.appendChild(b);
         cajaYa.appendChild(f);
@@ -180,6 +180,35 @@ var CamposCatalogo = (function () {
     });
   }
 
+  /* ---------- un campo que ya está puesto (fila 276) ----------
+
+     Su botón «Añadir» se queda apagado y dice por qué (`opciones.textoYaPuesto`,
+     por defecto «ya está en este tipo»). Si quien abre el panel dice que ese campo
+     está en el asunto pero sin rellenar (`opciones.sinRellenar[clave]`), el botón es
+     «Rellenar» y está encendido: `opciones.onRellenar(entrada)`. */
+  function motivoDeFila(opciones, clave) {
+    return (opciones.sinRellenar && opciones.sinRellenar[clave]) ? 'en este asunto, sin rellenar'
+      : (opciones.textoYaPuesto || 'ya está en este tipo');
+  }
+
+  function botonAnadirORellenar(opciones, lista, clave, yaPuesto, alAnadir) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'boton';
+    if (yaPuesto && opciones.sinRellenar && opciones.sinRellenar[clave] && opciones.onRellenar) {
+      b.textContent = 'Rellenar';
+      b.onclick = function () {
+        var entrada = lista.filter(function (c) { return Campos.claveDeCampo(c) === clave; })[0];
+        if (entrada) opciones.onRellenar(entrada);
+      };
+      return b;
+    }
+    b.textContent = 'Añadir';
+    b.disabled = !!yaPuesto;
+    b.title = yaPuesto ? motivoDeFila(opciones, clave).charAt(0).toUpperCase() + motivoDeFila(opciones, clave).slice(1) : '';
+    b.onclick = alAnadir;
+    return b;
+  }
+
   /* ---------- pestaña "Míos" ---------- */
 
   function pintarMios(interior, tipo, mios, lista, opciones, cuerpo) {
@@ -198,17 +227,14 @@ var CamposCatalogo = (function () {
         var f = document.createElement('div');
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(p.nombre) + '">' + U.escapar(p.nombre) + '</span>' +
-          '<span class="suave">' + (p.clase === 'lista' ? 'lista: ' + p.valores.join(', ') : (window.CamposClases ? CamposClases.nombreDe(p.clase).toLowerCase() : 'texto libre')) + '</span>';
+          '<span class="suave' + (yaPuesto ? ' campo-motivo' : '') + '">' + (yaPuesto ? U.escapar(motivoDeFila(opciones, 'propio:' + p.id)) :
+            (p.clase === 'lista' ? 'lista: ' + p.valores.join(', ') : (window.CamposClases ? CamposClases.nombreDe(p.clase).toLowerCase() : 'texto libre'))) + '</span>';
 
-        var anadir = document.createElement('button');
-        anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
-        anadir.disabled = !!yaPuesto;
-        anadir.title = yaPuesto ? 'Ya está puesto en este tipo' : '';
-        anadir.onclick = function () {
+        var anadir = botonAnadirORellenar(opciones, lista, 'propio:' + p.id, !!yaPuesto, function () {
           lista.push({ origen: 'propio', id: p.id, obligatorio: false, enNombre: false });
           opciones.onCambio();
           reabrir(cuerpo, tipo, lista, opciones);
-        };
+        });
         f.appendChild(anadir);
 
         var cambiar = document.createElement('button');
@@ -402,17 +428,14 @@ var CamposCatalogo = (function () {
         var f = document.createElement('div');
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(c.nombre) + '">' + U.escapar(c.nombre) + '</span>' +
-          '<span class="suave">' + U.escapar((window.Calculo && Calculo.describir(c, App.E.campos)) || '') + '</span>';
+          '<span class="suave' + (yaPuesto ? ' campo-motivo' : '') + '">' + U.escapar(yaPuesto ? motivoDeFila(opciones, 'calculado:' + c.id) :
+            ((window.Calculo && Calculo.describir(c, App.E.campos)) || '')) + '</span>';
 
-        var anadir = document.createElement('button');
-        anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
-        anadir.disabled = !!yaPuesto;
-        anadir.title = yaPuesto ? 'Ya está puesto en este tipo' : '';
-        anadir.onclick = function () {
+        var anadir = botonAnadirORellenar(opciones, lista, 'calculado:' + c.id, !!yaPuesto, function () {
           lista.push({ origen: 'calculado', id: c.id, obligatorio: false, enNombre: false });
           opciones.onCambio();
           reabrir(cuerpo, tipo, lista, opciones);
-        };
+        });
         f.appendChild(anadir);
 
         var cambiar = document.createElement('button');
