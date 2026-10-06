@@ -62,6 +62,8 @@ body.con-cep { overflow: hidden; }
 .cep-col:last-child { border-right: 0; }
 .cep-col h3 { margin: 0; padding: 8px 16px; background: #fff; border-bottom: 1px solid #d7dde5; font-size: 14px; }
 .cep-hoja-ext { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 16px; }
+/* Una hoja A4 (794 px) no cabe en media pantalla: se enseña al 80 % para que no se corte por el borde. */
+.cep-hoja-ext .cep-hoja-interior { zoom: .8; }
 @media (max-width: 1100px) {
   .cep-pestanas { display: flex; }
   .cep-col { display: none; }
