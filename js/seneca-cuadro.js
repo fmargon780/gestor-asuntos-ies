@@ -120,7 +120,7 @@ var SenecaCuadro = (function () {
               U.escapar(p.nombre) + '</option>';
           }).join('') +
         '</select>' +
-        '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Editar plantilla</button>' +
+        '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Cambiar la plantilla</button>' +
         '</div>' +
         '<div id="seneca-plantilla-confirmar" class="oculto"></div>'
       : '<p class="nota aviso-en-linea" id="seneca-sin-plantilla">Este tipo de asunto no tiene plantilla de ' +
