@@ -355,10 +355,15 @@
      (el mismo "Insertar hueco" de arriba); la vista previa usa los datos
      reales del asunto en el que se está, con `Plantillas.valoresDeAsunto`. */
 
-  function cuerpoEditorEnLineaHTML(existente) {
+  /* `inicial` (fila 270, js/plantilla-de-lo-escrito.js): { texto, cambios } de
+     «Guardar como plantilla nueva»: el texto de partida, la lista de datos
+     cambiados por su hueco y la nota de que el saludo y la firma no entran. */
+  function cuerpoEditorEnLineaHTML(existente, inicial) {
     return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
       '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
-      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', (existente && existente.texto) || '', 6) +
+      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', inicial ? inicial.texto : ((existente && existente.texto) || ''), 6) +
+      (inicial ? '<div id="pl2-cambios"></div>' +
+        '<p class="nota">El saludo y la firma no van en la plantilla: la app los pone sola en cada mensaje.</p>' : '') +
       campoSenecaHTML('pl2', existente && existente.textoSeneca) +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl2-previa"></div></div>' +
@@ -373,22 +378,76 @@
      datos de la vista previa). `existente`: la plantilla a editar, o
      `null` para crear una nueva. `alGuardar(plantillaGuardada)` se
      llama al terminar bien; `alCancelar()`, al pulsar Cancelar. */
-  function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar) {
-    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente);
+  /* La lista «He cambiado estos datos por su hueco» (fila 270): una línea por
+     cambio, con «Deshacer» (devuelve el dato en todos los sitios de ese hueco);
+     pulsar la línea deja seleccionado el hueco en el texto; si el hueco desaparece
+     del texto a mano, su línea desaparece sola. Devuelve el manejador de `input`
+     del texto. */
+  function montarCambios(cambios, alCambiar) {
+    var caja = $('pl2-cambios');
+    var vivos = (cambios || []).slice();
+    function pintar() {
+      if (!caja) return;
+      if (!vivos.length) { caja.innerHTML = ''; return; }
+      caja.innerHTML = '<p class="nota">He cambiado estos datos por su hueco. Revísalos:</p>';
+      vivos.forEach(function (c) {
+        var fila = document.createElement('div');
+        fila.className = 'pl2-cambio';
+        fila.style.cssText = 'display:flex;align-items:center;gap:8px;margin:4px 0;cursor:pointer';
+        var t = document.createElement('span');
+        t.textContent = c.dato + ' → ' + c.hueco;
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'boton boton-chico'; b.textContent = 'Deshacer';
+        b.onclick = function (ev) {
+          ev.stopPropagation();
+          var campo = $('pl2-texto');
+          campo.value = campo.value.split(c.hueco).join(c.dato);
+          vivos = vivos.filter(function (x) { return x !== c; });
+          pintar();
+          alCambiar();
+        };
+        fila.onclick = function () {
+          var campo = $('pl2-texto');
+          var i = campo.value.indexOf(c.hueco);
+          if (i === -1) return;
+          campo.focus();
+          campo.setSelectionRange(i, i + c.hueco.length);
+        };
+        fila.appendChild(t); fila.appendChild(b);
+        caja.appendChild(fila);
+      });
+    }
+    pintar();
+    return function () {
+      var texto = $('pl2-texto').value;
+      var antes = vivos.length;
+      vivos = vivos.filter(function (c) { return texto.indexOf(c.hueco) !== -1; });
+      if (vivos.length !== antes) pintar();
+      alCambiar();
+    };
+  }
+
+  function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar, inicial) {
+    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente, inicial);
     engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', []);
     engancharCampoDeTexto('pl2-texto-seneca', 'pl2-insertar-hueco-seneca', []);
 
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
 
+    /* Con el cuadro abierto desde un hito, la vista previa lleva también el hito (fila 270). */
+    var hitoDelCuadro = (window.CorreoNucleo && CorreoNucleo._interno && CorreoNucleo._interno.hitoActual) || undefined;
     function pintarPrevia() {
-      Plantillas.valoresDeAsunto(a).then(function (valores) {
+      Plantillas.valoresDeAsunto(a, hitoDelCuadro ? { hito: hitoDelCuadro } : undefined).then(function (valores) {
         var r = Plantillas.rellenar($('pl2-texto').value, valores || {});
         if ($('pl2-previa')) $('pl2-previa').textContent = r.texto || '(vacío)';
       }).catch(function () { if ($('pl2-previa')) $('pl2-previa').textContent = '(vacío)'; });
     }
-    $('pl2-texto').oninput = pintarPrevia;
+    var alCambiarTexto = pintarPrevia;
+    if (inicial) alCambiarTexto = montarCambios(inicial.cambios, pintarPrevia);
+    $('pl2-texto').oninput = alCambiarTexto;
     pintarPrevia();
+    if (inicial) $('pl2-nombre').focus();
 
     $('pl2-cancelar').onclick = function () { if (typeof alCancelar === 'function') alCancelar(); };
     $('pl2-guardar').onclick = async function () {
@@ -397,6 +456,15 @@
       var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
       if (!nombre || !texto.trim()) {
         $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Hace falta el nombre y el texto.</p>';
+        return;
+      }
+      /* Fila 270: no dos plantillas con el mismo nombre en un tipo de asunto. */
+      var yaEsta = ((Plantillas.enMemoria() || {}).lista || []).some(function (x) {
+        return (!existente || x.id !== existente.id) && x.categoria === categoria &&
+          U.normalizar(x.tipo || '') === U.normalizar(tipo) && U.normalizar(x.nombre || '') === U.normalizar(nombre);
+      });
+      if (yaEsta) {
+        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Ya hay una plantilla con ese nombre en este tipo de asunto.</p>';
         return;
       }
       try {

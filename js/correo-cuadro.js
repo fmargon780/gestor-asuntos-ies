@@ -258,6 +258,7 @@ var CorreoCuadro = (function () {
           }).join('') +
         '</select>' +
         '<button type="button" class="boton boton-chico" id="correo-plantilla-editar">Cambiar la plantilla</button>' +
+        '<button type="button" class="boton boton-chico" id="correo-plantilla-desde-escrito">Guardar como plantilla nueva</button>' +
         '</div>' +
         '<div id="correo-plantilla-confirmar" class="oculto"></div>'
       : '<label class="etiqueta" style="margin-top:0">Plantilla</label>' +
@@ -330,15 +331,7 @@ var CorreoCuadro = (function () {
   function engancharPlantilla(a) {
     var desplegable = $('correo-plantilla');
     if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
-
-    var editar = $('correo-plantilla-editar');
-    if (editar) editar.onclick = function () {
-      var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
-      var existente = opciones.filter(function (p) { return p.id === plantillaElegida; })[0] || null;
-      abrirEditorPlantilla(a, existente);
-    };
-    var crear = $('correo-plantilla-crear');
-    if (crear) crear.onclick = function () { abrirEditorPlantilla(a, null); };
+    PlantillaDeLoEscrito.engancharBotones(cfgPlantilla, a, function () { return plantillaElegida; });   /* fila 270 */
   }
 
   /* Cambiar de plantilla, con la confirmación en línea de siempre si el
@@ -379,28 +372,16 @@ var CorreoCuadro = (function () {
   }
 
   /* ---------- crear/editar la plantilla desde el propio cuadro
-     (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md) ---------- */
+     (fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md; el editor y el botón
+     «Guardar como plantilla nueva» de la fila 270 viven en
+     js/plantilla-de-lo-escrito.js) ---------- */
 
-  function abrirEditorPlantilla(a, existente) {
-    var formulario = $('correo-formulario');
-    var editor = $('correo-plantilla-editor');
-    if (!formulario || !editor || !window.PlantillasAjustes) return;
-    formulario.className = 'oculto';
-    editor.className = '';
-    PlantillasAjustes.montarEditorEnLinea(editor, a, existente, function (guardada) {
-      cerrarEditorPlantilla();
-      (n().recargarPlantillas ? n().recargarPlantillas(a) : Promise.resolve()).then(function () {
-        elegirPlantilla(a, guardada.id);
-      });
-    }, cerrarEditorPlantilla);
+  /* Plantilla nueva desde lo escrito: queda elegida y el texto del mensaje no se toca. */
+  function dejarElegida(a, id, texto) {
+    cambiarDePlantilla(a, id);
+    if ($('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = texto;
   }
-
-  function cerrarEditorPlantilla() {
-    var formulario = $('correo-formulario');
-    var editor = $('correo-plantilla-editor');
-    if (editor) editor.className = 'oculto';
-    if (formulario) formulario.className = '';
-  }
+  var cfgPlantilla = { prefijo: 'correo', elegir: elegirPlantilla, dejarElegida: dejarElegida };
 
   /* ---------- ENVIAR: resumen y confirmación (fila 115) ---------- */
 
