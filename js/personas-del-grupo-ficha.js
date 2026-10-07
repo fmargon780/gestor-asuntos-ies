@@ -25,7 +25,8 @@ var PersonasDelGrupoFicha = (function () {
   }
 
   function textoDeLinea(nombreTrabajo, h) {
-    var partes = [nombreTrabajo, 'generado el ' + PersonasDelGrupo.fechaLarga(h.generado.fecha)];
+    var partes = [nombreTrabajo];
+    if (h.generado) partes.push('generado el ' + PersonasDelGrupo.fechaLarga(h.generado.fecha));
     if (h.registrado.length) partes.push('registrado ' + h.registrado.join(', '));
     if (h.enviado) partes.push('enviado el ' + PersonasDelGrupo.fechaLarga(h.enviado.fecha) + (h.enviado.correo ? ' a ' + h.enviado.correo : ''));
     return partes.join(' · ');
@@ -95,9 +96,10 @@ var PersonasDelGrupoFicha = (function () {
       que.forEach(function (l) {
         var fila = document.createElement('div');
         fila.className = 'resultado' + (l ? ' pg-linea-persona' : '');
-        var texto = l ? textoDeLinea(PersonasDelGrupo.nombreDeTrabajo({ clave: l.trabajo.clave, tipo: l.trabajo.tipo, fecha: '' }, plantillas), l.h) : x.nombre;
+        var texto = l ? textoDeLinea(PersonasDelGrupo.nombreDeTrabajo({ clave: l.trabajo.clave, tipo: l.trabajo.tipo, fecha: '', aviso: l.trabajo.aviso }, plantillas), l.h) : x.nombre;
         fila.innerHTML = '<div>' + U.escapar(texto) + '</div><div class="resultado-pie">' + (l ? pie : (x.archivado ? 'Archivado' : 'Abierto')) + '</div>';
-        fila.onclick = function () { abrirAsunto(x, d, l ? l.h.generado.fichero : ''); };
+        /* Fila 295: con el correo ya enviado, la línea abre el PDF de ese correo; si no, su documento. */
+        fila.onclick = function () { abrirAsunto(x, d, l ? ((l.h.enviado && l.h.enviado.pdf) || (l.h.generado && l.h.generado.fichero) || '') : ''); };
         bloque.appendChild(fila);
         if (l) lineas++;
       });

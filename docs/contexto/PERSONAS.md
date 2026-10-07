@@ -301,6 +301,8 @@ de su carpeta solo al abrir la ficha.
 
 Fila 294 (`docs/TRABAJO-EN-BLOQUE-PDF-Y-REGISTRO.md`): la tarjeta lleva la casilla «Estos documentos se registran en Séneca» (`ficha.registroPorPersona`; con ella sale la columna «Registrado», con «Pendiente», la línea con «Ruta» y la lista «PDF sellados sin colocar», `GrupoRegistro.html/enganchar`); «Generar para todos» da muestra, barra y PDF con «Ref.» (`GrupoGenerar`); en el ⋯ de cada fila, «Volver a generar». `estado()` prefiere el PDF al Word de un mismo número.
 
+Fila 295 (`docs/TRABAJO-EN-BLOQUE-ENVIAR-A-TODOS.md`): junto a «Generar para todos ▾», **«Enviar… (N)»** (N = personas con el PDF del trabajo mirado, con registro si el trabajo lo lleva, sin enviar y con alguna dirección; «Seguir enviando (N)» si hay `ficha.envioPendiente`) y **«Enviar un aviso…»** (apagados en solo consulta o con el compañero al mando). `estado()` trata cada aviso de `ficha.avisosEnBloque` como un trabajo más (`aviso:<id>`, solo «Enviado», sin `generado`); la celda «Enviado» abre el PDF `CORREO` de su tanda (`ficha.tandasDeEnvio` `{ id, pdf }`; el apunte lleva `tanda`), o dice «No ha salido: …» (en memoria, `GrupoEnviar.fallosDe`) o «Pendiente de enviar». La línea de la ficha de la persona abre ese PDF y, en un aviso, dice «Aviso: <asunto> · enviado el … a …».
+
 ### Grupos de personas (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md)
 
 Señalar varios terceros a la vez, en vez de uno por vuelta al cuadro, y guardar listas con

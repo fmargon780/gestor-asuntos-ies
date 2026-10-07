@@ -14,11 +14,8 @@
        lo que falte de una persona se dice al final, sin parar el lote.
      - Cada uno se llama como siempre, con el nombre de la persona al
        final del texto adicional.
-     - Al terminar, un resumen con «Enviar a cada uno»: un correo por
-       persona con su documento adjunto (js/correo-enviar.js), nunca dos
-       veces el mismo documento a la misma persona (`ficha.enviosPorPersona`
-       y el `idEnvio` fijo). Quien no tiene correo sale en la lista, para
-       Séneca.
+     - Al terminar, un resumen que remite a «Enviar…» de la lista de personas
+       (fila 295: el envío a todos vive en js/grupo-enviar.js).
 
    Se engancha por la llamada que le hace js/hito-mesa-documentos.js al
    pintar las plantillas (`botonHTML` y `enganchar`): no envuelve nada.
@@ -289,110 +286,15 @@ var GenerarParaRelacionados = (function () {
       html += '<p class="aviso aviso-rojo">No he podido hacer el de: ' +
         fallidos.map(function (x) { return nombreDe(x.rel) + ' (' + U.escapar(x.motivo) + ')'; }).join(', ') + '.</p>';
     }
-    /* Los que ya estaban también se pueden mandar (a quien no lo tenga ya). */
-    var paraEnviar = hechos.concat(yaEstaban);
-    var sinCorreo = paraEnviar.filter(function (x) { return !x.correo; });
-    if (sinCorreo.length) {
-      html += '<p class="nota">Sin correo (mándaselo por Séneca): ' + sinCorreo.map(function (x) { return nombreDe(x.rel); }).join(', ') + '.</p>';
-    }
-    var conCorreo = paraEnviar.filter(function (x) { return x.correo; });
-    var puedeEnviar = conCorreo.length && window.CorreoEnviar && CorreoEnviar.tieneConexion();
-    if (conCorreo.length && !puedeEnviar) {
-      html += '<p class="nota">Para «Enviar a cada uno», conecta antes el envío de correo en Ajustes › Mantenimiento.</p>';
-    }
+    html += '<p class="nota">Para enviarlos: «Enviar…», en la lista de personas.</p>';
     U.aviso(titulo + (frases.length ? '. ' + frases.join(' ') : '.'), frases.length || fallidos.length ? 'ambar' : 'bueno');
-    var ok = await U.preguntar(titulo, html, puedeEnviar ? 'Enviar a cada uno…' : 'Cerrar', !puedeEnviar);
-    if (ok && puedeEnviar) await enviarACadaUno(a, h, conCorreo);
+    await U.preguntar(titulo, html, 'Cerrar', true);
     return { hechos: hechos, yaEstaban: yaEstaban, fallidos: fallidos, faltas: faltasPorPersona };
-  }
-
-  /* ---------- un correo a cada uno ---------- */
-
-  /* Un identificador fijo por asunto, documento y correo: el script no
-     manda dos veces el mismo (js/correo-enviar.js, fila 130). */
-  function idEnvioDe(a, documento, correo) {
-    var t = a.nombre + '|' + documento + '|' + String(correo).toLowerCase();
-    var h = 0;
-    for (var i = 0; i < t.length; i++) { h = ((h << 5) - h + t.charCodeAt(i)) | 0; }
-    return 'env-rel-' + (h >>> 0).toString(36) + '-' + t.length.toString(36);
-  }
-
-  function yaEnviado(ficha, documento, correo) {
-    return ((ficha && ficha.enviosPorPersona) || []).some(function (e) {
-      return e.documento === documento && String(e.correo).toLowerCase() === String(correo).toLowerCase();
-    });
-  }
-
-  async function plantillaDeCorreo(a) {
-    try {
-      var datos = await Plantillas.cargar(App.E.gestor);
-      var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-      var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
-      var lista = Plantillas.deTipo(datos, categoria, tipo) || [];
-      return lista.filter(function (p) { return /certificado|env[ií]o/i.test(p.nombre); })[0] || lista[0] || null;
-    } catch (e) { return null; }
-  }
-
-  function saludoPara(x) {
-    var natural = x.valores.nombreNatural || soloElNombre(x.rel.nombre);
-    return x.rel.categoria === 'EMPRESAS' || x.rel.categoria === 'ADMINISTRACIONES' ? 'Buenos días:' : 'Hola, ' + natural + ':';
-  }
-
-  function cuerpoPara(x, plantilla) {
-    var medio = plantilla ? Plantillas.rellenar(plantilla.texto, x.valores).texto
-      : 'Le enviamos adjunto el documento «' + x.nombre.replace(/\.[A-Za-z0-9]{1,8}$/, '') + '».';
-    return saludoPara(x) + '\n\n' + medio + '\n\n' + (x.valores.firma || '');
-  }
-
-  async function enviarACadaUno(a, h, conCorreo) {
-    await App.cargarRegistro();
-    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || {};
-    var pendientes = conCorreo.filter(function (x) { return !yaEnviado(ficha, x.nombre, x.correo); });
-    var repetidos = conCorreo.length - pendientes.length;
-    if (!pendientes.length) { U.aviso('Ya se había enviado a todos su documento.', 'ambar'); return; }
-    var plantilla = await plantillaDeCorreo(a);
-    var ok = await U.preguntar('Enviar a cada uno',
-      '<p>Se mandará <strong>un correo a cada persona</strong>, con su documento adjunto' +
-      (plantilla ? ' y el texto de «' + U.escapar(plantilla.nombre) + '»' : '') + ':</p>' +
-      '<ul class="generar-cada-envios">' + pendientes.map(function (x) {
-        return '<li>' + nombreDe(x.rel) + ' — ' + U.escapar(x.correo) + '</li>';
-      }).join('') + '</ul>' +
-      (repetidos ? '<p class="nota">' + repetidos + (repetidos === 1 ? ' ya lo tenía' : ' ya lo tenían') + ': no se le manda otra vez.</p>' : ''),
-      'Confirmar y enviar');
-    if (!ok) return;
-
-    var enviados = [], fallos = [];
-    for (var i = 0; i < pendientes.length; i++) {
-      var x = pendientes[i];
-      try {
-        var fichero = await (await a.handle.getFileHandle(x.nombre)).getFile();
-        var base64 = await CorreoAdjuntos.aBase64(fichero);
-        var r = await CorreoEnviar.enviar({
-          para: x.correo, cco: '', asunto: (window.CorreoNucleo && CorreoNucleo.asuntoDelCorreo) ? CorreoNucleo.asuntoDelCorreo(a) : a.nombre,
-          cuerpo: cuerpoPara(x, plantilla), hilo: '',
-          adjuntos: [{ nombre: x.nombre, tipo: fichero.type || 'application/octet-stream', base64: base64 }],
-          idEnvio: idEnvioDe(a, x.nombre, x.correo)
-        });
-        if (!r || !r.ok) throw new Error((r && r.motivo) || 'El envío no ha salido bien.');
-        enviados.push({ documento: x.nombre, correo: x.correo, cuando: U.ahora(), quien: App.E.usuario || '' });
-      } catch (e) { fallos.push(nombreDe(x.rel) + ' (' + U.mensajeDeError(e) + ')'); }
-    }
-
-    if (enviados.length) {
-      try {
-        await App.cargarRegistro();
-        var actual = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || {};
-        await App.anotar(a.nombre, { enviosPorPersona: (actual.enviosPorPersona || []).concat(enviados) });
-        if (window.Notas) await Notas.anadirAuto(a, 'Correo enviado a ' + enviados.map(function (e) { return e.correo; }).join(', ') + ', cada uno con su documento');
-      } catch (e) { U.accesorio('Enviados, pero no he podido apuntarlo en el asunto', e); }
-    }
-    if (fallos.length) U.aviso((enviados.length ? enviados.length + ' enviados. ' : '') + 'No he podido enviar a: ' + fallos.join(', ') + '.', 'malo');
-    else U.aviso(enviados.length + (enviados.length === 1 ? ' correo enviado.' : ' correos enviados, uno a cada persona.'), 'bueno');
   }
 
   return {
     relacionadosDe: relacionadosDe, botonHTML: botonHTML, enganchar: enganchar, generar: generar,
-    _interno: { idEnvioDe: idEnvioDe, yaEnviado: yaEnviado, cuerpoPara: cuerpoPara, esDeLaPersona: esDeLaPersona }
+    _interno: { esDeLaPersona: esDeLaPersona }
   };
 })();
 window.GenerarParaRelacionados = GenerarParaRelacionados;

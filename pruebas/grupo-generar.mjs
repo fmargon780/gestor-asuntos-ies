@@ -77,7 +77,7 @@ await pagina.waitForSelector('.word-visor-franja .muestra-generar', { timeout: 3
 await pagina.waitForFunction(() => /Noa/.test(document.getElementById('word-visor').textContent), null, { timeout: 15000 });
 await comprobar('1. la franja dice de quién es y cuántos se van a hacer, y trae sus dos botones',
   pagina.evaluate(() => [document.querySelector('.word-visor-franja').firstChild.textContent, document.querySelector('.muestra-generar').textContent, document.querySelector('.muestra-cancelar').textContent]),
-  ['Así queda el de Castro Reina, Noa. Se van a hacer 6 iguales, uno por persona.', 'Generar los 6', 'Cancelar']);
+  ['Así queda el de Castro Reina, Noa. Se van a hacer 8 iguales, uno por persona.', 'Generar los 8', 'Cancelar']);
 await comprobar('1. el documento que se ve es el de la primera persona', pagina.evaluate(() => /Noa Castro Reina/.test(document.getElementById('word-visor').textContent)), true);
 await pagina.click('.muestra-cancelar');
 await pagina.waitForTimeout(800);
@@ -87,7 +87,7 @@ await comprobar('2. la tabla sigue como estaba (la cuarta persona, sin nada)',
   pagina.locator('.pg-tabla tbody tr').nth(3).locator('td').allTextContents().then((c) => c[2]), '');
 
 /* ================= 3. GENERAR LOS N ================= */
-console.log('--- 3. generar los 6 ---');
+console.log('--- 3. generar los 8 ---');
 await pagina.evaluate(() => {
   window.__textos = [];
   new MutationObserver(() => { const t = document.querySelector('.grupo-barra-texto'); if (t && window.__textos[window.__textos.length - 1] !== t.textContent) window.__textos.push(t.textContent); })
@@ -97,19 +97,19 @@ await pulsarGenerar(pagina);
 await pagina.waitForSelector('.word-visor-franja .muestra-generar', { timeout: 30000 });
 await pagina.click('.muestra-generar');
 await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
-await comprobar('3. salió la barra «Generando … de 6…»', pagina.evaluate(() => window.__textos.some((t) => /^Generando \d de 6…$/.test(t))), true);
+await comprobar('3. salió la barra «Generando … de 8…»', pagina.evaluate(() => window.__textos.some((t) => /^Generando \d de 8…$/.test(t))), true);
 await comprobar('3. y se quitó al acabar', pagina.evaluate(() => !document.querySelector('.grupo-barra')), true);
-await comprobar('3. el resumen dice seis', pagina.locator('.generar-cada-resumen').textContent(), '6 documentos generados.');
+await comprobar('3. el resumen dice ocho', pagina.locator('.generar-cada-resumen').textContent(), '8 documentos generados.');
 await pagina.click('#cuadro-aceptar');
 const fechaHoy = await hoy(pagina);
 await pagina.waitForFunction((h) => [...document.querySelectorAll('.pg-tabla tbody tr')].every((r) => r.children[2].textContent.trim() === h), fechaHoy, { timeout: 20000 });
-await comprobar('3. todas las filas llevan la fecha de hoy en «Generado»', pagina.locator('.pg-cuenta').textContent().then((t) => /6 generados/.test(t)), true);
+await comprobar('3. todas las filas llevan la fecha de hoy en «Generado»', pagina.locator('.pg-cuenta').textContent().then((t) => /8 generados/.test(t)), true);
 
 const tras = await carpeta(pagina, demo);
 const nuevos = tras.filter((n) => antes.indexOf(n) === -1);
-await comprobar('3. seis PDF nuevos en la carpeta y ningún Word nuevo suelto', [nuevos.filter((n) => /\.pdf$/.test(n)).length, nuevos.filter((n) => /\.docx$/.test(n)).length], [6, 0]);
+await comprobar('3. ocho PDF nuevos en la carpeta y ningún Word nuevo suelto', [nuevos.filter((n) => /\.pdf$/.test(n)).length, nuevos.filter((n) => /\.docx$/.test(n)).length], [8, 0]);
 const previasN = (await previas(pagina, demo)).filter((n) => previasAntes.indexOf(n) === -1);
-await comprobar('3. los seis Word, en «Versiones previas», con el mismo nombre', previasN.length === 6 && nuevos.every((n) => previasN.indexOf(n.replace(/\.pdf$/, '.docx')) !== -1), true);
+await comprobar('3. los ocho Word, en «Versiones previas», con el mismo nombre', previasN.length === 8 && nuevos.every((n) => previasN.indexOf(n.replace(/\.pdf$/, '.docx')) !== -1), true);
 let todasConRef = true, sinRef = [];
 for (const n of nuevos.filter((x) => /\.pdf$/.test(x))) {
   const numero = (n.match(/D\d{2}-\d{5}/) || [''])[0];
@@ -165,7 +165,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(1200);
 const numerosDespues = await estadoFilas();
 await comprobar('7. su fila sigue con «Generado», con otro número; las demás, las mismas',
-  numerosDespues.map((x, i) => (x && x !== numerosAntes[i]) ? 'nuevo' : (x === numerosAntes[i] ? 'igual' : 'vacío')), ['igual', 'igual', 'igual', 'nuevo', 'igual', 'igual']);
+  numerosDespues.map((x, i) => (x && x !== numerosAntes[i]) ? 'nuevo' : (x === numerosAntes[i] ? 'igual' : 'vacío')), ['igual', 'igual', 'igual', 'nuevo', 'igual', 'igual', 'igual', 'igual']);
 await comprobar('7. en la papelera está su documento anterior (Word y PDF)',
   pagina.evaluate(async (num) => (await Papelera.leer()).filter((f) => String(f.nombre || '').indexOf(num) !== -1).length, numerosAntes[3]), 2);
 await comprobar('7. y la carpeta no tiene el viejo', carpeta(pagina, demo).then((l) => l.filter((n) => n.indexOf(numerosAntes[3]) !== -1).length), 0);
@@ -213,18 +213,18 @@ const parados = await p2.evaluate(() => [document.querySelector('.generar-cada-r
 await p2.click('#cuadro-aceptar');
 const nuevos2 = (await carpeta(p2, demo2)).filter((n) => antes2.indexOf(n) === -1);
 const hechos2 = nuevos2.filter((n) => /\.pdf$/.test(n)).length;
-await comprobar('5. «Parar» termina el que estaba a medias y no sigue (se hizo al menos uno y no los seis)', [hechos2 >= 1 && hechos2 < 6, parados[1], nuevos2.filter((n) => /\.docx$/.test(n)).length], [true, true, 0]);
+await comprobar('5. «Parar» termina el que estaba a medias y no sigue (se hizo al menos uno y no los ocho)', [hechos2 >= 1 && hechos2 < 8, parados[1], nuevos2.filter((n) => /\.docx$/.test(n)).length], [true, true, 0]);
 await pulsarGenerar(p2);
 await p2.waitForSelector('.word-visor-franja .muestra-generar, #capa:not(.oculto) .generar-cada-resumen', { timeout: 60000 });
 if (await p2.locator('.muestra-generar').count()) {
-  await comprobar('5. la muestra cuenta solo los que faltan', p2.evaluate(() => document.querySelector('.muestra-generar').textContent), 'Generar los ' + (6 - hechos2));
+  await comprobar('5. la muestra cuenta solo los que faltan', p2.evaluate(() => document.querySelector('.muestra-generar').textContent), 'Generar los ' + (8 - hechos2));
   await p2.click('.muestra-generar');
   await p2.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
 }
 await p2.click('#cuadro-aceptar');
 const final2 = (await carpeta(p2, demo2)).filter((n) => antes2.indexOf(n) === -1);
 const numeros2 = final2.map((n) => (n.match(/D\d{2}-\d{5}/) || [''])[0]);
-await comprobar('5. al volver a pulsar se completan los seis, sin repetir ninguno', [final2.length, new Set(numeros2).size], [6, 6]);
+await comprobar('5. al volver a pulsar se completan los ocho, sin repetir ninguno', [final2.length, new Set(numeros2).size], [8, 8]);
 await p2.close();
 
 /* ================= 6. UN WORD SIN PDF ================= */
@@ -243,10 +243,10 @@ await p3.waitForSelector('.word-visor-franja .muestra-generar', { timeout: 30000
 await p3.click('.muestra-generar');
 await p3.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
 await comprobar('6. el resumen dice cuántos y a quién no se le hizo el PDF',
-  p3.evaluate(() => [document.querySelector('.generar-cada-resumen').textContent, /su Word está hecho, pero no el PDF: fallo de prueba/.test(document.getElementById('cuadro-cuerpo').textContent)]), ['5 documentos generados.', true]);
+  p3.evaluate(() => [document.querySelector('.generar-cada-resumen').textContent, /su Word está hecho, pero no el PDF: fallo de prueba/.test(document.getElementById('cuadro-cuerpo').textContent)]), ['7 documentos generados.', true]);
 await p3.click('#cuadro-aceptar');
 const t3 = (await carpeta(p3, demo3)).filter((n) => antes3.indexOf(n) === -1);
-await comprobar('6. cinco PDF y un Word suelto (el del que falló)', [t3.filter((n) => /\.pdf$/.test(n)).length, t3.filter((n) => /\.docx$/.test(n)).length], [5, 1]);
+await comprobar('6. siete PDF y un Word suelto (el del que falló)', [t3.filter((n) => /\.pdf$/.test(n)).length, t3.filter((n) => /\.docx$/.test(n)).length], [7, 1]);
 await p3.evaluate(() => window.__restaurar());
 const docsAntes = await p3.evaluate((n) => Object.keys(App.E.registro.asuntos[n].documentos).length, demo3);
 await pulsarGenerar(p3);
@@ -254,9 +254,9 @@ await p3.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 
 await comprobar('6. sin muestra (solo falta uno) y se le hace solo el PDF', p3.evaluate(() => [!!document.querySelector('.muestra-generar'), document.querySelector('.generar-cada-resumen').textContent]), [false, '1 documento generado.']);
 await p3.click('#cuadro-aceptar');
 const f3 = (await carpeta(p3, demo3)).filter((n) => antes3.indexOf(n) === -1);
-await comprobar('6. ahora seis PDF y ningún Word suelto; ningún documento nuevo en la ficha',
+await comprobar('6. ahora ocho PDF y ningún Word suelto; ningún documento nuevo en la ficha',
   Promise.all([Promise.resolve([f3.filter((n) => /\.pdf$/.test(n)).length, f3.filter((n) => /\.docx$/.test(n)).length]), p3.evaluate((n) => Object.keys(App.E.registro.asuntos[n].documentos).length, demo3)]),
-  [[6, 0], docsAntes]);
+  [[8, 0], docsAntes]);
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 
 await navegador.close();
