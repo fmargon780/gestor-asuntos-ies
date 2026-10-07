@@ -72,7 +72,7 @@ var ParecidoDeCarpetas = (function () {
     var r = {
       numero: !!(a.numero && a.numero === b.numero),
       tercero: mismoTercero(a.id, b.id),
-      tipo: !!(a.tipo && a.tipo === b.tipo),
+      tipo: !!(a.tipo && (a.tipo === b.tipo || a.tipo + 's' === b.tipo || b.tipo + 's' === a.tipo)),   /* FACTURAS ≈ FACTURA: carpetas cambiadas a mano */
       fecha: !!(a.fecha && a.fecha === b.fecha),
       palabras: a.palabras.filter(function (p) { return b.palabras.indexOf(p) !== -1; }).length
     };

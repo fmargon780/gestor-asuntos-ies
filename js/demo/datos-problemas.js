@@ -2,7 +2,7 @@
    demo/datos-problemas.js — lo que enseña Ajustes → Problemas en la copia de pruebas (fila 291,
    docs/PROBLEMAS-CON-SU-SOLUCION.md), además del asunto sin carpeta de la fila 288
    (`crearFichaSinCarpeta` en js/demo/datos.js):
-     - la carpeta que alguien le cambió de nombre a mano (sin tildes), sin asunto: la que se elige al
+     - la carpeta que alguien le cambió de nombre a mano (sin tildes y con el tipo en plural), sin asunto: la que se elige al
        «Buscar su carpeta» (fila 292: la que encaja; y otra que no encaja, para ver el orden);
      - hitos guardados de un asunto que ya no existe y, para ver que no salen dos veces, hitos
        del asunto que ha perdido su carpeta;
@@ -29,12 +29,12 @@
 
   async function construir(tipos, sinCarpeta) {
     if (sinCarpeta) {
-      var carpetaNueva = await Carpetas.crear(App.E.abiertos, sinCarpeta.replace('Ferretería Los Álamos', 'Ferreteria Los Alamos'));
+      var carpetaNueva = await Carpetas.crear(App.E.abiertos, sinCarpeta.replace(' FACTURA ', ' FACTURAS ').replace('Ferretería Los Álamos', 'Ferreteria Los Alamos'));
       await Carpetas.escribirTexto(carpetaNueva, 'Presupuesto.txt', 'Presupuesto de la ferretería.');
       await Carpetas.escribirTexto(carpetaNueva, 'Factura 4471.txt', 'Factura de la ferretería.');
       /* Una carpeta que no encaja con nada, para ver que sale debajo. */
       var otro = Nombres.montarAsunto({
-        fecha: hace(200), tipo: Nombres.tipoParaCarpeta(tipos.CERTIFICADO), categoria: 'EMPRESAS',
+        fecha: hace(25), tipo: 'COMPRA', categoria: 'EMPRESAS',
         curso: '', grupo: '', campos: [], descripcion: '', tercero: Nombres.terceroEmpresa({ nombre: 'Taller Ruiz', nif: '99887766X' }), numero: ''
       }).nombre;
       var carpetaOtra = await Carpetas.crear(App.E.abiertos, otro);
