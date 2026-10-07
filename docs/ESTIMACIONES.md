@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 07-oct-2026 (filas 293 a 296 PENDIENTE, desde la conversación de diseño; 288 EN CURSO)
+Última puesta al día: 07-oct-2026 (fila 297 PENDIENTE, desde la conversación de diseño)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -21,3 +21,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 294 | 270 | Dos módulos nuevos: sacar el PDF del visor a una función que pinta fuera de la vista, la muestra previa, la barra con «Parar», la referencia escrita con pdf-lib, reconocerla en el nombre y en el texto del PDF sellado, partir un PDF con varias, la lista de sin colocar, PDF sellados de demostración, dos pruebas nuevas y el revisor con 13 puntos |
 | 295 | 240 | Tres módulos nuevos: la pantalla de dos columnas con la muestra y «A quién», la tanda de uno en uno con apunte cada diez, los fallos y el tope diario con «Seguir enviando», el aviso de Inicio, los avisos sin documento como un trabajo más, un PDF `CORREO` por tanda, retirar «Enviar a cada uno», dos pruebas nuevas y el revisor con 15 puntos |
 | 296 | 150 | Un módulo nuevo: partir lo pegado o el fichero, el reconocimiento por número, DNI y nombre con su índice, el cuadro con tres apartados, guardar como grupo, dos tocayos en la demostración, una prueba nueva con quince casos y el revisor con 11 puntos |
+| 297 | 120 | Arreglo sin módulo nuevo: la foto de los hitos al abrir la guía, la pregunta solo por lo cambiado con su tabla «Antes»/«Ahora», subir a la biblioteca solo unos campos, el tercer botón «Cancelar» que vuelve al cuadro de la guía, comprobar la pantalla del botón de soporte, datos de demostración, una prueba nueva con nueve casos y el revisor |
