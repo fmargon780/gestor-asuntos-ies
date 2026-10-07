@@ -109,7 +109,9 @@ for (const [clave, v] of Object.entries(valores)) {
 console.log('   (preguntados: ' + preguntados.join(' · ') + ')');
 /* El cuadro trae muchas líneas y el botón puede quedar fuera de la vista. */
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
-await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent.indexOf('generados') !== -1, null, { timeout: 20000 });
+await pagina.waitForSelector('.word-visor-franja .muestra-generar');   /* fila 294: la muestra, antes de hacer los tres */
+await pagina.click('.muestra-generar');
+await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent.indexOf('generados') !== -1, null, { timeout: 90000 });
 const textoResumen = await pagina.evaluate(() => document.getElementById('cuadro-cuerpo').textContent);
 console.log('   (resumen: ' + textoResumen + ')');
 await comprobar('4. el resumen dice los tres', textoResumen.indexOf('3 documentos generados') !== -1, true);
@@ -121,17 +123,20 @@ const lote = await pagina.evaluate(() => window.__lote);
 await comprobar('el lote termina bien, con tres', lote && lote.hechos, 3);
 
 const tras = await ficherosDelAsunto();
-await comprobar('tres Word en la carpeta', tras.filter((n) => /\.docx$/.test(n)).length, 3);
+/* Fila 294: cada uno con su PDF, y el Word a «Versiones previas». */
+await comprobar('tres PDF en la carpeta y ningún Word suelto', [tras.filter((n) => /\.pdf$/.test(n)).length, tras.filter((n) => /\.docx$/.test(n)).length], [3, 0]);
 for (const quien of ['Prueba Uno, Ana', 'Prueba Dos, Luis', 'Prueba Tres, Eva']) {
   /* Fila 239: el nombre ya no lleva a la persona (`AAMMDD TIPO D<año>-<cinco cifras>.docx`): está en el
      texto adicional que la ficha guarda de cada documento, con su número. */
   const docsFicha = await pagina.evaluate((a1) => App.E.registro.asuntos[a1].documentos || {}, ASUNTO);
   const numeroDeEl = Object.keys(docsFicha).filter((k) => (docsFicha[k].texto || '').indexOf(quien) !== -1)[0];
-  const nombre = tras.filter((n) => numeroDeEl && n.indexOf(numeroDeEl) !== -1)[0];
-  await comprobar('el documento de «' + quien + '» lleva su número y la ficha guarda su nombre', !!nombre && / CERTIFICADO D\d{2}-\d{5}\.docx$/.test(nombre) &&
+  const nombrePdf = tras.filter((n) => numeroDeEl && n.indexOf(numeroDeEl) !== -1)[0];
+  const nombre = nombrePdf && nombrePdf.replace(/\.pdf$/, '.docx');
+  await comprobar('el documento de «' + quien + '» lleva su número y la ficha guarda su nombre', !!nombrePdf && / CERTIFICADO D\d{2}-\d{5}\.pdf$/.test(nombrePdf) &&
     /participacion/.test(docsFicha[numeroDeEl].texto), true);
   const texto = await pagina.evaluate(async ([a1, n]) => {
-    const d = await window.__disco.abiertos.getDirectoryHandle(a1);
+    const d = await (await window.__disco.abiertos.getDirectoryHandle(a1)).getDirectoryHandle(await VersionesPrevias.nombreDeCarpeta(
+      await window.__disco.abiertos.getDirectoryHandle(a1)));
     const buf = await (await (await d.getFileHandle(n)).getFile()).arrayBuffer();
     return Docx.textoDelDocumento(buf);
   }, [ASUNTO, nombre]);
@@ -171,7 +176,7 @@ await pagina.evaluate(() => window.__lote);
 await pagina.waitForTimeout(300);
 await comprobar('sale un correo a cada uno', enviados.map((e) => e.para).sort(), ['ana@ejemplo.es', 'eva@ejemplo.es']);
 await comprobar('cada uno con su documento', enviados.every((e) => e.adjuntos.length === 1 &&
-  /^\d{6} CERTIFICADO D\d{2}-\d{5}\.docx$/.test(e.adjuntos[0].nombre)), true);
+  /^\d{6} CERTIFICADO D\d{2}-\d{5}\.pdf$/.test(e.adjuntos[0].nombre)), true);
 await comprobar('con el saludo a esa persona', enviados.every((e) => /^Hola, (Ana|Eva) Prueba/.test(e.cuerpo)), true);
 
 await lanzarOtraVez();

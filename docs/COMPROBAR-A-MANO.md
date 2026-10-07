@@ -229,3 +229,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 292 — problemas que se pueden arreglar (7-oct-2026)
 
 - Con los datos del centro: si en Ajustes → Problemas hay hitos de asuntos que ya no existen, comprobar con uno que «Parece este:» propone el asunto correcto.
+
+## Fila 294 — el PDF de cada persona y el registro de Séneca (7-oct-2026)
+
+- Con un certificado de verdad de un trabajo en bloque: firmarlo y darle registro de salida en Séneca, descargarlo y guardarlo en la carpeta del asunto. La tabla marca sola a esa persona como registrada. Si no lo hace y el PDF sale en «PDF sellados sin colocar», Séneca no conserva la referencia: decírselo a Claude, con el nombre con el que Séneca da el fichero y si los da de uno en uno o todos juntos.

@@ -201,9 +201,13 @@ de `App` va después del fichero que lo define.
 | `js/relacionados-archivar.js` | Archivar con relacionados (notas y marcadores), dónde es relacionado alguien, y los enganches a archivar, reabrir, el ARCHIVO y la ficha de la persona (fila 133, sacado de `js/relacionados.js`) |
 | `js/asunto-de-grupo.js` | Asunto de grupo (fila 293): `esGrupo(a)`, «Es para un grupo de personas» en «Nuevo asunto», nombre del grupo, `ficha.grupo`, cambiar su nombre y título de la tarjeta |
 | `js/personas-del-grupo.js` | La tarjeta «Personas del grupo» (fila 293): `estado(a, ficheros)` sin efectos, la tabla Generado · Registrado · Enviado, filtros, «Generar para todos ▾», «Quitar del grupo» |
+| `js/grupo-generar.js` | «Generar para todos»: la muestra, la barra «Generando N de M…», el PDF de cada persona con su «Ref.» y «Volver a generar» (fila 294) |
+| `js/grupo-registro.js` | Reconoce los PDF sellados de Séneca persona por persona: referencia, colocar, partir, «PDF sellados sin colocar» y la pasada (fila 294) |
 | `js/personas-del-grupo-ficha.js` | «En asuntos de grupo», en «Sus asuntos» de la ficha de una persona (fila 293) |
 | `js/demo/datos-grupo.js` | Copia de pruebas: «GRUPO 2ºB», seis personas, tres con certificado, una con registro y envío (fila 293) |
 | `pruebas/asunto-de-grupo.mjs` | Prueba de «Nuevo asunto» de grupo (fila 293) |
+| `pruebas/grupo-generar.mjs` | La muestra, los PDF con su «Ref.», «Parar» y «Volver a generar» (fila 294) |
+| `pruebas/grupo-registro.mjs` | Reconocer los PDF sellados: nombre, texto, partir, sin colocar, solo consulta (fila 294) |
 | `pruebas/personas-del-grupo.mjs` | Prueba de la tabla «Personas del grupo» y de la ficha de la persona (fila 293) |
 | `js/relacionados-ficha.js` | El bloque «Relacionados» de la ficha del asunto, y copiar el nombre en orden normal (fila 133, sacado de `js/relacionados.js`) |
 | `js/otros-del-tercero.js`, `css/ficha-asunto.css` | Bloque "Otros asuntos de este tercero" (separado de `js/ficha-asunto.js` en la fila 40): cada línea se pulsa y abre su ficha, y el botón "← Volver a …" que apunta siempre al asunto de partida |

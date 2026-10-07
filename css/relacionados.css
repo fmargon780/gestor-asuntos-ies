@@ -102,3 +102,12 @@
 .pg-menu-boton { font: inherit; text-align: left; background: none; border: 0; padding: 8px 10px; cursor: pointer; color: var(--tinta); border-radius: 6px; }
 .pg-menu-boton:hover:not(:disabled) { background: var(--azul-claro); }
 .pg-menu-boton:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Fila 294: la barra «Generando N de M…», la línea de registro y los PDF sellados sin colocar (js/grupo-generar.js, js/grupo-registro.js). */
+.grupo-barra { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 12px;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 0, 0, .18); padding: 8px 14px; }
+.pg-registro-linea { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; font-size: 13px; }
+.pg-registro-casilla { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.pg-sin-colocar { margin: 0 0 12px; }
+.pg-sin-colocar ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.pg-sin-colocar li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 0; }

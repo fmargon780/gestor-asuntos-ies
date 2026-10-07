@@ -500,3 +500,17 @@ Al ponerle nombre a un documento que entra en un asunto en espera (desde «Ver t
 ## Los encargos de los directivos en «Ver todo» (7-oct-2026, fila 289, `docs/ENCARGOS-DE-DIRECTIVOS.md`)
 
 «Ha llegado» de Inicio suma un tercer trozo, «N encargos» (resaltado; solo cuenta los `sin-atender`), que abre «Ver todo» con `App.irVista('clasificar', 'encargos')`: `App.E.soloQueClasificar` admite `'encargos'` (clase `solo-encargos` en `#zona-clasificar`, con su «Ver también los correos y los documentos»). `#zona-encargos` va arriba de la bandeja de correo y la pinta `EncargosLlegada.pintar()` (se llama desde `App.pintarSoloQueClasificar`): una tarjeta por encargo (quién y órgano, cuándo, texto, a quién afecta, para cuándo, documentos que abre el panel de lectura) con tres botones. Los documentos del encargo esperan en `_GESTOR/encargos/<id>/`; al atenderlo se mueven al asunto con `Carpetas.moverFichero` y pasan, uno detrás de otro, por el cuadro de ponerles nombre (mismo `serieAdjuntos` que los adjuntos de un correo, `js/bandeja-guardar.js`); después se borra su carpeta. No cambia nada de los documentos sueltos ni de la bandeja.
+
+## Los PDF sellados de un trabajo en bloque (7-oct-2026, fila 294, `docs/TRABAJO-EN-BLOQUE-PDF-Y-REGISTRO.md`)
+
+`GrupoRegistro` (`js/grupo-registro.js`): solo en un asunto con `ficha.registroPorPersona` (casilla «Estos documentos se
+registran en Séneca»; sin tocar, marcada si el hito actual tiene una tarea de registrar). Sobre `RegistroSellado.detectar`:
+la referencia `D\d{2}-\d{5}` (sin espacios) se busca en el nombre del fichero y, si no, en el texto de cada página
+(`RegistroLector.textoPorPagina`). Una sola que cuadra (documento de este asunto, sin registro, que sigue en la carpeta)
+→ `RegistroSellado.asociar` sin preguntar; varias en páginas seguidas → `PdfHerramientas.sacarPaginas` por referencia y el PDF
+entero a «Versiones previas»; si no cuadra, «PDF sellados sin colocar» con «¿De quién es?» (nunca se decide solo, ni con una
+sola persona pendiente). «No es de este trabajo» (`grupo-no-es:<asunto>` en `Almacen`) lo deja para el aviso ámbar de siempre
+(`GrupoRegistro.filtrarAviso` en `js/ficha-sellos.js`). Se mira al pintar la tarjeta y en `GrupoRegistro.pasada` (llamada
+desde `HacerEsteHitoSello.alRefrescar`; 15 s entre pasadas; no en solo consulta, ni con guardado en marcha, ni con el
+compañero al mando). Con todos los de la última plantilla registrados: `Hitos.marcarGuionPorAccion(a, hito, 'registrar')`
+una vez (`ficha.registroPorPersonaMarcado`) y «Los N están registrados.».

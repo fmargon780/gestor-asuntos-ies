@@ -169,12 +169,30 @@ var RegistroLector = (function () {
     }
   }
 
+  /* Fila 294 (js/grupo-registro.js): el texto de cada página por separado (hasta `tope`, 300 por defecto),
+     para saber qué referencia lleva cada una. Vacío si no es un PDF o no se puede leer. */
+  async function textoPorPagina(fichero, tope) {
+    try {
+      if ((await fichero.slice(0, 5).text()) !== '%PDF-') return [];
+      var pdfjsLib = await cargarPdfJs();
+      var documento = await pdfjsLib.getDocument({ data: await fichero.arrayBuffer() }).promise;
+      var limite = Math.min(documento.numPages, tope || 300), salida = [];
+      for (var n = 1; n <= limite; n++) {
+        var contenido = await (await documento.getPage(n)).getTextContent();
+        salida.push(contenido.items.map(function (i) { return i.str; }).join(' '));
+      }
+      return salida;
+    } catch (e) {
+      return [];
+    }
+  }
+
   /* Expuesta para js/verificacion.js (17-sep-2026, fila 19): el código
      de verificación del pie de un documento se busca con la misma
      máquina que ya lee el sello de Séneca, sin cargar pdf.js dos veces
      ni duplicar cómo se saca el texto de una página. */
   return {
     leerSello: leerSello, textoDePrimeraPagina: textoDePrimeraPagina,
-    buscarEnTexto: buscarEnTexto, textoDe: textoDe
+    buscarEnTexto: buscarEnTexto, textoDe: textoDe, textoPorPagina: textoPorPagina
   };
 })();

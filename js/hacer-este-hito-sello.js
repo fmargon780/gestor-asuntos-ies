@@ -133,6 +133,7 @@ var HacerEsteHitoSello = (function () {
   function alRefrescar() {
     avisar();
     pasada();
+    if (window.GrupoRegistro) GrupoRegistro.pasada();   /* fila 294: los PDF sellados de un trabajo en bloque */
   }
   if (window.Gestor && Gestor.alRefrescar) Gestor.alRefrescar.push(alRefrescar);
 

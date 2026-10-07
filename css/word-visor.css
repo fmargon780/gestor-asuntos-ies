@@ -15,6 +15,10 @@
    España, A4 con 2,5 cm arriba y abajo y 3 cm a los lados. */
 .word-visor-hoja section.docx:not([style*="padding"]) { width: 210mm; min-height: 297mm; padding: 2.5cm 3cm; box-sizing: border-box; }
 body.con-word-visor { overflow: hidden; }
+/* Fila 294: el Word pintado fuera de la vista para sacar su PDF (WordVisor.pdfDe): mismo ancho que la hoja del visor. */
+.word-visor-hoja.word-visor-fuera { position: fixed; left: -100000px; top: 0; width: 100vw; flex: none; overflow: visible; }
+/* Fila 294: la franja de la muestra de «Generar para todos», con sus botones. */
+.word-visor-franja .franja-botones { display: inline-flex; gap: 8px; margin-left: 12px; vertical-align: middle; }
 
 /* Imprimir: solo las páginas del Word. */
 @media print {

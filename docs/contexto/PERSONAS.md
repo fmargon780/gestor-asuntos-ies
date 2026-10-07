@@ -299,6 +299,8 @@ ficha de la persona**, «Sus asuntos» lleva «En asuntos de grupo» (`js/person
 `App.trasPintarFicha`; sustituye a «Relacionado con este asunto»): una línea por asunto y trabajo, los archivados leídos
 de su carpeta solo al abrir la ficha.
 
+Fila 294 (`docs/TRABAJO-EN-BLOQUE-PDF-Y-REGISTRO.md`): la tarjeta lleva la casilla «Estos documentos se registran en Séneca» (`ficha.registroPorPersona`; con ella sale la columna «Registrado», con «Pendiente», la línea con «Ruta» y la lista «PDF sellados sin colocar», `GrupoRegistro.html/enganchar`); «Generar para todos» da muestra, barra y PDF con «Ref.» (`GrupoGenerar`); en el ⋯ de cada fila, «Volver a generar». `estado()` prefiere el PDF al Word de un mismo número.
+
 ### Grupos de personas (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md)
 
 Señalar varios terceros a la vez, en vez de uno por vuelta al cuadro, y guardar listas con

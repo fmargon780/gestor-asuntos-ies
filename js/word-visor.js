@@ -90,7 +90,7 @@ var WordVisor = (function () {
     try { if (!blob && op.handle) blob = await op.handle.getFile(); }
     catch (e) { U.fallo('No he podido abrir el documento', e); return; }
     actual = { blob: blob, nombre: op.nombre || (blob && blob.name) || 'documento.docx', carpeta: op.carpeta || null,
-               asunto: op.asunto || null, hito: op.hito || null };
+               asunto: op.asunto || null, hito: op.hito || null, alCerrar: op.alCerrar || null };
     capa.querySelector('.word-visor-nombre').textContent = actual.nombre;
     capa.querySelector('.word-visor-pdf').disabled = !actual.carpeta;
     capa.querySelector('.word-visor-pdf').title = actual.carpeta ? '' : 'Ábrelo desde la ficha del asunto para guardar el PDF en su carpeta';
@@ -116,7 +116,9 @@ var WordVisor = (function () {
     capa.querySelector('.word-visor-hoja').innerHTML = '';
     var f = capa.querySelector('.word-visor-franja');
     if (f) f.remove();
+    var alCerrar = actual && actual.alCerrar;
     actual = null;
+    if (alCerrar) { try { alCerrar(); } catch (e) { /* un aviso de más o de menos */ } }   /* fila 294: la muestra de «Generar para todos» */
   }
 
   function cerrarSiAbierto() {
@@ -138,23 +140,49 @@ var WordVisor = (function () {
 
   function nombrePdf(nombre) { return String(nombre).replace(/\.docx?$/i, '') + '.pdf'; }
 
-  /* Cada página, como imagen a 200 ppp, en un PDF con su tamaño en puntos. */
-  async function hacerPdf() {
+  /* Cada página, como imagen a 200 ppp, en un PDF con su tamaño en puntos.
+     Fila 294: `hacerPdfDe(lista, opciones)` vale para cualquier lista de páginas (la del visor o la de un contenedor
+     fuera de la vista). Con `opciones.referencia`, cada página lleva ese texto de verdad, en pequeño, en vertical en el
+     margen izquierdo (por encima de la banda de la firma y por debajo de la del sello, docs/HUECO-PARA-SELLO-Y-FIRMA.md). */
+  async function hacerPdfDe(lista, opciones) {
     var html2canvas = await cargarScript('js/lib/html2canvas.min.js', 'html2canvas');
     var PDFLib = await cargarScript('js/lib/pdf-lib.min.js', 'PDFLib');
     var pdf = await PDFLib.PDFDocument.create();
-    var lista = paginas();
     if (!lista.length) throw new Error('El documento no tiene páginas que guardar.');
+    var referencia = opciones && opciones.referencia;
+    var letra = referencia ? await pdf.embedFont(PDFLib.StandardFonts.Helvetica) : null;
     for (var i = 0; i < lista.length; i++) {
       var el = lista[i];
       var lienzo = await html2canvas(el, { scale: PPP / 96, backgroundColor: '#ffffff', useCORS: true, logging: false });
       var bytes = await new Promise(function (r) { lienzo.toBlob(function (b) { r(b.arrayBuffer()); }, 'image/jpeg', 0.92); });
+      lienzo.width = lienzo.height = 0;   /* suelta la memoria del lienzo antes del siguiente */
       var img = await pdf.embedJpg(await bytes);
       var ancho = el.offsetWidth * 0.75, alto = el.offsetHeight * 0.75;
       var pagina = pdf.addPage([ancho, alto]);
       pagina.drawImage(img, { x: 0, y: 0, width: ancho, height: alto });
+      if (referencia) {
+        pagina.drawText(String(referencia), { x: 12, y: Math.min(82, alto * 0.2), size: 7, font: letra,
+          color: PDFLib.rgb(0.45, 0.45, 0.45), rotate: PDFLib.degrees(90) });
+      }
+      if (lista.length > 1) await new Promise(function (r) { setTimeout(r, 0); });   /* cede el paso al navegador */
     }
     return new Blob([await pdf.save()], { type: 'application/pdf' });
+  }
+
+  function hacerPdf() { return hacerPdfDe(paginas()); }
+
+  /* Fila 294: el PDF de un Word sin enseñar el visor. El Word se pinta en un contenedor fuera de la vista, con las mismas
+     clases que la hoja del visor (mismo corte de páginas), y se quita al acabar. */
+  async function pdfDe(blob, opciones) {
+    var docx = await librerias();
+    var fuera = document.createElement('div');
+    fuera.className = 'word-visor-hoja word-visor-fuera';
+    fuera.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(fuera);
+    try {
+      await docx.renderAsync(blob, fuera, null, OPCIONES_DE_PINTADO);
+      return await hacerPdfDe(Array.prototype.slice.call(fuera.querySelectorAll('section.docx')), opciones);
+    } finally { fuera.remove(); }
   }
 
   async function yaExiste(carpeta, nombre) {
@@ -215,7 +243,7 @@ var WordVisor = (function () {
   }
 
   return { abrir: abrir, cerrar: cerrar, cerrarSiAbierto: cerrarSiAbierto, abierto: abierto,
-           nombrePdf: nombrePdf, hacerPdf: hacerPdf, pintarEn: pintarEn,
+           nombrePdf: nombrePdf, hacerPdf: hacerPdf, pdfDe: pdfDe, pintarEn: pintarEn,
            guardarPdfAhora: function (opciones) { return guardarPdf(null, opciones); }, franja: franja };
 })();
 window.WordVisor = WordVisor;

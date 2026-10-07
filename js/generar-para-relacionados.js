@@ -108,7 +108,9 @@ var GenerarParaRelacionados = (function () {
     var docs = (a.ficha && a.ficha.documentos) || {};
     var numeros = Object.keys(docs).filter(function (n) { return docs[n].generadoDe === clave && docs[n].fecha === fecha; });
     for (var i = 0; i < numeros.length; i++) {
-      var hallado = nombresEnCarpeta.filter(function (f) { return f.indexOf(numeros[i]) !== -1; })[0];
+      var halladas = nombresEnCarpeta.filter(function (f) { return f.indexOf(numeros[i]) !== -1; });
+      /* Fila 294: con su PDF hecho, es el PDF el que cuenta; un Word solo (se paró a medias) es «sin PDF». */
+      var hallado = halladas.filter(function (f) { return /\.pdf$/i.test(f); })[0] || halladas[0];
       if (hallado) return hallado;
     }
     return '';
@@ -116,8 +118,24 @@ var GenerarParaRelacionados = (function () {
 
   /* ---------- generar el lote ---------- */
 
-  async function generar(a, plantillaDoc, h) {
+  function claveDeGenerado(plantillaDoc, rel) {
+    return (plantillaDoc.id || plantillaDoc.nombre || plantillaDoc.tipoDocumento || '') + '|' + (rel.categoria || '') + '|' + rel.nombre;
+  }
+
+  /* El Word ya rellenado de una persona (con lo que se ha escrito a mano y las tablas resaltadas). */
+  async function resultadoDe(x, aMano) {
+    var resultado = x.resultado;
+    if (aMano) resultado = await Docx.rellenar(x.buffer, Object.assign({}, x.valores, { aMano: aMano }));
+    if (x.tablas && window.TablasDatos) resultado = await TablasDatos.resaltarResultado(resultado, x.tablas.faltan);
+    return resultado;
+  }
+
+  /* `opciones.soloA` (fila 294, «Volver a generar»): solo esa persona. */
+  async function generar(a, plantillaDoc, h, opciones) {
     var personas = relacionadosDe(a);
+    if (opciones && opciones.soloA) {
+      personas = personas.filter(function (r) { return r.categoria === opciones.soloA.categoria && r.nombre === opciones.soloA.nombre; });
+    }
     if (!personas.length) { U.aviso('Este asunto no tiene relacionados.', 'ambar'); return; }
     var I = (window.PlantillasDocumento && PlantillasDocumento._interno) || {};
     if (!I.leerConMembrete) return;
@@ -160,22 +178,36 @@ var GenerarParaRelacionados = (function () {
     var yaEsta;
     try { yaEsta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); } catch (e) { yaEsta = []; }
 
-    var hechos = [], yaEstaban = [], fallidos = [], faltasPorPersona = [];
+    /* Fila 294: antes de hacer todos, uno de muestra (con una sola persona, no). */
+    var porHacer = todos.filter(function (x) {
+      var ya = nombreYaGenerado(a, yaEsta, claveDeGenerado(plantillaDoc, x.rel), fecha);
+      return !ya || !/\.pdf$/i.test(ya);
+    });
+    if (window.GrupoGenerar && porHacer.length > 1) {
+      var blobMuestra = (await resultadoDe(porHacer[0], aMano)).blob;
+      var sigue = await GrupoGenerar.muestra(blobMuestra, soloElNombre(porHacer[0].rel.nombre) || porHacer[0].rel.nombre, porHacer.length);
+      if (!sigue) { U.aviso('No se ha generado nada.', 'ambar'); return; }
+    }
+
+    var hechos = [], yaEstaban = [], fallidos = [], faltasPorPersona = [], parado = false;
+    var barra = window.GrupoGenerar ? GrupoGenerar.barra(todos.length) : null;
     for (var j = 0; j < todos.length; j++) {
       var x = todos[j];
+      if (barra) { if (barra.parado()) { parado = true; break; } barra.avanzar(j + 1); }
       try {
-        var resultado = x.resultado;
-        if (aMano) {
-          resultado = await Docx.rellenar(x.buffer, Object.assign({}, x.valores, { aMano: aMano }));
-        }
-        if (x.tablas && window.TablasDatos) resultado = await TablasDatos.resaltarResultado(resultado, x.tablas.faltan);
+        var resultado = await resultadoDe(x, aMano);
         /* Fila 239: cada documento lleva su número, y la persona (antes en
            el nombre) va a la ficha. Para no repetirlo si se vuelve a pulsar,
            se recuerda de quién y de qué plantilla salió. */
         var textoDoc = ((plantillaDoc.texto || '') + ' ' + soloElNombre(x.rel.nombre)).trim();
-        var claveGenerado = (plantillaDoc.id || plantillaDoc.nombre || plantillaDoc.tipoDocumento || '') + '|' +
-          (x.rel.categoria || '') + '|' + x.rel.nombre;
+        var claveGenerado = claveDeGenerado(plantillaDoc, x.rel);
         var yaHecho = nombreYaGenerado(a, yaEsta, claveGenerado, fecha);
+        if (yaHecho && window.GrupoGenerar && !/\.pdf$/i.test(yaHecho)) {
+          /* Fila 294: tiene el Word pero no el PDF (se paró a medias): solo se le hace el PDF. */
+          var soloPdf = await GrupoGenerar.soloElPdf(a, yaHecho);
+          hechos.push({ rel: x.rel, nombre: soloPdf, correo: x.valores.correo || '', valores: x.valores, claveGenerado: claveGenerado });
+          continue;
+        }
         if (yaHecho || hechos.some(function (d) { return d.claveGenerado === claveGenerado; })) {
           yaEstaban.push({ rel: x.rel, nombre: yaHecho, correo: x.valores.correo || '', valores: x.valores });
           continue;
@@ -196,14 +228,24 @@ var GenerarParaRelacionados = (function () {
         }
         var faltanDeEl = resultado.faltan.filter(function (f) { return esDeLaPersona(f, etiquetas); });
         if (faltanDeEl.length) faltasPorPersona.push({ rel: x.rel, faltan: faltanDeEl });
+        /* Fila 294: su PDF, con el mismo nombre y su referencia; en el hito se apunta el PDF, no el Word. */
+        if (window.GrupoGenerar) {
+          try { nombreDoc = await GrupoGenerar.hacerPdf(a, nombreDoc, resultado.blob, numeroDoc); }
+          catch (ePdf) {
+            fallidos.push({ rel: x.rel, motivo: 'su Word está hecho, pero no el PDF: ' + U.mensajeDeError(ePdf) });
+            continue;
+          }
+        }
         hechos.push({ rel: x.rel, nombre: nombreDoc, correo: x.valores.correo || '', valores: x.valores, claveGenerado: claveGenerado });
       } catch (e) {
         fallidos.push({ rel: x.rel, motivo: U.mensajeDeError(e) });
       }
     }
 
+    if (barra) barra.quitar();
+    if (window.GrupoGenerar) await GrupoGenerar.ordenar(a);   /* los Word con su PDF pasan a «Versiones previas» */
     await apuntar(a, h, plantillaDoc, hechos);
-    var salida = await resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona);
+    var salida = await resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona, parado ? todos.length : 0);
     if (window.PersonasDelGrupo) PersonasDelGrupo.repintar(a);   /* fila 293: la tabla «Personas del grupo» se pone al día sola */
     return salida;
   }
@@ -225,7 +267,7 @@ var GenerarParaRelacionados = (function () {
 
   function nombreDe(rel) { return U.escapar(soloElNombre(rel.nombre) || rel.nombre); }
 
-  async function resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona) {
+  async function resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona, paradoDeTotal) {
     var n = hechos.length;
     var frases = frasesDeFaltas(faltasPorPersona);
     var titulo = n + (n === 1 ? ' documento generado' : ' documentos generados');
@@ -235,6 +277,9 @@ var GenerarParaRelacionados = (function () {
       html += '<ul class="generar-cada-faltas">' + faltasPorPersona.map(function (x) {
         return '<li>' + nombreDe(x.rel) + ': falta ' + U.escapar(x.faltan.map(queFalta).join(', ')) + '</li>';
       }).join('') + '</ul>';
+    }
+    if (paradoDeTotal) {
+      html += '<p class="nota">Lo has parado: se han hecho ' + n + ' de ' + paradoDeTotal + '. Vuelve a pulsar «Generar para todos» para terminar; no se repite ninguno.</p>';
     }
     if (yaEstaban.length) {
       html += '<p class="nota">Ya estaban en la carpeta (no se han vuelto a hacer): ' +

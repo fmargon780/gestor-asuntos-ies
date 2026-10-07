@@ -34,6 +34,9 @@
     /* Fila 285: con un hito esperando su PDF sellado, se coloca solo sin preguntar (si no hay dudas). */
     if (window.HacerEsteHitoSello) detectados = await HacerEsteHitoSello.alDetectar(a, detectados);
     if (N.actual !== a) return;
+    /* Fila 294: en un asunto con «Estos documentos se registran en Séneca», esos PDF van a la lista de la tarjeta. */
+    if (window.GrupoRegistro) detectados = await GrupoRegistro.filtrarAviso(a, detectados);
+    if (N.actual !== a) return;
 
     if (!detectados.length) { caja.innerHTML = ''; return; }
 

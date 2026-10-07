@@ -40,6 +40,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Lo que la aplicación ha encontrado mal y hay que arreglar, con qué pasa, por qué y qué hacer (fila 291) | **problema** («N problemas por resolver», pestaña «Problemas») | huérfano, huérfana, ficha sin carpeta, envoltura, aviso de fallo |
 | Pasar los hitos guardados bajo un nombre viejo a un asunto vivo (fila 292) / lo que difiere entre dos versiones guardadas a la vez | **Son de este asunto…**, **Pasar los hitos**, **Unir los hitos**; **Qué cambia** | mover, fusionar, diff |
 | Un asunto cuyo tercero es un grupo de personas (fila 293) / las personas de ese grupo / lo que se le hace a todas con una plantilla | **asunto de grupo** («Es para un grupo de personas»), **Personas del grupo**; **Generado**, **Registrado**, **Enviado** (columnas) | lote, masivo, bloque, tanda, mailing |
+| La vista previa de «Generar para todos» / su barra / lo que no se ha podido colocar de Séneca (fila 294) | **«Así queda el de…»** con «Generar los N» y «Cancelar»; **«Generando 12 de 30…»** con «Parar»; **«Estos documentos se registran en Séneca»**, «Pendiente», **«PDF sellados sin colocar»**, «¿De quién es?», «No es de este trabajo», «Volver a generar»; la **«Ref.»** de cada PDF | previsualización, progreso, huérfano, reintentar |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).
