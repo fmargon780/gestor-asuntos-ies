@@ -199,6 +199,9 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 296 | `docs/TRABAJO-EN-BLOQUE-LISTA-PEGADA.md` (cuarta de cuatro, va después de la 293: al formar un grupo, «Pegar una lista» de Séneca o de una hoja de cálculo, o elegir el fichero; la app reconoce a cada persona por su número, su DNI o su nombre, pregunta cuando hay dos iguales y dice a quién no encuentra; se puede guardar como grupo; módulo nuevo `js/lista-pegada.js`) | PENDIENTE (7-oct-2026) |
 | 298 | Aviso de usuario: error en «Inicio» | DESCARTADA (7-oct-2026): descartada por Francisco desde el Centro de mando |
 | 299 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (7-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1XW4NDCPJZ0DmAZ66hzSD568VW8jrRelI/view?usp=drivesdk |
+| 300 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (7-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1whMmWcTx9RweW0jXrfPfBf4EN249LDHj/view?usp=drivesdk |
+| 301 | `docs/REGLAS-DE-ACUERDO.md` (una sola regla por asunto) | PENDIENTE (7-oct-2026) |
+| 302 | `docs/PRUEBAS-ROTAS.md` (arreglar o retirar las que fallan) | PENDIENTE (7-oct-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
