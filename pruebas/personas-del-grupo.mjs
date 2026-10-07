@@ -77,7 +77,7 @@ await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(1800);
 await comprobar('2. el resumen de la tarjeta cerrada',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '6 personas · 3 generados · 1 registrado · 1 enviado');
+  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '6 personas · 3 generados · 2 registrados · 1 enviado');   /* la tercera, colocada sola por su «Ref.» (fila 294) */
 await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina.waitForSelector('.pg-tabla');
 const columnas = () => pagina.locator('.pg-tabla thead th').allTextContents();
@@ -89,8 +89,8 @@ const hoy = await pagina.evaluate(() => PersonasDelGrupo.fechaLarga(U.hoyIso()))
 const hace3 = await pagina.evaluate(() => { const d = new Date(Date.now() - 3 * 86400000); return PersonasDelGrupo.fechaLarga(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')); });
 await comprobar('2. la primera: generada, con su registro y su envío (fecha y dirección)',
   fila(0).then((c) => [c[0], c[1], c[2], c[3], /tutor\.noa@correo-demo\.es/.test(c[4])]), ['Castro Reina, Noa', '2º B', hace3, '26SM0412', true]);
-await comprobar('2. la segunda y la tercera: solo generadas; la cuarta, vacía',
-  Promise.all([fila(1), fila(2), fila(3)]).then(([a, b, c]) => [a[2] === hace3 && !a[3] && !a[4], b[2] === hace3 && !b[3] && !b[4], !c[2] && !c[3] && !c[4]]), [true, true, true]);
+await comprobar('2. la segunda: solo generada (registro «Pendiente»); la tercera, con el registro de su PDF sellado; la cuarta, vacía',
+  Promise.all([fila(1), fila(2), fila(3)]).then(([a, b, c]) => [a[2] === hace3 && a[3] === 'Pendiente' && !a[4], b[2] === hace3 && b[3] === '26SM0413' && !b[4], !c[2] && !c[3] && !c[4]]), [true, true, true]);
 await pagina.check('.pg-solo-falta');
 await comprobar('2. «Solo lo que falta» deja fuera a la que lo tiene todo',
   pagina.locator('.pg-tabla tbody tr .pg-persona').allTextContents().then((l) => [l.length, l.indexOf('Castro Reina, Noa')]), [5, -1]);
@@ -100,7 +100,7 @@ await comprobar('2. con seis personas no sale el buscador por nombre', pagina.lo
 /* El menú de una fila. */
 await pagina.locator('.pg-tabla tbody tr').nth(1).locator('.pg-mas').click();
 await comprobar('2. con algo generado, «Quitar del grupo» está apagado',
-  pagina.locator('.pg-menu button').evaluateAll((bs) => bs.map((b) => b.textContent + ':' + b.disabled)), ['Abrir su ficha:false', 'Copiar el nombre:false', 'Quitar del grupo:true']);
+  pagina.locator('.pg-menu button').evaluateAll((bs) => bs.map((b) => b.textContent + ':' + b.disabled)), ['Abrir su ficha:false', 'Copiar el nombre:false', 'Quitar del grupo:true', 'Volver a generar:false']);
 await pagina.keyboard.press('Escape');
 await comprobar('2. Escape cierra solo el menú, no la tarjeta',
   pagina.evaluate(() => [document.querySelector('.pg-menu').classList.contains('oculto'), FichaTarjetas.abierta()]), [true, 'relacionados']);
@@ -115,7 +115,7 @@ await pagina.locator('.pg-menu button', { hasText: 'Quitar del grupo' }).click()
 await pagina.waitForFunction(() => document.querySelectorAll('.pg-tabla tbody tr').length === 5);
 await comprobar('2. sin nada hecho, «Quitar del grupo» quita y la cuenta baja en uno',
   pagina.evaluate((n) => [App.E.registro.asuntos[n].relacionados.length, document.querySelector('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-titulo').textContent.trim(), document.querySelector('.pg-cuenta').textContent], demo),
-  [5, 'Personas del grupo (5)', '5 personas · 3 generados · 1 registrado · 1 enviado']);
+  [5, 'Personas del grupo (5)', '5 personas · 3 generados · 2 registrados · 1 enviado']);
 
 await pagina.locator('.pg-tabla tbody tr').nth(0).locator('.pg-mas').click();
 await pagina.locator('.pg-menu button', { hasText: 'Abrir su ficha' }).click();
@@ -158,7 +158,9 @@ await pagina.waitForSelector('.pg-tabla');
 await pagina.click('.pg-generar');
 await comprobar('4. el menú ofrece la plantilla del tipo', pagina.locator('.pg-menu button').allTextContents(), ['Certificado de notas']);
 await pagina.click('.pg-menu button');
-await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 20000 });
+await pagina.waitForSelector('.word-visor-franja .muestra-generar');   /* fila 294: antes, una muestra */
+await pagina.click('.muestra-generar');
+await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
 await comprobar('4. el resumen dice cuántos documentos', pagina.locator('.generar-cada-resumen').textContent(), '5 documentos generados.');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction((h) => [...document.querySelectorAll('.pg-tabla tbody tr')].every((r) => r.children[2].textContent.trim() === h), hoy, { timeout: 15000 });
@@ -175,7 +177,9 @@ await pagina.evaluate(async () => {
 await pagina.click('.pg-generar');
 await comprobar('4. con dos plantillas en el tipo, el menú las ofrece', pagina.locator('.pg-menu button').allTextContents(), ['Certificado de notas', 'Otro certificado']);
 await pagina.locator('.pg-menu button', { hasText: 'Otro certificado' }).click();
-await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 20000 });
+await pagina.waitForSelector('.word-visor-franja .muestra-generar');
+await pagina.click('.muestra-generar');
+await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('.pg-trabajo-lista', { timeout: 15000 });
 await comprobar('4. aparece «Qué se mira» con los dos trabajos, el último elegido',

@@ -37,7 +37,7 @@ var PersonasDelGrupo = (function () {
     (ficheros || []).forEach(function (f) {
       var n = numeroDe(f);
       if (!n) return;
-      if (!porNumero[n] || /\.docx$/i.test(f)) porNumero[n] = f;
+      if (!porNumero[n] || /\.pdf$/i.test(f)) porNumero[n] = f;   /* fila 294: con su PDF, el PDF */
     });
     var indice = {};
     var personas = (ficha.relacionados || []).map(function (r) {
@@ -166,15 +166,15 @@ var PersonasDelGrupo = (function () {
       '" title="Abrir su documento">' + U.escapar(fechaLarga(f.generado.fecha)) + '</button>';
   }
 
-  function tablaHtml(est, vista, unidades, abierto) {
+  function tablaHtml(est, vista, unidades, conRegistro) {
     var cab = '<tr><th>Persona</th>' + (unidades ? '<th>Unidad</th>' : '') +
-      '<th>Generado</th><th>Registrado</th><th>Enviado</th><th></th></tr>';
+      '<th>Generado</th>' + (conRegistro ? '<th>Registrado</th>' : '') + '<th>Enviado</th><th></th></tr>';
     var cuerpo = vista.map(function (f) {
       var p = f.persona;
       return '<tr data-i="' + f.i + '"><td class="pg-persona">' + U.escapar(soloElNombre(p.nombre) || p.nombre) + '</td>' +
         (unidades ? '<td>' + U.escapar(unidades[p.nombre] || '') + '</td>' : '') +
         '<td class="pg-generado">' + celdaGenerado(f) + '</td>' +
-        '<td class="pg-registrado">' + U.escapar(f.registrado.join(', ')) + '</td>' +
+        (conRegistro ? '<td class="pg-registrado">' + (f.registrado.length ? U.escapar(f.registrado.join(', ')) : (f.generado ? '<span class="suave">Pendiente</span>' : '')) + '</td>' : '') +
         '<td class="pg-enviado">' + (f.enviado ? U.escapar(fechaLarga(f.enviado.fecha) + (f.enviado.correo ? ' · ' + f.enviado.correo : '')) : '') + '</td>' +
         '<td><button type="button" class="boton boton-chico pg-mas" data-solo-lectura title="Más acciones">⋯</button></td></tr>';
     }).join('');
@@ -187,6 +187,9 @@ var PersonasDelGrupo = (function () {
     var ficha = fichaDe(a);
     var lista = ficha.relacionados || [];
     var mem = memoria[a.nombre] || (memoria[a.nombre] = { trabajo: '', texto: '', solo: false });
+    /* Fila 294: con «Estos documentos se registran en Séneca», se miran antes los PDF sellados de la carpeta. */
+    var conRegistro = !!(window.GrupoRegistro && GrupoRegistro.activo(a)), sinColocar = [];
+    if (conRegistro && GrupoRegistro.hayPendientes(a)) sinColocar = (await GrupoRegistro.revisar(a)).sinColocar;
     var ficheros = [];
     try { ficheros = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); } catch (e) { ficheros = []; }
     var plantillas = null;
@@ -217,6 +220,7 @@ var PersonasDelGrupo = (function () {
             '<button type="button" class="boton pg-generar"' + (propia ? '' : ' disabled') + '>Generar para todos ▾</button>' +
             '<button type="button" class="boton pg-anadir"' + (propia ? '' : ' disabled') + '>+ Añadir personas</button>' +
           '</span></div><div class="pg-menu oculto"></div>' +
+        (window.GrupoRegistro ? '<div class="pg-registro">' + GrupoRegistro.html(est, trabajo, conRegistro, sinColocar) + '</div>' : '') +
         '<div class="pg-tabla-caja">' + (lista.length ? '' : '<p class="explica">Nadie en el grupo todavía.</p>') + '</div>';
       pintarCuerpo();
     });
@@ -224,8 +228,9 @@ var PersonasDelGrupo = (function () {
     function pintarCuerpo() {
       var vista = filas(est, trabajo, { texto: mem.texto, soloFalta: mem.solo });
       var cajaTabla = caja.querySelector('.pg-tabla-caja');
-      if (lista.length) cajaTabla.innerHTML = tablaHtml(est, vista, unidades, abierto);
+      if (lista.length) cajaTabla.innerHTML = tablaHtml(est, vista, unidades, conRegistro);
     }
+    if (window.GrupoRegistro) GrupoRegistro.enganchar(caja.querySelector('.pg-registro'), a, est, trabajo, sinColocar, propia, function () { pintar(caja, a, abierto, alCambiar); });
     var buscar = caja.querySelector('.pg-buscar');
     if (buscar) buscar.oninput = function () { mem.texto = buscar.value; pintarCuerpo(); };
     caja.querySelector('.pg-solo-falta').onchange = function (ev) { mem.solo = ev.target.checked; pintarCuerpo(); };
@@ -241,7 +246,7 @@ var PersonasDelGrupo = (function () {
       var abrirDoc = ev.target.closest('.pg-abrir');
       if (abrirDoc) { abrirDocumento(a, abrirDoc.dataset.fichero); return; }
       var mas = ev.target.closest('.pg-mas');
-      if (mas) menuDeFila(caja, a, est, parseInt(mas.closest('tr').dataset.i, 10), mas, propia, alCambiar);
+      if (mas) menuDeFila(caja, a, est, trabajo, parseInt(mas.closest('tr').dataset.i, 10), mas, propia, alCambiar);
     };
   }
 
@@ -285,9 +290,10 @@ var PersonasDelGrupo = (function () {
     return b;
   }
 
-  function menuDeFila(caja, a, est, i, boton, propia, alCambiar) {
+  function menuDeFila(caja, a, est, trabajo, i, boton, propia, alCambiar) {
     var persona = est.personas[i];
     var r = { categoria: persona.categoria, nombre: persona.nombre };
+    var hecho = trabajo && persona.hechos[trabajo];
     var tieneAlgo = Object.keys(persona.hechos).some(function (k) { return persona.hechos[k].generado || persona.hechos[k].enviado; });
     ponerMenu(caja, boton, [
       botonDeMenu('Abrir su ficha', function () { abrirFicha(persona); }),
@@ -300,7 +306,13 @@ var PersonasDelGrupo = (function () {
           await App.anotarLista(a.nombre, 'relacionados', { quitar: [r] });
           if (alCambiar) alCambiar();
         } catch (e) { U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo'); }
-      }, !propia || tieneAlgo, tieneAlgo ? 'Ya se le ha hecho algo: no se puede quitar' : '')
+      }, !propia || tieneAlgo, tieneAlgo ? 'Ya se le ha hecho algo: no se puede quitar' : ''),
+      botonDeMenu('Volver a generar', async function () {
+        try { await GrupoGenerar.volverAGenerar(a, r, hitoActual(a), trabajo, hecho.generado.numero); }
+        catch (e) { U.fallo('No he podido volver a generarlo', e); }
+        finally { if (alCambiar) alCambiar(); }
+      }, !propia || !hecho || !hecho.generado || hecho.registrado.length > 0 || !!hecho.enviado || !window.GrupoGenerar,
+      hecho && (hecho.registrado.length || hecho.enviado) ? 'Ya está registrado o enviado: no se puede volver a generar' : '')
     ]);
   }
 
@@ -365,6 +377,6 @@ var PersonasDelGrupo = (function () {
   }
 
   return { alRenombrar: alRenombrar, repintar: repintar, estado: estado, filas: filas, cuentas: cuentas, textoResumen: textoResumen, conAlgoHecho: conAlgoHecho, conAlgo: conAlgo,
-           aplica: aplica, pintar: pintar, fechaLarga: fechaLarga, nombreDeTrabajo: nombreDeTrabajo };
+           aplica: aplica, pintar: pintar, hitoActual: hitoActual, fechaLarga: fechaLarga, nombreDeTrabajo: nombreDeTrabajo };
 })();
 window.PersonasDelGrupo = PersonasDelGrupo;

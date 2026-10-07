@@ -113,3 +113,20 @@ lo repetido y los sellos (`Firmado digitalmente`, `CSV`, código de registro…)
 pintado con pdf.js (canvas, no el `<iframe>` del visor: se comprueba igual en un navegador sin visor de PDF).
 Copia de pruebas: `JUSTIFICANTE` (2 páginas) y `LISTADO` (tabla) en el asunto de Pablo. Pruebas:
 `pruebas/convertir-en-plantilla-pdf.mjs` y `pruebas/convertir-en-plantilla-pdf-pantalla.mjs`.
+
+## «Generar para todos»: muestra, PDF de cada persona y «Ref.» (7-oct-2026, fila 294, `docs/TRABAJO-EN-BLOQUE-PDF-Y-REGISTRO.md`)
+
+- `WordVisor.pdfDe(blob, { referencia })`: el PDF de un Word sin enseñar el visor. Pinta el Word en un contenedor fuera de la
+  vista (`.word-visor-hoja.word-visor-fuera`: mismas clases que la hoja del visor, mismo corte de páginas) y llama a
+  `hacerPdfDe(lista, opciones)`, que es la máquina de «Guardar PDF» (ahora con lista de páginas): una imagen a 200 ppp por
+  página, soltando el lienzo antes de la siguiente y cediendo el paso al navegador. «Guardar PDF» no cambia ni lleva «Ref.».
+  Con `referencia`, cada página lleva ese texto de verdad (Helvetica 7 pt, gris, en vertical en el margen izquierdo, x=12,
+  por encima de la banda de la firma —2,5 cm— y por debajo de la del sello): decisión de esta fila, porque abajo a la
+  izquierda es donde cae la firma. `WordVisor.abrir({ alCerrar })`: el visor avisa al cerrarse (lo usa la muestra).
+- `GrupoGenerar` (`js/grupo-generar.js`) lo usa `GenerarParaRelacionados.generar(a, plantilla, hito, { soloA })`: tras
+  preguntar lo que falte, con más de uno por hacer, `muestra` (visor + franja «Así queda el de… Se van a hacer N iguales…»,
+  «Generar los N»/«Cancelar»); luego, por persona, el Word, su PDF (`hacerPdf`, mismo nombre, «Ref. D26-01234») y, al
+  final, `VersionesPrevias.ordenarTrasCambio` (los Word con PDF se van a «Versiones previas»). Barra fija abajo «Generando
+  12 de 30…» con «Parar» (termina el que está a medias). `nombreYaGenerado` prefiere el PDF; un Word sin PDF (se paró o
+  falló el PDF) recibe solo el PDF al volver a pulsar. En el hito y en «Enviar a cada uno» va el PDF.
+  «Volver a generar» (⋯ de la fila): papelera para su Word y su PDF y de nuevo con `soloA`; apagado con registro o envío.
