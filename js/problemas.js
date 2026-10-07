@@ -13,7 +13,7 @@
      quien:     'texto',            «Esto lo hace quien montó la aplicación.»
      pasos:     ['…', '…'],         pasos numerados, escritos en pantalla
      acciones:  [{ texto, explica, alPulsar, normal, peligro, cambia, id }],
-     elementos: [{ nombre, detalle, dato, acciones: [...] }],
+     elementos: [{ nombre, detalle, dato, acciones: [...], queCambia: { cuando, lineas, mas } }],
      elegir:    true,               casilla en cada elemento y «Elegir todos»;
                                     las acciones de la tarjeta reciben los
                                     índices elegidos
@@ -173,6 +173,16 @@ var Problemas = (function () {
         cab.appendChild(el('span', 'problema-nombre', e.nombre));
         if (e.detalle) cab.appendChild(el('span', 'problema-elemento-detalle suave', e.detalle));
         li.appendChild(cab);
+        if (e.queCambia) {   /* fila 292: «Qué cambia», solo leído */
+          var det = el('details', 'problema-cambia');
+          det.open = true;
+          det.appendChild(el('summary', null, 'Qué cambia'));
+          var ulc = el('ul', 'problema-cambia-lista');
+          (e.queCambia.cuando || []).concat(e.queCambia.lineas || []).forEach(function (l) { ulc.appendChild(el('li', null, l)); });
+          if (e.queCambia.mas) ulc.appendChild(el('li', null, 'y ' + e.queCambia.mas + ' más'));
+          det.appendChild(ulc);
+          li.appendChild(det);
+        }
         var accs = el('div', 'problema-acciones');
         accionesDe(accs, e.acciones, function (i, b) {
           var vivo = actual(id);

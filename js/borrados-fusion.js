@@ -171,8 +171,8 @@ App.NOMBRES_BORRADOS = {
   tipos: 'Tipos de asunto borrados',
   estados: 'Estados borrados',
   tiposDocumento: 'Tipos de documento borrados',
-  recurrentes: 'Asuntos recurrentes quitados',
-  asuntos: 'Lápidas de asuntos cerrados'
+  recurrentes: 'Asuntos que se repiten, quitados',
+  asuntos: 'Asuntos archivados, unidos o con otro nombre'
 };
 
 App.pintarBorradosFusion = async function () {

@@ -38,6 +38,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Lo que un directivo escribe en un asunto suyo / la que Administración aún no ha visto | **nota de directivo**; **sin ver**, **Vista** | mensaje, comentario, aviso del directivo |
 | Una línea del registro de entrada o de salida de Séneca (en el control del registro) | **apunte** («apuntes sin asunto», «Apunte de registro») | asiento, entrada del registro |
 | Lo que la aplicación ha encontrado mal y hay que arreglar, con qué pasa, por qué y qué hacer (fila 291) | **problema** («N problemas por resolver», pestaña «Problemas») | huérfano, huérfana, ficha sin carpeta, envoltura, aviso de fallo |
+| Pasar los hitos guardados bajo un nombre viejo a un asunto vivo (fila 292) / lo que difiere entre dos versiones guardadas a la vez | **Son de este asunto…**, **Pasar los hitos**, **Unir los hitos**; **Qué cambia** | mover, fusionar, diff |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

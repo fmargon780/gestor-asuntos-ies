@@ -43,6 +43,7 @@ de `App` va después del fichero que lo define.
 | `js/borrados-fusion.js` | `_GESTOR/borrados-listas.json`: los borrados de tipos, estados, tipos de documento, recurrentes y asuntos (las lápidas de la fila 176), marcados en vez de quitados del todo, para que no reaparezcan solos al fusionar con el otro ordenador (fila 77). El bloque de Ajustes → Mantenimiento que dice cuántos hay y deja quitarlos pasados 90 días vive en el mismo fichero |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola (asuntos, hitos, tablón, con las lápidas de la fila 176) o aviso para elegir; y `presencia/`, borrada sin preguntar |
 | `js/conflictos-datos.js` | Sacado de `js/conflictos.js` en la fila 176: los CSV de terceros, `administraciones.json` y "los terceros se releen solos" |
+| `js/conflictos-diferencias.js` | «Qué cambia» (fila 292): de cuándo es cada versión y en qué se diferencian, solo leyendo (`ConflictosDiferencias.describir`) |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 239, con número y estructura fija sin recorte (`datos.numero`/`datos.numeroDoc`); y, para los de antes, desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
 | `js/plazos.js` | La fecha límite de los asuntos; desde la fila 131, cómo se cuenta un plazo de hito (`Plazos.sumarPlazo`: hábiles, lectivos o naturales, con festivos y no lectivos), `diasQueQuedan` y `textoPlazo` |
@@ -113,6 +114,8 @@ de `App` va después del fichero que lo define.
 | `js/ajustes-buscador.js` | «Buscar en Ajustes…» (fila 288) |
 | `js/problemas.js` | La pestaña «Problemas» (fila 291): una tarjeta por problema (`Problemas.registrar`), la cuenta (pestaña, menú, Inicio) y los cálculos de fondo |
 | `js/problemas-textos.js` | Las frases de cada tarjeta de «Problemas» (fila 291) |
+| `js/parecido-de-carpetas.js` | Cuánto se parecen dos nombres de asunto o de carpeta (fila 292, `ParecidoDeCarpetas.ordenar/mejor`): número, tercero, tipo, fecha, palabras |
+| `js/hitos-de-asuntos-perdidos.js` | «Son de este asunto…» (fila 292): elegir el asunto, pasar o unir los hitos, «Deshacer» (`HitosDeAsuntosPerdidos.elegir`) |
 | `js/ajustes-plegado.js` | Ajustes plegado (fila 105): las secciones de un tipo, "El centro" y "Mantenimiento" nacen plegadas, con un resumen en el título, la memoria de lo abierto (`gestor-ajustes-plegado`), los avisos de fallo solo con fallo y el bloque "Herramientas" |
 | `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `App.leerFicheroDeLaApp` (fila 89: antes `fetch` directo) y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
 | `herramientas/cargar-biblioteca.mjs` | Programa de una sola vez (fila 80): lee `docs/contenido/BIBLIOTECA-*.md` y genera `datos-biblioteca/biblioteca-centro.json`. Se ejecuta a mano con Node cuando el contenido cambie; no lo carga `index.html` |
@@ -343,6 +346,10 @@ de `App` va después del fichero que lo define.
 | `pruebas/generar-para-relacionados.mjs` | Un documento para cada relacionado (fila 171): tres relacionados, uno sin DNI; lo del asunto, una vez; «Enviar a cada uno» simulado y sin repetir |
 | `pruebas/documentos-en-un-solo-sitio.mjs` | Las opciones de cada documento en su fila (⧉, «Poner nombre», ⋮ de dos) y la barra de PDF del visor (fila 168) |
 | `pruebas/huerfanas.mjs` | Prueba de las fichas sin carpeta |
+| `pruebas/parecido-de-carpetas.mjs` | Prueba (fila 292) de los cinco criterios de parecido, el empate y sin candidatas |
+| `pruebas/hitos-vuelven-a-su-asunto.mjs` | Prueba (fila 292, demostración): pasar, unir y deshacer los hitos de un nombre viejo |
+| `pruebas/conflictos-que-cambia.mjs` | Prueba (fila 292, demostración): «Qué cambia», «Las dos dicen lo mismo.», sin detalle, solo se lee |
+| `pruebas/avisos-de-inicio-que-explican.mjs` | Prueba (fila 292, demostración): «asuntos que se repiten» pregunta, la línea de los aspirantes, «Borrados que se fusionan» |
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |

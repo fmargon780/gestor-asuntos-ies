@@ -62,7 +62,13 @@ await comprobar('el punto ámbar sale en el botón de Ajustes',
 console.log('--- se enlaza con la carpeta que no tenía ficha ---');
 await pagina.getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
 await pagina.waitForSelector('#huerfana-destino');
-await pagina.selectOption('#huerfana-destino', '260901 MATRICULA 26-27 Carpeta Nueva 111');
+/* Fila 292: una lista de carpetas, de más a menos parecida, con lo que tiene cada una dentro. */
+await comprobar('la única carpeta sin asunto sale marcada; sin tercero en común no es un parecido claro (ni «Parece esta:»)',
+  pagina.evaluate(() => [[...document.querySelectorAll('#huerfana-destino input[type=radio]')].map(r => [r.value, r.checked]),
+    document.getElementById('cuadro-cuerpo').textContent.includes('Parece esta:'),
+    document.getElementById('cuadro-cuerpo').textContent.includes('Solo hay una carpeta sin asunto, y encaja.')]),
+  [[['260901 MATRICULA 26-27 Carpeta Nueva 111', true]], false, false]);
+await pagina.check('#huerfana-destino input[value="260901 MATRICULA 26-27 Carpeta Nueva 111"]');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 

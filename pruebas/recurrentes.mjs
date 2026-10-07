@@ -217,5 +217,33 @@ await Recurrentes._cargar();
 comprobar('con el panel oculto, el recurrente que toca sigue contando como pendiente',
   Recurrentes._pendientes().map(function (r) { return r.id; }), ['r3']);
 
+/* ================================================================
+   5. Fila 292 (docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md, 5): pulsar «N asuntos que se repiten toca
+   crearlos» ya no los crea sin avisar: abre un cuadro con la lista, y solo «Crear» los crea.
+   ================================================================ */
+console.log('--- 5. el aviso de Inicio pregunta antes de crear ---');
+
+let alPulsar = null, texto = '';
+contexto.AvisosLinea = { registrar: function (id, t, urgente, f) { if (id === 'recurrentes') { texto = t; alPulsar = f; } } };
+const preguntas = [];
+let respuesta = false;
+contexto.U.preguntar = async function (titulo, cuerpo, aceptar) { preguntas.push({ titulo, cuerpo, aceptar }); return respuesta; };
+const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+const facturas = async () => (await Carpetas.subcarpetas(abiertos)).filter((c) => /FACTURA/.test(c.nombre)).length;
+
+Recurrentes._pintarPanel();
+comprobar('el trozo dice cuántos tocan', texto, '1 asunto que se repite toca crearlo');
+const antesDeCrear = await facturas();
+alPulsar();
+await espera(100);
+comprobar('al pulsarlo se abre un cuadro con la lista (tipo y tercero) y el botón «Crear 1 asunto»',
+  [preguntas.length, preguntas[0].titulo, preguntas[0].aceptar, /FACTURA · Proveedor Tres, SL/.test(preguntas[0].cuerpo)],
+  [1, 'Crear 1 asunto', 'Crear 1 asunto', true]);
+comprobar('«Cancelar»: no se ha creado ninguno', [await facturas(), Recurrentes._pendientes().map((r) => r.id)], [antesDeCrear, ['r3']]);
+respuesta = true;
+alPulsar();
+await espera(400);
+comprobar('«Crear»: ahora sí se crea', [await facturas(), Recurrentes._pendientes().map((r) => r.id)], [antesDeCrear + 1, []]);
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

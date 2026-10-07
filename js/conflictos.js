@@ -337,22 +337,35 @@
 
   function comoSeLlama(real) { return COMO_SE_LLAMA[real] || 'una lista de la aplicación'; }
 
-  function pintarBloque() {
+  var turnoBloque = 0;   /* si llegan dos pintados a la vez, solo vale el último */
+
+  async function pintarBloque() {
     if (!window.Problemas || !window.ProblemasTextos) return;
-    if (!pendientes.length) { Problemas.registrar('conflictos', null); return; }
-    var d = ProblemasTextos.conflictos(pendientes.map(function (p) {
+    if (!pendientes.length) { turnoBloque++; Problemas.registrar('conflictos', null); return; }
+    var mio = ++turnoBloque;
+    var lista = pendientes.slice();
+    var g = window.Gestor && window.Gestor.carpetaGestor();
+    /* Fila 292: «Qué cambia», solo leyendo (js/conflictos-diferencias.js). */
+    var cambios = await Promise.all(lista.map(function (p) {
+      if (p.fila || !g || !window.ConflictosDiferencias) return null;
+      return ConflictosDiferencias.describir(g, p).catch(function () { return null; });
+    }));
+    if (mio !== turnoBloque) return;
+    var d = ProblemasTextos.conflictos(lista.map(function (p, i) {
       if (p.fila) {
         return { fila: true, nombre: 'Los datos de ' + p.nombre,
           detalle: 'el otro ordenador tenía ' + Object.keys(p.fila).map(function (k) { return p.fila[k]; }).filter(Boolean).join(' · ') };
       }
-      return { nombre: comoSeLlama(p.real).replace(/^./, function (c) { return c.toUpperCase(); }), detalle: '' };
+      var c = cambios[i];
+      return { nombre: comoSeLlama(p.real).replace(/^./, function (c) { return c.toUpperCase(); }), detalle: '',
+        igual: !!(c && c.igual), queCambia: c ? { cuando: c.cuando, lineas: c.lineas, mas: c.mas } : null };
     }));
-    pendientes.forEach(function (p, i) {
+    lista.forEach(function (p, i) {
       var acc = d.elementos[i].acciones;
       acc[0].alPulsar = p.fila
         ? function () { pendientes = pendientes.filter(function (x) { return x !== p; }); pintarBloque(); }
         : function () { return quedarseConEsteOrdenador(p); };
-      acc[1].alPulsar = p.fila ? function () { return quedarseConLaFilaDelOtro(p); } : function () { return quedarseConElOtro(p); };
+      if (acc[1]) acc[1].alPulsar = p.fila ? function () { return quedarseConLaFilaDelOtro(p); } : function () { return quedarseConElOtro(p); };
     });
     Problemas.registrar('conflictos', d);
   }
@@ -406,7 +419,7 @@
     if (I.revisarCsv) { try { await I.revisarCsv(g); } catch (e) { /* a la siguiente pasada */ } }
     try { await revisarPresencia(g); } catch (e) { /* se intenta la próxima vez */ }
     if (I.revisarFechasDatos) { try { await I.revisarFechasDatos(); } catch (e) { /* no crítico */ } }
-    pintarBloque();
+    await pintarBloque();
   }
 
   /* Fila 176, punto 5: presencia.json pasa a un fichero por usuario

@@ -243,7 +243,9 @@
      ("recurrentes") en js/avisos-linea.js; pulsarlo hace lo que hacía
      el botón principal de antes, "Crear los N", con guarda para no
      lanzar una segunda creación mientras la primera todavía está en
-     marcha (antes lo hacía deshabilitando el propio botón). */
+     marcha (antes lo hacía deshabilitando el propio botón). Fila 292:
+     pulsarlo abre un cuadro con la lista, «Crear N asuntos» y «Cancelar»;
+     ya no los crea sin avisar. */
 
   var creandoDesdeLaLinea = false;
 
@@ -256,7 +258,15 @@
     AvisosLinea.registrar('recurrentes', texto, false, function () {
       if (creandoDesdeLaLinea) return;
       creandoDesdeLaLinea = true;
-      crearLosQueTocan().finally(function () { creandoDesdeLaLinea = false; });
+      /* Fila 292 (docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md, 5): primero se dice qué se va a crear. */
+      var lista = pendientes();
+      if (!lista.length) { creandoDesdeLaLinea = false; return; }
+      U.preguntar(lista.length === 1 ? 'Crear 1 asunto' : 'Crear ' + lista.length + ' asuntos',
+        '<p>Estos asuntos se repiten y les toca crearse ahora:</p><ul class="recurrentes-lista">' +
+        lista.map(function (r) { return '<li>' + U.escapar(r.tipo + ' · ' + r.tercero) + '</li>'; }).join('') + '</ul>',
+        lista.length === 1 ? 'Crear 1 asunto' : 'Crear ' + lista.length + ' asuntos')
+        .then(function (ok) { return ok ? crearLosQueTocan() : null; })
+        .finally(function () { creandoDesdeLaLinea = false; });
     });
   }
 
@@ -511,6 +521,7 @@
     _cargar: cargar,
     _pendientes: pendientes,
     _crearLosQueTocan: crearLosQueTocan,
+    _pintarPanel: pintarPanel,
     _cerradoHoy: cerradoHoy,
     _cerrarPorHoy: cerrarPorHoy
   };

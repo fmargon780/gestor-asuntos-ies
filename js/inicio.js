@@ -144,6 +144,24 @@
      única, de respaldo.
      ========================================================== */
 
+  /* Fila 292 (docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md, 5): encima de la lista, qué hacer. Se quita al cambiar
+     de lista, al buscar o al salir de la pantalla. */
+  function mostrarAvisoDeAspirantes() {
+    var linea = $('personas-aviso-aspirantes');
+    if (!linea) return;
+    linea.classList.remove('oculto');
+    if (linea.dataset.vigilado) return;
+    linea.dataset.vigilado = '1';
+    var quitar = function () { linea.classList.add('oculto'); };
+    if ($('filtro-personas')) $('filtro-personas').addEventListener('change', quitar);
+    if ($('buscar-personas')) $('buscar-personas').addEventListener('input', quitar);
+    var pantalla = $('pantalla-personas');
+    if (pantalla && window.MutationObserver) {
+      new MutationObserver(function () { if (pantalla.classList.contains('oculto')) quitar(); })
+        .observe(pantalla, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
   async function pintarAvisoAspirantes() {
     if (!window.AvisosLinea) return;
     var aspirantes = await QueMeToca.reunirAspirantesSinNumero();
@@ -157,6 +175,7 @@
       if ($('buscar-personas')) $('buscar-personas').value = '';
       App.ir('personas');
       if (App.pintarPersonas) App.pintarPersonas();
+      mostrarAvisoDeAspirantes();
     }, asuntos);
   }
 
