@@ -81,23 +81,23 @@
     var alumnos = [['Jimenez Rubio, Mateo', '2100011', true], ['Fuentes Calvo, Rubén', '2100007', false],
                    ['Delgado Prieto, Iker', '2100005', false], ['Klein Soto, Ana', '2100012', false]];
     for (var i = 0; i < alumnos.length; i++) {
-      var clave = await o.crearAsunto(sancion, 'ALUMNADO', Nombres.terceroAlumno({ nombre: alumnos[i][0], id: alumnos[i][1] }), o.hace(0), {
-        abiertoEl: new Date().toISOString()
+      var clave = await o.crearAsunto(sancion, 'ALUMNADO', Nombres.terceroAlumno({ nombre: alumnos[i][0], id: alumnos[i][1] }), o.hace(9), {
+        abiertoEl: o.hace(9) + 'T09:00:00.000Z'
       });
       if (!alumnos[i][2]) continue;
       var carpeta = await App.E.abiertos.getDirectoryHandle(clave);
       var numeroDoc = (await Numeros.reservar('documentos', '')).numero;
-      var nombre = Nombres.montarDocumento({ fecha: o.hace(0), tipo: 'NOTIFICACION', extension: 'pdf', numeroDoc: numeroDoc });
+      var nombre = Nombres.montarDocumento({ fecha: o.hace(9), tipo: 'NOTIFICACION', extension: 'pdf', numeroDoc: numeroDoc });
       await Carpetas.escribirBytes(carpeta, nombre, await pdf('Notificación de la medida disciplinaria (copia de pruebas)'), 'application/pdf');
-      await DocumentosDatos.anotar(clave, numeroDoc, { tipo: 'NOTIFICACION', fecha: o.hace(0), texto: '', campos: [], valores: {}, registros: [] });
+      await DocumentosDatos.anotar(clave, numeroDoc, { tipo: 'NOTIFICACION', fecha: o.hace(9), texto: '', campos: [], valores: {}, registros: [] });
     }
 
     var incidencia = await o.crearTipoConGuia('INCIDENCIA DE AULA', 'ALUMNADO', [
       { titulo: 'Comunicar la incidencia', cuerpo: '<p>Que la tutoría lo sepa el mismo día.</p>', responsable: 'yo',
         guion: [{ id: 'g-demo-tutoria-avisar', texto: 'Avisar a la tutoría', accion: 'comunicar' }] }
     ], null);
-    await o.crearAsunto(incidencia, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Jimenez Rubio, Mateo', id: '2100011' }), o.hace(0), {
-      abiertoEl: new Date().toISOString()
+    await o.crearAsunto(incidencia, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Jimenez Rubio, Mateo', id: '2100011' }), o.hace(9), {
+      abiertoEl: o.hace(9) + 'T09:00:00.000Z'
     });
   }
 

@@ -188,7 +188,7 @@ await cerrarCuadro();
 console.log('--- 12. adjuntar solo ---');
 await pagina.evaluate(async () => {
   const a = Gestor.asuntos().filter((x) => /SANCION Jimenez/.test(x.nombre))[0];
-  const f = await a.handle.getFileHandle('261001 INFORME D26-09999.pdf', { create: true });
+  const f = await a.handle.getFileHandle('260920 INFORME D26-09999.pdf', { create: true });
   const w = await f.createWritable(); await w.write(new Blob(['%PDF-1.4\n%%EOF'])); await w.close();
 });
 await abrirMesa('SANCION Jimenez Rubio');
