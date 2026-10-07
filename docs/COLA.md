@@ -174,8 +174,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 298 | Aviso de usuario: error en «Inicio» | DESCARTADA (7-oct-2026): descartada por Francisco desde el Centro de mando |
 | 299 | `docs/CORREO-AL-TUTOR-DEL-GRUPO.md` (aviso de usuario: el correo de un hito va solo al tutor/a del grupo del alumno; una plantilla de correo adjunta sola un documento; cambios pedidos en SANCIÓN) | SIN PUBLICACIÓN COMPROBADA (7-oct-2026 16:00): revisor APROBADA a la primera, en `main` (fusión 91c41af, PR 222); Vercel aún sin publicar. Pasa a HECHA cuando la web sirva `js/tutor-del-grupo.js`; punto 12 a mano en `docs/COMPROBAR-A-MANO.md` · aviso completo: https://drive.google.com/file/d/1XW4NDCPJZ0DmAZ66hzSD568VW8jrRelI/view?usp=drivesdk |
 | 300 | `docs/ORDEN-DE-LA-GUIA-LLEGA-A-LOS-ASUNTOS.md` (aviso de usuario: al subir un hito en «Cambiar la guía» el asunto seguía igual; el orden nuevo llega a los asuntos abiertos del tipo, solo para los hitos sin hacer, y el aviso verde lo dice) | SIN PUBLICACIÓN COMPROBADA (7-oct-2026 18:00): revisor APROBADA a la primera, en `main` (fusión cc39979, PR 223); Vercel aún sin publicar. Pasa a HECHA cuando la web sirva `js/demo/datos-orden.js` · aviso completo: https://drive.google.com/file/d/1whMmWcTx9RweW0jXrfPfBf4EN249LDHj/view?usp=drivesdk |
-| 301 | `docs/REGLAS-DE-ACUERDO.md` (una sola regla por asunto) | EN CURSO (7-oct-2026) · conversación: https://claude.ai/code/session_01GT3D9xFzwkzDaLbGtfXf6d |
-| 302 | `docs/PRUEBAS-ROTAS.md` (arreglar o retirar las que fallan) | PENDIENTE (7-oct-2026) |
+| 301 | `docs/REGLAS-DE-ACUERDO.md` (una sola regla por asunto) | HECHA (7-oct-2026 18:35): solo documentación, directa a `main`. 5 contradicciones resueltas, sin ninguna por decidir; el tope de `docs/CONTEXTO-CORTO.md` se corrige a 40.000 caracteres (mide 39.540); `CLAUDE.md` sin tocar. Detalle en `docs/HISTORIA.md` |
+| 302 | `docs/PRUEBAS-ROTAS.md` (arreglar o retirar las que fallan) | EN CURSO (7-oct-2026) · conversación: https://claude.ai/code/session_01GT3D9xFzwkzDaLbGtfXf6d |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
