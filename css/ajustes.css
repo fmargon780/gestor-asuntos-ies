@@ -82,12 +82,38 @@
    —"--cabecera-fija-alto" la pone js/cabecera-fija.js al medirla—,
    para que "Tipos de asunto · El centro · Mantenimiento" no se pierda
    al bajar (docs/CABECERA-QUE-SE-QUEDA.md, tabla del punto 2). */
-.pestanas-ajustes {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 10px 16px 0; margin-bottom: 16px;
+.ajustes-barra {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+  padding: 10px 16px 0; margin-bottom: 8px;
   position: sticky; top: var(--cabecera-fija-alto, 0px); z-index: 19;
   background: var(--fondo);
 }
+.pestanas-ajustes { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Fila 288: el buscador ocupa el ancho que quede libre, a la derecha de las pestañas. */
+.ajustes-buscar { flex: 1 1 220px; min-width: 180px; max-width: none; margin-left: auto; }
+.ajustes-resultados {
+  margin: 0 16px 10px; padding: 4px; max-width: 90ch;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  display: flex; flex-direction: column;
+}
+.ajustes-resultado {
+  font: inherit; text-align: left; background: none; border: 0; border-radius: 6px;
+  padding: 7px 10px; cursor: pointer; color: var(--tinta);
+}
+.ajustes-resultado:hover, .ajustes-resultado:focus-visible { background: var(--fondo); }
+.ajustes-linea { margin: 0 16px 14px; color: var(--tinta-suave); }
+.ajustes-titulo-tipos { margin: 6px 0 8px; font-size: 18px; }
+.ajustes-tipos { margin-bottom: 14px; }
+.problemas-punto {
+  display: inline-block; width: 9px; height: 9px; margin-left: 7px; border-radius: 50%;
+  background: #e8a317; vertical-align: middle;
+}
+.problemas-punto.oculto { display: none; }
+.ajustes-montaje { display: none; }
+details.bloque-ajustes.destello > summary { animation: destelloBloque 1.5s ease-out; }
+@keyframes destelloBloque { from { background: #fff1a8; } to { background: transparent; } }
+.herramientas-puesta { margin-top: 26px; }
+.herramientas-puesta-titulo { margin: 0 0 4px; font-size: 18px; }
 .pestana-ajustes {
   font: inherit; font-size: 14px; font-weight: 600;
   background: var(--papel); color: var(--tinta-suave);

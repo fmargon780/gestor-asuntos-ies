@@ -69,7 +69,7 @@ await comprobar('un valor raro se lee también como vacío',
 
 console.log('--- 2. Ajustes › «Quién encarga cada tipo» ---');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('dia'));
 await pagina.waitForSelector('#bloque-tipos-organo');
 const total = await pagina.evaluate(() => App.E.tipos.length);
 const resumen = () => pagina.locator('#bloque-tipos-organo .bloque-resumen').textContent();

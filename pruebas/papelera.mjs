@@ -219,7 +219,7 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('dia'));
 await pagina.fill('#buscar-tipos', 'matricula');
 await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 const tarjetaMatricula = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'MATRICULA' });

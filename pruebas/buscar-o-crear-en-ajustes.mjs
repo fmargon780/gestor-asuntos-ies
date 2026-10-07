@@ -148,8 +148,8 @@ await comprobar('aviso verde «Tipo añadido.»',
   pagina.locator('#mensajes .mensaje.bueno').first().textContent().then(t => t.indexOf('Tipo añadido') !== -1), true);
 
 console.log('--- 6. Tipos de documento: lo mismo, sin categoría ---');
-await pagina.click('[data-ajustes-pestana="centro"]');
-await pagina.evaluate(() => { document.querySelectorAll('#ajustes-tab-centro details').forEach(d => { d.open = true; }); });
+await pagina.click('[data-ajustes-pestana="dia"]');   /* fila 288: los tipos de documento están en «Lo de cada día» */
+await pagina.evaluate(() => { document.querySelectorAll('#ajustes-tab-dia details').forEach(d => { d.open = true; }); });
 await comprobar('no hay «TIPO NUEVO» ni «Añadir»',
   pagina.locator('#nuevo-tipo-doc, #btn-anadir-tipo-doc').count(), 0);
 const docs = await pagina.evaluate(() => App.E.tiposDocumento.slice());

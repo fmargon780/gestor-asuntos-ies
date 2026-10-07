@@ -69,8 +69,8 @@ await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
    ================================================================ */
 console.log('--- 1. las tres pestañas de Ajustes ---');
 
-await comprobar('la pestaña "Tipos de asunto" empieza activa',
-  pagina.locator('.pestana-ajustes.activa').textContent(), 'Tipos de asunto');
+await comprobar('la pestaña "Lo de cada día" empieza activa (fila 288)',
+  pagina.locator('.pestana-ajustes.activa').textContent(), 'Lo de cada día');
 await comprobar('la lista de tipos se ve de partida',
   pagina.locator('#ajustes-tab-tipos').isVisible(), true);
 await comprobar('"El centro" empieza oculta', pagina.locator('#ajustes-tab-centro').isVisible(), false);
@@ -79,26 +79,26 @@ await pagina.click('[data-ajustes-pestana="centro"]');
 await comprobar('"El centro" pasa a verse', pagina.locator('#ajustes-tab-centro').isVisible(), true);
 await comprobar('"Tipos de asunto" se oculta', pagina.locator('#ajustes-tab-tipos').isVisible(), false);
 await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-centro details').forEach((d) => { d.open = true; }));
-await comprobar('"El centro" trae Campos propios, Grupos y Datos del centro, y ya no Estados (fila 129)',
+await comprobar('"El centro" trae Datos del centro, y ya no Estados (fila 129) ni Campos propios ni Grupos (fila 288)',
   pagina.locator('#ajustes-tab-centro').textContent().then((t) =>
-    t.indexOf('Estados del asunto') === -1 && t.indexOf('Campos propios') !== -1 &&
-    t.indexOf('Grupos de personas') !== -1 && t.indexOf('Datos del centro y firma') !== -1), true);
+    t.indexOf('Estados del asunto') === -1 && t.indexOf('Campos propios') === -1 &&
+    t.indexOf('Grupos de personas') === -1 && t.indexOf('Datos del centro y firma') !== -1), true);
 
-await pagina.click('[data-ajustes-pestana="mantenimiento"]');
-await comprobar('"Mantenimiento" pasa a verse', pagina.locator('#ajustes-tab-mantenimiento').isVisible(), true);
-await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-mantenimiento details').forEach((d) => { d.open = true; }));
+await pagina.click('[data-ajustes-pestana="ordenador"]');
+await comprobar('"Este ordenador" pasa a verse', pagina.locator('#ajustes-tab-ordenador').isVisible(), true);
+await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-ordenador details').forEach((d) => { d.open = true; }));
 /* Fila 200: Copias y Papelera se han ido a la pestaña "Herramientas";
    Mantenimiento se queda con las carpetas de este ordenador y lo demás
    que sí es mantenimiento de verdad. */
-await comprobar('"Mantenimiento" trae las carpetas de este ordenador, y ya no Copias ni Papelera',
-  pagina.locator('#ajustes-tab-mantenimiento').textContent().then((t) =>
+await comprobar('"Este ordenador" trae las carpetas de este ordenador, y ya no Copias ni Papelera',
+  pagina.locator('#ajustes-tab-ordenador').textContent().then((t) =>
     t.indexOf('Carpetas de este ordenador') !== -1 &&
     t.indexOf('Copias de seguridad') === -1 && t.indexOf('Papelera') === -1), true);
 
 /* Se vuelve a "Tipos de asunto" y se cambia a EMPRESAS, para abrir
    luego COMPRA: así la prueba 4 puede comprobar de verdad que la
    categoría sobrevive a entrar y salir de un tipo. */
-await pagina.click('[data-ajustes-pestana="tipos"]');
+await pagina.click('[data-ajustes-pestana="dia"]');
 await pagina.locator('.pestana-categoria').filter({ hasText: 'EMPRESAS' }).click();
 await comprobar('la categoría EMPRESAS queda puesta', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await pagina.fill('#buscar-tipos', '');
@@ -179,7 +179,7 @@ console.log('--- 4. volver sin perder la categoría ni el buscador ---');
 await pagina.click('#pantalla-tipo-asunto .boton-volver');
 await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
 
-await comprobar('la pestaña "Tipos de asunto" sigue activa', pagina.locator('.pestana-ajustes.activa').textContent(), 'Tipos de asunto');
+await comprobar('la pestaña "Tipos de asunto" sigue activa', pagina.locator('.pestana-ajustes.activa').textContent(), 'Lo de cada día');
 await comprobar('la categoría sigue en EMPRESAS', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await comprobar('COMPRA sigue en la rejilla',
   pagina.locator('#tabla-tipos .tarjeta-tipo-nombre').allTextContents().then((n) => n.indexOf('COMPRA') !== -1), true);

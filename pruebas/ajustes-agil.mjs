@@ -179,13 +179,13 @@ await comprobar('las tres primeras tarjetas están en la misma fila (al menos 3 
    ================================================================ */
 console.log('--- 8. la barra queda fija, aunque la página sea larga ---');
 
-await pagina.click('[data-ajustes-pestana="mantenimiento"]');
+await pagina.click('[data-ajustes-pestana="centro"]');   /* fila 288: «El centro» es la pestaña más larga */
 await pagina.waitForTimeout(150);
 await pagina.evaluate(() => {
-  document.querySelectorAll('#ajustes-tab-mantenimiento details').forEach((d) => { d.open = true; });
+  document.querySelectorAll('#ajustes-tab-centro details').forEach((d) => { d.open = true; });
 });
-await comprobar('"Mantenimiento" trae al menos ocho bloques, todos abiertos',
-  pagina.locator('#ajustes-tab-mantenimiento details.bloque-ajustes').count().then(n => n >= 8), true);
+await comprobar('"El centro" trae al menos ocho bloques, todos abiertos',
+  pagina.locator('#ajustes-tab-centro details.bloque-ajustes').count().then(n => n >= 8), true);
 
 await pagina.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 await pagina.waitForTimeout(150);

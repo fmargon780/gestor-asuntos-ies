@@ -190,7 +190,8 @@ window.SoloConsulta = (function () {
   var ACCION = /^(\+ ?)?(Archivar|Pasar a Por liquidar|Liquidar|Guardar|Guardar aquí|Guardar en un asunto|Guardar PDF|Crear|Crear asunto con él|Crear el asunto|Borrar|Quitar|Cambiar el nombre|Reabrir|Enviar|Enviar estado|Añadir|Anotar|Marcar|Publicar|Restaurar|Traer|Importar|Subir|Vaciar|Duplicar|Renombrar|Probar|Arreglarlo|Actualizar|Nuevo asunto|Nuevo asunto para esta persona|Tomar el mando|Hecha$|A asunto$|Separar|Unir$|Sacar páginas|Ajustar tamaño|Repartir entre terceros|Cambiar$|Cambiar los datos|Dar de alta|Devolver|Nueva plantilla|Unir con otro tipo|Unir con él|Convertir en plantilla|Cambiar la guía|No son el mismo)/i;
   /* Lo que se queda encendido aunque caiga en algo de arriba. */
   var DEJAR = ['#ajustes-solo-consulta', '#franja-solo-consulta-quitar', '#cuadro-cancelar', '#cuadro-aceptar',
-    '[data-solo-lectura]', '.ficha-menu-boton', '#ficha-volver', '.boton-volver', '#btn-soporte'].join(',');
+    '[data-solo-lectura]', '.ficha-menu-boton', '#ficha-volver', '.boton-volver', '#btn-soporte',
+    '#ajustes-buscar', '.ajustes-resultado', '.ajustes-enlace-salto'].join(',');   /* fila 288: buscar y saltar solo leen */
 
   function apagarUno(el) {
     if (el.disabled || el.dataset.guardando || el.matches(DEJAR) || el.closest('#capa, #franja-solo-consulta')) return;

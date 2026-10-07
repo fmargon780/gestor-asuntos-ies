@@ -535,7 +535,7 @@
            junto con la caducidad) y con el título cambiado, porque
            "Copias de seguridad" ya nombra la sección de El centro
            (docs/HISTORIA.md, fila 200, explica por qué). -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-restaurar-copia">
         <summary>
           <span class="bloque-titulo">Restaurar una copia de seguridad</span>
           <span class="bloque-pie">Por si algún fichero compartido se estropea</span>
@@ -548,19 +548,36 @@
         </div>
       </details>
 
+      <!-- Fila 288 (docs/AJUSTES-EN-CUATRO-PESTANAS.md): las reparaciones que se usan muy de vez en
+           cuando, que vivían en Ajustes → Mantenimiento. Sus módulos las cuelgan donde siempre;
+           js/ajustes-reparto.js las trae aquí. -->
+      <div id="herramientas-puesta-a-punto" class="herramientas-puesta">
+        <h3 class="herramientas-puesta-titulo">Puesta a punto y reparaciones</h3>
+        <p class="explica">Botones que se pulsan muy de vez en cuando.</p>
+        <div id="herramientas-puesta-cuerpo"></div>
+      </div>
+
       </div>
     </section>
 
     <section id="pantalla-ajustes" class="pantalla oculto">
       <header class="cabecera"><h2>Ajustes</h2></header>
 
-      <div id="pestanas-ajustes" class="pestanas-ajustes" role="tablist">
-        <button type="button" class="pestana-ajustes activa" data-ajustes-pestana="tipos">Tipos de asunto</button>
-        <button type="button" class="pestana-ajustes" data-ajustes-pestana="centro">El centro</button>
-        <button type="button" class="pestana-ajustes" data-ajustes-pestana="mantenimiento">Mantenimiento</button>
+      <div class="ajustes-barra">
+        <div id="pestanas-ajustes" class="pestanas-ajustes" role="tablist">
+          <button type="button" class="pestana-ajustes activa" data-ajustes-pestana="dia">Lo de cada día</button>
+          <button type="button" class="pestana-ajustes" data-ajustes-pestana="centro">El centro</button>
+          <button type="button" class="pestana-ajustes" data-ajustes-pestana="ordenador">Este ordenador</button>
+          <button type="button" class="pestana-ajustes" data-ajustes-pestana="problemas">Problemas<span id="problemas-punto" class="problemas-punto oculto" aria-hidden="true"></span></button>
+        </div>
+        <input id="ajustes-buscar" class="campo ajustes-buscar" type="search" autocomplete="off" placeholder="Buscar en Ajustes…" aria-label="Buscar en Ajustes">
       </div>
+      <div id="ajustes-resultados" class="ajustes-resultados oculto"></div>
+      <p id="ajustes-linea-pestana" class="explica ajustes-linea"></p>
 
-      <div id="ajustes-tab-tipos" class="ajustes-tab">
+      <div id="ajustes-tab-dia" class="ajustes-tab">
+      <div id="ajustes-tab-tipos" class="ajustes-tipos" data-fijo="1">
+      <h3 class="ajustes-titulo-tipos">Tipos de asunto</h3>
       <p class="explica">Esta lista la comparten todos los ordenadores del centro:
          se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
          La lista de partida es una propuesta; cámbiala a vuestro gusto.
@@ -575,6 +592,7 @@
       <div id="tabla-tipos" class="rejilla-tipos"></div>
       <div id="crear-tipo-zona" class="crear-o-buscar-zona"></div>
       </div>
+      </div>
 
       <div id="ajustes-tab-centro" class="ajustes-tab oculto">
 
@@ -585,7 +603,7 @@
            "Asuntos dormidos" y "Avisos de vencimiento" (que vivía en
            Mantenimiento) juntos en una sola sección; sus dos campos
            (#dias-dormido, #avisos-dias) siguen tal cual por dentro. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-dias-aviso">
         <summary>
           <span class="bloque-titulo">Días de aviso</span>
           <span class="bloque-pie">Cuándo avisar de asuntos dormidos y de lo que está por vencer</span>
@@ -605,7 +623,7 @@
       <div class="alta-tipo">
         <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
         <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
-        <span class="suave">días de antelación</span>
+        <span class="suave">días de antelación (solo en este ordenador)</span>
       </div>
       <p class="explica">La papelera se vacía sola: lo que lleva en ella más de estos días se borra
          del todo, y antes se avisa en Inicio. Es de todo el centro.</p>
@@ -654,7 +672,7 @@
            restaurar se ha ido entera a Herramientas → "Restaurar una
            copia de seguridad" (decisión de diseño explicada en
            docs/HISTORIA.md, fila 200). -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-copias">
         <summary>
           <span class="bloque-titulo">Copias de seguridad</span>
           <span class="bloque-pie">Una copia diaria de cada fichero compartido, y cuándo se borran solas</span>
@@ -671,10 +689,11 @@
         <input id="dias-caducidad-copias" type="number" min="1" class="campo campo-plazo">
         <span class="suave">días</span>
       </div>
+      <p class="explica"><button type="button" class="enlace ajustes-enlace-salto" id="copias-enlace-restaurar">Restaurar una copia</button></p>
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-tipos-documento">
         <summary>
           <span class="bloque-titulo">Tipos de documento</span>
           <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
@@ -691,18 +710,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
-        <summary>
-          <span class="bloque-titulo">Campos propios</span>
-          <span class="bloque-pie">Datos que no vienen en ningún fichero, como el trimestre</span>
-        </summary>
-        <div class="bloque-cuerpo">
-      <p class="explica">Se configuran dentro de cada tipo: abre un tipo de asunto y usa "+ Añadir
-         campo" › "Míos". <button type="button" class="enlace" id="campos-propios-enlace">Ir a Tipos de asunto</button></p>
-        </div>
-      </details>
-
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-grupos-personas">
         <summary>
           <span class="bloque-titulo">Grupos de personas</span>
           <span class="bloque-pie">Listas con nombre para relacionar de golpe o mandar un correo a varios</span>
@@ -719,7 +727,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-ficheros-datos">
         <summary>
           <span class="bloque-titulo">Ficheros de datos</span>
           <span class="bloque-pie">Qué CSV hay cargados y qué columnas se reconocen</span>
@@ -730,7 +738,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-abreviar-grupos">
         <summary>
           <span class="bloque-titulo">Cómo se abrevia cada grupo</span>
           <span class="bloque-pie">Cómo queda escrito el grupo del alumno en el nombre</span>
@@ -743,7 +751,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-datos-centro">
         <summary>
           <span class="bloque-titulo">Datos del centro y firma</span>
           <span class="bloque-pie">Lo que rellena los huecos de correos y documentos</span>
@@ -781,7 +789,7 @@
       <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md: los
            cargos del centro y quién los ha ocupado, con fechas. Las
            tarjetas se pintan solas, con js/cargos-ajustes.js. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-cargos">
         <summary>
           <span class="bloque-titulo">Cargos del centro</span>
           <span class="bloque-pie">Quién firma cada documento, según la fecha</span>
@@ -797,7 +805,7 @@
       <!-- Fila 149, 25-sep-2026, docs/MEMBRETE-LETRA-DEL-MANUAL.md: el
            membrete lo dibuja la aplicación (js/membrete.js) con el manual
            de la Junta; aquí, la Consejería, el nombre del centro y el logo. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-membrete">
         <summary>
           <span class="bloque-titulo">Membrete</span>
           <span class="bloque-pie">Lo de arriba de cada documento: la Consejería, el centro y su logo</span>
@@ -822,7 +830,7 @@
       <!-- Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: las
            dos medidas que usa "Ajustar tamaño" (antes "Preparar el
            documento", fila 58). Las lee y las guarda js/ajustes-centro.js. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-sello">
         <summary>
           <span class="bloque-titulo">Sello y firma en el papel</span>
           <span class="bloque-pie">Cuánto hueco dejar libre para el sello de Séneca y para la firma</span>
@@ -844,7 +852,7 @@
       <!-- Fila 84, 20-sep-2026, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md:
            el mapa de casillas de cada impreso con PDF. Lo pinta y lo
            guarda js/formularios-rellenar.js. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-impresos">
         <summary>
           <span class="bloque-titulo">Impresos</span>
           <span class="bloque-pie">Qué casilla de cada PDF recibe qué dato del centro</span>
@@ -859,14 +867,37 @@
         </div>
       </details>
 
+      <!-- Fila 288: una sola sección para el alumnado y el personal. Lleva dentro (js/ajustes-reparto.js
+           las trae) «Ficheros de datos», «Aviso de fichero de alumnado viejo» y «Cómo se abrevia cada grupo». -->
+      <details class="bloque-ajustes" id="bloque-alumnado-personal">
+        <summary>
+          <span class="bloque-titulo">Alumnado y personal</span>
+          <span class="bloque-pie">Los ficheros de Séneca, cuándo avisar de que están viejos y cómo se abrevia cada grupo</span>
+        </summary>
+        <div class="bloque-cuerpo" id="alumnado-personal-cuerpo">
+          <p class="explica">
+            <button type="button" class="enlace ajustes-enlace-salto" id="alumnado-enlace-traer">Traer el alumnado</button> ·
+            <button type="button" class="enlace ajustes-enlace-salto" id="alumnado-enlace-carpeta-bd">Carpeta de la base de datos de alumnado</button>
+          </p>
+        </div>
+      </details>
+
       </div>
 
-      <div id="ajustes-tab-mantenimiento" class="ajustes-tab oculto">
+      <div id="ajustes-tab-ordenador" class="ajustes-tab oculto"></div>
+
+      <div id="ajustes-tab-problemas" class="ajustes-tab oculto">
+        <div id="problemas-todo-bien" class="aviso aviso-bueno oculto" data-fijo="1">Todo en orden. No hay nada que arreglar.</div>
+        <div id="problemas-frescura" class="aviso aviso-ambar oculto" data-fijo="1"></div>
+      </div>
+
+      <!-- Fila 288: sitio de paso donde los módulos cuelgan sus bloques; js/ajustes-reparto.js los lleva a su pestaña. No se ve. -->
+      <div id="ajustes-tab-mantenimiento" class="ajustes-montaje oculto" hidden>
 
       <!-- Fila 200, apartado 6: "Avisos de vencimiento" (su campo
            #avisos-dias) se ha ido a El centro → "Días de aviso". -->
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-carpetas">
         <summary>
           <span class="bloque-titulo">Carpetas de este ordenador</span>
           <span class="bloque-pie">Las dos carpetas señaladas aquí</span>
@@ -886,7 +917,7 @@
       <!-- El ayudante de Séneca (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
            un enlace-marcador que Francisco arrastra una vez a la barra de
            marcadores. Lo pinta js/seneca-ayudante.js dentro de este hueco. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-seneca">
         <summary>
           <span class="bloque-titulo">El ayudante de Séneca</span>
           <span class="bloque-pie">Un marcador que mete los destinatarios en Séneca uno a uno</span>
@@ -908,7 +939,7 @@
            los resucita); se quedan aquí, fuera de la vista, hasta que
            se quiten del todo pasados 90 días. Lo pinta
            js/borrados-fusion.js. -->
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-borrados-fusion">
         <summary>
           <span class="bloque-titulo">Borrados que se fusionan</span>
           <span class="bloque-pie">Tipos, estados y recurrentes borrados, para que no reaparezcan solos</span>
@@ -1564,6 +1595,8 @@
 <!-- Fila 105, 24-sep-2026, docs/AJUSTES-PLEGADO.md: todo Ajustes plegado,
      con un resumen en cada título y la memoria de lo abierto. -->
 <script src="js/ajustes-plegado.js"></script>
+<script src="js/ajustes-reparto.js"></script>
+<script src="js/ajustes-buscador.js"></script>
 <!-- Fila 80, 20-sep-2026, docs/CARGAR-BIBLIOTECA.md: el botón que
      carga el contenido de la biblioteca del centro, en Mantenimiento. -->
 <script src="js/cargar-biblioteca.js"></script>

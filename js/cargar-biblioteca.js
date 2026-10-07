@@ -300,7 +300,7 @@ window.CargarBiblioteca = CargarBiblioteca;
     d.id = 'bloque-cargar-biblioteca';
     d.innerHTML =
       '<summary>' +
-        '<span class="bloque-titulo">Biblioteca del centro</span>' +
+        '<span class="bloque-titulo">Cargar tipos, guías y tareas del instituto</span>' +
         '<span class="bloque-pie">Tipos, campos e hitos de la biblioteca ya preparados para el instituto</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +

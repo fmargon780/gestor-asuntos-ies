@@ -7,15 +7,15 @@
    - La pantalla de un tipo de asunto (js/ajustes-tipo.js): sus ocho
      secciones pasan a `<details class="bloque-ajustes">`, plegadas, con
      un resumen en el título (`seccion`, `resumirTipo`).
-   - La pestaña "El centro": todos los bloques plegados, en el orden de
-     más a menos uso, con su resumen (`ordenarCentro`).
-   - La pestaña "Mantenimiento": los avisos de fallo (conflictos de
-     Dropbox, fichas sin carpeta, hitos huérfanos, envolturas sin
-     aplicar) solo se ven cuando hay un fallo, y entonces arriba del
-     todo y desplegados; el RegAlum.csv viejo sube arriba y se despliega
-     (su bloque es también donde se configuran las épocas, así que no se
-     esconde nunca); los botones sueltos van dentro de "Herramientas",
-     al final (`ordenarMantenimiento`).
+   - Las pestañas de Ajustes y «Puesta a punto y reparaciones» de
+     Herramientas: todos los bloques plegados, con su resumen
+     (`ordenarCentro`). Desde la fila 288 (docs/AJUSTES-EN-CUATRO-PESTANAS.md)
+     el reparto entre pestañas no es de aquí sino de js/ajustes-reparto.js;
+     aquí quedan los resúmenes y la memoria de lo abierto.
+   - Los avisos de fallo (conflictos de Dropbox, fichas sin carpeta, hitos
+     huérfanos, envolturas sin aplicar) solo se ven cuando hay un fallo, y
+     entonces desplegados (`ordenarMantenimiento`); viven en la pestaña
+     «Problemas».
 
    Todo nace plegado. Lo que se deja abierto se recuerda en este
    ordenador (`localStorage`, clave `gestor-ajustes-plegado`, un objeto
@@ -278,36 +278,36 @@ var AjustesPlegado = (function () {
     } }
   ];
 
-  function bloqueQueLleva(tab, selector) {
-    var dentro = tab.querySelector(selector);
+  /* El bloque que lleva `selector` dentro, esté en la pestaña que esté. */
+  function bloqueQueLleva(raiz, selector) {
+    var dentro = (raiz || document).querySelector(selector);
     return dentro ? dentro.closest('details.bloque-ajustes') : null;
+  }
+
+  /* Recuerda lo abierto de todos los bloques sueltos de Ajustes y de la puesta a punto de
+     Herramientas, y pone al día los resúmenes. Lo llama el reparto cada vez que mueve algo. */
+  function registrarTodos() {
+    var lista = document.querySelectorAll('#pantalla-ajustes .ajustes-tab > details.bloque-ajustes, ' +
+      '#herramientas-puesta-cuerpo > details.bloque-ajustes, #bloque-frescura, #bloque-ficheros-datos, ' +
+      '#bloque-abreviar-grupos, #bloque-formularios');
+    Array.prototype.forEach.call(lista, function (det, i) {
+      if (det.dataset.plegadoId || det.classList.contains('tipo-asunto-seccion')) return;
+      var conocido = CENTRO.filter(function (c) { return bloqueQueLleva(document, c.dentro) === det; })[0];
+      recordar(det, 'centro:' + (conocido ? conocido.id : (det.id || tituloDe(det) || String(i))));
+    });
+    resumirCentro();
   }
 
   function ordenarCentro() {
     var tab = document.getElementById('ajustes-tab-centro');
     if (!tab) return;
-    var ancla = tab.firstElementChild;
-    CENTRO.forEach(function (c) {
-      var det = bloqueQueLleva(tab, c.dentro);
-      if (!det || det.parentNode !== tab) return;
-      /* Solo se mueve si no está ya en su sitio: mover un nodo, aunque
-         sea al mismo sitio, despierta a los observadores. */
-      if (det !== ancla) tab.insertBefore(det, ancla);
-      ancla = det.nextElementSibling;
-    });
-    Array.prototype.forEach.call(tab.querySelectorAll(':scope > details.bloque-ajustes'), function (det, i) {
-      var conocido = CENTRO.filter(function (c) { return bloqueQueLleva(tab, c.dentro) === det; })[0];
-      recordar(det, 'centro:' + (conocido ? conocido.id : (det.id || tituloDe(det) || String(i))));
-    });
-    resumirCentro();
+    registrarTodos();
     alCambiar(tab, resumirCentro);
   }
 
   function resumirCentro() {
-    var tab = document.getElementById('ajustes-tab-centro');
-    if (!tab) return;
     CENTRO.forEach(function (c) {
-      var det = bloqueQueLleva(tab, c.dentro);
+      var det = bloqueQueLleva(document, c.dentro);
       if (!det) return;
       var r;
       try { r = c.resumen(det) || ['']; } catch (e) { r = ['']; }
@@ -321,7 +321,7 @@ var AjustesPlegado = (function () {
   }
 
   /* ==========================================================
-     3. LA PESTAÑA "MANTENIMIENTO"
+     3. LOS AVISOS DE FALLO Y LOS RESÚMENES QUE QUEDAN
      ========================================================== */
 
   /* Los avisos de fallo: solo se ven si traen algo. `hay(det)` dice si
@@ -343,11 +343,7 @@ var AjustesPlegado = (function () {
     } }
   ];
 
-  /* Los botones sueltos: van juntos dentro de "Herramientas". */
-  var HERRAMIENTAS = ['bloque-cargar-biblioteca', 'bloque-plantillas-centro', 'bloque-fichas-archivo',
-    'bloque-contacto-migracion', 'bloque-formularios'];
-
-  /* El resto, en este orden, con su resumen. */
+  /* El resto, con su resumen. */
   var MANTENIMIENTO = [
     { id: 'carpetas', dentro: '#estado-carpetas', resumen: function () {
       var faltan = [];
@@ -360,21 +356,6 @@ var AjustesPlegado = (function () {
       if (!caja || !caja.children.length) return [''];
       return [/Sin señalar/.test(caja.textContent || '') ? 'sin señalar' : 'señalada'];
     } },
-    { id: 'copias', dentro: '#tabla-copias', resumen: function () {
-      var u = App.E.ultimaCopia;
-      return [u ? 'la última, del ' + U.fechaLegible(u) : ''];
-    } },
-    { id: 'papelera', dentro: '#tabla-papelera', resumen: function (det) {
-      var n = filasDe(det.querySelector('#tabla-papelera'), '.fila-tipo');
-      var aviso = det.querySelector('#aviso-papelera-vieja');
-      var viejas = 0;
-      if (aviso && !aviso.classList.contains('oculto')) {
-        var m = (aviso.textContent || '').match(/(\d+)/);
-        viejas = m ? parseInt(m[1], 10) : 0;
-      }
-      if (viejas) return [plural(n, 'cosa', 'cosas') + ' · ' + viejas + ' de más de 30 días', true];
-      return [n ? plural(n, 'cosa', 'cosas') : 'vacía'];
-    } },
     { id: 'avisos', dentro: '#avisos-dias', resumen: function (det) {
       var c = det.querySelector('#avisos-dias');
       var v = c ? parseInt(c.value, 10) : NaN;
@@ -386,90 +367,36 @@ var AjustesPlegado = (function () {
     } }
   ];
 
-  function bloqueHerramientas(tab) {
-    var ya = document.getElementById('bloque-herramientas');
-    if (ya) return ya;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-herramientas';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Herramientas</span>' +
-        '<span class="bloque-pie">Botones que se pulsan de vez en cuando: cargar la biblioteca y las ' +
-        'plantillas del centro, poner en orden las fichas del ARCHIVO…</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo" id="herramientas-cuerpo"></div>';
-    tab.appendChild(d);
-    return d;
-  }
-
   var ordenandoMantenimiento = false;
 
   function ordenarMantenimiento() {
-    var tab = document.getElementById('ajustes-tab-mantenimiento');
-    if (!tab || ordenandoMantenimiento) return;
+    if (ordenandoMantenimiento) return;
     ordenandoMantenimiento = true;
     try {
-      /* Herramientas, al final, con los botones sueltos dentro. */
-      var herr = bloqueHerramientas(tab);
-      var cuerpoHerr = herr.querySelector('#herramientas-cuerpo');
-      HERRAMIENTAS.forEach(function (id) {
-        var det = document.getElementById(id);
-        if (det && det.parentNode !== cuerpoHerr) cuerpoHerr.appendChild(det);
-        if (det) recordar(det, 'mantenimiento:' + id);
-      });
-      herr.classList.toggle('oculto', !cuerpoHerr.children.length);
-      recordar(herr, 'mantenimiento:herramientas');
+      registrarTodos();
 
-      /* Los normales, en su orden, delante de los demás que no se
-         conocen (que se quedan detrás, en el orden que ya tuvieran), y
-         Herramientas, la última. */
-      var ancla = tab.firstElementChild;
-      while (ancla && ancla.dataset.porAviso) ancla = ancla.nextElementSibling;
-      MANTENIMIENTO.forEach(function (m) {
-        var det = bloqueQueLleva(tab, m.dentro);
-        if (!det || det.parentNode !== tab) return;
-        if (det !== ancla) tab.insertBefore(det, ancla);
-        ancla = det.nextElementSibling;
-        recordar(det, 'mantenimiento:' + m.id);
-      });
-      Array.prototype.forEach.call(tab.querySelectorAll(':scope > details.bloque-ajustes'), function (det, i) {
-        if (!det.dataset.plegadoId) recordar(det, 'mantenimiento:' + (det.id || tituloDe(det) || String(i)));
-      });
-      if (herr.parentNode === tab && herr !== tab.lastElementChild) tab.appendChild(herr);
-
-      /* Los fallos: arriba del todo y desplegados si hay; si no, fuera
-         de la vista. */
-      var primero = tab.firstElementChild;
+      /* Los fallos: desplegados cuando hay; si no, fuera de la vista. */
       FALLOS.forEach(function (f) {
         var det = document.getElementById(f.id);
         if (!det) return;
         var hay = false;
         try { hay = f.hay(det); } catch (e) { hay = false; }
-        mostrarAviso(det, hay, tab, primero);
+        mostrarAviso(det, hay);
       });
 
       /* El RegAlum.csv viejo: su bloque es también el de las épocas, así
-         que nunca se esconde; con aviso, sube arriba y se abre. */
+         que nunca se esconde; con aviso, se queda en su sitio (Alumnado y
+         personal) con el aviso en el título, y «Problemas» lo enseña con
+         su botón «Verlo». */
       var fres = document.getElementById('bloque-frescura');
       if (fres) {
         var aviso = fres.dataset.aviso || '';
         if (aviso) {
-          if (!fres.dataset.porAviso) {
-            fres.dataset.porAviso = '1';
-            tab.insertBefore(fres, tab.firstElementChild);
-            fres.open = true;
-          }
           fres.classList.add('bloque-con-fallo');
           ponerResumen(fres, '⚠ ' + (aviso === 'falta' ? 'no hay RegAlum.csv' : 'RegAlum.csv de hace ' + aviso), true);
         } else {
           fres.classList.remove('bloque-con-fallo');
-          if (fres.dataset.porAviso) {
-            delete fres.dataset.porAviso;
-            var herrAhora = document.getElementById('bloque-herramientas');
-            tab.insertBefore(fres, herrAhora && herrAhora.parentNode === tab ? herrAhora : null);
-          }
-          recordar(fres, 'mantenimiento:bloque-frescura');
+          recordar(fres, 'centro:bloque-frescura');
           var epocas = filasDe(fres.querySelector('#tabla-frescura'), '.fila-tipo');
           ponerResumen(fres, epocas ? plural(epocas, 'época', 'épocas') : '');
         }
@@ -481,13 +408,12 @@ var AjustesPlegado = (function () {
     }
   }
 
-  function mostrarAviso(det, hay, tab, primero) {
+  function mostrarAviso(det, hay) {
     if (hay) {
       det.classList.remove('oculto');
       det.classList.add('bloque-con-fallo');
       if (!det.dataset.porAviso) {
         det.dataset.porAviso = '1';
-        if (primero && primero !== det) tab.insertBefore(det, primero);
         det.open = true;
       }
     } else {
@@ -498,10 +424,8 @@ var AjustesPlegado = (function () {
   }
 
   function resumirMantenimiento() {
-    var tab = document.getElementById('ajustes-tab-mantenimiento');
-    if (!tab) return;
     MANTENIMIENTO.forEach(function (m) {
-      var det = bloqueQueLleva(tab, m.dentro);
+      var det = bloqueQueLleva(document, m.dentro);
       if (!det) return;
       var r;
       try { r = m.resumen(det) || ['']; } catch (e) { r = ['']; }
@@ -510,35 +434,22 @@ var AjustesPlegado = (function () {
   }
 
   /* Los módulos crean sus bloques cuando les toca (al entrar, al
-     refrescar…): cada vez que aparece o se repinta uno, se vuelve a
-     ordenar. */
+     refrescar…): cada vez que se repinta uno, se pone al día. El reparto
+     entre pestañas es de js/ajustes-reparto.js. */
   function engancharMantenimiento() {
-    var tab = document.getElementById('ajustes-tab-mantenimiento');
+    var tab = document.getElementById('ajustes-tab-problemas');
     if (!tab || tab.dataset.plegadoEscucha) return;
     alCambiar(tab, ordenarMantenimiento);
-  }
-
-  function engancharCentro() {
-    var tab = document.getElementById('ajustes-tab-centro');
-    if (!tab || !window.MutationObserver || tab.dataset.plegadoHijos) return;
-    tab.dataset.plegadoHijos = '1';
-    /* Un bloque nuevo colgado directamente de la pestaña (los que crean
-       otros módulos): se engancha a la memoria de lo abierto. */
-    new MutationObserver(function (cambios) {
-      var nuevo = cambios.some(function (c) {
-        return c.target === tab && Array.prototype.some.call(c.addedNodes, function (n) {
-          return n.nodeType === 1 && n.matches('details.bloque-ajustes') && !n.dataset.plegadoId;
-        });
-      });
-      if (nuevo) ordenarCentro();
-    }).observe(tab, { childList: true });
+    ['ajustes-tab-mantenimiento', 'ajustes-tab-ordenador', 'ajustes-tab-dia', 'herramientas-puesta-cuerpo'].forEach(function (id) {
+      var otro = document.getElementById(id);
+      if (otro) alCambiar(otro, ordenarMantenimiento);
+    });
   }
 
   /* Arranque: los bloques que ya están en index.html quedan plegados y
      con la memoria puesta desde el primer momento. */
   function arrancar() {
     ordenarCentro();
-    engancharCentro();
     ordenarMantenimiento();
     engancharMantenimiento();
     engancharTipo();
@@ -563,6 +474,7 @@ var AjustesPlegado = (function () {
     abrirSeccionTipo: abrirSeccionTipo,
     ordenarCentro: ordenarCentro,
     ordenarMantenimiento: ordenarMantenimiento,
+    registrarTodos: registrarTodos,
     ponerResumen: ponerResumen,
     /* Fila 192, docs/INICIO-CUATRO-BLOQUES.md: js/inicio-plegados.js
        también necesita recordar si "Dormidos"/"Sin fecha" se dejaron

@@ -177,9 +177,7 @@ App.crearTipoDocumentoDesdeCaja = async function (nombre) {
    campos propios se crean y se borran desde dentro de cada tipo ("+
    Añadir campo" › "Míos", js/campos-catalogo.js), no aquí. Este bloque
    se queda solo con un enlace a "Tipos de asunto". */
-if ($('campos-propios-enlace')) {
-  $('campos-propios-enlace').onclick = function () { App.cambiarPestanaAjustes('tipos'); };
-}
+/* Fila 288: la sección ya no existe (estaba vacía); se ha quitado también su enlace. */
 
 /* ---------- Grupos de personas (17-sep-2026, fila 21,
    docs/GRUPOS-DE-PERSONAS.md) ---------- */

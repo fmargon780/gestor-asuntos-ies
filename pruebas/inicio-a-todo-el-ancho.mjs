@@ -127,7 +127,7 @@ await pagina.waitForTimeout(500);
 
 /* Señalar la carpeta de la bandeja, como pide Ajustes › Mantenimiento. */
 await pagina.evaluate(() => App.ir('ajustes'));
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('ordenador'));
 await pagina.waitForSelector('#bloque-bandeja');
 await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
 await pagina.click('#botones-bandeja .boton');

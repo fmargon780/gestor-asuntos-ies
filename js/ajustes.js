@@ -3,7 +3,7 @@
 
    Desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md) este
    fichero se queda solo con el marco: las tres pestañas de arriba
-   (Tipos de asunto · El centro · Mantenimiento), la lista de tipos de
+   (Lo de cada día · El centro · Este ordenador · Problemas; fila 288), la lista de tipos de
    la primera pestaña con su buscador cruzado, y los ayudantes que
    comparten varios ficheros (el menú de los tres puntos, el aviso en
    vivo de nombre repetido). Lo demás se ha repartido:
@@ -63,13 +63,15 @@ App.verTipoEnAjustes = function (tipo) {
   setTimeout(function () { tarjeta.classList.remove('destello'); }, 1000);
 };
 
-/* ---------- las tres pestañas de arriba (17-sep-2026, fila 39) ----------
+/* ---------- las cuatro pestañas de arriba (17-sep-2026, fila 39; cuatro desde la fila 288) ----------
 
    Igual que la categoría: se recuerda en localStorage y no se
    reinicia sola al volver a entrar en Ajustes (solo al elegir otra a
    propósito). */
 App.CLAVE_PESTANA_AJUSTES = 'gestor-ajustes-pestana';
-App.PESTANAS_AJUSTES = ['tipos', 'centro', 'mantenimiento'];
+App.PESTANAS_AJUSTES = ['dia', 'centro', 'ordenador', 'problemas'];
+/* Fila 288: los nombres de antes valen igual (el salto de otros módulos). */
+App.PESTANAS_AJUSTES_ANTES = { tipos: 'dia', mantenimiento: 'problemas' };
 
 App.pestanaAjustesInicial = function () {
   try {
@@ -80,6 +82,7 @@ App.pestanaAjustesInicial = function () {
 App.E.pestanaAjustes = App.pestanaAjustesInicial();
 
 App.cambiarPestanaAjustes = function (cual) {
+  cual = App.PESTANAS_AJUSTES_ANTES[cual] || cual;
   if (App.PESTANAS_AJUSTES.indexOf(cual) === -1) return;
   App.E.pestanaAjustes = cual;
   try { window.localStorage.setItem(App.CLAVE_PESTANA_AJUSTES, cual); } catch (e) {}
@@ -95,6 +98,9 @@ App.pintarPestanaAjustes = function () {
   Array.prototype.forEach.call(document.querySelectorAll('.pestana-ajustes'), function (b) {
     b.classList.toggle('activa', b.dataset.ajustesPestana === cual);
   });
+  var linea = $('ajustes-linea-pestana');
+  if (linea && window.AjustesReparto) linea.textContent = AjustesReparto.LINEAS[cual] || '';
+  if (window.AjustesBuscador) AjustesBuscador.alCambiarPestana();
 };
 
 Array.prototype.forEach.call(document.querySelectorAll('.pestana-ajustes'), function (b) {

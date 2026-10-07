@@ -128,7 +128,7 @@ async function dejarElCorreo(datos) {
    solo con window.__bandeja puesta a mano. */
 async function senalarLaBandeja() {
   await pagina.evaluate(() => App.ir('ajustes'));
-  await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+  await pagina.evaluate(() => App.cambiarPestanaAjustes('ordenador'));
   await pagina.waitForSelector('#bloque-bandeja');
   await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
   await pagina.click('#botones-bandeja .boton');

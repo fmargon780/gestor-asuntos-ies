@@ -345,7 +345,7 @@ await comprobar('un espacio sobrante se limpia', pagina.evaluate(() => Campos.ca
 console.log('--- 7. un campo propio de lista cerrada, creado desde dentro de un tipo ---');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.click('[data-ajustes-pestana="tipos"]');
+await pagina.click('[data-ajustes-pestana="dia"]');
 const tarjetaSancion2 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
 await tarjetaSancion2.locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');

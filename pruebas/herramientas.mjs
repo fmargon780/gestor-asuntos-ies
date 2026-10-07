@@ -98,7 +98,7 @@ await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-herramientas details').forEach((d) => { d.open = true; });
 });
 await comprobar('los cuatro títulos salen, en este orden',
-  pagina.locator('#herramientas-lista details .bloque-titulo').allTextContents(),
+  pagina.locator('#herramientas-lista > details .bloque-titulo, #herramientas-tablas-datos-hueco > details .bloque-titulo').allTextContents(),
   ['Control del registro', 'Papelera', 'Traer el alumnado', 'Tablas de datos', 'Restaurar una copia de seguridad']);
 await comprobarQue('el botón de Séneca está dentro de "Traer el alumnado"',
   pagina.locator('#bloque-traer-alumnado #btn-traer-datos').count().then(n => n === 1));
@@ -112,21 +112,21 @@ await comprobarQue('la papelera está aquí, con su buscador',
 /* ================================================================
    3. Ajustes → Mantenimiento ya no los tiene.
    ================================================================ */
-console.log('--- 3. Mantenimiento ya no tiene Papelera, Copias ni Tablas de datos ---');
+console.log('--- 3. «Este ordenador» ya no tiene Papelera, Copias ni Tablas de datos ---');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('ordenador'));
 await pagina.waitForTimeout(200);
 await comprobar('ni Papelera, ni Copias de seguridad, ni Tablas de datos, pero sí Carpetas de este ordenador',
-  pagina.locator('#ajustes-tab-mantenimiento').textContent().then((t) => ({
+  pagina.locator('#ajustes-tab-ordenador').textContent().then((t) => ({
     papelera: t.indexOf('Papelera') !== -1,
     copias: t.indexOf('Copias de seguridad') !== -1,
     tablas: t.indexOf('Tablas de datos') !== -1,
     carpetas: t.indexOf('Carpetas de este ordenador') !== -1
   })), { papelera: false, copias: false, tablas: false, carpetas: true });
-await comprobar('ni #tabla-papelera, ni #tabla-copias, ni #bloque-tablas-datos, dentro de Mantenimiento',
-  pagina.locator('#ajustes-tab-mantenimiento #tabla-papelera, #ajustes-tab-mantenimiento #tabla-copias, ' +
-    '#ajustes-tab-mantenimiento #bloque-tablas-datos').count(), 0);
+await comprobar('ni #tabla-papelera, ni #tabla-copias, ni #bloque-tablas-datos, dentro de «Este ordenador»',
+  pagina.locator('#ajustes-tab-ordenador #tabla-papelera, #ajustes-tab-ordenador #tabla-copias, ' +
+    '#ajustes-tab-ordenador #bloque-tablas-datos').count(), 0);
 
 /* ================================================================
    4. El centro: "Días de aviso" y "Copias de seguridad", una sola
