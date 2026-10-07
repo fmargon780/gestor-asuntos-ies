@@ -198,9 +198,10 @@ App.crearAsuntoDelFormulario = async function () {
        FICHA.md): se guarda solo si el tercero se ha cogido del CSV
        (App.E.nuevo.tercero), nunca para uno dado de alta a mano sin
        ese paso. Sirve para el día en que ya no esté en el fichero. */
-    if (App.E.nuevo.tercero) {
+    if (App.E.nuevo.tercero && !App.E.nuevo.tercero.esGrupo) {
       datosNuevoAsunto.contacto = Datos.fotoDeContacto(App.E.nuevo.tercero, App.E.nuevo.categoria);
     }
+    if (window.AsuntoDeGrupo) AsuntoDeGrupo.alDatosNuevos(datosNuevoAsunto, App.E.nuevo.tercero);   /* fila 293 */
     await App.anotar(nombre, datosNuevoAsunto);
     /* Fila 229: la primera línea del registro (accesorio). */
     if (window.RegistroAsunto) await RegistroAsunto.auto({ nombre: nombre }, 'Asunto creado');

@@ -796,3 +796,14 @@ Se comprueba con `pruebas/duplicados.mjs`.
 - «Buscar su carpeta» (tarjeta «N asuntos han perdido su carpeta», fila 292, `js/fichas-huerfanas.js`): lista de carpetas sin asunto ordenada por `ParecidoDeCarpetas.ordenar` (`js/parecido-de-carpetas.js`: mismo número del asunto > mismo tercero > mismo tipo > misma fecha > palabras), con cuántos documentos tiene cada una; «Parece esta:» solo con parecido claro (mismo número, o tercero y tipo, sin empate).
 - «Qué cambia» (tarjeta de lo guardado a la vez en dos ordenadores, fila 292): `js/conflictos-diferencias.js` (`ConflictosDiferencias.describir`) lee las dos versiones y cuenta la diferencia (listas, tablón, asuntos, hitos; máximo diez líneas y «y N más»; iguales: «Las dos dicen lo mismo.» y solo «Resolver»). `Conflictos.pintarBloque` es ahora asíncrono. Nota: `asuntos.json`, `tablon.json` y `hitos.json` se unen solos y nunca llegan a la tarjeta; en la demo la diferencia es la de la lista de tipos de documento.
 - Inicio (fila 292): «N asuntos que se repiten toca crearlos» abre un cuadro con la lista antes de crear (`js/recurrentes.js`); «N aspirantes sin Nº de identificación escolar» enseña `#personas-aviso-aspirantes` sobre la lista de Personas (`js/inicio.js`). «Borrados que se fusionan» se pinta al entrar en Herramientas (`js/herramientas.js`).
+
+## El asunto de grupo (7-oct-2026, fila 293, `docs/TRABAJO-EN-BLOQUE.md`)
+
+El detalle está en `docs/contexto/PERSONAS.md` («Asunto de grupo»). Lo que toca a los asuntos: «Nuevo asunto» lleva, debajo
+del buscador, «Es para un grupo de personas» (`js/asunto-de-grupo.js`; `App.E.nuevo.tercero` es entonces una pseudo-persona
+`{ esGrupo }` y `App.crearAsuntoDelFormulario` guarda `ficha.grupo` y `ficha.relacionados` en la misma escritura, sin
+`ficha.contacto`); la ficha enseña «Grupo de N personas» en «Datos y contacto» y la tarjeta «Personas del grupo (N)» en lugar de
+«Personas y entidades relacionadas» (`FichaTarjetas` toma el título de `data-titulo`); Inicio dice «Grupo <nombre> · N» en
+«Tercero» y encuentra el asunto por el nombre de una de sus personas (`App.textoBusquedaSimple`); «Hacer este hito» no sale.
+`ficha.grupo` de un asunto de grupo es un objeto: quien lo lea como texto (`App.piezasDelAsunto`, el índice del ARCHIVO,
+`Plantillas.valoresDeAsunto`) debe comprobar `typeof === 'string'`.

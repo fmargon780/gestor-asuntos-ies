@@ -142,8 +142,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
   SELLAR" al registrar a mano un fichero distinto (igual que el Word con su PDF); las versiones
   previas quedan plegadas; cada documento se asocia, se trae y se quita de su hito desde la ficha y desde la mesa de cualquier hito, y la tarea que se marcó con él se queda marcada, con «Desmarcar» (fila 282).
-- Terceros relacionados con un asunto (altas por grupo: unidad, nivel, grupo propio), destinatarios de
-  correo o Séneca; generar para cada relacionado: un documento por persona y un correo a cada una.
+- Terceros relacionados (altas por unidad, nivel, grupo propio) y asunto de grupo (fila 293, `ficha.grupo`):
+  tarjeta «Personas del grupo», una fila por persona con lo generado, registrado y enviado; generar por persona.
 - Menú de la izquierda: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas ·
   **Herramientas**, línea, Ajustes. Herramientas (fila 200) es lo que se usa de vez en cuando, no
   un ajuste: Papelera, Traer el alumnado (Séneca y BD de alumnado), Tablas de datos, Restaurar una

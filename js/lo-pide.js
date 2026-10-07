@@ -108,8 +108,9 @@ var LoPide = (function () {
   function opciones(persona) {
     var lista = [];
     var categoria = (persona && persona.categoria) || '';
+    var deGrupo = !!(persona && persona.esGrupo);   /* fila 293: un grupo no es «el propio interesado» */
 
-    lista.push({
+    if (!deGrupo) lista.push({
       valor: 'interesado',
       texto: 'El propio interesado',
       datos: {
@@ -121,7 +122,7 @@ var LoPide = (function () {
       }
     });
 
-    if (categoria === 'ALUMNADO') {
+    if (categoria === 'ALUMNADO' && !deGrupo) {
       [1, 2].forEach(function (n) {
         var t = datosDeTutor(persona.campos, n);
         /* Sin nombre pero con teléfono o correo, la opción no

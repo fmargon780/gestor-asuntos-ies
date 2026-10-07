@@ -68,6 +68,7 @@
     /* Fila 147: cambiar de tarjeta en la mesa y abrir un documento solo miran. */
     if (el.classList.contains('mesa-volver-guion') || el.classList.contains('mesa-doc-abrir') || el.classList.contains('mesa-doc-gemelo')) return true;   /* fila 129: abre la mesa del hito */
     if (el.classList.contains('boton-presencia-tomar')) return true;
+    if (el.hasAttribute('data-solo-lectura')) return true;   /* fila 293: la tabla «Personas del grupo» (abrir, buscar, filtrar) */
     if (el.hasAttribute('data-puerta-perfil')) return true;   /* fila 290: la caja de nota del directivo y abrir sus documentos */
     if ((el.classList.contains('mesa-tira-volver') || el.classList.contains('mesa-tira-hito')) && window.SoloConsulta && SoloConsulta.activo()) return true;   /* fila 260: navegar entre hitos */
     if (el.classList.contains('tercero-vertodo') && window.SoloConsulta && SoloConsulta.activo()) return true;   /* fila 260: «Ver todo» solo mira */

@@ -277,6 +277,28 @@ Un asunto puede afectar a más de una persona o entidad, además de su tercero p
 Se comprueba con `pruebas/relacionados.mjs` (el modo de siempre) y con `pruebas/grupos.mjs` /
 `pruebas/grupos-navegador.mjs` (el modo `multiple` y los grupos).
 
+**Asunto de grupo (7-oct-2026, fila 293, docs/TRABAJO-EN-BLOQUE.md).** Un asunto cuyo tercero es un grupo:
+`ficha.grupo = { nombre, origen: unidad|nivel|grupo|mano, creado }` (un objeto; los asuntos de antes guardan ahí,
+a lo sumo, un texto) y sus personas en `ficha.relacionados`. Un solo criterio, `AsuntoDeGrupo.esGrupo(a)`
+(`js/asunto-de-grupo.js`); tercero `GRUPO <nombre>`, carpeta `… GRUPO <nombre>`, un solo asunto y una sola carpeta; el
+documento de cada persona se guarda solo ahí. En «Nuevo asunto», «Es para un grupo de personas» abre el cuadro de
+señalar varios de «+ Añadir varios» (`Relacionados.elegirVarios`, con `titulo`, `marcadosIniciales`, `textoBoton`,
+`minimo` y `alSenalar`); el nombre sugerido sale de un solo atajo (sin añadir a nadie ajeno a él: quitar con la × no
+cuenta), si no, vacío y obligatorio (40 letras). El tercero elegido es una pseudo-persona `{ esGrupo, grupoDatos }`
+(`App.textoTercero` la dice `GRUPO <nombre>`); la categoría es la común o `OTROS`. Donde la aplicación busca la persona del
+asunto (`FichaTercero`, `correo.js`, `HitosComunicar`, `Plantillas.valoresDeAsunto`, «Quién lo pide») un grupo da «Grupo de N
+personas», nunca un hueco. «Hacer este hito» no sale. «Cambiar el asunto» cambia el nombre del grupo, nunca lo pasa a una
+persona. **La tarjeta «Personas del grupo (N)»** (`js/personas-del-grupo.js`, por `Relacionados.pintarEnFicha`; un asunto
+normal con relacionados la usa en cuanto a alguno se le haya generado o enviado algo): `PersonasDelGrupo.estado(a,
+ficheros)` (sin efectos) saca de `ficha.documentos[n].generadoDe` (`plantilla|categoría|nombre`, solo si su fichero sigue
+en la carpeta), sus `registros` y `ficha.enviosPorPersona` (se ata a la persona por el número del documento) la tabla
+Persona · Unidad · Generado · Registrado · Enviado; «Qué se mira» elige el trabajo (la plantilla), «Solo lo que falta»,
+buscador con más de 15; «Generar para todos ▾» llama a `GenerarParaRelacionados.generar(a, plantilla, hitoActual)`.
+`js/tercero-renombrar.js` pone al día el `generadoDe` de quien cambia de nombre (`PersonasDelGrupo.alRenombrar`). **En la
+ficha de la persona**, «Sus asuntos» lleva «En asuntos de grupo» (`js/personas-del-grupo-ficha.js`, por
+`App.trasPintarFicha`; sustituye a «Relacionado con este asunto»): una línea por asunto y trabajo, los archivados leídos
+de su carpeta solo al abrir la ficha.
+
 ### Grupos de personas (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md)
 
 Señalar varios terceros a la vez, en vez de uno por vuelta al cuadro, y guardar listas con

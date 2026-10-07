@@ -203,7 +203,9 @@ var GenerarParaRelacionados = (function () {
     }
 
     await apuntar(a, h, plantillaDoc, hechos);
-    return resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona);
+    var salida = await resumen(a, h, plantillaDoc, hechos, yaEstaban, fallidos, faltasPorPersona);
+    if (window.PersonasDelGrupo) PersonasDelGrupo.repintar(a);   /* fila 293: la tabla «Personas del grupo» se pone al día sola */
+    return salida;
   }
 
   /* Lo accesorio: la nota del asunto, los documentos en el hito y el paso

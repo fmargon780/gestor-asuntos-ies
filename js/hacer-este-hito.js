@@ -49,7 +49,7 @@ var HacerEsteHito = (function () {
   /* ---------- lo que se ve en la cabecera ---------- */
 
   function botonHTML(a, h) {
-    if (!puede(h)) return '';
+    if (!puede(h) || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return '';   /* fila 293: en un asunto de grupo, los botones de la lista */
     var c = h.cadena;
     if (c && c.estado === 'esperando-sello') {
       return '<button type="button" class="boton mesa-hacer-hito mesa-hacer-espera" disabled>Esperando el PDF sellado</button>' +
@@ -73,7 +73,7 @@ var HacerEsteHito = (function () {
 
   /* «Genera «Certificado» → espera el registro en Séneca → correo a la familia». */
   function lineaHTML(a, h) {
-    if (!puede(h)) return '';
+    if (!puede(h) || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return '';   /* fila 293 */
     var c = h.cadena;
     if (c && c.estado === 'listo-para-enviar') return '<div class="mesa-hacer-linea">El documento ya está sellado.</div>';
     if (c && c.estado === 'esperando-sello') return '';

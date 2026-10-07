@@ -148,6 +148,8 @@ var TerceroRenombrar = (function () {
         if (!rel.some(function (r) { return r && r.categoria === cat && r.nombre === viejo; })) continue;
         await App.anotarLista(abiertas[i], 'relacionados',
           { quitar: [{ categoria: cat, nombre: viejo }], anadir: [{ categoria: cat, nombre: nuevo }] });
+        /* Fila 293: lo que se le hizo (`generadoDe` de sus documentos) sigue siendo suyo. */
+        if (window.PersonasDelGrupo) await PersonasDelGrupo.alRenombrar(abiertas[i], cat, viejo, nuevo);
       }
     } catch (e) { resultado.fallos.push('los relacionados de otros asuntos: ' + U.mensajeDeError(e)); }
 

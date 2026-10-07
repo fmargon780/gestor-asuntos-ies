@@ -84,3 +84,21 @@
 .bd-grupo-conds { display: flex; flex-wrap: wrap; gap: 6px; }
 .bd-grupo-cond { font-size: 12px; background: #eef3f9; border: 1px solid var(--linea); border-radius: 10px; padding: 2px 8px; }
 .atajo-fila #bd-grupo-cuantos { flex: 1 1 auto; }
+
+/* Fila 293: la tarjeta «Personas del grupo» (js/personas-del-grupo.js). */
+#ficha-relacionados { position: relative; }
+.pg-cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 10px; }
+.pg-cabeza .pg-buscar { width: 200px; flex: 0 0 auto; }
+.pg-solo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.pg-trabajo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.pg-botones { margin-left: auto; display: inline-flex; gap: 8px; }
+.pg-tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pg-tabla th, .pg-tabla td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--linea); vertical-align: middle; }
+.pg-tabla th { font-weight: 600; color: var(--suave, #5b6b7d); }
+.pg-tabla .pg-abrir { padding: 0; }
+.pg-menu { position: absolute; z-index: 20; min-width: 200px; background: var(--papel); border: 1px solid var(--linea);
+  border-radius: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, .15); padding: 4px; display: flex; flex-direction: column; }
+.pg-menu.oculto { display: none; }
+.pg-menu-boton { font: inherit; text-align: left; background: none; border: 0; padding: 8px 10px; cursor: pointer; color: var(--tinta); border-radius: 6px; }
+.pg-menu-boton:hover:not(:disabled) { background: var(--azul-claro); }
+.pg-menu-boton:disabled { opacity: .5; cursor: not-allowed; }

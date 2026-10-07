@@ -50,6 +50,10 @@
   function pintarEnFicha(caja, a, abierto, alCambiar) {
     var lista = (a.ficha && a.ficha.relacionados) || [];
 
+    /* Fila 293: un asunto de grupo, o con algo ya generado o enviado a sus personas, enseña la tabla. */
+    if (window.PersonasDelGrupo && lista.length && (PersonasDelGrupo.aplica(a) || PersonasDelGrupo.conAlgo(a))) {
+      return PersonasDelGrupo.pintar(caja, a, abierto, alCambiar);
+    }
 
     var filas = lista.map(function (r, i) {
       return '<div class="relacionado-fila">' +
@@ -115,4 +119,5 @@
   }
 
   Relacionados.pintarEnFicha = pintarEnFicha;
+  Relacionados.nombreEnOrdenNormal = nombreEnOrdenNormal;   /* fila 293: «Copiar el nombre» de la tabla del grupo */
 })();

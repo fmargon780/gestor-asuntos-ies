@@ -125,7 +125,7 @@
   async function buscarPersona(a) {
     var categoria = categoriaDe(a);
     var quien = terceroDe(a);
-    if (!categoria || !quien || !App.E.datos) return null;
+    if (!categoria || !quien || !App.E.datos || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return null;   /* fila 293: un grupo no es una persona */
     var fuente = await Datos.cargar(App.E.datos, categoria);
     var lista = Datos.buscar(fuente.lista, quien, 1);
     if (!lista.length) lista = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);

@@ -26,7 +26,8 @@
 App.textoBusquedaSimple = function (a) {
   if (window.Reservados && Reservados.tapar(a)) return Reservados.textoDeBusqueda(a);
   var tercero = window.QueMeToca ? QueMeToca.terceroDe(a) : '';
-  return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero].filter(Boolean).join(' '));
+  var deGrupo = window.AsuntoDeGrupo ? AsuntoDeGrupo.textoDeBusqueda(a) : '';   /* fila 293: las personas de un grupo */
+  return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero, deGrupo].filter(Boolean).join(' '));
 };
 
 /* Fila 241 (docs/EXPORTAR-ASUNTOS.md): el filtro «Fechas» (Desde, Hasta),
@@ -430,7 +431,7 @@ App.filaTablaAsunto = function (a, opciones) {
   if (tapado) {
     spanTercero.innerHTML = candadoTercero + '<b>Reservado</b>';
   } else {
-    spanTercero.innerHTML = candadoTercero + '<b>' + U.escapar(QueMeToca.terceroDe(a) || a.nombre) + '</b>';
+    spanTercero.innerHTML = candadoTercero + '<b>' + U.escapar((window.AsuntoDeGrupo && AsuntoDeGrupo.terceroEnLista(a)) || QueMeToca.terceroDe(a) || a.nombre) + '</b>';   /* fila 293: «Grupo X · N» */
   }
   tdTercero.appendChild(spanTercero);
   var marcaNota = window.NotasDirectivos && NotasDirectivos.marca(a);   /* fila 290 */

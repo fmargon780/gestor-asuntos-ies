@@ -128,6 +128,7 @@
   async function personaDelTerceroLoPide(a) {
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var quien = nombreDelTercero(a);
+    if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) return AsuntoDeGrupo.personaDelGrupo(a);   /* fila 293: sin «el propio interesado» */
     if (!categoria || !quien || !App.E.datos) return null;
     try {
       var fuente = await Datos.cargar(App.E.datos, categoria);
