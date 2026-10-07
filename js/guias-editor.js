@@ -151,6 +151,7 @@
      su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
   function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
     var pasos = G.normalizar(lista);
+    var foto = null;   /* fila 297: los hitos como estaban al abrir (ya convertidos y leídos del cuadro) */
     var tipoInfo = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === nombreTipo; })[0];
     return convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')
       .catch(function () { /* sin poder convertir ahora, se abre el editor igual */ })
@@ -534,6 +535,9 @@
 
     plegado.enganchar();
     pintar();
+    /* Fila 297: la foto «al abrir», una sola vez, con lo que el propio cuadro ya recoge sin que nadie toque nada
+       (p. ej. la plantilla del aviso que enseña el desplegable): así no cuenta como cambio del usuario. */
+    if (!foto) { recoger(); foto = JSON.parse(JSON.stringify(pasos)); }
 
     /* El mapa (fila 113): panel dentro del mismo cuadro, dibujado con lo
        que hay en pantalla; pulsar un hito lleva a él. */
@@ -561,7 +565,9 @@
          ha resuelto y ocultado #capa), así que aquí sí se puede volver
          a abrir un cuadro, uno por cada hito cambiado. */
       if (window.GuiasBiblioteca) {
-        try { await GuiasBiblioteca.revisarAlGuardar(pasos, nombreTipo); } catch (e) { /* no crítico: se guarda igual */ }
+        var cancelado = false;
+        try { cancelado = await GuiasBiblioteca.revisarAlGuardar(pasos, nombreTipo, foto); } catch (e) { /* no crítico: se guarda igual */ }
+        if (cancelado) return abrirCuadro();   /* fila 297: de vuelta a «Cambiar la guía», con todo lo escrito */
       }
       return G.normalizar(pasos);
     });

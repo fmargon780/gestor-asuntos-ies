@@ -204,6 +204,7 @@ de `App` va después del fichero que lo define.
 | `js/grupo-generar.js` | «Generar para todos»: la muestra, la barra «Generando N de M…», el PDF de cada persona con su «Ref.» y «Volver a generar» (fila 294) |
 | `js/grupo-registro.js` | Reconoce los PDF sellados de Séneca persona por persona: referencia, colocar, partir, «PDF sellados sin colocar» y la pasada (fila 294) |
 | `js/personas-del-grupo-ficha.js` | «En asuntos de grupo», en «Sus asuntos» de la ficha de una persona (fila 293) |
+| `js/demo/datos-biblioteca.js` | Copia de pruebas: la guía «Medida disciplinaria por conducta gravemente perjudicial», seis hitos de la biblioteca (cuatro ya distintos de su modelo), un asunto suyo y otro tipo que usa el primero (fila 297) |
 | `js/demo/datos-grupo.js` | Copia de pruebas: «GRUPO 2ºB», seis personas, tres con certificado, una con registro y envío (fila 293) |
 | `pruebas/asunto-de-grupo.mjs` | Prueba de «Nuevo asunto» de grupo (fila 293) |
 | `pruebas/grupo-generar.mjs` | La muestra, los PDF con su «Ref.», «Parar» y «Volver a generar» (fila 294) |

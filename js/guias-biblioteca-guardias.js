@@ -107,8 +107,11 @@
     } catch (e) { return 0; }
   }
 
-  function preguntaCambioSoloAqui(nombreTipo, otros) {
-    return '¿Este cambio es solo para ' + nombreTipo + ', o también para la biblioteca?' +
+  /* Fila 297: `tituloHito` (el que tenía al abrir) y `contador` ('(1 de 3)')
+     son opcionales; sin ellos, la frase de siempre. */
+  function preguntaCambioSoloAqui(nombreTipo, otros, tituloHito, contador) {
+    var cabeza = tituloHito ? (contador ? contador + ' ' : '') + 'Has cambiado el hito «' + tituloHito + '». ' : '';
+    return cabeza + (tituloHito ? '¿Es solo para ' : '¿Este cambio es solo para ') + nombreTipo + ', o también para la biblioteca?' +
       (otros > 0 ? ' (lo usan ' + otros + (otros === 1 ? ' tipo más' : ' tipos más') + ')' : '');
   }
 

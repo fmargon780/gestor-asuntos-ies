@@ -227,8 +227,16 @@ como **copia**.
   sigue abierto, así que no cabe un segundo `U.preguntar`.
 - **Al pulsar Guardar de la guía** (`GuiasBiblioteca.revisarAlGuardar`, llamado desde
   `Guias.editar`): esto SÍ ocurre después de que `U.preguntar` haya cerrado `#capa`, así que aquí sí
-  se abre un `U.preguntar` por cada paso cambiado (uno detrás de otro, nunca dos a la vez), con la
-  misma pregunta de arriba.
+  se abre un `U.preguntar` por cada hito cambiado **esta vez** (fila 297, uno detrás de otro, nunca dos a
+  la vez). El editor toma una foto de los hitos al abrir (tras las conversiones a tareas y tras la primera
+  lectura del cuadro, `recoger()`), y se compara por `id` de hito, ambos lados normalizados con `Guias.normalizar`
+  (`HitosBiblioteca.cambiosEntre`, con los mismos `CAMPOS_COMPARABLES`/`textoLegibleDe` que `diferencias`). El
+  título dice el hito («Has cambiado el hito «X». ¿Es solo para <tipo>, o también para la biblioteca?», con
+  «(1 de N)» si hay varios); la tabla, «Antes · Ahora» y, si la biblioteca difiere de «Antes», «En la
+  biblioteca»; tres botones (Cancelar · Solo aquí · También en la biblioteca). «También…» sube solo los campos
+  cambiados (`HitosBiblioteca.subirCampos`, por `cambiar`); «Solo aquí» deja `divergido`. Nada se escribe hasta
+  la última respuesta; `revisarAlGuardar` devuelve `true` si se cancela y el editor reabre «Cambiar la guía»
+  con lo escrito. Un hito ya `divergido`, o ya distinto de su modelo y sin tocar, no pregunta.
 - **El aviso en los demás tipos** (`GuiasBiblioteca.pasosDesactualizados`/`abrirComparacion`, llamado
   desde `js/ajustes-tipo.js`, sección "Pasos del trámite"): una línea `.aviso-compartido` por paso
   con `origenBiblioteca.revision` por detrás de la del modelo, con "Ver el cambio" (comparación campo
