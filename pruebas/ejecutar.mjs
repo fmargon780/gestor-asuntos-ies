@@ -51,7 +51,7 @@ if (PALABRAS.length) {
    que corran sin competir por CPU, al final, después de todas las
    demás. Si alguna prueba futura tuviera el mismo problema, su nombre
    va también aquí. */
-const EN_SOLITARIO = ['grupo-generar.mjs', 'titulos-de-la-tabla-fijos.mjs', 'documentos-sueltos.mjs', 'ha-llegado-sustituye-la-vista.mjs', 'repintar-solo-lo-que-cambia.mjs', 'hito-desde-por-clasificar.mjs',
+const EN_SOLITARIO = ['grupo-registro.mjs', 'grupo-generar.mjs', 'titulos-de-la-tabla-fijos.mjs', 'documentos-sueltos.mjs', 'ha-llegado-sustituye-la-vista.mjs', 'repintar-solo-lo-que-cambia.mjs', 'hito-desde-por-clasificar.mjs',
   'ajustes-por-tipo.mjs', 'mesa-comunicar-del-paso-y-guion.mjs', 'tras-cada-accion.mjs', 'notas-asunto-no-se-borran.mjs',
   'refresco.mjs', 'hito-mesa.mjs', 'responsable-organismo.mjs', 'ha-llegado-sustituye-la-vista.mjs', 'aspirantes-numero.mjs', 'tipos-nombre.mjs', 'por-liquidar.mjs', 'por-liquidar-al-cambiar-tipo.mjs', 'registro-del-asunto.mjs'];
 
