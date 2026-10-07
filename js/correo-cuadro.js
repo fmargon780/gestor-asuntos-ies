@@ -154,15 +154,19 @@ var CorreoCuadro = (function () {
     var posibles = Destinatarios.posibles(persona, correoLoPide, elegidos);
     elegidos = posibles.elegidos;
     var otroInicial = posibles.otro;
+    /* Fila 299: al tutor o tutora del grupo no se le escribe a la familia: sin su correo, ninguna dirección marcada. */
+    if (n()._interno && n()._interno.tutorDelGrupo && !correoLoPide) Object.keys(elegidos).forEach(function (k) { elegidos[k] = false; });
 
     return '<div id="correo-formulario">' +
              '<div class="cuadro-cabecera-ruta"><span id="correo-ruta-lugar"></span></div>' +
              '<div id="correo-ruta-en-linea" class="oculto"></div>' +
              '<div class="correo-grid">' +
                '<div class="correo-col-izq">' +
+                 (window.CorreoTutor ? CorreoTutor.arribaHtml() : '') +   /* fila 299 */
                  bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
                  bloqueAsunto(a) +
                  (bloqueAdjuntos || '') +
+                 (window.CorreoAdjuntoPlantilla ? CorreoAdjuntoPlantilla.avisoHtml() : '') +   /* fila 299 */
                '</div>' +
                '<div class="correo-col-der">' +
                  '<div id="correo-comunes-der">' + bloqueCuerpo(a) + '</div>' +
@@ -215,6 +219,7 @@ var CorreoCuadro = (function () {
           ' Escríbelo aquí abajo.</p>') +
       '<input id="correo-otro" class="campo" value="' + U.escapar(otroInicial || '') + '" ' +
         'placeholder="Otro correo, si hace falta" style="margin-top:8px">' +
+      (window.CorreoTutor ? CorreoTutor.debajoDeOtroHtml() : '') +   /* fila 299 */
 
       (opcionesGrupo
         ? '<label class="etiqueta">Añadir un grupo</label>' +
@@ -284,6 +289,8 @@ var CorreoCuadro = (function () {
     engancharPlantilla(a);
     engancharCco();
     engancharRuta(a);
+    if (window.CorreoTutor) CorreoTutor.enganchar();   /* fila 299 */
+    if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alAbrir(a, plantillaElegida);   /* fila 299 */
 
     var selectorGrupo = $('correo-grupo');
     if (selectorGrupo) {
@@ -369,6 +376,7 @@ var CorreoCuadro = (function () {
     plantillaElegida = idElegida;
     $('correo-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
+    if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alElegir(a, plantillaElegida);   /* fila 299 */
   }
 
   /* ---------- crear/editar la plantilla desde el propio cuadro

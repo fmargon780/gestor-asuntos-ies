@@ -134,6 +134,8 @@ var HitosBiblioteca = (function () {
       version: 1,
       /* Fila 284: la marca de que js/plazos-del-centro.js ya hizo su pasada (no se repite sola). */
       plazosDelCentro: parseInt(l.plazosDelCentro, 10) || 0,
+      /* Fila 299: la marca de que js/informar-al-tutor.js ya hizo su pasada. */
+      informarAlTutor: parseInt(l.informarAlTutor, 10) || 0,
       modelos: (Array.isArray(l.modelos) ? l.modelos : []).map(normalizarModelo)
     };
   }

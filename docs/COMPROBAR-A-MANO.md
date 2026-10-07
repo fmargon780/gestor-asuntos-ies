@@ -241,3 +241,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 296 — formar un grupo pegando una lista (7-oct-2026)
 
 - Con un listado de verdad exportado de Séneca (por ejemplo, el de transporte escolar): «Nuevo asunto» → «Es para un grupo de personas» → «Pegar una lista» → «o elige un fichero». Casi todas las personas tienen que salir en «Reconocidas». Si muchas van a «No encontradas», decirle a Claude el nombre del listado.
+
+## Fila 299 — el correo al tutor o tutora del grupo (7-oct-2026)
+
+- En el centro, abrir un asunto de SANCIÓN de verdad: el hito se llama «Informar al tutor/a» y, al preparar su correo (Comunicar ▾ → «Tutor/a del grupo»), sale el tutor o tutora real del grupo de ese alumno. Si no sale («No sé quién es el tutor o tutora de…»), mirar cómo escribe Séneca la unidad en la relación de tutorías (Herramientas → Tablas de datos) y en el fichero de alumnado, y decírselo a Claude.

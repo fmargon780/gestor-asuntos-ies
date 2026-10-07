@@ -84,7 +84,9 @@
       ['Otero Campos, Marta', '11223344A', 'Matemáticas P.E.S.', '01/09/2015', '', '650111222', 'motero@correo-demo.es'],
       ['Reyes Palma, Fernando', '22334455B', 'Lengua P.E.S.', '01/09/2010', '', '650222333', 'freyes@correo-demo.es'],
       ['Uceda Molina, Patricia', '33445566C', 'Jefatura de Estudios', '01/09/2020', '', '650333444', 'puceda@correo-demo.es'],
-      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es']
+      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es'],
+      /* Fila 299: una tutora sin correo en su ficha (js/demo/datos-tutor.js). */
+      ['Cabello Ruiz, Esperanza', '77889900G', 'Inglés P.E.S.', '01/09/2018', '', '650555666', '']
     ]));
 
     /* empresas.csv: alta manual (CONTEXTO.md: Razón social · Nombre
@@ -607,6 +609,7 @@
     await crearArchivados(tipos);
     if (window.Demo.grupo) await Demo.grupo.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });   /* fila 293 */
     if (window.Demo.biblioteca) await Demo.biblioteca.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 297 */
+    if (window.Demo.tutor) await Demo.tutor.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 299 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();
@@ -621,10 +624,9 @@
       if (plazos) PlazosDelCentro.avisar(plazos);
     }
     /* Fila 285: ya recargado, la pasada que coloca el PDF sellado (sale «1 listos para enviar»). */
-    if (window.Demo.hacer) {
-      if (window.Gestor && Gestor.recargar) await Gestor.recargar();
-      await Demo.hacer.alAcabar();
-    }
+    if (window.Gestor && Gestor.recargar) await Gestor.recargar();
+    if (window.Demo.tutor) await Demo.tutor.alAcabar();   /* fila 299: «Informar al tutor/a» (antes que la pasada de abajo, para no coincidir con ella) */
+    if (window.Demo.hacer) await Demo.hacer.alAcabar();
   }
 
   window.Demo = window.Demo || {};

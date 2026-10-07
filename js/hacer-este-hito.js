@@ -23,7 +23,7 @@ var HacerEsteHito = (function () {
   var ACCIONES = ['generar', 'registrar', 'comunicar'];
   var activos = {};   /* «asunto|hito» -> true, mientras la cadena corre */
 
-  var PARA_QUIEN = { tercero: 'al tercero', tutores: 'a la familia', relacionados: 'a los relacionados', tutoria: 'a la tutoría', otro: 'a otra persona' };
+  var PARA_QUIEN = { tercero: 'al tercero', tutores: 'a la familia', relacionados: 'a los relacionados', tutoria: 'al tutor o tutora del grupo', otro: 'a otra persona' };
 
   function clave(a, h) { return a.nombre + '|' + h.id; }
   function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1; }
@@ -157,12 +157,9 @@ var HacerEsteHito = (function () {
     var canales = HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
     var via = receta.via || canales[0] || 'correo';
     var lista = await HitoMesaComunicar.candidatos(a, h);
-    var sel = HitoMesaRecetas.elegidosPara(receta, h, lista || []);
-    var op = { idPasoGuion: g.id, nombres: sel.map(function (c) { return c.soloNombre || c.nombre; }), cerrarTexto: 'Todavía no' };
-    if (receta.a === 'tutoria') op.nombres = ['la tutoría'];
-    if (receta.plantilla) op.plantilla = receta.plantilla;
+    var op = await HitoMesaRecetas.opcionesDePaso(a, h, g, lista, via);   /* fila 299: la misma regla que la mesa */
+    op.cerrarTexto = 'Todavía no';
     if (via === 'correo') {
-      op.correos = await HitoMesaComunicar.correosDe(sel);
       if (documento) op.adjuntos = [documento];
     } else if (documento) op.documentoSeneca = documento;
     await HitosComunicar.comunicar(a, h, via, op);

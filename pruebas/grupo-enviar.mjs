@@ -34,6 +34,7 @@ async function nuevaPagina(extra) {
   await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); " + (extra || '') + " } catch (e) {}");
   await p.goto(DIRECCION);
   await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
+  await p.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 60000 });   /* fila 299: la demostración tarda un poco más en montarse */
   await p.waitForTimeout(3500);
   await p.evaluate(() => {
     window.__asunto = App.E.listaAbiertos.filter((a) => /GRUPO 2ºB$/.test(a.nombre))[0].nombre;

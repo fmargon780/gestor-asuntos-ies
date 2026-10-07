@@ -41,6 +41,14 @@ var HitoMesaComunicar = (function () {
                      soloNombre: t.nombre || etiqueta, correos: t.correos.slice() });
       });
     }
+    /* Fila 299: el tutor o tutora del grupo del alumno (una casilla por cada uno en vigor), de js/tutor-del-grupo.js. */
+    if (window.TutorDelGrupo) {
+      var tg = await TutorDelGrupo.deAsunto(a);
+      tg.tutores.forEach(function (t, i) {
+        lista.push({ id: 'tutoria' + i, nombre: t.nombre + ' (tutor/a de ' + tg.unidad + ')', soloNombre: t.nombre,
+                     correos: t.correos.slice(), tutorDelGrupo: true });
+      });
+    }
     ((a.ficha && a.ficha.relacionados) || []).forEach(function (r, i) {
       lista.push({ id: 'rel' + i, nombre: r.nombre, correos: [], relacionado: r });
     });
@@ -49,7 +57,7 @@ var HitoMesaComunicar = (function () {
 
   function premarcados(h, lista) {
     if (h.responsable === 'tutor') {
-      var t = lista.filter(function (c) { return /^tutor/.test(c.id); })[0];
+      var t = lista.filter(function (c) { return /^tutor\d/.test(c.id); })[0];
       if (t) return [t.id];
     }
     if (h.responsable === 'relacionado') {
@@ -112,6 +120,8 @@ var HitoMesaComunicar = (function () {
     caja.querySelector('.mesa-preparar-correo').onclick = async function () {
       var sel = elegidos();
       var op = { correos: await correosDe(sel), nombres: nombres(sel) };
+      /* Fila 299: solo tutores del grupo: saludo «Buenas:» y sus avisos en el cuadro. */
+      if (sel.length && sel.every(function (c) { return c.tutorDelGrupo; })) op.tutoria = true;
       var adj = adjuntos();
       if (adj) op.adjuntos = adj;
       HitosComunicar.comunicar(a, h, 'correo', op);

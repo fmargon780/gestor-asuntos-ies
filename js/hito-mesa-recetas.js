@@ -48,28 +48,39 @@ var HitoMesaRecetas = (function () {
 
   /* Los destinatarios de la receta, de entre los de siempre de la mesa
      (js/hito-mesa-comunicar.js). Sin «a quién», los premarcados de
-     siempre; «la tutoría» y «otro» no se saben: el cuadro sale sin
+     siempre; «el tutor o tutora del grupo» (fila 299, js/tutor-del-grupo.js)
+     son las casillas «tutoria0»…; «otro» no se sabe: el cuadro sale sin
      correo, para escribirlo. */
   function elegidosPara(receta, h, lista) {
     var a = (receta && receta.a) || '';
     if (a === 'tercero') return lista.filter(function (c) { return c.id === 'tercero'; });
-    if (a === 'tutores') return lista.filter(function (c) { return /^tutor/.test(c.id); });
+    if (a === 'tutores') return lista.filter(function (c) { return /^tutor\d/.test(c.id); });
     if (a === 'relacionados') return lista.filter(function (c) { return /^rel/.test(c.id); });
-    if (a === 'tutoria' || a === 'otro') return [];
+    if (a === 'tutoria') return lista.filter(function (c) { return c.tutorDelGrupo; });
+    if (a === 'otro') return [];
     var ids = window.HitoMesaComunicar ? HitoMesaComunicar.premarcados(h, lista) : ['tercero'];
     return lista.filter(function (c) { return ids.indexOf(c.id) !== -1; });
+  }
+
+  /* Lo que el cuadro de Correo o de Séneca necesita de una tarea de comunicar (fila 299: una sola regla para la mesa y para
+     «Hacer este hito»): quién (nombres, correos), con qué plantilla y, si es a la tutoría, el aviso para el cuadro. */
+  async function opcionesDePaso(a, h, g, lista, via) {
+    var receta = g.receta || {};
+    var sel = elegidosPara(receta, h, lista || []);
+    var op = { idPasoGuion: g.id, nombres: sel.map(function (c) { return c.soloNombre || c.nombre; }) };
+    if (receta.a === 'tutoria' && !sel.length) op.nombres = ['la tutoría'];
+    if (receta.a === 'tutoria' || (sel.length && sel.every(function (c) { return c.tutorDelGrupo; }))) op.tutoria = true;
+    if (receta.plantilla) op.plantilla = receta.plantilla;
+    if (via === 'correo' && window.HitoMesaComunicar) op.correos = await HitoMesaComunicar.correosDe(sel);
+    return op;
   }
 
   async function comunicarPaso(a, h, g, lista) {
     var receta = g.receta || {};
     var canales = window.HitosComunicar && HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
     var via = receta.via || canales[0] || 'correo';
-    var sel = elegidosPara(receta, h, lista || []);
-    var op = { idPasoGuion: g.id, nombres: sel.map(function (c) { return c.soloNombre || c.nombre; }) };
-    if (receta.a === 'tutoria') op.nombres = ['la tutoría'];
-    if (receta.plantilla) op.plantilla = receta.plantilla;
+    var op = await opcionesDePaso(a, h, g, lista, via);
     if (via === 'correo' && window.HitoMesaComunicar) {
-      op.correos = await HitoMesaComunicar.correosDe(sel);
       var marcados = window.HitoMesaDocumentos && HitoMesaDocumentos.marcados ? HitoMesaDocumentos.marcados(document) : [];
       if (marcados.length) op.adjuntos = marcados;
     }
@@ -114,6 +125,6 @@ var HitoMesaRecetas = (function () {
     });
   }
 
-  return { pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara };
+  return { pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, opcionesDePaso: opcionesDePaso };
 })();
 window.HitoMesaRecetas = HitoMesaRecetas;

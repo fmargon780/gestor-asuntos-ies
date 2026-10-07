@@ -186,6 +186,13 @@
       extra.medioListo = Plantillas.rellenar(mensaje.cuerpo || '', valores).texto;
     }
 
+    /* Fila 299: el correo va al tutor o tutora del grupo: saludo «Buenas:» y los avisos de su cuadro (js/correo-tutor.js). */
+    if (opciones && opciones.tutoria && canal !== 'seneca' && window.TutorDelGrupo && window.CorreoTutor) {
+      var delTutor = CorreoTutor.extraDe(await TutorDelGrupo.deAsunto(a));
+      extra.saludo = delTutor.saludo;
+      extra.tutorDelGrupo = delTutor.tutorDelGrupo;
+    }
+
     if (canal !== 'seneca') {
       extra.adjuntosMarcados = (opciones && opciones.adjuntos) ? opciones.adjuntos.slice() : await documentosDelHitoEnCarpeta(a, hito);
     } else if (opciones && opciones.documentoSeneca) {
