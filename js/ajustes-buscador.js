@@ -175,7 +175,10 @@ var AjustesBuscador = (function () {
     if (!caja) return;
     caja.addEventListener('input', pintar);
     caja.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape') { quitar(true); }
+      if (ev.key === 'Escape') {
+        /* Si había algo que quitar, el Escape se queda aquí (si no, js/usabilidad.js volvería a la pantalla anterior). */
+        if (caja.value || lista.length) { ev.stopPropagation(); ev.preventDefault(); quitar(true); }
+      }
       else if (ev.key === 'Enter' && !ev.isComposing && lista.length) { ev.preventDefault(); ir(lista[0]); }
     });
   }

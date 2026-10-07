@@ -275,7 +275,7 @@ await comprobar('Ajustes funciona igual: se encoge también al bajar',
 console.log('--- las pestañas de Ajustes se quedan pegadas justo debajo ---');
 const posicionPestanas = await pagina.evaluate(() => {
   const cabecera = document.querySelector('#pantalla-ajustes header.cabecera');
-  const pestanas = document.getElementById('pestanas-ajustes');
+  const pestanas = document.getElementById('pestanas-ajustes').closest('.ajustes-barra') || document.getElementById('pestanas-ajustes');
   return {
     posicion: getComputedStyle(pestanas).position,
     huecoEntreMedias: pestanas.getBoundingClientRect().top - cabecera.getBoundingClientRect().bottom

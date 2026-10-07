@@ -138,7 +138,7 @@ await comprobar('6. el salto lleva a «Este ordenador» y abre la sección', pag
 await pagina.evaluate(() => App.irASeccionDeAjustes('#bloque-traer-alumnado'));
 await pagina.waitForTimeout(1500);
 await comprobar('6. y un salto a Herramientas va a esa pantalla', pagina.evaluate(() => !document.getElementById('pantalla-herramientas').classList.contains('oculto')), true);
-await pagina.click('.pestana[data-pantalla="inicio"]');
+await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForTimeout(800);
 await comprobar('6. al volver a Ajustes: la misma pestaña y la sección sigue abierta', pagina.evaluate(() => [App.E.pestanaAjustes, document.getElementById('bloque-envio-correo').open]), ['ordenador', true]);

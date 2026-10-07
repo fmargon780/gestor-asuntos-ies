@@ -9,7 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
-  { id: '288', fecha: '2026-10-07', texto: 'Ajustes está ordenado en cuatro pestañas —Lo de cada día, El centro, Este ordenador y Problemas— y tiene un buscador arriba. Las reparaciones que se usan muy de vez en cuando están ahora en Herramientas.' },
+  { id: '288', fecha: '2026-10-07', texto: 'Ajustes tiene cuatro pestañas y un buscador. Las reparaciones de vez en cuando están en Herramientas.' },
   { id: '287', fecha: '2026-10-07', texto: 'En Ajustes → El centro hay una sección nueva, «Quién usa la aplicación», para decir quién es de Dirección, de Secretaría o de Jefatura de Estudios. Quien entra con uno de esos nombres ve solo Inicio y Archivo con los asuntos de su órgano, sin poder cambiar nada.' },
   { id: '286', fecha: '2026-10-06', texto: 'Al guardar un documento en un asunto que está en espera sale una casilla ya marcada, «Es lo que se esperaba. Termina la espera»: con ella el hito se da por hecho y el plazo siguiente empieza a contar. Y un hito de espera con el plazo vencido lleva el botón «No ha llegado nada».' },
   { id: '285', fecha: '2026-10-06', texto: 'En la pantalla de un hito hay un botón nuevo, «Hacer este hito»: genera el documento y guarda el PDF solo, espera a que dejes el PDF sellado en la carpeta (y lo reconoce sin preguntar) y deja el correo preparado con el documento adjunto. En Inicio sale «N listos para enviar».' },
