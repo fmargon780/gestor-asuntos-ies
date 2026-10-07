@@ -188,13 +188,14 @@ var Relacionados = (function () {
      atajos de alumnado y "Meter un grupo entero" encima. Devuelve la
      lista de señalados ({categoria, nombre, persona}), o null si se
      cancela. */
-  function abrirAnadirRelacionados() {
+  function abrirAnadirRelacionados(opc) {
+    opc = opc || {};   /* fila 293: titulo, marcadosIniciales, textoBoton, minimo y alSenalar(tipo, valor, lista) */
     return new Promise(function (resolver) {
       var resuelto = false;
       function resolverUnaVez(v) { if (resuelto) return; resuelto = true; resolver(v); }
 
       var capa = $('capa');
-      $('cuadro-titulo').textContent = 'Añadir varios relacionados';
+      $('cuadro-titulo').textContent = opc.titulo || 'Añadir varios relacionados';
       var cuerpo = $('cuadro-cuerpo');
       cuerpo.innerHTML =
         '<div id="rel-grupo-fila"></div>' +
@@ -215,10 +216,11 @@ var Relacionados = (function () {
         resolverUnaVez(marcados);
       }, {
         multiple: true,
-        alCambiarCategoria: function (categoria) { pintarAtajosDeAlumnado(categoria, api); }
+        marcadosIniciales: opc.marcadosIniciales, textoBoton: opc.textoBoton, minimo: opc.minimo,
+        alCambiarCategoria: function (categoria) { pintarAtajosDeAlumnado(categoria, api, opc.alSenalar); }
       });
 
-      pintarGrupoFila(api);
+      pintarGrupoFila(api, opc.alSenalar);
     });
   }
 
@@ -226,7 +228,7 @@ var Relacionados = (function () {
      una enseñanza. Solo salen con la categoría ALUMNADO elegida, y
      solo con matriculados de este curso (Datos.unidadesDistintas ya
      filtra por eso). Elegir uno solo señala: no añade nada todavía. */
-  async function pintarAtajosDeAlumnado(categoria, api) {
+  async function pintarAtajosDeAlumnado(categoria, api, alSenalar) {
     var caja = $('rel-atajos');
     if (!caja) return;
     if (categoria !== 'ALUMNADO' || !App.E.datos) {
@@ -278,17 +280,17 @@ var Relacionados = (function () {
 
     $('atajo-unidad').onchange = function () {
       var v = $('atajo-unidad').value;
-      if (v) marcarAlumnado(filtrarPorUnidad(fuente.lista, v));
+      if (v) { var l1 = filtrarPorUnidad(fuente.lista, v); if (alSenalar) alSenalar('unidad', v, l1); marcarAlumnado(l1); }
       $('atajo-unidad').value = '';
     };
     $('atajo-nivel').onchange = function () {
       var v = $('atajo-nivel').value;
-      if (v) marcarAlumnado(filtrarPorNivel(fuente.lista, v));
+      if (v) { var l2 = filtrarPorNivel(fuente.lista, v); if (alSenalar) alSenalar('nivel', v, l2); marcarAlumnado(l2); }
       $('atajo-nivel').value = '';
     };
     $('atajo-ensenanza').onchange = function () {
       var v = $('atajo-ensenanza').value;
-      if (v) marcarAlumnado(filtrarPorEnsenanza(fuente.lista, v));
+      if (v) { var l3 = filtrarPorEnsenanza(fuente.lista, v); if (alSenalar) alSenalar('ensenanza', v, l3); marcarAlumnado(l3); }
       $('atajo-ensenanza').value = '';
     };
   }
@@ -317,7 +319,7 @@ var Relacionados = (function () {
      no estén en las listas también se señalan (por nombre), aunque el
      buscador no pueda comprobarlos: se dejan tal cual, como dice el
      punto 3 del documento. */
-  function pintarGrupoFila(api) {
+  function pintarGrupoFila(api, alSenalar) {
     var caja = $('rel-grupo-fila');
     if (!caja) return;
     var grupos = (window.Grupos && Grupos.lista()) || [];
@@ -338,6 +340,7 @@ var Relacionados = (function () {
       var g = grupos.filter(function (x) { return x.id === $('rel-grupo-elegir').value; })[0];
       $('rel-grupo-elegir').value = '';
       if (!g) return;
+      if (alSenalar) alSenalar('grupo', g.nombre, g.miembros);
       api.marcar(g.miembros.map(function (m) { return { categoria: m.categoria, nombre: m.nombre }; }));
     };
   }
@@ -376,6 +379,7 @@ var Relacionados = (function () {
     agregarRelacionado: agregarRelacionado,
     combinarRelacionados: combinarRelacionados,
     agregarVarios: agregarVarios,
+    elegirVarios: abrirAnadirRelacionados,   /* fila 293: el mismo cuadro, para formar un grupo */
     filtrarPorUnidad: filtrarPorUnidad,
     filtrarPorNivel: filtrarPorNivel,
     filtrarPorEnsenanza: filtrarPorEnsenanza,

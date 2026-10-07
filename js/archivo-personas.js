@@ -380,7 +380,11 @@ App.verAsuntosDeTercero = async function (p) {
     return a.nombre < b.nombre ? 1 : -1;
   });
 
-  if (titulo) titulo.textContent = 'Sus asuntos' + (salida.length ? ' (' + salida.length + ')' : '');
+  if (titulo) {
+    titulo.dataset.propios = String(salida.length);
+    titulo.textContent = 'Sus asuntos' + (salida.length ? ' (' + salida.length + ')' : '');
+    if (window.PersonasDelGrupoFicha) PersonasDelGrupoFicha.tituloAlDia();   /* fila 293: cuenta también «En asuntos de grupo» */
+  }
   var resumenAsuntos = $('fp-resumen-asuntos');
   if (resumenAsuntos) {
     var nAbiertos = salida.filter(function (x) { return x.donde === 'Abierto'; }).length;

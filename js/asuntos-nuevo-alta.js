@@ -235,7 +235,7 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
      que quitarlo desde aquí es la única manera: nunca se pierde ni se
      borra solo. */
   function pintarBarra() {
-    if (!multiple) return;
+    if (!multiple || !cajaBarra) return;   /* fila 293: con marcados que ya traen su `persona`, se llama antes de montar la barra */
     var lista = listaDeMarcados();
     if (!lista.length) { cajaBarra.className = 'marcados-barra oculto'; cajaBarra.innerHTML = ''; return; }
     cajaBarra.className = 'marcados-barra';
@@ -243,8 +243,9 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
       '<div class="marcados-cabecera">' +
         '<span class="marcados-cuenta">' + lista.length +
           (lista.length === 1 ? ' señalado' : ' señalados') + '</span>' +
-        '<button type="button" class="boton boton-principal" id="rel-marcados-anadir">' +
-          'Añadir los ' + lista.length + ' señalados</button>' +
+        '<button type="button" class="boton boton-principal" id="rel-marcados-anadir"' +
+          (opciones.minimo && lista.length < opciones.minimo ? ' disabled' : '') + '>' +
+          (opciones.textoBoton ? opciones.textoBoton(lista.length) : 'Añadir los ' + lista.length + ' señalados') + '</button>' +
       '</div>' +
       '<div class="marcados-lista">' + lista.map(function (m) {
         var clave = m.categoria + '|' + m.nombre;

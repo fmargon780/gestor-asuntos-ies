@@ -59,7 +59,7 @@
     var f = (a && a.ficha) || {}, l = (a && a.leido) || {};
     var resto = String(l.resto || '');
     var curso = f.curso || (resto.match(/\b(\d{2}[-\/]\d{2})\b/) || [])[1] || '';
-    var grupo = f.grupo || (resto.match(/\b(\d[ºo°](?:Bach|FP|Div)?[A-Za-z]?)\b/i) || [])[1] || '';
+    var grupo = (typeof f.grupo === 'string' && f.grupo) || (resto.match(/\b(\d[ºo°](?:Bach|FP|Div)?[A-Za-z]?)\b/i) || [])[1] || '';
     return { curso: curso, grupo: grupo };
   }
 
@@ -215,7 +215,7 @@
     var p = piezasDelNombreDe(a);
     var datosCentro = await datosDelCentro();
 
-    var persona = await personaDelAsunto(categoria, terceroTexto);
+    var persona = (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) ? null : await personaDelAsunto(categoria, terceroTexto);   /* fila 293 */
     var registro = await registroDelAsunto(a);
     /* Fila 280: con `opciones.fecha` (la de un documento ya hecho), «hoy» es esa fecha. Sin ella, la de hoy. */
     var fechaBase = /^\d{4}-\d{2}-\d{2}$/.test(op.fecha || '') ? op.fecha : '';

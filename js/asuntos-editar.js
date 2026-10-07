@@ -40,7 +40,7 @@ App.piezasDelAsunto = function (a) {
     fecha: fecha,
     tipo: a.ficha.tipo || a.leido.tipo || '',
     curso: a.ficha.curso || '',
-    grupo: a.ficha.grupo || '',
+    grupo: typeof a.ficha.grupo === 'string' ? a.ficha.grupo : '',   /* fila 293: el de un asunto de grupo es un objeto */
     campos: (a.ficha.campos && typeof a.ficha.campos === 'object') ? a.ficha.campos : {},
     descripcion: a.ficha.descripcion || '',
     tercero: a.ficha.tercero || '',
@@ -353,6 +353,8 @@ async function abrirCuadroDeEdicion(a, p, base) {
     refrescar();
     refrescarDepartamento();
   }, pedirAlta, terceroElegidoInicial);
+  /* Fila 293: en un asunto de grupo, en vez del buscador de personas, el nombre del grupo. */
+  if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) controlesTercero = AsuntoDeGrupo.montarEditar($('ed-tercero-caja'), a, refrescar);
 
   ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion']
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
@@ -409,7 +411,8 @@ async function abrirCuadroDeEdicion(a, p, base) {
      de contacto (fila 66) y el departamento (fila 167, del organismo
      recién elegido, o se limpia si ya no es de Administraciones). */
   var elegido = controlesTercero.terceroElegido();
-  if (elegido) datos.contacto = Datos.fotoDeContacto(elegido, elegido.categoria);
+  if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) datos.grupo = AsuntoDeGrupo.grupoRenombrado(a, elegido);   /* fila 293: sigue siendo un objeto */
+  else if (elegido) datos.contacto = Datos.fotoDeContacto(elegido, elegido.categoria);
   var organismoNuevo = (elegido !== null && window.AdministracionesFicha)
     ? AdministracionesFicha.organismoDePersona(elegido) : undefined;
   var departamento = window.AdministracionesFicha ? AdministracionesFicha.leerEditar(a, organismoNuevo) : undefined;

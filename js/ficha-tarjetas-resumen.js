@@ -170,6 +170,12 @@ var FichaTarjetasResumen = (function () {
     resumirNotas();
     resumirLista('otros', 'ficha-otros', '.otros-asunto', function (b) { return b.dataset.nombre || b.textContent; },
       'asunto', 'asuntos');
+    var tabla = $('ficha-relacionados');
+    if (tabla && tabla.dataset.resumen) {   /* fila 293: la tabla «Personas del grupo» trae su propio resumen */
+      ponerCuenta('relacionados', '');
+      ponerResumen('relacionados', [{ texto: tabla.dataset.resumen }], false);
+      return;
+    }
     resumirLista('relacionados', 'ficha-relacionados', '.relacionado-fila', function (f) {
       var s = f.querySelectorAll(':scope > span');
       return s.length > 1 ? s[1].textContent : f.textContent;

@@ -216,6 +216,7 @@ App.grupoDelTercero = function () {
 };
 
 App.textoTercero = function (p) {
+  if (p.esGrupo) return p.nombre;   /* fila 293: «GRUPO <nombre>» */
   if (p.categoria === 'ALUMNADO') return Nombres.terceroAlumno(p);
   if (p.categoria === 'PERSONAL') return Nombres.terceroPersonal(p);
   if (p.categoria === 'TUTORES LEGALES') return Nombres.terceroTutor(p);   /* fila 166 */

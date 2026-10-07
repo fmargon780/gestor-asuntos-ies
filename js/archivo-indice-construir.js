@@ -107,7 +107,7 @@
     return {
       nombre: nombre, categoria: categoria, tercero: tercero, ruta: ruta,
       fecha: leido.fecha || '', tipo: leido.tipo || '', reconocido: !!leido.reconocido,
-      curso: cursoGrupo.curso || ficha.curso || '', grupo: cursoGrupo.grupo || ficha.grupo || '',   /* fila 239: sin ellos en el nombre, de la ficha */
+      curso: cursoGrupo.curso || ficha.curso || '', grupo: cursoGrupo.grupo || (typeof ficha.grupo === 'string' ? ficha.grupo : ''),   /* fila 239: sin ellos en el nombre, de la ficha */
       documentos: documentos, registros: sinRepetir(registrosDeNombres(documentos).concat(registrosDeFicha(ficha))),
       numero: ficha.numero || leido.numero || '',   /* fila 239 */
       sueltoEn: sueltoEn || '',

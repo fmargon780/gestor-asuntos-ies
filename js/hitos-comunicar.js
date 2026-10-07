@@ -101,7 +101,7 @@
   async function buscarPersonaDelAsunto(a) {
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var quien = tercero(a);
-    if (!categoria || !quien || !window.Datos || !window.App || !App.E.datos) return null;
+    if (!categoria || !quien || !window.Datos || !window.App || !App.E.datos || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return null;   /* fila 293 */
     try {
       var fuente = await Datos.cargar(App.E.datos, categoria);
       var lista = Datos.buscar(fuente.lista, quien, 1);

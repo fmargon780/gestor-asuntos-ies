@@ -30,6 +30,8 @@
     var quien = (a.ficha && a.ficha.tercero) || (a.leido && a.leido.resto) || '';
     var contacto = a.ficha && a.ficha.contacto;
 
+    /* Fila 293: un asunto de grupo no tiene una persona detrás. */
+    if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) return { categoria: categoria, persona: null, aviso: AsuntoDeGrupo.textoCabecera(a) + '.' };
     if (!categoria || !quien) {
       return { categoria: categoria, persona: null,
                aviso: 'Este asunto no dice a qué tercero pertenece.' };

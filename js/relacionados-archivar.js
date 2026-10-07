@@ -147,7 +147,7 @@
         var resultado = await IndiceArchivo.leerDisco({ todos: true });
         if (resultado.ok) {
           resultado.datos.asuntos.forEach(function (e) {
-            if ((e.relacionados || []).some(esDeEsta)) salida.push({ nombre: e.nombre, archivado: true });
+            if ((e.relacionados || []).some(esDeEsta)) salida.push({ nombre: e.nombre, archivado: true, categoria: e.categoria, tercero: e.tercero });
           });
         }
       } catch (e) { /* sin índice usable, se queda con los abiertos */ }
@@ -231,39 +231,5 @@ U.envolver(window.Duplicados, 'window.Duplicados.delTercero', 'relacionados-arch
   };
 });
 
-/* ---------- engancharse a la ficha de la persona ---------- */
-
-(function () {
-  function $(id) { return document.getElementById(id); }
-  U.envolver(App, 'App.verFicha', 'relacionados-archivar.js', function (comoEra) {
-    return function (p) {
-    comoEra(p);
-    var caja = $('ficha-persona');
-    if (!caja) return;
-    var nombre = App.textoTercero(p);
-    /* asuntosDondeEsRelacionado es async desde la fila 64 (mira
-       también el índice del ARCHIVO): se pinta cuando responda, si la
-       pantalla de la persona sigue en pie (isConnected). Si mientras
-       tanto se ha abierto otra persona, esto ya no es perfecto (el
-       bloque podría llegar tarde y colgarse de la ficha nueva), pero
-       es solo un texto de consulta, nada que se guarde ni se pueda
-       estropear: el mismo riesgo que ya asume el nombre del tercero en
-       js/ficha-nombre-acciones.js. */
-    Relacionados.asuntosDondeEsRelacionado(p.categoria, nombre).then(function (asuntos) {
-      if (!asuntos.length || !caja.isConnected) return;
-
-      var bloque = document.createElement('div');
-      bloque.className = 'ficha-relacionado-de';
-      bloque.innerHTML = '<p class="nota"><strong>' +
-        (asuntos.length === 1 ? 'Relacionado con este asunto:' : 'Relacionado con estos asuntos:') +
-        '</strong></p>' +
-        asuntos.map(function (x) {
-          return '<div class="resultado">' + U.escapar(x.nombre) +
-                 '<div class="resultado-pie">' + (x.archivado ? 'Archivado' : 'Abierto') +
-                 '</div></div>';
-        }).join('');
-      caja.appendChild(bloque);
-    });
-    };
-  });
-})();
+/* La ficha de la persona (antes, aquí: «Relacionado con este asunto») la completa ahora
+   js/personas-del-grupo-ficha.js, «En asuntos de grupo» (fila 293). */

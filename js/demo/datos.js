@@ -60,6 +60,10 @@
       ['Jimenez Rubio, Mateo', '2100011', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculado', '21/12/2010', '600111333', 'tutor.mateo@correo-demo.es'],
       ['Klein Soto, Ana', '2100012', '1º de E.S.O.', '1º C', '20' + anoMatricula, 'Matriculada', '09/09/2014', '600222444', 'tutor.ana@correo-demo.es'],
       ['Lara Quintero, Bruno', '2100013', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculado', '15/10/2012', '600333555', 'tutor.bruno@correo-demo.es'],
+      /* Fila 293: tres más en 2º B, para que el asunto de grupo de la demostración sea de una unidad con seis. */
+      ['Navarro Gil, Lucía', '2100014', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculada', '04/04/2013', '600141414', 'tutor.lucia@correo-demo.es'],
+      ['Ortega Paz, Darío', '2100015', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculado', '27/07/2012', '600151515', 'tutor.dario@correo-demo.es'],
+      ['Pardo Luna, Nerea', '2100016', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculada', '13/01/2013', '600161616', 'tutor.nerea@correo-demo.es'],
       /* Fila 285: las dos alumnas y alumnos de «Hacer este hito», con correo del tutor para poder enviarles el certificado. */
       ['Vidal Soto, Irene', '2100030', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculada', '12/05/2010', '600121212', 'tutor.irene@correo-demo.es'],
       ['Moreno Sanz, Hugo', '2100031', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculado', '30/01/2010', '600131313', 'tutor.hugo@correo-demo.es'],
@@ -595,6 +599,7 @@
     await crearPlantillas();
     await crearAsuntosAbiertos(tipos);
     await crearArchivados(tipos);
+    if (window.Demo.grupo) await Demo.grupo.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });   /* fila 293 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();

@@ -108,6 +108,7 @@ var FichaTarjetas = (function () {
     asuntoActual = a || null;
     var r = raiz();
     if (!r) return;
+    if (window.AsuntoDeGrupo) AsuntoDeGrupo.titularTarjeta(r, a);   /* fila 293 */
     var rejilla = $('ficha-tarjetas-rejilla');
     if (abierta && !r.querySelector('.ficha-tarjeta[data-tarjeta="' + abierta + '"]')) abierta = null;
     rejilla.addEventListener('click', alPulsar);
@@ -173,6 +174,8 @@ var FichaTarjetas = (function () {
   /* ---------- las pestañas de arriba, con una tarjeta abierta ---------- */
 
   function tituloDe(id) {
+    var viva = raiz() && raiz().querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"]');
+    if (viva && viva.dataset.titulo) return viva.dataset.titulo;   /* fila 293: «Personas del grupo (N)» */
     var t = TARJETAS.filter(function (x) { return x.id === id; })[0];
     return t ? t.titulo : id;
   }

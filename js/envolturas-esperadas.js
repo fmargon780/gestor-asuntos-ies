@@ -70,7 +70,6 @@
     { fichero: 'relacionados-archivar.js', nombre: 'App.reabrirAsunto' },
     { fichero: 'relacionados-archivar.js', nombre: 'App.verArchivo' },
     { fichero: 'relacionados-archivar.js', nombre: 'window.Duplicados.delTercero' },
-    { fichero: 'relacionados-archivar.js', nombre: 'App.verFicha' },
     { fichero: 'rescate-datos.js', nombre: 'App.cargarTipos' },
     { fichero: 'tipos-buscador.js', nombre: 'App.pintarTipos' },
     { fichero: 'unir-asuntos.js', nombre: 'App.pintarAbiertos' },
