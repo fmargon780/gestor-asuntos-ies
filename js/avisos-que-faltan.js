@@ -95,8 +95,9 @@
      Mantenimiento (lo que hacía el botón "Verlas" de antes). */
 
   function irAMantenimiento(idBloque) {
+    /* Fila 288: el bloque ya no está en «Mantenimiento» sino en su pestaña de Ajustes (o en Herramientas). */
+    if (App.irASeccionDeAjustes && App.irASeccionDeAjustes('#' + idBloque)) return;
     App.ir('ajustes');
-    if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
     var bloque = $(idBloque);
     if (bloque) bloque.open = true;
   }

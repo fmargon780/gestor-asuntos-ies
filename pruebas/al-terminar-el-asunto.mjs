@@ -24,7 +24,7 @@ await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 
 async function abrirTipo(nombre) {
   await pagina.click('.pestana[data-pantalla="ajustes"]');
   await pagina.waitForTimeout(300);
-  await pagina.click('[data-ajustes-pestana="tipos"]');
+  await pagina.click('[data-ajustes-pestana="dia"]');
   await pagina.fill('#buscar-tipos', nombre);
   await pagina.waitForTimeout(300);
   await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: nombre }).first().locator('.tarjeta-tipo-nombre').click();

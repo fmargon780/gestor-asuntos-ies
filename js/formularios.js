@@ -387,7 +387,7 @@ var Formularios = (function () {
       d.id = 'bloque-formularios';
       d.innerHTML =
         '<summary>' +
-          '<span class="bloque-titulo">Impresos</span>' +
+          '<span class="bloque-titulo">Poner al día el catálogo de impresos</span>' +
           '<span class="bloque-pie" id="formularios-pie">El catálogo de impresos del trámite</span>' +
         '</summary>' +
         '<div class="bloque-cuerpo">' +

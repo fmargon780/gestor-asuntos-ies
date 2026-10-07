@@ -75,6 +75,8 @@
           if (--intentos > 0) setTimeout(buscar, 100);
           return;
         }
+        /* Fila 288: el salto común mira en qué pestaña (o en Herramientas) está la sección. */
+        if (App.irASeccionDeAjustes) { App.irASeccionDeAjustes(el); return; }
         var tab = el.closest('.ajustes-tab');
         if (tab && App.cambiarPestanaAjustes) App.cambiarPestanaAjustes(tab.id.replace('ajustes-tab-', ''));
         /* Algunos bloques (Hitos) se pliegan solos al terminar de cargar

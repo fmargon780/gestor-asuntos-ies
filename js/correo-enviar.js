@@ -424,7 +424,7 @@ window.CorreoEnviar = (function () {
     var cerrar = document.getElementById('cuadro-aceptar');
     if (cerrar) cerrar.click();
     App.ir('ajustes');
-    if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
+    if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('ordenador');   /* fila 288 */
     setTimeout(function () {
       var b = bloqueDeAjustes();
       if (b) {

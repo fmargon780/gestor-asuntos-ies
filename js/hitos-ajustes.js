@@ -45,7 +45,7 @@
     d.id = 'bloque-hitos';
     d.innerHTML =
       '<summary>' +
-        '<span class="bloque-titulo">Hitos</span>' +
+        '<span class="bloque-titulo">Calendario y responsables</span>' +
         '<span class="bloque-pie">Responsables, festivos y días no lectivos, para los hitos de los asuntos</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +

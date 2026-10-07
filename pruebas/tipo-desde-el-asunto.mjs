@@ -142,7 +142,7 @@ await comprobar('no se ha creado ningún tipo con ese texto',
 
 console.log('--- aparece en Ajustes ---');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('dia'));
 await pagina.fill('#buscar-tipos', 'evacuacion');
 await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 await comprobar('EVACUACION sale en Ajustes',

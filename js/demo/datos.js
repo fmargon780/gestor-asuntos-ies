@@ -258,6 +258,21 @@
     return nombre;
   }
 
+  /* Fila 288 (docs/AJUSTES-EN-CUATRO-PESTANAS.md): una ficha cuya carpeta se renombró por fuera de la
+     aplicación: está en asuntos.json y no en ninguna carpeta, para que Ajustes → Problemas →
+     «Fichas sin carpeta» tenga algo que enseñar. */
+  async function crearFichaSinCarpeta(tipos) {
+    var tercero = Nombres.terceroEmpresa({ nombre: 'Ferretería Los Álamos', nif: '55443322Z' });
+    var montado = Nombres.montarAsunto({
+      fecha: hace(40), tipo: Nombres.tipoParaCarpeta(tipos.FACTURA), categoria: 'EMPRESAS',
+      curso: '', grupo: '', campos: [], descripcion: '', tercero: tercero, numero: ''
+    });
+    await App.anotar(montado.nombre, {
+      estado: 'abierto', tipo: tipos.FACTURA.tipo, categoria: 'EMPRESAS', tercero: tercero,
+      descripcion: '', abiertoEl: hace(40) + 'T09:00:00.000Z', abiertoPor: App.E.usuario || 'Revisor'
+    });
+  }
+
   /* Fila 239: un documento con número (su registro vive en la ficha) y uno de
      antes (con el registro en el nombre), para ver los dos. */
   async function crearDocumentosDeDemostracion(asuntoNombre) {
@@ -576,6 +591,7 @@
     await crearPlantillas();
     await crearAsuntosAbiertos(tipos);
     await crearArchivados(tipos);
+    await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     await crearTablon();
     await crearPapelera();
     await crearSueltos();

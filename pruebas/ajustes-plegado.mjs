@@ -12,7 +12,7 @@
      4. Un hito desactualizado pone el aviso ámbar en el título de "Guía",
         aun plegado.
      5. "El centro": bloques plegados, en el orden nuevo.
-     6. "Mantenimiento": sin conflictos ni fichas sin carpeta, esos
+     6. "Problemas" (antes Mantenimiento): sin conflictos ni fichas sin carpeta, esos
         bloques no se ven; con una ficha sin carpeta de mentira, su
         bloque sale arriba y desplegado. Los botones sueltos, dentro de
         "Herramientas", al final.
@@ -199,37 +199,35 @@ const titulosCentro = await pagina.locator('#ajustes-tab-centro > details.bloque
    propios" ya no lleva una tabla que contar y ordenar (se queda con un
    enlace fijo a Tipos de asunto), así que sale de este reordenado
    automático de más uso a menos uso. */
-await comprobar('los seis primeros, en el orden nuevo', titulosCentro.slice(0, 6), [
-  'Tipos de documento', 'Grupos de personas', 'Hitos',
-  'Datos del centro y firma', 'Cómo se abrevia cada grupo', 'Ficheros de datos']);
-await comprobar('"Campos propios" sigue en "El centro", solo que ya no se reordena',
-  titulosCentro.indexOf('Campos propios') !== -1, true);
+await comprobar('los seis primeros, en el orden de la fila 288', titulosCentro.slice(0, 6), [
+  'Datos del centro y firma', 'Cargos del centro', 'Quién usa la aplicación',
+  'Membrete', 'Sello y firma en el papel', 'Calendario y responsables']);
+await comprobar('"Campos propios" ya no existe (fila 288: estaba vacía)',
+  titulosCentro.indexOf('Campos propios'), -1);
 await comprobar('todos plegados',
   pagina.locator('#ajustes-tab-centro details.bloque-ajustes[open]').count(), 0);
 await comprobar('ya no hay "Estados del asunto"', titulosCentro.indexOf('Estados del asunto'), -1);
-await comprobar('"Tipos de documento" dice cuántos hay',
+await comprobar('"Tipos de documento" (en «Lo de cada día») dice cuántos hay',
   pagina.evaluate(() => {
-    const t = document.querySelector('#ajustes-tab-centro > details.bloque-ajustes .bloque-resumen').textContent;
+    const t = document.querySelector('#bloque-tipos-documento .bloque-resumen').textContent;
     return t === String((App.E.tiposDocumento || []).length);
   }), true);
 
 /* ================================================================
-   6. "Mantenimiento": los avisos de fallo, solo con fallo.
+   6. "Problemas": los avisos de fallo, solo con fallo.
    ================================================================ */
-console.log('--- 6. Mantenimiento ---');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+console.log('--- 6. Problemas y Este ordenador ---');
+await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(500);
 await comprobar('sin fichas sin carpeta, su bloque no se ve',
   pagina.locator('#bloque-huerfanas').isVisible(), false);
 await comprobar('sin conflictos, su bloque no se ve',
   pagina.locator('#bloque-conflictos').isVisible(), false);
-await comprobar('"Herramientas" es el último bloque',
-  pagina.evaluate(() => document.getElementById('ajustes-tab-mantenimiento').lastElementChild.id), 'bloque-herramientas');
-await comprobar('y lleva dentro "Plantillas del centro"',
-  pagina.evaluate(() => !!document.querySelector('#bloque-herramientas #bloque-plantillas-centro')), true);
+await comprobar('«Plantillas del centro» está en la puesta a punto de Herramientas (fila 288)',
+  pagina.evaluate(() => !!document.querySelector('#herramientas-puesta-cuerpo > #bloque-plantillas-centro')), true);
 await comprobar('"Carpetas de este ordenador" dice "2 señaladas"',
-  pagina.locator('#ajustes-tab-mantenimiento details:has(#estado-carpetas) .bloque-resumen').textContent(), '2 señaladas');
+  pagina.locator('#bloque-carpetas .bloque-resumen').textContent(), '2 señaladas');
 
 await pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
@@ -243,8 +241,8 @@ await pagina.evaluate(async () => {
 await pagina.waitForTimeout(600);
 await comprobar('con una ficha sin carpeta, su bloque se ve',
   pagina.locator('#bloque-huerfanas').isVisible(), true);
-await comprobar('arriba del todo',
-  pagina.evaluate(() => document.getElementById('ajustes-tab-mantenimiento').firstElementChild.id), 'bloque-huerfanas');
+await comprobar('en la pestaña «Problemas»',
+  pagina.evaluate(() => document.getElementById('bloque-huerfanas').closest('.ajustes-tab').id), 'ajustes-tab-problemas');
 await comprobar('y desplegado',
   pagina.locator('#bloque-huerfanas').evaluate((d) => d.open), true);
 

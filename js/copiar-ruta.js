@@ -396,9 +396,9 @@ window.RutaCarpetas = (function () {
       '<span class="bloque-pie">Para el botón «Ruta» de la ficha del asunto</span></summary>' +
       '<div class="bloque-cuerpo">' +
         '<p class="nota">Dentro de Dropbox (para todo el centro): es igual en los dos ordenadores.</p>' +
-        '<label class="etiqueta">Carpeta de asuntos abiertos, dentro de Dropbox</label>' +
+        '<label class="etiqueta">Carpeta de asuntos abiertos, dentro de Dropbox (para todo el centro)</label>' +
         '<input id="ruta-comun-abiertos" class="campo" placeholder="ADMINISTRACIÓN/.../ASUNTOS ABIERTOS">' +
-        '<label class="etiqueta">Carpeta ARCHIVO, dentro de Dropbox</label>' +
+        '<label class="etiqueta">Carpeta ARCHIVO, dentro de Dropbox (para todo el centro)</label>' +
         '<input id="ruta-comun-archivo" class="campo" placeholder="ADMINISTRACIÓN/.../ARCHIVO">' +
         '<label class="etiqueta">Dropbox en este ordenador</label>' +
         '<div id="ruta-dropbox-lugar"></div>' +

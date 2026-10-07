@@ -451,7 +451,7 @@ await comprobar('y abrevia bien el de Bachillerato',
   pagina.locator('#tabla-grupos .fila-tipo').filter({ hasText: '1º Bach A' })
     .locator('.nombre-tipo').textContent(), '1ºBachA');
 
-await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('dia'));
 await pagina.fill('#buscar-tipos', 'evacuacion');
 await pagina.click('#crear-tipo-zona [data-bc="crear"]');
 await pagina.waitForSelector('#bc-categoria');

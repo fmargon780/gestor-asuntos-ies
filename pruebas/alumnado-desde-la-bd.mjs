@@ -232,7 +232,7 @@ await comprobar('Ajustes: la carpeta en El centro (sin caja de dirección) y «T
     await App.pintarAjustes();
     await new Promise((r) => setTimeout(r, 300));
     return {
-      centro: !!document.querySelector('#ajustes-tab-centro #bloque-alumnado-bd'),
+      centro: !!document.querySelector('#ajustes-tab-ordenador #bloque-alumnado-bd'),
       carpeta: document.getElementById('alumnado-bd-carpeta').textContent,
       sinDireccion: !document.getElementById('alumnado-bd-url'),
       traer: !!document.querySelector('#herramientas-traer-alumnado-bd #alumnado-bd-traer'),

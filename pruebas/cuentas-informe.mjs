@@ -83,7 +83,7 @@ await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
 await pagina.waitForTimeout(200);
 await pagina.evaluate(() => {
-  if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
+  if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('ordenador');
   const d = document.getElementById('bloque-envio-correo');
   if (d) d.open = true;
 });
