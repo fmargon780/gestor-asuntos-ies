@@ -54,13 +54,28 @@ const cajas = () => pagina.evaluate(() => {
   return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('#inicio-pestanas'), th: r('.inicio-tabla thead th'), scrollY: Math.round(window.scrollY),
     ha: (() => { const e = document.querySelector('#inicio-fila-superior'); return e ? Math.round(e.getBoundingClientRect().bottom) : null; })() };
 });
+/* Fila 302 (7-oct-2026): espera a que las cajas dejen de moverse (dos lecturas seguidas iguales) en vez de una
+   pausa fija: con la máquina cargada, el contenido de Inicio llegaba después de leer «antes» y la comparación
+   del punto 6 salía distinta. */
+async function estables(maximo) {
+  let ultima = JSON.stringify(await cajas());
+  for (let i = 0; i < (maximo || 50); i++) {
+    await pagina.waitForTimeout(100);
+    const ahora = JSON.stringify(await cajas());
+    if (ahora === ultima) return JSON.parse(ahora);
+    ultima = ahora;
+  }
+  return JSON.parse(ultima);
+}
 const pegadas = (c) => c.pest.top >= c.cab.bottom - 1 && c.pest.top <= c.cab.bottom + 1 && c.th.top >= c.pest.bottom - 1 && c.th.top <= c.pest.bottom + 1;
 
 console.log('--- 1. bajado: cabecera, pestañas y títulos pegados, en orden ---');
-const antes = await cajas();
+/* Fila 302: la línea de avisos de Inicio recibe, unos segundos después de entrar, el aviso «Tipos de asunto parecidos»,
+   y crece 16 px; hasta que no llega, las posiciones «de partida» no son las definitivas. Se espera a que llegue. */
+await pagina.waitForFunction(() => { const a = document.getElementById('avisos-linea'); return !!(a && /Tipos de asunto parecidos/.test(a.textContent)); }, null, { timeout: 20000 }).catch(() => {});
+const antes = await estables();
 await pagina.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-await pagina.waitForTimeout(700);
-let c = await cajas();
+let c = await estables();
 await comprobar('1. la ventana ha bajado de verdad', Promise.resolve(c.scrollY > 600), true);
 await comprobar('1. la cabecera está arriba, las pestañas pegadas debajo y los títulos pegados debajo de ellas', Promise.resolve(pegadas(c)), true);
 await comprobar('1. la cabecera arriba del todo (top 0)', Promise.resolve(c.cab.top), 0);
@@ -83,14 +98,12 @@ await comprobar('3. cambia la pestaña activa, y pestañas y títulos no se sola
 await pagina.click('.inicio-pestana[data-pestana="todos"]');
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => window.scrollTo(0, 500));
-await pagina.waitForTimeout(500);
-c = await cajas();
+c = await estables();
 await comprobar('3. de vuelta en «Todos» y bajado, siguen pegados', Promise.resolve(pegadas(c) && c.th.top > 0), true);
 
 console.log('--- 6. subir del todo ---');
 await pagina.evaluate(() => window.scrollTo(0, 0));
-await pagina.waitForTimeout(800);
-const arriba = await cajas();
+const arriba = await estables();
 await comprobar('6. arriba del todo todo vuelve a su sitio (mismas posiciones que al principio)',
   Promise.resolve([arriba.scrollY, Math.abs(arriba.pest.top - antes.pest.top) <= 2, Math.abs(arriba.th.top - antes.th.top) <= 2]), [0, true, true]);
 
@@ -121,13 +134,15 @@ await demo.evaluate(async () => {
 await demo.click('.inicio-pestana[data-pestana="todos"]');
 await demo.waitForTimeout(600);
 await demo.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-await demo.waitForTimeout(800);
-const cd = await demo.evaluate(() => {
+const medirDemo = () => demo.evaluate(() => {
   const r = (s) => { const b = document.querySelector(s).getBoundingClientRect(); return { top: Math.round(b.top), bottom: Math.round(b.bottom) }; };
   const e = document.querySelector('.inicio-tabla-envoltorio');
   return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('#inicio-pestanas'), th: r('.inicio-tabla thead th'),
     cabe: !e.classList.contains('desborda'), y: Math.round(window.scrollY) };
 });
+/* esperar a que las posiciones se estabilicen (dos lecturas seguidas iguales), no una pausa fija */
+let cd = await medirDemo();
+for (let i = 0; i < 100; i++) { await demo.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await demo.waitForTimeout(100); const otra = await medirDemo(); const igual = JSON.stringify(otra) === JSON.stringify(cd); cd = otra; if (igual) break; }
 await comprobar('8. a 1280 px la tabla cabe (sin scroll lateral) y los títulos se quedan fijos, bajo las pestañas',
   Promise.resolve([cd.cabe, cd.y > 400, pegadas(cd)]), [true, true, true]);
 await demo.close();

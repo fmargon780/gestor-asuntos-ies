@@ -179,13 +179,17 @@ const vacio = { control: { desde: '', subidas: {}, decisiones: {}, clasesSinAsun
 comprobar('sin fecha «Revisar desde», ningún aviso', ControlRegistro.resumenParaAvisos(vacio, ControlRegistro.clasificar(vacio, []), 7, '2026-10-02').activo, false);
 estado = await ControlRegistro.cargar();
 c = ControlRegistro.clasificar(estado, asuntos);
-const fresco = ControlRegistro.resumenParaAvisos(estado, c, 7, '2026-10-02');
+/* Las subidas de arriba se guardan con la hora de verdad; las fechas «de hoy» y «dentro de 10 días» se
+   calculan desde el día real (7-oct-2026, fila 302: con fechas fijas la prueba caducaba sola). */
+function enDias(n) { const d = new Date(ControlRegistro.hoyIso() + 'T12:00:00'); d.setDate(d.getDate() + n);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+const fresco = ControlRegistro.resumenParaAvisos(estado, c, 7, enDias(0));
 comprobar('subido hoy: ninguno atrasado', fresco.atrasados, []);
-const tarde = ControlRegistro.resumenParaAvisos(estado, c, 7, '2026-10-12');
+const tarde = ControlRegistro.resumenParaAvisos(estado, c, 7, enDias(10));
 comprobar('subido hace 10 días: atrasados los dos libros', tarde.atrasados.map((x) => x.libro), ['E', 'S']);
 const unSolo = JSON.parse(JSON.stringify(estado));
-unSolo.control.subidas.E.el = '2026-10-10T10:00:00.000Z';
-comprobar('solo uno atrasado: solo ese', ControlRegistro.resumenParaAvisos(unSolo, c, 7, '2026-10-12').atrasados.map((x) => x.libro), ['S']);
+unSolo.control.subidas.E.el = enDias(8) + 'T10:00:00.000Z';
+comprobar('solo uno atrasado: solo ese', ControlRegistro.resumenParaAvisos(unSolo, c, 7, enDias(10)).atrasados.map((x) => x.libro), ['S']);
 
 if (fallos) { console.log('\n' + fallos + ' FALLOS'); process.exit(1); }
 console.log('\nTodo bien.');

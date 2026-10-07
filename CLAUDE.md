@@ -45,8 +45,15 @@ Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas com
 2. La pasada completa (`npm test` sin palabras) se hace **una sola vez**, justo antes de la subida
    del cambio. Si sale en verde, se sube; no se repite «para confirmar».
 3. Si en esa pasada falla una prueba: arréglalo y repite **solo esa prueba y las de lo que hayas
-   vuelto a tocar**, no las 170. Si la que falla no tiene nada que ver con tu cambio y en solitario
-   pasa, es de las de tiempos finos: añádela a `EN_SOLITARIO` y sigue, sin investigarla más.
+   vuelto a tocar**, no las 170. Y además (7-oct-2026, fila 302, `docs/PRUEBAS-ROTAS.md`):
+   - Una prueba que falla en la pasada completa y **en solitario pasa**, y no tiene que ver con tu
+     cambio, va a `EN_SOLITARIO` de `pruebas/ejecutar.mjs` con la fecha de hoy.
+   - **Tope: 20.** Si la lista ya tiene 20, no entra ninguna más (el ejecutor se niega a arrancar):
+     antes hay que arreglar de verdad una de las que están (esperar a una condición en vez de una
+     pausa fija) o retirar otra.
+   - Una prueba que falla **también en solitario** no va a `EN_SOLITARIO`. Si es de tu cambio, se
+     arregla. Si falla igual en `main` sin tu cambio, va a `RETIRADAS` (mismo fichero) con fecha y
+     motivo, y se dice en la nota de la fila en una línea.
 
 **Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
 EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una

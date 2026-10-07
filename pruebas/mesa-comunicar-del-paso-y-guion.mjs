@@ -105,8 +105,21 @@ const filaG1 = pagina.locator('.hito-en-mesa .guion-paso[data-id="g1"]');
 await comprobar('3. la tarea de la guía lleva su «⋮»', filaG1.locator('.guion-tarea-menu-boton').count(), 1);
 /* El desplegable «Comunicar ▾» sigue abierto encima del guion: se cierra antes. */
 await pagina.evaluate(() => HitoMesa.cerrarPanelSiAbierto());
-await filaG1.locator('.guion-tarea-menu-boton').click();
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Abrir en la guía' }).click();
+/* Fila 302 (7-oct-2026): con la máquina cargada, la mesa se repinta (un refresco de la aplicación) justo entre
+   abrir el «⋮» y pulsar «Abrir en la guía», y el menú se quita del DOM («element was detached»). Se repite el
+   gesto entero hasta que el editor de la guía está abierto (como haría una persona), en vez de una pausa fija. */
+let editorAbierto = false;
+for (let intento = 0; intento < 6 && !editorAbierto; intento++) {
+  try {
+    await filaG1.locator('.guion-tarea-menu-boton').click({ timeout: 5000 });
+    await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Abrir en la guía' }).click({ timeout: 5000 });
+    await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila', { timeout: 8000 });
+    editorAbierto = true;
+  } catch (e) {
+    await pagina.evaluate(() => { if (window.HitoMesa) HitoMesa.cerrarPanelSiAbierto(); });
+    await pagina.keyboard.press('Escape');   /* cierra el menú si quedó abierto */
+  }
+}
 await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila');
 await comprobar('3. la tarea sale resaltada en el editor',
   pagina.evaluate(() => !!document.querySelector('#capa .paso-guion .guion-fila[data-id="g1"].guion-fila-resaltada')), true);

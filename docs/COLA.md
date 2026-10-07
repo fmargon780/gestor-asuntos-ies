@@ -180,9 +180,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
 - (6-oct-2026, fila 268) Francisco: volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (Google pedirá un permiso nuevo, una vez), leer el correo de resumen e «Implementar» → «Nueva versión»; el mismo pegado vale para las filas 240, 261 y 262. Opcional: propiedad `CORREO_AVISOS`. Pasos en `docs/COMPROBAR-A-MANO.md`.
-- (6-oct-2026, fila 268) En la pasada completa fallan también en `main` sin tocar nada `cabecera-compacta.mjs` (con la máquina cargada), `control-registro.mjs`, `tutores-legales.mjs`, `mesa-comunicar-del-paso-y-guion.mjs` y `por-liquidar.mjs` (estas dos pasan solas); `cabecera-fija.mjs` y `notas-no-se-borran.mjs` solo fallaron cargadas.
-- (2-oct-2026, fila 259) Pendiente de Francisco: subir los listados reales de Séneca y comprobar que los códigos coinciden (`docs/COMPROBAR-A-MANO.md`). Los documentos de asuntos abiertos con el registro solo en el nombre del fichero (antes de la fila 239) no se miran. En `main` sin tocar falla `titulos-de-la-tabla-fijos.mjs` (punto 8, a 1280 px): no es de esta fila.
-- (4-oct-2026, fila 262) Francisco: añadir `Focus_Lingo` al permiso «Soporte del Gestor» de GitHub y volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` e «Implementar» → «Nueva versión» (mismo pegado que 240 y 261; pasos en `docs/COMPROBAR-A-MANO.md`). Además, `tutores-legales.mjs` falla también en `main` (punto 5, «ninguna lista de categorías escrita a mano»), y `registro-del-asunto.mjs` falla en la pasada completa pero pasa sola (añadir a `EN_SOLITARIO`). `pruebas` no es ascendiente de `main`: no se nivela.
+- (2-oct-2026, fila 259) Pendiente de Francisco: subir los listados reales de Séneca y comprobar que los códigos coinciden (`docs/COMPROBAR-A-MANO.md`). Los documentos de asuntos abiertos con el registro solo en el nombre del fichero (antes de la fila 239) no se miran.
+- (4-oct-2026, fila 262) Francisco: añadir `Focus_Lingo` al permiso «Soporte del Gestor» de GitHub y volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` e «Implementar» → «Nueva versión» (mismo pegado que 240 y 261; pasos en `docs/COMPROBAR-A-MANO.md`). `pruebas` no es ascendiente de `main`: no se nivela.
 - (2-oct-2026, fila 261) Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (leer el registro; autorizar el correo) e «Implementar» → «Nueva versión»; el mismo pegado vale para la fila 240.
 - (2-oct-2026, fila 260) Ese día se mezclaron en el Dropbox del centro los cambios hechos en casa sobre la copia de Drive con los del centro: revisar con Francisco, en el centro, las fichas sin carpeta, los ficheros en conflicto y los números de asunto `A26-…` repetidos (en casa se creó al menos un asunto ese día). Trabajar desde casa directamente contra el Dropbox del centro: `docs/PENDIENTES-DE-DISENAR.md`, punto 2, sin diseñar.
 - (varias fechas) Notas viejas sobre pruebas que fallan en `main` y el botón de soporte: movidas sin tocar a `docs/HISTORIA.md` (sección «Notas movidas de `docs/COLA.md` el 7-oct-2026»).
@@ -193,9 +192,6 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
   sin diseñarse con Francisco.
 - Del 27-sep-2026 (fila 190): falta que Francisco pueda dar de alta un impreso propio del centro
   (sin anexo del BOJA), con un campo nuevo en el catálogo que diga de quién es cada impreso.
-- Prueba `pruebas/tras-cada-accion.mjs`: dos pasos («al volver, la misma altura» y «repintar la
-  lista no la sube arriba») fallan también en solitario desde antes de la fila 205; sin arreglar
-  todavía.
 - `docs/HISTORIA.md` podría seguir sin la entrada de las filas 53-56 (18-sep-2026: cuadro de
   Séneca en dos columnas, el ayudante fiable, el asunto sin elección, los campos calculados);
   comprobar y pegarla si falta.

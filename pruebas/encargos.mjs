@@ -82,7 +82,14 @@ async function entrar(usuario) {
   await p.goto(DIRECCION + (usuario ? '&usuario=' + encodeURIComponent(usuario) : ''));
   await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
   await p.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 40000 });
-  await p.waitForTimeout(usuario ? 9000 : 4000);
+  /* Fila 302 (7-oct-2026): antes, una pausa fija (9 s con nombre, 4 s sin él) para que el perfil se aplicara al menú;
+     con la máquina cargada no bastaba. Ahora se espera al menú del perfil (con nombre de jefa: «Mis encargos»;
+     sin nombre: «Ajustes» de quien lo ve todo) y, después, un margen corto para que acabe de repintar. */
+  await p.waitForFunction((conNombre) => { const b = document.querySelector('.lateral .pestana[data-pantalla="' + (conNombre ? 'encargos-mios' : 'ajustes') + '"]'); return !!(b && b.offsetParent); }, !!usuario, { timeout: 60000 });
+  /* Al final de su arranque (js/nucleo.js), la aplicación vuelve a poner la vista de Inicio de siempre (App.irVista) y
+     hace pulsable la versión del pie; si se pulsa «2 encargos» antes, esa llamada tardía deshace la vista. */
+  await p.waitForSelector('#usuario-pie .version-pulsable', { state: 'attached', timeout: 60000 });
+  await p.waitForTimeout(1500);
   return p;
 }
 const menu = (p) => p.$$eval('.lateral .pestana', (e) => e.filter((x) => x.offsetParent).map((x) => x.querySelector('span').textContent.trim()));
@@ -149,8 +156,16 @@ console.log('--- 3. Administración ---');
 pagina = await entrar('');
 const jefaTexto = 'cambio de grupo de Iker';
 await comprobar('3. «Ha llegado» cuenta los encargos, resaltado', pagina.evaluate(() => { const t = [...document.querySelectorAll('#inicio-ha-llegado-linea .inicio-ha-llegado-trozo')].find((b) => /encargo/.test(b.textContent)); return t ? [t.textContent, t.classList.contains('inicio-ha-llegado-nuevo')] : null; }), ['2 encargos', true]);
-await pagina.click('#inicio-ha-llegado-linea .inicio-ha-llegado-trozo:has-text("encargos")');
-await pagina.waitForTimeout(800);
+/* Fila 302 (7-oct-2026): se pulsa y se espera a que la vista quede en «solo encargos» (no una pausa fija de 800 ms);
+   si con la máquina cargada la aplicación la deshace antes de verla (repinta Inicio a los pocos segundos de entrar), se
+   vuelve a pulsar, como haría una persona. Nada más verla bien se comprueba, sin más esperas: pasados unos segundos,
+   la aplicación vuelve sola a enseñar correos y documentos juntos (apuntado en docs/HISTORIA.md). */
+const soloEncargos = () => { const v = (id) => { const e = document.getElementById(id); return !!(e && e.offsetParent); }; return document.querySelectorAll('.encargo-tarjeta').length > 0 && !v('lista-sueltos') && v('sueltos-ver-tambien'); };
+for (let intento = 0; intento < 5; intento++) {
+  const trozo = pagina.locator('#inicio-ha-llegado-linea .inicio-ha-llegado-trozo:has-text("encargos")');
+  if (await trozo.count()) await trozo.first().click({ timeout: 4000 }).catch(() => {});   /* si ya no se ve, la vista ya ha cambiado */
+  if (await pagina.waitForFunction(soloEncargos, null, { timeout: 8000 }).then(() => true, () => false)) break;
+}
 await comprobar('3. «Ver todo» enseña solo los encargos', pagina.evaluate(() => [document.querySelectorAll('.encargo-tarjeta').length, !!document.getElementById('correos-sin-clasificar').offsetParent, !!document.getElementById('lista-sueltos').offsetParent, !!document.getElementById('sueltos-ver-tambien').offsetParent]), [2, false, false, true]);
 await comprobar('3. cada tarjeta: quién, texto, a quién afecta, para cuándo, documentos y tres botones',
   pagina.evaluate(() => { const t = [...document.querySelectorAll('.encargo-tarjeta')].find((x) => /Iker/.test(x.textContent)); return [t.querySelector('.encargo-quien').textContent.replace(/\s+/g, ' ').indexOf('Jefa de estudios de prueba · Jefatura de Estudios · ') === 0, /cambio de grupo/.test(t.textContent), /Delgado Prieto, Iker · 2º B/.test(t.textContent), /Para cuándo/.test(t.textContent), [...t.querySelectorAll('.encargo-doc')].map((b) => b.textContent), [...t.querySelectorAll('.encargo-acciones button')].map((b) => b.textContent)]; }),
@@ -186,7 +201,8 @@ await pagina.waitForTimeout(2000);
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(500);
 await pagina.evaluate(() => App.irVista('clasificar', 'encargos'));
-await pagina.waitForTimeout(800);
+await pagina.waitForFunction(() => { const e = document.getElementById('sueltos-ver-tambien'); return !!(e && e.offsetParent); }, null, { timeout: 30000 }).catch(() => {});
+await pagina.waitForTimeout(300);
 await comprobar('3. ese encargo ya no está en «Ver todo»', pagina.$$eval('.encargo-tarjeta', (e) => e.map((x) => /Iker/.test(x.textContent))), [false]);
 const nuevoDeLaJefa = (id, texto) => pagina.evaluate(async ([id, texto]) => {
   await Encargos.cambiar((d) => { d.encargos.push({ id, de: 'Jefa de estudios de prueba', organo: 'Jefatura de Estudios', cuando: new Date().toISOString(), texto, estado: 'sin-atender', afecta: { nombre: 'Aguilar Ponce, Pablo', categoria: 'ALUMNADO', clave: '2100002', unidad: '3º A' }, documentos: [] }); });
@@ -217,16 +233,33 @@ await comprobar('3. y el encargo apunta a ese asunto', encargosEnDisco(pagina).t
 /* ===== 4. Lo que le pasa después al asunto ===== */
 console.log('--- 4. archivar, reabrir, papelera y cambiar ---');
 const estadoDe = (id) => encargosEnDisco(pagina).then((l) => l.filter((e) => e.id === id).map((e) => e.estado + (e.motivo ? ':' + e.motivo : ''))[0]);
+/* Espera (hasta 20 s) a que el encargo llegue al estado esperado, en vez de una pausa fija: con la máquina
+   cargada, archivar o reabrir tarda más de 2,5 s (fila 302, 7-oct-2026). Devuelve el último estado visto. */
+async function estadoEsperando(id, esperado) {
+  let e = await estadoDe(id);
+  for (let i = 0; i < 100 && e !== esperado; i++) { await pagina.waitForTimeout(200); e = await estadoDe(id); }
+  return e;
+}
 await pagina.evaluate((n) => { window.__cierre = App.cerrarAsunto(Gestor.asuntos().filter((a) => a.nombre === n)[0]); }, asuntoNuevo);
 await pagina.waitForSelector('#cuadro-aceptar', { state: 'visible', timeout: 5000 });
 await pagina.click('#cuadro-aceptar');
+/* Fila 302: se espera a que el cuadro se cierre de verdad; si no, el siguiente «esperar el cuadro» podía ver el
+   cuadro viejo todavía en pantalla y pulsar en él, y el de reabrir se quedaba sin contestar. */
+await pagina.waitForSelector('#cuadro-aceptar', { state: 'hidden', timeout: 30000 }).catch(() => {});
 await pagina.waitForTimeout(2500);
-await comprobar('4. archivar el asunto: su encargo pasa a «terminado»', estadoDe(e1.id), 'terminado');
-await pagina.evaluate((n) => { window.__cierre = App.verArchivo().then(() => App.reabrirAsunto(App.E.listaArchivo.filter((x) => x.nombre === n)[0])); }, asuntoNuevo);
+await comprobar('4. archivar el asunto: su encargo pasa a «terminado»', estadoEsperando(e1.id, 'terminado'), 'terminado');
+/* Fila 302: el estado «terminado» se guarda antes de que la carpeta acabe de pasar al archivo; con carga, el asunto
+   aún no estaba en la lista del archivo y se «reabría» uno que no existía. Se espera a verlo en el archivo. */
+await pagina.evaluate((n) => { window.__cierre = (async () => {
+  let a = null;
+  for (let i = 0; i < 100 && !a; i++) { await App.verArchivo(); a = App.E.listaArchivo.filter((x) => x.nombre === n)[0]; if (!a) await new Promise((r) => setTimeout(r, 200)); }
+  return App.reabrirAsunto(a);
+})(); }, asuntoNuevo);
 await pagina.waitForSelector('#cuadro-aceptar', { state: 'visible', timeout: 5000 });
 await pagina.click('#cuadro-aceptar');
+await pagina.waitForSelector('#cuadro-aceptar', { state: 'hidden', timeout: 30000 }).catch(() => {});
 await pagina.waitForTimeout(2500);
-await comprobar('4. reabrirlo: vuelve a «asunto»', estadoDe(e1.id), 'asunto');
+await comprobar('4. reabrirlo: vuelve a «asunto»', estadoEsperando(e1.id, 'asunto'), 'asunto');
 /* cambiar el nombre del asunto no rompe el enlace */
 const renombrado = asuntoNuevo.replace('Delgado Prieto, Iker', 'Delgado Prieto, Iker (cambiado)');
 await pagina.evaluate(async ([viejo, nuevo]) => { await Carpetas.renombrar(App.E.abiertos, viejo, nuevo); await AsuntoRenombrar.mover(viejo, nuevo, {}); await App.verAbiertos(); }, [asuntoNuevo, renombrado]);
@@ -235,16 +268,17 @@ await comprobar('4. cambiar el asunto: el nombre guardado se pone al día y el e
   Promise.all([encargosEnDisco(pagina).then((l) => l.filter((e) => e.id === e1.id)[0].asunto.nombre === renombrado), pagina.evaluate((id) => Encargos.asuntoDe(Encargos.porId(id)).nombre, e1.id)]), [true, renombrado]);
 await pagina.evaluate(async (n) => { await Papelera.mandarAsunto(Gestor.asuntos().filter((a) => a.nombre === n)[0]); await App.verAbiertos(); }, renombrado);
 await pagina.waitForTimeout(1500);
-await comprobar('4. mandarlo a la papelera: «no procede», «El asunto se ha borrado»', estadoDe(e1.id), 'no-procede:El asunto se ha borrado');
+await comprobar('4. mandarlo a la papelera: «no procede», «El asunto se ha borrado»', estadoEsperando(e1.id, 'no-procede:El asunto se ha borrado'), 'no-procede:El asunto se ha borrado');
 await pagina.evaluate(async () => { const f = (await Papelera.leer()).filter((x) => x.clase === 'asunto')[0]; await Papelera.devolver(f); await App.verAbiertos(); });
 await pagina.waitForTimeout(1500);
-await comprobar('4. recuperarlo: vuelve a «asunto»', estadoDe(e1.id), 'asunto');
+await comprobar('4. recuperarlo: vuelve a «asunto»', estadoEsperando(e1.id, 'asunto'), 'asunto');
 await comprobar('4. el asunto recuperado sigue con su `ficha.encargos`', pagina.evaluate((n) => (App.E.registro.asuntos[n].encargos || []).length, renombrado), 1);
 
 /* ===== 5. La jefa vuelve a entrar ===== */
 console.log('--- 5. la jefa vuelve a entrar ---');
 await pagina.evaluate(async (j) => { await Demo.entrarComo(j); }, JEFA);
-await pagina.waitForTimeout(3500);
+await pagina.waitForFunction(() => { const b = document.querySelector('.lateral .pestana[data-pantalla="encargos-mios"]'); return !!(b && b.offsetParent); }, null, { timeout: 60000 });
+await pagina.waitForTimeout(1500);
 await pagina.click('.pestana[data-pantalla="encargos-mios"]');
 await pagina.waitForSelector('#encargos-mios-cuerpo tr[data-encargo]');
 await comprobar('5. «Mis encargos»: el del asunto creado, «En marcha» con su hito; el «No procede» con su motivo',

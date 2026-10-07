@@ -31,15 +31,40 @@ async function comprobar(titulo, promesa, esperado) {
 }
 
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) { /* sin almacenamiento */ }");
+await pagina.addInitScript(`(function () {
+  var orig = window.setTimeout; window.__pasadasAlEntrar = { programadas: 0, acabadas: 0 };
+  window.setTimeout = function (fn, ms) {
+    if (ms === 2500 && typeof fn === 'function') {
+      window.__pasadasAlEntrar.programadas++;
+      var f = fn;
+      fn = async function () { try { return await f.apply(this, arguments); } finally { window.__pasadasAlEntrar.acabadas++; } };
+    }
+    return orig.apply(this, [fn, ms].concat([].slice.call(arguments, 2)));
+  };
+})();`);
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 20000 });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 20000 });
+/* Fila 302 (7-oct-2026): al entrar, Inicio se repinta varias veces mientras la aplicación acaba de cargar (hitos y
+   «Por liquidar»): unos instantes la pestaña «En Administración» enseña a los del seguro escolar. La aplicación
+   acaba con su pasada «al entrar» (temporizador de 2,5 s, js/por-liquidar.js); se apunta ese temporizador y se
+   espera a que acabe antes de mirar nada (no una pausa fija). */
+await pagina.waitForFunction(() => window.__pasadasAlEntrar.programadas > 0 && window.__pasadasAlEntrar.acabadas >= window.__pasadasAlEntrar.programadas, null, { timeout: 40000 });
 
 const filas = () => pagina.evaluate(() => [...document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]')].map((t) => t.dataset.asunto));
 const cuentaPestana = (p) => pagina.evaluate((p) => { const b = document.querySelector('.inicio-pestana[data-pestana="' + p + '"]'); return b && !b.classList.contains('oculto') ? b.querySelector('.cuenta-lista').textContent : null; }, p);
 async function irAPestana(p) {
   await pagina.click('.inicio-pestana[data-pestana="' + p + '"]');
-  await pagina.waitForTimeout(500);
+  /* Fila 302 (7-oct-2026): en vez de una pausa fija de 500 ms, se espera a que la pestaña esté activa y a que la
+     lista de filas deje de cambiar (dos lecturas seguidas iguales, con 200 ms de margen). */
+  await pagina.waitForSelector('.inicio-pestana.activa[data-pestana="' + p + '"]', { timeout: 10000 });
+  let antes = JSON.stringify(await filas());
+  for (let i = 0; i < 50; i++) {
+    await pagina.waitForTimeout(200);
+    const ahora = JSON.stringify(await filas());
+    if (ahora === antes) break;
+    antes = ahora;
+  }
 }
 const tercerosDe = (nombres) => nombres.map((n) => n.replace(/^\d+ A\d+-\d+ /, ''));
 
