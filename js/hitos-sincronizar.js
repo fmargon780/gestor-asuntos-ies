@@ -8,7 +8,10 @@
    al guardar la guía de un tipo (js/guias-enganche.js) y, como red de
    seguridad, al abrir la ficha (js/hitos-panel.js), los pasos que la
    guía tiene y el asunto nunca ha tenido se añaden en su sitio. Nada
-   de lo que ya tiene el asunto se toca, ni se reordena, ni se borra.
+   de lo que ya tiene el asunto se toca ni se borra. Solo se reordena
+   cuando quien guarda cambió el orden de los hitos en «Cambiar la guía»
+   (7-oct-2026, fila 300, docs/ORDEN-DE-LA-GUIA-LLEGA-A-LOS-ASUNTOS.md):
+   `ordenDeLaGuia`, y solo con los hitos sin hacer.
 
    `pasosConocidos` (en cada entrada de `porAsunto`): los ids de paso de
    la guía que ya han pasado alguna vez por ese asunto. Así un hito
@@ -169,6 +172,79 @@
     };
   }
 
+  /* ==========================================================
+     Fila 300: el orden nuevo de la guía llega a los asuntos abiertos,
+     solo para los hitos sin hacer. Función pura (ni disco ni pantalla,
+     no cambia `hitos`). Devuelve { hitos, movidos, actual }: la lista
+     nueva, cuántos hitos han cambiado de posición y el hito que ha
+     pasado a ser el actual (o null si el actual no cambia). */
+  function idsDe(pasos) {
+    return (pasos || []).map(function (p) { return p && p.id ? String(p.id) : ''; }).filter(Boolean);
+  }
+
+  function ordenCambiado(antes, ahora) {
+    var a = idsDe(antes), b = idsDe(ahora);
+    var comunesA = a.filter(function (id) { return b.indexOf(id) !== -1; });
+    var comunesB = b.filter(function (id) { return a.indexOf(id) !== -1; });
+    return comunesA.join('|') !== comunesB.join('|');
+  }
+
+  /* Un nivel: `lista` son los hitos del asunto; `antes` y `ahora`, los pasos
+     de ese mismo nivel en la guía. Devuelve cuántos hitos se han movido. */
+  function ordenarNivel(lista, antes, ahora) {
+    var movidos = 0;
+    var idsAhora = idsDe(ahora);
+    if (ordenCambiado(antes, ahora)) {
+      var sitios = [], movibles = [];
+      lista.forEach(function (h, i) {
+        var id = h && h.origenGuia && !h.delTipoAnterior ? String(h.origenGuia) : '';
+        if (id && idsAhora.indexOf(id) !== -1 &&
+            (h.estado === 'pendiente' || h.estado === 'encurso')) {
+          sitios.push(i); movibles.push(h);
+        }
+      });
+      movibles.sort(function (x, y) {
+        return idsAhora.indexOf(String(x.origenGuia)) - idsAhora.indexOf(String(y.origenGuia));
+      });
+      sitios.forEach(function (pos, k) {
+        if (lista[pos] !== movibles[k]) movidos++;
+        lista[pos] = movibles[k];
+      });
+    }
+    /* Dentro de cada opción de cada pregunta que exista en el asunto. */
+    lista.forEach(function (h) {
+      if (!h || h.clase !== 'decision' || !h.origenGuia || h.delTipoAnterior) return;
+      var pAhora = (ahora || []).filter(function (p) { return p && p.id === h.origenGuia; })[0];
+      var pAntes = (antes || []).filter(function (p) { return p && p.id === h.origenGuia; })[0];
+      if (!esPregunta(pAhora) || !esPregunta(pAntes)) return;
+      pAhora.opciones.forEach(function (o) {
+        var opt = (h.opciones || []).filter(function (x) { return x.id === o.id; })[0];
+        var oAntes = pAntes.opciones.filter(function (x) { return x.id === o.id; })[0];
+        if (opt && oAntes) movidos += ordenarNivel(opt.hitos, oAntes.pasos, o.pasos);
+      });
+    });
+    return movidos;
+  }
+
+  function ordenDeLaGuia(hitos, pasosAntes, pasosAhora) {
+    var lista = JSON.parse(JSON.stringify(hitos || []));
+    var movidos = ordenarNivel(lista, pasosAntes || [], pasosAhora || []);
+    var actual = null;
+    if (movidos) {
+      var sinHacer = Hitos.visibles(lista).filter(function (h) { return h.estado === 'pendiente' || h.estado === 'encurso'; });
+      var enCurso = sinHacer.filter(function (h) { return h.estado === 'encurso'; })[0];
+      if (enCurso && enCurso.cadena) {
+        actual = null;   /* un «Hacer este hito» a medias sigue siendo el actual */
+      } else if (sinHacer[0] && sinHacer[0] !== enCurso) {
+        if (enCurso) enCurso.estado = 'pendiente';   /* conserva todo lo suyo, como al desmarcar */
+        sinHacer[0].estado = 'encurso';
+        sinHacer[0].desde = U.hoyIso();
+        actual = sinHacer[0];
+      }
+    }
+    return { hitos: lista, movidos: movidos, actual: actual };
+  }
+
   /* Aplica pasosQueFaltan a una entrada de `porAsunto` ya leída (dentro
      de un Hitos.cambiar). Devuelve lo mismo que pasosQueFaltan. */
   function completarEntrada(entrada, pasos) {
@@ -192,19 +268,23 @@
 
   /* Al guardar la guía de un tipo: todos los asuntos abiertos de ese
      tipo que ya tienen hitos, en UNA sola escritura de hitos.json, por
-     la cola de guardado. Devuelve a cuántos asuntos ha llegado algo. */
-  async function llevarAAbiertos(tipo, pasos) {
-    if (!tipo || !window.Gestor || typeof Gestor.asuntos !== 'function') return 0;
+     la cola de guardado. Devuelve a cuántos asuntos ha llegado algo; con
+     `pasosAntes` (solo «Cambiar la guía», fila 300) recoloca además el
+     orden y devuelve { llegados, recolocados }. */
+  async function llevarAAbiertos(tipo, pasos, pasosAntes) {
+    var conOrden = Array.isArray(pasosAntes);
+    var vacio = conOrden ? { llegados: 0, recolocados: 0 } : 0;
+    if (!tipo || !window.Gestor || typeof Gestor.asuntos !== 'function') return vacio;
     var claves = Gestor.asuntos().filter(function (a) {
       var t = (window.App && typeof App.tipoDeAsunto === 'function')
         ? App.tipoDeAsunto(a) : ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '');
       return t === tipo && !tieneTipoUnido(a.nombre);
     }).map(function (a) { return a.nombre; });
-    if (!claves.length) return 0;
-    var llegados = 0;
+    if (!claves.length) return vacio;
+    var llegados = 0, recolocados = 0;
     var enCurso = [];
     await Hitos.cambiar(function (d) {
-      llegados = 0;
+      llegados = 0; recolocados = 0;
       enCurso = [];
       claves.forEach(function (clave) {
         var entrada = d.porAsunto[clave];
@@ -212,13 +292,21 @@
         var r = completarEntrada(entrada, pasos);
         if (r.anadidos) llegados++;
         if (r.enCurso) enCurso.push({ clave: clave, hito: r.enCurso });
+        if (conOrden) {
+          var o = ordenDeLaGuia(entrada.hitos, pasosAntes, pasos);
+          if (o.movidos) {
+            entrada.hitos = o.hitos;
+            recolocados++;
+            if (o.actual) enCurso.push({ clave: clave, hito: o.actual });
+          }
+        }
       });
       return d;
     });
     for (var i = 0; i < enCurso.length; i++) {
       await Hitos.aplicarEstadoDelHito(enCurso[i].clave, enCurso[i].hito);
     }
-    return llegados;
+    return conOrden ? { llegados: llegados, recolocados: recolocados } : llegados;
   }
 
   /* La red de seguridad al abrir la ficha (js/hitos-panel.js): solo
@@ -243,6 +331,7 @@
   }
 
   Hitos.pasosQueFaltan = pasosQueFaltan;
+  Hitos.ordenDeLaGuia = ordenDeLaGuia;
   Hitos.pasosConocidosDe = pasosConocidosDe;
   Hitos.llevarGuiaAAbiertos = llevarAAbiertos;
   Hitos.completarAsuntoConGuia = completarAsunto;

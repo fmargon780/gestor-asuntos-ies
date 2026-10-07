@@ -298,7 +298,7 @@ await comprobar('3. y se vuelve a poner', pagina.evaluate(async () => (await Pla
 
 /* ===== 11b. «Qué hay de nuevo» ===== */
 console.log('--- 11b. novedades ---');
-await comprobar('«Qué hay de nuevo» trae la línea del tutor del grupo', pagina.evaluate(() => NOVEDADES[0].id === '299' && /tutor o tutora del grupo/.test(NOVEDADES[0].texto) && NOVEDADES[0].texto.length < 110), true);
+await comprobar('«Qué hay de nuevo» trae la línea del tutor del grupo', pagina.evaluate(() => (() => { const n = NOVEDADES.filter((x) => x.id === '299')[0]; return !!n && /tutor o tutora del grupo/.test(n.texto) && n.texto.length < 110; })()), true);
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

@@ -229,6 +229,7 @@
     /* Las plantillas de documento, una vez antes de abrir el cuadro
        (fila 102, «Documentos de este hito»). */
     if (window.GuiasDocumentos) await GuiasDocumentos.precargar();
+    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));   /* fila 300: para el orden */
     var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, [], opciones);
     if (pasos === null || pasos === false || pasos === undefined) return false;
 
@@ -241,7 +242,8 @@
       U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
-    var llegados = await llevarAAbiertos(nombreTipo, pasos);
+    var res = await llevarAAbiertos(nombreTipo, pasos, pasosAntes);
+    var llegados = res.llegados, recolocados = res.recolocados;
     try {
       pintarTabla();
       pintarGuiaNuevo();
@@ -249,7 +251,9 @@
       U.aviso(pasos.length
         ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' hitos.' +
           (llegados ? ' Los hitos nuevos han llegado a ' +
-            (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.') : '')
+            (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.') : '') +
+          (recolocados ? ' El orden nuevo ha llegado a ' +
+            (recolocados === 1 ? '1 asunto abierto.' : recolocados + ' asuntos abiertos.') : '')
         : nombreTipo + ' se queda sin guía.', 'bueno');
       return true;
     } catch (e) {
@@ -272,7 +276,7 @@
       try { await CamposDeHito.limpiarMarcas(nombreTipo, pasosNuevos); }
       catch (e) { U.accesorio('La guía se ha guardado, pero no he podido soltar los campos de un hito borrado', e); }
     }
-    var llegados = await llevarAAbiertos(nombreTipo, pasosNuevos);
+    var llegados = (await llevarAAbiertos(nombreTipo, pasosNuevos)).llegados;
     if (llegados) {
       U.aviso('Los hitos nuevos de ' + nombreTipo + ' han llegado a ' +
         (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.'), 'bueno');
@@ -286,16 +290,20 @@
   /* Fila 118 (docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md): los hitos nuevos
      de la guía, a los asuntos abiertos de ese tipo que ya tienen hitos
      (js/hitos-sincronizar.js). La guía ya está guardada: si esto
-     falla, ámbar, nunca rojo. Devuelve a cuántos asuntos ha llegado. */
-  async function llevarAAbiertos(nombreTipo, pasos) {
-    if (!pasos || !pasos.length || !window.Hitos || !Hitos.llevarGuiaAAbiertos) return 0;
+     falla, ámbar, nunca rojo. Devuelve { llegados, recolocados }: a cuántos
+     asuntos han llegado hitos nuevos y a cuántos el orden nuevo (fila 300:
+     solo si llega `pasosAntes`, que solo pasa «Cambiar la guía»). */
+  async function llevarAAbiertos(nombreTipo, pasos, pasosAntes) {
+    var nada = { llegados: 0, recolocados: 0 };
+    if (!pasos || !pasos.length || !window.Hitos || !Hitos.llevarGuiaAAbiertos) return nada;
     try {
-      var n = await Hitos.llevarGuiaAAbiertos(nombreTipo, pasos);
-      if (n && window.HitosPanel) HitosPanel.programarRepintado();
-      return n;
+      var r = await Hitos.llevarGuiaAAbiertos(nombreTipo, pasos, pasosAntes);
+      if (typeof r === 'number') r = { llegados: r, recolocados: 0 };
+      if ((r.llegados || r.recolocados) && window.HitosPanel) HitosPanel.programarRepintado();
+      return r;
     } catch (e) {
       U.accesorio('Guía guardada, pero no he podido llevar los hitos nuevos a los asuntos abiertos', e);
-      return 0;
+      return nada;
     }
   }
 

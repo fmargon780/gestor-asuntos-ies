@@ -179,7 +179,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
-  Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo. Sin frases al pie (fila 224): una
+  Los hitos nuevos de una guía, y su orden nuevo (solo los sin hacer; fila 300), llegan a los asuntos abiertos de su tipo. Sin frases al pie (fila 224): una
   caja «Nueva tarea…», y cada tarea lleva su «⋮» (Anotar, con 💬; Cambiar; Borrar; Abrir en la guía, o Pasar a la guía si es «solo aquí»).
   Todo cambio de hitos o tareas desde un asunto pregunta antes «¿Dónde se guarda?» (fila 235): «A la guía de <tipo>» (marcada, dice a cuántos
   abiertos llega) o «Solo en este asunto»; el aviso verde de después lleva «Deshacer». Un hito solo de este asunto se lleva entero a la guía

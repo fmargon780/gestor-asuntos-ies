@@ -41,7 +41,7 @@ Pura, sin disco ni DOM.
   con su propia lista de hitos. Se aplica la misma regla dentro de cada opción que exista, y una
   **opción nueva** de una pregunta ya existente se añade entera. No se cambia `elegida`.
 - Los hitos `delTipoAnterior`, los añadidos a mano y los `noaplica` se quedan donde están.
-- Nunca se reordena lo que ya existe, aunque el paso se haya movido en la guía.
+- Los hitos que ya existen no se reordenan al llegar hitos nuevos. El orden nuevo de la guía llega solo al cambiarlo en «Cambiar la guía», y solo para los hitos sin hacer: `docs/ORDEN-DE-LA-GUIA-LLEGA-A-LOS-ASUNTOS.md` (fila 300).
 - Un paso que ya existía en el asunto y se quitó a mano (`Hitos.quitarHito`), o que se podó al
   cambiar de rama, **no vuelve**. Para eso, cada entrada de `porAsunto` gana el campo
   `pasosConocidos: [id]`: los ids de paso de la guía que ya han pasado por ese asunto. Se rellena

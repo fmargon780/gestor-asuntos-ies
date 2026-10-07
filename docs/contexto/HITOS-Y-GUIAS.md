@@ -407,6 +407,20 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   (`aplicarModoConsulta`) o si la guía de ese tipo todavía no ha terminado de cargar (en ese caso
   no se marca nada como "ya intentado": el siguiente repintado lo reintenta). Tocar los hitos de
   un asunto nunca cambia la guía del tipo.
+- **El orden nuevo de la guía llega a los asuntos abiertos** (fila 300, 7-oct-2026,
+  `docs/ORDEN-DE-LA-GUIA-LLEGA-A-LOS-ASUNTOS.md`, `js/hitos-sincronizar.js`). Solo `escribirGuia`
+  («Cambiar la guía» desde Ajustes, la ficha o la mesa) pasa los pasos de antes:
+  `Hitos.llevarGuiaAAbiertos(tipo, pasos, pasosAntes)` devuelve `{ llegados, recolocados }` (sin
+  `pasosAntes`, como `guardarPasos`, devuelve el número de siempre y no recoloca; tampoco la red de
+  seguridad de la ficha). La función pura `Hitos.ordenDeLaGuia(hitos, pasosAntes, pasosAhora)` →
+  `{ hitos, movidos, actual }` trabaja por nivel (el de arriba y cada opción, a cualquier
+  profundidad), solo en el nivel donde cambió el orden relativo de los pasos comunes, y reparte los
+  hitos **sin hacer** de la guía (pendiente o en curso; no `delTipoAnterior`, no hechos, no
+  `noaplica`, no los solo de este asunto) en los mismos huecos, en el orden de la guía. Si el primer
+  hito sin hacer no es el que está en curso, el de antes vuelve a pendiente (conserva todo) y el
+  primero pasa a en curso, salvo que el actual lleve `cadena` (un «Hacer este hito» a medias). Mover
+  un hito desde la mesa («A la guía») sigue con `propagarCambio`: otra regla (en
+  `docs/PENDIENTES-DE-DISENAR.md`). Prueba: `pruebas/orden-de-la-guia-llega-a-los-asuntos.mjs`.
 - **Los pasos nuevos de la guía llegan a los asuntos abiertos** (fila 118, 24-sep-2026,
   `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`, `js/hitos-sincronizar.js`). Al guardar la guía de un
   tipo (`escribirGuia` y `guardarPasos` de `js/guias-enganche.js`, este también para «Traer el
