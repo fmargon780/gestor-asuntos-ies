@@ -211,6 +211,8 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
   }
 
   contenedor.innerHTML =
+    (multiple ? '<div id="rel-pegar-fila"><button type="button" class="boton" id="rel-pegar">Pegar una lista</button></div>' +
+      '<div id="rel-pegar-sitio"></div>' : '') +   /* fila 296: js/lista-pegada-pantalla.js */
     '<div class="categorias-mini" id="rel-categorias"></div>' +
     '<div id="rel-buscador" class="oculto">' +
       '<input id="rel-buscar" class="campo" placeholder="Escribe dos letras del nombre">' +
@@ -350,6 +352,17 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
     clearTimeout(temporizador);
     temporizador = setTimeout(buscar, 180);
   };
+
+  if (multiple) {
+    var botonPegar = contenedor.querySelector('#rel-pegar');
+    botonPegar.onclick = function () {
+      botonPegar.parentNode.classList.add('oculto');
+      ListaPegada.abrir(contenedor.querySelector('#rel-pegar-sitio'), {
+        categoria: function () { return estado.categoria; }, marcar: marcar, alSenalar: opciones.alSenalar,
+        alCerrar: function () { botonPegar.parentNode.classList.remove('oculto'); }
+      });
+    };
+  }
 
   pintarCategorias();
   if (estado.categoria) cajaBuscador.classList.remove('oculto');
