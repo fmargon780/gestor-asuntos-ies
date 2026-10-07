@@ -192,6 +192,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 290 | `docs/NOTAS-DE-DIRECTIVOS.md` (tercera de tres, va después de la 289: el directivo deja una nota con documentos en un asunto suyo; aviso «N notas de directivos» en Inicio; en la ficha, «Vista» y «Guardar en el asunto»; archivar con notas sin ver pregunta antes; módulo nuevo `js/notas-directivos.js`) | PENDIENTE (6-oct-2026) |
 | 291 | `docs/PROBLEMAS-CON-SU-SOLUCION.md` (segunda de tres, va después de la 288: en Ajustes → Problemas, cada aviso es una tarjeta con «Qué pasa», «Por qué» y «Qué hacer», y cada botón dice qué ocurre al pulsarlo y si tiene vuelta atrás; Inicio y el menú avisan con «N problemas por resolver»; módulo nuevo `js/problemas.js`) | PENDIENTE (6-oct-2026) |
 | 292 | `docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md` (tercera de tres, va después de la 291: los hitos de un asunto que cambió de nombre pueden volver a él; «Buscar su carpeta» propone la que más se parece; al elegir entre dos versiones guardadas a la vez se ve en qué se diferencian; los asuntos que se repiten preguntan antes de crearse) | PENDIENTE (6-oct-2026) |
+| 293 | implementar un sistema de creación y gestión de tareas en bloque, como emitir un certificado a un grupo de alumnos de una clase, emitir un mailing masivo y cosas así | EN DISEÑO (7-oct-2026) · conversación: https://claude.ai/code/session_015E6yfFSzs3nQdXXt48cnck |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
