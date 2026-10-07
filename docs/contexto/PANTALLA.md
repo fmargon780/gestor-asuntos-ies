@@ -77,8 +77,7 @@ repartidas entre El centro y Mantenimiento.
 
 **Ajustes en cuatro pestañas** (fila 288, `docs/AJUSTES-EN-CUATRO-PESTANAS.md`): «Lo de cada día»
 (`#ajustes-tab-dia`: la rejilla de tipos y cuatro secciones), «El centro», «Este ordenador» y
-«Problemas» (conflictos, fichas sin carpeta, hitos huérfanos, envolturas, conservación: solo se ven
-con algo; sin nada, «Todo en orden»; punto ámbar en la pestaña si hay). Ya no existe «Mantenimiento»:
+«Problemas» (tarjetas, fila 291: ver abajo; sin ninguna, «Todo en orden»; punto ámbar en la pestaña si hay). Ya no existe «Mantenimiento»:
 `#ajustes-tab-mantenimiento` es un sitio de paso que no se ve, donde los módulos cuelgan sus bloques
 como siempre; `js/ajustes-reparto.js` (tabla `TABLA`: bloque → pestaña, orden, otras palabras) los
 lleva a su pestaña, o a «Puesta a punto y reparaciones» al pie de Herramientas
@@ -87,6 +86,16 @@ personal» lleva ficheros de datos, el aviso de alumnado viejo y las abreviatura
 está en la tabla va al final de «El centro». Los nombres viejos de pestaña (`tipos`, `mantenimiento`)
 siguen valiendo en `App.cambiarPestanaAjustes` (van a `dia` y `problemas`). Buscador:
 `js/ajustes-buscador.js`.
+
+**«Problemas»: una tarjeta por problema** (fila 291, `docs/PROBLEMAS-CON-SU-SOLUCION.md`).
+`js/problemas.js` (`Problemas.registrar(id, descripcion)`; null la quita) pinta tarjetas siempre
+abiertas: título, «Qué pasa:», «Por qué:», «Qué hacer:» (cada botón con su frase; la normal va la
+primera, «(lo normal)»; `cambia: false` la deja encendida en solo consulta). Frases en
+`js/problemas-textos.js`; cada módulo que detecta el problema pone los botones y registra su tarjeta
+(`Problemas.calculador`: al entrar y en cada refresco de Inicio, nada con un guardado en marcha, lo
+caro cada diez minutos, a la fuerza al abrir Ajustes). Orden: `Problemas.ORDEN`. Con alguna: «Problemas (N)»,
+punto ámbar en la pestaña y en «Ajustes» del menú, y «N problemas por resolver» en Inicio (id
+`problemas`). `Soporte.abrir(texto)`: «Avisar por Soporte».
 
 **Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
 `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea

@@ -269,6 +269,35 @@ var FichaArchivo = (function () {
     return d;
   }
 
+  /* El botón de siempre: confirma y mueve. Lo usan la sección de Herramientas y la tarjeta de
+     «Problemas» (fila 291, que no tiene caja de progreso). */
+  async function mover(boton, progreso, pendientes) {
+    if (!pendientes) pendientes = await pendientesDeConvertir();
+    if (!pendientes.length) { U.aviso('Todas las fichas de asuntos archivados están ya en su carpeta.', ''); return; }
+    var sinCarpeta = pendientes.filter(function (p) { return !p.handle; }).length;
+    var detalle = sinCarpeta
+      ? '<p class="aviso aviso-ambar">' + sinCarpeta + ' no tienen carpeta localizable: se ' +
+        'quedan como están, no se cuentan como error.</p>'
+      : '';
+    var ok = await U.preguntar('Poner en orden las fichas del ARCHIVO',
+      '<p>Se van a mover ' + pendientes.length + ' ficha' + (pendientes.length === 1 ? '' : 's') +
+      ' a su propia carpeta, dentro de <code>_ficha.json</code>.</p>' + detalle,
+      'Adelante');
+    if (!ok) return;
+    await U.mientrasGuarda(boton, async function () {
+      if (progreso) progreso.classList.remove('oculto');
+      var resultado = await convertirTodo(function (hechos, total) {
+        if (progreso) progreso.textContent = 'Moviendo… ' + hechos + ' de ' + total;
+      });
+      var mensaje = resultado.movidos + (resultado.movidos === 1 ? ' ficha movida.' : ' fichas movidas.');
+      if (resultado.sinCarpeta.length) {
+        mensaje += ' ' + resultado.sinCarpeta.length + ' sin carpeta localizable, sin tocar.';
+      }
+      U.aviso(mensaje, 'bueno');
+      App.pintarFichasDelArchivo();
+    });
+  }
+
   async function pintarCuerpo() {
     var cuerpo = $('fichas-archivo-cuerpo');
     if (!cuerpo) return;
@@ -281,37 +310,13 @@ var FichaArchivo = (function () {
       cuerpo.innerHTML = '<div class="vacio">Todas las fichas de asuntos archivados están ya en su carpeta.</div>';
       return;
     }
-    var sinCarpeta = pendientes.filter(function (p) { return !p.handle; }).length;
-
     var boton = document.createElement('button');
     boton.className = 'boton';
     boton.textContent = 'Mover ' + pendientes.length + (pendientes.length === 1 ? ' ficha' : ' fichas');
     var progreso = document.createElement('div');
     progreso.className = 'explica oculto';
 
-    boton.onclick = async function () {
-      var detalle = sinCarpeta
-        ? '<p class="aviso aviso-ambar">' + sinCarpeta + ' no tienen carpeta localizable: se ' +
-          'quedan como están, no se cuentan como error.</p>'
-        : '';
-      var ok = await U.preguntar('Poner en orden las fichas del ARCHIVO',
-        '<p>Se van a mover ' + pendientes.length + ' ficha' + (pendientes.length === 1 ? '' : 's') +
-        ' a su propia carpeta, dentro de <code>_ficha.json</code>.</p>' + detalle,
-        'Adelante');
-      if (!ok) return;
-      await U.mientrasGuarda(boton, async function () {
-        progreso.classList.remove('oculto');
-        var resultado = await convertirTodo(function (hechos, total) {
-          progreso.textContent = 'Moviendo… ' + hechos + ' de ' + total;
-        });
-        var mensaje = resultado.movidos + (resultado.movidos === 1 ? ' ficha movida.' : ' fichas movidas.');
-        if (resultado.sinCarpeta.length) {
-          mensaje += ' ' + resultado.sinCarpeta.length + ' sin carpeta localizable, sin tocar.';
-        }
-        U.aviso(mensaje, 'bueno');
-        App.pintarFichasDelArchivo();
-      });
-    };
+    boton.onclick = function () { return mover(boton, progreso, pendientes); };
 
     cuerpo.appendChild(boton);
     cuerpo.appendChild(progreso);
@@ -329,7 +334,18 @@ var FichaArchivo = (function () {
       ? n + (n === 1 ? ' ficha por poner en orden' : ' fichas por poner en orden')
       : 'Ya está todo en orden';
     if (bloque && bloque.open) await pintarCuerpo();
+    tarjeta(n);
   };
+
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): la misma tarea, como tarjeta de «Problemas». */
+  function tarjeta(n) {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!n) { Problemas.registrar('fichas-archivo', null); return; }
+    var d = ProblemasTextos.fichasArchivo(n);
+    d.acciones[0].alPulsar = function (arg, boton) { return mover(boton, null, null); };
+    Problemas.registrar('fichas-archivo', d);
+  }
+  if (window.Problemas) Problemas.calculador('fichas-archivo', function () { return App.pintarFichasDelArchivo(); });
 
   return {
     NOMBRE: NOMBRE, leer: leer, escribir: escribir, borrar: borrar, completar: completar,

@@ -37,6 +37,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Lo que un directivo pide a Administración desde la aplicación (no es un asunto hasta que Administración lo convierte) / cómo va, visto por quien lo pidió | **encargo** («Nuevo encargo», «Mis encargos»); **Sin atender**, **En marcha**, **Terminado**, **No procede** | petición, solicitud, tarea, ticket |
 | Lo que un directivo escribe en un asunto suyo / la que Administración aún no ha visto | **nota de directivo**; **sin ver**, **Vista** | mensaje, comentario, aviso del directivo |
 | Una línea del registro de entrada o de salida de Séneca (en el control del registro) | **apunte** («apuntes sin asunto», «Apunte de registro») | asiento, entrada del registro |
+| Lo que la aplicación ha encontrado mal y hay que arreglar, con qué pasa, por qué y qué hacer (fila 291) | **problema** («N problemas por resolver», pestaña «Problemas») | huérfano, huérfana, ficha sin carpeta, envoltura, aviso de fallo |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

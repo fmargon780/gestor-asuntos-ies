@@ -72,7 +72,7 @@
   function pintarMarca() {
     var m = marca();
     if (!m) return;
-    if (!filas) { m.classList.add('oculto'); return; }
+    if (!filas) { m.classList.add('oculto'); registrarProblema(0); return; }
     var faltan = filas.filter(C.cuentanComoFalta).length;
     var hayRoja = filas.some(function (f) { return f.estado === 'falta' && !f.ambar; });
     m.classList.remove('oculto', 'comprobacion-bien', 'comprobacion-ambar', 'comprobacion-roja');
@@ -84,6 +84,17 @@
       m.classList.add(hayRoja ? 'comprobacion-roja' : 'comprobacion-ambar');
     }
     m.title = 'Comprobación al entrar: pulsa para ver el detalle';
+    registrarProblema(faltan);
+  }
+
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): lo que falta, como tarjeta de «Problemas». Lo
+     marcado como «No lo uso en este ordenador» no cuenta (cuentanComoFalta). */
+  function registrarProblema(faltan) {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!faltan) { Problemas.registrar('configurar', null); return; }
+    var d = ProblemasTextos.configurar(faltan);
+    d.acciones[0].alPulsar = function () { return abrirPanel(); };
+    Problemas.registrar('configurar', d);
   }
 
   /* ---------- el panel ---------- */

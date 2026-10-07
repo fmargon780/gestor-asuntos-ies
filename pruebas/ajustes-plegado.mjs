@@ -220,10 +220,10 @@ console.log('--- 6. Problemas y Este ordenador ---');
 await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(500);
-await comprobar('sin fichas sin carpeta, su bloque no se ve',
-  pagina.locator('#bloque-huerfanas').isVisible(), false);
-await comprobar('sin conflictos, su bloque no se ve',
-  pagina.locator('#bloque-conflictos').isVisible(), false);
+await comprobar('sin asuntos sin carpeta, su tarjeta no sale (fila 291: son tarjetas, no secciones)',
+  pagina.locator('[data-problema="carpetas"]').count(), 0);
+await comprobar('sin conflictos, su tarjeta no sale',
+  pagina.locator('[data-problema="conflictos"]').count(), 0);
 await comprobar('«Plantillas del centro» está en la puesta a punto de Herramientas (fila 288)',
   pagina.evaluate(() => !!document.querySelector('#herramientas-puesta-cuerpo > #bloque-plantillas-centro')), true);
 await comprobar('"Carpetas de este ordenador" dice "2 señaladas"',
@@ -239,12 +239,10 @@ await pagina.evaluate(async () => {
   await App.pintarAjustes();
 });
 await pagina.waitForTimeout(600);
-await comprobar('con una ficha sin carpeta, su bloque se ve',
-  pagina.locator('#bloque-huerfanas').isVisible(), true);
-await comprobar('en la pestaña «Problemas»',
-  pagina.evaluate(() => document.getElementById('bloque-huerfanas').closest('.ajustes-tab').id), 'ajustes-tab-problemas');
-await comprobar('y desplegado',
-  pagina.locator('#bloque-huerfanas').evaluate((d) => d.open), true);
+await comprobar('con una ficha sin carpeta, su tarjeta sale',
+  pagina.locator('[data-problema="carpetas"]').isVisible(), true);
+await comprobar('en la pestaña «Problemas», siempre abierta (no es una sección plegable)',
+  pagina.evaluate(() => [document.querySelector('[data-problema="carpetas"]').closest('.ajustes-tab').id, !!document.querySelector('[data-problema="carpetas"]').closest('details')]), ['ajustes-tab-problemas', false]);
 
 await comprobar('sin errores en la consola', errores, []);
 

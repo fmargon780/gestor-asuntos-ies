@@ -50,20 +50,17 @@ await pagina.evaluate(async () => {
 });
 
 await pagina.evaluate(() => App.ir('ajustes'));
-/* 17-sep-2026, fila 39: "Fichas sin carpeta" vive en la pestaña
-   "Mantenimiento". */
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
-await pagina.waitForTimeout(300);
-await pagina.evaluate(() => { document.getElementById('bloque-huerfanas').open = true; });
-await pagina.waitForTimeout(200);
+/* Fila 291: es una tarjeta («asuntos que han perdido su carpeta») de la pestaña «Problemas». */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
+await pagina.waitForTimeout(600);
 
 await comprobar('aparece como huérfana',
-  pagina.locator('#tabla-huerfanas .fila-tipo').count(), 1);
+  pagina.locator('[data-problema="carpetas"] .problema-elemento').count(), 1);
 await comprobar('el punto ámbar sale en el botón de Ajustes',
-  pagina.locator('#punto-huerfanas').isHidden(), false);
+  pagina.locator('#punto-problemas').isHidden(), false);
 
 console.log('--- se enlaza con la carpeta que no tenía ficha ---');
-await pagina.getByRole('button', { name: 'Enlazar con una carpeta' }).click();
+await pagina.getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
 await pagina.waitForSelector('#huerfana-destino');
 await pagina.selectOption('#huerfana-destino', '260901 MATRICULA 26-27 Carpeta Nueva 111');
 await pagina.click('#cuadro-aceptar');
@@ -79,7 +76,8 @@ await comprobar('la ficha ha pasado a la carpeta nueva',
 await comprobar('con sus notas de siempre',
   registroTrasEnlazar.asuntos['260901 MATRICULA 26-27 Carpeta Nueva 111'].notas[0].texto,
   'Primera nota');
-await comprobar('ya no queda ninguna huérfana', pagina.locator('#punto-huerfanas').isHidden(), true);
+/* (Queda la tarjeta del fichero de alumnado, que en este disco de mentira no existe: el punto sigue.) */
+await comprobar('ya no queda ninguna huérfana', pagina.locator('[data-problema="carpetas"]').count(), 0);
 
 console.log('--- borrar una ficha huérfana ---');
 await pagina.evaluate(async () => {
@@ -90,9 +88,9 @@ await pagina.evaluate(async () => {
 });
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(200);
-await comprobar('sale la nueva huérfana', pagina.locator('#tabla-huerfanas .fila-tipo').count(), 1);
+await comprobar('sale la nueva huérfana', pagina.locator('[data-problema="carpetas"] .problema-elemento').count(), 1);
 
-await pagina.getByRole('button', { name: 'Quitar la ficha' }).click();
+await pagina.getByRole('button', { name: 'El asunto ya no existe' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
@@ -111,7 +109,7 @@ await comprobar('pero antes se ha guardado una copia', pagina.evaluate(async () 
   for await (const p of c.entries()) n.push(p[0]);
   return n.some(x => x.indexOf('asuntos-') === 0);
 }), true);
-await comprobar('sin huérfanas, no sale el punto', pagina.locator('#punto-huerfanas').isHidden(), true);
+await comprobar('sin huérfanas, no sale su tarjeta', pagina.locator('[data-problema="carpetas"]').count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

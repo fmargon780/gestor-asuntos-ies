@@ -274,6 +274,7 @@
         descripcion: '', abiertoEl: hace(40) + 'T09:00:00.000Z', abiertoPor: App.E.usuario || 'Revisor', notas: []
       };
     });
+    return montado.nombre;
   }
 
   /* Fila 239: un documento con número (su registro vive en la ficha) y uno de
@@ -594,7 +595,8 @@
     await crearPlantillas();
     await crearAsuntosAbiertos(tipos);
     await crearArchivados(tipos);
-    await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
+    var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
+    if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();
     await crearPapelera();
     await crearSueltos();

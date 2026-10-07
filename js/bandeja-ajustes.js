@@ -116,13 +116,29 @@
     var dias = Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000));
     if (dias > DIAS_DE_AVISO_BANDEJA) {
       fila.innerHTML = '<span class="aviso-en-linea">Último correo recogido: hace ' + dias + ' días. ' +
-        'Si esperabas correos, comprueba que el recolector está dejándolos en esta carpeta y no en ' +
-        'otra con el mismo nombre.</span>';
+        'Lo que hay que hacer está en la pestaña «Problemas».</span>';
     } else {
       fila.innerHTML = '<span class="suave">Último correo recogido: ' +
         U.escapar(N.fechaHoraLegible(new Date(t).toISOString())) + '</span>';
     }
   }
+
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): con la misma condición, la tarjeta «No llegan
+     correos a la bandeja» de «Problemas». Mirar cada fichero cuesta: como mucho cada diez minutos. */
+  var turnoProblema = 0;
+  async function calcularProblema() {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!N.carpeta()) { Problemas.registrar('bandeja', null); return; }
+    var mio = ++turnoProblema;
+    var t = await ultimoFicheroRecogido();
+    if (mio !== turnoProblema) return;
+    var dias = t ? Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000)) : 0;
+    if (!t || dias <= DIAS_DE_AVISO_BANDEJA) { Problemas.registrar('bandeja', null); return; }
+    var d = ProblemasTextos.bandeja(dias);
+    d.acciones[0].alPulsar = function () { App.irASeccionDeAjustes('#bloque-bandeja'); };
+    Problemas.registrar('bandeja', d);
+  }
+  if (window.Problemas) Problemas.calculador('bandeja', calcularProblema, 10 * 60 * 1000);
 
   /* ==========================================================
      LIMPIAR LOS RESTOS DEL VIEJO "BORRADOR EN CAMINO"

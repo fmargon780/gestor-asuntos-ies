@@ -3,7 +3,7 @@
 
    1. Las cuatro pestañas, en su orden y con su línea gris; no existe «Mantenimiento».
    2. Cada sección de la tabla está en su sitio y solo en uno; nada queda en el sitio de paso que no se ve.
-   3. «Problemas»: con la ficha sin carpeta de la demostración sale el aviso y el punto ámbar; al quitarla, «Todo en orden».
+   3. «Problemas»: con el asunto sin carpeta de la demostración sale su tarjeta y el punto ámbar; al quitarlo, la tarjeta desaparece (el resto, en pruebas/problemas.mjs).
    4. Herramientas lleva «Puesta a punto y reparaciones» con sus ocho secciones.
    5. El buscador: por título, por otra palabra, sin acentos, resultado de Herramientas, de dentro de un tipo, sin resultados, Esc.
    6. El salto común y lo recordado (pestaña y sección abierta). */
@@ -32,7 +32,7 @@ await pagina.waitForTimeout(2500);
 const titulos = (selector) => pagina.$$eval(selector, (e) => e.map((x) => x.querySelector(':scope > summary .bloque-titulo').textContent.trim()));
 
 console.log('--- 1. las pestañas ---');
-await comprobar('1. cuatro pestañas, en su orden', pagina.$$eval('.pestana-ajustes', (b) => b.map((x) => x.textContent.trim())),
+await comprobar('1. cuatro pestañas, en su orden (la última lleva el número de problemas, fila 291)', pagina.$$eval('.pestana-ajustes', (b) => b.map((x) => x.textContent.trim().replace(/ \(\d+\)$/, ''))),
   ['Lo de cada día', 'El centro', 'Este ordenador', 'Problemas']);
 await comprobar('1. lo recordado era «Mantenimiento»: se abre «Lo de cada día»', pagina.locator('.pestana-ajustes.activa').textContent(), 'Lo de cada día');
 const lineas = [];
@@ -70,15 +70,14 @@ await comprobar('2. el rótulo de «solo en este ordenador» y el de «para todo
 console.log('--- 3. Problemas ---');
 await pagina.click('.pestana-ajustes[data-ajustes-pestana="problemas"]');
 await pagina.waitForTimeout(1500);
-await comprobar('3. sale «Fichas sin carpeta» con una ficha', pagina.evaluate(() => { const d = document.getElementById('bloque-huerfanas'); return [!d.classList.contains('oculto'), d.querySelectorAll('#tabla-huerfanas .fila-tipo, #tabla-huerfanas .tarjeta-tipo').length > 0]; }), [true, true]);
+await comprobar('3. sale la tarjeta de los asuntos que han perdido su carpeta (fila 291)', pagina.evaluate(() => { const d = document.querySelector('#ajustes-tab-problemas [data-problema="carpetas"]'); return [!!d, d.querySelectorAll('.problema-elemento').length]; }), [true, 1]);
 await comprobar('3. el botón de la pestaña lleva un punto ámbar', pagina.locator('#problemas-punto').evaluate((p) => !p.classList.contains('oculto')), true);
 await comprobar('3. y no sale «Todo en orden»', pagina.locator('#problemas-todo-bien').evaluate((p) => p.classList.contains('oculto')), true);
-await pagina.evaluate(() => { const b = [...document.querySelectorAll('#bloque-huerfanas button')].find((x) => /Quitar la ficha/.test(x.textContent)); b.click(); });
+await pagina.evaluate(() => { const b = [...document.querySelectorAll('[data-problema="carpetas"] button')].find((x) => /El asunto ya no existe/.test(x.textContent)); b.click(); });
 await pagina.waitForTimeout(600);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(2500);
-await comprobar('3. quitada la ficha: «Todo en orden. No hay nada que arreglar.»', pagina.locator('#problemas-todo-bien').evaluate((p) => [!p.classList.contains('oculto'), p.textContent.trim()]), [true, 'Todo en orden. No hay nada que arreglar.']);
-await comprobar('3. y desaparece el punto ámbar', pagina.locator('#problemas-punto').evaluate((p) => p.classList.contains('oculto')), true);
+await comprobar('3. quitado el asunto: la tarjeta desaparece', pagina.evaluate(() => !!document.querySelector('#ajustes-tab-problemas [data-problema="carpetas"]')), false);
 
 console.log('--- 4. Herramientas ---');
 await pagina.click('.pestana[data-pantalla="herramientas"]');

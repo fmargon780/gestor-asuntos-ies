@@ -95,6 +95,31 @@
     return d;
   }
 
+  /* El botón de siempre: confirma y guarda. Lo usan la sección de Herramientas y la tarjeta de
+     «Problemas» (fila 291, que no tiene caja de progreso). */
+  async function guardar(boton, progreso) {
+    var claves = abiertosSinContacto();
+    if (!claves.length) { U.aviso('Todos los asuntos abiertos ya tienen guardado el contacto.', ''); return; }
+    var ok = await U.preguntar('Guardar el contacto de los asuntos abiertos',
+      '<p>Se va a buscar en el CSV de hoy al tercero de ' + claves.length +
+      (claves.length === 1 ? ' asunto abierto' : ' asuntos abiertos') +
+      ' y guardarle una foto de su contacto.</p>', 'Adelante');
+    if (!ok) return;
+    await U.mientrasGuarda(boton, async function () {
+      if (progreso) progreso.classList.remove('oculto');
+      var resultado = await rellenarTodos(function (hechos, total) {
+        if (progreso) progreso.textContent = 'Guardando… ' + hechos + ' de ' + total;
+      });
+      var mensaje = resultado.rellenados +
+        (resultado.rellenados === 1 ? ' asunto rellenado.' : ' asuntos rellenados.');
+      if (resultado.sinEncontrar.length) {
+        mensaje += ' ' + resultado.sinEncontrar.length + ' sin encontrar en el CSV, sin tocar.';
+      }
+      U.aviso(mensaje, 'bueno');
+      App.pintarContactoGuardado();
+    });
+  }
+
   async function pintarCuerpo() {
     var cuerpo = $('contacto-migracion-cuerpo');
     if (!cuerpo) return;
@@ -113,26 +138,7 @@
     var progreso = document.createElement('div');
     progreso.className = 'explica oculto';
 
-    boton.onclick = async function () {
-      var ok = await U.preguntar('Guardar el contacto de los asuntos abiertos',
-        '<p>Se va a buscar en el CSV de hoy al tercero de ' + claves.length +
-        (claves.length === 1 ? ' asunto abierto' : ' asuntos abiertos') +
-        ' y guardarle una foto de su contacto.</p>', 'Adelante');
-      if (!ok) return;
-      await U.mientrasGuarda(boton, async function () {
-        progreso.classList.remove('oculto');
-        var resultado = await rellenarTodos(function (hechos, total) {
-          progreso.textContent = 'Guardando… ' + hechos + ' de ' + total;
-        });
-        var mensaje = resultado.rellenados +
-          (resultado.rellenados === 1 ? ' asunto rellenado.' : ' asuntos rellenados.');
-        if (resultado.sinEncontrar.length) {
-          mensaje += ' ' + resultado.sinEncontrar.length + ' sin encontrar en el CSV, sin tocar.';
-        }
-        U.aviso(mensaje, 'bueno');
-        App.pintarContactoGuardado();
-      });
-    };
+    boton.onclick = function () { return guardar(boton, progreso); };
 
     cuerpo.appendChild(boton);
     cuerpo.appendChild(progreso);
@@ -147,7 +153,18 @@
       ? n + (n === 1 ? ' asunto sin guardar' : ' asuntos sin guardar')
       : 'Ya está todo guardado';
     if (bloque && bloque.open) await pintarCuerpo();
+    tarjeta(n);
   };
+
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): la misma tarea, como tarjeta de «Problemas». */
+  function tarjeta(n) {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!n) { Problemas.registrar('contacto', null); return; }
+    var d = ProblemasTextos.contacto(n);
+    d.acciones[0].alPulsar = function (arg, boton) { return guardar(boton, null); };
+    Problemas.registrar('contacto', d);
+  }
+  if (window.Problemas) Problemas.calculador('contacto', function () { return App.pintarContactoGuardado(); });
 
   window.ContactoMigracion = {
     /* para las pruebas */

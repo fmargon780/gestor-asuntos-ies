@@ -324,25 +324,6 @@ var AjustesPlegado = (function () {
      3. LOS AVISOS DE FALLO Y LOS RESÚMENES QUE QUEDAN
      ========================================================== */
 
-  /* Los avisos de fallo: solo se ven si traen algo. `hay(det)` dice si
-     hay fallo, mirando lo que su propio módulo ha pintado. */
-  var FALLOS = [
-    { id: 'bloque-conflictos', hay: function (det) {
-      return filasDe(det.querySelector('#tabla-conflictos')) > 0;
-    } },
-    { id: 'bloque-huerfanas', hay: function (det) {
-      return filasDe(det.querySelector('#tabla-huerfanas')) > 0;
-    } },
-    { id: 'bloque-hitos-huerfanos', hay: function (det) {
-      var pie = det.querySelector('#hitos-huerfanos-pie');
-      return !!(pie && /^\d/.test((pie.textContent || '').trim()));
-    } },
-    { id: 'bloque-envolturas', hay: function (det) {
-      var pie = det.querySelector('#envolturas-pie');
-      return !!(pie && /sin aplicar/.test(pie.textContent || ''));
-    } }
-  ];
-
   /* El resto, con su resumen. */
   var MANTENIMIENTO = [
     { id: 'carpetas', dentro: '#estado-carpetas', resumen: function () {
@@ -375,15 +356,6 @@ var AjustesPlegado = (function () {
     try {
       registrarTodos();
 
-      /* Los fallos: desplegados cuando hay; si no, fuera de la vista. */
-      FALLOS.forEach(function (f) {
-        var det = document.getElementById(f.id);
-        if (!det) return;
-        var hay = false;
-        try { hay = f.hay(det); } catch (e) { hay = false; }
-        mostrarAviso(det, hay);
-      });
-
       /* El RegAlum.csv viejo: su bloque es también el de las épocas, así
          que nunca se esconde; con aviso, se queda en su sitio (Alumnado y
          personal) con el aviso en el título, y «Problemas» lo enseña con
@@ -408,21 +380,6 @@ var AjustesPlegado = (function () {
     }
   }
 
-  function mostrarAviso(det, hay) {
-    if (hay) {
-      det.classList.remove('oculto');
-      det.classList.add('bloque-con-fallo');
-      if (!det.dataset.porAviso) {
-        det.dataset.porAviso = '1';
-        det.open = true;
-      }
-    } else {
-      det.classList.add('oculto');
-      det.classList.remove('bloque-con-fallo');
-      delete det.dataset.porAviso;
-    }
-  }
-
   function resumirMantenimiento() {
     MANTENIMIENTO.forEach(function (m) {
       var det = bloqueQueLleva(document, m.dentro);
@@ -437,9 +394,8 @@ var AjustesPlegado = (function () {
      refrescar…): cada vez que se repinta uno, se pone al día. El reparto
      entre pestañas es de js/ajustes-reparto.js. */
   function engancharMantenimiento() {
-    var tab = document.getElementById('ajustes-tab-problemas');
+    var tab = document.getElementById('ajustes-tab-dia');
     if (!tab || tab.dataset.plegadoEscucha) return;
-    alCambiar(tab, ordenarMantenimiento);
     ['ajustes-tab-mantenimiento', 'ajustes-tab-ordenador', 'ajustes-tab-dia', 'herramientas-puesta-cuerpo'].forEach(function (id) {
       var otro = document.getElementById(id);
       if (otro) alCambiar(otro, ordenarMantenimiento);

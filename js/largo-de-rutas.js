@@ -51,6 +51,21 @@ var LargoDeRutas = (function () {
     } else if (det) { det.innerHTML = ''; }
   }
 
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): si la ruta más larga no cabe, la tarjeta «La ruta
+     más larga no cabe» de «Problemas». Mide al abrir Ajustes. */
+  async function calcularProblema() {
+    if (!window.Problemas || !window.ProblemasTextos || !window.Nombres || !Nombres.medidor) return;
+    var m;
+    try { m = await Nombres.medidor(); } catch (e) { return; }
+    if (!m || !m.conocido || m.margen >= 0) { Problemas.registrar('rutas', null); return; }
+    var d = ProblemasTextos.rutas(m);
+    d.acciones[0].alPulsar = function () { App.irASeccionDeAjustes('#bloque-largo-rutas'); };
+    d.acciones[1].alPulsar = async function () { await Problemas.recalcular('rutas'); pintar(); U.aviso('He vuelto a medir la ruta.', ''); };
+    Problemas.registrar('rutas', d);
+  }
+  /* Medir lee el catálogo de terceros: solo al abrir Ajustes (la comprobación al entrar ya cuenta si no cabe). */
+  if (window.Problemas) Problemas.calculador('rutas', function (forzar) { return forzar ? calcularProblema() : null; });
+
   function ponerBloque() {
     var tab = document.getElementById('ajustes-tab-centro');
     if (!tab || document.getElementById('bloque-largo-rutas')) return;

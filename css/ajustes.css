@@ -415,3 +415,27 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 /* Fila 255: «Ya están en este asunto», arriba de la lista de campos cuando se abre desde un hito. */
 .campos-catalogo-grupo { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--linea); }
 .campos-catalogo-grupo .etiqueta { margin: 0 0 6px; }
+
+/* Fila 291: la tarjeta de cada problema, siempre abierta y a todo el ancho. */
+.problema {
+  margin: 0 16px 14px; padding: 14px 16px; max-width: 90ch;
+  background: var(--papel); border: 1px solid var(--linea); border-left: 4px solid #e8a317; border-radius: 8px;
+}
+.problema-roja { border-left-color: #c0392b; }
+.problema-titulo { margin: 0 0 8px; font-size: 17px; }
+.problema-linea { margin: 0 0 6px; }
+.problema-hacer-rotulo { margin-top: 10px; }
+.problema-quien { margin: 0 0 6px; font-weight: 600; }
+.problema-pasos { margin: 0 0 8px; padding-left: 22px; }
+.problema-pasos li { margin-bottom: 4px; }
+.problema-antes { margin: 0 0 6px; color: var(--tinta-suave); }
+.problema-acciones { display: flex; flex-direction: column; gap: 8px; margin: 6px 0; }
+.problema-accion { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.problema-explica { flex: 1 1 260px; }
+.problema-lista { list-style: none; margin: 6px 0 0; padding: 0; }
+.problema-elemento { padding: 10px 0; border-top: 1px solid var(--linea); }
+.problema-elemento-cab { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-bottom: 4px; }
+.problema-nombre { font-weight: 600; overflow-wrap: anywhere; }
+.problema-todos { display: block; margin: 6px 0; }
+.problema-detalle { margin-top: 10px; }
+.problema-detalle pre { white-space: pre-wrap; font-size: 12px; margin: 6px 0 0; }

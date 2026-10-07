@@ -142,68 +142,22 @@
     avisar();
   }
 
-  /* ---------- Ajustes → Mantenimiento: la lista completa ---------- */
+  /* ---------- Ajustes → Problemas: la tarjeta ----------
 
-  function $(id) { return document.getElementById(id); }
-
-  function bloqueDeAjustes() {
-    var ya = $('bloque-envolturas');
-    if (ya) return ya;
-    var pantalla = $('ajustes-tab-mantenimiento');
-    if (!pantalla) return null;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-envolturas';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Envolturas de la aplicación</span>' +
-        '<span class="bloque-pie" id="envolturas-pie"></span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">La aplicación se construye "envolviendo" funciones de unos ficheros ' +
-        'con otros, y eso depende del orden en que se cargan (docs/ENVOLTURAS-COMPROBADAS.md). ' +
-        'Esta lista es la comprobación de que todas las envolturas que debe haber se han ' +
-        'aplicado de verdad.</p>' +
-        '<div id="envolturas-cuerpo"></div>' +
-      '</div>';
-    pantalla.appendChild(d);
-    return d;
-  }
+     Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): solo sale si falta alguna; el detalle técnico
+     queda plegado dentro de la tarjeta y viaja en el aviso de Soporte. */
 
   App.pintarEnvolturas = function () {
-    var d = bloqueDeAjustes();
-    if (!d) return;
+    if (!window.Problemas || !window.ProblemasTextos) return;
     var r = comprobar();
-    var U2 = window.U;
-    var escapar = (U2 && U2.escapar) ? U2.escapar : function (v) { return String(v); };
-
-    $('envolturas-pie').textContent = r.faltan.length
-      ? r.faltan.length + ' de ' + r.esperadas.length + ' sin aplicar'
-      : 'las ' + r.esperadas.length + ' aplicadas';
-
-    var cuerpo = $('envolturas-cuerpo');
-    cuerpo.innerHTML = '';
-    r.esperadas.forEach(function (e) {
-      var falta = r.faltan.filter(function (f) { return f.fichero === e.fichero && f.nombre === e.nombre; })[0];
-      var fila = document.createElement('div');
-      fila.className = 'fila-tipo';
-      fila.innerHTML =
-        '<span class="nombre-tipo">' + (falta ? '✗' : '✓') + '</span>' +
-        '<span class="suave" style="flex:1">' + escapar(e.fichero) + ' → ' + escapar(e.nombre) +
-        (falta ? '  —  ' + escapar(falta.motivo) : '') + '</span>';
-      cuerpo.appendChild(fila);
-    });
-    if (r.sobran.length) {
-      var aviso = document.createElement('p');
-      aviso.className = 'aviso aviso-ambar';
-      aviso.textContent = r.sobran.length + ' envoltura' + (r.sobran.length === 1 ? '' : 's') +
-        ' aplicada' + (r.sobran.length === 1 ? '' : 's') + ' que no está' +
-        (r.sobran.length === 1 ? '' : 'n') + ' en esta lista: falta apuntarla' +
-        (r.sobran.length === 1 ? '' : 's') + ' en js/envolturas-esperadas.js.';
-      cuerpo.appendChild(aviso);
-    }
+    if (!r.faltan.length) { Problemas.registrar('envolturas', null); return; }
+    var lineas = r.faltan.map(function (f) { return f.fichero + ' → ' + f.nombre + ': ' + f.motivo; });
+    var d = ProblemasTextos.envolturas(lineas.join('\n'));
+    d.acciones[0].alPulsar = function () { location.reload(); };
+    Problemas.registrar('envolturas', d);
   };
+  if (window.Problemas) Problemas.calculador('envolturas', function () { App.pintarEnvolturas(); });
 
-  /* Para las pruebas y para Ajustes → Mantenimiento. */
+  /* Para las pruebas y para Ajustes → Problemas. */
   window.EnvolturasEsperadas = { LISTA: ESPERADAS, comprobar: comprobar, avisar: avisar };
 })();

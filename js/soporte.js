@@ -363,7 +363,8 @@ window.Soporte = (function () {
     if (previo) campo.focus();
   }
 
-  function abrir() {
+  /* `previo` (fila 291, «Avisar por Soporte» de una tarjeta de Problemas): el texto ya escrito. */
+  function abrir(previo) {
     if (document.getElementById('capa-soporte')) return;
     estado = { tipo: '', captura: null, enviando: false, pantalla: nombrePantalla() };
 
@@ -395,6 +396,7 @@ window.Soporte = (function () {
       tipos.appendChild(b);
     });
     cuadro.appendChild(tipos);
+    if (typeof previo === 'string' && previo && tipos.firstChild) tipos.firstChild.onclick();   /* «Algo no funciona» */
 
     var texto = el('textarea', 'campo soporte-texto');
     texto.id = 'soporte-texto';
@@ -411,6 +413,10 @@ window.Soporte = (function () {
       palabras.textContent = textoPalabras(contarPalabras(texto.value));
     });
     window.addEventListener('resize', alCambiarVentana);
+    if (typeof previo === 'string' && previo) {
+      texto.value = previo;
+      palabras.textContent = textoPalabras(contarPalabras(previo));
+    }
 
     if (!quienSabido()) {
       var nombre = el('input', 'campo soporte-nombre');
@@ -464,6 +470,7 @@ window.Soporte = (function () {
 
     pintarCaptura();
     texto.focus();
+    if (typeof previo === 'string' && previo) crecer(texto);
   }
 
   /* ---------- el botón ---------- */

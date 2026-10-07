@@ -318,6 +318,7 @@ var Copias = (function () {
     comprobarTodos: comprobarTodos,
     restaurar: restaurar,
     listar: listar,
-    listarTodas: listarTodas
+    listarTodas: listarTodas,
+    diasCaducidad: diasCaducidad   /* fila 291: «queda en las copias N días» */
   };
 })();

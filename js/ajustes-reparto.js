@@ -33,7 +33,7 @@ var AjustesReparto = (function () {
 
   /* Sitios donde los módulos cuelgan sus bloques: se vigilan. */
   var DE_PASO = ['ajustes-tab-mantenimiento', 'ajustes-tab-tipos', 'ajustes-tab-centro', 'ajustes-tab-dia',
-    'ajustes-tab-ordenador', 'ajustes-tab-problemas', 'herramientas-puesta-cuerpo'];
+    'ajustes-tab-ordenador', 'herramientas-puesta-cuerpo'];
 
   var LINEAS = {
     dia: 'Lo que se cambia a menudo. Vale para todos los ordenadores del centro.',
@@ -70,12 +70,6 @@ var AjustesReparto = (function () {
     { id: 'bloque-bandeja', donde: 'ordenador', otras: 'Gmail, Drive, correos que llegan, etiqueta GESTOR' },
     { id: 'bloque-envio-correo', donde: 'ordenador', otras: 'Gmail, script, enviar, cuenta' },
     { id: 'bloque-seneca', donde: 'ordenador', otras: 'marcador, favoritos, mensaje de Séneca' },
-    /* Problemas */
-    { id: 'bloque-conflictos', donde: 'problemas', otras: 'Dropbox, conflicto, copia en conflicto' },
-    { id: 'bloque-huerfanas', donde: 'problemas', otras: 'fichas, carpeta, huérfanas' },
-    { id: 'bloque-hitos-huerfanos', donde: 'problemas', otras: 'hitos, huérfanos' },
-    { id: 'bloque-envolturas', donde: 'problemas', otras: 'envolturas, aplicar' },
-    { id: 'bloque-conservacion', donde: 'problemas', otras: 'conservación, plazo, borrar, archivo' },
     /* Herramientas → Puesta a punto y reparaciones */
     { id: 'bloque-plantillas-centro', donde: 'herramientas', otras: 'plantillas, Word, correo, preparar' },
     { id: 'bloque-cargar-biblioteca', donde: 'herramientas', otras: 'biblioteca, tipos, guías, tareas, cargar, instituto' },
@@ -163,62 +157,18 @@ var AjustesReparto = (function () {
         });
       });
 
-      engancharFrescura();
       if (window.AjustesPlegado && AjustesPlegado.registrarTodos) AjustesPlegado.registrarTodos();
       actualizarProblemas();
     } finally { enMarcha = false; }
   }
 
-  /* ---------- la pestaña «Problemas» ---------- */
+  /* ---------- la pestaña «Problemas» ----------
 
-  function hayProblemas() {
-    var cont = $('ajustes-tab-problemas');
-    var hay = false;
-    if (cont) {
-      Array.prototype.forEach.call(cont.children, function (n) {
-        if (n.matches && n.matches('details.bloque-ajustes') && !n.classList.contains('oculto')) hay = true;
-      });
-    }
-    return hay;
-  }
+     Fila 291: son tarjetas que pinta js/problemas.js (con la cuenta, el punto ámbar y «Todo en
+     orden»). Aquí solo queda ponerlas al día cuando se reparte. */
 
   function actualizarProblemas() {
-    var fres = $('bloque-frescura');
-    var aviso = fres ? (fres.dataset.aviso || '') : '';
-    var linea = $('problemas-frescura');
-    if (linea) {
-      if (aviso) {
-        var texto = '⚠ ' + (aviso === 'falta' ? 'No hay RegAlum.csv' : 'El RegAlum.csv es de hace ' + aviso) + '. ';
-        if (linea.dataset.texto !== texto) {
-          linea.dataset.texto = texto;
-          linea.textContent = texto;
-          var ver = document.createElement('button');
-          ver.type = 'button';
-          ver.className = 'enlace ajustes-enlace-salto';
-          ver.id = 'problemas-frescura-ver';
-          ver.textContent = 'Verlo';
-          ver.onclick = function () { App.irASeccionDeAjustes('#bloque-frescura'); };
-          linea.appendChild(ver);
-        }
-      } else if (linea.dataset.texto) {
-        linea.dataset.texto = '';
-        linea.textContent = '';
-      }
-      linea.classList.toggle('oculto', !aviso);
-    }
-    var hay = hayProblemas() || !!aviso;
-    var bien = $('problemas-todo-bien');
-    if (bien) bien.classList.toggle('oculto', hay);
-    var punto = $('problemas-punto');
-    if (punto) punto.classList.toggle('oculto', !hay);
-  }
-
-  var fresVigilada = null;
-  function engancharFrescura() {
-    var fres = $('bloque-frescura');
-    if (!fres || fres === fresVigilada || !window.MutationObserver) return;
-    fresVigilada = fres;
-    new MutationObserver(actualizarProblemas).observe(fres, { attributes: true, attributeFilter: ['data-aviso'] });
+    if (window.Problemas) Problemas.pintar();
   }
 
   /* ---------- el salto común ---------- */
@@ -277,9 +227,6 @@ var AjustesReparto = (function () {
         var cont = $(cid);
         if (cont) new MutationObserver(pronto).observe(cont, { childList: true });
       });
-      var prob = $('ajustes-tab-problemas');
-      if (prob) new MutationObserver(function () { actualizarProblemas(); })
-        .observe(prob, { attributes: true, attributeFilter: ['class'], subtree: true });
     }
     /* Los enlaces de arriba de «Alumnado y personal» y el de «Copias de seguridad». */
     function enlace(id, selector) {

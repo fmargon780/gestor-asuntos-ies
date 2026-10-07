@@ -105,25 +105,24 @@ await comprobar('el índice guarda la fecha de archivo', pagina.evaluate(async (
 }, ANA), '2021-06-01');
 await comprobar('4 años sobre el 29 de febrero caen en el 28', pagina.evaluate(() => Conservacion.sumarAnios('2024-02-29', 1)), '2025-02-28');
 
-console.log('--- el aviso en Ajustes › Mantenimiento ---');
+console.log('--- el aviso en Ajustes › Problemas (fila 291: una tarjeta) ---');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
 await pagina.evaluate(async () => { await App.pintarAjustesMantenimiento(); });
-await comprobar('el bloque se ve', pagina.locator('#bloque-conservacion').isHidden(), false);
-await comprobar('su resumen, en el título plegado', pagina.locator('#bloque-conservacion .bloque-resumen').textContent(),
-  '2 asuntos han cumplido su plazo de conservación');
-await pagina.evaluate(() => { document.getElementById('bloque-conservacion').open = true; });
+await comprobar('la tarjeta se ve', pagina.locator('[data-problema="conservacion"]').isVisible(), true);
+await comprobar('su título dice cuántos', pagina.locator('[data-problema="conservacion"] .problema-titulo').textContent(),
+  '2 asuntos archivados han cumplido su plazo de conservación');
 await comprobar('dos filas; la de Eva, con la fecha aproximada',
-  pagina.locator('#tabla-conservacion .conservacion-fila').allTextContents().then(l => l.map(t => t.indexOf('(aprox.)') !== -1)).then(l => l.sort()),
+  pagina.locator('[data-problema="conservacion"] .problema-elemento').allTextContents().then(l => l.map(t => t.indexOf('(aprox.)') !== -1)).then(l => l.sort()),
   [false, true]);
 
 console.log('--- 5. «Conservar más tiempo…» ---');
-await pagina.check(`#tabla-conservacion .conservacion-elegir[data-nombre="${ANA}"]`);
+await pagina.check(`[data-problema="conservacion"] .problema-elegir[data-nombre="${ANA}"]`);
 await pagina.click('#btn-conservacion-mas');
 await pagina.waitForSelector('#conservar-mas-anios');
 await pagina.fill('#conservar-mas-anios', '3');
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
-await esperar(() => document.querySelectorAll('#tabla-conservacion .conservacion-fila').length === 1);
+await esperar(() => document.querySelectorAll('[data-problema="conservacion"] .problema-elemento').length === 1);
 const dentroDeTres = await pagina.evaluate(() => Conservacion.sumarAnios(U.hoyIso(), 3));
 await comprobar('apunta conservarHasta en su _ficha.json', pagina.evaluate(async () => {
   const c = await (await (await window.__disco.archivo.getDirectoryHandle('ALUMNADO')).getDirectoryHandle('Pérez, Ana 1234'))
@@ -133,12 +132,12 @@ await comprobar('apunta conservarHasta en su _ficha.json', pagina.evaluate(async
 await comprobar('y ya no sale', cumplidos(), [EVA + ' (aprox.)']);
 
 console.log('--- 6. «Mandar a la papelera» ---');
-await pagina.check(`#tabla-conservacion .conservacion-elegir[data-nombre="${EVA}"]`);
+await pagina.check(`[data-problema="conservacion"] .problema-elegir[data-nombre="${EVA}"]`);
 await pagina.click('#btn-conservacion-papelera');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('la confirmación dice cuántos', pagina.locator('#cuadro-cuerpo').textContent().then(t => t.indexOf('1 asunto') !== -1), true);
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
-await esperar(() => document.getElementById('bloque-conservacion').classList.contains('oculto'));
+await esperar(() => !document.querySelector('[data-problema="conservacion"]'));
 const enElArchivo = () => pagina.evaluate(async () => {
   const t = await (await window.__disco.archivo.getDirectoryHandle('ALUMNADO')).getDirectoryHandle('Ruiz, Eva 9999');
   const n = []; for await (const [k] of t.entries()) n.push(k); return n;
@@ -156,7 +155,7 @@ await comprobar('está en la papelera, con su carpeta', pagina.evaluate(async (n
 /* Fila 177: Eva es de 2015 (curso 15-16), no del curso actual, así
    que hace falta pedirlos todos para comprobar de verdad. */
 await comprobar('y fuera del índice', pagina.evaluate(async (n) => (await IndiceArchivo.leerDisco({ todos: true })).datos.asuntos.some(e => e.nombre === n), EVA), false);
-await comprobar('el bloque se esconde: ya no queda ninguno', pagina.locator('#bloque-conservacion').isHidden(), true);
+await comprobar('la tarjeta se quita: ya no queda ninguno', pagina.locator('[data-problema="conservacion"]').count(), 0);
 
 console.log('--- y se devuelve a su sitio ---');
 await comprobar('devolver sale bien', pagina.evaluate(async (n) => {

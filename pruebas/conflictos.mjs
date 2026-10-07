@@ -115,13 +115,12 @@ await comprobar('sale como pendiente, no se fusiona solo',
   pagina.evaluate(() => window.Conflictos.pendientes().map(p => p.real)), ['tipos.json']);
 
 await pagina.evaluate(() => App.ir('ajustes'));
-/* 17-sep-2026, fila 39: "Conflictos de Dropbox" vive en la pestaña
-   "Mantenimiento". */
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
-await pagina.waitForTimeout(200);
-await pagina.evaluate(() => { document.getElementById('bloque-conflictos').open = true; });
-await comprobar('aparece en la tabla de Ajustes',
-  pagina.locator('#tabla-conflictos .fila-tipo').count(), 1);
+/* Fila 291: «Conflictos de Dropbox» es una tarjeta de la pestaña «Problemas». */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
+await pagina.waitForTimeout(600);
+await comprobar('aparece como tarjeta en Ajustes, con la lista de tipos de asunto dicha con palabras',
+  pagina.evaluate(() => [document.querySelectorAll('[data-problema="conflictos"] .problema-elemento').length,
+    document.querySelector('[data-problema="conflictos"] .problema-nombre').textContent]), [1, 'La lista de tipos de asunto']);
 
 await pagina.getByRole('button', { name: 'Quedarse con el otro' }).click();
 await pagina.waitForTimeout(300);
