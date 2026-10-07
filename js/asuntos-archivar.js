@@ -86,6 +86,8 @@ function mensajeDeFallo(verbo, e, sigueEn, dondeCopia) {
    `Carpetas.fusionarEn` en vez de fallar otra vez. */
 
 App.cerrarAsunto = async function (a) {
+  /* Fila 290: con notas de directivos sin ver, se pregunta antes. */
+  if (window.NotasDirectivos && !App.E.archivarSinPreguntar && !(await NotasDirectivos.antesDeArchivar(a))) return;
   var categoria = a.ficha.categoria || a.leido.categoria || '';
   var tercero = a.ficha.tercero || '';
 

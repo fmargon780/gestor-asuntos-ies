@@ -57,3 +57,11 @@
 .hito-nota.registro-linea { border: 0; border-left: 4px solid #c3d8ec; border-radius: 8px; background: var(--fondo); padding: 6px 10px; }
 .hito-nota.registro-linea.registro-auto { border-left-color: var(--linea); background: none; padding-left: 10px; }
 .hito-nota.registro-linea .nota-texto { font-size: 13px; }
+
+/* Fila 290: las notas de los directivos. */
+.nota-directivo-sin-ver { background: #fff6dc; border-left: 4px solid #e0a800; }
+.nota-directivo-etiqueta { margin-left: 8px; padding: 0 6px; border-radius: 8px; background: #e0a800; color: #fff; font-size: 11px; }
+.nota-directivo-docs { margin: 6px 0; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.nota-directivo-doc { display: inline-flex; gap: 6px; align-items: center; }
+.nota-directivo-error { color: #b3261e; }
+.marca-nota-directivo { margin-left: 6px; color: #b07f00; font-size: 13px; cursor: help; }
