@@ -170,3 +170,8 @@ En `pruebas/orden-de-la-guia-llega-a-los-asuntos.mjs`:
 7. Abrir «Cambiar la guía» y Guardar sin tocar nada: el aviso no habla del orden y los asuntos no
    cambian.
 8. Un asunto abierto de otro tipo no ha cambiado.
+
+En la copia de demostración (`?demo=1&auto=1`): el tipo preparado es **AJUSTE DE PLANIFICACION** (hitos:
+Recoger la petición, Valorar el ajuste, Ajustar la planificación, Comunicar el ajuste). «Pozo Mena, Alba»
+tiene el primero hecho y el segundo en curso; «Cano Lara, Sergio» está sin tocar. Se llega a «Cambiar la
+guía» desde Ajustes → Guías, o desde la ficha de cualquiera de los dos.

@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 7-oct-2026 — Fila 300: el orden nuevo de la guía llega a los asuntos abiertos
+
+Sale de un aviso de Diego Herrera: subió un hito al paso 2 en «Cambiar la guía», guardó y su asunto
+seguía igual. Leyendo el código la guía sí se guardaba con el orden nuevo; lo que no se movía era el
+asunto abierto, por la regla de la fila 118 («nunca se reordena lo que ya existe»), y el aviso verde
+no decía nada del orden. Ahora `escribirGuia` pasa los pasos de antes a `Hitos.llevarGuiaAAbiertos`, y
+`Hitos.ordenDeLaGuia` (función pura, `js/hitos-sincronizar.js`) recoloca por nivel solo los hitos sin
+hacer, en los mismos huecos; el hito actual pasa a ser el primero sin hacer (salvo un «Hacer este
+hito» a medias), sin perder nada del que deja de serlo. `guardarPasos` y la red de seguridad de la
+ficha no recolocan. El aviso añade «El orden nuevo ha llegado a N asuntos abiertos.». Comprobado en la
+copia de demostración (tipo AJUSTE DE PLANIFICACION): la guía guardaba bien el orden; no hubo nada
+más que arreglar. La regla de mover desde la mesa («A la guía») no se toca: queda en
+`docs/PENDIENTES-DE-DISENAR.md`. Prueba: `pruebas/orden-de-la-guia-llega-a-los-asuntos.mjs`.
+
+---
+
 ## 7-oct-2026 — Fila 299: el correo de un hito, al tutor o tutora del grupo
 
 Sale de un aviso de Diego Herrera (compañero de Francisco): en SANCIÓN, «Notificar al tutor/a» debía llamarse «Informar al tutor/a» y llevar una plantilla de correo para el tutor con el documento NOTIFICACIÓN adjunto. Diseño cerrado con Francisco: vale para cualquier hito de cualquier tipo, y los cambios de Diego los hace la app sola. `TutorDelGrupo` (`js/tutor-del-grupo.js`) decide quién es (unidad del alumno por `DatosFavoritos`, tabla TUTORIAS por `TablasDatos`, curso y fechas en vigor, bloque de Pedagogía Terapéutica fuera, correo de PERSONAL o el recordado); sin saberlo, todo sigue como antes y el cuadro lo dice en ámbar. La casilla del tutor sale en «Comunicar ▾» con id `tutoria0`…; `tutoria` en una tarea de comunicar y `HitoMesaRecetas.opcionesDePaso` (que ahora comparten la mesa y «Hacer este hito») eligen esas casillas. El saludo «Buenas:», la línea ámbar y «No tengo el correo de…» viajan por `extra` (`js/correo-tutor.js`); el correo escrito a mano se recuerda al enviar en `_GESTOR/correos-a-mano.json` (`js/correos-a-mano.js`; no había sitio previo en PERSONAS.md; dentro de las copias y de la fusión de conflictos) solo con un tutor sin correo y una dirección nueva. Una plantilla de correo puede llevar `adjuntar` (un tipo de documento): `js/correo-adjunto-plantilla.js` marca el más reciente (PDF antes que Word) y no toca lo que marcó la persona. `js/informar-al-tutor.js` es la pasada única (marca en `hitos-biblioteca.json`) con el modelo de `PlazosDelCentro`; los asuntos abiertos se renombran por `HitosDesdeElAsunto.propagarCambio` (que gana `soloTitulo`: solo el nombre, en todos, también los que ya tienen trabajo). Decisiones de la sesión: «tutor/a» se escribe «tutor o tutora» en la plantilla (con la barra, `Genero` lo cambiaría por el sexo del alumno); «al alumno» sale como «al/a la alumno/a» (que `Genero` resuelve); sin el hito en la guía la pasada no crea plantilla; en un hito anidado en una respuesta se renombra la guía pero no los asuntos abiertos; si falta el correo del tutor las direcciones de la familia salen sin marcar. La demostración trae el tipo SANCION (cuatro asuntos: tutora con correo y NOTIFICACION, tutora sin correo, dos tutores, unidad sin tutor), INCIDENCIA DE AULA con «Avisar a la tutoría» y la relación de tutorías como PDF. Punto solo de Francisco: la unidad de verdad (`docs/COMPROBAR-A-MANO.md`).

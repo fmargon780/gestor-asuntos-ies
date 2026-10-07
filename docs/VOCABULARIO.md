@@ -27,6 +27,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Eliminar algo que va a la papelera | **borrar** | |
 | Eliminar algo que no va a la papelera (sacar de una lista) | **quitar** | |
 | Dejar un cuadro sin hacer nada | **cancelar** | dejarlo |
+| El aviso de que el orden de los hitos de una guía ha llegado a los asuntos (fila 300) | «El orden nuevo ha llegado a N asuntos abiertos.» (con 1: «…a 1 asunto abierto.»), detrás de la frase de los hitos nuevos si la hay | «reordenados», «sincronizados» |
 | Los tres botones de la pregunta de la biblioteca al guardar una guía (fila 297) | «Cancelar» · «Solo aquí» · «También en la biblioteca»; la tabla, «Antes» · «Ahora» · «En la biblioteca» | «Este tipo» / «La biblioteca» |
 | El bloque de hitos que le tocan a Administración, con o sin fecha | **En Administración** | Me toca |
 | El bloque de asuntos cuyo hito actual espera a otro responsable | **En espera** | Esperamos a otros |

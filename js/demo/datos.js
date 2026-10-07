@@ -610,6 +610,7 @@
     if (window.Demo.grupo) await Demo.grupo.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });   /* fila 293 */
     if (window.Demo.biblioteca) await Demo.biblioteca.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 297 */
     if (window.Demo.tutor) await Demo.tutor.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 299 */
+    if (window.Demo.orden) await Demo.orden.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 300 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();
