@@ -55,38 +55,33 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    cambio, a `main` (no publica nada), en el primer commit del trabajo. Así, si otra sesión abre
    esta cola, sabe que ya hay alguien con ella y no la repite.
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
-   los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota y pasa a
-   la siguiente.
+   los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota; después
+   sigue la regla 0 (para, o pasa a la siguiente solo si el lanzamiento pidió varias).
 4. Al terminar una, márcala **HECHA** con la fecha y **para**, salvo que el lanzamiento pida varias filas (regla 0). **La hora de `App.VERSION` sale del reloj de verdad**
    (`TZ='Europe/Madrid' date`, receta exacta en `js/version.js`), nunca a ojo: el 17-sep-2026
    salieron versiones con horas por delante de la real.
 5. Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
-   sigue con la siguiente. Nunca dejes el repositorio con las pruebas en rojo.
+   para (regla 0). Nunca dejes el repositorio con las pruebas en rojo.
 6. Si encuentras una instrucción **EN CURSO** de otra sesión y no eres tú quien la empezó,
-   sáltala y coge la siguiente PENDIENTE.
+   aplica la regla 0 (menos de 90 minutos con conversación enlazada: no se coge otra; si no, se retoma).
 7. No preguntes nada a Francisco. Al final, un mensaje corto: qué instrucciones has hecho, la
    versión publicada, y qué va a ver distinto en pantalla.
 8. Al terminar cualquier instrucción: actualiza `docs/CONTEXTO-CORTO.md` y `docs/CONTEXTO.md` (o
    el hijo de `docs/contexto/` que toque) **sustituyendo la línea vieja, no añadiendo una debajo**.
    Si algo deja de ser verdad, se borra.
 9. Añade a `docs/HISTORIA.md` lo que merezca recordarse, con su fecha. No dejes que
-   `docs/CONTEXTO-CORTO.md` pase de 14.000 caracteres.
-10. **Antes de subir nada, vuelve a bajar `main`.** Marcar la fila EN CURSO no basta: otra sesión
-    puede haber fusionado su trabajo mientras tanto, y subir ficheros enteros sin releer pisa lo
-    suyo. Pasó el 16-sep-2026 con las filas 13 y 14, y el 17-sep-2026 con la fila 38 y con
-    `vercel.json` en la fila 48. **Vuelve a bajar `main` justo antes de cada llamada que suba un
-    fichero, no una sola vez al empezar el cierre.**
+   `docs/CONTEXTO-CORTO.md` pase de 40.000 caracteres.
+10. **Antes de subir nada, vuelve a bajar `main`** (`git fetch`): marcar la fila EN CURSO no basta,
+    y subir sin releer pisa lo de otro. Hazlo justo antes de cada subida, no una sola vez al empezar.
 11. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
     contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se
     quedó en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más, y hubo que recuperarlo
     del historial de git. Después de subir, vuelve a bajar lo subido y compruébalo.
-12. **Algunas sesiones no pueden subir un fichero de más de unos 45-50 KB de una sola vez**: la
-    llamada que sube el contenido se corta sola sin avisar de ningún error, y el fichero queda en
-    `main` con solo el primer trozo. Pasó el 17-sep-2026 con `docs/HISTORIA.md`. **Antes de subir
-    un fichero grande** (`docs/CONTEXTO.md`, `docs/HISTORIA.md`), compruébalo después de subirlo
-    (`get_file_contents` o `git show origin/main:<ruta>`) y compara el tamaño con el de antes: si
-    ha quedado más corto de lo esperado, esa sesión no puede con ese fichero de una vez, y hay que
-    dejarlo apuntado aquí en vez de reintentarlo mil veces.
+12. **Subida de ficheros** (7-oct-2026, fila 301): ver `CLAUDE.md`, punto 3 de «Trabajar en la rama
+    de la fila». Nunca se suben ficheros de código con las herramientas de ficheros de GitHub
+    (`create_or_update_file`, `push_files`); si git no puede subir, la fila queda EN CURSO y se dice.
+    Las reglas 14, 15, 17 y 18, que explicaban cómo subir con ellas, se han retirado.
+
 13. **El reparto de las subidas** (30-sep-2026, fila 242, `docs/REVISOR-EN-LOCAL.md`). Cada push a
     `main` con código le cuesta una publicación a Vercel, y el plan gratuito solo da 100 al día,
     de toda la cuenta. **Una sola publicación de código por fila**: la fusión de su rama
@@ -94,31 +89,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     Las subidas de solo `docs/` (marca EN CURSO, estimaciones, HECHA) van directas a `main` y no
     publican nada. Nada de un commit por fichero. Ver `docs/NO-GASTAR-PUBLICACIONES.md`.
 
-14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
-    subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
-    17-sep-2026 esto dejó `docs/COLA.md` en 35 bytes con el comando sin ejecutar. El contenido
-    tiene que ir escrito entero, de verdad, en el propio parámetro.
-15. **`push_files` con muchos ficheros grandes en una sola llamada es donde más falla el volcado
-    del contenido.** El 20-sep-2026, en la fila 77, una llamada de doce ficheros dejó seis con la
-    palabra `PLACEHOLDER` en vez del contenido, y `js/nucleo.js` con `PLACEHOLDER` es la
-    aplicación entera sin arrancar, publicada. Para una fila con más de cuatro o cinco ficheros de
-    código, súbelos con `create_or_update_file` uno a uno (o en dos o tres llamadas de
-    `push_files` más pequeñas), comprobando el tamaño de cada uno nada más subirlo.
 16. **Si delegas una fila de documentación en una sesión auxiliar**, pídele explícitamente que lea
     el fichero entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El
     19-sep-2026 una sesión auxiliar retipeó tres ficheros de memoria e introdujo erratas en los
     tres (`docs/COLA.md`, `docs/contexto/ASUNTOS.md`, `docs/HISTORIA.md`).
-17. **Sin `git push` ni acceso a `api.github.com`** (algunas sesiones, por la política de red de su
-    entorno): todo pasa por la herramienta MCP de GitHub, fichero a fichero. `docs/HISTORIA.md` (más
-    de 120 KB) ya no se puede reconstruir con fiabilidad en una sola sesión así: en vez de
-    arriesgarse a truncarlo (regla 12), esa sesión deja el texto de la entrada ya escrito, listo
-    para pegar, en una nota al final de este documento, para que una sesión con `git push` de
-    verdad lo incorpore. Pasó con la fila 93 (23-sep-2026).
-18. **Nunca pases el mensaje del commit como contenido del fichero.** El 23-sep-2026, al marcar la
-    fila 103 EN CURSO, una llamada a `create_or_update_file` dejó por error el texto del mensaje
-    de commit en el parámetro `content`, y `docs/COLA.md` se quedó en 83 bytes. Antes de cada
-    llamada, comprueba que `content` es el documento entero y `message` es la frase del commit:
-    son dos parámetros distintos, nunca el mismo texto.
 19. **Una fila solo es HECHA con las dos cosas** (fila 242, `docs/REVISOR-EN-LOCAL.md`, sección 2):
     (1) su commit está en `main` (`git merge-base --is-ancestor <sha-de-la-fila> origin/main`, o
     que aparezca en el historial de `main`); sin esto, nunca HECHA, lo diga la web o no; y (2)
@@ -213,11 +187,6 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 - (2-oct-2026, fila 260) Ese día se mezclaron en el Dropbox del centro los cambios hechos en casa sobre la copia de Drive con los del centro: revisar con Francisco, en el centro, las fichas sin carpeta, los ficheros en conflicto y los números de asunto `A26-…` repetidos (en casa se creó al menos un asunto ese día). Trabajar desde casa directamente contra el Dropbox del centro: `docs/PENDIENTES-DE-DISENAR.md`, punto 2, sin diseñar.
 - (varias fechas) Notas viejas sobre pruebas que fallan en `main` y el botón de soporte: movidas sin tocar a `docs/HISTORIA.md` (sección «Notas movidas de `docs/COLA.md` el 7-oct-2026»).
 
-- Fila 223: `.claude/settings.json` sigue sin poder crearlo ninguna sesión de Claude Code (lo
-  deniega el propio clasificador, «Self-Modification»); hace falta que Francisco lo cree a mano,
-  con el contenido de la sección 5 de `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
-- `docs/CONTEXTO-CORTO.md` sigue por encima de los 14.000 caracteres; hace falta una sesión aparte
-  que lo compacte de verdad.
 - Vercel: el tope diario de despliegues es de toda la cuenta, no solo de este proyecto; Francisco
   decide si separa cuentas, cambia de plan, o coordina cuándo se trabaja cada cola.
 - Del 21-sep-2026: buscador de normativa por texto para rellenar solo la clave de un paso — sigue

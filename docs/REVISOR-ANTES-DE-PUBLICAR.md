@@ -38,27 +38,10 @@ Vale para este proyecto; cuando lleve una semana funcionando, Francisco lo exten
   revisor no lo pasa; al marcar la fila HECHA se copia a `docs/COMPROBAR-A-MANO.md`, y en el
   mensaje final a Francisco se le dice en una línea. Son los únicos puntos que le llegan a él.
 
-## 2. La rama `pruebas` y el paso a `main`
+## 2. La rama y el paso a `main`
 
-- **`main` es producción y solo recibe lo que el revisor ha aprobado.** Ninguna sesión sube
-  código a `main` directamente. Esto sustituye a la norma «Subir directamente a `main`» de
-  `CLAUDE.md` (28-sep-2026, por la mañana): Francisco la cambió esa misma tarde al ver que los
-  fallos le salían en producción.
-- Al empezar una fila: nivelar `pruebas` con `main` (`git fetch`, `git push --force origin
-  main:pruebas`, o en una sesión sin `git push`: una petición de cambios de `main` a `pruebas`
-  fusionada al momento con `merge_pull_request`). Después, todo el trabajo de la fila se sube a
-  `pruebas`. Vercel publica la *preview* sola; comprobar con `curl` que `pruebas.fmargon.com` (o
-  la dirección automática) sirve la `App.VERSION` nueva antes de llamar al revisor.
-- Con la aprobación: `pruebas` pasa a `main` (`git push origin pruebas:main` si es avance
-  limpio; si no, fusión y subida; sin `git push`, petición de cambios `pruebas` → `main`
-  fusionada al momento). Comprobar producción por `curl` como siempre (regla general de
-  publicación de `CLAUDE.md`) y marcar HECHA.
-- Las subidas que solo tocan `docs/` (marcar EN CURSO, estimaciones, HECHA) siguen yendo a
-  `main` directamente: no publican nada (`scripts/vercel-ignore-build.sh`) y la página de estado
-  de Francisco lee `main`. Publicaciones de Vercel por fila: como mucho tres (una o dos a
-  `pruebas`, una a `main`).
-- La rama `pruebas` no se borra nunca; se nivela al empezar cada fila. Si una fila queda DEVUELTA
-  (sección 4), `pruebas` se queda con su trabajo hasta el siguiente lanzamiento.
+Ver `CLAUDE.md`, apartado «Trabajar en la rama de la fila; a `main` solo con el revisor», y
+`docs/REVISOR-EN-LOCAL.md`.
 
 ## 3. El revisor
 
@@ -69,8 +52,8 @@ Vale para este proyecto; cuando lleve una semana funcionando, Francisco lo exten
   quiere Francisco (sección «Qué quiere Francisco» o equivalente). **No recibe el código, ni el
   diff, ni el resto de la instrucción, ni lo que la sesión opina de su propio trabajo.** Si lo
   ha visto, no es un revisor.
-- Trabaja con Playwright y Chromium real contra la dirección publicada (no contra ficheros
-  locales): entra con `?demo=1`, y pasa cada punto de la lista tal como está escrito. Además,
+- Trabaja con Playwright y Chromium real contra el servidor local de la rama de la fila
+  (`docs/REVISOR-EN-LOCAL.md`): entra con `?demo=1&auto=1`, y pasa cada punto de la lista tal como está escrito. Además,
   siempre, tres comprobaciones fijas: (a) la consola del navegador sin errores al entrar y en
   cada pantalla que abra; (b) Inicio, Nuevo asunto, Archivo, Personas y empresas, Ajustes y
   Herramientas abren; (c) crear un asunto, abrir su ficha y archivarlo funciona.
@@ -83,17 +66,17 @@ Vale para este proyecto; cuando lleve una semana funcionando, Francisco lo exten
 
 ## 4. Qué pasa con el resultado
 
-- **APROBADA**: paso a `main` (sección 2), producción comprobada, fila HECHA. En la nota de la fila:
+- **APROBADA**: paso a `main` (`CLAUDE.md`), producción comprobada, fila HECHA. En la nota de la fila:
   «Revisor: APROBADA (N puntos, M solo Francisco)». En `docs/HISTORIA.md`, el informe entero.
 - **RECHAZADA, primera vez**: la sesión arregla lo que dice el informe (solo eso), sube a
-  `pruebas` una vez más, comprueba la *preview* por `curl` y vuelve a lanzar el revisor **desde
+  su rama `fila-<nº>` una vez más y vuelve a lanzar el revisor **desde
   cero** (agente nuevo, mismo guion, sin contarle qué se arregló).
 - **RECHAZADA, segunda vez**: la fila pasa a **DEVUELTA (fecha hora): <puntos que fallan, en
   una línea cada uno>**. `main` no se toca. La sesión para, con un mensaje final que empieza por
   «DEVUELTA:» y dice qué falla en palabras de usuario. Nada de un tercer intento en la misma
   sesión: es la forma de que un fallo que la sesión no sabe arreglar no se coma la cuota.
 - **El siguiente lanzamiento coge primero las filas DEVUELTA** (antes que cualquier PENDIENTE):
-  parte de la rama `pruebas` tal como quedó, arregla lo apuntado, y sigue el mismo camino
+  parte de su rama `fila-<nº>` tal como quedó, arregla lo apuntado, y sigue el mismo camino
   (revisor, dos intentos). Una fila DEVUELTA dos lanzamientos seguidos pasa a **BLOQUEADA** con
   el informe, y se queda para que Francisco la lleve a una conversación de diseño.
 - DEVUELTA entra en la lista de estados de la cabecera de `docs/COLA.md`. La página «Centro de
@@ -126,7 +109,7 @@ sobre qué tarea se está ejecutando. Dos reglas, las dos obligatorias:
 - **Cada fila se trabaja en una conversación de Claude Code nueva.** Una conversación = una fila.
   Al terminar (HECHA, DEVUELTA, BLOQUEADA o SIN PUBLICACIÓN COMPROBADA), la conversación se acaba;
   la siguiente fila es otra conversación, no la misma con `/clear`. Si una sesión ve que la fila
-  que le toca es DEVUELTA, también la coge en conversación nueva: parte de la rama `pruebas` y del
+  que le toca es DEVUELTA, también la coge en conversación nueva: parte de la rama `fila-<nº>` y del
   informe apuntado en la fila, no de la memoria de la sesión anterior.
 - **La marca EN CURSO lleva el enlace a la conversación**, igual que ya lo lleva EN DISEÑO. Formato
   exacto, en la columna de estado: `EN CURSO (28-sep-2026 16:10) · conversación:
@@ -135,7 +118,7 @@ sobre qué tarea se está ejecutando. Dos reglas, las dos obligatorias:
   inventa uno. Al pasar a HECHA o DEVUELTA, el enlace se queda en la nota de la fila, para que
   el Centro de mando pueda abrir la conversación que hizo el trabajo. Una fila EN CURSO **sin**
   enlace se considera abandonada por otra sesión a los 90 minutos de su hora, y el siguiente
-  lanzamiento la retoma (mirando qué quedó en `pruebas`, no en `main`).
+  lanzamiento la retoma (mirando qué quedó en su rama `fila-<nº>`, no en `main`).
 
 Esto entra también en la regla 2 de `docs/COLA.md` y en el bloque «Una sola sesión y una sola
 fila» de `CLAUDE.md` (sección 6).

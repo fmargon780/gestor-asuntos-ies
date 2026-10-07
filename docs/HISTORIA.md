@@ -4615,3 +4615,269 @@ Los avisos de fallo de Ajustes pasan de secciones plegables a tarjetas de la pes
 ## Fila 297 (7-oct-2026): la pregunta de la biblioteca al guardar una guía
 
 Aviso de Diego Herrera (7-oct-2026, copia sin internet): «contesto solo aquí o también en la biblioteca, pero no se sale de la ventana de diálogo». Causa confirmada: `revisarAlGuardar` preguntaba por cada hito de la biblioteca distinto de su modelo, lo hubiera tocado o no, una ventana tras otra, con el mismo título y sin decir de qué hito hablaba. Ahora solo pregunta por lo cambiado esta vez, dice el hito, enseña «Antes · Ahora» (y «En la biblioteca» si difiere), tiene «Cancelar» · «Solo aquí» · «También en la biblioteca» (sube solo los campos cambiados, `HitosBiblioteca.subirCampos`) y no escribe nada hasta la última; cancelar vuelve a «Cambiar la guía» con lo escrito. Otra causa, encontrada al probar: el propio cuadro de la guía, al leerse con `recoger()`, deja la «Plantilla del aviso» con la del desplegable («Aviso de avance») aunque «avisar a quien lo pide» esté apagado, y esa plantilla nunca se guarda en el modelo (`pasoAModelo` no la lleva): por eso salía «Plantilla del aviso: Aviso de avance / (vacío)» en hitos que nadie había tocado. Se arregla comparando ambos lados normalizados con `Guias.normalizar` (que vacía la plantilla si el aviso está apagado) y con la foto tomada tras la primera lectura. De dónde salen las diferencias que nadie escribió a mano (sin corregirlas aquí; lo más probable): de la carga de las guías del instituto («Traer los guiones del instituto») y de cualquier guía guardada antes de esa normalización; el aviso a quien lo pide (`avisarLoPide`, `avisarLoPidePlantilla`) está en `CAMPOS_COMPARABLES` pero el modelo de la biblioteca no lo guarda, así que un hito con ese aviso encendido sale siempre distinto. «Pantalla: Inicio» del aviso (apartado 3): `nombrePantalla` (`js/soporte.js`) mira `.pantalla:not(.oculto)`; con la ficha de un asunto, con un hito a pantalla completa (la mesa vive dentro de `#pantalla-asunto`) y con un cuadro encima dice «Ficha de un asunto» en los tres casos: acierta, no se toca (la captura era de las 9:52 y el aviso de las 9:56; lo probable es que Diego ya estuviera en Inicio al enviarlo).
+
+
+## Fila 301 (7-oct-2026): qué se borró y dónde
+
+Texto viejo quitado o sustituido al poner de acuerdo las reglas (texto nuevo entre paréntesis solo cuando sustituye). El tope de `docs/CONTEXTO-CORTO.md` pasó de 14.000 a 40.000 caracteres (el fichero mide unos 39.500 y no se recortó). La nota de `.claude/settings.json` sobraba: el fichero está en `main`.
+
+### docs/COLA.md
+
+Antes:
+
+```
+Si ya está hecha, márcala **HECHA** con una nota y pasa a
+   la siguiente.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
+   sigue con la siguiente. Nunca dejes
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+Si encuentras una instrucción **EN CURSO** de otra sesión y no eres tú quien la empezó,
+   sáltala y coge la siguiente PENDIENTE.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+No dejes que
+   `docs/CONTEXTO-CORTO.md` pase de 14.000 caracteres.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+10. **Antes de subir nada, vuelve a bajar `main`.** Marcar la fila EN CURSO no basta: otra sesión
+    puede haber fusionado su trabajo mientras tanto, y subir ficheros enteros sin releer pisa lo
+    suyo. Pasó el 16-sep-2026 con las filas 13 y 14, y el 17-sep-2026 con la fila 38 y con
+    `vercel.json` en la fila 48. **Vuelve a bajar `main` justo antes de cada llamada que suba un
+    fichero, no una sola vez al empezar el cierre.**
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+12. **Algunas sesiones no pueden subir un fichero de más de unos 45-50 KB de una sola vez**: la
+    llamada que sube el contenido se corta sola sin avisar de ningún error, y el fichero queda en
+    `main` con solo el primer trozo. Pasó el 17-sep-2026 con `docs/HISTORIA.md`. **Antes de subir
+    un fichero grande** (`docs/CONTEXTO.md`, `docs/HISTORIA.md`), compruébalo después de subirlo
+    (`get_file_contents` o `git show origin/main:<ruta>`) y compara el tamaño con el de antes: si
+    ha quedado más corto de lo esperado, esa sesión no puede con ese fichero de una vez, y hay que
+    dejarlo apuntado aquí en vez de reintentarlo mil veces.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
+    subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
+    17-sep-2026 esto dejó `docs/COLA.md` en 35 bytes con el comando sin ejecutar. El contenido
+    tiene que ir escrito entero, de verdad, en el propio parámetro.
+15. **`push_files` con muchos ficheros grandes en una sola llamada es donde más falla el volcado
+    del contenido.** El 20-sep-2026, en la fila 77, una llamada de doce ficheros dejó seis con la
+    palabra `PLACEHOLDER` en vez del contenido, y `js/nucleo.js` con `PLACEHOLDER` es la
+    aplicación entera sin arrancar, publicada. Para una fila con más de cuatro o cinco ficheros de
+    código, súbelos con `create_or_update_file` uno a uno (o en dos o tres llamadas de
+    `push_files` más pequeñas), comprobando el tamaño de cada uno nada más subirlo.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+17. **Sin `git push` ni acceso a `api.github.com`** (algunas sesiones, por la política de red de su
+    entorno): todo pasa por la herramienta MCP de GitHub, fichero a fichero. `docs/HISTORIA.md` (más
+    de 120 KB) ya no se puede reconstruir con fiabilidad en una sola sesión así: en vez de
+    arriesgarse a truncarlo (regla 12), esa sesión deja el texto de la entrada ya escrito, listo
+    para pegar, en una nota al final de este documento, para que una sesión con `git push` de
+    verdad lo incorpore. Pasó con la fila 93 (23-sep-2026).
+18. **Nunca pases el mensaje del commit como contenido del fichero.** El 23-sep-2026, al marcar la
+    fila 103 EN CURSO, una llamada a `create_or_update_file` dejó por error el texto del mensaje
+    de commit en el parámetro `content`, y `docs/COLA.md` se quedó en 83 bytes. Antes de cada
+    llamada, comprueba que `content` es el documento entero y `message` es la frase del commit:
+    son dos parámetros distintos, nunca el mismo texto.
+```
+
+### docs/COLA.md
+
+Antes:
+
+```
+- Fila 223: `.claude/settings.json` sigue sin poder crearlo ninguna sesión de Claude Code (lo
+  deniega el propio clasificador, «Self-Modification»); hace falta que Francisco lo cree a mano,
+  con el contenido de la sección 5 de `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+- `docs/CONTEXTO-CORTO.md` sigue por encima de los 14.000 caracteres; hace falta una sesión aparte
+  que lo compacte de verdad.
+```
+
+### docs/CONTEXTO-CORTO.md
+
+Antes:
+
+```
+**Máximo 14.000 caracteres** (fila 65, 19-sep-2026:
+antes el tope era de líneas, y se esquivaba escribiendo párrafos enteros en una sola línea)
+```
+
+### docs/CONTEXTO-CORTO.md
+
+Antes:
+
+```
+- No dejar que este documento pase de 14.000 caracteres.
+```
+
+### docs/CONTEXTO-CORTO.md
+
+Antes:
+
+```
+- **Permiso permanente de Francisco**: una petición de cambios hacia `pruebas`, o hacia `main` tras
+  la aprobación del revisor, la fusiona Claude Code solo, sin esperar a nadie
+  (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223).
+```
+
+### docs/AHORRO-CUOTA.md
+
+Antes:
+
+```
+- **Sube el código a la rama `pruebas`; a `main` solo llega tras la aprobación del revisor**
+  (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223). No dejes una pull request abierta.
+  **Excepción**: si el propio entorno de ejecución (por ejemplo, Claude Code en la nube) obliga a
+  trabajar en una rama `claude/...` y a abrir pull request, ábrela contra `pruebas` (o contra
+  `main`, ya aprobada por el revisor) y fusiónala tú mismo al momento; dilo claro en el mensaje
+  final si algo se queda a medias.
+```
+
+### docs/AHORRO-CUOTA.md
+
+Antes:
+
+```
+- `CONTEXTO-CORTO.md` no pasa nunca de 160 líneas.
+```
+
+### docs/REPARTO-DE-LA-COLA-2026-09-27.md
+
+Antes:
+
+```
+- **Sube a `pruebas`, y a `main` solo con el revisor** (28-sep-2026,
+  `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223: sustituye el «sube directamente a `main`» de
+  cuando se escribió este reparto). Sin pull request abierta: si el entorno obliga a una, se
+  fusiona al momento.
+- **Como mucho tres subidas por fila**: una a `main` para marcar EN CURSO; una a `pruebas` con
+  todo el código y todas las pruebas juntas; y, con la aprobación del revisor, una de `pruebas` a
+  `main` con la documentación y la marca HECHA. Nada de una subida por fichero. Si la sesión no
+  tiene `git push` y solo puede subir con la herramienta de GitHub, usa `push_files` con todos los
+  ficheros de código y pruebas en una sola llamada (o en dos si son muchos), nunca uno a uno.
+```
+
+### docs/REPARTO-DE-LA-COLA-2026-09-27.md
+
+Antes:
+
+```
+4. Si al empezar hay una fila EN CURSO, la sesión **no coge otra**: comprueba en qué estado quedó
+   esa (qué hay ya en `main`) y la termina ella. Nunca hay dos filas EN CURSO.
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+## 2. La rama `pruebas` y el paso a `main`
+
+- **`main` es producción y solo recibe lo que el revisor ha aprobado.** Ninguna sesión sube
+  código a `main` directamente. Esto sustituye a la norma «Subir directamente a `main`» de
+  `CLAUDE.md` (28-sep-2026, por la mañana): Francisco la cambió esa misma tarde al ver que los
+  fallos le salían en producción.
+- Al empezar una fila: nivelar `pruebas` con `main` (`git fetch`, `git push --force origin
+  main:pruebas`, o en una sesión sin `git push`: una petición de cambios de `main` a `pruebas`
+  fusionada al momento con `merge_pull_request`). Después, todo el trabajo de la fila se sube a
+  `pruebas`. Vercel publica la *preview* sola; comprobar con `curl` que `pruebas.fmargon.com` (o
+  la dirección automática) sirve la `App.VERSION` nueva antes de llamar al revisor.
+- Con la aprobación: `pruebas` pasa a `main` (`git push origin pruebas:main` si es avance
+  limpio; si no, fusión y subida; sin `git push`, petición de cambios `pruebas` → `main`
+  fusionada al momento). Comprobar producción por `curl` como siempre (regla general de
+  publicación de `CLAUDE.md`) y marcar HECHA.
+- Las subidas que solo tocan `docs/` (marcar EN CURSO, estimaciones, HECHA) siguen yendo a
+  `main` directamente: no publican nada (`scripts/vercel-ignore-build.sh`) y la página de estado
+  de Francisco lee `main`. Publicaciones de Vercel por fila: como mucho tres (una o dos a
+  `pruebas`, una a `main`).
+- La rama `pruebas` no se borra nunca; se nivela al empezar cada fila. Si una fila queda DEVUELTA
+  (sección 4), `pruebas` se queda con su trabajo hasta el siguiente lanzamiento.
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+contra la dirección publicada (no contra ficheros
+  locales): entra con `?demo=1`,
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+paso a `main` (sección 2), producción comprobada
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+sube a
+  `pruebas` una vez más, comprueba la *preview* por `curl` y vuelve a lanzar
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+parte de la rama `pruebas` tal como quedó,
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+parte de la rama `pruebas` y del
+  informe
+```
+
+### docs/REVISOR-ANTES-DE-PUBLICAR.md
+
+Antes:
+
+```
+(mirando qué quedó en `pruebas`, no en `main`)
+```

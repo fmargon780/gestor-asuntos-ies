@@ -2,8 +2,8 @@
 
 Se lee en toda conversación y en cada sesión de Claude Code. Es para **decidir**, no para
 programar: para eso está `docs/CONTEXTO.md` y sus hijos en `docs/contexto/`. El porqué de las
-cosas y el diario están en `docs/HISTORIA.md`. **Máximo 14.000 caracteres** (fila 65, 19-sep-2026:
-antes el tope era de líneas, y se esquivaba escribiendo párrafos enteros en una sola línea).
+cosas y el diario están en `docs/HISTORIA.md`. **Máximo 40.000 caracteres** (regla 9 de `docs/COLA.md`; fila 301, 7-oct-2026:
+antes 14.000, que ya no se cumplía).
 
 ## 0. La regla que no se puede olvidar
 
@@ -12,7 +12,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - Actualizar este documento y `docs/CONTEXTO.md` (o el hijo de `docs/contexto/` que toque)
   **sustituyendo la línea vieja, no añadiendo una debajo**. Si algo deja de ser verdad, se borra.
 - Añadir a `docs/HISTORIA.md` lo que merezca recordarse, con su fecha.
-- No dejar que este documento pase de 14.000 caracteres. La sección 5 es una línea por cosa, sin
+- No dejar que este documento pase de 40.000 caracteres. La sección 5 es una línea por cosa, sin
   números de fila ni fechas: el detalle vive en `HISTORIA.md` y en el documento de cada fila.
 
 ## 1. Lo básico
@@ -246,9 +246,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Todo código nuevo que escriba en las carpetas **de fondo** (sin que lo pida un botón) mira antes `SoloConsulta.activo()` y se salta (fila 260).
 - El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`) y pone
   sola la hora de la versión al publicar; la de `js/version.js` (hora real) es la de la copia sin internet.
-- **Permiso permanente de Francisco**: una petición de cambios hacia `pruebas`, o hacia `main` tras
-  la aprobación del revisor, la fusiona Claude Code solo, sin esperar a nadie
-  (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223).
+- **Permiso permanente de Francisco**: una petición de cambios hacia `main` tras la aprobación del
+  revisor la fusiona Claude Code solo, sin esperar a nadie (`CLAUDE.md`, rama de la fila).
 - **Una fila es HECHA solo con las dos cosas** (fila 242): su commit está en `main` (`git merge-base --is-ancestor`) y Vercel lo ha publicado (`curl` a `js/version.js`, estado «Vercel» del commit o `list_deployments`).
 - Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; una sola publicación de código por fila (la de `main`, tras el revisor en local).
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.

@@ -17,12 +17,8 @@ Francisco paga la cuota y se le agotó el 97% en tres días. Estas reglas no son
 
 ## Al escribir
 
-- **Sube el código a la rama `pruebas`; a `main` solo llega tras la aprobación del revisor**
-  (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223). No dejes una pull request abierta.
-  **Excepción**: si el propio entorno de ejecución (por ejemplo, Claude Code en la nube) obliga a
-  trabajar en una rama `claude/...` y a abrir pull request, ábrela contra `pruebas` (o contra
-  `main`, ya aprobada por el revisor) y fusiónala tú mismo al momento; dilo claro en el mensaje
-  final si algo se queda a medias.
+- **Dónde se sube el trabajo:** ver `CLAUDE.md`, apartado «Trabajar en la rama de la fila; a `main`
+  solo con el revisor».
 - **Cambios quirúrgicos.** No reescribas un fichero entero para cambiar unas líneas.
   La regla de "fichero entero, siempre" es para lo que se le enseña a Francisco, no para ti.
 - **Si tienes que tocar un fichero que pasa de unas 400 líneas, pártelo** en dos, por módulos.
@@ -34,7 +30,7 @@ Francisco paga la cuota y se le agotó el 97% en tres días. Estas reglas no son
 - `CONTEXTO-CORTO.md` y `CONTEXTO.md` se mantienen **sustituyendo la línea vieja, nunca
   añadiendo una debajo**. Si algo deja de ser verdad, se borra.
 - El relato con fecha va a `HISTORIA.md`.
-- `CONTEXTO-CORTO.md` no pasa nunca de 160 líneas.
+- `CONTEXTO-CORTO.md` no pasa del tope de la regla 9 de `docs/COLA.md` (40.000 caracteres).
 
 ## Al comprobar
 

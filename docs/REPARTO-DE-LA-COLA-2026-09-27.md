@@ -23,22 +23,17 @@ de las filas 179 a 187**: dice qué trozo de cada uno se hace en cada fila nueva
 3. **Cada vez que se lanza, se hace una sola fila**: la primera PENDIENTE. Al terminarla (publicada
    y comprobada, como dice `CLAUDE.md`), la sesión **para** y se lo cuenta a Francisco. La
    siguiente fila empieza solo cuando él vuelve a lanzar.
-4. Si al empezar hay una fila EN CURSO, la sesión **no coge otra**: comprueba en qué estado quedó
-   esa (qué hay ya en `main`) y la termina ella. Nunca hay dos filas EN CURSO.
+4. Si al empezar hay una fila EN CURSO: regla 0 de `docs/COLA.md` (la coge otra solo si está
+   abandonada). Nunca hay dos filas EN CURSO.
 
 ## Cláusulas que valen para todas las filas de la 188 en adelante
 
 Aunque el documento de la fila no las diga:
 
-- **Sube a `pruebas`, y a `main` solo con el revisor** (28-sep-2026,
-  `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223: sustituye el «sube directamente a `main`» de
-  cuando se escribió este reparto). Sin pull request abierta: si el entorno obliga a una, se
-  fusiona al momento.
-- **Como mucho tres subidas por fila**: una a `main` para marcar EN CURSO; una a `pruebas` con
-  todo el código y todas las pruebas juntas; y, con la aprobación del revisor, una de `pruebas` a
-  `main` con la documentación y la marca HECHA. Nada de una subida por fichero. Si la sesión no
-  tiene `git push` y solo puede subir con la herramienta de GitHub, usa `push_files` con todos los
-  ficheros de código y pruebas en una sola llamada (o en dos si son muchos), nunca uno a uno.
+- **Dónde y cómo se sube el trabajo** (rama `fila-<nº>`, `main` solo con el revisor, nunca ficheros
+  de código uno a uno con las herramientas de GitHub): ver `CLAUDE.md`, apartado «Trabajar en la
+  rama de la fila; a `main` solo con el revisor». Como mucho tres subidas por fila: marca EN CURSO
+  (solo `docs/`), el código con sus pruebas, y la marca HECHA.
 - **Nada se sube hasta que `npm test` entero está en verde en local.** Subir la mitad y seguir
   trabajando está prohibido: la web publica cada subida.
 - **No leas el repositorio entero.** Solo los ficheros de la lista, y `grep` para lo demás.
