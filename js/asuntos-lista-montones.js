@@ -82,7 +82,7 @@ App.irVista = function (cual, soloQue) {
   }
 
   if (esClasificar) {
-    App.E.soloQueClasificar = (soloQue === 'correos' || soloQue === 'documentos') ? soloQue : '';
+    App.E.soloQueClasificar = (soloQue === 'correos' || soloQue === 'documentos' || soloQue === 'encargos') ? soloQue : '';
     App.pintarSoloQueClasificar();
     /* La bandeja de correos arranca siempre plegada al entrar aquí, se
        dejara como se dejara la última vez (fila 27, 17-sep-2026): sin
@@ -106,11 +106,13 @@ App.pintarSoloQueClasificar = function () {
   var enlace = $('sueltos-ver-tambien');
   if (!zona || !enlace) return;
   var cual = App.E.soloQueClasificar || '';
+  if (window.EncargosLlegada) EncargosLlegada.pintar();   /* fila 289 */
+  zona.classList.toggle('solo-encargos', cual === 'encargos');
   zona.classList.toggle('solo-correos', cual === 'correos');
   zona.classList.toggle('solo-documentos', cual === 'documentos');
   enlace.classList.toggle('oculto', !cual);
   if (!cual) return;
-  enlace.textContent = cual === 'correos' ? 'Ver también los documentos' : 'Ver también los correos';
+  enlace.textContent = cual === 'correos' ? 'Ver también los documentos' : (cual === 'encargos' ? 'Ver también los correos y los documentos' : 'Ver también los correos');
   enlace.onclick = function () { App.irVista('clasificar'); };
 };
 

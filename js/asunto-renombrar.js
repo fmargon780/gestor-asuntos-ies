@@ -91,6 +91,7 @@ var AsuntoRenombrar = (function () {
       }
     });
 
+    if (window.Encargos) await Encargos.alMoverAsunto(claveVieja, claveNueva);   /* fila 289: el nombre guardado en sus encargos */
     var nota = await moverHitosYPresencia(claveVieja, claveNueva);
     if (nota && window.Notas) {
       try { await Notas.anadirAuto({ nombre: claveNueva }, nota); } catch (e) { /* no crítico */ }
@@ -103,6 +104,7 @@ var AsuntoRenombrar = (function () {
      de esa pantalla); aquí solo se mueven hitos y presencia de
      'seVa' a 'seQueda'. */
   async function fusionar(claveQueda, claveVa) {
+    if (window.Encargos) await Encargos.alMoverAsunto(claveVa, claveQueda);   /* fila 289 */
     return moverHitosYPresencia(claveVa, claveQueda);
   }
 

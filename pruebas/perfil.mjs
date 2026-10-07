@@ -124,7 +124,7 @@ pagina = await entrar('Jefa de estudios de prueba');
 const escrituras = () => pagina.evaluate(() => Demo.escrituras());
 await comprobar('3. la línea fija de arriba', pagina.locator('#franja-perfil').textContent(), 'Entras como Jefatura de Estudios. Ves los asuntos de tu órgano.');
 await comprobar('3. sin la franja de «solo consultar»', pagina.locator('#franja-solo-consulta').count(), 0);
-await comprobar('3. el menú, solo Inicio y Archivo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Archivo']);
+await comprobar('3. el menú, solo Inicio y Archivo (y, desde la fila 289, sus dos entradas de encargos)', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo encargo', 'Mis encargos', 'Archivo']);
 await comprobar('3. sin tablón, ni «Ha llegado», ni avisos, ni «+ Nuevo asunto», ni las otras pestañas',
   Promise.all([visibles(pagina, '#btn-nuevo-asunto, #tablon, #inicio-ha-llegado-linea, #avisos-linea, #inicio-fila-superior'), visibles(pagina, '.inicio-pestana')]), [0, 1]);
 await comprobar('3. una sola lista, solo asuntos de Jefatura (MATRICULA), con el reservado', filas(pagina).then((f) => [f.length, f.every((n) => /MATRICULA/.test(n))]), [3, true]);

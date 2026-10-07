@@ -83,7 +83,7 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 console.log('--- 1. el menú lateral ---');
 
 await comprobar('el orden de las pestañas',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.lateral .pestana[data-pantalla]')).map(b => b.dataset.pantalla)),
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.lateral .pestana[data-pantalla]')).filter(b => b.offsetParent !== null).map(b => b.dataset.pantalla)),
   ['abiertos', 'nuevo', 'archivo', 'personas', 'formularios', 'cuentas', 'herramientas', 'ajustes']);
 await comprobar('"Herramientas" se llama así', pagina.locator('.pestana[data-pantalla="herramientas"]').textContent(), 'Herramientas');
 

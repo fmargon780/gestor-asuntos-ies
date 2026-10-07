@@ -38,10 +38,13 @@
     await o.crearAsunto(tipos.MATRICULA, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Lara Quintero, Bruno', id: '2100013' }), o.hace(8), {
       abiertoEl: o.hace(8) + 'T09:00:00.000Z', datos: { reservado: true }
     });
-    await o.archivar(tipos.MATRICULA, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Klein Soto, Ana', id: '2100012' }), o.hace(30), true);
+    var archivadoJefatura = await o.archivar(tipos.MATRICULA, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Klein Soto, Ana', id: '2100012' }), o.hace(30), true);
     await o.archivar(tipos['BAJA MEDICA'], 'PERSONAL', Nombres.terceroPersonal({ nombre: 'Vidal Cano, Ramón', documento: '44556677D' }), o.hace(15), true);
     await o.archivar(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', Nombres.terceroPersonal({ nombre: 'Uceda Molina, Patricia', documento: '33445566C' }), o.hace(20), true);
     await o.archivar(tipos.FACTURA, 'EMPRESAS', Nombres.terceroEmpresa({ nombre: 'Copistería Central', nif: '99887766X' }), o.hace(25), true);
+
+    /* 4. Los encargos de los directivos (fila 289). */
+    if (window.Demo.encargos) await Demo.encargos.construir(o, { archivadoJefatura: archivadoJefatura });
   }
 
   window.Demo = window.Demo || {};

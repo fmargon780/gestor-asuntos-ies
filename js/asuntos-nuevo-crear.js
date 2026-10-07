@@ -278,6 +278,7 @@ App.crearAsuntoDelFormulario = async function () {
        el nombre que le toca (fila 174, punto 2; encima de la ficha
        nueva), con lo que se haya leído del documento. */
     if (traido && recien) await App.verDocumentos(recien, { ponerNombre: traido.nombre, propuesta: propuestaTraida });
+    if (window.EncargosLlegada && recien) await EncargosLlegada.alTerminarDeCrear(recien);   /* fila 289: los documentos de un encargo */
   } catch (e) {
     U.accesorio('Asunto creado, pero no he podido terminar de poner la pantalla al día. Pulsa Recargar', e);
   }

@@ -57,6 +57,9 @@
       registro.asuntos[seQueda.nombre] = Object.assign({}, fichaQueda, {
         notas: notas, pasosHechos: pasosHechos, pasosElegidos: pasosElegidos
       });
+      /* Fila 289: los encargos de los dos asuntos viajan con la ficha que se queda. */
+      var encargos = App.unirPorIdentidad(fichaQueda.encargos, fichaVa.encargos, App.IDENTIDAD_LISTA.encargos);
+      if (encargos.length) registro.asuntos[seQueda.nombre].encargos = encargos;
       delete registro.asuntos[seVa.nombre];
       /* Fila 176, punto 2: la lápida de "seVa", en la misma operación
          de la cola que borra su clave. */

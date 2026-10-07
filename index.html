@@ -50,6 +50,7 @@
 <link rel="stylesheet" href="css/plantillas-documento.css">
 <link rel="stylesheet" href="css/pdf-separar-unir.css">
 <link rel="stylesheet" href="css/inicio.css">
+<link rel="stylesheet" href="css/encargos.css">
 <link rel="stylesheet" href="css/filas.css">
 <link rel="stylesheet" href="css/cabecera-fija.css">
 <link rel="stylesheet" href="css/comprobacion-entrada.css">
@@ -127,6 +128,8 @@
   <nav class="lateral">
     <div class="marca">Gestor de Asuntos</div>
     <button class="pestana activa" data-pantalla="abiertos"><span>Inicio</span><span class="cuenta" id="cuenta-abiertos"></span><span class="cuenta cuenta-roja oculto" id="cuenta-vencidos-inicio"></span></button>
+    <button class="pestana pestana-encargo" data-pantalla="encargo-nuevo"><span>Nuevo encargo</span></button>
+    <button class="pestana pestana-encargo" data-pantalla="encargos-mios"><span>Mis encargos</span></button>
     <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
     <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
     <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
@@ -339,6 +342,9 @@
              plegada detrás de esta barra y siempre arrancando así (fila 27,
              17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). Los dos
              elementos nacen aquí, ya no los crea JavaScript. -->
+        <!-- Fila 289: los encargos de los directivos, arriba (js/encargos-llegada.js). -->
+        <div id="zona-encargos" class="oculto"></div>
+
         <div id="correos-sin-clasificar" class="oculto">
           <button type="button" id="btn-correos-sin-clasificar" class="boton" aria-expanded="false">
             Correos sin clasificar (<span id="cuenta-correos-sin-clasificar">0</span>)
@@ -1510,6 +1516,10 @@
 <script src="js/hacer-este-hito-sello.js"></script>
 <script src="js/esperas.js"></script>
 <script src="js/perfil-ajustes.js"></script>
+<script src="js/encargos.js"></script>
+<script src="js/encargos-nuevo.js"></script>
+<script src="js/encargos-mios.js"></script>
+<script src="js/encargos-llegada.js"></script>
 <script src="js/dni.js"></script>
 <script src="js/presencia.js"></script>
 <!-- Fila 176, punto 3: el vistazo de 20 s también relee asuntos.json e

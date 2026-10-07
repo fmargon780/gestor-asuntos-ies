@@ -465,6 +465,7 @@ App.empezarAsuntoCon = function (s) {
 
 App.pintarPendiente = function () {
   var caja = $('aviso-pendiente');
+  if (window.EncargosLlegada && EncargosLlegada.avisoDeNuevo(caja)) return;   /* fila 289: viene de un encargo */
   if (!App.E.pendiente) { caja.classList.add('oculto'); caja.innerHTML = ''; return; }
   caja.classList.remove('oculto');
   caja.innerHTML = '<strong>Este asunto se crea con un documento.</strong>' +

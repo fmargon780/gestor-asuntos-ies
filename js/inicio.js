@@ -79,6 +79,11 @@
     }).length;
   }
 
+  /* Fila 289: los encargos de los directivos sin atender. */
+  function contarEncargos(texto) {
+    return window.Encargos ? Encargos.sinAtender().filter(function (e) { return coincideTexto(texto, [e.texto, e.de]); }).length : 0;
+  }
+
   function trozoHaLlegado(n, singular, plural, soloQue, resaltar) {
     if (!n) return null;
     var b = document.createElement('button');
@@ -95,10 +100,11 @@
 
     var nCorreos = contarCorreos(texto);
     var nSueltos = contarSueltos(texto);
+    var nEncargos = contarEncargos(texto);
     var hayNuevos = Object.keys(App.E.reciales || {}).length > 0;
 
     caja.innerHTML = '';
-    if (!nCorreos && !nSueltos) {
+    if (!nCorreos && !nSueltos && !nEncargos) {
       caja.innerHTML = '<span class="inicio-ha-llegado-vacio">No ha llegado nada.</span>';
       /* Si #zona-clasificar está a la vista con un filtro puesto (se ha
          llegado desde uno de los dos enlaces y, mientras tanto, ha
@@ -114,7 +120,8 @@
 
     var trozos = [
       trozoHaLlegado(nCorreos, 'correo', 'correos', 'correos', false),
-      trozoHaLlegado(nSueltos, 'documento por clasificar', 'documentos por clasificar', 'documentos', hayNuevos)
+      trozoHaLlegado(nSueltos, 'documento por clasificar', 'documentos por clasificar', 'documentos', hayNuevos),
+      trozoHaLlegado(nEncargos, 'encargo', 'encargos', 'encargos', true)   /* fila 289: resaltado, solo cuenta los sin atender */
     ].filter(Boolean);
 
     trozos.forEach(function (trozo, i) {

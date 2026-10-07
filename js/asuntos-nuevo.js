@@ -302,7 +302,9 @@ App.elegirTipo = function (t) {
    - fecha va a «Fecha de inicio»; descripcion, a «Descripción corta».
    - viaInicial ({via, viaDato}), a «Lo pide» (punto 4: los asuntos que
      llegan de la bandeja de correo siguen entrando con «Correo
-     electrónico» y la dirección del remitente). */
+     electrónico» y la dirección del remitente).
+   - limite (fecha ISO) va a «Fecha límite» y loPide (el objeto de
+     LoPide.leer) a «Quién lo pide» (fila 289, encargos de directivos). */
 App.nuevoAsuntoCon = function (opciones) {
   opciones = opciones || {};
   var tercero = opciones.tercero || null;
@@ -329,6 +331,8 @@ App.nuevoAsuntoCon = function (opciones) {
   App.actualizarCursoNuevo();
   App.actualizarLimiteNuevo();
   if (opciones.descripcion) $('campo-descripcion').value = opciones.descripcion;
+  if (opciones.limite) $('campo-limite').value = opciones.limite;   /* fila 289: «Para cuándo» de un encargo */
+  App.E.nuevo.loPideInicial = opciones.loPide || null;               /* fila 289: «Quién lo pide» ya relleno */
   App.refrescarVista();
 };
 

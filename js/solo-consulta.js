@@ -191,7 +191,7 @@ window.SoloConsulta = (function () {
   /* Lo que se queda encendido aunque caiga en algo de arriba. */
   var DEJAR = ['#ajustes-solo-consulta', '#franja-solo-consulta-quitar', '#cuadro-cancelar', '#cuadro-aceptar',
     '[data-solo-lectura]', '.ficha-menu-boton', '#ficha-volver', '.boton-volver', '#btn-soporte',
-    '#ajustes-buscar', '.ajustes-resultado', '.ajustes-enlace-salto'].join(',');   /* fila 288: buscar y saltar solo leen */
+    '#ajustes-buscar', '.ajustes-resultado', '.ajustes-enlace-salto', '[data-puerta-perfil]'].join(',');   /* fila 288: buscar y saltar solo leen */
 
   function apagarUno(el) {
     if (el.disabled || el.dataset.guardando || el.matches(DEJAR) || el.closest('#capa, #franja-solo-consulta')) return;
@@ -201,6 +201,7 @@ window.SoloConsulta = (function () {
   }
 
   function apagarControles() {
+    if (!activo()) return;   /* fila 289: ya no hay nada que apagar (la demostración cambia de nombre sin recargar) */
     Array.prototype.forEach.call(document.querySelectorAll(CONCRETOS + ',' + CAJAS), apagarUno);
     /* Los botones de acción de las pantallas normales (la ficha y la mesa se apagan solas: js/ficha-consulta.js). */
     /* Ajustes, el tipo de asunto y Herramientas solo se miran: todos sus botones, menos los que navegan o solo leen. */

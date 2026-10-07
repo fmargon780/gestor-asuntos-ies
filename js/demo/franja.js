@@ -96,6 +96,28 @@
     paso.appendChild(nota);
   }
 
+  /* Fila 289: entrar otra vez con otro nombre SIN recargar (recargar vaciaría el disco de mentira, y los encargos pasan de un
+     nombre a otro). `Demo.entrarComo('Revisor')` vuelve a Administración; con el nombre de un directivo, a su pantalla. */
+  async function entrarComo(nombre) {
+    document.body.classList.add('demo-montando');
+    Perfil._reiniciar();
+    document.body.classList.remove('solo-consulta', 'perfil-directivo');
+    var fp = $('franja-perfil');
+    if (fp) fp.remove();
+    document.documentElement.style.setProperty('--franja-consulta-alto', '0px');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-apagado-por-solo-consulta]'), function (el) {
+      el.disabled = false;
+      el.removeAttribute('data-apagado-por-solo-consulta');
+      el.removeAttribute('title');
+    });
+    $('campo-usuario').value = nombre || 'Revisor';
+    Demo.reiniciarEscrituras();
+    await $('btn-entrar').onclick();
+    document.body.classList.remove('demo-montando');
+    App.ir('abiertos');
+  }
+  window.Demo.entrarComo = entrarComo;
+
   /* ---------- la franja fija ---------- */
 
   function ponerFranja() {

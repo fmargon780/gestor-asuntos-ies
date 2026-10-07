@@ -119,6 +119,7 @@
     /* Los hitos vuelven con el asunto (fila 62,
        docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
     if (ficha.hitos && window.AsuntoRenombrar) await AsuntoRenombrar.restaurar(ficha.nombre, ficha.hitos);
+    if (window.Encargos) await Encargos.alCambiarElAsunto(ficha.nombre, 'recuperar', ficha.datos);   /* fila 289: sus encargos vuelven a «En marcha» */
     await quitarDeIndice(ficha.id);
     return { ok: true };
   }
@@ -144,6 +145,10 @@
     }
     var pap = await I.carpetaPapelera();
     await Carpetas.trasladar(pap, ficha.carpeta, padre, ficha.nombre);
+    if (window.Encargos) {   /* fila 289: su ficha vuelve con la carpeta */
+      try { await Encargos.alCambiarElAsunto(ficha.nombre, 'recuperarArchivado', window.FichaArchivo ? await FichaArchivo.leer(await padre.getDirectoryHandle(ficha.nombre)) : null); }
+      catch (eEnc) { /* los encargos se quedan como estaban */ }
+    }
     var entrada = ficha.datos && ficha.datos.entrada;
     if (entrada && window.IndiceArchivo) {
       try { await IndiceArchivo.anadirEntrada(entrada); }
