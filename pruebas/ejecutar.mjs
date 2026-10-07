@@ -36,24 +36,72 @@ const todasLasPruebas = readdirSync(CARPETA)
   .filter((f) => f.endsWith('.mjs') && f !== 'ejecutar.mjs')
   .sort();
 
+/* Pruebas que comprueban tiempos finos (como mucho una relectura, un aviso que no se repite) y, yendo la
+   máquina a tope de CPU (todos los núcleos ocupados a la vez), alguna tanda fallaba solo por eso, aunque la app
+   estuviera bien (en solitario, en verde). Van aquí para que corran sin competir por CPU, al final, después de
+   todas las demás.
+
+   Reglas (fila 302, 7-oct-2026, docs/PRUEBAS-ROTAS.md):
+   - Cada entrada lleva la fecha en que entró.
+   - TOPE: 20. Si la lista pasa de 20 (o repite un nombre, o falta una fecha), este ejecutor se niega a
+     arrancar y lo dice. Antes de añadir la número 21 hay que arreglar la frágil de verdad (esperar a una
+     condición en vez de una pausa fija) o retirar otra.
+   - Una prueba que falla también EN SOLITARIO no va aquí: se arregla, o va a RETIRADAS. */
+const TOPE_EN_SOLITARIO = 20;
+const EN_SOLITARIO_ENTRADAS = [
+  ['indice-del-expediente.mjs', 'antes del 7-oct-2026'], ['solo-consulta.mjs', 'antes del 7-oct-2026'],
+  ['grupo-enviar.mjs', 'antes del 7-oct-2026'],
+  ['grupo-registro.mjs', 'antes del 7-oct-2026'], ['grupo-generar.mjs', 'antes del 7-oct-2026'],
+  ['documentos-sueltos.mjs', 'antes del 7-oct-2026'], ['ha-llegado-sustituye-la-vista.mjs', 'antes del 7-oct-2026'],
+  ['repintar-solo-lo-que-cambia.mjs', 'antes del 7-oct-2026'], ['hito-desde-por-clasificar.mjs', 'antes del 7-oct-2026'],
+  ['ajustes-por-tipo.mjs', 'antes del 7-oct-2026'], ['mesa-comunicar-del-paso-y-guion.mjs', 'antes del 7-oct-2026'],
+  ['tras-cada-accion.mjs', 'antes del 7-oct-2026'], ['notas-asunto-no-se-borran.mjs', 'antes del 7-oct-2026'],
+  ['refresco.mjs', 'antes del 7-oct-2026'], ['hito-mesa.mjs', 'antes del 7-oct-2026'],
+  ['responsable-organismo.mjs', 'antes del 7-oct-2026'], ['aspirantes-numero.mjs', 'antes del 7-oct-2026'],
+  ['tipos-nombre.mjs', 'antes del 7-oct-2026'], ['registro-del-asunto.mjs', 'antes del 7-oct-2026']
+];
+const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
+
+/* Pruebas retiradas de la pasada completa (fila 302). No se lanzan sin palabras; pedidas por su nombre
+   (`npm test -- tutores-legales`) sí. El fichero no se borra. Cada entrada: fichero, fecha en que entra y
+   motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
+const RETIRADAS = [
+  { fichero: 'tutores-legales.mjs', desde: '7-oct-2026',
+    motivo: 'fallo real de la aplicación: al crear un asunto desde el control de registro, js/control-registro-pantalla.js solo busca el tercero en ALUMNADO, PERSONAL, EMPRESAS y OTROS (no reconoce a tutores legales ni administraciones)' }
+];
+
+{
+  const problemas = [];
+  if (EN_SOLITARIO_ENTRADAS.length > TOPE_EN_SOLITARIO) {
+    problemas.push('EN_SOLITARIO tiene ' + EN_SOLITARIO_ENTRADAS.length + ' pruebas y el tope es ' + TOPE_EN_SOLITARIO +
+      '. No se añade otra: arregla la frágil de verdad (esperar a una condición, no una pausa fija) o retira una con RETIRADAS.');
+  }
+  const vistos = new Set();
+  for (const [f, desde] of EN_SOLITARIO_ENTRADAS) {
+    if (vistos.has(f)) problemas.push('EN_SOLITARIO repite «' + f + '».');
+    vistos.add(f);
+    if (!desde) problemas.push('EN_SOLITARIO: «' + f + '» no lleva la fecha en que entró.');
+    if (!todasLasPruebas.includes(f)) problemas.push('EN_SOLITARIO: «' + f + '» no existe en pruebas/.');
+  }
+  for (const r of RETIRADAS) {
+    if (!r.desde || !r.motivo) problemas.push('RETIRADAS: «' + r.fichero + '» necesita fecha y motivo.');
+    if (!todasLasPruebas.includes(r.fichero)) problemas.push('RETIRADAS: «' + r.fichero + '» no existe en pruebas/.');
+    if (vistos.has(r.fichero)) problemas.push('«' + r.fichero + '» está a la vez en EN_SOLITARIO y en RETIRADAS.');
+  }
+  if (problemas.length) {
+    console.log('Lista de pruebas mal puesta en pruebas/ejecutar.mjs:\n  - ' + problemas.join('\n  - '));
+    process.exit(1);
+  }
+}
+
+/* Sin palabras, la pasada completa no lanza las retiradas (más abajo); con palabras, sí. */
 const pruebas = PALABRAS.length
   ? todasLasPruebas.filter((f) => PALABRAS.some((p) => f.includes(p)))
-  : todasLasPruebas;
+  : todasLasPruebas.filter((f) => !RETIRADAS.some((r) => r.fichero === f));
 
 if (PALABRAS.length) {
   console.log('Solo las pruebas de: ' + PALABRAS.join(', ') + ' (' + pruebas.length + ' de ' + todasLasPruebas.length + ')\n');
 }
-
-/* Estas dos comprueban tiempos finos (como mucho una relectura, un
-   aviso que no se repite) y, yendo la máquina a tope de CPU (todos los
-   núcleos ocupados a la vez), alguna tanda fallaba solo por eso, aunque
-   la app estuviera bien (en solitario, 3 de 3 en verde). Van aquí para
-   que corran sin competir por CPU, al final, después de todas las
-   demás. Si alguna prueba futura tuviera el mismo problema, su nombre
-   va también aquí. */
-const EN_SOLITARIO = ['indice-del-expediente.mjs', 'solo-consulta.mjs', 'por-liquidar.mjs', 'por-liquidar-al-cambiar-tipo.mjs', 'grupo-enviar.mjs', 'grupo-registro.mjs', 'grupo-generar.mjs', 'titulos-de-la-tabla-fijos.mjs', 'documentos-sueltos.mjs', 'ha-llegado-sustituye-la-vista.mjs', 'repintar-solo-lo-que-cambia.mjs', 'hito-desde-por-clasificar.mjs',
-  'ajustes-por-tipo.mjs', 'mesa-comunicar-del-paso-y-guion.mjs', 'tras-cada-accion.mjs', 'notas-asunto-no-se-borran.mjs',
-  'refresco.mjs', 'hito-mesa.mjs', 'responsable-organismo.mjs', 'ha-llegado-sustituye-la-vista.mjs', 'aspirantes-numero.mjs', 'tipos-nombre.mjs', 'por-liquidar.mjs', 'por-liquidar-al-cambiar-tipo.mjs', 'registro-del-asunto.mjs'];
 
 function tope() {
   const n = parseInt(process.env.PRUEBAS_A_LA_VEZ, 10);
@@ -149,5 +197,10 @@ const segundos = ((Date.now() - empiezan) / 1000).toFixed(1);
 console.log('\n' + resultados.length + ' pruebas, ' + (resultados.length - fallos.length) + ' bien, ' +
   fallos.length + ' fallos, ' + segundos + ' s.');
 if (fallos.length) console.log('Fallan: ' + fallos.join(', '));
+/* Las retiradas se enseñan siempre al final de la pasada completa (fila 302); sin ninguna, no se escribe nada. */
+if (!PALABRAS.length && RETIRADAS.length) {
+  console.log('\n' + RETIRADAS.length + (RETIRADAS.length === 1 ? ' prueba retirada:' : ' pruebas retiradas:'));
+  for (const r of RETIRADAS) console.log('  ' + r.fichero + ' (desde el ' + r.desde + '): ' + r.motivo);
+}
 console.log(fallos.length ? '\nAlguna prueba ha fallado.' : '\nTodas las pruebas pasan.');
 process.exit(fallos.length ? 1 : 0);

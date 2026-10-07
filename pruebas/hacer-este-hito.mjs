@@ -72,7 +72,7 @@ await comprobar('1. «1 listos para enviar» en el cuadro de avisos', avisos().t
 await comprobar('1. la fila de Hugo dice «· listo para enviar»',
   pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="Moreno Sanz"] .inicio-tabla-hito').textContent().then((t) => /· listo para enviar/.test(t)), true);
 await comprobar('1. el PDF sellado se colocó solo: queda el sellado con el nombre de la aplicación y no el suelto',
-  ficheros('Moreno Sanz').then((f) => [f.some((n) => /^261006 CERTIFICADO D26-/.test(n)), f.indexOf('29700692 - Fuente Lucena (certificado).pdf') === -1]), [true, true]);
+  ficheros('Moreno Sanz').then((f) => [f.some((n) => /^\d{6} CERTIFICADO D26-/.test(n)), f.indexOf('29700692 - Fuente Lucena (certificado).pdf') === -1]), [true, true]);
 await comprobar('1. el hito de Hugo: listo para enviar y la tarea de registrar hecha', hitoDe('Moreno Sanz').then((h) => [h.cadena, h.hechas]),
   ['listo-para-enviar', ['g-hacer-generar', 'g-hacer-registrar']]);
 
@@ -87,7 +87,7 @@ await pagina.waitForSelector('#capa:not(.oculto) #correo-caja', { timeout: 15000
 await pagina.waitForTimeout(1200);
 await comprobar('2. el cuadro de Correo, con el PDF sellado adjunto y «Todavía no»',
   pagina.evaluate(() => [document.getElementById('cuadro-titulo').textContent, document.getElementById('cuadro-aceptar').textContent,
-    [...document.querySelectorAll('#correo-caja input[type=checkbox]:checked')].some((c) => /^261006 CERTIFICADO D26-/.test(c.dataset.nombre || c.value || ''))]),
+    [...document.querySelectorAll('#correo-caja input[type=checkbox]:checked')].some((c) => /^\d{6} CERTIFICADO D26-/.test(c.dataset.nombre || c.value || ''))]),
   ['Correo de este asunto', 'Todavía no', true]);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(1500);
@@ -140,7 +140,7 @@ await pagina.waitForTimeout(1500);
 await comprobar('4. el Word se abre en grande con la franja verde',
   pagina.locator('#word-visor .word-visor-franja').textContent().then((t) => /^Documento listo\. Ahora toca firmarlo y registrarlo en Séneca\./.test(t)), true);
 await comprobar('4. el botón «Ruta» está en la franja', pagina.locator('#word-visor .word-visor-franja .boton-copiar-fila').count(), 1);
-await comprobar('4. el PDF se guardó solo', ficheros('Vidal Soto').then((f) => f.filter((n) => /^261006 CERTIFICADO D26-.*\.pdf$/.test(n)).length), 1);
+await comprobar('4. el PDF se guardó solo', ficheros('Vidal Soto').then((f) => f.filter((n) => /^\d{6} CERTIFICADO D26-.*\.pdf$/.test(n)).length), 1);
 await comprobar('4. la tarea de generar, marcada; el hito esperando el sello', hitoDe('Vidal Soto').then((h) => [h.hechas, h.cadena]), [['g-hacer-generar'], 'esperando-sello']);
 await pagina.evaluate(() => WordVisor.cerrar());
 await pagina.waitForTimeout(1200);

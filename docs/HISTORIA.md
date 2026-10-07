@@ -4881,3 +4881,61 @@ Antes:
 ```
 (mirando qué quedó en `pruebas`, no en `main`)
 ```
+
+## Fila 302 (7-oct-2026): pruebas arregladas y retiradas
+
+Foto de partida (pasada completa en `main`, 17 min): fallaron `cabecera-compacta`, `control-registro`,
+`encargos`, `hacer-este-hito`, `tutores-legales`, `por-liquidar-al-cambiar-tipo` y `titulos-de-la-tabla-fijos`
+(`tras-cada-accion` pasó). `EN_SOLITARIO` tenía 25 entradas, 22 distintas (repetidas: `ha-llegado-sustituye-la-vista`,
+`por-liquidar`, `por-liquidar-al-cambiar-tipo`). Nada de `js/` ni de `apps-script/` tocado. Diez arregladas, una retirada (tres más salieron rojas en la primera pasada final, por la carga).
+
+Arregladas (siguen comprobando lo mismo):
+- `control-registro.mjs`: las subidas se guardan con la hora real y los avisos «atrasado» se calculaban con fechas fijas
+  (2 y 12 de octubre); desde el 7-oct la cuenta ya no salía. Ahora las fechas «hoy» y «dentro de 10 días» salen del día real.
+- `hacer-este-hito.mjs`: el nombre del PDF sellado lleva la fecha del día (`261006 …`), escrita fija en tres comprobaciones;
+  ahora `^\d{6} CERTIFICADO D26-`. Mismas comprobaciones.
+- `cabecera-compacta.mjs`: dos medidas de diseño que cambiaron a propósito al añadirse la fila de botones del hito
+  («Hacer este hito», «Generar documento»…): «QUÉ HAY QUE HACER» queda a ~320 px (tope 250 → 360, el 40 % de la ventana) y
+  «Marcar como hecho» ya no va en la línea del nombre sino en la fila de botones justo debajo (se comprueba que está debajo,
+  a menos de 40 px, y que nombre y etiquetas siguen en una línea).
+- `encargos.mjs`: tras archivar o reabrir el asunto esperaba 2,5 s fijos; con carga no bastaba. Ahora espera (hasta 20 s)
+  a que el encargo llegue al estado esperado.
+- `por-liquidar-al-cambiar-tipo.mjs` (fallaba también en solitario, con carga): tres carreras. (1) la guía de la prueba se
+  escribía en disco pero la aplicación no la tenía en memoria y creaba los asuntos con la guía mínima: ahora se llama a
+  `GuiasDelCentro.recargar()` hasta ver el paso `pl-1`; (2) la pasada «al entrar» de la aplicación (a los 2,5 s) caía a
+  mitad de la prueba y se llevaba el asunto de seguro escolar antes de tiempo o pisaba la pasada de la casilla: ahora la
+  prueba apunta ese temporizador y espera a que acabe antes de crear nada; (3) pausas fijas de 500, 800 y 3600 ms tras
+  «Deshacer» y tras la pasada, cambiadas por esperas a la condición. 6 de 6 en verde con 6 pruebas a la vez.
+- `titulos-de-la-tabla-fijos.mjs` (también fallaba en solitario): unos segundos después de entrar, Inicio añade el aviso
+  «Tipos de asunto parecidos» y la fila de avisos crece 16 px; «antes» se medía sin él. Ahora se espera a ese aviso, las
+  posiciones se leen cuando dos lecturas seguidas son iguales (no tras pausas fijas) y en el punto 8 se vuelve a bajar del
+  todo hasta que se estabiliza. 6 de 6 en verde con 6 a la vez.
+
+- `por-liquidar.mjs` (la que más fallaba en solitario al final de la pasada, 2 de 5 solo): al entrar, Inicio se repinta
+  varias veces mientras acaba de cargar y durante ~1,5 s «En Administración» enseña a los del seguro escolar; la prueba
+  pulsaba la pestaña con una pausa fija de 500 ms. Ahora espera a la pasada «al entrar» de la aplicación (temporizador de
+  2,5 s apuntado desde la prueba) y, al cambiar de pestaña, a que la pestaña esté activa y la lista quieta. 8 de 8 en verde
+  con 8 a la vez; sale de `EN_SOLITARIO`.
+
+- `encargos.mjs` (rojo en la pasada de partida y otra vez en la final): pausas fijas cambiadas por esperas a la condición:
+  el estado del encargo tras archivar/reabrir/papelera (hasta 20 s), que el cuadro se cierre de verdad antes de esperar el
+  siguiente, que el asunto esté ya en la lista del archivo antes de «reabrirlo», el menú del perfil al entrar (antes 9 s y 4 s
+  fijos), el fin del arranque (`.version-pulsable` del pie: al final de su arranque la aplicación vuelve a poner la vista de
+  Inicio y deshacía lo pulsado) y la vista «solo encargos» (se pulsa y se espera a verla; se repite si hace falta). 32 de 32
+  en verde con 8 a la vez. Posible detalle de la aplicación, sin tocar: unos segundos después de pulsar «N encargos» en «Ha
+  llegado», la vista vuelve sola a enseñar correos y documentos juntos (se vio a ~1,5-3 s con carga; no hay comprobación
+  de eso en ninguna prueba).
+- `cabecera-fija.mjs` (en la pasada final, «a 20px se despliega»): tras cada `scrollTo` se esperan dos fotogramas reales
+  (`requestAnimationFrame`) y a que el scroll esté en su sitio, y luego los 450 ms del candado. 6 de 6 con 6 a la vez.
+- `mesa-comunicar-del-paso-y-guion.mjs` (en solitario, «element was detached»): el menú «⋮» se quitaba del DOM por un
+  repintado entre abrirlo y pulsar «Abrir en la guía»; ahora se repite el gesto hasta que el editor de la guía está abierto.
+  6 de 6 con 6 a la vez. Sigue en `EN_SOLITARIO`.
+
+Retirada (`RETIRADAS`, `docs/PRUEBAS-RETIRADAS.md`): `tutores-legales.mjs`. Fallo real de la aplicación: al crear un asunto
+desde el control de registro, no se reconoce como tercero ya conocido a un tutor legal ni a una administración
+(`terceroQueEncaja` en `js/control-registro-pantalla.js` solo mira ALUMNADO, PERSONAL, EMPRESAS y OTROS).
+
+`EN_SOLITARIO`: sin repetidos, con fecha («antes del 7-oct-2026») y 19 entradas (las tres arregladas, `por-liquidar`, `por-liquidar-al-cambiar-tipo`
+y `titulos-de-la-tabla-fijos`, salen de la lista); tope de 20 que el ejecutor exige (con 21 se niega a arrancar, comprobado).
+`tras-cada-accion.mjs` pasó entera en la pasada de partida y se queda en la lista. Notas viejas de `docs/COLA.md` limpiadas.
+`CLAUDE.md` («Pruebas», punto 3) cambiado: tope de 20, `RETIRADAS`, sin «sin investigarla más».

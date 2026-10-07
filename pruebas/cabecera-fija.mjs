@@ -64,6 +64,13 @@ function scroll(y) {
    por el cambio anterior. */
 async function subirYEsperar(y) {
   await scroll(y);
+  /* Fila 302 (7-oct-2026): la cabecera decide en un fotograma (requestAnimationFrame) tras el evento de scroll; con la
+     máquina cargada, 450 ms a veces no bastaban para que ese fotograma llegara. Se esperan dos fotogramas de verdad
+     (el de la aplicación y uno más) y a que el scroll esté en su sitio, y después los 450 ms del candado. */
+  await pagina.evaluate((v) => new Promise((resolver) => {
+    let n = 0;
+    (function turno() { requestAnimationFrame(() => { n++; if (n >= 2 && Math.abs(window.scrollY - v) < 2) resolver(); else if (n > 600) resolver(); else turno(); }); })();
+  }), y);
   await pagina.waitForTimeout(450);
 }
 

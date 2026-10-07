@@ -20,9 +20,27 @@ async function comprobar(titulo, promesa, esperado) {
 }
 
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) { /* sin almacenamiento */ }");
+/* Fila 302 (7-oct-2026): la aplicación hace sola una pasada «al entrar» 2,5 s después de cargar (js/por-liquidar.js).
+   Si cae justo mientras la prueba marca la casilla del tipo, las dos pasadas se pisan y salen avisos y estados a
+   medias (según la carga de la máquina). Aquí se apuntan esos temporizadores para esperar a que acabe esa pasada
+   antes de empezar, en vez de adivinar con una pausa. */
+await pagina.addInitScript(`(function () {
+  var orig = window.setTimeout; window.__pasadasAlEntrar = { programadas: 0, acabadas: 0 };
+  window.setTimeout = function (fn, ms) {
+    if (ms === 2500 && typeof fn === 'function') {
+      window.__pasadasAlEntrar.programadas++;
+      var f = fn;
+      fn = async function () { try { return await f.apply(this, arguments); } finally { window.__pasadasAlEntrar.acabadas++; } };
+    }
+    return orig.apply(this, [fn, ms].concat([].slice.call(arguments, 2)));
+  };
+})();`);
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 20000 });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 20000 });
+
+/* Espera a que la pasada «al entrar» (programada con 2500 ms) haya empezado y acabado, ANTES de crear los asuntos de la prueba (si no, se llevaría el de seguro escolar sin hitos antes de tiempo). */
+await pagina.waitForFunction(() => window.__pasadasAlEntrar.programadas > 0 && window.__pasadasAlEntrar.acabadas >= window.__pasadasAlEntrar.programadas, null, { timeout: 30000 });
 
 /* Un tipo nuevo sin casilla (PRUEBA LIQ), otro con casilla (el seguro escolar de la demo) y
    cuatro asuntos: uno de otro tipo sin hitos, dos de PRUEBA LIQ sin hitos y uno de PRUEBA LIQ
@@ -35,6 +53,14 @@ await pagina.evaluate(async () => {
   const w = await h.createWritable();
   await w.write(JSON.stringify({ 'PRUEBA LIQ': [{ id: 'pl-1', titulo: 'Hacer algo', cuerpo: '', opciones: [], responsable: 'tercero' }] }));
   await w.close();
+  /* Fila 302 (7-oct-2026): la aplicación guarda las guías en memoria; si se crean los asuntos antes de que
+     lea la de PRUEBA LIQ, les pone la guía mínima y la prueba fallaba según la carga. Se espera a que la
+     guía de la prueba esté de verdad en memoria (no un tiempo fijo). */
+  for (let i = 0; i < 100; i++) {
+    await GuiasDelCentro.recargar();
+    if (GuiasDelCentro.pasosDe('PRUEBA LIQ').some((p) => p.id === 'pl-1')) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
   const nombres = ['261002 A26-0801 SEGURO ESCOLAR Alta Cero, Ana 7770001', '261002 A26-0802 PRUEBA LIQ Alta Uno, Eva 7770002',
     '261002 A26-0803 PRUEBA LIQ Alta Dos, Rosa 7770003', '261002 A26-0804 PRUEBA LIQ Alta Tres, Pía 7770004'];
   for (const n of nombres) {
@@ -57,7 +83,7 @@ await comprobar('1. cambiado el tipo, pasa solo', estado('A26-0801'), true);
 await comprobar('1. con su aviso «Pasa a Por liquidar.» y «Deshacer»', pagina.evaluate(() => [[...document.querySelectorAll('.mensaje')].some((m) => /Pasa a Por liquidar/.test(m.textContent)), !!document.querySelector('.mensaje-boton')]), [true, true]);
 await comprobar('1. entra como automático', pagina.evaluate(() => Gestor.asuntos().filter((x) => x.nombre.indexOf('A26-0801') !== -1)[0].ficha.porLiquidar.auto), true);
 await pagina.click('.mensaje-boton');
-await pagina.waitForTimeout(500);
+await pagina.waitForFunction(() => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('A26-0801') !== -1)[0]; return a && !PorLiquidar.estaPorLiquidar(a); }, null, { timeout: 15000 }).catch(() => {});
 await comprobar('2. «Deshacer» lo saca de «Por liquidar»', estado('A26-0801'), false);
 await comprobar('2. y sigue siendo del mismo tipo', pagina.evaluate(() => Gestor.asuntos().filter((x) => x.nombre.indexOf('A26-0801') !== -1)[0].leido.tipo), 'SEGURO ESCOLAR');
 await comprobar('4. un asunto de seguro escolar con un hito por hacer no pasa (el de la demo)',
@@ -93,13 +119,14 @@ await pagina.waitForFunction(() => ['A26-0802', 'A26-0803'].every((t) => { const
 await comprobar('5. pasan los dos sin hitos por hacer y no el que tiene uno', Promise.all([estado('A26-0802'), estado('A26-0803'), estado('A26-0804')]), [true, true, false]);
 await comprobar('5. un solo aviso: «2 asuntos pasan a Por liquidar.»', avisos().then((a) => a.filter((t) => /Por liquidar/.test(t)).map((t) => t.replace(/Deshacer$/, '').trim())), ['2 asuntos pasan a Por liquidar.']);
 await pagina.locator('.mensaje-boton').first().click();
-await pagina.waitForTimeout(800);
+await pagina.waitForFunction(() => ['A26-0802', 'A26-0803'].every((t) => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf(t) !== -1)[0]; return a && !PorLiquidar.estaPorLiquidar(a); }), null, { timeout: 15000 }).catch(() => {});   /* espera a que salgan */
 await comprobar('5. «Deshacer» los devuelve a los dos', Promise.all([estado('A26-0802'), estado('A26-0803')]), [false, false]);
 
 console.log('--- 6. la pasada al entrar ---');
 await pagina.evaluate(() => document.querySelectorAll('.mensaje').forEach((m) => m.remove()));
 await pagina.evaluate(() => PorLiquidar._alEntrar());
-await pagina.waitForTimeout(3600);
+await pagina.waitForFunction(() => ['A26-0802', 'A26-0803'].every((t) => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf(t) !== -1)[0]; return a && PorLiquidar.estaPorLiquidar(a); }), null, { timeout: 30000 }).catch(() => {});   /* la pasada espera 2,5 s y puede aplazarse */
+await pagina.waitForTimeout(600);   /* margen para que acabe de mirar también el tercero (que no debe pasar) */
 await comprobar('6. recoge los dos que ya estaban en esa situación (y no el del hito por hacer)', Promise.all([estado('A26-0802'), estado('A26-0803'), estado('A26-0804')]), [true, true, false]);
 await comprobar('6. sin aviso verde', avisos().then((a) => a.filter((t) => /Por liquidar/.test(t)).length), 0);
 await comprobar('6. y deja la línea en el registro del asunto',

@@ -134,14 +134,19 @@ async function abrirMesa(pagina) {
   const guion = await alto(pagina, '.mesa-guion .mesa-bloque-titulo');
   /* Fila 145: el título del guion es ahora «Qué hay que hacer». */
   console.log('   (QUÉ HAY QUE HACER a ' + Math.round(guion.top) + ' px)');
-  await comprobar('3. «QUÉ HAY QUE HACER» a 250 px o menos del borde', Promise.resolve(guion.top <= 250), true);
+  /* Fila 302 (7-oct-2026): con la fila de botones del hito («Hacer este hito», «Generar documento»…) añadida
+     después, el guion queda a unos 320 px; el tope pasa de 250 a 360 px (el 40 % de los 920 px de alto):
+     sigue viéndose entero sin bajar. */
+  await comprobar('3. «QUÉ HAY QUE HACER» a 360 px o menos del borde (sin bajar)', Promise.resolve(guion.top <= 360), true);
 
   /* 4. */
   const t = await alto(pagina, '.mesa-titulo');
   const et = await alto(pagina, '.mesa-etiquetas');
   const h = await alto(pagina, '.mesa-marcar-hecho');
-  await comprobar('4. nombre, etiquetas y «Hecho» en una sola línea',
-    Promise.resolve([Math.abs(t.top - et.top) < 14, Math.abs(t.top - h.top) < 14]), [true, true]);
+  /* Fila 302: «Marcar como hecho» ya no va en la línea del nombre sino en la fila de botones del hito,
+     justo debajo (a menos de 40 px del nombre). */
+  await comprobar('4. nombre y etiquetas en una sola línea, y «Hecho» en la fila de botones justo debajo',
+    Promise.resolve([Math.abs(t.top - et.top) < 14, h.top >= t.bottom - 2 && h.top - t.bottom < 40]), [true, true]);
 
   /* 5. */
   await pagina.click('.ficha-pestana.activa');
