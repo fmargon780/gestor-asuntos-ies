@@ -209,6 +209,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/grupo-generar.mjs` | La muestra, los PDF con su «Ref.», «Parar» y «Volver a generar» (fila 294) |
 | `pruebas/grupo-registro.mjs` | Reconocer los PDF sellados: nombre, texto, partir, sin colocar, solo consulta (fila 294) |
 | `pruebas/personas-del-grupo.mjs` | Prueba de la tabla «Personas del grupo» y de la ficha de la persona (fila 293) |
+| `js/lista-pegada.js`, `js/lista-pegada-pantalla.js` | «Pegar una lista» (fila 296): reconocer a cada persona de un texto o fichero (sin efectos) y el cuadro con sus tres apartados |
 | `js/relacionados-ficha.js` | El bloque «Relacionados» de la ficha del asunto, y copiar el nombre en orden normal (fila 133, sacado de `js/relacionados.js`) |
 | `js/otros-del-tercero.js`, `css/ficha-asunto.css` | Bloque "Otros asuntos de este tercero" (separado de `js/ficha-asunto.js` en la fila 40): cada línea se pulsa y abre su ficha, y el botón "← Volver a …" que apunta siempre al asunto de partida |
 | `js/grupos.js` | Grupos propios de personas, guardados con nombre en `_GESTOR/grupos.json` |

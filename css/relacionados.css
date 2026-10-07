@@ -111,3 +111,28 @@
 .pg-sin-colocar { margin: 0 0 12px; }
 .pg-sin-colocar ul { list-style: none; margin: 6px 0 0; padding: 0; }
 .pg-sin-colocar li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 0; }
+
+/* Fila 296: el cuadro «Pegar una lista» (js/lista-pegada-pantalla.js). */
+#rel-pegar-fila { margin-bottom: 10px; }
+.lp-cuadro { border: 1px solid var(--linea); border-radius: var(--radio); padding: 12px; margin-bottom: 12px; background: var(--papel); }
+.lp-texto { width: 100%; min-height: 8em; font-family: inherit; resize: vertical; }
+.lp-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+.lp-fila .etiqueta { margin: 0; }
+.lp-apartado { border: 1px solid var(--linea); border-radius: var(--radio); padding: 8px 10px; margin-top: 10px; }
+.lp-apartado h4 { margin: 0 0 6px; font-size: 14px; }
+.lp-ok h4 { color: var(--azul); }
+.lp-dudosas { background: var(--ambar); border-color: var(--ambar-linea); }
+.lp-dudosas h4 { color: #8a6100; }
+.lp-no { background: var(--rojo); border-color: var(--rojo-linea); }
+.lp-no h4 { color: var(--rojo-linea); }
+.lp-fila-persona { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; cursor: pointer; }
+.lp-fila-persona input { margin-top: 3px; flex: 0 0 auto; }
+.lp-linea { display: block; color: var(--tinta-suave); font-size: 11px; }
+.lp-duda { padding: 6px 0; border-top: 1px dashed var(--ambar-linea); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lp-duda:first-of-type { border-top: 0; }
+.lp-linea-pegada { flex: 1 0 100%; font-weight: 600; }
+.lp-no-lineas { font-size: 13px; margin-bottom: 6px; }
+.lp-guardar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.lp-guardar .campo { flex: 1 1 180px; }
+.lp-sustituir { margin-top: 8px; padding: 8px 10px; background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: var(--radio); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lp-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }

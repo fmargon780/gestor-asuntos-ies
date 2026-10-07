@@ -70,6 +70,9 @@
       /* Fila 285: las dos alumnas y alumnos de «Hacer este hito», con correo del tutor para poder enviarles el certificado. */
       ['Vidal Soto, Irene', '2100030', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculada', '12/05/2010', '600121212', 'tutor.irene@correo-demo.es'],
       ['Moreno Sanz, Hugo', '2100031', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculado', '30/01/2010', '600131313', 'tutor.hugo@correo-demo.es'],
+      /* Fila 296: dos alumnos con el mismo nombre y apellidos en unidades distintas (para «Pegar una lista»). */
+      ['Soler Vega, Adrián', '2100040', '1º de E.S.O.', '1º A', '20' + anoMatricula, 'Matriculado', '10/10/2013', '600404040', 'tutor.adrian1@correo-demo.es'],
+      ['Soler Vega, Adrián', '2100041', '3º de E.S.O.', '3º A', '20' + anoMatricula, 'Matriculado', '05/05/2011', '600414141', 'tutor.adrian3@correo-demo.es'],
       /* aspirante sin matricular: sin fila propia hasta que se dé de alta a mano */
       /* un alumno antiguo (ya no está matriculado este curso) */
       ['Moya Santana, Elena', '2099998', '4º de E.S.O.', '4º A', '20' + (parseInt(anoMatricula, 10) - 1), 'Baja', '02/02/2010', '600444888', 'tutor.elena@correo-demo.es']

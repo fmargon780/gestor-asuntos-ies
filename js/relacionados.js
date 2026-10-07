@@ -215,7 +215,7 @@ var Relacionados = (function () {
         cerrarCapa();
         resolverUnaVez(marcados);
       }, {
-        multiple: true,
+        multiple: true, alSenalar: opc.alSenalar,   /* fila 296: «Pegar una lista» */
         marcadosIniciales: opc.marcadosIniciales, textoBoton: opc.textoBoton, minimo: opc.minimo,
         alCambiarCategoria: function (categoria) { pintarAtajosDeAlumnado(categoria, api, opc.alSenalar); }
       });

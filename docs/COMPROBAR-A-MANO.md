@@ -237,3 +237,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 295 — enviar a todas las personas del grupo y los avisos (7-oct-2026)
 
 - En el centro, con un grupo de verdad de dos o tres personas (por ejemplo, tú y tu compañero como personal): «Enviar un aviso…» y comprobar que a cada uno le llega su correo, con su nombre, y que al contestar la respuesta llega a quien lo envió.
+
+## Fila 296 — formar un grupo pegando una lista (7-oct-2026)
+
+- Con un listado de verdad exportado de Séneca (por ejemplo, el de transporte escolar): «Nuevo asunto» → «Es para un grupo de personas» → «Pegar una lista» → «o elige un fichero». Casi todas las personas tienen que salir en «Reconocidas». Si muchas van a «No encontradas», decirle a Claude el nombre del listado.
