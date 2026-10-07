@@ -197,6 +197,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 295 | `docs/TRABAJO-EN-BLOQUE-ENVIAR-A-TODOS.md` (tercera de cuatro, va después de la 294: «Enviar…» en la tabla enseña un correo de muestra y a quién va, y con un botón manda un correo a cada persona con su PDF registrado; los fallos, con «Reintentar»; si Google corta por el tope del día, «Seguir enviando» al día siguiente sin repetir a nadie; «Enviar un aviso…» hace lo mismo sin documento; un solo PDF `CORREO` por tanda; módulos nuevos `js/grupo-enviar.js` y `js/grupo-avisos.js`) | PENDIENTE (7-oct-2026) |
 | 296 | `docs/TRABAJO-EN-BLOQUE-LISTA-PEGADA.md` (cuarta de cuatro, va después de la 293: al formar un grupo, «Pegar una lista» de Séneca o de una hoja de cálculo, o elegir el fichero; la app reconoce a cada persona por su número, su DNI o su nombre, pregunta cuando hay dos iguales y dice a quién no encuentra; se puede guardar como grupo; módulo nuevo `js/lista-pegada.js`) | PENDIENTE (7-oct-2026) |
 | 297 | Aviso de usuario: error en «Inicio» | IDEA (7-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16M5QZivlkiP12JmzxNUZD3jcptxvJkmM/view?usp=drivesdk |
+| 298 | Aviso de usuario: error en «Inicio» | IDEA (7-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1YXIlqvLhhPvxpBqCV4XEo5c3tg5QWFit/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
