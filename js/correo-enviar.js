@@ -79,6 +79,7 @@ window.CorreoEnviar = (function () {
      tiene el script. */
   function registrarVersionScript(version) {
     guardarVersionConocida(version || '');
+    if (window.Problemas) Problemas.recalcular('script');   /* fila 291 */
   }
 
   /* ¿Sabemos que el script es más viejo que esta app? Sin ninguna
@@ -93,10 +94,21 @@ window.CorreoEnviar = (function () {
     return filaConocida < filaEsperada;
   }
 
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): la tarjeta «El envío de correo está anticuado»
+     de «Problemas», con los pasos escritos en pantalla. Solo mira lo ya sabido: no cuesta nada. */
+  function calcularProblema() {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!scriptDesactualizado()) { Problemas.registrar('script', null); return; }
+    var d = ProblemasTextos.script();
+    d.acciones[0].alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    Problemas.registrar('script', d);
+  }
+  if (window.Problemas) Problemas.calculador('script', calcularProblema);
+
   function textoAvisoVersion() {
     return 'El script de Gmail es más antiguo que la app (tienes ' +
       (leerVersionConocida() || 'una versión anterior a la fila 130') + '; hace falta ' + SCRIPT_ESPERADO +
-      '). Vuelve a pegarlo: docs/ENVIO-CUENTA-DEL-SCRIPT.md';
+      '). Quien montó la aplicación tiene que ponerlo al día: los pasos están en Ajustes → Problemas.';
   }
 
   function leerUrl() {
@@ -206,7 +218,10 @@ window.CorreoEnviar = (function () {
   async function llamar(cuerpo, limiteMs) {
     if (enDemo()) {
       return new Promise(function (r) {
-        setTimeout(function () { r({ ok: true, version: SCRIPT_ESPERADO, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() }); }, 300);
+        setTimeout(function () {
+          registrarVersionScript(SCRIPT_ESPERADO);   /* fila 291: el script de mentira está al día; «Probar» quita el aviso de la demostración */
+          r({ ok: true, version: SCRIPT_ESPERADO, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() });
+        }, 300);
       });
     }
     var url = leerUrl();

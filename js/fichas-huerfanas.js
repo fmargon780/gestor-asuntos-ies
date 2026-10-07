@@ -4,8 +4,10 @@
    de la aplicación, la ficha se queda huérfana: no se ve en ningún
    lado, pero sigue en el fichero.
 
-   Este bloque de Ajustes las encuentra y deja enlazarlas con una
-   carpeta que no tenga ficha, o borrarlas si ya no hacen falta.
+   Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): ya no pinta una
+   sección de Ajustes sino la tarjeta «N asuntos han perdido su
+   carpeta» de la pestaña «Problemas» (js/problemas.js): buscar su
+   carpeta, o quitar el asunto de la lista.
    ============================================================ */
 (function () {
 
@@ -66,16 +68,17 @@
   async function enlazar(clave) {
     var candidatos = carpetasSinFicha();
     if (!candidatos.length) {
-      U.aviso('No hay ninguna carpeta sin ficha con la que enlazarla.', 'malo');
+      U.aviso('No hay ninguna carpeta sin asunto. Puede que la carpeta se haya borrado o esté fuera de la carpeta de ' +
+        'asuntos abiertos. Si la encuentras, devuélvela a su sitio y vuelve a mirar.', 'ambar');
       return;
     }
     var opciones = candidatos.map(function (c) {
       return '<option value="' + U.escapar(c.nombre) + '">' + U.escapar(c.nombre) +
              '  ·  ' + U.escapar(c.donde) + '</option>';
     }).join('');
-    var ok = await U.preguntar('Enlazar la ficha con una carpeta',
-      '<p class="explica">La ficha de <strong>' + U.escapar(clave) + '</strong> pasa a ser la de ' +
-      'la carpeta que elijas. La que tenía antes se queda como estaba.</p>' +
+    var ok = await U.preguntar('Buscar su carpeta',
+      '<p class="explica">El asunto <strong>' + U.escapar(clave) + '</strong> pasa a ser el de ' +
+      'la carpeta que elijas. Queda como estaba, con sus hitos y sus notas.</p>' +
       '<label class="etiqueta">Carpeta</label>' +
       '<select id="huerfana-destino" class="campo">' + opciones + '</select>', 'Enlazar');
     if (!ok) return;
@@ -84,124 +87,84 @@
     try {
       await App.cargarRegistro();
       if (!App.E.registro.asuntos[clave]) {
-        U.aviso('Esa ficha ya no está: puede que el compañero la haya tocado.', 'malo');
+        U.aviso('Ese asunto ya no está: puede que el compañero lo haya tocado.', 'malo');
         return;
       }
       /* La ficha pasa a la carpeta nueva, y con ella sus hitos y su
          señal de presencia si la hubiera (fila 62,
          docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
       await AsuntoRenombrar.mover(clave, destino, {});
-      U.aviso('Ficha enlazada con ' + destino + '.', 'bueno');
+      U.aviso('Asunto enlazado con ' + destino + '.', 'bueno');
       await App.pintarAjustes();
+      if (App.verAbiertos) App.verAbiertos();
     } catch (e) {
-      U.aviso('No he podido enlazarla: ' + U.mensajeDeError(e), 'malo');
+      U.aviso('No he podido enlazarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
   async function borrar(clave, ficha) {
-    var ok = await U.preguntar('Quitar la ficha',
-      '<p>Se quita la ficha huérfana de <strong>' + U.escapar(clave) + '</strong>.</p>' +
+    var ok = await U.preguntar('Quitar el asunto de la lista',
+      '<p>Se quita de la lista el asunto <strong>' + U.escapar(clave) + '</strong>, que ya no existe.</p>' +
       '<p class="nota">' + U.escapar(resumenNotas(ficha)) + '</p>' +
-      '<p class="nota">Antes de quitarla se guarda una copia de asuntos.json en ' +
-      '_GESTOR/copias, así que se puede recuperar a mano si hiciera falta.</p>', 'Quitar');
+      '<p class="nota">Antes de quitarlo se guarda una copia de seguridad, así que se puede recuperar ' +
+      'si era un error.</p>', 'Quitar');
     if (!ok) return;
     try {
       await App.guardarRegistroFresco(function (registro) {
         delete registro.asuntos[clave];
       });
-      U.aviso('Ficha quitada.', 'bueno');
+      U.aviso('Asunto quitado de la lista.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {
-      U.aviso('No he podido quitarla: ' + U.mensajeDeError(e), 'malo');
+      U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
-  /* ---------- el bloque de Ajustes ---------- */
+  /* ---------- la tarjeta de «Problemas» ---------- */
 
-  function bloqueDeAjustes() {
-    var ya = $('bloque-huerfanas');
-    if (ya) return ya;
-    /* 17-sep-2026, fila 39: este bloque vive en la pestaña
-       "Mantenimiento", no en la pantalla de Ajustes entera. */
-    var pantalla = $('ajustes-tab-mantenimiento');
-    if (!pantalla) return null;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-huerfanas';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Fichas sin carpeta</span>' +
-        '<span class="bloque-pie" id="huerfanas-pie">Cuando una carpeta ha cambiado de nombre o se ha movido a mano</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">La ficha de un asunto (su estado, sus notas, su guía) se guarda con ' +
-        'el nombre exacto de su carpeta. Si alguien cambia el nombre o mueve una carpeta desde el ' +
-        'explorador de archivos, en vez de desde "Cambiar", la ficha se queda huérfana: sigue en ' +
-        '<code>asuntos.json</code> pero no se ve en ningún lado. Aquí se puede enlazar con la ' +
-        'carpeta que le corresponda, o borrarla si ya no hace falta.</p>' +
-        '<div id="tabla-huerfanas" class="lista"></div>' +
-      '</div>';
-    pantalla.appendChild(d);
-    return d;
+  /* El hito en el que está el asunto, de lo último que se leyó de hitos.json (sin leer nada más). */
+  function hitoActual(clave, ficha) {
+    var d = window.Hitos && Hitos.ultimosLeidos && Hitos.ultimosLeidos();
+    var lista = (d && d.porAsunto && d.porAsunto[clave] && d.porAsunto[clave].hitos) || [];
+    var h = lista.filter(function (x) { return x.estado === 'encurso'; })[0] ||
+      lista.filter(function (x) { return x.estado !== 'hecho'; })[0];
+    return (h && h.titulo) || ficha.situacion || 'Sin hito';
   }
 
-  function puntoDeLaBarra() {
-    var boton = document.querySelector('.pestana[data-pantalla="ajustes"]');
-    if (!boton) return null;
-    var punto = boton.querySelector('#punto-huerfanas');
-    if (punto) return punto;
-    punto = document.createElement('span');
-    punto.id = 'punto-huerfanas';
-    punto.className = 'punto-ambar oculto';
-    punto.title = 'Hay fichas sin carpeta';
-    boton.appendChild(punto);
-    return punto;
+  function cuentaDeNotas(ficha) {
+    var n = (ficha.notas || []).length;
+    return n === 0 ? 'sin notas' : n === 1 ? '1 nota' : n + ' notas';
   }
 
-  App.pintarFichasHuerfanas = async function () {
-    bloqueDeAjustes();
-    var huerfanas = await calcular();
+  /* Calcula y pone (o quita) la tarjeta. Sin Problemas cargado, devuelve solo la lista. */
+  var turno = 0;   /* si llegan dos cálculos a la vez, solo vale el último */
 
-    var punto = puntoDeLaBarra();
-    if (punto) punto.classList.toggle('oculto', !huerfanas.length);
-
-    var pie = $('huerfanas-pie');
-    if (pie) pie.textContent = huerfanas.length
-      ? huerfanas.length + (huerfanas.length === 1 ? ' ficha sin carpeta' : ' fichas sin carpeta')
-      : 'Cuando una carpeta se ha renombrado o movido a mano';
-
-    var caja = $('tabla-huerfanas');
-    if (!caja) return;
-    caja.innerHTML = '';
-    if (!huerfanas.length) {
-      caja.innerHTML = '<div class="vacio">Ninguna. Todas las fichas tienen su carpeta.</div>';
-      return;
+  async function pintarTarjeta() {
+    var mio = ++turno;
+    var claves = await calcular();
+    if (mio !== turno) return claves;
+    if (window.Problemas && window.ProblemasTextos) {
+      if (!claves.length) Problemas.registrar('carpetas', null);
+      else {
+        var d = ProblemasTextos.carpetas(claves.map(function (k) {
+          var ficha = App.E.registro.asuntos[k] || {};
+          return { nombre: k, detalle: hitoActual(k, ficha) + '  ·  ' + cuentaDeNotas(ficha) };
+        }));
+        claves.forEach(function (k, i) {
+          var ficha = App.E.registro.asuntos[k] || {};
+          d.elementos[i].acciones[0].alPulsar = function () { return enlazar(k); };
+          d.elementos[i].acciones[1].alPulsar = function () { return borrar(k, ficha); };
+        });
+        Problemas.registrar('carpetas', d);
+      }
     }
-    huerfanas.forEach(function (clave) {
-      var ficha = App.E.registro.asuntos[clave] || {};
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(clave) + '</span>' +
-        '<span class="suave" style="flex:1">' +
-        U.escapar((ficha.situacion || 'Sin estado') + '  ·  ' + resumenNotas(ficha)) + '</span>';
+    return claves;
+  }
 
-      var enlazarBtn = document.createElement('button');
-      enlazarBtn.className = 'boton';
-      enlazarBtn.textContent = 'Enlazar con una carpeta';
-      enlazarBtn.onclick = function () { enlazar(clave); };
-      f.appendChild(enlazarBtn);
-
-      var borrarBtn = document.createElement('button');
-      borrarBtn.className = 'boton boton-peligro';
-      borrarBtn.textContent = 'Quitar la ficha';
-      borrarBtn.onclick = function () { borrar(clave, ficha); };
-      f.appendChild(borrarBtn);
-
-      caja.appendChild(f);
-    });
-  };
+  App.pintarFichasHuerfanas = pintarTarjeta;
+  if (window.Problemas) Problemas.calculador('carpetas', pintarTarjeta);
 
   /* Para js/avisos-que-faltan.js (fila 68, 1): la misma cuenta, sin
      duplicar la lógica. */
-  window.FichasHuerfanas = { calcular: calcular };
+  window.FichasHuerfanas = { calcular: calcular, pintarTarjeta: pintarTarjeta };
 })();

@@ -156,76 +156,72 @@ var AsuntoRenombrar = (function () {
      pertenecía: solo se cuenta y se ofrece borrarla.
      ========================================================== */
 
-  async function huerfanos() {
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): mira la misma fuente que las fichas sin carpeta
+     (el índice del ARCHIVO; si no está hecho, el ARCHIVO si ya se leyó), para no dar por perdido
+     lo de un asunto archivado. Sin ninguna de las dos, un asunto cerrado no se puede comprobar:
+     no se acusa. */
+  async function huerfanos(soloLoLeido) {
     if (!window.Hitos) return [];
-    var datos = await Hitos.leer();
+    /* `soloLoLeido` (el cálculo de fondo de «Problemas»): sin volver a leer hitos.json. */
+    var datos = soloLoLeido ? Hitos.ultimosLeidos() : await Hitos.leer();
+    if (!datos) return [];
     var vivos = {};
     (App.E.listaAbiertos || []).forEach(function (a) { vivos[a.nombre] = true; });
-    (App.E.listaArchivo || []).forEach(function (a) { vivos[a.nombre] = true; });
-    return Object.keys(datos.porAsunto).filter(function (k) { return !vivos[k]; });
+    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco({ todos: true }) : { ok: false };
+    var archivoConocido = false;
+    if (indice.ok) {
+      archivoConocido = true;
+      indice.datos.asuntos.forEach(function (e) { vivos[e.nombre] = true; });
+    }
+    if (App.E.listaArchivo && App.E.listaArchivo.length) {
+      archivoConocido = true;
+      App.E.listaArchivo.forEach(function (a) { vivos[a.nombre] = true; });
+    }
+    var fichas = (App.E.registro && App.E.registro.asuntos) || {};
+    return Object.keys(datos.porAsunto).filter(function (k) {
+      if (vivos[k]) return false;
+      return archivoConocido || !(fichas[k] && fichas[k].estado === 'cerrado');
+    });
   }
 
   function $(id) { return document.getElementById(id); }
 
-  function bloqueDeAjustes() {
-    var ya = $('bloque-hitos-huerfanos');
-    if (ya) return ya;
-    var pantalla = $('ajustes-tab-mantenimiento');
-    if (!pantalla) return null;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-hitos-huerfanos';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Hitos huérfanos</span>' +
-        '<span class="bloque-pie" id="hitos-huerfanos-pie">De asuntos renombrados antes de este arreglo</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">Antes de este arreglo, cambiar el nombre de un asunto no movía sus hitos: puede ' +
-        'haber quedado en <code>hitos.json</code> alguna entrada con el nombre de una carpeta que ' +
-        'ya no existe. No se puede adivinar a qué asunto pertenecía: aquí se cuentan y se pueden ' +
-        'borrar.</p>' +
-        '<div id="hitos-huerfanos-cuerpo"></div>' +
-      '</div>';
-    pantalla.appendChild(d);
-    return d;
+  /* La tarjeta «Hay hitos guardados de N asuntos que ya no existen» de «Problemas». Los de un
+     asunto de la tarjeta «han perdido su carpeta» no salen aquí: se arreglan solos al buscarle su carpeta. */
+  var turno = 0;   /* si llegan dos cálculos a la vez, solo vale el último */
+
+  async function pintarTarjeta(forzar) {
+    var mio = ++turno;
+    var claves = await huerfanos(forzar !== true);
+    if (window.FichasHuerfanas) {
+      var conFicha = await FichasHuerfanas.calcular();
+      claves = claves.filter(function (k) { return conFicha.indexOf(k) === -1; });
+    }
+    if (mio !== turno) return claves;
+    if (!window.Problemas || !window.ProblemasTextos) return claves;
+    if (!claves.length) { Problemas.registrar('hitos', null); return claves; }
+    var datos = Hitos.ultimosLeidos ? Hitos.ultimosLeidos() : null;
+    var d = ProblemasTextos.hitos(claves.map(function (c) {
+      var n = datos && datos.porAsunto[c] ? (datos.porAsunto[c].hitos || []).length : 0;
+      return { nombre: c, detalle: n === 1 ? '1 hito' : n + ' hitos' };
+    }));
+    claves.forEach(function (c, i) {
+      d.elementos[i].acciones[0].alPulsar = async function () {
+        var ok = await U.preguntar('Quitar estos hitos',
+          '<p>Se quitan los hitos guardados de <strong>' + U.escapar(c) + '</strong>, un asunto que ya no existe con ese nombre.</p>' +
+          '<p class="nota">Quedan en las copias de seguridad, por si era un error.</p>', 'Quitar');
+        if (!ok) return;
+        await Hitos.cambiar(function (h) { delete h.porAsunto[c]; return h; });
+        U.aviso('Hitos quitados.', 'bueno');
+        await Problemas.recalcular('hitos');
+      };
+    });
+    Problemas.registrar('hitos', d);
+    return claves;
   }
 
-  App.pintarHitosHuerfanos = async function () {
-    bloqueDeAjustes();
-    var claves = await huerfanos();
-
-    var pie = $('hitos-huerfanos-pie');
-    if (pie) pie.textContent = claves.length
-      ? claves.length + (claves.length === 1 ? ' hito huérfano' : ' hitos huérfanos')
-      : 'De asuntos renombrados antes de este arreglo';
-
-    var cuerpo = $('hitos-huerfanos-cuerpo');
-    if (!cuerpo) return;
-    cuerpo.innerHTML = '';
-    if (!claves.length) {
-      cuerpo.innerHTML = '<div class="vacio">Ninguno.</div>';
-      return;
-    }
-    var boton = document.createElement('button');
-    boton.className = 'boton boton-peligro';
-    boton.textContent = 'Quitar ' + claves.length + (claves.length === 1 ? ' hito huérfano' : ' hitos huérfanos');
-    boton.onclick = async function () {
-      var lista = claves.map(function (c) { return '<li>' + U.escapar(c) + '</li>'; }).join('');
-      var ok = await U.preguntar('Quitar hitos huérfanos',
-        '<p>Se van a quitar los hitos de estas ' + claves.length + ' entradas de ' +
-        '<code>hitos.json</code>, de asuntos que ya no existen con ese nombre:</p>' +
-        '<ul>' + lista + '</ul>', 'Quitar');
-      if (!ok) return;
-      await Hitos.cambiar(function (d) {
-        claves.forEach(function (c) { delete d.porAsunto[c]; });
-        return d;
-      });
-      U.aviso('Hitos huérfanos quitados.', 'bueno');
-      await App.pintarHitosHuerfanos();
-    };
-    cuerpo.appendChild(boton);
-  };
+  App.pintarHitosHuerfanos = pintarTarjeta;
+  if (window.Problemas) Problemas.calculador('hitos', pintarTarjeta, 10 * 60 * 1000);   /* de fondo, con lo ya leído; al abrir Ajustes, leyendo de verdad */
 
   return {
     mover: mover, fusionar: fusionar, quitar: quitar, restaurar: restaurar,

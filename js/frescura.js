@@ -179,7 +179,7 @@
   }
 
   function registrarEnLinea(estado) {
-    if (!window.AvisosLinea) return;
+    if (!window.AvisosLinea && !window.Problemas) return;
     var epoca = epocaDe(new Date());
     var texto = '';
     var urgente = false;
@@ -191,7 +191,19 @@
       texto = 'fichero de alumnado de hace ' + estado.dias + ' días';
     }
 
-    AvisosLinea.registrar('frescura', texto, urgente, irAMantenimiento);
+    /* Fila 291: el trozo de Inicio lleva a su tarjeta de «Problemas». */
+    if (window.AvisosLinea) AvisosLinea.registrar('frescura', texto, urgente, function () {
+      if (window.Problemas) Problemas.ir('alumnado'); else irAMantenimiento();
+    });
+    if (window.Problemas && window.ProblemasTextos) {
+      var desc = null;
+      if (texto) {
+        desc = ProblemasTextos.alumnado(estado.falta ? { falta: true } : { dias: estado.dias });
+        desc.acciones[0].alPulsar = irAMantenimiento;
+        desc.acciones[1].alPulsar = async function () { await repasar(); U.aviso('He vuelto a mirar la fecha del fichero.', ''); };
+      }
+      Problemas.registrar('alumnado', desc);
+    }
   }
 
   /* ---------- el bloque de Ajustes ----------
@@ -355,6 +367,9 @@
     /* Fila 105 (js/ajustes-plegado.js): si hay aviso, su bloque de Ajustes sube arriba. */
     var d = $('bloque-frescura'); if (d) d.dataset.aviso = estado.falta ? 'falta' : (estado.dias > epocaDe(new Date()).dias ? estado.dias + ' días' : '');
   }
+
+  /* Para la demostración (js/demo/datos.js): volver a mirar la fecha del fichero. */
+  window.Frescura = { repasar: function () { return repasar(); } };
 
   async function arrancar() {
     if (yaMirado) return;

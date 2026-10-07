@@ -98,12 +98,9 @@ App.pintarAjustesMantenimiento = async function () {
   /* Fila 200, apartado 7: Copias de seguridad, Papelera y Tablas de
      datos se pintan ahora desde la pestaña "Herramientas"
      (App.pintarHerramientas, js/herramientas.js), no desde aquí. */
-  if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
-  if (typeof App.pintarHitosHuerfanos === 'function') await App.pintarHitosHuerfanos();
-  if (typeof App.pintarFichasDelArchivo === 'function') await App.pintarFichasDelArchivo();
-  if (typeof App.pintarContactoGuardado === 'function') await App.pintarContactoGuardado();
-  if (typeof App.pintarEnvolturas === 'function') App.pintarEnvolturas();
-  if (window.Conservacion) await Conservacion.pintar();   /* fila 136: plazo de conservación cumplido */
+  /* Fila 291: los problemas son tarjetas de la pestaña «Problemas» (js/problemas.js); al entrar en
+     Ajustes se calculan todas de nuevo, sin esperar los diez minutos de lo caro. */
+  if (window.Problemas) await Problemas.calcular({ forzar: true });
   /* Fila 105: los avisos de fallo arriba (solo si hay), Herramientas
      al final y el resumen de cada título. */
   if (window.AjustesPlegado) AjustesPlegado.ordenarMantenimiento();

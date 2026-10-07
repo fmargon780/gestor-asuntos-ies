@@ -318,82 +318,43 @@
     }
   }
 
-  /* ---------- el bloque de Ajustes ---------- */
+  /* ---------- la tarjeta de «Problemas» ----------
 
-  function bloqueDeAjustes() {
-    var ya = $('bloque-conflictos');
-    if (ya) return ya;
-    /* 17-sep-2026, fila 39: este bloque vive en la pestaña
-       "Mantenimiento", no en la pantalla de Ajustes entera. */
-    var pantalla = $('ajustes-tab-mantenimiento');
-    if (!pantalla) return null;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-conflictos';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Conflictos de Dropbox</span>' +
-        '<span class="bloque-pie" id="conflictos-pie">Cuando los dos ordenadores guardan casi a la vez</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">Los cambios de <code>asuntos.json</code> y <code>tablon.json</code> se ' +
-        'unen solos, sin preguntar. Los de las demás listas —que cambian mucho menos— se avisan ' +
-        'aquí, para elegir con cuál de los dos ordenadores quedarse. El que no se elija no se ' +
-        'pierde: se guarda en <code>_GESTOR/copias</code>.</p>' +
-        '<div id="tabla-conflictos" class="lista"></div>' +
-      '</div>';
-    pantalla.appendChild(d);
-    return d;
-  }
+     Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): ya no es una sección de Ajustes sino la tarjeta
+     «N cosas se guardaron a la vez en dos ordenadores». Cada una dice qué es con palabras. */
+
+  var COMO_SE_LLAMA = {
+    'tipos.json': 'la lista de tipos de asunto', 'tipos-documento.json': 'la lista de tipos de documento',
+    'estados.json': 'la lista de estados', 'campos.json': 'los campos propios', 'guias.json': 'las guías',
+    'recurrentes.json': 'los asuntos que se repiten', 'frescura.json': 'los avisos del fichero de alumnado',
+    'grupos.json': 'los grupos de personas', 'cargos.json': 'los cargos del centro', 'usuarios.json': 'la lista de usuarios',
+    'hitos-biblioteca.json': 'la biblioteca de hitos', 'formularios-campos.json': 'las casillas de los impresos',
+    'plantillas.json': 'las plantillas', 'rutas.json': 'las rutas de las carpetas', 'margenes-pdf.json': 'los márgenes de los PDF',
+    'no-duplicados.json': 'los duplicados descartados', 'papelera.json': 'la papelera', 'envios.json': 'los envíos de correo',
+    'asuntos.json': 'la lista de asuntos', 'tablon.json': 'el tablón', 'hitos.json': 'los hitos',
+    'perfiles.json': 'los perfiles', 'encargos.json': 'los encargos'
+  };
+
+  function comoSeLlama(real) { return COMO_SE_LLAMA[real] || 'una lista de la aplicación'; }
 
   function pintarBloque() {
-    bloqueDeAjustes();
-    var caja = $('tabla-conflictos');
-    var pie = $('conflictos-pie');
-    if (!caja) return;
-    if (pie) pie.textContent = pendientes.length
-      ? pendientes.length + (pendientes.length === 1 ? ' conflicto por resolver' : ' conflictos por resolver')
-      : 'Cuando los dos ordenadores guardan casi a la vez';
-    caja.innerHTML = '';
-    if (!pendientes.length) {
-      caja.innerHTML = '<div class="vacio">Sin conflictos pendientes.</div>';
-      return;
-    }
-    pendientes.forEach(function (p) {
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
-      /* Fila 130: una fila de un CSV de terceros que choca por el nombre. */
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!pendientes.length) { Problemas.registrar('conflictos', null); return; }
+    var d = ProblemasTextos.conflictos(pendientes.map(function (p) {
       if (p.fila) {
-        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.real) + '</span>' +
-          '<span class="suave" style="flex:1">' + U.escapar(p.nombre) + ': el otro ordenador tenía ' +
-          U.escapar(Object.keys(p.fila).map(function (k) { return p.fila[k]; }).filter(Boolean).join(' · ')) + '</span>';
-        var deja = document.createElement('button');
-        deja.className = 'boton';
-        deja.textContent = 'Dejar los de este ordenador';
-        deja.onclick = function () { pendientes = pendientes.filter(function (x) { return x !== p; }); pintarBloque(); };
-        f.appendChild(deja);
-        var toma = document.createElement('button');
-        toma.className = 'boton';
-        toma.textContent = 'Quedarse con los del otro';
-        toma.onclick = function () { quedarseConLaFilaDelOtro(p); };
-        f.appendChild(toma);
-        caja.appendChild(f);
-        return;
+        return { fila: true, nombre: 'Los datos de ' + p.nombre,
+          detalle: 'el otro ordenador tenía ' + Object.keys(p.fila).map(function (k) { return p.fila[k]; }).filter(Boolean).join(' · ') };
       }
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.real) + '</span>' +
-        '<span class="suave" style="flex:1">' + U.escapar(p.nombreConflicto) + '</span>';
-      var esteOrdenador = document.createElement('button');
-      esteOrdenador.className = 'boton';
-      esteOrdenador.textContent = 'Quedarse con el de este ordenador';
-      esteOrdenador.onclick = function () { quedarseConEsteOrdenador(p); };
-      f.appendChild(esteOrdenador);
-      var otro = document.createElement('button');
-      otro.className = 'boton';
-      otro.textContent = 'Quedarse con el otro';
-      otro.onclick = function () { quedarseConElOtro(p); };
-      f.appendChild(otro);
-      caja.appendChild(f);
+      return { nombre: comoSeLlama(p.real).replace(/^./, function (c) { return c.toUpperCase(); }), detalle: '' };
+    }));
+    pendientes.forEach(function (p, i) {
+      var acc = d.elementos[i].acciones;
+      acc[0].alPulsar = p.fila
+        ? function () { pendientes = pendientes.filter(function (x) { return x !== p; }); pintarBloque(); }
+        : function () { return quedarseConEsteOrdenador(p); };
+      acc[1].alPulsar = p.fila ? function () { return quedarseConLaFilaDelOtro(p); } : function () { return quedarseConElOtro(p); };
     });
+    Problemas.registrar('conflictos', d);
   }
 
   /* ---------- la revisión ---------- */

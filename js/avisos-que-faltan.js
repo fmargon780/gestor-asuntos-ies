@@ -5,8 +5,8 @@
    ya sabía pero no decía.
 
    1. Fichas sin carpeta (huérfanas): antes solo se veían entrando a
-      propósito en Ajustes → Mantenimiento. Ahora hay una línea aquí
-      que lleva directo a ese bloque.
+      propósito en Ajustes → Mantenimiento. Desde la fila 291 son una
+      tarjeta de «Problemas» y Inicio avisa con «N problemas por resolver».
    2. La papelera: desde la fila 203 avisa de lo que se borrará del todo
       pronto («12 cosas se borrarán del todo el 3-oct · Ver»); «Ver»
       abre Herramientas › Papelera filtrada a esas cosas.
@@ -94,14 +94,6 @@
      js/avisos-linea.js, que al pulsarlo lleva a su bloque de
      Mantenimiento (lo que hacía el botón "Verlas" de antes). */
 
-  function irAMantenimiento(idBloque) {
-    /* Fila 288: el bloque ya no está en «Mantenimiento» sino en su pestaña de Ajustes (o en Herramientas). */
-    if (App.irASeccionDeAjustes && App.irASeccionDeAjustes('#' + idBloque)) return;
-    App.ir('ajustes');
-    var bloque = $(idBloque);
-    if (bloque) bloque.open = true;
-  }
-
   /* Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: la
      papelera se ha ido a la pestaña "Herramientas", calcada a
      irAMantenimiento pero sin pasar por Ajustes. */
@@ -111,14 +103,13 @@
     if (bloque) bloque.open = true;
   }
 
+  /* Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): las fichas sin carpeta ya no tienen su trozo en
+     Inicio: son una tarjeta más de «Problemas» y el trozo es «N problemas por resolver»
+     (js/problemas.js). Aquí solo se lanzan los cálculos de las tarjetas en cada refresco de
+     Inicio: ninguno fuerza una lectura del ARCHIVO, ninguno corre con un guardado en marcha, y
+     lo caro se calcula como mucho cada diez minutos. */
   async function pintarHuerfanas() {
-    if (!window.AvisosLinea) return;
-    var huerfanas = await calcularHuerfanas();
-    var activo = huerfanas.length && sePintaHuerfanas(huerfanas.length, guardadoHuerfanas());
-    var texto = activo
-      ? (huerfanas.length === 1 ? '1 ficha sin carpeta' : huerfanas.length + ' fichas sin carpeta')
-      : '';
-    AvisosLinea.registrar('huerfanas', texto, false, function () { irAMantenimiento('bloque-huerfanas'); });
+    if (window.Problemas) await Problemas.calcular();
   }
 
   /* Medir la papelera recorre sus ficheros: se hace como mucho cada

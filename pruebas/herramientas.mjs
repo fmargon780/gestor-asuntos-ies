@@ -181,7 +181,15 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.waitForSelector('[data-aviso="frescura"]');
 await pagina.click('[data-aviso="frescura"]');
 await pagina.waitForTimeout(200);
-await comprobar('el aviso de alumnado desfasado lleva a Herramientas, con "Traer el alumnado" abierto',
+/* Fila 291: el trozo lleva a su tarjeta de «Problemas»; su botón «Traer el alumnado» es el que lleva a Herramientas. */
+await comprobar('el aviso de alumnado desfasado lleva a su tarjeta de Ajustes → Problemas',
+  pagina.evaluate(() => ({
+    pantalla: document.querySelector('.pestana.activa').dataset.pantalla,
+    tarjeta: !!document.querySelector('#ajustes-tab-problemas:not(.oculto) [data-problema="alumnado"]')
+  })), { pantalla: 'ajustes', tarjeta: true });
+await pagina.locator('[data-problema="alumnado"]').getByRole('button', { name: /Traer el alumnado/ }).click();
+await pagina.waitForTimeout(200);
+await comprobar('y «Traer el alumnado» lleva a Herramientas, con "Traer el alumnado" abierto',
   pagina.evaluate(() => ({
     pantalla: document.querySelector('.pestana.activa').dataset.pantalla,
     traerAbierto: document.getElementById('bloque-traer-alumnado').open

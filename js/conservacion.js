@@ -20,8 +20,9 @@
      tiempo…».
 
    El aviso: al entrar, una vez al día como mucho, un aviso ámbar si hay
-   alguno; y en Ajustes › Mantenimiento, el bloque «Plazo de
-   conservación cumplido» (solo si hay), con la lista y dos botones.
+   alguno; y en Ajustes › Problemas, la tarjeta «N asuntos archivados han
+   cumplido su plazo de conservación» (solo si hay), con la lista y dos
+   botones (fila 291).
    ============================================================ */
 var Conservacion = (function () {
 
@@ -99,7 +100,7 @@ var Conservacion = (function () {
         '<input type="number" min="1" step="1" class="campo campo-plazo tipo-conservar-anios" placeholder="—"> ' +
         'años después de archivar</label>' +
       '<p class="nota">Vacío: sin plazo, y no avisa nunca. Cuando un archivado lo cumpla, sale en ' +
-        'Ajustes › Mantenimiento; nunca se borra nada solo. Plazos de referencia: ' +
+        'Ajustes › Problemas; nunca se borra nada solo. Plazos de referencia: ' +
         '<a href="' + ENLACE + '" target="_blank" rel="noopener">tablas de valoración de la Junta de Andalucía</a>.</p>';
     var campo = fila.querySelector('.tipo-conservar-anios');
     campo.value = aniosDeTipo(tipo) || '';
@@ -125,90 +126,45 @@ var Conservacion = (function () {
     return fila;
   }
 
-  /* ---------- Ajustes › Mantenimiento ---------- */
+  /* ---------- la tarjeta de «Problemas» ----------
 
-  var bloque = null;
+     Fila 291 (docs/PROBLEMAS-CON-SU-SOLUCION.md): ya no es una sección de Ajustes sino la tarjeta
+     «N asuntos archivados han cumplido su plazo de conservación» (solo si hay), con la lista y los
+     dos botones de siempre. */
+
   var ultimaLista = [];
-
-  function construir() {
-    var tab = $('ajustes-tab-mantenimiento');
-    if (!tab) return null;
-    var det = document.createElement('details');
-    det.className = 'bloque-ajustes';
-    det.id = 'bloque-conservacion';
-    det.innerHTML =
-      '<summary><span class="bloque-titulo">Plazo de conservación cumplido</span>' +
-      '<span class="bloque-pie">Archivados que ya han cumplido el plazo de su tipo</span></summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">Nada se borra solo. Elige los que quieras y mándalos a la papelera ' +
-        '(desde allí se pueden devolver), o apunta que se conserven más tiempo.</p>' +
-        '<label class="conservacion-todos"><input type="checkbox" id="conservacion-todos"> Elegir todos</label>' +
-        '<div class="lista" id="tabla-conservacion"></div>' +
-        '<div class="alta-tipo">' +
-          '<button type="button" class="boton" id="btn-conservacion-papelera">Mandar a la papelera</button>' +
-          '<button type="button" class="boton" id="btn-conservacion-mas">Conservar más tiempo…</button>' +
-        '</div>' +
-      '</div>';
-    tab.insertBefore(det, tab.firstElementChild);
-    det.querySelector('#conservacion-todos').onchange = function (ev) {
-      Array.prototype.forEach.call(det.querySelectorAll('.conservacion-elegir'), function (c) { c.checked = ev.target.checked; });
-    };
-    det.querySelector('#btn-conservacion-papelera').onclick = mandarElegidos;
-    det.querySelector('#btn-conservacion-mas').onclick = conservarMas;
-    return det;
-  }
 
   function textoPlazo(p) {
     if (p.porPeticion) return 'conservar hasta el ' + legible(p.hasta);
     return p.anios + (p.anios === 1 ? ' año' : ' años') + ' · cumplido el ' + legible(p.hasta);
   }
 
+  var turno = 0;   /* si llegan dos cálculos a la vez, solo vale el último */
+
   async function pintar() {
-    if (!bloque || !bloque.isConnected) bloque = construir();
-    if (!bloque) return;
+    var mio = ++turno;
     var r;
     try { r = await leerCumplidos(); } catch (e) { r = { ok: false, lista: [] }; }
+    if (mio !== turno) return;
     ultimaLista = r.lista;
-    bloque.classList.toggle('oculto', !ultimaLista.length);
-    var n = ultimaLista.length;
-    /* Con alguno, arriba del todo (como los demás avisos: `porAviso` hace
-       que el orden de Mantenimiento lo deje ahí), pero plegado. */
-    if (n) {
-      bloque.dataset.porAviso = '1';
-      var tab = bloque.parentNode;
-      if (tab && tab.firstElementChild !== bloque) tab.insertBefore(bloque, tab.firstElementChild);
-    } else {
-      delete bloque.dataset.porAviso;
-    }
-    if (window.AjustesPlegado) {
-      AjustesPlegado.ponerResumen(bloque, n ? n + (n === 1 ? ' asunto ha cumplido su plazo de conservación'
-        : ' asuntos han cumplido su plazo de conservación') : '', true);
-    }
-    var caja = bloque.querySelector('#tabla-conservacion');
-    caja.innerHTML = '';
-    bloque.querySelector('#conservacion-todos').checked = false;
-    ultimaLista.forEach(function (x) {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    if (!ultimaLista.length) { Problemas.registrar('conservacion', null); return; }
+    var d = ProblemasTextos.conservacion(ultimaLista.map(function (x) {
       var e = x.entrada, p = x.plazo;
-      var f = document.createElement('label');
-      f.className = 'fila-tipo conservacion-fila';
-      f.innerHTML = '<input type="checkbox" class="conservacion-elegir" data-nombre="' + U.escapar(e.nombre) + '">' +
-        '<span class="nombre-tipo">' + U.escapar(e.nombre) + '</span>' +
-        '<span class="suave">' + U.escapar(e.tipo || '') + '</span>' +
-        '<span class="suave">Archivado el ' + U.escapar(legible(p.archivadoEl)) + (p.aproximada ? ' (aprox.)' : '') + '</span>' +
-        '<span class="suave">' + U.escapar(textoPlazo(p)) + '</span>';
-      caja.appendChild(f);
-    });
+      return { nombre: e.nombre, dato: e.nombre,
+        detalle: (e.tipo ? e.tipo + ' · ' : '') + 'Archivado el ' + legible(p.archivadoEl) + (p.aproximada ? ' (aprox.)' : '') + ' · ' + textoPlazo(p) };
+    }));
+    d.acciones[0].alPulsar = function (indices) { return mandarElegidos(indices); };
+    d.acciones[1].alPulsar = function (indices) { return conservarMas(indices); };
+    Problemas.registrar('conservacion', d);
   }
 
-  function elegidos() {
-    if (!bloque) return [];
-    var nombres = Array.prototype.filter.call(bloque.querySelectorAll('.conservacion-elegir'), function (c) { return c.checked; })
-      .map(function (c) { return c.dataset.nombre; });
-    return ultimaLista.filter(function (x) { return nombres.indexOf(x.entrada.nombre) !== -1; });
+  function elegidos(indices) {
+    return (indices || []).map(function (i) { return ultimaLista[i]; }).filter(Boolean);
   }
 
-  async function mandarElegidos() {
-    var lista = elegidos();
+  async function mandarElegidos(indices) {
+    var lista = elegidos(indices);
     if (!lista.length) { U.aviso('Elige antes alguno de la lista.', 'ambar'); return; }
     if (!window.Papelera || !Papelera.mandarArchivado) { U.aviso('La papelera no está disponible ahora mismo.', 'malo'); return; }
     var ok = await U.preguntar('Mandar a la papelera',
@@ -228,8 +184,8 @@ var Conservacion = (function () {
     if (typeof App.pintarPapelera === 'function') { try { await App.pintarPapelera(); } catch (e) { /* solo pintar */ } }
   }
 
-  async function conservarMas() {
-    var lista = elegidos();
+  async function conservarMas(indices) {
+    var lista = elegidos(indices);
     if (!lista.length) { U.aviso('Elige antes alguno de la lista.', 'ambar'); return; }
     var anios = 1;
     var ok = await U.preguntar('Conservar más tiempo',
@@ -275,13 +231,15 @@ var Conservacion = (function () {
     var n = r.lista.length;
     if (n) {
       U.aviso(n + (n === 1 ? ' asunto del ARCHIVO ha cumplido' : ' asuntos del ARCHIVO han cumplido') +
-        ' su plazo de conservación. Lo tienes en Ajustes › Mantenimiento.', 'ambar');
+        ' su plazo de conservación. Lo tienes en Ajustes › Problemas.', 'ambar');
     }
   }
 
   if (window.Gestor && window.Gestor.alRefrescar) {
     window.Gestor.alRefrescar.push(function () { if (!yaMirado && App.E && App.E.gestor) revisarAlEntrar(); });
   }
+
+  if (window.Problemas) Problemas.calculador('conservacion', pintar, 10 * 60 * 1000);
 
   return {
     ENLACE: ENLACE,

@@ -89,7 +89,7 @@
     var f = { kind: 'file', name: nombre, _texto: contenido || '' };
     f.getFile = function () {
       var bytes = f._texto;
-      return Promise.resolve(new File([bytes], nombre, { type: tipo || 'text/plain', lastModified: Date.now() }));
+      return Promise.resolve(new File([bytes], nombre, { type: tipo || 'text/plain', lastModified: f._modificado || Date.now() }));
     };
     f.createWritable = function () {
       escrituras++;

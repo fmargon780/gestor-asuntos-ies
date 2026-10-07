@@ -138,13 +138,13 @@ await comprobar('la franja desaparece', pagina.locator('#avisos-linea').isHidden
 
 console.log('--- 4. un aviso nuevo que no estaba oculto la hace volver ---');
 await pagina.evaluate(() => {
-  AvisosLinea.registrar('huerfanas', '1 ficha sin carpeta', false, function () {});
+  AvisosLinea.registrar('registro-atrasado', '1 apunte atrasado', false, function () {});
 });
 await pagina.waitForTimeout(200);
 await comprobar('la franja vuelve a salir, aunque sea el mismo día',
   pagina.locator('#avisos-linea').isVisible(), true);
 await comprobar('con el trozo nuevo',
-  pagina.locator('[data-aviso="huerfanas"]').textContent(), '1 ficha sin carpeta');
+  pagina.locator('[data-aviso="registro-atrasado"]').textContent(), '1 apunte atrasado');
 
 /* ================= 5. UN SOLO "VOLVER" (FILA 194) ================= */
 
