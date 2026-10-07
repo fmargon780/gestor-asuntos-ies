@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 07-oct-2026 (filas 301 y 302 PENDIENTE, desde la conversación de diseño)
+Última puesta al día: 07-oct-2026 (fila 299 PENDIENTE, desde la conversación de diseño)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -22,5 +22,7 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 295 | 240 | Tres módulos nuevos: la pantalla de dos columnas con la muestra y «A quién», la tanda de uno en uno con apunte cada diez, los fallos y el tope diario con «Seguir enviando», el aviso de Inicio, los avisos sin documento como un trabajo más, un PDF `CORREO` por tanda, retirar «Enviar a cada uno», dos pruebas nuevas y el revisor con 15 puntos |
 | 296 | 150 | Un módulo nuevo: partir lo pegado o el fichero, el reconocimiento por número, DNI y nombre con su índice, el cuadro con tres apartados, guardar como grupo, dos tocayos en la demostración, una prueba nueva con quince casos y el revisor con 11 puntos |
 | 297 | 120 | Arreglo sin módulo nuevo: la foto de los hitos al abrir la guía, la pregunta solo por lo cambiado con su tabla «Antes»/«Ahora», subir a la biblioteca solo unos campos, el tercer botón «Cancelar» que vuelve al cuadro de la guía, comprobar la pantalla del botón de soporte, datos de demostración, una prueba nueva con nueve casos y el revisor |
+| 299 | 240 | Dos módulos nuevos (quién es el tutor del grupo, con la unidad comparada y las fechas; la pasada única que cambia el hito, crea la plantilla y pone «a quién» en las tareas de tutoría), el saludo y dos líneas nuevas en el cuadro de Correo, el correo escrito a mano que se recuerda, «Adjuntar solo» en las plantillas, datos de demostración, tres pruebas nuevas y el revisor con 11 puntos |
+| 300 | 100 | Arreglo sin módulo nuevo: una función pura que recoloca los hitos sin hacer por niveles, el cambio de hito actual sin perder lo apuntado, el enganche solo en «Cambiar la guía», el texto del aviso, dos asuntos en la demostración si faltan, una prueba nueva de once puntos y el revisor |
 | 301 | 30 | Solo documentación: cinco contradicciones ya vistas entre `CLAUDE.md`, la cola y tres documentos, buscar si hay más, y borrar o corregir lo caducado; sin código ni pruebas |
 | 302 | 45 | Seis pruebas que fallan también en `main`: averiguar por qué, arreglarlas o retirarlas, la lista de retiradas en el ejecutor, tope y fechas en `EN_SOLITARIO` y una pasada completa |
