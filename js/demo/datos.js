@@ -160,7 +160,6 @@
     var bajaMedica = await crearTipoConGuia('BAJA MEDICA', 'PERSONAL', [
       { titulo: 'Recibir el parte de baja', cuerpo: '<p>Del interesado o de la mutua.</p>', responsable: 'yo' },
       { titulo: 'Esperar el parte de alta', cuerpo: '<p>Hasta que el interesado lo traiga.</p>', toca: 'espera', tocaA: 'Interesado' },
-      /* Fila 286: un hito después de la espera, para que «Espera terminada» diga qué toca ahora. */
       { titulo: 'Archivar el parte de alta', cuerpo: '<p>Dejar el parte en la carpeta.</p>', responsable: 'yo' }
     ], null);
 
@@ -207,7 +206,6 @@
     consejo.nombreCorto = 'CertConsEsc';
     await App.guardarTipos();
 
-    /* Fila 285: el tipo cuyo primer hito tiene tareas de generar, registrar y comunicar (js/demo/datos-hacer-hito.js). */
     var notas = null;
     if (window.Demo.hacer) {
       var idPlantilla = await Demo.hacer.crearPlantilla();
@@ -217,9 +215,7 @@
       ], null);
     }
 
-    /* Fila 284: una guía de la tabla de plazos legales (Reclamación de calificaciones), con sus tres hitos
-       sacados de la biblioteca y SIN plazo: el que se lo pone es la pasada de js/plazos-del-centro.js. */
-    await crearReclamacion();
+    await crearReclamacion();   /* fila 284: guía de la tabla de plazos, sin plazo (lo pone js/plazos-del-centro.js) */
 
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
              'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo, 'CERTIFICADO DE NOTAS': notas };
@@ -398,9 +394,8 @@
                          'propio:p-fecha-factura': { valor: hace(58), enNombre: false } } }
     });
 
-    /* Fila 285: dos asuntos para «Hacer este hito» (uno sin tocar y otro esperando el PDF sellado). */
     if (window.Demo.hacer && tipos['CERTIFICADO DE NOTAS']) {
-      await Demo.hacer.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], tipoBaja: tipos['BAJA MEDICA'], crearAsunto: crearAsunto, hace: hace });
+      await Demo.hacer.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], tipoBaja: tipos['BAJA MEDICA'], tipos: tipos, archivar: archivarDeMentira, crearAsunto: crearAsunto, hace: hace });
     }
 
     /* 6d. fila 244: dos facturas más, con un importe negativo y uno que no es una cifra

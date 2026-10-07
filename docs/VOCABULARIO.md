@@ -33,6 +33,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | La clase de un campo propio con cifras en euros / con cifras / con día | **Importe en euros**, **Número**, **Fecha** (junto a «Texto libre» y «Lista cerrada») | cantidad, moneda, numérico |
 | El código único de un asunto (`A26-0137`) o de un documento (`D26-01234`) | **número del asunto**, **número del documento** | código, referencia, expediente |
 | Un asunto terminado de un tipo que hay que liquidar antes de archivar / el paso de entregar lo cobrado | **Por liquidar** (pestaña de Inicio), **Liquidar**, **liquidación** (el PDF) | pendiente de cobro, cierre de caja |
+| Lo que es cada nombre de quien entra (Administración, Dirección, Secretaría o Jefatura de Estudios) / quien entra con uno que no es de Administración | **perfil** / **directivo** | rol, permisos, usuario restringido |
 | Una línea del registro de entrada o de salida de Séneca (en el control del registro) | **apunte** («apuntes sin asunto», «Apunte de registro») | asiento, entrada del registro |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se

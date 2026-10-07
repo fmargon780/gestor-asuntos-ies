@@ -12,7 +12,7 @@ var Carpetas = (function () {
   }
 
   /* Fila 260: en un ordenador de solo consulta, las carpetas se piden solo para leer. */
-  function modo() { return (window.SoloConsulta && SoloConsulta.activo()) ? 'read' : 'readwrite'; }
+  function modo() { return (window.SoloConsulta && (SoloConsulta.soloPorMarca ? SoloConsulta.soloPorMarca() : SoloConsulta.activo())) ? 'read' : 'readwrite'; }   /* fila 287: un directivo pide permiso de escritura */
 
   /* Abre el cuadro de Windows para señalar una carpeta. */
   function elegir(id) {

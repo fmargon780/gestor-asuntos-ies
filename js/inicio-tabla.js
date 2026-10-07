@@ -39,6 +39,7 @@
      "En Administración"); con 'todos' de partida se preserva ese
      comportamiento para cualquier prueba que no mencione pestañas. */
   function pestanaInicial() {
+    if (window.Perfil && Perfil.esDirectivo()) return 'todos';   /* fila 287: una sola lista */
     try {
       var v = window.localStorage.getItem(CLAVE_PESTANA);
       return PESTANAS.indexOf(v) !== -1 ? v : 'todos';
@@ -224,6 +225,7 @@
 
   async function pintar() {
     if (!$('inicio-todos-asuntos') || !window.QueMeToca) return;
+    if (window.Perfil && Perfil.esDirectivo()) pestanaActual = 'todos';   /* fila 287: un directivo ve una sola lista */
     var esteTurno = ++turno;
     var texto = textoBuscado();
 

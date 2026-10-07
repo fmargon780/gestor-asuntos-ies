@@ -83,6 +83,7 @@
     await Hitos.guardarCampos(clave, h.id, { cadena: { estado: 'esperando-sello', tarea: 'g-hacer-registrar', documento: nombrePdf,
       quien: 'Revisor', cuando: new Date(Date.now() - 3600000).toISOString() } });
     await construirEsperas(o);
+    if (window.Demo.perfil) await Demo.perfil.construir(o);   /* fila 287 */
   }
 
   /* Fila 286 (docs/ESPERAS-QUE-SE-CIERRAN.md): un papel suelto del tercero de un asunto que está en espera (el de Marta,

@@ -200,6 +200,8 @@ $('btn-archivo').onclick = function () {
 
 $('btn-entrar').onclick = async function () {
   try {
+    /* Fila 287 (docs/PERFIL-DIRECTIVO.md): el perfil se lee ANTES de proteger nada y sin crear nada. */
+    if (window.Perfil) await Perfil.leerAntes(App.E.abiertos, $('campo-usuario').value.trim());
     /* Fila 260: en solo consulta, las dos carpetas van protegidas (js/solo-consulta.js). */
     if (window.SoloConsulta) {
       App.E.abiertos = SoloConsulta.proteger(App.E.abiertos);

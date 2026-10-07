@@ -576,7 +576,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 
 /* Fila 260 (docs/SOLO-CONSULTA-EN-ESTE-ORDENADOR.md): el aviso fijo de «solo consulta» y la casilla de entrada. */
 :root { --franja-consulta-alto: 0px; }
-#franja-solo-consulta {
+#franja-solo-consulta, #franja-perfil {
   position: fixed; top: var(--franja-demo-alto, 0px); left: 0; right: 0; z-index: 69;
   display: flex; align-items: center; justify-content: center; gap: 14px; padding: 7px 16px;
   background: #fff4d6; color: #1b2430; font-size: 14px; border-bottom: 2px solid #e0b34a;
@@ -584,6 +584,12 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 #franja-solo-consulta .boton { padding: 3px 10px; font-size: 12.5px; }
 body.solo-consulta { padding-top: var(--franja-consulta-alto); }
 body.solo-consulta.demo-activo { padding-top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto)); }
+/* Fila 287: la línea fija de un directivo (sin botón) y lo que no ve. */
+#franja-perfil { background: #e8eef5; border-bottom-color: #9db3cc; }
+body.perfil-directivo .pestana[data-pantalla="nuevo"], body.perfil-directivo .pestana[data-pantalla="personas"], body.perfil-directivo .pestana[data-pantalla="formularios"],
+body.perfil-directivo .pestana[data-pantalla="cuentas"], body.perfil-directivo .pestana[data-pantalla="herramientas"], body.perfil-directivo .pestana[data-pantalla="ajustes"],
+body.perfil-directivo #btn-nuevo-asunto, body.perfil-directivo #inicio-tablon-hueco, body.perfil-directivo #tablon, body.perfil-directivo #inicio-fila-superior,
+body.perfil-directivo .accion-de-administracion, body.perfil-directivo .guion-soltar, body.perfil-directivo #comprobacion-marca, body.perfil-directivo .inicio-pestana:not([data-pestana="todos"]), body.perfil-directivo label.filtro:has(#filtro-organo) { display: none !important; }
 body.solo-consulta .lateral { top: var(--franja-consulta-alto); height: calc(100vh - var(--franja-consulta-alto)); }
 body.solo-consulta.demo-activo .lateral {
   top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto));

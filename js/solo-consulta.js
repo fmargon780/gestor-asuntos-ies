@@ -32,7 +32,12 @@ window.SoloConsulta = (function () {
   }
 
   /* ¿Está puesta ahora? (`pausar` la apaga un momento: solo lo usa la copia de pruebas para montar sus datos.) */
-  function activo() { return marcado && !pausado; }
+  function activo() { return (marcado && !pausado) || directivo(); }
+  /* Fila 287 (docs/PERFIL-DIRECTIVO.md): quien entra con un perfil de directivo va protegido igual. */
+  function directivo() { return !!(window.Perfil && Perfil.esDirectivo()); }
+  /* Solo la marca de este ordenador (el permiso de las carpetas, que para un directivo es de escritura). */
+  function soloPorMarca() { return marcado && !pausado; }
+  function textoError() { return (!marcado && directivo()) ? 'Con tu perfil no se puede cambiar esto.' : TEXTO_ERROR; }
   function pausar(si) { pausado = !!si; }
 
   function guardar(valor) {
@@ -50,7 +55,7 @@ window.SoloConsulta = (function () {
   }
 
   function error() {
-    var e = new Error(TEXTO_ERROR);
+    var e = new Error(textoError());
     e.name = 'SoloConsulta';
     return e;
   }
@@ -108,6 +113,8 @@ window.SoloConsulta = (function () {
   }
 
   function proteger(h) { return activo() ? envolver(h) : h; }
+  /* La carpeta sin envolver: solo para `Perfil.escribir` (fila 287). */
+  function crudo(h) { return desenvolver(h); }
 
   /* ---------- la pantalla de entrada y el aviso fijo ---------- */
 
@@ -125,7 +132,7 @@ window.SoloConsulta = (function () {
   }
 
   function medirFranja() {
-    var f = document.getElementById('franja-solo-consulta');
+    var f = document.getElementById('franja-solo-consulta') || document.getElementById('franja-perfil');
     document.documentElement.style.setProperty('--franja-consulta-alto', f ? Math.ceil(f.getBoundingClientRect().height) + 'px' : '0px');
   }
 
@@ -140,6 +147,21 @@ window.SoloConsulta = (function () {
   function alEntrar() {
     if (!activo()) return;
     document.body.classList.add('solo-consulta');
+    /* Fila 287: un directivo no ve la franja de «solo consultar» sino una línea fija, discreta. */
+    if (!marcado && directivo()) {
+      document.body.classList.add('perfil-directivo');
+      if (!document.getElementById('franja-perfil')) {
+        var fp = document.createElement('div');
+        fp.id = 'franja-perfil';
+        fp.setAttribute('role', 'status');
+        fp.innerHTML = '<span>' + U.escapar(Perfil.textoDeEntrada()) + '</span>';
+        document.body.insertBefore(fp, document.body.firstChild);
+        window.addEventListener('resize', medirFranja, { passive: true });
+      }
+      medirFranja();
+      vigilarControles();
+      return;
+    }
     if (!document.getElementById('franja-solo-consulta')) {
       var f = document.createElement('div');
       f.id = 'franja-solo-consulta';
@@ -212,6 +234,7 @@ window.SoloConsulta = (function () {
 
   return {
     activo: activo, pausar: pausar, poner: poner, guardar: guardar, proteger: proteger, error: error, esError: esError,
-    alEntrar: alEntrar, enganchar: enganchar, apagarControles: apagarControles, TEXTO_ERROR: TEXTO_ERROR
+    alEntrar: alEntrar, enganchar: enganchar, apagarControles: apagarControles, TEXTO_ERROR: TEXTO_ERROR,
+    textoError: textoError, soloPorMarca: soloPorMarca, crudo: crudo
   };
 })();

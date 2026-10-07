@@ -41,6 +41,7 @@
   var ultimaRevision = 0;
   var pendientes = [];   /* { real, nombreConflicto } de los que no se fusionan solos */
   I.pendientesPush = function (p) { pendientes.push(p); };
+  I.archivarConflicto = function (g, nombre) { return archivarConflicto(g, nombre); };   /* fila 287 */
   I.pintarBloque = function () { pintarBloque(); };
 
   /* Fila 178, punto 3: deja en 'destino' (el objeto que se va a guardar
@@ -423,6 +424,10 @@
         if (await fusionarTablon(g, nombre)) {
           U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         }
+        continue;
+      }
+      if (real === 'perfiles.json' && window.Perfil) {   /* fila 287: por nombre */
+        if (await Perfil.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         continue;
       }
       if (real === 'hitos.json') {

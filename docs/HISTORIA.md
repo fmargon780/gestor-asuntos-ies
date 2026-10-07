@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 7-oct-2026 — Fila 287: el perfil directivo
+
+Primera de tres filas (287, 289, 290) para abrir la aplicación al equipo directivo, a consultar y encargar, no a tramitar. Cada nombre de la lista de entrada tiene un perfil (Administración, Dirección, Secretaría o Jefatura de Estudios) en `_GESTOR/perfiles.json`; quien entra con uno de los tres últimos va protegido como «solo consultar» y ve solo Inicio y Archivo con los asuntos de su órgano. Decisiones: se reutiliza `SoloConsulta.activo()` (todo lo que ya se apagaba en solo consulta se apaga solo, también las tareas de fondo), el permiso de las carpetas sigue siendo de escritura (por `soloPorMarca`) para la puerta `Perfil.escribir`, y las listas se filtran en su origen (`App.E.listaAbiertos` y `listaArchivo`), así que todo lo que lista o busca queda filtrado sin tocar cada sitio. Para instalarlo en el ordenador de un directivo: entrar primero una vez con un nombre de Administración, señalar las carpetas y después entrar con el nombre del directivo. La copia de pruebas admite `&usuario=<nombre>`. Prueba: `pruebas/perfil.mjs`.
+
 ## 6-oct-2026 — Fila 286: las esperas se cierran al llegar el documento
 
 Segunda mitad de la auditoría de procedimiento: cuando llega lo que se esperaba hay que guardar el documento, abrir el hito, marcar su tarea y darlo por hecho; y si el plazo vence, solo se pone en rojo. Ahora, al ponerle nombre a un documento que entra en un asunto en espera sale una casilla ya marcada que termina la espera (con aviso y «Deshacer», sin cambiar de pantalla), y el hito de espera vencido lleva «No ha llegado nada». Decisiones: el hito se da por hecho con la casilla de siempre sin pintarla (`marcarDesdeCasilla` con un `input` suelto); la marca `sinRespuesta` se escribe después de darlo por hecho (un hito sin hacer la suelta al normalizarse); la copia de pruebas añade un tercer hito a BAJA MEDICA para que «Espera terminada» diga qué toca ahora. Prueba: `pruebas/esperas.mjs`.

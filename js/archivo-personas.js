@@ -98,6 +98,7 @@ App.verArchivo = async function () {
     };
   });
   salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
+  if (window.Perfil) salida = salida.filter(Perfil.veAsunto);   /* fila 287 */
   App.E.listaArchivo = salida;
 
   var partes = [salida.length + ' asuntos archivados.'];
@@ -113,7 +114,7 @@ App.verArchivo = async function () {
     explica.appendChild(document.createTextNode(avisoIndice + ' '));
     var btnAviso = document.createElement('button');
     btnAviso.type = 'button';
-    btnAviso.className = 'enlace';
+    btnAviso.className = 'enlace accion-de-administracion';   /* fila 287 */
     btnAviso.textContent = 'Reconstruir el índice';
     btnAviso.onclick = function () { App.reconstruirIndiceArchivo(btnAviso); };
     explica.appendChild(btnAviso);
@@ -221,7 +222,7 @@ $('selector-curso-archivo').onchange = function () {
   var reconstruir = document.createElement('button');
   reconstruir.type = 'button';
   reconstruir.id = 'btn-reconstruir-indice';
-  reconstruir.className = 'boton';
+  reconstruir.className = 'boton accion-de-administracion';   /* fila 287: un directivo no la ve */
   reconstruir.title = 'Recorre el archivo entero una vez y guarda el índice de búsqueda';
   reconstruir.textContent = 'Reconstruir el índice';
   reconstruir.onclick = function () { App.reconstruirIndiceArchivo(reconstruir); };
