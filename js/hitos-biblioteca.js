@@ -308,6 +308,25 @@ var HitosBiblioteca = (function () {
     return salida;
   }
 
+  /* Fila 297: lo que el usuario ha cambiado en un hito entre `antes` (cómo
+     estaba al abrir la guía; con `null`, el propio modelo) y `ahora`, con
+     los mismos campos y textos que `diferencias`. Devuelve una lista de
+     { campo, etiqueta, antes, ahora, biblioteca }; `biblioteca` solo lleva
+     texto si el modelo tiene un valor distinto del de «antes». Un campo que
+     ahora ya vale lo mismo que el modelo no es un cambio que haya que subir. */
+  function cambiosEntre(antes, ahora, modelo) {
+    var salida = [];
+    CAMPOS_COMPARABLES.forEach(function (c) {
+      var mk = c.modeloClave || c.clave;
+      var libre = textoLegibleDe(c.clave, modelo ? modelo[mk] : undefined);
+      var a = antes ? textoLegibleDe(c.clave, antes[c.clave]) : libre;
+      var b = textoLegibleDe(c.clave, ahora[c.clave]);
+      if (a === b || b === libre) return;
+      salida.push({ campo: c.clave, etiqueta: c.etiqueta, antes: a, ahora: b, biblioteca: libre !== a ? libre : '' });
+    });
+    return salida;
+  }
+
   /* ==========================================================
      CREAR, ACTUALIZAR Y BORRAR UN MODELO
      ========================================================== */
@@ -330,6 +349,29 @@ var HitosBiblioteca = (function () {
       nuevo.id = m.id;
       nuevo.creadoEl = m.creadoEl;
       Object.assign(m, nuevo);
+      resultado = m;
+      return d;
+    });
+    return resultado;
+  }
+
+  /* Fila 297: sube a un modelo solo los campos `claves` de un hito (por la
+     misma puerta, `cambiar`); lo demás del modelo se queda como estaba. La
+     revisión sube igual. Los campos que el modelo no guarda (el aviso a quien
+     lo pide) no se copian. Devuelve el modelo, o null si ya no existe. */
+  async function subirCampos(idModelo, paso, claves, usuario) {
+    var resultado = null;
+    await cambiar(function (d) {
+      var m = buscar(d, idModelo);
+      if (!m) return d;
+      var nuevo = pasoAModelo(paso, m.nombre, m.revision + 1, usuario);
+      CAMPOS_COMPARABLES.forEach(function (c) {
+        var mk = c.modeloClave || c.clave;
+        if (claves.indexOf(c.clave) !== -1 && mk in nuevo) m[mk] = nuevo[mk];
+      });
+      m.revision = nuevo.revision;
+      m.actualizadoEl = nuevo.actualizadoEl;
+      m.actualizadoPor = nuevo.actualizadoPor;
       resultado = m;
       return d;
     });
@@ -410,7 +452,7 @@ var HitosBiblioteca = (function () {
     enlaceDeNormativa: enlaceDeNormativa, esDeNormativa: esDeNormativa,
     leer: leer, cambiar: cambiar, buscar: buscar,
     esPasoValido: esPasoValido, modeloAPaso: modeloAPaso,
-    diferencias: diferencias,
+    diferencias: diferencias, cambiosEntre: cambiosEntre, subirCampos: subirCampos,
     crearDesdePaso: crearDesdePaso, actualizarDesdePaso: actualizarDesdePaso,
     crearDesdeCero: crearDesdeCero, renombrar: renombrar, editar: editar, borrar: borrar,
     tiposQueUsan: tiposQueUsan, naceSoloInformativo: naceSoloInformativo,

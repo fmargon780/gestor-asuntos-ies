@@ -148,3 +148,10 @@ ellos ya distintos de su modelo:
 2. Con cualquiera de los tres botones la ventana se cierra a la primera.
 3. Con «Cancelar» se vuelve a la guía, con lo escrito.
 4. Abrir y guardar esa guía sin tocar nada no pregunta.
+
+**Cómo se ve en la copia de demostración** (fila 297): hay un tipo, «Medida disciplinaria por conducta gravemente
+perjudicial», con seis hitos de la biblioteca (cuatro ya distintos de su modelo) y un asunto suyo (el de Mateo
+Jimenez). Otro tipo, «Parte de incidencia», usa el primer hito, así que cambiar el título de ese primero dice «(lo usan
+1 tipo más)». Abrir el asunto → «Cambiar la guía» (abajo, en la ficha; o «Cambiar la guía…» del menú ··· de la mesa) →
+abrir un hito, cambiar su título → Guardar. Para el punto 4, abrir «Cambiar la guía» y pulsar Guardar sin tocar nada. La
+pantalla de la pregunta enseña los tres botones «Cancelar» · «Solo aquí» · «También en la biblioteca».

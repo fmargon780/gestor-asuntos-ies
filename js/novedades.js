@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '297', fecha: '2026-10-07', texto: 'Al guardar una guía, la biblioteca solo pregunta por lo que has cambiado, dice el hito y se puede cancelar.' },
   { id: '296', fecha: '2026-10-07', texto: 'Para formar un grupo puedes «Pegar una lista» de Séneca o de una hoja de cálculo.' },
   { id: '295', fecha: '2026-10-07', texto: 'En la lista de personas, «Enviar…» manda a todas su correo, y «Enviar un aviso…» lo hace sin documento.' },
   { id: '294', fecha: '2026-10-07', texto: 'Generar para todos enseña una muestra, deja el PDF de cada uno y reconoce los sellados de Séneca.' },

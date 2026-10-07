@@ -238,12 +238,16 @@ var GuiasBiblioteca = (function () {
   }
 
   /* ==========================================================
-     3. LA REVISIÓN AL PULSAR GUARDAR (apartado 4.3)
+     3. LA REVISIÓN AL PULSAR GUARDAR (apartado 4.3; rehecha en la
+     fila 297, docs/PREGUNTA-DE-LA-BIBLIOTECA-AL-GUARDAR.md)
 
      Se llama DESPUÉS de que el U.preguntar de la guía haya cerrado
-     #capa (su promesa ya está resuelta): aquí sí se puede abrir un
-     U.preguntar por cada hito cambiado, uno detrás de otro. Muta
-     `pasos` en el sitio; no devuelve nada.
+     #capa. Solo pregunta por los hitos de la biblioteca que el usuario
+     ha cambiado esta vez (`foto`: los hitos tal como estaban al abrir
+     «Cambiar la guía», ya convertidos), uno detrás de otro, con tres
+     botones. Nada se escribe hasta contestar la última: si se cancela
+     alguna, no se toca nada y devuelve true (el editor vuelve al cuadro
+     de la guía). Muta `pasos` en el sitio.
      ========================================================== */
 
   function pasosConOrigen(pasos) {
@@ -252,33 +256,70 @@ var GuiasBiblioteca = (function () {
     return (pasos || []).filter(function (p) { return p.origenBiblioteca && !p.origenBiblioteca.divergido; });
   }
 
-  /* `nombreTipo` (fila 201, apartado 3.2): la pregunta se reescribe en
-     una sola frase, con el nombre del tipo y cuántos otros tipos usan
-     ya ese modelo. */
-  async function revisarAlGuardar(pasos, nombreTipo) {
+  /* La tabla de lo cambiado esta vez: Antes · Ahora (y «En la biblioteca»
+     solo si algún renglón tiene un valor distinto del de «Antes»). */
+  function cambiosHTML(cambios) {
+    var conBiblioteca = cambios.some(function (c) { return c.biblioteca; });
+    return '<table class="tabla-comparacion"><thead><tr><th></th><th>Antes</th><th>Ahora</th>' +
+      (conBiblioteca ? '<th>En la biblioteca</th>' : '') + '</tr></thead><tbody>' +
+      cambios.map(function (c) {
+        return '<tr><td>' + U.escapar(c.etiqueta) + '</td><td>' + U.escapar(c.antes) + '</td><td>' +
+          U.escapar(c.ahora) + '</td>' + (conBiblioteca ? '<td>' + U.escapar(c.biblioteca) + '</td>' : '') + '</tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  /* Un cuadro con tres botones: Cancelar · Solo aquí · También en la
+     biblioteca. Devuelve 'subir', 'solo' o null (Cancelar o Escape). */
+  async function preguntarTres(titulo, cuerpoHtml) {
+    var cancelar = $('cuadro-cancelar');
+    var solo = document.createElement('button');
+    solo.type = 'button'; solo.id = 'cuadro-solo-aqui'; solo.className = 'boton'; solo.textContent = 'Solo aquí';
+    cancelar.parentNode.insertBefore(solo, cancelar.nextSibling);
+    var eleccion = null;
+    solo.onclick = function () { eleccion = 'solo'; cancelar.click(); };
+    var ok = await U.preguntar(titulo, cuerpoHtml, 'También en la biblioteca');
+    solo.remove();
+    return ok ? 'subir' : eleccion;
+  }
+
+  /* `nombreTipo` (fila 201): el nombre del tipo y cuántos otros tipos usan
+     ya ese modelo, en el título. */
+  async function revisarAlGuardar(pasos, nombreTipo, foto) {
     var biblioteca = await HitosBiblioteca.leer();
-    var candidatos = pasosConOrigen(pasos);
-    for (var i = 0; i < candidatos.length; i++) {
-      var paso = candidatos[i];
+    /* Los dos lados, normalizados como al guardar la guía (lo que el cuadro lee sin que nadie toque nada,
+       como la plantilla del aviso con el aviso apagado, no cuenta como cambio). */
+    var antes = {}, ahora = {};
+    Guias.normalizar(foto || []).forEach(function (p) { antes[p.id] = p; });
+    Guias.normalizar(pasos).forEach(function (p) { ahora[p.id] = p; });
+    var lista = [];
+    pasosConOrigen(pasos).forEach(function (paso) {
       var modelo = HitosBiblioteca.buscar(biblioteca, paso.origenBiblioteca.id);
-      if (!modelo) continue;
-      var diffs = HitosBiblioteca.diferencias(paso, modelo);
-      if (!diffs.length) continue;
+      if (!modelo) return;
+      /* Sin foto de este hito (se trajo en esta edición): se compara con su modelo, como siempre. */
+      var previo = antes[paso.id] || null;
+      var cambios = HitosBiblioteca.cambiosEntre(previo, ahora[paso.id] || paso, modelo);
+      if (cambios.length) lista.push({ paso: paso, ahora: ahora[paso.id] || paso, modelo: modelo, cambios: cambios, titulo: (previo || paso).titulo || paso.titulo });
+    });
 
-      var otros = await GuiasBiblioteca.otrosTiposQueUsan(modelo.id, nombreTipo);
-      $('cuadro-cancelar').textContent = 'Solo aquí';
-      var subir = await U.preguntar(GuiasBiblioteca.preguntaCambioSoloAqui(nombreTipo, otros),
-        comparacionHTML(diffs), 'También en la biblioteca');
-      $('cuadro-cancelar').textContent = 'Cancelar';
+    for (var i = 0; i < lista.length; i++) {
+      var it = lista[i];
+      var otros = await GuiasBiblioteca.otrosTiposQueUsan(it.modelo.id, nombreTipo);
+      it.respuesta = await preguntarTres(
+        GuiasBiblioteca.preguntaCambioSoloAqui(nombreTipo, otros, it.titulo,
+          lista.length > 1 ? '(' + (i + 1) + ' de ' + lista.length + ')' : ''), cambiosHTML(it.cambios));
+      if (!it.respuesta) return true;   /* Cancelar: no se guarda nada, se olvida lo contestado */
+    }
 
-      if (subir) {
-        var m = await HitosBiblioteca.actualizarDesdePaso(modelo.id, paso, usuario());
+    for (var j = 0; j < lista.length; j++) {
+      var r = lista[j], paso = r.paso;
+      if (r.respuesta === 'subir') {
+        var m = await HitosBiblioteca.subirCampos(r.modelo.id, r.ahora, r.cambios.map(function (c) { return c.campo; }), usuario());
         paso.origenBiblioteca = m ? { id: m.id, revision: m.revision, divergido: false } : paso.origenBiblioteca;
-        biblioteca = await HitosBiblioteca.leer();   /* para que el siguiente hito vea la revisión nueva */
       } else {
         paso.origenBiblioteca = { id: paso.origenBiblioteca.id, revision: paso.origenBiblioteca.revision, divergido: true };
       }
     }
+    return false;
   }
 
   function $(id) { return document.getElementById(id); }
@@ -339,7 +380,7 @@ var GuiasBiblioteca = (function () {
     botonHTML: botonHTML, engancharBoton: engancharBoton,
     revisarAlGuardar: revisarAlGuardar,
     pasosDesactualizados: pasosDesactualizados, abrirComparacion: abrirComparacion,
-    comparacionHTML: comparacionHTML, resumenDeModelo: resumenDeModelo
+    comparacionHTML: comparacionHTML, cambiosHTML: cambiosHTML, resumenDeModelo: resumenDeModelo
   };
 })();
 window.GuiasBiblioteca = GuiasBiblioteca;

@@ -188,8 +188,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Cada hito de una guía dice de dónde viene, siempre a la vista: etiqueta «De la biblioteca», «De la biblioteca ·
   cambiado aquí» o «Propio de este tipo» (fila 202); pulsarla enseña el modelo y «Ver en la biblioteca». Al
   escribir el título de un hito nuevo, si se parece a uno de la biblioteca lo dice con «Usarlo»; al guardar uno
-  cambiado, una sola pregunta («¿Solo para este tipo, o también para la biblioteca?», con cuántos tipos más lo
-  usan); «Guardar en la biblioteca» avisa si ya hay uno parecido. El texto para los documentos de un hito o de un
+  cambiado esta vez (fila 297), una pregunta por hito cambiado, con su título y lo cambiado («Antes · Ahora», y «En la
+  biblioteca» si difiere), con «Cancelar» · «Solo aquí» · «También en la biblioteca» (cancelar vuelve a la guía); «Guardar en la biblioteca» avisa si ya hay uno parecido. El texto para los documentos de un hito o de un
   tipo de documento avisa si otro sitio ya tiene el mismo texto, y ofrece copiarlo.
   En el editor de un hito, "Comunicación"/"Documentos" ya no son secciones propias (fila 199): al abrir el
   editor, cada plantilla de documento marcada y el texto de comunicación (correo/Séneca, con plantilla nueva
