@@ -375,6 +375,7 @@ var HitoMesaDocumentos = (function () {
       zona.classList.remove('encima');
       var ficheros = ev.dataTransfer && ev.dataTransfer.files;
       if (!ficheros || !ficheros.length) return;
+      if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287: un directivo no guarda documentos */
       if (window.Documentos && Documentos.abrir) {
         Documentos.abrir(a, { hito: h, ficheroSoltado: ficheros[0] });
       }

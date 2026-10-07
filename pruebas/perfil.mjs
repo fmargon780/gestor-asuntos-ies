@@ -139,6 +139,7 @@ await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="Aguilar Ponce, Marin
 await pagina.waitForTimeout(1500);
 await comprobar('3. la ficha: sin «Tomar el mando» y sin «Archivar el asunto» encendido',
   pagina.evaluate(() => [document.querySelectorAll('.boton-presencia-tomar').length, [...document.querySelectorAll('#ficha-asunto-cuerpo button, #ficha-archivar button')].filter((b) => /Archivar/.test(b.textContent) && !b.disabled).length]), [0, 0]);
+await comprobar('3. la ficha: la zona «Suelta aquí el PDF» no se ve', visibles(pagina, '.guion-soltar'), 0);
 await pagina.click('#ficha-volver');
 await pagina.click('.pestana[data-pantalla="archivo"]');
 await pagina.waitForTimeout(2500);

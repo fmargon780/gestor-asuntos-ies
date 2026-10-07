@@ -589,7 +589,7 @@ body.solo-consulta.demo-activo { padding-top: calc(var(--franja-demo-alto, 0px) 
 body.perfil-directivo .pestana[data-pantalla="nuevo"], body.perfil-directivo .pestana[data-pantalla="personas"], body.perfil-directivo .pestana[data-pantalla="formularios"],
 body.perfil-directivo .pestana[data-pantalla="cuentas"], body.perfil-directivo .pestana[data-pantalla="herramientas"], body.perfil-directivo .pestana[data-pantalla="ajustes"],
 body.perfil-directivo #btn-nuevo-asunto, body.perfil-directivo #inicio-tablon-hueco, body.perfil-directivo #tablon, body.perfil-directivo #inicio-fila-superior,
-body.perfil-directivo .accion-de-administracion, body.perfil-directivo #comprobacion-marca, body.perfil-directivo .inicio-pestana:not([data-pestana="todos"]), body.perfil-directivo label.filtro:has(#filtro-organo) { display: none !important; }
+body.perfil-directivo .accion-de-administracion, body.perfil-directivo .guion-soltar, body.perfil-directivo #comprobacion-marca, body.perfil-directivo .inicio-pestana:not([data-pestana="todos"]), body.perfil-directivo label.filtro:has(#filtro-organo) { display: none !important; }
 body.solo-consulta .lateral { top: var(--franja-consulta-alto); height: calc(100vh - var(--franja-consulta-alto)); }
 body.solo-consulta.demo-activo .lateral {
   top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto));
