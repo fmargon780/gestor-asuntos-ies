@@ -179,7 +179,7 @@ console.log('--- 4. volver sin perder la categoría ni el buscador ---');
 await pagina.click('#pantalla-tipo-asunto .boton-volver');
 await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
 
-await comprobar('la pestaña "Tipos de asunto" sigue activa', pagina.locator('.pestana-ajustes.activa').textContent(), 'Tipos de asunto');
+await comprobar('la pestaña "Tipos de asunto" sigue activa', pagina.locator('.pestana-ajustes.activa').textContent(), 'Lo de cada día');
 await comprobar('la categoría sigue en EMPRESAS', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await comprobar('COMPRA sigue en la rejilla',
   pagina.locator('#tabla-tipos .tarjeta-tipo-nombre').allTextContents().then((n) => n.indexOf('COMPRA') !== -1), true);

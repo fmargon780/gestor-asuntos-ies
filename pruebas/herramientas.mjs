@@ -98,7 +98,7 @@ await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-herramientas details').forEach((d) => { d.open = true; });
 });
 await comprobar('los cuatro títulos salen, en este orden',
-  pagina.locator('#herramientas-lista details .bloque-titulo').allTextContents(),
+  pagina.locator('#herramientas-lista > details .bloque-titulo, #herramientas-tablas-datos-hueco > details .bloque-titulo').allTextContents(),
   ['Control del registro', 'Papelera', 'Traer el alumnado', 'Tablas de datos', 'Restaurar una copia de seguridad']);
 await comprobarQue('el botón de Séneca está dentro de "Traer el alumnado"',
   pagina.locator('#bloque-traer-alumnado #btn-traer-datos').count().then(n => n === 1));

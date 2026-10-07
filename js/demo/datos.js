@@ -267,9 +267,12 @@
       fecha: hace(40), tipo: Nombres.tipoParaCarpeta(tipos.FACTURA), categoria: 'EMPRESAS',
       curso: '', grupo: '', campos: [], descripcion: '', tercero: tercero, numero: ''
     });
-    await App.anotar(montado.nombre, {
-      estado: 'abierto', tipo: tipos.FACTURA.tipo, categoria: 'EMPRESAS', tercero: tercero,
-      descripcion: '', abiertoEl: hace(40) + 'T09:00:00.000Z', abiertoPor: App.E.usuario || 'Revisor'
+    /* Directo al registro, sin pasar por `App.anotar` (que también le montaría hitos, y entonces saldrían «Hitos huérfanos»). */
+    await App.guardarRegistroFresco(function (registro) {
+      registro.asuntos[montado.nombre] = {
+        estado: 'abierto', tipo: tipos.FACTURA.tipo, categoria: 'EMPRESAS', tercero: tercero,
+        descripcion: '', abiertoEl: hace(40) + 'T09:00:00.000Z', abiertoPor: App.E.usuario || 'Revisor', notas: []
+      };
     });
   }
 

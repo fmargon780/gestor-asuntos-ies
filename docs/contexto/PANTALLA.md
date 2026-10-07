@@ -75,11 +75,18 @@ seguridad"** (la caducidad, `#dias-caducidad-copias`, con el texto explicativo d
 guardan; la lista para restaurar vive en Herramientas) como una sola sección cada una, en vez de
 repartidas entre El centro y Mantenimiento.
 
-**Ajustes → Mantenimiento** se queda con lo que es mantenimiento de verdad: carpetas de este
-ordenador, el ayudante de Séneca, borrados que se fusionan, conflictos de Dropbox, fichas sin
-carpeta, hitos huérfanos, fichas del archivo, contacto guardado, envolturas esperadas, el
-RegAlum.csv viejo (`#bloque-frescura`, las épocas de aviso), conservación, cargar la biblioteca y
-las plantillas del centro, y "Pasar a Administraciones".
+**Ajustes en cuatro pestañas** (fila 288, `docs/AJUSTES-EN-CUATRO-PESTANAS.md`): «Lo de cada día»
+(`#ajustes-tab-dia`: la rejilla de tipos y cuatro secciones), «El centro», «Este ordenador» y
+«Problemas» (conflictos, fichas sin carpeta, hitos huérfanos, envolturas, conservación: solo se ven
+con algo; sin nada, «Todo en orden»; punto ámbar en la pestaña si hay). Ya no existe «Mantenimiento»:
+`#ajustes-tab-mantenimiento` es un sitio de paso que no se ve, donde los módulos cuelgan sus bloques
+como siempre; `js/ajustes-reparto.js` (tabla `TABLA`: bloque → pestaña, orden, otras palabras) los
+lleva a su pestaña, o a «Puesta a punto y reparaciones» al pie de Herramientas
+(`#herramientas-puesta-cuerpo`), o dentro de otra sección («Impresos» lleva el catálogo; «Alumnado y
+personal» lleva ficheros de datos, el aviso de alumnado viejo y las abreviaturas). Un bloque que no
+está en la tabla va al final de «El centro». Los nombres viejos de pestaña (`tipos`, `mantenimiento`)
+siguen valiendo en `App.cambiarPestanaAjustes` (van a `dia` y `problemas`). Buscador:
+`js/ajustes-buscador.js`.
 
 **Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
 `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea
@@ -353,7 +360,7 @@ ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
 - `css/ficha-asunto.css`: `.ficha-cabecera.encogida` pasa a una sola fila (`display: flex`, con
   `order` para no tocar el HTML que escribe `js/ficha-asunto.js`): volver, nombre (con
   `text-overflow: ellipsis`, 16px), tipo/estado/plazo al final.
-- `css/ajustes.css`: `#pestanas-ajustes` (Tipos de asunto · El centro · Mantenimiento) es sticky
+- `css/ajustes.css`: `.ajustes-barra` (las cuatro pestañas de Ajustes y el buscador) es sticky
   también, con `top: var(--cabecera-fija-alto, 0px)` — esa variable la mide y la pone
   `js/cabecera-fija.js` en cada repintado (el alto real de la cabecera, encogida o no) sobre
   `document.documentElement`, así las pestañas se quedan pegadas justo debajo sin hueco ni solape,
