@@ -226,6 +226,7 @@ App.cerrarAsunto = async function (a) {
     });
     /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');
+    if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'archivar');   /* fila 289: sus encargos pasan a «Terminado» */
   } catch (e) {
     U.accesorio('La carpeta ya está en el archivo, pero no he podido apuntar el cierre en su ficha. ' +
       'Pulsa Recargar', e);
@@ -324,6 +325,7 @@ App.reabrirAsunto = async function (a) {
       : { conSufijo: [] };
     if (!haciendoFusion) await Carpetas.mover(padreUsar, a.nombre, App.E.abiertos);
     await App.anotar(a.nombre, { estado: 'abierto', reabiertoEl: U.ahora(), reabiertoPor: App.E.usuario });
+    if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'reabrir', ficha);   /* fila 289: sus encargos vuelven a «En marcha» */
     var mensaje = 'Asunto reabierto.';
     if (haciendoFusion) {
       mensaje = 'Asunto reabierto. Se ha completado una reapertura anterior que se había quedado a medias.';

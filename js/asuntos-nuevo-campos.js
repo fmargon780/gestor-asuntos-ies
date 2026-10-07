@@ -192,7 +192,7 @@ App.fijarTercero = function (p) {
 App.loPideNuevoControles = null;
 App.pintarLoPideNuevo = function (persona) {
   if (!window.LoPide) return;
-  App.loPideNuevoControles = LoPide.controles($('lopide-caja-nuevo'), persona, null, App.E.nuevo.viaInicial || null);
+  App.loPideNuevoControles = LoPide.controles($('lopide-caja-nuevo'), persona, App.E.nuevo.loPideInicial || null, App.E.nuevo.viaInicial || null);
   /* La fecha de "Lo pide" nace con la de "Fecha de inicio" y la sigue
      mientras el usuario no la toque (fila 173, punto 4). */
   App.fechaLoPideAuto = $('campo-fecha').value || U.hoyIso();

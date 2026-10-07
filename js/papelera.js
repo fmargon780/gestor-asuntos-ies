@@ -178,6 +178,7 @@ var Papelera = (function () {
     }
 
     try {
+      if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'papelera', fresca);   /* fila 289: sus encargos pasan a «No procede» */
       if (window.AsuntoRenombrar) await AsuntoRenombrar.quitar(a.nombre);
       await App.guardarRegistroFresco(async function (registro) {
         if (registro.asuntos) delete registro.asuntos[a.nombre];
@@ -218,6 +219,7 @@ var Papelera = (function () {
       throw e;
     }
     try {
+      if (window.Encargos) await Encargos.alCambiarElAsunto(entrada.nombre, 'papelera', window.FichaArchivo ? await FichaArchivo.leer(sitio.handle) : null);   /* fila 289: la ficha, de su carpeta */
       await IndiceArchivo.quitarEntrada(entrada.nombre);
     } catch (e3) {
       U.accesorio('El asunto está en la papelera, pero no he podido quitarlo del índice del ARCHIVO. ' +

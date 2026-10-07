@@ -773,3 +773,13 @@ Se comprueba con `pruebas/duplicados.mjs`.
 
 
 ---
+
+## Los encargos de los directivos (7-oct-2026, fila 289, `docs/ENCARGOS-DE-DIRECTIVOS.md`)
+
+`Encargos` (`js/encargos.js`) lee y escribe `_GESTOR/encargos.json` (`{ encargos: [{ id, de, organo, cuando, texto, afecta, paraCuando, documentos, estado, asunto, motivo, atendidoPor, atendidoEl }] }`; `id` = fecha, hora y `hueso` del nombre, sin contador; `asunto` = `{ numero, nombre }`). Todo se escribe por `Encargos.cambiar` (en fila, `Copias.guardar`), que para un directivo pasa por `Perfil.escribir`. Pantallas: `js/encargos-nuevo.js` («Nuevo encargo», pestaña `.pestana-encargo`, solo visible con `body.perfil-directivo`), `js/encargos-mios.js` («Mis encargos»: «En marcha · Hito N de M · título» con `Encargos.hitoDe`) y `js/encargos-llegada.js` (las tarjetas de «Ver todo»).
+
+- «Crear asunto con él»: `App.nuevoAsuntoCon({ limite, loPide })` (dos opciones nuevas: «Fecha límite» y `App.E.nuevo.loPideInicial`, que `App.pintarLoPideNuevo` pasa a `LoPide.controles`); `App.fijarTercero` con el tercero que `terceroDe` encuentra por nombre; `App.E.nuevo.encargo` guarda el encargo hasta crear (aviso en `#aviso-pendiente`, vía `App.pintarPendiente`). Al crear, un `Gestor.alCrearAsunto` llama a `atender`: nota «Encargo de <nombre> (<órgano>): <texto>» (con `encargo: id`), `ficha.encargos` (lista `[{ id, de, cuando }]`, `App.IDENTIDAD_LISTA.encargos`), documentos movidos y estado `asunto`; el cuadro de nombres lo abre `EncargosLlegada.alTerminarDeCrear` (una línea al final de `App.crearAsuntoDelFormulario`).
+- Lo que le pasa después al asunto (`Encargos.alCambiarElAsunto`, llamado por quien lo hace): archivar → `terminado`; reabrir → `asunto` (con la ficha que se llevaba en la carpeta); papelera → `no-procede` («El asunto se ha borrado»); recuperar → `asunto` (o `terminado` si era del ARCHIVO). `AsuntoRenombrar.mover/fusionar` llaman a `Encargos.alMoverAsunto` (el nombre guardado); unir asuntos funde `ficha.encargos`. El enlace encargo → asunto se busca por el número (`Encargos.asuntoDe`).
+- Un conflicto de `encargos.json` se funde por `id` (`Encargos.fusionarConflicto`: gana el atendido, y entre dos atendidos el de `atendidoEl` más reciente). Se relee con el vistazo periódico (`Gestor.alRefrescar`, cada 15 s como mucho).
+- Los botones del directivo llevan `data-puerta-perfil` para que `SoloConsulta` no los apague (su texto, «Enviar el encargo», casa con su lista de acciones que cambian algo). `SoloConsulta.apagarControles` no hace nada si ya no está activo.
+- Demo: `js/demo/datos-encargos.js` (cuatro encargos de «Jefa de estudios de prueba» y uno de «Directora de prueba») y `Demo.entrarComo(nombre)` (cambia de nombre sin recargar). Prueba: `pruebas/encargos.mjs`.

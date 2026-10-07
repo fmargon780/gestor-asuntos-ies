@@ -430,6 +430,10 @@
         if (await Perfil.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         continue;
       }
+      if (real === 'encargos.json' && window.Encargos) {   /* fila 289: por id */
+        if (await Encargos.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        continue;
+      }
       if (real === 'hitos.json') {
         if (await fusionarHitos(g, nombre)) {
           U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');

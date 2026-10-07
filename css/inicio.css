@@ -125,6 +125,16 @@
   display: none;
 }
 
+/* Fila 289: la tercera clase, los encargos de los directivos (js/encargos-llegada.js). */
+#zona-clasificar.solo-encargos #correos-sin-clasificar,
+#zona-clasificar.solo-encargos #lista-sueltos,
+#zona-clasificar.solo-encargos #nuevos-sueltos,
+#zona-clasificar.solo-encargos #btn-sueltos-visto,
+#zona-clasificar.solo-correos #zona-encargos,
+#zona-clasificar.solo-documentos #zona-encargos {
+  display: none;
+}
+
 /* ---------- el badge rojo de vencidos, en la pestaña lateral "Inicio" ---------- */
 
 .pestana .cuenta.cuenta-roja {

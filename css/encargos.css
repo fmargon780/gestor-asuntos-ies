@@ -1,0 +1,59 @@
+/* ============================================================
+   encargos.css — los encargos de los directivos (7-oct-2026, fila 289,
+   docs/ENCARGOS-DE-DIRECTIVOS.md): «Nuevo encargo», «Mis encargos» y las
+   tarjetas de «Ver todo». Solo un directivo ve las dos entradas del menú.
+   ============================================================ */
+
+body:not(.perfil-directivo) .pestana-encargo { display: none !important; }
+
+/* ---------- Nuevo encargo: a todo el ancho, sin desplazamiento ---------- */
+
+.encargo-nuevo {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px 28px;
+  align-items: start;
+}
+.encargo-columna { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.encargo-columna .etiqueta { margin-top: 6px; }
+.encargo-columna .etiqueta:first-child { margin-top: 0; }
+#encargo-texto { min-height: 260px; height: 38vh; resize: vertical; font: inherit; }
+.encargo-error { color: var(--rojo, #b3261e); margin: 0; font-weight: 600; }
+.encargo-elegido { padding: 6px 10px; border: 1px solid var(--linea, #d8d4cc); border-radius: 8px; background: var(--fondo-suave, #f6f4ef); }
+.encargo-resultados { display: flex; flex-direction: column; gap: 2px; max-height: 150px; overflow-y: auto; margin: 4px 0; }
+.encargo-resultado {
+  text-align: left; font: inherit; background: none; border: 1px solid transparent; border-radius: 6px;
+  padding: 4px 8px; cursor: pointer;
+}
+.encargo-resultado:hover { background: var(--fondo-suave, #f6f4ef); border-color: var(--linea, #d8d4cc); }
+.encargo-soltar {
+  border: 2px dashed var(--linea, #d8d4cc); border-radius: 10px; padding: 10px 12px; color: var(--tinta-suave, #6b665c);
+}
+.encargo-soltar.encima { border-color: var(--azul, #2a5db0); background: var(--fondo-suave, #f6f4ef); }
+.encargo-ficheros { margin: 6px 0 0; padding-left: 18px; color: var(--tinta, #222); max-height: 90px; overflow-y: auto; }
+.encargo-pie { margin-top: 14px; }
+
+/* ---------- Mis encargos ---------- */
+
+.encargos-tabla { width: 100%; border-collapse: collapse; }
+.encargos-tabla th, .encargos-tabla td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--linea, #d8d4cc); vertical-align: top; }
+.encargos-tabla .encargo-que { text-align: left; }
+.encargo-estado-sin-atender { color: var(--ambar-texto, #7a5200); }
+.encargo-estado-no-procede { color: var(--rojo, #b3261e); }
+.encargo-detalle td { background: var(--fondo-suave, #f6f4ef); }
+.encargo-texto-entero { white-space: pre-wrap; }
+.encargo-docs { margin-top: 6px; }
+
+/* ---------- las tarjetas de «Ver todo» ---------- */
+
+#zona-encargos { margin-bottom: 18px; }
+.encargos-titulo { margin: 0 0 8px; font-size: 15px; }
+.encargo-tarjeta {
+  border: 1px solid var(--ambar-linea, #e6c377); background: var(--ambar, #fff4d6); border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.encargo-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.encargo-motivo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.encargo-motivo .campo { flex: 1 1 280px; }
+
+@media (max-width: 900px) { .encargo-nuevo { grid-template-columns: 1fr; } }
