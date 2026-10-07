@@ -108,6 +108,46 @@ var AsuntoRenombrar = (function () {
     return moverHitosYPresencia(claveVa, claveQueda);
   }
 
+  /* Fila 292 (docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md, 1): los hitos guardados bajo un nombre que ya no
+     existe pasan a un asunto vivo. Si el asunto ya tenía hitos, se unen: los del mismo título cuentan como
+     uno, y se queda el que esté hecho. Devuelve lo que había antes, para `deshacerPasarHitos`. */
+  function unirPorTitulo(dest, vieja) {
+    var salida = (dest || []).slice();
+    var t = function (h) { return window.U && U.normalizar ? U.normalizar(h.titulo || '') : String(h.titulo || ''); };
+    (vieja || []).forEach(function (h) {
+      var i = -1;
+      salida.forEach(function (x, j) { if (i < 0 && (x.id === h.id || (t(x) && t(x) === t(h)))) i = j; });
+      if (i < 0) salida.push(h);
+      else if (h.estado === 'hecho' && salida[i].estado !== 'hecho') salida[i] = h;
+    });
+    return salida;
+  }
+
+  async function pasarHitos(claveVieja, claveNueva) {
+    var antes = { vieja: null, nueva: null };
+    await Hitos.cambiar(function (d) {
+      var v = d.porAsunto[claveVieja], n = d.porAsunto[claveNueva];
+      antes.vieja = v ? JSON.parse(JSON.stringify(v)) : null;
+      antes.nueva = n ? JSON.parse(JSON.stringify(n)) : null;
+      if (!v || claveVieja === claveNueva) return d;
+      d.porAsunto[claveNueva] = (n && (n.hitos || []).length)
+        ? { creados: n.creados || v.creados, hitos: unirPorTitulo(n.hitos, v.hitos),
+            pasosConocidos: (n.pasosConocidos || []).concat(v.pasosConocidos || []) }
+        : v;
+      delete d.porAsunto[claveVieja];
+      return d;
+    });
+    return antes;
+  }
+
+  async function deshacerPasarHitos(claveVieja, claveNueva, antes) {
+    await Hitos.cambiar(function (d) {
+      if (antes.nueva) d.porAsunto[claveNueva] = antes.nueva; else delete d.porAsunto[claveNueva];
+      if (antes.vieja) d.porAsunto[claveVieja] = antes.vieja;
+      return d;
+    });
+  }
+
   /* Borrar un asunto (mandarlo a la papelera): saca los hitos de
      hitos.json (para que la papelera los lleve dentro de su ficha) y
      quita la señal de presencia. La ficha de asuntos.json la borra
@@ -206,7 +246,10 @@ var AsuntoRenombrar = (function () {
       return { nombre: c, detalle: n === 1 ? '1 hito' : n + ' hitos' };
     }));
     claves.forEach(function (c, i) {
-      d.elementos[i].acciones[0].alPulsar = async function () {
+      d.elementos[i].acciones[0].alPulsar = function () {   /* fila 292: «Son de este asunto…» */
+        return window.HitosDeAsuntosPerdidos ? HitosDeAsuntosPerdidos.elegir(c) : null;
+      };
+      d.elementos[i].acciones[1].alPulsar = async function () {
         var ok = await U.preguntar('Quitar estos hitos',
           '<p>Se quitan los hitos guardados de <strong>' + U.escapar(c) + '</strong>, un asunto que ya no existe con ese nombre.</p>' +
           '<p class="nota">Quedan en las copias de seguridad, por si era un error.</p>', 'Quitar');
@@ -225,6 +268,7 @@ var AsuntoRenombrar = (function () {
 
   return {
     mover: mover, fusionar: fusionar, quitar: quitar, restaurar: restaurar,
+    pasarHitos: pasarHitos, deshacerPasarHitos: deshacerPasarHitos,
     /* para las pruebas */
     _huerfanos: huerfanos
   };

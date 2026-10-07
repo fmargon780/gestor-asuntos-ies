@@ -457,6 +457,7 @@
           <input id="buscar-personas" class="campo" placeholder="Escribe un nombre">
         </div>
       </header>
+      <p id="personas-aviso-aspirantes" class="explica oculto">Cuando tengas su Nº de identificación escolar, escríbelo en su ficha. Sus carpetas cambian de nombre solas.</p>
       <div class="dos-paneles">
         <div id="lista-personas" class="lista"></div>
         <div id="ficha-persona" class="ficha"><p class="explica">Elige a alguien de la lista para ver su ficha.</p></div>
@@ -947,14 +948,14 @@
       <details class="bloque-ajustes" id="bloque-borrados-fusion">
         <summary>
           <span class="bloque-titulo">Borrados que se fusionan</span>
-          <span class="bloque-pie">Tipos, estados y recurrentes borrados, para que no reaparezcan solos</span>
+          <span class="bloque-pie">Lo que borraste, recordado un tiempo para que no reaparezca solo</span>
         </summary>
         <div class="bloque-cuerpo">
-      <p class="explica">Al borrar un tipo de asunto, un estado, un tipo de documento o un
-         asunto recurrente, la aplicación se acuerda de que se borró, en vez de olvidarlo del
-         todo: así, si el otro ordenador todavía lo tenía cargado, no lo trae de vuelta la
-         próxima vez que guarde algo suyo. El recuerdo no se ve en ningún otro sitio; aquí puedes
-         ver cuántos hay y quitar del todo, sin vuelta atrás, los de hace más de 90 días.</p>
+      <p class="explica">Cuando borras un tipo de asunto, un estado, un tipo de documento o un asunto que se
+         repite, la aplicación se acuerda de que lo borraste, durante un tiempo. Así, si el otro ordenador
+         todavía lo tenía abierto, no lo trae de vuelta al guardar. Aquí ves cuántos recuerdos hay de cada
+         cosa. Al quitar los de hace más de 90 días, la aplicación los olvida del todo, sin vuelta atrás;
+         lo que usas hoy no cambia.</p>
       <div id="tabla-borrados-fusion" class="lista"></div>
         </div>
       </details>
@@ -1148,6 +1149,7 @@
 <script src="js/tercero-cambiar-datos.js"></script>
 <script src="js/ajustes.js"></script>
 <script src="js/tipos-nombre.js"></script>
+<script src="js/parecido-de-carpetas.js"></script>
 <script src="js/problemas-textos.js"></script>
 <script src="js/problemas.js"></script>
 <script src="js/fichas-huerfanas.js"></script>
@@ -1173,6 +1175,7 @@
      de js/conflictos.js, comparte lo necesario por
      Conflictos._interno. -->
 <script src="js/conflictos-datos.js"></script>
+<script src="js/conflictos-diferencias.js"></script>
 <script src="js/recurrentes.js"></script>
 <script src="js/guias-enganche.js"></script>
 <!-- El modelo de los hitos de un asunto: después de js/guias.js y de
@@ -1531,6 +1534,7 @@
      cargado): va después de todos ellos. -->
 <script src="js/vistazo-registro.js"></script>
 <script src="js/asunto-renombrar.js"></script>
+<script src="js/hitos-de-asuntos-perdidos.js"></script>
 <script src="js/papelera.js"></script>
 <script src="js/papelera-devolver.js"></script>
 <script src="js/papelera-ajustes.js"></script>

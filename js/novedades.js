@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '292', fecha: '2026-10-07', texto: 'En Problemas, los hitos de un asunto pueden volver a él, y se ve en qué se diferencian dos versiones.' },
   { id: '291', fecha: '2026-10-07', texto: 'En Ajustes → Problemas, cada aviso dice qué pasa, por qué y qué hacer. Inicio avisa con el número.' },
   { id: '290', fecha: '2026-10-07', texto: 'Un directivo puede dejar una nota, con documentos, en un asunto suyo; Administración la ve en Inicio.' },
   { id: '289', fecha: '2026-10-07', texto: 'Dirección, Secretaría y Jefatura hacen encargos desde la aplicación y ven en «Mis encargos» cómo van.' },

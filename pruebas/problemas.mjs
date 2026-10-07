@@ -139,12 +139,11 @@ await comprobar('5. los hitos del asunto sin carpeta existen en la demostración
     const d = await Hitos.leer();
     const nombres = [...document.querySelectorAll('[data-problema="hitos"] .problema-nombre')].map((e) => e.textContent);
     return [!!d.porAsunto[nombre], nombres.length, nombres.includes(nombre)];
-  }, nombreAsunto), [true, 1, false]);
+  }, nombreAsunto), [true, 2, false]);
 
 await pagina.locator('[data-problema="carpetas"]').getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
 await pagina.waitForSelector('#huerfana-destino');
-const destino = await pagina.evaluate(() => [...document.querySelectorAll('#huerfana-destino option')].map((o) => o.value)[0]);
-await pagina.selectOption('#huerfana-destino', destino);
+const destino = await pagina.evaluate(() => [...document.querySelectorAll('#huerfana-destino input[type=radio]')].map((o) => o.value)[0]);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="carpetas"]'), null, { timeout: 15000 });
 await pagina.waitForTimeout(800);
@@ -157,7 +156,7 @@ await comprobar('4. el asunto desaparece de la tarjeta, queda con sus hitos y el
       document.getElementById('punto-problemas').title];
   }, { destino, viejo: nombreAsunto }),
   [true, true, 'Problemas (' + (n - 1) + ')', (n - 1) + ' problemas por resolver', (n - 1) + ' problemas por resolver']);
-await comprobar('5. y la tarjeta de los hitos sigue con el de verdad perdido', pagina.locator('[data-problema="hitos"] .problema-nombre').count(), 1);
+await comprobar('5. y la tarjeta de los hitos sigue con los dos nombres viejos', pagina.locator('[data-problema="hitos"] .problema-nombre').count(), 2);
 
 /* ================= 6. DOS ORDENADORES Y EL FICHERO DE ALUMNADO ================= */
 
@@ -165,7 +164,7 @@ console.log('--- 6. lo guardado a la vez, y el alumnado ---');
 await comprobar('6. cada línea dice qué es con palabras, y sus dos botones llevan su frase',
   pagina.evaluate(() => [...document.querySelectorAll('[data-problema="conflictos"] .problema-elemento')].map((e) =>
     [e.querySelector('.problema-nombre').textContent, [...e.querySelectorAll('.problema-accion')].map((a) => [a.querySelector('button').textContent, a.querySelector('.problema-explica').textContent.length > 10])])),
-  [['La lista de tipos de documento', [['Quedarse con el de este ordenador', true], ['Quedarse con el otro', true]]]]);
+  [['La lista de tipos de documento', [['Quedarse con el de este ordenador', true], ['Quedarse con el otro', true]]]]);   /* (fila 292: y «Qué cambia», en pruebas/conflictos-que-cambia.mjs) */
 await comprobar('6. el título del fichero de alumnado', pagina.locator('[data-problema="alumnado"] .problema-titulo').textContent(), 'El fichero de alumnado tiene 90 días');
 await pagina.locator('[data-problema="alumnado"]').getByRole('button', { name: 'Traer el alumnado (lo normal)' }).click();
 await pagina.waitForTimeout(800);
@@ -178,8 +177,11 @@ console.log('--- 9. sin tarjetas ---');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForTimeout(500);
 await pagina.evaluate(() => App.cambiarPestanaAjustes('problemas'));
-await pagina.locator('[data-problema="hitos"]').getByRole('button', { name: 'Quitar' }).click();
-await pagina.click('#cuadro-aceptar');
+for (let i = 0; i < 2; i++) {   /* fila 292: la demostración trae dos nombres viejos */
+  await pagina.locator('[data-problema="hitos"]').getByRole('button', { name: 'Quitar' }).first().click();
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForFunction((k) => document.querySelectorAll('[data-problema="hitos"] .problema-elemento').length === k, 1 - i, { timeout: 15000 });
+}
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="hitos"]'), null, { timeout: 15000 });
 await pagina.locator('[data-problema="conflictos"]').getByRole('button', { name: 'Quedarse con el de este ordenador' }).click();
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="conflictos"]'), null, { timeout: 15000 });

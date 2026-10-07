@@ -225,3 +225,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 291 — problemas con su solución (7-oct-2026)
 
 - Con los datos del centro: abrir Ajustes → Problemas y decir si con cada tarjeta se entiende qué hacer sin preguntar a nadie.
+
+## Fila 292 — problemas que se pueden arreglar (7-oct-2026)
+
+- Con los datos del centro: si en Ajustes → Problemas hay hitos de asuntos que ya no existen, comprobar con uno que «Parece este:» propone el asunto correcto.

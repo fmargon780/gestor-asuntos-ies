@@ -18,4 +18,6 @@ App.pintarHerramientas = async function () {
   if (typeof App.pintarCopias === 'function') await App.pintarCopias();
   if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();
   if (window.AlumnadoBD) await AlumnadoBD.pintarAjustes();
+  /* Fila 292: nadie llamaba a esta; su lista salía siempre vacía. */
+  if (typeof App.pintarBorradosFusion === 'function') await App.pintarBorradosFusion();
 };

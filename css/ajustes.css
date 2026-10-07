@@ -439,3 +439,7 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 .problema-todos { display: block; margin: 6px 0; }
 .problema-detalle { margin-top: 10px; }
 .problema-detalle pre { white-space: pre-wrap; font-size: 12px; margin: 6px 0 0; }
+.problema-cambia { margin: 4px 0 8px; }
+.problema-cambia summary { cursor: pointer; font-weight: 600; }
+.problema-cambia-lista { margin: 4px 0 0; padding-left: 20px; }
+.huerfana-opcion { cursor: pointer; overflow-wrap: anywhere; }

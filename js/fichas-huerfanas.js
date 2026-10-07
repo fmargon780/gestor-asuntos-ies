@@ -72,18 +72,31 @@
         'asuntos abiertos. Si la encuentras, devuélvela a su sitio y vuelve a mirar.', 'ambar');
       return;
     }
-    var opciones = candidatos.map(function (c) {
-      return '<option value="' + U.escapar(c.nombre) + '">' + U.escapar(c.nombre) +
-             '  ·  ' + U.escapar(c.donde) + '</option>';
+    /* Fila 292 (docs/PROBLEMAS-QUE-SE-PUEDEN-ARREGLAR.md, 2): de más a menos parecida, con lo que tiene dentro. */
+    var lista = window.ParecidoDeCarpetas
+      ? ParecidoDeCarpetas.ordenar(clave, candidatos, App.E.tipos)
+      : candidatos.map(function (c) { return { nombre: c.nombre, claro: false }; });
+    var cuantos = {};
+    for (var k = 0; k < lista.length; k++) {
+      try { cuantos[lista[k].nombre] = await Carpetas.contarFicheros(await App.E.abiertos.getDirectoryHandle(lista[k].nombre)); }
+      catch (e) { cuantos[lista[k].nombre] = null; }
+    }
+    var filas = lista.map(function (c, i) {
+      var n = cuantos[c.nombre];
+      return (i === 0 && c.claro ? '<div class="etiqueta">Parece esta:</div>' : '') +
+        '<label class="huerfana-opcion" style="display:block;margin:6px 0"><input type="radio" name="huerfana-destino" value="' +
+        U.escapar(c.nombre) + '"' + (i === 0 ? ' checked' : '') + '> <strong>' + U.escapar(c.nombre) + '</strong> ' +
+        '<span class="suave">' + (n === null ? '' : n === 0 ? 'sin documentos' : n === 1 ? '1 documento' : n + ' documentos') + '</span></label>';
     }).join('');
     var ok = await U.preguntar('Buscar su carpeta',
       '<p class="explica">El asunto <strong>' + U.escapar(clave) + '</strong> pasa a ser el de ' +
       'la carpeta que elijas. Queda como estaba, con sus hitos y sus notas.</p>' +
-      '<label class="etiqueta">Carpeta</label>' +
-      '<select id="huerfana-destino" class="campo">' + opciones + '</select>', 'Enlazar');
+      (lista.length === 1 && lista[0].claro ? '<p class="explica">Solo hay una carpeta sin asunto, y encaja.</p>' : '') +
+      '<div id="huerfana-destino">' + filas + '</div>', 'Enlazar');
     if (!ok) return;
 
-    var destino = $('huerfana-destino').value;
+    var elegida = document.querySelector('#huerfana-destino input[name="huerfana-destino"]:checked');
+    var destino = elegida ? elegida.value : lista[0].nombre;
     try {
       await App.cargarRegistro();
       if (!App.E.registro.asuntos[clave]) {

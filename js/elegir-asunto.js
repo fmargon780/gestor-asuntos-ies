@@ -162,7 +162,7 @@ window.ElegirAsunto = (function () {
      fila, y Cancelar es el de siempre.
 
      opciones = { titulo, cabecera (HTML), sugeridos: [{nombre, ficha,
-     puntos}], crearNuevo: { texto, alPulsar } (opcional: botón «No está,
+     puntos}], rotuloSugeridos (el título del bloque de arriba), pie (HTML debajo de la lista), crearNuevo: { texto, alPulsar } (opcional: botón «No está,
      crear uno nuevo», fila 230) }. Devuelve {nombre, ficha} o null si
      se cancela (con ✕, Cancelar o Escape).
 
@@ -191,14 +191,15 @@ window.ElegirAsunto = (function () {
       $('cuadro-cuerpo').innerHTML =
         (o.cabecera || '') +
         (sugeridos.length
-          ? '<div class="enlace-bloque"><div class="etiqueta">Podrían encajar</div>' +
+          ? '<div class="enlace-bloque"><div class="etiqueta">' + U.escapar(o.rotuloSugeridos || 'Podrían encajar') + '</div>' +
             '<div class="lista enlace-lista">' +
             sugeridos.map(function (x) { return filaDeAsunto(x); }).join('') +
             '</div></div>'
           : '') +
         '<div class="enlace-bloque"><div class="etiqueta">Todos los asuntos</div>' +
         '<input id="enlace-buscar" class="campo" placeholder="Buscar por nombre o tercero">' +
-        '<div class="lista enlace-lista" id="enlace-todos"></div></div>';
+        '<div class="lista enlace-lista" id="enlace-todos"></div></div>' +
+        (o.pie || '');   /* fila 292: lo que se va a hacer con el asunto que se elija */
 
       $('cuadro-aceptar').classList.add('oculto');
       capa.classList.remove('oculto');

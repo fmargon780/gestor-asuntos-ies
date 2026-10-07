@@ -70,12 +70,16 @@ var ProblemasTextos = (function () {
         : 'Hay hitos guardados de ' + n + ' asuntos que ya no existen con ese nombre',
       que: 'La app guarda los hitos de cada asunto junto al nombre de su carpeta. Estos nombres ya no corresponden a ninguna carpeta.',
       porque: 'El asunto cambió de nombre hace tiempo, o su carpeta se movió a mano.',
-      antes: 'Si reconoces el asunto, no los quites todavía.',
+      antes: 'Por cada nombre:',
       elementos: elementos.map(function (e) {
         return {
           nombre: e.nombre, detalle: e.detalle,
-          acciones: [{ texto: 'Quitar', peligro: true,
-            explica: 'Quita esos hitos. Quedan en las copias de seguridad durante ' + plural(dias, 'día', 'días') + '.' }]
+          acciones: [
+            { texto: 'Son de este asunto…', normal: true,
+              explica: 'Eliges el asunto al que pertenecen. Los hitos pasan a él.' },
+            { texto: 'Quitar', peligro: true,
+              explica: 'Quita esos hitos. Quedan en las copias de seguridad durante ' + plural(dias, 'día', 'días') + '.' }
+          ]
         };
       })
     };
@@ -91,8 +95,10 @@ var ProblemasTextos = (function () {
       antes: 'Una por una:',
       elementos: elementos.map(function (e) {
         return {
-          nombre: e.nombre, detalle: e.detalle,
-          acciones: e.fila ? [
+          nombre: e.nombre, detalle: e.detalle, queCambia: e.queCambia || undefined,
+          acciones: e.igual ? [
+            { texto: 'Resolver', explica: 'Se queda la de este ordenador. La otra se guarda en las copias de seguridad.' }
+          ] : e.fila ? [
             { texto: 'Dejar los de este ordenador', explica: 'Se quedan los datos de este ordenador. Los del otro quedan en las copias de seguridad.' },
             { texto: 'Quedarse con los del otro', explica: 'Se guardan los datos del otro ordenador para esta persona.' }
           ] : [
