@@ -44,6 +44,9 @@
        y un alumno que ya no está matriculado este curso. */
     var curso = U.cursoActual();
     var anoMatricula = curso.slice(3);
+    /* Fila 295: «Correo del alumno» solo en Ibarra Nieto, Sara (2100010), para que «A quién» de «Enviar…» cambie la lista;
+       y Gallardo Reyes, Vera (2100008) sin ningún correo. */
+    var ALUMNO_CON_CORREO = { '2100010': 'sara.ibarra@correo-demo.es' };
     await Carpetas.escribirTexto(d, 'RegAlum.csv', csv([
       ['Alumno/a', 'Nº Id. Escolar', 'Curso', 'Unidad', 'Año de la matrícula', 'Estado Matrícula', 'Fecha de nacimiento', 'Teléfono del tutor', 'Correo del tutor'],
       ['Aguilar Ponce, Marina', '2100001', '1º de E.S.O.', '1º A', '20' + anoMatricula, 'Matriculada', '14/03/2013', '600111222', 'tutor.marina@correo-demo.es'],
@@ -53,7 +56,7 @@
       ['Delgado Prieto, Iker', '2100005', '2º de E.S.O.', '2º B', '20' + anoMatricula, 'Matriculado', '05/01/2013', '600555666', 'tutor.iker@correo-demo.es'],
       ['Espejo Montes, Carla', '2100006', '4º de E.S.O.', '4º A', '20' + anoMatricula, 'Matriculada', '23/04/2011', '600666777', 'tutor.carla@correo-demo.es'],
       ['Fuentes Calvo, Rubén', '2100007', '1º de Bachillerato', '1º Bach A', '20' + anoMatricula, 'Matriculado', '11/05/2009', '600777888', 'tutor.ruben@correo-demo.es'],
-      ['Gallardo Reyes, Vera', '2100008', '1º de Bachillerato', '1º Bach A', '20' + anoMatricula, 'Matriculada', '30/07/2009', '600888999', 'tutor.vera@correo-demo.es'],
+      ['Gallardo Reyes, Vera', '2100008', '1º de Bachillerato', '1º Bach A', '20' + anoMatricula, 'Matriculada', '30/07/2009', '600888999', ''],
       ['Herrera Lozano, Diego', '2100009', '2º de Bachillerato', '2º Bach B', '20' + anoMatricula, 'Matriculado', '17/02/2008', '600999000', 'tutor.diego@correo-demo.es'],
       ['Quintero Maldonado, María Concepción Josefa Remedios', '2100020', '3º de E.S.O.', '3º A', '20' + anoMatricula, 'Matriculada', '03/03/2011', '600000222', 'tutor.maria@correo-demo.es'],
       ['Ibarra Nieto, Sara', '2100010', '3º de E.S.O.', '3º A', '20' + anoMatricula, 'Matriculada', '08/08/2011', '600000111', 'tutor.sara@correo-demo.es'],
@@ -70,7 +73,7 @@
       /* aspirante sin matricular: sin fila propia hasta que se dé de alta a mano */
       /* un alumno antiguo (ya no está matriculado este curso) */
       ['Moya Santana, Elena', '2099998', '4º de E.S.O.', '4º A', '20' + (parseInt(anoMatricula, 10) - 1), 'Baja', '02/02/2010', '600444888', 'tutor.elena@correo-demo.es']
-    ]));
+    ].map(function (fila, i) { return fila.concat([i === 0 ? 'Correo del alumno' : (ALUMNO_CON_CORREO[fila[1]] || '')]); })));
 
     /* RelPerCen: profesorado y PAS de este curso. */
     await Carpetas.escribirTexto(d, 'RelPerCen ' + curso + '.csv', csv([

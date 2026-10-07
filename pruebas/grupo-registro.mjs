@@ -96,7 +96,7 @@ let pagina = await nuevaPagina();
 await abrirTarjeta(pagina);
 await esperarRegistro(pagina, 2, '26SM0413');
 await comprobar('0. Bruno (referencia en el texto de su PDF) ya tiene su número, sin pulsar nada; Noa lo tenía; Iker, «Pendiente»',
-  registrados(pagina), ['26SM0412', 'Pendiente', '26SM0413', '', '', '']);
+  registrados(pagina), ['26SM0412', 'Pendiente', '26SM0413', '', '', '', '26SM0430', '26SM0431']);
 await comprobar('0. el PDF de Bruno ya no está con el nombre de descarga; su Word de antes, no (era un PDF) y el sin sellar, a «Versiones previas»',
   Promise.all([carpeta(pagina).then((l) => l.indexOf('Certificado firmado 1.pdf') === -1), previas(pagina).then((l) => l.some((n) => /SIN SELLAR/.test(n)))]), [true, true]);
 await comprobar('0. encima de la tabla, la línea de Séneca y, debajo, «PDF sellados sin colocar (1)» con su número de registro',
@@ -109,10 +109,10 @@ await comprobar('0. no sale el aviso ámbar de «este papel trae el sello de reg
 await pagina.locator('.pg-sc-quien').selectOption({ index: 1 });
 await esperarRegistro(pagina, 1, '26SM0414');
 await comprobar('0. elegirla lo coloca: su fila tiene el número y la lista de sin colocar desaparece',
-  Promise.all([registrados(pagina), sinColocar(pagina)]), [['26SM0412', '26SM0414', '26SM0413', '', '', ''], '']);
+  Promise.all([registrados(pagina), sinColocar(pagina)]), [['26SM0412', '26SM0414', '26SM0413', '', '', '', '26SM0430', '26SM0431'], '']);
 await comprobar('0. el PDF sellado ocupa el nombre del documento (con su número), y su Word, a «Versiones previas» como «SIN SELLAR»',
   Promise.all([carpeta(pagina), previas(pagina)]).then(([c, pr]) => [c.filter((n) => /^\d{6} CERTIFICADO D26-\d{5}\.pdf$/.test(n)).length, c.indexOf('Certificado firmado 2.pdf') === -1, pr.filter((n) => /SIN SELLAR\.docx$/.test(n)).length]),
-  [2, true, 2]);
+  [4, true, 2]);
 await pagina.close();
 
 /* ================= 1. NOMBRE, TEXTO CON ESPACIOS, OTRO ASUNTO ================= */
@@ -128,7 +128,7 @@ await pagina.evaluate(([a, b]) => Promise.all([
 await abrirTarjeta(pagina);
 await esperarRegistro(pagina, 3, '26SM0415');
 await esperarRegistro(pagina, 4, '26SM0416');
-await comprobar('1. la referencia en el nombre y la del texto, con espacios en medio, se colocan sin preguntar', registrados(pagina), ['26SM0412', 'Pendiente', '26SM0413', '26SM0415', '26SM0416', '']);
+await comprobar('1. la referencia en el nombre y la del texto, con espacios en medio, se colocan sin preguntar', registrados(pagina), ['26SM0412', 'Pendiente', '26SM0413', '26SM0415', '26SM0416', '', '26SM0430', '26SM0431']);
 await pagina.waitForTimeout(500);
 await comprobar('1. la de otro asunto no se toca: queda con su nombre y sale sin colocar, junto al otro sin referencia',
   Promise.all([carpeta(pagina).then((l) => [l.indexOf('Séneca tres.pdf') !== -1, l.indexOf('Certificado firmado 2.pdf') !== -1]), sinColocar(pagina)]), [[true, true], 'PDF sellados sin colocar (2)']);
@@ -164,7 +164,7 @@ await pagina.evaluate(([a, b, c, d]) => window.__crearPdf('Séneca junto.pdf', [
 await abrirTarjeta(pagina);
 await esperarRegistro(pagina, 5, '26SM0423');
 await comprobar('2. las cuatro personas del PDF juntas quedan registradas, cada una con su número',
-  registrados(pagina), ['26SM0412', '26SM0420', '26SM0413', '26SM0421', '26SM0422', '26SM0423']);
+  registrados(pagina), ['26SM0412', '26SM0420', '26SM0413', '26SM0421', '26SM0422', '26SM0423', '26SM0430', '26SM0431']);
 await comprobar('2. el PDF entero, a «Versiones previas», y ya no está en la carpeta ni quedan trozos sueltos',
   Promise.all([carpeta(pagina).then((l) => l.filter((n) => /Séneca junto/.test(n)).length), previas(pagina).then((l) => l.filter((n) => /^Séneca junto\.pdf$/.test(n)).length)]), [0, 1]);
 await comprobar('2. no queda nada sin colocar (lo de «Certificado firmado 2» sigue: no tiene referencia)', sinColocar(pagina), 'PDF sellados sin colocar (1)');
@@ -194,7 +194,7 @@ await pagina.waitForFunction(() => [...document.querySelectorAll('.pg-tabla thea
 await esperarRegistro(pagina, 3, '26SM0415');
 await comprobar('3. al marcarla sale la columna «Registrado» y se coloca lo que traía su referencia; Iker, «Pendiente»',
   Promise.all([registrados(pagina), pagina.evaluate(() => document.querySelector('.pg-registro-linea').textContent.replace(/\s+/g, ' ').trim().replace(/ Ruta$/, ''))]),
-  [['26SM0412', 'Pendiente', '26SM0413', '26SM0415', '', ''], 'Firma y registra el documento en Séneca y guarda aquí el PDF que descargues.']);
+  [['26SM0412', 'Pendiente', '26SM0413', '26SM0415', '', '', '26SM0430', '26SM0431'], 'Firma y registra el documento en Séneca y guarda aquí el PDF que descargues.']);
 await comprobar('3. y la elección se guarda en el asunto', pagina.evaluate(() => App.E.registro.asuntos[window.__asunto].registroPorPersona), true);
 await pagina.close();
 
@@ -207,7 +207,7 @@ await pagina.waitForTimeout(1500);
 await comprobar('4. solo consulta: nada se coloca (Bruno sin número), los dos PDF salen sin colocar y los controles, apagados',
   Promise.all([registrados(pagina), carpeta(pagina).then((l) => [l.indexOf('Certificado firmado 1.pdf') !== -1, l.indexOf('Certificado firmado 2.pdf') !== -1]), sinColocar(pagina),
     pagina.evaluate(() => [...document.querySelectorAll('.pg-sc-quien, .pg-sc-no, .pg-registro-por')].every((e) => e.disabled))]),
-  [['26SM0412', 'Pendiente', 'Pendiente', '', '', ''], [true, true], 'PDF sellados sin colocar (2)', true]);
+  [['26SM0412', 'Pendiente', 'Pendiente', '', '', '', '26SM0430', '26SM0431'], [true, true], 'PDF sellados sin colocar (2)', true]);
 await comprobar('4. y no se ha escrito nada', pagina.evaluate(() => Demo.escrituras()), 0);
 await pagina.close();
 
@@ -218,7 +218,7 @@ await pagina.evaluate(async () => { GrupoRegistro._interno.reiniciar(); await Gr
 await pagina.waitForTimeout(1500);
 await comprobar('4. con el compañero al mando: no se coloca nada',
   Promise.all([registrados(pagina), carpeta(pagina).then((l) => [l.indexOf('Certificado firmado 1.pdf') !== -1, l.indexOf('Certificado firmado 2.pdf') !== -1])]),
-  [['26SM0412', 'Pendiente', 'Pendiente', '', '', ''], [true, true]]);
+  [['26SM0412', 'Pendiente', 'Pendiente', '', '', '', '26SM0430', '26SM0431'], [true, true]]);
 await pagina.close();
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);

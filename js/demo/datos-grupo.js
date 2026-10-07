@@ -6,6 +6,7 @@
    Fila 294: con «Estos documentos se registran en Séneca» marcada y dos PDF sellados de Séneca sin colocar en su
    carpeta: el de la tercera persona (Bruno) trae su «Ref.» escrita y se coloca solo; el otro no trae ninguna y sale en
    «PDF sellados sin colocar».
+   Fila 295: y dos personas más (Sara y Vera) con su PDF registrado y sin enviar; con Bruno, tres sin enviar, y una (Vera) sin correo.
    Todo inventado. Lo llama js/demo/datos.js al montar los asuntos.
    ============================================================ */
 (function () {
@@ -13,7 +14,10 @@
 
   var ALUMNOS = [
     ['Castro Reina, Noa', '2100004'], ['Delgado Prieto, Iker', '2100005'], ['Lara Quintero, Bruno', '2100013'],
-    ['Navarro Gil, Lucía', '2100014'], ['Ortega Paz, Darío', '2100015'], ['Pardo Luna, Nerea', '2100016']
+    ['Navarro Gil, Lucía', '2100014'], ['Ortega Paz, Darío', '2100015'], ['Pardo Luna, Nerea', '2100016'],
+    /* Fila 295: dos más, de otras unidades, con su PDF ya registrado y sin enviar (con Bruno, tres): Sara con correo del tutor y
+       del alumno; Vera sin ninguno. Así «Enviar… (2)» y «Sin correo (1)». */
+    ['Ibarra Nieto, Sara', '2100010'], ['Gallardo Reyes, Vera', '2100008']
   ];
 
   async function construir(o) {
@@ -53,7 +57,28 @@
       numeros.push(numeroDoc);
     }
     await sellados(carpeta, numeros[2]);
+    await registradosSinEnviar(clave, carpeta, plantilla, personas, fecha, [[6, '0430'], [7, '0431']]);
     await App.anotar(clave, { enviosPorPersona: [{ documento: hechos[0], correo: 'tutor.noa@correo-demo.es', cuando: o.hace(2) + 'T10:00:00.000Z', quien: App.E.usuario || 'Revisor' }] });
+  }
+
+  /* Fila 295: el PDF de una persona, con su registro, sin enviar (fecha de hace tres días, como los otros). */
+  async function registradosSinEnviar(clave, carpeta, plantilla, personas, fecha, quienes) {
+    var PDFLib = await PdfHerramientas.cargarPdfLib();
+    for (var k = 0; k < quienes.length; k++) {
+      var i = quienes[k][0], texto = ALUMNOS[i][0];
+      var numeroDoc = (await Numeros.reservar('documentos', '')).numero;
+      var nombre = Nombres.montarDocumento({ fecha: fecha, tipo: 'CERTIFICADO', curso: texto, extension: 'pdf', numeroDoc: numeroDoc });
+      var doc = await PDFLib.PDFDocument.create();
+      var fuente = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+      var pagina = doc.addPage([595, 842]);
+      pagina.drawText('CERTIFICADO DE NOTAS', { x: 50, y: 780, size: 14, font: fuente });
+      pagina.drawText('Se certifica que ' + texto.split(', ').reverse().join(' ') + ' ha obtenido las calificaciones del curso.', { x: 50, y: 750, size: 11, font: fuente });
+      pagina.drawText('Ref. ' + numeroDoc, { x: 12, y: 82, size: 7, font: fuente, rotate: PDFLib.degrees(90) });
+      await Carpetas.escribirBytes(carpeta, nombre, await doc.save(), 'application/pdf');
+      var r = { ano: fecha.slice(2, 4), sentido: 'S', modo: 'M', numero: quienes[k][1] };
+      await DocumentosDatos.anotar(clave, numeroDoc, { tipo: 'CERTIFICADO', fecha: fecha, texto: texto, campos: [], valores: {}, registros: [Object.assign({ codigo: Nombres.codigoRegistro(r) }, r)],
+        generadoDe: plantilla.id + '|' + personas[i].categoria + '|' + personas[i].nombre, hito: '' });
+    }
   }
 
   /* Dos PDF como los que vuelven de Séneca: el sello como texto, en la página. Uno con la «Ref.» de la tercera persona. */

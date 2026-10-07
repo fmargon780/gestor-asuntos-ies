@@ -117,7 +117,7 @@ console.log('   (resumen: ' + textoResumen + ')');
 await comprobar('4. el resumen dice los tres', textoResumen.indexOf('3 documentos generados') !== -1, true);
 await comprobar('4. y que a una persona le falta el DNI', /A 1 persona le falta[^.]*DNI/.test(textoResumen), true);
 await comprobar('4. y a quién', textoResumen.indexOf('Prueba Tres, Eva') !== -1, true);
-await comprobar('4. quien no tiene correo sale para Séneca', /Sin correo[^.]*Prueba Dos, Luis/.test(textoResumen), true);
+await comprobar('4. y remite a «Enviar…» de la lista de personas (fila 295: quien no tiene correo se ve allí)', /Para enviarlos: «Enviar…», en la lista de personas\./.test(textoResumen), true);
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 const lote = await pagina.evaluate(() => window.__lote);
 await comprobar('el lote termina bien, con tres', lote && lote.hechos, 3);
@@ -147,13 +147,7 @@ for (const quien of ['Prueba Uno, Ana', 'Prueba Dos, Luis', 'Prueba Tres, Eva'])
   if (quien === 'Prueba Dos, Luis') await comprobar('con su DNI', texto.indexOf('22222222J') !== -1, true);
 }
 
-console.log('--- «Enviar a cada uno», con el envío conectado (simulado) ---');
-const enviados = [];
-await pagina.route('https://script.google.com/**', async (ruta) => {
-  enviados.push(JSON.parse(ruta.request().postData() || '{}'));
-  await ruta.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, hilo: '' }) });
-});
-await pagina.evaluate(() => localStorage.setItem('gestor-envio-correo', 'https://script.google.com/macros/s/PRUEBA/exec?k=clave'));
+console.log('--- el resumen ya no ofrece «Enviar a cada uno» (fila 295: el envío está en «Enviar…» de la lista) ---');
 async function lanzarOtraVez() {
   await pagina.evaluate(() => {
     const a = App.asuntoDeLaFicha();
@@ -166,32 +160,17 @@ async function lanzarOtraVez() {
 }
 await lanzarOtraVez();
 await comprobar('los que ya estaban no se rehacen', pagina.evaluate(() => /Ya estaban en la carpeta/.test(document.getElementById('cuadro-cuerpo').textContent)), true);
-await comprobar('y el resumen ofrece «Enviar a cada uno…»', pagina.evaluate(() => document.getElementById('cuadro-aceptar').textContent), 'Enviar a cada uno…');
-await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
-await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent === 'Enviar a cada uno');
-await comprobar('la confirmación lista a los dos que tienen correo',
-  pagina.evaluate(() => document.querySelectorAll('.generar-cada-envios li').length), 2);
+await comprobar('el resumen termina con «Cerrar» y la línea que lleva a «Enviar…»',
+  pagina.evaluate(() => [document.getElementById('cuadro-aceptar').textContent, /Para enviarlos: «Enviar…», en la lista de personas\./.test(document.getElementById('cuadro-cuerpo').textContent),
+    /Enviar a cada uno/.test(document.getElementById('capa').textContent)]), ['Cerrar', true, false]);
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.evaluate(() => window.__lote);
-await pagina.waitForTimeout(300);
-await comprobar('sale un correo a cada uno', enviados.map((e) => e.para).sort(), ['ana@ejemplo.es', 'eva@ejemplo.es']);
-await comprobar('cada uno con su documento', enviados.every((e) => e.adjuntos.length === 1 &&
-  /^\d{6} CERTIFICADO D\d{2}-\d{5}\.pdf$/.test(e.adjuntos[0].nombre)), true);
-await comprobar('con el saludo a esa persona', enviados.every((e) => /^Hola, (Ana|Eva) Prueba/.test(e.cuerpo)), true);
-
-await lanzarOtraVez();
-await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
-await pagina.evaluate(() => window.__lote);
-await pagina.waitForTimeout(300);
-await comprobar('la segunda vez no se manda nada (ya lo tenían)', enviados.length, 2);
 
 console.log('--- el envío: nunca dos veces el mismo documento a la misma persona ---');
-await comprobar('el identificador del envío es siempre el mismo', pagina.evaluate(() => {
-  const I = GenerarParaRelacionados._interno;
-  return I.idEnvioDe({ nombre: 'X' }, 'doc.docx', 'Ana@Ejemplo.es') === I.idEnvioDe({ nombre: 'X' }, 'doc.docx', 'ana@ejemplo.es');
-}), true);
-await comprobar('y lo ya enviado se reconoce', pagina.evaluate(() => GenerarParaRelacionados._interno.yaEnviado(
-  { enviosPorPersona: [{ documento: 'doc.docx', correo: 'ana@ejemplo.es' }] }, 'doc.docx', 'ANA@ejemplo.es')), true);
+await comprobar('el identificador del envío es siempre el mismo para la misma persona, y distinto para otra', pagina.evaluate(() => {
+  const I = GrupoEnviar.idEnvioDe;
+  return [I({ nombre: 'X' }, 'doc.pdf', 'ALUMNADO|Ana') === I({ nombre: 'X' }, 'doc.pdf', 'alumnado|ana'), I({ nombre: 'X' }, 'doc.pdf', 'ALUMNADO|Eva') !== I({ nombre: 'X' }, 'doc.pdf', 'ALUMNADO|Ana')];
+}), [true, true]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien.');

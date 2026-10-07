@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '295', fecha: '2026-10-07', texto: 'En la lista de personas, «Enviar…» manda a todas su correo, y «Enviar un aviso…» lo hace sin documento.' },
   { id: '294', fecha: '2026-10-07', texto: 'Generar para todos enseña una muestra, deja el PDF de cada uno y reconoce los sellados de Séneca.' },
   { id: '293', fecha: '2026-10-07', texto: 'Un asunto puede ser de un grupo: ves a cada persona y qué se le ha generado, registrado y enviado.' },
   { id: '292', fecha: '2026-10-07', texto: 'En Problemas, los hitos de un asunto pueden volver a él, y se ve en qué se diferencian dos versiones.' },

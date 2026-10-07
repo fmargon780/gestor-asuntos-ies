@@ -233,3 +233,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 294 — el PDF de cada persona y el registro de Séneca (7-oct-2026)
 
 - Con un certificado de verdad de un trabajo en bloque: firmarlo y darle registro de salida en Séneca, descargarlo y guardarlo en la carpeta del asunto. La tabla marca sola a esa persona como registrada. Si no lo hace y el PDF sale en «PDF sellados sin colocar», Séneca no conserva la referencia: decírselo a Claude, con el nombre con el que Séneca da el fichero y si los da de uno en uno o todos juntos.
+
+## Fila 295 — enviar a todas las personas del grupo y los avisos (7-oct-2026)
+
+- En el centro, con un grupo de verdad de dos o tres personas (por ejemplo, tú y tu compañero como personal): «Enviar un aviso…» y comprobar que a cada uno le llega su correo, con su nombre, y que al contestar la respuesta llega a quien lo envió.

@@ -77,13 +77,13 @@ await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(1800);
 await comprobar('2. el resumen de la tarjeta cerrada',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '6 personas · 3 generados · 2 registrados · 1 enviado');   /* la tercera, colocada sola por su «Ref.» (fila 294) */
+  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '8 personas · 5 generados · 4 registrados · 1 enviado');   /* la tercera, colocada sola por su «Ref.» (fila 294); fila 295: y Sara y Vera, con su PDF registrado */
 await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina.waitForSelector('.pg-tabla');
 const columnas = () => pagina.locator('.pg-tabla thead th').allTextContents();
 await comprobar('2. las columnas', columnas(), ['Persona', 'Unidad', 'Generado', 'Registrado', 'Enviado', '']);
 await comprobar('2. una fila por persona, a todo el ancho de la tarjeta',
-  pagina.evaluate(() => { const t = document.querySelector('.pg-tabla'), c = document.querySelector('.ficha-tarjeta.abierta .ficha-tarjeta-cuerpo'); return [t.querySelectorAll('tbody tr').length, t.getBoundingClientRect().width > c.getBoundingClientRect().width * 0.9]; }), [6, true]);
+  pagina.evaluate(() => { const t = document.querySelector('.pg-tabla'), c = document.querySelector('.ficha-tarjeta.abierta .ficha-tarjeta-cuerpo'); return [t.querySelectorAll('tbody tr').length, t.getBoundingClientRect().width > c.getBoundingClientRect().width * 0.9]; }), [8, true]);
 const fila = (i) => pagina.locator('.pg-tabla tbody tr').nth(i).locator('td').allTextContents();
 const hoy = await pagina.evaluate(() => PersonasDelGrupo.fechaLarga(U.hoyIso()));
 const hace3 = await pagina.evaluate(() => { const d = new Date(Date.now() - 3 * 86400000); return PersonasDelGrupo.fechaLarga(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')); });
@@ -93,9 +93,9 @@ await comprobar('2. la segunda: solo generada (registro «Pendiente»); la terce
   Promise.all([fila(1), fila(2), fila(3)]).then(([a, b, c]) => [a[2] === hace3 && a[3] === 'Pendiente' && !a[4], b[2] === hace3 && b[3] === '26SM0413' && !b[4], !c[2] && !c[3] && !c[4]]), [true, true, true]);
 await pagina.check('.pg-solo-falta');
 await comprobar('2. «Solo lo que falta» deja fuera a la que lo tiene todo',
-  pagina.locator('.pg-tabla tbody tr .pg-persona').allTextContents().then((l) => [l.length, l.indexOf('Castro Reina, Noa')]), [5, -1]);
+  pagina.locator('.pg-tabla tbody tr .pg-persona').allTextContents().then((l) => [l.length, l.indexOf('Castro Reina, Noa')]), [7, -1]);
 await pagina.uncheck('.pg-solo-falta');
-await comprobar('2. con seis personas no sale el buscador por nombre', pagina.locator('.pg-buscar').count(), 0);
+await comprobar('2. con ocho personas no sale el buscador por nombre', pagina.locator('.pg-buscar').count(), 0);
 
 /* El menú de una fila. */
 await pagina.locator('.pg-tabla tbody tr').nth(1).locator('.pg-mas').click();
@@ -112,10 +112,10 @@ await pagina.evaluate(() => document.querySelector('.word-visor-cerrar').click()
 
 await pagina.locator('.pg-tabla tbody tr').nth(4).locator('.pg-mas').click();
 await pagina.locator('.pg-menu button', { hasText: 'Quitar del grupo' }).click();
-await pagina.waitForFunction(() => document.querySelectorAll('.pg-tabla tbody tr').length === 5);
+await pagina.waitForFunction(() => document.querySelectorAll('.pg-tabla tbody tr').length === 7);
 await comprobar('2. sin nada hecho, «Quitar del grupo» quita y la cuenta baja en uno',
   pagina.evaluate((n) => [App.E.registro.asuntos[n].relacionados.length, document.querySelector('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-titulo').textContent.trim(), document.querySelector('.pg-cuenta').textContent], demo),
-  [5, 'Personas del grupo (5)', '5 personas · 3 generados · 2 registrados · 1 enviado']);
+  [7, 'Personas del grupo (7)', '7 personas · 5 generados · 4 registrados · 1 enviado']);
 
 await pagina.locator('.pg-tabla tbody tr').nth(0).locator('.pg-mas').click();
 await pagina.locator('.pg-menu button', { hasText: 'Abrir su ficha' }).click();
@@ -161,11 +161,11 @@ await pagina.click('.pg-menu button');
 await pagina.waitForSelector('.word-visor-franja .muestra-generar');   /* fila 294: antes, una muestra */
 await pagina.click('.muestra-generar');
 await pagina.waitForSelector('#capa:not(.oculto) .generar-cada-resumen', { timeout: 120000 });
-await comprobar('4. el resumen dice cuántos documentos', pagina.locator('.generar-cada-resumen').textContent(), '5 documentos generados.');
+await comprobar('4. el resumen dice cuántos documentos', pagina.locator('.generar-cada-resumen').textContent(), '7 documentos generados.');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction((h) => [...document.querySelectorAll('.pg-tabla tbody tr')].every((r) => r.children[2].textContent.trim() === h), hoy, { timeout: 15000 });
-await comprobar('4. al terminar, todas las filas llevan la fecha de hoy y el resumen cuenta cinco generados',
-  pagina.locator('.pg-cuenta').textContent(), '5 personas · 5 generados · 0 registrados · 0 enviados');
+await comprobar('4. al terminar, todas las filas llevan la fecha de hoy y el resumen cuenta siete generados',
+  pagina.locator('.pg-cuenta').textContent(), '7 personas · 7 generados · 0 registrados · 0 enviados');
 await comprobar('4. el trabajo es el mismo (una sola plantilla): no sale «Qué se mira»', pagina.locator('.pg-trabajo-lista').count(), 0);
 
 /* Una segunda plantilla: dos trabajos. */
@@ -187,7 +187,7 @@ await comprobar('4. aparece «Qué se mira» con los dos trabajos, el último el
   [['Certificado de notas', 'Otro certificado'], 'Otro certificado']);
 await pagina.selectOption('.pg-trabajo-lista', { index: 0 });
 await comprobar('4. y al elegir el primero, la tabla cambia a sus columnas',
-  pagina.locator('.pg-cuenta').textContent(), '5 personas · 5 generados · 0 registrados · 0 enviados');
+  pagina.locator('.pg-cuenta').textContent(), '7 personas · 7 generados · 0 registrados · 0 enviados');
 
 await comprobar('sin errores de consola (parte principal)', Promise.resolve(errores), []);
 
@@ -207,7 +207,7 @@ await comprobar('6. tras el cambio de nombre, sus documentos siguen siendo suyos
     const est = PersonasDelGrupo.estado(a, (await Carpetas.ficheros(a.handle)).map((f) => f.nombre));
     const p = est.personas.filter((x) => x.nombre === 'Castro Reina, Noa 2199999')[0];
     return [!!p, Object.keys(p.hechos).length, est.personas.filter((x) => Object.keys(x.hechos).length).length];
-  }, demo2), [true, 1, 3]);
+  }, demo2), [true, 1, 5]);
 await pagina2.close();
 
 /* ================= 5. ARCHIVADO ================= */
@@ -242,8 +242,8 @@ await pagina3.waitForTimeout(1500);
 await pagina3.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina3.waitForSelector('.pg-tabla');
 await pagina3.waitForTimeout(500);
-await comprobar('7. la tabla se ve entera y sus dos botones están apagados',
-  pagina3.evaluate(() => [document.querySelectorAll('.pg-tabla tbody tr').length, ...[...document.querySelectorAll('.pg-botones button')].map((b) => b.disabled)]), [6, true, true]);
+await comprobar('7. la tabla se ve entera y sus cuatro botones están apagados',
+  pagina3.evaluate(() => [document.querySelectorAll('.pg-tabla tbody tr').length, ...[...document.querySelectorAll('.pg-botones button')].map((b) => b.disabled)]), [8, true, true, true, true]);
 await comprobar('7. mirar, filtrar y abrir siguen funcionando; «Quitar del grupo» apagado',
   (async () => {
     await pagina3.check('.pg-solo-falta');
@@ -252,7 +252,7 @@ await comprobar('7. mirar, filtrar y abrir siguen funcionando; «Quitar del grup
     await pagina3.locator('.pg-tabla tbody tr').nth(3).locator('.pg-mas').click();
     const quitar = await pagina3.locator('.pg-menu button', { hasText: 'Quitar del grupo' }).isDisabled();
     return [filas, quitar];
-  })(), [5, true]);
+  })(), [7, true]);
 await comprobar('7. no se ha escrito nada', pagina3.evaluate(() => Demo.escrituras()), 0);
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 

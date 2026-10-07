@@ -1,0 +1,35 @@
+/* ============================================================
+   grupo-enviar.css — la pantalla de «Enviar…» y «Enviar un aviso…» (fila 295, js/grupo-enviar-pantalla.js).
+   A todo el ancho, en dos columnas; el botón de enviar siempre a la vista, abajo.
+   ============================================================ */
+.grupo-enviar { position: fixed; inset: 0; z-index: 38; display: flex; flex-direction: column; background: var(--fondo, #f4f6f9); }
+body.solo-consulta .grupo-enviar { top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto, 0px)); }
+body:not(.solo-consulta) .grupo-enviar { top: var(--franja-demo-alto, 0px); }
+.ge-barra { display: flex; align-items: baseline; gap: 14px; padding: 10px 16px; background: var(--papel, #fff); border-bottom: 1px solid var(--linea); }
+.ge-asunto-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ge-cuerpo { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 16px; }
+.ge-izq, .ge-der { min-height: 0; overflow: auto; background: var(--papel, #fff); border: 1px solid var(--linea); border-radius: 8px; padding: 14px; }
+.ge-campo { display: flex; flex-direction: column; gap: 4px; margin: 0 0 10px; font-size: 13px; }
+.ge-texto { resize: vertical; font: inherit; }
+.ge-nav { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; font-size: 13px; }
+.ge-correo { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; background: #fff; }
+.ge-correo p { margin: 0 0 4px; }
+.ge-m-texto { white-space: pre-wrap; font: inherit; margin: 8px 0; }
+.ge-se-envia { margin: 8px 0 6px; font-size: 15px; }
+.ge-lista { list-style: none; margin: 0 0 12px; padding: 0; font-size: 13px; }
+.ge-lista li { padding: 3px 0; border-bottom: 1px solid var(--linea); }
+.ge-ambar { padding: 10px 12px; border-radius: 8px; margin: 0 0 10px; font-size: 13px; }
+.ge-ambar .boton { margin-left: 8px; }
+.ge-nombres { margin-top: 6px; font-size: 13px; }
+.ge-gris { margin: 0 0 8px; color: var(--suave, #5b6b7d); font-size: 13px; }
+.ge-gris summary { cursor: pointer; }
+.ge-resultado:not(:empty) { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--linea); border-radius: 8px; }
+.ge-fallos { margin: 6px 0 8px; padding-left: 18px; font-size: 13px; color: var(--rojo-linea); }
+.ge-tope { padding: 8px 10px; border-radius: 8px; margin: 6px 0 0; }
+.ge-pie { display: flex; align-items: center; gap: 12px; padding: 10px 130px 10px 16px;   /* a la derecha, hueco para el botón «Soporte» */ background: var(--papel, #fff); border-top: 1px solid var(--linea); }
+.ge-estado { flex: 1 1 auto; font-size: 13px; }
+.ge-enviando .ge-estado { font-weight: 600; }
+.ge-botones { display: inline-flex; gap: 8px; }
+.pg-fallo { color: var(--rojo-linea); font-weight: 600; }
+body.con-grupo-enviar { overflow: hidden; }
+@media (max-width: 800px) { .ge-cuerpo { grid-template-columns: 1fr; overflow: auto; } }

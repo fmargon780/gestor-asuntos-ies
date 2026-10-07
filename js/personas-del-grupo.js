@@ -46,6 +46,8 @@ var PersonasDelGrupo = (function () {
       return p;
     });
     var trabajos = {};
+    var pdfDeTanda = {};   /* fila 295: el PDF `CORREO` de cada tanda de envío */
+    (ficha.tandasDeEnvio || []).forEach(function (t) { if (t && t.id && t.pdf) pdfDeTanda[t.id] = t.pdf; });
     var elegido = {};   /* persona|trabajo -> número del documento que cuenta (el último) */
 
     Object.keys(docs).forEach(function (n) {
@@ -68,6 +70,7 @@ var PersonasDelGrupo = (function () {
     });
 
     (ficha.enviosPorPersona || []).forEach(function (e) {
+      if (e.aviso) return;
       var n = numeroDe(e.documento), d = docs[n];
       if (!d || !d.generadoDe) return;
       var partes = String(d.generadoDe).split('|');
@@ -76,8 +79,20 @@ var PersonasDelGrupo = (function () {
       /* Solo el envío del documento que cuenta (el último): uno rehecho después no está enviado todavía. */
       if (!celda || celda.generado.numero !== n || (celda.enviado && celda.enviado.cuando > (e.cuando || ''))) return;
       celda.enviado = { fecha: String(e.cuando || '').slice(0, 10), cuando: e.cuando || '', correo: e.correo || '', quien: e.quien || '' };
+      if (pdfDeTanda[e.tanda]) celda.enviado.pdf = pdfDeTanda[e.tanda];   /* fila 295: el PDF de su tanda */
     });
 
+    /* Fila 295: cada aviso sin documento es un trabajo más, con solo la columna «Enviado». */
+    (ficha.avisosEnBloque || []).forEach(function (v) {
+      trabajos['aviso:' + v.id] = { clave: 'aviso:' + v.id, tipo: '', fecha: String(v.cuando || '').slice(0, 10), numero: '', aviso: v.asunto || '' };
+    });
+    (ficha.enviosPorPersona || []).forEach(function (e) {
+      if (!e.aviso || !trabajos['aviso:' + e.aviso]) return;
+      var i = String(e.persona || '').indexOf('|');
+      var persona = i > 0 && indice[clave(e.persona.slice(0, i), e.persona.slice(i + 1))];
+      if (persona) persona.hechos['aviso:' + e.aviso] = { generado: null, registrado: [],
+        enviado: { fecha: String(e.cuando || '').slice(0, 10), cuando: e.cuando || '', correo: e.correo || '', quien: e.quien || '', pdf: pdfDeTanda[e.tanda] || '' } };
+    });
     var lista = Object.keys(trabajos).map(function (k) { return trabajos[k]; });
     /* Del más viejo al último: por fecha y, el mismo día, por el número del documento. */
     lista.sort(function (x, y) {
@@ -110,14 +125,15 @@ var PersonasDelGrupo = (function () {
     est.personas.forEach(function (p) {
       var h = trabajo && p.hechos[trabajo];
       if (!h) return;
-      c.generados++;
+      if (h.generado) c.generados++;
       if (h.registrado.length) c.registrados++;
       if (h.enviado) c.enviados++;
     });
     return c;
   }
 
-  function textoResumen(c) {
+  function textoResumen(c, esAviso) {
+    if (esAviso) return c.personas + (c.personas === 1 ? ' persona' : ' personas') + ' · ' + c.enviados + (c.enviados === 1 ? ' enviado' : ' enviados');
     return c.personas + (c.personas === 1 ? ' persona' : ' personas') + ' · ' + c.generados + (c.generados === 1 ? ' generado' : ' generados') +
       ' · ' + c.registrados + (c.registrados === 1 ? ' registrado' : ' registrados') + ' · ' + c.enviados + (c.enviados === 1 ? ' enviado' : ' enviados');
   }
@@ -135,7 +151,7 @@ var PersonasDelGrupo = (function () {
   /* Algo generado o enviado a las personas de este asunto (una mirada a la ficha, sin leer la carpeta). */
   function conAlgo(a) {
     var f = fichaDe(a), docs = f.documentos || {};
-    return Object.keys(docs).some(function (k) { return docs[k] && docs[k].generadoDe; }) || (f.enviosPorPersona || []).length > 0;
+    return Object.keys(docs).some(function (k) { return docs[k] && docs[k].generadoDe; }) || (f.enviosPorPersona || []).length > 0 || (f.avisosEnBloque || []).length > 0;
   }
 
   function aplica(a) {
@@ -144,6 +160,7 @@ var PersonasDelGrupo = (function () {
 
   function nombreDeTrabajo(t, plantillas) {
     var p = plantillas && plantillas.documentos && plantillas.documentos.filter(function (x) { return x.id === t.clave; })[0];
+    if (t.aviso !== undefined) return 'Aviso: ' + t.aviso + (t.fecha ? ' · ' + fechaLarga(t.fecha) : '');
     var nombre = (p && p.nombre) || (t.tipo ? t.tipo.charAt(0) + t.tipo.slice(1).toLowerCase() : 'Documento');
     return nombre + (t.fecha ? ' · ' + fechaLarga(t.fecha) : '');
   }
@@ -166,16 +183,29 @@ var PersonasDelGrupo = (function () {
       '" title="Abrir su documento">' + U.escapar(fechaLarga(f.generado.fecha)) + '</button>';
   }
 
-  function tablaHtml(est, vista, unidades, conRegistro) {
+  /* Fila 295: la celda «Enviado»: fecha y dirección (abre el PDF de su tanda), «No ha salido: …» o «Pendiente de enviar». */
+  function celdaEnviado(f, extra) {
+    if (f.enviado) {
+      var texto = U.escapar(fechaLarga(f.enviado.fecha) + (f.enviado.correo ? ' · ' + f.enviado.correo : ''));
+      return f.enviado.pdf ? '<button type="button" class="enlace pg-abrir" data-solo-lectura data-fichero="' + U.escapar(f.enviado.pdf) + '" title="Abrir el correo enviado">' + texto + '</button>' : texto;
+    }
+    if (extra && extra.pendiente && (extra.esAviso || f.generado)) return '<span class="suave">Pendiente de enviar</span>';
+    var fallo = extra && extra.fallos && extra.fallos[f.persona.categoria + '|' + f.persona.nombre];
+    if (fallo && (extra.esAviso || f.generado)) return '<span class="pg-fallo">No ha salido: ' + U.escapar(fallo) + '</span>';
+    return '';
+  }
+
+  function tablaHtml(est, vista, unidades, conRegistro, extra) {
+    var esAviso = !!(extra && extra.esAviso);
     var cab = '<tr><th>Persona</th>' + (unidades ? '<th>Unidad</th>' : '') +
-      '<th>Generado</th>' + (conRegistro ? '<th>Registrado</th>' : '') + '<th>Enviado</th><th></th></tr>';
+      (esAviso ? '' : '<th>Generado</th>') + (conRegistro && !esAviso ? '<th>Registrado</th>' : '') + '<th>Enviado</th><th></th></tr>';
     var cuerpo = vista.map(function (f) {
       var p = f.persona;
       return '<tr data-i="' + f.i + '"><td class="pg-persona">' + U.escapar(soloElNombre(p.nombre) || p.nombre) + '</td>' +
         (unidades ? '<td>' + U.escapar(unidades[p.nombre] || '') + '</td>' : '') +
-        '<td class="pg-generado">' + celdaGenerado(f) + '</td>' +
-        (conRegistro ? '<td class="pg-registrado">' + (f.registrado.length ? U.escapar(f.registrado.join(', ')) : (f.generado ? '<span class="suave">Pendiente</span>' : '')) + '</td>' : '') +
-        '<td class="pg-enviado">' + (f.enviado ? U.escapar(fechaLarga(f.enviado.fecha) + (f.enviado.correo ? ' · ' + f.enviado.correo : '')) : '') + '</td>' +
+        (esAviso ? '' : '<td class="pg-generado">' + celdaGenerado(f) + '</td>') +
+        (conRegistro && !esAviso ? '<td class="pg-registrado">' + (f.registrado.length ? U.escapar(f.registrado.join(', ')) : (f.generado ? '<span class="suave">Pendiente</span>' : '')) + '</td>' : '') +
+        '<td class="pg-enviado">' + celdaEnviado(f, extra) + '</td>' +
         '<td><button type="button" class="boton boton-chico pg-mas" data-solo-lectura title="Más acciones">⋯</button></td></tr>';
     }).join('');
     return '<table class="pg-tabla"><thead>' + cab + '</thead><tbody>' + cuerpo + '</tbody></table>' +
@@ -196,20 +226,26 @@ var PersonasDelGrupo = (function () {
     try { plantillas = window.Plantillas ? await Plantillas.cargar(App.E.gestor) : null; } catch (e1) { plantillas = null; }
     var est = estado(a, ficheros);
     var unidades = await unidadesDe(est);
+    var envio = null;   /* fila 295: a cuántos se puede enviar ahora */
+    var trabajoElegido = est.trabajos.some(function (t) { return t.clave === mem.trabajo; }) ? mem.trabajo : (est.trabajos.length ? est.trabajos[est.trabajos.length - 1].clave : '');
+    if (window.GrupoEnviar) { try { envio = await GrupoEnviar.contar(a, est, trabajoElegido, conRegistro); } catch (eEnvio) { envio = null; } }
     if (turno !== caja._turnoGrupo || !caja.isConnected) return;
 
     /* El que se eligió a mano; si no, el último. */
     var trabajo = est.trabajos.some(function (t) { return t.clave === mem.trabajo; }) ? mem.trabajo
       : (est.trabajos.length ? est.trabajos[est.trabajos.length - 1].clave : '');
+    var esAviso = String(trabajo).indexOf('aviso:') === 0;
+    var pendiente = !!(ficha.envioPendiente && ficha.envioPendiente.trabajo === trabajo);
+    var extraTabla = { esAviso: esAviso, pendiente: pendiente, fallos: window.GrupoEnviar ? GrupoEnviar.fallosDe(a) : null };
     caja.dataset.cuenta = String(lista.length);
-    caja.dataset.resumen = textoResumen(cuentas(est, trabajo));
+    caja.dataset.resumen = textoResumen(cuentas(est, trabajo), esAviso);
     if (window.AsuntoDeGrupo && aplica(a)) AsuntoDeGrupo.titularTarjeta($('ficha-tarjetas'), { ficha: ficha });
 
     caja._ultimo = { a: a, abierto: abierto, alCambiar: alCambiar };   /* para repintar al terminar de generar desde la mesa del hito */
     var propia = abierto && !soloConsulta();
     U.conservandoLoEscrito(caja, function () {
       caja.innerHTML =
-        '<div class="pg-cabeza"><strong class="pg-cuenta">' + U.escapar(textoResumen(cuentas(est, trabajo))) + '</strong>' +
+        '<div class="pg-cabeza"><strong class="pg-cuenta">' + U.escapar(textoResumen(cuentas(est, trabajo), esAviso)) + '</strong>' +
           (lista.length > 15 ? '<input type="search" class="campo pg-buscar" data-solo-lectura placeholder="Buscar por nombre" value="' + U.escapar(mem.texto) + '">' : '') +
           '<label class="pg-solo"><input type="checkbox" class="pg-solo-falta" data-solo-lectura' + (mem.solo ? ' checked' : '') + '> Solo lo que falta</label>' +
           (est.trabajos.length > 1 ? '<label class="pg-trabajo">Qué se mira <select class="campo pg-trabajo-lista" data-solo-lectura>' +
@@ -219,6 +255,9 @@ var PersonasDelGrupo = (function () {
           '<span class="pg-botones">' +
             '<button type="button" class="boton pg-generar"' + (propia ? '' : ' disabled') + '>Generar para todos ▾</button>' +
             '<button type="button" class="boton pg-anadir"' + (propia ? '' : ' disabled') + '>+ Añadir personas</button>' +
+            (envio === null ? '' : '<button type="button" class="boton boton-principal pg-enviar"' + (propia && envio ? '' : ' disabled') + '>' +
+              (pendiente ? 'Seguir enviando' : 'Enviar…') + ' (' + envio + ')</button>' +
+              '<button type="button" class="boton pg-aviso"' + (propia ? '' : ' disabled') + '>Enviar un aviso…</button>') +
           '</span></div><div class="pg-menu oculto"></div>' +
         (window.GrupoRegistro ? '<div class="pg-registro">' + GrupoRegistro.html(est, trabajo, conRegistro, sinColocar) + '</div>' : '') +
         '<div class="pg-tabla-caja">' + (lista.length ? '' : '<p class="explica">Nadie en el grupo todavía.</p>') + '</div>';
@@ -228,7 +267,7 @@ var PersonasDelGrupo = (function () {
     function pintarCuerpo() {
       var vista = filas(est, trabajo, { texto: mem.texto, soloFalta: mem.solo });
       var cajaTabla = caja.querySelector('.pg-tabla-caja');
-      if (lista.length) cajaTabla.innerHTML = tablaHtml(est, vista, unidades, conRegistro);
+      if (lista.length) cajaTabla.innerHTML = tablaHtml(est, vista, unidades, conRegistro, extraTabla);
     }
     if (window.GrupoRegistro) GrupoRegistro.enganchar(caja.querySelector('.pg-registro'), a, est, trabajo, sinColocar, propia, function () { pintar(caja, a, abierto, alCambiar); });
     var buscar = caja.querySelector('.pg-buscar');
@@ -240,6 +279,9 @@ var PersonasDelGrupo = (function () {
       var cambiado = await Relacionados.agregarVarios(a);
       if (cambiado && alCambiar) alCambiar();
     };
+    var bEnviar = caja.querySelector('.pg-enviar'), bAviso = caja.querySelector('.pg-aviso');
+    if (bEnviar) bEnviar.onclick = function () { GrupoEnviarPantalla.abrir(a, { trabajo: trabajo, conRegistro: conRegistro }); };
+    if (bAviso) bAviso.onclick = function () { GrupoAvisos.abrir(a, '', conRegistro); };
     caja.querySelector('.pg-generar').onclick = function (ev) { ev.stopPropagation(); menuDeGenerar(caja, a, alCambiar, ev.currentTarget); };
 
     caja.querySelector('.pg-tabla-caja').onclick = function (ev) {
@@ -359,6 +401,7 @@ var PersonasDelGrupo = (function () {
   function repintar(a) {
     var caja = $('ficha-relacionados');
     if (!caja || !caja._ultimo || caja._ultimo.a.nombre !== a.nombre || !caja.isConnected) return;
+    if (window.GrupoEnviar && GrupoEnviar.enMarcha(a)) return;   /* fila 295: durante una tanda no se repinta nada; al acabar sí */
     pintar(caja, caja._ultimo.a, caja._ultimo.abierto, caja._ultimo.alCambiar);
   }
 
@@ -376,7 +419,7 @@ var PersonasDelGrupo = (function () {
     });
   }
 
-  return { alRenombrar: alRenombrar, repintar: repintar, estado: estado, filas: filas, cuentas: cuentas, textoResumen: textoResumen, conAlgoHecho: conAlgoHecho, conAlgo: conAlgo,
+  return { alRenombrar: alRenombrar, repintar: repintar, estado: estado, filas: filas, cuentas: cuentas, textoResumen: textoResumen, conAlgoHecho: conAlgoHecho, conAlgo: conAlgo, celdaEnviado: celdaEnviado,
            aplica: aplica, pintar: pintar, hitoActual: hitoActual, fechaLarga: fechaLarga, nombreDeTrabajo: nombreDeTrabajo };
 })();
 window.PersonasDelGrupo = PersonasDelGrupo;

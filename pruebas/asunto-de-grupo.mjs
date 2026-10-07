@@ -9,7 +9,7 @@
       foto de contacto; la ficha dice «Grupo de N personas» y no «no encontrado»; el formulario vuelve a salir limpio.
    4. Una categoría mezclada da `OTROS`.
    5. `GRUPO …` no sale como persona en el buscador de «Nuevo asunto» ni en «Personas y empresas».
-   6. En el asunto de grupo de la demostración: «Hacer este hito» no sale; Inicio dice «Grupo 2ºB · 6» y lo encuentra por el
+   6. En el asunto de grupo de la demostración: «Hacer este hito» no sale; Inicio dice «Grupo 2ºB · 8» y lo encuentra por el
       apellido de una persona; «Quién lo pide» no propone «el propio interesado»; «Cambiar el asunto» cambia el nombre del
       grupo y sigue siendo un grupo. */
 import { chromium } from 'playwright';
@@ -169,8 +169,8 @@ await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(600);
 await pagina.fill('#buscar-abiertos', 'Navarro');
 await pagina.waitForTimeout(800);
-await comprobar('6. Inicio encuentra el asunto de grupo por el apellido de una de sus personas; la columna «Tercero» dice «Grupo 2ºB · 6»',
-  pagina.locator('.inicio-tabla-tercero').allTextContents().then((l) => l.map((t) => t.trim())), ['Grupo 2ºB · 6']);
+await comprobar('6. Inicio encuentra el asunto de grupo por el apellido de una de sus personas; la columna «Tercero» dice «Grupo 2ºB · 8»',
+  pagina.locator('.inicio-tabla-tercero').allTextContents().then((l) => l.map((t) => t.trim())), ['Grupo 2ºB · 8']);
 await pagina.fill('#buscar-abiertos', '');
 
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), demo);
@@ -189,7 +189,7 @@ await comprobar('6. «Quién lo pide» no propone «el propio interesado» ni a 
   ['— sin apuntar —', 'Otra persona…']);
 await comprobar('6. ninguna búsqueda de «la persona» da una persona ni un error',
   pagina.evaluate(async (n) => { const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0]; const r = await FichaTercero._buscarPersona(a); return [r.persona, r.aviso, await HitosComunicar.buscarPersonaDelAsunto(a)]; }, demo),
-  [null, 'Grupo de 6 personas.', null]);
+  [null, 'Grupo de 8 personas.', null]);
 
 /* Cambiar el asunto: el nombre del grupo, sin pasar a una persona. */
 pagina.evaluate((n) => App.editarAsunto(App.E.listaAbiertos.filter((x) => x.nombre === n)[0]), demo);
@@ -199,9 +199,9 @@ await comprobar('6. «Cambiar el asunto» enseña el nombre del grupo (no el bus
 await pagina.fill('#ed-grupo-nombre', 'Segundo B');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(2500);
-await comprobar('6. el nombre cambia, sigue siendo un grupo y conserva a sus seis personas',
+await comprobar('6. el nombre cambia, sigue siendo un grupo y conserva a sus ocho personas',
   pagina.evaluate(() => App.E.listaAbiertos.filter((a) => /GRUPO Segundo B$/.test(a.nombre)).map((a) => [a.ficha.grupo.nombre, a.ficha.grupo.origen, a.ficha.tercero, a.ficha.relacionados.length, AsuntoDeGrupo.esGrupo(a)])),
-  [['Segundo B', 'unidad', 'GRUPO Segundo B', 6, true]]);
+  [['Segundo B', 'unidad', 'GRUPO Segundo B', 8, true]]);
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 await navegador.close();
