@@ -332,7 +332,7 @@
     'plantillas.json': 'las plantillas', 'rutas.json': 'las rutas de las carpetas', 'margenes-pdf.json': 'los márgenes de los PDF',
     'no-duplicados.json': 'los duplicados descartados', 'papelera.json': 'la papelera', 'envios.json': 'los envíos de correo',
     'asuntos.json': 'la lista de asuntos', 'tablon.json': 'el tablón', 'hitos.json': 'los hitos',
-    'perfiles.json': 'los perfiles', 'encargos.json': 'los encargos'
+    'perfiles.json': 'los perfiles', 'encargos.json': 'los encargos', 'correos-a-mano.json': 'los correos escritos a mano'
   };
 
   function comoSeLlama(real) { return COMO_SE_LLAMA[real] || 'una lista de la aplicación'; }
@@ -406,6 +406,10 @@
       }
       if (real === 'encargos.json' && window.Encargos) {   /* fila 289: por id */
         if (await Encargos.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        continue;
+      }
+      if (real === 'correos-a-mano.json' && window.CorreosAMano) {   /* fila 299: por clave */
+        if (await CorreosAMano.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         continue;
       }
       if (real === 'hitos.json') {

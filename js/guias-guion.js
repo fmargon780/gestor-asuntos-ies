@@ -47,7 +47,7 @@ var GuiasGuion = (function () {
 
   var A_QUIEN = [
     { valor: '', texto: 'A quien toque' }, { valor: 'tercero', texto: 'El tercero' },
-    { valor: 'tutores', texto: 'La familia' }, { valor: 'tutoria', texto: 'La tutoría' },
+    { valor: 'tutores', texto: 'La familia' }, { valor: 'tutoria', texto: 'Tutor/a del grupo' },
     { valor: 'relacionados', texto: 'Los relacionados' }, { valor: 'otro', texto: 'Otro' }
   ];
   var VIAS = [{ valor: '', texto: 'Correo o Séneca' }, { valor: 'correo', texto: 'Por correo' }, { valor: 'seneca', texto: 'Por Séneca' }];

@@ -2780,7 +2780,12 @@
           "texto": "Convocar a la tutoría y a la orientación",
           "explicacion": "",
           "accion": "comunicar",
-          "normativa": null
+          "normativa": null,
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
+          }
         },
         {
           "id": "g2",
@@ -3845,6 +3850,11 @@
             "bloque": "",
             "clave": "",
             "url": ""
+          },
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
           }
         },
         {
@@ -4736,7 +4746,12 @@
           "texto": "Avisar a la tutoría",
           "explicacion": "",
           "accion": "comunicar",
-          "normativa": null
+          "normativa": null,
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
+          }
         },
         {
           "id": "g4",
@@ -4795,7 +4810,12 @@
           "texto": "Pedir el informe a la tutoría",
           "explicacion": "",
           "accion": "comunicar",
-          "normativa": null
+          "normativa": null,
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
+          }
         },
         {
           "id": "g2",
@@ -5115,7 +5135,12 @@
           "texto": "Comunicar la baja a la tutoría",
           "explicacion": "",
           "accion": "comunicar",
-          "normativa": null
+          "normativa": null,
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
+          }
         },
         {
           "id": "g2",
@@ -5474,6 +5499,11 @@
             "bloque": "",
             "clave": "",
             "url": ""
+          },
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
           }
         },
         {
@@ -8499,7 +8529,12 @@
           "texto": "Comunicarlo a la tutoría",
           "explicacion": "",
           "accion": "comunicar",
-          "normativa": null
+          "normativa": null,
+          "receta": {
+            "a": "tutoria",
+            "via": "",
+            "plantilla": ""
+          }
         },
         {
           "id": "g3",

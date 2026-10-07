@@ -168,6 +168,7 @@ var SenecaCuadro = (function () {
     engancharPasos(a);
     engancharRuta(a);
     engancharDocAdjuntar();
+    if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.paraSeneca(a, plantillaElegida);   /* fila 299 */
 
     if (window.SenecaAyudante) {
       /* El enlace se queda a la vista; la explicación entra en el
@@ -234,6 +235,7 @@ var SenecaCuadro = (function () {
     plantillaElegida = idElegida;
     $('seneca-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
+    if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.paraSeneca(a, plantillaElegida);   /* fila 299 */
   }
 
   /* ---------- crear/editar la plantilla desde el propio cuadro

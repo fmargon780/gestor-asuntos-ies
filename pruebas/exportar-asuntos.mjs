@@ -37,6 +37,8 @@ await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas',
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 20000 });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 20000 });
+await pagina.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 60000 });   /* fila 299: la demostración tarda un poco más en montarse */
+await pagina.waitForTimeout(1500);
 
 /* ================= LO PURO ================= */
 
@@ -72,12 +74,12 @@ await pagina.fill('#filtro-fecha-desde', isoHaceDias(6));
 await pagina.fill('#filtro-fecha-hasta', isoHaceDias(1));
 await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length < n, cuentaTodos);
 await comprobar('con Desde y Hasta solo salen los asuntos iniciados entre esos días (los dos extremos entran)',
-  pagina.locator('#inicio-tabla-cuerpo tr[data-asunto]').count(), 5);
+  pagina.locator('#inicio-tabla-cuerpo tr[data-asunto]').count(), 6);   /* seis desde la fila 297 (su asunto de Jimenez Rubio es de hace 2 días) */
 await comprobar('«Filtros (1)» cuenta Fechas como uno', pagina.locator('#btn-filtros').textContent(), 'Filtros (1)');
 await comprobar('la línea de filtros dice «Fechas: del … al …»',
   pagina.locator('#barra-filtros, .filtros-barra, .chip').allTextContents().then((t) => t.join(' ').indexOf('Fechas: del ') !== -1), true);
 await comprobar('las cuatro pestañas cuentan solo lo de las fechas',
-  pagina.locator('.inicio-pestana[data-pestana="todos"] .cuenta-lista').textContent(), '5');
+  pagina.locator('.inicio-pestana[data-pestana="todos"] .cuenta-lista').textContent(), '6');
 await pagina.click('.boton-limpiar');
 await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === n, cuentaTodos);
 await comprobar('«Limpiar todo» quita las fechas', pagina.locator('#filtro-fecha-desde').inputValue(), '');

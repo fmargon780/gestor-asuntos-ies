@@ -257,3 +257,12 @@ cargue la biblioteca desde cero.
     «Informar al tutor/a» y, al preparar su correo, sale el tutor o tutora real del grupo de ese
     alumno (si no sale, mirar cómo escribe Séneca la unidad en la relación de tutorías y en el
     fichero de alumnado).
+
+## Decisiones de la sesión (7-oct-2026)
+
+- La plantilla dice «para el tutor o la tutora» y no «tutor/a»: con la barra, `Genero` cambiaría la palabra por el sexo del alumno. «Al alumno» se escribe «al/a la alumno/a» (forma doble que `Genero` resuelve; en la demostración los cuatro alumnos de SANCION llevan su sexo).
+- La pasada solo crea la plantilla cuando encuentra el hito «Notificar al tutor/a» en la guía del tipo; sin él, solo hace el punto 6.
+- Los asuntos abiertos se renombran con `HitosDesdeElAsunto.propagarCambio` y su nueva marca `soloTitulo` (solo el nombre, también en los que ya tienen trabajo); un hito anidado dentro de una respuesta se renombra en la guía pero no en los asuntos abiertos.
+- Sin correo del tutor, las direcciones de la familia del alumno no salen marcadas de entrada (el aviso es para el profesor, no para la familia).
+- Con el correo al tutor, el saludo es «Buenas:» también cuando no se sabe quién es.
+- La demostración trae cuatro asuntos de SANCION (el cuarto, de Klein Soto, Ana, 1º C, para el caso «unidad sin tutor») y uno de INCIDENCIA DE AULA (también de Jimenez Rubio, Mateo, 4º A) con «Avisar a la tutoría». El tipo SANCION de la demostración es distinto del «Medida disciplinaria…» de la fila 297 (sin el hito «Notificar al tutor/a»).

@@ -123,3 +123,5 @@ sin tocar su nombre corto. `{{PROVINCIA}}` es ya un hueco de cualquier plantilla
 
 Se comprueba con `pruebas/tablas-datos.mjs` (un PDF dibujado con pdf-lib con la disposición de
 Séneca, la tabla en Word, la especialidad que falta en amarillo, un CSV en Latin-1 y un `.xlsx`).
+
+**Quién es el tutor o tutora de una unidad** (fila 299, `js/tutor-del-grupo.js`): `TutorDelGrupo` lee las filas de TUTORIAS de `TablasDatos` del curso de hoy y del bloque de unidades (no el de Pedagogía Terapéutica), en vigor hoy, para el correo de un hito (`docs/contexto/CORREO-Y-SENECA.md`). Si la tabla no está o la unidad del alumno no casa, el cuadro de Correo lo dice en ámbar.

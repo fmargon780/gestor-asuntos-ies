@@ -301,17 +301,20 @@ window.HitosDesdeElAsunto = (function () {
         var h = lista.filter(function (x) { return x.origenGuia === idOrigen && !x.delTipoAnterior; })[0];
         if (!h) return;
         var esActual = clave === claveActual;
-        if (!esActual && !estaVacio(h, clave)) { saltados++; return; }
+        /* Fila 299 (`soloTitulo`, js/informar-al-tutor.js): cambiar solo el nombre del hito, en todos los abiertos. */
+        if (!esActual && !campos.soloTitulo && !estaVacio(h, clave)) { saltados++; return; }
         h.titulo = campos.titulo;
-        h.cuerpo = campos.cuerpo;
-        h.responsable = campos.responsable;
-        if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) {
-          h.responsableNombre = ResponsableOrganismo.copia(h.responsable, null);
-        } else {
-          delete h.responsableNombre;
+        if (!campos.soloTitulo) {
+          h.cuerpo = campos.cuerpo;
+          h.responsable = campos.responsable;
+          if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) {
+            h.responsableNombre = ResponsableOrganismo.copia(h.responsable, null);
+          } else {
+            delete h.responsableNombre;
+          }
+          h.plazo = campos.plazo;
+          colocarTrasAncla(lista, h, idAncla);
         }
-        h.plazo = campos.plazo;
-        colocarTrasAncla(lista, h, idAncla);
         tocados++;
         var r = Hitos.recomputeEnCurso(lista);
         if (r) enCurso.push({ clave: clave, hito: r });
@@ -633,6 +636,7 @@ window.HitosDesdeElAsunto = (function () {
     clavesAbiertasDelTipo: clavesAbiertasDelTipo,
     nivelSuperior: nivelSuperior,
     colocarTrasAncla: colocarTrasAncla,
+    propagarCambio: propagarCambio,   /* fila 299: lo usa js/informar-al-tutor.js */
     pasoAnclaDeHito: pasoAnclaDeHito,
     abrirCrear: abrirCrear,
     abrirCambiar: abrirCambiar,

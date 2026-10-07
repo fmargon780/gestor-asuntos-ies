@@ -128,6 +128,8 @@
   }
 
   async function apuntarElRastro(a) {
+    /* Fila 299: al enviar de verdad, el correo escrito a mano del tutor o tutora del grupo se recuerda (js/correo-tutor.js). */
+    if (I.envioRealizado && window.CorreoTutor) CorreoTutor.recordarAlEnviar();
     if (I.yaApuntado) { pintarRastro(a, ''); return; }
     I.yaApuntado = true;
 

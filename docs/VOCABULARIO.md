@@ -19,6 +19,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Un hito guardado para reutilizar en varias guías | **hito de la biblioteca** | modelo, hito modelo |
 | La persona o entidad de un asunto | **tercero** | interesado, «con quién es el asunto» |
 | Los tutores legales de un alumno, como grupo | **familia** | «la familia (tutores legales)», tutores (en general) |
+| El profesor tutor de la unidad de un alumno (fila 299; no es la familia) | **tutor/a del grupo** («Tutor/a del grupo», «tutor o tutora del grupo») | «la tutoría» a solas, tutor (a secas) |
 | Documento que genera la app (correo, Séneca, Word) | **plantilla** | modelo |
 | Documento que rellena otra persona | **impreso** (con etiqueta «de la Junta» o «del centro» cuando se sepa) | formulario, impreso oficial |
 | Meter un documento en un asunto que ya existe | **guardar en el asunto** («Guardar en un asunto», «Guardar aquí», «Guardar en ese asunto») | meter, meter aquí, elegir asunto, apuntar |

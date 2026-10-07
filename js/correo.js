@@ -98,6 +98,8 @@
      de un documento del hito elige "Por Séneca" (no hay adjuntos de
      verdad allí: se marca el nombre para copiarlo y pegarlo a mano). */
   var documentoSenecaActual = '';
+  /* Fila 299 (js/correo-tutor.js): el correo va al tutor o tutora del grupo; su saludo («Buenas:») y sus avisos. */
+  var saludoPedido = '';
 
   function $(id) { return document.getElementById(id); }
 
@@ -166,6 +168,7 @@
   /* El saludo que la app pone sola (fila 270: la plantilla de lo escrito
      lo quita, y lo necesita saber tal cual). */
   function saludoDe(a) {
+    if (saludoPedido) return saludoPedido;
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     if (categoria === 'ALUMNADO') return 'Estimados tutores legales de ' + nombre + ':';
@@ -230,6 +233,8 @@
     I.comunicarHitoActual = (extra && extra.comunicarHito) || null;
     adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
     documentoSenecaActual = (extra && extra.documentoSeneca) || '';
+    saludoPedido = (extra && extra.saludo) || '';
+    I.tutorDelGrupo = (extra && extra.tutorDelGrupo) || null;
     /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
     I.plantillaPedida = (extra && extra.plantilla) || '';
     /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): el hito desde el que
