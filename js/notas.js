@@ -201,7 +201,12 @@
   /* Fila 229: con el asunto, se pinta el registro (notas y lo automático de
      los hitos, fundidos y por fecha); sin él, la lista de notas de siempre. */
   function pintarRegistro(a, notas, editable) {
-    return RegistroAsunto.html(RegistroAsunto.lineas(a, { notas: notas }), { editable: editable });
+    /* Fila 290: las notas de directivos sin ver van resaltadas y arriba (js/notas-directivos.js). */
+    var nd = window.NotasDirectivos;
+    var arriba = nd ? nd.htmlSinVer(a, notas) : '';
+    var lineas = RegistroAsunto.lineas(a, { notas: nd ? nd.sinLasSinVer(notas) : notas });
+    if (arriba && !lineas.length) return arriba;
+    return arriba + RegistroAsunto.html(lineas, { editable: editable });
   }
 
   function pintarLista(notas, a, editable) {
@@ -387,9 +392,10 @@
   function pintarCajaDeNota(caja, a, abierto, alGuardar) {
     var notas = notasDe(a);
     cajaAsuntoActual = abierto ? a : null;
+    var directivo = !!(abierto && window.NotasDirectivos && NotasDirectivos.activa());   /* fila 290: su caja, sin editar nada */
 
     caja.innerHTML =
-      (abierto
+      (directivo ? NotasDirectivos.cajaHtml() : abierto
         ? '<div class="nota-nueva">' +
             '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
               'placeholder="Anotar algo que ha pasado…"></textarea>' +
@@ -400,8 +406,10 @@
           '</div>'
         : '<p class="explica">Asunto archivado: el registro se lee, pero ya no se escribe.</p>') +
       '<div id="ficha-notas-lista" class="notas-lista" data-clave="' + U.escapar(a.nombre) + '">' +
-        pintarLista(notas, a, abierto) + '</div>';
+        pintarLista(notas, a, abierto && !directivo) + '</div>';
 
+    if (window.NotasDirectivos) NotasDirectivos.afinar($('ficha-notas-lista'));
+    if (directivo) { NotasDirectivos.enlazarCaja(caja, a); cajaAsuntoActual = null; return; }
     if (!abierto) return;
 
     var campo = $('ficha-nota-texto');

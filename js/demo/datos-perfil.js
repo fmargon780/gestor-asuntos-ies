@@ -45,6 +45,8 @@
 
     /* 4. Los encargos de los directivos (fila 289). */
     if (window.Demo.encargos) await Demo.encargos.construir(o, { archivadoJefatura: archivadoJefatura });
+    /* 5. Las notas de la Jefa de estudios en dos asuntos (fila 290). */
+    if (window.Demo.notas) await Demo.notas.construir(o);
   }
 
   window.Demo = window.Demo || {};

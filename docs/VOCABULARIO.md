@@ -35,6 +35,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Un asunto terminado de un tipo que hay que liquidar antes de archivar / el paso de entregar lo cobrado | **Por liquidar** (pestaña de Inicio), **Liquidar**, **liquidación** (el PDF) | pendiente de cobro, cierre de caja |
 | Lo que es cada nombre de quien entra (Administración, Dirección, Secretaría o Jefatura de Estudios) / quien entra con uno que no es de Administración | **perfil** / **directivo** | rol, permisos, usuario restringido |
 | Lo que un directivo pide a Administración desde la aplicación (no es un asunto hasta que Administración lo convierte) / cómo va, visto por quien lo pidió | **encargo** («Nuevo encargo», «Mis encargos»); **Sin atender**, **En marcha**, **Terminado**, **No procede** | petición, solicitud, tarea, ticket |
+| Lo que un directivo escribe en un asunto suyo / la que Administración aún no ha visto | **nota de directivo**; **sin ver**, **Vista** | mensaje, comentario, aviso del directivo |
 | Una línea del registro de entrada o de salida de Séneca (en el control del registro) | **apunte** («apuntes sin asunto», «Apunte de registro») | asiento, entrada del registro |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se

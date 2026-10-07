@@ -55,7 +55,7 @@ var RegistroAsunto = (function () {
     (opciones.notas || notasDe(a)).forEach(function (n, i) {
       if (!n || !String(n.texto || '').trim()) return;
       if (filtro && n.hito !== filtro) return;
-      salida.push({ texto: n.texto, quien: n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
+      salida.push({ texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
         hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, auto: esAuto(n),
         propia: n, orden: i, fuente: 'asunto' });
     });
@@ -64,7 +64,7 @@ var RegistroAsunto = (function () {
       if (filtro && h.id !== filtro) return;
       (h.notas || []).forEach(function (n, i) {
         if (!n || !String(n.texto || '').trim()) return;
-        salida.push({ texto: n.texto, quien: n.quien || '', cuando: n.cuando || '', hito: h.id,
+        salida.push({ texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: h.id,
           hitoTitulo: h.titulo || '', auto: true, propia: null, orden: 100000 + k * 1000 + i, fuente: 'hito' });
       });
     });
@@ -78,7 +78,7 @@ var RegistroAsunto = (function () {
   function idDe(n) { return String((n && n.cuando) || '') + '|' + String((n && n.texto) || ''); }
 
   function lineaHtml(l, o) {
-    var editable = !!(o.editable && !l.auto && l.fuente === 'asunto');
+    var editable = !!(o.editable && !l.auto && l.fuente === 'asunto' && !(l.propia && l.propia.deDirectivo));   /* fila 290 */
     var hito = (o.conEtiqueta !== false && l.hito && window.NotasHito)
       ? NotasHito.etiquetaHtml({ hito: l.hito, hitoTitulo: l.hitoTitulo }) : '';
     var enlace = '';
@@ -97,6 +97,7 @@ var RegistroAsunto = (function () {
           '<button type="button" class="boton registro-borrar">Borrar</button></span></span>' : '') +
       '</div>' +
       '<div class="nota-texto">' + U.escapar(l.texto) + '</div>' + enlace +
+      (l.propia && l.propia.deDirectivo && window.NotasDirectivos ? NotasDirectivos.documentosHtml(l.propia, !NotasDirectivos.activa()) : '') +
     '</div>';
   }
 

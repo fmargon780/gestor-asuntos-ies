@@ -267,5 +267,5 @@
     if (window.Inicio && Inicio.repintar) Inicio.repintar();
   });
 
-  window.EncargosLlegada = { pintar: pintar, avisoDeNuevo: avisoDeNuevo, alTerminarDeCrear: alTerminarDeCrear, _atender: atender };
+  window.EncargosLlegada = { pintar: pintar, avisoDeNuevo: avisoDeNuevo, alTerminarDeCrear: alTerminarDeCrear, nombrarDocumentos: nombrarDocumentos, _atender: atender };
 })();

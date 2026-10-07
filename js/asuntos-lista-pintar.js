@@ -433,6 +433,8 @@ App.filaTablaAsunto = function (a, opciones) {
     spanTercero.innerHTML = candadoTercero + '<b>' + U.escapar(QueMeToca.terceroDe(a) || a.nombre) + '</b>';
   }
   tdTercero.appendChild(spanTercero);
+  var marcaNota = window.NotasDirectivos && NotasDirectivos.marca(a);   /* fila 290 */
+  if (marcaNota) tdTercero.appendChild(marcaNota);
   tr.appendChild(tdTercero);
 
   /* ---------- Tipo ---------- */
