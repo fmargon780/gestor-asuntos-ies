@@ -184,7 +184,8 @@ await pagina.waitForFunction(() => !document.querySelector('[data-problema="hito
 await pagina.locator('[data-problema="conflictos"]').getByRole('button', { name: 'Quedarse con el de este ordenador' }).click();
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="conflictos"]'), null, { timeout: 15000 });
 await pagina.evaluate(async () => {   /* el fichero de alumnado, bajado de nuevo */
-  (await App.E.datos.getFileHandle('RegAlum.csv'))._modificado = Date.now();
+  const h = await App.E.datos.getFileHandle('RegAlum.csv');   /* «Traer el alumnado» de Séneca: copia el fichero encima */
+  await Carpetas.copiarFicheroEn(App.E.datos, h, 'RegAlum.csv');
 });
 await pagina.locator('[data-problema="alumnado"]').getByRole('button', { name: 'Ya lo he bajado, vuelve a mirar' }).click();
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="alumnado"]'), null, { timeout: 15000 });

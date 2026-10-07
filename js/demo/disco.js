@@ -93,6 +93,7 @@
     };
     f.createWritable = function () {
       escrituras++;
+      f._modificado = null;   /* fila 291: escribir un fichero lo deja con la fecha de hoy («Traer el alumnado» rejuvenece el RegAlum de la demostración) */
       return Promise.resolve({
         write: function (c) {
           if (typeof c === 'string') { f._texto = c; return Promise.resolve(); }
