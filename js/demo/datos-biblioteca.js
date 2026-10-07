@@ -22,14 +22,14 @@
     });
     var pasos = modelos.map(function (m) { return HitosBiblioteca.modeloAPaso(m, ''); });
     /* Cuatro ya distintos de su modelo (nadie los ha escrito a mano: así llegan guías de verdad). */
-    pasos[0].responsable = 'Secretaría';
+    pasos[0].responsable = 'Orientación';
     pasos[1].cuerpo = '<p>Explicación propia de este tipo.</p>';
-    pasos[2].responsable = 'Secretaría';
-    pasos[3].responsable = 'Dirección';
+    pasos[2].responsable = 'Orientación';
+    pasos[3].responsable = 'Orientación';
     var tipo = await o.crearTipoConGuia(TIPO, 'ALUMNADO', pasos, null);
     /* Otro tipo que usa el primer modelo: la pregunta dice «(lo usan 1 tipo más)». */
     await o.crearTipoConGuia('Parte de incidencia', 'ALUMNADO', [HitosBiblioteca.modeloAPaso(modelos[0], '')], null);
-    await o.crearAsunto(tipo, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Aguilar Ponce, Marina', id: '2100001' }), o.hace(2), {});
+    await o.crearAsunto(tipo, 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Jimenez Rubio, Mateo', id: '2100011' }), o.hace(2), {});
   }
 
   window.Demo = window.Demo || {};
