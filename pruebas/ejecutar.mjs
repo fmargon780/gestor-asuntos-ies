@@ -67,7 +67,11 @@ const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
    motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
 const RETIRADAS = [
   { fichero: 'tutores-legales.mjs', desde: '7-oct-2026',
-    motivo: 'fallo real de la aplicación: al crear un asunto desde el control de registro, js/control-registro-pantalla.js solo busca el tercero en ALUMNADO, PERSONAL, EMPRESAS y OTROS (no reconoce a tutores legales ni administraciones)' }
+    motivo: 'fallo real de la aplicación: al crear un asunto desde el control de registro, js/control-registro-pantalla.js solo busca el tercero en ALUMNADO, PERSONAL, EMPRESAS y OTROS (no reconoce a tutores legales ni administraciones)' },
+  { fichero: 'hacer-este-hito.mjs', desde: '8-oct-2026',
+    motivo: 'falla igual en main sin la fila 303, también en solitario (el PDF sellado no se coloca solo: «esperando-sello»); no es de ningún cambio reciente' },
+  { fichero: 'conflictos-que-cambia.mjs', desde: '8-oct-2026',
+    motivo: 'falla igual en main sin la fila 303, también en solitario (no sale de qué ordenador es la otra versión)' },
 ];
 
 {

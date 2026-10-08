@@ -45,6 +45,7 @@
     { fichero: 'duplicados.js', nombre: 'boton(#btn-crear).onclick' },
     { fichero: 'ficha-archivo.js', nombre: 'App.cerrarAsunto' },
     { fichero: 'ficha-archivo.js', nombre: 'App.reabrirAsunto' },
+    { fichero: 'fichas-huerfanas.js', nombre: 'App.pintarPestanaAjustes' },   /* fila 303 */
     { fichero: 'ficha-huella.js', nombre: 'App.verAbiertos' },
     { fichero: 'ficha-en-la-lista.js', nombre: 'App.tarjetaAsunto' },
     { fichero: 'ficha-nombre-acciones.js', nombre: 'App.abrirFicha' },

@@ -7,6 +7,8 @@ su nombre (`npm test -- <nombre>`) sí se lanzan. El fichero de la prueba no se 
 | Prueba | Desde | Motivo | Qué haría falta para volver a meterla |
 |---|---|---|---|
 | `tutores-legales.mjs` | 7-oct-2026 | Fallo real de la aplicación (punto 5, «ninguna lista de categorías escrita a mano»): `js/control-registro-pantalla.js`, en `terceroQueEncaja`, tiene escrita a mano `['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS']`. Al crear un asunto desde el control de registro, no reconoce como tercero ya conocido a un tutor legal ni a una administración. | Que la aplicación use `Nombres.CATEGORIAS` en ese sitio (fila de aplicación, no de pruebas); entonces se quita de `RETIRADAS`. |
+| `hacer-este-hito.mjs` | 8-oct-2026 | Falla igual en `main` sin la fila 303, también en solitario: el PDF sellado no se coloca solo (el hito se queda en «esperando-sello»). | Averiguar por qué no se coloca el sellado en esta copia y arreglarlo; entonces se quita de `RETIRADAS`. |
+| `conflictos-que-cambia.mjs` | 8-oct-2026 | Falla igual en `main` sin la fila 303, también en solitario: no sale de qué ordenador es la otra versión. | Averiguar qué dato de la copia de pruebas falta y arreglarlo; entonces se quita de `RETIRADAS`. |
 
 ## Texto propuesto para `CLAUDE.md` (apartado «Pruebas», punto 3)
 

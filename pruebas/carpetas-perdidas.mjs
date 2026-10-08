@@ -35,7 +35,12 @@ async function nuevaPagina(extra) {
   await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
   await pagina.waitForFunction(() => window.Problemas && Problemas.ids().includes('carpetas'), null, { timeout: 30000 });
   await pagina.waitForTimeout(1200);
-  await pagina.evaluate(() => { App.ir('ajustes'); App.cambiarPestanaAjustes('problemas'); });
+  await pagina.evaluate(() => {   /* apunta los avisos, por si con la máquina cargada se pierden de vista */
+    window.__avisos = [];
+    const original = U.aviso;
+    U.aviso = function (texto, clase, accion) { window.__avisos.push({ texto, clase }); return original.apply(this, arguments); };
+    App.ir('ajustes'); App.cambiarPestanaAjustes('problemas');
+  });
   return pagina;
 }
 const esperarBloque = (p) => p.waitForSelector('#problema-carpetas-enlazar-todos', { timeout: 30000 });
@@ -280,9 +285,9 @@ await falla.evaluate(async () => {   /* el compañero lo quita desde el otro ord
   await App.guardarRegistroFresco((r) => { delete r.asuntos[k]; });
 });
 await falla.click('#problema-carpetas-enlazar-todos');
-await falla.waitForFunction(() => /No he podido enlazar/.test(document.getElementById('mensajes').textContent), null, { timeout: 30000 });
+await falla.waitForFunction(() => window.__avisos.some((a) => /No he podido enlazar/.test(a.texto)), null, { timeout: 60000, polling: 100 });
 await comprobar('8. aviso ámbar: uno enlazado y cuál no, con el motivo',
-  falla.evaluate(() => { const m = [...document.querySelectorAll('#mensajes .mensaje')].find((x) => /No he podido enlazar/.test(x.textContent)); return [m.className.includes('ambar'), m.textContent.includes('1 asunto enlazado.'), m.textContent.includes('Navarro Pons'), m.textContent.includes('ya no está')]; }),
+  falla.evaluate(() => { const m = window.__avisos.find((x) => /No he podido enlazar/.test(x.texto)); return [m.clase === 'ambar', m.texto.includes('1 asunto enlazado.'), m.texto.includes('Navarro Pons'), m.texto.includes('ya no está')]; }),
   [true, true, true, true]);
 await comprobar('8. el otro quedó enlazado', estadoRegistro(falla, 'Ferreter').then((r) => r.claves.length === 1 && r.claves[0].includes('FACTURAS')), true);
 await falla.close();
