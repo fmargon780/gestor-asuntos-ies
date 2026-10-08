@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '308', fecha: '2026-10-08', texto: 'En el informe en PDF de «Exportar» puedes escribir el título. El fichero se guarda con ese mismo nombre.' },
   { id: '307', fecha: '2026-10-08', texto: 'El informe en PDF de «Exportar» ya no pierde asuntos al pasar de página, y «Imprimir» no saca una hoja de más.' },
   { id: '305', fecha: '2026-10-08', texto: 'El teléfono o el correo que apuntas en «El encargo» se ve ahora en la cabecera del asunto y de cada hito, con un botón para copiarlo. Si es un correo, sale ya marcado en «Para» al escribir un correo.' },
   { id: '303', fecha: '2026-10-08', texto: 'En Ajustes → Problemas, la app encuentra sola la carpeta de los asuntos que la habían perdido, también si está archivada, y los enlaza todos con un botón. «Buscar su carpeta» ya busca entre todas las carpetas.' },

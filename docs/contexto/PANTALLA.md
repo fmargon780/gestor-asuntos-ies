@@ -315,6 +315,8 @@ bloque del último nivel sin las columnas por las que se agrupa, y línea de cie
 saltos de página entre bloques, título + fila de títulos + primer asunto juntos, cierre con el último asunto y «(continúa)»
 al repetir el título. El total general no cambia. La hoja de cálculo, tampoco. Prueba: `pruebas/informe-agrupado.mjs`.
 
+**Título del informe** (fila 308, `docs/TITULO-DEL-INFORME-EN-PDF.md`): en la ventana de «Informe en PDF» hay una casilla «Título» (`#exp-titulo`, máx. 120) que trae siempre «Listado de asuntos» y no se recuerda. El título (espacios recortados; vacío vale el de siempre) sale en el `h1` de la hoja, en la barra del visor y en el nombre del fichero (`nombrePdf()`, sin `\ / : * ? " < > |`). La hoja de cálculo no lleva casilla. Prueba: `pruebas/informe-titulo.mjs`.
+
 ### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
 ### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
 

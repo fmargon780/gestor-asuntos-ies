@@ -28,7 +28,9 @@ var ExportarInforme = (function () {
   var PPP = 200;
   var CLAVE = 'exportar-visor';
   var capa = null;
-  var actual = null;   /* { nombre, apaisado } */
+  var actual = null;   /* { nombre, titulo, apaisado } */
+  var TITULO_POR_DEFECTO = 'Listado de asuntos';   /* fila 308 */
+  var tituloAbierto = TITULO_POR_DEFECTO;
   var cargas = {};
   var urlMembrete = null;
 
@@ -112,7 +114,7 @@ var ExportarInforme = (function () {
       ? '<img class="exportar-membrete" alt="Junta de Andalucía" src="' + membrete.url + '" width="' + membrete.ancho + '" height="' + membrete.alto + '">'
       : '<div class="exportar-membrete-texto"><strong>Junta de Andalucía</strong></div>';
     return logo +
-      '<h1 class="exportar-titulo">Listado de asuntos</h1>' +
+      '<h1 class="exportar-titulo">' + escapar(tituloAbierto) + '</h1>' +
       '<p class="exportar-fecha">' + hoyLegible() + '</p>' +
       '<p class="exportar-filtros">' + escapar(filtros) + '</p>';
   }
@@ -380,7 +382,9 @@ var ExportarInforme = (function () {
      incluyeArchivados, por }. */
   async function abrir(datos) {
     construir();
-    var nombre = 'Listado de asuntos';
+    var titulo = String(datos.titulo || '').replace(/\s+/g, ' ').trim() || TITULO_POR_DEFECTO;
+    tituloAbierto = titulo;
+    var nombre = titulo;
     capa.querySelector('.word-visor-nombre').textContent = nombre;
     var hoja = capa.querySelector('.exportar-hoja');
     hoja.innerHTML = '<p class="explica">Preparando el informe…</p>';
@@ -396,7 +400,7 @@ var ExportarInforme = (function () {
       /* El reparto de páginas mide: antes, todo tiene que estar cargado (fila 307). */
       await Promise.race([document.fonts && document.fonts.ready, esperar(3000)]);
       var r = montar(hoja, datos, membrete);
-      actual = { nombre: nombre, apaisado: r.apaisado, esperados: datos.registros.length };
+      actual = { nombre: nombre, titulo: titulo, apaisado: r.apaisado, esperados: datos.registros.length };
       requestAnimationFrame(function () { requestAnimationFrame(function () { if (actual) revisar(); }); });
     } catch (e) {
       hoja.innerHTML = '<p class="explica">No he podido preparar el informe: ' + escapar(U.mensajeDeError(e)) + '</p>';
@@ -408,7 +412,9 @@ var ExportarInforme = (function () {
   function nombrePdf() {
     var d = new Date();
     var aammdd = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
-    return aammdd + ' Listado de asuntos.pdf';
+    var t = String((actual && actual.titulo) || TITULO_POR_DEFECTO)
+      .replace(/[\\\/:*?"<>|\u0000-\u001f]/g, '').replace(/\s+/g, ' ').replace(/[.\s]+$/, '').trim();
+    return aammdd + ' ' + (t || TITULO_POR_DEFECTO) + '.pdf';
   }
 
   async function hacerPdf() {
