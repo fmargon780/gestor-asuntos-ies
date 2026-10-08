@@ -67,6 +67,7 @@ var ActividadesFicha = (function () {
     var caja = $('ficha-actividad');
     if (!caja || !a) return;
     var act = actividadDe(a);
+    Actividades.ponerAlDia();   /* la cuenta al día cada vez que se pinta la ficha: «Quitar del grupo» no repinta la lista */
     if (!act) {
       caja.dataset.resumen = 'Sin apuntar todavía';
       caja.dataset.accion = 'apuntar';

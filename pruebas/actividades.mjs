@@ -187,8 +187,8 @@ await comprobar('6. la tarjeta cuenta ocho y «Personas del grupo» también',
   pagina.evaluate((n) => [Actividades.porAsunto(n).alumnado, App.E.registro.asuntos[n].relacionados.length, document.querySelector('.ficha-tarjeta[data-tarjeta="relacionados"]').dataset.titulo, document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"]').textContent.indexOf('8 alumnos/as') !== -1], nombre), [8, 8, 'Personas del grupo (8)', true]);
 
 /* La cuenta siempre es la verdadera: quitar a alguien por otro camino. */
-await pagina.evaluate(async (n) => { const r = App.E.registro.asuntos[n].relacionados[0]; await App.anotarLista(n, 'relacionados', { quitar: [{ categoria: r.categoria, nombre: r.nombre }] }); await Actividades.ponerAlDia(); }, nombre);
-await pagina.waitForTimeout(800);
+await pagina.evaluate(async (n) => { const r = App.E.registro.asuntos[n].relacionados[0]; await App.anotarLista(n, 'relacionados', { quitar: [{ categoria: r.categoria, nombre: r.nombre }] }); App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'); }, nombre);
+await pagina.waitForTimeout(2500);
 await comprobar('6. «Quitar del grupo» por otro camino: el registro se pone al día solo (7 y las unidades)',
   pagina.evaluate(async (n) => { await Actividades.releer(); const a = Actividades.porAsunto(n); return [a.alumnado, a.unidades.reduce((s, u) => s + u.van, 0)]; }, nombre), [7, 7]);
 
