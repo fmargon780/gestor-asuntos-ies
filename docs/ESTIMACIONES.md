@@ -12,4 +12,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 305 | 70 | Una regla nueva en `js/lo-pide.js`, una marca con botón de copiar en dos cabeceras (la del hito no puede crecer), tres huecos, datos de demostración y una prueba nueva; revisor con 16 puntos |

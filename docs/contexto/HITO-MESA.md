@@ -440,3 +440,5 @@ pregunta es siempre la misma y sale sola, sin ir a buscarla:
 
 - En la cabecera de la mesa de un hito de espera con la fecha límite pasada, «No ha llegado nada» (`Esperas.botonHTML/enganchar`, desde `pintarCabecera`): anota «Venció el … sin respuesta.», da el hito por hecho por el camino de «Marcar como hecho», le pone `sinRespuesta` y abre la mesa del siguiente; «Deshacer» lo reabre (la marca se borra sola). La etiqueta de estado dice «Hecho · sin respuesta» (`Esperas.textoHecho`), igual que la fila de la lista y la exportación.
 - La casilla «Es lo que se esperaba…» vive en el cuadro de nombre (ver `docs/contexto/DOCUMENTOS.md`).
+
+- Fila 305: `.mesa-etiquetas` lleva la marca de `ContactoALaVista` («Lo pide: … · Tel. … ⧉»); no hace crecer la cabecera (el nombre se recorta, el dato no).

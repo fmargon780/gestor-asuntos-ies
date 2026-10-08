@@ -807,3 +807,5 @@ del buscador, «Es para un grupo de personas» (`js/asunto-de-grupo.js`; `App.E.
 «Tercero» y encuentra el asunto por el nombre de una de sus personas (`App.textoBusquedaSimple`); «Hacer este hito» no sale.
 `ficha.grupo` de un asunto de grupo es un objeto: quien lo lea como texto (`App.piezasDelAsunto`, el índice del ARCHIVO,
 `Plantillas.valoresDeAsunto`) debe comprobar `typeof === 'string'`.
+
+- **Contacto de «El encargo»** (fila 305, `docs/CONTACTO-DEL-ENCARGO-DONDE-HACE-FALTA.md`): `LoPide.contactoDe(ficha)` es la única regla (correo, teléfono y `aLaVista`; gana lo escrito en `viaDato` a lo de `loPide`); `LoPide.correoDe` se apoya en ella. `ContactoALaVista.html(a)` pinta la marca en `marcasDeFicha` y en `.mesa-etiquetas`; el botón ⧉ sigue activo en solo consulta (`js/ficha-consulta.js`). Pruebas: `pruebas/contacto-del-encargo.mjs`, `pruebas/lo-pide.mjs` (caso 9).

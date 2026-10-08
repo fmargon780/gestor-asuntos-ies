@@ -225,7 +225,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
   (sello y firma) y Repartir entre terceros, en la barra del visor.
 - "Quién lo pide y por qué vía": un único cuadro, tanto en Nuevo asunto como en "El encargo" de la ficha; su
-  correo sale en el cuadro de Correo.
+  correo sale en el cuadro de Correo. El contacto apuntado (`LoPide.contactoDe`: gana lo escrito a mano a lo del fichero)
+  se ve junto a «Lo pide: …» en la cabecera del asunto y del hito, con botón de copiar (`js/contacto-a-la-vista.js`, fila 305).
 - Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o cambiar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
