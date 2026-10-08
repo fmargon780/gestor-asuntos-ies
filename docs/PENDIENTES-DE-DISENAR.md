@@ -83,3 +83,27 @@ se manda a todo el profesorado. Francisco quiere afinarlo: mandarlo solo al prof
 clase a las unidades convocadas, en las horas de esos días. Para saberlo, el gestor tendría que
 enlazarse con la otra aplicación del centro que lleva los horarios y las ausencias. Hasta que ese
 enlace exista, el aviso sigue yendo a todo el profesorado (así se diseña la idea 306).
+
+## 4. Importar las actividades extraescolares antiguas (idea 306, 8-oct-2026)
+
+El compañero de Francisco tiene una base de datos de Access con todas las actividades
+extraescolares de cursos anteriores. Francisco quiere importarlas, no teclearlas; el 8-oct-2026 no
+tenía acceso al fichero. **No se puede diseñar sin verlo**: cuando lo tenga (el fichero de Access o
+sus tablas pasadas a Excel), se adjunta en una conversación y se diseña la importación.
+
+Lo que ya está preparado: una actividad antigua es una actividad de `_GESTOR/actividades.json` con
+`asunto: null` y `antigua: true` (fila 310, `docs/ACTIVIDADES-EXTRAESCOLARES-PANTALLA.md`): nombre,
+fechas, lugar, departamento, horas y profesorado con «Organiza» o «Acompaña», por nombre y, si se
+sabe, DNI. La importación solo tiene que escribir actividades con esa forma, avisando de las
+repetidas (mismo nombre y misma fecha de inicio).
+
+## 5. Otros controles parecidos al de actividades extraescolares (idea 306, 8-oct-2026)
+
+Francisco intuye un sistema general: que un asunto sirva de formulario para apuntar una línea en
+una lista de datos, que de ahí salgan documentos y comunicaciones con su plantilla, y que otros
+asuntos saquen documentos con los datos de muchas líneas juntas. Eligió empezar solo por las
+actividades extraescolares (filas 306, 309, 310 y 311) y diseñar lo general cuando haya un segundo
+caso real. **Pidió que, cuando encargue otro control semejante, se le recuerde que ya se empezó
+por este.** Lo que hay para reutilizar: el fichero compartido con una línea por actividad, la marca
+en el tipo de asunto, la tarjeta propia en la ficha, la tabla de datos calculada para los huecos
+`{{TABLA …}}` y la pantalla de consulta en Herramientas.
