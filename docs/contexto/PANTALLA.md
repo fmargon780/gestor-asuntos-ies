@@ -296,6 +296,16 @@ La hoja (`js/exportar-hoja.js`, `ExportarHoja`) es un `.xlsx` escrito con JSZip 
 total, y «Hitos»). El informe (`js/exportar-informe.js`, `ExportarInforme`, `css/exportar.css`) usa la capa del
 Word: membrete de la Junta, tabla paginada midiendo (apaisada con más de 5 columnas), «Guardar PDF» (imagen de
 cada página a 200 ppp, se descarga), «Imprimir» y «Cerrar». Prueba: `pruebas/exportar-asuntos.mjs`.
+**Páginas del informe sin perder asuntos** (fila 307, `docs/INFORME-EN-PDF-QUE-PIERDE-ASUNTOS.md`): `abrir` espera al
+membrete (`decode()`, con tope de 4 s; si falla, encabezado de texto; la imagen lleva `width`/`height`) y a
+`document.fonts.ready` antes de medir. El reparto de `montar` pone cada asunto con `poner` (título, tabla y primer
+asunto juntos; el último asunto con sus líneas de cierre; lo que no cabe pasa entero a la página siguiente); un asunto
+que no cabe ni en una página vacía se reparte: su fila se repite con «(continúa)» (`tr.exportar-fila-continua`, no
+cuenta como asunto). `.exportar-contenido` es `flow-root`. `js/exportar-informe-comprobar.js` (`ExportarComprobar`)
+cuenta `{ esperados, visibles, paginasQueDesbordan }` al terminar `montar` y antes de «Guardar PDF» e «Imprimir»
+(`ExportarInforme.revisar()`): si algo falla, aviso rojo `.exportar-aviso` en la barra y los dos botones apagados. En
+`@media print` el `body` pierde el relleno de la franja de la copia de pruebas y la última página no fuerza salto: una
+hoja por página. Prueba: `pruebas/informe-paginas.mjs`.
 **Informe agrupado** (fila 278, `docs/INFORME-AGRUPADO.md`): en la ventana del PDF, «Agrupar por» e «Y dentro, por»
 (`#exp-agrupar-1/2`, hasta dos columnas de las marcadas; se recuerda en `gestor-exportar-agrupar-pdf`). El cálculo
 (`js/exportar-agrupar.js`, `ExportarAgrupar.agrupar(tabla, ids)`) agrupa sobre lo que se lee en cada celda (un reservado va a

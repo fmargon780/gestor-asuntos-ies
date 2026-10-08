@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 8-oct-2026 — Fila 307: el informe en PDF pierde asuntos al pasar de página
+
+Aviso de un compañero: los listados exportados cortaban la lista. Tres causas, medidas en la demostración (40 asuntos):
+1. El membrete se medía antes de cargarse (la imagen medía 0 y luego 168 px): toda primera página llevaba 168 px de más
+   (476 → 644 px sin hitos; 640 → 808 con hitos). Ahora `abrir` espera a `decode()` (tope 4 s) y a las fuentes, y la
+   imagen lleva `width`/`height`.
+2. El reparto agrupado dejaba pasar bloques enteros (`nodos` no se vaciaba y `hayPrevio()` fallaba en el segundo bloque):
+   páginas de 769, 905, 921, 1002 y 1121 px sobre 706 útiles. Se reescribió el reparto con una sola pieza, `poner`, que
+   prueba el asunto (con sus títulos y cierres), lo quita si desborda y lo pasa a la página siguiente.
+3. «Imprimir» sacaba una hoja de más: el `body` de la copia de pruebas lleva `padding-top` (franja fija) y la última
+   página forzaba un salto. Arreglado solo en `@media print` de `css/exportar.css`.
+Además: un asunto más alto que una página se reparte con su fila repetida y «(continúa)», y `ExportarComprobar` cuenta
+antes de guardar o imprimir (aviso rojo y botones apagados si falta algún asunto). `css/word-visor.css` tiene la misma
+última página con salto forzado al imprimir; no se ha tocado (apuntado en la fila).
+
 ## 7-oct-2026 — Fila 300: el orden nuevo de la guía llega a los asuntos abiertos
 
 Sale de un aviso de Diego Herrera: subió un hito al paso 2 en «Cambiar la guía», guardó y su asunto

@@ -55,6 +55,7 @@ var ExportarInforme = (function () {
     capa.innerHTML =
       '<div class="word-visor-barra">' +
         '<span class="word-visor-nombre"></span>' +
+        '<span class="exportar-aviso oculto" role="alert"></span>' +
         '<span class="word-visor-botones">' +
           '<button type="button" class="boton boton-principal exportar-guardar-pdf">Guardar PDF</button>' +
           '<button type="button" class="boton exportar-imprimir">Imprimir</button>' +
@@ -85,7 +86,7 @@ var ExportarInforme = (function () {
     if (ev.key === 'Escape' && abierto() && !document.querySelector('#capa:not(.oculto)')) { ev.stopPropagation(); cerrar(); }
   }, true);
 
-  function imprimir() { window.print(); }
+  function imprimir() { if (revisar().completo) window.print(); }
 
   /* ---------- las páginas ---------- */
 
@@ -95,21 +96,20 @@ var ExportarInforme = (function () {
 
   function hoyLegible() { return ExportarAsuntos.fechaLegible(U.hoyIso()); }
 
-  function hitosHtml(r, n) {
-    if (!r.hitos || !r.hitos.length) return '';
-    var lineas = r.hitos.map(function (h) {
+  /* Las líneas de hitos de un asunto, una por hito (fila 307: así un asunto muy alto se puede repartir). */
+  function lineasDeHitos(r) {
+    return (r.hitos || []).map(function (h) {
       var partes = [h.estado, h.responsable];
       if (h.plazo) partes.push('plazo ' + ExportarAsuntos.fechaLegible(h.plazo));
       if (h.terminado) partes.push('terminado el ' + ExportarAsuntos.fechaLegible(h.terminado));
       return '<div>' + h.n + '. ' + escapar(h.titulo) + ' <span class="suave">— ' +
         escapar(partes.filter(Boolean).join(' · ')) + '</span></div>';
-    }).join('');
-    return '<tr class="exportar-hitos"><td colspan="' + n + '">' + lineas + '</td></tr>';
+    });
   }
 
   function cabeceraHtml(membrete, filtros, apaisado) {
     var logo = membrete
-      ? '<img class="exportar-membrete" alt="Junta de Andalucía" src="' + membrete + '">'
+      ? '<img class="exportar-membrete" alt="Junta de Andalucía" src="' + membrete.url + '" width="' + membrete.ancho + '" height="' + membrete.alto + '">'
       : '<div class="exportar-membrete-texto"><strong>Junta de Andalucía</strong></div>';
     return logo +
       '<h1 class="exportar-titulo">Listado de asuntos</h1>' +
@@ -188,56 +188,105 @@ var ExportarInforme = (function () {
       return '<td class="' + (celda.k === 'numero' ? 'exportar-derecha' : '') + '">' + escapar(texto) + '</td>';
     }
 
-    function grupoDe(i) {
+    /* Un asunto: su fila y sus hitos desde `desde` hasta `hasta` (sin incluir). Con `continua`, es la fila repetida
+       de un asunto que sigue de la página anterior: lleva «(continúa)» y no cuenta como otro asunto. */
+    function grupoDe(i, desde, hasta, continua) {
       var r = datos.registros[i], fila = datos.tabla.filas[i];
+      var lineas = datos.conHitos ? lineasDeHitos(r) : [];
+      var puesto = false;
+      var celdas = pos.map(function (p, j) {
+        var h = celdaHtml(fila[p], cols[j]);
+        if (continua && !puesto && fila[p].k === 'texto' && ExportarAsuntos.textoDeCelda(fila[p], cols[j])) {
+          puesto = true;
+          h = h.replace('</td>', ' (continúa)</td>');
+        }
+        return h;
+      });
+      if (continua && !puesto) celdas[0] = celdas[0].replace('</td>', ' (continúa)</td>');
       var grupo = document.createElement('tbody');
       grupo.className = 'exportar-asunto';
-      grupo.innerHTML = '<tr class="exportar-fila' + (r.abierto ? '' : ' exportar-archivado') + '">' +
-        pos.map(function (p, j) { return celdaHtml(fila[p], cols[j]); }).join('') + '</tr>' +
-        (datos.conHitos ? hitosHtml(r, n) : '');
+      grupo.innerHTML = '<tr class="' + (continua ? 'exportar-fila-continua' : 'exportar-fila') + (r.abierto ? '' : ' exportar-archivado') + '">' +
+        celdas.join('') + '</tr>' +
+        (lineas.length ? '<tr class="exportar-hitos"><td colspan="' + n + '">' + lineas.slice(desde, hasta).join('') + '</td></tr>' : '');
       return grupo;
     }
 
     var cont = paginaNueva(true);
     var tabla = null;
+    var titulosAhora = [];
     function desborda() { return cont.offsetHeight > altoUtil; }
+    function hayPrevio() { return cont.children.length > base; }
+
+    function elTitulo(t, continua) {
+      var d = document.createElement('div');
+      d.className = 'exportar-bloque-titulo exportar-bloque-' + t.nivel;
+      d.textContent = t.texto + (continua ? ' (continúa)' : '');
+      return d;
+    }
+    function elCierre(t) {
+      var d = document.createElement('div');
+      d.className = 'exportar-cierre exportar-cierre-' + t.nivel;
+      d.textContent = t.texto;
+      return d;
+    }
+
+    /* Pone en la página de ahora el asunto `i` (sus hitos de `desde` a `hasta`), con los títulos y la tabla si
+       empieza un bloque o si la página no tiene ya la tabla, y con las líneas de cierre si `conCierres`.
+       Devuelve lo que ha puesto y cómo quitarlo. */
+    function intento(i, desde, hasta, nuevoBloque, continua, cierres) {
+      var nodos = [], grupo;
+      var tablaAnterior = tabla;
+      var nueva = nuevoBloque || !tabla || tabla.parentNode !== cont;
+      if (nueva) {
+        if (agr) titulosAhora.forEach(function (t) { var e = elTitulo(t, !nuevoBloque); cont.appendChild(e); nodos.push(e); });
+        tabla = tablaNueva(cont);
+        nodos.push(tabla);
+      }
+      grupo = grupoDe(i, desde, hasta, continua);
+      tabla.appendChild(grupo);
+      var elementosCierre = cierres ? cierres() : [];
+      elementosCierre.forEach(function (e) { cont.appendChild(e); nodos.push(e); });
+      return {
+        grupo: grupo, cierres: elementosCierre,
+        quitar: function () {
+          if (grupo.parentNode) grupo.parentNode.removeChild(grupo);
+          nodos.forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); });
+          if (!nueva) tabla = tablaAnterior;
+        }
+      };
+    }
+
+    /* Lo que no cabe pasa entero a la página siguiente; un asunto que no cabe ni en una página vacía se reparte
+       (su fila se repite con «(continúa)» y el resto de sus hitos). Las líneas de cierre van con el último trozo. */
+    function poner(i, opciones) {
+      var total = datos.conHitos ? (datos.registros[i].hitos || []).length : 0;
+      var desde = 0, continua = false, nuevoBloque = opciones.nuevoBloque;
+      for (var vuelta = 0; vuelta < 1000; vuelta++) {
+        var previo = hayPrevio();
+        var u = intento(i, desde, total, nuevoBloque, continua, opciones.cierres);
+        if (desborda() && previo) {
+          u.quitar();
+          cont = paginaNueva(false);
+          u = intento(i, desde, total, nuevoBloque, continua, opciones.cierres);
+        }
+        var hasta = total;
+        var divs = u.grupo.querySelectorAll('.exportar-hitos div');
+        while (desborda() && hasta > desde + 1) {
+          divs[hasta - desde - 1].parentNode.removeChild(divs[hasta - desde - 1]);
+          hasta--;
+          u.cierres.forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); });
+        }
+        if (hasta >= total) return;
+        desde = hasta; continua = true; nuevoBloque = false;
+        cont = paginaNueva(false);
+      }
+    }
 
     if (!agr) {
-      tabla = tablaNueva(cont);
-      datos.registros.forEach(function (r, i) {
-        var grupo = grupoDe(i);
-        tabla.appendChild(grupo);
-        if (desborda() && tabla.querySelectorAll('tbody.exportar-asunto').length > 1) {
-          tabla.removeChild(grupo);
-          cont = paginaNueva(false);
-          tabla = tablaNueva(cont);
-          tabla.appendChild(grupo);
-        }
-      });
+      if (!datos.registros.length) tablaNueva(cont);
+      datos.registros.forEach(function (r, i) { poner(i, { nuevoBloque: i === 0, cierres: null }); });
     } else {
       /* ---- el informe agrupado ---- */
-      var nodos = [];   /* lo que lleva ya el bloque de ahora en esta página: títulos, tabla y cierres */
-      var titulosAhora = [];
-
-      function elTitulo(t, continua) {
-        var d = document.createElement('div');
-        d.className = 'exportar-bloque-titulo exportar-bloque-' + t.nivel;
-        d.textContent = t.texto + (continua ? ' (continúa)' : '');
-        return d;
-      }
-      function elCierre(t) {
-        var d = document.createElement('div');
-        d.className = 'exportar-cierre exportar-cierre-' + t.nivel;
-        d.textContent = t.texto;
-        return d;
-      }
-      function hayPrevio() { return cont.children.length > base + nodos.length; }
-      function pasarAPagina(conTitulos) {
-        cont = paginaNueva(false);
-        nodos = [];
-        if (conTitulos) titulosAhora.forEach(function (t) { var e = elTitulo(t, true); cont.appendChild(e); nodos.push(e); });
-      }
-
       /* Las hojas del árbol de bloques (los del último nivel), con los títulos que abre cada una y las líneas que cierra. */
       function hojasDelArbol() {
         var hojas = [];
@@ -258,60 +307,15 @@ var ExportarInforme = (function () {
         var b = h.bloque;
         titulosAhora = h.abre.map(function (x) { return { nivel: NIVELES[x.nivel] || 'interior', texto: x.bloque.titulo }; })
           .concat([{ nivel: NIVELES[h.nivel] || 'interior', texto: b.titulo }]);
-        /* Al empezar: los títulos, la fila de títulos de columna y el primer asunto, juntos. */
-        var previo = hayPrevio();
-        var puestos = [];
-        titulosAhora.forEach(function (t) { var e = elTitulo(t, false); cont.appendChild(e); puestos.push(e); });
-        tabla = tablaNueva(cont);
-        puestos.push(tabla);
-        nodos = nodos.concat(puestos);
-        tabla.appendChild(grupoDe(b.filas[0]));
-        if (desborda() && previo) {
-          puestos.forEach(function (e) { cont.removeChild(e); });
-          nodos = nodos.filter(function (e) { return puestos.indexOf(e) === -1; });
-          cont = paginaNueva(false);
-          nodos = [];
-          puestos.forEach(function (e) { cont.appendChild(e); nodos.push(e); });
-        }
-        /* Los demás asuntos del bloque. */
-        b.filas.slice(1).forEach(function (i) {
-          var grupo = grupoDe(i);
-          tabla.appendChild(grupo);
-          if (desborda() && tabla.querySelectorAll('tbody.exportar-asunto').length > 1) {
-            tabla.removeChild(grupo);
-            pasarAPagina(true);
-            tabla = tablaNueva(cont);
-            nodos.push(tabla);
-            tabla.appendChild(grupo);
-          }
+        var cierres = function () {
+          return h.cierra.map(function (x) {
+            return elCierre({ nivel: x.nivel === 0 && agr.niveles.length > 1 ? 'exterior' : 'interior', texto: ExportarAgrupar.lineaDeCierre(datos.tabla, agr, x.bloque) });
+          });
+        };
+        b.filas.forEach(function (i, k) {
+          poner(i, { nuevoBloque: k === 0, cierres: k === b.filas.length - 1 ? cierres : null });
         });
-        /* Las líneas de cierre, con el último asunto. */
-        var cierres = h.cierra.map(function (x) {
-          return elCierre({ nivel: x.nivel === 0 && agr.niveles.length > 1 ? 'exterior' : 'interior', texto: ExportarAgrupar.lineaDeCierre(datos.tabla, agr, x.bloque) });
-        });
-        cierres.forEach(function (e) { cont.appendChild(e); nodos.push(e); });
-        if (desborda()) {
-          var todos = tabla.querySelectorAll('tbody.exportar-asunto');
-          if (todos.length > 1) {
-            var ultimo = todos[todos.length - 1];
-            tabla.removeChild(ultimo);
-            cierres.forEach(function (e) { cont.removeChild(e); });
-            nodos = nodos.filter(function (e) { return cierres.indexOf(e) === -1; });
-            pasarAPagina(true);
-            tabla = tablaNueva(cont);
-            nodos.push(tabla);
-            tabla.appendChild(ultimo);
-            cierres.forEach(function (e) { cont.appendChild(e); nodos.push(e); });
-          } else if (hayPrevio()) {
-            var mover = nodos.slice();
-            mover.forEach(function (e) { cont.removeChild(e); });
-            cont = paginaNueva(false);
-            nodos = [];
-            mover.forEach(function (e) { cont.appendChild(e); nodos.push(e); });
-          }
-        }
       });
-      nodos = [];
     }
 
     var totales = document.createElement('div');
@@ -337,6 +341,41 @@ var ExportarInforme = (function () {
     return { apaisado: apaisado };
   }
 
+  function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  /* El membrete, ya cargado y con su alto (si no carga en unos segundos, encabezado de texto). */
+  async function prepararMembrete() {
+    if (!(window.Membrete && Membrete.montar)) return null;
+    var m = await Membrete.montar({ conLogoCentro: true });
+    if (!(m && m.bytes)) return null;
+    if (urlMembrete) URL.revokeObjectURL(urlMembrete);
+    var url = URL.createObjectURL(new Blob([m.bytes], { type: 'image/png' }));
+    urlMembrete = url;
+    var img = new Image();
+    img.src = url;
+    try {
+      await Promise.race([img.decode(), esperar(4000).then(function () { throw new Error('tarda'); })]);
+    } catch (e) { return null; }
+    if (!img.naturalWidth || !img.naturalHeight) return null;
+    return { url: url, ancho: img.naturalWidth, alto: img.naturalHeight };
+  }
+
+  /* La cuenta (fila 307): si en las páginas falta algún asunto o algo desborda, aviso rojo y botones apagados. */
+  function revisar() {
+    if (!capa || !actual) return { completo: true };
+    var r = ExportarComprobar.comprobar(paginas(), actual.esperados);
+    var aviso = capa.querySelector('.exportar-aviso');
+    var texto = r.completo ? '' : ExportarComprobar.textoDeAviso(r);
+    aviso.textContent = texto;
+    aviso.classList.toggle('oculto', r.completo);
+    ['.exportar-guardar-pdf', '.exportar-imprimir'].forEach(function (q) {
+      var b = capa.querySelector(q);
+      b.disabled = !r.completo;
+      if (r.completo) b.removeAttribute('title'); else b.title = texto;
+    });
+    return r;
+  }
+
   /* `datos`: { tabla, registros, filtros (ExportarAsuntos.filtrosActuales), conHitos,
      incluyeArchivados, por }. */
   async function abrir(datos) {
@@ -345,21 +384,20 @@ var ExportarInforme = (function () {
     capa.querySelector('.word-visor-nombre').textContent = nombre;
     var hoja = capa.querySelector('.exportar-hoja');
     hoja.innerHTML = '<p class="explica">Preparando el informe…</p>';
+    actual = null;
+    capa.querySelector('.exportar-aviso').classList.add('oculto');
+    capa.querySelector('.exportar-guardar-pdf').disabled = false;
+    capa.querySelector('.exportar-imprimir').disabled = false;
     capa.classList.remove('oculto');
     document.body.classList.add('con-exportar-visor');
     try {
-      var membrete = null;
-      if (window.Membrete && Membrete.montar) {
-        var m = await Membrete.montar({ conLogoCentro: true });
-        if (m && m.bytes) {
-          if (urlMembrete) URL.revokeObjectURL(urlMembrete);
-          urlMembrete = URL.createObjectURL(new Blob([m.bytes], { type: 'image/png' }));
-          membrete = urlMembrete;
-        }
-      }
+      var membrete = await prepararMembrete();
       datos.lineaDeFiltros = lineaDeFiltros(datos.filtros || {}, datos.incluyeArchivados, datos.agrupado);
+      /* El reparto de páginas mide: antes, todo tiene que estar cargado (fila 307). */
+      await Promise.race([document.fonts && document.fonts.ready, esperar(3000)]);
       var r = montar(hoja, datos, membrete);
-      actual = { nombre: nombre, apaisado: r.apaisado };
+      actual = { nombre: nombre, apaisado: r.apaisado, esperados: datos.registros.length };
+      requestAnimationFrame(function () { requestAnimationFrame(function () { if (actual) revisar(); }); });
     } catch (e) {
       hoja.innerHTML = '<p class="explica">No he podido preparar el informe: ' + escapar(U.mensajeDeError(e)) + '</p>';
     }
@@ -392,7 +430,7 @@ var ExportarInforme = (function () {
   }
 
   async function guardarPdf(boton) {
-    if (!actual) return;
+    if (!actual || !revisar().completo) return;
     try {
       await U.mientrasGuarda(boton, async function () {
         var blob = await hacerPdf();
@@ -402,7 +440,7 @@ var ExportarInforme = (function () {
     U.aviso('PDF guardado: ' + nombrePdf(), 'bueno');
   }
 
-  return { abrir: abrir, cerrar: cerrar, abierto: abierto, nombrePdf: nombrePdf, hacerPdf: hacerPdf,
+  return { abrir: abrir, cerrar: cerrar, abierto: abierto, nombrePdf: nombrePdf, hacerPdf: hacerPdf, revisar: revisar,
            _lineaDeFiltros: lineaDeFiltros };
 })();
 window.ExportarInforme = ExportarInforme;

@@ -229,6 +229,7 @@ de `App` va después del fichero que lo define.
 | `js/word-visor.js` | `WordVisor` (fila 155): el Word en grande dentro de la aplicación, con «Guardar PDF» en la carpeta del asunto e «Imprimir» (`css/word-visor.css`) |
 | `js/exportar-datos.js` | `ExportarAsuntos` (fila 241): lo que se ve en Inicio y los archivados que cumplen los mismos filtros (índice del ARCHIVO), una fila neutra por asunto, el catálogo de columnas (y campos propios), la tabla con sumas, números a la española, columnas recordadas |
 | `js/exportar-hoja.js` | `ExportarHoja` (fila 241): el `.xlsx` de «Exportar ▾ → Hoja de cálculo», escrito con JSZip (pestañas «Asuntos» e «Hitos») |
+| `js/exportar-informe-comprobar.js` | `ExportarComprobar` (fila 307): la cuenta de asuntos visibles y páginas que desbordan, antes de guardar o imprimir el informe |
 | `js/exportar-informe.js` | `ExportarInforme` (fila 241): el informe en PDF dentro de la aplicación (membrete, tabla paginada, hitos, totales; «Guardar PDF», «Imprimir», `css/exportar.css`) |
 | `js/exportar-ventana.js` | El botón «Exportar ▾» de Inicio y su ventana de columnas (fila 241) |
 | `js/duplicados-aviso.js` | `DuplicadosAviso` (fila 163): el recuadro de «Nuevo asunto» con lo que ya tiene el tercero (mismo tipo en rojo, archivados a 15 días, el resto en gris); lo llama `js/duplicados.js` |

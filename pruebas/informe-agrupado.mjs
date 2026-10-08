@@ -89,9 +89,10 @@ await comprobar('2. ofrece exactamente las columnas marcadas', pagina.evaluate((
   return JSON.stringify(marcadas) === JSON.stringify(ofrecidas) && marcadas.length > 0;
 }), true);
 await exportarYEsperar();
-await comprobar('3. sin agrupar: una sola tabla, sin títulos de bloque, y el total al final', pagina.evaluate(() => [
-  document.querySelectorAll('#exportar-visor .exportar-tabla').length, document.querySelectorAll('#exportar-visor .exportar-bloque-titulo').length,
-  /\d+ asuntos?/.test(document.querySelector('#exportar-visor .exportar-totales').textContent)]), [1, 0, true]);
+await comprobar('3. sin agrupar: una tabla por página, sin títulos de bloque, y el total al final', pagina.evaluate(() => [
+  document.querySelectorAll('#exportar-visor .exportar-tabla').length === document.querySelectorAll('#exportar-visor section.exportar-pagina').length /* fila 307: una tabla por página, la lista es larga */,
+  document.querySelectorAll('#exportar-visor .exportar-bloque-titulo').length,
+  /\d+ asuntos?/.test(document.querySelector('#exportar-visor .exportar-totales').textContent)]), [true, 0, true]);
 const totalSin = await pagina.locator('#exportar-visor .exportar-totales').innerText();
 await cerrarInforme();
 

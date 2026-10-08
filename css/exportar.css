@@ -41,13 +41,19 @@
 .exportar-totales p { margin: 2px 0; }
 .exportar-pie { position: absolute; left: 0; right: 0; bottom: 18px; padding: 0 48px; display: flex; justify-content: space-between; font-size: 9px; color: #666; }
 body.con-exportar-visor { overflow: hidden; }
+.exportar-contenido { display: flow-root; }   /* fila 307: que el alto medido incluya los márgenes de lo último */
+.exportar-aviso { flex: 0 1 auto; color: #fff; background: #b3261e; border-radius: 4px; padding: 4px 10px; font-weight: 600; }
+.exportar-aviso.oculto { display: none; }
+.exportar-fila-continua td { background: #fff8e6; }
 
 @media print {
   body.con-exportar-visor > *:not(#exportar-visor) { display: none !important; }
   body.con-exportar-visor #exportar-visor { position: static; background: #fff; display: block; }
   body.con-exportar-visor .word-visor-barra { display: none; }
   body.con-exportar-visor .exportar-hoja { overflow: visible; padding: 0; background: #fff; }
-  body.con-exportar-visor .exportar-pagina { box-shadow: none; margin: 0; page-break-after: always; }
+  body.con-exportar-visor .exportar-pagina { box-shadow: none; margin: 0; page-break-after: always; break-after: page; }
+  body.con-exportar-visor .exportar-pagina:last-child { page-break-after: auto; break-after: auto; }
+  body.con-exportar-visor { padding: 0 !important; margin: 0; overflow: visible; }
 }
 
 /* En la copia de pruebas hay una franja fija arriba: el informe empieza debajo, para no taparle los botones. */
