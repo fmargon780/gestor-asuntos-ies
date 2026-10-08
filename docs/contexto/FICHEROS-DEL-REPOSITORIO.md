@@ -44,7 +44,9 @@ de `App` va después del fichero que lo define.
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola (asuntos, hitos, tablón, con las lápidas de la fila 176) o aviso para elegir; y `presencia/`, borrada sin preguntar |
 | `js/conflictos-datos.js` | Sacado de `js/conflictos.js` en la fila 176: los CSV de terceros, `administraciones.json` y "los terceros se releen solos" |
 | `js/conflictos-diferencias.js` | «Qué cambia» (fila 292): de cuándo es cada versión y en qué se diferencian, solo leyendo (`ConflictosDiferencias.describir`) |
-| `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
+| `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: la tarjeta de «Problemas», el cuadro de «Buscar su carpeta» y borrar |
+| `js/carpetas-perdidas-buscar.js` | Fila 303: candidatas (abiertas y ARCHIVO), cuál encaja, búsqueda por palabras. Sin pantalla |
+| `js/carpetas-perdidas-enlazar.js` | Fila 303: enlazar un asunto perdido con su carpeta (abierta, con asunto o archivada) y su «Deshacer» |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 239, con número y estructura fija sin recorte (`datos.numero`/`datos.numeroDoc`); y, para los de antes, desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
 | `js/plazos.js` | La fecha límite de los asuntos; desde la fila 131, cómo se cuenta un plazo de hito (`Plazos.sumarPlazo`: hábiles, lectivos o naturales, con festivos y no lectivos), `diasQueQuedan` y `textoPlazo` |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/hitos-normativa.js` para "Normativa" y a `js/guias-biblioteca.js` para traer/guardar en la biblioteca (fila 79) |

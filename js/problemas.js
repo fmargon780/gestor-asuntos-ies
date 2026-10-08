@@ -10,6 +10,9 @@
    descripcion = {
      titulo, que, porque,           frases, sin palabras del código
      antes:     'texto',            línea suelta encima de la lista (opcional)
+     bloque:    {...},              fila 303: un bloque encima de la lista, con una casilla marcada por fila y un solo
+                                    botón «Enlazar los N»: { titulo, buscando, filas: [{ clave, nombre, carpeta, donde,
+                                    avisos }], alEnlazar(claves, boton, progreso) }
      quien:     'texto',            «Esto lo hace quien montó la aplicación.»
      pasos:     ['…', '…'],         pasos numerados, escritos en pantalla
      acciones:  [{ texto, explica, alPulsar, normal, peligro, cambia, id }],
@@ -108,6 +111,72 @@ var Problemas = (function () {
     } catch (e) { U.fallo('No he podido hacerlo', e); }
   }
 
+  /* ---------- fila 303: un bloque de filas marcadas con un solo botón ---------- */
+
+  function bloqueDe(id, b) {
+    var caja = el('div', 'problema-bloque');
+    var titulo = el('p', 'problema-linea problema-bloque-titulo');
+    titulo.appendChild(el('strong', null, b.titulo));
+    caja.appendChild(titulo);
+    if (b.buscando || !(b.filas || []).length) return caja;
+
+    var ul = el('ul', 'problema-bloque-lista');
+    b.filas.forEach(function (f) {
+      var li = el('li', 'problema-bloque-fila');
+      var etiqueta = el('label', 'problema-bloque-nombre');
+      var x = document.createElement('input');
+      x.type = 'checkbox';
+      x.checked = true;
+      x.className = 'problema-bloque-casilla';
+      x.dataset.clave = f.clave;
+      etiqueta.appendChild(x);
+      etiqueta.appendChild(document.createTextNode(' '));
+      etiqueta.appendChild(el('strong', null, f.nombre));
+      li.appendChild(etiqueta);
+      var carpeta = el('div', 'problema-bloque-carpeta');
+      carpeta.appendChild(el('span', 'suave', 'Su carpeta: '));
+      carpeta.appendChild(document.createTextNode(f.carpeta));
+      li.appendChild(carpeta);
+      li.appendChild(el('div', 'suave', f.donde));
+      (f.avisos || []).forEach(function (a) { li.appendChild(el('div', 'problema-bloque-aviso', a)); });
+      ul.appendChild(li);
+    });
+    caja.appendChild(ul);
+
+    var progreso = el('progress', 'problema-bloque-progreso');
+    progreso.hidden = true;
+    var boton = el('button', 'boton boton-principal');
+    boton.type = 'button';
+    boton.id = 'problema-' + id + '-enlazar-todos';
+
+    function marcadas() {
+      return Array.prototype.filter.call(caja.querySelectorAll('.problema-bloque-casilla'), function (c) { return c.checked; })
+        .map(function (c) { return c.dataset.clave; });
+    }
+    function actualizar() {
+      var n = marcadas().length;
+      boton.textContent = n === 1 ? 'Enlazar 1' : 'Enlazar los ' + n;
+      boton.disabled = n === 0 || !!(window.SoloConsulta && SoloConsulta.activo());
+    }
+    Array.prototype.forEach.call(caja.querySelectorAll('.problema-bloque-casilla'), function (c) { c.onchange = actualizar; });
+    boton.onclick = function () {
+      var vivo = actual(id);
+      var f = vivo && vivo.bloque && vivo.bloque.alEnlazar;
+      if (!f) return;
+      correr(function () {
+        return f(marcadas(), boton, function (hecho, total) {
+          progreso.hidden = total <= 5;
+          progreso.max = total;
+          progreso.value = hecho;
+        });
+      });
+    };
+    actualizar();
+    caja.appendChild(boton);
+    caja.appendChild(progreso);
+    return caja;
+  }
+
   /* ---------- la tarjeta ---------- */
 
   function construir(id, d) {
@@ -127,6 +196,7 @@ var Problemas = (function () {
       d.pasos.forEach(function (p) { ol.appendChild(el('li', null, p)); });
       hacer.appendChild(ol);
     }
+    if (d.bloque) hacer.appendChild(bloqueDe(id, d.bloque));
     if (d.antes) hacer.appendChild(el('p', 'problema-antes', d.antes));
 
     var acciones = (d.acciones || []).slice();

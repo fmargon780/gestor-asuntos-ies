@@ -45,14 +45,14 @@ var ProblemasTextos = (function () {
     return {
       titulo: n === 1 ? '1 asunto ha perdido su carpeta' : n + ' asuntos han perdido su carpeta',
       que: 'La app tiene apuntado el asunto, pero no encuentra su carpeta en Dropbox.',
-      porque: 'Alguien cambió el nombre de la carpeta o la movió a mano, fuera de la app.',
+      porque: 'Alguien cambió el nombre de la carpeta o la movió a mano, o el asunto se archivó y la app no se enteró.',
       antes: 'Asunto por asunto:',
       elementos: elementos.map(function (e) {
         return {
           nombre: e.nombre, detalle: e.detalle,
           acciones: [
             { texto: 'Buscar su carpeta', normal: true,
-              explica: 'Eliges la carpeta que es ahora la suya. El asunto queda como estaba, con sus hitos y sus notas.' },
+              explica: 'Buscas su carpeta entre todas, las abiertas y las archivadas. El asunto conserva sus hitos y sus notas.' },
             { texto: 'El asunto ya no existe', peligro: true,
               explica: 'Se quita de la lista. Queda en las copias de seguridad durante ' + plural(dias, 'día', 'días') + ', por si era un error.' }
           ]

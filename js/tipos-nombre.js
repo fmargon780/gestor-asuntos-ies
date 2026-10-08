@@ -339,12 +339,17 @@ App.renombrarTipo = async function (tipo) {
     var desde = a.leido.numero ? 7 + a.leido.numero.length + 1 : 7;
     var nombreCarpeta = a.nombre.slice(0, desde) + nombreNuevo + a.nombre.slice(desde + nombreViejo.length);
     try {
-      await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreCarpeta);
-      var ficha = App.E.registro.asuntos[a.nombre];
-      if (ficha) {
-        ficha.tipo = nombreNuevo;
-        await App.anotar(nombreCarpeta, ficha);
+      /* Fila 303 (docs/CARPETAS-PERDIDAS-QUE-ESTAN-ARCHIVADAS.md, 7): la clave de la ficha no se toca si su carpeta
+         no existe con el nombre viejo. */
+      if (!(await Carpetas.existe(App.E.abiertos, a.nombre))) {
+        fallos.push(a.nombre + ': su carpeta ya no está con ese nombre');
+        continue;
       }
+      await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreCarpeta);
+      /* Fila 303: la ficha SE MUDA al nombre nuevo (con sus hitos y su presencia). Hasta aquí se copiaba con
+         `App.anotar` y la del nombre viejo se quedaba en asuntos.json: sin carpeta, era un asunto perdido, y si el
+         asunto se archivaba después, su carpeta del ARCHIVO llevaba el tipo con el nombre nuevo. */
+      if (App.E.registro.asuntos[a.nombre]) await AsuntoRenombrar.mover(a.nombre, nombreCarpeta, { tipo: nombreNuevo });
       cambiadas++;
     } catch (e) {
       fallos.push(a.nombre + ': ' + U.mensajeDeError(e));

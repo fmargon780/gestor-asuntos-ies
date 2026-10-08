@@ -444,6 +444,37 @@ más de 17 MB. Se copia el patrón de `js/hitos-archivo.js` con el historial de 
 Prueba: `pruebas/ficha-del-archivo.mjs`, sin navegador, con `js/asuntos-archivar.js` y
 `js/ficha-archivo.js` de verdad en un `vm`.
 
+### Asuntos perdidos cuya carpeta existe (fila 303, 8-oct-2026)
+
+`docs/CARPETAS-PERDIDAS-QUE-ESTAN-ARCHIVADAS.md`. Antes, «Buscar su carpeta» solo ofrecía carpetas de asuntos
+abiertos sin asunto. Ahora:
+
+- **Candidatas** (`js/carpetas-perdidas-buscar.js`, sin pantalla ni escritura): todas las carpetas de asuntos abiertos,
+  las del índice del ARCHIVO (`IndiceArchivo.leerDisco({ todos: true })`) y, aunque el índice exista, la carpeta de esa
+  persona en el ARCHIVO leída directamente (`ARCHIVO/<categoría>/<tercero>`). Se lee solo con «Problemas» a la vista
+  (`FichasHuerfanas._buscarSiToca`, como mucho cada 10 minutos mientras los perdidos sean los mismos, nunca con un
+  guardado en marcha); el número de la tarjeta, el de Inicio y el del menú siguen saliendo del cálculo barato.
+- **Encaja** (`ParecidoDeCarpetas.encaja/encajes`, `js/parecido-de-carpetas.js`): el mismo número; o la misma fecha, el
+  mismo tercero y un tipo que no es otro distinto (el mismo, nombre corto o antiguo, o uno abreviado del otro palabra a
+  palabra: `TRAS. MATR. VIVA` ≈ `TRASLADO MATR VIVA`). Solo se propone si es la única, y una carpeta no se propone a dos
+  asuntos.
+- **El bloque** «La app ha encontrado la carpeta de N de ellos» (`bloque` en `js/problemas.js`): una fila marcada por
+  asunto y un botón «Enlazar los N». El cuadro de «Buscar su carpeta» lleva una caja «Buscar entre todas las carpetas…»,
+  máximo 30 resultados, «Unir y enlazar» si la carpeta ya tiene asunto, y la línea «El ARCHIVO no está leído entero…» con
+  «Reconstruir el índice» si el índice no está hecho.
+- **Enlazar** (`js/carpetas-perdidas-enlazar.js`): (a) carpeta abierta sin asunto → `AsuntoRenombrar.mover`; (b) abierta
+  con asunto → se unen en uno (ficha: manda la de la carpeta, lo vacío se rellena, las listas se funden por identidad;
+  hitos por título, `AsuntoRenombrar.pasarHitos`); (c) carpeta del ARCHIVO → el asunto termina archivado: `_ficha.json` de
+  la carpeta (`estado: 'cerrado'`), hitos al «HISTORIAL DE TRAMITACION.txt», clave fuera de `asuntos.json` y `hitos.json`
+  con su lápida (`'archivado'`), entrada al día en el índice. La carpeta ni se mueve ni cambia de nombre. «Deshacer» devuelve
+  todo (foto de antes en memoria; vale mientras el aviso está en pantalla).
+- **La causa** (apartado 7): `App.renombrarTipo` (`js/tipos-nombre.js`) renombraba las carpetas abiertas del tipo y copiaba
+  la ficha al nombre nuevo con `App.anotar`, pero **dejaba la del nombre viejo** en `asuntos.json` (y sus hitos): sin carpeta,
+  un asunto perdido; si luego se archivaba, la carpeta del ARCHIVO llevaba el tipo con el nombre nuevo. Ahora usa
+  `AsuntoRenombrar.mover` (la ficha, los hitos y la presencia se mudan) y no toca la clave si su carpeta ya no existe con el
+  nombre viejo. Prueba: `pruebas/carpetas-perdidas.mjs`, sección 9. Los 21 del centro no se arreglan solos: son los que
+  enlaza el bloque nuevo.
+
 ### Fichas sin carpeta (huérfanas), y su aviso en la pantalla principal
 
 19-sep-2026, fila 68, `docs/AVISOS-QUE-FALTAN.md`, 1. `window.FichasHuerfanas.calcular()`

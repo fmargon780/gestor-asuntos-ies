@@ -73,6 +73,24 @@ await comprobar('mejor(): con el mismo número propone ese, aunque haya otros',
   }), ['260907 A26-0888 PEDIDO Imprenta Sol 22334455C', true]);
 await comprobar('mejor(): sin candidatas, null', pagina.evaluate(() => ParecidoDeCarpetas.mejor('260704 A26-0888 PEDIDO X', [])), null);
 
+console.log('--- fila 303: cuándo «encaja» una carpeta ---');
+const encaja = (v, n) => pagina.evaluate(([a, b]) => ParecidoDeCarpetas.encaja(a, b, App.E.tipos), [v, n]);
+const V = '260917 TRASLADO MATR VIVA 26-27 Apellido Apellido, Nombre 1234567';
+await comprobar('encaja: el tipo escrito abreviado, misma fecha y misma persona', encaja(V, '260917 TRAS. MATR. VIVA 26-27 Apellido Apellido, Nombre 1234567'), true);
+await comprobar('encaja: el mismo número, aunque cambie todo lo demás', encaja('260101 A26-0137 PEDIDO Uno 1111', '260909 A26-0137 FACTURA Otro 2222'), true);
+await comprobar('no encaja: otro tipo distinto', encaja(V, '260917 BAJA MEDICA 26-27 Apellido Apellido, Nombre 1234567'), false);
+await comprobar('no encaja: otra fecha', encaja(V, '260918 TRAS. MATR. VIVA 26-27 Apellido Apellido, Nombre 1234567'), false);
+await comprobar('no encaja: otra persona', encaja(V, '260917 TRAS. MATR. VIVA 26-27 Otro Otro, Nombre 7654321'), false);
+await comprobar('encaja: plural y sin tildes (carpeta cambiada a mano)', encaja('260829 FACTURA Ferretería Los Álamos 55443322Z', '260829 FACTURAS Ferreteria Los Alamos 55443322Z'), true);
+await comprobar('encaja: el tipo con el nombre corto o antiguo que tenga en la aplicación',
+  pagina.evaluate(() => {
+    const tipos = [{ tipo: 'CERTIFICADO DE NOTAS', nombreCorto: 'CERT NOTAS', alias: ['NOTAS CERTIFICADAS'] }];
+    return [ParecidoDeCarpetas.encaja('260101 CERTIFICADO DE NOTAS Vidal Soto, Irene 2100030', '260101 CERT NOTAS Vidal Soto, Irene 2100030', tipos),
+      ParecidoDeCarpetas.encaja('260101 NOTAS CERTIFICADAS Vidal Soto, Irene 2100030', '260101 CERTIFICADO DE NOTAS Vidal Soto, Irene 2100030', tipos)];
+  }), [true, true]);
+await comprobar('encajes(): devuelve las que encajan, para proponer solo si es una',
+  pagina.evaluate((v) => ParecidoDeCarpetas.encajes(v, [{ nombre: '260917 TRAS. MATR. VIVA 26-27 Apellido Apellido, Nombre 1234567' }, { nombre: '260917 BAJA 26-27 Apellido Apellido, Nombre 1234567' }, { nombre: '260917 TRASLADO MATR. VIVA 26-27 Apellido Apellido, Nombre 1234567' }], App.E.tipos).length, V), 2);
+
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();
 if (fallos) { console.log('\n' + fallos + ' fallo(s).'); process.exit(1); }

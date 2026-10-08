@@ -443,3 +443,17 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 .problema-cambia summary { cursor: pointer; font-weight: 600; }
 .problema-cambia-lista { margin: 4px 0 0; padding-left: 20px; }
 .huerfana-opcion { cursor: pointer; overflow-wrap: anywhere; }
+/* Fila 303: el bloque «La app ha encontrado la carpeta de N de ellos» y el cuadro de «Buscar su carpeta». */
+.problema-bloque { margin: 8px 0 12px; padding: 10px 12px; border: 1px solid var(--linea); border-radius: 6px; }
+.problema-bloque-titulo { margin: 0 0 6px; }
+.problema-bloque-lista { list-style: none; margin: 0 0 10px; padding: 0; }
+.problema-bloque-fila { padding: 8px 0; border-top: 1px solid var(--linea); }
+.problema-bloque-nombre { cursor: pointer; overflow-wrap: anywhere; }
+.problema-bloque-carpeta { margin: 2px 0 0 22px; overflow-wrap: anywhere; }
+.problema-bloque-fila .suave, .problema-bloque-aviso { margin-left: 22px; }
+.problema-bloque-aviso { color: var(--tinta-suave); }
+.problema-bloque-progreso { display: block; width: 100%; margin-top: 8px; }
+#huerfana-buscar { width: 100%; margin: 8px 0; box-sizing: border-box; }
+#huerfana-destino { max-height: 46vh; overflow: auto; }
+#huerfana-union { margin: 8px 0 0; font-weight: 600; }
+
