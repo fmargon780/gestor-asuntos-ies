@@ -3,7 +3,7 @@
    docs/ACTIVIDADES-EXTRAESCOLARES.md) en la copia de pruebas:
      - el tipo ACTIVIDAD EXTRAESCOLAR, con su marca `actividades`;
      - una actividad PREVISTA (dentro de nueve días): un asunto abierto, dos unidades
-       (2º B y 3º A), nueve alumnos y tres profesores, uno de ellos «Organiza»;
+       (2º B y 3º A), ocho alumnos y tres profesores, uno de ellos «Organiza»;
      - una REALIZADA (fecha pasada) y una ANULADA, también con su asunto.
    Todo inventado. Lo llama js/demo/datos.js al montar los asuntos
    (`Demo.actividades.construir({ crearTipoConGuia, crearAsunto, hace })`).
@@ -17,7 +17,6 @@
       { titulo: 'Recoger las autorizaciones', cuerpo: '<p>Las firmadas por las familias.</p>', responsable: 'yo' },
       { titulo: 'Avisar al claustro', cuerpo: '<p>Con la lista del alumnado que va.</p>', responsable: 'yo' }
     ], 0);
-    tipo.organo = 'JEFATURA';
     tipo.actividades = true;
     await App.guardarTipos();
 
@@ -51,13 +50,13 @@
       await Actividades.guardarActividad(a);
     }
 
-    /* Prevista: nueve alumnos de dos unidades y tres profesores. */
+    /* Prevista: ocho alumnos de dos unidades (no entran Castro Reina, Noa ni Navarro Gil, Lucía: otras pruebas cuentan sus asuntos) y tres profesores. */
     await actividad('Visita Granada', 'Visita a la Alhambra y al Albaicín', -9, -9,
-      ['2100004', '2100005', '2100013', '2100015', '2100016', '2100002', '2100010', '2100020', '2100041'],
+      ['2100005', '2100013', '2100015', '2100016', '2100002', '2100010', '2100020', '2100041'],
       [profe('Otero Campos', 'organiza'), profe('Reyes Palma', 'acompana'), profe('Uceda Molina', 'acompana')]);
     /* Realizada: su fecha ya pasó. */
     await actividad('Museo de Ciencias', 'Visita al Parque de las Ciencias', 20, 20,
-      ['2100004', '2100005', '2100013'], [profe('Reyes Palma', 'organiza'), profe('Otero Campos', 'acompana')]);
+      ['2100005', '2100013'], [profe('Reyes Palma', 'organiza'), profe('Otero Campos', 'acompana')]);
     /* Anulada. */
     await actividad('Excursion Sierra', 'Ruta por la Sierra de Grazalema', -14, -14,
       ['2100002', '2100010'], [profe('Uceda Molina', 'organiza')], { anulada: true });

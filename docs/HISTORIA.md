@@ -10,7 +10,7 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 Primera de cuatro filas (306, 309, 310, 311). Un fichero compartido nuevo, `_GESTOR/actividades.json` (`js/actividades.js`), es la única
 fuente de los datos de una actividad; el alumnado que va sigue siendo `ficha.relacionados` del asunto de grupo y el profesorado (quién
 organiza y quién acompaña) vive en el registro. El tipo ACTIVIDAD EXTRAESCOLAR lleva la marca `actividades: true` (una pasada única la
-pone o lo crea). «Apuntar la actividad» en «Nuevo asunto» abre un formulario ancho (`js/actividades-formulario.js`): al elegir unidades sale
+pone, si el centro lo tiene: no se crea de nuevo un tipo borrado a propósito, y así no cambian las listas de tipos de otras pruebas). «Apuntar la actividad» en «Nuevo asunto» abre un formulario ancho (`js/actividades-formulario.js`): al elegir unidades sale
 su alumnado ya marcado. «Seguir» fija el grupo con la categoría del tipo (no la del alumnado, que apartaría el tipo) y la fecha límite
 es la de inicio. La tarjeta «La actividad» (`js/actividades-ficha.js`) cambia, anula y deshace; la cuenta se pone al día sola
 (`Actividades.ponerAlDia`). Una actividad cuenta como realizada desde el día siguiente a su fin. La plantilla vieja «Participación del

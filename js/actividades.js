@@ -16,7 +16,7 @@
 
    Qué tipo de asunto apunta actividades lo dice una marca en el propio tipo
    (`tipo.actividades = true`, en tipos.json). Una pasada única al entrar la pone
-   al tipo ACTIVIDAD EXTRAESCOLAR (o la crea si el centro no lo tiene).
+   al tipo ACTIVIDAD EXTRAESCOLAR (si el centro lo tiene).
    El formulario es js/actividades-formulario.js; la tarjeta de la ficha,
    js/actividades-ficha.js.
    ============================================================ */
@@ -171,9 +171,8 @@ var Actividades = (function () {
     var g = gestor();
     if (!g) return Promise.reject(new Error('No hay carpeta de datos.'));
     return App.enFila(FICHERO, async function () {
-      var leido = null;
-      try { leido = await Carpetas.leerJson(g, FICHERO); } catch (e) { leido = null; }
-      var actual = normalizar(leido);
+      /* Si no se puede leer, no se escribe encima: se perdería lo que hubiera. */
+      var actual = normalizar(await Carpetas.leerJson(g, FICHERO));
       var r = await hacer(actual);
       await Copias.guardar(g, FICHERO, actual);
       guardarEnMemoria(actual);
@@ -228,7 +227,7 @@ var Actividades = (function () {
     return !!(f.actividad && f.actividad.id);
   }
 
-  /* La pasada única: pone la marca al tipo ACTIVIDAD EXTRAESCOLAR (o al que lo tuvo como nombre antiguo), o lo crea. */
+  /* La pasada única: pone la marca al tipo ACTIVIDAD EXTRAESCOLAR (o al que lo tuvo como nombre antiguo). */
   async function pasada() {
     if (corriendo) return null;
     if (window.SoloConsulta && SoloConsulta.activo()) return null;
@@ -241,7 +240,8 @@ var Actividades = (function () {
       var objetivo = U.normalizar(NOMBRE_TIPO);
       var tipo = App.E.tipos.filter(function (t) { return U.normalizar(t.tipo) === objetivo; })[0] ||
         App.E.tipos.filter(function (t) { return (t.alias || []).some(function (x) { return U.normalizar(x) === objetivo; }); })[0];
-      if (!tipo) tipo = await App.crearTipo({ nombre: NOMBRE_TIPO, categoria: 'OTROS', organo: 'JEFATURA' });
+      /* Un centro que no tiene el tipo (lo borró a propósito) no lo recibe de vuelta: se reintenta en la próxima entrada. */
+      if (!tipo) return null;
       if (tipo.actividades !== true) { tipo.actividades = true; await App.guardarTipos(); }
       await cambiar(function (d) { d.tipoMarcado = true; });
       return tipo;

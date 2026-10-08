@@ -812,7 +812,7 @@ del buscador, «Es para un grupo de personas» (`js/asunto-de-grupo.js`; `App.E.
 
 ## Las actividades extraescolares (8-oct-2026, fila 306, `docs/ACTIVIDADES-EXTRAESCOLARES.md`)
 
-Un tipo con la marca `actividades: true` (la pasada de `Actividades.pasada` la pone al tipo ACTIVIDAD EXTRAESCOLAR o lo crea;
+Un tipo con la marca `actividades: true` (la pasada de `Actividades.pasada` la pone al tipo ACTIVIDAD EXTRAESCOLAR si el centro lo tiene;
 `Actividades.esTipoDeActividad`) enseña en «Nuevo asunto» el botón «Apuntar la actividad» (`#actividad-nuevo-caja`, lo pinta
 `ActividadesFormulario.alRefrescarNuevo` desde `App.refrescarVista`). El formulario devuelve el grupo por `AsuntoDeGrupo.fijar`
 (`grupoDatos.actividad` lleva todo lo escrito; categoría = la del tipo) y la fecha límite es la de inicio. Al crear, `alDatosNuevos`

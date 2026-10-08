@@ -29,6 +29,7 @@ pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message + ' ' + (e
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
+await pagina.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 90000 });   /* la demostración tarda un poco en montarse */
 await pagina.waitForTimeout(4000);
 
 /* ================= 1. LA LÓGICA ================= */
@@ -53,9 +54,17 @@ await comprobar('1. la demostración trae el tipo con la marca y el registro con
     const hoy = U.hoyIso();
     return [Actividades.esTipoDeActividad('ACTIVIDAD EXTRAESCOLAR'), Actividades.tipoMarcado(), Actividades.lista().map((a) => Actividades.situacion(a, hoy)).sort()];
   }), [true, true, ['anulada', 'prevista', 'realizada']]);
-await comprobar('1. la prevista: dos unidades, nueve alumnos, tres profesores y uno «organiza»',
+await comprobar('1. la pasada única pone la marca al tipo que no la tiene y deja puesta la suya',
+  pagina.evaluate(async () => {
+    const t = App.E.tipos.filter((x) => x.tipo === 'ACTIVIDAD EXTRAESCOLAR')[0];
+    t.actividades = false; await App.guardarTipos(); await Actividades.cambiar((d) => { d.tipoMarcado = false; });
+    for (let i = 0; i < 40 && window.ColaGuardado && ColaGuardado.hayGuardado(); i++) await new Promise((r) => setTimeout(r, 100));
+    const r = await Actividades.pasada();
+    return [!!r, t.actividades === true, Actividades.tipoMarcado(), await Actividades.pasada()];
+  }), [true, true, true, null]);
+await comprobar('1. la prevista: dos unidades, ocho alumnos, tres profesores y uno «organiza»',
   pagina.evaluate(() => { const a = Actividades.lista().filter((x) => /Alhambra/.test(x.nombre))[0]; return [a.unidades.map((u) => u.unidad + ':' + u.van), a.alumnado, a.profesorado.length, a.profesorado.filter((p) => p.papel === 'organiza').length, !!a.asunto.nombre]; }),
-  [['2º B:5', '3º A:4'], 9, 3, 1, true]);
+  [['2º B:4', '3º A:4'], 8, 3, 1, true]);
 
 /* ================= 2. NUEVO ASUNTO ================= */
 console.log('--- 2. «Nuevo asunto» ---');
@@ -312,6 +321,7 @@ await consulta.addInitScript("try { localStorage.setItem('gestor.novedadesVistas
 await consulta.goto(DIRECCION);
 await consulta.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
 await consulta.waitForSelector('#franja-solo-consulta', { timeout: 20000 });
+await consulta.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 90000 });
 await consulta.waitForTimeout(5000);
 const prevista = await consulta.evaluate(() => Actividades.lista().filter((x) => /Alhambra/.test(x.nombre))[0].asunto.nombre);
 await consulta.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), prevista);
