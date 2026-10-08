@@ -28,7 +28,7 @@ var ContactoALaVista = (function () {
     if (!quien && !av) return '';
     return '<span class="marca-lopide marca-contacto">' +
       (quien
-        ? '<span class="lp-nombre">Lo pide: ' + U.escapar(LoPide.etiqueta(lp)) + '</span>' + (av ? '<span class="lp-sep"> · </span>' : '')
+        ? '<span class="lp-nombre">Lo pide: ' + U.escapar(LoPide.etiqueta(lp)) + '</span>' + (av ? '<span class="lp-sep">&nbsp;·&nbsp;</span>' : '')
         : '<span class="lp-nombre">Contacto:&nbsp;</span>') +
       (av ? trozo(av) : '') + '</span>';
   }
