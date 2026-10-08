@@ -359,6 +359,11 @@
     valores.quienlopiderelacion = loPideDato ? (loPideDato.relacion || '') : '';
     var viaLoPide = (loPideDato && loPideDato.via && window.Nombres) ? Nombres.via(loPideDato.via) : null;
     valores.quienlopidevia = viaLoPide ? viaLoPide.texto : '';
+    /* Fila 305: el contacto apuntado en «El encargo» (lo mismo que la cabecera, sin «Tel.»). */
+    var contactoLoPide = window.LoPide ? LoPide.contactoDe(f) : null;
+    valores.quienlopidecontacto = (contactoLoPide && contactoLoPide.aLaVista) ? contactoLoPide.aLaVista.texto : '';
+    valores.quienlopidetelefono = contactoLoPide ? contactoLoPide.telefono : '';
+    valores.quienlopidecorreo = contactoLoPide ? contactoLoPide.correo : '';
     valores.quienlopidefecha = (loPideDato && loPideDato.fecha)
       ? U.fechaLegible(U.aAaMmDd(loPideDato.fecha)) : '';
 

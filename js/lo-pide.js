@@ -312,10 +312,51 @@ var LoPide = (function () {
     return trozos.join(' · ');
   }
 
-  /* La dirección de quien lo pide, o cadena vacía. */
+  /* El contacto del asunto (fila 305, docs/CONTACTO-DEL-ENCARGO-DONDE-HACE-FALTA.md):
+     una sola regla para el cuadro de Correo, los avisos, las
+     plantillas y la cabecera. Gana lo escrito a mano en «El encargo»
+     (`ficha.viaDato`, texto libre) a lo que la app sabe por los
+     ficheros de quien lo pide (`ficha.loPide`). Pura: solo lee.
+     `correoEscrito` dice si el correo salió de lo escrito a mano. */
+  var RE_CORREO_EN_TEXTO = /[^\s@,;<>()]+@[^\s@,;<>()]+\.[^\s@,;<>()]+/;
+  var RE_TELEFONO_EN_TEXTO = /(?<!\d)(?:\+34[\s.-]?)?\d(?:[\s.-]?\d){8}(?!\d)/;
+  var MAX_A_LA_VISTA = 40;
+
+  function contactoDe(ficha) {
+    var f = ficha || {};
+    var d = f.loPide || {};
+    var escrito = String(f.viaDato || '').trim();
+    var mc = escrito.match(RE_CORREO_EN_TEXTO);
+    var mt = escrito.match(RE_TELEFONO_EN_TEXTO);
+    var correoEscrito = mc ? mc[0].replace(/[.:]+$/, '') : '';
+    var telefonoEscrito = mt ? mt[0].trim() : '';
+    var correo = correoEscrito || d.correo || '';
+    var telefono = telefonoEscrito || d.telefono || '';
+    var via = f.via || d.via || '';
+
+    var aLaVista = null;
+    if (escrito) {
+      var clase = (via === 'TELEFONO' || (telefonoEscrito && !correoEscrito)) ? 'telefono'
+        : (correoEscrito ? 'correo' : 'texto');
+      aLaVista = {
+        clase: clase,
+        texto: escrito.length > MAX_A_LA_VISTA ? escrito.slice(0, MAX_A_LA_VISTA - 1).trimEnd() + '…' : escrito,
+        titulo: escrito,
+        copia: telefonoEscrito || correoEscrito || escrito
+      };
+      if (clase === 'telefono' && telefonoEscrito) aLaVista.copia = telefonoEscrito;
+      if (clase === 'correo') aLaVista.copia = correoEscrito;
+    } else if (via === 'TELEFONO' && telefono) {
+      aLaVista = { clase: 'telefono', texto: telefono, titulo: telefono, copia: telefono };
+    } else if (via === 'CORREO' && correo) {
+      aLaVista = { clase: 'correo', texto: correo, titulo: correo, copia: correo };
+    }
+    return { correo: correo, telefono: telefono, aLaVista: aLaVista, correoEscrito: !!correoEscrito };
+  }
+
+  /* La dirección de contacto del asunto, o cadena vacía. */
   function correoDe(ficha) {
-    var d = ficha && ficha.loPide;
-    return (d && d.correo) || '';
+    return contactoDe(ficha).correo;
   }
 
   /* Cómo quedan las casillas de "Para" del cuadro de Correo y el campo
@@ -343,7 +384,7 @@ var LoPide = (function () {
   }
 
   return {
-    opciones: opciones, controles: controles, texto: texto, etiqueta: etiqueta, correoDe: correoDe,
+    opciones: opciones, controles: controles, texto: texto, etiqueta: etiqueta, correoDe: correoDe, contactoDe: contactoDe,
     elegirDestinatarios: elegirDestinatarios, datosDeTutor: datosDeTutor
   };
 })();

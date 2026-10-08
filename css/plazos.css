@@ -26,6 +26,17 @@
   background: #f0eafb; color: #5b3fa0; border: 1px solid #d6c8f0;
 }
 
+/* Fila 305: el contacto de «El encargo» dentro de la marca «Lo pide». Una sola
+   línea; si no cabe se recorta el nombre, nunca el dato. */
+.marca-contacto { display: inline-flex; align-items: center; max-width: 100%; white-space: nowrap; }
+.marca-contacto .lp-nombre { overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.marca-contacto .lp-sep, .marca-contacto .contacto-vista, .marca-contacto .contacto-copiar { flex: none; }
+.contacto-copiar {
+  font: inherit; line-height: 1; cursor: pointer; margin-left: 6px; padding: 0 3px;
+  border: 0; background: transparent; color: inherit;
+}
+.contacto-copiar.boton-marcado { font-size: 11px; font-weight: 600; }
+
 /* La casilla de días de plazo de cada tipo, en Ajustes. */
 .plazo-tipo {
   display: flex; align-items: center; gap: 6px;

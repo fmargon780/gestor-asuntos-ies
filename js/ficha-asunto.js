@@ -84,11 +84,9 @@
      relación entre paréntesis, en minúscula (fila 106, docs/LO-PIDE-EN-
      LA-CABECERA.md): es el único sitio de la cabecera donde sale. */
   function marcasDeFicha(a, tipo) {
-    var lp = a.ficha.loPide;
     return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
       (a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +   /* fila 239 */
-      (lp && lp.nombre
-        ? '<span class="marca-lopide">Lo pide: ' + U.escapar(LoPide.etiqueta(lp)) + '</span>' : '');
+      ContactoALaVista.html(a);   /* fila 305: «Lo pide: …» con su contacto, o «Contacto: …» */
   }
 
   /* Tras cambiar el estado, el plazo, la vía o el encargo, se repinta

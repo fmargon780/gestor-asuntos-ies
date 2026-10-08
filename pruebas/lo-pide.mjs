@@ -316,5 +316,28 @@ comprobar('8. sin relación, solo el nombre', LoPide.etiqueta({ nombre: 'Juan P�
 comprobar('8. si el nombre ya es la relación, no se repite',
   LoPide.etiqueta({ nombre: 'Tutor legal 2', relacion: 'Tutor legal 2' }), 'Tutor legal 2');
 
+/* 9. LoPide.contactoDe (fila 305, docs/CONTACTO-DEL-ENCARGO-DONDE-HACE-FALTA.md). */
+{
+  const lp = { nombre: 'María López', relacion: 'Madre', correo: 'maria@fichero.es', telefono: '611222333' };
+  const c1 = LoPide.contactoDe({ loPide: lp, via: 'CORREO', viaDato: 'otra@ejemplo.es, por las tardes' });
+  comprobar('9. un correo dentro de un texto; gana lo escrito a mano', c1.correo, 'otra@ejemplo.es');
+  comprobar('9. su vista', c1.aLaVista, { clase: 'correo', texto: 'otra@ejemplo.es, por las tardes', titulo: 'otra@ejemplo.es, por las tardes', copia: 'otra@ejemplo.es' });
+  comprobarQue('9. correoEscrito', c1.correoEscrito === true);
+  comprobar('9. LoPide.correoDe usa la misma regla', LoPide.correoDe({ loPide: lp, viaDato: 'otra@ejemplo.es' }), 'otra@ejemplo.es');
+  comprobar('9. teléfono con espacios', LoPide.contactoDe({ via: 'TELEFONO', viaDato: '600 111 222' }).aLaVista,
+    { clase: 'telefono', texto: '600 111 222', titulo: '600 111 222', copia: '600 111 222' });
+  comprobar('9. teléfono con +34 y guiones', LoPide.contactoDe({ viaDato: 'llama al +34 600-111-222' }).telefono, '+34 600-111-222');
+  comprobar('9. un número de más de nueve cifras no es teléfono', LoPide.contactoDe({ viaDato: '1234567890123' }).telefono, '');
+  const aclar = LoPide.contactoDe({ via: 'PRESENCIAL', viaDato: 'llamar por las tardes' }).aLaVista;
+  comprobar('9. aclaración sin dato', [aclar.clase, aclar.texto, aclar.copia], ['texto', 'llamar por las tardes', 'llamar por las tardes']);
+  const larga = LoPide.contactoDe({ viaDato: 'x'.repeat(60) }).aLaVista;
+  comprobar('9. se recorta a 40 y el título lleva todo', [larga.texto.length, larga.titulo.length], [40, 60]);
+  comprobar('9. sin escrito y vía teléfono: el del fichero', LoPide.contactoDe({ loPide: lp, via: 'TELEFONO' }).aLaVista.texto, '611222333');
+  comprobar('9. sin escrito y vía correo: el del fichero', LoPide.contactoDe({ loPide: lp, via: 'CORREO' }).aLaVista.texto, 'maria@fichero.es');
+  comprobar('9. sin escrito y vía en persona: nada', LoPide.contactoDe({ loPide: lp, via: 'PRESENCIAL' }).aLaVista, null);
+  comprobar('9. sin loPide ni nada', LoPide.contactoDe({}).aLaVista, null);
+  comprobar('9. sin loPide, el correo escrito vale', LoPide.contactoDe({ via: 'CORREO', viaDato: 'a@b.es' }).correo, 'a@b.es');
+}
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

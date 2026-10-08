@@ -278,6 +278,7 @@ var HitoMesa = (function () {
         '<div class="mesa-etiquetas">' +
           /* Fila 239: el número del asunto, si lo tiene. */
           (a && a.ficha && a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +
+          (window.ContactoALaVista ? ContactoALaVista.html(a) : '') +   /* fila 305 */
           /* Fila 162: «Paso actual», el mismo que en la lista y en la cabecera. */
           (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML() : '') +
           estadoHTML +

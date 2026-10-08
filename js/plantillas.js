@@ -92,6 +92,9 @@ var Plantillas = (function () {
     { clave: 'quienlopiderelacion', etiqueta: 'Quien lo pide: qué es del interesado' },
     { clave: 'quienlopidevia', etiqueta: 'Quien lo pide: por dónde lo pidió' },
     { clave: 'quienlopidefecha', etiqueta: 'Quien lo pide: fecha' },
+    { clave: 'quienlopidecontacto', etiqueta: 'Quien lo pide: contacto apuntado' },   /* fila 305 */
+    { clave: 'quienlopidetelefono', etiqueta: 'Quien lo pide: teléfono' },
+    { clave: 'quienlopidecorreo', etiqueta: 'Quien lo pide: correo' },
     /* «Avisar a quien lo pide» (27-sep-2026, fila 195,
        docs/AVISOS-A-QUIEN-LO-PIDE.md): el número del hito actual y
        cuántos hay en total, para las plantillas "Aviso de avance" y

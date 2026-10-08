@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '305', fecha: '2026-10-08', texto: 'El teléfono o el correo que apuntas en «El encargo» se ve ahora en la cabecera del asunto y de cada hito, con un botón para copiarlo. Si es un correo, sale ya marcado en «Para» al escribir un correo.' },
   { id: '303', fecha: '2026-10-08', texto: 'En Ajustes → Problemas, la app encuentra sola la carpeta de los asuntos que la habían perdido, también si está archivada, y los enlaza todos con un botón. «Buscar su carpeta» ya busca entre todas las carpetas.' },
   { id: '300', fecha: '2026-10-07', texto: 'Al cambiar el orden de los hitos de una guía, los asuntos abiertos recolocan los que están sin hacer.' },
   { id: '299', fecha: '2026-10-07', texto: 'El correo de un hito puede ir al tutor o tutora del grupo, y una plantilla puede adjuntar sola un documento.' },

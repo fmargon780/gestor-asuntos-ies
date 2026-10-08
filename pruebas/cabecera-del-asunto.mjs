@@ -227,7 +227,7 @@ await comprobar('8. quedan escritos donde estaban antes: loPide y via/viaDato',
 /* Fila 106 (docs/LO-PIDE-EN-LA-CABECERA.md): quién lo pide sale una sola
    vez, arriba, con la relación en minúscula; debajo del botón, nada. */
 await comprobar('8. la etiqueta de arriba lleva la relación entre paréntesis',
-  pagina.locator('#pantalla-asunto .marca-lopide').textContent(), 'Lo pide: María López (tutora)');
+  pagina.locator('#pantalla-asunto .marca-lopide .lp-nombre').textContent(), 'Lo pide: María López (tutora)');   /* fila 305: el contacto va aparte, en la misma marca */
 await comprobar('8. debajo de "El encargo" ya no hay línea gris',
   pagina.locator('.ficha-encargo').evaluate((e) => e.children.length), 1);
 await pagina.click('.ficha-encargo button');

@@ -367,7 +367,8 @@
     /* 3. con la fecha límite ya vencida. */
     var carlaClave = await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {
       abiertoEl: hace(20) + 'T09:00:00.000Z',
-      datos: { limite: hace(6), limiteEl: hace(20) + 'T09:00:00.000Z', limitePor: 'Revisor' }
+      /* Fila 305, ASUNTO C: sin «quién lo pide», vía correo, con un correo que el alumno ya tiene en su fichero. */
+      datos: { limite: hace(6), limiteEl: hace(20) + 'T09:00:00.000Z', limitePor: 'Revisor', via: 'CORREO', viaDato: 'tutor.carla@correo-demo.es' }
     });
     await crearSelladoSuelto(carlaClave);
 
@@ -393,11 +394,17 @@
     var porLiquidar = { desde: hace(1), auto: false };
     var claveAlvaro = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', alvaro, hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z',
-      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } },
+        /* Fila 305, ASUNTO A: lo pide su madre, vía correo, con otra dirección escrita a mano. */
+        loPide: { nombre: 'Rosa Ortiz', categoria: '', relacion: 'Madre', correo: 'tutor.alvaro@correo-demo.es', telefono: '600333444', via: 'CORREO', fecha: hace(1), apuntadoPor: 'Revisor' },
+        via: 'CORREO', viaDato: 'otra.direccion@ejemplo.es' }
     });
     var claveNoa = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', noa, hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z',
-      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } },
+        /* Fila 305, ASUNTO B: lo pide su padre, vía teléfono, con el teléfono escrito a mano. */
+        loPide: { nombre: 'Luis Castro', categoria: '', relacion: 'Padre', correo: 'tutor.noa@correo-demo.es', telefono: '600444555', via: 'TELEFONO', fecha: hace(1), apuntadoPor: 'Revisor' },
+        via: 'TELEFONO', viaDato: '600 111 222' }
     });
     var claveDuarte = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Duarte Gil, Pilar', id: '2100020' }), hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z', datos: { porLiquidar: porLiquidar }

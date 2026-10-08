@@ -194,10 +194,15 @@ var CorreoCuadro = (function () {
   function avisoLoPideHtml(a) {
     if (!window.LoPide) return '';
     var d = a.ficha && a.ficha.loPide;
-    if (!d || !d.nombre) return '';
-    var texto = 'Lo pidió ' + d.nombre + (d.relacion ? ' (' + d.relacion + ')' : '') +
-      (d.fecha ? ', el ' + U.fechaLegible(U.aAaMmDd(d.fecha)) : '') + '.';
-    return '<p class="nota" style="margin-top:0">' + U.escapar(texto) + '</p>';
+    var c = LoPide.contactoDe(a.ficha);
+    var quien = d && d.nombre
+      ? 'Lo pidió ' + d.nombre + (d.relacion ? ' (' + d.relacion + ')' : '') +
+        (d.fecha ? ', el ' + U.fechaLegible(U.aAaMmDd(d.fecha)) : '') + '.'
+      : '';
+    /* Fila 305: si la dirección sale de lo escrito en «El encargo», se dice. */
+    var escrito = c.correoEscrito ? 'Correo apuntado en «El encargo»: ' + c.correo : '';
+    var texto = [quien, escrito].filter(Boolean).join(' ');
+    return texto ? '<p class="nota" style="margin-top:0">' + U.escapar(texto) + '</p>' : '';
   }
 
   function bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) {

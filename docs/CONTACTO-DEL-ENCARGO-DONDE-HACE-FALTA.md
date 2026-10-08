@@ -177,8 +177,9 @@ lo usan también «Enviar estado» y los avisos; y que hay tres huecos nuevos pa
 
 ## Cómo sabemos que está bien
 
-En la copia de demostración. ASUNTO A, B y C son los tres de `js/demo/datos.js` (la sesión escribe
-aquí sus nombres antes de llamar al revisor).
+En la copia de demostración. ASUNTO A, B y C son los tres de `js/demo/datos.js`:
+**ASUNTO A** = el seguro escolar de Bermúdez Ortiz, Álvaro; **ASUNTO B** = el seguro escolar de
+Castro Reina, Noa; **ASUNTO C** = el certificado de Espejo Montes, Carla.
 
 1. Abrir ASUNTO B. En la cabecera, la marca «Lo pide: …» termina en «· Tel. 600 111 222» y lleva un
    botón de copiar.
