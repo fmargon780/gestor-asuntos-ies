@@ -155,7 +155,7 @@ var Problemas = (function () {
     }
     function actualizar() {
       var n = marcadas().length;
-      boton.textContent = n === 1 ? 'Enlazar 1' : 'Enlazar los ' + n;
+      boton.textContent = n === 0 ? 'Enlazar' : n === 1 ? 'Enlazar 1' : 'Enlazar los ' + n;
       boton.disabled = n === 0 || !!(window.SoloConsulta && SoloConsulta.activo());
     }
     Array.prototype.forEach.call(caja.querySelectorAll('.problema-bloque-casilla'), function (c) { c.onchange = actualizar; });
