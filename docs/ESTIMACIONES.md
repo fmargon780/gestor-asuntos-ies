@@ -12,4 +12,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 308 | 35 | Casilla «Título» en la ventana del informe en PDF, título en la hoja y en el nombre del fichero; dos ficheros de código, una prueba nueva y revisor |
