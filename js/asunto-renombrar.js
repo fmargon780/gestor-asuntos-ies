@@ -269,6 +269,7 @@ var AsuntoRenombrar = (function () {
   return {
     mover: mover, fusionar: fusionar, quitar: quitar, restaurar: restaurar,
     pasarHitos: pasarHitos, deshacerPasarHitos: deshacerPasarHitos,
+    unirHitosPorTitulo: unirPorTitulo,   /* fila 303: lo usa js/carpetas-perdidas-enlazar.js */
     /* para las pruebas */
     _huerfanos: huerfanos
   };

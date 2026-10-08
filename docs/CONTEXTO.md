@@ -402,13 +402,14 @@ La ficha de un asunto se busca por el nombre exacto de la carpeta. Si alguien re
 una carpeta a mano, por fuera de la aplicación, la ficha se queda huérfana: sigue en
 `asuntos.json` pero no se ve en ningún lado.
 
-- En Ajustes, el bloque **Fichas sin carpeta** (`js/fichas-huerfanas.js`) calcula, al abrirlo,
-  qué claves de `asuntos.json` no tienen carpeta ni en abiertos ni en el archivo.
-- Cada huérfana se enseña con su estado y un resumen de sus notas, y dos botones: **Enlazar con
-  una carpeta** (con las carpetas de abiertos y archivo sin ficha) y **Quitar la ficha** (con
-  confirmación; guarda copia antes, como todo lo que toca `asuntos.json`; no va a la papelera, solo
-  desaparece de `asuntos.json`).
-- Un punto ámbar en el botón de Ajustes de la barra avisa de que hay huérfanas.
+- En Ajustes → Problemas, la tarjeta «N asuntos han perdido su carpeta» (`js/fichas-huerfanas.js`) cuenta, sin
+  coste, qué claves de `asuntos.json` no tienen carpeta ni en abiertos ni en el archivo.
+- Fila 303: con la pestaña «Problemas» a la vista la app **busca sola** la carpeta de cada una (abiertas y ARCHIVO;
+  `js/carpetas-perdidas-buscar.js`), enseña el bloque «La app ha encontrado la carpeta de N de ellos» con un solo botón
+  **Enlazar los N** y su «Deshacer» (`js/carpetas-perdidas-enlazar.js`), y **Buscar su carpeta** abre un cuadro con
+  buscador por palabras entre todas las carpetas. Detalle en `docs/contexto/ASUNTOS-ARCHIVO.md`.
+- Cada una lleva también **Quitar la ficha** (con confirmación; guarda copia antes; no va a la papelera).
+- Un punto ámbar en el botón de Ajustes de la barra avisa de que hay problemas.
 
 Se comprueba con `pruebas/huerfanas.mjs`.
 

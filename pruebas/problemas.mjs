@@ -126,12 +126,12 @@ await comprobar('7. quitadas las de prueba, vuelve la cuenta de la demostración
 
 console.log('--- 4. asuntos que han perdido su carpeta ---');
 const carpetas = pagina.locator('[data-problema="carpetas"]');
-await comprobar('4. el título lleva el número y sin palabras del código', carpetas.locator('.problema-titulo').textContent(), '1 asunto ha perdido su carpeta');
+await comprobar('4. el título lleva el número y sin palabras del código (fila 303: tres asuntos perdidos en la demostración)', carpetas.locator('.problema-titulo').textContent(), '3 asuntos han perdido su carpeta');
 await comprobar('4. cada asunto: «Buscar su carpeta (lo normal)» y «El asunto ya no existe», cada uno con su frase',
-  pagina.evaluate(() => [...document.querySelectorAll('[data-problema="carpetas"] .problema-elemento .problema-accion')].map((a) => [a.querySelector('button').textContent, a.querySelector('.problema-explica').textContent])),
-  [['Buscar su carpeta (lo normal)', 'Eliges la carpeta que es ahora la suya. El asunto queda como estaba, con sus hitos y sus notas.'],
+  pagina.evaluate(() => [...document.querySelectorAll('[data-problema="carpetas"] .problema-elemento')].slice(0, 1).map((e) => [...e.querySelectorAll('.problema-accion')].map((a) => [a.querySelector('button').textContent, a.querySelector('.problema-explica').textContent]))[0]),
+  [['Buscar su carpeta (lo normal)', 'Buscas su carpeta entre todas, las abiertas y las archivadas. El asunto conserva sus hitos y sus notas.'],
    ['El asunto ya no existe', 'Se quita de la lista. Queda en las copias de seguridad durante 90 días, por si era un error.']]);
-const nombreAsunto = await pagina.locator('[data-problema="carpetas"] .problema-nombre').textContent();
+const nombreAsunto = await pagina.locator('[data-problema="carpetas"] .problema-nombre').first().textContent();
 
 console.log('--- 5. los hitos no salen dos veces ---');
 await comprobar('5. los hitos del asunto sin carpeta existen en la demostración, pero no salen en la tarjeta de los hitos',
@@ -141,22 +141,32 @@ await comprobar('5. los hitos del asunto sin carpeta existen en la demostración
     return [!!d.porAsunto[nombre], nombres.length, nombres.includes(nombre)];
   }, nombreAsunto), [true, 2, false]);
 
-await pagina.locator('[data-problema="carpetas"]').getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
-await pagina.waitForSelector('#huerfana-destino');
-const destino = await pagina.evaluate(() => [...document.querySelectorAll('#huerfana-destino input[type=radio]')].map((o) => o.value)[0]);
+await pagina.locator('[data-problema="carpetas"] .problema-elemento').first().getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
+await pagina.waitForSelector('#huerfana-destino input[type=radio]');
+const destino = await pagina.evaluate(() => [...document.querySelectorAll('#huerfana-destino input[type=radio]')].filter((o) => o.checked).map((o) => o.value)[0]);
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForFunction(() => !document.querySelector('[data-problema="carpetas"]'), null, { timeout: 15000 });
+await pagina.waitForFunction(() => document.querySelectorAll('[data-problema="carpetas"] .problema-elemento').length === 2, null, { timeout: 15000 });
 await pagina.waitForTimeout(800);
-await comprobar('4. el asunto desaparece de la tarjeta, queda con sus hitos y el número baja en la pestaña, en Inicio y en el menú',
+await comprobar('4. el asunto desaparece de la tarjeta, queda con sus hitos (la tarjeta sigue con los otros dos)',
   pagina.evaluate(async (a) => {
     const d = await Hitos.leer();
     return [!!App.E.registro.asuntos[a.destino], !!d.porAsunto[a.destino] && !d.porAsunto[a.viejo],
-      document.querySelector('[data-ajustes-pestana="problemas"]').textContent.trim(),
-      document.querySelector('[data-aviso="problemas"]').textContent,
-      document.getElementById('punto-problemas').title];
+      document.querySelector('[data-problema="carpetas"] .problema-titulo').textContent];
   }, { destino, viejo: nombreAsunto }),
-  [true, true, 'Problemas (' + (n - 1) + ')', (n - 1) + ' problemas por resolver', (n - 1) + ' problemas por resolver']);
+  [true, true, '2 asuntos han perdido su carpeta']);
 await comprobar('5. y la tarjeta de los hitos sigue con los dos nombres viejos', pagina.locator('[data-problema="hitos"] .problema-nombre').count(), 2);
+/* Fila 303: los otros dos se arreglan aquí (el bloque «Enlazar», y «El asunto ya no existe»); lo demás se prueba en pruebas/carpetas-perdidas.mjs. */
+await pagina.waitForSelector('#problema-carpetas-enlazar-todos:not([disabled])', { timeout: 20000 });
+await pagina.click('#problema-carpetas-enlazar-todos');
+await pagina.waitForFunction(() => document.querySelectorAll('[data-problema="carpetas"] .problema-elemento').length === 1, null, { timeout: 20000 });
+await pagina.locator('[data-problema="carpetas"]').getByRole('button', { name: 'El asunto ya no existe' }).click();
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForFunction(() => !document.querySelector('[data-problema="carpetas"]'), null, { timeout: 15000 });
+await pagina.waitForTimeout(500);
+await comprobar('4. sin asuntos perdidos, el número baja en la pestaña, en Inicio y en el menú',
+  pagina.evaluate((k) => [document.querySelector('[data-ajustes-pestana="problemas"]').textContent.trim(), document.querySelector('[data-aviso="problemas"]').textContent, document.getElementById('punto-problemas').title],
+    n - 1),
+  ['Problemas (' + (n - 1) + ')', (n - 1) + ' problemas por resolver', (n - 1) + ' problemas por resolver']);
 
 /* ================= 6. DOS ORDENADORES Y EL FICHERO DE ALUMNADO ================= */
 

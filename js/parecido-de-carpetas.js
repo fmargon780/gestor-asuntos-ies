@@ -72,13 +72,83 @@ var ParecidoDeCarpetas = (function () {
     var r = {
       numero: !!(a.numero && a.numero === b.numero),
       tercero: mismoTercero(a.id, b.id),
-      tipo: !!(a.tipo && (a.tipo === b.tipo || a.tipo + 's' === b.tipo || b.tipo + 's' === a.tipo)),   /* FACTURAS ≈ FACTURA: carpetas cambiadas a mano */
+      tipo: !!(a.tipo && (a.tipo === b.tipo || a.tipo + 's' === b.tipo || b.tipo + 's' === a.tipo)) ||   /* FACTURAS ≈ FACTURA: carpetas cambiadas a mano */
+        tipoCompatible(viejo, nuevo, tipos),   /* fila 303: abreviado, nombre corto o antiguo */
       fecha: !!(a.fecha && a.fecha === b.fecha),
       palabras: a.palabras.filter(function (p) { return b.palabras.indexOf(p) !== -1; }).length
     };
     r.puntos = (r.numero ? PESO.numero : 0) + (r.tercero ? PESO.tercero : 0) + (r.tipo ? PESO.tipo : 0) +
       (r.fecha ? PESO.fecha : 0) + r.palabras * PESO.palabra;
     return r;
+  }
+
+  /* ---------- fila 303 (docs/CARPETAS-PERDIDAS-QUE-ESTAN-ARCHIVADAS.md, apartado 2): cuándo «encaja» ---------- */
+
+  /* El tipo de un nombre, en bruto: las palabras en mayúsculas que siguen a la fecha (y al número) hasta el
+     año o el tercero. `resto` es lo que queda detrás. Sirve para tipos que la app no reconoce, como
+     «TRAS. MATR. VIVA». */
+  function tipoEnBruto(nombre) {
+    var texto = String(nombre || '').trim();
+    var m = texto.match(/^\d{6}\s+(.*)$/);
+    var resto = m ? m[1] : texto;
+    var mn = resto.match(/^A\d{2}-\d{4}\s+(.*)$/);
+    if (mn) resto = mn[1];
+    var trozos = resto.split(/\s+/).filter(Boolean), i = 0;
+    while (i < trozos.length && /^[A-ZÁÉÍÓÚÜÑ0-9][A-ZÁÉÍÓÚÜÑ0-9._\/-]*$/.test(trozos[i]) && !/^\d{2}[-\/]\d{2}$/.test(trozos[i])) i++;
+    return { texto: trozos.slice(0, i).join(' '), resto: trozos.slice(i).join(' ') };
+  }
+
+  /* Todos los nombres con los que se puede llamar al tipo de ese nombre: si la app lo reconoce, el nombre, el
+     corto y los antiguos; si no, el que está escrito. Y lo que queda detrás (año, grupo, tercero). */
+  function tipoYResto(nombre, tipos) {
+    var bruto = tipoEnBruto(nombre);
+    var salida = { nombres: bruto.texto ? [bruto.texto] : [], resto: bruto.resto };
+    if (window.Nombres && Nombres.leer && tipos && tipos.length) {
+      try {
+        var l = Nombres.leer(nombre, tipos);
+        if (l && l.reconocido && l.tipo) {
+          var t = tipos.filter(function (x) { return x.tipo === l.tipo; })[0] || { tipo: l.tipo };
+          salida.nombres = [t.tipo, t.nombreCorto].concat(t.alias || []).filter(Boolean);
+          salida.resto = l.resto;
+        }
+      } catch (e) { /* se queda con lo escrito */ }
+    }
+    return salida;
+  }
+
+  function palabrasDeTipo(t) { return norm(t).replace(/\./g, ' ').split(/\s+/).filter(Boolean); }
+
+  /* Uno es el otro abreviado: mismas palabras, y cada una de un nombre es el principio de la del otro. */
+  function abreviado(a, b) {
+    var pa = palabrasDeTipo(a), pb = palabrasDeTipo(b);
+    if (!pa.length || pa.length !== pb.length) return false;
+    return pa.every(function (p, i) { return p.indexOf(pb[i]) === 0 || pb[i].indexOf(p) === 0; });
+  }
+
+  /* ¿El tipo de un nombre NO es otro distinto del de otro? Es el mismo, uno es el nombre corto o antiguo del
+     otro, o uno es el otro abreviado. */
+  function tipoCompatible(viejo, nuevo, tipos) {
+    var a = tipoYResto(viejo, tipos).nombres, b = tipoYResto(nuevo, tipos).nombres;
+    return a.some(function (x) {
+      return b.some(function (y) { return norm(x) === norm(y) || abreviado(x, y); });
+    });
+  }
+
+  /* ¿Esta carpeta encaja con este asunto perdido? El mismo número; o la misma fecha, el mismo tercero y un
+     tipo que no es otro distinto. */
+  function encaja(viejo, nuevo, tipos) {
+    var a = analizar(viejo, tipos), b = analizar(nuevo, tipos);
+    if (a.numero && a.numero === b.numero) return true;
+    if (!a.fecha || a.fecha !== b.fecha) return false;
+    var quitar = function (resto) { return norm(window.Nombres && Nombres.terceroDeResto ? Nombres.terceroDeResto(resto) : resto); };
+    var ta = quitar(tipoYResto(viejo, tipos).resto), tb = quitar(tipoYResto(nuevo, tipos).resto);
+    var mismo = mismoTercero(a.id, b.id) || (!a.id && !b.id && ta !== '' && ta === tb);
+    return !!mismo && tipoCompatible(viejo, nuevo, tipos);
+  }
+
+  /* De las candidatas, las que encajan. Solo vale proponer una si es la única. */
+  function encajes(viejo, candidatos, tipos) {
+    return (candidatos || []).filter(function (c) { return encaja(viejo, c.nombre, tipos); });
   }
 
   /* ¿Se parece de verdad, o solo comparten algo suelto? */
@@ -111,6 +181,7 @@ var ParecidoDeCarpetas = (function () {
     return lista.length && seParece(lista[0].parecido) ? lista[0] : null;
   }
 
-  return { analizar: analizar, puntuar: puntuar, ordenar: ordenar, mejor: mejor, seParece: seParece, esClaro: esClaro, PESO: PESO };
+  return { analizar: analizar, puntuar: puntuar, ordenar: ordenar, mejor: mejor, seParece: seParece, esClaro: esClaro, PESO: PESO,
+    encaja: encaja, encajes: encajes, tipoCompatible: tipoCompatible };
 })();
 window.ParecidoDeCarpetas = ParecidoDeCarpetas;

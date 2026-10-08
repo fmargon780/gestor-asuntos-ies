@@ -4939,3 +4939,17 @@ desde el control de registro, no se reconoce como tercero ya conocido a un tutor
 y `titulos-de-la-tabla-fijos`, salen de la lista); tope de 20 que el ejecutor exige (con 21 se niega a arrancar, comprobado).
 `tras-cada-accion.mjs` pasó entera en la pasada de partida y se queda en la lista. Notas viejas de `docs/COLA.md` limpiadas.
 `CLAUDE.md` («Pruebas», punto 3) cambiado: tope de 20, `RETIRADAS`, sin «sin investigarla más».
+
+## Fila 303 (8-oct-2026): la carpeta de un asunto perdido, también si está archivada
+
+La app busca sola la carpeta de cada asunto que ha perdido la suya (abiertas y ARCHIVO), la enseña en una lista con «Enlazar los N» y
+«Deshacer», y «Buscar su carpeta» busca por palabras entre todas. Módulos nuevos `js/carpetas-perdidas-buscar.js` y
+`js/carpetas-perdidas-enlazar.js`; `ParecidoDeCarpetas.encaja` entiende el tipo abreviado, el nombre corto y los antiguos.
+
+Causa encontrada (apartado 7), a la primera: `App.renombrarTipo` renombraba las carpetas abiertas del tipo y copiaba la ficha al nombre
+nuevo con `App.anotar`, pero dejaba la del nombre viejo (y sus hitos) en `asuntos.json`. Con el asunto archivado después, la
+carpeta del ARCHIVO llevaba el tipo con el nombre nuevo (`TRAS. MATR. VIVA`) y la ficha vieja seguía con el largo. Arreglado con
+`AsuntoRenombrar.mover`; la prueba lo reproduce (sin el arreglo, de 3 asuntos perdidos en la demostración pasan a 6). Descartado
+sin mirar más: la unión sola de tipos (fila 277) y «Unir con otro tipo» (fila 207) ya pasan por `AsuntoRenombrar.mover`; no se
+investigó la lápida del conflicto de Dropbox (fila 260) ni el índice atrasado de `FichasHuerfanas.calcular`, porque la causa
+encontrada explica el caso mirado con Francisco.

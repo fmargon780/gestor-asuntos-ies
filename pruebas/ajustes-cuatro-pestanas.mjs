@@ -70,13 +70,16 @@ await comprobar('2. el rótulo de «solo en este ordenador» y el de «para todo
 console.log('--- 3. Problemas ---');
 await pagina.click('.pestana-ajustes[data-ajustes-pestana="problemas"]');
 await pagina.waitForTimeout(1500);
-await comprobar('3. sale la tarjeta de los asuntos que han perdido su carpeta (fila 291)', pagina.evaluate(() => { const d = document.querySelector('#ajustes-tab-problemas [data-problema="carpetas"]'); return [!!d, d.querySelectorAll('.problema-elemento').length]; }), [true, 1]);
+await comprobar('3. sale la tarjeta de los asuntos que han perdido su carpeta (fila 291)', pagina.evaluate(() => { const d = document.querySelector('#ajustes-tab-problemas [data-problema="carpetas"]'); return [!!d, d.querySelectorAll('.problema-elemento').length]; }), [true, 3]);   /* fila 303: la demostración trae tres */
 await comprobar('3. el botón de la pestaña lleva un punto ámbar', pagina.locator('#problemas-punto').evaluate((p) => !p.classList.contains('oculto')), true);
 await comprobar('3. y no sale «Todo en orden»', pagina.locator('#problemas-todo-bien').evaluate((p) => p.classList.contains('oculto')), true);
-await pagina.evaluate(() => { const b = [...document.querySelectorAll('[data-problema="carpetas"] button')].find((x) => /El asunto ya no existe/.test(x.textContent)); b.click(); });
-await pagina.waitForTimeout(600);
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(2500);
+for (let i = 0; i < 3; i++) {   /* fila 303: son tres */
+  await pagina.evaluate(() => { const b = [...document.querySelectorAll('[data-problema="carpetas"] button')].find((x) => /El asunto ya no existe/.test(x.textContent)); b.click(); });
+  await pagina.waitForTimeout(600);
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForTimeout(1500);
+}
+await pagina.waitForTimeout(1000);
 await comprobar('3. quitado el asunto: la tarjeta desaparece', pagina.evaluate(() => !!document.querySelector('#ajustes-tab-problemas [data-problema="carpetas"]')), false);
 
 console.log('--- 4. Herramientas ---');
