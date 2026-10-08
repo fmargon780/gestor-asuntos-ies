@@ -245,3 +245,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 299 — el correo al tutor o tutora del grupo (7-oct-2026)
 
 - En el centro, abrir un asunto de SANCIÓN de verdad: el hito se llama «Informar al tutor/a» y, al preparar su correo (Comunicar ▾ → «Tutor/a del grupo»), sale el tutor o tutora real del grupo de ese alumno. Si no sale («No sé quién es el tutor o tutora de…»), mirar cómo escribe Séneca la unidad en la relación de tutorías (Herramientas → Tablas de datos) y en el fichero de alumnado, y decírselo a Claude.
+
+## Fila 303 — asuntos que han perdido su carpeta (8-oct-2026)
+
+- En el centro, Ajustes → Problemas: mirar que el traslado del recorte de la idea 303 sale en la lista «La app ha encontrado la carpeta de N de ellos» con su carpeta del ARCHIVO, repasar la lista, desmarcar lo que no cuadre y pulsar «Enlazar los N». Decir cuántos de los 21 quedan sin encontrar.
