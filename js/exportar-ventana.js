@@ -135,6 +135,10 @@
     var html =
       '<p class="explica">Se exporta lo que se ve ahora en «' + U.escapar(filtros.pestanaTexto) + '»' +
       (filtros.palabras.length ? ', con ' + U.escapar(filtros.palabras.join(' · ')) : '') + '.</p>' +
+      /* Fila 308: el título del informe; trae siempre «Listado de asuntos» y no se recuerda. */
+      (destino === 'pdf'
+        ? '<div class="exportar-titulo-linea"><label for="exp-titulo">Título</label>' +
+          '<input type="text" id="exp-titulo" class="campo" maxlength="120" value="Listado de asuntos"></div>' : '') +
       '<label class="exportar-casilla exportar-archivados"><input type="checkbox" id="exp-archivados"> Incluir también los archivados</label>' +
       '<p class="nota exportar-nota oculto" id="exp-nota"></p>' +
       '<div id="exp-columnas">' + columnasHtml(marcadas, camposAbiertos, false) + '</div>' +
@@ -206,6 +210,7 @@
     if ($('exp-archivados')) $('exp-archivados').onchange = alCambiarArchivados;
     pintarVacio();
     engancharAgrupar();
+    if ($('exp-titulo')) $('exp-titulo').addEventListener('focus', function () { this.select(); });
 
     var ok = await promesa;
     if (aceptar) { aceptar.disabled = false; aceptar.title = ''; }
@@ -213,6 +218,7 @@
 
     var conArchivados = $('exp-archivados') && $('exp-archivados').checked;
     var conHitos = !!($('exp-hitos') && $('exp-hitos').checked);
+    var titulo = $('exp-titulo') ? $('exp-titulo').value.replace(/\s+/g, ' ').trim() : '';
     var agruparPor = destino === 'pdf' ? agruparElegido() : [];
     if (destino === 'pdf') guardarAgrupar(agruparPor);
     var elegidas = marcadasAhora();
@@ -223,7 +229,7 @@
     var entradasFinal = entradas;
     turno++;
     await exportar(destino, { filtros: filtros, abiertos: abiertos, conArchivados: conArchivados, conHitos: conHitos,
-                              ids: ids, entradas: entradasFinal, tiposAbiertos: tiposAbiertos, agruparPor: agruparPor });
+                              ids: ids, entradas: entradasFinal, tiposAbiertos: tiposAbiertos, agruparPor: agruparPor, titulo: titulo });
   }
 
   async function exportar(destino, o) {
@@ -260,7 +266,7 @@
       } else {
         await ExportarInforme.abrir({
           tabla: tabla, registros: registros, filtros: o.filtros, conHitos: o.conHitos,
-          incluyeArchivados: o.conArchivados, por: (App.E && App.E.usuario) || '',
+          titulo: o.titulo || 'Listado de asuntos', incluyeArchivados: o.conArchivados, por: (App.E && App.E.usuario) || '',
           /* Fila 278: los bloques, si se ha elegido agrupar. */
           agrupado: (o.agruparPor && o.agruparPor.length && window.ExportarAgrupar) ? ExportarAgrupar.agrupar(tabla, o.agruparPor) : null
         });

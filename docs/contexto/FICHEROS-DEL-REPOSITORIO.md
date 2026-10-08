@@ -521,3 +521,4 @@ de `App` va después del fichero que lo define.
 | `pruebas/tipos-que-son-el-mismo.mjs` | Prueba de la fila 277: unión sola, con algo propio no, solo consulta, guardado en marcha, las reglas de parecido, «No son el mismo» y «Unir» desde el cuadro |
 | `js/exportar-agrupar.js` | Fila 278: el cálculo de los bloques del informe en PDF agrupado por una o dos columnas (orden, meses, «Sin dato», sumas, título y línea de cierre) |
 | `pruebas/informe-agrupado.mjs` | Prueba de la fila 278: el cálculo, la ventana, el informe agrupado de uno y dos niveles, reservados, importes, hitos y el corte de páginas |
+| `pruebas/informe-titulo.mjs` | Prueba de la fila 308: la casilla «Título» del informe en PDF, el título en la hoja, la barra y el nombre del fichero, signos raros, vacío, título largo y que no se recuerda |

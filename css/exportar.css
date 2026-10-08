@@ -71,3 +71,9 @@ body.con-exportar-visor { overflow: hidden; }
 .exportar-bloque-interior { font-size: 12px; font-weight: 700; margin-left: 12px; }
 .exportar-cierre { margin: 4px 0 8px; font-size: 11px; }
 .exportar-cierre-exterior { font-weight: 700; border-top: 1px solid #222; padding-top: 4px; margin-bottom: 10px; }
+
+/* Fila 308: la casilla «Título» del informe en PDF */
+.exportar-titulo-linea { display: flex; align-items: center; gap: 8px 12px; margin: 8px 0; }
+.exportar-titulo-linea label { font-weight: 600; color: #445; }
+.exportar-titulo-linea input { flex: 1; min-width: 0; }
+.exportar-titulo { overflow-wrap: anywhere; }
