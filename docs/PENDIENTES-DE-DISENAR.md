@@ -75,3 +75,11 @@ centro puede bloquearlo); dejar la copia de Drive solo para consultar (es la fil
 ## Mover un hito desde la mesa, en los demás asuntos (fila 300)
 
 «Hito ▾» → «Cambiar» → «Colocar después de», guardado «A la guía», solo mueve el hito en los demás asuntos si está vacío (`propagarCambio`); «Cambiar la guía» (fila 300) recoloca todos los sin hacer. Hablar con Francisco si deben ser la misma regla.
+
+## 3. Aviso de actividad extraescolar solo al profesorado afectado (idea 306, 8-oct-2026)
+
+Proyecto futuro, apuntado por Francisco: hoy no está listo. El aviso de una actividad extraescolar
+se manda a todo el profesorado. Francisco quiere afinarlo: mandarlo solo al profesorado que da
+clase a las unidades convocadas, en las horas de esos días. Para saberlo, el gestor tendría que
+enlazarse con la otra aplicación del centro que lleva los horarios y las ausencias. Hasta que ese
+enlace exista, el aviso sigue yendo a todo el profesorado (así se diseña la idea 306).
