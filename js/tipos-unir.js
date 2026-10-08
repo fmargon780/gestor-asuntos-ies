@@ -144,6 +144,7 @@ var TiposUnir = (function () {
     var palabras = palabrasUnidas(desaparece, seQueda);
     if (palabras !== seQueda.palabrasClave) { seQueda.palabrasClave = palabras; r.palabrasClave = true; }
     seQueda.alias = aliasUnidos(desaparece, seQueda);
+    if (desaparece.actividades) seQueda.actividades = true;   /* fila 306: la marca de las actividades pasa al que se queda */
 
     App.E.tipos = (App.E.tipos || []).filter(function (t) { return t !== desaparece; });
     await Borrados.marcar(App.E.gestor, 'tipos', viejo);

@@ -377,6 +377,8 @@ var PersonasDelGrupo = (function () {
     var h = hitoActual(a);
     var g = (window.HitosGenerar && HitosGenerar.grupos && HitosGenerar.grupos(a, h)) || { delPaso: [], delTipo: [] };
     var todas = g.delPaso.concat(g.delTipo);
+    /* Fila 306: en un asunto de actividad, la plantilla de participación del profesorado no se ofrece. */
+    if (window.Actividades && Actividades.tieneActividad(a)) todas = todas.filter(function (p) { return !Actividades.esPlantillaVieja(p); });
     if (!todas.length) { U.aviso('No hay ninguna plantilla de documento para este tipo de asunto.', 'ambar'); return; }
     ponerMenu(caja, boton, todas.map(function (p) {
       return botonDeMenu(p.nombre, async function () {

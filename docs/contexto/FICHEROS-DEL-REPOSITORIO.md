@@ -36,6 +36,12 @@ de `App` va después del fichero que lo define.
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto. Se borran solas las de más de 90 días (configurable), aunque no lleguen a 30 (fila 72) |
 | `js/perfil.js`, `js/perfil-ajustes.js` | El perfil de cada nombre (`_GESTOR/perfiles.json`: `{ perfiles: { nombre: { perfil, correo } } }`, un nombre que no está es Administración) y la sección de Ajustes «Quién usa la aplicación» (fila 287); se funde por nombre en un conflicto de Dropbox |
 | `js/encargos.js`, `js/encargos-nuevo.js`, `js/encargos-mios.js`, `js/encargos-llegada.js` | Los encargos de los directivos (fila 289): `_GESTOR/encargos.json` (`{ encargos: [ … ] }`, documentos en `_GESTOR/encargos/<id>/`), «Nuevo encargo», «Mis encargos» y las tarjetas de «Ver todo»; se funde por `id` en un conflicto de Dropbox |
+| `js/actividades.js` | Las actividades extraescolares (fila 306): `_GESTOR/actividades.json`, `situacion`, `cuenta`, `unidadesDe`, `fechasLegibles`, la pasada que marca el tipo (`tipo.actividades`), `ponerAlDia`, papelera, unir y renombrar |
+| `js/actividades-formulario.js` | El formulario «La actividad» y el botón «Apuntar la actividad» de «Nuevo asunto» (fila 306) |
+| `js/actividades-ficha.js` | La tarjeta «La actividad» de la ficha: «Cambiar», «Anular la actividad», «Apuntar los datos de la actividad» (fila 306) |
+| `css/actividades.css` | Estilos del formulario y de la tarjeta de actividades (fila 306) |
+| `js/demo/datos-actividades.js` | Tres actividades de la copia de pruebas: prevista, realizada y anulada (fila 306) |
+| `pruebas/actividades.mjs` | La prueba de las actividades extraescolares (fila 306) |
 | `js/demo/datos-encargos.js` | Los encargos de la copia de pruebas (fila 289) |
 | `js/demo/datos-problemas.js` | Lo que enseña «Problemas» en la copia de pruebas (fila 291): carpeta sin asunto, hitos de un asunto que no existe, lo guardado a la vez, alumnado viejo, script anticuado |
 | `js/notas-directivos.js`, `js/demo/datos-notas.js` | Las notas de los directivos en un asunto (fila 290): la caja del directivo, «Vista» y «Guardar en el asunto», el aviso de Inicio y la pregunta al archivar; documentos en `_GESTOR/notas-directivos/<carpeta>/` (carpeta de espera que se borra al guardar el último) |

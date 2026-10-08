@@ -809,3 +809,18 @@ del buscador, «Es para un grupo de personas» (`js/asunto-de-grupo.js`; `App.E.
 `Plantillas.valoresDeAsunto`) debe comprobar `typeof === 'string'`.
 
 - **Contacto de «El encargo»** (fila 305, `docs/CONTACTO-DEL-ENCARGO-DONDE-HACE-FALTA.md`): `LoPide.contactoDe(ficha)` es la única regla (correo, teléfono y `aLaVista`; gana lo escrito en `viaDato` a lo de `loPide`); `LoPide.correoDe` se apoya en ella. `ContactoALaVista.html(a)` pinta la marca en `marcasDeFicha` y en `.mesa-etiquetas`; el botón ⧉ sigue activo en solo consulta (`js/ficha-consulta.js`). Pruebas: `pruebas/contacto-del-encargo.mjs`, `pruebas/lo-pide.mjs` (caso 9).
+
+## Las actividades extraescolares (8-oct-2026, fila 306, `docs/ACTIVIDADES-EXTRAESCOLARES.md`)
+
+Un tipo con la marca `actividades: true` (la pasada de `Actividades.pasada` la pone al tipo ACTIVIDAD EXTRAESCOLAR o lo crea;
+`Actividades.esTipoDeActividad`) enseña en «Nuevo asunto» el botón «Apuntar la actividad» (`#actividad-nuevo-caja`, lo pinta
+`ActividadesFormulario.alRefrescarNuevo` desde `App.refrescarVista`). El formulario devuelve el grupo por `AsuntoDeGrupo.fijar`
+(`grupoDatos.actividad` lleva todo lo escrito; categoría = la del tipo) y la fecha límite es la de inicio. Al crear, `alDatosNuevos`
+pone `ficha.grupo` (`origen: 'actividad'`) y `ficha.actividad = { id }`, y `Gestor.alCrearAsunto` apunta la actividad en
+`_GESTOR/actividades.json` (si falla, aviso ámbar y la tarjeta ofrece «Apuntar los datos de la actividad»). La tarjeta «La actividad»
+(`FichaTarjetas`, solo con `Actividades.tarjetaAplica`) trae su resumen por `data-resumen` de `#ficha-actividad`. «Cambiar» guarda con
+`App.anotarLista` (añade y quita alumnado; no toca a quien ya tiene algo generado) y, si cambia el nombre corto, renombra la
+carpeta con `AsuntoRenombrar.mover`. `Actividades.ponerAlDia` (en `Gestor.alRefrescar`) mantiene `unidades` y `alumnado` al día. Papelera,
+recuperar, unir y renombrar asuntos o personas llaman a `Actividades.alCambiarElAsunto`, `alUnirAsuntos`, `alMoverAsunto` y
+`alRenombrarPersona`. En un asunto con actividad no se ofrece la plantilla «Participación del profesorado en actividad
+extraescolar» (`Actividades.esPlantillaVieja`).
