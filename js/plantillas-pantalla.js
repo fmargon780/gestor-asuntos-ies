@@ -126,6 +126,8 @@ var PlantillasPantalla = (function () {
         : '<button type="button" class="boton" data-accion="activar"' + off + '>Volver a activar</button>') +
       '<button type="button" class="boton boton-peligro" data-accion="borrar"' + (deLaApp ? ' disabled title="La aplicación la vuelve a crear sola."' : off) + '>Borrar</button>';
     return '<td class="pt-acciones"><button type="button" class="boton" data-accion="ver" data-solo-lectura>Ver</button> ' +
+      (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="retocar"' +
+        (E.falta[p.id] ? ' disabled title="El fichero «' + esc(p.fichero) + '» no está en la carpeta de plantillas."' : off) + '>Retocar</button> ' : '') +
       '<button type="button" class="boton" data-accion="cambiar"' + off + '>Cambiar</button> ' +
       '<details class="pt-mas-menu"><summary title="Más" data-solo-lectura>⋮</summary><div class="pt-menu">' + menu + '</div></details></td>';
   }
@@ -239,6 +241,7 @@ var PlantillasPantalla = (function () {
 
   async function hacer(accion, p) {
     if (accion === 'ver') return ver(p);
+    if (accion === 'retocar') return PlantillaRetocarPantalla.abrir(p, recargar);
     if (accion === 'cambiar') return cambiar(p);
     if (accion === 'sustituir') return PlantillasFichero.sustituir(p, recargar);
     if (accion === 'fuera') return PlantillasFueraDeUso.dejar(p, E.pestana === 'word' ? 'documento' : 'correo', usos(p), recargar);

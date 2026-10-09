@@ -23,7 +23,7 @@ var ConvertirEnPlantillaPantalla = (function () {
   ];
 
   var capa = null, api = null, st = null, paso = 1, cerrandose = false;
-  var menuSel = null, aviso = null;
+  var sel = null;   /* el menú sobre lo seleccionado (js/plantilla-seleccion.js) */
 
   function $(sel, raiz) { return (raiz || capa).querySelector(sel); }
   function esc(t) { return U.escapar(t); }
@@ -44,15 +44,24 @@ var ConvertirEnPlantillaPantalla = (function () {
     document.body.classList.add('con-cep');
     $('.cep-nombre').textContent = st.nombre;
     document.addEventListener('keydown', alEscape, true);
-    document.addEventListener('mouseup', alSoltarRaton, true);
-    document.addEventListener('mousedown', alPulsarFueraDelMenu, true);
+    sel = PlantillaSeleccion.montar({
+      documento: function () { return capa && capa.querySelector('.cep-doc .cep-hoja-interior'); },
+      activo: function () { return !!capa && paso === 1; },
+      opciones: function (s) {
+        return [
+          ['Cambiar por un dato…', function () { cambiarPorUnDato(s); }],
+          ['Cambiar por otro texto…', function () { cambiarPorOtroTexto(s); }],
+          ['Esto se pregunta cada vez', function () { sePreguntaCadaVez(s); }],
+          ['Quitar del documento', function () { quitarDelDocumento(s); }]
+        ];
+      }
+    });
   }
 
   function destruir() {
     document.removeEventListener('keydown', alEscape, true);
-    document.removeEventListener('mouseup', alSoltarRaton, true);
-    document.removeEventListener('mousedown', alPulsarFueraDelMenu, true);
-    ocultarMenu();
+    if (sel) sel.destruir();
+    sel = null;
     if (capa) capa.remove();
     capa = null;
     document.body.classList.remove('con-cep');
@@ -78,7 +87,7 @@ var ConvertirEnPlantillaPantalla = (function () {
     if (ev.key !== 'Escape' || !capa || document.querySelector('#capa:not(.oculto)') || document.getElementById('huecos-cuadro')) return;
     ev.stopPropagation();
     ev.preventDefault();
-    if (menuSel) { ocultarMenu(); return; }
+    if (sel && sel.hayMenu()) { sel.ocultar(); return; }
     cancelar();
   }
 
@@ -93,41 +102,9 @@ var ConvertirEnPlantillaPantalla = (function () {
     return new Promise(function (r) { resolverApertura = r; });
   }
 
-  /* ---------- el documento, con los huecos en amarillo ---------- */
+  /* ---------- el documento, con los huecos en amarillo (js/plantilla-seleccion.js) ---------- */
 
-  async function pintarDocumento(hoja, blob) {
-    var antes = hoja.scrollTop;
-    var caja = hoja.querySelector('.cep-hoja-interior');
-    if (!caja) { caja = document.createElement('div'); caja.className = 'cep-hoja-interior'; hoja.appendChild(caja); }
-    try {
-      await WordVisor.pintarEn(caja, blob);
-      resaltarHuecos(caja);
-    } catch (e) {
-      caja.innerHTML = '<p class="explica">No he podido enseñar este Word: ' + esc(U.mensajeDeError(e)) + '</p>';
-    }
-    hoja.scrollTop = antes;
-  }
-
-  /* Cada `{…}` o `{{…}}` del documento, en un <mark>. */
-  function resaltarHuecos(caja) {
-    var recorrido = document.createTreeWalker(caja, NodeFilter.SHOW_TEXT, null), nodos = [], n;
-    while ((n = recorrido.nextNode())) { if (/\{[^{}]+\}/.test(n.nodeValue)) nodos.push(n); }
-    nodos.forEach(function (nodo) {
-      var texto = nodo.nodeValue, re = /\{\{[^{}]+\}\}|\{[^{}]+\}/g, ultimo = 0, m, frag = document.createDocumentFragment();
-      while ((m = re.exec(texto))) {
-        if (m.index > ultimo) frag.appendChild(document.createTextNode(texto.slice(ultimo, m.index)));
-        var marca = document.createElement('mark');
-        marca.className = 'cep-hueco';
-        marca.dataset.hueco = m[0];
-        marca.textContent = m[0];
-        marca.onclick = function (ev) { ev.stopPropagation(); irALinea(this.dataset.hueco); };
-        frag.appendChild(marca);
-        ultimo = m.index + m[0].length;
-      }
-      if (ultimo < texto.length) frag.appendChild(document.createTextNode(texto.slice(ultimo)));
-      nodo.parentNode.replaceChild(frag, nodo);
-    });
-  }
+  function pintarDocumento(hoja, blob) { return PlantillaSeleccion.pintarDocumento(hoja, blob, irALinea); }
 
   /* Pulsar un hueco del documento lleva a su línea de la lista. */
   function irALinea(hueco) {
@@ -151,18 +128,8 @@ var ConvertirEnPlantillaPantalla = (function () {
       })[0] || null;
       if (!destino && l.poner === '') destino = null;
     }
-    if (!destino) destino = primerSitioDeTexto(caja, l.buscar);
+    if (!destino) destino = PlantillaSeleccion.primerSitioDeTexto(caja, l.buscar);
     if (destino) destino.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-
-  function primerSitioDeTexto(caja, texto) {
-    var buscado = DocxSustituir.normalizar(String(texto).replace(/\s+/g, ' ').trim());
-    if (!buscado) return null;
-    var recorrido = document.createTreeWalker(caja, NodeFilter.SHOW_TEXT, null), n;
-    while ((n = recorrido.nextNode())) {
-      if (DocxSustituir.normalizar(n.nodeValue).indexOf(buscado) !== -1) return n.parentNode;
-    }
-    return null;
   }
 
   /* La línea fija de arriba: de qué se parte, si no es un .docx tal cual. */
@@ -355,93 +322,29 @@ var ConvertirEnPlantillaPantalla = (function () {
     }
   }
 
-  /* ---------- el menú de lo seleccionado ---------- */
-
-  function ocultarMenu() {
-    if (menuSel && menuSel.parentNode) menuSel.parentNode.removeChild(menuSel);
-    menuSel = null;
-    var viejo = document.getElementById('cep-hueco-temporal');
-    if (viejo) viejo.remove();
-  }
-
-  function alPulsarFueraDelMenu(ev) {
-    if (menuSel && !menuSel.contains(ev.target)) ocultarMenu();
-  }
-
-  /* El texto seleccionado, si está dentro de un solo párrafo del documento. */
-  function seleccionValida() {
-    var sel = window.getSelection();
-    if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
-    var doc = capa && capa.querySelector('.cep-doc .cep-hoja-interior');
-    if (!doc) return null;
-    var a = sel.anchorNode && (sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentNode : sel.anchorNode);
-    var f = sel.focusNode && (sel.focusNode.nodeType === 3 ? sel.focusNode.parentNode : sel.focusNode);
-    if (!a || !f || !doc.contains(a) || !doc.contains(f)) return null;
-    var pa = a.closest('p'), pf = f.closest('p');
-    if (!pa || pa !== pf) return null;
-    var texto = sel.toString().replace(/\s+/g, ' ').trim();
-    if (texto.length < 3 || /[{}]/.test(texto)) return null;
-    return { texto: texto, rect: sel.getRangeAt(0).getBoundingClientRect() };
-  }
-
-  function alSoltarRaton(ev) {
-    if (!capa || paso !== 1 || (menuSel && menuSel.contains(ev.target))) return;
-    setTimeout(function () {
-      var s = capa && paso === 1 ? seleccionValida() : null;
-      if (!s) { if (!menuSel || !menuSel.matches(':hover')) ocultarMenu(); return; }
-      mostrarMenu(s);
-    }, 0);
-  }
-
-  function mostrarMenu(s) {
-    ocultarMenu();
-    menuSel = document.createElement('div');
-    menuSel.className = 'cep-menu-sel';
-    menuSel.addEventListener('mousedown', function (e) { e.preventDefault(); });
-    var opciones = [
-      ['Cambiar por un dato…', function () { cambiarPorUnDato(s); }],
-      ['Esto se pregunta cada vez', function () { sePreguntaCadaVez(s); }],
-      ['Quitar del documento', function () { quitarDelDocumento(s); }]
-    ];
-    opciones.forEach(function (o) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.textContent = o[0];
-      b.onclick = function () { var texto = s; menuSel.style.visibility = 'hidden'; o[1](); window.getSelection().removeAllRanges(); void texto; };
-      menuSel.appendChild(b);
-    });
-    document.body.appendChild(menuSel);
-    var r = s.rect;
-    menuSel.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menuSel.offsetWidth - 8)) + 'px';
-    menuSel.style.top = Math.min(window.innerHeight - menuSel.offsetHeight - 8, r.bottom + 6) + 'px';
-  }
+  /* ---------- lo que se hace con lo seleccionado (el menú: js/plantilla-seleccion.js) ---------- */
 
   async function marcarManual(m) {
     await api.anadirManual(m);
-    ocultarMenu();
+    sel.ocultar();
     await refrescar();
   }
 
   function cambiarPorUnDato(s) {
-    var viejo = document.getElementById('cep-hueco-temporal');
-    if (viejo) viejo.remove();
-    var caja = document.createElement('div');
-    caja.id = 'cep-hueco-temporal';
-    caja.style.cssText = 'position:fixed;left:' + Math.round(s.rect.left) + 'px;top:' + Math.round(s.rect.bottom) + 'px;width:1px;height:1px;overflow:hidden';
-    var campo = document.createElement('input'), boton = document.createElement('button');
-    boton.type = 'button';
-    caja.appendChild(campo); caja.appendChild(boton);
-    document.body.appendChild(caja);
-    HuecosBuscador.montar({ boton: boton, campos: [campo] });
-    campo.addEventListener('input', function () {
-      var hueco = campo.value.trim();
-      caja.remove();
-      if (hueco) marcarManual({ tipo: 'dato', buscar: s.texto, poner: hueco, mostrarPoner: hueco, etiqueta: ConvertirEnPlantillaPropuestas.etiquetaDe(hueco) });
+    PlantillaSeleccion.cambiarPorUnDato(s, function (hueco) {
+      marcarManual({ tipo: 'dato', buscar: s.texto, poner: hueco, mostrarPoner: hueco, etiqueta: ConvertirEnPlantillaPropuestas.etiquetaDe(hueco) });
     });
-    boton.click();
+  }
+
+  /* Fila 322: un trozo por otro texto, que se escribe. Entra en «Lo que has marcado tú» como los demás. */
+  async function cambiarPorOtroTexto(s) {
+    sel.ocultar();
+    var nuevo = await PlantillaSeleccion.cuadroCambiarTexto(s.texto);
+    if (nuevo) await marcarManual({ tipo: 'otrotexto', buscar: s.texto, poner: nuevo, mostrarPoner: nuevo, etiqueta: nuevo });
   }
 
   async function sePreguntaCadaVez(s) {
-    ocultarMenu();
+    sel.ocultar();
     var ok = await U.preguntar('¿Cómo se llama este dato?',
       '<input id="cep-nombre-dato" class="campo" placeholder="Motivo de la salida" autocomplete="off">' +
       '<p class="nota">Se preguntará cada vez que se genere el documento, en «Faltan datos para este documento».</p>', 'Aceptar');
@@ -478,7 +381,7 @@ var ConvertirEnPlantillaPantalla = (function () {
 
   async function pintarPaso2(relleno) {
     paso = 2;
-    ocultarMenu();
+    sel.ocultar();
     var cuerpo = $('.cep-cuerpo');
     cuerpo.className = 'cep-cuerpo cep-paso2';
     cuerpo.innerHTML =

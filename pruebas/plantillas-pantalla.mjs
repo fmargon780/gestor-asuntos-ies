@@ -72,7 +72,7 @@ await p.fill('#pt-buscar', 'zzzzz');
 await comprobar('6. sin resultados', p.locator('#pt-cuerpo .vacio').textContent(), 'Ninguna plantilla tiene esas palabras.');
 await p.fill('#pt-buscar', '');
 await p.selectOption('#pt-tipo', 'BAJA MEDICA');
-await comprobar('7. el desplegable «Tipo de asunto» deja las de ese tipo', nombres(p), ['Nota de baja médica']);
+await comprobar('7. el desplegable «Tipo de asunto» deja las de ese tipo', nombres(p), ['Aviso de revisión', 'Nota de baja médica']);   /* fila 322: «Aviso de revisión» es del mismo tipo */
 await p.selectOption('#pt-tipo', '');
 await comprobar('7. y «Todos» las devuelve', nombres(p).then((n) => n.length >= 4), true);
 

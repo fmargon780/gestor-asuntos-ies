@@ -97,6 +97,27 @@ también se convierte: ver más abajo.
   (`accion: 'generar'`, `receta.plantilla`) sin duplicarla. Primero el fichero, luego `plantillas.json`, luego la guía.
 - Copia de pruebas: `js/demo/datos-plantilla.js` (Word de Carla, PDF y Word gemelo de Marta, `notas antiguas.doc`, sexos).
 - Pruebas: `pruebas/convertir-en-plantilla.mjs` (sin navegador) y `pruebas/convertir-en-plantilla-pantalla.mjs`.
+- Fila 322: el menú de la selección lleva también «Cambiar por otro texto…» (cuadro «Cambiar este texto»; línea manual
+  de `tipo: 'otrotexto'`); las piezas que comparte con «Retocar» (pintar el Word con los huecos, la selección, el menú, los
+  cuadros pequeños) están en `js/plantilla-seleccion.js`.
+
+## «Retocar» una plantilla de Word (fila 322, `docs/RETOCAR-UNA-PLANTILLA.md`)
+
+Botón «Retocar» en cada plantilla de Word: Herramientas → «Plantillas» (entre «Ver» y «Cambiar»; apagado en solo
+consultar y si falta el fichero) y la tarjeta del tipo de asunto en Ajustes. No es un editor de Word (descartado, fila 165):
+se selecciona un trozo y se cambia por otro texto, por un dato o «se pregunta cada vez», o se quita el trozo o el párrafo entero.
+
+- `js/plantilla-retocar.js` (lógica, sin pantalla): `nueva(buffer)` da una sesión con la lista de cambios; cada cambio
+  (`aplicar`) se hace siempre desde los bytes originales con `DocxSustituir.aplicar` (el más largo primero), así que
+  quitar un cambio es volver a aplicar los demás. `op.sobrevivientes` (nuevo en `js/docx-sustituir.js`) da el índice
+  original de cada párrafo del cuerpo que queda; con él `parrafoOriginal` sabe cuál es el párrafo seleccionado (por
+  posición si cuadran los números, o por texto si es único; si no, `null` y la pantalla avisa en ámbar). Cambiar algo ya
+  cambiado corrige ese cambio. `guardar` aplica, comprueba que se abre como Word, pregunta «también lo usan…» y escribe un
+  fichero nuevo (`PlantillasFichero.guardarBytes`, nombre libre, sin borrar el anterior); `PlantillasFichero.apuntarAlNuevo`
+  apunta la plantilla (mismo `id`) y da el aviso «Plantilla retocada.» con «Deshacer».
+- `js/plantilla-retocar-pantalla.js`: la pantalla (`#retocar-plantilla`, clases `.cep` de `css/convertir-en-plantilla.css`).
+- Copia de pruebas: «Aviso de revisión» (`js/demo/datos-plantillas-pantalla.js`, con «el alunmo», «2025» dos veces y un párrafo que sobra).
+- Pruebas: `pruebas/plantilla-retocar.mjs` (sin navegador) y `pruebas/plantilla-retocar-pantalla.mjs`.
 
 ### PDF sin su Word (fila 281, `docs/CONVERTIR-EN-PLANTILLA-DESDE-PDF.md`)
 

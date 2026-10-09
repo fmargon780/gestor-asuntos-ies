@@ -117,6 +117,13 @@
     acciones.className = 'acciones';
     acciones.style.marginTop = '8px';
 
+    var retocar = document.createElement('button');   /* fila 322: cambiar trozos del texto del Word */
+    retocar.type = 'button';
+    retocar.className = 'boton';
+    retocar.textContent = 'Retocar';
+    retocar.onclick = function () { return PlantillaRetocarPantalla.abrir(p, refrescarSeccionActual); };
+    acciones.appendChild(retocar);
+
     var editar = document.createElement('button');
     editar.type = 'button';
     editar.className = 'boton';

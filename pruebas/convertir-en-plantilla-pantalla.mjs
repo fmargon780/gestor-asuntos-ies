@@ -98,7 +98,7 @@ await comprobar('3. marcar otra vez: vuelve el hueco', [/2100006/.test(await tex
 
 console.log('--- 4. lo marcado a mano ---');
 await seleccionar('la solicitud de beca');
-await comprobar('4. sale el menú con tres opciones', pagina.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un dato…', 'Esto se pregunta cada vez', 'Quitar del documento']);
+await comprobar('4. sale el menú con cuatro opciones', pagina.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un dato…', 'Cambiar por otro texto…', 'Esto se pregunta cada vez', 'Quitar del documento']);
 await pagina.locator('.cep-menu-sel button', { hasText: 'Esto se pregunta cada vez' }).click();
 await pagina.waitForSelector('#cep-nombre-dato');
 await comprobar('4. pide el nombre del dato', pagina.locator('#cuadro-titulo').textContent(), '¿Cómo se llama este dato?');
@@ -126,6 +126,19 @@ await pagina.waitForTimeout(2000);
 await comprobar('4. «Cambiar por un dato…» abre el buscador de huecos y cambia el trozo por el elegido', [
   (await lineas()).some((l) => /el presente certificado → /.test(l)), /\{grupo\}/.test(await textoDoc())], [true, true]);
 
+/* Fila 322: «Cambiar por otro texto…» también aquí. */
+await seleccionar('Y para que conste');
+await pagina.locator('.cep-menu-sel button', { hasText: 'Cambiar por otro texto…' }).click();
+await pagina.waitForSelector('#cep-texto-nuevo');
+await comprobar('4. «Cambiar por otro texto…» abre «Cambiar este texto» con el trozo ya escrito', pagina.evaluate(() => [
+  document.getElementById('cuadro-titulo').textContent, document.getElementById('cep-texto-nuevo').value, document.getElementById('cuadro-cuerpo').textContent.indexOf('Antes: Y para que conste') !== -1]),
+  ['Cambiar este texto', 'Y para que conste', true]);
+await pagina.fill('#cep-texto-nuevo', 'Y para que quede constancia');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(2000);
+await comprobar('4. entra en «Lo que has marcado tú», con sus veces, y el documento lo enseña', [
+  (await lineas()).some((l) => /Y para que conste → Y para que quede constancia · 1 vez/.test(l)), /Y para que quede constancia/.test(await textoDoc())], [true, true]);
+
 console.log('--- 5. los datos de la plantilla ---');
 await comprobar('5. nombre, tipo de asunto, tipo de documento y quien firma', pagina.evaluate(() => [
   document.getElementById('cep-nombre-plantilla').value, document.querySelector('#cep-tipo-asunto strong').textContent,
@@ -150,7 +163,7 @@ await comprobar('6. lleva el membrete (una imagen) y ya no el rótulo de la cabe
 console.log('--- 7. volver a corregir y guardar ---');
 await pagina.click('text=← Volver a corregir');
 await pagina.waitForSelector('.cep-paso1 .cep-linea');
-await comprobar('7. se vuelve con lo mismo marcado y el nombre puesto', [(await lineas()).length, await pagina.inputValue('#cep-nombre-plantilla')], [10, 'Certificado de matrícula']);
+await comprobar('7. se vuelve con lo mismo marcado y el nombre puesto', [(await lineas()).length, await pagina.inputValue('#cep-nombre-plantilla')], [11, 'Certificado de matrícula']);
 const antesDeGuardar = await pagina.evaluate(async () => (await Carpetas.ficheros(App.E.listaAbiertos.filter((a) => /Espejo/.test(a.nombre))[0].handle)).map((f) => f.nombre).sort());
 await pagina.click('text=Ver cómo queda');
 await pagina.waitForSelector('.cep-paso2 .cep-col');
@@ -161,12 +174,12 @@ await comprobar('7. aviso verde', (await avisos()).some((a) => /^Plantilla guard
 await comprobar('7. los documentos del asunto siguen siendo los mismos', pagina.evaluate(async () => (await Carpetas.ficheros(App.E.listaAbiertos.filter((a) => /Espejo/.test(a.nombre))[0].handle)).map((f) => f.nombre).sort()), antesDeGuardar);
 const guardada = await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.filter((p) => p.nombre === 'Certificado de matrícula')[0] || null);
 await comprobar('7. la plantilla está en plantillas.json, del tipo CERTIFICADO', guardada && [guardada.tipo, guardada.categoria, guardada.tipoDocumento, guardada.firmante, /\.docx$/.test(guardada.fichero), guardada.conLogoCentro], ['CERTIFICADO', 'ALUMNADO', 'CERTIFICADO', 'secretaria', true, true]);
-await comprobar('7. el fichero está en _GESTOR/PLANTILLAS con los huecos', pagina.evaluate(async (f) => {
+await comprobar('7. el fichero está en _GESTOR/PLANTILLAS con los huecos y el texto cambiado a mano', pagina.evaluate(async (f) => {
   const dir = await PlantillasDocumento._interno.carpetaDePlantillas();
   const h = await dir.getFileHandle(f); const bytes = new Uint8Array(await (await h.getFile()).arrayBuffer());
   const xml = await Docx.leerEntradaDeTexto(bytes, 'word/document.xml');
-  return [xml.indexOf('{{MEMBRETE}}') !== -1, xml.indexOf('{nombreNatural}') !== -1, xml.indexOf('{campo:Para qué se presenta}') !== -1, xml.indexOf('Carla Espejo') === -1];
-}, guardada && guardada.fichero), [true, true, true, true]);
+  return [xml.indexOf('{{MEMBRETE}}') !== -1, xml.indexOf('{nombreNatural}') !== -1, xml.indexOf('{campo:Para qué se presenta}') !== -1, xml.indexOf('Carla Espejo') === -1, xml.indexOf('Y para que quede constancia') !== -1];
+}, guardada && guardada.fichero), [true, true, true, true, true]);
 await comprobar('7. la tarea de generar está en el hito de la guía', pagina.evaluate((id) => {
   const paso = GuiasDelCentro.pasosDe('CERTIFICADO').filter((p) => /Preparar el certificado/.test(p.titulo))[0];
   const t = (paso.guion || []).filter((x) => x.accion === 'generar' && x.receta && x.receta.plantilla === id);
@@ -249,7 +262,7 @@ await comprobar('10. dice que usa el Word del PDF', pagina.locator('.cep-aviso-g
 await comprobar('10. propone cambiar el nombre de Marta', (await lineas()).some((l) => /Marta Otero Campos/.test(l)), true);
 await pagina.click('.cep-pie-botones >> text=Cancelar');
 await pagina.waitForSelector('#convertir-plantilla', { state: 'detached' });
-await comprobar('10. cancelar sin haber cambiado nada: sale sin preguntar y no hay plantillas nuevas', [await pagina.locator('#capa:not(.oculto)').count(), await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.length)], [0, 5]);   /* fila 320: la copia de pruebas lleva tres más de Word para la pantalla «Plantillas». Antes: la plantilla de la copia de pruebas de la fila 285 y la de la fila 280 */
+await comprobar('10. cancelar sin haber cambiado nada: sale sin preguntar y no hay plantillas nuevas', [await pagina.locator('#capa:not(.oculto)').count(), await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.length)], [0, 6]);   /* fila 322: y una más, «Aviso de revisión». Fila 320: la copia de pruebas lleva tres más de Word para la pantalla «Plantillas». Antes: la plantilla de la copia de pruebas de la fila 285 y la de la fila 280 */
 const entradaDoc = await menuDe('notas antiguas.doc');
 await comprobar('10. un .doc viejo: apagada, con su motivo', [await entradaDoc.isDisabled(), await entradaDoc.getAttribute('title')], [true, 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.']);
 await pagina.keyboard.press('Escape');
