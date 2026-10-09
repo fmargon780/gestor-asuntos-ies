@@ -297,21 +297,23 @@ var CorreoCuadro = (function () {
     if (window.CorreoTutor) CorreoTutor.enganchar();   /* fila 299 */
     if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alAbrir(a, plantillaElegida);   /* fila 299 */
 
+    /* Añadir un grupo a la copia oculta: el desplegable y, fila 309, `extra.grupoInicial` (el aviso al claustro). */
+    async function anadirGrupo(valor) {
+      var resueltos = await Destinatarios.miembrosDeOpcion(valor);   /* fila 132 */
+      if (!resueltos.length) return;
+      var resultado = combinarCorreosDeGrupo(resueltos);
+      resultado.direcciones.forEach(function (d) { cco[d] = true; });
+      resultado.sinCorreo.forEach(function (nombre) {
+        if (ccoSinCorreo.indexOf(nombre) === -1) ccoSinCorreo.push(nombre);
+      });
+      refrescarCco();
+    }
     var selectorGrupo = $('correo-grupo');
     if (selectorGrupo) {
-      selectorGrupo.onchange = async function () {
-        var valor = selectorGrupo.value;
-        selectorGrupo.value = '';
-        var resueltos = await Destinatarios.miembrosDeOpcion(valor);   /* fila 132 */
-        if (!resueltos.length) return;
-        var resultado = combinarCorreosDeGrupo(resueltos);
-        resultado.direcciones.forEach(function (d) { cco[d] = true; });
-        resultado.sinCorreo.forEach(function (nombre) {
-          if (ccoSinCorreo.indexOf(nombre) === -1) ccoSinCorreo.push(nombre);
-        });
-        refrescarCco();
-      };
+      selectorGrupo.onchange = function () { var valor = selectorGrupo.value; selectorGrupo.value = ''; return anadirGrupo(valor); };
     }
+    var grupoInicial = (n()._interno || {}).grupoInicial;
+    if (grupoInicial) { n()._interno.grupoInicial = ''; anadirGrupo('grupo:' + grupoInicial); }
 
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
     $('correo-copiar-asunto').onclick = function () { copiar($('correo-asunto').value, this); };
@@ -542,6 +544,7 @@ var CorreoCuadro = (function () {
       if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto); } catch (e) { /* accesorio */ } }
       if (n().marcarEnvioRealizado) n().marcarEnvioRealizado();
       if (n().apuntarElRastro) n().apuntarElRastro(a);
+      if (interno && interno.avisoActividad && window.ActividadesInforme) { var av = interno.avisoActividad; interno.avisoActividad = null; await ActividadesInforme.alEnviar(a, av); }   /* fila 309 */
       /* Fila 236 (docs/CORREO-ENVIADO-EN-PDF.md): el correo enviado, como PDF en el asunto. */
       if (window.CorreoEnviadoPdf) await CorreoEnviadoPdf.alEnviar(a, datos, respuesta);
 

@@ -5,7 +5,7 @@
      - una actividad PREVISTA (dentro de nueve días): un asunto abierto, dos unidades
        (2º B y 3º A), ocho alumnos y tres profesores, uno de ellos «Organiza»;
      - una REALIZADA (fecha pasada) y una ANULADA, también con su asunto.
-   Todo inventado. Lo llama js/demo/datos.js al montar los asuntos
+   Fila 309: y el grupo «Profesorado» (cuatro personas, una sin correo). Todo inventado. Lo llama js/demo/datos.js al montar los asuntos
    (`Demo.actividades.construir({ crearTipoConGuia, crearAsunto, hace })`).
    ============================================================ */
 (function () {
@@ -61,6 +61,16 @@
     await actividad('Excursion Sierra', 'Ruta por la Sierra de Grazalema', -14, -14,
       ['2100002', '2100010'], [profe('Uceda Molina', 'organiza')], { anulada: true });
     await Actividades.cambiar(function (d) { d.tipoMarcado = true; });
+
+    /* Fila 309: el grupo «Profesorado», que recibe el aviso al claustro; una de las cuatro personas no tiene correo. */
+    if (window.Grupos) {
+      try {
+        await Grupos.cargar();
+        var miembros = ['Otero Campos', 'Reyes Palma', 'Uceda Molina', 'Cabello Ruiz'].map(function (t) { return profe(t, 'acompana'); }).filter(Boolean)
+          .map(function (p) { return { categoria: 'PERSONAL', nombre: p.nombre }; });
+        if (miembros.length && !Grupos.lista().some(function (g) { return g.nombre === 'Profesorado'; })) await Grupos.crear('Profesorado', miembros);
+      } catch (e) { /* sin el grupo, la copia de pruebas enseña la línea ámbar */ }
+    }
   }
 
   window.Demo = window.Demo || {};

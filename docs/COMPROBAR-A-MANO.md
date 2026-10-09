@@ -289,3 +289,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 322 — retocar una plantilla de Word (9-oct-2026)
 
 - [ ] En el ordenador del centro: retocar una plantilla de verdad del centro (corregir una palabra), guardarla, generar un documento con ella y mirar que el Word generado conserva el formato, el membrete y las tablas tal como estaban.
+
+## Fila 309 — aviso al claustro de una actividad (9-oct-2026)
+
+- [ ] Con el grupo «Profesorado» de verdad creado, avisar de una actividad real: el correo llega a todo el profesorado, en copia oculta, con el informe adjunto.

@@ -677,6 +677,22 @@
 
       <!-- Fila 213, docs/BOTON-DE-SOPORTE.md: dónde está el buzón al que
            manda sus avisos el botón «Soporte». Se guarda en _GESTOR. -->
+      <!-- Fila 309, docs/ACTIVIDADES-EXTRAESCOLARES-AVISO.md: a qué grupo se avisa de las actividades. -->
+      <details class="bloque-ajustes" id="bloque-aviso-actividades">
+        <summary>
+          <span class="bloque-titulo">Aviso de actividades extraescolares</span>
+          <span class="bloque-pie">Qué grupo recibe el aviso al claustro</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">El botón «Avisar al claustro» de una actividad abre el correo con el informe adjunto y este grupo en copia oculta.
+         Los grupos se crean en la pestaña «Lo de cada día». Si no eliges ninguno, vale el que se llame «Profesorado» o «Claustro».</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="grupo-aviso-actividades">Grupo que lo recibe</label>
+        <select id="grupo-aviso-actividades" class="campo"></select>
+      </div>
+        </div>
+      </details>
+
       <details class="bloque-ajustes" id="bloque-soporte">
         <summary>
           <span class="bloque-titulo">Buzón de soporte</span>
@@ -1677,6 +1693,7 @@
 <!-- Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js. -->
 <script src="js/actividades.js"></script>
 <script src="js/actividades-formulario.js"></script>
+<script src="js/actividades-informe.js"></script>
 <script src="js/actividades-ficha.js"></script>
 <script src="js/informar-al-tutor.js"></script>   <!-- fila 299: «Informar al tutor/a» en la guía de las sanciones -->
 

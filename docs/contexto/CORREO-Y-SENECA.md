@@ -654,3 +654,7 @@ batería completa.
 - Pruebas: `pruebas/tutor-del-grupo.mjs`, `pruebas/correo-al-tutor.mjs`, `pruebas/informar-al-tutor.mjs`.
 
 - Fila 305: el correo escrito a mano en «El encargo» sale marcado en «Para» (`LoPide.contactoDe(...).correo`), y la línea gris dice «Correo apuntado en «El encargo»: …». «Enviar estado» y los avisos lo usan igual. Huecos nuevos de plantilla: `quienlopidecontacto`, `quienlopidetelefono`, `quienlopidecorreo`.
+
+## Aviso al claustro de una actividad (fila 309)
+
+`js/actividades-informe.js`: `ActividadesInforme.avisar(a, act)` guarda el informe PDF en el asunto y abre `CorreoNucleo.abrirCuadro` con `extra.adjuntosMarcados`, `extra.plantilla` (la plantilla «Aviso de actividad extraescolar», que se crea sola colgada del tipo del asunto), `extra.saludo`, `extra.asuntoListo`, `extra.avisoActividad` y, nuevos, `extra.grupoInicial` (id de un grupo propio, que entra en la copia oculta por el mismo camino que «Añadir un grupo»: `anadirGrupo` de `js/correo-cuadro.js`) y `extra.avisoEnlace` (un enlace al final de `extra.avisoAmbar`). Al enviarse de verdad, `ActividadesInforme.alEnviar` apunta `ficha.avisosActividad` (`{ cuando, quien, documento, personas }`). El grupo se elige en Ajustes → El centro (`ajustesAvisos.grupoActividades`); sin elegir, vale «Profesorado» o «Claustro». Los huecos `{{ACTIVIDAD…}}` los pone `js/plantillas-valores.js` desde `ActividadesInforme.valores`.

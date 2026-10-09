@@ -257,6 +257,8 @@
         if (U.normalizar(k) === 'dni para el certificado' && valores.campos[k]) valores.dni = String(valores.campos[k]).trim();
       });
     }
+    /* Fila 309: los {{ACTIVIDAD…}} de un asunto con actividad apuntada. */
+    if (f.actividad && f.actividad.id && window.Actividades && window.ActividadesInforme) Object.assign(valores, ActividadesInforme.valores(Actividades.porId(f.actividad.id)));
     /* Fila 167: {departamento}, {departamentocorreo} y {organismooficial}. */
     var deAdministracion = window.Administraciones ? Administraciones.valoresDe(a)
       : { departamento: '', departamentocorreo: '', organismooficial: '' };
@@ -412,6 +414,7 @@
     return valoresDeAsunto(asuntoParaPersona(asunto, relacionado), opciones);
   }
 
+  Plantillas.nombreNaturalDe = nombreNaturalDe;   /* fila 309 */
   Plantillas.valoresDeAsunto = valoresDeAsunto;
   Plantillas.asuntoParaPersona = asuntoParaPersona;
   Plantillas.valoresDePersona = valoresDePersona;
