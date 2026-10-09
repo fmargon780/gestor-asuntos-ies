@@ -355,12 +355,8 @@ var ConvertirEnPlantilla = (function () {
     return otra ? 'otra' : 'sustituir';
   }
 
-  async function ficheroLibre(carpeta, base) {
-    var existentes = (await Carpetas.ficheros(carpeta)).map(function (f) { return sin(f.nombre); });
-    var nombre = base + '.docx', n = 2;
-    while (existentes.indexOf(sin(nombre)) !== -1) { nombre = base + ' (' + n + ').docx'; n++; }
-    return nombre;
-  }
+  /* Fila 320: el mismo código que «Traer un Word del ordenador…» (js/plantillas-fichero.js). */
+  function ficheroLibre(carpeta, base) { return PlantillasFichero.ficheroLibre(carpeta, base); }
 
   /* Devuelve true si se ha guardado (la pantalla se cierra), false si no (se sigue en ella). */
   async function guardar() {

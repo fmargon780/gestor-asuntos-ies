@@ -1,0 +1,31 @@
+/* La pantalla «Plantillas» de Herramientas (fila 320, docs/PANTALLA-DE-PLANTILLAS.md): una tabla a todo el ancho, densa. */
+#plantillas-vista { width: 100%; }
+.pt-barra { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.pt-titulo { margin: 0; font-size: 18px; }
+.pt-pestanas { display: flex; gap: 4px; margin: 10px 0 0; border-bottom: 2px solid var(--linea); }
+.pt-pestana { border: 1px solid var(--linea); border-bottom: 0; background: var(--fondo); padding: 7px 16px; cursor: pointer;
+  border-radius: 8px 8px 0 0; font-size: 14px; color: var(--tinta); }
+.pt-pestana.activa { background: var(--papel); font-weight: 600; color: var(--azul); }
+.pt-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 10px 0; }
+.pt-filtros #pt-buscar { flex: 1 1 260px; max-width: 420px; }
+.pt-etq { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; }
+.pt-nueva { margin-left: auto; }
+.pt-tabla { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--papel); }
+.pt-tabla th, .pt-tabla td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--linea); vertical-align: top; overflow-wrap: anywhere; }
+.pt-tabla th { background: var(--fondo); font-weight: 600; }
+.pt-ordenar { font-weight: 600; font-size: 13px; }
+.pt-ordenar.activa { color: var(--azul); text-decoration: underline; }
+.pt-nombre { font-weight: 600; }
+.pt-etiqueta { display: inline-block; background: var(--azul-claro); border-radius: 6px; padding: 0 6px; font-size: 11.5px; font-weight: 400; color: var(--azul); }
+.pt-ambar { background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: 4px; padding: 0 5px; font-size: 11.5px; display: inline-block; }
+.pt-acciones { white-space: nowrap; }
+.pt-acciones .boton { padding: 2px 8px; font-size: 12.5px; }
+.pt-mas-menu { display: inline-block; position: relative; }
+.pt-mas-menu > summary { cursor: pointer; padding: 0 8px; list-style: none; font-size: 16px; }
+.pt-mas-menu > summary::-webkit-details-marker { display: none; }
+.pt-menu { position: absolute; right: 0; z-index: 5; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  padding: 6px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 4px; }
+.pt-texto { white-space: pre-wrap; font: inherit; background: var(--fondo); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; margin: 4px 0; max-height: 40vh; overflow: auto; }
+.pt-ver-todas { margin: 8px 0 0; }
+.pf-traer { margin: 4px 0 8px; }
+.pt-tipodoc { white-space: nowrap; }

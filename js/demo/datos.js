@@ -170,7 +170,8 @@
     ], 5);
 
     var bajaMedica = await crearTipoConGuia('BAJA MEDICA', 'PERSONAL', [
-      { titulo: 'Recibir el parte de baja', cuerpo: '<p>Del interesado o de la mutua.</p>', responsable: 'yo' },
+      { titulo: 'Recibir el parte de baja', cuerpo: '<p>Del interesado o de la mutua.</p>', responsable: 'yo',
+        guion: [{ id: 'g-demo-baja-comunicar', texto: 'Acusar recibo del parte', accion: 'comunicar', receta: { via: 'correo', a: 'tercero', plantilla: 'pl-demo-baja' } }] },   /* fila 320: una plantilla de correo puesta en una tarea */
       { titulo: 'Esperar el parte de alta', cuerpo: '<p>Hasta que el interesado lo traiga.</p>', toca: 'espera', tocaA: 'Interesado' },
       { titulo: 'Archivar el parte de alta', cuerpo: '<p>Dejar el parte en la carpeta.</p>', responsable: 'yo' }
     ], null);
@@ -244,6 +245,13 @@
         nombre: 'Confirmación de matrícula',
         texto: 'Le confirmamos que la matrícula ha quedado registrada correctamente.'
       });
+      /* Fila 320 (pantalla «Plantillas»): una de correo en la tarea de un hito (la usa BAJA MEDICA) y las dos de la aplicación. */
+      actual.lista.push({ id: 'pl-demo-baja', tipo: 'BAJA MEDICA', categoria: 'PERSONAL', nombre: 'Acuse de recibo del parte',
+        texto: 'Hemos recibido su parte de baja. Cuando tenga el parte de alta, tráigalo al centro.' });
+      actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: 'Aviso de avance',
+        texto: 'Le informamos de que su gestión sigue en marcha.\n\nVa por el hito {{HITON}} de {{HITOSM}}: {{HITO}}.\n\nFecha: {{HOY}}.' });
+      actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: 'Aviso de cierre',
+        texto: 'Le informamos de que su gestión ha quedado cerrada el {{HOY}}.' });
       return actual;
     });
   }
@@ -612,6 +620,7 @@
     if (window.Datos && Datos.olvidar) Datos.olvidar();
     var tipos = await crearTipos();
     await crearPlantillas();
+    if (window.Demo.plantillasPantalla) await Demo.plantillasPantalla.construir();   /* fila 320: plantillas de Word para la pantalla «Plantillas» */
     await crearAsuntosAbiertos(tipos);
     await crearArchivados(tipos);
     if (window.Demo.grupo) await Demo.grupo.construir({ tipo: tipos['CERTIFICADO DE NOTAS'], crearAsunto: crearAsunto, hace: hace });   /* fila 293 */

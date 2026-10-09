@@ -14,6 +14,8 @@
 App.pintarHerramientas = async function () {
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
+  /* Fila 320: lo mismo con la pantalla de plantillas; y la línea de su bloque («12 de Word · 30 de correo»). */
+  if (window.PlantillasPantalla) { PlantillasPantalla.cerrar(); await PlantillasPantalla.pintarBloque(); }
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarCopias === 'function') await App.pintarCopias();
   if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();

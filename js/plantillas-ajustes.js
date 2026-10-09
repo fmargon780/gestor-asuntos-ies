@@ -119,20 +119,9 @@
     acciones.appendChild(editar);
 
     acciones.appendChild(Papelera.botonBorrar(async function () {
-      var ok = await Papelera.preguntarBorrar(p.nombre);
-      if (!ok) return;
-      try {
-        await Papelera.mandarDato('plantilla', p.nombre, { categoria: p.categoria, tipo: p.tipo }, { plantilla: p });
-        await Plantillas.guardar(App.E.gestor, function (actual) {
-          actual.lista = actual.lista.filter(function (x) { return x.id !== p.id; });
-          return actual;
-        });
-        U.aviso('Plantilla mandada a la papelera.', 'bueno');
-        await cargar();
-        refrescarSeccionActual();
-      } catch (e) {
-        U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
-      }
+      if (!(await Plantillas.borrarConPapelera(p, 'correo'))) return;   /* fila 320: el mismo código que la pantalla «Plantillas» */
+      await cargar();
+      refrescarSeccionActual();
     }));
 
     div.appendChild(acciones);
@@ -170,6 +159,8 @@
     $('tipo-plantillas-nueva').onclick = function () {
       abrirCuadroDePlantilla(null, tipo, refrescarSeccionActual);
     };
+    /* Fila 320: la pantalla «Plantillas», con este tipo ya puesto. */
+    if (window.PlantillasPantalla) PlantillasPantalla.enlaceDeTipo($('tipo-plantillas-nueva'), 'correo', tipo.tipo);
   }
 
   /* ---------- el cuadro de alta / edición ----------
@@ -289,7 +280,7 @@
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
 
-    var promesa = U.preguntar(existente ? 'Editar plantilla' : 'Nueva plantilla', cuerpo,
+    var promesa = U.preguntar(existente ? 'Cambiar plantilla' : 'Nueva plantilla', cuerpo,
       existente ? 'Guardar' : 'Crear');
 
     /* El catálogo de huecos ya no se pinta entero encima del texto:

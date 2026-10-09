@@ -21,6 +21,7 @@ var AjustesBuscador = (function () {
   /* Lo de la pantalla Herramientas que no se reparte desde Ajustes. */
   var HERRAMIENTAS = [
     { titulo: 'Control del registro', sel: '#bloque-control-registro', otras: 'registro de entrada, registro de salida, Séneca, apuntes' },
+    { titulo: 'Plantillas', sel: '#bloque-plantillas', otras: 'plantillas, Word, correo, documentos, hitos, ficheros' },
     { titulo: 'Papelera', sel: '#bloque-papelera', otras: 'borrados, recuperar' },
     { titulo: 'Traer el alumnado', sel: '#bloque-traer-alumnado', otras: 'alumnado, Séneca, RegAlum, base de datos' },
     { titulo: 'Tablas de datos', sel: '#bloque-tablas-datos', otras: 'tablas, datos, CSV' },
