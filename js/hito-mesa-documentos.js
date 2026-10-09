@@ -322,7 +322,7 @@ var HitoMesaDocumentos = (function () {
         '<span class="mesa-plantilla-nombre">' + U.escapar(p.nombre) + '</span>' +
         (abierto ? '<button type="button" class="boton boton-chico mesa-plantilla-generar">Generar documento</button>' : '') +
         /* Fila 171: «… para cada relacionado (N)», si el asunto los tiene. */
-        (abierto && window.GenerarParaRelacionados ? GenerarParaRelacionados.botonHTML(a) : '') + '</div>';
+        (abierto && window.GenerarParaRelacionados ? GenerarParaRelacionados.botonHTML(a, p) : '') + '</div>';
     }
     /* Fila 164: arriba, los pasos pendientes con receta de generar. */
     caja.innerHTML = (abierto && window.HitoMesaRecetas ? HitoMesaRecetas.bloqueHTML(a, h, 'generar') : '') +

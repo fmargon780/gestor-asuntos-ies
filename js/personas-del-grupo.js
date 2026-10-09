@@ -346,6 +346,9 @@ var PersonasDelGrupo = (function () {
       botonDeMenu('Quitar del grupo', async function () {
         try {
           await App.anotarLista(a.nombre, 'relacionados', { quitar: [r] });
+          if (window.Actividades && window.ActividadesFicha && Actividades.tieneActividad(a)) {   /* fila 306: la tarjeta «La actividad» cuenta a quien queda */
+            try { await Actividades.ponerAlDia(); ActividadesFicha.pintar(a); } catch (e2) { /* a la siguiente pasada */ }
+          }
           if (alCambiar) alCambiar();
         } catch (e) { U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo'); }
       }, !propia || tieneAlgo, tieneAlgo ? 'Ya se le ha hecho algo: no se puede quitar' : ''),
@@ -377,6 +380,8 @@ var PersonasDelGrupo = (function () {
     var h = hitoActual(a);
     var g = (window.HitosGenerar && HitosGenerar.grupos && HitosGenerar.grupos(a, h)) || { delPaso: [], delTipo: [] };
     var todas = g.delPaso.concat(g.delTipo);
+    /* Fila 306: en un asunto de actividad, la plantilla de participación del profesorado no se ofrece. */
+    if (window.Actividades && Actividades.tieneActividad(a)) todas = todas.filter(function (p) { return !Actividades.esPlantillaVieja(p); });
     if (!todas.length) { U.aviso('No hay ninguna plantilla de documento para este tipo de asunto.', 'ambar'); return; }
     ponerMenu(caja, boton, todas.map(function (p) {
       return botonDeMenu(p.nombre, async function () {

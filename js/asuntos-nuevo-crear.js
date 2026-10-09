@@ -74,6 +74,7 @@ App.datosDelFormulario = function () {
 };
 
 App.refrescarVista = function () {
+  if (window.ActividadesFormulario) ActividadesFormulario.alRefrescarNuevo();   /* fila 306: el botón «Apuntar la actividad» */
   /* Fila 215 (docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md): "Crear el asunto"
      está siempre a la vista, así que bloque-detalles ya no se esconde
      mientras falte persona o tipo (antes, fila 197): se deja siempre

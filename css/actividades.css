@@ -1,0 +1,63 @@
+/* ============================================================
+   actividades.css — las actividades extraescolares (8-oct-2026, fila 306,
+   docs/ACTIVIDADES-EXTRAESCOLARES.md): el formulario «La actividad»
+   (js/actividades-formulario.js) y la tarjeta de la ficha
+   (js/actividades-ficha.js).
+   ============================================================ */
+
+/* ---------- el botón de «Nuevo asunto» ---------- */
+#actividad-nuevo-caja { margin: 8px 0 4px; }
+
+/* ---------- el formulario: una ventana ancha, en columnas ---------- */
+.cuadro.cuadro-actividad { max-width: min(1280px, 96vw); width: 96vw; max-height: calc(100vh - 40px); overflow: auto; padding-bottom: 0; }
+.act-form { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(300px, 1.6fr) minmax(230px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .act-form { grid-template-columns: 1fr; } }
+.act-et { margin: 12px 0 5px; }
+.act-col > .act-et:first-child { margin-top: 0; }
+.act-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.act-horas { max-width: 140px; }
+
+.act-unidades { display: flex; flex-wrap: wrap; gap: 6px; }
+.act-unidad { border: 1px solid var(--linea); background: var(--papel); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13.5px; cursor: pointer; color: var(--tinta); }
+.act-unidad small { color: var(--tinta-suave); margin-left: 3px; }
+.act-unidad.elegida { background: var(--azul); border-color: var(--azul); color: #fff; }
+.act-unidad.elegida small { color: #dbe7f3; }
+.act-acciones { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+
+.act-bloques { display: flex; flex-direction: column; gap: 10px; }
+.act-bloque { border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; }
+.act-bloque h4 { margin: 0 0 6px; font-size: 14px; }
+.act-personas { columns: 2 200px; column-gap: 14px; }
+.act-persona { display: block; font-size: 13.5px; padding: 1px 0; break-inside: avoid; cursor: pointer; }
+.act-persona.bloqueada { color: var(--tinta-suave); cursor: not-allowed; }
+
+.act-profes { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.act-profe { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; }
+.act-profe-nombre { font-size: 13.5px; overflow-wrap: anywhere; }
+.act-papel { width: auto; padding: 4px 6px; }
+.act-profe-quitar { border: 0; background: none; font-size: 18px; line-height: 1; cursor: pointer; color: var(--tinta-suave); }
+.act-profe-quitar:hover { color: var(--rojo-linea); }
+
+.act-picker { border: 1px solid var(--azul); border-radius: 8px; padding: 10px 12px; margin-top: 14px; background: var(--azul-claro); }
+.act-picker-cabecera { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+/* La cuenta y los botones, siempre a la vista. */
+.act-cuenta { position: sticky; bottom: 50px; background: var(--papel); border-top: 1px solid var(--linea); margin-top: 14px; padding: 8px 0 2px; font-weight: 600; }
+.cuadro.cuadro-actividad .cuadro-botones { position: sticky; bottom: 0; background: var(--papel); margin-top: 0; padding: 8px 0 14px; }
+
+/* ---------- la tarjeta «La actividad» ---------- */
+.ficha-tarjetas.con-actividad .ficha-tarjetas-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1100px) {
+  .ficha-tarjetas.con-actividad .ficha-tarjetas-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); }
+}
+.act-ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; width: 100%; }
+.act-ficha h4 { margin: 0 0 6px; font-size: 14.5px; }
+.act-ficha dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 14px; }
+.act-ficha dt { color: var(--tinta-suave); }
+.act-ficha dd { margin: 0; }
+.act-ficha ul { margin: 0 0 8px; padding-left: 18px; font-size: 14px; }
+.act-ficha-botones { display: flex; gap: 8px; margin-top: 14px; }
+.act-situacion { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.act-sit-prevista { background: var(--azul-claro); color: var(--azul); }
+.act-sit-realizada { background: var(--verde); color: #1e7a46; }
+.act-sit-anulada { background: var(--rojo); color: var(--rojo-linea); }

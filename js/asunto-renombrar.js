@@ -92,6 +92,7 @@ var AsuntoRenombrar = (function () {
     });
 
     if (window.Encargos) await Encargos.alMoverAsunto(claveVieja, claveNueva);   /* fila 289: el nombre guardado en sus encargos */
+    if (window.Actividades) await Actividades.alMoverAsunto(claveVieja, claveNueva);   /* fila 306 */
     var nota = await moverHitosYPresencia(claveVieja, claveNueva);
     if (nota && window.Notas) {
       try { await Notas.anadirAuto({ nombre: claveNueva }, nota); } catch (e) { /* no crítico */ }
@@ -105,6 +106,7 @@ var AsuntoRenombrar = (function () {
      'seVa' a 'seQueda'. */
   async function fusionar(claveQueda, claveVa) {
     if (window.Encargos) await Encargos.alMoverAsunto(claveVa, claveQueda);   /* fila 289 */
+    if (window.Actividades) await Actividades.alUnirAsuntos(claveQueda, claveVa);   /* fila 306: solo una actividad por asunto */
     return moverHitosYPresencia(claveVa, claveQueda);
   }
 

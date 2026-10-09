@@ -93,7 +93,7 @@ var Copias = (function () {
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
                    'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json',
-                   'formularios-campos.json', 'papelera-borrados.json', 'perfiles.json', 'encargos.json', 'correos-a-mano.json', 'centro-de-datos.json'];   /* perfiles.json: fila 287; encargos.json: fila 289; correos-a-mano.json: fila 299; centro-de-datos.json: fila 312 */
+                   'formularios-campos.json', 'papelera-borrados.json', 'perfiles.json', 'encargos.json', 'correos-a-mano.json', 'actividades.json', 'centro-de-datos.json'];   /* perfiles.json: fila 287; encargos.json: fila 289; correos-a-mano.json: fila 299; centro-de-datos.json: fila 312; actividades.json: fila 306 */
 
   /* Fila 178: el número de esquema de hoy. Cada migración futura que
      cambie el formato de alguno de estos ficheros lo sube. */

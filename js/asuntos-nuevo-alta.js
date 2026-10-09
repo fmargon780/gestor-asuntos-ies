@@ -161,6 +161,8 @@ App.altaTercero = async function (categoria, sugerencia, alDarDeAlta) {
    escrito). El alta de verdad la hace quien llama, con
    App.cuadroDeTercero: así aquí no se abren dos cuadros a la vez.
 
+   `opciones.categorias` (fila 306): solo esas categorías salen para elegir.
+
    `opciones.multiple` (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md):
    cada resultado lleva una casilla en vez de pulsarse directamente, y
    abajo sale una barra fija con la cuenta y "Añadir los N señalados".
@@ -282,6 +284,7 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
   function pintarCategorias() {
     cajaCategorias.innerHTML = '';
     Nombres.CATEGORIAS.forEach(function (cat) {
+      if (opciones && opciones.categorias && opciones.categorias.indexOf(cat) === -1) return;   /* fila 306: solo alumnado, o solo personal */
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'categoria-mini-boton' + (estado.categoria === cat ? ' elegido' : '');

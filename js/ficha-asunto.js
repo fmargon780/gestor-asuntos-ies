@@ -233,7 +233,7 @@
          cuadrícula, abrir una en grande y la franja de documentos viven
          en js/ficha-tarjetas.js; los huecos de dentro (#ficha-guia,
          #ficha-documentos, #ficha-notas…) son los mismos de siempre. */
-      FichaTarjetas.html(tramite);
+      FichaTarjetas.html(tramite, a);
 
     /* Antes de volver a la lista, si queda una nota sin guardar en la
        caja de la ficha, avisa (18-sep-2026, fila 58,
@@ -256,6 +256,7 @@
     N.pintarDocumentos(a);
     N.pintarOtrosDelTercero(a);
     N.pintarRelacionados(a, abierto);
+    if (window.ActividadesFicha) ActividadesFicha.pintar(a);   /* fila 306: la tarjeta «La actividad» */
     N.pintarPresencia();
     N.pintarSellos(a);
     if (window.OtrosDelTercero) OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a);

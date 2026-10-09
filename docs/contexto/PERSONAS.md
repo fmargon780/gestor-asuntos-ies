@@ -620,3 +620,10 @@ una vez). «Familia y contacto» es `FichaTerceroAlumno.familia` (alumno, tutore
 `#asuntos-del-tercero`, `#vt-nie`. Lo abierto/cerrado: `localStorage` `gestor.fichaPersona.abiertas`
 (por categoría y tarjeta; solo al pulsar la persona). Personal y las demás categorías: cabecera y tarjetas «Puesto y
 contacto»/«Datos», «Sus asuntos», «Otros datos del fichero».
+
+## Actividad extraescolar como asunto de grupo (fila 306)
+
+Es un asunto de grupo (`ficha.grupo.origen === 'actividad'`) cuyas personas son el alumnado que va; su profesorado (quién organiza
+y quién acompaña) no son relacionados: vive en `_GESTOR/actividades.json`. El nombre del profesorado sigue a la persona si cambia de
+nombre (`js/tercero-renombrar.js` → `Actividades.alRenombrarPersona`). `App.pintarBuscadorDeTercero` acepta `opciones.categorias`
+para ofrecer solo alumnado o solo personal.

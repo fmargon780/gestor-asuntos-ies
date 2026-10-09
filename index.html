@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="css/registro.css">
 <link rel="stylesheet" href="css/relacionados.css">
 <link rel="stylesheet" href="css/grupo-enviar.css">   <!-- fila 295 -->
+<link rel="stylesheet" href="css/actividades.css">   <!-- fila 306 -->
 <link rel="stylesheet" href="css/duplicados.css">
 <link rel="stylesheet" href="css/unir-asuntos.css">
 <link rel="stylesheet" href="css/papelera.css">
@@ -374,6 +375,7 @@
             <div class="categorias" id="categorias-lista"></div>
             <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
             <button type="button" class="enlace" id="btn-grupo-nuevo">Es para un grupo de personas</button>   <!-- fila 293: js/asunto-de-grupo.js -->
+            <div id="actividad-nuevo-caja" class="oculto"></div>   <!-- fila 306: js/actividades-formulario.js -->
             <div id="resultados-tercero" class="resultados"></div>
             <div id="tercero-elegido" class="elegido oculto"></div>
           </div>
@@ -1646,6 +1648,10 @@
      carga el contenido de la biblioteca del centro, en Mantenimiento. -->
 <script src="js/cargar-biblioteca.js"></script>
 <script src="js/plazos-del-centro.js"></script>
+<!-- Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js. -->
+<script src="js/actividades.js"></script>
+<script src="js/actividades-formulario.js"></script>
+<script src="js/actividades-ficha.js"></script>
 <script src="js/informar-al-tutor.js"></script>   <!-- fila 299: «Informar al tutor/a» en la guía de las sanciones -->
 
 <!-- Fila 222, docs/COPIA-DE-PRUEBAS.md: decide si esta visita es la copia
