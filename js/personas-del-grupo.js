@@ -346,6 +346,9 @@ var PersonasDelGrupo = (function () {
       botonDeMenu('Quitar del grupo', async function () {
         try {
           await App.anotarLista(a.nombre, 'relacionados', { quitar: [r] });
+          if (window.Actividades && window.ActividadesFicha && Actividades.tieneActividad(a)) {   /* fila 306: la tarjeta «La actividad» cuenta a quien queda */
+            try { await Actividades.ponerAlDia(); ActividadesFicha.pintar(a); } catch (e2) { /* a la siguiente pasada */ }
+          }
           if (alCambiar) alCambiar();
         } catch (e) { U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo'); }
       }, !propia || tieneAlgo, tieneAlgo ? 'Ya se le ha hecho algo: no se puede quitar' : ''),

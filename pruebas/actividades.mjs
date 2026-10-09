@@ -192,6 +192,16 @@ await pagina.waitForTimeout(2500);
 await comprobar('6. «Quitar del grupo» por otro camino: el registro se pone al día solo (7 y las unidades)',
   pagina.evaluate(async (n) => { await Actividades.releer(); const a = Actividades.porAsunto(n); return [a.alumnado, a.unidades.reduce((s, u) => s + u.van, 0)]; }, nombre), [7, 7]);
 
+/* Fila 306, punto 13: «Quitar del grupo» desde el menú de la tarjeta «Personas del grupo». */
+await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
+await pagina.waitForSelector('.pg-tabla');
+await pagina.locator('.pg-tabla tbody tr').nth(0).locator('.pg-mas').click();
+await pagina.locator('.pg-menu button', { hasText: 'Quitar del grupo' }).click();
+await pagina.waitForFunction(() => document.querySelectorAll('.pg-tabla tbody tr').length === 6);
+await pagina.waitForTimeout(1500);
+await comprobar('6. «Quitar del grupo» desde el menú: la tarjeta «La actividad» cuenta una persona menos',
+  pagina.evaluate((n) => [Actividades.porAsunto(n).alumnado, document.getElementById('ficha-actividad').textContent.indexOf('6 alumnos/as') !== -1], nombre), [6, true]);
+
 /* Anular y deshacer. */
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(400);
