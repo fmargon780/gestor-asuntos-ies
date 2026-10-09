@@ -180,3 +180,9 @@ paso a `main`).
   «Traer el alumnado» esas filas salen en ámbar con «Traerlo». Código: `js/demo/mas-nuevo.js` (`Demo.masNuevoListo` avisa a las pruebas).
 - El Centro de datos de mentira lleva ahora un `ALUMNADO-BD.json` inventado y válido. Sin `masnuevo=` la demostración queda como siempre, salvo el recuadro nuevo.
 - Los ficheros escritos en el disco de mentira conservan la fecha de cuando se escribieron (antes era la hora de leerlos).
+
+## Fila 321: `fueradeuso=1`
+
+- `?demo=1&auto=1&fueradeuso=1`: «Certificado de notas» (Word, en la tarea de generar de su hito; «Vidal Soto, Irene» y «Moreno Sanz, Hugo» tienen ese hito) y
+  «Acuse de recibo del parte» (correo, en la tarea de comunicar del primer hito de BAJA MEDICA) arrancan fuera de uso. Sin el parámetro, ninguna.
+  Código: `js/demo/datos-plantillas-pantalla.js`.

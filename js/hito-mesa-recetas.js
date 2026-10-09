@@ -40,7 +40,8 @@ var HitoMesaRecetas = (function () {
     if (!lista.length) return '';
     return '<div class="mesa-recetas" data-accion="' + accion + '"><div class="mesa-recetas-titulo">' + ETIQUETA[accion] + '</div>' +
       lista.map(function (g) {
-        return '<button type="button" class="mesa-receta" data-paso="' + U.escapar(g.id) + '">' + U.escapar(g.texto) + '</button>';
+        return '<button type="button" class="mesa-receta" data-paso="' + U.escapar(g.id) + '">' + U.escapar(g.texto) +
+          (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' <span class="guion-fuera-de-uso">plantilla fuera de uso</span>' : '') + '</button>';
       }).join('') + '</div>';
   }
 
@@ -75,8 +76,20 @@ var HitoMesaRecetas = (function () {
     return op;
   }
 
+  /* La plantilla fuera de uso que lleva una tarea (leyendo lo último del disco), o null. */
+  async function plantillaFueraDeUso(g) {
+    var id = g && g.receta && g.receta.plantilla;
+    if (!id || !window.Plantillas) return null;
+    try { await Plantillas.cargarReciente(App.E.gestor); } catch (e) { /* con lo que haya */ }
+    var p = Plantillas.porId(id);
+    return p && !Plantillas.enUso(p) ? p : null;
+  }
+
   async function comunicarPaso(a, h, g, lista) {
     var receta = g.receta || {};
+    /* Fila 321: la plantilla de la tarea está fuera de uso: no se prepara nada. */
+    var fuera = await plantillaFueraDeUso(g);
+    if (fuera) { Plantillas.avisoFueraDeUso(fuera); return; }
     var canales = window.HitosComunicar && HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
     var via = receta.via || canales[0] || 'correo';
     var op = await opcionesDePaso(a, h, g, lista, via);
@@ -96,6 +109,8 @@ var HitoMesaRecetas = (function () {
       try { datos = await Plantillas.cargarReciente(App.E.gestor); } catch (e) { datos = null; }
     }
     var p = datos && (datos.documentos || []).filter(function (x) { return x.id === id; })[0];
+    /* Fila 321: la plantilla de la tarea está fuera de uso: no se genera nada. */
+    if (p && !Plantillas.enUso(p)) { Plantillas.avisoFueraDeUso(p); return; }
     if (!p) {
       /* Sin plantilla fija (o ya no está): el cuadro de elegir de siempre. */
       var b = fila && fila.querySelector('.hito-generar');
@@ -125,6 +140,6 @@ var HitoMesaRecetas = (function () {
     });
   }
 
-  return { pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, opcionesDePaso: opcionesDePaso };
+  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, opcionesDePaso: opcionesDePaso };
 })();
 window.HitoMesaRecetas = HitoMesaRecetas;

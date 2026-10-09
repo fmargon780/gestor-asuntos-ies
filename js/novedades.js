@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '321', fecha: '2026-10-09', texto: 'Una plantilla se puede dejar «Fuera de uso» desde Herramientas → «Plantillas»: sigue en la lista, en gris, pero deja de ofrecerse al generar un documento o al preparar un correo. Antes avisa de los hitos que la usan. Se vuelve a activar con un botón.' },
   { id: '320', fecha: '2026-10-09', texto: 'En Herramientas hay una pantalla nueva, «Plantillas», con todas las plantillas de Word y de correo juntas: se ve qué hitos usan cada una, y desde ahí se crean, se cambian, se les sustituye el fichero y se borran. Al crear una de Word ya se puede traer el fichero del ordenador, sin copiarlo antes a Dropbox.' },
   { id: '319', fecha: '2026-10-09', texto: 'En Herramientas → «Traer el alumnado» hay un recuadro nuevo, «Lo que tengo ahora»: dice de cuándo es cada fichero de alumnado y de personal, con su hora, cuántas personas trae, por dónde llegó y si hay otro más nuevo sin coger.' },
   { id: '318', fecha: '2026-10-09', texto: 'Al pulsar «Entrar», la aplicación pide también el permiso de las carpetas del alumnado, de la bandeja y del Centro de datos: ya no hay que volver a señalarlas cada mañana. En «Comprobación al entrar», el botón «Dar permiso» lo arregla con una pulsación.' },

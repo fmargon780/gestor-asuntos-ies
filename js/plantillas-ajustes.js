@@ -102,10 +102,21 @@
 
   /* ---------- las plantillas de UN tipo (sección de js/ajustes-tipo.js) ---------- */
 
+  /* Fila 321: «Volver a activar» en la tarjeta de una plantilla fuera de uso. */
+  function botonVolverAActivar(p, clase, alTerminar) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton';
+    b.textContent = 'Volver a activar';
+    b.onclick = function () { return PlantillasFueraDeUso.volverAActivar(p, clase, alTerminar); };
+    return b;
+  }
+
   function tarjetaDePlantilla(p) {
     var div = document.createElement('div');
-    div.className = 'tarjeta-tipo';
-    div.innerHTML = '<div class="nombre-tipo">' + U.escapar(p.nombre) + '</div>';
+    div.className = 'tarjeta-tipo' + (Plantillas.enUso(p) ? '' : ' tarjeta-fuera-de-uso');
+    div.innerHTML = '<div class="nombre-tipo">' + U.escapar(p.nombre) + '</div>' +
+      (Plantillas.enUso(p) ? '' : '<div class="suave">' + U.escapar(PlantillasFueraDeUso.etiqueta(p)) + '</div>');
 
     var acciones = document.createElement('div');
     acciones.className = 'acciones';
@@ -117,6 +128,7 @@
     editar.textContent = 'Cambiar';
     editar.onclick = function () { abrirCuadroDePlantilla(p, null, refrescarSeccionActual); };
     acciones.appendChild(editar);
+    if (!Plantillas.enUso(p)) acciones.appendChild(botonVolverAActivar(p, 'correo', async function () { await cargar(); refrescarSeccionActual(); }));
 
     acciones.appendChild(Papelera.botonBorrar(async function () {
       if (!(await Plantillas.borrarConPapelera(p, 'correo'))) return;   /* fila 320: el mismo código que la pantalla «Plantillas» */
@@ -236,8 +248,9 @@
   }
 
   /* La fila de `plantillas.json`: `textoSeneca` solo si trae algo. */
-  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar) {
+  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa) {
     var fila = { id: id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+    if (previa && previa.fueraDeUso) fila.fueraDeUso = previa.fueraDeUso;   /* fila 321: cambiar una plantilla no pierde la marca */
     if (String(textoSeneca || '').trim()) fila.textoSeneca = textoSeneca;
     if (String(adjuntar || '').trim()) fila.adjuntar = adjuntar;   /* fila 299: «Adjuntar solo» */
     return fila;
@@ -323,7 +336,7 @@
         await Plantillas.guardar(App.E.gestor, function (actual) {
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-            if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar);
+            if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i]);
           } else {
             actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar));
           }
@@ -470,7 +483,7 @@
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
             if (i !== -1) {
-              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2);
+              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i]);
               guardada = actual.lista[i];
             }
           } else {

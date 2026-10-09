@@ -37,7 +37,8 @@ var ListaComprobacionTipo = (function () {
     for (var i = 0; i < pasos.length; i++) {
       var guion = guionDe(pasos[i]);
       var falta = guion.some(function (g) {
-        return g.accion === accion && (!g.receta || !g.receta.plantilla);
+        /* Fila 321: una plantilla fuera de uso cuenta como si la tarea no tuviera plantilla. */
+        return g.accion === accion && (!g.receta || !g.receta.plantilla || (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g)));
       });
       if (falta) return i;
     }

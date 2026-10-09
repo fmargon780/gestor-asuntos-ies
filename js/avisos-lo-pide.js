@@ -85,12 +85,15 @@
     if (!datos) return '<option value="">(sin plantillas)</option>';
     var categoria = (window.Nombres && window.App) ? Nombres.categoriaDeTipo(App.E.tipos, nombreTipo) : '';
     var opciones = Plantillas.deTipo(datos, categoria, nombreTipo);
+    /* Fila 321: la que ya está elegida sigue saliendo aunque esté fuera de uso, para no perderla al guardar. */
+    var puesta = seleccionada ? porId(datos, seleccionada) : null;
+    if (puesta && !Plantillas.enUso(puesta) && !opciones.some(function (p) { return p.id === puesta.id; })) opciones = opciones.concat([puesta]);
     if (!opciones.length) return '<option value="">(sin plantillas de correo en este tipo)</option>';
     var elegida = seleccionada && opciones.some(function (p) { return p.id === seleccionada; })
       ? seleccionada
       : ((porNombre(datos, nombreDefecto || NOMBRE_AVANCE) || {}).id || '');
     return opciones.map(function (p) {
-      return '<option value="' + p.id + '"' + (p.id === elegida ? ' selected' : '') + '>' + U.escapar(p.nombre) + '</option>';
+      return '<option value="' + p.id + '"' + (p.id === elegida ? ' selected' : '') + '>' + U.escapar(p.nombre) + (Plantillas.enUso(p) ? '' : ' (fuera de uso)') + '</option>';
     }).join('');
   }
 
@@ -119,7 +122,10 @@
     try { datos = await asegurarPlantillas(gestor); } catch (e) { datos = null; }
     var plantilla = (datos && (porId(datos, h.avisarLoPidePlantilla) || porNombre(datos, NOMBRE_AVANCE))) || null;
     if (!plantilla) return;
-    await CorreoNucleo.abrirCuadro(a, false, { plantilla: plantilla.id, hito: h, avisoLoPide: true });
+    /* Fila 321: con la plantilla fuera de uso el cuadro se abre sin ella y con una línea ámbar arriba. */
+    var extra = Plantillas.enUso(plantilla) ? { plantilla: plantilla.id, hito: h, avisoLoPide: true }
+      : { hito: h, avisoLoPide: true, avisoAmbar: 'La plantilla de este aviso, «' + plantilla.nombre + '», está fuera de uso.' };
+    await CorreoNucleo.abrirCuadro(a, false, extra);
     await marcarPreguntado(a.nombre, h.id);
   }
 
@@ -140,8 +146,10 @@
     try { datos = await asegurarPlantillas(gestor); } catch (e) { datos = null; }
     var plantilla = (datos && (porId(datos, info.avisarLoPideCierrePlantilla) || porNombre(datos, NOMBRE_CIERRE))) || null;
     if (!plantilla) return;
-    /* Se abre y se espera; se archive lo que se decida dentro. */
-    await CorreoNucleo.abrirCuadro(a, false, { plantilla: plantilla.id, avisoLoPide: true });
+    /* Se abre y se espera; se archive lo que se decida dentro. Fila 321: con la plantilla fuera de uso, sin ella y con una línea ámbar. */
+    var extra = Plantillas.enUso(plantilla) ? { plantilla: plantilla.id, avisoLoPide: true }
+      : { avisoLoPide: true, avisoAmbar: 'La plantilla de este aviso, «' + plantilla.nombre + '», está fuera de uso.' };
+    await CorreoNucleo.abrirCuadro(a, false, extra);
   }
 
   /* Antes de mover la carpeta (para que el cuadro tenga la ficha a

@@ -6,6 +6,17 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ### Plantillas de documento de Word
 
+**Fuera de uso** (9-oct-2026, fila 321, `docs/PLANTILLAS-FUERA-DE-USO.md`): una plantilla (de Word o de correo) lleva `fueraDeUso:
+{ desde, por }` en `plantillas.json`; sin la clave, está en uso (`Plantillas.enUso`, la única que la mira). En Herramientas →
+«Plantillas», «⋮» → «Dejar fuera de uso…» (`js/plantillas-fuera-de-uso.js`: avisa de los hitos que la usan, con «Deshacer») y
+«Volver a activar». Sigue en la lista, en gris y al final, con «Fuera de uso desde el…». **Deja de ofrecerse** porque
+`Plantillas.deTipo` y `Plantillas.documentosDeTipo` dejan fuera las que no están en uso (el cuarto parámetro `todas` las pide: las
+listas de Ajustes ya las enseñan todas); `HitosGenerar.agrupar`, `PlantillaBuscar` y el desplegable de la tarea de la guía
+(`plantillasPara`, que conserva la que la tarea ya tiene, con «(fuera de uso)») filtran también. Una tarea de generar o de comunicar con
+plantilla fuera de uso lleva «plantilla fuera de uso» y no genera ni prepara nada (aviso ámbar `Plantillas.avisoFueraDeUso`);
+«Hacer este hito» se para. Los avisos «al terminar» y «al cerrar» abren el cuadro sin la plantilla y con una línea ámbar
+(`extra.avisoAmbar` de `CorreoNucleo.abrirCuadro`). Los dos cuadros de «Cambiar» conservan `fueraDeUso`.
+
 **La pantalla «Plantillas»** (10-oct-2026, fila 320, `docs/PANTALLA-DE-PLANTILLAS.md`): Herramientas → «Plantillas» →
 «Abrir las plantillas» (`js/plantillas-pantalla.js`, vista `#plantillas-vista` a todo el ancho como el control del
 registro). Pestañas Word y Correo; por línea: nombre, tipo, **los hitos que la usan** (`js/plantillas-uso.js`, puro:

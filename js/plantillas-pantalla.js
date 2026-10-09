@@ -20,7 +20,7 @@ var PlantillasPantalla = (function () {
   var NOMBRES_DE_LA_APP = ['Aviso de avance', 'Aviso de cierre'];
 
   var E = { pestana: 'word', orden: 'nombre', texto: '', tipo: '', sinHito: false, abierta: false,
-    datos: null, uso: {}, falta: {}, desplegados: {}, turno: 0 };
+    datos: null, uso: {}, falta: {}, desplegados: {}, turno: 0, fuera: false };
 
   function $(id) { return document.getElementById(id); }
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
@@ -58,6 +58,10 @@ var PlantillasPantalla = (function () {
   function esDeLaApp(p) { return E.pestana === 'correo' && !p.tipo && !p.categoria && NOMBRES_DE_LA_APP.indexOf(p.nombre) !== -1; }
   function tipoExiste(p) { return !p.tipo || !window.TiposNombre || !!TiposNombre.tipoPorNombre(p.tipo); }
   function usos(p) { return E.uso[p.id] || []; }
+  function enUso(p) { return Plantillas.enUso(p); }
+  function cuantasFuera(l) { return (l || []).filter(function (p) { return !enUso(p); }).length; }
+  /* «12» o «12 · 2 fuera de uso» */
+  function cuenta(l) { var f = cuantasFuera(l); return (l || []).length + (f ? ' · ' + f + ' fuera de uso' : ''); }
 
   function textoBuscable(p) {
     return n([p.nombre, p.tipo, p.categoria, p.tipoDocumento, p.fichero].concat(usos(p).map(function (u) { return u.etiqueta + ' ' + u.tipo; })).join(' '));
@@ -68,10 +72,13 @@ var PlantillasPantalla = (function () {
     var l = lista().filter(function (p) {
       if (E.tipo && n(p.tipo) !== n(E.tipo)) return false;
       if (E.sinHito && usos(p).length) return false;
+      if (E.fuera && enUso(p)) return false;
       var t = textoBuscable(p);
       return palabras.every(function (w) { return t.indexOf(w) !== -1; });
     });
     l.sort(function (a, b) {
+      /* Las fuera de uso, al final, en cualquiera de los dos órdenes. */
+      if (enUso(a) !== enUso(b)) return enUso(a) ? -1 : 1;
       if (E.orden === 'tipo') {
         var ta = n(a.tipo), tb = n(b.tipo);
         if (ta !== tb) return ta < tb ? -1 : 1;
@@ -114,6 +121,9 @@ var PlantillasPantalla = (function () {
     var off = soloConsulta() ? ' disabled' : '';
     var deLaApp = esDeLaApp(p);
     var menu = (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="sustituir"' + off + '>Sustituir el fichero…</button>' : '') +
+      (enUso(p)
+        ? '<button type="button" class="boton" data-accion="fuera"' + (deLaApp ? ' disabled title="La aplicación la necesita para avisar a quien lo pide."' : off) + '>Dejar fuera de uso…</button>'
+        : '<button type="button" class="boton" data-accion="activar"' + off + '>Volver a activar</button>') +
       '<button type="button" class="boton boton-peligro" data-accion="borrar"' + (deLaApp ? ' disabled title="La aplicación la vuelve a crear sola."' : off) + '>Borrar</button>';
     return '<td class="pt-acciones"><button type="button" class="boton" data-accion="ver" data-solo-lectura>Ver</button> ' +
       '<button type="button" class="boton" data-accion="cambiar"' + off + '>Cambiar</button> ' +
@@ -132,12 +142,14 @@ var PlantillasPantalla = (function () {
   }
 
   function fila(p) {
-    var nombre = esc(p.nombre) + (esDeLaApp(p) ? ' <span class="pt-etiqueta">De la aplicación</span>' : '');
+    var nombre = esc(p.nombre) + (esDeLaApp(p) ? ' <span class="pt-etiqueta">De la aplicación</span>' : '') +
+      (enUso(p) ? '' : ' <span class="pt-etiqueta pt-etiqueta-fuera">' + esc(PlantillasFueraDeUso.etiqueta(p)) + '</span>');
+    var clase = enUso(p) ? '' : ' class="pt-fuera"';
     if (E.pestana === 'word') {
-      return '<tr data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td class="pt-tipodoc">' + esc(p.tipoDocumento) + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
+      return '<tr' + clase + ' data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td class="pt-tipodoc">' + esc(p.tipoDocumento) + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
         '</td><td class="pt-fichero">' + esc(p.fichero) + (E.falta[p.id] ? ' <span class="pt-ambar pt-falta">Falta el fichero</span>' : '') + '</td>' + acciones(p) + '</tr>';
     }
-    return '<tr data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
+    return '<tr' + clase + ' data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
       '</td><td>' + (String(p.textoSeneca || '').trim() ? 'Sí' : '—') + '</td>' + acciones(p) + '</tr>';
   }
 
@@ -168,19 +180,19 @@ var PlantillasPantalla = (function () {
 
   function pintarCabecera() {
     var vista = $('plantillas-vista');
-    var w = (E.datos.documentos || []).length, c = (E.datos.lista || []).length;
     var off = soloConsulta() ? ' disabled' : '';
     vista.innerHTML =
       '<div class="pt-barra"><button type="button" class="boton" id="pt-volver" data-solo-lectura>← Volver a Herramientas</button>' +
         '<h3 class="pt-titulo">Plantillas</h3></div>' +
       '<div class="pt-pestanas">' +
-        '<button type="button" class="pt-pestana' + (E.pestana === 'word' ? ' activa' : '') + '" data-solo-lectura data-pestana="word">Word (' + w + ')</button>' +
-        '<button type="button" class="pt-pestana' + (E.pestana === 'correo' ? ' activa' : '') + '" data-solo-lectura data-pestana="correo">Correo (' + c + ')</button>' +
+        '<button type="button" class="pt-pestana' + (E.pestana === 'word' ? ' activa' : '') + '" data-solo-lectura data-pestana="word">Word (' + cuenta(E.datos.documentos) + ')</button>' +
+        '<button type="button" class="pt-pestana' + (E.pestana === 'correo' ? ' activa' : '') + '" data-solo-lectura data-pestana="correo">Correo (' + cuenta(E.datos.lista) + ')</button>' +
       '</div>' +
       '<div class="pt-filtros">' +
         '<input id="pt-buscar" class="campo" data-solo-lectura placeholder="Buscar entre las plantillas…" value="' + esc(E.texto) + '">' +
         '<label class="pt-etq">Tipo de asunto <select id="pt-tipo" class="campo" data-solo-lectura>' + opcionesDeTipo() + '</select></label>' +
         '<label class="pt-etq"><input type="checkbox" id="pt-sin-hito" data-solo-lectura' + (E.sinHito ? ' checked' : '') + '> Sin ningún hito</label>' +
+        '<label class="pt-etq"><input type="checkbox" id="pt-fuera" data-solo-lectura' + (E.fuera ? ' checked' : '') + '> Fuera de uso</label>' +
         '<button type="button" class="boton boton-principal pt-nueva" id="pt-nueva"' + off + '>+ Nueva plantilla</button>' +
       '</div>' +
       '<div id="pt-cuerpo"></div>';
@@ -191,6 +203,7 @@ var PlantillasPantalla = (function () {
     $('pt-buscar').oninput = function () { E.texto = this.value; pintarCuerpo(); };
     $('pt-tipo').onchange = function () { E.tipo = this.value; pintarCuerpo(); };
     $('pt-sin-hito').onchange = function () { E.sinHito = this.checked; pintarCuerpo(); };
+    $('pt-fuera').onchange = function () { E.fuera = this.checked; pintarCuerpo(); };
     $('pt-nueva').onclick = function () { nueva(); };
   }
 
@@ -228,6 +241,8 @@ var PlantillasPantalla = (function () {
     if (accion === 'ver') return ver(p);
     if (accion === 'cambiar') return cambiar(p);
     if (accion === 'sustituir') return PlantillasFichero.sustituir(p, recargar);
+    if (accion === 'fuera') return PlantillasFueraDeUso.dejar(p, E.pestana === 'word' ? 'documento' : 'correo', usos(p), recargar);
+    if (accion === 'activar') return PlantillasFueraDeUso.volverAActivar(p, E.pestana === 'word' ? 'documento' : 'correo', recargar);
     if (accion === 'borrar') { if (await Plantillas.borrarConPapelera(p, E.pestana === 'word' ? 'documento' : 'correo')) { await recargar(); if (typeof App.pintarPapelera === 'function') App.pintarPapelera(); } }
   }
 
@@ -280,7 +295,7 @@ var PlantillasPantalla = (function () {
     opciones = opciones || {};
     if (opciones.pestana) { E.pestana = opciones.pestana; guardarPestana(E.pestana); } else E.pestana = pestanaGuardada();
     E.tipo = opciones.tipo || '';
-    E.texto = ''; E.sinHito = false;
+    E.texto = ''; E.sinHito = false; E.fuera = false;
     var herr = $('pantalla-herramientas');
     if (herr && herr.classList.contains('oculto') && App.ir) App.ir('herramientas');
     E.abierta = true;
@@ -308,7 +323,8 @@ var PlantillasPantalla = (function () {
     if (!linea || !App.E.gestor) return;
     try {
       var d = E.datos && E.abierta ? E.datos : await Plantillas.cargar(App.E.gestor);
-      linea.textContent = (d.documentos || []).length + ' de Word · ' + (d.lista || []).length + ' de correo';
+      var fuera = cuantasFuera(d.documentos) + cuantasFuera(d.lista);
+      linea.textContent = (d.documentos || []).length + ' de Word · ' + (d.lista || []).length + ' de correo' + (fuera ? ' · ' + fuera + ' fuera de uso' : '');
     } catch (e) { linea.textContent = ''; }
     var b = $('plantillas-abrir');
     if (b && !b.onclick) b.onclick = function () { return abrir(); };

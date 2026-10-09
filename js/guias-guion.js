@@ -83,11 +83,19 @@ var GuiasGuion = (function () {
     if (!datos && window.Plantillas && Plantillas.cargarReciente && window.App && App.E && App.E.gestor) {
       Plantillas.cargarReciente(App.E.gestor).catch(function () { /* sin plantillas, sin lista */ });
     }
-    var lista = ((datos && datos[clase]) || []).map(function (p) {
-      return { valor: p.id, texto: p.nombre + (p.tipo ? ' (' + p.tipo + ')' : '') };
+    /* Fila 321: las fuera de uso no se ofrecen, salvo la que ya tiene la tarea (con «(fuera de uso)»), para no perderla al guardar. */
+    var lista = ((datos && datos[clase]) || []).filter(function (p) {
+      return !window.Plantillas || Plantillas.enUso(p) || p.id === actual;
+    }).map(function (p) {
+      return { valor: p.id, texto: p.nombre + (p.tipo ? ' (' + p.tipo + ')' : '') + ((window.Plantillas && !Plantillas.enUso(p)) ? ' (fuera de uso)' : '') };
     });
     if (actual && !lista.some(function (x) { return x.valor === actual; })) lista.push({ valor: actual, texto: actual });
     return [{ valor: '', texto: 'Sin plantilla fija' }].concat(lista);
+  }
+
+  /* Fila 321: la misma marca que en la mesa del hito. */
+  function marcaFueraDeUso(g) {
+    return (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g)) ? ' <span class="guion-fuera-de-uso">plantilla fuera de uso</span>' : '';
   }
 
   function recetaHTML(g) {
@@ -96,11 +104,11 @@ var GuiasGuion = (function () {
       return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
         '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>' +
         '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>' +
-        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select></div>';
+        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>' + marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'generar') {
       return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
-        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select></div>';
+        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select>' + marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'registrar') {
       return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
