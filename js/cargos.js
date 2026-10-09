@@ -255,11 +255,13 @@ window.Cargos = Cargos;
       try {
         await Cargos.editarOcupante(cargo.id, o.id, nombre.value.trim(), desde.value, hasta.value, sexo.value);
         alGuardar();
-      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
+        return true;
+      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); return false; }
     }
     nombre.onchange = guardarCambio;
-    desde.onchange = guardarCambio;
-    hasta.onchange = guardarCambio;
+    /* Fila 314: las fechas se guardan al terminar de escribirlas, no con cada cifra. */
+    U.alTerminarFecha(desde, guardarCambio, { minimo: '1950-01-01', vacioVale: true });
+    U.alTerminarFecha(hasta, guardarCambio, { minimo: '1950-01-01', vacioVale: true });
     sexo.onchange = guardarCambio;
 
     fila.appendChild(nombre);
