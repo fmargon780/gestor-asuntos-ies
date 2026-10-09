@@ -16,4 +16,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 309 | 110 | Informe en PDF con pdf-lib y membrete, grupo ya puesto en el correo, sección de Ajustes, huecos nuevos y «Volver a avisar» |
 | 310 | 120 | Pantalla nueva en Herramientas con filtros, actividad antigua con papelera y hoja de cálculo de dos pestañas |
 | 311 | 90 | Tabla de datos calculada, hueco de tabla con fechas, tipo con dos campos que llega solo y plantilla nueva |
-| 322 | 150 | Pantalla nueva sobre el asistente, piezas comunes sacadas de un fichero al borde de 600 líneas, cambiar por otro texto, quitar párrafo entero, guardar con deshacer y dos pruebas nuevas |
