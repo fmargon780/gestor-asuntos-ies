@@ -554,6 +554,18 @@ llamado desde `App.buscarPersonas` y `App.verFicha` de `js/archivo-personas.js`,
 
 Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).
 
+### Lo que tengo ahora: de cuándo son el alumnado y el personal (9-oct-2026, fila 319, `docs/LO-QUE-TENGO-AHORA.md`)
+
+- **El apunte**: `_GESTOR/datos-origen.json` (`{ _esquema: 1, ficheros: { <nombre>: { via, fechaOriginal, nombreOriginal, traidoEl, traidoPor, marca, subidoPor } } }`),
+  por `DatosQueTengo.apuntar` (`js/datos-que-tengo.js`) desde `TraerDatos.copiarUno` (a mano, o con el origen que pase el Centro de datos),
+  `AlumnadoBD.traer`/`aceptar` y `js/rescate-datos.js` (recogido). `via`: `a-mano`, `centro-de-datos`, `carpeta-bd`, `recogido`. `marca`: el
+  `lastModified` de la copia (CSV, 2 s de margen) o el `generado` (ALUMNADO-BD.json); si no coincide, el apunte no vale y la fila dice «No se sabe por
+  dónde llegó». Dos apuntes del mismo fichero: gana el de `traidoEl` más reciente (también en un conflicto de Dropbox). Con «solo consultar» no se apunta.
+- **La tabla** (`js/datos-que-tengo-ver.js`, `#herramientas-lo-que-tengo`, primer hueco de «Traer el alumnado»): una fila por RegAlum.csv,
+  ALUMNADO-BD.json y cada RelPerCen…csv (los de cursos anteriores, plegados). «¿Hay otro más nuevo?» (`DatosQueTengo.mirarSiHayMasNuevo`, 60 s en
+  memoria) solo mira (`queryPermission`): Centro de datos (`CentroDeDatos.pendientes`) y carpeta de la base de datos (`AlumnadoBD.mirarCarpeta`).
+  «Traerlo» y «Dar permiso» salen de una pulsación. El pie del título dice las fechas sin abrir el bloque.
+
 ### El alumnado de la base de datos, desde la carpeta de Drive (25-sep-2026, filas 142 y 144, `docs/ALUMNADO-BD-DESDE-DRIVE.md`)
 
 El acuerdo entre las dos aplicaciones está en `docs/ACUERDO-ALUMNADO.md` (versión 2: un archivo en

@@ -284,15 +284,15 @@ await comprobar('el botón «Traer ahora del Centro de datos» está en Herramie
 /* ================= 8. EL ORDENADOR SIN CARPETA, CON APUNTES ================= */
 console.log('--- 8. sin carpeta pero con apuntes ---');
 await pagina.evaluate(async () => { await CentroDeDatos.olvidarCarpeta(); await CentroDeDatosVer.pintar(); });
-await comprobar('las líneas grises dicen de cuándo son los datos, en los tres sitios',
+await comprobar('las líneas grises dicen de cuándo son los datos, en los tres sitios (fila 319: en «Traer el alumnado» ya no hay, lo dice la tabla)',
   pagina.evaluate(async () => {
     await CentroDeDatosVer.pintar();
     const t = (sel) => [...document.querySelectorAll(sel + ' .centro-linea')].map((x) => x.dataset.clave);
     return [t('[data-centro-lineas="seneca"]'), t('[data-centro-lineas="tablas"]')];
-  }), [['alumnado', 'personal', 'alumnado-bd'], ['tutorias', 'consejo-escolar']]);
-await comprobar('la línea del personal lleva fecha, resumen y quién lo subió',
-  pagina.evaluate(() => document.querySelector('.centro-linea[data-clave="personal"]').textContent.replace(/\d+-\w+-\d{4}/, 'FECHA')),
-  'Personal: Datos del Centro de datos, del FECHA · 1 empleado · los subió direccion');
+  }), [[], ['tutorias', 'consejo-escolar']]);
+await comprobar('fila 319: lo del personal lo dice la tabla «Lo que tengo ahora»: del Centro de datos y quién lo subió',
+  pagina.evaluate(async () => { const ap = (await DatosQueTengo.leerApuntes(true)).ficheros; const k = Object.keys(ap).find((n) => /^RelPerCen/.test(n)); return DatosQueTengo.porDondeLlego(ap[k]); }),   /* el disco de esta prueba no da fecha a los ficheros: se mira el apunte */
+  'Del Centro de datos. Lo subió direccion.');
 await comprobar('la comprobación al entrar da «bien» con lo que trae el otro',
   pagina.evaluate(async () => { const f = (await ComprobacionEntrada.revisar()).find((x) => x.id === 'centro-de-datos'); return [f.estado, /^Este ordenador usa lo que trae el otro\. Último: \d+-\w+-\d{4}\.$/.test(f.frase)]; }),
   ['bien', true]);

@@ -277,3 +277,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 318 — permisos de las carpetas al entrar (9-oct-2026)
 
 - [ ] En el ordenador del centro, con la copia sin internet ya actualizada: al pulsar «Entrar», el navegador enseña un cuadro por carpeta (alumnado, bandeja y, si está señalada, Centro de datos). Elegir «Permitir en cada visita» en cada uno. A la mañana siguiente, al entrar, no sale ningún cuadro y el panel no enseña esas filas. Si el cuadro no ofrece «Permitir en cada visita», decírselo a Claude: queda una pulsación en «Permitir» por carpeta cada mañana.
+
+## Fila 319 — Lo que tengo ahora (9-oct-2026)
+
+- [ ] En el ordenador del centro, con la copia sin internet ya actualizada: descargar el alumnado de Séneca, traerlo con «Traer ficheros de Séneca» y mirar que la fila «Alumnado de Séneca» de Herramientas → «Traer el alumnado» dice el día y la hora de esa descarga y «A mano. Lo trajo Francisco…».

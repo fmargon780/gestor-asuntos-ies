@@ -40,6 +40,9 @@ var CentroDeDatosReparto = (function () {
     return prefijo + ' ' + curso + '.csv';
   }
 
+  /* Fila 319: por dónde llega (js/datos-que-tengo.js): la fecha de la entrada del índice y quién la subió. */
+  function origenDe(e) { return { via: 'centro-de-datos', fechaOriginal: e.subido, subidoPor: e.subidoPor || '', nombreOriginal: e.fichero || '' }; }
+
   /* La fecha (ms) del dato que el gestor ya tiene de eso, o 0 si no hay. `elegidas`: las de esta tanda. */
   async function fechaDelGestor(e, elegidas) {
     var d = datos();
@@ -74,14 +77,14 @@ var CentroDeDatosReparto = (function () {
     if (!datos()) throw new Error('todavía no hay carpeta de datos');
     switch (e.clave) {
       case 'alumnado':
-        await TraerDatos.copiarUno(h, 'ALUMNADO'); ctx.repasar = true; return true;
+        await TraerDatos.copiarUno(h, 'ALUMNADO', undefined, origenDe(e)); ctx.repasar = true; return true;
       case 'personal':
-        await TraerDatos.copiarUno(h, 'PERSONAL', nombreDePersonal(e, ctx.elegidas)); ctx.repasar = true; return true;
+        await TraerDatos.copiarUno(h, 'PERSONAL', nombreDePersonal(e, ctx.elegidas), origenDe(e)); ctx.repasar = true; return true;
       case 'alumnado-bd': {
         var f = await h.getFile();
         var nuevo;
         try { nuevo = JSON.parse(await f.text()); } catch (x) { throw new Error('el archivo no se puede leer'); }
-        var r = await AlumnadoBD.aceptar(nuevo);
+        var r = await AlumnadoBD.aceptar(nuevo, origenDe(e));
         ctx.repasar = ctx.repasar || r.copiado;
         return r.copiado;
       }

@@ -1,0 +1,17 @@
+/* Fila 319: el recuadro «Lo que tengo ahora» de Herramientas → «Traer el alumnado». */
+.dqt-caja { margin: 0 0 14px; }
+.dqt-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.dqt-titulo { font-weight: 700; font-size: 15px; color: #1d4f86; }
+.dqt-tabla { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
+.dqt-tabla th, .dqt-tabla td { border-bottom: 1px solid var(--linea); padding: 6px 8px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.dqt-tabla th { font-size: 12px; color: var(--tinta-suave); font-weight: 600; }
+.dqt-nombre { display: block; font-size: 12px; color: var(--tinta-suave); }
+.dqt-verde { color: #1e6b3b; }
+.dqt-ambar { color: #8a6100; }
+.dqt-gris { color: var(--tinta-suave); }
+.dqt-rojo { color: var(--rojo-linea); font-weight: 600; }
+.dqt-tabla .boton { margin-top: 4px; padding: 3px 10px; font-size: 12.5px; }
+.dqt-anteriores td { background: #f7f9fb; }
+.dqt-notas { margin: 8px 0 0; font-size: 12.5px; color: var(--tinta-suave); }
+.dqt-notas p { margin: 4px 0; }
+.bloque-pie .dqt-pie-ambar { color: #8a6100; font-weight: 600; }

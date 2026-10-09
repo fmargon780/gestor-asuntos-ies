@@ -69,6 +69,7 @@
       if (typeof App.irVista === 'function') App.irVista(App.E.vista || 'departamento');
 
       ponerFranja();
+      if (Demo.prepararMasNuevo) Demo.prepararMasNuevo(disco);   /* fila 319: `masnuevo=`, sin esperar */
     } catch (e) {
       entrando = false;
       if (boton) { boton.disabled = false; boton.textContent = 'Entrar con datos de demostración'; }

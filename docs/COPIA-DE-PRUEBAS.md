@@ -172,3 +172,11 @@ paso a `main`).
 - `&niega=bandeja`: para esos `id`, `requestPermission` da `'denied'`.
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
+
+## Fila 319: `masnuevo=`
+
+- `?demo=1&auto=1&masnuevo=alumnado,personal` (claves: `alumnado`, `personal`, `alumnado-bd`): la carpeta del Centro de datos de mentira queda señalada
+  sola, con permiso; se toma lo que trae y, unos segundos después, el índice anuncia listados más nuevos de esas claves sin coger. En Herramientas →
+  «Traer el alumnado» esas filas salen en ámbar con «Traerlo». Código: `js/demo/mas-nuevo.js` (`Demo.masNuevoListo` avisa a las pruebas).
+- El Centro de datos de mentira lleva ahora un `ALUMNADO-BD.json` inventado y válido. Sin `masnuevo=` la demostración queda como siempre, salvo el recuadro nuevo.
+- Los ficheros escritos en el disco de mentira conservan la fecha de cuando se escribieron (antes era la hora de leerlos).

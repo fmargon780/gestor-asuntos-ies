@@ -81,11 +81,13 @@ var CentroDeDatosVer = (function () {
         '<button type="button" class="boton oculto" id="centro-de-datos-permiso">Volver a dar permiso</button></div>' +
         '<p class="explica" id="centro-de-datos-indice"></p>' +
         '<p class="suave oculto" id="centro-de-datos-ocupado"></p>' +
-        '<div class="aviso aviso-ambar oculto" id="centro-de-datos-aviso"></div>');
+        '<div class="aviso aviso-ambar oculto" id="centro-de-datos-aviso"></div>' +
+        '<p class="explica"><button type="button" class="enlace" id="centro-enlace-lo-que-tengo">Ver todo lo que tengo</button></p>');
       var ancla = $('bloque-alumnado-bd');
       if (ancla && ancla.parentNode === centro) centro.insertBefore(det, ancla.nextSibling); else centro.appendChild(det);
       $('centro-de-datos-senalar').onclick = function () { return CentroDeDatos.senalarCarpeta(); };
       $('centro-de-datos-olvidar').onclick = function () { return CentroDeDatos.olvidarCarpeta(); };
+      $('centro-enlace-lo-que-tengo').onclick = function () { if (App.irASeccionDeAjustes) App.irASeccionDeAjustes($('bloque-traer-alumnado')); };
       $('centro-de-datos-permiso').onclick = async function () {
         var d = await CentroDeDatos.carpeta();
         if (d && (await CentroDeDatos.permiso(d, true))) { await CentroDeDatos.traer({ avisar: true, pedir: true }); }
@@ -188,8 +190,6 @@ var CentroDeDatosVer = (function () {
         var apuntes = await CentroDeDatos.leerApuntes();
         ponerBoton();
         if (window.CentroDeDatosConfiguracion) await CentroDeDatosConfiguracion.marcarCampos();
-        var seneca = $('herramientas-traer-seneca');
-        lineas(seneca && seneca.parentNode, seneca, ['alumnado', 'personal', 'alumnado-bd'], apuntes, 'seneca');
         var tablas = $('bloque-tablas-datos');
         var cuerpo = tablas && tablas.querySelector('.bloque-cuerpo');
         lineas(cuerpo, $('tablas-datos-lista'), ['tutorias', 'consejo-escolar'], apuntes, 'tablas');
