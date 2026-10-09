@@ -444,7 +444,7 @@ const NOCHE = '2026-10-06T21:00:00Z';      /* 23:00 en Madrid */
 /* Comprobaciones del fichero. */
 {
   comprobar('5. soporte.gs no lleva ninguna dirección de correo escrita', /[\w.+-]+@[\w-]+\.[\w.-]+/.test(codigo), false);
-  comprobar('5. VERSION_SCRIPT ha cambiado', /VERSION_SCRIPT = '6-oct-2026 · fila 268'/.test(codigo), true);
+  comprobar('5. VERSION_SCRIPT ha cambiado', /VERSION_SCRIPT = '9-oct-2026 · fila 315'/.test(codigo), true);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
