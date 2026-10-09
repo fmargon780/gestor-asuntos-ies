@@ -57,6 +57,11 @@ contrato 1 y con uno de contrato 2. Se prueba con la carpeta de mentira.
    botón de traer contesta eso mismo.
 4. La regla de la fila 312 no cambia: nunca se sustituye un dato por otro más viejo (las tres
    condiciones siguen igual, por `clave` + `variante`).
+5. **Nada de lo ya tomado se vuelve a tomar por este cambio.** Con el contrato 2 cambian algunas
+   `variante` (`registro-entrada` pasa de `""` a `26-27`; `personal`, de `26-27` a
+   `26-27/docentes`), y el apunte de antes ya no casa por su llave. Por eso se añade una cuarta
+   condición: **una entrada no se toma si algún apunte de esa misma `clave`, con la variante que
+   sea, tiene su misma `huella`.**
 
 ## Qué hay que hacer
 
@@ -79,7 +84,7 @@ tomarían, con esta regla por clave. Antes de nada se descartan las que no tiene
 | `alumnado-bd` | la única; con más de una, ninguna, igual |
 | `personal` | **todas**: todos los cursos, docentes y no docentes. Es lo que quiere `js/datos-personal.js`, que lee todos los `RelPerCen…` de la carpeta |
 | `tutorias` | la de `cursoEscolar` igual a `cursoActual`; si no hay ninguna, la de `cursoEscolar` vacío; si tampoco, ninguna |
-| `consejo-escolar` | una sola: la de `periodo` más alto (comparando como texto; el vacío es el más bajo) |
+| `consejo-escolar` | **todas**, una por `periodo`. `js/tablas-datos-consejo.js` ya guarda un fichero por periodo y los funde: un periodo viejo no pisa a uno nuevo |
 | `registro-entrada`, `registro-salida` | la de `cursoEscolar` igual a `cursoActual`; si no hay, la de `cursoEscolar` vacío |
 
 Con un índice de contrato 1 (sin `cursoActual` ni fichas), `cursoActual` es `U.cursoActual()` y
@@ -91,14 +96,19 @@ los campos que falten se leen como vacíos: el resultado es el de hoy.
 nombre supone el de hoy. El Centro de datos puede saber el curso aunque el nombre no lo lleve (lo
 eligió Francisco al soltarlo). Para que no se pierda, y para que dos entradas no se pisen:
 
-- Si `cursoDelFichero(e.fichero)` da el mismo curso que `e.cursoEscolar` (o `e.cursoEscolar` viene
-  vacío) **y** ninguna otra entrada elegida de `personal` tiene ese mismo `fichero`: se guarda con
-  su nombre original, como hoy.
-- Si no: se guarda como `RelPerCen <cursoEscolar>.csv`, o `RelPerCenNodocente <cursoEscolar>.csv`
-  si `ambito` es `no-docentes`.
+- Si `e.cursoEscolar` viene vacío (índice de contrato 1): con su nombre original, como hoy.
+- Si el nombre **lleva escrito** un curso, es el mismo que `e.cursoEscolar`, **y** ninguna otra
+  entrada elegida de `personal` tiene ese mismo `fichero`: con su nombre original, como hoy.
+- En cualquier otro caso (el nombre no lleva curso, lleva otro, o se repite): se guarda como
+  `RelPerCen <cursoEscolar>.csv` si `ambito` es `docentes`, `RelPerCenNodocente <cursoEscolar>.csv`
+  si es `no-docentes`, y `RelPerCenTodo <cursoEscolar>.csv` si viene vacío (todo el personal).
 
-`fechaDelGestor` tiene que mirar ese mismo nombre. Saca `cursoDelFichero` de `datos-personal.js`
-a donde las dos puedan usarla si hoy no se alcanza; no la copies.
+«Lleva escrito un curso» no es lo que devuelve hoy `cursoDelFichero`, que sin curso en el nombre
+contesta el curso de hoy: un `RelPerCen.csv` guardado así se leería en septiembre como del curso
+siguiente. Hace falta saber si el curso salió del nombre o se supuso. Saca esa parte de
+`js/datos-personal.js` a donde las dos puedan usarla; no la copies.
+
+`fechaDelGestor` tiene que mirar el mismo nombre con el que se guarda.
 
 ### 4. La carpeta de mentira y los documentos
 
@@ -132,14 +142,21 @@ En `pruebas/centro-de-datos.mjs`, con la carpeta de mentira:
    gris. Al pasar a `false`, se toma.
 4. `personal` con tres entradas (26-27 docentes, 26-27 no docentes, 25-26 docentes): quedan **tres**
    ficheros en `_GESTOR/datos` y `Datos` ve a las personas de los tres.
-5. Dos entradas de `personal` con el mismo `fichero` (`RelPerCen.csv`) y distinto `ambito`: quedan
-   dos ficheros con nombres distintos, y ninguno pisa al otro.
+5. Dos entradas de `personal` con el mismo `fichero` (`RelPerCen.csv`) y distinto `ambito`
+   (`docentes` y vacío), del mismo curso: quedan `RelPerCen 26-27.csv` y `RelPerCenTodo 26-27.csv`,
+   y ninguno pisa al otro.
+5b. Una entrada con `fichero: "RelPerCen.csv"` y `cursoEscolar` igual al curso de hoy se guarda
+   como `RelPerCen <curso>.csv`, no como `RelPerCen.csv`.
 6. Una entrada de `personal` con `fichero: "RelPerCen.csv"` y `cursoEscolar: "25-26"` se guarda
    como `RelPerCen 25-26.csv`, y `datos-personal.js` la lee como de 25-26.
 7. `tutorias` con una entrada de 25-26 y otra de 26-27 (`cursoActual: "26-27"`): solo se copia la
    de 26-27. Con solo la de 25-26: no se copia ninguna.
-8. `consejo-escolar` con `periodo` `2022-2024` y `2024-2026`: solo entra el segundo.
+8. `consejo-escolar` con `periodo` `2022-2024` y `2024-2026`: entran los dos, cada uno en su
+   fichero, como si se hubieran añadido a mano.
 9. `registro-entrada` con una entrada de 25-26 y otra de 26-27: solo se sube la de 26-27.
+9b. Con los apuntes que dejó la fila 312 (`registro-entrada|`, `personal|26-27`) y el mismo índice
+   pasado a contrato 2 **sin cambiar huellas** (ahora `registro-entrada` tiene `variante: "26-27"`
+   y `personal`, `26-27/docentes`): no se toma nada y no sale ningún aviso verde.
 10. Dos entradas de `alumnado`: no se copia ninguna y sale el aviso ámbar.
 11. Una entrada con `porAlumno: true` y otra de clave `censo-neae` no hacen nada y no dan error.
 12. Con `contrato: 2` u `ocupado: true` en el índice, los datos del centro de
