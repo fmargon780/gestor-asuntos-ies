@@ -165,7 +165,7 @@ await comprobar('6. la tarjeta es la primera y se llama «La actividad»',
   pagina.evaluate(() => [document.querySelector('.ficha-tarjetas-rejilla .ficha-tarjeta').dataset.tarjeta, document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-titulo').textContent.trim()]), ['actividad', 'La actividad']);
 await comprobar('6. cerrada, su resumen',
   pagina.locator('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-resumen-linea').allTextContents(),
-  ['Visita al Museo de la Ciencia', '20-nov-2026 · Granada', '9 alumnos/as · 3 profesores/as · Prevista']);
+  ['Visita al Museo de la Ciencia', '20-nov-2026 · Granada', '9 alumnos/as · 3 profesores/as', 'Prevista']);
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(500);
 await comprobar('6. abierta: las unidades con «van N de M» y el profesorado separado',

@@ -172,9 +172,13 @@ var FichaTarjetasResumen = (function () {
     if (!resumen) { ponerResumen('actividad', [{ texto: 'Leyendo…' }], true); return; }
     var partes = [];
     if (caja.dataset.nombre) partes.push({ texto: caja.dataset.nombre, clase: 'fuerte' });
-    var trozos = resumen.split(' · ');   /* dos renglones: cuándo y dónde / cuánta gente y cómo va; así no se corta con «…» */
-    if (trozos.length > 3) { partes.push({ texto: trozos.slice(0, 2).join(' · ') }); partes.push({ texto: trozos.slice(2).join(' · ') }); }
-    else partes.push({ texto: resumen });
+    /* tres renglones, para que ninguno se corte con «…»: cuándo y dónde / cuánta gente / cómo va */
+    var trozos = resumen.split(' · ');
+    if (trozos.length > 3) {
+      partes.push({ texto: trozos.slice(0, 2).join(' · ') });
+      partes.push({ texto: trozos.slice(2, -1).join(' · ') });
+      partes.push({ texto: trozos[trozos.length - 1] });
+    } else partes.push({ texto: resumen });
     if (caja.dataset.accion === 'apuntar' && window.ActividadesFicha) {
       partes.push({ texto: 'Apuntar los datos de la actividad', alPulsar: function () { ActividadesFicha.apuntarActual(); } });
     }
