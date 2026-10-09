@@ -138,6 +138,18 @@ var CentroDeDatos = (function () {
     });
   }
 
+  /* Fila 313: lo que se tomó de configuracion.json, junto a `tomado`. */
+  function apuntarConfiguracion(configuracion) {
+    return ColaGuardado.poner(FICHERO, async function () {
+      var g = gestor();
+      var actual = await leerApuntes(true);
+      actual.configuracion = configuracion;
+      actual._esquema = ESQUEMA;
+      await Copias.guardar(g, FICHERO, actual);
+      enMemoria = actual; leidoEn = Date.now();
+    });
+  }
+
   /* El último apunte de una clave (el de la variante más reciente). */
   function apunteDe(apuntes, clave) {
     var mejor = null;
@@ -254,9 +266,15 @@ var CentroDeDatos = (function () {
       }
       await R.terminar(ctx);
       await apuntar(nuevos);
+      var config = false;
+      if (window.CentroDeDatosConfiguracion) {
+        try { config = await CentroDeDatosConfiguracion.tomar(dir, r.indice, apuntes); }
+        catch (x) { salida.fallos.push('Datos del centro: ' + U.mensajeDeError(x)); }
+      }
+      salida.configuracion = config;
       salida.ok = true;
       salida.esperaRegistro = esperaRegistro;
-      if (salida.tomados.length) {
+      if (salida.tomados.length || config) {
         var vistos = {};
         var partes = [];
         lista.forEach(function (e) {
@@ -265,7 +283,8 @@ var CentroDeDatos = (function () {
             partes.push(TITULOS[e.clave] + ' (' + fechaCorta(e.subido, false) + ')');
           }
         });
-        U.aviso('Traído del Centro de datos: ' + partes.join(', ') + '.', 'bueno');
+        if (config) partes.push('los datos del centro');
+        U.aviso('Traído del Centro de datos: ' + (config && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');
       }
@@ -297,7 +316,7 @@ var CentroDeDatos = (function () {
   return {
     FICHERO: FICHERO, CLAVE_CARPETA: CLAVE_CARPETA, CONTRATO: CONTRATO, CLAVES: CLAVES, TITULOS: TITULOS,
     carpeta: carpeta, permiso: permiso, leerIndice: leerIndice, senalarCarpeta: senalarCarpeta, olvidarCarpeta: olvidarCarpeta,
-    leerApuntes: leerApuntes, apunteDe: apunteDe, traer: traer, registroEsperando: registroEsperando,
+    leerApuntes: leerApuntes, apuntarConfiguracion: apuntarConfiguracion, apunteDe: apunteDe, traer: traer, registroEsperando: registroEsperando,
     fechaCorta: fechaCorta, hayQueTomar: hayQueTomar,
     _alEntrarDeNuevo: function () { yaMirado = false; alEntrar(); }   /* para las pruebas */
   };

@@ -57,6 +57,11 @@
       '"2026/29700692/A000000000902","02/10/2026","02/10/2026","HORAS de ejemplo","Comunicación electrónica de la Delegación/Consejería","Completo","Unidad administrativa","Servicio de Ordenación Educativa","","Comunicación electrónica de la Adm.","N"\r\n';
     var rutaEnt = await poner(dir, 'registro-entrada', 'RegLibEntCen.csv', ent);
     entrada('registro-entrada', 'Registro de entrada', 'RegLibEntCen.csv', rutaEnt, 'csv', '2 apuntes');
+    await Carpetas.escribirTexto(dir, 'configuracion.json', JSON.stringify({
+      contrato: 1, actualizado: new Date().toISOString(), actualizadoPor: 'direccion@centro-demo.es',
+      centro: { nombre: 'IES Centro de Demostración', codigo: '', direccion: '', localidad: 'Granada', provincia: '', telefono: '958000000' },
+      correo: { direccionDelCentro: '', firma: 'Un saludo.\n{usuario}\n{centro}' }
+    }));
     await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify({
       contrato: 1, actualizado: new Date().toISOString(), web: '', listados: listados
     }));

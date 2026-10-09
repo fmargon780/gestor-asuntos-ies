@@ -253,3 +253,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 312 — beber del Centro de datos (9-oct-2026)
 
 - Con datos reales: en Ajustes → Este ordenador, «Carpeta del Centro de datos» → «Señalar la carpeta» y elegir la carpeta «CENTRO DE DATOS» de Google Drive para ordenador. Ver que sale el aviso verde «Traído del Centro de datos: …» con lo que había nuevo, y que en Herramientas → «Traer ficheros de Séneca» sale la línea gris «Datos del Centro de datos, del …».
+
+## Fila 313 — datos del centro y firma desde el Centro de datos (9-oct-2026)
+
+- Con datos reales: escribir los datos del centro y la firma en el Centro de datos, entrar en el gestor y mirar Ajustes → El centro → «Datos del centro y firma»: los campos con valor salen sin poder escribirse y con «Se cambia en el Centro de datos».

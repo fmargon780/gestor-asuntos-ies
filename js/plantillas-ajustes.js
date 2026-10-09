@@ -48,6 +48,7 @@
       $('plantillas-direccion-normativa').value = datosDeAjustes.direccionNormativa;
     }
     if (window.HitosNormativa) HitosNormativa.refrescar();
+    if (window.CentroDeDatosConfiguracion) CentroDeDatosConfiguracion.marcarCampos();   /* fila 313: lo que viene del Centro de datos no se escribe aquí */
   }
 
   /* Fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md: solo el texto de
