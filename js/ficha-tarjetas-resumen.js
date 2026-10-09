@@ -163,8 +163,31 @@ var FichaTarjetasResumen = (function () {
     ponerResumen(id, partes, false);
   }
 
+  /* Fila 306: la tarjeta «La actividad» trae su propio resumen (js/actividades-ficha.js). */
+  function resumirActividad() {
+    var caja = $('ficha-actividad');
+    if (!caja) return;
+    var resumen = caja.dataset.resumen || '';
+    ponerCuenta('actividad', '');
+    if (!resumen) { ponerResumen('actividad', [{ texto: 'Leyendo…' }], true); return; }
+    var partes = [];
+    if (caja.dataset.nombre) partes.push({ texto: caja.dataset.nombre, clase: 'fuerte' });
+    /* tres renglones, para que ninguno se corte con «…»: cuándo y dónde / cuánta gente / cómo va */
+    var trozos = resumen.split(' · ');
+    if (trozos.length > 3) {
+      partes.push({ texto: trozos.slice(0, 2).join(' · ') });
+      partes.push({ texto: trozos.slice(2, -1).join(' · ') });
+      partes.push({ texto: trozos[trozos.length - 1] });
+    } else partes.push({ texto: resumen });
+    if (caja.dataset.accion === 'apuntar' && window.ActividadesFicha) {
+      partes.push({ texto: 'Apuntar los datos de la actividad', alPulsar: function () { ActividadesFicha.apuntarActual(); } });
+    }
+    ponerResumen('actividad', partes, false);
+  }
+
   function resumirTodas() {
     if (!raiz()) return;
+    resumirActividad();
     resumirHitos();
     resumirDocumentos();
     resumirNotas();

@@ -33,6 +33,7 @@ var FichaTarjetas = (function () {
   /* En el orden de la cuadrícula. `siempre`: el cuerpo se ve también con
      la tarjeta cerrada (ya es, él mismo, un resumen de una línea). */
   var TARJETAS = [
+    { id: 'actividad', titulo: 'La actividad' },   /* fila 306: solo en un asunto de actividad extraescolar */
     { id: 'hitos', titulo: 'Hitos' },
     { id: 'documentos', titulo: 'Documentos de la carpeta' },
     { id: 'contacto', titulo: 'Datos y contacto', siempre: true },
@@ -63,10 +64,12 @@ var FichaTarjetas = (function () {
     '</section>';
   }
 
-  function html(tramite) {
-    return '<div class="ficha-tarjetas' + (tramite ? ' con-tramite' : '') + '" id="ficha-tarjetas">' +
+  function html(tramite, a) {
+    var conActividad = !!(window.Actividades && Actividades.tarjetaAplica(a));   /* fila 306 */
+    return '<div class="ficha-tarjetas' + (tramite ? ' con-tramite' : '') + (conActividad ? ' con-actividad' : '') + '" id="ficha-tarjetas">' +
       '<div class="ficha-tarjetas-pestanas" id="ficha-tarjetas-pestanas"></div>' +
       '<div class="ficha-tarjetas-rejilla" id="ficha-tarjetas-rejilla">' +
+        (conActividad ? tarjeta('actividad', 'La actividad', '<div id="ficha-actividad" class="explica">Leyendo…</div>') : '') +
         tarjeta('hitos', 'Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>',
                 '<span class="ficha-cuenta" data-cuenta-tarjeta="hitos"></span>') +
         tarjeta('documentos', 'Documentos de la carpeta',

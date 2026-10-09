@@ -92,6 +92,8 @@ var AsuntoDeGrupo = (function () {
 
   async function empezar() {
     var actual = App.E.nuevo.tercero && App.E.nuevo.tercero.esGrupo ? App.E.nuevo.tercero.grupoDatos : null;
+    /* Fila 306: un grupo que es una actividad extraescolar se cambia en su propio formulario. */
+    if (actual && actual.actividad && window.ActividadesFormulario) return ActividadesFormulario.cambiarDesdeNuevo();
     var atajos = actual ? actual.atajos.slice() : [];
     var marcados = await Relacionados.elegirVarios({
       titulo: 'Un grupo de personas', marcadosIniciales: actual ? actual.marcados : null, minimo: 2,
@@ -111,7 +113,7 @@ var AsuntoDeGrupo = (function () {
   }
 
   function fijar(g) {
-    var categoria = categoriaDe(g.marcados);
+    var categoria = g.categoria || categoriaDe(g.marcados);   /* fila 306: una actividad lleva la categoría de su tipo */
     var pseudo = { esGrupo: true, categoria: categoria, nombre: 'GRUPO ' + g.nombre, campos: {}, grupoDatos: g };
     var primero = g.marcados[0] && g.marcados[0].persona;
     if (g.origen === 'unidad' && primero) { pseudo.unidad = primero.unidad; pseudo.curso = primero.curso; }
@@ -134,6 +136,7 @@ var AsuntoDeGrupo = (function () {
     var g = tercero.grupoDatos;
     delete datos.contacto;
     datos.grupo = { nombre: g.nombre, origen: g.origen, creado: U.ahora() };
+    if (g.actividad) datos.actividad = { id: g.actividad.id };   /* fila 306: lo demás vive en actividades.json */
     datos.relacionados = Relacionados.combinarRelacionados([], datos.categoria, datos.tercero,
       g.marcados.map(function (m) { return { categoria: m.categoria, nombre: m.nombre }; })).finales;
   }
@@ -188,6 +191,7 @@ var AsuntoDeGrupo = (function () {
     esGrupo: esGrupo, cuantas: cuantas, textoCabecera: textoCabecera, terceroEnLista: terceroEnLista,
     textoDeBusqueda: textoDeBusqueda, personaDelGrupo: personaDelGrupo, titularTarjeta: titularTarjeta,
     alDatosNuevos: alDatosNuevos, montarEditar: montarEditar, grupoRenombrado: grupoRenombrado,
+    fijar: fijar,
     _interno: { categoriaDe: categoriaDe, origenYNombre: origenYNombre, empezar: empezar }
   };
 })();

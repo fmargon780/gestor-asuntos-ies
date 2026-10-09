@@ -55,7 +55,7 @@ const EN_SOLITARIO_ENTRADAS = [
   ['documentos-sueltos.mjs', 'antes del 7-oct-2026'], ['ha-llegado-sustituye-la-vista.mjs', 'antes del 7-oct-2026'],
   ['repintar-solo-lo-que-cambia.mjs', 'antes del 7-oct-2026'], ['hito-desde-por-clasificar.mjs', 'antes del 7-oct-2026'],
   ['ajustes-por-tipo.mjs', 'antes del 7-oct-2026'], ['mesa-comunicar-del-paso-y-guion.mjs', 'antes del 7-oct-2026'],
-  ['tras-cada-accion.mjs', 'antes del 7-oct-2026'], ['notas-asunto-no-se-borran.mjs', 'antes del 7-oct-2026'],
+  ['notas-asunto-no-se-borran.mjs', 'antes del 7-oct-2026'],
   ['refresco.mjs', 'antes del 7-oct-2026'], ['hito-mesa.mjs', 'antes del 7-oct-2026'],
   ['responsable-organismo.mjs', 'antes del 7-oct-2026'], ['aspirantes-numero.mjs', 'antes del 7-oct-2026'],
   ['tipos-nombre.mjs', 'antes del 7-oct-2026'], ['registro-del-asunto.mjs', 'antes del 7-oct-2026'],
@@ -71,6 +71,8 @@ const RETIRADAS = [
     motivo: 'fallo real de la aplicación: al crear un asunto desde el control de registro, js/control-registro-pantalla.js solo busca el tercero en ALUMNADO, PERSONAL, EMPRESAS y OTROS (no reconoce a tutores legales ni administraciones)' },
   { fichero: 'hacer-este-hito.mjs', desde: '8-oct-2026',
     motivo: 'falla igual en main sin la fila 303, también en solitario (el PDF sellado no se coloca solo: «esperando-sello»); no es de ningún cambio reciente' },
+  { fichero: 'tras-cada-accion.mjs', desde: '8-oct-2026',
+    motivo: 'falla igual en main sin la fila 306, también en solitario (la lista de Inicio no vuelve a la misma altura tras repintar)' },
   { fichero: 'conflictos-que-cambia.mjs', desde: '8-oct-2026',
     motivo: 'falla igual en main sin la fila 303, también en solitario (no sale de qué ordenador es la otra versión)' },
 ];
