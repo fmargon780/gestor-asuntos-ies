@@ -124,7 +124,10 @@ var DocxSustituir = (function () {
     var salida = xml.replace(RE_PARRAFO, function (p) {
       indice++;
       if (quitar[indice]) return '';
-      return cambiarParrafo(p, op.cambios || [], veces);
+      var nuevo = cambiarParrafo(p, op.cambios || [], veces);
+      /* Fila 322: el índice, en el original, de cada párrafo del cuerpo que sobrevive (para «Retocar»). */
+      if (esCuerpo && op.sobrevivientes && nuevo !== '') op.sobrevivientes.push(indice);
+      return nuevo;
     });
     if (esCuerpo) {
       if (op.sinCabecera) salida = salida.replace(/<w:headerReference\b[^>]*\/>/g, '');
@@ -137,7 +140,8 @@ var DocxSustituir = (function () {
 
   /* ---------- el .docx ---------- */
 
-  /* op: { cambios: [{ id, buscar, poner }], quitarParrafos: [índices del cuerpo], sinCabecera, membrete }.
+  /* op: { cambios: [{ id, buscar, poner }], quitarParrafos: [índices del cuerpo], sinCabecera, membrete,
+     sobrevivientes: [] (opcional: se llena con el índice original de cada párrafo del cuerpo que queda) }.
      Devuelve { bytes, blob, veces: { id: n } }. */
   async function aplicar(buffer, op) {
     op = op || {};

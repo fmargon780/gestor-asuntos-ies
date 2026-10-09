@@ -270,6 +270,9 @@ de `App` va después del fichero que lo define.
 | `js/plantillas-pantalla.js` | Fila 320: la pantalla «Plantillas» de Herramientas (bloque, vista a todo el ancho, pestañas, filtros, acciones) |
 | `js/plantillas-fichero.js` | Fila 320: traer un `.docx` del ordenador, comprobarlo, nombre libre, «Sustituir el fichero» con «Deshacer» |
 | `css/plantillas-pantalla.css` | Fila 320: los estilos de la pantalla «Plantillas» |
+| `js/plantilla-seleccion.js` | Fila 322: lo que comparten «Convertir en plantilla» y «Retocar» (pintar el Word con huecos, la selección y su menú, «Cambiar por un dato / otro texto») |
+| `js/plantilla-retocar.js`, `js/plantilla-retocar-pantalla.js` | Fila 322: «Retocar» una plantilla de Word (cambios desde el original, guardar fichero nuevo con «Deshacer»; ver `docs/contexto/WORD-EN-LA-APP.md`) |
+| `pruebas/plantilla-retocar.mjs`, `pruebas/plantilla-retocar-pantalla.mjs` | Fila 322: la lógica (sin navegador) y la pantalla (Chromium) de «Retocar» |
 | `js/demo/datos-plantillas-pantalla.js` | Copia de pruebas: Word sin hito y dos que comparten `.docx` (fila 320) |
 | `pruebas/plantillas-uso.mjs` | Fila 320: `PlantillasUso`, sin navegador |
 | `pruebas/plantillas-pantalla.mjs` | Fila 320: la pantalla «Plantillas» entera, con Chromium |

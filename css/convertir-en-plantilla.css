@@ -71,3 +71,10 @@ body.con-cep { overflow: hidden; }
   .cep-col h3 { display: none; }
   .cep-paso1 .cep-lateral { flex-basis: 360px; }
 }
+
+/* «Retocar» una plantilla (fila 322): lo cambiado en el documento, la ✕ de cada línea y las notas del lateral. */
+.cep-cambio { background: #d6f2d9; border-radius: 2px; padding: 0 1px; }
+.cer-titulo { margin: 0 0 6px; font-size: 16px; }
+.cer-x { flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: #667; font: inherit; padding: 0 4px; border-radius: 4px; }
+.cer-x:hover { background: #fde6e6; color: #a33; }
+.cer-pie-nota { margin-top: 18px; color: #667; }

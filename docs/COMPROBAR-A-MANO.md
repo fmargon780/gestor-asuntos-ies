@@ -285,3 +285,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 320 — la pantalla de plantillas (9-oct-2026)
 
 - [ ] En el ordenador del centro: abrir Herramientas → «Plantillas» y mirar que están todas las plantillas del centro, que las que cuelgan de un hito lo dicen, y que «Ver» abre bien un Word de verdad del centro.
+
+## Fila 322 — retocar una plantilla de Word (9-oct-2026)
+
+- [ ] En el ordenador del centro: retocar una plantilla de verdad del centro (corregir una palabra), guardarla, generar un documento con ella y mirar que el Word generado conserva el formato, el membrete y las tablas tal como estaban.

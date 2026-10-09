@@ -79,25 +79,33 @@ var PlantillasFichero = (function () {
     return ((datos && datos.documentos) || []).filter(function (x) { return x.id !== p.id && x.fichero === p.fichero; });
   }
 
-  /* «Sustituir el fichero…» de una plantilla de Word. `alTerminar()` repinta la lista. */
-  async function sustituir(p, alTerminar) {
-    var datos = await Plantillas.cargar(App.E.gestor);
-    var otras = otrasConElMismoFichero(datos, p);
-    var alcance = 'sola';
-    var nuevo = await traerWord(async function () {
-      if (!otras.length) return true;
-      var eleccion = '';
-      var cuerpo = '<p>Este Word lo usan también: ' + U.escapar(otras.map(function (x) { return x.nombre; }).join(', ')) + '.</p>' +
-        '<p><button type="button" class="boton" id="pf-solo-esta">Solo en esta</button></p>';
-      var promesa = U.preguntar('Sustituir el fichero', cuerpo, 'En todas');
-      var solo = document.getElementById('pf-solo-esta');
-      if (solo) solo.onclick = function () { eleccion = 'sola'; document.getElementById('cuadro-cancelar').click(); };
-      var ok = await promesa;
-      if (ok) { alcance = 'todas'; return true; }
-      if (eleccion === 'sola') { alcance = 'sola'; return true; }
-      return false;   /* Cancelar: no se escribe nada */
-    });
-    if (!nuevo) return false;
+  /* La pregunta «Este Word lo usan también: A, B.». Devuelve 'todas', 'sola' o null (Cancelar). Sin otras, 'sola'. */
+  async function preguntarAlcance(otras, titulo) {
+    if (!otras.length) return 'sola';
+    var eleccion = '';
+    var cuerpo = '<p>Este Word lo usan también: ' + U.escapar(otras.map(function (x) { return x.nombre; }).join(', ')) + '.</p>' +
+      '<p><button type="button" class="boton" id="pf-solo-esta">Solo en esta</button></p>';
+    var promesa = U.preguntar(titulo || 'Sustituir el fichero', cuerpo, 'En todas');
+    var solo = document.getElementById('pf-solo-esta');
+    if (solo) solo.onclick = function () { eleccion = 'sola'; document.getElementById('cuadro-cancelar').click(); };
+    var ok = await promesa;
+    if (ok) return 'todas';
+    return eleccion === 'sola' ? 'sola' : null;
+  }
+
+  /* Escribe unos bytes de Word ya hechos en `_GESTOR/PLANTILLAS`, con un nombre libre a partir de `base`
+     (fila 322). Devuelve el nombre guardado. No borra nada. */
+  async function guardarBytes(bytes, base) {
+    var dir = await carpeta();
+    var nombre = await ficheroLibre(dir, baseDe(base));
+    await PlantillasDocumento._interno.guardarBlobEnCarpeta(dir, nombre,
+      new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
+    return nombre;
+  }
+
+  /* Hace que la plantilla `p` (y, con 'todas', las que usan su mismo fichero) apunte a `nuevo`, y avisa con «Deshacer».
+     Devuelve true si lo ha hecho. `textos`: { hecho, devuelto } para el aviso verde. */
+  async function apuntarAlNuevo(p, nuevo, alcance, alTerminar, textos) {
     var antes = {};
     try {
       await Plantillas.guardar(App.E.gestor, function (actual) {
@@ -106,8 +114,8 @@ var PlantillasFichero = (function () {
         });
         return actual;
       });
-    } catch (e) { U.aviso('No he podido sustituir el fichero: ' + U.mensajeDeError(e), 'malo'); return false; }
-    U.aviso('Fichero sustituido.', 'bueno', {
+    } catch (e) { U.aviso('No he podido guardar el cambio: ' + U.mensajeDeError(e), 'malo'); return false; }
+    U.aviso(textos.hecho, 'bueno', {
       boton: 'Deshacer',
       alPulsar: async function () {
         try {
@@ -115,7 +123,7 @@ var PlantillasFichero = (function () {
             actual.documentos.forEach(function (x) { if (antes[x.id] !== undefined && x.fichero === nuevo) x.fichero = antes[x.id]; });
             return actual;
           });
-          U.aviso('Fichero devuelto al de antes.', 'bueno');
+          U.aviso(textos.devuelto, 'bueno');
         } catch (e) { U.aviso('No he podido deshacerlo: ' + U.mensajeDeError(e), 'malo'); }
         if (typeof alTerminar === 'function') alTerminar();
       }
@@ -124,7 +132,23 @@ var PlantillasFichero = (function () {
     return true;
   }
 
+  /* «Sustituir el fichero…» de una plantilla de Word. `alTerminar()` repinta la lista. */
+  async function sustituir(p, alTerminar) {
+    var datos = await Plantillas.cargar(App.E.gestor);
+    var otras = otrasConElMismoFichero(datos, p);
+    var alcance = 'sola';
+    var nuevo = await traerWord(async function () {
+      var a = await preguntarAlcance(otras);
+      if (!a) return false;   /* Cancelar: no se escribe nada */
+      alcance = a;
+      return true;
+    });
+    if (!nuevo) return false;
+    return apuntarAlNuevo(p, nuevo, alcance, alTerminar, { hecho: 'Fichero sustituido.', devuelto: 'Fichero devuelto al de antes.' });
+  }
+
   return { ficheroLibre: ficheroLibre, baseDe: baseDe, elegirWord: elegirWord, comprobarWord: comprobarWord, traerWord: traerWord,
-    otrasConElMismoFichero: otrasConElMismoFichero, sustituir: sustituir };
+    otrasConElMismoFichero: otrasConElMismoFichero, preguntarAlcance: preguntarAlcance, guardarBytes: guardarBytes,
+    apuntarAlNuevo: apuntarAlNuevo, sustituir: sustituir };
 })();
 window.PlantillasFichero = PlantillasFichero;

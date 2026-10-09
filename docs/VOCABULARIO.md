@@ -24,6 +24,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Documento que rellena otra persona | **impreso** (con etiqueta «de la Junta» o «del centro» cuando se sepa) | formulario, impreso oficial |
 | Meter un documento en un asunto que ya existe | **guardar en el asunto** («Guardar en un asunto», «Guardar aquí», «Guardar en ese asunto») | meter, meter aquí, elegir asunto, apuntar |
 | Editar algo | **cambiar** («Cambiar el nombre», «Cambiar el asunto») | editar, renombrar, poner nombre |
+| Cambiar trozos del texto de una plantilla de Word (fila 322) | **retocar** («Retocar»), frente a «Cambiar» (sus datos) y «Sustituir el fichero» (poner otro Word) | editar, modificar, corregir la plantilla |
 | Eliminar algo que va a la papelera | **borrar** | |
 | Eliminar algo que no va a la papelera (sacar de una lista) | **quitar** | |
 | Dejar un cuadro sin hacer nada | **cancelar** | dejarlo |
