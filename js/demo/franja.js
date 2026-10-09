@@ -30,6 +30,7 @@
     if (boton) { boton.disabled = true; boton.textContent = 'Entrando…'; }
     try {
       var disco = Demo.activar();
+      if (Demo.prepararPermisos) await Demo.prepararPermisos(disco);   /* fila 318: carpetas sin permiso (`sinpermiso=`) */
 
       App.E.abiertos = disco.abiertos;
       App.marcarCarpeta('estado-abiertos', disco.abiertos.name);

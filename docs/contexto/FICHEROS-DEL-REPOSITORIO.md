@@ -342,6 +342,9 @@ de `App` va después del fichero que lo define.
 | `css/cabecera-fija.css` | El aspecto de la cabecera pegada: fondo opaco de borde a borde, título más pequeño encogida, qué se esconde |
 | `js/comprobacion-entrada.js` | Las comprobaciones de «Comprobación al entrar» (fila 204): carpetas, base de alumnado, bandeja, envío de correo, ruta de Dropbox, datos del centro, cargos, festivos y copia sin internet; cada una devuelve `{ id, titulo, estado, frase, arreglar }`; solo lee; lo omitido en este ordenador, en `localStorage` |
 | `js/comprobacion-entrada-ver.js` | La marca de la barra lateral («✓ Todo configurado» / «⚠ N por configurar»), el panel con `U.preguntar` y su enganche a `Gestor.alRefrescar` (una vez por entrada) |
+| `js/permisos-carpetas.js` | El permiso de las carpetas recordadas (alumnado, bandeja, Centro de datos): `estado`, `pedir` y `pedirAlEntrar` (lo llama «Entrar»); sus filas del panel llevan «Dar permiso» (fila 318) |
+| `js/demo/permisos.js` | Copia de pruebas: `sinpermiso=` (carpetas que empiezan sin permiso) y `niega=` (las que lo niegan) (fila 318) |
+| `pruebas/permisos-carpetas.mjs` | «Dar permiso» en las tres filas, `niega`, «Entrar» pide los tres permisos, carpeta omitida, peticiones seguidas y la demostración de siempre (fila 318) |
 | `css/comprobacion-entrada.css` | El aspecto de la marca y de las filas del panel |
 | `pruebas/comprobacion-entrada.mjs` | Falta casi todo (panel solo, «Arreglarlo» lleva al bloque), «No lo uso en este ordenador», todo bien (marca verde) y una comprobación imposible (gris con motivo) |
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |

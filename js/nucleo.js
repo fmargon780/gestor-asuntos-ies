@@ -213,6 +213,7 @@ $('btn-entrar').onclick = async function () {
       U.aviso('Sin permiso sobre alguna de las dos carpetas. Vuelve a elegirla.', 'malo');
       return;
     }
+    if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
     App.E.usuario = $('campo-usuario').value.trim();
     await Almacen.guardar('usuario', App.E.usuario);
 

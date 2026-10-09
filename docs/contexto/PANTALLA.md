@@ -266,6 +266,9 @@ centro, cargos, festivos y (solo en `file://`) la copia sin internet. Cada compr
 pestaña y los `details` que contienen ese elemento. Lo omitido, en `localStorage`
 (`gestor-comprobacion-omitidas`). En la copia de pruebas y con `navigator.webdriver` el panel no sale
 solo (salvo `window.__COMPROBACION_ABRIR_PANEL__`, que usa `pruebas/comprobacion-entrada.mjs`).
+Fila 318: si una carpeta recordada (alumnado, bandeja, Centro de datos) no tiene permiso, su fila lleva «Dar permiso»
+(`darPermiso` → `PermisosCarpetas.pedir`) en vez de «Arreglarlo»: pide el permiso dentro de la pulsación, sin cerrar el panel,
+trae lo de esa carpeta y vuelve a comprobar. «Entrar» ya las pide todas (`PermisosCarpetas.pedirAlEntrar`).
 
 ### La pantalla se mide a sí misma
 

@@ -134,3 +134,10 @@ del centro» se reparten en tres filas (datos, cargos, festivos) que solo se ven
 faltan; «Arreglarlo» de la ruta lleva al bloque «Rutas de las carpetas» de Ajustes › El centro. En
 la copia de pruebas y bajo un navegador automatizado el cuadro no sale solo (solo la marca), para
 no tapar a quien esté probando otra cosa.
+
+## Fila 318: «Dar permiso»
+
+Cuando la carpeta del alumnado, la del Centro de datos o la de la bandeja está recordada pero el navegador ya no da
+permiso, la fila lleva el botón **«Dar permiso»** (no «Arreglarlo») y dice que no hay que volver a señalarla. Al pulsarlo
+el panel no se cierra: pide el permiso, trae lo de esa carpeta y vuelve a comprobar. Si se niega, aviso ámbar y la fila se
+queda como estaba. Los demás casos (sin carpeta, ya no tiene el fichero…) siguen con «Arreglarlo». `docs/PERMISOS-DE-CARPETAS-AL-ENTRAR.md`.

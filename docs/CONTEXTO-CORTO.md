@@ -79,7 +79,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Solo consulta (fila 260): casilla «En este ordenador, solo consultar» en la entrada y en Ajustes → Mantenimiento (`localStorage`, nunca `_GESTOR`); las carpetas van protegidas (`js/solo-consulta.js`, `SoloConsulta.proteger`: rechazan escribir, crear, borrar y mover con error `SoloConsulta`), aviso fijo arriba con «Quitar», controles que cambian algo apagados, ficha siempre en modo consulta.
 
 - Comprobación al entrar (fila 204): marca en la barra lateral («✓ Todo configurado» / «⚠ N por
-  configurar») y panel con «Arreglarlo» para las cosas que se configuran una vez por ordenador.
+  configurar») y panel con «Arreglarlo» para las cosas que se configuran una vez por ordenador; al pulsar
+  «Entrar» se pide también el permiso de las carpetas recordadas (alumnado, bandeja, Centro de datos;
+  `js/permisos-carpetas.js`, fila 318) y sus filas llevan «Dar permiso».
 - Nuevo asunto empieza por la persona (fila 197): buscador único en todas las categorías, con la
   parrilla de tipos limitada a la suya en cuanto se elige (el camino tipo-primero sigue
   existiendo), resumen de la guía en una línea, y nombre de carpeta con vista previa
@@ -246,6 +248,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
+- Una carpeta recordada sin permiso se arregla pidiendo el permiso sobre ella (`PermisosCarpetas.pedir`), nunca mandando a señalarla otra vez (fila 318).
 - Un campo de fecha que guarda sin botón se engancha con `U.alTerminarFecha`, nunca con `change` (fila 314).
 - Todo código nuevo que escriba en las carpetas **de fondo** (sin que lo pida un botón) mira antes `SoloConsulta.activo()` y se salta (fila 260).
 - El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`) y pone

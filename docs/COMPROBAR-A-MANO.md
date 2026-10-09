@@ -273,3 +273,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 317 — contrato 2 del Centro de datos (9-oct-2026)
 
 - Cuando el Centro de datos haya terminado de recolocar (su fila 7): señalar la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador y ver que el aviso verde trae el personal docente y el no docente.
+
+## Fila 318 — permisos de las carpetas al entrar (9-oct-2026)
+
+- [ ] En el ordenador del centro, con la copia sin internet ya actualizada: al pulsar «Entrar», el navegador enseña un cuadro por carpeta (alumnado, bandeja y, si está señalada, Centro de datos). Elegir «Permitir en cada visita» en cada uno. A la mañana siguiente, al entrar, no sale ningún cuadro y el panel no enseña esas filas. Si el cuadro no ofrece «Permitir en cada visita», decírselo a Claude: queda una pulsación en «Permitir» por carpeta cada mañana.
