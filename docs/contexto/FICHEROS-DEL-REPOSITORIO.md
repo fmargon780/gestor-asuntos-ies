@@ -326,6 +326,11 @@ de `App` va después del fichero que lo define.
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/soporte.js` | El botón «Soporte» y su ventana: error o mejora, texto, captura opcional (Ctrl+V, arrastrar o elegir; se reduce a 1.500 px JPEG), errores de la consola, envío al buzón y el campo «Buzón de soporte» de Ajustes (`ajustesAvisos.urlSoporte`) (fila 213) |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
+| `js/datos-que-tengo.js` | Fila 319: qué ficheros de alumnado y personal tiene el gestor, de cuándo, por dónde llegaron (`_GESTOR/datos-origen.json`) y si hay otro más nuevo (`apuntar`, `estado`, `mirarSiHayMasNuevo`) |
+| `js/datos-que-tengo-ver.js` | Fila 319: el recuadro «Lo que tengo ahora» de Herramientas → «Traer el alumnado» y el pie de su título |
+| `css/datos-que-tengo.css` | Los estilos de la tabla «Lo que tengo ahora» |
+| `js/demo/mas-nuevo.js` | Copia de pruebas: `masnuevo=` anuncia listados más nuevos del Centro de datos (fila 319) |
+| `pruebas/datos-que-tengo.mjs` | La tabla, el apunte a mano, el Centro de datos, `masnuevo=`, la carpeta de la base de datos, Ajustes, solo consultar y dos apuntes (fila 319) |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén; en Ajustes, cuelga ahora dentro de `#herramientas-traer-seneca`, en el bloque "Traer el alumnado" de Herramientas (fila 200; antes junto a "Ficheros de datos" en El centro) |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
 | `js/bandeja-correos.js` | La lógica de la bandeja de correos: leer, adivinar, guardar, la huella del hilo, lo que deja un correo dentro del asunto (`window.Bandeja`). Desde la fila 115 ya no vigila ningún "Borrador en camino"; solo `limpiarEnviosViejos()`, que borra al arrancar los restos que pudieran quedar de antes de esa fila |

@@ -123,6 +123,12 @@ var AlumnadoBD = (function () {
 
   /* ---------- traer ---------- */
 
+  /* Fila 319: por dónde llegó la copia (js/datos-que-tengo.js). La fecha y la marca son su `generado`. */
+  function apuntarOrigen(nuevo, origen) {
+    if (!window.DatosQueTengo) return Promise.resolve();
+    return DatosQueTengo.apuntar(FICHERO, Object.assign({ fechaOriginal: nuevo.generado, marca: nuevo.generado }, origen));
+  }
+
   /* Devuelve { ok, copiado, cuantos, generado } o { ok: false, motivo }.
      `avisar`: avisos verdes (el botón). `pedir`: puede pedir permiso
      (solo tras un clic). */
@@ -142,6 +148,7 @@ var AlumnadoBD = (function () {
         return { ok: true, copiado: false, cuantos: copia.alumnos.length, generado: copia.generado };
       }
       await guardar(nuevo);
+      await apuntarOrigen(nuevo, { via: 'carpeta-bd' });
       if (avisar) U.aviso('Alumnado traído: ' + nuevo.alumnos.length + ' alumnos, datos del ' + fechaLegible(nuevo.generado) + '.', 'bueno');
       return { ok: true, copiado: true, cuantos: nuevo.alumnos.length, generado: nuevo.generado };
     } catch (e) {
@@ -155,14 +162,29 @@ var AlumnadoBD = (function () {
 
   /* Fila 312: un archivo ya leído (de la carpeta del Centro de datos): misma validación, misma copia y
      nunca uno más viejo que el que hay. Devuelve { copiado, cuantos, generado }; si no vale, lanza. */
-  async function aceptar(nuevo) {
+  async function aceptar(nuevo, origen) {
     var v = validar(nuevo);
     if (!v.ok) throw new Error('el archivo no vale: ' + v.motivo);
     var copia = await leer();
     var fn = fecha(nuevo.generado), fc = copia && fecha(copia.generado);
     if (copia && fc && fn && fn <= fc) return { copiado: false, cuantos: copia.alumnos.length, generado: copia.generado };
     await guardar(nuevo);
+    await apuntarOrigen(nuevo, origen || { via: 'centro-de-datos' });
     return { copiado: true, cuantos: nuevo.alumnos.length, generado: nuevo.generado };
+  }
+
+  /* Fila 319: lo que hay en la carpeta señalada, sin pedir permiso ni copiar nada.
+     { sinCarpeta } | { sinPermiso } | { hay, valido, motivo, generado, cuantos }. */
+  async function mirarCarpeta() {
+    var dir = await carpeta();
+    if (!dir) return { sinCarpeta: true };
+    if (!(await permiso(dir, false))) return { sinPermiso: true };
+    var j;
+    try { j = await Carpetas.leerJson(dir, FICHERO); }
+    catch (e) { return { hay: true, valido: false, motivo: 'no se puede leer (' + U.mensajeDeError(e) + ')', generado: '', cuantos: 0 }; }
+    if (!j) return { hay: false };
+    var v = validar(j);
+    return { hay: true, valido: v.ok, motivo: v.ok ? '' : v.motivo, generado: j.generado || '', cuantos: Array.isArray(j.alumnos) ? j.alumnos.length : 0 };
   }
 
   /* La fila 142 guardaba una dirección en asuntos.json: fuera. */
@@ -245,17 +267,20 @@ var AlumnadoBD = (function () {
     var centro = $('ajustes-tab-centro');
     if (centro && !$('bloque-alumnado-bd')) {
       var det = bloque('bloque-alumnado-bd', 'Carpeta de la base de datos de alumnado', 'De dónde sale el alumnado de la base de datos, en este ordenador',
-        '<p class="explica">Señala la carpeta «Datos de matrícula» de Google Drive para ordenador, la que tiene ' +
-        '<code>' + FICHERO + '</code>. Es de este ordenador, como las del Dropbox: el otro usa la copia.</p>' +
+        '<p class="explica">Señala la carpeta de Google Drive para ordenador que tiene ' +
+        '<code>' + FICHERO + '</code>: la deja ahí la base de datos de alumnado. Es de este ordenador, como las del Dropbox: el otro usa la copia.</p>' +
         '<p class="explica" id="alumnado-bd-carpeta"></p>' +
+        '<div class="aviso aviso-ambar oculto" id="alumnado-bd-aviso"></div>' +
         '<div class="alta-tipo"><button type="button" class="boton" id="alumnado-bd-senalar">Señalar la carpeta</button>' +
         '<button type="button" class="boton" id="alumnado-bd-olvidar">Olvidarla</button></div>' +
-        '<p class="explica alumnado-bd-copia"></p>');
+        '<p class="explica alumnado-bd-copia"></p>' +
+        '<p class="explica"><button type="button" class="enlace" id="alumnado-enlace-lo-que-tengo">Ver todo lo que tengo</button></p>');
       var datosCaja = $('estado-datos');
       var ancla = datosCaja && datosCaja.closest('details');
       if (ancla && ancla.parentNode === centro) centro.insertBefore(det, ancla.nextSibling); else centro.appendChild(det);
       $('alumnado-bd-senalar').onclick = senalarCarpeta;
       $('alumnado-bd-olvidar').onclick = olvidarCarpeta;
+      $('alumnado-enlace-lo-que-tengo').onclick = function () { if (App.irASeccionDeAjustes) App.irASeccionDeAjustes($('bloque-traer-alumnado')); };
     }
     /* Fila 200, apartado 7: este botón ya no crea su propio <details>
        en Ajustes → Mantenimiento; se cuelga, sin envoltorio propio,
@@ -265,8 +290,7 @@ var AlumnadoBD = (function () {
     if (mant && !$('bloque-alumnado-bd-traer')) {
       var envoltorio = document.createElement('div');
       envoltorio.id = 'bloque-alumnado-bd-traer';
-      envoltorio.innerHTML = '<p class="explica alumnado-bd-copia" id="alumnado-bd-copia"></p>' +
-        '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>';
+      envoltorio.innerHTML = '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>';
       mant.appendChild(envoltorio);
       $('alumnado-bd-traer').onclick = function () {
         return U.mientrasGuarda($('alumnado-bd-traer'), async function () {
@@ -282,16 +306,35 @@ var AlumnadoBD = (function () {
       p.textContent = dir ? 'Carpeta señalada: ' + dir.name + '.' : 'Sin carpeta señalada en este ordenador: se usa la copia del Dropbox.';
       var olv = $('alumnado-bd-olvidar');
       if (olv) olv.classList.toggle('oculto', !dir);
+      /* Fila 319: con la carpeta a la vista y con permiso, si no tiene el fichero se avisa (sin permiso no se mira ni se pide). */
+      var av = $('alumnado-bd-aviso'), bloqueBD = $('bloque-alumnado-bd');
+      if (av) {
+        var textoAviso = '';
+        if (dir && bloqueBD && bloqueBD.offsetParent && await permiso(dir, false)) {
+          try { await dir.getFileHandle(FICHERO); } catch (e) { textoAviso = 'En esta carpeta no está ' + FICHERO + '. Señala la que lo tiene.'; }
+        }
+        av.textContent = textoAviso;
+        av.classList.toggle('oculto', !textoAviso);
+      }
     }
     await pintarCopia();
   }
 
   async function pintarCopia() {
+    if (window.DatosQueTengoVer) DatosQueTengoVer.repintar();   /* fila 319: la tabla de Herramientas */
     var ps = document.querySelectorAll('.alumnado-bd-copia');
     if (!ps.length) return;
     var d = await leer();
-    var texto = d ? 'Última copia: ' + d.alumnos.length + ' alumnos y ' + d.campos.length + ' datos, del ' + fechaLegible(d.generado) + '.'
-      : 'Todavía no hay ninguna copia: el alumnado sale solo de RegAlum.csv.';
+    var texto = 'Todavía no hay ninguna copia: el alumnado sale solo de RegAlum.csv.';
+    if (d) {
+      texto = 'Lo que tengo ahora: ' + d.alumnos.length + ' alumnos y ' + d.campos.length + ' datos, del ' + fechaLegible(d.generado) + '.';
+      if (window.DatosQueTengo) {
+        try {
+          var fila = (await DatosQueTengo.estado()).filter(function (f) { return f.id === 'alumnado-bd'; })[0];
+          if (fila && fila.hay) texto = 'Lo que tengo ahora: ' + fila.cuantos + ', del ' + DatosQueTengo.fechaHora(fila.fecha) + '.' + (fila.via ? ' ' + DatosQueTengo.viaCorta(fila) : '');
+        } catch (e) { /* se queda con la frase de antes */ }
+      }
+    }
     Array.prototype.forEach.call(ps, function (x) { x.textContent = texto; });
   }
 
@@ -299,7 +342,7 @@ var AlumnadoBD = (function () {
 
   return {
     FICHERO: FICHERO, ACUERDO: ACUERDO, CLAVE_CARPETA: CLAVE_CARPETA, validar: validar,
-    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, permiso: permiso, traer: traer, aceptar: aceptar,
+    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, permiso: permiso, mirarCarpeta: mirarCarpeta, traer: traer, aceptar: aceptar,
     unir: unir, porClave: porClave, fechaGenerado: fechaGenerado, fechaLegible: fechaLegible,
     pintarAjustes: pintarAjustes
   };

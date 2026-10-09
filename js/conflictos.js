@@ -332,7 +332,7 @@
     'plantillas.json': 'las plantillas', 'rutas.json': 'las rutas de las carpetas', 'margenes-pdf.json': 'los márgenes de los PDF',
     'no-duplicados.json': 'los duplicados descartados', 'papelera.json': 'la papelera', 'envios.json': 'los envíos de correo',
     'asuntos.json': 'la lista de asuntos', 'tablon.json': 'el tablón', 'hitos.json': 'los hitos',
-    'perfiles.json': 'los perfiles', 'encargos.json': 'los encargos', 'correos-a-mano.json': 'los correos escritos a mano', 'actividades.json': 'las actividades extraescolares'
+    'perfiles.json': 'los perfiles', 'encargos.json': 'los encargos', 'correos-a-mano.json': 'los correos escritos a mano', 'actividades.json': 'las actividades extraescolares', 'datos-origen.json': 'de dónde llegó el alumnado y el personal'
   };
 
   function comoSeLlama(real) { return COMO_SE_LLAMA[real] || 'una lista de la aplicación'; }
@@ -414,6 +414,10 @@
       }
       if (real === 'actividades.json' && window.Actividades) {   /* fila 306: por id */
         if (await Actividades.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        continue;
+      }
+      if (real === 'datos-origen.json' && window.DatosQueTengo) {   /* fila 319: gana el apunte más reciente de cada fichero */
+        if (await DatosQueTengo.fusionarConflicto(g, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         continue;
       }
       if (real === 'hitos.json') {

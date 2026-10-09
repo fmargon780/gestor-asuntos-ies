@@ -87,16 +87,27 @@
     var boton = document.getElementById('btn-frescura-repasar');
     if (boton) boton.click();
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
+    if (window.DatosQueTengoVer) DatosQueTengoVer.repintar();   /* fila 319: la tabla «Lo que tengo ahora» */
   }
 
   /* Fila 312: copia un fichero (el que sea, venga de donde venga) a `_GESTOR/datos` con el nombre que le toca.
      `clave`: 'ALUMNADO' o 'PERSONAL' si ya se sabe qué es; si no, se mira por su nombre. Devuelve el nombre puesto. */
-  async function copiarUno(h, clase, nombreDestino) {
+  async function copiarUno(h, clase, nombreDestino, origen) {
     if (typeof clase === 'string') clase = CLASES.filter(function (c) { return c.clave === clase; })[0];
     clase = clase || claseDe(h.name);
     if (!clase) throw new Error(h.name + ' no tiene nombre de fichero de Séneca');
     var destino = nombreDestino || clase.nombre(h.name);   /* fila 317: el Centro de datos puede decidir el nombre */
     await Carpetas.copiarFicheroEn(App.E.datos, h, destino);
+    /* Fila 319: se apunta por dónde llegó. Sin `origen`, a mano, con la fecha del fichero elegido (cuándo se bajó de Séneca). */
+    if (window.DatosQueTengo) {
+      var o = origen;
+      if (!o) {
+        var modificado = 0;
+        try { modificado = (await h.getFile()).lastModified; } catch (e) { modificado = 0; }
+        o = { via: 'a-mano', fechaOriginal: modificado };
+      }
+      await DatosQueTengo.apuntar(destino, Object.assign({ nombreOriginal: h.name }, o));
+    }
     return destino;
   }
 
@@ -156,7 +167,7 @@
     fila.appendChild(b);
     var nota = document.createElement('span');
     nota.className = 'suave';
-    nota.textContent = 'Elige el fichero donde lo tengas bajado; se copia solo a _GESTOR/datos.';
+    nota.textContent = 'Elige el fichero donde lo tengas descargado. La aplicación lo coloca sola.';
     fila.appendChild(nota);
     caja.appendChild(fila);
   }

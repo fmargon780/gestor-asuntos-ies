@@ -57,6 +57,10 @@
       try {
         await Carpetas.moverFichero(dir, nombre, datos);
         movidos.push(nombre);
+        /* Fila 319: solo los de Séneca; se apunta que se recogieron sueltos, con la fecha de fuera. */
+        if (window.DatosQueTengo && esDeDatos(nombre, DE_SENECA)) {
+          await DatosQueTengo.apuntar(nombre, { via: 'recogido', fechaOriginal: deFuera, nombreOriginal: nombre });
+        }
       } catch (e) { /* se queda donde estaba; no se pierde nada */ }
     }
   }

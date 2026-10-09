@@ -236,11 +236,12 @@ await comprobar('Ajustes: la carpeta en El centro (sin caja de dirección) y «T
       carpeta: document.getElementById('alumnado-bd-carpeta').textContent,
       sinDireccion: !document.getElementById('alumnado-bd-url'),
       traer: !!document.querySelector('#herramientas-traer-alumnado-bd #alumnado-bd-traer'),
-      copia: document.getElementById('alumnado-bd-copia').textContent,
+      copiaEnHerramientas: !!document.getElementById('alumnado-bd-copia'),
+      copia: document.querySelector('#bloque-alumnado-bd .alumnado-bd-copia').textContent.replace(/ · \d{2}:\d{2}/, ' · HH:MM').replace(/-sep-2099/, '-sep-2099'),
       web: window.__llamadasWeb
     };
   }), { centro: true, carpeta: 'Carpeta señalada: Datos de matrícula.', sinDireccion: true, traer: true,
-        copia: 'Última copia: 3 alumnos y 8 datos, del 20-09-2099.', web: 0 });
+        copiaEnHerramientas: false, copia: 'Lo que tengo ahora: 3 alumnos y 8 datos, del 20-sep-2099 · HH:MM. Llegó de la carpeta de la base de datos de alumnado.', web: 0 });   /* fila 319: la línea de Herramientas se quitó y la de Ajustes dice lo mismo que la tabla */
 
 /* Los avisos ámbar del archivo que se rechaza a propósito no son errores. */
 const deVerdad = errores.filter((e) => e.indexOf('alumnado') === -1);

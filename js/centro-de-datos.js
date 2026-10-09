@@ -340,6 +340,7 @@ var CentroDeDatos = (function () {
     } finally {
       tomando = false;
       if (window.CentroDeDatosVer) CentroDeDatosVer.pintar();
+      if (window.DatosQueTengoVer) DatosQueTengoVer.repintar();   /* fila 319 */
     }
     return salida;
   }
@@ -362,7 +363,7 @@ var CentroDeDatos = (function () {
     FICHERO: FICHERO, CLAVE_CARPETA: CLAVE_CARPETA, CONTRATO: CONTRATO, CLAVES: CLAVES, TITULOS: TITULOS,
     carpeta: carpeta, permiso: permiso, leerIndice: leerIndice, senalarCarpeta: senalarCarpeta, olvidarCarpeta: olvidarCarpeta,
     leerApuntes: leerApuntes, apuntarConfiguracion: apuntarConfiguracion, apunteDe: apunteDe, traer: traer, registroEsperando: registroEsperando,
-    fechaCorta: fechaCorta, hayQueTomar: hayQueTomar, elegir: elegir, RECOLOCANDO: RECOLOCANDO,
+    fechaCorta: fechaCorta, hayQueTomar: hayQueTomar, elegir: elegir, pendientes: pendientes, RECOLOCANDO: RECOLOCANDO,
     _alEntrarDeNuevo: function () { yaMirado = false; alEntrar(); }   /* para las pruebas */
   };
 })();

@@ -5044,6 +5044,15 @@ trae lo de esa carpeta y vuelve a comprobar. Dos arreglos de paso en `js/bandeja
 está en marcha. En la copia de pruebas, `sinpermiso=` y `niega=` (`js/demo/permisos.js`); con `sinpermiso=` el panel sale
 solo y espera a que la demostración esté montada. Prueba: `pruebas/permisos-carpetas.mjs`.
 
+## Fila 319 — Lo que tengo ahora (9-oct-2026)
+
+Herramientas → «Traer el alumnado» estrena el recuadro «Lo que tengo ahora» (`js/datos-que-tengo*.js`): una tabla con RegAlum.csv, ALUMNADO-BD.json y cada
+RelPerCen…csv: fecha y hora, cuántos, por dónde llegó y si hay otro más nuevo en una carpeta señalada. El origen se apunta en `_GESTOR/datos-origen.json`
+(registrado en `Copias.FICHEROS` y con fusión de conflictos: gana el apunte más reciente de cada fichero). Se quitan las líneas grises de «Datos del Centro de
+datos» de esa pantalla y el párrafo «Última copia»; el bloque de Ajustes de la carpeta de la base de datos ya no nombra «Datos de matrícula», avisa si la carpeta no
+tiene el fichero y enlaza a la tabla. En la copia de pruebas: `masnuevo=` y un `ALUMNADO-BD.json` en el Centro de datos de mentira; el disco de mentira ya no
+rejuvenece los ficheros a cada lectura (guardaban «ahora» al leerlos). `CentroDeDatos.pendientes` se exporta. Prueba: `pruebas/datos-que-tengo.mjs`.
+
 ## Filas cerradas movidas de `docs/COLA.md` el 9-oct-2026 (texto sin tocar)
 
 | 283 | Aviso de usuario: mejora en «Ficha de un asunto» | DESCARTADA (6-oct-2026): descartada por Francisco desde el Centro de mando |
