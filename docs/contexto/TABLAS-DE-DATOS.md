@@ -125,3 +125,5 @@ Se comprueba con `pruebas/tablas-datos.mjs` (un PDF dibujado con pdf-lib con la 
 Séneca, la tabla en Word, la especialidad que falta en amarillo, un CSV en Latin-1 y un `.xlsx`).
 
 **Quién es el tutor o tutora de una unidad** (fila 299, `js/tutor-del-grupo.js`): `TutorDelGrupo` lee las filas de TUTORIAS de `TablasDatos` del curso de hoy y del bloque de unidades (no el de Pedagogía Terapéutica), en vigor hoy, para el correo de un hito (`docs/contexto/CORREO-Y-SENECA.md`). Si la tabla no está o la unidad del alumno no casa, el cuadro de Correo lo dice en ámbar.
+
+**De dónde llegan los listados** (fila 312, `docs/BEBER-DEL-CENTRO-DE-DATOS.md`): además de subirlos a mano, el gestor los coge de la carpeta «CENTRO DE DATOS» de Drive si está señalada en Ajustes → Este ordenador (`js/centro-de-datos*.js`). Las tutorías (PDF) se copian a `_GESTOR/datos` con su nombre; los del Consejo Escolar pasan por `TablasDatosPantalla.anadirFicherosDelConsejo(ficheros, { sustituir, silencioso })`; lo tomado se apunta en `_GESTOR/centro-de-datos.json` y bajo «Tablas de datos» sale «Datos del Centro de datos, del …».

@@ -249,3 +249,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 303 — asuntos que han perdido su carpeta (8-oct-2026)
 
 - En el centro, Ajustes → Problemas: mirar que el traslado del recorte de la idea 303 sale en la lista «La app ha encontrado la carpeta de N de ellos» con su carpeta del ARCHIVO, repasar la lista, desmarcar lo que no cuadre y pulsar «Enlazar los N». Decir cuántos de los 21 quedan sin encontrar.
+
+## Fila 312 — beber del Centro de datos (9-oct-2026)
+
+- Con datos reales: en Ajustes → Este ordenador, «Carpeta del Centro de datos» → «Señalar la carpeta» y elegir la carpeta «CENTRO DE DATOS» de Google Drive para ordenador. Ver que sale el aviso verde «Traído del Centro de datos: …» con lo que había nuevo, y que en Herramientas → «Traer ficheros de Séneca» sale la línea gris «Datos del Centro de datos, del …».
