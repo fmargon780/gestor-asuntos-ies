@@ -142,7 +142,13 @@
      ========================================================== */
 
   async function mirar(aLaFuerza) {
-    if (!carpeta || mirando) return;
+    if (!carpeta) return;
+    if (mirando) {
+      if (!aLaFuerza) return;
+      /* Fila 318: tras «Dar permiso», la mirada a la fuerza espera a la que ya está en marcha (empezó sin permiso). */
+      for (var espera = 0; mirando && espera < 50; espera++) await new Promise(function (ok) { setTimeout(ok, 100); });
+      if (mirando) return;
+    }
     var ahora = Date.now();
     if (!aLaFuerza && ahora - ultimaMirada < SEGUNDOS_ENTRE_MIRADAS * 1000) return;
     mirando = true;
@@ -178,8 +184,9 @@
     } catch (e) {
       correos = null;
       repintarPantalla();
+    } finally {
+      mirando = false;   /* fila 318: antes, sin permiso, el return de arriba lo dejaba en true y la bandeja no volvía a mirar tras «Dar permiso» */
     }
-    mirando = false;
   }
 
   /* ==========================================================

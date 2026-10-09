@@ -163,3 +163,12 @@ copia de pruebas; sección 5: una línea «Copia de pruebas con datos de demostr
 `docs/CONTEXTO.md` o el hijo que toque (dónde vive `js/demo/` y qué no debe hacer), `docs/HISTORIA.md`,
 `docs/COLA.md`, `docs/ESTIMACIONES.md`. Subidas a Vercel: como mucho tres (rama `pruebas`, y el
 paso a `main`).
+
+## Fila 318: carpetas sin permiso en la copia de pruebas
+
+- `?demo=1&auto=1&sinpermiso=alumnado,bandeja,centro-de-datos`: esas carpetas de mentira están recordadas y empiezan sin
+  permiso (`queryPermission` da `'prompt'` hasta que se llama a `requestPermission`). El panel «Comprobación al entrar» sale
+  solo, cuando la demostración ya está montada, con «Dar permiso» en esas filas.
+- `&niega=bandeja`: para esos `id`, `requestPermission` da `'denied'`.
+- Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
+- Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.

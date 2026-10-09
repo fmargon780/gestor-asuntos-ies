@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '318', fecha: '2026-10-09', texto: 'Al pulsar «Entrar», la aplicación pide también el permiso de las carpetas del alumnado, de la bandeja y del Centro de datos: ya no hay que volver a señalarlas cada mañana. En «Comprobación al entrar», el botón «Dar permiso» lo arregla con una pulsación.' },
   { id: '317', fecha: '2026-10-09', texto: 'El gestor ya distingue el personal docente del no docente y los cursos cuando trae los datos del Centro de datos.' },
   { id: '316', fecha: '2026-10-09', texto: 'La dirección del buzón de soporte se puede escribir una sola vez en el Centro de datos: la app la copia sola y en Ajustes sale con la nota «Se cambia en el Centro de datos».' },
   { id: '314', fecha: '2026-10-09', texto: 'En «Control del registro», la fecha «Revisar desde el día» ya deja escribir el año: se guarda al salir del campo o al pulsar Intro, y pregunta antes de quitar apuntes.' },

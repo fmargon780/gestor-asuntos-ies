@@ -38,7 +38,7 @@
   enlace.href = 'css/demo.css';
   document.head.appendChild(enlace);
 
-  ['js/demo/disco.js', 'js/demo/datos-plantilla.js', 'js/demo/datos-hacer-hito.js', 'js/demo/datos-perfil.js', 'js/demo/datos-encargos.js', 'js/demo/datos-notas.js', 'js/demo/datos-problemas.js', 'js/demo/datos-grupo.js', 'js/demo/datos-biblioteca.js', 'js/demo/datos-tutor.js', 'js/demo/datos-orden.js', 'js/demo/datos-centro-de-datos.js', 'js/demo/datos.js', 'js/demo/franja.js'].forEach(function (src) {
+  ['js/demo/disco.js', 'js/demo/datos-plantilla.js', 'js/demo/datos-hacer-hito.js', 'js/demo/datos-perfil.js', 'js/demo/datos-encargos.js', 'js/demo/datos-notas.js', 'js/demo/datos-problemas.js', 'js/demo/datos-grupo.js', 'js/demo/datos-biblioteca.js', 'js/demo/datos-tutor.js', 'js/demo/datos-orden.js', 'js/demo/datos-centro-de-datos.js', 'js/demo/datos.js', 'js/demo/permisos.js', 'js/demo/franja.js'].forEach(function (src) {
     document.write('<script src="' + src + '"><' + '/script>');
   });
 })();

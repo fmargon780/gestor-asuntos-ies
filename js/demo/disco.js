@@ -198,6 +198,7 @@
     activo: function () { return activo; },
     disco: function () { return raiz; },
     ficheroDeMentira: fich,
+    carpetaDeMentira: dir,   /* fila 318: una carpeta suelta, para js/demo/permisos.js */
     reiniciar: reiniciar,
     escrituras: function () { return escrituras; },
     reiniciarEscrituras: function () { escrituras = 0; }

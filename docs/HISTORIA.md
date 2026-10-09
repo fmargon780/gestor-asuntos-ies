@@ -5019,6 +5019,19 @@ En la misma lectura de `configuracion.json` de la fila 313, `soporte.buzon` (sol
 
 `CentroDeDatos.CONTRATO` es 2 (el de `configuracion.json` sigue en 1, en su propio módulo). Nueva `elegir(indice)`: descarta lo que no tiene `ruta`, lleva `porAlumno` o `alumno`; `alumnado` y `alumnado-bd` solo si hay uno (con más, ninguno y aviso ámbar); `personal` y `consejo-escolar` todas; `tutorias` y registros las del `cursoActual` (o sin curso); con un índice de contrato 1 sale lo de siempre. Cuarta condición para no repetir: ningún apunte de la misma clave con la misma huella. Un fichero de personal se guarda con un nombre que diga su curso y ámbito (`RelPerCen`, `RelPerCenNodocente` o `RelPerCenTodo` + curso) si el nombre no lo dice igual o dos entradas se llamarían igual (`Datos.cursoEnElNombre`, sacado de `cursoDelFichero`). Con `ocupado: true` no se toma nada y se dice en gris. La configuración del centro (filas 313 y 316) se lee aunque el índice sea de un contrato más nuevo o esté ocupado. La carpeta de mentira de la copia de pruebas es ya de contrato 2, con personal docente y no docente. Pruebas: `pruebas/centro-de-datos.mjs` (apartado 9) y `pruebas/centro-de-datos-configuracion.mjs`.
 
+## Fila 318 — El permiso de las carpetas, al entrar (9-oct-2026)
+
+`js/permisos-carpetas.js` (`window.PermisosCarpetas`: `estado`, `pedir`, `pedirAlEntrar`). Al pulsar «Entrar», tras
+las dos carpetas de Dropbox, se pide el permiso de las carpetas recordadas del alumnado, de la bandeja y del Centro de
+datos, todas seguidas (la pulsación caduca a los pocos segundos) y con 60 s de tope. Las omitidas en este ordenador no se
+piden. «Solo consultar» y directivo: el Centro de datos no se pide (`centro-de-datos.js` no lo lee en ese modo); el
+alumnado y la bandeja sí (solo leen). En «Comprobación al entrar», esas tres filas, cuando hay carpeta recordada sin
+permiso, llevan «Dar permiso» (`boton`, `darPermiso`): pide el permiso dentro de la propia pulsación, sin cerrar el panel,
+trae lo de esa carpeta y vuelve a comprobar. Dos arreglos de paso en `js/bandeja-correos.js`: `mirando` se quedaba en
+`true` si la primera mirada era sin permiso (la bandeja no volvía a mirar), y la mirada a la fuerza espera ahora a la que
+está en marcha. En la copia de pruebas, `sinpermiso=` y `niega=` (`js/demo/permisos.js`); con `sinpermiso=` el panel sale
+solo y espera a que la demostración esté montada. Prueba: `pruebas/permisos-carpetas.mjs`.
+
 ## Filas cerradas movidas de `docs/COLA.md` el 9-oct-2026 (texto sin tocar)
 
 | 283 | Aviso de usuario: mejora en «Ficha de un asunto» | DESCARTADA (6-oct-2026): descartada por Francisco desde el Centro de mando |

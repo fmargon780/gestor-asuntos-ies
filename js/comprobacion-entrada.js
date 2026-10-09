@@ -98,6 +98,17 @@
     return { id: id, titulo: titulo, estado: estado, frase: frase, arreglar: arreglar || null, ambar: !!ambar };
   }
 
+  /* Fila 318: carpeta recordada a la que el navegador ya no da permiso. Se arregla pidiéndolo
+     (PermisosCarpetas.pedir), nunca señalándola otra vez. */
+  var PERMISO_OTRA_VEZ = ' Pulsa «Dar permiso»: no hay que volver a señalarla. Si el navegador ofrece «Permitir en cada visita», elígelo y no volverá a pedirlo.';
+  function pedirPermiso(id, titulo, frase, arreglar, ambar) {
+    var r = resultado(id, titulo, 'falta', 'El navegador pide otra vez el permiso de ' + frase + '.' + PERMISO_OTRA_VEZ, arreglar, ambar);
+    r.boton = 'Dar permiso';
+    r.carpeta = frase;
+    r.darPermiso = function () { return PermisosCarpetas.pedir(id); };
+    return r;
+  }
+
   function sinComprobar(id, titulo, e) {
     return resultado(id, titulo, 'sin-comprobar',
       'No he podido comprobarlo: ' + ((e && e.message) ? e.message : 'no ha contestado') + '.');
@@ -149,11 +160,11 @@
       try { permiso = (await dir.queryPermission(op)) === 'granted'; } catch (e) { permiso = false; }
       if (!permiso) {
         if (copia) {
-          return resultado('alumnado', T, 'falta', 'El navegador ha dejado de dar permiso a la carpeta de la base ' +
-            'de datos de alumnado; se sigue usando la última copia. Hay que volver a señalarla.', arreglar, true);
+          var r = pedirPermiso('alumnado', T, 'la carpeta de la base de datos de alumnado', arreglar, true);
+          r.frase = r.frase.replace('alumnado.', 'alumnado; mientras tanto se usa la última copia.');
+          return r;
         }
-        return resultado('alumnado', T, 'falta', 'El navegador ha dejado de dar permiso a la carpeta de la base ' +
-          'de datos de alumnado. Hay que volver a señalarla.', arreglar);
+        return pedirPermiso('alumnado', T, 'la carpeta de la base de datos de alumnado', arreglar);
       }
       try { await dir.getFileHandle(AlumnadoBD.FICHERO); }
       catch (e) {
@@ -190,8 +201,7 @@
     });
     if (dir) {
       if (!(await CentroDeDatos.permiso(dir, false))) {
-        return resultado('centro-de-datos', T, 'falta', 'El navegador ha dejado de dar permiso a la carpeta del Centro de datos. ' +
-          'Hay que volver a dar permiso.', arreglar, true);
+        return pedirPermiso('centro-de-datos', T, 'la carpeta del Centro de datos', arreglar, true);
       }
       var r = await CentroDeDatos.leerIndice(dir);
       if (!r.ok) {
@@ -217,12 +227,12 @@
       return resultado('bandeja', T, 'falta', 'No hay carpeta de la bandeja señalada: los correos etiquetados en ' +
         'Gmail no llegan a la aplicación.', arreglar);
     }
-    if (enDemo()) return resultado('bandeja', T, 'bien', 'Señalada.');
+    /* Fila 318: con `sinpermiso=` la copia de pruebas sí mira el permiso. */
+    if (enDemo() && !(Demo.permisosSimulados && Demo.permisosSimulados())) return resultado('bandeja', T, 'bien', 'Señalada.');
     if (!(await Carpetas.permiso(h, false))) {
-      return resultado('bandeja', T, 'falta', 'El navegador ha dejado de dar permiso a la carpeta de la bandeja. ' +
-        'Hay que volver a señalarla.', arreglar);
+      return pedirPermiso('bandeja', T, 'la carpeta de la bandeja', arreglar);
     }
-    try { await h.values().next(); }
+    try { await (h.values ? h.values() : h.entries())[Symbol.asyncIterator]().next(); }   /* fila 318: el disco de la copia de pruebas solo trae entries() */
     catch (e) {
       return resultado('bandeja', T, 'falta', 'No puedo leer la carpeta de la bandeja (¿se ha movido o borrado?). ' +
         'Hay que volver a señalarla.', arreglar);

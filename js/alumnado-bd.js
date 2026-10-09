@@ -299,7 +299,7 @@ var AlumnadoBD = (function () {
 
   return {
     FICHERO: FICHERO, ACUERDO: ACUERDO, CLAVE_CARPETA: CLAVE_CARPETA, validar: validar,
-    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, traer: traer, aceptar: aceptar,
+    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, permiso: permiso, traer: traer, aceptar: aceptar,
     unir: unir, porClave: porClave, fechaGenerado: fechaGenerado, fechaLegible: fechaLegible,
     pintarAjustes: pintarAjustes
   };

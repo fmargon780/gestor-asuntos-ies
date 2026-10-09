@@ -39,7 +39,7 @@
 
   function sinPanelAutomatico() {
     if (window.__COMPROBACION_ABRIR_PANEL__) return false;
-    if (window.Demo && Demo.activo && Demo.activo()) return true;
+    if (window.Demo && Demo.activo && Demo.activo()) return !(Demo.permisosSimulados && Demo.permisosSimulados());   /* fila 318: con `sinpermiso=` el panel sale solo */
     return !!(navigator && navigator.webdriver);
   }
 
@@ -106,7 +106,8 @@
       f.estado === 'sin-comprobar' ? 'gris' : (f.ambar ? 'ambar' : 'roja');
     var botones = '';
     if (f.estado === 'falta' || f.estado === 'sin-comprobar') {
-      if (f.arreglar) botones += '<button type="button" class="boton boton-principal" data-arreglar="' + esc(f.id) + '">Arreglarlo</button>';
+      if (f.darPermiso) botones += '<button type="button" class="boton boton-principal" data-dar="' + esc(f.id) + '">' + esc(f.boton || 'Dar permiso') + '</button>';
+      else if (f.arreglar) botones += '<button type="button" class="boton boton-principal" data-arreglar="' + esc(f.id) + '">' + esc(f.boton || 'Arreglarlo') + '</button>';
       botones += '<button type="button" class="comprobacion-enlace" data-omitir="' + esc(f.id) + '">No lo uso en este ordenador</button>';
     } else if (f.estado === 'omitida') {
       botones += '<button type="button" class="comprobacion-enlace" data-revisar="' + esc(f.id) + '">Volver a revisarla</button>';
@@ -135,6 +136,31 @@
     });
   }
 
+  var DONDE_TRAER = {
+    alumnado: function () { return AlumnadoBD.traer(false, false); },
+    'centro-de-datos': function () { return CentroDeDatos.traer({ avisar: false, pedir: false }); },
+    bandeja: function () { return Bandeja.pedirPermiso(); }
+  };
+
+  /* Fila 318: «Dar permiso». La petición sale dentro de la propia pulsación, sin esperar nada antes
+     (si se espera, el navegador la rechaza). El panel no se cierra ni se va a Ajustes. */
+  async function darPermiso(f, boton, repintar) {
+    if (!f || boton.disabled) return;
+    boton.disabled = true;
+    var quedo = false;
+    try {
+      quedo = await f.darPermiso();
+      if (quedo) {
+        U.aviso('Permiso dado a ' + f.carpeta + '.', 'bueno');
+        try { if (DONDE_TRAER[f.id]) await DONDE_TRAER[f.id](); } catch (e) { /* lo suyo lo traerá en la próxima entrada */ }
+        await comprobar();
+      } else {
+        U.aviso('Sin permiso no puedo leer ' + f.carpeta + '.', 'ambar');
+      }
+    } catch (e) { quedo = false; }
+    if (quedo) repintar(); else boton.disabled = false;
+  }
+
   var panelAbierto = false;
 
   async function abrirPanel() {
@@ -150,23 +176,33 @@
         var textoCancelar = cancelar.textContent;
         cancelar.textContent = 'Ahora no';
         var cuerpo = $('cuadro-cuerpo');
-        Array.prototype.forEach.call(cuerpo.querySelectorAll('[data-arreglar]'), function (b) {
-          b.onclick = function () {
-            var f = filas.filter(function (x) { return x.id === b.dataset.arreglar; })[0];
-            accion = function () { recalcular = true; if (f && f.arreglar) f.arreglar(); };
-            cancelar.click();
-          };
-        });
-        ['omitir', 'revisar'].forEach(function (que) {
-          Array.prototype.forEach.call(cuerpo.querySelectorAll('[data-' + que + ']'), function (b) {
+        /* Se enlaza aquí y otra vez tras «Dar permiso», que repinta el cuerpo sin cerrar el panel. */
+        var enlazar = function () {
+          Array.prototype.forEach.call(cuerpo.querySelectorAll('[data-arreglar]'), function (b) {
             b.onclick = function () {
-              var id = b.dataset[que];
-              if (que === 'omitir') C.omitir(id); else C.volverARevisar(id);
-              accion = 'recomprobar';
+              var f = filas.filter(function (x) { return x.id === b.dataset.arreglar; })[0];
+              accion = function () { recalcular = true; if (f && f.arreglar) f.arreglar(); };
               cancelar.click();
             };
           });
-        });
+          Array.prototype.forEach.call(cuerpo.querySelectorAll('[data-dar]'), function (b) {
+            b.onclick = function () {
+              var f = filas.filter(function (x) { return x.id === b.dataset.dar; })[0];
+              darPermiso(f, b, function () { cuerpo.innerHTML = htmlPanel(); enlazar(); });
+            };
+          });
+          ['omitir', 'revisar'].forEach(function (que) {
+            Array.prototype.forEach.call(cuerpo.querySelectorAll('[data-' + que + ']'), function (b) {
+              b.onclick = function () {
+                var id = b.dataset[que];
+                if (que === 'omitir') C.omitir(id); else C.volverARevisar(id);
+                accion = 'recomprobar';
+                cancelar.click();
+              };
+            });
+          });
+        };
+        enlazar();
         var acepto = await promesa;
         cancelar.textContent = textoCancelar;
         if (typeof accion === 'function') { seguir = false; accion(); }
@@ -188,8 +224,13 @@
   }
 
   async function alEntrar() {
+    /* Fila 318: con `sinpermiso=`, la copia de pruebas espera a estar montada para que la comprobación vea la bandeja llena. */
+    for (var i = 0; i < 200 && window.Demo && Demo.permisosSimulados && Demo.permisosSimulados() && Demo.montando; i++) await new Promise(function (ok) { setTimeout(ok, 300); });
     await comprobar();
-    if (filas && filas.some(C.cuentanComoFalta) && !sinPanelAutomatico()) abrirPanel();
+    /* Fila 318: en la copia de pruebas con `sinpermiso=`, el panel sale solo por las carpetas sin permiso. */
+    var simulados = window.Demo && Demo.permisosSimulados && Demo.permisosSimulados() && window.PermisosCarpetas ? PermisosCarpetas.ids() : null;
+    var hayQueMostrar = filas && filas.some(function (f) { return C.cuentanComoFalta(f) && (!simulados || simulados.indexOf(f.id) !== -1); });
+    if (hayQueMostrar && !sinPanelAutomatico()) abrirPanel();
   }
 
   /* Una sola vez por entrada, cuando ya hay datos y el _GESTOR; y, tras
