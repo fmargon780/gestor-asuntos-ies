@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 09-oct-2026 (fila 318 PENDIENTE, desde la conversación de diseño)
+Última puesta al día: 09-oct-2026 (fila 319 PENDIENTE, desde la conversación de diseño)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -17,3 +17,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 310 | 120 | Pantalla nueva en Herramientas con filtros, actividad antigua con papelera y hoja de cálculo de dos pestañas |
 | 311 | 90 | Tabla de datos calculada, hueco de tabla con fechas, tipo con dos campos que llega solo y plantilla nueva |
 | 318 | 80 | Módulo nuevo pequeño, una llamada en «Entrar», botón «Dar permiso» en tres filas del panel, carpetas sin permiso en la demostración y prueba nueva |
+| 319 | 110 | Dos módulos nuevos, apunte de origen en cuatro puertas, tabla en Herramientas con aviso de más nuevo, bloque de Ajustes, demostración y prueba nuevas, dos pruebas que poner al día |
