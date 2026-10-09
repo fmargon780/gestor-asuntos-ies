@@ -80,6 +80,7 @@ var CentroDeDatosVer = (function () {
         '<button type="button" class="boton" id="centro-de-datos-olvidar">Olvidarla</button>' +
         '<button type="button" class="boton oculto" id="centro-de-datos-permiso">Volver a dar permiso</button></div>' +
         '<p class="explica" id="centro-de-datos-indice"></p>' +
+        '<p class="suave oculto" id="centro-de-datos-ocupado"></p>' +
         '<div class="aviso aviso-ambar oculto" id="centro-de-datos-aviso"></div>');
       var ancla = $('bloque-alumnado-bd');
       if (ancla && ancla.parentNode === centro) centro.insertBefore(det, ancla.nextSibling); else centro.appendChild(det);
@@ -97,7 +98,7 @@ var CentroDeDatosVer = (function () {
     var visible = !!bloqueAjustes.offsetParent;   /* oculto: no se lee su índice del disco */
     var carpetaP = $('centro-de-datos-carpeta'), indiceP = $('centro-de-datos-indice');
     var aviso = $('centro-de-datos-aviso'), permiso = $('centro-de-datos-permiso');
-    var texto = '', ambar = avisoDeCarpeta, conPermiso = true, indiceTexto = '';
+    var texto = '', ambar = avisoDeCarpeta, conPermiso = true, indiceTexto = '', ocupado = false;
     if (dir) {
       texto = 'Carpeta señalada: ' + dir.name + '.';
       conPermiso = visible ? await CentroDeDatos.permiso(dir, false) : true;
@@ -110,6 +111,7 @@ var CentroDeDatosVer = (function () {
           indiceTexto = 'Índice del ' + (cuando && !isNaN(cuando.getTime()) ? CentroDeDatos.fechaCorta(ind.actualizado, true) + ' ' +
             String(cuando.getHours()).padStart(2, '0') + ':' + String(cuando.getMinutes()).padStart(2, '0') : 'sin fecha') +
             ' · ' + n + (n === 1 ? ' listado' : ' listados') + ' para el gestor';
+          ocupado = !!ind.ocupado && (ind.contrato || 1) <= CentroDeDatos.CONTRATO;
           if ((ind.contrato || 1) > CentroDeDatos.CONTRATO) ambar = ambar || 'El Centro de datos es más nuevo que esta aplicación.';
         } else ambar = ambar || 'Esta carpeta no es la del Centro de datos.';
       }
@@ -129,6 +131,8 @@ var CentroDeDatosVer = (function () {
         indiceP.appendChild(a);
       }
     }
+    var ocupadoP = $('centro-de-datos-ocupado');
+    if (ocupadoP && visible) { ocupadoP.textContent = ocupado ? CentroDeDatos.RECOLOCANDO : ''; ocupadoP.classList.toggle('oculto', !ocupado); }
     if (aviso) { aviso.textContent = ambar; aviso.classList.toggle('oculto', !ambar); }
     if (permiso) permiso.classList.toggle('oculto', !(dir && !conPermiso));
     var olv = $('centro-de-datos-olvidar');

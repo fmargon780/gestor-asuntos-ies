@@ -51,7 +51,7 @@ var CentroDeDatosConfiguracion = (function () {
     var conf = await Carpetas.leerJson(dir, 'configuracion.json');
     var NADA = { centro: false, buzon: false };
     if (!conf || typeof conf !== 'object') return NADA;
-    if ((conf.contrato || 1) > CentroDeDatos.CONTRATO) return NADA;
+    if ((conf.contrato || 1) > 1) return NADA;   /* el contrato de configuracion.json es el suyo (1), no el del índice */
     var previo = apuntes && apuntes.configuracion;
     if (previo && previo.actualizado && previo.actualizado === conf.actualizado) return NADA;
 

@@ -18,6 +18,8 @@ funciona como hoy, y se prueba con una carpeta inventada.
 
 ## Lo que el Centro de datos promete (copia de su contrato, versión 1)
 
+> **Desde la fila 317 (9-oct-2026) la copia vigente del contrato es `docs/CENTRO-DE-DATOS-CONTRATO-2.md`** (índice de contrato 2, con fichas y varias entradas por clave); lo de abajo es la versión 1, que el gestor sigue entendiendo.
+
 La versión buena vive en `docs/CONTRATO.md` de `centro-de-datos-ies`. Lo que hace falta aquí:
 
     CENTRO DE DATOS/

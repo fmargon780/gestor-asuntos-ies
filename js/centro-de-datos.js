@@ -26,7 +26,7 @@ var CentroDeDatos = (function () {
 
   var FICHERO = 'centro-de-datos.json';
   var ESQUEMA = 1;
-  var CONTRATO = 1;
+  var CONTRATO = 2;   /* fila 317: el del índice; configuracion.json lleva el suyo (1) */
   var CLAVE_CARPETA = 'centro-de-datos-carpeta';
   var CLAVES = ['alumnado', 'personal', 'alumnado-bd', 'tutorias', 'consejo-escolar', 'registro-entrada', 'registro-salida'];
   var TITULOS = {
@@ -170,13 +170,39 @@ var CentroDeDatos = (function () {
     return actual.getFileHandle(partes[partes.length - 1]);
   }
 
-  function interesa(e) { return e && CLAVES.indexOf(e.clave) !== -1 && e.ruta; }
+  /* Fila 317 (contrato 2): qué entradas del índice se cogen. Con un índice de contrato 1 (sin `cursoActual` ni
+     fichas) los campos que faltan se leen vacíos y sale lo de siempre. Devuelve { lista, avisos }. */
+  function elegir(indice) {
+    var cursoActual = (indice && indice.cursoActual) || (window.U && U.cursoActual ? U.cursoActual() : '');
+    var avisos = [];
+    var todas = ((indice && indice.listados) || []).filter(function (e) {
+      return e && CLAVES.indexOf(e.clave) !== -1 && e.ruta && !e.porAlumno && !e.alumno;
+    });
+    var de = function (clave) { return todas.filter(function (e) { return e.clave === clave; }); };
+    var delCurso = function (clave) {
+      var l = de(clave);
+      var hoy = l.filter(function (e) { return (e.cursoEscolar || '') === cursoActual; });
+      return hoy.length ? hoy : l.filter(function (e) { return !e.cursoEscolar; });
+    };
+    var unica = function (clave, nombre) {
+      var l = de(clave);
+      if (l.length > 1) { avisos.push('En el Centro de datos hay más de un listado de ' + nombre + '. No he traído ninguno.'); return []; }
+      return l;
+    };
+    var elegidas = [].concat(unica('alumnado', 'alumnado'), unica('alumnado-bd', 'alumnado de la base de datos'), de('personal'),
+      delCurso('tutorias'), de('consejo-escolar'), delCurso('registro-entrada'), delCurso('registro-salida'));
+    var lista = todas.filter(function (e) { return elegidas.indexOf(e) !== -1; });   /* en el orden del índice */
+    return { lista: lista, avisos: avisos, cursoActual: cursoActual };
+  }
 
   /* Las tres condiciones del diseño. `deLaCasa`: la fecha (ms) del dato que el gestor ya tiene, o 0. */
   function hayQueTomar(e, apuntes, deLaCasa) {
     var ap = apuntes.tomado[llave(e.clave, e.variante)];
     var subido = new Date(e.subido).getTime();
     if (ap && ap.huella && e.huella && ap.huella === e.huella) return false;
+    /* Fila 317: si algún apunte de esa clave, con la variante que sea, tiene la misma huella, no se vuelve a tomar
+       (con el contrato 2 cambian algunas variantes y el apunte de antes ya no casa por su llave). */
+    if (e.huella && Object.keys(apuntes.tomado).some(function (k) { return k.split('|')[0] === e.clave && apuntes.tomado[k].huella === e.huella; })) return false;
     if (ap && !isNaN(subido) && new Date(ap.subido).getTime() >= subido) return false;
     if (deLaCasa && !isNaN(subido) && deLaCasa > subido) return false;
     return true;
@@ -185,13 +211,13 @@ var CentroDeDatos = (function () {
   /* Los del índice que se tomarían ahora. `sinRegistro`: dejar fuera los del registro. */
   async function pendientes(indice, apuntes, sinRegistro) {
     var R = window.CentroDeDatosReparto;
+    var elegidas = elegir(indice).lista;
     var lista = [];
-    for (var i = 0; i < indice.listados.length; i++) {
-      var e = indice.listados[i];
-      if (!interesa(e)) continue;
+    for (var i = 0; i < elegidas.length; i++) {
+      var e = elegidas[i];
       if (sinRegistro && /^registro-/.test(e.clave)) continue;
       var deLaCasa = 0;
-      try { deLaCasa = await R.fechaDelGestor(e); } catch (x) { deLaCasa = 0; }
+      try { deLaCasa = await R.fechaDelGestor(e, elegidas); } catch (x) { deLaCasa = 0; }
       if (hayQueTomar(e, apuntes, deLaCasa)) lista.push(e);
     }
     return lista;
@@ -203,13 +229,26 @@ var CentroDeDatos = (function () {
       var dir = await carpeta();
       if (!dir || !(await permiso(dir, false))) return false;
       var r = await leerIndice(dir);
-      if (!r.ok || (r.indice.contrato || 1) > CONTRATO) return false;
+      if (!r.ok || (r.indice.contrato || 1) > CONTRATO || r.indice.ocupado) return false;
       var lista = await pendientes(r.indice, await leerApuntes(), false);
       return lista.some(function (e) { return /^registro-/.test(e.clave); });
     } catch (e) { return false; }
   }
 
   /* ---------- tomar ---------- */
+
+  var RECOLOCANDO = 'El Centro de datos está recolocando sus ficheros. Lo traeré más tarde.';
+  var avisadosElegir = {};
+
+  /* El aviso verde de lo traído; `config`: lo que se copió de configuracion.json. */
+  function avisarTraido(partes, config) {
+    partes = partes.slice();
+    if (config && config.centro) partes.push('los datos del centro');
+    if (config && config.buzon) partes.push('la dirección del buzón de soporte');
+    var conConfig = !!(config && (config.centro || config.buzon));
+    U.aviso('Traído del Centro de datos: ' + (conConfig && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
+  }
+  function avisarConfiguracion(config) { avisarTraido([], config); }
 
   /* `avisar`: contesta siempre (el botón); `pedir`: puede pedir permiso (tras un clic).
      Devuelve { ok, tomados: [clave…], fallos: [texto…], motivo? }. */
@@ -237,15 +276,28 @@ var CentroDeDatos = (function () {
         U.accesorio('No he podido leer el índice del Centro de datos', new Error(r.motivo));
         return salida;
       }
-      if ((r.indice.contrato || 1) > CONTRATO) {
-        salida.motivo = 'contrato';
-        if (!avisadoContrato || op.avisar) { avisadoContrato = true; U.aviso('El Centro de datos es más nuevo que esta aplicación.', 'ambar'); }
+      var apuntes = await leerApuntes(true);
+      /* Fila 317: los datos del centro (configuracion.json, que lleva su propio contrato) se leen aunque el índice
+         sea de un contrato más nuevo o esté ocupado. */
+      var config = null;
+      if (window.CentroDeDatosConfiguracion) {
+        try { config = await CentroDeDatosConfiguracion.tomar(dir, r.indice, apuntes); }
+        catch (x) { salida.fallos.push('Datos del centro: ' + U.mensajeDeError(x)); }
+      }
+      salida.configuracion = !!(config && (config.centro || config.buzon));
+      var bloqueo = (r.indice.contrato || 1) > CONTRATO ? 'contrato' : (r.indice.ocupado ? 'ocupado' : '');
+      if (bloqueo) {
+        salida.motivo = bloqueo;
+        if (bloqueo === 'contrato' && (!avisadoContrato || op.avisar)) { avisadoContrato = true; U.aviso('El Centro de datos es más nuevo que esta aplicación.', 'ambar'); }
+        if (bloqueo === 'ocupado' && op.avisar) U.aviso(RECOLOCANDO);
+        if (salida.configuracion) avisarConfiguracion(config);
         return salida;
       }
-      var apuntes = await leerApuntes(true);
+      var elegido = elegir(r.indice);
+      elegido.avisos.forEach(function (a) { if (!avisadosElegir[a] || op.avisar) { avisadosElegir[a] = true; U.aviso(a, 'ambar'); } });
       var lista = await pendientes(r.indice, apuntes, false);
       var R = window.CentroDeDatosReparto;
-      var ctx = R.contexto();
+      var ctx = R.contexto(elegido.lista);
       var nuevos = {};
       var esperaRegistro = false;
       for (var i = 0; i < lista.length; i++) {
@@ -266,12 +318,6 @@ var CentroDeDatos = (function () {
       }
       await R.terminar(ctx);
       await apuntar(nuevos);
-      var config = null;
-      if (window.CentroDeDatosConfiguracion) {
-        try { config = await CentroDeDatosConfiguracion.tomar(dir, r.indice, apuntes); }
-        catch (x) { salida.fallos.push('Datos del centro: ' + U.mensajeDeError(x)); }
-      }
-      salida.configuracion = !!(config && (config.centro || config.buzon));
       salida.ok = true;
       salida.esperaRegistro = esperaRegistro;
       if (salida.tomados.length || salida.configuracion) {
@@ -283,9 +329,7 @@ var CentroDeDatos = (function () {
             partes.push(TITULOS[e.clave] + ' (' + fechaCorta(e.subido, false) + ')');
           }
         });
-        if (config && config.centro) partes.push('los datos del centro');
-        if (config && config.buzon) partes.push('la dirección del buzón de soporte');
-        U.aviso('Traído del Centro de datos: ' + (salida.configuracion && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
+        avisarTraido(partes, config);
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');
       }
@@ -318,7 +362,7 @@ var CentroDeDatos = (function () {
     FICHERO: FICHERO, CLAVE_CARPETA: CLAVE_CARPETA, CONTRATO: CONTRATO, CLAVES: CLAVES, TITULOS: TITULOS,
     carpeta: carpeta, permiso: permiso, leerIndice: leerIndice, senalarCarpeta: senalarCarpeta, olvidarCarpeta: olvidarCarpeta,
     leerApuntes: leerApuntes, apuntarConfiguracion: apuntarConfiguracion, apunteDe: apunteDe, traer: traer, registroEsperando: registroEsperando,
-    fechaCorta: fechaCorta, hayQueTomar: hayQueTomar,
+    fechaCorta: fechaCorta, hayQueTomar: hayQueTomar, elegir: elegir, RECOLOCANDO: RECOLOCANDO,
     _alEntrarDeNuevo: function () { yaMirado = false; alEntrar(); }   /* para las pruebas */
   };
 })();

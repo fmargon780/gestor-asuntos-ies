@@ -91,11 +91,11 @@
 
   /* Fila 312: copia un fichero (el que sea, venga de donde venga) a `_GESTOR/datos` con el nombre que le toca.
      `clave`: 'ALUMNADO' o 'PERSONAL' si ya se sabe qué es; si no, se mira por su nombre. Devuelve el nombre puesto. */
-  async function copiarUno(h, clase) {
+  async function copiarUno(h, clase, nombreDestino) {
     if (typeof clase === 'string') clase = CLASES.filter(function (c) { return c.clave === clase; })[0];
     clase = clase || claseDe(h.name);
     if (!clase) throw new Error(h.name + ' no tiene nombre de fichero de Séneca');
-    var destino = clase.nombre(h.name);
+    var destino = nombreDestino || clase.nombre(h.name);   /* fila 317: el Centro de datos puede decidir el nombre */
     await Carpetas.copiarFicheroEn(App.E.datos, h, destino);
     return destino;
   }
