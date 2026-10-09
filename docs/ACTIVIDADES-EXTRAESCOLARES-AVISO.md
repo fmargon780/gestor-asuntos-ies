@@ -186,7 +186,9 @@ En la copia de demostración.
    correo.
 5. Cerrar el cuadro y abrir el informe desde los documentos del asunto: lleva el membrete, el
    nombre de la actividad, la fecha, el lugar, el profesorado separado en «Organiza» y «Acompaña»,
-   y el alumnado bajo el título de cada unidad con «van N de M». Los nombres ocupan tres columnas.
+   y el alumnado bajo el título de cada unidad con «van N de M». Los nombres ocupan tres columnas. Un nombre
+   largo («Quintero Maldonado, María Concepción Josefa Remedios») se lee entero, partido en dos líneas,
+   sin puntos suspensivos.
 6. Volver a pulsar «Avisar al claustro» y enviar: la tarjeta dice «Aviso enviado el …» con la
    fecha de hoy.
 7. En «La actividad» → «Cambiar», desmarcar a un alumno y guardar: la tarjeta dice en ámbar «La

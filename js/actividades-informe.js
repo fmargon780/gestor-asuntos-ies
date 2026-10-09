@@ -170,23 +170,34 @@ var ActividadesInforme = (function () {
     grupos.forEach(function (g) {
       /* Reparto en tres columnas lo más parejo posible (de arriba abajo): 4 nombres, 2 + 1 + 1. */
       var tam = [0, 1, 2].map(function (c) { return Math.floor(g.nombres.length / 3) + (c < g.nombres.length % 3 ? 1 : 0); });
-      var filas = tam[0], alto = 22 + filas * FILA;
+      var filas = tam[0], inicio = [0, tam[0], tam[0] + tam[1]], LIN = 10.5;
+      /* Un nombre que no cabe en su columna se parte en dos líneas; nunca se corta. */
+      var celdas = [], altos = [], alto = 22;
+      for (var r0 = 0; r0 < filas; r0++) {
+        var mas = 1;
+        celdas[r0] = [0, 1, 2].map(function (c) {
+          var n0 = r0 < tam[c] ? g.nombres[inicio[c] + r0] : '';
+          if (!n0) return [];
+          var ls = lineasDe(n0, normal, 9, ANCHO_COL - 8);
+          if (ls.length > 2) ls = [ls[0], ls.slice(1).join(' ')];
+          mas = Math.max(mas, ls.length);
+          return ls;
+        });
+        altos[r0] = mas === 1 ? FILA : mas * LIN + 2;
+        alto += altos[r0];
+      }
       if (alto <= UTIL) sitio(alto); else sitio(22 + FILA);
       texto(g.titulo, M, y, 11, negrita); y -= 15;
-      var inicio = [0, tam[0], tam[0] + tam[1]];
       for (var r = 0; r < filas; r++) {
-        sitio(FILA);
+        sitio(altos[r]);
         for (var c = 0; c < 3; c++) {
-          var n = r < tam[c] ? g.nombres[inicio[c] + r] : '';
-          if (!n) continue;
-          var s = limpio(n);
-          if (normal.widthOfTextAtSize(s, 9) > ANCHO_COL - 8) {
-            while (s.length > 1 && normal.widthOfTextAtSize(s + '...', 9) > ANCHO_COL - 8) s = s.slice(0, -1);
-            s += '...';
-          }
-          texto(s, M + c * ANCHO_COL, y, 9, normal);
+          celdas[r][c].forEach(function (l, k) {
+            var tamL = 9;
+            while (tamL > 6 && normal.widthOfTextAtSize(l, tamL) > ANCHO_COL - 8) tamL -= 0.5;
+            texto(l, M + c * ANCHO_COL, y - k * LIN, tamL, normal);
+          });
         }
-        y -= FILA;
+        y -= altos[r];
       }
       y -= 8;
     });
