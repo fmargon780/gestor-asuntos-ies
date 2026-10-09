@@ -257,3 +257,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 313 — datos del centro y firma desde el Centro de datos (9-oct-2026)
 
 - Con datos reales: escribir los datos del centro y la firma en el Centro de datos, entrar en el gestor y mirar Ajustes → El centro → «Datos del centro y firma»: los campos con valor salen sin poder escribirse y con «Se cambia en el Centro de datos».
+
+## Fila 314 — la fecha «Revisar desde el día» (9-oct-2026)
+
+- En el centro: abrir Herramientas → «Control del registro»: la fecha sale vacía (ya no 01/01/0020), poner la buena escribiendo el año entero y subir los listados.

@@ -180,7 +180,7 @@ var ControlRegistroPantalla = (function () {
       if (elegidos.length) subirFicheros(elegidos);
     };
     var d = $('cr-desde');
-    if (d) d.onchange = function () { cambiarDesde(d.value); };
+    if (d) U.alTerminarFecha(d, cambiarDesde);
   }
 
   /* ---------- acciones ---------- */
@@ -190,13 +190,25 @@ var ControlRegistroPantalla = (function () {
     await recargar();
   }
 
+  function fechaLarga(iso) { var p = String(iso).split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+
+  /* Devuelve false si no se cambia (para que el campo vuelva a su fecha). Fila 314: antes de quitar apuntes, pregunta. */
   async function cambiarDesde(valor) {
-    if (!valor) return;
+    if (!valor) return false;
+    var cuantos = 0;
+    try { cuantos = await ControlRegistro.cuantosQuitaria(valor); } catch (e) { cuantos = 0; }
+    if (cuantos > 0) {
+      var ok = await U.preguntar('Revisar desde el día…',
+        '<p>' + (cuantos === 1 ? 'Se va a quitar 1 apunte anterior' : 'Se van a quitar ' + cuantos + ' apuntes anteriores') + ' al día ' + fechaLarga(valor) + '.</p>' +
+        '<p class="nota">Lo que ya decidiste sobre ellos no se pierde. Para volver a verlos hay que atrasar la fecha y subir otra vez los listados de Séneca.</p>', 'Quitar');
+      if (!ok) return false;
+    }
     await hacer(async function () {
       var r = await ControlRegistro.ponerDesde(valor);
       E.avisoDesde = r.atrasa ? 'Vuelve a subir los listados para revisar esos días.' : '';
       if (r.quitados) U.aviso('Se han quitado ' + r.quitados + ' apuntes anteriores a esa fecha.', 'bueno');
     });
+    return true;
   }
 
   async function subirFicheros(archivos) {
@@ -206,10 +218,11 @@ var ControlRegistroPantalla = (function () {
       var propuesta = ControlRegistro.hoyIso();
       var ok = await U.preguntar('Revisar desde el día…',
         '<p>Antes de subir hay que decir desde qué día se revisa: lo registrado antes no se mira ni avisa.</p>' +
-        '<p><input type="date" id="cr-desde-propuesta" class="campo" value="' + propuesta + '"></p>', 'Poner esta fecha y subir');
+        '<p><input type="date" id="cr-desde-propuesta" class="campo" min="2000-01-01" max="2099-12-31" value="' + propuesta + '"></p>', 'Poner esta fecha y subir');
       if (!ok) return;
       var v = ($('cr-desde-propuesta') || {}).value;
       if (!v) { U.aviso('Pon una fecha para poder subir.', 'ambar'); return; }
+      if (!ControlRegistro.desdeValida(v)) { U.aviso('El año tiene que estar entre 2000 y 2099. La fecha se queda como estaba.', 'ambar'); return; }
       await ControlRegistro.ponerDesde(v);
     }
     await hacer(async function () {
