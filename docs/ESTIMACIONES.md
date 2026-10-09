@@ -16,4 +16,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 309 | 110 | Informe en PDF con pdf-lib y membrete, grupo ya puesto en el correo, sección de Ajustes, huecos nuevos y «Volver a avisar» |
 | 310 | 120 | Pantalla nueva en Herramientas con filtros, actividad antigua con papelera y hoja de cálculo de dos pestañas |
 | 311 | 90 | Tabla de datos calculada, hueco de tabla con fechas, tipo con dos campos que llega solo y plantilla nueva |
-| 317 | 60 | Una función que elige las entradas del índice por su ficha, el nombre de los ficheros de personal, la frase de «recolocando», la carpeta de mentira en contrato 2 y la prueba ampliada |
