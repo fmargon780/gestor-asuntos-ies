@@ -96,11 +96,12 @@ async function montar(spec) {
       f.getFile = async () => new File([contenido], partes[partes.length - 1], { lastModified: l.lastModified || Date.now() });
       if (!l.sinFichero) d._hijos.set(partes[partes.length - 1], f);
       lista.push({ clave: l.clave, variante: l.variante || '', titulo: l.clave, fichero: l.fichero, ruta: l.ruta, tipo: 'csv',
+        cursoEscolar: l.cursoEscolar || '', ambito: l.ambito || '', periodo: l.periodo || '', alumno: l.alumno || '', porAlumno: l.porAlumno || undefined,
         subido: l.subido, subidoPor: 'direccion@centro-inventado.es', resumen: l.resumen || '', huella: l.huella });
     }
     if (!spec.sinIndice) {
       centro._hijos.set('indice.json', window.__disco.fich('indice.json',
-        JSON.stringify({ contrato: spec.contrato || 1, actualizado: new Date().toISOString(), web: 'https://script.google.com/inventado/exec', listados: lista })));
+        JSON.stringify({ contrato: spec.contrato || 1, actualizado: new Date().toISOString(), cursoActual: spec.cursoActual, ocupado: spec.ocupado, web: 'https://script.google.com/inventado/exec', listados: lista })));
     }
     await Almacen.guardar(CentroDeDatos.CLAVE_CARPETA, centro);
   }, spec);
@@ -204,9 +205,9 @@ await comprobar('al entrar, con un guardado en marcha, espera y luego lo toma',
     ColaGuardado.hayGuardado = original;
     return [antes, (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella, veces >= 3];
   }), ['h-per-1', 'h-per-9', true]);
-await montar({ contrato: 2, listados: [{ ...TODO[1], huella: 'h-per-10', subido: new Date(Date.now() + 5 * 86400000).toISOString() }] });
+await montar({ contrato: 3, listados: [{ ...TODO[1], huella: 'h-per-10', subido: new Date(Date.now() + 5 * 86400000).toISOString() }] });
 await pagina.evaluate(() => { window.__avisos.length = 0; });
-await comprobar('con contrato 2 no se toca nada y se dice',
+await comprobar('con contrato 3 no se toca nada y se dice',
   pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); return [r.tomados.length, r.motivo, window.__avisos.map((a) => a[0])]; }),
   [0, 'contrato', ['El Centro de datos es más nuevo que esta aplicación.']]);
 await comprobar('la comprobación al entrar lo pone en ámbar',
@@ -297,6 +298,121 @@ await comprobar('la comprobación al entrar da «bien» con lo que trae el otro'
   ['bien', true]);
 await comprobar('sin carpeta, traer no hace nada y el aviso del botón manda a Ajustes',
   pagina.evaluate(async () => { window.__avisos.length = 0; const r = await CentroDeDatos.traer({ avisar: true }); return [r.motivo, window.__avisos.length]; }), ['sin carpeta', 1]);
+
+/* ================= 9. EL CONTRATO 2 (fila 317) ================= */
+console.log('--- 9. contrato 2: elegir qué se coge ---');
+const limpiar = () => pagina.evaluate(async () => { await Carpetas.guardarJson(App.E.gestor, 'centro-de-datos.json', { _esquema: 1, tomado: {} }); await CentroDeDatos.leerApuntes(true); window.__avisos.length = 0; });
+const nombresEnDatos = (prefijo) => pagina.evaluate(async (prefijo) => { const n = []; for await (const [k] of App.E.datos.entries()) if (k.indexOf(prefijo) === 0) n.push(k); return n.sort(); }, prefijo);
+const persona = (nombre, dni) => '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"\r\n"' + nombre + '","' + dni + '","Música P.E.S.","01/09/2026",""\r\n';
+const ent = (clave, variante, fich, texto, extra) => ({ clave, variante, fichero: fich, ruta: 'listados/' + clave + '/' + variante.replace(/[\/]/g, '-') + '/' + fich, texto, subido: MANANA, huella: 'c2-' + clave + variante + fich, ...extra });
+const CURSO = '26-27';
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, ocupado: false, listados: [
+  ent('personal', CURSO + '/docentes', 'RelPerCen 26-27.csv', persona('Docente Uno, Ana', '11111111A'), { cursoEscolar: CURSO, ambito: 'docentes' }),
+  ent('personal', CURSO + '/no-docentes', 'RelPerCenNodocente 26-27.csv', persona('No Docente Dos, Luis', '22222222B'), { cursoEscolar: CURSO, ambito: 'no-docentes' }),
+  ent('personal', '25-26/docentes', 'RelPerCen 25-26.csv', persona('Antiguo Tres, Eva', '33333333C'), { cursoEscolar: '25-26', ambito: 'docentes' })
+] });
+await comprobar('contrato 2: ya no sale «es más nuevo», se toma lo que toca y quedan tres ficheros de personal',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({ avisar: false, pedir: true }); return [r.ok, r.motivo || '', r.tomados.length, window.__avisos.some((a) => /más nuevo/.test(a[0]))]; }), [true, '', 3, false]);
+await comprobar('en `_GESTOR/datos` están los tres y `Datos` ve a las personas de los tres',
+  pagina.evaluate(async () => { const n = []; for await (const [k] of App.E.datos.entries()) if (/^RelPerCen/.test(k)) n.push(k); await new Promise((r) => setTimeout(r, 1500)); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); const nombres = p.lista.map((x) => x.nombre); return [n.sort().filter((k) => /26-27|25-26/.test(k)), ['Docente Uno, Ana', 'No Docente Dos, Luis', 'Antiguo Tres, Eva'].map((x) => nombres.indexOf(x) !== -1)]; }),
+  [['RelPerCen 25-26.csv', 'RelPerCen 26-27.csv', 'RelPerCenNodocente 26-27.csv'], [true, true, true]]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  ent('personal', CURSO + '/docentes', 'RelPerCen.csv', persona('Mismo Cuatro, Pepe', '44444444D'), { cursoEscolar: CURSO, ambito: 'docentes' }),
+  ent('personal', CURSO, 'RelPerCen.csv', persona('Mismo Cinco, Rosa', '55555555E'), { cursoEscolar: CURSO, ambito: '' })
+] });
+await comprobar('dos de personal con el mismo `fichero` y distinto ámbito: ninguno pisa al otro',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); const n = []; for await (const [k] of App.E.datos.entries()) if (/^RelPerCen(Todo)? 26-27/.test(k)) n.push(k); return n.sort(); }), ['RelPerCen 26-27.csv', 'RelPerCenTodo 26-27.csv']);
+const hoy = await pagina.evaluate(() => U.cursoActual());
+await limpiar();
+await montar({ contrato: 2, cursoActual: hoy, listados: [ent('personal', hoy, 'RelPerCen.csv', persona('Sin Curso Seis, Ana', '66666666F'), { cursoEscolar: hoy, ambito: 'docentes' })] });
+await comprobar('`RelPerCen.csv` del curso de hoy se guarda como `RelPerCen <curso>.csv`',
+  pagina.evaluate(async (hoy) => { await CentroDeDatos.traer({}); try { await App.E.datos.getFileHandle('RelPerCen.csv'); return false; } catch (e) { /* no está */ } try { await App.E.datos.getFileHandle('RelPerCen ' + hoy + '.csv'); return true; } catch (e) { return false; } }, hoy), true);
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [ent('personal', '25-26/docentes', 'RelPerCen.csv', persona('Viejo Siete, Juan', '77777777G'), { cursoEscolar: '25-26', ambito: 'docentes' })] });
+await comprobar('`RelPerCen.csv` de 25-26 se guarda como `RelPerCen 25-26.csv` y `Datos` lo lee como de 25-26',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); await new Promise((r) => setTimeout(r, 1200)); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); return [Datos.cursoDelFichero('RelPerCen 25-26.csv'), p.ficheros.filter((f) => f.fichero === 'RelPerCen 25-26.csv').map((f) => f.curso)]; }), ['25-26', ['25-26']]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  ent('tutorias', '25-26', 'Función Tutorial 2035-2036.pdf', 'pdf viejo', { cursoEscolar: '25-26' }),
+  ent('tutorias', CURSO, 'Función Tutorial 2036-2037.pdf', 'pdf nuevo', { cursoEscolar: CURSO })
+] });
+await comprobar('tutorías de dos cursos: solo se copia la de este',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); const dentro = async (n) => { try { await App.E.datos.getFileHandle(n); return true; } catch (e) { return false; } }; return [await dentro('Función Tutorial 2035-2036.pdf'), await dentro('Función Tutorial 2036-2037.pdf')]; }), [false, true]);
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [ent('tutorias', '24-25', 'Función Tutorial 2024-2025.pdf', 'pdf viejo', { cursoEscolar: '24-25' })] });
+await comprobar('con solo la tutoría de un curso viejo no se copia ninguna',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); let hay = true; try { await App.E.datos.getFileHandle('Función Tutorial 2024-2025.pdf'); } catch (e) { hay = false; } return [r.tomados.length, hay]; }), [0, false]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  ent('consejo-escolar', '2022-2024', 'RegMieConEsc 2022-2024.csv', CONSEJO, { periodo: '2022-2024' }),
+  ent('consejo-escolar', '2024-2026', 'RegMieConEsc 2024-2026.csv', CONSEJO, { periodo: '2024-2026' })
+] });
+await comprobar('Consejo Escolar de dos periodos: entran los dos, cada uno en su fichero',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); const t = await App.E.datos.getDirectoryHandle('Tablas'); const n = []; for await (const [k] of t.entries()) n.push(k); return [r.tomados.length, n.sort().filter((k) => /2022-2024|2024-2026/.test(k))]; }), [2, ['RegMieConEsc 2022-2024.csv', 'RegMieConEsc 2024-2026.csv']]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  { ...ent('registro-entrada', '25-26', 'RegLibEntCen.csv', '', { cursoEscolar: '25-26', huella: 'c2-ent-viejo' }), bytes: Array.from(ENTRADA) },
+  { ...ent('registro-entrada', CURSO, 'RegLibEntCen.csv', '', { cursoEscolar: CURSO, huella: 'c2-ent-nuevo' }), bytes: Array.from(ENTRADA) }
+] });
+await comprobar('registro de entrada de dos cursos: solo se sube el de este',
+  pagina.evaluate(async () => { await ControlRegistro.ponerDesde('2026-09-01'); const r = await CentroDeDatos.traer({}); return [r.tomados, Object.keys((await CentroDeDatos.leerApuntes(true)).tomado).filter((k) => /^registro-entrada/.test(k))]; }), [['registro-entrada'], ['registro-entrada|26-27']]);
+
+await limpiar();
+await pagina.evaluate(async () => {
+  const d = await CentroDeDatos.leerApuntes(true);
+  d.tomado['registro-entrada|'] = { huella: 'hh1', subido: new Date(Date.now() + 86400000).toISOString() };
+  d.tomado['personal|26-27'] = { huella: 'hp1', subido: new Date(Date.now() + 86400000).toISOString() };
+  await Carpetas.guardarJson(App.E.gestor, 'centro-de-datos.json', d);
+  await CentroDeDatos.leerApuntes(true);
+});
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  { ...ent('registro-entrada', CURSO, 'RegLibEntCen.csv', '', { cursoEscolar: CURSO, huella: 'hh1', subido: new Date(Date.now() + 2 * 86400000).toISOString() }), bytes: Array.from(ENTRADA) },
+  ent('personal', CURSO + '/docentes', 'RelPerCen 26-27.csv', persona('Otra, Ana', '88888888H'), { cursoEscolar: CURSO, ambito: 'docentes', huella: 'hp1', subido: new Date(Date.now() + 2 * 86400000).toISOString() })
+] });
+await comprobar('con apuntes de la fila 312 y las mismas huellas con otra `variante`: no se toma nada y no sale ningún aviso verde',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); return [r.tomados.length, window.__avisos.filter((a) => /Traído/.test(a[0])).length]; }), [0, 0]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  ent('alumnado', '', 'RegAlum.csv', 'a;b\r\n', { huella: 'c2-alu-1' }),
+  ent('alumnado', '2', 'RegAlum2.csv', 'a;b\r\n', { huella: 'c2-alu-2' })
+] });
+await comprobar('dos de alumnado: no se copia ninguna y sale el aviso ámbar',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); return [r.tomados.length, window.__avisos.filter((a) => a[1] === 'ambar').map((a) => a[0])]; }), [0, ['En el Centro de datos hay más de un listado de alumnado. No he traído ninguno.']]);
+
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, listados: [
+  { clave: 'expediente-secundaria', variante: '', fichero: '', ruta: '', texto: '', subido: MANANA, huella: 'c2-exp', porAlumno: true },
+  ent('censo-neae', '', 'censo.csv', 'a;b\r\n', { huella: 'c2-neae' }),
+  ent('personal', CURSO + '/docentes', 'RelPerCen 26-27.csv', persona('Con Alumno, Ana', '99999990J'), { cursoEscolar: CURSO, ambito: 'docentes', alumno: '2100001', huella: 'c2-conalumno' })
+] });
+await comprobar('una entrada `porAlumno`, una clave que no es del gestor y una con `alumno`: no hacen nada y no dan error',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); return [r.ok, r.tomados.length, r.fallos.length]; }), [true, 0, 0]);
+
+/* el índice ocupado */
+await limpiar();
+await montar({ contrato: 2, cursoActual: CURSO, ocupado: true, listados: [ent('personal', CURSO + '/docentes', 'RelPerCen 26-27.csv', persona('Ocupado Ocho, Ana', '12121212K'), { cursoEscolar: CURSO, ambito: 'docentes', huella: 'c2-ocupado' })] });
+await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('[data-ajustes-pestana="ordenador"]');
+await comprobar('con `ocupado: true`: no se copia nada, no hay aviso ámbar, el bloque dice la frase en gris y el botón contesta eso',
+  pagina.evaluate(async () => {
+    window.__avisos.length = 0;
+    const r = await CentroDeDatos.traer({ avisar: true });
+    CentroDeDatosVer.pintar();
+    for (let i = 0; i < 40 && !document.getElementById('centro-de-datos-ocupado').textContent; i++) await new Promise((x) => setTimeout(x, 100));
+    const p = document.getElementById('centro-de-datos-ocupado');
+    return [r.motivo, r.tomados.length, window.__avisos.filter((a) => a[1] === 'ambar').length, window.__avisos.map((a) => a[0]), p.textContent, p.classList.contains('oculto')];
+  }), ['ocupado', 0, 0, ['El Centro de datos está recolocando sus ficheros. Lo traeré más tarde.'], 'El Centro de datos está recolocando sus ficheros. Lo traeré más tarde.', false]);
+await montar({ contrato: 2, cursoActual: CURSO, ocupado: false, listados: [ent('personal', CURSO + '/docentes', 'RelPerCen 26-27.csv', persona('Ocupado Ocho, Ana', '12121212K'), { cursoEscolar: CURSO, ambito: 'docentes', huella: 'c2-ocupado' })] });
+await comprobar('al pasar a `ocupado: false`, se toma',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); CentroDeDatosVer.pintar(); for (let i = 0; i < 40 && !document.getElementById('centro-de-datos-ocupado').classList.contains('oculto'); i++) await new Promise((x) => setTimeout(x, 100)); return [r.tomados, document.getElementById('centro-de-datos-ocupado').classList.contains('oculto')]; }), [['personal'], true]);
 
 const deVerdad = errores.filter((e) => !/Failed to load resource/.test(e));
 if (deVerdad.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + deVerdad.join('\n')); } else console.log('bien   sin errores de consola');

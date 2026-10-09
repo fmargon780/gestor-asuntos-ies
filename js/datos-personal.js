@@ -31,7 +31,7 @@
 
   /* El curso académico que le corresponde a un fichero, sacado de su
      nombre. Si no lleva año, se supone que es la descarga de hoy. */
-  function cursoDelFichero(nombre) {
+  function cursoEnElNombre(nombre) {   /* fila 317: '' si el nombre no lleva ningún curso (cursoDelFichero supone entonces el de hoy) */
     var n = String(nombre || '');
 
     /* 2026-2027 */
@@ -52,8 +52,10 @@
     var suelto = n.match(/(20\d{2})/);
     if (suelto) return U.cursoDeAno(suelto[1]);
 
-    return U.cursoActual();
+    return '';
   }
+
+  function cursoDelFichero(nombre) { return cursoEnElNombre(nombre) || U.cursoActual(); }
 
   async function ficherosQueEmpiezanPor(dir, prefijo) {
     var lista = await Carpetas.ficheros(dir);
@@ -178,7 +180,7 @@
   }
 
   Object.assign(Datos, {
-    cursoDelFichero: cursoDelFichero,
+    cursoDelFichero: cursoDelFichero, cursoEnElNombre: cursoEnElNombre,
     clavePersona: clavePersona
   });
 

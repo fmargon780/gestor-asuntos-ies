@@ -24,12 +24,29 @@ var CentroDeDatosReparto = (function () {
     catch (e) { return new TextDecoder('windows-1252').decode(bytes); }
   }
 
-  /* La fecha (ms) del dato que el gestor ya tiene de eso, o 0 si no hay. */
-  async function fechaDelGestor(e) {
+  /* Fila 317: el nombre con el que se guarda un fichero de personal. `js/datos-personal.js` saca el curso de
+     cada RelPerCen de su NOMBRE (sin curso en el nombre supone el de hoy), así que si el Centro de datos sabe
+     el curso y el nombre no lo dice igual, o dos entradas se llamarían igual, se le pone uno que lo diga.
+     `elegidas`: las entradas elegidas de esta tanda. */
+  function nombreDePersonal(e, elegidas) {
+    var original = e.fichero || '';
+    if (!e.cursoEscolar) return original;
+    var norma = function (c) { return (window.Datos && Datos.cursoEnElNombre ? Datos.cursoEnElNombre(c) : '') || c; };
+    var curso = norma(e.cursoEscolar);
+    var enNombre = window.Datos && Datos.cursoEnElNombre ? Datos.cursoEnElNombre(original) : '';
+    var repetido = (elegidas || []).some(function (o) { return o !== e && o.clave === 'personal' && o.fichero === e.fichero; });
+    if (enNombre && enNombre === curso && !repetido) return original;
+    var prefijo = e.ambito === 'docentes' ? 'RelPerCen' : (e.ambito === 'no-docentes' ? 'RelPerCenNodocente' : 'RelPerCenTodo');
+    return prefijo + ' ' + curso + '.csv';
+  }
+
+  /* La fecha (ms) del dato que el gestor ya tiene de eso, o 0 si no hay. `elegidas`: las de esta tanda. */
+  async function fechaDelGestor(e, elegidas) {
     var d = datos();
     if (!d) return 0;
     if (e.clave === 'alumnado') return Carpetas.fechaFichero(d, 'RegAlum.csv');
-    if (e.clave === 'personal' || e.clave === 'tutorias') return Carpetas.fechaFichero(d, e.fichero || '');
+    if (e.clave === 'personal') return Carpetas.fechaFichero(d, nombreDePersonal(e, elegidas));
+    if (e.clave === 'tutorias') return Carpetas.fechaFichero(d, e.fichero || '');
     if (e.clave === 'alumnado-bd') {
       var copia = await AlumnadoBD.leer();
       var t = copia && new Date(copia.generado).getTime();
@@ -43,7 +60,7 @@ var CentroDeDatosReparto = (function () {
   }
 
   /* Lo que hay que repasar al final de una tanda (una sola vez, no por fichero). */
-  function contexto() { return { repasar: false, tablas: false }; }
+  function contexto(elegidas) { return { repasar: false, tablas: false, elegidas: elegidas || [] }; }
 
   async function terminar(ctx) {
     if (ctx.repasar && window.TraerDatos) TraerDatos.repasar();
@@ -59,7 +76,7 @@ var CentroDeDatosReparto = (function () {
       case 'alumnado':
         await TraerDatos.copiarUno(h, 'ALUMNADO'); ctx.repasar = true; return true;
       case 'personal':
-        await TraerDatos.copiarUno(h, 'PERSONAL'); ctx.repasar = true; return true;
+        await TraerDatos.copiarUno(h, 'PERSONAL', nombreDePersonal(e, ctx.elegidas)); ctx.repasar = true; return true;
       case 'alumnado-bd': {
         var f = await h.getFile();
         var nuevo;
@@ -91,6 +108,6 @@ var CentroDeDatosReparto = (function () {
     return false;
   }
 
-  return { fechaDelGestor: fechaDelGestor, contexto: contexto, terminar: terminar, entregar: entregar };
+  return { fechaDelGestor: fechaDelGestor, nombreDePersonal: nombreDePersonal, contexto: contexto, terminar: terminar, entregar: entregar };
 })();
 window.CentroDeDatosReparto = CentroDeDatosReparto;

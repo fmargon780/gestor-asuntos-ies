@@ -269,3 +269,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 316 — buzón de soporte desde el Centro de datos (9-oct-2026)
 
 - Con el enlace ya escrito en el Centro de datos: entrar en el gestor en el centro, Ajustes → El centro → «Buzón de soporte» enseña esa dirección con «Se cambia en el Centro de datos», y un aviso de prueba llega al Centro de mando.
+
+## Fila 317 — contrato 2 del Centro de datos (9-oct-2026)
+
+- Cuando el Centro de datos haya terminado de recolocar (su fila 7): señalar la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador y ver que el aviso verde trae el personal docente y el no docente.

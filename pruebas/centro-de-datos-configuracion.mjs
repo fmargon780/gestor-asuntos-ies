@@ -94,7 +94,7 @@ async function montar(spec) {
     if (spec.configuracion) centro._hijos.set('configuracion.json', window.__disco.fich('configuracion.json', JSON.stringify(spec.configuracion)));
     if (!spec.sinIndice) {
       centro._hijos.set('indice.json', window.__disco.fich('indice.json',
-        JSON.stringify({ contrato: spec.contrato || 1, actualizado: new Date().toISOString(), web: 'https://script.google.com/inventado/exec', listados: lista })));
+        JSON.stringify({ contrato: spec.contrato || 1, ocupado: spec.ocupado, actualizado: new Date().toISOString(), web: 'https://script.google.com/inventado/exec', listados: lista })));
     }
     await Almacen.guardar(CentroDeDatos.CLAVE_CARPETA, centro);
   }, spec);
@@ -171,13 +171,16 @@ await comprobar('con «solo consultar» no se toca nada',
 await montar({ listados: [], configuracion: Object.assign(conf(4, { nombre: 'IES Dos' }), { contrato: 2 }) });
 await comprobar('con configuracion.json de contrato 2 no se toca nada',
   pagina.evaluate(async () => { const g = window.__guardados; const r = await CentroDeDatos.traer({}); return [r.configuracion, window.__guardados - g, (await Plantillas.cargar(App.E.gestor)).centro]; }), [false, 0, 'IES Inventado']);
-await montar({ contrato: 2, listados: [], configuracion: conf(5, { nombre: 'IES Tres' }) });
-await comprobar('y con el índice de contrato 2 tampoco',
-  pagina.evaluate(async () => { const g = window.__guardados; await CentroDeDatos.traer({}); return [window.__guardados - g, (await Plantillas.cargar(App.E.gestor)).centro]; }), [0, 'IES Inventado']);
+await montar({ contrato: 3, listados: [], configuracion: conf(5, { nombre: 'IES Tres' }) });
+await comprobar('(fila 317) con el índice de un contrato más nuevo, la configuración del centro se lee igualmente',
+  pagina.evaluate(async () => { const g = window.__guardados; const r = await CentroDeDatos.traer({}); return [r.motivo, r.configuracion, window.__guardados - g, (await Plantillas.cargar(App.E.gestor)).centro]; }), ['contrato', true, 1, 'IES Tres']);
+await montar({ ocupado: true, listados: [], configuracion: conf(6, { nombre: 'IES Cuatro' }) });
+await comprobar('(fila 317) con el índice ocupado, también',
+  pagina.evaluate(async () => { const g = window.__guardados; const r = await CentroDeDatos.traer({}); return [r.motivo, r.configuracion, window.__guardados - g, (await Plantillas.cargar(App.E.gestor)).centro]; }), ['ocupado', true, 1, 'IES Cuatro']);
 
 /* ================= 6. LA PLANTILLA ================= */
 console.log('--- 6. la plantilla ---');
-await montar({ listados: [], configuracion: conf(6, { nombre: 'IES Nuevo de Verdad' }) });
+await montar({ listados: [], configuracion: conf(60, { nombre: 'IES Nuevo de Verdad' }) });
 await comprobar('un hueco con el nombre del centro sale con el valor nuevo',
   pagina.evaluate(async () => { await CentroDeDatos.traer({}); const p = await Plantillas.cargar(App.E.gestor); return Plantillas.rellenar('Del {centro}.', { centro: p.centro }).texto; }), 'Del IES Nuevo de Verdad.');
 
