@@ -221,7 +221,7 @@
         (existente && existente.conLogoCentro === false ? '' : ' checked') + '> Con el logo del centro</label>' +
       '<p class="nota">En el membrete, a la derecha (Ajustes → El centro → Membrete). Sin marcar, esa parte sale en blanco.</p>';
 
-    var promesa = U.preguntar(existente ? 'Editar plantilla de documento' : 'Nueva plantilla de documento',
+    var promesa = U.preguntar(existente ? 'Cambiar plantilla de documento' : 'Nueva plantilla de documento',
       cuerpo, existente ? 'Guardar' : 'Crear');
 
     $('pd-categoria').onchange = function () {

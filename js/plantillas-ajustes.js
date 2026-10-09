@@ -280,7 +280,7 @@
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
 
-    var promesa = U.preguntar(existente ? 'Editar plantilla' : 'Nueva plantilla', cuerpo,
+    var promesa = U.preguntar(existente ? 'Cambiar plantilla' : 'Nueva plantilla', cuerpo,
       existente ? 'Guardar' : 'Crear');
 
     /* El catálogo de huecos ya no se pinta entero encima del texto:

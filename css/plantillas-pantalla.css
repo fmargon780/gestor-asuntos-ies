@@ -28,3 +28,4 @@
 .pt-texto { white-space: pre-wrap; font: inherit; background: var(--fondo); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; margin: 4px 0; max-height: 40vh; overflow: auto; }
 .pt-ver-todas { margin: 8px 0 0; }
 .pf-traer { margin: 4px 0 8px; }
+.pt-tipodoc { white-space: nowrap; }

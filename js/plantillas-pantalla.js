@@ -134,7 +134,7 @@ var PlantillasPantalla = (function () {
   function fila(p) {
     var nombre = esc(p.nombre) + (esDeLaApp(p) ? ' <span class="pt-etiqueta">De la aplicación</span>' : '');
     if (E.pestana === 'word') {
-      return '<tr data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td>' + esc(p.tipoDocumento) + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
+      return '<tr data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td class="pt-tipodoc">' + esc(p.tipoDocumento) + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
         '</td><td class="pt-fichero">' + esc(p.fichero) + (E.falta[p.id] ? ' <span class="pt-ambar pt-falta">Falta el fichero</span>' : '') + '</td>' + acciones(p) + '</tr>';
     }
     return '<tr data-id="' + esc(p.id) + '"><td class="pt-nombre">' + nombre + '</td><td>' + celdaTipo(p) + '</td><td>' + celdaHitos(p) +
@@ -228,7 +228,7 @@ var PlantillasPantalla = (function () {
     if (accion === 'ver') return ver(p);
     if (accion === 'cambiar') return cambiar(p);
     if (accion === 'sustituir') return PlantillasFichero.sustituir(p, recargar);
-    if (accion === 'borrar') { if (await Plantillas.borrarConPapelera(p, E.pestana === 'word' ? 'documento' : 'correo')) await recargar(); }
+    if (accion === 'borrar') { if (await Plantillas.borrarConPapelera(p, E.pestana === 'word' ? 'documento' : 'correo')) { await recargar(); if (typeof App.pintarPapelera === 'function') App.pintarPapelera(); } }
   }
 
   async function ver(p) {
