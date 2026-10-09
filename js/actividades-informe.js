@@ -180,7 +180,10 @@ var ActividadesInforme = (function () {
           var n = r < tam[c] ? g.nombres[inicio[c] + r] : '';
           if (!n) continue;
           var s = limpio(n);
-          while (s.length > 1 && normal.widthOfTextAtSize(s, 9) > ANCHO_COL - 8) s = s.slice(0, -1);
+          if (normal.widthOfTextAtSize(s, 9) > ANCHO_COL - 8) {
+            while (s.length > 1 && normal.widthOfTextAtSize(s + '...', 9) > ANCHO_COL - 8) s = s.slice(0, -1);
+            s += '...';
+          }
           texto(s, M + c * ANCHO_COL, y, 9, normal);
         }
         y -= FILA;
@@ -274,6 +277,7 @@ var ActividadesInforme = (function () {
       var todos = await Actividades.alumnadoMatriculado();
       var bytes = await pdfDe(datos(a, act, todos));
       nombreInforme = await guardar(a, bytes);
+      if (window.FichaDocumentos) { try { FichaDocumentos.pintar(a); } catch (e2) { /* solo pintar */ } }   /* que «Documentos de la carpeta» ya lo enseñe */
     } catch (e) { U.fallo('No he podido preparar el informe de la actividad', e); return; }
     var idPlantilla = '';
     try { idPlantilla = await asegurarPlantilla(a); } catch (e) { U.accesorio('No he podido preparar la plantilla del aviso', e); }

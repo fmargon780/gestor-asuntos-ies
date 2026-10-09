@@ -124,6 +124,8 @@ await comprobar('3. «Para» vacío, y el grupo «Profesorado» en la copia ocul
 await comprobar('3. avisa de la persona que no tiene correo', pagina.evaluate(() => /no tiene correo/.test(document.getElementById('correo-cco-caja').textContent)), true);
 await comprobar('3. no hay línea ámbar de «sin grupo»', pagina.evaluate(() => /No hay ningún grupo/.test(document.getElementById('correo-caja').textContent)), false);
 
+await comprobar('3. «Documentos de la carpeta» ya enseña el informe, sin salir de la ficha', pagina.evaluate(() => /INFORME ACTIVIDAD/.test(document.getElementById('ficha-documentos').textContent)), true);
+
 /* ================= 4. EL INFORME ================= */
 console.log('--- 4. el informe ---');
 const t = await textoPdf(pagina, asunto, informes1[0]);
