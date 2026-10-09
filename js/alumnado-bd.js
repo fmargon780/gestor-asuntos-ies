@@ -153,6 +153,18 @@ var AlumnadoBD = (function () {
     }
   }
 
+  /* Fila 312: un archivo ya leído (de la carpeta del Centro de datos): misma validación, misma copia y
+     nunca uno más viejo que el que hay. Devuelve { copiado, cuantos, generado }; si no vale, lanza. */
+  async function aceptar(nuevo) {
+    var v = validar(nuevo);
+    if (!v.ok) throw new Error('el archivo no vale: ' + v.motivo);
+    var copia = await leer();
+    var fn = fecha(nuevo.generado), fc = copia && fecha(copia.generado);
+    if (copia && fc && fn && fn <= fc) return { copiado: false, cuantos: copia.alumnos.length, generado: copia.generado };
+    await guardar(nuevo);
+    return { copiado: true, cuantos: nuevo.alumnos.length, generado: nuevo.generado };
+  }
+
   /* La fila 142 guardaba una dirección en asuntos.json: fuera. */
   function quitarDireccionVieja() {
     var r = App.E.registro;
@@ -287,7 +299,7 @@ var AlumnadoBD = (function () {
 
   return {
     FICHERO: FICHERO, ACUERDO: ACUERDO, CLAVE_CARPETA: CLAVE_CARPETA, validar: validar,
-    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, traer: traer,
+    leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, traer: traer, aceptar: aceptar,
     unir: unir, porClave: porClave, fechaGenerado: fechaGenerado, fechaLegible: fechaLegible,
     pintarAjustes: pintarAjustes
   };

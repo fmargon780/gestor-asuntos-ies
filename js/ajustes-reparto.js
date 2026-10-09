@@ -67,6 +67,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-rutas', donde: 'ordenador', otras: 'ruta, copiar ruta, dónde está Dropbox' },
     { id: 'bloque-largo-rutas', donde: 'ordenador', otras: 'largo, caracteres, nombre largo' },
     { id: 'bloque-alumnado-bd', donde: 'ordenador', otras: 'base de datos, Drive, matrícula' },
+    { id: 'bloque-centro-de-datos', donde: 'ordenador', otras: 'centro de datos, listados, Séneca, Drive' },
     { id: 'bloque-bandeja', donde: 'ordenador', otras: 'Gmail, Drive, correos que llegan, etiqueta GESTOR' },
     { id: 'bloque-envio-correo', donde: 'ordenador', otras: 'Gmail, script, enviar, cuenta' },
     { id: 'bloque-seneca', donde: 'ordenador', otras: 'marcador, favoritos, mensaje de Séneca' },

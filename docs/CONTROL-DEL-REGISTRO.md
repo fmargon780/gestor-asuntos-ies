@@ -231,3 +231,7 @@ avisa de los apuntes sin asunto y de cuándo toca volver a subirlos.
 14. Con «solo consultar», la pantalla se ve y no deja subir ni decidir.
 15. [SOLO FRANCISCO] Subir los dos listados reales del centro: se leen enteros y los códigos
     coinciden con los de los documentos ya registrados (`docs/COMPROBAR-A-MANO.md`).
+
+## Cómo se guarda la fecha «Revisar desde el día» (fila 314, 9-oct-2026)
+
+Se guarda al salir del campo o con Intro (no mientras se escribe), solo con año de 2000 a 2099; un `desde` guardado fuera de ese rango cuenta como sin fecha. Si adelantar la fecha quita apuntes, antes pregunta «Se van a quitar N apuntes anteriores al día X» con «Quitar» y «Cancelar»; las decisiones no se pierden. Ver `docs/FECHA-QUE-NO-DEJA-ESCRIBIR-EL-ANO.md`.

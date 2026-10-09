@@ -9,6 +9,11 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '317', fecha: '2026-10-09', texto: 'El gestor ya distingue el personal docente del no docente y los cursos cuando trae los datos del Centro de datos.' },
+  { id: '316', fecha: '2026-10-09', texto: 'La dirección del buzón de soporte se puede escribir una sola vez en el Centro de datos: la app la copia sola y en Ajustes sale con la nota «Se cambia en el Centro de datos».' },
+  { id: '314', fecha: '2026-10-09', texto: 'En «Control del registro», la fecha «Revisar desde el día» ya deja escribir el año: se guarda al salir del campo o al pulsar Intro, y pregunta antes de quitar apuntes.' },
+  { id: '313', fecha: '2026-10-09', texto: 'Los datos del centro y la firma de los correos se escriben una sola vez en el Centro de datos. La app los copia sola, y en Ajustes salen con la nota «Se cambia en el Centro de datos».' },
+  { id: '312', fecha: '2026-10-09', texto: 'Si señalas la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador, al entrar la app coge sola los listados nuevos de Séneca (alumnado, personal, tutorías, Consejo Escolar y registro). Subirlos a mano sigue valiendo.' },
   { id: '306', fecha: '2026-10-08', texto: 'En «Nuevo asunto», con el tipo «Actividad extraescolar», sale «Apuntar la actividad»: eliges las unidades, desmarcas a quien no va y apuntas el profesorado. La ficha tiene una tarjeta «La actividad» con todo.' },
   { id: '308', fecha: '2026-10-08', texto: 'En el informe en PDF de «Exportar» puedes escribir el título. El fichero se guarda con ese mismo nombre.' },
   { id: '307', fecha: '2026-10-08', texto: 'El informe en PDF de «Exportar» ya no pierde asuntos al pasar de página, y «Imprimir» no saca una hoja de más.' },

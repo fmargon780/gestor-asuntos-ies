@@ -249,3 +249,27 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 303 — asuntos que han perdido su carpeta (8-oct-2026)
 
 - En el centro, Ajustes → Problemas: mirar que el traslado del recorte de la idea 303 sale en la lista «La app ha encontrado la carpeta de N de ellos» con su carpeta del ARCHIVO, repasar la lista, desmarcar lo que no cuadre y pulsar «Enlazar los N». Decir cuántos de los 21 quedan sin encontrar.
+
+## Fila 312 — beber del Centro de datos (9-oct-2026)
+
+- Con datos reales: en Ajustes → Este ordenador, «Carpeta del Centro de datos» → «Señalar la carpeta» y elegir la carpeta «CENTRO DE DATOS» de Google Drive para ordenador. Ver que sale el aviso verde «Traído del Centro de datos: …» con lo que había nuevo, y que en Herramientas → «Traer ficheros de Séneca» sale la línea gris «Datos del Centro de datos, del …».
+
+## Fila 313 — datos del centro y firma desde el Centro de datos (9-oct-2026)
+
+- Con datos reales: escribir los datos del centro y la firma en el Centro de datos, entrar en el gestor y mirar Ajustes → El centro → «Datos del centro y firma»: los campos con valor salen sin poder escribirse y con «Se cambia en el Centro de datos».
+
+## Fila 314 — la fecha «Revisar desde el día» (9-oct-2026)
+
+- En el centro: abrir Herramientas → «Control del registro»: la fecha sale vacía (ya no 01/01/0020), poner la buena escribiendo el año entero y subir los listados.
+
+## Fila 315 — el buzón admite el Centro de datos (9-oct-2026)
+
+- Tras añadir `centro-de-datos-ies` al permiso de GitHub y pegar el script: `prepararTodo` dice «Bien: fmargon780/centro-de-datos-ies». Con el botón del Centro de datos ya publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva del Centro de datos en el Centro de mando.
+
+## Fila 316 — buzón de soporte desde el Centro de datos (9-oct-2026)
+
+- Con el enlace ya escrito en el Centro de datos: entrar en el gestor en el centro, Ajustes → El centro → «Buzón de soporte» enseña esa dirección con «Se cambia en el Centro de datos», y un aviso de prueba llega al Centro de mando.
+
+## Fila 317 — contrato 2 del Centro de datos (9-oct-2026)
+
+- Cuando el Centro de datos haya terminado de recolocar (su fila 7): señalar la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador y ver que el aviso verde trae el personal docente y el no docente.

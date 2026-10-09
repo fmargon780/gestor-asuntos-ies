@@ -244,7 +244,58 @@
     return Promise.resolve(marcar(copiarALaAntigua(texto)));
   }
 
+  /* ---------- «he terminado de escribir la fecha» (fila 314) ----------
+
+     Un campo de fecha lanza `change` en cuanto la fecha es válida, y lo es con la primera cifra del año:
+     guardar ahí, y repintar, impedía escribir el año. Esto termina cuando el campo pierde el foco, con
+     Intro, o con un `change` sin teclas (un día elegido con el ratón en el calendario). Nunca dos veces
+     por la misma escritura. `alTerminar(valor)` puede devolver `false` (o una promesa de `false`) para
+     que el campo vuelva a su valor guardado. Opciones: `minimo` ('2000-01-01'), `maximo` ('2099-12-31'),
+     `vacioVale` (false). */
+  function alTerminarFecha(campo, alTerminar, opciones) {
+    var op = opciones || {};
+    var minimo = op.minimo || '2000-01-01', maximo = op.maximo || '2099-12-31';
+    campo.min = minimo; campo.max = maximo;
+    var guardado = campo.value;
+    var tecleado = false, terminando = false;
+
+    function valida(v) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+      var f = new Date(v + 'T12:00:00');
+      if (isNaN(f.getTime()) || f.toISOString().slice(0, 10) !== v) return false;
+      return v >= minimo && v <= maximo;
+    }
+
+    async function terminar() {
+      if (terminando) return;
+      var v = campo.value;
+      if (campo.validity && campo.validity.badInput) { campo.value = guardado; return; }   /* fecha a medias */
+      if (v === guardado) return;
+      terminando = true;
+      try {
+        if (!v) {
+          if (!op.vacioVale) { campo.value = guardado; return; }
+        } else if (!valida(v)) {
+          campo.value = guardado;
+          aviso('El año tiene que estar entre ' + minimo.slice(0, 4) + ' y ' + maximo.slice(0, 4) + '. La fecha se queda como estaba.', 'ambar');
+          return;
+        }
+        var r = await alTerminar(v);
+        if (r === false) campo.value = guardado; else guardado = v;
+      } finally { terminando = false; }
+    }
+
+    campo.addEventListener('focus', function () { tecleado = false; });
+    campo.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); terminar(); }
+      else if (ev.key !== 'Tab' && ev.key !== 'Shift') tecleado = true;
+    });
+    campo.addEventListener('change', function () { if (!tecleado) terminar(); });
+    campo.addEventListener('blur', function () { terminar(); tecleado = false; });
+  }
+
   U.conservandoLoEscrito = conservandoLoEscrito;
   U.menuDeAcciones = menuDeAcciones;
   U.copiar = copiar;
+  U.alTerminarFecha = alTerminarFecha;
 })();

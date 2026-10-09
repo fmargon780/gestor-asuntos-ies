@@ -110,8 +110,17 @@ var ControlRegistro = (function () {
     return { _esquema: ESQUEMA, desde: '', subidas: {}, decisiones: {}, clasesSinAsunto: { E: [], S: [] } };
   }
 
+  /* Fila 314: la fecha «Revisar desde» solo vale como AAAA-MM-DD real, de 2000 a 2099. */
+  function desdeValida(iso) {
+    var v = String(iso || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+    var f = new Date(v + 'T12:00:00');
+    return !isNaN(f.getTime()) && f.toISOString().slice(0, 10) === v && v >= '2000-01-01' && v <= '2099-12-31';
+  }
+
   function normalizarControl(c) {
     var s = Object.assign(vacio(), c || {});
+    if (s.desde && !desdeValida(s.desde)) s.desde = '';   /* solo en memoria: no se escribe nada por ello (p. ej. el 0020 de antes) */
     s.subidas = s.subidas || {};
     s.decisiones = s.decisiones || {};
     s.clasesSinAsunto = s.clasesSinAsunto || {};
@@ -201,16 +210,23 @@ var ControlRegistro = (function () {
 
   /* «Revisar desde el día». Adelantarla quita lo anterior; atrasarla avisa de que hay que volver a subir. */
   async function ponerDesde(iso) {
+    if (!desdeValida(iso)) throw new Error('La fecha tiene que ser un día real entre 2000 y 2099.');
     var antes = (await leerControlDisco()).desde;
     await cambiarControl(function (c) { c.desde = iso; });
     var quitados = 0;
-    if (antes && iso > antes) {
-      var anos = await anosGuardados();
-      for (var i = 0; i < anos.length; i++) {
-        await quitarDeAno(anos[i], function (a) { if (a.fecha >= iso) return true; quitados++; return false; });
-      }
+    var anos = await anosGuardados();
+    for (var i = 0; i < anos.length; i++) {
+      await quitarDeAno(anos[i], function (a) { if (a.fecha >= iso) return true; quitados++; return false; });
     }
     return { atrasa: !!(antes && iso < antes), quitados: quitados };
+  }
+
+  /* Cuántos apuntes guardados se quitarían al poner esta fecha (no escribe nada). */
+  async function cuantosQuitaria(iso) {
+    var n = 0;
+    var apuntes = (await cargar()).apuntes;
+    Object.keys(apuntes).forEach(function (k) { if (!(apuntes[k].fecha >= iso)) n++; });
+    return n;
   }
 
   /* Sube uno o varios listados: `ficheros` = [{ nombre, texto }]. Sin la fecha puesta no sube nada.
@@ -447,7 +463,7 @@ var ControlRegistro = (function () {
   return {
     DIAS_POR_DEFECTO: DIAS_POR_DEFECTO,
     hueso: hueso, fechaIso: fechaIso, fechaLarga: fechaLarga, hoyIso: hoyIso, codigoDeNumero: codigoDeNumero,
-    leerCsv: leerCsv, cargar: cargar, ponerDesde: ponerDesde, subir: subir,
+    leerCsv: leerCsv, cargar: cargar, ponerDesde: ponerDesde, cuantosQuitaria: cuantosQuitaria, desdeValida: desdeValida, subir: subir,
     decidir: decidir, quitarDecision: quitarDecision,
     ponerClaseSinAsunto: ponerClaseSinAsunto, quitarClaseSinAsunto: quitarClaseSinAsunto,
     contextoDeAsuntos: contextoDeAsuntos, clasificar: clasificar, cuantosDeUnaClase: cuantosDeUnaClase,

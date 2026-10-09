@@ -42,7 +42,7 @@
    y deja el fichero ESTADO-VIGILANTE.json para el Centro de mando.
    ============================================================ */
 
-var VERSION_SCRIPT = '6-oct-2026 · fila 268';
+var VERSION_SCRIPT = '9-oct-2026 · fila 315';
 
 /* Los repositorios que pueden mandar avisos (fila 261: todas las apps de
    Francisco). Que uno esté aquí no hace nada por sí solo: hasta que esa app
@@ -60,7 +60,8 @@ var REPOS_PERMITIDOS = [
   'fmargon780/Cancionero-Parroquia',
   'fmargon780/Parroquia_Conteo_Colectas',
   'fmargon780/ERP-Nutricion',
-  'fmargon780/Focus_Lingo'
+  'fmargon780/Focus_Lingo',
+  'fmargon780/centro-de-datos-ies'   /* fila 315: el Centro de datos */
 ];
 
 var CARPETA_RAIZ = 'SOPORTE-AVISOS';

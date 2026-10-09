@@ -490,6 +490,7 @@ window.Soporte = (function () {
     var campo = document.getElementById('soporte-url');
     if (!campo || !window.App || !App.guardarRegistroFresco) return;
     campo.value = direccion();
+    if (window.CentroDeDatosConfiguracion) CentroDeDatosConfiguracion.marcarCampos();   /* fila 316: si viene del Centro de datos, no se escribe aquí */
     campo.onchange = async function () {
       var nueva = campo.value.trim();
       if (nueva && !/^https:\/\//i.test(nueva)) {

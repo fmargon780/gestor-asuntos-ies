@@ -125,10 +125,22 @@ async function abrirMas() {
   await pagina.waitForSelector('.ficha-menu:not(.oculto)');
 }
 
+/* La mesa se repinta sola de vez en cuando y, con la máquina cargada, el menú se desprendía a mitad de clic:
+   se pulsa de una vez, dentro de la página, y si no se abre el cuadro se vuelve a abrir el menú. */
 async function elegirDelMenu(texto) {
-  await abrirMas();
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click();
-  await pagina.waitForSelector('#capa:not(.oculto)');
+  for (let intento = 0; intento < 5; intento++) {
+    if (intento) { await pagina.keyboard.press('Escape'); await pagina.waitForTimeout(400); }
+    try { await abrirMas(); } catch (e) { continue; }
+    const hecho = await pagina.evaluate((t) => {
+      const o = [...document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')].find((x) => x.textContent.indexOf(t) !== -1);
+      if (!o) return false;
+      o.click();
+      return true;
+    }, texto);
+    if (!hecho) continue;
+    try { await pagina.waitForSelector('#capa:not(.oculto)', { timeout: 5000 }); return; } catch (e) { /* otra vez */ }
+  }
+  throw new Error('No he conseguido elegir «' + texto + '» en el menú de la mesa');
 }
 
 /* ========== A. Crear con guía: en su sitio, y llega a otro abierto ========== */
