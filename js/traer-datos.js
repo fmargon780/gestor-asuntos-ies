@@ -89,6 +89,17 @@
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
   }
 
+  /* Fila 312: copia un fichero (el que sea, venga de donde venga) a `_GESTOR/datos` con el nombre que le toca.
+     `clave`: 'ALUMNADO' o 'PERSONAL' si ya se sabe qué es; si no, se mira por su nombre. Devuelve el nombre puesto. */
+  async function copiarUno(h, clase) {
+    if (typeof clase === 'string') clase = CLASES.filter(function (c) { return c.clave === clase; })[0];
+    clase = clase || claseDe(h.name);
+    if (!clase) throw new Error(h.name + ' no tiene nombre de fichero de Séneca');
+    var destino = clase.nombre(h.name);
+    await Carpetas.copiarFicheroEn(App.E.datos, h, destino);
+    return destino;
+  }
+
   async function traer() {
     var datos = App.E.datos;
     if (!datos) { U.aviso('Todavía no hay carpeta de datos.', 'malo'); return; }
@@ -106,10 +117,8 @@
       var clase = claseDe(h.name);
       if (!clase) clase = await preguntarQueEs(h.name);
       if (!clase) continue;
-      var destino = clase.nombre(h.name);
       try {
-        await Carpetas.copiarFicheroEn(datos, h, destino);
-        traidos.push(destino);
+        traidos.push(await copiarUno(h, clase));
       } catch (e) {
         U.aviso('No he podido traer ' + h.name + ': ' + U.mensajeDeError(e), 'malo');
       }
@@ -184,6 +193,8 @@
     ponerEnElAviso();
     vigilarElAviso();
   }
+
+  window.TraerDatos = { copiarUno: copiarUno, repasar: repasarLaPantalla };
 
   arrancar();
   if (!document.getElementById('btn-traer-datos')) {

@@ -176,6 +176,39 @@
     return resultado('alumnado', T, 'bien', 'Se usa la copia que hay guardada.');
   }
 
+  /* Fila 312: la carpeta del Centro de datos, de la que el gestor coge los listados de Séneca. */
+  async function centroDeDatos() {
+    var T = 'Carpeta del Centro de datos';
+    var arreglar = llevarA('#bloque-centro-de-datos');
+    if (!window.CentroDeDatos) return resultado('centro-de-datos', T, 'omitida', '');
+    var dir = await CentroDeDatos.carpeta();
+    var apuntes = await CentroDeDatos.leerApuntes(true);
+    var ultimo = null;
+    CentroDeDatos.CLAVES.forEach(function (c) {
+      var a = CentroDeDatos.apunteDe(apuntes, c);
+      if (a && (!ultimo || new Date(a.subido) > new Date(ultimo))) ultimo = a.subido;
+    });
+    if (dir) {
+      if (!(await CentroDeDatos.permiso(dir, false))) {
+        return resultado('centro-de-datos', T, 'falta', 'El navegador ha dejado de dar permiso a la carpeta del Centro de datos. ' +
+          'Hay que volver a dar permiso.', arreglar, true);
+      }
+      var r = await CentroDeDatos.leerIndice(dir);
+      if (!r.ok) {
+        return resultado('centro-de-datos', T, 'falta', 'La carpeta señalada no es la del Centro de datos. Hay que señalar la buena.', arreglar);
+      }
+      if ((r.indice.contrato || 1) > CentroDeDatos.CONTRATO) {
+        return resultado('centro-de-datos', T, 'falta', 'El Centro de datos es más nuevo que esta aplicación.', arreglar, true);
+      }
+      return resultado('centro-de-datos', T, 'bien', 'Índice del ' + (CentroDeDatos.fechaCorta(r.indice.actualizado, true) || 'sin fecha') + '.');
+    }
+    if (ultimo) {
+      return resultado('centro-de-datos', T, 'bien', 'Este ordenador usa lo que trae el otro. Último: ' + CentroDeDatos.fechaCorta(ultimo, true) + '.');
+    }
+    return resultado('centro-de-datos', T, 'falta', 'No hay carpeta del Centro de datos señalada ni nada traído de ella: ' +
+      'los listados de Séneca se suben a mano.', arreglar);
+  }
+
   async function bandeja() {
     var T = 'Bandeja de Gmail';
     var arreglar = llevarA('#estado-bandeja');
@@ -336,6 +369,7 @@
   var LISTA = [
     ['carpetas', 'Carpetas de Dropbox', carpetas],
     ['alumnado', 'Base de datos de alumnado', alumnado],
+    ['centro-de-datos', 'Carpeta del Centro de datos', centroDeDatos],
     ['bandeja', 'Bandeja de Gmail', bandeja],
     ['envio', 'Envío de correo', envio],
     ['ruta', 'Ruta de Dropbox en este ordenador', ruta],

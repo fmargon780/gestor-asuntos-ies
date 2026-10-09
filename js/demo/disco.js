@@ -154,14 +154,16 @@
     raiz = {
       abiertos: dir('ASUNTOS ABIERTOS'),
       archivo: dir('ARCHIVO'),
-      bandeja: dir('GESTOR-BANDEJA')
+      bandeja: dir('GESTOR-BANDEJA'),
+      centro: dir('CENTRO DE DATOS')   /* fila 312: la carpeta del Centro de datos, con su índice, que se llena al señalarla */
     };
 
     Object.defineProperty(window, 'indexedDB', { configurable: true, value: indexedDBDeMentira() });
 
     window.showDirectoryPicker = function (opciones) {
       var id = opciones && opciones.id;
-      var h = id === 'gestor-archivo' ? raiz.archivo : (id === 'gestor-bandeja' ? raiz.bandeja : raiz.abiertos);
+      var h = id === 'gestor-archivo' ? raiz.archivo : (id === 'gestor-bandeja' ? raiz.bandeja : (id === 'gestor-centro-de-datos' ? raiz.centro : raiz.abiertos));
+      if (id === 'gestor-centro-de-datos' && window.Demo && Demo.llenarCentro) return Demo.llenarCentro(h).then(function () { return h; });
       return Promise.resolve(h);
     };
 

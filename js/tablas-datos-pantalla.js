@@ -59,7 +59,8 @@
   /* Fila 238: copia cada fichero a `datos/Tablas/` con su nombre limpio
      (`RegMieConEsc 2024-2025.csv`; si ya está, pregunta antes de sustituirlo) y
      vuelve a leer. Un fichero que no trae las columnas, aviso ámbar y no se copia. */
-  async function anadirFicherosDelConsejo(ficheros) {
+  async function anadirFicherosDelConsejo(ficheros, opc) {
+    opc = opc || {};   /* fila 312: `sustituir` no pregunta; `silencioso` no avisa ni pinta (los trae el Centro de datos) */
     if (!App.E.datos) { U.aviso('Primero hay que señalar la carpeta de datos.', 'ambar'); return; }
     var C = window.TablasDatosConsejo;
     var puestos = 0;
@@ -71,15 +72,16 @@
         var r = C.leerTexto(decodificar(bytes), f.name);
         if (!r.ok) { U.aviso('«' + f.name + '» no parece del Consejo Escolar: ' + r.motivo + ' No lo he añadido.', 'ambar'); continue; }
         var nombre = C.nombreLimpio(f.name, r.periodo);
-        if (await Carpetas.existeFichero(sub, nombre)) {
+        if (!opc.sustituir && await Carpetas.existeFichero(sub, nombre)) {
           var ok = await U.preguntar('Sustituir el fichero', '<p>Ya hay «' + U.escapar(nombre) + '». ¿Lo sustituyo por el nuevo?</p>', 'Sustituir');
           if (!ok) continue;
         }
         await Carpetas.escribirBytes(sub, nombre, bytes, 'text/csv');
         puestos++;
       }
-    } catch (e) { U.fallo('No he podido añadir los ficheros', e); }
+    } catch (e) { if (opc.silencioso) throw e; U.fallo('No he podido añadir los ficheros', e); }
     TablasDatos.olvidar();
+    if (opc.silencioso) return puestos;
     await pintar();
     if (puestos) U.aviso(puestos === 1 ? 'Fichero del Consejo Escolar añadido.' : puestos + ' ficheros del Consejo Escolar añadidos.', 'bueno');
   }
@@ -135,5 +137,5 @@
     seccion.appendChild(det);
   }
 
-  window.TablasDatosPantalla = { pintar: pintar, pintarEnFicha: pintarEnFicha };
+  window.TablasDatosPantalla = { pintar: pintar, pintarEnFicha: pintarEnFicha, anadirFicherosDelConsejo: anadirFicherosDelConsejo };
 })();

@@ -32,6 +32,8 @@ Todo vive en el Dropbox del centro. Nada de esto sale de ahí salvo lo que se ex
 **Dentro de `_GESTOR/datos`:**
 
 - Los ficheros que ya bajaba el centro de Séneca (alumnado y personal), que la aplicación solo lee.
+  Los listados de Séneca se guardan además en el Centro de datos: una carpeta privada de Drive de la
+  cuenta del instituto de Francisco, a la que solo entran él y su compañero, y que el gestor solo la lee.
 - Tres listas que crea la propia aplicación para quien no sale en esos ficheros: aspirantes a
   plaza sin matricular todavía (nombre, documento, número de expediente, fecha de nacimiento,
   teléfono y correo), personal que no aparece en Séneca (conserjería, limpieza, empresas de
