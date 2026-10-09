@@ -5053,6 +5053,16 @@ datos» de esa pantalla y el párrafo «Última copia»; el bloque de Ajustes de
 tiene el fichero y enlaza a la tabla. En la copia de pruebas: `masnuevo=` y un `ALUMNADO-BD.json` en el Centro de datos de mentira; el disco de mentira ya no
 rejuvenece los ficheros a cada lectura (guardaban «ahora» al leerlos). `CentroDeDatos.pendientes` se exporta. Prueba: `pruebas/datos-que-tengo.mjs`.
 
+## Fila 320 — La pantalla de plantillas (9-oct-2026)
+
+Herramientas → «Plantillas»: todas las plantillas de Word y de correo en una tabla a todo el ancho, con los hitos que las usan
+(`js/plantillas-uso.js`, puro), ver, cambiar, nueva, sustituir el fichero (con «Deshacer», sin borrar el de antes), borrar a la
+Papelera (código común `Plantillas.borrarConPapelera`) y, en el cuadro de Word, «Traer un Word del ordenador…»
+(`js/plantillas-fichero.js`). `WordVisor.abrir` gana `soloVer`. Cada tipo de asunto lleva «Ver todas las plantillas». El buscador de
+Ajustes lo encuentra por `js/ajustes-buscador.js` (la tabla de `js/ajustes-reparto.js` es solo de Ajustes). La copia de pruebas
+lleva más plantillas (`js/demo/datos-plantillas-pantalla.js`, `pl-demo-baja` en la tarea de un hito de BAJA MEDICA). Ojo en la
+demostración: la franja fija tapa el botón «Cerrar» del visor de Word (se cierra con Escape). Prueba: `pruebas/plantillas-pantalla.mjs`.
+
 ## Filas cerradas movidas de `docs/COLA.md` el 9-oct-2026 (texto sin tocar)
 
 | 283 | Aviso de usuario: mejora en «Ficha de un asunto» | DESCARTADA (6-oct-2026): descartada por Francisco desde el Centro de mando |

@@ -6,6 +6,19 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ### Plantillas de documento de Word
 
+**La pantalla «Plantillas»** (10-oct-2026, fila 320, `docs/PANTALLA-DE-PLANTILLAS.md`): Herramientas → «Plantillas» →
+«Abrir las plantillas» (`js/plantillas-pantalla.js`, vista `#plantillas-vista` a todo el ancho como el control del
+registro). Pestañas Word y Correo; por línea: nombre, tipo, **los hitos que la usan** (`js/plantillas-uso.js`, puro:
+tareas `generar`/`comunicar` con `receta.plantilla`, `plantillasDocumento`, aviso «al terminar» del hito y «al cerrar» del
+tipo, modelos de la biblioteca, también dentro de las respuestas de una pregunta), fichero y acciones. Buscador, tipo de
+asunto, «Sin ningún hito». Ver (Word: `WordVisor.abrir({ soloVer: true })`, sin «Guardar PDF»; correo: su texto), Cambiar y
++ Nueva (los cuadros de siempre), ⋮ → «Sustituir el fichero…» (`js/plantillas-fichero.js`: se comprueba que es un Word,
+se guarda en `_GESTOR/PLANTILLAS` con nombre libre, el de antes **no se borra**, si otras lo usan se pregunta «Solo en esta» /
+«En todas» y hay «Deshacer») y Borrar (`Plantillas.borrarConPapelera`, el mismo código que la tarjeta del tipo; «Aviso de
+avance» y «Aviso de cierre» no se pueden borrar: la aplicación las vuelve a crear). En el cuadro de una plantilla de Word,
+«Traer un Word del ordenador…» copia un `.docx` a `_GESTOR/PLANTILLAS` y lo deja elegido. Cada tipo de asunto lleva «Ver todas
+las plantillas». `plantillas.json` no cambia.
+
 El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.md`, fila 17 de
 `docs/COLA.md`): un botón **Generar documento** en la ficha de un asunto saca una copia de un
 `.docx` con los huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.

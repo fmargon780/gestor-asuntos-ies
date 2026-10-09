@@ -90,9 +90,10 @@ var WordVisor = (function () {
     try { if (!blob && op.handle) blob = await op.handle.getFile(); }
     catch (e) { U.fallo('No he podido abrir el documento', e); return; }
     actual = { blob: blob, nombre: op.nombre || (blob && blob.name) || 'documento.docx', carpeta: op.carpeta || null,
-               asunto: op.asunto || null, hito: op.hito || null, alCerrar: op.alCerrar || null };
+               asunto: op.asunto || null, hito: op.hito || null, alCerrar: op.alCerrar || null, soloVer: !!op.soloVer };
     capa.querySelector('.word-visor-nombre').textContent = actual.nombre;
     capa.querySelector('.word-visor-pdf').disabled = !actual.carpeta;
+    capa.querySelector('.word-visor-pdf').classList.toggle('oculto', actual.soloVer);   /* fila 320: una plantilla se mira, no hay asunto donde guardar el PDF */
     capa.querySelector('.word-visor-pdf').title = actual.carpeta ? '' : 'Ábrelo desde la ficha del asunto para guardar el PDF en su carpeta';
     var hoja = capa.querySelector('.word-visor-hoja');
     hoja.innerHTML = '<p class="explica">Abriendo…</p>';

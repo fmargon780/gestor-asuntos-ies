@@ -100,6 +100,8 @@
       lista.forEach(function (p) { caja.appendChild(tarjetaDePlantillaDoc(p)); });
     }
     $('tipo-pd-nueva').onclick = function () { abrirCuadroDePlantillaDoc(null, tipo, refrescarSeccionActual); };
+    /* Fila 320: la pantalla «Plantillas», con este tipo ya puesto. */
+    if (window.PlantillasPantalla) PlantillasPantalla.enlaceDeTipo($('tipo-pd-nueva'), 'word', tipo.tipo);
     pintarHuecos($('tipo-pd-huecos'));
   }
 
@@ -122,20 +124,7 @@
     acciones.appendChild(editar);
 
     acciones.appendChild(Papelera.botonBorrar(async function () {
-      var ok = await Papelera.preguntarBorrar(p.nombre);
-      if (!ok) return;
-      try {
-        await Papelera.mandarDato('plantilla-documento', p.nombre,
-          { categoria: p.categoria, tipo: p.tipo }, { plantilla: p });
-        await Plantillas.guardar(App.E.gestor, function (actual) {
-          actual.documentos = actual.documentos.filter(function (x) { return x.id !== p.id; });
-          return actual;
-        });
-        U.aviso('Plantilla de documento mandada a la papelera.', 'bueno');
-        refrescarSeccionActual();
-      } catch (e) {
-        U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
-      }
+      if (await Plantillas.borrarConPapelera(p, 'documento')) refrescarSeccionActual();   /* fila 320: el mismo código que la pantalla «Plantillas» */
     }));
 
     div.appendChild(acciones);
@@ -206,8 +195,9 @@
         '<div><label class="etiqueta">Tipo de asunto</label>' +
           '<select id="pd-tipo" class="campo">' + opcionesTipos(categoriaInicial) + '</select></div>' +
       '</div>' +
-      '<label class="etiqueta">Fichero (.docx en _GESTOR/PLANTILLAS)</label>' +
+      '<label class="etiqueta">Fichero de Word</label>' +
       '<select id="pd-fichero" class="campo">' + opcionesFicheros() + '</select>' +
+      '<p class="pf-traer"><button type="button" class="boton" id="pd-traer-word">Traer un Word del ordenador…</button></p>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pd-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       '<div class="dos-columnas">' +
@@ -217,8 +207,7 @@
         '<div><label class="etiqueta">Texto adicional <span class="suave">(opcional)</span></label>' +
           '<input id="pd-texto" class="campo" value="' + U.escapar((existente && existente.texto) || '') + '"></div>' +
       '</div>' +
-      '<p class="nota">Con esas dos piezas y la fecha de hoy se monta el nombre del documento ' +
-      'generado (js/nombres.js).</p>' +
+      '<p class="nota">Con esas dos piezas y la fecha de hoy se monta el nombre del documento generado.</p>' +
       '<div class="dos-columnas">' +
         '<div><label class="etiqueta">Quien firma</label>' +
           '<select id="pd-firmante" class="campo">' + opcionesFirmante + '</select></div>' +
@@ -238,6 +227,22 @@
     $('pd-categoria').onchange = function () {
       $('pd-tipo').innerHTML = opcionesTipos($('pd-categoria').value);
     };
+    /* Fila 320: traer el .docx del ordenador sin copiarlo antes a Dropbox; queda elegido en el desplegable. */
+    var traer = $('pd-traer-word');
+    if (traer) {
+      if (window.SoloConsulta && SoloConsulta.activo()) traer.disabled = true;
+      traer.onclick = async function () {
+        var nombreNuevo = await PlantillasFichero.traerWord();
+        if (!nombreNuevo) return;
+        var sel = $('pd-fichero');
+        if (!sel) return;
+        if (sel.options.length === 1 && !sel.options[0].value) sel.innerHTML = '';
+        var o = document.createElement('option');
+        o.value = nombreNuevo; o.textContent = nombreNuevo;
+        sel.appendChild(o);
+        sel.value = nombreNuevo;
+      };
+    }
 
     var ok = await promesa;
     if (!ok) return;

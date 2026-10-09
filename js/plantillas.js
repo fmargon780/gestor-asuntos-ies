@@ -408,7 +408,29 @@ var Plantillas = (function () {
   }
 
 
+  /* Fila 320: borrar una plantilla a la Papelera, igual desde la tarjeta de un tipo que desde la pantalla «Plantillas».
+     `clase`: 'documento' (Word) o 'correo'. Pregunta antes; devuelve true si se ha borrado. */
+  async function borrarConPapelera(p, clase) {
+    var esDoc = clase === 'documento';
+    var ok = await Papelera.preguntarBorrar(p.nombre);
+    if (!ok) return false;
+    try {
+      await Papelera.mandarDato(esDoc ? 'plantilla-documento' : 'plantilla', p.nombre, { categoria: p.categoria, tipo: p.tipo }, { plantilla: p });
+      await guardar(App.E.gestor, function (actual) {
+        if (esDoc) actual.documentos = actual.documentos.filter(function (x) { return x.id !== p.id; });
+        else actual.lista = actual.lista.filter(function (x) { return x.id !== p.id; });
+        return actual;
+      });
+      U.aviso(esDoc ? 'Plantilla de documento mandada a la papelera.' : 'Plantilla mandada a la papelera.', 'bueno');
+      return true;
+    } catch (e) {
+      U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
+      return false;
+    }
+  }
+
   var API = {
+    borrarConPapelera: borrarConPapelera,
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, direccionDeNormativa: direccionDeNormativa, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,

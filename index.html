@@ -63,6 +63,7 @@
 <link rel="stylesheet" href="css/administraciones.css">
 <link rel="stylesheet" href="css/soporte.css">
 <link rel="stylesheet" href="css/control-registro.css">
+<link rel="stylesheet" href="css/plantillas-pantalla.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -478,6 +479,7 @@
       <header class="cabecera"><h2>Herramientas</h2></header>
 
       <div id="control-registro-vista" class="oculto"></div>
+      <div id="plantillas-vista" class="oculto"></div>
 
       <div id="herramientas-lista">
 
@@ -492,6 +494,19 @@
         <div class="bloque-cuerpo">
           <p class="explica">Sube los dos listados de Séneca y mira qué apuntes no tienen asunto.</p>
           <button type="button" class="boton" id="control-registro-abrir" data-solo-lectura>Abrir el control del registro</button>
+        </div>
+      </details>
+
+      <!-- Fila 320 (docs/PANTALLA-DE-PLANTILLAS.md): todas las plantillas de Word y de correo. La vista a todo el ancho
+           (#plantillas-vista) la pinta js/plantillas-pantalla.js y sustituye a esta lista mientras está abierta. -->
+      <details class="bloque-ajustes" id="bloque-plantillas">
+        <summary>
+          <span class="bloque-titulo">Plantillas</span>
+          <span class="bloque-pie">Todas las plantillas de Word y de correo del centro, y qué hitos las usan</span>
+        </summary>
+        <div class="bloque-cuerpo">
+          <p class="explica" id="plantillas-resumen"></p>
+          <button type="button" class="boton" id="plantillas-abrir" data-solo-lectura>Abrir las plantillas</button>
         </div>
       </details>
 
@@ -1427,6 +1442,9 @@
 <script src="js/docx-tabla.js"></script>
 <script src="js/plantillas-documento.js"></script>
 <script src="js/plantillas-documento-ajustes.js"></script>
+<script src="js/plantillas-uso.js"></script>
+<script src="js/plantillas-fichero.js"></script>
+<script src="js/plantillas-pantalla.js"></script>
 <!-- Fila 280, «Convertir en plantilla»: detrás de js/plantillas-documento-ajustes.js; js/plantilla-de-lo-escrito.js y js/genero.js ya están cargados. -->
 <script src="js/docx-sustituir.js"></script>
 <script src="js/convertir-en-plantilla-propuestas.js"></script>
