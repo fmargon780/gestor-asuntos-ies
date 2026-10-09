@@ -38,6 +38,14 @@ var ActividadesFicha = (function () {
     return '<h4>' + esc(titulo) + '</h4>' + (gente.length ? '<ul>' + gente.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' : '<p class="nota">Nadie.</p>');
   }
 
+  var estadoAviso = { linea: '', ambar: '', boton: 'Avisar al claustro' };
+
+  /* Fila 309: «Aviso enviado el …» / «Sin avisar al claustro» y, en ámbar, que la lista ha cambiado desde el aviso. */
+  function avisoDe(act) {
+    return '<p class="act-aviso">' + esc(estadoAviso.linea) + '</p>' +
+      (estadoAviso.ambar ? '<p class="aviso aviso-ambar act-aviso-cambio">' + esc(estadoAviso.ambar) + '</p>' : '');
+  }
+
   function cuerpoDe(act) {
     var s = Actividades.situacion(act, U.hoyIso());
     var horario = [act.salida && 'salida a las ' + act.salida, act.regreso && 'regreso a las ' + act.regreso].filter(Boolean).join(' · ');
@@ -54,8 +62,10 @@ var ActividadesFicha = (function () {
         lista('Organiza', act.profesorado.filter(function (p) { return p.papel === 'organiza'; }).map(function (p) { return p.nombre; })) +
         lista('Acompaña', act.profesorado.filter(function (p) { return p.papel !== 'organiza'; }).map(function (p) { return p.nombre; })) +
       '</div></div>' +
+      avisoDe(act) +
       '<div class="act-ficha-botones">' +
         '<button type="button" class="boton" id="act-cambiar">Cambiar</button>' +
+        '<button type="button" class="boton' + (estadoAviso.ambar ? ' boton-principal' : '') + '" id="act-avisar"' + (act.anulada ? ' disabled title="La actividad está anulada."' : '') + '>' + esc(estadoAviso.boton) + '</button>' +
         (act.anulada
           ? '<button type="button" class="boton" id="act-deshacer-anulacion">Deshacer la anulación</button>'
           : '<button type="button" class="boton" id="act-anular">Anular la actividad</button>') +
@@ -82,8 +92,10 @@ var ActividadesFicha = (function () {
     caja.dataset.nombre = act.nombre;
     delete caja.dataset.accion;
     caja.className = '';
+    estadoAviso = ActividadesInforme.estadoDelAviso(a);
     caja.innerHTML = cuerpoDe(act);
     $('act-cambiar').onclick = function () { cambiar(a); };
+    $('act-avisar').onclick = function () { ActividadesInforme.avisar(a, act); };
     var anular = $('act-anular'), deshacer = $('act-deshacer-anulacion');
     if (anular) anular.onclick = function () { anularActividad(a, act); };
     if (deshacer) deshacer.onclick = function () { deshacerAnulacion(a, act); };

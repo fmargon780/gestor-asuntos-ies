@@ -61,3 +61,7 @@
 .act-sit-prevista { background: var(--azul-claro); color: var(--azul); }
 .act-sit-realizada { background: var(--verde); color: #1e7a46; }
 .act-sit-anulada { background: var(--rojo); color: var(--rojo-linea); }
+/* Fila 309: el aviso al claustro en la tarjeta «La actividad». */
+.act-aviso { margin: 14px 0 0; color: var(--tinta-suave); font-size: 14px; }
+.act-aviso-cambio { margin: 6px 0 0; }
+.act-ficha-botones .boton[disabled] { opacity: .55; cursor: not-allowed; }

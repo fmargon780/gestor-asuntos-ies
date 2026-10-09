@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '309', fecha: '2026-10-09', texto: 'En la tarjeta «La actividad» hay un botón nuevo, «Avisar al claustro»: hace un informe en PDF con los datos de la actividad y el alumnado que va, por unidades, y abre el correo con el informe adjunto y el grupo del profesorado puesto en copia oculta. El grupo se elige en Ajustes → El centro. Si la lista cambia después, la tarjeta lo avisa y ofrece «Volver a avisar».' },
   { id: '322', fecha: '2026-10-09', texto: 'Cada plantilla de Word tiene un botón nuevo, «Retocar»: seleccionas un trozo del documento y lo cambias por otro texto, por un dato, o quitas el párrafo, sin salir de la aplicación. Vale para corregir una frase o una errata. «Cambiar por otro texto…» está también al convertir un documento en plantilla.' },
   { id: '321', fecha: '2026-10-09', texto: 'Una plantilla se puede dejar «Fuera de uso» desde Herramientas → «Plantillas»: sigue en la lista, en gris, pero deja de ofrecerse al generar un documento o al preparar un correo. Antes avisa de los hitos que la usan. Se vuelve a activar con un botón.' },
   { id: '320', fecha: '2026-10-09', texto: 'En Herramientas hay una pantalla nueva, «Plantillas», con todas las plantillas de Word y de correo juntas: se ve qué hitos usan cada una, y desde ahí se crean, se cambian, se les sustituye el fichero y se borran. Al crear una de Word ya se puede traer el fichero del ordenador, sin copiarlo antes a Dropbox.' },

@@ -50,7 +50,7 @@ await comprobar('2. «Lo de cada día»: tipos de documento, grupos, biblioteca 
   ['bloque-tipos-documento', 'bloque-grupos-personas', 'bloque-biblioteca-hitos', 'bloque-tipos-organo']);
 await comprobar('2. «El centro», en el orden del documento', titulos('#ajustes-tab-centro > details.bloque-ajustes'),
   ['Datos del centro y firma', 'Cargos del centro', 'Quién usa la aplicación', 'Membrete', 'Sello y firma en el papel', 'Calendario y responsables',
-    'Días de aviso', 'Copias de seguridad', 'Impresos', 'Alumnado y personal', 'Buzón de soporte']);
+    'Días de aviso', 'Copias de seguridad', 'Impresos', 'Alumnado y personal', 'Aviso de actividades extraescolares', 'Buzón de soporte']);   /* fila 309 */
 await comprobar('2. «Este ordenador»: las ocho', titulos('#ajustes-tab-ordenador > details.bloque-ajustes'),
   ['Carpetas de este ordenador', 'Rutas de las carpetas', 'Largo de las rutas', 'Carpeta de la base de datos de alumnado', 'Carpeta del Centro de datos', 'Bandeja de correos', 'Enviar correo', 'El ayudante de Séneca']);
 await comprobar('2. el sitio de paso no guarda ninguna sección', pagina.$$eval('#ajustes-tab-mantenimiento > details', (e) => e.length), 0);

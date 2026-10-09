@@ -38,8 +38,10 @@ de `App` va después del fichero que lo define.
 | `js/encargos.js`, `js/encargos-nuevo.js`, `js/encargos-mios.js`, `js/encargos-llegada.js` | Los encargos de los directivos (fila 289): `_GESTOR/encargos.json` (`{ encargos: [ … ] }`, documentos en `_GESTOR/encargos/<id>/`), «Nuevo encargo», «Mis encargos» y las tarjetas de «Ver todo»; se funde por `id` en un conflicto de Dropbox |
 | `js/actividades.js` | Las actividades extraescolares (fila 306): `_GESTOR/actividades.json`, `situacion`, `cuenta`, `unidadesDe`, `fechasLegibles`, la pasada que marca el tipo (`tipo.actividades`), `ponerAlDia`, papelera, unir y renombrar |
 | `js/actividades-formulario.js` | El formulario «La actividad» y el botón «Apuntar la actividad» de «Nuevo asunto» (fila 306) |
+| `js/actividades-informe.js` | El aviso al claustro (fila 309): `datos`, `cambios`, `valores` (huecos `{{ACTIVIDAD…}}`), el PDF, guardarlo en el asunto, `avisar`, `alEnviar`, el desplegable de Ajustes |
 | `js/actividades-ficha.js` | La tarjeta «La actividad» de la ficha: «Cambiar», «Anular la actividad», «Apuntar los datos de la actividad» (fila 306) |
 | `css/actividades.css` | Estilos del formulario y de la tarjeta de actividades (fila 306) |
+| `pruebas/actividades-aviso.mjs` | El aviso al claustro de una actividad (fila 309), con Chromium |
 | `js/demo/datos-actividades.js` | Tres actividades de la copia de pruebas: prevista, realizada y anulada (fila 306) |
 | `pruebas/actividades.mjs` | La prueba de las actividades extraescolares (fila 306) |
 | `js/demo/datos-encargos.js` | Los encargos de la copia de pruebas (fila 289) |

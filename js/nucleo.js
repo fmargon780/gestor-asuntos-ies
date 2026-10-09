@@ -546,7 +546,8 @@ App.IDENTIDAD_LISTA = {
   hilos: function (h) { return (h && h.id) || ''; },
   relacionados: function (r) { return (r && r.categoria || '') + '|' + (r && r.nombre || ''); },
   pendientesRegistro: function (p) { return typeof p === 'string' ? p : ((p && p.nombre) || ''); },
-  encargos: function (e) { return (e && e.id) || ''; }   /* fila 289 */
+  encargos: function (e) { return (e && e.id) || ''; },   /* fila 289 */
+  avisosActividad: function (x) { return (x && x.cuando) || ''; }   /* fila 309 */
 };
 
 App.unirPorIdentidad = function (a, b, identidad) {

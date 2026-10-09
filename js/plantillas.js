@@ -102,6 +102,16 @@ var Plantillas = (function () {
        hito concreto (`Plantillas.valoresDeAsunto(a, {hito})`). */
     { clave: 'hiton', etiqueta: 'Número del hito actual' },
     { clave: 'hitosm', etiqueta: 'Total de hitos del asunto' },
+    /* Fila 309 (docs/ACTIVIDADES-EXTRAESCOLARES-AVISO.md): los datos de la actividad de un asunto que lleva
+       `ficha.actividad`. Sin actividad, como cualquier hueco sin dato. Los pone js/actividades-informe.js. */
+    { clave: 'actividad', etiqueta: 'Nombre de la actividad extraescolar' },
+    { clave: 'actividad fechas', etiqueta: 'Fechas de la actividad extraescolar' },
+    { clave: 'actividad lugar', etiqueta: 'Lugar de la actividad extraescolar' },
+    { clave: 'actividad departamento', etiqueta: 'Departamento que organiza la actividad' },
+    { clave: 'actividad salida', etiqueta: 'Hora de salida de la actividad' },
+    { clave: 'actividad regreso', etiqueta: 'Hora de regreso de la actividad' },
+    { clave: 'actividad alumnado', etiqueta: 'Cuántos alumnos y alumnas van a la actividad' },
+    { clave: 'actividad profesorado', etiqueta: 'Profesorado que va a la actividad' },
     /* "Pedir lo que falta" (18-sep-2026, fila 59, docs/REQUISITOS-DE-HITO.md,
        sección 7): un hueco distinto, con doble llave a propósito, para
        que se note que no es un dato del asunto como los demás, sino un
@@ -338,7 +348,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm'];
+  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que

@@ -47,7 +47,7 @@ var GrupoRegistro = (function () {
   /* ¿Hay documentos generados sin registro? (una mirada a la ficha, sin tocar la carpeta). */
   function hayPendientes(a) {
     var docs = fichaDe(a).documentos || {};
-    return Object.keys(docs).some(function (n) { return docs[n] && docs[n].generadoDe && !(docs[n].registros || []).length; });
+    return Object.keys(docs).some(function (n) { return docs[n] && docs[n].generadoDe && docs[n].generadoDe !== 'informe-actividad' && !(docs[n].registros || []).length; });   /* fila 309: el informe de la actividad no se registra */
   }
 
   function puedeEscribir(a) {

@@ -237,6 +237,8 @@
     I.tutorDelGrupo = (extra && extra.tutorDelGrupo) || null;
     /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
     I.plantillaPedida = (extra && extra.plantilla) || '';
+    I.avisoActividad = (extra && extra.avisoActividad) || null;   /* fila 309: al enviarse, se apunta el aviso en el asunto */
+    I.grupoInicial = (extra && extra.grupoInicial) || '';   /* fila 309: el id de un grupo propio, ya en la copia oculta */
     /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): el hito desde el que
        se avisa o se pide "Enviar estado", para que {{HITO}}, {{HITON}}
        y {{HITOSM}} salgan resueltos en la plantilla. `avisoLoPide`
@@ -274,6 +276,13 @@
       var linea = document.createElement('div');
       linea.className = 'aviso aviso-ambar';
       linea.textContent = extra.avisoAmbar;
+      if (extra.avisoEnlace) {   /* fila 309: un enlace al final de la línea */
+        var enlace = document.createElement('button');
+        enlace.type = 'button'; enlace.className = 'enlace'; enlace.textContent = extra.avisoEnlace.texto;
+        enlace.onclick = extra.avisoEnlace.alPulsar;
+        linea.appendChild(document.createTextNode(' '));
+        linea.appendChild(enlace);
+      }
       $('correo-caja').insertBefore(linea, $('correo-caja').firstChild);
     }
     await esperar;

@@ -61,6 +61,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-copias', donde: 'centro', otras: 'copia, restaurar, recuperar, caducidad' },
     { id: 'bloque-impresos', donde: 'centro', otras: 'casillas, PDF, anexo, catálogo, formularios' },
     { id: 'bloque-alumnado-personal', donde: 'centro', otras: 'RegAlum, RelPerCen, Séneca, CSV, fichero viejo, épocas, grupos, unidades, alumnado, personal' },
+    { id: 'bloque-aviso-actividades', donde: 'centro', otras: 'actividades, extraescolares, claustro, profesorado, grupo, aviso, correo' },
     { id: 'bloque-soporte', donde: 'centro', otras: 'soporte, avisos, mejoras, dirección del buzón' },
     /* Este ordenador */
     { id: 'bloque-carpetas', donde: 'ordenador', otras: 'Dropbox, abiertos, ARCHIVO, señalar carpetas, solo consultar' },
