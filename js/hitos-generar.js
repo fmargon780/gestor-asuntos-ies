@@ -51,6 +51,7 @@ window.HitosGenerar = (function () {
     var delPaso = [];
     (ids || []).forEach(function (id) {
       if (vistos[id] || !porId[id]) return;
+      if (window.Plantillas && !Plantillas.enUso(porId[id])) return;   /* fila 321: las fuera de uso no se ofrecen */
       vistos[id] = true;
       delPaso.push(porId[id]);
     });

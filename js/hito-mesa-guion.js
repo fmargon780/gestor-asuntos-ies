@@ -85,6 +85,7 @@ var HitoMesaGuion = (function () {
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
+        (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" title="Vuelve a activarla en Herramientas → Plantillas, o pon otra en la tarea">plantilla fuera de uso</span>' : '') +
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
         quienCuando + botonesTarea + '</div>' +
       debajoTarea +

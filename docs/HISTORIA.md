@@ -5063,6 +5063,14 @@ Ajustes lo encuentra por `js/ajustes-buscador.js` (la tabla de `js/ajustes-repar
 lleva más plantillas (`js/demo/datos-plantillas-pantalla.js`, `pl-demo-baja` en la tarea de un hito de BAJA MEDICA). Ojo en la
 demostración: la franja fija tapa el botón «Cerrar» del visor de Word (se cierra con Escape). Prueba: `pruebas/plantillas-pantalla.mjs`.
 
+## Fila 321 — Plantillas fuera de uso (9-oct-2026)
+
+`fueraDeUso: { desde, por }` en `plantillas.json`, `Plantillas.enUso`, «Dejar fuera de uso…» / «Volver a activar» en la pantalla «Plantillas»
+(`js/plantillas-fuera-de-uso.js`) y botón en la tarjeta del tipo. Dejan de ofrecerse `Plantillas.deTipo`/`documentosDeTipo` (parámetro `todas` para
+Ajustes y la pantalla), `HitosGenerar.agrupar`, `PlantillaBuscar` y los desplegables de la guía y de los avisos (que conservan la puesta, con «(fuera de uso)»).
+Las tareas con plantilla fuera de uso no generan, «Hacer este hito» se para y los avisos abren el cuadro sin plantilla y con línea ámbar.
+Los cuadros de «Cambiar» conservan la marca. Palabra nueva en `docs/VOCABULARIO.md`. Demostración: `&fueradeuso=1`. Prueba: `pruebas/plantillas-fuera-de-uso.mjs`.
+
 ## Filas cerradas movidas de `docs/COLA.md` el 9-oct-2026 (texto sin tocar)
 
 | 283 | Aviso de usuario: mejora en «Ficha de un asunto» | DESCARTADA (6-oct-2026): descartada por Francisco desde el Centro de mando |

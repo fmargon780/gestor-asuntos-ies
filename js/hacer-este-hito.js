@@ -105,6 +105,7 @@ var HacerEsteHito = (function () {
     var datos = null;
     if (window.Plantillas) { try { datos = await Plantillas.cargarReciente(App.E.gestor); } catch (e) { datos = null; } }
     var p = id && datos && (datos.documentos || []).filter(function (x) { return x.id === id; })[0];
+    if (p && !Plantillas.enUso(p)) return { fueraDeUso: p };   /* fila 321: la cadena se para */
     if (p) return p;
     /* Sin plantilla en la receta: el cuadro de elegir de siempre. */
     var lista = await PlantillasDocumento.plantillasDelAsunto(a);
@@ -117,6 +118,7 @@ var HacerEsteHito = (function () {
   async function pasoGenerar(a, h, g, siguiente) {
     var p = await plantillaDe(a, g);
     if (!p) return { sigue: false };
+    if (p.fueraDeUso) { Plantillas.avisoFueraDeUso(p.fueraDeUso); return { sigue: false }; }
     var guardado = false;
     var paraRegistrar = !!(siguiente && siguiente.accion === 'registrar');
     var res = await PlantillasDocumento.generar(a, p, 'abierto', {
@@ -154,6 +156,9 @@ var HacerEsteHito = (function () {
 
   async function pasoComunicar(a, h, g, documento) {
     var receta = g.receta || {};
+    /* Fila 321: la plantilla de la tarea está fuera de uso: la cadena se para, sin dar el hito por hecho. */
+    var fuera = HitoMesaRecetas.plantillaFueraDeUso ? await HitoMesaRecetas.plantillaFueraDeUso(g) : null;
+    if (fuera) { Plantillas.avisoFueraDeUso(fuera); return { sigue: false }; }
     var canales = HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
     var via = receta.via || canales[0] || 'correo';
     var lista = await HitoMesaComunicar.candidatos(a, h);

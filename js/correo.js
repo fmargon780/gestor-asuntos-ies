@@ -269,6 +269,13 @@
     try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }
     try { valoresActuales = await Plantillas.valoresDeAsunto(a, { hito: I.hitoActual }); } catch (e) { valoresActuales = null; }
     await pintarCuadro(a, persona);
+    /* Fila 321: una línea ámbar arriba (por ejemplo, «La plantilla de este aviso… está fuera de uso»). */
+    if (extra && extra.avisoAmbar && $('correo-caja')) {
+      var linea = document.createElement('div');
+      linea.className = 'aviso aviso-ambar';
+      linea.textContent = extra.avisoAmbar;
+      $('correo-caja').insertBefore(linea, $('correo-caja').firstChild);
+    }
     await esperar;
     if (cuadroEl) { cuadroEl.classList.remove('cuadro-seneca'); cuadroEl.classList.remove('cuadro-correo'); }
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay

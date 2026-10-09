@@ -424,6 +424,14 @@ pregunta es siempre la misma y sale sola, sin ir a buscarla:
 
 **Campos de este hito (fila 255)**: en la columna derecha, debajo de los tres resúmenes, la tarjeta `.mesa-campos-hito` (la pinta `CamposDeHito.tarjetaHtml` desde `cuerpoDeHito`, se engancha en `engancharCuerpo`): los campos del hito con su control según la clase, guardados al cambiar, con «⋮» y «+ Añadir campo» en el título; sin campos, una tarjeta pequeña con solo el botón; en modo consulta y en el ARCHIVO, solo lectura.
 
+## Tareas con la plantilla fuera de uso (9-oct-2026, fila 321)
+
+`Plantillas.fueraDeUsoDeLaTarea(g)` (síncrona) dice si la plantilla de la receta de una tarea está fuera de uso. La mesa pone junto al
+texto de la tarea (`js/hito-mesa-guion.js`) y en el menú de recetas (`js/hito-mesa-recetas.js`) la marca «plantilla fuera de uso»; el botón
+de la tarea (generar o comunicar) da un aviso ámbar y no hace nada, y «Hacer este hito» (`js/hacer-este-hito.js`) se para en esa tarea sin dar
+el hito por hecho. La tarea se puede marcar hecha a mano. El editor de la guía enseña la misma marca (`js/guias-guion.js`) y la lista de
+comprobación del tipo la cuenta como «sin plantilla».
+
 ## «Hacer este hito» (6-oct-2026, fila 285, `docs/HACER-ESTE-HITO.md`)
 
 - Botón en la cabecera de la mesa, delante de «Generar documento ▾» (`HacerEsteHito.botonHTML/lineaHTML/enganchar`, pintados desde `pintarCabecera` de `js/hito-mesa.js`). Solo sale si el hito tiene una tarea pendiente con acción `generar` o `comunicar`; la línea gris de debajo lista la cadena («Genera «…» → espera el registro en Séneca → correo al tercero»). Apagado en solo consulta. Los tres menús y las recetas (fila 164) no cambian.

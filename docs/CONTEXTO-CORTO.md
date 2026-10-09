@@ -171,7 +171,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   «Imprimir» (sin editar aún).
 - Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
   también desde el cuadro de Correo/Séneca (se abre con la propia del tipo o «Sin plantilla»; «Sin plantilla» se queda; «Guardar como plantilla nueva» convierte lo escrito en plantilla, fila 270; «Convertir en plantilla» en el ⋮ de un Word (o PDF) del asunto, filas 280 y 281); las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
-  el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona. Todas juntas en Herramientas → «Plantillas» (fila 320, `js/plantillas-pantalla.js`, `js/plantillas-uso.js`): qué hitos usan cada una, ver, cambiar, sustituir el fichero y borrar.
+  el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona. Todas juntas en Herramientas → «Plantillas» (fila 320, `js/plantillas-pantalla.js`, `js/plantillas-uso.js`): qué hitos usan cada una, ver, cambiar, sustituir el fichero y borrar. Una plantilla puede estar fuera de uso (fila 321, `fueraDeUso`, `Plantillas.enUso`): no se ofrece, y la tarea de un hito que la lleva no genera.
 - Tablas de datos (tutorías de Séneca, Consejo Escolar —por nombre, fila 238—, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
@@ -248,6 +248,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
+- Para **ofrecer** plantillas, siempre `Plantillas.deTipo` o `Plantillas.documentosDeTipo` (dejan fuera las que no están en uso); `datos.lista` y `datos.documentos` a pelo, solo para encontrar una por su `id`. Un cuadro que cambia una plantilla conserva las claves que no conoce (fila 321).
 - Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319).
 - Una carpeta recordada sin permiso se arregla pidiendo el permiso sobre ella (`PermisosCarpetas.pedir`), nunca mandando a señalarla otra vez (fila 318).
 - Un campo de fecha que guarda sin botón se engancha con `U.alTerminarFecha`, nunca con `change` (fila 314).

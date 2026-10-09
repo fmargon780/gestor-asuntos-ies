@@ -29,7 +29,7 @@ var PlantillaBuscar = (function () {
   async function catalogo() {
     var datos = null;
     try { datos = await Plantillas.cargarReciente(App.E.gestor, 60000); } catch (e) { datos = Plantillas.enMemoria(); }
-    return (datos && datos.documentos) || [];
+    return ((datos && datos.documentos) || []).filter(function (p) { return Plantillas.enUso(p); });   /* fila 321: las fuera de uso no salen */
   }
 
   async function montar(caja, alElegir) {

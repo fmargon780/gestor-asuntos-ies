@@ -107,8 +107,9 @@
 
   function tarjetaDePlantillaDoc(p) {
     var div = document.createElement('div');
-    div.className = 'tarjeta-tipo';
+    div.className = 'tarjeta-tipo' + (Plantillas.enUso(p) ? '' : ' tarjeta-fuera-de-uso');
     div.innerHTML = '<div class="nombre-tipo">' + U.escapar(p.nombre) + '</div>' +
+      (Plantillas.enUso(p) ? '' : '<div class="suave">' + U.escapar(PlantillasFueraDeUso.etiqueta(p)) + '</div>') +
       '<div class="suave">' + U.escapar(p.tipo) + '  ·  ' + U.escapar(p.categoria) + '</div>' +
       '<div class="suave">' + U.escapar(p.fichero) + '</div>';
 
@@ -122,6 +123,14 @@
     editar.textContent = 'Cambiar';
     editar.onclick = function () { abrirCuadroDePlantillaDoc(p, null, refrescarSeccionActual); };
     acciones.appendChild(editar);
+    if (!Plantillas.enUso(p)) {
+      var activar = document.createElement('button');
+      activar.type = 'button';
+      activar.className = 'boton';
+      activar.textContent = 'Volver a activar';
+      activar.onclick = function () { return PlantillasFueraDeUso.volverAActivar(p, 'documento', refrescarSeccionActual); };
+      acciones.appendChild(activar);
+    }
 
     acciones.appendChild(Papelera.botonBorrar(async function () {
       if (await Plantillas.borrarConPapelera(p, 'documento')) refrescarSeccionActual();   /* fila 320: el mismo código que la pantalla «Plantillas» */
@@ -267,9 +276,10 @@
         if (existente) {
           var i = actual.documentos.findIndex(function (x) { return x.id === existente.id; });
           if (i !== -1) {
-            actual.documentos[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre,
+            /* Fila 321: se parte de la fila que había, para no perder las claves que este cuadro no conoce (`fueraDeUso`). */
+            actual.documentos[i] = Object.assign({}, actual.documentos[i], { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre,
               fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
-              firmante: firmante, vistoBueno: vistoBueno, conLogoCentro: conLogoCentro };
+              firmante: firmante, vistoBueno: vistoBueno, conLogoCentro: conLogoCentro });
           }
         } else {
           actual.documentos.push({ id: Plantillas.idNuevoDocumento(), tipo: tipo, categoria: categoria,

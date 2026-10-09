@@ -35,6 +35,18 @@
       fila('SEGURO ESCOLAR', 'ALUMNADO', 'Justificante de cobro', 'Justificante común.docx', 'JUSTIFICANTE');
       return actual;
     });
+    /* Fila 321: con `&fueradeuso=1`, «Certificado de notas» (Word, en la tarea de generar de su hito) y «Acuse de recibo del parte»
+       (correo, en la tarea de comunicar del primer hito de BAJA MEDICA) arrancan fuera de uso. */
+    if (/(^|[?&])fueradeuso=1(&|$)/.test(location.search)) {
+      await Plantillas.guardar(App.E.gestor, function (actual) {
+        (actual.documentos || []).concat(actual.lista || []).forEach(function (p) {
+          if (p.nombre === 'Certificado de notas' || p.nombre === 'Acuse de recibo del parte') {
+            p.fueraDeUso = { desde: new Date().toISOString(), por: 'Revisor' };
+          }
+        });
+        return actual;
+      });
+    }
   }
 
   window.Demo = window.Demo || {};

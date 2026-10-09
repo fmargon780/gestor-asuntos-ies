@@ -239,9 +239,33 @@ var Plantillas = (function () {
      cualquier asunto — ninguna plantilla de antes de esta fila se
      queda nunca sin categoría o sin tipo, así que esto no cambia lo
      que ya había. */
-  function deTipo(datos, categoria, tipo) {
+  /* Fila 321 (docs/PLANTILLAS-FUERA-DE-USO.md): una plantilla «fuera de uso» lleva `fueraDeUso: { desde, por }`.
+     Una sola función dice si está en uso: nadie mira la clave por su cuenta. */
+  function enUso(p) { return !(p && p.fueraDeUso); }
+
+  /* Una plantilla (de correo o de Word) por su id, con lo último que se leyó; null si no existe o no se ha leído. */
+  function porId(id) {
+    if (!id || !cache) return null;
+    return (cache.documentos || []).concat(cache.lista || []).filter(function (p) { return p.id === id; })[0] || null;
+  }
+
+  /* La plantilla fuera de uso que lleva una tarea del guion (`receta.plantilla`), o null. Síncrona, para pintar. */
+  function fueraDeUsoDeLaTarea(g) {
+    var p = porId(g && g.receta && g.receta.plantilla);
+    return p && !enUso(p) ? p : null;
+  }
+
+  /* El aviso ámbar de una tarea cuya plantilla está fuera de uso. */
+  function avisoFueraDeUso(p) {
+    U.aviso('La plantilla «' + p.nombre + '» está fuera de uso. Vuelve a activarla en Herramientas → Plantillas, o pon otra en la tarea.', 'ambar');
+  }
+
+  /* Para OFRECER plantillas (desplegables, «Generar documento», el cuadro de Correo…) las fuera de uso no salen.
+     `todas` (true): las listas de Ajustes y la pantalla de plantillas las piden todas. */
+  function deTipo(datos, categoria, tipo, todas) {
     var nombres = nombresDelTipo(tipo);
     return ((datos && datos.lista) || []).filter(function (p) {
+      if (!todas && !enUso(p)) return false;
       if (p.categoria && p.categoria !== categoria) return false;
       return !p.tipo || p.tipo === tipo || nombres.indexOf(U.normalizar(p.tipo || '')) !== -1;
     });
@@ -258,9 +282,10 @@ var Plantillas = (function () {
     return (cache.documentos || []).filter(function (d) { return d.id === id; })[0] || null;
   }
 
-  function documentosDeTipo(datos, categoria, tipo) {
+  function documentosDeTipo(datos, categoria, tipo, todas) {
     var nombres = nombresDelTipo(tipo);
     return ((datos && datos.documentos) || []).filter(function (p) {
+      if (!todas && !enUso(p)) return false;
       /* Sin tildes ni mayúsculas (fila 123): «DESEMPEÑO FUNCION TUTORIAL»
          casa con la plantilla de «DESEMPEÑO FUNCIÓN TUTORIAL». */
       return p.categoria === categoria && nombres.indexOf(U.normalizar(p.tipo || '')) !== -1;
@@ -430,7 +455,7 @@ var Plantillas = (function () {
   }
 
   var API = {
-    borrarConPapelera: borrarConPapelera,
+    borrarConPapelera: borrarConPapelera, enUso: enUso, porId: porId, fueraDeUsoDeLaTarea: fueraDeUsoDeLaTarea, avisoFueraDeUso: avisoFueraDeUso,
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, direccionDeNormativa: direccionDeNormativa, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
