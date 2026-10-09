@@ -51,8 +51,8 @@ await comprobar('2. «Lo de cada día»: tipos de documento, grupos, biblioteca 
 await comprobar('2. «El centro», en el orden del documento', titulos('#ajustes-tab-centro > details.bloque-ajustes'),
   ['Datos del centro y firma', 'Cargos del centro', 'Quién usa la aplicación', 'Membrete', 'Sello y firma en el papel', 'Calendario y responsables',
     'Días de aviso', 'Copias de seguridad', 'Impresos', 'Alumnado y personal', 'Buzón de soporte']);
-await comprobar('2. «Este ordenador»: las siete', titulos('#ajustes-tab-ordenador > details.bloque-ajustes'),
-  ['Carpetas de este ordenador', 'Rutas de las carpetas', 'Largo de las rutas', 'Carpeta de la base de datos de alumnado', 'Bandeja de correos', 'Enviar correo', 'El ayudante de Séneca']);
+await comprobar('2. «Este ordenador»: las ocho', titulos('#ajustes-tab-ordenador > details.bloque-ajustes'),
+  ['Carpetas de este ordenador', 'Rutas de las carpetas', 'Largo de las rutas', 'Carpeta de la base de datos de alumnado', 'Carpeta del Centro de datos', 'Bandeja de correos', 'Enviar correo', 'El ayudante de Séneca']);
 await comprobar('2. el sitio de paso no guarda ninguna sección', pagina.$$eval('#ajustes-tab-mantenimiento > details', (e) => e.length), 0);
 await comprobar('2. no hay «Campos propios» ni una sección «Hitos»', pagina.evaluate(() => [...document.querySelectorAll('#pantalla-ajustes .bloque-titulo')].map((t) => t.textContent.trim()).filter((t) => t === 'Campos propios' || t === 'Hitos')), []);
 await comprobar('2. «Impresos» lleva el catálogo dentro y no hay otra sección «Impresos»',
