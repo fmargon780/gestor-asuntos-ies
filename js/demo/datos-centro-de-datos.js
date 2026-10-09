@@ -60,7 +60,8 @@
     await Carpetas.escribirTexto(dir, 'configuracion.json', JSON.stringify({
       contrato: 1, actualizado: new Date().toISOString(), actualizadoPor: 'direccion@centro-demo.es',
       centro: { nombre: 'IES Centro de Demostración', codigo: '', direccion: '', localidad: 'Granada', provincia: '', telefono: '958000000' },
-      correo: { direccionDelCentro: '', firma: 'Un saludo.\n{usuario}\n{centro}' }
+      correo: { direccionDelCentro: '', firma: 'Un saludo.\n{usuario}\n{centro}' },
+      soporte: { buzon: 'https://buzon.demo.invalido/exec' }
     }));
     await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify({
       contrato: 1, actualizado: new Date().toISOString(), web: '', listados: listados

@@ -5010,3 +5010,7 @@ En «Control del registro», «Revisar desde el día» guardaba con `change`, qu
 ## Fila 315 — El buzón de soporte admite el Centro de datos (9-oct-2026)
 
 `fmargon780/centro-de-datos-ies` entra en `REPOS_PERMITIDOS` de `apps-script/soporte.gs` (con `VERSION_SCRIPT` nueva) y `pruebas/soporte-script.mjs` comprueba que su aviso se acepta, que su cola de cuatro columnas lleva `IDEA (fecha)` sola en la tercera y el enlace en la cuarta, y que otro repositorio se sigue rechazando. No se toca el botón del Gestor. Dos pasos de Francisco (permiso de GitHub y volver a pegar el script) en `docs/TE-TOCA.md`.
+
+## Fila 316 — La dirección del buzón de soporte desde el Centro de datos (9-oct-2026)
+
+En la misma lectura de `configuracion.json` de la fila 313, `soporte.buzon` (solo si empieza por `https://` y es distinta) se copia a `registro.ajustesAvisos.urlSoporte`; si no viene o no vale, no se toca ni se borra nada. El apunte `configuracion.buzonSoporte` dice que viene de fuera y en Ajustes › El centro › «Buzón de soporte» el campo sale sin poder escribirse, con «Se cambia en el Centro de datos» (una llamada en `js/soporte.js`; la lógica en `js/centro-de-datos-configuracion.js`). El aviso verde añade «la dirección del buzón de soporte». Decisión: en la copia de pruebas la dirección de demostración (`https://buzon.demo.invalido/exec`) viene en el `configuracion.json` de la carpeta de mentira, así que aparece al señalar esa carpeta en Ajustes › Este ordenador (no antes). Prueba: `pruebas/centro-de-datos-configuracion.mjs`.

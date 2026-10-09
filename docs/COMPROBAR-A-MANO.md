@@ -265,3 +265,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 315 — el buzón admite el Centro de datos (9-oct-2026)
 
 - Tras añadir `centro-de-datos-ies` al permiso de GitHub y pegar el script: `prepararTodo` dice «Bien: fmargon780/centro-de-datos-ies». Con el botón del Centro de datos ya publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva del Centro de datos en el Centro de mando.
+
+## Fila 316 — buzón de soporte desde el Centro de datos (9-oct-2026)
+
+- Con el enlace ya escrito en el Centro de datos: entrar en el gestor en el centro, Ajustes → El centro → «Buzón de soporte» enseña esa dirección con «Se cambia en el Centro de datos», y un aviso de prueba llega al Centro de mando.
