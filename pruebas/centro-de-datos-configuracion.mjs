@@ -105,9 +105,9 @@ const leerDatos = (nombre) => pagina.evaluate(async (nombre) => {
 }, nombre);
 const apuntes = () => pagina.evaluate(async () => Object.keys((await CentroDeDatos.leerApuntes(true)).tomado).sort());
 
-const conf = (extra, centro, correo) => ({ contrato: 1, actualizado: new Date(Date.now() + extra * 1000).toISOString(), actualizadoPor: 'direccion@centro-inventado.es',
+const conf = (extra, centro, correo, soporte) => (Object.assign({},{ contrato: 1, actualizado: new Date(Date.now() + extra * 1000).toISOString(), actualizadoPor: 'direccion@centro-inventado.es',
   centro: Object.assign({ nombre: '', codigo: '', direccion: '', localidad: '', provincia: '', telefono: '' }, centro),
-  correo: Object.assign({ direccionDelCentro: '', firma: '' }, correo) });
+  correo: Object.assign({ direccionDelCentro: '', firma: '' }, correo) }, soporte ? { soporte } : {}));
 const plantillas = () => pagina.evaluate(async () => { const p = await Plantillas.cargar(App.E.gestor); return { centro: p.centro, codigo: p.codigo, localidad: p.localidad, firma: p.firma, direccion: p.direccion, provincia: p.provincia }; });
 await pagina.evaluate(async () => {
   await Plantillas.guardar(App.E.gestor, (a) => { a.codigo = '29000000'; a.centro = 'IES Antiguo'; a.firma = 'Firma antigua'; a.cargo = 'Secretario'; return a; });
@@ -180,6 +180,52 @@ console.log('--- 6. la plantilla ---');
 await montar({ listados: [], configuracion: conf(6, { nombre: 'IES Nuevo de Verdad' }) });
 await comprobar('un hueco con el nombre del centro sale con el valor nuevo',
   pagina.evaluate(async () => { await CentroDeDatos.traer({}); const p = await Plantillas.cargar(App.E.gestor); return Plantillas.rellenar('Del {centro}.', { centro: p.centro }).texto; }), 'Del IES Nuevo de Verdad.');
+
+/* ================= 7. EL BUZÓN DE SOPORTE (fila 316) ================= */
+console.log('--- 7. el buzón de soporte ---');
+await pagina.evaluate(async () => {
+  await App.guardarRegistroFresco(function (reg) { reg.ajustesAvisos = reg.ajustesAvisos || {}; reg.ajustesAvisos.urlSoporte = 'https://buzon.antiguo.invalido/exec'; });
+  window.__registros = 0;
+  const o = App.guardarRegistroFresco;
+  App.guardarRegistroFresco = function () { window.__registros++; return o.apply(this, arguments); };
+});
+const urlSoporte = () => pagina.evaluate(() => App.E.registro.ajustesAvisos.urlSoporte);
+await montar({ listados: [], configuracion: conf(7, { nombre: 'IES Nuevo de Verdad' }, {}, { buzon: 'http://no-vale.invalido/exec' }) });
+await comprobar('con una dirección que no empieza por https:// no se toca nada',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); return [window.__registros, (await CentroDeDatos.leerApuntes(true)).configuracion.buzonSoporte]; }).then(async ([n, flag]) => [n, flag, await urlSoporte()]), [0, false, 'https://buzon.antiguo.invalido/exec']);
+await montar({ listados: [], configuracion: conf(8, { nombre: 'IES Nuevo de Verdad' }, {}, { buzon: '' }) });
+await comprobar('con la dirección vacía, tampoco (y no se borra la del gestor)',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); return window.__registros; }).then(async (n) => [n, await urlSoporte()]), [0, 'https://buzon.antiguo.invalido/exec']);
+await montar({ listados: [], configuracion: conf(9, { nombre: 'IES Nuevo de Verdad' }) });
+await comprobar('sin el grupo `soporte`, tampoco',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); return window.__registros; }).then(async (n) => [n, await urlSoporte()]), [0, 'https://buzon.antiguo.invalido/exec']);
+await montar({ listados: [], configuracion: conf(10, {}, {}, { buzon: 'https://buzon.nuevo.invalido/exec' }) });
+await pagina.evaluate(() => { window.__avisos.length = 0; });
+await comprobar('con una dirección https:// distinta se copia a donde ya vive y el aviso verde lo dice',
+  pagina.evaluate(async () => { const r = await CentroDeDatos.traer({}); return [r.configuracion, window.__registros, window.__avisos.filter((a) => /Traído/.test(a[0])).map((a) => a[0])]; }).then(async ([c, n, av]) => [c, n, av, await urlSoporte()]),
+  [true, 1, ['Traído del Centro de datos: la dirección del buzón de soporte.'], 'https://buzon.nuevo.invalido/exec']);
+await comprobar('se apunta que viene del Centro de datos, y el botón «Soporte» usa la dirección nueva',
+  pagina.evaluate(async () => [(await CentroDeDatos.leerApuntes(true)).configuracion.buzonSoporte, Soporte.direccion()]), [true, 'https://buzon.nuevo.invalido/exec']);
+await comprobar('con el mismo `actualizado` no se escribe nada',
+  pagina.evaluate(async () => { const n = window.__registros; await CentroDeDatos.traer({}); return window.__registros - n; }), 0);
+await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('[data-ajustes-pestana="centro"]');
+await comprobar('Ajustes → «Buzón de soporte»: la dirección, sin poder escribir, con su nota',
+  pagina.evaluate(async () => {
+    Soporte.pintarAjustes();
+    await new Promise((r) => setTimeout(r, 600));
+    const c = document.getElementById('soporte-url'); const n = document.getElementById('soporte-url-nota-centro');
+    return [c.value, c.readOnly, n && n.textContent];
+  }), ['https://buzon.nuevo.invalido/exec', true, 'Se cambia en el Centro de datos']);
+await montar({ listados: [], configuracion: conf(11, {}, {}, { buzon: 'https://buzon.otro.invalido/exec' }) });
+await comprobar('con «solo consultar» no se copia',
+  pagina.evaluate(async () => { const o = SoloConsulta.activo; SoloConsulta.activo = () => true; try { const n = window.__registros; await CentroDeDatos.traer({}); return [window.__registros - n, App.E.registro.ajustesAvisos.urlSoporte]; } finally { SoloConsulta.activo = o; } }), [0, 'https://buzon.nuevo.invalido/exec']);
+await montar({ listados: [], configuracion: Object.assign(conf(12, {}, {}, { buzon: 'https://buzon.otro.invalido/exec' }), { contrato: 2 }) });
+await comprobar('con configuracion.json de contrato 2 tampoco',
+  pagina.evaluate(async () => { const n = window.__registros; await CentroDeDatos.traer({}); return [window.__registros - n, App.E.registro.ajustesAvisos.urlSoporte]; }), [0, 'https://buzon.nuevo.invalido/exec']);
+await montar({ listados: [], configuracion: conf(13, {}, {}, {}) });
+await comprobar('si deja de venir, se quita la marca pero no se borra la dirección',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); return [(await CentroDeDatos.leerApuntes(true)).configuracion.buzonSoporte, App.E.registro.ajustesAvisos.urlSoporte]; }), [false, 'https://buzon.nuevo.invalido/exec']);
 
 const deVerdad = errores.filter((e) => !/Failed to load resource/.test(e));
 if (deVerdad.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + deVerdad.join('\n')); } else console.log('bien   sin errores de consola');

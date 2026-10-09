@@ -266,15 +266,15 @@ var CentroDeDatos = (function () {
       }
       await R.terminar(ctx);
       await apuntar(nuevos);
-      var config = false;
+      var config = null;
       if (window.CentroDeDatosConfiguracion) {
         try { config = await CentroDeDatosConfiguracion.tomar(dir, r.indice, apuntes); }
         catch (x) { salida.fallos.push('Datos del centro: ' + U.mensajeDeError(x)); }
       }
-      salida.configuracion = config;
+      salida.configuracion = !!(config && (config.centro || config.buzon));
       salida.ok = true;
       salida.esperaRegistro = esperaRegistro;
-      if (salida.tomados.length || config) {
+      if (salida.tomados.length || salida.configuracion) {
         var vistos = {};
         var partes = [];
         lista.forEach(function (e) {
@@ -283,8 +283,9 @@ var CentroDeDatos = (function () {
             partes.push(TITULOS[e.clave] + ' (' + fechaCorta(e.subido, false) + ')');
           }
         });
-        if (config) partes.push('los datos del centro');
-        U.aviso('Traído del Centro de datos: ' + (config && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
+        if (config && config.centro) partes.push('los datos del centro');
+        if (config && config.buzon) partes.push('la dirección del buzón de soporte');
+        U.aviso('Traído del Centro de datos: ' + (salida.configuracion && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');
       }
