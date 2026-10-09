@@ -183,6 +183,7 @@ var CentroDeDatosVer = (function () {
         await pintarAjustes();
         var apuntes = await CentroDeDatos.leerApuntes();
         ponerBoton();
+        if (window.CentroDeDatosConfiguracion) await CentroDeDatosConfiguracion.marcarCampos();
         var seneca = $('herramientas-traer-seneca');
         lineas(seneca && seneca.parentNode, seneca, ['alumnado', 'personal', 'alumnado-bd'], apuntes, 'seneca');
         var tablas = $('bloque-tablas-datos');
