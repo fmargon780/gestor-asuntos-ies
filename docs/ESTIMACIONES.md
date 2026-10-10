@@ -12,5 +12,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 310 | 120 | Pantalla nueva en Herramientas con filtros, actividad antigua con papelera y hoja de cálculo de dos pestañas |
 | 311 | 90 | Tabla de datos calculada, hueco de tabla con fechas, tipo con dos campos que llega solo y plantilla nueva |
