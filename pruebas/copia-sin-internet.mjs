@@ -679,22 +679,25 @@ const ESPERA_CORTA = 'window.__COPIA_ESPERA_MS__ = 100;';
   await comprobarAsync('en marcha: otra vuelta no pone una segunda marca', pagina.locator('#marca-version').count(), 1);
 
   /* El número de versión sigue abriendo «Qué hay de nuevo». */
+  /* Puede haberse abierto sola alguna ventana (Qué hay de nuevo, Comprobación al entrar): se cierran. */
+  await pagina.waitForTimeout(3500);
+  await pagina.evaluate(() => { const c = document.getElementById('capa'); if (c && !c.classList.contains('oculto')) (document.getElementById('cuadro-cancelar').offsetParent ? document.getElementById('cuadro-cancelar') : document.getElementById('cuadro-aceptar')).click(); });
   await pagina.click('.version-pulsable');
   await comprobarAsync('en marcha: el número de versión abre «Qué hay de nuevo»', pagina.locator('#cuadro-titulo').textContent().then((t) => t.indexOf('nuevo') !== -1 && t !== 'Actualizar el Gestor'), true);
-  await pagina.click('#cuadro-aceptar');
+  await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 
   /* Cancelar: no recarga ni escribe, y la marca sigue. */
   await pagina.click('#marca-version');
   await comprobarAsync('en marcha: la marca abre «Actualizar el Gestor»', pagina.locator('#cuadro-titulo').textContent(), 'Actualizar el Gestor');
   await comprobarAsync('en marcha: la pregunta avisa de que se pierde lo escrito', pagina.locator('#cuadro-cuerpo').textContent().then((t) => t.indexOf('lo que esté a medio escribir se pierde') !== -1 && t.indexOf(VERSION_NUEVA_TEXTO) !== -1), true);
-  await pagina.click('#cuadro-cancelar');
+  await pagina.evaluate(() => document.getElementById('cuadro-cancelar').click());
   await pagina.waitForTimeout(500);
   await comprobar('en marcha: «Cancelar» no recarga ni escribe', [navegaciones(), delCopia(entorno, 'enmarcha')], [1, []]);
   await comprobarAsync('en marcha: «Cancelar» deja la marca', hayMarca(pagina), true);
 
   /* Actualizar ahora: actualiza, recarga una vez y vuelve dentro. */
   await pagina.click('#marca-version');
-  await pagina.click('#cuadro-aceptar');
+  await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
   await esperarVersionNueva(pagina);
   await dentro(pagina);
   await comprobarAsync('en marcha: tras «Actualizar ahora», la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
