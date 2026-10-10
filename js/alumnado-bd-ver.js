@@ -83,7 +83,7 @@ var AlumnadoBDVer = (function () {
   function tarjetas(persona) {
     var datos = window.AlumnadoBD && AlumnadoBD.enMemoria();
     if (!datos || !persona || !persona.bd) return [];
-    var fechaPie = '<p class="nota">Datos de la base de datos de alumnado del ' + U.escapar(AlumnadoBD.fechaLegible(persona.bdGenerado)) + '</p>';
+    var fechaPie = '<p class="nota">Datos ' + (AlumnadoBD.hechoPor(datos) ? 'del Centro de datos' : 'de la base de datos de alumnado') + ' del ' + U.escapar(AlumnadoBD.fechaLegible(persona.bdGenerado)) + '</p>';
     return apartados(datos).map(function (ap) {
       var con = ap.campos.filter(function (c) { return !vacio(persona.bd[c.clave]); });
       if (!con.length) return null;

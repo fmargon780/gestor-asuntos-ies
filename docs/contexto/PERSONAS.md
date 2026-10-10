@@ -571,6 +571,11 @@ Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).
 El acuerdo entre las dos aplicaciones está en `docs/ACUERDO-ALUMNADO.md` (versión 2: un archivo en
 Drive, nada de dirección web ni clave; la fila 142 lo hacía por dirección web y la 144 lo quitó).
 
+- **Quién hace el fichero** (fila 323, `docs/PLAN-NUCLEO.md`): la base de datos de alumnado o, después, el
+  Centro de datos (`origen: "centro-de-datos-ies"`; `dueno` por campo). El gestor acepta el de `generado`
+  más reciente y no decide nada por `origen`: solo `AlumnadoBD.hechoPor(datos)` lo mira, para tres textos
+  (pie de las tarjetas, nota de «Lo que tengo ahora», «Por dónde llegó» con `subidoPor: centro-de-datos-ies`).
+  Con cualquier otro `origen` salen los de siempre. Prueba: `pruebas/nucleo-ficha-del-centro.mjs`.
 - **La carpeta** (`js/alumnado-bd.js`): Ajustes › El centro › «Carpeta de la base de datos de
   alumnado» → «Señalar la carpeta» (la «Datos de matrícula» de Google Drive para ordenador). Se
   recuerda en este ordenador (Almacen, `alumnado-bd-carpeta`), como las del Dropbox; el otro

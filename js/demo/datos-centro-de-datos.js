@@ -36,6 +36,7 @@
     var curso = U.cursoActual();
     var ano = curso.slice(3);
     var listados = [];
+    var nucleo = /(^|[?&])nucleo=1(&|$)/.test(location.search);   /* fila 323 */
     function entrada(clave, titulo, fichero, ruta, tipo, resumen, variante, ficha) {
       ficha = ficha || {};
       listados.push({ clave: clave, variante: variante || '', titulo: titulo, fichero: fichero, ruta: ruta, tipo: tipo,
@@ -62,8 +63,16 @@
     var bd = { acuerdo: 2, generado: subido, origen: 'bd-alumnado-ies', cursoAcademico: curso,
       campos: [{ clave: 'pil', etiqueta: 'PIL', apartado: 'Otros datos', tipo: 'si-no' }],
       alumnos: [{ idEscolar: '2100099', matriculado: true, datos: { pil: false } }] };
-    var rutaBd = await poner(dir, 'alumnado-bd', 'ALUMNADO-BD.json', JSON.stringify(bd));
+    /* Plan del núcleo (fila 323): `?nucleo=1` pone el Centro de datos del final del plan. */
+    if (nucleo) { bd.origen = 'centro-de-datos-ies'; bd.campos[0].dueno = 'bd-alumnado-ies'; }
+    var rutaBd = await poner(dir, nucleo ? 'hecho/alumnado-bd' : 'alumnado-bd', 'ALUMNADO-BD.json', JSON.stringify(bd));
     entrada('alumnado-bd', 'Alumnado de la base de datos', 'ALUMNADO-BD.json', rutaBd, 'json', '1 alumno');
+    if (nucleo) {
+      listados[listados.length - 1].subidoPor = 'centro-de-datos-ies';
+      listados[listados.length - 1].via = 'hecho';
+      var rutaEntrega = await poner(dir, 'alumnado/bd-alumnado-ies', 'entrega.json', JSON.stringify({ entrega: 'demo' }));
+      entrada('entrega', 'Entrega', 'entrega.json', rutaEntrega, 'json', '1 entrega', 'alumnado/bd-alumnado-ies');
+    }
     var ent = '"Nº.Registro","Fecha de trabajo","Fecha de registro","Extracto","Clase de documento","Estado","Tipo de remitente","Remitente","Procedencia","Modo de recepción","Doc. Adjunta"\r\n' +
       '"2026/29700692/M000000000901","01/10/2026","01/10/2026","SOLICITUD de ejemplo","Solicitudes","Completo","Familia","Lara Quintero, Bruno","","Registro presencial","S"\r\n' +
       '"2026/29700692/A000000000902","02/10/2026","02/10/2026","HORAS de ejemplo","Comunicación electrónica de la Delegación/Consejería","Completo","Unidad administrativa","Servicio de Ordenación Educativa","","Comunicación electrónica de la Adm.","N"\r\n';
@@ -75,9 +84,9 @@
       correo: { direccionDelCentro: '', firma: 'Un saludo.\n{usuario}\n{centro}' },
       soporte: { buzon: 'https://buzon.demo.invalido/exec' }
     }));
-    await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify({
-      contrato: 2, actualizado: new Date().toISOString(), cursoActual: curso, ocupado: false, web: '', listados: listados
-    }));
+    var indice = { contrato: 2, actualizado: new Date().toISOString(), cursoActual: curso, ocupado: false, web: '', listados: listados };
+    if (nucleo) { indice.capacidades = ['alumnado-bd']; indice.hechos = [{ clave: 'alumnado-bd', alDia: false }]; }
+    await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify(indice));
   }
 
   window.Demo = window.Demo || {};

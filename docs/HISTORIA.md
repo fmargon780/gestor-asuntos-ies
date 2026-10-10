@@ -5,6 +5,13 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 10-oct-2026 — Fila 323: el Gestor acepta la ficha del alumnado venga de quien venga
+
+Plan «el Centro de datos como núcleo» (`docs/PLAN-NUCLEO.md`). `ALUMNADO-BD.json` cambia de autor (hoy la base de datos de alumnado, después el Centro de datos) y el
+Gestor no se entera: no mira `origen`, ignora `dueno`, los campos desconocidos y la clave `entrega` del índice. Se deja atado con `pruebas/nucleo-ficha-del-centro.mjs`. De código solo
+`AlumnadoBD.hechoPor(datos)` y tres frases que dicen de dónde viene (pie de tarjetas, nota de «Lo que tengo ahora», «Por dónde llegó»), y `nucleo=1` en la copia de pruebas.
+Con el fichero de hoy no cambia nada en pantalla. Acuerdo y contrato (siguen en 2) puestos al día; el acuerdo vive idéntico en `bd-alumnado-ies`: allí queda por copiar.
+
 ## 10-oct-2026 — Fila 311: el certificado de actividades extraescolares del profesorado
 
 Cuarta de cuatro. Un solo certificado por profesor con todas sus actividades realizadas entre dos fechas (campos «Actividades desde» y «Actividades hasta»),

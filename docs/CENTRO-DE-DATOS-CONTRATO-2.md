@@ -47,6 +47,15 @@ contrato 1 y con uno de contrato 2. Se prueba con la carpeta de mentira.
 - La carpeta `sin-reconocer/` se llama ahora `sin-clasificar/`. El gestor no la mira.
 - `configuracion.json` **no cambia** y sigue con su propio `"contrato": 1`.
 
+## Lo que añade el plan del núcleo (el contrato sigue en 2)
+
+Fila 323, `docs/PLAN-NUCLEO.md`. El índice puede traer `capacidades`, `hechos` (con la carpeta `hecho/`)
+y entradas de una clave nueva, `entrega`. El gestor **ignora** todo eso: solo mira las claves que ya
+conoce. `subidoPor` puede ser el nombre de una aplicación (`centro-de-datos-ies`) en vez de un correo.
+De la entrada `alumnado-bd` el gestor necesita **una sola**, con `ruta`, `subido` y `huella`; la `ruta`
+puede estar en cualquier carpeta, también dentro de `hecho/`. El fichero que trae puede ser de
+`origen: "centro-de-datos-ies"` (ver `docs/ACUERDO-ALUMNADO.md`).
+
 ## Decisiones ya tomadas (no se vuelven a discutir)
 
 1. **No se escribe ninguna importación nueva.** Solo cambia **qué entradas se eligen**. Lo elegido

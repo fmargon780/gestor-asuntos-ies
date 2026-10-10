@@ -47,6 +47,12 @@ var AlumnadoBD = (function () {
     return { ok: true };
   }
 
+  /* Plan del núcleo (fila 323): quién hizo la copia. Solo dice «Centro de datos»
+     si `origen` es `centro-de-datos-ies`; con otro valor, o ninguno, '' (como hoy). */
+  function hechoPor(datos) {
+    return datos && datos.origen === 'centro-de-datos-ies' ? 'Centro de datos' : '';
+  }
+
   function fecha(iso) {
     var f = new Date(iso || '');
     return isNaN(f.getTime()) ? null : f;
@@ -343,7 +349,7 @@ var AlumnadoBD = (function () {
   return {
     FICHERO: FICHERO, ACUERDO: ACUERDO, CLAVE_CARPETA: CLAVE_CARPETA, validar: validar,
     leer: leer, enMemoria: enMemoria, olvidar: olvidar, guardar: guardar, carpeta: carpeta, permiso: permiso, mirarCarpeta: mirarCarpeta, traer: traer, aceptar: aceptar,
-    unir: unir, porClave: porClave, fechaGenerado: fechaGenerado, fechaLegible: fechaLegible,
+    hechoPor: hechoPor, unir: unir, porClave: porClave, fechaGenerado: fechaGenerado, fechaLegible: fechaLegible,
     pintarAjustes: pintarAjustes
   };
 })();

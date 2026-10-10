@@ -141,7 +141,7 @@ var FichaPersona = (function () {
     var recuerdo = leerRecuerdo(p.categoria);
     var reparto = FichaPersonaReparto.alumno(p);
     var pie = window.AlumnadoBD && p.bd
-      ? '<p class="nota">Datos de la base de datos de alumnado del ' + U.escapar(AlumnadoBD.fechaLegible(p.bdGenerado)) + '</p>' : '';
+      ? '<p class="nota">Datos ' + (AlumnadoBD.hechoPor(AlumnadoBD.enMemoria()) ? 'del Centro de datos' : 'de la base de datos de alumnado') + ' del ' + U.escapar(AlumnadoBD.fechaLegible(p.bdGenerado)) + '</p>' : '';
 
     TARJETAS_ALUMNADO.forEach(function (t) {
       var id = t[0], def = { id: id, titulo: t[1], abierta: t[2] };
