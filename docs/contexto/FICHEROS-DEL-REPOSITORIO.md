@@ -40,6 +40,10 @@ de `App` va después del fichero que lo define.
 | `js/actividades-formulario.js` | El formulario «La actividad» y el botón «Apuntar la actividad» de «Nuevo asunto» (fila 306) |
 | `js/actividades-informe.js` | El aviso al claustro (fila 309): `datos`, `cambios`, `valores` (huecos `{{ACTIVIDAD…}}`), el PDF, guardarlo en el asunto, `avisar`, `alEnviar`, el desplegable de Ajustes |
 | `js/actividades-ficha.js` | La tarjeta «La actividad» de la ficha: «Cambiar», «Anular la actividad», «Apuntar los datos de la actividad» (fila 306) |
+| `js/actividades-pantalla.js` | La pantalla «Actividades extraescolares» de Herramientas: tabla, filtros, abrir la ficha (fila 310) |
+| `js/actividades-antigua.js` | El cuadro de «Apuntar una actividad antigua», cambiar y borrar (fila 310) |
+| `js/actividades-exportar.js` | La hoja de cálculo de la pantalla de actividades (fila 310) |
+| `pruebas/actividades-pantalla.mjs` | La pantalla de actividades y las antiguas (fila 310), con Chromium |
 | `css/actividades.css` | Estilos del formulario y de la tarjeta de actividades (fila 306) |
 | `pruebas/actividades-aviso.mjs` | El aviso al claustro de una actividad (fila 309), con Chromium |
 | `js/demo/datos-actividades.js` | Tres actividades de la copia de pruebas: prevista, realizada y anulada (fila 306) |

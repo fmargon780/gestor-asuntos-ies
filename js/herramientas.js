@@ -16,6 +16,8 @@ App.pintarHerramientas = async function () {
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   /* Fila 320: lo mismo con la pantalla de plantillas; y la línea de su bloque («12 de Word · 30 de correo»). */
   if (window.PlantillasPantalla) { PlantillasPantalla.cerrar(); await PlantillasPantalla.pintarBloque(); }
+  /* Fila 310: lo mismo con la pantalla de actividades extraescolares, que se reabre si se vuelve de la ficha de una actividad. */
+  if (window.ActividadesPantalla) await ActividadesPantalla.alEntrarEnHerramientas();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarCopias === 'function') await App.pintarCopias();
   if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();

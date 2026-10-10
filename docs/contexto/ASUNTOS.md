@@ -824,3 +824,13 @@ carpeta con `AsuntoRenombrar.mover`. `Actividades.ponerAlDia` (en `Gestor.alRefr
 recuperar, unir y renombrar asuntos o personas llaman a `Actividades.alCambiarElAsunto`, `alUnirAsuntos`, `alMoverAsunto` y
 `alRenombrarPersona`. En un asunto con actividad no se ofrece la plantilla «Participación del profesorado en actividad
 extraescolar» (`Actividades.esPlantillaVieja`).
+
+### La pantalla de todas las actividades y las antiguas (9-oct-2026, fila 310)
+
+Bloque «Actividades extraescolares» en Herramientas (`#actividades-vista`, `js/actividades-pantalla.js`): lee solo `actividades.json`;
+`filtrar(actividades, filtros, hoyIso)` es pura (curso, profesor, unidad, situación, palabras; la papelera no sale). Lo elegido se recuerda en
+`localStorage` (`gestor.actividades.filtros`). Pulsar una fila abre la ficha de su asunto (abierto, o archivado por el índice del ARCHIVO);
+`E.vuelta` hace que al «Volver» a Herramientas la tabla se reabra con los mismos filtros (`alEntrarEnHerramientas`). Una actividad antigua
+(`asunto: null`, `antigua: true`, sin alumnado) se apunta/cambia en `js/actividades-antigua.js` (profesorado de PERSONAL o «que ya no está en el
+centro», con nombre y DNI tal cual) y «Borrar» la saca del registro y la manda a la papelera (clase `actividad`; `Actividades.devolver`).
+La hoja de cálculo, `js/actividades-exportar.js` (`hojas`, pura): pestañas «Actividades» y «Profesorado», con lo filtrado.

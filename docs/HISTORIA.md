@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 10-oct-2026 — Fila 310: la pantalla de todas las actividades extraescolares y las actividades antiguas
+
+Tercera de cuatro. Bloque nuevo en Herramientas y vista a todo el ancho (modelo: Plantillas, fila 320): tabla con fecha, nombre, departamento,
+lugar, unidades, alumnado, profesorado y situación; buscador y filtros por curso (de partida el actual), profesor/a, unidad y situación; «Exportar ▾ →
+Hoja de cálculo» (dos pestañas) y «+ Nueva actividad» (formulario de la 306 y «Nuevo asunto» con el tipo puesto). «+ Apuntar una actividad antigua»: fecha,
+nombre y profesorado, también quien ya no está en el centro; «Borrar» va a la papelera (clase `actividad`) y se recupera. «Quitar» deja el curso elegido
+(si no, «Curso: Todos» y «Quitar» harían lo mismo). La demostración trae dos antiguas. No se programa ninguna importación de Access.
+
 ## 8-oct-2026 — Fila 306: actividades extraescolares (apuntar la actividad, su alumnado y su profesorado)
 
 Primera de cuatro filas (306, 309, 310, 311). Un fichero compartido nuevo, `_GESTOR/actividades.json` (`js/actividades.js`), es la única

@@ -48,12 +48,12 @@ await comprobar('1. fechasLegibles: un día y varios días',
   pagina.evaluate(() => [Actividades.fechasLegibles({ inicio: '2026-10-15', fin: '2026-10-15' }), Actividades.fechasLegibles({ inicio: '2026-10-15', fin: '2026-10-17' }),
     Actividades.fechasLegibles({ inicio: '2026-10-30', fin: '2026-11-02' }), Actividades.fechasLegibles({ inicio: '2026-12-30', fin: '2027-01-02' })]),
   ['15 de octubre de 2026', 'del 15 al 17 de octubre de 2026', 'del 30 de octubre al 2 de noviembre de 2026', 'del 30 de diciembre de 2026 al 2 de enero de 2027']);
-await comprobar('1. la demostración trae el tipo con la marca y el registro con tres actividades (prevista, realizada y anulada)',
+await comprobar('1. la demostración trae el tipo con la marca y el registro con tres actividades (prevista, realizada y anulada) y dos antiguas (fila 310)',
   pagina.evaluate(async () => {
     await Actividades.releer();
     const hoy = U.hoyIso();
     return [Actividades.esTipoDeActividad('ACTIVIDAD EXTRAESCOLAR'), Actividades.tipoMarcado(), Actividades.lista().map((a) => Actividades.situacion(a, hoy)).sort()];
-  }), [true, true, ['anulada', 'prevista', 'realizada']]);
+  }), [true, true, ['anulada', 'prevista', 'realizada', 'realizada', 'realizada']]);
 await comprobar('1. la pasada única pone la marca al tipo que no la tiene y deja puesta la suya',
   pagina.evaluate(async () => {
     const t = App.E.tipos.filter((x) => x.tipo === 'ACTIVIDAD EXTRAESCOLAR')[0];
@@ -154,7 +154,7 @@ await comprobar('5. `ficha.actividad` y `ficha.grupo` guardados, con nueve relac
 await comprobar('5. el registro tiene la actividad con su asunto, fechas, unidades y profesorado',
   pagina.evaluate(async (n) => { await Actividades.releer(); const a = Actividades.porAsunto(n); return [a.nombre, a.inicio, a.fin, a.salida, a.regreso, a.lugar, a.departamento, a.horas, a.alumnado, a.unidades.map((u) => u.unidad + ':' + u.van + '/' + u.de), a.profesorado.map((p) => p.papel), !!a.profesorado[0].clave, a.asunto.numero.length > 0]; }, nombre),
   ['Visita al Museo de la Ciencia', '2026-11-20', '2026-11-20', '08:30', '15:00', 'Granada', 'Ciencias', 6, 9, ['2º B:5/6', '3º A:4/4'], ['organiza', 'acompana', 'acompana'], true, true]);
-await comprobar('5. el fichero del disco lleva la marca y la actividad', pagina.evaluate(async () => { const d = await Carpetas.leerJson(App.E.gestor, 'actividades.json'); return [d.tipoMarcado, d.actividades.length]; }), [true, 4]);
+await comprobar('5. el fichero del disco lleva la marca y la actividad', pagina.evaluate(async () => { const d = await Carpetas.leerJson(App.E.gestor, 'actividades.json'); return [d.tipoMarcado, d.actividades.length]; }), [true, 6]);
 
 /* ================= 6. LA TARJETA ================= */
 console.log('--- 6. la tarjeta «La actividad» ---');
