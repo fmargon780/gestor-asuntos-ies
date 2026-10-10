@@ -84,3 +84,5 @@
 .ant-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 @media (max-width: 800px) { .ant-form { grid-template-columns: 1fr; } }
 .ant-fuera { margin-top: 8px; }
+.ap-tabla th { white-space: nowrap; }
+.ap-tabla td { overflow-wrap: break-word; word-break: normal; }
