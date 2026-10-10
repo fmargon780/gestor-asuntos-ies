@@ -13,3 +13,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 324 | 75 | Una función nueva que da la fecha real del listado y tres sitios que la usan (comprobación al entrar, quién manda al unir, aviso de alumnado viejo); parámetro nuevo en la demostración, prueba nueva y revisor |
+| 326 | 110 | Módulo pequeño que presenta la app y pide el botón único a Google, quitar el botón copiado, el bloque de Ajustes y lo que copiaba la dirección del buzón, borrar el programa del buzón y sus pruebas; prueba nueva con botón de mentira, una comprobación con el de verdad y revisor |
