@@ -67,7 +67,7 @@
 
   var ICONOS = {
     documento: '📄', suelto: '📄', asunto: '📁', archivado: '📁', tipo: '📋', estado: '📋',
-    'tipo-documento': '📋', 'campo-propio': '📋', tercero: '📋', 'nota-tablon': '📋', grupo: '👥'
+    'tipo-documento': '📋', 'campo-propio': '📋', tercero: '📋', 'nota-tablon': '📋', grupo: '👥', actividad: '👥'
   };
 
   function deDonde(ficha) {
@@ -83,6 +83,7 @@
       ((ficha.origen && ficha.origen.categoria) ? ' (' + ficha.origen.categoria + ')' : '');
     if (ficha.clase === 'nota-tablon') return 'Nota del tablón';
     if (ficha.clase === 'grupo') return 'Grupo de personas';
+    if (ficha.clase === 'actividad') return 'Actividad extraescolar antigua';
     return '';
   }
 

@@ -62,6 +62,16 @@
       ['2100002', '2100010'], [profe('Uceda Molina', 'organiza')], { anulada: true });
     await Actividades.cambiar(function (d) { d.tipoMarcado = true; });
 
+    /* Fila 310: dos actividades antiguas de cursos anteriores, sin asunto ni alumnado; una con una profesora que ya no está en el centro. */
+    await Actividades.guardarAntigua({
+      nombre: 'Viaje a Cádiz de 4º de ESO', inicio: o.hace(400), fin: o.hace(399), lugar: 'Cádiz', departamento: 'Geografía e Historia', horas: 12,
+      profesorado: [profe('Otero Campos', 'organiza'), { nombre: 'Salas Pérez, Rosario', clave: Datos.clavePersona('12345678', 'Salas Pérez, Rosario'), papel: 'acompana' }].filter(Boolean)
+    });
+    await Actividades.guardarAntigua({
+      nombre: 'Taller de robótica en el CEIP', inicio: o.hace(700), fin: o.hace(700), lugar: 'Sevilla', departamento: 'Tecnología', horas: 4,
+      profesorado: [profe('Reyes Palma', 'organiza')].filter(Boolean)
+    });
+
     /* Fila 309: el grupo «Profesorado», que recibe el aviso al claustro; una de las cuatro personas no tiene correo. */
     if (window.Grupos) {
       try {

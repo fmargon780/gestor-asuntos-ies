@@ -99,7 +99,7 @@ await pagina.evaluate(() => {
 });
 await comprobar('los cinco títulos salen, en este orden (fila 320: «Plantillas» tras el control del registro)',
   pagina.locator('#herramientas-lista > details .bloque-titulo, #herramientas-tablas-datos-hueco > details .bloque-titulo').allTextContents(),
-  ['Control del registro', 'Plantillas', 'Papelera', 'Traer el alumnado', 'Tablas de datos', 'Restaurar una copia de seguridad']);
+  ['Control del registro', 'Actividades extraescolares', 'Plantillas', 'Papelera', 'Traer el alumnado', 'Tablas de datos', 'Restaurar una copia de seguridad']);
 await comprobarQue('el botón de Séneca está dentro de "Traer el alumnado"',
   pagina.locator('#bloque-traer-alumnado #btn-traer-datos').count().then(n => n === 1));
 await comprobarQue('el botón de la BD de alumnado está dentro de "Traer el alumnado"',

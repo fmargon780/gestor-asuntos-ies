@@ -204,6 +204,37 @@ var Actividades = (function () {
     });
   }
 
+  /* ---------- las actividades antiguas (fila 310, docs/ACTIVIDADES-EXTRAESCOLARES-PANTALLA.md) ----------
+     Una actividad de un curso anterior: fecha, nombre y profesorado, sin alumnado ni asunto (`asunto: null`, `antigua: true`). */
+
+  /* Guarda una antigua nueva o cambiada. `r`: { id, nombre, inicio, fin, lugar, departamento, horas, profesorado }. */
+  async function guardarAntigua(r) {
+    var base = r.id ? porId(r.id) : null;
+    var a = limpia(Object.assign({}, base || {}, r, { asunto: null, antigua: true, unidades: [], alumnado: 0, id: r.id || U.nuevoId('act') }));
+    if (!base || !base.creadaEl) { a.creadaPor = usuario(); a.creadaEl = U.ahora(); }
+    sellar(a);
+    await guardarActividad(a);
+    return a;
+  }
+
+  /* Borrar una antigua: sale del registro y va a la papelera, con su vuelta. */
+  async function borrarAntigua(id) {
+    var a = porId(id);
+    if (!a || !a.antigua) return false;
+    await cambiar(function (d) { d.actividades = d.actividades.filter(function (x) { return x.id !== id; }); });
+    if (window.Papelera) await Papelera.mandarDato('actividad', a.nombre, null, { actividad: a });
+    return true;
+  }
+
+  /* Desde la papelera: la antigua vuelve al registro. */
+  async function devolver(ficha) {
+    var a = ficha.datos && ficha.datos.actividad;
+    if (!a || !a.id) return { ok: false, motivo: 'No se sabe qué actividad era.' };
+    if (porId(a.id)) return { ok: false, motivo: 'Esa actividad ya está en el registro.' };
+    await cambiar(function (d) { d.actividades.push(limpia(a)); });
+    return { ok: true };
+  }
+
   /* ---------- el tipo que apunta actividades ---------- */
 
   function tipoPorNombre(t) {
@@ -395,7 +426,7 @@ var Actividades = (function () {
     situacion: situacion, cuenta: cuenta, unidadesDe: unidadesDe, fechasLegibles: fechasLegibles, fechaCorta: fechaCorta,
     textoSituacion: textoSituacion,
     releer: releer, lista: lista, porId: porId, porAsunto: porAsunto, tipoMarcado: tipoMarcado, cambiar: cambiar,
-    construir: construir, guardarActividad: guardarActividad, marcarAnulada: marcarAnulada, sellar: sellar,
+    construir: construir, guardarActividad: guardarActividad, guardarAntigua: guardarAntigua, borrarAntigua: borrarAntigua, devolver: devolver, marcarAnulada: marcarAnulada, sellar: sellar,
     esTipoDeActividad: esTipoDeActividad, tarjetaAplica: tarjetaAplica, tieneActividad: tieneActividad,
     pasada: pasada, ponerAlDia: ponerAlDia, alumnosDe: alumnosDe, alumnadoMatriculado: alumnadoMatriculado,
     alCambiarElAsunto: alCambiarElAsunto, alMoverAsunto: alMoverAsunto, alUnirAsuntos: alUnirAsuntos,

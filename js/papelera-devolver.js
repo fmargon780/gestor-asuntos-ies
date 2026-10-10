@@ -30,6 +30,7 @@
         case 'tercero': return await devolverTercero(ficha);
         case 'nota-tablon': return await devolverNotaTablon(ficha);
         case 'grupo': return await devolverGrupo(ficha);
+        case 'actividad': return await devolverActividad(ficha);
         default: return { ok: false, motivo: 'No sé devolver esto.' };
       }
     } catch (e) {
@@ -215,6 +216,14 @@
   async function devolverGrupo(ficha) {
     if (!window.Grupos) return { ok: false, motivo: 'No se puede devolver un grupo ahora mismo.' };
     var salida = await Grupos.devolver(ficha);
+    if (salida.ok) await quitarDeIndice(ficha.id);
+    return salida;
+  }
+
+  /* Fila 310: una actividad antigua; la devuelve js/actividades.js. */
+  async function devolverActividad(ficha) {
+    if (!window.Actividades) return { ok: false, motivo: 'No se puede devolver una actividad ahora mismo.' };
+    var salida = await Actividades.devolver(ficha);
     if (salida.ok) await quitarDeIndice(ficha.id);
     return salida;
   }

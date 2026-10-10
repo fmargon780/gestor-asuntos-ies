@@ -359,7 +359,7 @@ var ActividadesFormulario = (function () {
   }
 
   return {
-    abrir: abrir, alRefrescarNuevo: alRefrescarNuevo, cambiarDesdeNuevo: cambiarDesdeNuevo,
+    abrir: abrir, fijarEnNuevo: fijarEnNuevo, alRefrescarNuevo: alRefrescarNuevo, cambiarDesdeNuevo: cambiarDesdeNuevo,
     _interno: { quienesVan: quienesVan, cortoDe: cortoDe, estadoVacio: estadoVacio, resultado: resultado }
   };
 })();

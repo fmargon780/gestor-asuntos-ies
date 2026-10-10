@@ -65,3 +65,22 @@
 .act-aviso { margin: 14px 0 0; color: var(--tinta-suave); font-size: 14px; }
 .act-aviso-cambio { margin: 6px 0 0; }
 .act-ficha-botones .boton[disabled] { opacity: .55; cursor: not-allowed; }
+
+/* ---------- la pantalla «Actividades extraescolares» de Herramientas (fila 310) ---------- */
+#actividades-vista { width: 100%; }
+.ap-tabla td.ap-num { text-align: right; }
+.ap-tabla .ap-fecha { white-space: nowrap; }
+.ap-fila.ap-clic { cursor: pointer; }
+.ap-fila.ap-clic:hover td { background: var(--azul-claro); }
+.ap-anulada { color: var(--tinta-suave); text-decoration: line-through; }
+.ap-filtrado { margin: 4px 0 8px; font-size: 13.5px; }
+.ap-cuenta { margin: 8px 0 0; }
+.ap-exportar > summary { list-style: none; cursor: pointer; display: inline-block; }
+.ap-exportar > summary::-webkit-details-marker { display: none; }
+.ap-exportar .pt-menu { left: 0; right: auto; }
+
+/* ---------- el cuadro de la actividad antigua (fila 310) ---------- */
+.cuadro.cuadro-actividad-antigua { max-width: min(960px, 96vw); width: 96vw; max-height: calc(100vh - 40px); overflow: auto; }
+.ant-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 800px) { .ant-form { grid-template-columns: 1fr; } }
+.ant-fuera { margin-top: 8px; }
