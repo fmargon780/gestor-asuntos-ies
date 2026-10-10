@@ -150,12 +150,22 @@ la copia sin internet (que se genera del repositorio y solo se actualiza si camb
 sacada del reloj (`TZ='Europe/Madrid' date`), nunca a ojo ni sumando algo a la de antes (aviso de
 Francisco del 17-sep-2026; receta exacta en `js/version.js`).
 
-**La web también avisa de versión nueva (fila 178):** la copia sin internet ya se actualizaba sola
-(`js/actualizar-copia.js`, solo si `location.protocol === 'file:'`); ahora, en el mismo fichero, un
-segundo bloque independiente hace lo mismo para cuando NO es la copia local: cada 30 minutos, y al
-recuperar el foco de la pestaña (como mucho una vez cada 10), si no hay guardado en marcha, pide
-`js/version.js?v=<hora>` sin caché y compara. Distinta de `App.VERSION`: la misma franja de
-arriba, pero solo con «Recargar» (nunca sola: aquí no hay ninguna carpeta que actualizar).
+**La versión nueva, sin franja (filas 178 y 325, `docs/VERSION-NUEVA-SIN-FRANJA.md`):** la web
+(`js/aviso-version-web.js`, cada 30 minutos y al recuperar el foco, sin guardado en marcha) y la copia
+sin internet con la aplicación abierta (`js/actualizar-copia.js`, `comprobar(true)`) ya no pintan la
+franja amarilla: `MarcaVersion.poner(versionNueva, alActualizar)` (`js/marca-version.js`) cuelga
+«hay versión nueva» junto al número de versión de `#usuario-pie` (un observador la vuelve a colgar si
+`js/nucleo.js` o `NovedadesVentana.hacerPulsable` rehacen el pie). Al pulsarla, `U.preguntar`
+(«Actualizar el Gestor») y, al aceptar, `alActualizar` en esa misma pulsación. Nada recarga sola. La
+copia sin internet se actualiza al abrir si tiene permiso; si no, `ActualizarCopia.pendiente()` guarda la
+versión y `ActualizarCopia.alEntrar()` (una línea en `btn-entrar`, tras `PermisosCarpetas.pedirAlEntrar`,
+que lanza en su misma tanda la petición del permiso de la carpeta de la copia) la baja y recarga, con
+tope de 60 s y espera de 2 s a la comprobación. Quien recarga para actualizar llama a
+`EntrarSola.apuntar()` (`js/entrar-sola.js`, `sessionStorage` `gestor-entrar-sola`, 60 s): al cargar,
+con permiso sobre las dos carpetas (solo `queryPermission`) y nombre, entra por el botón; si no, «Gestor
+actualizado a la versión …. Pulsa «Entrar».». La franja ámbar queda para cuando algo falla (sin carpeta
+recordada, carpeta equivocada, actualización fallida, versión que no se puede comprobar). Copia de
+pruebas: `versionnueva=1` (`js/demo/version-nueva.js`).
 
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA

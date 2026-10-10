@@ -177,7 +177,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final, antes de fusionar en `main` (el código pasa antes por el revisor, en local, fila 242).
-- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
+- Versión nueva (fila 325): la copia sin internet (`file://`) se actualiza sola al abrir si tiene permiso sobre su carpeta y, si no, al pulsar «Entrar» (pide el permiso, baja la versión, recarga y entra sola; `ActualizarCopia.alEntrar`). Con la aplicación abierta, en la copia y en la web, sin franja: marca «hay versión nueva» junto al número de versión (`js/marca-version.js`), que pregunta antes de recargar. La franja ámbar solo sale si algo falla.
 - Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos, naturales o meses; fila 284), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
@@ -250,6 +250,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 
 - Para **ofrecer** plantillas, siempre `Plantillas.deTipo` o `Plantillas.documentosDeTipo` (dejan fuera las que no están en uso); `datos.lista` y `datos.documentos` a pelo, solo para encontrar una por su `id`. Un cuadro que cambia una plantilla conserva las claves que no conoce (fila 321).
 - Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319).
+- Nada recarga la página sin una pulsación de quien la usa, salvo la actualización de la copia antes de entrar. Un aviso de versión nueva es la marca (`MarcaVersion.poner`), nunca una franja (fila 325).
 - Una carpeta recordada sin permiso se arregla pidiendo el permiso sobre ella (`PermisosCarpetas.pedir`), nunca mandando a señalarla otra vez (fila 318).
 - Un campo de fecha que guarda sin botón se engancha con `U.alTerminarFecha`, nunca con `change` (fila 314).
 - Todo código nuevo que escriba en las carpetas **de fondo** (sin que lo pida un botón) mira antes `SoloConsulta.activo()` y se salta (fila 260).
@@ -289,6 +290,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Esconder el tablón, sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
 - Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
+- Mudar el Gestor a Google Apps Script para esquivar el filtro de la red del centro: una página servida por Google no puede abrir carpetas del disco (idea 325).
 
 ## 8. Qué falta
 

@@ -192,3 +192,7 @@ paso a `main`).
 - `?demo=1&auto=1&fueradeuso=1`: «Certificado de notas» (Word, en la tarea de generar de su hito; «Vidal Soto, Irene» y «Moreno Sanz, Hugo» tienen ese hito) y
   «Acuse de recibo del parte» (correo, en la tarea de comunicar del primer hito de BAJA MEDICA) arrancan fuera de uso. Sin el parámetro, ninguna.
   Código: `js/demo/datos-plantillas-pantalla.js`.
+
+## Fila 325: `versionnueva=`
+
+- `?demo=1&auto=1&versionnueva=1`: la comprobación de la web (`js/aviso-version-web.js`) da por buena una versión remota inventada («31-dic-2099 · 23:59») y se lanza sola nada más entrar. Sale la marca «hay versión nueva» junto al número de versión. Tras recargar desde la marca no vuelve a salir en esa pestaña (`sessionStorage`). Vive en `js/demo/version-nueva.js`; sin el parámetro, la demostración queda como siempre.

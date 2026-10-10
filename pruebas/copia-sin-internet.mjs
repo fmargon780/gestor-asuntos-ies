@@ -245,24 +245,39 @@ function carpetaVacia(nombre, ficheros) {
    sobrevive a las recargas) y quien lee y escribe es este proceso Node.
    IndexedDB igual: `window.__idb(...)`, porque una carpeta guardada
    tiene que seguir ahí tras `location.reload()`. */
-function nuevoEntorno({ guardada, permiso }) {
+function nuevoEntorno({ guardada, permiso, dropbox, niega, olvidarDropbox }) {
   const estado = {
     idb: new Map(guardada ? [['copiaCarpeta', { raiz: guardada }]] : []),
     permiso: permiso || 'granted',
+    /* Fila 325: solo el permiso de la carpeta de la copia se cuenta; las dos carpetas de Dropbox
+       (`dropbox`), si las hay, tienen el suyo aparte. */
+    raizCopia: guardada, permisoDropbox: 'granted', niega: !!niega, olvidarDropbox: !!olvidarDropbox,
     consultas: 0, peticiones: 0,
     escritos: [],
     elegir: []   /* lo que irá devolviendo el selector de carpetas, en orden */
   };
+  if (dropbox) {
+    for (const n of ['dropbox-abiertos', 'dropbox-archivo']) mkdirSync(join(TEMPORAL, n), { recursive: true });
+    estado.idb.set('abiertos', { raiz: 'dropbox-abiertos' });
+    estado.idb.set('archivo', { raiz: 'dropbox-archivo' });
+    estado.idb.set('usuario', { valor: 'Francisco' });
+  }
   function ruta(raiz, r) { return join(TEMPORAL, raiz, r || ''); }
   async function disco(raiz, accion, r, datos) {
     const abs = ruta(raiz, r);
-    if (accion === 'permiso') { estado.consultas++; return estado.permiso; }
-    if (accion === 'pedirPermiso') { estado.peticiones++; estado.permiso = 'granted'; return 'granted'; }
+    const esCopia = raiz === estado.raizCopia;
+    if (accion === 'permiso') { if (!esCopia) return estado.permisoDropbox; estado.consultas++; return estado.permiso; }
+    if (accion === 'pedirPermiso') {
+      if (!esCopia) { estado.permisoDropbox = 'granted'; return 'granted'; }
+      estado.peticiones++;
+      if (!estado.niega) estado.permiso = 'granted';
+      return estado.niega ? 'denied' : 'granted';
+    }
     if (accion === 'existeDir') return existsSync(abs) && statSync(abs).isDirectory();
     if (accion === 'existeArchivo') return existsSync(abs) && statSync(abs).isFile();
     if (accion === 'crearDir') { mkdirSync(abs, { recursive: true }); return true; }
     if (accion === 'leer') return existsSync(abs) ? readFileSync(abs, 'utf8') : null;
-    if (accion === 'escribir') { mkdirSync(dirname(abs), { recursive: true }); writeFileSync(abs, Buffer.from(datos || [])); estado.escritos.push(raiz + '/' + r); return true; }
+    if (accion === 'escribir') { mkdirSync(dirname(abs), { recursive: true }); writeFileSync(abs, Buffer.from(datos || [])); estado.escritos.push(raiz + '/' + r); if (esCopia && r === 'version.json' && estado.olvidarDropbox) estado.permisoDropbox = 'prompt'; return true; }
     if (accion === 'borrar') { rmSync(abs, { force: true }); return true; }
     if (accion === 'listar') return readdirSync(abs, { withFileTypes: true }).map((e) => [e.name, e.isDirectory() ? 'directory' : 'file']);
     throw new Error('acción desconocida: ' + accion);
@@ -380,6 +395,20 @@ async function abrir(entorno, base, fichero, antes) {
 }
 const versionDeLaPagina = (pagina) => pagina.evaluate(() => window.App && App.VERSION);
 const hayFranja = (pagina) => pagina.locator('#franja-copia').isVisible().catch(() => false);
+const hayMarca = (pagina) => pagina.locator('#marca-version').isVisible().catch(() => false);
+const delCopia = (entorno, raiz) => entorno.estado.escritos.filter((e) => e.startsWith(raiz + '/')).sort();
+async function dentro(pagina, ms) {
+  try {
+    await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: ms || 30000 });
+    /* Al entrar con una versión nueva sale «Qué hay de nuevo»: se cierra. */
+    await pagina.waitForSelector('#capa:not(.oculto)', { timeout: 4000 }).then(() => pagina.click('#cuadro-aceptar')).catch(() => {});
+  }
+  catch (e) { console.log('NO ENTRA. ' + JSON.stringify(await pagina.evaluate(() => ({ v: window.App && App.VERSION, boton: document.getElementById('btn-entrar').textContent, dis: document.getElementById('btn-entrar').disabled, franja: (document.getElementById('franja-copia') || {}).textContent, capa: !document.getElementById('capa').classList.contains('oculto'), cuadro: document.getElementById('cuadro-cuerpo').textContent.slice(0, 200), msg: document.getElementById('mensajes').textContent, url: location.href, aviso: (document.getElementById('aviso-actualizado') || {}).textContent })).catch((e) => String(e)))); throw e; }
+}
+async function pulsarEntrar(pagina) {
+  await pagina.waitForSelector('#btn-entrar:not([disabled])', { timeout: 15000 });
+  await pagina.click('#btn-entrar');
+}
 async function esperarVersionNueva(pagina) {
   try { await pagina.waitForFunction((v) => window.App && App.VERSION === v, VERSION_NUEVA_TEXTO, { timeout: 10000 }); } catch (e) { /* lo dirá la comprobación */ }
   await pagina.waitForTimeout(500);
@@ -388,16 +417,40 @@ async function esperarVersionNueva(pagina) {
 const servidor = await arrancarServidor(FICHEROS_REMOTOS);
 const BASE = baseDe(servidor);
 
+/* ---------- fila 157: «Actualizar» mientras se publica (una carrera) ----------
+   El servidor sirve un version.json cuya huella de js/version.js no
+   casa con el fichero (lo que pasa si se publica justo entre leer la
+   lista y bajar el fichero). */
+function arrancarServidorConTurnos(versionJson) {
+  const cuenta = { lecturas: 0 };
+  const servidor = createServer((req, res) => {
+    const ruta = decodeURIComponent(req.url.split('?')[0].replace(/^\//, ''));
+    const cabeceras = { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' };
+    if (ruta === 'version.json') { cuenta.lecturas++; res.writeHead(200, cabeceras); res.end(versionJson(cuenta.lecturas)); return; }
+    if (ruta === 'js/version.js') { res.writeHead(200, cabeceras); res.end(VERSION_JS_NUEVO); return; }
+    res.writeHead(404, { 'access-control-allow-origin': '*' }); res.end('no está');
+  });
+  return new Promise((r) => servidor.listen(0, '127.0.0.1', () => r({ servidor, cuenta })));
+}
+const LISTA_QUE_NO_CASA = JSON.stringify(Object.assign({}, VERSION_REMOTA,
+  { ficheros: Object.assign({}, VERSION_REMOTA.ficheros, { 'js/version.js': sha256Hex('otra publicación') }) }));
+const ESPERA_CORTA = 'window.__COPIA_ESPERA_MS__ = 100;';
+
+
 /* ---------- al día: ni franja, ni permiso, ni disco ---------- */
 {
   const servidorAlDia = await arrancarServidor({ 'version.json': JSON.stringify(VERSION_LOCAL) });
   const d = nuevaCopia('aldia');
-  const entorno = nuevoEntorno({ guardada: 'aldia', permiso: 'prompt' });
+  const entorno = nuevoEntorno({ guardada: 'aldia', permiso: 'prompt', dropbox: true });
   const { pagina, errores } = await abrir(entorno, baseDe(servidorAlDia), d + '/index.html');
   await pagina.waitForTimeout(1500);
   await comprobarAsync('al día: no sale la franja', hayFranja(pagina), false);
+  await comprobarAsync('al día: ni marca', hayMarca(pagina), false);
+  await pulsarEntrar(pagina);
+  await dentro(pagina);
+  await comprobarAsync('al día: al pulsar «Entrar» entra, sin franja ni marca', Promise.all([hayFranja(pagina), hayMarca(pagina)]), [false, false]);
   await comprobar('al día: ni se mira ni se pide el permiso', [entorno.estado.consultas, entorno.estado.peticiones], [0, 0]);
-  await comprobar('al día: no se escribe nada en el disco', entorno.estado.escritos, []);
+  await comprobar('al día: no se escribe nada en el disco de la copia', delCopia(entorno, 'aldia'), []);
   await comprobar('al día: ninguna excepción', errores, []);
   await pagina.close();
   servidorAlDia.close();
@@ -444,21 +497,108 @@ const BASE = baseDe(servidor);
   await pagina.close();
 }
 
-/* ---------- vieja, con carpeta y sin permiso: el botón pide el permiso ---------- */
+/* ---------- fila 325: vieja, con carpeta y sin permiso: se actualiza al pulsar «Entrar» ---------- */
 {
   const d = nuevaCopia('sinpermiso');
-  const entorno = nuevoEntorno({ guardada: 'sinpermiso', permiso: 'prompt' });
-  const { pagina, errores } = await abrir(entorno, BASE, d + '/index.html');
-  await pagina.waitForSelector('#franja-copia', { timeout: 5000 }).catch(() => {});
-  await comprobarAsync('sin permiso: sale la franja', hayFranja(pagina), true);
-  await comprobar('sin permiso: no se pide el permiso sin un clic', entorno.estado.peticiones, 0);
+  const entorno = nuevoEntorno({ guardada: 'sinpermiso', permiso: 'prompt', dropbox: true });
+  const { pagina, errores, navegaciones } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForFunction(() => window.ActualizarCopia && ActualizarCopia.pendiente(), null, { timeout: 10000 }).catch(() => {});
+  await pagina.waitForTimeout(300);
+  await comprobarAsync('sin permiso: al abrir, ni franja ni marca', Promise.all([hayFranja(pagina), hayMarca(pagina)]), [false, false]);
+  await comprobar('sin permiso: al abrir, no se pide el permiso', entorno.estado.peticiones, 0);
   await comprobarAsync('sin permiso: ya no sale el aviso de abajo de antes', pagina.locator('#aviso-copia-permiso').count(), 0);
-  await pagina.click('#franja-copia-actualizar');
+  await pulsarEntrar(pagina);
   await esperarVersionNueva(pagina);
-  await comprobar('sin permiso: el botón pide el permiso', entorno.estado.peticiones, 1);
-  await comprobarAsync('sin permiso: después, la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
-  await comprobarAsync('sin permiso: después ya no hay franja', hayFranja(pagina), false);
+  await dentro(pagina);
+  await comprobarAsync('sin permiso: tras «Entrar», la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobar('sin permiso: una sola petición de permiso, sobre la carpeta recordada', entorno.estado.peticiones, 1);
+  await comprobar('sin permiso: solo se escriben js/version.js y version.json', delCopia(entorno, 'sinpermiso'), ['sinpermiso/js/version.js', 'sinpermiso/version.json']);
+  await comprobar('sin permiso: una sola recarga', navegaciones(), 2);
+  await comprobarAsync('sin permiso: tras recargar entra sola, sin franja ni marca', Promise.all([hayFranja(pagina), hayMarca(pagina)]), [false, false]);
+  await comprobar('sin permiso: la carpeta guardada es la misma', entorno.estado.idb.get('copiaCarpeta'), { raiz: 'sinpermiso' });
   await comprobar('sin permiso: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+/* ---------- fila 325: igual, pero se niega el permiso: se entra con la versión vieja y sale la marca ---------- */
+{
+  const d = nuevaCopia('niega');
+  const entorno = nuevoEntorno({ guardada: 'niega', permiso: 'prompt', dropbox: true, niega: true });
+  const { pagina, errores } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForFunction(() => window.ActualizarCopia && ActualizarCopia.pendiente(), null, { timeout: 10000 }).catch(() => {});
+  await pulsarEntrar(pagina);
+  await dentro(pagina);
+  await pagina.waitForSelector('#marca-version', { timeout: 5000 }).catch(() => {});
+  await comprobarAsync('niega: se entra con la versión vieja', versionDeLaPagina(pagina), VERSION_LOCAL.version);
+  await comprobarAsync('niega: sin franja y con la marca en el pie', Promise.all([hayFranja(pagina), pagina.locator('#usuario-pie #marca-version').isVisible()]), [false, true]);
+  await comprobarAsync('niega: la marca dice «hay versión nueva»', pagina.locator('#marca-version').textContent(), 'hay versión nueva');
+  await comprobar('niega: no se escribe nada', delCopia(entorno, 'niega'), []);
+  await comprobar('niega: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+/* ---------- fila 325: la descarga falla las dos veces: se entra con la versión vieja y sale la franja ---------- */
+{
+  const { servidor: s4 } = await arrancarServidorConTurnos(() => LISTA_QUE_NO_CASA);
+  const d = nuevaCopia('descargamal');
+  const entorno = nuevoEntorno({ guardada: 'descargamal', permiso: 'prompt', dropbox: true });
+  const { pagina, errores } = await abrir(entorno, baseDe(s4), d + '/index.html', 'window.__COPIA_ESPERA_MS__ = 100;');
+  await pagina.waitForFunction(() => window.ActualizarCopia && ActualizarCopia.pendiente(), null, { timeout: 10000 }).catch(() => {});
+  await pulsarEntrar(pagina);
+  await dentro(pagina);
+  await pagina.waitForSelector('#franja-copia', { timeout: 10000 }).catch(() => {});
+  await comprobarAsync('descarga mal: se entra con la versión vieja', versionDeLaPagina(pagina), VERSION_LOCAL.version);
+  await comprobarAsync('descarga mal: sale la franja con su detalle', pagina.locator('#franja-copia-detalle').textContent().then((t) => t.indexOf('No se ha podido actualizar') !== -1), true);
+  await comprobarAsync('descarga mal: la franja trae «Actualizar ahora»', pagina.locator('#franja-copia-actualizar').isVisible(), true);
+  await comprobar('descarga mal: no se escribe nada', delCopia(entorno, 'descargamal'), []);
+  await comprobar('descarga mal: ninguna excepción', errores, []);
+  await pagina.close();
+  s4.close();
+}
+
+/* ---------- fila 325: la comprobación de la versión tarda 10 segundos ---------- */
+{
+  const lento = createServer((req, res) => {
+    const ruta = decodeURIComponent(req.url.split('?')[0].replace(/^\//, ''));
+    const cab = { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' };
+    if (ruta === 'version.json') { setTimeout(() => { res.writeHead(200, cab); res.end(JSON.stringify(VERSION_REMOTA)); }, 10000); return; }
+    res.writeHead(404, cab); res.end('no está');
+  });
+  await new Promise((r) => lento.listen(0, '127.0.0.1', r));
+  const d = nuevaCopia('lento');
+  const entorno = nuevoEntorno({ guardada: 'lento', permiso: 'prompt', dropbox: true });
+  const { pagina, errores } = await abrir(entorno, baseDe(lento), d + '/index.html');
+  await pagina.waitForSelector('#btn-entrar:not([disabled])', { timeout: 15000 });
+  const t0 = Date.now();
+  await pagina.click('#btn-entrar');
+  await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
+  const tardo = Date.now() - t0;
+  await dentro(pagina);
+  await comprobar('lento: «Entrar» entra en menos de 4 segundos', tardo < 4000, true);
+  await comprobarAsync('lento: entra sin actualizar', versionDeLaPagina(pagina), VERSION_LOCAL.version);
+  await pagina.waitForSelector('#marca-version', { timeout: 15000 }).catch(() => {});
+  await comprobarAsync('lento: cuando contesta, sale la marca', hayMarca(pagina), true);
+  await comprobarAsync('lento: y ninguna franja', hayFranja(pagina), false);
+  await comprobar('lento: no se pidió ni se escribió nada', [entorno.estado.peticiones, delCopia(entorno, 'lento')], [0, []]);
+  await comprobar('lento: ninguna excepción', errores, []);
+  await pagina.close();
+  lento.close();
+}
+
+/* ---------- fila 325: tras recargar para actualizar, sin permiso en Dropbox no se entra ---------- */
+{
+  const d = nuevaCopia('sinentrarsola');
+  const entorno = nuevoEntorno({ guardada: 'sinentrarsola', permiso: 'prompt', dropbox: true, olvidarDropbox: true });
+  const { pagina, errores } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForFunction(() => window.ActualizarCopia && ActualizarCopia.pendiente(), null, { timeout: 10000 }).catch(() => {});
+  await pulsarEntrar(pagina);
+  await esperarVersionNueva(pagina);
+  await pagina.waitForSelector('#aviso-actualizado', { timeout: 15000 }).catch(() => {});
+  await comprobarAsync('sin entrar sola: la pantalla de entrada lo dice', pagina.locator('#aviso-actualizado').textContent(),
+    'Gestor actualizado a la versión ' + VERSION_NUEVA_TEXTO + '. Pulsa «Entrar».');
+  await comprobarAsync('sin entrar sola: no se ha entrado', pagina.locator('#aplicacion').isHidden(), true);
+  await comprobarAsync('sin entrar sola: ni franja', hayFranja(pagina), false);
+  await comprobar('sin entrar sola: ninguna excepción', errores, []);
   await pagina.close();
 }
 
@@ -518,21 +658,52 @@ const BASE = baseDe(servidor);
   await pagina.close();
 }
 
-/* ---------- fila 121: la vuelta de cada 30 minutos nunca recarga ---------- */
+/* ---------- fila 121 y 325: la vuelta de cada 30 minutos nunca recarga y pone la marca ---------- */
 {
   const servidorAlDia = await arrancarServidor({ 'version.json': JSON.stringify(VERSION_LOCAL) });
   const d = nuevaCopia('enmarcha');
-  const entorno = nuevoEntorno({ guardada: 'enmarcha', permiso: 'granted' });
+  const entorno = nuevoEntorno({ guardada: 'enmarcha', permiso: 'granted', dropbox: true });
   const { pagina, errores, navegaciones } = await abrir(entorno, baseDe(servidorAlDia), d + '/index.html');
   await pagina.waitForTimeout(1200);
-  await comprobarAsync('en marcha: al entrar, al día, sin franja', hayFranja(pagina), false);
+  await pulsarEntrar(pagina);
+  await dentro(pagina);
+  await comprobarAsync('en marcha: al entrar, al día, sin franja ni marca', Promise.all([hayFranja(pagina), hayMarca(pagina)]), [false, false]);
   /* Mientras está abierta, se publica una versión nueva. */
   await pagina.evaluate((base) => { window.ActualizarCopia._cambiarBase && window.ActualizarCopia._cambiarBase(base); }, BASE);
   await pagina.evaluate(() => window.ActualizarCopia.comprobar(true));
-  await pagina.waitForTimeout(800);
-  await comprobarAsync('en marcha: sale la franja con «Actualizar ahora»', pagina.locator('#franja-copia-actualizar').isVisible(), true);
+  await pagina.waitForSelector('#marca-version', { timeout: 5000 }).catch(() => {});
+  await comprobarAsync('en marcha: sale la marca, sin franja', Promise.all([hayMarca(pagina), hayFranja(pagina)]), [true, false]);
   await comprobar('en marcha: no se recarga la página', navegaciones(), 1);
-  await comprobar('en marcha: no escribe nada sola', entorno.estado.escritos, []);
+  await comprobar('en marcha: no escribe nada sola', delCopia(entorno, 'enmarcha'), []);
+  await pagina.evaluate(() => window.ActualizarCopia.comprobar(true));
+  await comprobarAsync('en marcha: otra vuelta no pone una segunda marca', pagina.locator('#marca-version').count(), 1);
+
+  /* El número de versión sigue abriendo «Qué hay de nuevo». */
+  /* Puede haberse abierto sola alguna ventana (Qué hay de nuevo, Comprobación al entrar): se cierran. */
+  await pagina.waitForTimeout(3500);
+  await pagina.evaluate(() => { const c = document.getElementById('capa'); if (c && !c.classList.contains('oculto')) (document.getElementById('cuadro-cancelar').offsetParent ? document.getElementById('cuadro-cancelar') : document.getElementById('cuadro-aceptar')).click(); });
+  await pagina.click('.version-pulsable');
+  await comprobarAsync('en marcha: el número de versión abre «Qué hay de nuevo»', pagina.locator('#cuadro-titulo').textContent().then((t) => t.indexOf('nuevo') !== -1 && t !== 'Actualizar el Gestor'), true);
+  await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
+
+  /* Cancelar: no recarga ni escribe, y la marca sigue. */
+  await pagina.click('#marca-version');
+  await comprobarAsync('en marcha: la marca abre «Actualizar el Gestor»', pagina.locator('#cuadro-titulo').textContent(), 'Actualizar el Gestor');
+  await comprobarAsync('en marcha: la pregunta avisa de que se pierde lo escrito', pagina.locator('#cuadro-cuerpo').textContent().then((t) => t.indexOf('lo que esté a medio escribir se pierde') !== -1 && t.indexOf(VERSION_NUEVA_TEXTO) !== -1), true);
+  await pagina.evaluate(() => document.getElementById('cuadro-cancelar').click());
+  await pagina.waitForTimeout(500);
+  await comprobar('en marcha: «Cancelar» no recarga ni escribe', [navegaciones(), delCopia(entorno, 'enmarcha')], [1, []]);
+  await comprobarAsync('en marcha: «Cancelar» deja la marca', hayMarca(pagina), true);
+
+  /* Actualizar ahora: actualiza, recarga una vez y vuelve dentro. */
+  await pagina.click('#marca-version');
+  await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
+  await esperarVersionNueva(pagina);
+  await dentro(pagina);
+  await comprobarAsync('en marcha: tras «Actualizar ahora», la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobar('en marcha: una sola recarga más', navegaciones(), 2);
+  /* Tras recargar, la página vuelve a mirar el servidor "al día" de arriba (versión vieja): una franja ahí es cosa de la prueba. */
+  await comprobarAsync('en marcha: vuelve dentro, sin marca', hayMarca(pagina), false);
   await comprobar('en marcha: ninguna excepción', errores, []);
   await pagina.close();
   servidorAlDia.close();
@@ -559,25 +730,6 @@ const BASE = baseDe(servidor);
   await comprobar('instalador: ninguna excepción', errores, []);
   await pagina.close();
 }
-
-/* ---------- fila 157: «Actualizar» mientras se publica (una carrera) ----------
-   El servidor sirve un version.json cuya huella de js/version.js no
-   casa con el fichero (lo que pasa si se publica justo entre leer la
-   lista y bajar el fichero). */
-function arrancarServidorConTurnos(versionJson) {
-  const cuenta = { lecturas: 0 };
-  const servidor = createServer((req, res) => {
-    const ruta = decodeURIComponent(req.url.split('?')[0].replace(/^\//, ''));
-    const cabeceras = { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' };
-    if (ruta === 'version.json') { cuenta.lecturas++; res.writeHead(200, cabeceras); res.end(versionJson(cuenta.lecturas)); return; }
-    if (ruta === 'js/version.js') { res.writeHead(200, cabeceras); res.end(VERSION_JS_NUEVO); return; }
-    res.writeHead(404, { 'access-control-allow-origin': '*' }); res.end('no está');
-  });
-  return new Promise((r) => servidor.listen(0, '127.0.0.1', () => r({ servidor, cuenta })));
-}
-const LISTA_QUE_NO_CASA = JSON.stringify(Object.assign({}, VERSION_REMOTA,
-  { ficheros: Object.assign({}, VERSION_REMOTA.ficheros, { 'js/version.js': sha256Hex('otra publicación') }) }));
-const ESPERA_CORTA = 'window.__COPIA_ESPERA_MS__ = 100;';
 
 {
   /* La primera lista no casa; la segunda, sí: se actualiza igual, sin error. */

@@ -619,3 +619,7 @@ body.solo-consulta #lector { height: calc(100vh - var(--franja-demo-alto, 0px) -
 .ac-cabe { color: #15803d; }
 .ac-motivo { grid-column: 1 / -1; color: var(--rojo-linea); font-size: 13px; }
 .ac-motivo:empty { display: none; }
+/* Fila 325: la marca «hay versión nueva» junto al número de versión. */
+.marca-version { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 9px; background: #fff4d6; color: #8a5a00;
+  border: 1px solid #e0b34a; font-size: 11px; cursor: pointer; white-space: nowrap; }
+.marca-version:hover { background: #ffe9ad; }

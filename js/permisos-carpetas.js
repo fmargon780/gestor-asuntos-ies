@@ -75,6 +75,10 @@
     var salida = { conPermiso: [], sinPermiso: [] };
     /* Con `auto=1` de la copia de pruebas no hay pulsación en «Entrar»: no se pide nada. */
     if (window.Demo && Demo.sinPulsacion && Demo.sinPulsacion()) return salida;
+    /* Fila 325: tras actualizar y recargar se entra sin pulsación (js/entrar-sola.js). */
+    if (window.EntrarSola && EntrarSola.sinPulsacion()) return salida;
+    /* Fila 325: el permiso de la carpeta de la copia sin internet, si hay versión nueva esperando, va en esta misma tanda. */
+    if (window.ActualizarCopia && ActualizarCopia.pedirPermisoJunto) ActualizarCopia.pedirPermisoJunto();
     var omitidas = (window.ComprobacionEntrada && ComprobacionEntrada.leerOmitidas) ? ComprobacionEntrada.leerOmitidas() : [];
     var pendientes = [];
     for (var i = 0; i < LISTA.length; i++) {
