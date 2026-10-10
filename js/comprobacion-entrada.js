@@ -179,10 +179,14 @@
     }
     /* Sin carpeta pero con copia (el caso del compañero): bien, salvo copia más vieja que el RegAlum. */
     var deLaCopia = new Date(copia.generado);
-    var reg = App.E.datos ? await Carpetas.fechaFichero(App.E.datos, 'RegAlum.csv') : 0;
+    var reg = window.DatosQueTengo ? await DatosQueTengo.fechaReal('RegAlum.csv') : 0;
     if (reg && !isNaN(deLaCopia.getTime()) && deLaCopia.getTime() < reg) {
-      return resultado('alumnado', T, 'falta', 'Se usa la copia de la base de datos de alumnado, pero es más vieja ' +
-        'que el listado de matrícula. Hay que traerla de nuevo desde el otro ordenador.', arreglar, true);
+      var fechas = ' es del ' + DatosQueTengo.fechaHora(deLaCopia) + ' y el listado de matrícula, del ' +
+        DatosQueTengo.fechaHora(reg) + ': la copia es más vieja. ';
+      var frase = AlumnadoBD.hechoPor(copia) ?
+        'La copia del alumnado que hace el Centro de datos' + fechas + 'Hay que subir ese listado al Centro de datos: él hace la copia nueva.' :
+        'La copia de la base de datos de alumnado' + fechas + 'Hay que pulsar «Actualizar los datos» en la base de datos de alumnado y entrar en el gestor desde el ordenador que la trae.';
+      return resultado('alumnado', T, 'falta', frase, arreglar, true);
     }
     return resultado('alumnado', T, 'bien', 'Se usa la copia que hay guardada.');
   }

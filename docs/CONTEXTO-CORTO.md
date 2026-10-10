@@ -21,7 +21,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
   también `vercel.app` y, desde la fila 89, `asuntos.fmargon.com` (de ahí la copia sin internet,
   `docs/COPIA-SIN-INTERNET.md`). `gestor-de-asuntos.vercel.app` sigue viva, para `curl` desde fuera.
 - El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
-- Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
+- Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, público.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
@@ -249,7 +249,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 ## 6. Reglas de código que no se pueden olvidar
 
 - Para **ofrecer** plantillas, siempre `Plantillas.deTipo` o `Plantillas.documentosDeTipo` (dejan fuera las que no están en uso); `datos.lista` y `datos.documentos` a pelo, solo para encontrar una por su `id`. Un cuadro que cambia una plantilla conserva las claves que no conoce (fila 321).
-- Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319).
+- Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319); de cuándo es, `DatosQueTengo.fechaReal`, nunca la fecha de su copia (fila 324).
 - Nada recarga la página sin una pulsación de quien la usa, salvo la actualización de la copia antes de entrar. Un aviso de versión nueva es la marca (`MarcaVersion.poner`), nunca una franja (fila 325).
 - Una carpeta recordada sin permiso se arregla pidiendo el permiso sobre ella (`PermisosCarpetas.pedir`), nunca mandando a señalarla otra vez (fila 318).
 - Un campo de fecha que guarda sin botón se engancha con `U.alTerminarFecha`, nunca con `change` (fila 314).

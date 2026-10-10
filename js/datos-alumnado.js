@@ -201,7 +201,11 @@
     }
     /* Fila 144: la base de datos de alumnado suma sus datos (y manda si no es más vieja que el RegAlum). */
     var fechaRegAlum = null;
-    try { fechaRegAlum = new Date((await fichero.handle.getFile()).lastModified); } catch (e) { fechaRegAlum = null; }
+    /* Fila 324: la fecha real del listado (la de Séneca), no el día en que se copió; sin ella manda la base de datos. */
+    try {
+      var real = window.DatosQueTengo ? await DatosQueTengo.fechaReal(fichero.nombre) : 0;
+      fechaRegAlum = real ? new Date(real) : null;
+    } catch (e) { fechaRegAlum = null; }
     var bd = window.AlumnadoBD ? await AlumnadoBD.unir(lista, porId, fechaRegAlum) : null;
     matriculados = contarMatriculados(lista);
     var solicitantes = await anadirSolicitantes(dirDatos, lista, porId);

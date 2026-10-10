@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '324', fecha: '2026-10-11', texto: 'El aviso de alumnado viejo mira ya la fecha real del listado, no el día en que se copió.' },
   { id: '325', fecha: '2026-10-10', texto: 'El Gestor se pone al día solo al pulsar «Entrar». Con la aplicación abierta ya no sale la franja amarilla: junto al número de versión sale «hay versión nueva», y se puede pulsar.' },
   { id: '311', fecha: '2026-10-10', texto: 'Hay un tipo de asunto nuevo, «Certificado actividades extraescolares»: un solo certificado por profesor con todas sus actividades realizadas, y en cada una si organizó o acompañó.' },
   { id: '310', fecha: '2026-10-09', texto: 'En Herramientas hay una pantalla nueva, «Actividades extraescolares»: todas en una tabla, con filtros y hoja de cálculo, y se pueden apuntar las de cursos anteriores.' },

@@ -643,6 +643,7 @@
     }
     /* Fila 285: ya recargado, la pasada que coloca el PDF sellado (sale «1 listos para enviar»). */
     if (window.Gestor && Gestor.recargar) await Gestor.recargar();
+    if (window.Demo.copiaAlumnado) await Demo.copiaAlumnado.construir();   /* fila 324: ?copiaalumnado= (al final: «Problemas» envejece el RegAlum) */
     if (window.Demo.tutor) await Demo.tutor.alAcabar();   /* fila 299: «Informar al tutor/a» (antes que la pasada de abajo, para no coincidir con ella) */
     if (window.Demo.hacer) await Demo.hacer.alAcabar();
   }

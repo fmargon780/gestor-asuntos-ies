@@ -355,6 +355,8 @@ de `App` va después del fichero que lo define.
 | `js/demo/version-nueva.js` | Copia de pruebas: `versionnueva=1` inventa una versión remota y lanza la comprobación sola (fila 325) |
 | `pruebas/marca-version.mjs` | La marca en la copia de pruebas: sin franja, pregunta, cancelar, un minuto sin recargar, actualizar y volver dentro (fila 325) |
 | `js/demo/mas-nuevo.js` | Copia de pruebas: `masnuevo=` anuncia listados más nuevos del Centro de datos (fila 319) |
+| `pruebas/fecha-real-del-listado.mjs` | Fila 324: `DatosQueTengo.fechaReal` y sus tres usos (comprobación al entrar, quién manda al cargar el alumnado, aviso de alumnado viejo), con `copiaalumnado=` |
+| `js/demo/copia-alumnado.js` | Fila 324: `?copiaalumnado=aldia\|vieja\|sinfecha` de la copia de pruebas |
 | `pruebas/datos-que-tengo.mjs` | La tabla, el apunte a mano, el Centro de datos, `masnuevo=`, la carpeta de la base de datos, Ajustes, solo consultar y dos apuntes (fila 319) |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén; en Ajustes, cuelga ahora dentro de `#herramientas-traer-seneca`, en el bloque "Traer el alumnado" de Herramientas (fila 200; antes junto a "Ficheros de datos" en El centro) |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
