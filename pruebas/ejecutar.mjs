@@ -59,7 +59,8 @@ const EN_SOLITARIO_ENTRADAS = [
   ['refresco.mjs', 'antes del 7-oct-2026'], ['hito-mesa.mjs', 'antes del 7-oct-2026'],
   ['responsable-organismo.mjs', 'antes del 7-oct-2026'], ['aspirantes-numero.mjs', 'antes del 7-oct-2026'],
   ['tipos-nombre.mjs', 'antes del 7-oct-2026'], ['registro-del-asunto.mjs', 'antes del 7-oct-2026'],
-  ['carpetas-perdidas.mjs', '9-oct-2026']   /* falla en la pasada completa (espera de 60 s agotada, apartado 8) y en solitario pasa; no es de ninguna fila reciente */
+  ['carpetas-perdidas.mjs', '9-oct-2026'],   /* falla en la pasada completa (espera de 60 s agotada, apartado 8) y en solitario pasa; no es de ninguna fila reciente */
+  ['exportar-asuntos.mjs', '10-oct-2026']   /* falla en la pasada completa y en solitario pasa; no tiene que ver con la fila 323 */
 ];
 const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
 
