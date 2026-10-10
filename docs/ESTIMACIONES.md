@@ -12,5 +12,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 323 | 60 | Prueba nueva con el fichero y el índice del final del plan, tres frases, parámetro de demo y seis documentos |
 | 325 | 120 | Partir el actualizador de la copia, marca nueva junto a la versión, actualizar al pulsar «Entrar» y entrar sola tras recargar; prueba con disco de mentira por `file://`, prueba nueva de la marca y revisor |
