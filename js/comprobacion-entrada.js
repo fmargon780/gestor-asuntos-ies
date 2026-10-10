@@ -367,13 +367,18 @@
     if (!remoto || !remoto.version) return resultado('copia', T, 'sin-comprobar', 'No he podido comprobarlo: la respuesta no se entiende.');
     if (remoto.version === App.VERSION) return resultado('copia', T, 'bien', 'Es la última versión.');
     var arreglar = function () {
+      /* Fila 325: ya no hay franja; el botón hace lo mismo que pulsar la marca (abre su pregunta). */
       var cerrar = document.getElementById('cuadro-cancelar');
       if (cerrar && !document.getElementById('capa').classList.contains('oculto')) cerrar.click();
+      var m = document.getElementById('marca-version');
+      if (m) { m.click(); return; }
       var b = document.getElementById('franja-copia-actualizar');
       if (b && b.scrollIntoView) { b.scrollIntoView({ block: 'center' }); if (b.focus) b.focus(); }
     };
-    return resultado('copia', T, 'falta', 'Hay una versión nueva del Gestor (' + remoto.version + ') y esta copia tiene la ' +
-      App.VERSION + '. Pulsa «Actualizar ahora».', arreglar, true);
+    var r = resultado('copia', T, 'falta', 'Hay una versión nueva del Gestor (' + remoto.version + ') y esta copia tiene la ' +
+      App.VERSION + '. Se pone al día sola al pulsar «Entrar»; si la quieres ya, pulsa «Actualizar ahora».', arreglar, true);
+    r.boton = 'Actualizar ahora';
+    return r;
   }
 
   var LISTA = [

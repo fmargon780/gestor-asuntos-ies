@@ -293,3 +293,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 309 — aviso al claustro de una actividad (9-oct-2026)
 
 - [ ] Con el grupo «Profesorado» de verdad creado, avisar de una actividad real: el correo llega a todo el profesorado, en copia oculta, con el informe adjunto.
+
+## Fila 325 — la versión nueva, sin franja (10-oct-2026)
+
+- [ ] 11. [SOLO FRANCISCO] En el ordenador del centro, **a partir de la segunda mañana** con esta versión: al pulsar «Entrar» con una versión nueva publicada, el navegador enseña un cuadro para la carpeta de la copia. Elegir «Permitir en cada visita» si lo ofrece. La aplicación dice «Actualizando el Gestor…», se recarga y entra sola, sin franja. Durante la mañana, si llega otra versión, no sale la franja: sale «hay versión nueva» junto al número de versión. Si el cuadro no ofrece «Permitir en cada visita», decírselo a Claude.

@@ -58,6 +58,15 @@
      6. Con la aplicación abierta, se vuelve a comprobar cada 30
         minutos (fila 121). Esa vuelta nunca recarga la página: si hay
         versión nueva, solo la franja con «Actualizar ahora».
+     7. FILA 325 (docs/VERSION-NUEVA-SIN-FRANJA.md): ya no sale la franja
+        por falta de permiso ni con la aplicación abierta. Sin permiso,
+        la versión queda esperando (`pendiente()`) y al pulsar «Entrar»
+        (`alEntrar()`) se pide el permiso de la carpeta de la copia, se
+        actualiza, se recarga y la aplicación entra sola
+        (js/entrar-sola.js). Con la aplicación abierta sale la marca
+        «hay versión nueva» (js/marca-version.js). La franja queda para
+        cuando algo falla: sin carpeta recordada, carpeta equivocada,
+        actualización fallida o versión que no se puede comprobar.
    ============================================================ */
 (function () {
   if (location.protocol !== 'file:') return;
@@ -307,10 +316,11 @@
     caja.appendChild(cerrar);
   }
 
-  function detalleFranja(texto) {
+  function detalleFranjaPuesta(texto) {
     var d = $('franja-copia-detalle');
     if (d) d.textContent = texto;
   }
+  var detalleFranja = detalleFranjaPuesta;
 
   async function esCarpetaDeLaCopia(dir) {
     try {
@@ -322,7 +332,12 @@
 
   /* El botón «Actualizar ahora»: la carpeta que ya se tenga (o la que
      elija ahora), el permiso, y lo mismo que haría sola. */
-  async function actualizarAhora(remoto, dir, boton) {
+  async function actualizarAhora(remoto, dir, boton, entrarSola) {
+    /* Fila 325: desde la marca no hay franja; si algo falla, sale la de siempre con su detalle. */
+    function detalleFranja(texto) {
+      if (!$('franja-copia')) franja(remoto, dir, null);
+      detalleFranjaPuesta(texto);
+    }
     if (!dir) {
       if (typeof window.showDirectoryPicker !== 'function') {
         detalleFranja('Este navegador no puede actualizar la copia: hace falta Google Chrome o Microsoft Edge.');
@@ -354,7 +369,7 @@
        cuando se pintó la franja, que puede ser de otra publicación). */
     try {
       var ahora = await leerVersionRemota(true);
-      if (ahora.version === App.VERSION) { var f = $('franja-copia'); if (f) f.remove(); return; }
+      if (ahora.version === App.VERSION) { var f = $('franja-copia'); if (f) f.remove(); quitarMarca(); return; }
       if (ahora.version !== remoto.version) {
         var negrita = document.querySelector('#franja-copia-texto strong');
         if (negrita) negrita.textContent = ahora.version;
@@ -363,7 +378,8 @@
     } catch (e) { /* sin conexión ahora mismo: se intenta con la que había */ }
     try {
       var hecha = await actualizarConReintento(dir, remoto);
-      if (!hecha) { var f2 = $('franja-copia'); if (f2) f2.remove(); return; }
+      if (!hecha) { var f2 = $('franja-copia'); if (f2) f2.remove(); quitarMarca(); return; }
+      if (entrarSola && window.EntrarSola) EntrarSola.apuntar();
       recargar(dir, hecha);
     } catch (e) {
       if (boton) { boton.disabled = false; boton.textContent = textoBoton; }
@@ -372,11 +388,90 @@
     }
   }
 
+  /* ---------- la marca (fila 325) ---------- */
+
+  function quitarMarca() { if (window.MarcaVersion) MarcaVersion.quitar(); }
+
+  /* La marca de la aplicación abierta: al aceptar la pregunta, lo mismo que el botón de la franja. */
+  function ponerMarca(remoto, dir) {
+    if (!window.MarcaVersion) { if (!$('franja-copia')) franja(remoto, dir, null); return; }
+    MarcaVersion.poner(remoto.version, function () { return actualizarAhora(remoto, dir, null, true); });
+  }
+
+  /* ---------- «Entrar» (fila 325) ---------- */
+
+  var pendiente = null;          /* { remoto, dir }: hay versión nueva y la carpeta no tiene permiso */
+  var comprobada = false;
+  var avisarComprobada = null;
+  var comprobacionInicial = new Promise(function (r) { avisarComprobada = r; });
+  var yaPulsoEntrar = false;
+  var permisoPedido = null;      /* la petición lanzada junto a las de la fila 318 */
+  var ESPERA_COMPROBACION_MS = typeof window.__COPIA_ESPERA_COMPROBACION_MS__ === 'number' ? window.__COPIA_ESPERA_COMPROBACION_MS__ : 2000;
+  var TOPE_ACTUALIZAR_MS = typeof window.__COPIA_TOPE_MS__ === 'number' ? window.__COPIA_TOPE_MS__ : 60000;
+
+  function termino() { comprobada = true; avisarComprobada(); }
+
+  /* Lo llama PermisosCarpetas.pedirAlEntrar en la misma tanda que las demás peticiones. */
+  function pedirPermisoJunto() {
+    if (!pendiente || permisoPedido) return permisoPedido;
+    permisoPedido = pedirPermiso(pendiente.dir);
+    return permisoPedido;
+  }
+
+  function esperar(ms) { return new Promise(function (r) { setTimeout(function () { r('tarde'); }, ms); }); }
+
+  /* Devuelve true si va a recargar la página. */
+  async function alEntrar() {
+    yaPulsoEntrar = true;
+    if (!comprobada) await Promise.race([comprobacionInicial, esperar(ESPERA_COMPROBACION_MS)]);
+    if (!pendiente) return false;
+    var p = pendiente;
+    var boton = $('btn-entrar');
+    var ok = await (permisoPedido || pedirPermiso(p.dir));
+    permisoPedido = null;
+    if (!ok) { ponerMarca(p.remoto, p.dir); return false; }
+
+    var textoBoton = boton ? boton.textContent : '';
+    if (boton) { boton.disabled = true; boton.textContent = 'Actualizando el Gestor…'; }
+    function devolverBoton() { if (boton) { boton.disabled = false; boton.textContent = textoBoton; } }
+    var trabajo = actualizarConReintento(p.dir, p.remoto).then(function (hecha) { return { hecha: hecha }; },
+      function (e) { return { error: e }; });
+    /* Pasado el tope se deja de esperar: si termina después, no recarga (nadie sigue el resultado). */
+    var r = await Promise.race([trabajo, esperar(TOPE_ACTUALIZAR_MS)]);
+    if (r === 'tarde') {
+      devolverBoton();
+      franja(p.remoto, p.dir, null);
+      detalleFranja('No se ha podido actualizar: la descarga tarda demasiado.');
+      return false;
+    }
+    if (r.error) {
+      devolverBoton();
+      franja(p.remoto, p.dir, null);
+      var e = r.error;
+      detalleFranja(e && e.message === MENSAJE_PUBLICANDO ? MENSAJE_PUBLICANDO
+        : 'No se ha podido actualizar sola: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
+      return false;
+    }
+    if (!r.hecha) { devolverBoton(); pendiente = null; return false; }
+    if (window.EntrarSola) EntrarSola.apuntar();
+    recargar(p.dir, r.hecha);
+    return true;
+  }
+
   /* ---------- el conjunto ---------- */
 
-  /* `enMarcha` (fila 121): la vuelta de cada 30 minutos, con la
-     aplicación abierta. Nunca recarga la página. */
   async function comprobar(enMarcha) {
+    try {
+      await comprobarVersion(enMarcha);
+    } finally {
+      if (enMarcha !== true) termino();
+    }
+  }
+
+  /* `enMarcha` (fila 121): la vuelta de cada 30 minutos, con la
+     aplicación abierta. Nunca recarga la página. Desde la fila 325, con
+     versión nueva sale la marca, no la franja. */
+  async function comprobarVersion(enMarcha) {
     var remoto;
     try {
       remoto = await leerVersionRemota();
@@ -386,7 +481,8 @@
     }
     quitarFranjaSinComprobar();
     if (enMarcha === true) {
-      if (remoto.version !== App.VERSION && !$('franja-copia')) franja(remoto, await obtenerCarpeta(), null);
+      if (remoto.version === App.VERSION) { quitarMarca(); return; }
+      if (!$('franja-copia')) ponerMarca(remoto, await obtenerCarpeta());
       return;
     }
 
@@ -410,7 +506,13 @@
     var dir = await obtenerCarpeta();
     var permiso = false;
     if (dir) { try { permiso = await tienePermiso(dir); } catch (e) { permiso = false; } }
-    if (!dir || !permiso) { franja(remoto, dir, null); return; }
+    if (!dir) { franja(remoto, dir, null); return; }
+    if (!permiso) {
+      /* Fila 325: sin franja. La versión espera; se actualiza al pulsar «Entrar». */
+      pendiente = { remoto: remoto, dir: dir };
+      if (yaPulsoEntrar) ponerMarca(remoto, dir);   /* la respuesta llegó cuando ya se había entrado */
+      return;
+    }
 
     try {
       var hecha = await actualizarConReintento(dir, remoto);
@@ -427,117 +529,7 @@
   setInterval(function () { comprobar(true); }, 30 * 60 * 1000);   /* fila 121 */
 
   /* Para la prueba de actualización (pruebas/), sin tocar nada más. */
-  window.ActualizarCopia = { comprobar: comprobar, _BASE_REMOTO: BASE_REMOTO,
+  window.ActualizarCopia = { comprobar: comprobar, alEntrar: alEntrar, pendiente: function () { return pendiente; },
+    pedirPermisoJunto: pedirPermisoJunto, _BASE_REMOTO: BASE_REMOTO,
     _cambiarBase: function (b) { BASE_REMOTO = b; } };
-})();
-
-/* ============================================================
-   fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md, punto 4: el aviso de
-   versión nueva, también en la web (no solo en la copia sin internet,
-   de arriba, que solo actúa con `location.protocol === 'file:'`).
-
-   Aquí no hay ninguna carpeta que tocar ni nada que actualizar sola:
-   solo se avisa, con la misma franja de arriba («Hay una versión
-   nueva. Recargar»). Nunca recarga sola.
-
-   Cada 30 minutos, y al recuperar el foco de la pestaña (como mucho
-   una vez cada 10 minutos), si no hay un guardado en marcha, se pide
-   `js/version.js?v=<hora>` (sin caché) y se compara el `App.VERSION`
-   que trae con el ya cargado. Distinto, la franja; igual, nada (y si
-   ya estaba puesta de una comprobación anterior, se quita: puede que
-   ya se haya recargado desde otra pestaña).
-
-   Se activa siempre que esto NO sea la copia sin internet (`file:`):
-   la web de verdad se sirve por `https://`, pero el servidor local con
-   el que se prueba esta aplicación (`python3 -m http.server`) la sirve
-   por `http://`, y tiene que poder probarse igual. */
-(function () {
-  if (location.protocol === 'file:') return;
-
-  var CADA_MS = 30 * 60 * 1000;
-  var MIN_ENTRE_FOCOS_MS = 10 * 60 * 1000;
-  var ultimaComprobacion = 0;
-
-  function $(id) { return document.getElementById(id); }
-
-  /* `js/version.js` es JavaScript, no JSON: se lee su texto y se saca
-     la línea `App.VERSION = '...'` con una expresión regular, sin
-     ejecutarlo (ejecutar lo que llega de una petición es innecesario
-     aquí, y así no hace falta un `<script>` nuevo por cada comprobación). */
-  function extraerVersion(texto) {
-    var m = String(texto || '').match(/App\.VERSION\s*=\s*'([^']*)'/);
-    return m ? m[1] : '';
-  }
-
-  function quitarFranjaWeb() {
-    var caja = $('franja-copia');
-    if (caja && caja.dataset.franjaWeb === '1') caja.remove();
-  }
-
-  function pintarFranjaWeb(versionNueva) {
-    if ($('franja-copia')) return;   /* ya se ve (esta u otra franja) */
-    var caja = document.createElement('div');
-    caja.id = 'franja-copia';
-    caja.dataset.franjaWeb = '1';
-    caja.setAttribute('role', 'alert');
-    caja.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
-      'padding:10px 48px 10px 16px;background:#fff4d6;border-bottom:2px solid #e0b34a;color:#1b2430;font-size:15px;box-shadow:0 4px 12px rgba(10,25,45,.18)';
-
-    var texto = document.createElement('span');
-    texto.innerHTML = 'Hay una versión nueva del Gestor (<strong></strong>). Esta pantalla tiene la <strong></strong>.';
-    var negritas = texto.querySelectorAll('strong');
-    negritas[0].textContent = versionNueva;
-    negritas[1].textContent = (window.App && App.VERSION) || '';
-    caja.appendChild(texto);
-
-    var boton = document.createElement('button');
-    boton.type = 'button';
-    boton.className = 'boton boton-principal';
-    boton.textContent = 'Recargar';
-    boton.onclick = function () { location.reload(); };
-    caja.appendChild(boton);
-
-    var cerrar = document.createElement('button');
-    cerrar.type = 'button';
-    cerrar.title = 'Cerrar';
-    cerrar.setAttribute('aria-label', 'Cerrar');
-    cerrar.textContent = '✕';
-    cerrar.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;color:#5d6b7a';
-    cerrar.onclick = function () { caja.remove(); };
-    caja.appendChild(cerrar);
-
-    document.body.appendChild(caja);
-  }
-
-  async function comprobarVersionWeb() {
-    if (!window.App || !App.VERSION) return;
-    if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
-    var texto;
-    try {
-      var resp = await fetch('js/version.js?v=' + Date.now(), { cache: 'no-store' });
-      if (!resp.ok) return;
-      texto = await resp.text();
-    } catch (e) { return; }   /* sin conexión ahora mismo: se prueba en la próxima vuelta */
-    var remota = extraerVersion(texto);
-    if (!remota) return;
-    if (remota === App.VERSION) { quitarFranjaWeb(); return; }
-    pintarFranjaWeb(remota);
-  }
-
-  function alRecuperarElFoco() {
-    var ahora = Date.now();
-    if (ahora - ultimaComprobacion < MIN_ENTRE_FOCOS_MS) return;
-    ultimaComprobacion = ahora;
-    comprobarVersionWeb();
-  }
-
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') alRecuperarElFoco();
-  });
-  window.addEventListener('focus', alRecuperarElFoco);
-
-  setInterval(function () { ultimaComprobacion = Date.now(); comprobarVersionWeb(); }, CADA_MS);
-
-  /* Para las pruebas. */
-  window.AvisoVersionWeb = { comprobar: comprobarVersionWeb, _extraerVersion: extraerVersion };
 })();

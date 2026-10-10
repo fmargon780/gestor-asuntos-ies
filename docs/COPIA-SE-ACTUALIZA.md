@@ -1,5 +1,7 @@
 # La copia sin internet tiene que actualizarse de verdad (fila 91)
 
+> **Fila 325 (10-oct-2026):** sin permiso sobre la carpeta ya no sale la franja: la copia se actualiza al pulsar «Entrar» y, con la aplicación abierta, avisa la marca «hay versión nueva». Ver `docs/VERSION-NUEVA-SIN-FRANJA.md`.
+
 Decidido con Francisco el 23-sep-2026. Diseño cerrado por él. Continúa la fila 89
 (`docs/COPIA-SIN-INTERNET.md`).
 

@@ -214,6 +214,7 @@ $('btn-entrar').onclick = async function () {
       return;
     }
     if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
+    if (window.ActualizarCopia && ActualizarCopia.alEntrar && await ActualizarCopia.alEntrar()) return;   /* fila 325 */
     App.E.usuario = $('campo-usuario').value.trim();
     await Almacen.guardar('usuario', App.E.usuario);
 
