@@ -184,6 +184,7 @@ var DatosQueTengo = (function () {
   function porDondeLlego(f) {
     if (f.via === 'a-mano') return 'A mano.' + (f.traidoPor ? ' Lo trajo ' + f.traidoPor : ' Lo trajeron') + (f.traidoEl ? ' el ' + fechaHora(f.traidoEl) : '') + '.';
     if (f.via === 'centro-de-datos') {
+      if (f.subidoPor === 'centro-de-datos-ies') return 'Del Centro de datos. Lo hace el propio Centro de datos.';
       var quien = String(f.subidoPor || '').split('@')[0];
       return 'Del Centro de datos.' + (quien ? ' Lo subió ' + quien + '.' : '');
     }

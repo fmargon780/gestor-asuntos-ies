@@ -52,7 +52,7 @@ Es **el gestor de asuntos del centro**: crea, nombra y archiva las carpetas de c
 administrativa, en el Dropbox del centro.
 
 **No es** la base de datos de alumnado (proyecto aparte, `fmargon780/bd-alumnado-ies`). Solo
-comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y de sus tutores.
+comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; después, el Centro de datos: el gestor acepta el de `generado` más reciente).
 
 ## 4. Las reglas de nombres
 

@@ -69,10 +69,15 @@ var DatosQueTengoVer = (function () {
     return '<table class="dqt-tabla"><thead><tr><th>Qué</th><th>Fecha del fichero</th><th>Cuántos</th><th>Por dónde llegó</th><th>¿Hay otro más nuevo?</th></tr></thead><tbody>' + html + '</tbody></table>';
   }
 
-  var NOTAS = '<div class="dqt-notas">' +
-    '<p>Para actualizar el alumnado o el personal: descarga el fichero de Séneca y pulsa «Traer ficheros de Séneca». No hay que guardarlo en ninguna carpeta concreta. ' +
-    'El alumnado de la base de datos lo hace la base de datos de alumnado, al pulsar allí «Actualizar los datos».</p>' +
-    '<p>Solo puedo comparar con las carpetas señaladas en este ordenador. Si has cambiado algo en Séneca después de la fecha de la tabla, hay que volver a descargarlo.</p></div>';
+  /* Plan del núcleo (fila 323): quién hace el alumnado de la base de datos depende de la copia. */
+  function notas() {
+    var cd = window.AlumnadoBD && AlumnadoBD.hechoPor(AlumnadoBD.enMemoria());
+    return '<div class="dqt-notas">' +
+      '<p>Para actualizar el alumnado o el personal: descarga el fichero de Séneca y pulsa «Traer ficheros de Séneca». No hay que guardarlo en ninguna carpeta concreta. ' +
+      (cd ? 'El alumnado de la base de datos lo hace el Centro de datos, él solo: no hay que pulsar nada.'
+          : 'El alumnado de la base de datos lo hace la base de datos de alumnado, al pulsar allí «Actualizar los datos».') + '</p>' +
+      '<p>Solo puedo comparar con las carpetas señaladas en este ordenador. Si has cambiado algo en Séneca después de la fecha de la tabla, hay que volver a descargarlo.</p></div>';
+  }
 
   function cabecera() {
     return '<div class="dqt-cabecera"><span class="dqt-titulo">Lo que tengo ahora</span>' +
@@ -123,13 +128,13 @@ var DatosQueTengoVer = (function () {
     try { filas = await DatosQueTengo.estado(); } catch (e) { return; }
     if (mio !== turno) return;
     var yaMirada = DatosQueTengo.enMemoriaLaMirada();
-    caja.innerHTML = '<div class="dqt-caja">' + cabecera() + tablaHtml(filas, fresco ? null : yaMirada) + NOTAS + '</div>';
+    caja.innerHTML = '<div class="dqt-caja">' + cabecera() + tablaHtml(filas, fresco ? null : yaMirada) + notas() + '</div>';
     enlazar(caja);
     pintarPie(filas, yaMirada);
     var mirada;
     try { mirada = await DatosQueTengo.mirarSiHayMasNuevo(!!fresco); } catch (e) { return; }
     if (mio !== turno) return;
-    caja.innerHTML = '<div class="dqt-caja">' + cabecera() + tablaHtml(filas, mirada) + NOTAS + '</div>';
+    caja.innerHTML = '<div class="dqt-caja">' + cabecera() + tablaHtml(filas, mirada) + notas() + '</div>';
     enlazar(caja);
     pintarPie(filas, mirada);
   }

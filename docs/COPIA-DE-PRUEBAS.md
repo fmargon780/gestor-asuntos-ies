@@ -181,6 +181,12 @@ paso a `main`).
 - El Centro de datos de mentira lleva ahora un `ALUMNADO-BD.json` inventado y válido. Sin `masnuevo=` la demostración queda como siempre, salvo el recuadro nuevo.
 - Los ficheros escritos en el disco de mentira conservan la fecha de cuando se escribieron (antes era la hora de leerlos).
 
+## Fila 323: `nucleo=1`
+
+- `?demo=1&auto=1&nucleo=1`: el Centro de datos de mentira es el del final del plan del núcleo. Su `ALUMNADO-BD.json` trae `origen: "centro-de-datos-ies"`
+  y `dueno`, está dentro de `hecho/`, su entrada lleva `subidoPor: "centro-de-datos-ies"` y `via: "hecho"`, y el índice trae `capacidades`, `hechos`
+  y una entrada `entrega`. Se ve con tres frases distintas (pie de la ficha, «Por dónde llegó» y la nota de «Lo que tengo ahora»). Sin él, todo igual. Código: `js/demo/datos-centro-de-datos.js`.
+
 ## Fila 321: `fueradeuso=1`
 
 - `?demo=1&auto=1&fueradeuso=1`: «Certificado de notas» (Word, en la tarea de generar de su hito; «Vidal Soto, Irene» y «Moreno Sanz, Hugo» tienen ese hito) y

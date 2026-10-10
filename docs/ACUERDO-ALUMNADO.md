@@ -5,6 +5,10 @@ documento vive, idéntico, en los dos repositorios**: `fmargon780/bd-alumnado-ie
 `fmargon780/gestor-asuntos-ies`, en `docs/ACUERDO-ALUMNADO.md`. Si se cambia en uno, se cambia en
 el otro en la misma sesión.
 
+**Puesto al día el 10-oct-2026 por `docs/PLAN-NUCLEO.md`** (la forma no cambia: sigue en `acuerdo: 2`):
+quién genera el fichero (apartado 2), el campo `origen` y el campo opcional `dueno` (apartado 3), y
+los campos que no se conocen (apartado 4).
+
 **Qué cambió en la versión 2**: la versión 1 servía el alumnado por una dirección web con clave.
 El control de seguridad de Claude Code la paró (datos de menores abiertos a quien tuviera la
 línea, sin registro, con una clave que no caduca) y Francisco la descartó. **Nada de dirección
@@ -13,8 +17,9 @@ datos de cada alumno, no una selección.
 
 ## 1. El reparto
 
-- **Todo lo que viene de Séneca sobre alumnado entra por la base de datos de alumnado.** Allí se
-  limpia y se cruza, una sola vez.
+- **Todo lo que viene de Séneca sobre alumnado entra por el Centro de datos**, que lo limpia y lo
+  cruza una sola vez. Lo que escribe una persona en la base de datos de alumnado (PIL, correcciones,
+  reparto) se lo entrega ella al Centro de datos.
 - **El gestor de asuntos no prepara listas de alumnado de Séneca por su cuenta.** Usa lo que le
   da la base de datos de alumnado.
 - El gestor sigue leyendo `RegAlum.csv` como hasta ahora. Lo del archivo se **suma** a eso.
@@ -23,6 +28,10 @@ datos de cada alumno, no una selección.
   que siga dejando el mismo archivo.
 
 ## 2. Cómo llega
+
+- **Quién genera el fichero**: primero la base de datos de alumnado y, después, el Centro de datos
+  (`docs/PLAN-NUCLEO.md`, 6.5, «El relevo»). El gestor coge el de `generado` más reciente, venga de
+  quien venga.
 
 - Al terminar «Actualizar los datos», el cuaderno escribe `ALUMNADO-BD.json` en la carpeta de
   Drive **«Datos de matrícula»** (la privada de Francisco, la misma donde ya viven los CSV).
@@ -58,11 +67,14 @@ nuevos.
     }
 
 - `acuerdo`: la versión de este documento. Hoy, `2`.
+- `origen`: quién hizo el fichero, `bd-alumnado-ies` o `centro-de-datos-ies`. **Quien lee no decide
+  nada por él**: solo lo usa para decir en pantalla de dónde viene.
 - `generado`: cuándo se construyeron los datos (la última pulsación de «Actualizar los datos»).
 - `campos`: un elemento por dato. `clave` (fija, sin espacios ni tildes), `etiqueta` (lo que ve
   Francisco), `apartado` (para agruparlos en la ficha), `tipo` y, si hace falta, `descripcion`.
   Tipos: `texto`, `numero`, `fecha` (`AAAA-MM-DD`), `si-no`, `lista` (varios textos) y `tabla`
-  (varias filas, con sus `columnas`). Un tipo que el gestor no conozca lo enseña como texto.
+  (varias filas, con sus `columnas`). Un tipo que el gestor no conozca lo enseña como texto. Cada
+  campo puede llevar además `dueno` (quién lo rellena); el gestor lo conserva y no lo usa.
 - `alumnos`: **todos** los alumnos que conoce la base de datos, matriculados y antiguos, con toda
   su historia. `idEscolar` (Nº de identificación escolar) es obligatorio y es la clave que une
   todo. `matriculado` dice si está este curso. `datos` lleva el valor de cada campo; lo que no
@@ -87,6 +99,8 @@ nuevos.
   una plantilla o en un grupo. Si un dato deja de existir, se deja de rellenar. Cambiar la
   `etiqueta` sí se puede.
 - Solo un cambio de la forma general (lo de arriba de `campos` y `alumnos`) sube `acuerdo` a `3`.
+- **Un campo que no se conoce** (en la raíz, en un elemento de `campos` o en un alumno) **se
+  ignora**: el gestor no falla y lo conserva en su copia.
 - Si el gestor recibe un `acuerdo` que no conoce, o un alumno sin `idEscolar`, no usa esos datos:
   sigue con la última copia buena y avisa en ámbar.
 
@@ -95,4 +109,5 @@ nuevos.
 - Son datos de menores. Nunca se suben a ningún repositorio, ni en pruebas: las pruebas usan
   alumnos inventados.
 - Nunca se sirven por una dirección web.
-- Solo existen en la carpeta de Drive de Francisco y en el Dropbox del centro.
+- Solo existen en la carpeta de Drive de Francisco, en la carpeta «CENTRO DE DATOS» del Drive del
+  centro y en el Dropbox del centro.
