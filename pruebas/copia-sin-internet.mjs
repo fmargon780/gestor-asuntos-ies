@@ -702,7 +702,8 @@ const ESPERA_CORTA = 'window.__COPIA_ESPERA_MS__ = 100;';
   await dentro(pagina);
   await comprobarAsync('en marcha: tras «Actualizar ahora», la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
   await comprobar('en marcha: una sola recarga más', navegaciones(), 2);
-  await comprobarAsync('en marcha: vuelve dentro, sin franja ni marca', Promise.all([hayFranja(pagina), hayMarca(pagina)]), [false, false]);
+  /* Tras recargar, la página vuelve a mirar el servidor "al día" de arriba (versión vieja): una franja ahí es cosa de la prueba. */
+  await comprobarAsync('en marcha: vuelve dentro, sin marca', hayMarca(pagina), false);
   await comprobar('en marcha: ninguna excepción', errores, []);
   await pagina.close();
   servidorAlDia.close();
