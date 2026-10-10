@@ -40,6 +40,8 @@
         });
       }
       if (window.Datos && Datos.olvidar) Datos.olvidar('ALUMNADO');
+      /* La comprobación al entrar ya se hizo, antes de que existiera la copia: se repite. */
+      if (window.ComprobacionEntrada) await ComprobacionEntrada.comprobar();
     } catch (e) { console.error('copiaalumnado:', e); }
   }
 
