@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 11-oct-2026 — Fila 324: se compara con la fecha real del listado
+
+La «Comprobación al entrar» decía a veces que la copia del alumnado era más vieja que el listado de matrícula sin serlo, porque miraba el día en que el listado se
+copió y no el día en que salió de Séneca. Ahora los tres sitios que comparan (la comprobación, quién manda al unir y el aviso de alumnado viejo) usan
+`DatosQueTengo.fechaReal`; sin fecha real apuntada no se avisa y manda la base de datos. Copia de pruebas: `copiaalumnado=`. Prueba: `pruebas/fecha-real-del-listado.mjs`.
+
+---
+
 ## 10-oct-2026 — Fila 323: el Gestor acepta la ficha del alumnado venga de quien venga
 
 Plan «el Centro de datos como núcleo» (`docs/PLAN-NUCLEO.md`). `ALUMNADO-BD.json` cambia de autor (hoy la base de datos de alumnado, después el Centro de datos) y el

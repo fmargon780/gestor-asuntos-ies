@@ -151,6 +151,9 @@
     try {
       var f = await mejor.handle.getFile();
       var cuando = new Date(f.lastModified);
+      /* Fila 324: se cuenta desde la fecha real del listado si está apuntada; si no, desde la copia, como siempre. */
+      var real = window.DatosQueTengo ? await DatosQueTengo.fechaReal(mejor.nombre) : 0;
+      if (real) cuando = new Date(real);
       var hoy = new Date();
       var dias = Math.floor((hoy.getTime() - cuando.getTime()) / 86400000);
       return { falta: false, nombre: mejor.nombre, cuando: cuando, dias: dias < 0 ? 0 : dias };

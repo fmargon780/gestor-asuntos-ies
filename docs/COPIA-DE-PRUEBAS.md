@@ -173,6 +173,13 @@ paso a `main`).
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
 
+## Fila 324: `copiaalumnado=`
+
+- `?demo=1&auto=1&copiaalumnado=aldia|vieja|sinfecha`: este ordenador no tiene señalada la carpeta de la base de datos de alumnado y guarda una copia válida
+  de `ALUMNADO-BD.json` hecha hace 5 días; `RegAlum.csv` es el copiado hoy. `aldia`: apunte con fecha real de hace 10 días (sale bien); `vieja`: de ayer
+  (la «Comprobación al entrar» avisa con las dos fechas); `sinfecha`: sin apunte (sale bien y manda la base de datos). Código: `js/demo/copia-alumnado.js`,
+  que se llama al final del montaje. Sin el parámetro la demostración queda como siempre.
+
 ## Fila 319: `masnuevo=`
 
 - `?demo=1&auto=1&masnuevo=alumnado,personal` (claves: `alumnado`, `personal`, `alumnado-bd`): la carpeta del Centro de datos de mentira queda señalada

@@ -119,6 +119,21 @@ var DatosQueTengo = (function () {
     return !!ap.marca && Math.abs(ms(ap.marca) - modificado) <= MARGEN_MS;
   }
 
+  /* Fila 324: la fecha real (en milisegundos) en que salió de Séneca el listado `nombre`, la apuntada en
+     `fechaOriginal`, y solo si el apunte sigue valiendo para la copia que hay. 0 si no hay apunte, ya no vale o
+     no trae fecha. Para comparar edades de datos se usa esta, nunca el día en que se copió el fichero. No llama a
+     `estado()` ni a `Datos.cargar` (la usa la propia carga del alumnado) y nunca lanza. */
+  async function fechaReal(nombre) {
+    try {
+      var d = datos();
+      if (!d) return 0;
+      var ap = (await leerApuntes()).ficheros[nombre];
+      if (!ap || !ap.fechaOriginal) return 0;
+      var modificado = await Carpetas.fechaFichero(d, nombre);
+      return modificado && vale(ap, modificado) ? ms(ap.fechaOriginal) : 0;
+    } catch (e) { return 0; }
+  }
+
   function entrada(base, ap, modificado, generado) {
     var v = vale(ap, modificado, generado);
     base.hay = true;
@@ -321,7 +336,7 @@ var DatosQueTengo = (function () {
 
   return {
     FICHERO: FICHERO, apuntar: apuntar, estado: estado, mirarSiHayMasNuevo: mirarSiHayMasNuevo, olvidarMirada: olvidarMirada,
-    enMemoriaLaMirada: enMemoriaLaMirada, leerApuntes: leerApuntes, fusionarConflicto: fusionarConflicto, fechaHora: fechaHora, porDondeLlego: porDondeLlego, viaCorta: viaCorta,
+    enMemoriaLaMirada: enMemoriaLaMirada, leerApuntes: leerApuntes, fusionarConflicto: fusionarConflicto, fechaHora: fechaHora, fechaReal: fechaReal, porDondeLlego: porDondeLlego, viaCorta: viaCorta,
     _elegirApunte: elegirApunte, _vale: vale
   };
 })();

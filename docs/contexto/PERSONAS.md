@@ -565,6 +565,7 @@ Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).
   ALUMNADO-BD.json y cada RelPerCen…csv (los de cursos anteriores, plegados). «¿Hay otro más nuevo?» (`DatosQueTengo.mirarSiHayMasNuevo`, 60 s en
   memoria) solo mira (`queryPermission`): Centro de datos (`CentroDeDatos.pendientes`) y carpeta de la base de datos (`AlumnadoBD.mirarCarpeta`).
   «Traerlo» y «Dar permiso» salen de una pulsación. El pie del título dice las fechas sin abrir el bloque.
+- **La fecha real** (fila 324, `docs/FECHA-REAL-DEL-LISTADO.md`): `DatosQueTengo.fechaReal(nombre)` da los ms de `fechaOriginal` si el apunte sigue valiendo, o 0 (nunca lanza ni llama a `estado()`). La usan la «Comprobación al entrar» (sin carpeta y con copia: avisa de copia vieja con las dos fechas y quién actualiza, según `AlumnadoBD.hechoPor`; con 0 no avisa), `js/datos-alumnado.js` (quién manda al unir: con 0, la base de datos) y `js/frescura.js` (con 0, la fecha de la copia como siempre). Prueba: `pruebas/fecha-real-del-listado.mjs`.
 
 ### El alumnado de la base de datos, desde la carpeta de Drive (25-sep-2026, filas 142 y 144, `docs/ALUMNADO-BD-DESDE-DRIVE.md`)
 
@@ -601,7 +602,7 @@ Drive, nada de dirección web ni clave; la fila 142 lo hacía por dirección web
   - Relacionados: en las altas por grupo de alumnado, «Por datos del alumnado»: uno o varios datos
     con su valor (desplegable con los que hay), cuántos salen y «Añadirlos». Solo matriculados,
     salvo «Incluir antiguos». Quien no está en el RegAlum no se puede añadir (se cuenta aparte).
-- **Frescura**: `js/frescura.js` usa `generado` si es más reciente que el RegAlum.
+- **Frescura**: `js/frescura.js` usa `generado` si es más reciente que el RegAlum, y cuenta los días del RegAlum desde su fecha real (`DatosQueTengo.fechaReal`) si está apuntada; si no, desde la copia (fila 324).
 
 ### Sus asuntos, en la propia ficha (26-sep-2026, fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`)
 
