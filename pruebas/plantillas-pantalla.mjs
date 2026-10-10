@@ -45,7 +45,7 @@ console.log('--- 1 y 2. el bloque y la vista ---');
 let p = await abrir();
 await irAHerramientas(p);
 await comprobar('1. el bloque dice cuántas hay', p.evaluate(() => /^\d+ de Word · \d+ de correo$/.test(document.getElementById('plantillas-resumen').textContent)), true);
-await comprobar('1. el bloque está debajo de «Control del registro»', p.evaluate(() => document.getElementById('bloque-control-registro').nextElementSibling.id), 'bloque-plantillas');
+await comprobar('1. el bloque está debajo de «Control del registro» (fila 310: entre los dos, «Actividades extraescolares»)', p.evaluate(() => document.getElementById('bloque-control-registro').nextElementSibling.id), 'bloque-actividades');
 await p.click('#plantillas-abrir');
 await p.waitForSelector('.pt-tabla');
 await comprobar('2. la lista de Herramientas desaparece y se ve la vista con «← Volver a Herramientas»', p.evaluate(() => [document.getElementById('herramientas-lista').classList.contains('oculto'), document.getElementById('pt-volver').textContent]), [true, '← Volver a Herramientas']);
