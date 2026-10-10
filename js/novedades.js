@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '311', fecha: '2026-10-10', texto: 'Hay un tipo de asunto nuevo, «Certificado actividades extraescolares»: un solo certificado por profesor con todas sus actividades realizadas, y en cada una si organizó o acompañó.' },
   { id: '310', fecha: '2026-10-09', texto: 'En Herramientas hay una pantalla nueva, «Actividades extraescolares»: todas en una tabla, con filtros y hoja de cálculo, y se pueden apuntar las de cursos anteriores.' },
   { id: '309', fecha: '2026-10-09', texto: 'En la tarjeta «La actividad» hay un botón nuevo, «Avisar al claustro»: hace un informe en PDF con los datos de la actividad y el alumnado que va, por unidades, y abre el correo con el informe adjunto y el grupo del profesorado puesto en copia oculta. El grupo se elige en Ajustes → El centro. Si la lista cambia después, la tarjeta lo avisa y ofrece «Volver a avisar».' },
   { id: '322', fecha: '2026-10-09', texto: 'Cada plantilla de Word tiene un botón nuevo, «Retocar»: seleccionas un trozo del documento y lo cambias por otro texto, por un dato, o quitas el párrafo, sin salir de la aplicación. Vale para corregir una frase o una errata. «Cambiar por otro texto…» está también al convertir un documento en plantilla.' },

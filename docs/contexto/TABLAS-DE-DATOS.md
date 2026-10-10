@@ -127,3 +127,11 @@ Séneca, la tabla en Word, la especialidad que falta en amarillo, un CSV en Lati
 **Quién es el tutor o tutora de una unidad** (fila 299, `js/tutor-del-grupo.js`): `TutorDelGrupo` lee las filas de TUTORIAS de `TablasDatos` del curso de hoy y del bloque de unidades (no el de Pedagogía Terapéutica), en vigor hoy, para el correo de un hito (`docs/contexto/CORREO-Y-SENECA.md`). Si la tabla no está o la unidad del alumno no casa, el cuadro de Correo lo dice en ámbar.
 
 **De dónde llegan los listados** (fila 312, `docs/BEBER-DEL-CENTRO-DE-DATOS.md`): además de subirlos a mano, el gestor los coge de la carpeta «CENTRO DE DATOS» de Drive si está señalada en Ajustes → Este ordenador (`js/centro-de-datos*.js`). Las tutorías (PDF) se copian a `_GESTOR/datos` con su nombre; los del Consejo Escolar pasan por `TablasDatosPantalla.anadirFicherosDelConsejo(ficheros, { sustituir, silencioso })`; lo tomado se apunta en `_GESTOR/centro-de-datos.json` y bajo «Tablas de datos» sale «Datos del Centro de datos, del …».
+
+## La tabla ACTIVIDADES EXTRAESCOLARES (10-oct-2026, fila 311)
+
+No sale de ningún fichero de `datos/`: `js/actividades-tabla.js` (`comoTabla`) la monta con el registro de actividades en cada `TablasDatos.cargar` (se vuelve
+a leer aunque haya caché). Una fila por profesor y actividad que cuenta (`Actividades.cuenta`), unida a la persona por el DNI (los dígitos) o, sin DNI, por
+`claveNombre`. Hueco `{{TABLA ACTIVIDADES EXTRAESCOLARES}}` (Fecha · Actividad · Lugar · Participación, y Horas si alguna fila las tiene; se pueden elegir
+columnas) filtrado por los campos del asunto «Actividades desde» / «Actividades hasta»; `{{ACTIVIDADES PERIODO}}` da «, entre el … y el …». Tipo y plantilla
+llegan solos con `ActividadesTabla.pasada` (marca `certMarcado` en `actividades.json`); también salen en la biblioteca (`CertActExtra`).

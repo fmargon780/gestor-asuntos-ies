@@ -201,6 +201,11 @@ Encarga: Secretaría
 Campos: DNI para el certificado
 NUEVO
 
+### CertActExtra — CERTIFICADO ACTIVIDADES EXTRAESCOLARES
+Encarga: Secretaría
+Campos: Actividades desde, Actividades hasta
+NUEVO
+
 ### INSUFICIENCIA HORARIA — Insuficiencia de horario y reubicación
 Encarga: Secretaría
 NUEVO

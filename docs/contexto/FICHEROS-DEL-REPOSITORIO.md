@@ -43,6 +43,8 @@ de `App` va después del fichero que lo define.
 | `js/actividades-pantalla.js` | La pantalla «Actividades extraescolares» de Herramientas: tabla, filtros, abrir la ficha (fila 310) |
 | `js/actividades-antigua.js` | El cuadro de «Apuntar una actividad antigua», cambiar y borrar (fila 310) |
 | `js/actividades-exportar.js` | La hoja de cálculo de la pantalla de actividades (fila 310) |
+| `js/actividades-tabla.js` | La tabla de datos ACTIVIDADES EXTRAESCOLARES y el certificado del profesorado: `filasDe`, `entre`, `celdas`, `periodoDe`, la pasada del tipo (fila 311) |
+| `pruebas/actividades-certificado.mjs` | El certificado de actividades extraescolares (fila 311), con Chromium |
 | `pruebas/actividades-pantalla.mjs` | La pantalla de actividades y las antiguas (fila 310), con Chromium |
 | `css/actividades.css` | Estilos del formulario y de la tarjeta de actividades (fila 306) |
 | `pruebas/actividades-aviso.mjs` | El aviso al claustro de una actividad (fila 309), con Chromium |

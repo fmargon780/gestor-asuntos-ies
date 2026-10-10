@@ -59,7 +59,7 @@
       ['2100005', '2100013'], [profe('Reyes Palma', 'organiza'), profe('Otero Campos', 'acompana')]);
     /* Anulada. */
     await actividad('Excursion Sierra', 'Ruta por la Sierra de Grazalema', -14, -14,
-      ['2100002', '2100010'], [profe('Uceda Molina', 'organiza')], { anulada: true });
+      ['2100002', '2100010'], [profe('Uceda Molina', 'organiza'), profe('Otero Campos', 'acompana')], { anulada: true });
     await Actividades.cambiar(function (d) { d.tipoMarcado = true; });
 
     /* Fila 310: dos actividades antiguas de cursos anteriores, sin asunto ni alumnado; una con una profesora que ya no está en el centro. */
@@ -69,8 +69,22 @@
     });
     await Actividades.guardarAntigua({
       nombre: 'Taller de robótica en el CEIP', inicio: o.hace(700), fin: o.hace(700), lugar: 'Sevilla', departamento: 'Tecnología', horas: 4,
-      profesorado: [profe('Reyes Palma', 'organiza')].filter(Boolean)
+      profesorado: [profe('Reyes Palma', 'organiza'), profe('Otero Campos', 'acompana')].filter(Boolean)
     });
+
+    /* Fila 311: el tipo del certificado de actividades extraescolares, con sus dos campos y su plantilla, y un asunto para Marta Otero:
+       organizó (la antigua de Cádiz), acompañó (el taller antiguo), tiene una prevista y una anulada. */
+    var tipoCert = await o.crearTipoConGuia(ActividadesTabla.TIPO, 'PERSONAL', [
+      { titulo: 'Preparar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo' },
+      { titulo: 'Firmar el certificado', cuerpo: '<p>Lo firma Secretaría con el visto bueno de Dirección.</p>', responsable: 'secretaria-vb-direccion' }
+    ], null);
+    tipoCert.nombreCorto = 'CertActExtra';
+    await App.guardarTipos();
+    await ActividadesTabla.asegurarCampos();
+    await ActividadesTabla.asegurarPlantilla();
+    await Actividades.cambiar(function (d) { d.certMarcado = true; });
+    var otero = personal.filter(function (x) { return x.nombre.indexOf('Otero Campos') !== -1; })[0];
+    if (otero) await o.crearAsunto(tipoCert, 'PERSONAL', Nombres.terceroPersonal({ nombre: otero.nombre, documento: otero.documento }), o.hace(0), { abiertoEl: new Date().toISOString() });
 
     /* Fila 309: el grupo «Profesorado», que recibe el aviso al claustro; una de las cuatro personas no tiene correo. */
     if (window.Grupos) {
