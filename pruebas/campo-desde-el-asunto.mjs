@@ -240,7 +240,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(700);
 await comprobar('9. el campo nuevo existe y sale «solo aquí»',
   Promise.all([pagina.evaluate(() => App.E.campos.propios.map((p) => p.nombre)), soloAqui('Fecha de entrega')]),
-  [['Trimestre', 'Observaciones', 'Extra', 'Fecha de entrega'],
+  [['Trimestre', 'Observaciones', 'Extra', 'Actividades desde', 'Actividades hasta', 'Fecha de entrega'],
    [{ campo: 'Fecha de entrega', marca: 'solo aquí', valor: 'mañana', menu: true }]]);
 
 /* Sin tipo: no se pregunta dónde, se guarda solo en el asunto. */
