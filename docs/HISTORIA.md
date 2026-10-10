@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 10-oct-2026 — Fila 311: el certificado de actividades extraescolares del profesorado
+
+Cuarta de cuatro. Un solo certificado por profesor con todas sus actividades realizadas entre dos fechas (campos «Actividades desde» y «Actividades hasta»),
+diciendo en cada una si organizó o acompañó. La tabla de datos nueva sale del registro de actividades y no de un fichero, así que se relee en cada carga
+(la caché de `TablasDatos` no la guarda). Quien figura dos veces en la misma actividad sale una vez; manda «Organización». Sin DNI (una antigua) se une por
+el nombre y el documento lleva el aviso «Hay actividades antiguas apuntadas solo por el nombre». El tipo, sus dos campos y su plantilla llegan solos una vez
+(`ActividadesTabla.pasada`); si el centro ya tiene el tipo, no se toca. La ficha del profesor enseña también sus actividades realizadas.
+
 ## 10-oct-2026 — Fila 310: la pantalla de todas las actividades extraescolares y las actividades antiguas
 
 Tercera de cuatro. Bloque nuevo en Herramientas y vista a todo el ancho (modelo: Plantillas, fila 320): tabla con fecha, nombre, departamento,

@@ -114,7 +114,7 @@ var Actividades = (function () {
 
   /* PURA. */
   function normalizar(leido) {
-    var salida = { tipoMarcado: !!(leido && leido.tipoMarcado), actividades: [] };
+    var salida = { tipoMarcado: !!(leido && leido.tipoMarcado), certMarcado: !!(leido && leido.certMarcado), actividades: [] };
     var vistos = {};
     ((leido && Array.isArray(leido.actividades)) ? leido.actividades : []).forEach(function (x) {
       var a = limpia(x);
@@ -134,7 +134,7 @@ var Actividades = (function () {
       if (!antes) { porId[x.id] = x; orden.push(x.id); return; }
       if (String(x.cambiadaEl || x.creadaEl) > String(antes.cambiadaEl || antes.creadaEl)) porId[x.id] = x;
     });
-    return { tipoMarcado: !!(a.tipoMarcado || b.tipoMarcado), actividades: orden.map(function (id) { return porId[id]; }) };
+    return { tipoMarcado: !!(a.tipoMarcado || b.tipoMarcado), certMarcado: !!(a.certMarcado || b.certMarcado), actividades: orden.map(function (id) { return porId[id]; }) };
   }
 
   /* ---------- leer y escribir ---------- */
@@ -160,6 +160,8 @@ var Actividades = (function () {
   function porId(id) { return datos.actividades.filter(function (a) { return a.id === id; })[0] || null; }
   function porAsunto(nombre) { return datos.actividades.filter(function (a) { return a.asunto && a.asunto.nombre === nombre; })[0] || null; }
   function tipoMarcado() { return !!datos.tipoMarcado; }
+  /* Fila 311: la pasada del tipo CERTIFICADO ACTIVIDADES EXTRAESCOLARES (js/actividades-tabla.js) ya se hizo. */
+  function certMarcado() { return !!datos.certMarcado; }
 
   function avisarCambio() {
     alCambiar.forEach(function (f) { try { f(); } catch (e) { /* una pantalla rota no tumba lo demás */ } });
@@ -425,7 +427,7 @@ var Actividades = (function () {
     FICHERO: FICHERO, NOMBRE_TIPO: NOMBRE_TIPO,
     situacion: situacion, cuenta: cuenta, unidadesDe: unidadesDe, fechasLegibles: fechasLegibles, fechaCorta: fechaCorta,
     textoSituacion: textoSituacion,
-    releer: releer, lista: lista, porId: porId, porAsunto: porAsunto, tipoMarcado: tipoMarcado, cambiar: cambiar,
+    releer: releer, lista: lista, porId: porId, porAsunto: porAsunto, tipoMarcado: tipoMarcado, certMarcado: certMarcado, cambiar: cambiar,
     construir: construir, guardarActividad: guardarActividad, guardarAntigua: guardarAntigua, borrarAntigua: borrarAntigua, devolver: devolver, marcarAnulada: marcarAnulada, sellar: sellar,
     esTipoDeActividad: esTipoDeActividad, tarjetaAplica: tarjetaAplica, tieneActividad: tieneActividad,
     pasada: pasada, ponerAlDia: ponerAlDia, alumnosDe: alumnosDe, alumnadoMatriculado: alumnadoMatriculado,

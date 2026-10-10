@@ -159,6 +159,8 @@ var Plantillas = (function () {
     { clave: 'especialidad firmante', etiqueta: 'Especialidad de quien firma (del RelPerCen)' },
     { clave: 'especialidad visto bueno', etiqueta: 'Especialidad de quien da el visto bueno (del RelPerCen)' },
     { clave: '{TABLA CONSEJO ESCOLAR}', etiqueta: 'Tabla de periodos como miembro del Consejo Escolar: sector, cargo, nombramiento y cese' },
+    { clave: '{TABLA ACTIVIDADES EXTRAESCOLARES}', etiqueta: 'Tabla de las actividades extraescolares realizadas: fecha, actividad, lugar y participación (y horas)' },
+    { clave: 'actividades periodo', etiqueta: 'El periodo de «Actividades desde» y «Actividades hasta»: «, entre el … y el …»' },
     { clave: '{TABLA TUTORIAS}', etiqueta: 'Tabla de periodos de tutoría: cargo, curso, toma de posesión y cese' },
     { clave: '{DATO tabla: columna}', etiqueta: 'Un dato suelto de una tabla de datos (el de su curso más reciente)' },
     { clave: '{TABLA tabla: columna | columna}', etiqueta: 'Una tabla de datos entera, con esas columnas' }
@@ -348,7 +350,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso'];
+  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que

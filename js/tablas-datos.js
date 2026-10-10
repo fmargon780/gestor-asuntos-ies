@@ -41,7 +41,11 @@ var TablasDatos = (function () {
   /* ---------- leer todo (con caché) ---------- */
 
   async function cargar(forzar) {
-    if (CACHE && !forzar) return CACHE;
+    if (CACHE && !forzar) {
+      /* Fila 311: la tabla de actividades sale del registro, que cambia sin tocar la carpeta de datos: se lee otra vez. */
+      if (window.ActividadesTabla) { delete CACHE.tablas[ActividadesTabla.NOMBRE]; await ActividadesTabla.comoTabla(CACHE); }
+      return CACHE;
+    }
     var salida = { tablas: {}, errores: [] };
     var dir = dirDatos();
     if (!dir) return (CACHE = salida);
@@ -92,6 +96,8 @@ var TablasDatos = (function () {
     }
     /* Filas 142 y 144: las tablas «ALUMNADO BD…» (unidas por Nº escolar). */
     if (window.AlumnadoBDVer) { try { await AlumnadoBDVer.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'ALUMNADO-BD.json', motivo: U.mensajeDeError(e) }); } }
+    /* Fila 311: ACTIVIDADES EXTRAESCOLARES, del registro de actividades (js/actividades-tabla.js). */
+    if (window.ActividadesTabla) { try { await ActividadesTabla.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'actividades.json', motivo: U.mensajeDeError(e) }); } }
     CACHE = salida;
     return salida;
   }
@@ -129,7 +135,7 @@ var TablasDatos = (function () {
     var d = await cargar();
     var tablas = Object.keys(d.tablas).map(function (k) {
       var t = d.tablas[k];
-      return { nombre: t.nombre, ficheros: t.ficheros, cursos: t.cursos, filas: t.filas.length };
+      return { nombre: t.nombre, ficheros: t.ficheros, cursos: t.cursos, filas: t.filas.length, origen: t.origen || '' };
     });
     return { tablas: tablas, errores: d.errores };
   }
@@ -163,6 +169,7 @@ var TablasDatos = (function () {
   /* Una fila como lista de celdas, con las columnas pedidas. */
   function celdasDe(tabla, fila, columnas, ctx) {
     if (tabla === 'CONSEJO ESCOLAR') return TablasDatosConsejo.celdas(fila, columnas, ctx);   /* fila 238 */
+    if (window.ActividadesTabla && tabla === ActividadesTabla.NOMBRE) return ActividadesTabla.celdas(fila, columnas);   /* fila 311 */
     if (tabla === 'TUTORIAS') {
       var desde = fechaLegible(fila.desde), hasta = fechaLegible(fila.hasta);
       var mapa = { 'curso escolar': fila.curso, 'curso': String(fila.curso || '').replace('/', '-'), 'grupo': fila.grupo,
@@ -213,7 +220,7 @@ var TablasDatos = (function () {
   async function prepararDocumento(buffer, asunto, valores) {
     var texto = await Docx.textoDelDocumento(buffer);
     var huecos = [];
-    texto.replace(/\{\{\s*(ESPECIALIDAD(?:\s+FIRMANTE|\s+VISTO\s+BUENO)?|TABLA[^{}]*|DATO[^{}]*)\s*\}\}/gi, function (t, dentro) { huecos.push(dentro.trim()); });
+    texto.replace(/\{\{\s*(ESPECIALIDAD(?:\s+FIRMANTE|\s+VISTO\s+BUENO)?|TABLA[^{}]*|DATO[^{}]*|ACTIVIDADES\s+PERIODO)\s*\}\}/gi, function (t, dentro) { huecos.push(dentro.trim()); });
     if (!huecos.length) return { buffer: buffer, faltan: [] };
 
     var persona = await personaDelAsunto(asunto);
@@ -239,6 +246,8 @@ var TablasDatos = (function () {
         valores['especialidad ' + quien] = espCargo;
         continue;
       }
+      /* Fila 311: «, entre el … y el …» según «Actividades desde» y «Actividades hasta» del asunto. */
+      if (window.ActividadesTabla && /^actividades\s+periodo$/i.test(h)) { valores['actividades periodo'] = ActividadesTabla.periodoDe(valores); continue; }
       var tabla = h.match(/^TABLA\s+([^:]+?)\s*(?::\s*(.*))?$/i);
       if (tabla) {
         var nombre = nombreTabla(tabla[1]);
@@ -247,11 +256,15 @@ var TablasDatos = (function () {
         if (nombre === 'CONSEJO ESCOLAR' && !tabla[2]) columnas = TablasDatosConsejo.COLUMNAS;
         var filas = await filasDe(nombre, persona);
         if (nombre === 'TUTORIAS' && filas.length) filas = filtrarPorCursos(filas, valores, faltan);
+        if (window.ActividadesTabla && nombre === ActividadesTabla.NOMBRE && filas.length) {   /* fila 311 */
+          filas = ActividadesTabla.preparar(filas, valores, faltan);
+          if (!tabla[2]) columnas = ActividadesTabla.columnasPara(filas);
+        }
         if (filas.length) {
           var r = await Docx.ponerTabla(buffer, h, columnas, filas.map(function (f) { return celdasDe(nombre, f, columnas, { faltan: faltan }); }));
           buffer = r.bytes;
         } else {
-          var etiqueta = nombre === 'CONSEJO ESCOLAR' ? 'Consejo Escolar' : 'Tabla ' + tabla[1].trim();   /* fila 238 */
+          var etiqueta = nombre === 'CONSEJO ESCOLAR' ? 'Consejo Escolar' : (window.ActividadesTabla && nombre === ActividadesTabla.NOMBRE ? 'Actividades extraescolares' : 'Tabla ' + tabla[1].trim());   /* filas 238 y 311 */
           faltan.push(etiqueta);
           valores.datosTablas[U.normalizar(h)] = Docx.MARCA_FALTA(etiqueta);
         }

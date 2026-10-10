@@ -95,7 +95,7 @@
     var filas = r.tablas.map(function (t) {
       return '<div class="fila-tipo"><span class="nombre-tipo">' + U.escapar(t.nombre === 'TUTORIAS' ? 'Tutorías' : t.nombre) + '</span>' +
         '<span class="suave" style="flex:1">' + U.escapar(t.filas + (t.filas === 1 ? ' fila' : ' filas') +
-          (t.cursos.length ? ' · cursos ' + t.cursos.join(', ') : '') + ' · ' + t.ficheros.join(', ')) + '</span></div>';
+          (t.cursos.length ? ' · cursos ' + t.cursos.join(', ') : '') + ' · ' + (t.origen === 'actividades' ? 'sale de las actividades extraescolares, no de un fichero' : t.ficheros.join(', '))) + '</span></div>';
     });
     /* El profesorado sale de los RelPerCen (no se lee otra vez). */
     try {
@@ -122,8 +122,9 @@
       var t = d.tablas[nombre];
       var filas = await TablasDatos.filasDe(nombre, persona);
       if (!filas.length) continue;
-      var columnas = nombre === 'TUTORIAS' ? TablasDatos.COLUMNAS_TUTORIAS : t.cabecera;   /* la del Consejo: Sector, Cargo, Nombramiento, Cese */
-      html += '<div class="tablas-ficha-tabla"><div class="suave">' + U.escapar(nombre === 'TUTORIAS' ? 'Tutorías' : nombre) + '</div>' +
+      var esActividades = !!window.ActividadesTabla && nombre === ActividadesTabla.NOMBRE;   /* fila 311 */
+      var columnas = nombre === 'TUTORIAS' ? TablasDatos.COLUMNAS_TUTORIAS : (esActividades ? ActividadesTabla.columnasPara(filas) : t.cabecera);   /* la del Consejo: Sector, Cargo, Nombramiento, Cese */
+      html += '<div class="tablas-ficha-tabla"><div class="suave">' + U.escapar(nombre === 'TUTORIAS' ? 'Tutorías' : (esActividades ? 'Actividades extraescolares' : nombre)) + '</div>' +
         '<table class="tablas-ficha"><tr>' + columnas.map(function (c) { return '<th>' + U.escapar(c) + '</th>'; }).join('') + '</tr>' +
         filas.map(function (f) {
           return '<tr>' + TablasDatos.celdasDe(nombre, f, columnas).map(function (c) { return '<td>' + U.escapar(c) + '</td>'; }).join('') + '</tr>';
