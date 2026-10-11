@@ -115,6 +115,9 @@ Una vez por sesión, 30 segundos después de entrar, `Medidas.foto`:
   ese día pasado del `localStorage`. El buzón de hoy todavía no entiende las medidas (lo hará con
   la fila 6 de `fmargon780/soporte-apps`) y contesta `ok: false`: se guarda y se reintenta en la
   siguiente pasada. **Nunca se enseña nada en pantalla por esto**, ni aviso ni error.
+- El buzón rechaza unas medidas con un texto de más de 40 caracteres, una clave de más de 60, una
+  lista que no sea solo de números o de más de 20, o más de cinco niveles. Lo de arriba cabe de
+  sobra: los rótulos son cortos y la única lista son los siete cubos. No añadas nada que no quepa.
 - El cuerpo no pasa de 60.000 caracteres. Con la lista fija de rótulos no puede pasar; si pasara,
   se mandan solo `tiempos` y `foto`.
 - No se envía en la copia de pruebas (`demo=1`) ni bajo un navegador manejado por un programa
