@@ -382,7 +382,7 @@ o `os.availableParallelism() - 1`, entre 2 y 6), fallando si falla cualquiera; c
 línea de comandos (`node pruebas/ejecutar.mjs hito mesa`) solo corren las que coinciden en el
 nombre, para probar rápido lo que se está tocando mientras se trabaja una fila. Las que necesitan
 tiempos finos y no aguantan ir muy cargadas de CPU están en el `EN_SOLITARIO` del propio fichero, y
-corren solas, en serie, al final. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada
+corren solas, en serie, al final. Desde la fila 333 el ejecutor repite a solas la que falla en paralelo, y a esa lista no se añade ninguna más. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada
 pull request a `main`, con Ubuntu, Node 20 y Chromium instalado por Playwright. Desde la fila 148 no
 se lanza si el cambio solo toca `docs/` (`paths-ignore`), y dos subidas seguidas cancelan la primera
 (`concurrency`, `cancel-in-progress`).
