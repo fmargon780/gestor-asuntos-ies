@@ -173,6 +173,15 @@ paso a `main`).
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
 
+## Fila 327: `personalhecho=`
+
+- `?demo=1&auto=1&personalhecho=avisos|limpio|amano`: la carpeta del Centro de datos de mentira queda señalada sola, con permiso; su índice trae
+  `capacidades: ["hechos"]` y una parte del personal del curso de hoy (fichero y huella de verdad, `hecho` de mañana), hecha con el personal inventado de la
+  copia, y se toma como al entrar. `avisos`: más una persona sin DNI («Lozano Rey, Marina», Ordenanza, no docentes), una que sale en los dos listados y un aviso
+  del listado («falta la columna Teléfono»). `limpio`: sin avisos. `amano`: como `limpio`, y `RelPerCen <curso>.csv` apuntado a mano con fecha real de pasado
+  mañana y «Vega Soto, Lucas», que no está en la parte: manda el listado. Código: `js/demo/personal-hecho.js` (`Demo.personalHechoListo` avisa a las pruebas).
+  Sin el parámetro la demostración queda como siempre.
+
 ## Fila 324: `copiaalumnado=`
 
 - `?demo=1&auto=1&copiaalumnado=aldia|vieja|sinfecha`: este ordenador no tiene señalada la carpeta de la base de datos de alumnado y guarda una copia válida

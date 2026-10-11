@@ -188,7 +188,10 @@ var DatosQueTengo = (function () {
       var mod = await Carpetas.fechaFichero(d, f.fichero);
       var p = { id: 'personal:' + f.fichero, clave: 'personal', titulo: tituloPersonal(f.curso), nombre: f.fichero, hay: true,
         curso: f.curso, anterior: !!f.curso && f.curso !== curso, cuantos: num(f.filas) + (f.filas === 1 ? ' persona' : ' personas') };
-      ps.push(entrada(p, F[f.fichero], mod));
+      entrada(p, F[f.fichero], mod);
+      /* Fila 327: lo preparado por el Centro de datos lleva la fecha de su `generado`. */
+      if (f.hecho && f.generado && p.via) { p.fecha = f.generado; p.fechaEsDeLaCopia = false; }
+      ps.push(p);
     }
     ps.sort(function (a, b) { return (a.anterior ? 1 : 0) - (b.anterior ? 1 : 0); });
     if (!ps.length) ps.push({ id: 'personal', clave: 'personal', titulo: 'Personal', nombre: 'RelPerCen…csv', hay: false, cuantos: '' });
@@ -235,7 +238,14 @@ var DatosQueTengo = (function () {
     if ((r.indice.contrato || 1) > C.CONTRATO) return Object.assign(no, { estado: 'no-se-puede', frase: 'El Centro de datos es más nuevo que esta aplicación.', ambar: true });
     if (r.indice.ocupado) return Object.assign(no, { estado: 'no-se-puede', frase: C.RECOLOCANDO, ambar: true });
     var elegido = C.elegir(r.indice);
-    var pend = (await C.pendientes(r.indice, await C.leerApuntes(true), true)).filter(function (e) { return CLAVES_QUE_CUENTAN.indexOf(e.clave) !== -1; });
+    var apuntes = await C.leerApuntes(true);
+    var pend = (await C.pendientes(r.indice, apuntes, true)).filter(function (e) { return CLAVES_QUE_CUENTAN.indexOf(e.clave) !== -1; });
+    /* Fila 327: las partes del personal ya preparadas que se tomarían ahora. */
+    if (window.CentroDeDatosPersonal) {
+      CentroDeDatosPersonal.pendientes(r.indice, apuntes).forEach(function (h) {
+        pend.push({ clave: 'personal', parteDelPersonal: true, cursoEscolar: h.cursoEscolar, subido: h.hecho, fichero: h.ruta });
+      });
+    }
     return Object.assign(no, { estado: 'ok', pendientes: pend, elegidas: elegido.lista, avisos: elegido.avisos });
   }
 
@@ -259,7 +269,7 @@ var DatosQueTengo = (function () {
     c.pendientes.forEach(function (e) {
       var fila = null;
       if (e.clave === 'personal') {
-        var nombre = R.nombreDePersonal(e, c.elegidas);
+        var nombre = e.parteDelPersonal ? CentroDeDatosPersonal.nombreDe(e.cursoEscolar) : R.nombreDePersonal(e, c.elegidas);
         fila = personal.filter(function (f) { return f.hay && f.nombre === nombre; })[0] || primera;
       } else fila = filas.filter(function (f) { return f.clave === e.clave; })[0];
       if (fila) (por[fila.id] = por[fila.id] || []).push(e);

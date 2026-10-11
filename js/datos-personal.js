@@ -76,13 +76,78 @@
     return digitos || U.normalizar(nombre);
   }
 
+  /* Fila 327: las partes del personal que el Centro de datos ha preparado y se copiaron a `_GESTOR/datos`
+     (`PERSONAL-HECHO 26-27.json`). { curso: { nombre, parte } }, solo las que valen. Una rota se ignora. */
+  async function partesDelCentro(dirDatos) {
+    var salida = {};
+    if (!window.DatosPersonalHecho) return salida;
+    var lista = await Carpetas.ficheros(dirDatos);
+    for (var i = 0; i < lista.length; i++) {
+      var m = /^PERSONAL-HECHO (\d{2}-\d{2})\.json$/i.exec(lista[i].nombre);
+      if (!m) continue;
+      var parte = null;
+      try { parte = await Carpetas.leerJson(dirDatos, lista[i].nombre); } catch (e) { parte = null; }
+      if (DatosPersonalHecho.vale(parte)) { parte.cursoEscolar = m[1]; salida[m[1]] = { nombre: lista[i].nombre, parte: parte }; }
+    }
+    return salida;
+  }
+
+  /* Excepción de la fila 327: si un listado subido a mano de ese curso es más nuevo (por su fecha real, la de
+     «Lo que tengo ahora») que lo preparado por el Centro de datos, ese curso se lee del listado. Un RelPerCen sin
+     apunte, o con otra procedencia, nunca gana. No llama a `DatosQueTengo.estado()`: cargaría el personal. */
+  async function ganaLoSubidoAMano(csvsDelCurso, parte) {
+    if (!window.DatosQueTengo || !DatosQueTengo.fechaReal || !DatosQueTengo.leerApuntes) return false;
+    var generado = new Date(parte.generado || '').getTime() || 0;
+    var apuntes = (await DatosQueTengo.leerApuntes()).ficheros || {};
+    for (var i = 0; i < csvsDelCurso.length; i++) {
+      var ap = apuntes[csvsDelCurso[i].nombre];
+      if (!ap || ap.via !== 'a-mano') continue;
+      if ((await DatosQueTengo.fechaReal(csvsDelCurso[i].nombre)) > generado) return true;
+    }
+    return false;
+  }
+
   async function cargarPersonal(dirDatos) {
     if (I.CACHE.PERSONAL) return I.CACHE.PERSONAL;
 
     var ficheros = await ficherosQueEmpiezanPor(dirDatos, 'RelPerCen');
+    var partes = await partesDelCentro(dirDatos);
+    var delCentro = {};   /* los cursos que se leen de su parte */
+    for (var c0 in partes) {
+      var csvs = ficheros.filter(function (f) { return cursoDelFichero(f.nombre) === c0; });
+      if (!csvs.length || !(await ganaLoSubidoAMano(csvs, partes[c0].parte))) delCentro[c0] = partes[c0];
+    }
+    ficheros = ficheros.filter(function (f) { return !delCentro[cursoDelFichero(f.nombre)]; });
+
     var porPersona = {};
     var resumen = [];
     var cursoMasAlto = '';
+
+    /* Una persona de un fichero o de una parte: los datos buenos son los del curso más reciente en que sale. */
+    function anadir(curso, fila) {
+      var clave = clavePersona(fila.documento, fila.nombre);
+      if (!porPersona[clave]) {
+        porPersona[clave] = {
+          nombre: fila.nombre, documento: fila.documento, nif: '', referencia: '',
+          puesto: fila.puesto, fechaCese: fila.cese, enElCentro: false,
+          deSeneca: true, categoria: 'PERSONAL', campos: fila.campos,
+          cursos: [], cursoUltimo: ''
+        };
+      }
+      var r = porPersona[clave];
+      if (r.cursos.indexOf(curso) === -1) r.cursos.push(curso);
+      if (curso >= r.cursoUltimo) {
+        r.cursoUltimo = curso;
+        r.nombre = fila.nombre;
+        r.documento = fila.documento || r.documento;
+        r.puesto = fila.puesto;
+        r.fechaCese = fila.cese;
+        r.campos = fila.campos;
+        if (fila.tipoPersonal) r.tipoPersonal = fila.tipoPersonal; else delete r.tipoPersonal;
+        if (fila.puestos) r.puestos = fila.puestos; else delete r.puestos;
+        if (fila.sinDocumento) r.sinDocumento = true; else delete r.sinDocumento;
+      }
+    }
 
     for (var i = 0; i < ficheros.length; i++) {
       var nombreFichero = ficheros[i].nombre;
@@ -107,39 +172,30 @@
         var nombre = String(fila[iNombre] || '').trim();
         if (!nombre) continue;
         cuantas++;
-        var documento = String(fila[iDoc] || '').trim();
-        var puesto = iPuesto === -1 ? '' : String(fila[iPuesto] || '').trim();
-        var cese = iCese === -1 ? '' : String(fila[iCese] || '').trim();
         var campos = {};
         for (var c = 0; c < cab.length; c++) {
           var v = String(fila[c] === undefined ? '' : fila[c]).trim();
           if (v) campos[cab[c]] = v;
         }
-
-        var clave = clavePersona(documento, nombre);
-        if (!porPersona[clave]) {
-          porPersona[clave] = {
-            nombre: nombre, documento: documento, nif: '', referencia: '',
-            puesto: puesto, fechaCese: cese, enElCentro: false,
-            deSeneca: true, categoria: 'PERSONAL', campos: campos,
-            cursos: [], cursoUltimo: ''
-          };
-        }
-        var r = porPersona[clave];
-        if (r.cursos.indexOf(curso) === -1) r.cursos.push(curso);
-
-        /* Los datos buenos son los del fichero más reciente en que sale. */
-        if (curso >= r.cursoUltimo) {
-          r.cursoUltimo = curso;
-          r.nombre = nombre;
-          r.documento = documento || r.documento;
-          r.puesto = puesto;
-          r.fechaCese = cese;
-          r.campos = campos;
-        }
+        anadir(curso, {
+          nombre: nombre, documento: String(fila[iDoc] || '').trim(),
+          puesto: iPuesto === -1 ? '' : String(fila[iPuesto] || '').trim(),
+          cese: iCese === -1 ? '' : String(fila[iCese] || '').trim(), campos: campos
+        });
       }
       resumen.push({ fichero: nombreFichero, curso: curso, filas: cuantas });
     }
+
+    /* Fila 327: los cursos que se leen de su parte entran por el mismo camino. */
+    var avisos = [];
+    var cursosPartes = Object.keys(delCentro).sort();
+    cursosPartes.forEach(function (curso) {
+      if (curso > cursoMasAlto) cursoMasAlto = curso;
+      var filas = DatosPersonalHecho.filasDe(delCentro[curso].parte);
+      filas.forEach(function (fila) { anadir(curso, fila); });
+      resumen.push({ fichero: delCentro[curso].nombre, curso: curso, filas: filas.length, hecho: true, generado: delCentro[curso].parte.generado || '' });
+    });
+    if (delCentro[cursoMasAlto]) avisos = DatosPersonalHecho.avisosDe(delCentro[cursoMasAlto].parte);
 
     var lista = [];
     var vistos = {};
@@ -172,8 +228,8 @@
     lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
     I.CACHE.PERSONAL = {
       lista: lista,
-      fichero: ficheros.length ? ficheros[ficheros.length - 1].nombre : null,
-      ficheros: resumen, curso: cursoMasAlto,
+      fichero: resumen.length ? resumen[resumen.length - 1].fichero : null,
+      ficheros: resumen, curso: cursoMasAlto, avisos: avisos,
       manuales: manual.lista.length, enElCentro: enElCentro
     };
     return I.CACHE.PERSONAL;

@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '327', fecha: '2026-10-11', texto: 'El personal llega ya preparado del Centro de datos, y sus avisos salen en Ajustes → Problemas.' },
   { id: '326', fecha: '2026-10-11', texto: 'El botón «Soporte» es ahora el mismo en todas las aplicaciones. En Ajustes ya no hay bloque «Buzón de soporte».' },
   { id: '324', fecha: '2026-10-11', texto: 'El aviso de alumnado viejo mira ya la fecha real del listado, no el día en que se copió.' },
   { id: '325', fecha: '2026-10-10', texto: 'El Gestor se pone al día solo al pulsar «Entrar». Con la aplicación abierta ya no sale la franja amarilla: junto al número de versión sale «hay versión nueva», y se puede pulsar.' },
