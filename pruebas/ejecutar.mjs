@@ -19,12 +19,16 @@
    que van a la vez. Al final, un resumen: cuántas pasan, cuáles
    fallan y cuánto ha tardado la tanda entera.
 
+   Segundo intento (fila 333, docs/PRUEBAS-SEGUNDO-INTENTO-A-SOLAS.md): la prueba que falla en la tanda en
+   paralelo se repite una vez, a solas; si pasa, vale y el resumen la nombra.
+
    Se usa con `npm test`. Falla (código de salida distinto de 0) si
-   falla cualquiera de las pruebas. */
+   falla cualquiera de las pruebas (después del segundo intento). */
 import { spawn } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { aRepetir, decidir, lineasDelResumen, tituloSegundoIntento } from './apoyo/segundo-intento.mjs';
 
 const CARPETA = fileURLToPath(new URL('.', import.meta.url));
 const PUERTO = 8123;
@@ -46,7 +50,9 @@ const todasLasPruebas = readdirSync(CARPETA)
    - TOPE: 20. Si la lista pasa de 20 (o repite un nombre, o falta una fecha), este ejecutor se niega a
      arrancar y lo dice. Antes de añadir la número 21 hay que arreglar la frágil de verdad (esperar a una
      condición en vez de una pausa fija) o retirar otra.
-   - Una prueba que falla también EN SOLITARIO no va aquí: se arregla, o va a RETIRADAS. */
+   - Una prueba que falla también EN SOLITARIO no va aquí: se arregla, o va a RETIRADAS.
+   - DESDE LA FILA 333 (11-oct-2026) NO SE AÑADE NINGUNA MÁS: el ejecutor repite a solas, una vez, la que falla
+     en paralelo (más abajo), y eso hace el trabajo de esta lista. */
 const TOPE_EN_SOLITARIO = 20;
 const EN_SOLITARIO_ENTRADAS = [
   ['indice-del-expediente.mjs', 'antes del 7-oct-2026'], ['solo-consulta.mjs', 'antes del 7-oct-2026'],
@@ -174,6 +180,7 @@ const servidor = spawn('python3', ['-m', 'http.server', String(PUERTO)], {
 
 const empiezan = Date.now();
 let resultados = [];
+const segundosIntentos = [];
 try {
   if (!(await servidorListo())) {
     console.log('El servidor local no ha arrancado.');
@@ -195,16 +202,29 @@ try {
     if (!r.ok) console.log(r.fichero + ' ha fallado.');
     resultados.push(r);
   }
+
+  /* Segundo intento: las de la tanda en paralelo que han fallado, una por una, sin ninguna otra a la vez. */
+  const repetir = aRepetir(resultados.filter((r) => enParalelo.includes(r.fichero)), EN_SOLITARIO);
+  for (const fichero of repetir) {
+    const r = await ejecutarUna(fichero);
+    console.log('\n=== ' + tituloSegundoIntento(r.fichero) + ' ===');
+    process.stdout.write(r.salida);
+    if (!r.ok) console.log(r.fichero + ' ha fallado también a solas.');
+    segundosIntentos.push(r);
+  }
 } finally {
   servidor.kill();
 }
 
-const fallos = resultados.filter((r) => !r.ok).map((r) => r.fichero);
+const decision = decidir(resultados, segundosIntentos);
+resultados = decision.finales;
+const fallos = decision.fallos;
 const segundos = ((Date.now() - empiezan) / 1000).toFixed(1);
 
 console.log('\n' + resultados.length + ' pruebas, ' + (resultados.length - fallos.length) + ' bien, ' +
   fallos.length + ' fallos, ' + segundos + ' s.');
 if (fallos.length) console.log('Fallan: ' + fallos.join(', '));
+for (const l of lineasDelResumen(decision.recuperadas)) console.log(l);
 /* Las retiradas se enseñan siempre al final de la pasada completa (fila 302); sin ninguna, no se escribe nada. */
 if (!PALABRAS.length && RETIRADAS.length) {
   console.log('\n' + RETIRADAS.length + (RETIRADAS.length === 1 ? ' prueba retirada:' : ' pruebas retiradas:'));

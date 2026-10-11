@@ -17,11 +17,12 @@ Ya aplicado en `CLAUDE.md` en la fila 302. Se deja aquí por si hay que volver a
 
 3. Si en esa pasada falla una prueba: arréglalo y repite **solo esa prueba y las de lo que hayas
    vuelto a tocar**, no las 170. Y además:
-   - Una prueba que falla en la pasada completa y **en solitario pasa**, y no tiene que ver con tu
-     cambio, va a `EN_SOLITARIO` de `pruebas/ejecutar.mjs` con la fecha de hoy.
-   - **Tope: 20.** Si la lista ya tiene 20, no entra ninguna más (el ejecutor se niega a arrancar):
-     antes hay que arreglar de verdad una de las que están (esperar a una condición en vez de una
-     pausa fija) o retirar otra.
-   - Una prueba que falla **también en solitario** no va a `EN_SOLITARIO`. Si es de tu cambio, se
-     arregla. Si falla igual en `main` sin tu cambio, va a `RETIRADAS` con fecha y motivo, y se dice
-     en la nota de la fila en una línea.
+   - (11-oct-2026, fila 333, `docs/PRUEBAS-SEGUNDO-INTENTO-A-SOLAS.md`) El ejecutor repite solo, una
+     vez y a solas, cada prueba que falla en la tanda en paralelo. Si pasa en ese segundo intento,
+     la pasada sale en verde y no hay nada que apuntar ni que apartar: **a `EN_SOLITARIO` ya no se
+     añade ninguna prueba**.
+   - Excepción: si la que ha necesitado segundo intento es una prueba **de tu fila** (nueva, o que
+     has tocado), no vale. Arréglala para que espere a una condición y no a una pausa fija.
+   - Una prueba que falla **también en el segundo intento**: si es de tu cambio, se arregla. Si
+     falla igual en `main` sin tu cambio, va a `RETIRADAS` (mismo fichero) con fecha y motivo, y se
+     dice en la nota de la fila en una línea.
