@@ -173,6 +173,12 @@ paso a `main`).
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
 
+## Fila 329: Administraciones y `recibe=empresas`
+
+- La copia lleva cuatro Administraciones inventadas (`js/demo/datos-administraciones.js`): «Delegación de Mentira» (con un nombre oficial anterior y departamentos en dos niveles) y
+  «Servicio de Prueba», que dependen de «Consejería Inventada», y los centros «IES Ejemplo» (29000001) y «CEIP Falso» (29000002). La carpeta de mentira del Centro de datos recibe las dos
+  listas; `?recibe=empresas` solo las empresas (con `entregar=1` u otro de los parámetros de la fila 328 para que esté señalada), `?recibe=0` ninguna.
+
 ## Fila 328: `entregar=1`, `recibe=0`, `sinescribir=1`
 
 - Cualquiera de los tres deja la carpeta del Centro de datos de mentira **señalada antes de entrar** (sin ellos se señala a mano), con `entrada/` y un índice que dice que

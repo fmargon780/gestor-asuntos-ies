@@ -9,6 +9,7 @@
                                    recibe las empresas
      ...&recibe=0                  como `entregar=1`, pero el índice no
                                    trae `recibe` (lo pone js/demo/datos-centro-de-datos.js)
+     ...&recibe=empresas           (fila 329) solo recibe las empresas
      ...&sinescribir=1             como `entregar=1`, pero sin permiso de
                                    escribir hasta que se pide («Dar
                                    permiso» / «Arreglarlo»)
@@ -20,7 +21,7 @@
   'use strict';
   if (!window.Demo) return;
   function hay(n) { return new RegExp('(?:^|[?&])' + n + '=([^&]*)').exec(location.search); }
-  var entregar = !!hay('entregar'), recibe0 = (hay('recibe') || [])[1] === '0', sinEscribir = (hay('sinescribir') || [])[1] === '1';
+  var entregar = !!hay('entregar'), recibe0 = !!hay('recibe'), sinEscribir = (hay('sinescribir') || [])[1] === '1';
   if (!entregar && !recibe0 && !sinEscribir) return;
 
   /* Con `sinescribir=1`, la «Comprobación al entrar» saca su panel sola (como con carpetas sin permiso). */

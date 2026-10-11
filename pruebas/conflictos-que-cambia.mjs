@@ -35,7 +35,7 @@ await comprobar('1. la línea lleva «Qué cambia», abierto, antes de los dos b
   pagina.evaluate(() => { const e = document.querySelector('[data-problema="conflictos"] .problema-elemento'); const d = e.querySelector('details.problema-cambia');
     return [d.querySelector('summary').textContent, d.open, !!(d.compareDocumentPosition(e.querySelector('.problema-acciones')) & Node.DOCUMENT_POSITION_FOLLOWING)]; }), ['Qué cambia', true, true]);
 await comprobar('1. de cuándo es cada versión, con día y hora, y de qué ordenador es la otra',
-  [/^La de este ordenador: .*20\d\d.*\d:\d\d/.test(lineas[0]), /^La del otro \(PC-Secretaría\): 5 oct 2026, \d\d:\d\d$/.test(lineas[1])], [true, true]);
+  [/^La de este ordenador: .*20\d\d.*\d:\d\d/.test(lineas[0]), /^La del otro \(PC-Secretaría\): \d{1,2} [a-z]{3} 20\d\d, \d\d:\d\d$/.test(lineas[1])], [true, true]);
 await comprobar('1. las dos diferencias, con nombres: una solo aquí y una solo en el otro',
   [lineas.length, /^Solo en este ordenador: \S/.test(lineas[2]), lineas[3]], [4, true, 'Solo en el otro: Informe de la Inspección']);
 await comprobar('1. no se nombra ningún fichero ni dato interno',

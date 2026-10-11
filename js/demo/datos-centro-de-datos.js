@@ -88,7 +88,11 @@
     if (nucleo) { indice.capacidades = ['alumnado-bd']; indice.hechos = [{ clave: 'alumnado-bd', alDia: false }]; }
     /* Fila 328: `entrada/` (donde el Gestor deja su entrega) y, salvo con `?recibe=0`, lo que el Centro de datos dice que recibe. */
     await subcarpeta(dir, 'entrada');
-    if (!/(^|[?&])recibe=0(&|$)/.test(location.search)) indice.recibe = [{ conjunto: 'empresas', de: 'gestor-asuntos-ies', entrega: 1, entero: true }];
+    var recibe = (/(?:^|[?&])recibe=([^&]*)/.exec(location.search) || [])[1];   /* `0`: ninguna; `empresas`: solo las empresas (fila 329) */
+    if (recibe !== '0') {
+      indice.recibe = ['empresas', 'administraciones'].filter(function (c) { return recibe === undefined || recibe === c; })
+        .map(function (c) { return { conjunto: c, de: 'gestor-asuntos-ies', entrega: 1, entero: true }; });
+    }
     await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify(indice));
   }
 

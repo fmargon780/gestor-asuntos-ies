@@ -102,6 +102,8 @@
       ['Suministros Dobla Norte, S.L.', 'Dobla Norte', 'b12345678', '', '950666000', '']
     ]));
 
+    if (window.Demo.administraciones) await Demo.administraciones.escribir(d);   /* fila 329: cuatro Administraciones inventadas */
+
     /* Fila 238: dos ficheros del Consejo Escolar (como los da Séneca: el de
        2024-2025 con Cese antes que Nombramiento y un asterisco en HTML pegado
        a la cabecera), en `Tablas`. Nombres inventados. */

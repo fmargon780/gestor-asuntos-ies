@@ -50,6 +50,10 @@ Se comprueba con `pruebas/dni-personal.mjs` (sin navegador, con un contexto de m
 
 `js/centro-de-datos-entregar.js` (`CentroDeDatosEntregar`) deja la lista entera de `empresas.csv` en `entrada/ENTREGA empresas gestor-asuntos-ies.json` de la carpeta del Centro de datos. Se mira al entrar (tras `CentroDeDatos.traer`) y 5 s después del último cambio de la lista (`Datos.alCambiarLista`, que llama `js/datos-listas.js`); solo entrega el ordenador con la carpeta señalada y permiso de escribir, solo si el índice trae `recibe` con las empresas y solo si la huella de los datos cambió (`entregado.empresas` en `_GESTOR/centro-de-datos.json`). De tener empresas a ninguna no se entrega sola. Ajustes → Este ordenador dice cómo va; «Entregar ahora» es la reserva. Prueba: `pruebas/centro-de-datos-entregar.mjs`. Demostración: `?entregar=1`, `?recibe=0`, `?sinescribir=1`.
 
+### Las Administraciones, entregadas al Centro de datos (11-oct-2026, fila 329)
+
+La segunda lista de `js/centro-de-datos-entregar.js` (misma mecánica que las empresas, cada una por separado): sale de `administraciones.json` (no de un CSV) y `Administraciones.paraEntregar(d)` (`js/administraciones.js`) da los registros (`id` del organismo, árbol de departamentos aplanado con `nivel` y `dependeDe`). `Administraciones.cambiar` avisa por `Datos.alCambiarLista` cuando de verdad escribe. Ajustes dice una línea por lista, un solo «Dar permiso» y «Entregar ahora» entrega todo con una frase por lista. Prueba: `pruebas/centro-de-datos-entregar-administraciones.mjs`. Demostración: cuatro Administraciones (`js/demo/datos-administraciones.js`) y `?recibe=empresas`.
+
 ### El nombre comercial de las empresas
 
 Columna adicional en el alta. El buscador encuentra al proveedor por cualquiera de los dos

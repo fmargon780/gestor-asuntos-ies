@@ -74,7 +74,7 @@ var CentroDeDatosVer = (function () {
     if (centro && !$('bloque-centro-de-datos')) {
       var det = bloque('bloque-centro-de-datos', 'Carpeta del Centro de datos', 'De dónde salen los listados de Séneca, en este ordenador',
         '<p class="explica">Señala la carpeta «CENTRO DE DATOS» de Google Drive para ordenador, la que tiene ' +
-        '<code>indice.json</code>. Es de este ordenador: el otro usa lo que traiga este. Aquí se leen los listados; lo único que se escribe es la lista de empresas, en su carpeta «entrada».</p>' +
+        '<code>indice.json</code>. Es de este ordenador: el otro usa lo que traiga este. Aquí se leen los listados; lo único que se escribe son las listas de empresas y de Administraciones, en su carpeta «entrada».</p>' +
         '<p class="explica" id="centro-de-datos-carpeta"></p>' +
         '<div class="alta-tipo"><button type="button" class="boton" id="centro-de-datos-senalar">Señalar la carpeta</button>' +
         '<button type="button" class="boton" id="centro-de-datos-olvidar">Olvidarla</button>' +
@@ -82,9 +82,11 @@ var CentroDeDatosVer = (function () {
         '<p class="explica" id="centro-de-datos-indice"></p>' +
         '<p class="suave oculto" id="centro-de-datos-ocupado"></p>' +
         '<p class="explica oculto" id="centro-de-datos-entrega"></p>' +
+        '<p class="explica oculto" id="centro-de-datos-entrega-administraciones"></p>' +
         '<div class="alta-tipo oculto" id="centro-de-datos-entrega-botones">' +
         '<button type="button" class="boton oculto" id="centro-entrega-permiso">Dar permiso</button>' +
-        '<button type="button" class="boton oculto" id="centro-entrega-vacia">Entregar la lista vacía</button>' +
+        '<button type="button" class="boton oculto" id="centro-entrega-vacia">Entregar la lista vacía de empresas</button>' +
+        '<button type="button" class="boton oculto" id="centro-entrega-vacia-administraciones">Entregar la lista vacía de Administraciones</button>' +
         '<button type="button" class="boton" id="centro-entrega-ahora">Entregar ahora</button></div>' +
         '<div class="aviso aviso-ambar oculto" id="centro-de-datos-aviso"></div>' +
         '<p class="explica"><button type="button" class="enlace" id="centro-enlace-lo-que-tengo">Ver todo lo que tengo</button></p>');
@@ -99,7 +101,8 @@ var CentroDeDatosVer = (function () {
         if (d && (await CentroDeDatos.pedirPermisos(d))) { await CentroDeDatosEntregar.mirar({}); }
         pintar();
       };
-      $('centro-entrega-vacia').onclick = function () { return U.mientrasGuarda($('centro-entrega-vacia'), function () { return CentroDeDatosEntregar.entregarAhora({ vacia: true }); }); };
+      $('centro-entrega-vacia').onclick = function () { return U.mientrasGuarda($('centro-entrega-vacia'), function () { return CentroDeDatosEntregar.entregarAhora({ vacia: 'empresas' }); }); };
+      $('centro-entrega-vacia-administraciones').onclick = function () { return U.mientrasGuarda($('centro-entrega-vacia-administraciones'), function () { return CentroDeDatosEntregar.entregarAhora({ vacia: 'administraciones' }); }); };
       $('centro-entrega-ahora').onclick = function () { return U.mientrasGuarda($('centro-entrega-ahora'), function () { return CentroDeDatosEntregar.entregarAhora({}); }); };
       $('centro-de-datos-permiso').onclick = async function () {
         var d = await CentroDeDatos.carpeta();
@@ -149,22 +152,24 @@ var CentroDeDatosVer = (function () {
     var ocupadoP = $('centro-de-datos-ocupado');
     if (ocupadoP && visible) { ocupadoP.textContent = ocupado ? CentroDeDatos.RECOLOCANDO : ''; ocupadoP.classList.toggle('oculto', !ocupado); }
     if (aviso) { aviso.textContent = ambar; aviso.classList.toggle('oculto', !ambar); }
-    /* Fila 328: la línea de las empresas entregadas (solo mira; nunca pide permiso). */
+    /* Filas 328 y 329: una línea por lista que el Gestor entrega (solo mira; nunca pide permiso). */
     var entregaP = $('centro-de-datos-entrega');
     if (entregaP && visible && window.CentroDeDatosEntregar) {
-      var est = null;
-      try { est = await CentroDeDatosEntregar.estadoParaAjustes(); } catch (e) { est = null; }
-      var texto2 = est ? est.texto : '';
-      if (entregaP.textContent !== texto2) entregaP.textContent = texto2;
-      entregaP.classList.toggle('oculto', !est);
+      var ests = {};
+      try { ests = await CentroDeDatosEntregar.estadosParaAjustes(); } catch (e) { ests = {}; }
+      [['empresas', 'centro-de-datos-entrega', 'centro-entrega-vacia'], ['administraciones', 'centro-de-datos-entrega-administraciones', 'centro-entrega-vacia-administraciones']].forEach(function (l) {
+        var est = ests[l[0]] || null, p = $(l[1]);
+        if (!p) return;
+        var texto2 = est ? est.texto : '';
+        if (p.textContent !== texto2) p.textContent = texto2;
+        p.classList.toggle('oculto', !est);
+        $(l[2]).classList.toggle('oculto', !(est && est.boton === 'vacia'));
+      });
       var botonesE = $('centro-de-datos-entrega-botones');
       if (botonesE) botonesE.classList.toggle('oculto', !dir);
-      $('centro-entrega-permiso').classList.toggle('oculto', !(est && est.boton === 'permiso'));
-      $('centro-entrega-vacia').classList.toggle('oculto', !(est && est.boton === 'vacia'));
+      /* «Dar permiso» sale una sola vez, no una por línea. */
+      $('centro-entrega-permiso').classList.toggle('oculto', !Object.keys(ests).some(function (k) { return ests[k] && ests[k].boton === 'permiso'; }));
     }
-    if (permiso) permiso.classList.toggle('oculto', !(dir && !conPermiso));
-    var olv = $('centro-de-datos-olvidar');
-    if (olv) olv.classList.toggle('oculto', !dir);
   }
 
   /* ---------- las líneas y el botón de Herramientas ---------- */

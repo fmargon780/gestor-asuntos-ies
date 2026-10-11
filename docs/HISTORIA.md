@@ -5178,3 +5178,7 @@ El Gestor lee las partes del personal que el Centro de datos deja en `hecho/pers
 ## 11-oct-2026 · fila 328 · el Gestor entrega sus empresas al Centro de datos
 
 El Gestor deja la lista entera de empresas en `entrada/ENTREGA empresas gestor-asuntos-ies.json` del Centro de datos, sola, cuando el índice dice que la recibe. La carpeta pasa a pedirse para leer y escribir (si se niega escribir, queda con leer). El acuerdo (`recibe`, forma del fichero, `id`) está copiado en `docs/CENTRO-DE-DATOS-CONTRATO-2.md`, porque la fila 23 del Centro de datos no se pudo consultar. Decisiones: «Entregar ahora» está en el bloque de Ajustes junto a su línea; la copia de pruebas necesita `entregar=1` (u otro de los dos parámetros) para tener la carpeta señalada; la huella se calcula en el propio módulo (SHA-256).
+
+## 11-oct-2026 · fila 329 · el Gestor entrega también sus Administraciones al Centro de datos
+
+Segunda lista del camino de la fila 328: `administraciones.json` (con el árbol de departamentos aplanado y los nombres anteriores) se entrega entera en `entrada/ENTREGA administraciones gestor-asuntos-ies.json`, cada lista por separado, con el índice leído una vez. El acuerdo está copiado en `docs/CENTRO-DE-DATOS-CONTRATO-2.md` porque la fila 24 del Centro de datos no se pudo consultar. `Administraciones.paraEntregar` vive en `js/administraciones.js` (541 líneas).
