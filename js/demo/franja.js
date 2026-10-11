@@ -70,6 +70,7 @@
 
       ponerFranja();
       if (Demo.prepararMasNuevo) Demo.prepararMasNuevo(disco);   /* fila 319: `masnuevo=`, sin esperar */
+      if (Demo.prepararPersonalHecho) Demo.prepararPersonalHecho(disco);   /* fila 327: `personalhecho=`, sin esperar */
     } catch (e) {
       entrando = false;
       if (boton) { boton.disabled = false; boton.textContent = 'Entrar con datos de demostración'; }

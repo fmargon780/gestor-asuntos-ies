@@ -246,7 +246,44 @@ var ProblemasTextos = (function () {
     };
   }
 
+  /* Fila 327: los avisos del personal que deja el Centro de datos. `elementos`: [{ nombre, detalle }]. Cada línea
+     lleva datos de una persona: estas tarjetas nunca llevan «Avisar por Soporte». */
+  var PASOS_PERSONAL = ['Corregirlo en Séneca.', 'Bajar otra vez el listado de personal.', 'Soltarlo en el Centro de datos.'];
+  var MIRAR_PERSONAL = { texto: 'Vuelve a mirar', cambia: false, id: 'problema-personal-mirar',
+    explica: 'Trae lo nuevo del Centro de datos y comprueba otra vez.' };
+
+  function personalSinDni(elementos) {
+    var n = elementos.length;
+    return {
+      titulo: n === 1 ? '1 persona del personal viene sin DNI' : n + ' personas del personal vienen sin DNI',
+      que: 'Sale en la aplicación solo con su nombre y su puesto.',
+      porque: 'En el listado de personal de Séneca no trae DNI ni pasaporte.',
+      pasos: PASOS_PERSONAL, elementos: elementos, acciones: [Object.assign({}, MIRAR_PERSONAL)]
+    };
+  }
+
+  function personalDosListados(elementos) {
+    var n = elementos.length;
+    return {
+      titulo: n === 1 ? '1 persona sale como docente y como no docente' : n + ' personas salen como docente y como no docente',
+      que: 'La aplicación no sabe si es docente o no docente.',
+      porque: 'En Séneca está en el listado de docentes y en el de no docentes del mismo curso.',
+      pasos: PASOS_PERSONAL, elementos: elementos, acciones: [Object.assign({}, MIRAR_PERSONAL)]
+    };
+  }
+
+  function personalListado(elementos) {
+    var n = elementos.length;
+    return {
+      titulo: n === 1 ? 'Un listado de personal trae algo que revisar' : n + ' avisos de los listados de personal',
+      que: 'El Centro de datos dejó dicho algo al leer el listado.',
+      porque: 'Lo dice el propio listado; puede faltarle una columna o traer una fila rara.',
+      pasos: PASOS_PERSONAL, elementos: elementos, acciones: [Object.assign({}, MIRAR_PERSONAL)]
+    };
+  }
+
   return {
+    personalSinDni: personalSinDni, personalDosListados: personalDosListados, personalListado: personalListado,
     NO_SE_SABE: NO_SE_SABE, QUIEN: QUIEN, plural: plural,
     alumnado: alumnado, carpetas: carpetas, hitos: hitos, conflictos: conflictos, conservacion: conservacion,
     envolturas: envolturas, bandeja: bandeja, script: script, rutas: rutas, configurar: configurar,

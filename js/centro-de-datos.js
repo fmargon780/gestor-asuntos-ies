@@ -154,7 +154,8 @@ var CentroDeDatos = (function () {
   function apunteDe(apuntes, clave) {
     var mejor = null;
     Object.keys((apuntes && apuntes.tomado) || {}).forEach(function (k) {
-      if (k.split('|')[0] !== clave) return;
+      var deClave = k.split('|')[0];
+      if (deClave !== clave && !(clave === 'personal' && deClave === 'hecho-personal')) return;   /* fila 327 */
       var a = apuntes.tomado[k];
       if (!mejor || new Date(a.subido) > new Date(mejor.subido)) mejor = a;
     });
@@ -189,7 +190,13 @@ var CentroDeDatos = (function () {
       if (l.length > 1) { avisos.push('En el Centro de datos hay más de un listado de ' + nombre + '. No he traído ninguno.'); return []; }
       return l;
     };
-    var elegidas = [].concat(unica('alumnado', 'alumnado'), unica('alumnado-bd', 'alumnado de la base de datos'), de('personal'),
+    /* Fila 327: un listado de personal de un curso que ya viene preparado (parte del índice) no se toma en bruto. */
+    var conParte = {};
+    if (window.CentroDeDatosPersonal) {
+      CentroDeDatosPersonal.partes(indice).forEach(function (h) { if (!(Number(h.acuerdoHecho) > 1)) conParte[h.cursoEscolar] = true; });
+    }
+    var personalEnBruto = de('personal').filter(function (e) { return !(e.cursoEscolar && conParte[e.cursoEscolar]); });
+    var elegidas = [].concat(unica('alumnado', 'alumnado'), unica('alumnado-bd', 'alumnado de la base de datos'), personalEnBruto,
       delCurso('tutorias'), de('consejo-escolar'), delCurso('registro-entrada'), delCurso('registro-salida'));
     var lista = todas.filter(function (e) { return elegidas.indexOf(e) !== -1; });   /* en el orden del índice */
     return { lista: lista, avisos: avisos, cursoActual: cursoActual };
@@ -315,8 +322,20 @@ var CentroDeDatos = (function () {
           salida.fallos.push((TITULOS[e.clave] || e.clave) + ': ' + U.mensajeDeError(x));
         }
       }
+      /* Fila 327: el personal ya preparado, después de los listados. */
+      var delPersonal = null;
+      if (window.CentroDeDatosPersonal) {
+        try { delPersonal = await CentroDeDatosPersonal.tomar(dir, r.indice, apuntes, op, ctx); }
+        catch (x) { salida.fallos.push('Personal: ' + U.mensajeDeError(x)); }
+      }
+      if (delPersonal) {
+        Object.keys(delPersonal.nuevos).forEach(function (k) { nuevos[k] = delPersonal.nuevos[k]; });
+        delPersonal.fallos.forEach(function (f) { salida.fallos.push(f); });
+        if (delPersonal.cursos.length) salida.tomados.push('personal');
+      }
       await R.terminar(ctx);
       await apuntar(nuevos);
+      if (delPersonal && delPersonal.cursos.length && window.Problemas) Problemas.recalcular('personal');   /* fila 327: sus avisos */
       salida.ok = true;
       salida.esperaRegistro = esperaRegistro;
       if (salida.tomados.length || salida.configuracion) {
@@ -328,6 +347,7 @@ var CentroDeDatos = (function () {
             partes.push(TITULOS[e.clave] + ' (' + fechaCorta(e.subido, false) + ')');
           }
         });
+        if (delPersonal && delPersonal.cursos.length && !vistos.personal) partes.push(TITULOS.personal + ' (' + fechaCorta(delPersonal.subido, false) + ')');
         avisarTraido(partes, config);
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');
