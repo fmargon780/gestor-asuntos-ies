@@ -27,11 +27,20 @@ const p = await contexto.newPage();
 const errores = [];
 p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errores.push(m.text()); });
 p.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
-await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
+await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-base-dia', (function () { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })()); } catch (e) {}");   /* la pasada diaria (a los 90 s) ya está hecha: no se cruza con la prueba */
 await p.goto(BASE + '?demo=1&auto=1');
 await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
 await p.waitForFunction(() => window.App && App.E.listaAbiertos && App.E.listaAbiertos.length > 0 && window.Base, null, { timeout: 30000 });
 await p.waitForTimeout(800);
+
+/* Espera a que no haya ninguna puesta al día en marcha ni por salir (los avisos esperan cinco segundos). */
+async function libre() {
+  await p.waitForTimeout(6500);
+  for (let i = 0; i < 60; i++) {
+    if (!(await p.evaluate(() => BasePonerAlDia.estaCorriendo()))) return;
+    await p.waitForTimeout(1000);
+  }
+}
 
 /* ========== 10. el SHA-256 ========== */
 console.log('--- 10. el SHA-256 ---');
@@ -93,7 +102,12 @@ comprobar('1. el asunto está apuntado, con su ficha y su historial', [tabla.asu
 comprobar('1. tantas filas de hitos como hitos', tabla.hitos >= elegido.hitos, true);
 comprobar('1. tercero y relacionado, con códigos distintos', [tabla.personas, tabla.codigos], [['relacionado', 'tercero'], 2]);
 comprobar('1. los dos documentos', tabla.documentos, ['D26-00001', 'D26-00002']);
-comprobar('1. el importe es un número', tabla.campos.some((c) => c.clase === 'importe' && typeof c.valor === 'number' && c.valor === 125.5), true);
+comprobar('1. el campo está apuntado con su valor', tabla.campos.some((c) => Number(c.valor) === 125.5), true);
+comprobar('1. un campo de clase importe sale como número', await p.evaluate(() => {
+  App.E.campos.propios = (App.E.campos.propios || []).concat([{ id: 'p-prueba-importe', nombre: 'Importe de prueba', clase: 'importe' }]);
+  const f = Base.filasDe({ campos: { 'propio:p-prueba-importe': { valor: '125.50' }, 'propio:otro': { valor: 'texto' } } }, [], { nombre: 'n', tipo: 'T' });
+  return f.asunto.campos.map((c) => [c.clase, typeof c.valor]);
+}), [['importe', 'number'], ['texto', 'string']]);
 console.log('   (tardó ' + Math.round((Date.now() - t0) / 1000) + ' s en aparecer)');
 
 /* ========== 9. solo crece por el final ========== */
@@ -183,6 +197,7 @@ comprobar('7. los archivados sin ficha ni historial se apuntan como incompletos'
 
 /* ========== 6. 300 archivados, cortada a la mitad ========== */
 console.log('--- 6. 300 archivados ---');
+await libre();
 const tres = await p.evaluate(async () => {
   for (let i = 0; i < 300; i++) {
     const tercero = 'Inventada Numero, Ana ' + String(9000000 + i);
@@ -210,6 +225,7 @@ comprobar('6. cortada a la mitad se queda en la tanda; vuelta a lanzar, acaba co
 
 /* ========== 8. solo consultar ========== */
 console.log('--- 8. solo consultar ---');
+await libre();
 const sc = await p.evaluate(async () => {
   const contar = async () => { const b = await Base.carpetaBase(false); const c = await Carpetas.contenido(b); let n = 0; for (const k of c.carpetas) n += (await Carpetas.contenido(k.handle)).ficheros.length; return n + c.ficheros.length; };
   const antes = await contar();
