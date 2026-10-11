@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 326 | 110 | Módulo pequeño que presenta la app y pide el botón único a Google, quitar el botón copiado, el bloque de Ajustes y lo que copiaba la dirección del buzón, borrar el programa del buzón y sus pruebas; prueba nueva con botón de mentira, una comprobación con el de verdad y revisor |
 | 331 | 45 | Solo configuración y reglas: `vercel.json`, borrar el guion y su prueba, prueba corta nueva, cuatro documentos de reglas, pasada completa de pruebas una vez y las comprobaciones con Vercel (dos esperas de tres minutos); sin revisor de pantalla |
 | 327 | 150 | Tres módulos nuevos (tomar las partes del personal, convertirlas en las filas de hoy, tarjetas de Problemas), la regla curso por curso con la subida a mano, filas nuevas en «Lo que tengo ahora», tres variantes en la demostración, prueba nueva de doce puntos y revisor |
 | 328 | 110 | Módulo nuevo que monta la entrega de empresas y la escribe en la carpeta del Centro de datos; permiso de escribir además del de leer en tres sitios; línea y botones en Ajustes; fila ámbar en la comprobación al entrar; dos parámetros nuevos en la demostración, prueba nueva y revisor |
