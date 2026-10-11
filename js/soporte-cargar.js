@@ -24,6 +24,7 @@
 
   var REPO = 'fmargon780/gestor-asuntos-ies';
   var DIRECCION = 'https://script.google.com/macros/s/AKfycbz2LFRhlvnlUjr_QZFW5cuY3ayE-wmXCCg1TdtUCNDJ6SEosNMetkZP6muz1NVwFDMXhQ/exec?boton=1&repo=' + REPO;
+  window.SoporteCargar = { buzon: DIRECCION.split('?')[0] };   /* fila 332: la dirección del buzón, sin lo de después de «?» (la usa js/medidas-enviar.js) */
   var CADA_MS = 10 * 60 * 1000;
   var MAX_ERRORES = 20;
   var LARGO_ERROR = 300;

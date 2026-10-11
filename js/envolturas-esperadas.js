@@ -55,6 +55,10 @@
     { fichero: 'hitos-archivo.js', nombre: 'App.reabrirAsunto' },
     { fichero: 'hitos-panel.js', nombre: 'App.abrirFicha' },
     { fichero: 'hitos.js', nombre: 'App.anotar' },
+    { fichero: 'medidas-enganches.js', nombre: 'App.abrirFicha' },   /* fila 332 */
+    { fichero: 'medidas-enganches.js', nombre: 'App.cerrarAsunto' },
+    { fichero: 'medidas-enganches.js', nombre: 'App.reabrirAsunto' },
+    { fichero: 'medidas-enganches.js', nombre: 'App.verAbiertos' },
     { fichero: 'otros-del-tercero.js', nombre: 'App.abrirFicha' },
     { fichero: 'papelera.js', nombre: 'App.tarjetaSuelto' },
     { fichero: 'papelera.js', nombre: 'App.verFicha' },

@@ -281,10 +281,12 @@ var U = (function () {
   }
 
   function fallo(texto, e) {
+    if (window.Medidas) Medidas.cuentaError('fallo', e);   /* fila 332 */
     avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'malo');
   }
 
   function accesorio(texto, e) {
+    if (window.Medidas) Medidas.cuentaError('accesorio', e);   /* fila 332 */
     avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'ambar');
   }
 
@@ -360,6 +362,21 @@ var U = (function () {
      La parte al azar lleva más letras que la de cada sitio por
      separado (tres, antes): con solo tres, muchos creados en el mismo
      milisegundo (una lista entera, de golpe) sí llegaban a chocar. */
+  /* Fila 332 (regla 5.2 de docs/PLAN-DATOS-DEL-GESTOR.md): el identificador de ESTE ordenador, seis caracteres al azar
+     ([a-z0-9]) guardados en localStorage (`gestor-ordenador`). No es un nombre de persona ni de máquina. */
+  var _ordenador = '';
+  function ordenador() {
+    try {
+      var v = window.localStorage.getItem('gestor-ordenador');
+      if (/^[a-z0-9]{6}$/.test(v || '')) return v;
+    } catch (e) { /* sin memoria del navegador: uno por sesión */ }
+    if (!_ordenador) {
+      for (var i = 0; i < 6; i++) _ordenador += 'abcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 36));
+      try { window.localStorage.setItem('gestor-ordenador', _ordenador); } catch (e) { /* se queda en memoria */ }
+    }
+    return _ordenador;
+  }
+
   function nuevoId(prefijo) {
     return prefijo + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
   }
@@ -373,6 +390,6 @@ var U = (function () {
     fallo: fallo, accesorio: accesorio,
     mientrasGuarda: mientrasGuarda,
     envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas,
-    nuevoId: nuevoId
+    nuevoId: nuevoId, ordenador: ordenador
   };
 })();

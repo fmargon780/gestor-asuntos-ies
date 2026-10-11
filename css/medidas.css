@@ -1,0 +1,5 @@
+/* La tarjeta «Medidas» de Herramientas (fila 332, js/medidas-pantalla.js): una tabla a todo el ancho. */
+.medidas-tabla { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+.medidas-tabla th, .medidas-tabla td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.medidas-tabla th { font-weight: 600; color: var(--azul); }
+.medidas-tabla td:nth-child(2), .medidas-tabla th:nth-child(2) { text-align: right; width: 80px; }

@@ -37,11 +37,13 @@ var Reintentar = (function () {
   /* `intento` es una función que hace la escritura ENTERA, desde pedir
      el manejador del fichero: así cada reintento pide uno nuevo, en
      vez de reutilizar uno que ya ha dejado de servir. */
-  async function escritura(intento) {
+  async function escritura(intento, dir, nombre) {
     for (var i = 0; i <= ESPERAS_MS.length; i++) {
       try {
         return await intento();
       } catch (e) {
+        /* Fila 332: cuántas veces se reintenta y cuántas se rinde (`nombre`: solo al escribir; el rótulo sale de una tabla fija). */
+        if (window.Medidas && nombre !== undefined && esErrorDeSincronizacion(e)) Medidas.cuenta((i === ESPERAS_MS.length ? 'sin-remedio:' : 'reintento:') + Medidas.rotuloDeFichero(dir, nombre));
         if (!esErrorDeSincronizacion(e) || i === ESPERAS_MS.length) throw e;
         await esperar(ESPERAS_MS[i]);
       }

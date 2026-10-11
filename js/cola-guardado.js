@@ -31,9 +31,10 @@ var ColaGuardado = (function () {
   var enMarcha = 0;
 
   function poner(fichero, fn) {
+    var medida = window.Medidas ? Medidas.cola(fichero) : null;   /* fila 332: lo que espera y lo que dura */
     enMarcha++;
     var previa = colas[fichero] || Promise.resolve();
-    var esta = previa.then(function () { return fn(); });
+    var esta = previa.then(function () { return medida ? medida.correr(fn) : fn(); });
     var fin = esta.then(function () {}, function () {}).then(function () {
       enMarcha--;
       if (colas[fichero] === fin) delete colas[fichero];

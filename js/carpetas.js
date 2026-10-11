@@ -497,12 +497,13 @@ var Carpetas = (function () {
   /* Reintenta si Dropbox está tocando el fichero justo al leerlo
      (NotReadableError, fila 99, docs/GUARDAR-EN-FILA.md): antes, eso
      tumbaba el segundo paso de las acciones encadenadas. */
-  function leerTexto(dir, nombre) {
+  function leerTextoSinMedir(dir, nombre) {
     if (window.Reintentar && window.Reintentar.lectura) {
       return window.Reintentar.lectura(function () { return leerTextoUnaVez(dir, nombre); });
     }
     return leerTextoUnaVez(dir, nombre);
   }
+  var leerTexto = window.Medidas ? Medidas.fichero('leer', leerTextoSinMedir) : leerTextoSinMedir;   /* fila 332: cuánto tarda */
 
   async function leerTextoUnaVez(dir, nombre) {
     try {
@@ -527,41 +528,40 @@ var Carpetas = (function () {
      Si el módulo no se ha cargado, escribe sin reintento: nunca un
      «Reintentar is not defined» que deja la aplicación sin poder guardar
      nada (fila 92, docs/NADA-SE-GUARDA-REINTENTAR.md). */
-  function conReintento(intento) {
-    if (window.Reintentar && window.Reintentar.escritura) return window.Reintentar.escritura(intento);
+  function conReintento(intento, dir, nombre) {
+    if (window.Reintentar && window.Reintentar.escritura) return window.Reintentar.escritura(intento, dir, nombre);
     return intento();
   }
 
-  function escribirTexto(dir, nombre, texto) {
+  function escribirTextoSinMedir(dir, nombre, texto) {
     return conReintento(async function () {
       var h = await dir.getFileHandle(nombre, { create: true });
       var w = await h.createWritable();
       await w.write(new Blob([texto], { type: 'text/plain;charset=utf-8' }));
       await w.close();
       return true;
-    });
+    }, dir, nombre);
   }
+  var escribirTexto = window.Medidas ? Medidas.fichero('escribir', escribirTextoSinMedir) : escribirTextoSinMedir;   /* fila 332 */
 
   /* Como escribirTexto, pero para bytes cualquiera: un PDF nuevo, por
      ejemplo (17-sep-2026, fila 22, separar y unir PDF). */
-  function escribirBytes(dir, nombre, bytes, tipo) {
+  function escribirBytesSinMedir(dir, nombre, bytes, tipo) {
     return conReintento(async function () {
       var h = await dir.getFileHandle(nombre, { create: true });
       var w = await h.createWritable();
       await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
       await w.close();
       return true;
-    });
+    }, dir, nombre);
   }
+  var escribirBytes = window.Medidas ? Medidas.fichero('escribir', escribirBytesSinMedir) : escribirBytesSinMedir;   /* fila 332 */
 
-  /* Distingue "no existe" de "no se puede leer". Si el fichero no está,
-     devuelve null: es lo normal la primera vez que arranca la
-     aplicación. Si el fichero está pero no se puede interpretar como
-     JSON, es que se ha estropeado (un corte a mitad de guardar, un
-     conflicto de Dropbox mal resuelto a mano), y entonces se lanza un
-     error con nombre FicheroRoto en vez de devolver null: devolver null
-     ahí haría que el siguiente guardado lo escribiera encima, y se
-     perdería todo. */
+  /* Distingue "no existe" de "no se puede leer". Sin fichero devuelve null
+     (lo normal la primera vez). Si está pero no es JSON (un corte a mitad de
+     guardar, un conflicto de Dropbox mal resuelto a mano) se lanza un error
+     FicheroRoto en vez de devolver null: así el siguiente guardado no lo
+     escribe encima y no se pierde todo. */
   async function leerJson(dir, nombre) {
     var t = await leerTexto(dir, nombre);
     if (t === null) return null;
