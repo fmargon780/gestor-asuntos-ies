@@ -265,3 +265,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 328 — las empresas, entregadas al Centro de datos (11-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: al pulsar «Entrar» el navegador pide permiso para editar la carpeta; aceptarlo. Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Empresas entregadas al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Empresas: …» con el mismo número.
+
+## Fila 329 — las Administraciones, entregadas al Centro de datos (11-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Administraciones entregadas al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Administraciones: …» con el mismo número.
