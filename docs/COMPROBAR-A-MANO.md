@@ -261,3 +261,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 327 — el personal ya preparado (11-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: Herramientas → «Traer el alumnado»; la fila «Personal 26-27» dice que lo hace el propio Centro de datos y trae las mismas personas que la página del Centro de datos.
+
+## Fila 328 — las empresas, entregadas al Centro de datos (11-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: al pulsar «Entrar» el navegador pide permiso para editar la carpeta; aceptarlo. Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Empresas entregadas al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Empresas: …» con el mismo número.
