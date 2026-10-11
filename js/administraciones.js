@@ -199,6 +199,8 @@ var Administraciones = (function () {
       if (texto !== textoAntes) {
         try { await copiaDelDia(textoAntes); } catch (e) { /* la copia no para el guardado */ }
         await Carpetas.escribirTexto(dirDatos, FICHERO, texto);
+        /* Fila 329: avisa de que la lista ha cambiado (el Centro de datos la recibe entera); un fallo del aviso no llega a quien guardaba. */
+        try { (Datos.alCambiarLista || []).forEach(function (f) { try { f(CAT); } catch (e) { /* un oyente roto */ } }); } catch (e) { /* nada */ }
       }
       cache = d;
       delete Datos._interno.CACHE[CAT];
@@ -354,6 +356,61 @@ var Administraciones = (function () {
     });
   }
 
+  /* ---------- lo que se entrega al Centro de datos (fila 329) ---------- */
+
+  /* Los registros de la entrega: { id, datos } por Administración, por nombre corto, con todo lo que se guarda de
+     ella y el árbol de departamentos aplanado (`nivel`, y `dependeDe` con el id del padre). Un dato vacío no se
+     escribe; una tabla sin filas, tampoco. No corrige nada: si hay dos con el mismo `id`, salen las dos. `d`: lo
+     leído de administraciones.json. */
+  function paraEntregar(d) {
+    d = limpio(d);
+    function lleno(v) { return v !== undefined && v !== null && String(v).trim() !== ''; }
+    function poner(destino, clave, v) { if (lleno(v)) destino[clave] = v; }
+    function filas(lista, claves) {
+      return (lista || []).map(function (x) {
+        var f = {};
+        claves.forEach(function (c) { poner(f, c, x && x[c]); });
+        return f;
+      }).filter(function (f) { return Object.keys(f).length; });
+    }
+    var salida = d.organismos.map(function (o) {
+      var s = superiorPorId(d, o.superior);
+      var datos = {};
+      poner(datos, 'clase', o.clase === 'centro' ? 'centro' : 'organismo');
+      poner(datos, 'tercero', tercero(o));
+      poner(datos, 'nombreCorto', o.corto);
+      poner(datos, 'nombreOficial', o.oficial);
+      poner(datos, 'dir3', o.dir3);
+      poner(datos, 'codigoCentro', o.codigoCentro);
+      if (s) poner(datos, 'dependeDe', s.nombre);
+      poner(datos, 'dependeDeId', o.superior);
+      var antes = filas(o.antes, ['nombre', 'hasta']);
+      if (antes.length) datos.nombresAnteriores = antes;
+      var antesSup = filas(s && s.antes, ['nombre', 'hasta']);
+      if (antesSup.length) datos.dependeDeAnteriores = antesSup;
+      poner(datos, 'correo', o.correo);
+      poner(datos, 'telefono', o.telefono);
+      poner(datos, 'direccion', o.direccion);
+      var deps = [];
+      recorrer(o.departamentos, function (dep, nivel, padre) {
+        var f = {};
+        poner(f, 'id', dep.id);
+        poner(f, 'nombre', dep.nombre);
+        f.nivel = nivel;
+        if (padre) poner(f, 'dependeDe', padre.id);
+        ['correo', 'telefono', 'contacto', 'dir3'].forEach(function (c) { poner(f, c, dep[c]); });
+        deps.push(f);
+      });
+      if (deps.length) datos.departamentos = deps;
+      var r = {};
+      if (lleno(o.id)) r.id = o.id;
+      r.datos = datos;
+      return { r: r, orden: U.normalizar(o.corto || '') };
+    });
+    salida.sort(function (a, b) { return a.orden < b.orden ? -1 : (a.orden > b.orden ? 1 : 0); });
+    return salida.map(function (x) { return x.r; });
+  }
+
   /* ---------- en un asunto ---------- */
 
   /* El organismo de un asunto, por su tercero (lo leído en memoria). */
@@ -478,7 +535,7 @@ var Administraciones = (function () {
     tercero: tercero, persona: persona, agrupar: agrupar, pie: pie, aplanar: aplanar,
     organismoPorId: organismoPorId, superiorPorId: superiorPorId, departamentoPorId: departamentoPorId,
     organismoDelAsunto: organismoDelAsunto, correoDelAsunto: correoDelAsunto, valoresDe: valoresDe,
-    departamentoParaFicha: departamentoParaFicha, porDominio: porDominio, unirDatos: unirDatos
+    departamentoParaFicha: departamentoParaFicha, porDominio: porDominio, unirDatos: unirDatos, paraEntregar: paraEntregar
   };
 })();
 window.Administraciones = Administraciones;

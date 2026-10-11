@@ -215,8 +215,9 @@
         return resultado('centro-de-datos', T, 'falta', 'El Centro de datos es más nuevo que esta aplicación.', arreglar, true);
       }
       /* Fila 328: el índice recibe las empresas y falta el permiso de escribir: ámbar, y «Arreglarlo» lo pide. */
-      if (window.CentroDeDatosEntregar && !(window.SoloConsulta && SoloConsulta.activo()) && await CentroDeDatosEntregar.faltaPermisoDeEscribir()) {
-        var f = resultado('centro-de-datos', T, 'falta', 'Falta el permiso para escribir: las empresas no se entregan al Centro de datos.', arreglar, true);
+      var sinEscribir = (window.CentroDeDatosEntregar && !(window.SoloConsulta && SoloConsulta.activo())) ? await CentroDeDatosEntregar.listasSinPermisoDeEscribir() : [];
+      if (sinEscribir.length) {   /* fila 329: nombra las listas que se reciben y no se pueden entregar */
+        var f = resultado('centro-de-datos', T, 'falta', 'Falta el permiso para escribir: ' + sinEscribir.join(' y ') + ' no se entregan al Centro de datos.', arreglar, true);
         f.boton = 'Arreglarlo';
         f.darPermiso = async function () { return (await CentroDeDatos.pedirPermisos(dir)) && (await CentroDeDatos.permisoEscribir(dir, false)); };
         return f;

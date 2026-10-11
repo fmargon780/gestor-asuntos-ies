@@ -29,9 +29,12 @@ var CentroDeDatosEntregar = (function () {
   var ESPERA_MS = 5000;
   var REINTENTOS_GUARDADO = 10;
 
+  /* La tabla de listas que se entregan. Una lista sale de un CSV (cada dato, de la columna de su título) o de un JSON de
+     `_GESTOR/datos` (`json`: la función que, con lo ya leído, da los registros). Un dato nuevo es una línea de `campos`. */
   var EMPRESAS = {
-    conjunto: 'empresas', categoria: 'EMPRESAS', csv: 'empresas.csv', nombre: 'empresas',
+    conjunto: 'empresas', categoria: 'EMPRESAS', csv: 'empresas.csv',
     fichero: 'ENTREGA empresas ' + ORIGEN + '.json',
+    titulo: 'Empresas', frase: 'las empresas', listaDe: 'La lista de empresas', unidad: ['empresa', 'empresas'],
     campos: [
       { clave: 'razonSocial', etiqueta: 'Razón social', apartado: 'Empresa', tipo: 'texto', columna: 'Razón social' },
       { clave: 'nombreComercial', etiqueta: 'Nombre comercial', apartado: 'Empresa', tipo: 'texto', columna: 'Nombre comercial' },
@@ -45,19 +48,47 @@ var CentroDeDatosEntregar = (function () {
     idDe: function (datos) {
       var nif = String(datos.nif || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (nif) return nif;
-      var social = String(datos.razonSocial || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      var social = String(datos.razonSocial || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       return 'sin-nif-' + social;
     }
   };
-  var LISTAS = [EMPRESAS];
+
+  var NOMBRES_ANTERIORES = [{ clave: 'nombre', etiqueta: 'Nombre' }, { clave: 'hasta', etiqueta: 'Hasta' }];
+  var ADMINISTRACIONES = {
+    conjunto: 'administraciones', categoria: 'ADMINISTRACIONES', archivo: 'administraciones.json',
+    fichero: 'ENTREGA administraciones ' + ORIGEN + '.json',
+    titulo: 'Administraciones', frase: 'las Administraciones', listaDe: 'La lista de Administraciones', unidad: ['Administración', 'Administraciones'],
+    campos: [
+      { clave: 'clase', etiqueta: 'Clase', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'tercero', etiqueta: 'Nombre en el Gestor', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'nombreCorto', etiqueta: 'Nombre corto', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'nombreOficial', etiqueta: 'Nombre oficial', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'dir3', etiqueta: 'DIR3', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'codigoCentro', etiqueta: 'Código de centro', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'dependeDe', etiqueta: 'Depende de', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'dependeDeId', etiqueta: 'Depende de (identificador)', apartado: 'Administración', tipo: 'texto' },
+      { clave: 'nombresAnteriores', etiqueta: 'Nombres anteriores', apartado: 'Administración', tipo: 'tabla', columnas: NOMBRES_ANTERIORES },
+      { clave: 'dependeDeAnteriores', etiqueta: 'Nombres anteriores de «Depende de»', apartado: 'Administración', tipo: 'tabla', columnas: NOMBRES_ANTERIORES },
+      { clave: 'correo', etiqueta: 'Correo electrónico', apartado: 'Contacto', tipo: 'texto' },
+      { clave: 'telefono', etiqueta: 'Teléfono', apartado: 'Contacto', tipo: 'texto' },
+      { clave: 'direccion', etiqueta: 'Dirección', apartado: 'Contacto', tipo: 'texto' },
+      { clave: 'departamentos', etiqueta: 'Departamentos', apartado: 'Departamentos', tipo: 'tabla', columnas: [
+        { clave: 'id', etiqueta: 'Identificador' }, { clave: 'nombre', etiqueta: 'Nombre' }, { clave: 'nivel', etiqueta: 'Nivel' },
+        { clave: 'dependeDe', etiqueta: 'Depende de' }, { clave: 'correo', etiqueta: 'Correo electrónico' }, { clave: 'telefono', etiqueta: 'Teléfono' },
+        { clave: 'contacto', etiqueta: 'Persona de contacto' }, { clave: 'dir3', etiqueta: 'DIR3' }] }
+    ],
+    /* Los registros los da quien conoce el árbol (js/administraciones.js). */
+    json: function (leido) { return Administraciones.paraEntregar(leido); }
+  };
+  var LISTAS = [EMPRESAS, ADMINISTRACIONES];
 
   var temporizador = null;
   var mirando = false;
   var avisadoFallo = {};
   var yaEntrado = false;
   var espera = ESPERA_MS;
-  var ultimaVacia = { t: 0, v: false };
+  var ultimaVacia = {};   /* por lista: { t, v } */
 
   function norma(t) { return window.U && U.normalizar ? U.normalizar(t) : String(t || '').toLowerCase(); }
   function ms(v) { var t = new Date(v || '').getTime(); return isNaN(t) ? 0 : t; }
@@ -90,18 +121,23 @@ var CentroDeDatosEntregar = (function () {
 
   /* ---------- qué se entrega ---------- */
 
-  /* Lee la lista del fichero, en este momento, dentro de la cola de guardado de su CSV. Devuelve
-     { registros, campos, texto, huella } o { sinFichero: true }. Un fichero que no se puede leer lanza. */
+  function nombreDeFichero(lista) { return lista.csv || lista.archivo; }
+
+  /* Lee la lista del fichero, en este momento, dentro de la cola de guardado de ese fichero. Devuelve
+     { registros, campos, huella } o { sinFichero: true }. Un fichero que no se puede leer lanza. */
   function montar(lista) {
-    return ColaGuardado.poner(lista.csv, async function () {
-      var texto = await Carpetas.leerTexto(datosDir(), lista.csv);
+    return ColaGuardado.poner(nombreDeFichero(lista), async function () {
+      var texto = await Carpetas.leerTexto(datosDir(), nombreDeFichero(lista));
       if (texto === null) return { sinFichero: true };
+      if (lista.json) {   /* un JSON de `_GESTOR/datos`: los campos son todos los de la tabla */
+        var leido;
+        try { leido = JSON.parse(texto); } catch (e) { throw new Error('el fichero ' + lista.archivo + ' no se puede leer'); }
+        return { registros: lista.json(leido), campos: lista.campos.map(campoDe) };
+      }
       var t = Datos.aTabla(texto);
       var cab = (t.filas[0] || []).map(function (c) { return norma(String(c).trim()); });
       var columnas = lista.campos.map(function (c) { return { campo: c, i: cab.indexOf(norma(c.columna)) }; });
-      var campos = lista.campos.filter(function (c, k) { return columnas[k].i !== -1; }).map(function (c) {
-        return { clave: c.clave, etiqueta: c.etiqueta, apartado: c.apartado, tipo: c.tipo, dueno: ORIGEN };
-      });
+      var campos = lista.campos.filter(function (c, k) { return columnas[k].i !== -1; }).map(campoDe);
       var registros = [];
       t.filas.slice(1).forEach(function (fila) {
         var datos = {};
@@ -119,6 +155,13 @@ var CentroDeDatosEntregar = (function () {
       r.huella = await huellaDe(JSON.stringify({ campos: r.campos, registros: r.registros }));
       return r;
     });
+  }
+
+  function campoDe(c) {
+    var campo = { clave: c.clave, etiqueta: c.etiqueta, apartado: c.apartado, tipo: c.tipo };
+    if (c.columnas) campo.columnas = c.columnas;
+    campo.dueno = ORIGEN;
+    return campo;
   }
 
   function entregaDe(lista, m) {
@@ -144,8 +187,9 @@ var CentroDeDatosEntregar = (function () {
     return ((indice && indice.recibe) || []).some(function (r) { return r && r.conjunto === lista.conjunto && r.de === ORIGEN && Number(r.entrega) === 1; });
   }
 
-  /* Lo que hay que saber de la carpeta, sin pedir nada: { estado, dir?, indice? }. `estado`: 'ok' o el motivo. */
-  async function mirarCarpeta(lista) {
+  /* Lo que se sabe de la carpeta, UNA vez para todas las listas y sin pedir nada: { estado, dir?, indice? }.
+     `estado`: 'ok' o el motivo. */
+  async function leerCarpeta() {
     var C = window.CentroDeDatos;
     if (!C) return { estado: 'sin-carpeta' };
     var dir = await C.carpeta();
@@ -155,29 +199,37 @@ var CentroDeDatosEntregar = (function () {
     if (!r.ok) return { estado: 'sin-indice', dir: dir };
     if ((r.indice.contrato || 1) > C.CONTRATO) return { estado: 'contrato', dir: dir, indice: r.indice };
     if (r.indice.ocupado) return { estado: 'ocupado', dir: dir, indice: r.indice };
-    if (!recibeEl(r.indice, lista)) return { estado: 'no-recibe', dir: dir, indice: r.indice };
-    if (!(await C.permisoEscribir(dir, false))) return { estado: 'sin-permiso-escribir', dir: dir, indice: r.indice };
-    return { estado: 'ok', dir: dir, indice: r.indice };
+    return { estado: 'ok', dir: dir, indice: r.indice, puedeEscribir: await C.permisoEscribir(dir, false) };
   }
+
+  /* El estado de la carpeta para UNA lista: lo de `leerCarpeta` más si el índice la recibe y si se puede escribir. */
+  function paraLista(base, lista) {
+    if (base.estado !== 'ok') return base;
+    if (!recibeEl(base.indice, lista)) return { estado: 'no-recibe', dir: base.dir, indice: base.indice };
+    if (!base.puedeEscribir) return { estado: 'sin-permiso-escribir', dir: base.dir, indice: base.indice };
+    return base;
+  }
+
+  function mirarCarpeta(lista) { return leerCarpeta().then(function (b) { return paraLista(b, lista); }); }
 
   function sinGuardado() { return !(window.ColaGuardado && ColaGuardado.hayGuardado()); }
 
-  /* Entrega una lista si hace falta. `op.vacia`: entregar aunque ahora esté vacía y antes no. Devuelve
-     { estado, registros? }: 'entregado', 'nada-nuevo', 'vacia', o el motivo por el que no se hizo. */
-  async function entregarLista(lista, op) {
+  /* Entrega una lista si hace falta. `base`: lo de `leerCarpeta` (si no, se lee). `op.vacia`: entregar aunque ahora esté
+     vacía y antes no (`true`, o el conjunto al que se refiere). Devuelve { estado, registros? }: 'entregado', 'nada-nuevo', 'vacia', o el motivo por el que no se hizo. */
+  async function entregarLista(lista, op, base) {
     op = op || {};
     if (window.SoloConsulta && SoloConsulta.activo()) return { estado: 'solo-consulta' };
     if (!datosDir() || !gestor()) return { estado: 'sin-datos' };
-    var c = await mirarCarpeta(lista);
+    var c = paraLista(base || await leerCarpeta(), lista);
     if (c.estado !== 'ok') return { estado: c.estado };
-    ultimaVacia = { t: 0, v: false };
+    ultimaVacia[lista.conjunto] = { t: 0, v: false };
     var m = await montar(lista);
     if (m.sinFichero) return { estado: 'sin-fichero' };
     if (!m.huella) return { estado: 'sin-huella' };
     var apuntes = await CentroDeDatos.leerApuntes(true);
     var previo = apuntes.entregado && apuntes.entregado[lista.conjunto];
     if (previo && previo.huellaDatos === m.huella) return { estado: 'nada-nuevo', registros: m.registros.length };
-    if (!m.registros.length && previo && previo.registros > 0 && !op.vacia) return { estado: 'vacia' };
+    if (!m.registros.length && previo && previo.registros > 0 && !(op.vacia === true || op.vacia === lista.conjunto)) return { estado: 'vacia' };
     var entrega = entregaDe(lista, m);
     await escribirEntrega(c.dir, lista.fichero, JSON.stringify(entrega));
     await CentroDeDatos.apuntarEntregado(lista.conjunto, {
@@ -187,7 +239,8 @@ var CentroDeDatosEntregar = (function () {
     return { estado: 'entregado', registros: m.registros.length };
   }
 
-  /* Mira todas las listas. Con un guardado en marcha espera (hasta 10 veces); si falla, lo dice una vez por sesión. */
+  /* Mira todas las listas, cada una por separado y con el índice leído una sola vez. Con un guardado en marcha espera
+     (hasta 10 veces); si una falla, lo dice una vez por sesión y las demás siguen. */
   async function mirar(op, intento) {
     if (mirando) return { estado: 'ya-mirando' };
     if (!sinGuardado()) {
@@ -197,12 +250,14 @@ var CentroDeDatosEntregar = (function () {
     mirando = true;
     var salida = { estado: 'nada-nuevo', listas: {} };
     try {
+      var base = null;
+      try { base = await leerCarpeta(); } catch (e) { base = { estado: 'sin-indice' }; }
       for (var i = 0; i < LISTAS.length; i++) {
         var l = LISTAS[i];
-        try { salida.listas[l.conjunto] = await entregarLista(l, op); }
+        try { salida.listas[l.conjunto] = await entregarLista(l, op, base); }
         catch (e) {
           salida.listas[l.conjunto] = { estado: 'error' };
-          if (!avisadoFallo[l.conjunto]) { avisadoFallo[l.conjunto] = true; U.accesorio('No he podido entregar la lista de ' + l.nombre + ' al Centro de datos', e); }
+          if (!avisadoFallo[l.conjunto]) { avisadoFallo[l.conjunto] = true; U.accesorio('No he podido entregar la lista de ' + l.titulo.toLowerCase() + ' al Centro de datos', e); }
         }
       }
     } finally { mirando = false; }
@@ -216,7 +271,7 @@ var CentroDeDatosEntregar = (function () {
     mirar({}).catch(function () { /* a la siguiente entrada */ });
   }
 
-  /* Unos segundos después del último cambio de la lista: tres cambios seguidos dan una sola entrega. */
+  /* Unos segundos después del último cambio de una lista: varios cambios seguidos dan una sola pasada. */
   function programar() {
     clearTimeout(temporizador);
     temporizador = setTimeout(function () { temporizador = null; mirar({}).catch(function () { /* a la siguiente */ }); }, espera);
@@ -228,70 +283,110 @@ var CentroDeDatosEntregar = (function () {
     });
   }
 
-  /* El botón «Entregar ahora»: lo mismo que al entrar, pero contesta siempre. */
+  var FRASES_DE_ESTADO = {
+    'vacia': function (l) { return l.listaDe + ' está vacía y antes no lo estaba: no la he entregado.'; },
+    'sin-carpeta': function () { return 'Primero señala la carpeta del Centro de datos en este ordenador.'; },
+    'sin-permiso-leer': function () { return 'El navegador no da permiso a la carpeta del Centro de datos.'; },
+    'sin-permiso-escribir': function () { return 'Falta el permiso para escribir en la carpeta del Centro de datos.'; },
+    'no-recibe': function (l) { return 'El Centro de datos todavía no recibe ' + l.frase + '.'; },
+    'sin-fichero': function (l) { return 'Todavía no hay lista de ' + l.titulo.toLowerCase() + ' que entregar.'; },
+    'sin-huella': function () { return 'Este navegador no puede preparar la entrega.'; },
+    'solo-consulta': function () { return 'En este ordenador solo se puede consultar: no se entrega nada.'; }
+  };
+
+  /* El botón «Entregar ahora»: lo mismo que al entrar, pero contesta siempre, con una frase por lista. Devuelve
+     { estado, registros, listas }: `estado` y `registros` son los de la primera lista entregada o, si ninguna, la primera
+     que no estaba al día. */
   async function entregarAhora(op) {
-    var l = EMPRESAS;
-    var r;
-    try { r = await entregarLista(l, op); }
-    catch (e) { U.accesorio('No he podido entregar la lista de ' + l.nombre + ' al Centro de datos', e); return { estado: 'error' }; }
-    var frase = {
-      'entregado': 'Entregadas ' + r.registros + (r.registros === 1 ? ' empresa' : ' empresas') + ' al Centro de datos.',
-      'nada-nuevo': 'No hay nada nuevo que entregar.',
-      'vacia': 'La lista de empresas está vacía y antes no lo estaba: no la he entregado.',
-      'sin-carpeta': 'Primero señala la carpeta del Centro de datos en este ordenador.',
-      'sin-permiso-leer': 'El navegador no da permiso a la carpeta del Centro de datos.',
-      'sin-permiso-escribir': 'Falta el permiso para escribir en la carpeta del Centro de datos.',
-      'no-recibe': 'El Centro de datos todavía no recibe las empresas.',
-      'sin-fichero': 'Todavía no hay lista de empresas que entregar.',
-      'sin-huella': 'Este navegador no puede preparar la entrega.',
-      'solo-consulta': 'En este ordenador solo se puede consultar: no se entrega nada.'
-    }[r.estado];
-    if (frase) U.aviso(frase, r.estado === 'entregado' || r.estado === 'nada-nuevo' ? 'bueno' : 'ambar');
-    return r;
+    var base = null;
+    try { base = await leerCarpeta(); } catch (e) { base = { estado: 'sin-indice' }; }
+    var listas = {};
+    for (var i = 0; i < LISTAS.length; i++) {
+      var l = LISTAS[i];
+      try { listas[l.conjunto] = await entregarLista(l, op, base); }
+      catch (e) { U.accesorio('No he podido entregar la lista de ' + l.titulo.toLowerCase() + ' al Centro de datos', e); listas[l.conjunto] = { estado: 'error' }; }
+    }
+    var estados = LISTAS.map(function (l) { return listas[l.conjunto]; });
+    var entregadas = LISTAS.filter(function (l) { return listas[l.conjunto].estado === 'entregado'; });
+    var frases = [];
+    if (entregadas.length) {
+      LISTAS.forEach(function (l) {
+        var r = listas[l.conjunto];
+        if (r.estado === 'entregado') frases.push('Entregadas ' + r.registros + ' ' + l.unidad[r.registros === 1 ? 0 : 1] + (entregadas.length === 1 && LISTAS.length === 1 ? ' al Centro de datos' : '') + '.');
+        else if (r.estado === 'nada-nuevo') frases.push('No hay nada nuevo de ' + l.frase + '.');
+      });
+    } else if (estados.every(function (r) { return r.estado === 'nada-nuevo'; })) frases.push('No hay nada nuevo que entregar.');
+    else {
+      LISTAS.forEach(function (l) {
+        var r = listas[l.conjunto];
+        var f = FRASES_DE_ESTADO[r.estado];
+        if (f) frases.push(f(l)); else if (r.estado === 'nada-nuevo') frases.push('No hay nada nuevo de ' + l.frase + '.');
+      });
+    }
+    var buena = entregadas.length > 0 || estados.every(function (r) { return r.estado === 'nada-nuevo'; });
+    if (frases.length) U.aviso(frases.join(' '), buena ? 'bueno' : 'ambar');
+    var primera = entregadas[0] || LISTAS.filter(function (l) { return listas[l.conjunto].estado !== 'nada-nuevo'; })[0] || LISTAS[0];
+    return { estado: listas[primera.conjunto].estado, registros: listas[primera.conjunto].registros, listas: listas };
   }
 
   /* ---------- lo que se ve en Ajustes ---------- */
 
-  /* { texto, boton? } con lo que hay que decir de las empresas, o null si no hay nada que decir. `boton`: 'permiso' | 'vacia'.
-     Solo mira: nunca pide permiso. */
-  async function estadoParaAjustes() {
-    var l = EMPRESAS;
-    var apuntes = await CentroDeDatos.leerApuntes();
-    var previo = apuntes.entregado && apuntes.entregado[l.conjunto];
+  /* { texto, boton? } con lo que hay que decir de UNA lista, o null si no hay nada que decir. `boton`: 'permiso' |
+     'vacia'. Solo mira: nunca pide permiso. `base`: lo de `leerCarpeta`. */
+  async function estadoDeLista(lista, base, apuntes) {
+    var previo = apuntes.entregado && apuntes.entregado[lista.conjunto];
     var fecha = previo ? CentroDeDatos.fechaCorta(previo.entregadoEl, true) : '';
-    var c = await mirarCarpeta(l);
+    var c = paraLista(base, lista);
     if (c.estado === 'sin-carpeta') {
-      return previo ? { texto: 'Las empresas las entrega el otro ordenador. Última entrega: ' + previo.registros + ', el ' + fecha + '.' } : null;
+      return previo ? { texto: lista.frase.charAt(0).toUpperCase() + lista.frase.slice(1) + ' las entrega el otro ordenador. Última entrega: ' + previo.registros + ', el ' + fecha + '.' } : null;
     }
-    if (c.estado === 'no-recibe') return { texto: 'El Centro de datos todavía no recibe las empresas.' };
-    if (c.estado === 'sin-permiso-escribir') return { texto: 'Falta el permiso para escribir en esta carpeta: las empresas no se entregan.', boton: 'permiso' };
+    if (c.estado === 'no-recibe') return { texto: 'El Centro de datos todavía no recibe ' + lista.frase + '.' };
+    if (c.estado === 'sin-permiso-escribir') return { texto: 'Falta el permiso para escribir en esta carpeta: ' + lista.frase + ' no se entregan.', boton: 'permiso' };
     if (c.estado !== 'ok') return null;
-    if (!(await huellaDe('x'))) return { texto: 'Este navegador no puede preparar la entrega de las empresas.' };
+    if (!(await huellaDe('x'))) return { texto: 'Este navegador no puede preparar la entrega de ' + lista.frase + '.' };
     var vacia = false;
-    if (previo && previo.registros > 0) {   /* se repinta a menudo: lo caro (leer el CSV) se mira como mucho cada 15 s */
-      if (Date.now() - ultimaVacia.t < 15000) vacia = ultimaVacia.v;
+    if (previo && previo.registros > 0) {   /* se repinta a menudo: lo caro (leer el fichero) se mira como mucho cada 15 s */
+      var u = ultimaVacia[lista.conjunto] || { t: 0, v: false };
+      if (Date.now() - u.t < 15000) vacia = u.v;
       else {
         try {
-          var m = await montar(l);
+          var m = await montar(lista);
           vacia = !m.sinFichero && !m.registros.length && previo.huellaDatos !== m.huella;
         } catch (e) { vacia = false; }
-        ultimaVacia = { t: Date.now(), v: vacia };
+        ultimaVacia[lista.conjunto] = { t: Date.now(), v: vacia };
       }
     }
-    if (vacia) return { texto: 'La lista de empresas está vacía y antes no lo estaba: no la he entregado.', boton: 'vacia' };
-    if (!previo) return { texto: 'Todavía no se han entregado las empresas al Centro de datos.' };
-    return { texto: 'Empresas entregadas al Centro de datos: ' + previo.registros + ', el ' + fecha + (previo.entregadoPor ? ' (' + previo.entregadoPor + ')' : '') + '.' };
+    if (vacia) return { texto: lista.listaDe + ' está vacía y antes no lo estaba: no la he entregado.', boton: 'vacia' };
+    if (!previo) return { texto: 'Todavía no se han entregado ' + lista.frase + ' al Centro de datos.' };
+    return { texto: lista.titulo + ' entregadas al Centro de datos: ' + previo.registros + ', el ' + fecha + (previo.entregadoPor ? ' (' + previo.entregadoPor + ')' : '') + '.' };
   }
 
-  /* Para la «Comprobación al entrar»: el índice recibe las empresas y falta el permiso de escribir (sin pedirlo). */
-  async function faltaPermisoDeEscribir() {
-    try { return (await mirarCarpeta(EMPRESAS)).estado === 'sin-permiso-escribir'; } catch (e) { return false; }
+  /* Una por lista: { <conjunto>: { texto, boton? } | null }. */
+  async function estadosParaAjustes() {
+    var base = await leerCarpeta();
+    var apuntes = await CentroDeDatos.leerApuntes();
+    var salida = {};
+    for (var i = 0; i < LISTAS.length; i++) salida[LISTAS[i].conjunto] = await estadoDeLista(LISTAS[i], base, apuntes);
+    return salida;
   }
+
+  async function estadoParaAjustes(conjunto) { return (await estadosParaAjustes())[conjunto || 'empresas']; }
+
+  /* Para la «Comprobación al entrar»: las listas que el índice recibe y no se pueden entregar por falta del permiso de
+     escribir (sin pedirlo). Devuelve sus frases: «las empresas», «las Administraciones». */
+  async function listasSinPermisoDeEscribir() {
+    try {
+      var base = await leerCarpeta();
+      return LISTAS.filter(function (l) { return paraLista(base, l).estado === 'sin-permiso-escribir'; }).map(function (l) { return l.frase; });
+    } catch (e) { return []; }
+  }
+  async function faltaPermisoDeEscribir() { return (await listasSinPermisoDeEscribir()).length > 0; }
 
   return {
     LISTAS: LISTAS, entregarLista: entregarLista, mirar: mirar, alEntrar: alEntrar, entregarAhora: entregarAhora,
-    estadoParaAjustes: estadoParaAjustes, faltaPermisoDeEscribir: faltaPermisoDeEscribir, generadoMadrid: generadoMadrid,
-    _montar: function () { return montar(EMPRESAS); },
+    estadosParaAjustes: estadosParaAjustes, estadoParaAjustes: estadoParaAjustes, faltaPermisoDeEscribir: faltaPermisoDeEscribir,
+    listasSinPermisoDeEscribir: listasSinPermisoDeEscribir, generadoMadrid: generadoMadrid,
+    _montar: function (conjunto) { return montar(laLista(conjunto || 'empresas')); },
     _reiniciarEntrada: function () { yaEntrado = false; },   /* para las pruebas */
     _ajustar: function (o) { if (o && o.espera !== undefined) espera = o.espera; }   /* para las pruebas */
   };

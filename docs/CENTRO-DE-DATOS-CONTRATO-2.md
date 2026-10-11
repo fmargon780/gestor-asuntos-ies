@@ -193,3 +193,14 @@ no se pudo leer desde aquí (si allí cambia, se vuelve a copiar).
   `nombreComercial`, `nif`, `contacto`, `telefono`, `correo`.
 - La entrega es siempre la lista entera. El `id` es el NIF en mayúsculas sin lo que no sea letra o cifra; sin NIF, `sin-nif-` y la razón social sin tildes en
   minúsculas con guiones. Un dato vacío no se escribe. Dos empresas con el mismo `id` se entregan las dos. Cero empresas es una entrega válida.
+
+## Lo que el Gestor entrega: el conjunto `administraciones` (fila 329, 11-oct-2026)
+
+Copia del acuerdo de `docs/ENTREGAR-ADMINISTRACIONES-AL-CENTRO-DE-DATOS.md`; la versión buena es `docs/24-ADMINISTRACIONES.md` de `centro-de-datos-ies`, que no se
+pudo leer desde aquí (si allí cambia, se vuelve a copiar). Misma mecánica que `empresas` (`recibe` con `conjunto: "administraciones"`, `entrega: 1`; fichero
+`entrada/ENTREGA administraciones gestor-asuntos-ies.json`; siempre la lista entera; cero Administraciones es válido).
+
+- `registros`: `{ id, datos }`, con el `id` de cada organismo en `administraciones.json` (`org-…`; una sin `id` se entrega sin él), por nombre corto. No se corrige nada.
+- Catorce campos, todos con `dueno: "gestor-asuntos-ies"`: `clase` (`centro` u `organismo`), `tercero`, `nombreCorto`, `nombreOficial`, `dir3`, `codigoCentro`, `dependeDe`,
+  `dependeDeId`, `nombresAnteriores` (tabla: `nombre`, `hasta`), `dependeDeAnteriores` (tabla), `correo`, `telefono`, `direccion` y `departamentos` (tabla: `id`, `nombre`,
+  `nivel`, `dependeDe`, `correo`, `telefono`, `contacto`, `dir3`, con el árbol aplanado en su orden). Un dato vacío no se escribe, tampoco dentro de una tabla; `nivel` siempre.
