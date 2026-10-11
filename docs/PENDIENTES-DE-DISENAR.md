@@ -107,3 +107,76 @@ caso real. **Pidió que, cuando encargue otro control semejante, se le recuerde 
 por este.** Lo que hay para reutilizar: el fichero compartido con una línea por actividad, la marca
 en el tipo de asunto, la tarjeta propia en la ficha, la tabla de datos calculada para los huecos
 `{{TABLA …}}` y la pantalla de consulta en Herramientas.
+
+---
+
+## 6. La mudanza a Google: asuntos vivos, ARCHIVO y datos en una unidad compartida de Drive
+
+**Fecha:** 11-oct-2026. Sale de la idea 332 (`docs/PLAN-DATOS-DEL-GESTOR.md`). **Sin diseñar.**
+Espera a dos cosas que no dependen de la aplicación.
+
+**Lo que quiere Francisco.** Tiene entendido que Dropbox no es un sitio permitido por la Junta para
+lo que guarda el centro. Mientras el centro use Dropbox no va a mover las carpetas por su cuenta,
+pero quiere acabar así:
+
+- **En Dropbox, solo la Bandeja de Entrada.** Es la única carpeta de la aplicación que usa el resto
+  del centro, para dejar documentos que hay que trabajar. No se les cambia la costumbre.
+- **En una unidad compartida de Drive del centro: los asuntos vivos, el ARCHIVO y los datos del
+  Gestor** (`_GESTOR`). Esas carpetas solo las usan Francisco y su compañero.
+
+**Decidido con él:** se va **directo a la unidad compartida**, sin pasar antes por su cuenta
+`g.educaand.es`. Hoy los datos no dependen de él (están en el Dropbox del centro); en su cuenta
+dependerían de él. En una unidad compartida los ficheros son del centro.
+
+**De qué depende (le toca a Francisco):**
+
+1. Hablar con quien gestiona la unidad compartida del centro (cree que existe).
+2. Plantear la mudanza a dirección. Mover los expedientes del centro no es decisión suya.
+
+**La duda legal, que no resuelve la aplicación.** Lo publicado por la Junta describe Google
+Workspace para fines educativos; no nombra la gestión administrativa ni los expedientes. En 2026
+el Consejo de Transparencia y Protección de Datos de Andalucía sancionó a la Consejería por cómo
+usa Google, con mención a los datos sensibles; no prohíbe usarlo. Pasar de Dropbox a Google mejora
+la situación, no la cierra: lo deciden dirección y el Delegado de Protección de Datos.
+
+**Lo que se vio al mirar el código (11-oct-2026), para no repetirlo:**
+
+- La aplicación ya trabaja sobre carpetas de Drive que el ordenador enseña como carpetas normales:
+  la del Centro de datos y la de la bandeja de correos. Técnicamente se puede.
+- Los datos se alcanzan casi siempre por `App.E.gestor`. Solo tres sitios crean o buscan `_GESTOR`
+  dentro de la carpeta de asuntos: `js/nucleo.js` (el botón «Entrar» y la lista de nombres de la
+  entrada) y `js/perfil.js` (el perfil, antes de entrar). `js/versiones-previas.js` lo nombra para
+  saltárselo.
+- Los documentos sueltos salen de leer la raíz de la carpeta de asuntos vivos
+  (`js/asuntos-lista.js`, `App.E.sueltos`). Unos treinta y cinco ficheros usan `App.E.abiertos`;
+  los que mueven un documento suelto a un asunto habría que repasarlos uno a uno
+  (`js/documentos-sueltos.js`, `js/documentos-vigilancia.js`, `js/bandeja-guardar.js`,
+  `js/repartir-crear.js`, `js/pdf-separar-unir.js`, `js/encargos-llegada.js`, entre otros).
+- Las protecciones de «solo consultar», los permisos al entrar, «Entrar sola» y la comprobación
+  al entrar cuentan hoy con dos carpetas (asuntos vivos y ARCHIVO). Con cuatro, hay que ponerlas
+  al día todas.
+
+**Lo que hay que saber antes de diseñar nada:**
+
+1. **Cómo se porta Drive cuando los dos guardan a la vez.** Con Dropbox queda una «copia en
+   conflicto» y la aplicación une las dos (`js/conflictos.js`, que reconoce esos nombres). Si
+   Drive se queda solo con la última, se perderían cambios sin aviso. Hay que probarlo con dos
+   ordenadores de verdad. Las tablas de la fila 334 ya están hechas para no depender de esto.
+2. **Si un ARCHIVO de miles de carpetas se abre rápido** con los ficheros de Drive sin bajar al
+   ordenador. Las medidas de la fila 332 darán la referencia de hoy.
+
+**Lo que tendrá que llevar el diseño:**
+
+1. **Cuatro carpetas señaladas por separado** en cada ordenador: Bandeja de Entrada, asuntos
+   vivos, ARCHIVO y datos del Gestor. Se propuso el 11-oct-2026 como paso previo y **se sacó de la
+   cola al escribir la instrucción**: sin la mudanza no sirve para nada y es peligroso solo. Si un
+   ordenador señala una carpeta de datos distinta y el otro no, cada uno trabaja sobre datos
+   diferentes y nadie avisa.
+2. **Que eso no pueda pasar.** Una carpeta de datos solo se acepta si ya lleva los datos del
+   Gestor. La carpeta vieja se queda con una marca («los datos se han mudado a…») y, con esa
+   marca, la aplicación no entra y pide señalar la nueva.
+3. **La mudanza en sí, hecha por la aplicación**: copiar, comprobar y marcar, con vuelta atrás. Sin
+   tareas manuales de Francisco más allá de señalar las carpetas en cada ordenador.
+4. **Trabajar desde casa** (punto 2 de esta lista) queda resuelto con la mudanza: el Chromebook
+   ya tiene Drive, y sobra la copia de hoy y la contraseña del Dropbox.
+5. Qué pasa con la copia sin internet del programa, que hoy vive en el Dropbox.
