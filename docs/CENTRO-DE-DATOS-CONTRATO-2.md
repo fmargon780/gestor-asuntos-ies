@@ -204,3 +204,15 @@ pudo leer desde aquí (si allí cambia, se vuelve a copiar). Misma mecánica que
 - Catorce campos, todos con `dueno: "gestor-asuntos-ies"`: `clase` (`centro` u `organismo`), `tercero`, `nombreCorto`, `nombreOficial`, `dir3`, `codigoCentro`, `dependeDe`,
   `dependeDeId`, `nombresAnteriores` (tabla: `nombre`, `hasta`), `dependeDeAnteriores` (tabla), `correo`, `telefono`, `direccion` y `departamentos` (tabla: `id`, `nombre`,
   `nivel`, `dependeDe`, `correo`, `telefono`, `contacto`, `dir3`, con el árbol aplanado en su orden). Un dato vacío no se escribe, tampoco dentro de una tabla; `nivel` siempre.
+
+## Lo que el Gestor entrega: el conjunto `cargos` (fila 330, 11-oct-2026)
+
+Copia del acuerdo de `docs/ENTREGAR-CARGOS-AL-CENTRO-DE-DATOS.md`; la versión buena es `docs/25-CARGOS.md` de `centro-de-datos-ies`, que no se pudo leer desde aquí (si allí
+cambia, se vuelve a copiar). Misma mecánica que `empresas` y `administraciones` (`recibe` con `conjunto: "cargos"`, `entrega: 1`; fichero `entrada/ENTREGA cargos gestor-asuntos-ies.json`;
+siempre la lista entera).
+
+- Un registro por cargo y ocupante, `{ id, datos }`: `id` = el del cargo, una barra y el del ocupante (tal como están en `cargos.json`; un cargo sin ocupantes da un solo registro con el `id` del
+  cargo y solo sus cuatro datos; sin `id` en el fichero, el registro va sin `id`). Orden: los cargos por `orden` (a igual `orden`, como están) y los ocupantes como están en el fichero.
+- Ocho campos, con `dueno: "gestor-asuntos-ies"`: `cargo` (el id), `cargoNombre`, `tratamiento`, `orden` (numero), `persona`, `sexo` (`H` o `M`), `desde` y `hasta` (fecha, `AAAA-MM-DD`).
+  Un dato vacío no se escribe; la `persona` no se limpia; no se corrige nada (fechas que se pisan o al revés se entregan como están).
+- Si `cargos.json` no existe no se entrega (no valen los seis cargos de fábrica); de tener ocupantes a no tener ninguno no se entrega sola.

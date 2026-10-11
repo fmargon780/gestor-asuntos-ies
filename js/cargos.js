@@ -84,6 +84,8 @@ var Cargos = (function () {
     var actual = await leer();
     var nuevo = hacer(actual) || actual;
     await Copias.guardar(g, FICHERO, nuevo);
+    /* Fila 330: avisa de que los cargos han cambiado (el Centro de datos los recibe enteros); un fallo del aviso no llega a quien guardaba. */
+    try { (window.Datos && Datos.alCambiarLista || []).forEach(function (f) { try { f('CARGOS'); } catch (e) { /* un oyente roto */ } }); } catch (e) { /* nada */ }
     return nuevo;
   }
 
@@ -93,6 +95,47 @@ var Cargos = (function () {
 
   function ordenados(datos) {
     return (datos.cargos || []).slice().sort(function (a, b) { return a.orden - b.orden; });
+  }
+
+  /* Fila 330: los registros de la entrega al Centro de datos, de lo leído de cargos.json TAL CUAL (sin las normalizaciones
+     que inventarían un `id`): un registro por cargo y ocupante, `{ id, datos }`, los cargos por `orden` (a igual `orden`,
+     como están en el fichero) y los ocupantes en el orden del fichero. Un cargo sin ocupantes da un solo registro, solo con
+     los cuatro datos del cargo. Un dato vacío no se escribe; no se corrige nada. */
+  function paraEntregar(leido) {
+    var cargos = (leido && Array.isArray(leido.cargos)) ? leido.cargos : [];
+    function lleno(v) { return v !== undefined && v !== null && String(v).trim() !== ''; }
+    var con = cargos.map(function (c, i) { return { c: c || {}, orden: (c && typeof c.orden === 'number') ? c.orden : i + 1 }; });
+    con.sort(function (a, b) { return a.orden - b.orden; });   /* estable: a igual orden, como están */
+    var salida = [];
+    con.forEach(function (x) {
+      var c = x.c;
+      var base = {};
+      if (lleno(c.id)) base.cargo = c.id;
+      if (lleno(c.nombre)) base.cargoNombre = c.nombre;
+      if (lleno(c.tratamiento)) base.tratamiento = c.tratamiento;
+      base.orden = x.orden;
+      var ocupantes = Array.isArray(c.ocupantes) ? c.ocupantes : [];
+      if (!ocupantes.length) {
+        var r = {};
+        if (lleno(c.id)) r.id = c.id;
+        r.datos = base;
+        salida.push(r);
+        return;
+      }
+      ocupantes.forEach(function (o) {
+        o = o || {};
+        var datos = Object.assign({}, base);
+        if (lleno(o.persona)) datos.persona = o.persona;
+        if (o.sexo === 'H' || o.sexo === 'M') datos.sexo = o.sexo;
+        if (lleno(o.desde)) datos.desde = o.desde;
+        if (lleno(o.hasta)) datos.hasta = o.hasta;
+        var reg = {};
+        if (lleno(c.id) && lleno(o.id)) reg.id = c.id + '/' + o.id;
+        reg.datos = datos;
+        salida.push(reg);
+      });
+    });
+    return salida;
   }
 
   /* ----------------------------------------------------------
@@ -213,7 +256,7 @@ var Cargos = (function () {
 
   return {
     FICHERO: FICHERO, DE_FABRICA: DE_FABRICA,
-    leer: leer, guardar: guardar, buscar: buscar, ordenados: ordenados,
+    leer: leer, guardar: guardar, buscar: buscar, ordenados: ordenados, paraEntregar: paraEntregar,
     enFecha: enFecha, vigente: vigente, solapes: solapes, vigenteDeCargo: vigenteDeCargo,
     crearCargo: crearCargo, renombrarCargo: renombrarCargo, borrarCargo: borrarCargo,
     anadirOcupante: anadirOcupante, cerrarOcupante: cerrarOcupante, editarOcupante: editarOcupante

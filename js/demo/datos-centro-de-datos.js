@@ -90,7 +90,7 @@
     await subcarpeta(dir, 'entrada');
     var recibe = (/(?:^|[?&])recibe=([^&]*)/.exec(location.search) || [])[1];   /* `0`: ninguna; `empresas`: solo las empresas (fila 329) */
     if (recibe !== '0') {
-      indice.recibe = ['empresas', 'administraciones'].filter(function (c) { return recibe === undefined || recibe === c; })
+      indice.recibe = ['empresas', 'administraciones', 'cargos'].filter(function (c) { return recibe === undefined || recibe === c; })
         .map(function (c) { return { conjunto: c, de: 'gestor-asuntos-ies', entrega: 1, entero: true }; });
     }
     await Carpetas.escribirTexto(dir, 'indice.json', JSON.stringify(indice));

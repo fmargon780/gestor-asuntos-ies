@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '330', fecha: '2026-10-11', texto: 'Los cargos del centro se entregan solos al Centro de datos, como las empresas.' },
   { id: '329', fecha: '2026-10-11', texto: 'La lista de Administraciones se entrega sola al Centro de datos, igual que la de empresas.' },
   { id: '328', fecha: '2026-10-11', texto: 'La lista de empresas se entrega sola al Centro de datos. La primera vez, el navegador pide permiso para escribir en su carpeta.' },
   { id: '327', fecha: '2026-10-11', texto: 'El personal llega ya preparado del Centro de datos, y sus avisos salen en Ajustes → Problemas.' },

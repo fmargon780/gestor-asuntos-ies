@@ -173,6 +173,11 @@ paso a `main`).
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
 
+## Fila 330: cargos
+
+- Dirección lleva dos ocupantes inventados (`js/demo/datos-cargos.js`: «Rosa Sellés Manzano», desde 2025, y «Miguel Prado Soler», hasta 2025); Secretaría ya llevaba uno y los demás cargos de fábrica
+  no tienen ocupante. La carpeta de mentira del Centro de datos recibe también los cargos; `?recibe=empresas` o `?recibe=0` los quitan.
+
 ## Fila 329: Administraciones y `recibe=empresas`
 
 - La copia lleva cuatro Administraciones inventadas (`js/demo/datos-administraciones.js`): «Delegación de Mentira» (con un nombre oficial anterior y departamentos en dos niveles) y
