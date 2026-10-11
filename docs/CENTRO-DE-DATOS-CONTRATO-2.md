@@ -180,3 +180,16 @@ aplicación».
 **[SOLO FRANCISCO]** (a `docs/COMPROBAR-A-MANO.md`): cuando el Centro de datos haya terminado de
 recolocar (su fila 7), señalar la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador y ver que
 el aviso verde trae el personal docente y el no docente.
+
+## Lo que el Gestor entrega: `recibe` y el conjunto `empresas` (fila 328, 11-oct-2026)
+
+Copia del acuerdo de `docs/ENTREGAR-EMPRESAS-AL-CENTRO-DE-DATOS.md`; la versión buena es `docs/23-EMPRESAS.md` de `centro-de-datos-ies`, que
+no se pudo leer desde aquí (si allí cambia, se vuelve a copiar).
+
+- En `indice.json`, cuando el Centro de datos sabe recibir una lista: `"recibe": [ { "conjunto": "empresas", "de": "gestor-asuntos-ies", "entrega": 1, "entero": true } ]`.
+  **Una aplicación no entrega a un conjunto que no esté en `recibe` con su nombre y `entrega: 1`.**
+- El fichero va a `entrada/ENTREGA empresas gestor-asuntos-ies.json` (UTF-8): `{ entrega: 1, conjunto: "empresas", origen: "gestor-asuntos-ies", generado
+  (hora de Madrid con su desfase), hechoCon: [], campos: [ { clave, etiqueta, apartado, tipo, dueno } ], registros: [ { id, datos } ] }`. Los campos: `razonSocial`,
+  `nombreComercial`, `nif`, `contacto`, `telefono`, `correo`.
+- La entrega es siempre la lista entera. El `id` es el NIF en mayúsculas sin lo que no sea letra o cifra; sin NIF, `sin-nif-` y la razón social sin tildes en
+  minúsculas con guiones. Un dato vacío no se escribe. Dos empresas con el mismo `id` se entregan las dos. Cero empresas es una entrega válida.

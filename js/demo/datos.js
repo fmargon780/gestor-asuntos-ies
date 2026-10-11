@@ -95,7 +95,11 @@
       ['Razón social', 'Nombre comercial', 'NIF', 'Contacto', 'Teléfono', 'Correo'],
       ['Suministros Escolares Dobla, S.L.', 'Dobla', 'B12345678', 'Laura Santos', '950111000', 'pedidos@dobla-demo.es'],
       ['Mantenimientos del Sur, S.A.', '', 'A87654321', 'Julio Reina', '950222000', 'oficina@mantesur-demo.es'],
-      ['Copistería Central', 'Copistería Central', '99887766X', 'Nuria Paz', '950333000', 'info@copicentral-demo.es']
+      ['Copistería Central', 'Copistería Central', '99887766X', 'Nuria Paz', '950333000', 'info@copicentral-demo.es'],
+      /* Fila 328: una sin NIF y dos con el mismo (la entrega al Centro de datos las lleva todas). */
+      ['Papelería La Esquina, S.L.', 'La Esquina', 'B-11223344', 'Rosa Vela', '950444000', 'esquina@papeleria-demo.es'],
+      ['Reparaciones de Mentira', '', '', 'Tomás Gil', '950555000', ''],
+      ['Suministros Dobla Norte, S.L.', 'Dobla Norte', 'b12345678', '', '950666000', '']
     ]));
 
     /* Fila 238: dos ficheros del Consejo Escolar (como los da Séneca: el de

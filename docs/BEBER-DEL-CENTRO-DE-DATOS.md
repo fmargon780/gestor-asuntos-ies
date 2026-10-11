@@ -39,7 +39,7 @@ La versión buena vive en `docs/CONTRATO.md` de `centro-de-datos-ies`. Lo que ha
 
 Reglas del contrato que obligan al gestor:
 
-- **El gestor solo lee** esa carpeta. Nunca escribe en ella. La carpeta se pide en modo lectura.
+- **El gestor solo lee** esa carpeta, salvo una cosa (fila 328, `docs/ENTREGAR-EMPRESAS-AL-CENTRO-DE-DATOS.md`): deja un único fichero en `entrada/`, `ENTREGA empresas gestor-asuntos-ies.json`, con su lista de empresas (`js/centro-de-datos-entregar.js`). Traer los listados sigue pidiendo solo el permiso de leer; la carpeta se señala y se pide ahora para leer y escribir, y si se niega el de escribir se queda con el de leer.
 - Los ficheros están **tal como salieron de Séneca**, byte a byte. Se leen como ya se leen hoy.
 - Si `contrato` es mayor que 1: no se toca nada y se dice «El Centro de datos es más nuevo que
   esta aplicación».

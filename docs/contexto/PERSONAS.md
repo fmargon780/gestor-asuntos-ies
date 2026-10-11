@@ -46,6 +46,10 @@ aviso por edad ni por columna que falte: eso es solo de `js/dni.js`, que no se t
 Se comprueba con `pruebas/dni-personal.mjs` (sin navegador, con un contexto de mentira que carga
 `js/datos.js` y `js/asuntos-nuevo.js`) y con los casos nuevos de `pruebas/logica.mjs`.
 
+### La lista de empresas, entregada al Centro de datos (11-oct-2026, fila 328)
+
+`js/centro-de-datos-entregar.js` (`CentroDeDatosEntregar`) deja la lista entera de `empresas.csv` en `entrada/ENTREGA empresas gestor-asuntos-ies.json` de la carpeta del Centro de datos. Se mira al entrar (tras `CentroDeDatos.traer`) y 5 s después del último cambio de la lista (`Datos.alCambiarLista`, que llama `js/datos-listas.js`); solo entrega el ordenador con la carpeta señalada y permiso de escribir, solo si el índice trae `recibe` con las empresas y solo si la huella de los datos cambió (`entregado.empresas` en `_GESTOR/centro-de-datos.json`). De tener empresas a ninguna no se entrega sola. Ajustes → Este ordenador dice cómo va; «Entregar ahora» es la reserva. Prueba: `pruebas/centro-de-datos-entregar.mjs`. Demostración: `?entregar=1`, `?recibe=0`, `?sinescribir=1`.
+
 ### El nombre comercial de las empresas
 
 Columna adicional en el alta. El buscador encuentra al proveedor por cualquiera de los dos
