@@ -95,7 +95,7 @@ primera, «(lo normal)»; `cambia: false` la deja encendida en solo consulta). F
 (`Problemas.calculador`: al entrar y en cada refresco de Inicio, nada con un guardado en marcha, lo
 caro cada diez minutos, a la fuerza al abrir Ajustes). Orden: `Problemas.ORDEN`. Con alguna: «Problemas (N)»,
 punto ámbar en la pestaña y en «Ajustes» del menú, y «N problemas por resolver» en Inicio (id
-`problemas`). `Soporte.abrir(texto)`: «Avisar por Soporte».
+`problemas`). `Soporte.abrir({ tipo: 'error', texto })` (el botón único, `js/soporte-cargar.js`): «Avisar por Soporte»; sin botón, aviso ámbar.
 
 **Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
 `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea

@@ -16,9 +16,8 @@
    - Ajustes › El centro › «Datos del centro y firma» enseña esos
      campos sin poder escribir en ellos: «Se cambia en el Centro de datos».
 
-   Fila 316: también `soporte.buzon` (la dirección del buzón de soporte): se copia a
-   `registro.ajustesAvisos.urlSoporte` si empieza por https:// y en Ajustes › «Buzón de soporte» sale
-   sin poder cambiarse. La dirección con la que cada persona envía correo no se toca.
+   Fila 326: la dirección del buzón de soporte ya no se copia (el botón único la trae de Google).
+   La dirección con la que cada persona envía correo no se toca.
    ============================================================ */
 var CentroDeDatosConfiguracion = (function () {
 
@@ -40,16 +39,10 @@ var CentroDeDatosConfiguracion = (function () {
     return typeof v === 'string' ? v : '';
   }
 
-  function urlDeRegistro() {
-    var r = window.App && App.E && App.E.registro;
-    var u = r && r.ajustesAvisos && r.ajustesAvisos.urlSoporte;
-    return typeof u === 'string' ? u.trim() : '';
-  }
-
-  /* Lee y copia. Devuelve { centro, buzon }: true en lo que se ha copiado de verdad. */
+  /* Lee y copia. Devuelve { centro }: true si se ha copiado algo de verdad. */
   async function tomar(dir, indice, apuntes) {
     var conf = await Carpetas.leerJson(dir, 'configuracion.json');
-    var NADA = { centro: false, buzon: false };
+    var NADA = { centro: false };
     if (!conf || typeof conf !== 'object') return NADA;
     if ((conf.contrato || 1) > 1) return NADA;   /* el contrato de configuracion.json es el suyo (1), no el del índice */
     var previo = apuntes && apuntes.configuracion;
@@ -70,53 +63,22 @@ var CentroDeDatosConfiguracion = (function () {
         return actual;
       });
     }
-    /* Fila 316: la dirección del buzón de soporte, a donde ya vive. */
-    var buzon = conf.soporte && typeof conf.soporte.buzon === 'string' ? conf.soporte.buzon.trim() : '';
-    var buzonVale = /^https:\/\//i.test(buzon);
-    var buzonCopiado = false;
-    if (buzonVale && buzon !== urlDeRegistro()) {
-      await App.guardarRegistroFresco(function (reg) {
-        reg.ajustesAvisos = reg.ajustesAvisos || {};
-        reg.ajustesAvisos.urlSoporte = buzon;
-      });
-      buzonCopiado = true;
-    }
     await CentroDeDatos.apuntarConfiguracion({
       actualizado: conf.actualizado || '', actualizadoPor: conf.actualizadoPor || '', tomadoEl: U.ahora ? U.ahora() : new Date().toISOString(),
       vienen: vienen,
       telefono: (conf.centro && conf.centro.telefono) || '',
       direccionDelCentro: (conf.correo && conf.correo.direccionDelCentro) || '',
-      web: (indice && typeof indice.web === 'string') ? indice.web : '',
-      buzonSoporte: buzonVale
+      web: (indice && typeof indice.web === 'string') ? indice.web : ''
     });
-    return { centro: hay, buzon: buzonCopiado };
+    return { centro: hay };
   }
 
   /* ---------- Ajustes ---------- */
-
-  /* Fila 316: el campo «Dirección del buzón de soporte». */
-  function marcarBuzon(ap) {
-    var campo = $('soporte-url');
-    if (!campo) return;
-    var viene = !!(ap && ap.buzonSoporte);
-    campo.readOnly = viene;
-    campo.classList.toggle('viene-de-fuera', viene);
-    if (viene && campo.offsetParent && urlDeRegistro() && campo.value !== urlDeRegistro()) campo.value = urlDeRegistro();
-    var nota = $('soporte-url-nota-centro');
-    if (viene && !nota) {
-      nota = document.createElement('p');
-      nota.id = 'soporte-url-nota-centro';
-      nota.className = 'nota';
-      nota.textContent = 'Se cambia en el Centro de datos';
-      campo.parentNode.insertBefore(nota, campo.nextSibling);
-    } else if (!viene && nota) nota.remove();
-  }
 
   async function marcarCampos() {
     if (!window.CentroDeDatos) return;
     var ap = null;
     try { ap = (await CentroDeDatos.leerApuntes()).configuracion; } catch (e) { ap = null; }
-    marcarBuzon(ap);
     var cuerpo = $('centro-firma-cuerpo');
     if (!cuerpo) return;
     var vienen = (ap && ap.vienen) || [];

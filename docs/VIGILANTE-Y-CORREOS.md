@@ -1,3 +1,5 @@
+Mudado a `fmargon780/soporte-apps` el 11-oct-2026; lo vivo está allí.
+
 # El vigilante: correos de aviso, apps caídas y respuesta a quien avisó (fila 268 de la cola)
 
 Diseño cerrado con Francisco el 5-oct-2026, en Cowork. Lo que él decidió, y por qué, está en

@@ -27,7 +27,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob:"
+          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob: https://script.google.com https://script.googleusercontent.com"
         }
       ]
     }
