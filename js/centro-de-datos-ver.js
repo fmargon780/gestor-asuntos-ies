@@ -74,7 +74,7 @@ var CentroDeDatosVer = (function () {
     if (centro && !$('bloque-centro-de-datos')) {
       var det = bloque('bloque-centro-de-datos', 'Carpeta del Centro de datos', 'De dónde salen los listados de Séneca, en este ordenador',
         '<p class="explica">Señala la carpeta «CENTRO DE DATOS» de Google Drive para ordenador, la que tiene ' +
-        '<code>indice.json</code>. Es de este ordenador: el otro usa lo que traiga este. Aquí solo se lee, nunca se escribe.</p>' +
+        '<code>indice.json</code>. Es de este ordenador: el otro usa lo que traiga este. Aquí se leen los listados; lo único que se escribe es la lista de empresas, en su carpeta «entrada».</p>' +
         '<p class="explica" id="centro-de-datos-carpeta"></p>' +
         '<div class="alta-tipo"><button type="button" class="boton" id="centro-de-datos-senalar">Señalar la carpeta</button>' +
         '<button type="button" class="boton" id="centro-de-datos-olvidar">Olvidarla</button>' +
