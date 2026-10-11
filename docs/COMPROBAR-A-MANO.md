@@ -269,3 +269,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 329 — las Administraciones, entregadas al Centro de datos (11-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Administraciones entregadas al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Administraciones: …» con el mismo número.
+
+## Fila 330 — los cargos, entregados al Centro de datos (11-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Cargos entregados al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Cargos: …» con el mismo número.
