@@ -257,3 +257,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 326 — el botón «Soporte» único (11-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En el centro, con la copia sin internet ya actualizada: abajo a la derecha sale el botón «Soporte». Pulsarlo, elegir «Propongo una mejora», escribir «Prueba del botón único» y enviar. Sale «Recibido. Gracias.» sin pedir el correo, y en el Centro de mando aparece una idea nueva del Gestor. Repetirlo una vez en la web, desde casa. (Esta entrada sustituye a las de las filas 213, 240, 261, 262, 268, 269, 315 y 316: el buzón ya no es de este repositorio.)
+
+## Fila 327 — el personal ya preparado (11-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En el ordenador con la carpeta del Centro de datos señalada: Herramientas → «Traer el alumnado»; la fila «Personal 26-27» dice que lo hace el propio Centro de datos y trae las mismas personas que la página del Centro de datos.
