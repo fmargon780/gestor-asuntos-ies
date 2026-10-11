@@ -112,7 +112,7 @@ const entrada = () => pagina.evaluate(async () => {
   for (const n of salida.nombres) salida.json[n] = JSON.parse(await Carpetas.leerTexto(e, n));
   return salida;
 });
-const mirar = () => pagina.evaluate(async () => { const r = await CentroDeDatosEntregar.mirar({}); return r.listas ? Object.fromEntries(Object.entries(r.listas).map(([k, v]) => [k, v.estado])) : r.estado; });
+const mirar = () => pagina.evaluate(async () => { const r = await CentroDeDatosEntregar.mirar({}); return r.listas ? Object.fromEntries(Object.entries(r.listas).filter(([k]) => k !== 'cargos').map(([k, v]) => [k, v.estado])) : r.estado; });   /* los cargos son de la fila 330 */
 const entregas = () => pagina.evaluate(() => Object.fromEntries(Object.entries(window.__entregas).sort()));
 const apunte = () => pagina.evaluate(async () => { const a = await CentroDeDatos.leerApuntes(true); return { entregado: a.entregado || null, tomado: Object.keys(a.tomado) }; });
 const instantanea = () => pagina.evaluate(async () => {

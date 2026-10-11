@@ -217,7 +217,7 @@
       /* Fila 328: el índice recibe las empresas y falta el permiso de escribir: ámbar, y «Arreglarlo» lo pide. */
       var sinEscribir = (window.CentroDeDatosEntregar && !(window.SoloConsulta && SoloConsulta.activo())) ? await CentroDeDatosEntregar.listasSinPermisoDeEscribir() : [];
       if (sinEscribir.length) {   /* fila 329: nombra las listas que se reciben y no se pueden entregar */
-        var f = resultado('centro-de-datos', T, 'falta', 'Falta el permiso para escribir: ' + sinEscribir.join(' y ') + ' no se entregan al Centro de datos.', arreglar, true);
+        var f = resultado('centro-de-datos', T, 'falta', 'Falta el permiso para escribir: ' + (sinEscribir.length > 1 ? sinEscribir.slice(0, -1).join(', ') + ' y ' + sinEscribir[sinEscribir.length - 1] : sinEscribir[0]) + ' no se entregan al Centro de datos.', arreglar, true);
         f.boton = 'Arreglarlo';
         f.darPermiso = async function () { return (await CentroDeDatos.pedirPermisos(dir)) && (await CentroDeDatos.permisoEscribir(dir, false)); };
         return f;

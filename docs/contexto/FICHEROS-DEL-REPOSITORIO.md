@@ -347,6 +347,8 @@ de `App` va después del fichero que lo define.
 | `js/centro-de-datos-entregar.js` | Entrega la lista de empresas al Centro de datos (un fichero en `entrada/`, huella, apunte `entregado`, línea de Ajustes, «Entregar ahora») (fila 328) |
 | `js/demo/datos-administraciones.js` | Cuatro Administraciones inventadas para la copia de pruebas (dos organismos con un superior común, uno con departamentos y un nombre anterior, y dos centros) (fila 329) |
 | `pruebas/centro-de-datos-entregar-administraciones.mjs` | Prueba en navegador (fila 329): la entrega de Administraciones (forma, id, árbol, nombres anteriores, cambios, vacía, sin fichero, solo esos ficheros) y la fila ámbar con las dos listas |
+| `js/demo/datos-cargos.js` | Dos ocupantes inventados de Dirección (el de hoy y uno anterior) para la copia de pruebas (fila 330) |
+| `pruebas/centro-de-datos-entregar-cargos.mjs` | Prueba en navegador (fila 330): la entrega de cargos (forma, id, orden, cambios, fechas que se pisan, sin fichero, vacía, quién firma) y la fila ámbar con las tres listas |
 | `js/demo/entrega.js` | `?entregar=1`, `?recibe=0`, `?sinescribir=1` de la copia de pruebas (fila 328) |
 | `pruebas/centro-de-datos-entregar.mjs` | Prueba en navegador (fila 328): la entrega de empresas, sus id, no repetir, cambios, vacía, fallos, solo escribir ese fichero, solo permiso de leer y la comprobación al entrar |
 | `js/centro-de-datos-personal.js` | Toma las partes del personal ya preparadas por el Centro de datos (huella SHA-256, copia a `_GESTOR/datos/PERSONAL-HECHO <curso>.json`, apunte `hecho-personal|<curso>`) (fila 327) |

@@ -619,6 +619,7 @@
     await escribirDatos();
     /* Fila 249: quien ocupa Secretaría, para «Recibe» al liquidar. */
     try { if (window.Cargos) await Cargos.anadirOcupante('secretaria', 'Fernando Reyes Palma', '2020-09-01', 'H'); } catch (e) { /* sin cargo, «Recibe» sale vacío */ }
+    try { if (window.Demo.cargos) await Demo.cargos.escribir(); } catch (e) { /* sin cargos de Dirección */ }   /* fila 330 */
     /* La entrada normal ya ha podido leer (y guardar en caché, vacíos)
        los CSV de personas al pintar Inicio, antes de que estos
        existieran: se tira esa caché para que la próxima lectura sí los

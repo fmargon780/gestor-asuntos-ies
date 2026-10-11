@@ -54,6 +54,10 @@ Se comprueba con `pruebas/dni-personal.mjs` (sin navegador, con un contexto de m
 
 La segunda lista de `js/centro-de-datos-entregar.js` (misma mecánica que las empresas, cada una por separado): sale de `administraciones.json` (no de un CSV) y `Administraciones.paraEntregar(d)` (`js/administraciones.js`) da los registros (`id` del organismo, árbol de departamentos aplanado con `nivel` y `dependeDe`). `Administraciones.cambiar` avisa por `Datos.alCambiarLista` cuando de verdad escribe. Ajustes dice una línea por lista, un solo «Dar permiso» y «Entregar ahora» entrega todo con una frase por lista. Prueba: `pruebas/centro-de-datos-entregar-administraciones.mjs`. Demostración: cuatro Administraciones (`js/demo/datos-administraciones.js`) y `?recibe=empresas`.
 
+### Los cargos, entregados al Centro de datos (11-oct-2026, fila 330)
+
+La tercera lista de `js/centro-de-datos-entregar.js`: sale de `_GESTOR/cargos.json` (no de `_GESTOR/datos`; `enGestor: true`) y `Cargos.paraEntregar(leido)` (`js/cargos.js`) da un registro por cargo y ocupante, sobre lo leído tal cual (sin los `id` nuevos que inventa `normalizar`). `Cargos.cambiar` avisa por `Datos.alCambiarLista` (categoría `CARGOS`). Se cuenta por cargos distintos (`cuenta` en el apunte); «vacía» es que ningún cargo tiene ocupante (`conDatos` en el apunte); sin `cargos.json` no se entrega. Prueba: `pruebas/centro-de-datos-entregar-cargos.mjs`. Demostración: Dirección con dos ocupantes (`js/demo/datos-cargos.js`).
+
 ### El nombre comercial de las empresas
 
 Columna adicional en el alta. El buscador encuentra al proveedor por cualquiera de los dos

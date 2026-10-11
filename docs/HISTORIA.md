@@ -5182,3 +5182,7 @@ El Gestor deja la lista entera de empresas en `entrada/ENTREGA empresas gestor-a
 ## 11-oct-2026 · fila 329 · el Gestor entrega también sus Administraciones al Centro de datos
 
 Segunda lista del camino de la fila 328: `administraciones.json` (con el árbol de departamentos aplanado y los nombres anteriores) se entrega entera en `entrada/ENTREGA administraciones gestor-asuntos-ies.json`, cada lista por separado, con el índice leído una vez. El acuerdo está copiado en `docs/CENTRO-DE-DATOS-CONTRATO-2.md` porque la fila 24 del Centro de datos no se pudo consultar. `Administraciones.paraEntregar` vive en `js/administraciones.js` (541 líneas).
+
+## 11-oct-2026 · fila 330 · el Gestor entrega también sus cargos al Centro de datos
+
+Tercera lista del camino de las filas 328 y 329: `_GESTOR/cargos.json` se entrega entero (un registro por cargo y ocupante) en `entrada/ENTREGA cargos gestor-asuntos-ies.json`. Decisiones: la tabla de listas gana `enGestor` (el fichero está en `_GESTOR`), `cuenta` (cargos distintos) y `sinDatos` (ningún ocupante); el apunte lleva `cuenta` y `conDatos` (los apuntes de antes se leen por `registros`). Sin `cargos.json` no se entrega. El acuerdo está copiado en `docs/CENTRO-DE-DATOS-CONTRATO-2.md` porque la fila 25 del Centro de datos no se pudo consultar.

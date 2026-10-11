@@ -34,7 +34,7 @@ var CentroDeDatosEntregar = (function () {
   var EMPRESAS = {
     conjunto: 'empresas', categoria: 'EMPRESAS', csv: 'empresas.csv',
     fichero: 'ENTREGA empresas ' + ORIGEN + '.json',
-    titulo: 'Empresas', frase: 'las empresas', listaDe: 'La lista de empresas', unidad: ['empresa', 'empresas'],
+    titulo: 'Empresas', frase: 'las empresas', loEntrega: 'las', entregadas: 'Entregadas', listaDe: 'La lista de empresas', unidad: ['empresa', 'empresas'],
     campos: [
       { clave: 'razonSocial', etiqueta: 'Razón social', apartado: 'Empresa', tipo: 'texto', columna: 'Razón social' },
       { clave: 'nombreComercial', etiqueta: 'Nombre comercial', apartado: 'Empresa', tipo: 'texto', columna: 'Nombre comercial' },
@@ -58,7 +58,7 @@ var CentroDeDatosEntregar = (function () {
   var ADMINISTRACIONES = {
     conjunto: 'administraciones', categoria: 'ADMINISTRACIONES', archivo: 'administraciones.json',
     fichero: 'ENTREGA administraciones ' + ORIGEN + '.json',
-    titulo: 'Administraciones', frase: 'las Administraciones', listaDe: 'La lista de Administraciones', unidad: ['Administración', 'Administraciones'],
+    titulo: 'Administraciones', frase: 'las Administraciones', loEntrega: 'las', entregadas: 'Entregadas', listaDe: 'La lista de Administraciones', unidad: ['Administración', 'Administraciones'],
     campos: [
       { clave: 'clase', etiqueta: 'Clase', apartado: 'Administración', tipo: 'texto' },
       { clave: 'tercero', etiqueta: 'Nombre en el Gestor', apartado: 'Administración', tipo: 'texto' },
@@ -81,7 +81,37 @@ var CentroDeDatosEntregar = (function () {
     /* Los registros los da quien conoce el árbol (js/administraciones.js). */
     json: function (leido) { return Administraciones.paraEntregar(leido); }
   };
-  var LISTAS = [EMPRESAS, ADMINISTRACIONES];
+
+  /* Los cargos: `cargos.json` está en `_GESTOR` (no en `_GESTOR/datos`); un registro por cargo y ocupante. Se cuenta por cargos
+     distintos, y «vacía» es que ningún cargo tiene ocupante. */
+  var CARGOS = {
+    conjunto: 'cargos', categoria: 'CARGOS', archivo: 'cargos.json', enGestor: true,
+    fichero: 'ENTREGA cargos ' + ORIGEN + '.json',
+    titulo: 'Cargos', frase: 'los cargos', loEntrega: 'los', entregadas: 'Entregados', unidad: ['cargo', 'cargos'],
+    textoVacia: 'Los cargos no tienen ningún ocupante y antes sí: no los he entregado.', botonVacia: 'Entregar de todos modos',
+    campos: [
+      { clave: 'cargo', etiqueta: 'Cargo (identificador)', apartado: 'Cargo', tipo: 'texto' },
+      { clave: 'cargoNombre', etiqueta: 'Cargo', apartado: 'Cargo', tipo: 'texto' },
+      { clave: 'tratamiento', etiqueta: 'Tratamiento', apartado: 'Cargo', tipo: 'texto' },
+      { clave: 'orden', etiqueta: 'Orden', apartado: 'Cargo', tipo: 'numero' },
+      { clave: 'persona', etiqueta: 'Persona', apartado: 'Ocupante', tipo: 'texto' },
+      { clave: 'sexo', etiqueta: 'Sexo', apartado: 'Ocupante', tipo: 'texto' },
+      { clave: 'desde', etiqueta: 'Desde', apartado: 'Ocupante', tipo: 'fecha' },
+      { clave: 'hasta', etiqueta: 'Hasta', apartado: 'Ocupante', tipo: 'fecha' }
+    ],
+    json: function (leido) { return Cargos.paraEntregar(leido); },
+    cuenta: function (registros) {
+      var v = {};
+      registros.forEach(function (r) { v[r.datos.cargo || r.datos.cargoNombre || ''] = true; });
+      return Object.keys(v).length;
+    },
+    sinDatos: function (registros) { return !registros.some(function (r) { return r.datos.persona; }); }
+  };
+  var LISTAS = [EMPRESAS, ADMINISTRACIONES, CARGOS];
+
+  function cuentaDe(lista, registros) { return lista.cuenta ? lista.cuenta(registros) : registros.length; }
+  function sinDatosDe(lista, registros) { return lista.sinDatos ? lista.sinDatos(registros) : !registros.length; }
+  function dirDe(lista) { return lista.enGestor ? gestor() : datosDir(); }
 
   var temporizador = null;
   var mirando = false;
@@ -127,7 +157,7 @@ var CentroDeDatosEntregar = (function () {
      { registros, campos, huella } o { sinFichero: true }. Un fichero que no se puede leer lanza. */
   function montar(lista) {
     return ColaGuardado.poner(nombreDeFichero(lista), async function () {
-      var texto = await Carpetas.leerTexto(datosDir(), nombreDeFichero(lista));
+      var texto = await Carpetas.leerTexto(dirDe(lista), nombreDeFichero(lista));
       if (texto === null) return { sinFichero: true };
       if (lista.json) {   /* un JSON de `_GESTOR/datos`: los campos son todos los de la tabla */
         var leido;
@@ -212,6 +242,9 @@ var CentroDeDatosEntregar = (function () {
 
   function mirarCarpeta(lista) { return leerCarpeta().then(function (b) { return paraLista(b, lista); }); }
 
+  /* ¿Lo último entregado de esa lista tenía datos? (Los apuntes de antes de la fila 330 no lo dicen: se mira por los registros.) */
+  function tuvoDatos(previo) { return !!previo && (previo.conDatos !== undefined ? !!previo.conDatos : previo.registros > 0); }
+
   function sinGuardado() { return !(window.ColaGuardado && ColaGuardado.hayGuardado()); }
 
   /* Entrega una lista si hace falta. `base`: lo de `leerCarpeta` (si no, se lee). `op.vacia`: entregar aunque ahora esté
@@ -229,14 +262,15 @@ var CentroDeDatosEntregar = (function () {
     var apuntes = await CentroDeDatos.leerApuntes(true);
     var previo = apuntes.entregado && apuntes.entregado[lista.conjunto];
     if (previo && previo.huellaDatos === m.huella) return { estado: 'nada-nuevo', registros: m.registros.length };
-    if (!m.registros.length && previo && previo.registros > 0 && !(op.vacia === true || op.vacia === lista.conjunto)) return { estado: 'vacia' };
+    if (sinDatosDe(lista, m.registros) && tuvoDatos(previo) && !(op.vacia === true || op.vacia === lista.conjunto)) return { estado: 'vacia' };
     var entrega = entregaDe(lista, m);
     await escribirEntrega(c.dir, lista.fichero, JSON.stringify(entrega));
     await CentroDeDatos.apuntarEntregado(lista.conjunto, {
-      huellaDatos: m.huella, registros: m.registros.length, generado: entrega.generado, entregadoEl: new Date().toISOString(), entregadoPor: quien()
+      huellaDatos: m.huella, registros: m.registros.length, cuenta: cuentaDe(lista, m.registros), conDatos: !sinDatosDe(lista, m.registros),
+      generado: entrega.generado, entregadoEl: new Date().toISOString(), entregadoPor: quien()
     });
     if (window.CentroDeDatosVer) CentroDeDatosVer.pintar();
-    return { estado: 'entregado', registros: m.registros.length };
+    return { estado: 'entregado', registros: m.registros.length, cuenta: cuentaDe(lista, m.registros) };
   }
 
   /* Mira todas las listas, cada una por separado y con el índice leído una sola vez. Con un guardado en marcha espera
@@ -284,7 +318,7 @@ var CentroDeDatosEntregar = (function () {
   }
 
   var FRASES_DE_ESTADO = {
-    'vacia': function (l) { return l.listaDe + ' está vacía y antes no lo estaba: no la he entregado.'; },
+    'vacia': function (l) { return l.textoVacia || (l.listaDe + ' está vacía y antes no lo estaba: no la he entregado.'); },
     'sin-carpeta': function () { return 'Primero señala la carpeta del Centro de datos en este ordenador.'; },
     'sin-permiso-leer': function () { return 'El navegador no da permiso a la carpeta del Centro de datos.'; },
     'sin-permiso-escribir': function () { return 'Falta el permiso para escribir en la carpeta del Centro de datos.'; },
@@ -312,7 +346,7 @@ var CentroDeDatosEntregar = (function () {
     if (entregadas.length) {
       LISTAS.forEach(function (l) {
         var r = listas[l.conjunto];
-        if (r.estado === 'entregado') frases.push('Entregadas ' + r.registros + ' ' + l.unidad[r.registros === 1 ? 0 : 1] + (entregadas.length === 1 && LISTAS.length === 1 ? ' al Centro de datos' : '') + '.');
+        if (r.estado === 'entregado') frases.push(l.entregadas + ' ' + r.cuenta + ' ' + l.unidad[r.cuenta === 1 ? 0 : 1] + '.');
         else if (r.estado === 'nada-nuevo') frases.push('No hay nada nuevo de ' + l.frase + '.');
       });
     } else if (estados.every(function (r) { return r.estado === 'nada-nuevo'; })) frases.push('No hay nada nuevo que entregar.');
@@ -326,7 +360,7 @@ var CentroDeDatosEntregar = (function () {
     var buena = entregadas.length > 0 || estados.every(function (r) { return r.estado === 'nada-nuevo'; });
     if (frases.length) U.aviso(frases.join(' '), buena ? 'bueno' : 'ambar');
     var primera = entregadas[0] || LISTAS.filter(function (l) { return listas[l.conjunto].estado !== 'nada-nuevo'; })[0] || LISTAS[0];
-    return { estado: listas[primera.conjunto].estado, registros: listas[primera.conjunto].registros, listas: listas };
+    return { estado: listas[primera.conjunto].estado, registros: listas[primera.conjunto].registros, cuenta: listas[primera.conjunto].cuenta, listas: listas };
   }
 
   /* ---------- lo que se ve en Ajustes ---------- */
@@ -338,28 +372,30 @@ var CentroDeDatosEntregar = (function () {
     var fecha = previo ? CentroDeDatos.fechaCorta(previo.entregadoEl, true) : '';
     var c = paraLista(base, lista);
     if (c.estado === 'sin-carpeta') {
-      return previo ? { texto: lista.frase.charAt(0).toUpperCase() + lista.frase.slice(1) + ' las entrega el otro ordenador. Última entrega: ' + previo.registros + ', el ' + fecha + '.' } : null;
+      return previo ? { texto: lista.frase.charAt(0).toUpperCase() + lista.frase.slice(1) + ' ' + lista.loEntrega + ' entrega el otro ordenador. Última entrega: ' + cuentaPrevia(previo) + ', el ' + fecha + '.' } : null;
     }
     if (c.estado === 'no-recibe') return { texto: 'El Centro de datos todavía no recibe ' + lista.frase + '.' };
     if (c.estado === 'sin-permiso-escribir') return { texto: 'Falta el permiso para escribir en esta carpeta: ' + lista.frase + ' no se entregan.', boton: 'permiso' };
     if (c.estado !== 'ok') return null;
     if (!(await huellaDe('x'))) return { texto: 'Este navegador no puede preparar la entrega de ' + lista.frase + '.' };
     var vacia = false;
-    if (previo && previo.registros > 0) {   /* se repinta a menudo: lo caro (leer el fichero) se mira como mucho cada 15 s */
+    if (tuvoDatos(previo)) {   /* se repinta a menudo: lo caro (leer el fichero) se mira como mucho cada 15 s */
       var u = ultimaVacia[lista.conjunto] || { t: 0, v: false };
       if (Date.now() - u.t < 15000) vacia = u.v;
       else {
         try {
           var m = await montar(lista);
-          vacia = !m.sinFichero && !m.registros.length && previo.huellaDatos !== m.huella;
+          vacia = !m.sinFichero && sinDatosDe(lista, m.registros) && previo.huellaDatos !== m.huella;
         } catch (e) { vacia = false; }
         ultimaVacia[lista.conjunto] = { t: Date.now(), v: vacia };
       }
     }
-    if (vacia) return { texto: lista.listaDe + ' está vacía y antes no lo estaba: no la he entregado.', boton: 'vacia' };
+    if (vacia) return { texto: lista.textoVacia || (lista.listaDe + ' está vacía y antes no lo estaba: no la he entregado.'), boton: 'vacia' };
     if (!previo) return { texto: 'Todavía no se han entregado ' + lista.frase + ' al Centro de datos.' };
-    return { texto: lista.titulo + ' entregadas al Centro de datos: ' + previo.registros + ', el ' + fecha + (previo.entregadoPor ? ' (' + previo.entregadoPor + ')' : '') + '.' };
+    return { texto: lista.titulo + ' ' + lista.entregadas.toLowerCase() + ' al Centro de datos: ' + cuentaPrevia(previo) + ', el ' + fecha + (previo.entregadoPor ? ' (' + previo.entregadoPor + ')' : '') + '.' };
   }
+
+  function cuentaPrevia(previo) { return previo.cuenta !== undefined ? previo.cuenta : previo.registros; }
 
   /* Una por lista: { <conjunto>: { texto, boton? } | null }. */
   async function estadosParaAjustes() {
