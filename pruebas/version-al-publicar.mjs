@@ -6,7 +6,7 @@
    1. La hora es la de España, en invierno y en verano, y cambia de día
       y de año a medianoche de España (no de UTC).
    2. Solo cambia la línea App.VERSION; sin ella, no rompe nada.
-   3. vercel.json lo llama como buildCommand y el ignoreCommand sigue igual.
+   3. vercel.json lo llama como buildCommand (el ignoreCommand ya no existe: fila 331).
    4. Ejecutado sobre una copia, escribe la hora en la copia y el
       js/version.js del repositorio no cambia. */
 import fs from 'node:fs';
@@ -42,7 +42,7 @@ comprobar('2. el js/version.js del repositorio lleva una fecha escrita, nunca va
 /* 3 */
 const vercel = JSON.parse(fs.readFileSync(raiz + 'vercel.json', 'utf8'));
 comprobar('3. buildCommand', vercel.buildCommand, 'node scripts/version-al-publicar.mjs');
-comprobar('3. el ignoreCommand, igual que antes', vercel.ignoreCommand, 'bash scripts/vercel-ignore-build.sh');
+comprobar('3. sin ignoreCommand (fila 331)', vercel.ignoreCommand, undefined);
 comprobar('3. scripts/ se publica (si no, Vercel no encuentra el script)',
   fs.readFileSync(raiz + '.vercelignore', 'utf8').split('\n').some(l => l.trim() === 'scripts/'), false);
 

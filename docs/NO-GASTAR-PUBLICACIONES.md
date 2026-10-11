@@ -1,3 +1,5 @@
+Sustituido en lo de publicar por `docs/PUBLICAR-SOLO-AL-TERMINAR.md` (11-oct-2026).
+
 # No gastar publicaciones de Vercel
 
 Acordado con Francisco el 17-sep-2026, el día que Vercel dejó de publicar.

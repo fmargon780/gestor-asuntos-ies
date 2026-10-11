@@ -221,18 +221,7 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   fila 178: ya no había manejadores en línea que lo impidieran —`grep 'onclick="' index.html` da
   cero—, así que se pudo añadir `script-src`; `blob:` por el trabajador de pdf.js. Sin política de
   conexiones a propósito: la aplicación llama a Apps Script).
-- **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
-  `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
-  un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
-  `claude/...` con pull request abierto gastando además su propia vista previa. `vercel.json`
-  gana `ignoreCommand`: se salta la publicación cuando la rama no es `main`, o cuando el cambio
-  solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando contra
-  `VERCEL_GIT_PREVIOUS_SHA`, el commit de la última publicación buena, no siempre `HEAD^`: con
-  dos commits en el mismo push —código y luego documentos— comparar solo con `HEAD^` se saltaría
-  la publicación del código). Ante cualquier duda, publica. **`ignoreCommand` no puede pasar de
-  256 caracteres** (Vercel lo rechaza si se pasa: pasó la primera vez, con 296): la receta vive
-  en `scripts/vercel-ignore-build.sh`, y `ignoreCommand` solo lo llama. Y la regla 13 de
-  `docs/COLA.md`: como mucho dos subidas por fila. Prueba: `pruebas/vercel-ignore-command.mjs`.
+- **El plan gratuito (Hobby) solo da 100 publicaciones al día a toda la cuenta** (filas 48 y 331, `docs/PUBLICAR-SOLO-AL-TERMINAR.md`): Vercel no publica nada solo (`vercel.json`: `git.deploymentEnabled: false`, sin `ignoreCommand`, porque las publicaciones canceladas también cuentan). Cada fila con código publica una vez, a propósito, con `create_deployment` tras fusionar en `main`. Prueba: `pruebas/sin-publicacion-automatica.mjs`.
 
 ### Ficheros del repositorio
 

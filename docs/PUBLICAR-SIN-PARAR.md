@@ -1,3 +1,5 @@
+Sustituido en lo de publicar por `docs/PUBLICAR-SOLO-AL-TERMINAR.md` (11-oct-2026).
+
 # Publicar sin parar la cola (fila 211)
 
 Acordado con Francisco el 28-sep-2026. Norma para todos sus proyectos.
