@@ -4,7 +4,7 @@
    1. Las cuatro pestañas, en su orden y con su línea gris; no existe «Mantenimiento».
    2. Cada sección de la tabla está en su sitio y solo en uno; nada queda en el sitio de paso que no se ve.
    3. «Problemas»: con el asunto sin carpeta de la demostración sale su tarjeta y el punto ámbar; al quitarlo, la tarjeta desaparece (el resto, en pruebas/problemas.mjs).
-   4. Herramientas lleva «Puesta a punto y reparaciones» con sus ocho secciones.
+   4. Herramientas lleva «Puesta a punto y reparaciones» con sus nueve secciones.
    5. El buscador: por título, por otra palabra, sin acentos, resultado de Herramientas, de dentro de un tipo, sin resultados, Esc.
    6. El salto común y lo recordado (pestaña y sección abierta). */
 import { chromium } from 'playwright';
@@ -85,10 +85,10 @@ await comprobar('3. quitado el asunto: la tarjeta desaparece', pagina.evaluate((
 console.log('--- 4. Herramientas ---');
 await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForTimeout(1500);
-await comprobar('4. «Puesta a punto y reparaciones» con sus ocho secciones, en orden',
+await comprobar('4. «Puesta a punto y reparaciones» con sus nueve secciones, en orden',
   pagina.evaluate(() => [document.querySelector('.herramientas-puesta-titulo').textContent, [...document.querySelectorAll('#herramientas-puesta-cuerpo > details .bloque-titulo')].map((t) => t.textContent.trim())]),
   ['Puesta a punto y reparaciones', ['Plantillas del centro', 'Cargar tipos, guías y tareas del instituto', 'Poner en orden las fichas del ARCHIVO', 'Guardar el contacto de los asuntos abiertos',
-    'Versiones previas', 'Duplicados descartados', 'Pasar a Administraciones', 'Borrados que se fusionan']]);
+    'Versiones previas', 'Duplicados descartados', 'Pasar a Administraciones', 'Borrados que se fusionan', 'Medidas']]);
 await comprobar('4. y no queda en Ajustes ninguna sección «Herramientas»', pagina.evaluate(() => [...document.querySelectorAll('#pantalla-ajustes .bloque-titulo')].some((t) => t.textContent.trim() === 'Herramientas')), false);
 
 console.log('--- 5. el buscador ---');
