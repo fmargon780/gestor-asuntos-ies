@@ -15,7 +15,7 @@
                        sin permiso y no omitidas, todas seguidas.
 
    Cada carpeta pide el mismo modo que pide hoy (alumnado y Centro de
-   datos, solo leer; la bandeja, el de Carpetas). No escribe nada.
+   datos, leer y, desde la fila 328, escribir; la bandeja, el de Carpetas). No escribe nada.
    ============================================================ */
 (function () {
   'use strict';
@@ -27,7 +27,7 @@
     { id: 'alumnado', carpeta: function () { return window.AlumnadoBD ? AlumnadoBD.carpeta() : null; },
       permiso: function (d, p) { return AlumnadoBD.permiso(d, p); } },
     { id: 'centro-de-datos', carpeta: function () { return window.CentroDeDatos ? CentroDeDatos.carpeta() : null; },
-      permiso: function (d, p) { return CentroDeDatos.permiso(d, p); },
+      permiso: function (d, p) { return p ? CentroDeDatos.pedirPermisos(d) : CentroDeDatos.permiso(d, false); },   /* fila 328: leer y escribir en una petición */
       /* En «solo consultar» el Centro de datos no se lee (js/centro-de-datos.js): no se pide. */
       noSePide: function () { return !!(window.SoloConsulta && SoloConsulta.activo()); } },
     { id: 'bandeja', carpeta: function () { return Almacen.leer('bandeja'); },

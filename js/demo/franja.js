@@ -31,6 +31,7 @@
     try {
       var disco = Demo.activar();
       if (Demo.prepararPermisos) await Demo.prepararPermisos(disco);   /* fila 318: carpetas sin permiso (`sinpermiso=`) */
+      if (Demo.prepararEntrega) await Demo.prepararEntrega(disco);   /* fila 328: `entregar=`, `recibe=0`, `sinescribir=1` */
 
       App.E.abiertos = disco.abiertos;
       App.marcarCarpeta('estado-abiertos', disco.abiertos.name);

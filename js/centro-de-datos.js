@@ -67,6 +67,24 @@ var CentroDeDatos = (function () {
     } catch (e) { return false; }
   }
 
+  /* Fila 328: el permiso de ESCRIBIR (solo para entregar las empresas, js/centro-de-datos-entregar.js). Traer los
+     listados sigue pidiendo solo leer. */
+  async function permisoEscribir(dir, pedir) {
+    var op = { mode: 'readwrite' };
+    try {
+      if ((await dir.queryPermission(op)) === 'granted') return true;
+      if (!pedir) return false;
+      return (await dir.requestPermission(op)) === 'granted';
+    } catch (e) { return false; }
+  }
+
+  /* Donde hoy se pide el permiso con una pulsación: leer y escribir en una sola petición. Si se niega el de
+     escribir, se intenta quedar al menos con el de leer. Devuelve true si queda con el de leer. */
+  async function pedirPermisos(dir) {
+    if (await permisoEscribir(dir, true)) return true;
+    return permiso(dir, true);
+  }
+
   /* { ok, indice } o { ok: false, motivo, sinIndice? }. */
   async function leerIndice(dir) {
     var indice;
@@ -80,7 +98,7 @@ var CentroDeDatos = (function () {
 
   async function senalarCarpeta() {
     try {
-      var h = await window.showDirectoryPicker({ id: 'gestor-centro-de-datos', mode: 'read' });
+      var h = await window.showDirectoryPicker({ id: 'gestor-centro-de-datos', mode: 'readwrite' });
       var r = await leerIndice(h);
       if (!r.ok) {
         if (window.CentroDeDatosVer) CentroDeDatosVer.avisoCarpeta('Esta carpeta no es la del Centro de datos.');
@@ -144,6 +162,22 @@ var CentroDeDatos = (function () {
       var g = gestor();
       var actual = await leerApuntes(true);
       actual.configuracion = configuracion;
+      actual._esquema = ESQUEMA;
+      await Copias.guardar(g, FICHERO, actual);
+      enMemoria = actual; leidoEn = Date.now();
+    });
+  }
+
+  /* Fila 328: lo último entregado de un conjunto, junto a `tomado` y sin tocarlo. Un apunte nunca se sustituye por
+     otro de `generado` anterior. */
+  function apuntarEntregado(conjunto, apunte) {
+    return ColaGuardado.poner(FICHERO, async function () {
+      var g = gestor();
+      var actual = await leerApuntes(true);
+      actual.entregado = actual.entregado || {};
+      var previo = actual.entregado[conjunto];
+      if (previo && new Date(previo.generado) > new Date(apunte.generado)) return;
+      actual.entregado[conjunto] = apunte;
       actual._esquema = ESQUEMA;
       await Copias.guardar(g, FICHERO, actual);
       enMemoria = actual; leidoEn = Date.now();
@@ -372,7 +406,9 @@ var CentroDeDatos = (function () {
     function probar() {
       if (window.SoloConsulta && SoloConsulta.activo()) return;
       if (window.ColaGuardado && ColaGuardado.hayGuardado() && intentos++ < 10) { setTimeout(probar, 1500); return; }
-      traer({ avisar: false, pedir: false }).catch(function () { /* a la siguiente entrada */ });
+      traer({ avisar: false, pedir: false }).catch(function () { /* a la siguiente entrada */ }).then(function () {
+        if (window.CentroDeDatosEntregar) CentroDeDatosEntregar.alEntrar();   /* fila 328: después de traer, para no pisarse con el índice */
+      });
     }
     setTimeout(probar, 1500);
   }
@@ -380,10 +416,10 @@ var CentroDeDatos = (function () {
 
   return {
     FICHERO: FICHERO, CLAVE_CARPETA: CLAVE_CARPETA, CONTRATO: CONTRATO, CLAVES: CLAVES, TITULOS: TITULOS,
-    carpeta: carpeta, permiso: permiso, leerIndice: leerIndice, senalarCarpeta: senalarCarpeta, olvidarCarpeta: olvidarCarpeta,
+    carpeta: carpeta, permiso: permiso, permisoEscribir: permisoEscribir, pedirPermisos: pedirPermisos, apuntarEntregado: apuntarEntregado, leerIndice: leerIndice, senalarCarpeta: senalarCarpeta, olvidarCarpeta: olvidarCarpeta,
     leerApuntes: leerApuntes, apuntarConfiguracion: apuntarConfiguracion, apunteDe: apunteDe, traer: traer, registroEsperando: registroEsperando,
     fechaCorta: fechaCorta, hayQueTomar: hayQueTomar, elegir: elegir, pendientes: pendientes, RECOLOCANDO: RECOLOCANDO,
-    _alEntrarDeNuevo: function () { yaMirado = false; alEntrar(); }   /* para las pruebas */
+    _alEntrarDeNuevo: function () { yaMirado = false; if (window.CentroDeDatosEntregar) CentroDeDatosEntregar._reiniciarEntrada(); alEntrar(); }   /* para las pruebas */
   };
 })();
 window.CentroDeDatos = CentroDeDatos;

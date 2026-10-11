@@ -173,6 +173,13 @@ paso a `main`).
 - Sin `auto=1`, al pulsar «Entrar con datos de demostración» se piden esos permisos; con `auto=1` no hay pulsación y no se pide nada.
 - Código: `js/demo/permisos.js`. Sin `sinpermiso=` la demostración queda igual.
 
+## Fila 328: `entregar=1`, `recibe=0`, `sinescribir=1`
+
+- Cualquiera de los tres deja la carpeta del Centro de datos de mentira **señalada antes de entrar** (sin ellos se señala a mano), con `entrada/` y un índice que dice que
+  recibe las empresas. `entregar=1`: con permiso de leer y escribir; las empresas se entregan solas (la copia lleva seis, una sin NIF y dos con el mismo).
+  `recibe=0`: el índice no trae `recibe`. `sinescribir=1`: sin permiso de escribir hasta que se pide («Dar permiso» o «Arreglarlo»); la «Comprobación al entrar» saca su panel sola.
+  Código: `js/demo/entrega.js` y `js/demo/datos-centro-de-datos.js`. Sin los parámetros la demostración queda como siempre, salvo las tres empresas más.
+
 ## Fila 327: `personalhecho=`
 
 - `?demo=1&auto=1&personalhecho=avisos|limpio|amano`: la carpeta del Centro de datos de mentira queda señalada sola, con permiso; su índice trae

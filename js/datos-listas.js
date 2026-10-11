@@ -43,6 +43,13 @@
     delete I.CACHE[categoria];
   }
 
+  /* Fila 328: quien quiera saber que una lista ha cambiado se apunta aquí (`Datos.alCambiarLista.push(fn)`); `fn`
+     recibe la categoría. Este módulo no sabe quién escucha. */
+  Datos.alCambiarLista = Datos.alCambiarLista || [];
+  function avisarCambio(categoria) {
+    Datos.alCambiarLista.forEach(function (f) { try { f(categoria); } catch (e) { /* un oyente roto no tumba el guardado */ } });
+  }
+
   function filaDe(def, campos) {
     return def.cabecera.map(function (c) { return campos[c] || ''; });
   }
@@ -65,6 +72,7 @@
       filas.sort(porNombre);
       await Carpetas.escribirTexto(dirDatos, def.fichero, Datos.aCsv(def.cabecera, filas));
       olvidar(categoria);
+      avisarCambio(categoria);
     });
     return Datos.cargar(dirDatos, categoria);
   }
@@ -93,6 +101,7 @@
       filas.sort(porNombre);
       await Carpetas.escribirTexto(dirDatos, def.fichero, Datos.aCsv(def.cabecera, filas));
       olvidar(categoria);
+      avisarCambio(categoria);
     });
     return Datos.cargar(dirDatos, categoria);
   }
@@ -116,6 +125,7 @@
       if (!quitado) return null;
       await Carpetas.escribirTexto(dirDatos, def.fichero, Datos.aCsv(def.cabecera, filas));
       olvidar(categoria);
+      avisarCambio(categoria);
       return quitado;
     });
   }
