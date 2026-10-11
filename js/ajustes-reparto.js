@@ -81,6 +81,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-pasar-administraciones', donde: 'herramientas', otras: 'administraciones, terceros, pasar' },
     { id: 'bloque-borrados-fusion', donde: 'herramientas', otras: 'borrados, fusionan, resucitar' },
     { id: 'bloque-medidas', donde: 'herramientas', otras: 'medidas, velocidad, tiempos, lento, cuánto tarda' },
+    { id: 'bloque-base', donde: 'herramientas', otras: 'tablas, informes, estadísticas, base, archivados, apuntados, poner al día' },
     /* Dentro de otra sección */
     { id: 'bloque-formularios', dentro: '#bloque-impresos > .bloque-cuerpo' },
     { id: 'bloque-ficheros-datos', dentro: '#alumnado-personal-cuerpo', orden: 1 },

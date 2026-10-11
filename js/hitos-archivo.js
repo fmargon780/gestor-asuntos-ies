@@ -478,6 +478,6 @@
     quitarResponsable: quitarResponsable, guardarNoLectivos: guardarNoLectivos, guardarFestivos: guardarFestivos,
     NOMBRE_HISTORIAL: NOMBRE_HISTORIAL,
     /* para las pruebas */
-    _textoHistorial: textoHistorial, _leerHitosDeHistorial: leerHitosDeHistorial
+    _textoHistorial: textoHistorial, leerHitosDeHistorial: leerHitosDeHistorial, _leerHitosDeHistorial: leerHitosDeHistorial
   });
 })();

@@ -26,6 +26,10 @@ Todo vive en el Dropbox del centro. Nada de esto sale de ahí salvo lo que se ex
 - Quién ha borrado qué: la papelera guarda los asuntos borrados **enteros**, con todos sus
   documentos, hasta que alguien los borre del todo a mano (avisa a los 30 días, pero no se vacía
   sola).
+- Las tablas para estadísticas (carpeta `base`, fila 334): por cada asunto archivado, una línea con su número, tipo, fechas, sus
+  hitos, los códigos de las personas que salen en él y los nombres de sus documentos. Las personas van por un código, no por
+  su nombre ni su número de identificación; el diccionario que enlaza código y nombre está en la misma carpeta, así que lleva
+  datos personales como el resto de `_GESTOR`.
 - Copias de seguridad: hasta 30 fotos guardadas de cada uno de estos ficheros, por si alguno se
   estropea, y nunca de más de 90 días (configurable en Ajustes → El centro).
 
