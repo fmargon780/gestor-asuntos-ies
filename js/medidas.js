@@ -137,6 +137,8 @@ var Medidas = (function () {
   }
 
   function foto(objeto) { try { dia().foto = objeto; programar(); } catch (e) { /* nada */ } }
+  /* Fila 334: suma números a la foto del día sin borrar lo que ya tenía (solo cifras). */
+  function fotoMas(objeto) { try { var d = dia(); d.foto = Object.assign(d.foto || {}, objeto); programar(); } catch (e) { /* nada */ } }
 
   /* Un error se cuenta por su NOMBRE y solo si está en la lista fija; si no, «otro». Nunca el mensaje. */
   function cuentaError(clase, e) {
@@ -269,7 +271,7 @@ var Medidas = (function () {
   } catch (e) { /* sin ventana: nada que hacer */ }
 
   return {
-    hoy: hoy, tiempo: tiempo, cuenta: cuenta, cuentaUnaVez: cuentaUnaVez, peso: peso, foto: foto, cuentaError: cuentaError,
+    hoy: hoy, tiempo: tiempo, cuenta: cuenta, cuentaUnaVez: cuentaUnaVez, peso: peso, foto: foto, fotoMas: fotoMas, cuentaError: cuentaError,
     rotuloDeFichero: rotuloDeFichero, fichero: fichero, cola: cola, medida: medida,
     diasGuardados: diasGuardados, leerDia: leerDia, borrarDia: borrarDia, guardar: guardar,
     CUBOS_MS: CUBOS_MS, FICHEROS: FICHEROS, ERRORES: ERRORES, PREFIJO: PREFIJO,

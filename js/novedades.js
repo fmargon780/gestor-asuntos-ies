@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '334', fecha: '2026-10-11', texto: 'Los asuntos archivados se apuntan ya en unas tablas, con sus hitos, personas y documentos, para los informes que vengan (Herramientas → Puesta a punto).' },
   { id: '332', fecha: '2026-10-11', texto: 'El Gestor apunta solo cuánto tarda en entrar, abrir y archivar, y lo manda una vez al día al buzón de soporte. Solo cifras: nunca un nombre. En Herramientas → «Puesta a punto» se ve la tabla.' },
   { id: '330', fecha: '2026-10-11', texto: 'Los cargos del centro se entregan solos al Centro de datos, como las empresas.' },
   { id: '329', fecha: '2026-10-11', texto: 'La lista de Administraciones se entrega sola al Centro de datos, igual que la de empresas.' },

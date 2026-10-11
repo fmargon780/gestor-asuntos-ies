@@ -502,3 +502,39 @@ siempre. **El aviso de la papelera vieja se queda sin ✕**: la única salida de
 decidir, porque son datos de menores. Prueba: `pruebas/avisos-que-faltan.mjs`.
 
 ---
+
+---
+
+### Las tablas para informes (fila 334, 11-oct-2026, `docs/DATOS-2-TABLAS-PARA-INFORMES.md`)
+
+Cada asunto archivado queda además apuntado en cuatro tablas (asuntos, hitos, personas de cada asunto y documentos), en
+`_GESTOR/base/`. Las carpetas y los ficheros de siempre no cambian: las tablas son un duplicado ordenado que se rehace
+entero desde ellos. En pantalla no cambia nada salvo la tarjeta «Tablas para informes» de Herramientas → Puesta a punto.
+
+- **Dónde**: `base/<curso>/<AAAA-MM>-<ordenador>.jsonl` (un fichero por curso, mes y ordenador; `<curso>` es el del índice del
+  ARCHIVO; `<ordenador>` es `U.ordenador()`). Texto, una línea por apunte. **Cada ordenador escribe solo sus ficheros y solo
+  añadiendo al final**: no hay copias en conflicto. `base/personas-<ordenador>.jsonl` lleva el diccionario de códigos
+  (`{ v, cuando, codigo, categoria, nombre, clase }`) y las líneas `equivale`. `base/poniendo-al-dia-<ordenador>.json` marca la
+  pasada completa en marcha (si hay uno de otro ordenador de menos de 30 minutos, la completa no arranca).
+- **Tres clases de línea**: `alta` (`clave` = nombre de la carpeta, `marca` = `cerradoEl|tercero`, y `asunto`, `hitos`,
+  `personas`, `documentos`), `baja` y `equivale` (código viejo → nuevo). Al leer gana la línea más reciente de cada `clave`;
+  una `baja` más reciente quita; una línea rota se salta.
+- **Quién**: `js/base-filas.js` (`BaseFilas`: SHA-256 propio y síncrono, `codigoDe`, `filasDe`, funciones puras),
+  `js/base.js` (`Base`: escribir añadiendo, `cargar`, `leer`, `avisar`, `avisarTercero`), `js/base-poner-al-dia.js`
+  (`BasePonerAlDia`: la única manera de apuntar) y `js/base-pantalla.js` (la tarjeta).
+- **El código de una persona**: `P-` y 12 cifras hexadecimales del SHA-256 de `categoria|clase|valor`; la clase y el valor son el
+  Nº escolar (alumnado), el NIF (empresas), el código (Administraciones), el nombre reducido con `U.hueso` más los cuatro
+  caracteres del documento (personal y demás) o, sin nada de eso, el nombre reducido. Los dos ordenadores calculan el mismo. No es
+  un secreto: solo evita que el DNI o el Nº escolar aparezcan en las tablas. Si cambia el identificador o el nombre del tercero
+  (`IndiceArchivo.cambiarTercero`), se añade una línea `equivale` y al leer los códigos viejos pasan al nuevo.
+- **Poner al día** (`BasePonerAlDia.ponerAlDia({ claves })`): compara el índice del ARCHIVO con lo apuntado; para cada asunto sin
+  apunte o con la `marca` distinta lee su `_ficha.json` y los hitos del final de su historial y añade el `alta` (sin alguno de los
+  dos, `incompleto: true`); para cada apunte que ya no está en el índice, una `baja`. Tandas de 50, cede el paso y espera a un
+  guardado en marcha; se puede cortar y repetir. Nunca en «solo consultar» ni con perfil directivo. `Base.avisar(clave)` (una línea
+  al final de `anadirEntradaYa`, `quitarEntradaYa` y `cambiarTerceroYa` de `js/archivo-indice.js`) junta claves y cinco segundos
+  después las pone al día, suelto y sin esperar. Una vez al día en cada ordenador, 90 s después de entrar, la pasada completa.
+- **Leer**: `Base.leer({ cursos, conAbiertos })` → `{ asuntos, hitos, personas, documentos, gente }`; con `conAbiertos` suma los
+  abiertos montados con la misma función (`BaseFilas.filasDe`) y `abierto: true`. Para una estadística o un cruce de archivados se
+  usa `Base.leer`, no se abre carpeta por carpeta.
+- **Medidas** (fila 332): la pasada completa apunta `base.poner-al-dia` y deja en la foto del día `apuntados`, `archivados` e `incompletos`.
+- Prueba: `pruebas/base.mjs`.

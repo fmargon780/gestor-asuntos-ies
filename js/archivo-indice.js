@@ -335,6 +335,7 @@ var IndiceArchivo = (function () {
       resumen.cursos = resumen.cursos.concat([curso]).sort();
       await escribirResumenDisco(resumen);
     }
+    if (window.Base) Base.avisar(entrada.nombre);   /* fila 334: a las tablas, suelto */
   }
 
   /* Quita una entrada por el nombre de su carpeta: para cuando se
@@ -353,6 +354,7 @@ var IndiceArchivo = (function () {
     previo.asuntos = previo.asuntos.filter(function (a) { return a.nombre !== nombre; });
     if (previo.asuntos.length === antes) return;   /* no estaba: nada que escribir */
     await escribirCursoDisco(curso, previo);
+    if (window.Base) Base.avisar(nombre);   /* fila 334 */
   }
 
   /* Fila 266: cambia el nombre de un tercero en todas sus entradas (la
@@ -366,12 +368,14 @@ var IndiceArchivo = (function () {
   async function cambiarTerceroYa(categoria, viejo, nuevo) {
     var resumen = await leerResumenDisco();
     if (!resumen || !Array.isArray(resumen.cursos)) return;
+    var tocadas = [];
     for (var i = 0; i < resumen.cursos.length; i++) {
       var previo = await leerCursoDisco(resumen.cursos[i]);
       if (!previo || !Array.isArray(previo.asuntos)) continue;
       var tocado = false;
       previo.asuntos.forEach(function (a) {
         if (a.categoria !== categoria || a.tercero !== viejo) return;
+        tocadas.push(a.nombre);
         a.tercero = nuevo;
         var segmentos = String(a.ruta || '').split(' / ');
         if (segmentos[1] === viejo) { segmentos[1] = nuevo; a.ruta = segmentos.join(' / '); }
@@ -379,6 +383,7 @@ var IndiceArchivo = (function () {
       });
       if (tocado) await escribirCursoDisco(resumen.cursos[i], previo);
     }
+    if (window.Base) Base.avisarTercero(categoria, viejo, nuevo, tocadas);   /* fila 334: el código nuevo equivale al viejo */
   }
 
   function recuentosIguales(a, b) {

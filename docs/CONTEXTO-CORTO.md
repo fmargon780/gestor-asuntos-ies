@@ -237,6 +237,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   de demostración» (disco de mentira en memoria, datos inventados creados con las mismas
   funciones de las pantallas); «Volver a empezar» deja todo como al principio. En producción no
   se carga nada de `js/demo/` salvo el guion que decide si toca.
+- Tablas para informes (fila 334, `docs/DATOS-2-TABLAS-PARA-INFORMES.md`): cada asunto archivado se apunta en `_GESTOR/base/` (asuntos, hitos, personas con código fijo `P-…`, documentos), añadiendo líneas por curso, mes y ordenador (`js/base*.js`); lo archivado antes se apunta solo (una pasada al día) y hay tarjeta en Herramientas → Puesta a punto. Nada cambia en pantalla.
 - Medidas (fila 332, `docs/DATOS-1-MEDIDAS.md`): `window.Medidas` apunta tiempos (siete cubos), pesos y recuentos en `localStorage` por día (`js/medidas*.js`); rótulos solo de una lista fija, nunca un nombre; se envían al buzón de soporte una vez al día (no en demo salvo `medidas=1`); tarjeta «Medidas» en Herramientas → Puesta a punto. `U.ordenador()` da el código del ordenador.
 - Botón «Soporte» (fila 326, `docs/BOTON-UNICO-DE-SOPORTE.md`): el mismo para todas las apps; abajo a la derecha, en todas las pantallas. No es de este repositorio: `js/soporte-cargar.js` presenta la app (`window.SOPORTE_APP`) y lo pide a Google tras el `load`; sin conexión con Google no sale. No se pide en la demostración ni bajo un navegador manejado por un programa, salvo con `soporte=1`. `vercel.json` deja pasar `script.google.com` y `script.googleusercontent.com`.
 - «Qué hay de nuevo» (fila 248): `js/novedades.js` (lista `window.NOVEDADES`, lo más nuevo primero) y `js/novedades-ventana.js`; al entrar sale lo que este ordenador no ha visto (`localStorage` `gestor.novedadesVistas`), y el número de versión de la barra lateral la vuelve a abrir.
@@ -247,6 +248,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 
 - Para **ofrecer** plantillas, siempre `Plantillas.deTipo` o `Plantillas.documentosDeTipo` (dejan fuera las que no están en uso); `datos.lista` y `datos.documentos` a pelo, solo para encontrar una por su `id`. Un cuadro que cambia una plantilla conserva las claves que no conoce (fila 321).
 - Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319); de cuándo es, `DatosQueTengo.fechaReal`, nunca la fecha de su copia (fila 324).
+- Para una estadística o un cruce de asuntos archivados se usa `Base.leer` (fila 334), no se abre carpeta por carpeta; lo que se apunta en `base/` se hace siempre por `BasePonerAlDia`.
 - Lo único que el Gestor escribe en la carpeta del Centro de datos es `CentroDeDatosEntregar` (un fichero `ENTREGA … gestor-asuntos-ies.json` en `entrada/`); traer sigue pidiendo solo leer (fila 328).
 - El personal se pide siempre a `Datos` (`cargarPersonal`), nunca abriendo un `RelPerCen` ni una parte (`PERSONAL-HECHO …json`) por otro lado (fila 327).
 - El botón «Soporte» y el buzón no son de este repositorio: se cambian en `fmargon780/soporte-apps`. Aquí solo `js/soporte-cargar.js`.

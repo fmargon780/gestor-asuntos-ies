@@ -13,7 +13,8 @@ var MedidasPantalla = (function () {
   var ROTULOS = {
     'entrar.total': 'Entrar', 'entrar.comprobar': 'Entrar: comprobar los ficheros', 'entrar.cargar': 'Entrar: cargar tipos y asuntos',
     'entrar.lista': 'Entrar: pintar Inicio', 'lista.repintar': 'Repintar Inicio', 'asunto.abrir': 'Abrir un asunto',
-    'asunto.archivar': 'Archivar', 'asunto.reabrir': 'Reabrir', 'archivo.leer-indice': 'Leer el índice del ARCHIVO'
+    'asunto.archivar': 'Archivar', 'asunto.reabrir': 'Reabrir', 'archivo.leer-indice': 'Leer el índice del ARCHIVO',
+    'base.poner-al-dia': 'Poner al día las tablas para informes'
   };
   var FICHEROS = { 'otro': 'otros ficheros', 'indice-por-curso': 'los índices del ARCHIVO', 'copia': 'las copias de seguridad',
     'registro-por-año': 'el control del registro', 'presencia': 'la presencia', 'medidas': 'las medidas', 'base': 'la base' };
