@@ -459,7 +459,7 @@ var IndiceArchivo = (function () {
 
   return {
     FICHERO_RESUMEN: FICHERO_RESUMEN, CARPETA: CARPETA, VERSION: VERSION,
-    leerDisco: leerDisco, guardar: guardar,
+    leerDisco: window.Medidas ? Medidas.medida('archivo.leer-indice', leerDisco) : leerDisco, guardar: guardar,
     anadirEntrada: anadirEntrada, quitarEntrada: quitarEntrada, cambiarTercero: cambiarTercero,
     recuentosIguales: recuentosIguales,
     textoDeBusqueda: textoDeBusqueda, resolverHandle: resolverHandle,

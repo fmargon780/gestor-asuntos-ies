@@ -387,6 +387,7 @@
          ignoraban del todo. Ahora entran en el mismo cajón de "no se
          fusionan solos" que ya tenían tipos, estados... */
       if (!real) continue;
+      if (window.Medidas) Medidas.cuentaUnaVez('conflicto:' + Medidas.rotuloDeFichero(null, real), nombre);   /* fila 332: una vez por copia */
 
       if (real === App.FICHERO_ASUNTOS) {
         if (await fusionarAsuntos(g, nombre)) {

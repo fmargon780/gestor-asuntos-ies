@@ -199,6 +199,7 @@ $('btn-archivo').onclick = function () {
 };
 
 $('btn-entrar').onclick = async function () {
+  var M = window.Medidas ? Medidas.tiempo : function () { return function () {}; };   /* fila 332: cuánto tarda entrar */
   try {
     /* Fila 287 (docs/PERFIL-DIRECTIVO.md): el perfil se lee ANTES de proteger nada y sin crear nada. */
     if (window.Perfil) await Perfil.leerAntes(App.E.abiertos, $('campo-usuario').value.trim());
@@ -215,6 +216,7 @@ $('btn-entrar').onclick = async function () {
     }
     if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
     if (window.ActualizarCopia && ActualizarCopia.alEntrar && await ActualizarCopia.alEntrar()) return;   /* fila 325 */
+    var finTotal = M('entrar.total');   /* después de los permisos y de la actualización (ahí espera a una persona) */
     App.E.usuario = $('campo-usuario').value.trim();
     await Almacen.guardar('usuario', App.E.usuario);
 
@@ -229,7 +231,9 @@ $('btn-entrar').onclick = async function () {
        fijos, como siempre. */
     if (window.RutaCarpetas) RutaCarpetas.cargarComun().catch(function () { /* se queda con los topes fijos */ });
 
+    var finComprobar = M('entrar.comprobar');
     var rotos = await Copias.comprobarTodos(App.E.gestor);
+    finComprobar();
     if (rotos.length) {
       App.avisoFicherosRotos(rotos);
       return;
@@ -243,12 +247,14 @@ $('btn-entrar').onclick = async function () {
        fondo mientras ya se está leyendo el resto de ficheros. */
     if (window.Usuarios && !(window.SoloConsulta && SoloConsulta.activo())) await Usuarios.anadirSiHaceFalta(App.E.gestor, App.E.usuario);   /* fila 260: en solo consulta no se apunta el nombre */
 
+    var finCargar = M('entrar.cargar');
     await App.cargarTipos();
     await App.cargarTiposDocumento();
     if (window.TiposDocumentoCortos) await TiposDocumentoCortos.cargar();   /* fila 239 */
     await App.cargarCampos();
     if (window.Grupos) await Grupos.cargar();
     await App.cargarRegistro();
+    finCargar();
 
     Documentos.configurar({
       tipos: function () { return App.E.tiposDocumento; },
@@ -269,8 +275,13 @@ $('btn-entrar').onclick = async function () {
     $('usuario-pie').textContent = (App.E.usuario ? 'Sesión de ' + App.E.usuario + '  ·  ' : '') +
                                    'versión ' + App.textoVersion();
     App.E.vista = App.vistaGuardada();
+    var finLista = M('entrar.lista');
+    if (window.Medidas) Medidas.entrando = true;   /* esta lista es la de entrar, no un repintado */
     await App.verAbiertos();
+    if (window.Medidas) Medidas.entrando = false;
+    finLista();
     App.irVista(App.E.vista);
+    finTotal();
     App.vigilarLaCarpeta();
     if (window.SoloConsulta) SoloConsulta.alEntrar();   /* fila 260 */
     if (window.NovedadesVentana) {   /* fila 248 */
