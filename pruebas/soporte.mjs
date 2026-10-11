@@ -1,37 +1,30 @@
-/* Prueba en navegador de verdad de la fila 213 (docs/BOTON-DE-SOPORTE.md):
-   el botón «Soporte», su ventana y el campo del buzón en Ajustes.
+/* Prueba en navegador de verdad de la fila 326 (docs/BOTON-UNICO-DE-SOPORTE.md):
+   el botón «Soporte» único se pide a Google después de cargar; aquí lo contesta un botón de mentira.
 
-   1. El botón está siempre a la vista, abajo a la derecha.
-   2. Validación: sin tipo o sin texto no se envía y se dice qué falta.
-   3. Sin dirección de buzón: aviso claro y el texto se queda.
-   4. La dirección se guarda en _GESTOR (asuntos.json → ajustesAvisos).
-   5. Enviar un error: lleva app, repo, tipo, texto, pantalla (solo su
-      nombre), quién, fecha, versión y los últimos errores.
-   6. Si el buzón falla, aviso y el texto NO se pierde; al reintentar,
-      «Recibido. Gracias» y la ventana se cierra.
-   7. Una mejora no lleva errores.
-   8. Captura grande pegada/soltada: se reduce (≤ 1.500 px, JPEG), se ve
-      en pequeño, se puede quitar y va en el envío.
-   9. ✕, Cancelar y Escape cierran.
-   10. Con un buzón sin internet (petición cortada): aviso, texto intacto.
-   12. Fila 269 (docs/SOPORTE-MANDA-EL-CORREO.md): el correo de quien avisa, pedido
-       una vez, recordado, enviado con el aviso, y «Cambiar».
-   Reutiliza el disco de mentira de pruebas/navegador.mjs. */
+   1. Sin `soporte=1` (demostración) no sale ninguna petición a Google.
+   2. Con `soporte=1`: una sola petición, a la dirección exacta, después del `load`.
+   3. `SOPORTE_APP`: repositorio, versión, nombre de pantalla (cambia al cambiar de pantalla), persona,
+      contexto, y un error provocado antes de que cargue el botón sale en `errores()`.
+   4. Con el botón cargado, un error nuevo ya no se suma a `errores()`.
+   5. Si Google no contesta: ni botón, ni aviso, ni error propio en la consola; al volver la conexión
+      (`online`) se pide otra vez, y con el botón puesto no se vuelve a pedir.
+   6. Con `body.con-lector` y con un cuadro abierto, el botón se aparta o se retira como toca.
+   7. `vercel.json` trae los dos sitios de Google en `script-src`.
+   El Gestor ya no lleva ni botón ni ventana propios: no se copia nada del botón aquí. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
-const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
-const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
-                                 fuente.indexOf('`;\n\nconst DIRECCION'));
+const BASE = (process.env.DIRECCION || 'http://localhost:8123/index.html');
+const ESPERADA = 'https://script.google.com/macros/s/AKfycbz2LFRhlvnlUjr_QZFW5cuY3ayE-wmXCCg1TdtUCNDJ6SEosNMetkZP6muz1NVwFDMXhQ/exec?boton=1&repo=fmargon780/gestor-asuntos-ies';
+/* El botón de mentira: apunta cuándo se ejecuta y deja lo mismo que el de verdad (la marca, `Soporte` y el elemento). */
+const BOTON_FALSO = `window.__falso = { estado: document.readyState };
+window.__soporteBoton = true;
+window.Soporte = { abrir: function () { return true; }, cerrar: function () {}, version: 'falso', correoBueno: function () { return true; }, errores: function () { return []; } };
+(function () { var h = document.createElement('div'); h.id = 'soporte-boton';
+  h.style.cssText = 'position:fixed;right:var(--soporte-derecha,20px);bottom:var(--soporte-abajo,20px);width:60px;height:30px;z-index:2147483000';
+  h.textContent = 'Soporte'; document.body.appendChild(h); })();`;
 
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const pagina = await navegador.newPage({ viewport: { width: 1400, height: 900 } });
-const errores = [];
-pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
-pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
-await pagina.addInitScript(preparacion);
-await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
-
 let fallos = 0;
 async function comprobar(titulo, promesa, esperado) {
   const real = await promesa;
@@ -39,253 +32,106 @@ async function comprobar(titulo, promesa, esperado) {
   if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
   else console.log('bien   ' + titulo);
 }
-async function comprobarQue(titulo, promesa) {
-  const real = await promesa;
-  if (!real) { fallos++; console.log('FALLA  ' + titulo); }
-  else console.log('bien   ' + titulo);
+
+/* Abre una página con la demostración; `contestar(ruta)` decide qué pasa con Google. */
+async function abrir(parametros, contestar) {
+  const contexto = await navegador.newContext({ viewport: { width: 1400, height: 900 } });
+  const pagina = await contexto.newPage();
+  await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");   /* sin la ventana de novedades */
+  const peticiones = [], errores = [];
+  await pagina.route('https://script.google.com/**', async (ruta) => { peticiones.push(ruta.request().url()); await contestar(ruta); });
+  pagina.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errores.push(m.text()); });
+  pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
+  await pagina.goto(BASE + '?demo=1&auto=1' + parametros);
+  await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
+  return { contexto, pagina, peticiones, errores };
+}
+const fingir = (ruta) => ruta.fulfill({ status: 200, contentType: 'application/javascript', body: BOTON_FALSO });
+
+/* ================= 1. sin soporte=1 no se pide nada ================= */
+console.log('--- 1. la demostración no pide el botón ---');
+{
+  const { contexto, pagina, peticiones } = await abrir('', fingir);
+  await pagina.waitForTimeout(1500);
+  await comprobar('1. ninguna petición a Google, y no hay botón', [peticiones.length, await pagina.evaluate(() => !!window.__soporteBoton || !!window.Soporte)], [0, false]);
+  await contexto.close();
 }
 
-/* 1. Ya en la pantalla de entrada el botón está. */
-await comprobarQue('1. el botón sale en la pantalla de entrada', pagina.locator('#btn-soporte').isVisible());
+/* ================= 2 a 4. con soporte=1 ================= */
+console.log('--- 2 a 4. con soporte=1 ---');
+{
+  let soltar; const compuerta = new Promise((r) => { soltar = r; });
+  const { contexto, pagina, peticiones, errores } = await abrir('&soporte=1', async (ruta) => { await compuerta; await fingir(ruta); });
+  await pagina.waitForFunction(() => document.readyState === 'complete');
+  await pagina.waitForTimeout(300);
+  await comprobar('2. una sola petición, a la dirección exacta', [peticiones.length, peticiones[0]], [1, ESPERADA]);
 
-await pagina.click('#btn-abiertos');
-await pagina.click('#btn-archivo');
-await pagina.fill('#campo-usuario', 'Francisco');
-await pagina.waitForSelector('#btn-entrar:not([disabled])');
-await pagina.click('#btn-entrar');
-await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.waitForTimeout(300);
+  await comprobar('3. repositorio y versión', await pagina.evaluate(() => [SOPORTE_APP.repo, SOPORTE_APP.version === App.VERSION && App.VERSION.length > 5]), ['fmargon780/gestor-asuntos-ies', true]);
+  const inicio = await pagina.evaluate(() => SOPORTE_APP.pantalla());
+  await pagina.click('.pestana[data-pantalla="ajustes"]');
+  await comprobar('3. el nombre de la pantalla cambia al cambiar de pantalla',
+    [inicio, await pagina.evaluate(() => SOPORTE_APP.pantalla())], ['Inicio', 'Ajustes']);
+  await comprobar('3. la persona es quien ha entrado, con su correo (vacío si no se sabe)',
+    await pagina.evaluate(() => { const p = SOPORTE_APP.persona(); return [p.nombre === App.E.usuario && p.nombre.length > 0, typeof p.correo]; }), [true, 'string']);
+  await comprobar('3. el contexto dice «web» y el perfil, sin datos de nadie',
+    await pagina.evaluate(() => { const c = SOPORTE_APP.contexto(); return [/^web/.test(c), /perfil/.test(c), c.length <= 300]; }), [true, true, true]);
+  await pagina.evaluate(() => { console.error('fallo temprano de prueba'); });
+  await comprobar('3. un error provocado antes de cargar el botón sale en errores()',
+    await pagina.evaluate(() => SOPORTE_APP.errores().some((e) => /fallo temprano de prueba/.test(e))), true);
 
-await comprobar('1. abajo a la derecha, sin salirse de la pantalla',
-  pagina.evaluate(() => { const r = document.getElementById('btn-soporte').getBoundingClientRect();
-    return [r.right > innerWidth - 40, r.bottom > innerHeight - 40, r.right <= innerWidth, r.bottom <= innerHeight]; }),
-  [true, true, true, true]);
-await comprobar('1. el texto del botón es «Soporte»', pagina.locator('#btn-soporte').textContent(), 'Soporte');
+  soltar();
+  await pagina.waitForFunction(() => window.__soporteBoton === true);
+  await comprobar('2. el botón se ejecutó después del load', await pagina.evaluate(() => window.__falso.estado), 'complete');
+  await pagina.evaluate(() => { console.error('fallo tardío de prueba'); });
+  await comprobar('4. con el botón cargado, un error nuevo ya no se suma a errores()',
+    await pagina.evaluate(() => SOPORTE_APP.errores().some((e) => /fallo tardío de prueba/.test(e))), false);
+  await comprobar('4. y los de antes se conservan', await pagina.evaluate(() => SOPORTE_APP.errores().some((e) => /fallo temprano de prueba/.test(e))), true);
 
-async function abrir(conCorreo = true) {
-  await pagina.click('#btn-soporte');
-  await pagina.waitForSelector('#capa-soporte');
-  /* Fila 269: la primera vez el correo es obligatorio; las pruebas antiguas lo rellenan. */
-  if (conCorreo && await pagina.locator('#soporte-correo').count()) await pagina.fill('#soporte-correo', 'ana@ejemplo.es');
+  /* ================= 6. el sitio del botón ================= */
+  console.log('--- 6. el sitio del botón ---');
+  const derecha = () => pagina.evaluate(() => getComputedStyle(document.getElementById('soporte-boton')).right);
+  await comprobar('6. sin lector, a 20 px del borde', await derecha(), '20px');
+  await pagina.evaluate(() => document.body.classList.add('con-lector'));
+  await comprobar('6. con el lector abierto, a la izquierda de su panel (46 % del ancho + 20 px)', await derecha(), (1400 * 0.46 + 20) + 'px');
+  await pagina.evaluate(() => document.body.classList.remove('con-lector'));
+  await comprobar('6. con un cuadro abierto el botón se retira',
+    await pagina.evaluate(() => { const capa = document.getElementById('capa'); capa.classList.remove('oculto'); const d = getComputedStyle(document.getElementById('soporte-boton')).display; capa.classList.add('oculto'); return [d, getComputedStyle(document.getElementById('soporte-boton')).display]; }), ['none', 'block']);
+  await comprobar('6. los avisos siguen saliendo por encima del botón (64 px del borde de abajo)',
+    await pagina.evaluate(() => getComputedStyle(document.querySelector('.mensajes')).bottom), '64px');
+  await comprobar('2 a 6. sin errores propios en la consola', errores.filter((e) => !/prueba/.test(e)), []);
+  await contexto.close();
 }
-const mensaje = () => pagina.locator('#soporte-mensaje').textContent();
 
-/* 2. Validación. */
-await abrir();
-await pagina.click('#soporte-enviar');
-await comprobarQue('2. sin tipo, dice que elija', (await mensaje()).indexOf('Elige primero') === 0);
-await pagina.click('.soporte-tipo[data-tipo="error"]');
-await pagina.click('#soporte-enviar');
-await comprobarQue('2. sin texto, dice que lo cuente', (await mensaje()).indexOf('Cuéntalo') === 0);
-await comprobar('2. la ventana sigue abierta', pagina.locator('#capa-soporte').count(), 1);
-await comprobar('2. como el usuario ya es conocido, no pide el nombre', pagina.locator('#soporte-nombre').count(), 0);
+/* ================= 5. Google no contesta ================= */
+console.log('--- 5. Google no contesta ---');
+{
+  let modo = 'caido';
+  const { contexto, pagina, peticiones, errores } = await abrir('&soporte=1', async (ruta) => { if (modo === 'caido') await ruta.abort(); else await fingir(ruta); });
+  await pagina.waitForFunction(() => document.readyState === 'complete');
+  await pagina.waitForTimeout(500);
+  await comprobar('5. se pidió una vez y no hay botón', [peticiones.length, await pagina.evaluate(() => !!window.__soporteBoton)], [1, false]);
+  await comprobar('5. ni aviso en pantalla, ni error propio en la consola',
+    [await pagina.evaluate(() => (document.querySelector('.mensajes') || { textContent: '' }).textContent.trim()), errores], ['', []]);
+  await pagina.evaluate(() => window.dispatchEvent(new Event('online')));
+  await pagina.waitForTimeout(500);
+  await comprobar('5. al volver la conexión se pide otra vez (y sigue sin botón)', [peticiones.length, await pagina.evaluate(() => !!window.__soporteBoton)], [2, false]);
+  modo = 'bien';
+  await pagina.evaluate(() => window.dispatchEvent(new Event('online')));
+  await pagina.waitForFunction(() => window.__soporteBoton === true);
+  await pagina.evaluate(() => window.dispatchEvent(new Event('online')));
+  await pagina.waitForTimeout(500);
+  await comprobar('5. con el botón puesto no se vuelve a pedir', peticiones.length, 3);
+  await contexto.close();
+}
 
-/* 3. Sin dirección. */
-await pagina.fill('#soporte-texto', 'No me deja archivar el asunto');
-await pagina.click('#soporte-enviar');
-await comprobarQue('3. sin buzón configurado lo dice', (await mensaje()).indexOf('aún no está configurado') > -1);
-await comprobar('3. el texto sigue en la ventana', pagina.inputValue('#soporte-texto'), 'No me deja archivar el asunto');
-await comprobar('3. el botón Enviar vuelve a estar activo', pagina.locator('#soporte-enviar').isEnabled(), true);
+/* ================= 7. vercel.json ================= */
+console.log('--- 7. vercel.json ---');
+const csp = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).headers
+  .flatMap((h) => h.headers).find((x) => x.key === 'Content-Security-Policy').value;
+const scripts = (csp.split(';').map((x) => x.trim()).find((x) => x.startsWith('script-src')) || '').split(/\s+/);
+await comprobar('7. script-src deja pasar script.google.com y script.googleusercontent.com, y sigue sin permitir nada en línea',
+  [scripts.includes('https://script.google.com'), scripts.includes('https://script.googleusercontent.com'), scripts.includes("'unsafe-inline'"), scripts.includes("'self'")], [true, true, false, true]);
 
-/* 9. Cerrar de las tres maneras. */
-await pagina.click('#soporte-x');
-await comprobar('9. ✕ cierra', pagina.locator('#capa-soporte').count(), 0);
-await abrir();
-await pagina.click('#soporte-cancelar');
-await comprobar('9. Cancelar cierra', pagina.locator('#capa-soporte').count(), 0);
-await abrir();
-await pagina.keyboard.press('Escape');
-await comprobar('9. Escape cierra', pagina.locator('#capa-soporte').count(), 0);
-
-/* 4. La dirección se guarda en Ajustes → El centro. */
-await pagina.evaluate(() => App.ir('ajustes'));
-await pagina.click('[data-ajustes-pestana="centro"]');
-await pagina.evaluate(() => { document.getElementById('bloque-soporte').open = true; });
-await pagina.fill('#soporte-url', 'http://no-vale');
-await pagina.press('#soporte-url', 'Tab');
-await pagina.waitForTimeout(200);
-await comprobar('4. una dirección sin https:// se rechaza',
-  pagina.evaluate(() => (App.E.registro.ajustesAvisos || {}).urlSoporte || ''), '');
-await pagina.fill('#soporte-url', 'https://buzon.prueba/exec');
-await pagina.press('#soporte-url', 'Tab');
-await pagina.waitForTimeout(400);
-await comprobar('4. la dirección buena se guarda en el registro compartido',
-  pagina.evaluate(() => App.E.registro.ajustesAvisos.urlSoporte), 'https://buzon.prueba/exec');
-await comprobar('4. y está en asuntos.json del disco',
-  pagina.evaluate(async () => {
-    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-    const j = JSON.parse(await (await (await g.getFileHandle('asuntos.json')).getFile()).text());
-    return (j.ajustesAvisos || {}).urlSoporte;
-  }), 'https://buzon.prueba/exec');
-
-/* El buzón de mentira. */
-const recibidos = [];
-let modo = 'falla';
-await pagina.route('https://buzon.prueba/**', async (ruta) => {
-  if (modo === 'corta') return ruta.abort();
-  if (modo === 'falla') return ruta.fulfill({ status: 200, contentType: 'application/json',
-    headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ ok: false, motivo: 'Drive no responde.' }) });
-  recibidos.push(JSON.parse(ruta.request().postData()));
-  return ruta.fulfill({ status: 200, contentType: 'application/json',
-    headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ ok: true, colaApuntada: true, fila: 300 }) });
-});
-
-await pagina.evaluate(() => App.ir('abiertos'));
-await pagina.waitForTimeout(200);
-/* Un error de la app, para ver que viaja. */
-await pagina.evaluate(() => window.dispatchEvent(new ErrorEvent('error', { message: 'fallo de prueba', filename: 'js/x.js', lineno: 7 })));
-
-/* 6. Falla el buzón: el texto no se pierde. */
-await abrir();
-await pagina.click('.soporte-tipo[data-tipo="error"]');
-await pagina.fill('#soporte-texto', 'No me deja archivar el asunto');
-await pagina.click('#soporte-enviar');
-await pagina.waitForFunction(() => document.getElementById('soporte-mensaje').textContent.indexOf('Drive no responde') > -1);
-await comprobar('6. si el buzón falla, dice por qué y el texto sigue', pagina.inputValue('#soporte-texto'), 'No me deja archivar el asunto');
-await comprobar('6. sigue habiendo ventana', pagina.locator('#capa-soporte').count(), 1);
-
-/* 10. Sin conexión. */
-modo = 'corta';
-await pagina.click('#soporte-enviar');
-await pagina.waitForFunction(() => document.getElementById('soporte-mensaje').textContent.indexOf('No he podido contactar') > -1);
-await comprobar('10. sin conexión el texto sigue', pagina.inputValue('#soporte-texto'), 'No me deja archivar el asunto');
-
-/* 8. Una captura grande soltada en la ventana. */
-await pagina.evaluate(async () => {
-  const l = document.createElement('canvas'); l.width = 3000; l.height = 1000;
-  const c = l.getContext('2d'); c.fillStyle = '#c33'; c.fillRect(0, 0, 3000, 1000);
-  const blob = await new Promise(r => l.toBlob(r, 'image/png'));
-  const dt = new DataTransfer();
-  dt.items.add(new File([blob], 'captura.png', { type: 'image/png' }));
-  document.getElementById('capa-soporte').dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
-});
-await pagina.waitForSelector('.soporte-vista');
-await comprobar('8. la captura se ve en pequeño', pagina.locator('.soporte-vista').isVisible(), true);
-await comprobar('8. se ha reducido a 1.500 px de ancho',
-  pagina.evaluate(() => document.querySelector('.soporte-vista').naturalWidth), 1500);
-await pagina.click('#soporte-quitar');
-await comprobar('8. se puede quitar', pagina.locator('.soporte-vista').count(), 0);
-await pagina.evaluate(async () => {
-  const l = document.createElement('canvas'); l.width = 800; l.height = 400;
-  const c = l.getContext('2d'); c.fillStyle = '#36c'; c.fillRect(0, 0, 800, 400);
-  const blob = await new Promise(r => l.toBlob(r, 'image/png'));
-  const dt = new DataTransfer();
-  dt.items.add(new File([blob], 'otra.png', { type: 'image/png' }));
-  document.getElementById('capa-soporte').dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
-});
-await pagina.waitForSelector('.soporte-vista');
-await comprobar('8. una imagen pequeña no se agranda',
-  pagina.evaluate(() => document.querySelector('.soporte-vista').naturalWidth), 800);
-
-/* 5 y 6. Ahora sí llega. */
-modo = 'bien';
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-await comprobarQue('6. «Recibido. Gracias»', pagina.evaluate(() =>
-  Array.from(document.querySelectorAll('#mensajes .mensaje')).some(m => m.textContent === 'Recibido. Gracias')));
-await comprobar('5. llega un solo aviso', recibidos.length, 1);
-const r = recibidos[0] || {};
-await comprobar('5. app y repositorio', [r.app, r.repo], ['Gestor de Asuntos', 'fmargon780/gestor-asuntos-ies']);
-await comprobar('5. tipo y texto', [r.tipo, r.texto], ['error', 'No me deja archivar el asunto']);
-await comprobar('5. pantalla (solo el nombre) y quién', [r.pantalla, r.quien], ['Inicio', 'Francisco']);
-await comprobarQue('5. fecha con hora y versión', /^\d{4}-\d\d-\d\d \d\d:\d\d$/.test(r.fecha || '') && /\d{4}/.test(r.version || ''));
-await comprobarQue('5. lleva el último error de la consola', (r.errores || '').indexOf('fallo de prueba (x.js:7)') > -1);
-await comprobarQue('5. lleva la captura en JPEG', (r.captura || '').indexOf('/9j/') === 0);
-
-/* 7. Una mejora no lleva errores ni captura, y no pide el nombre. */
-await abrir();
-await pagina.click('.soporte-tipo[data-tipo="mejora"]');
-await pagina.fill('#soporte-texto', 'Estaría bien poder ordenar por fecha');
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-const m = recibidos[1] || {};
-await comprobar('7. mejora: tipo', m.tipo, 'mejora');
-await comprobar('7. mejora: sin errores y sin captura', [m.errores === undefined, m.captura === undefined], [true, true]);
-
-/* Pantalla de un asunto: solo el nombre de la pantalla. */
-await comprobar('pantalla en Ajustes se llama Ajustes',
-  pagina.evaluate(() => { App.ir('ajustes'); return Soporte.abrir && document.querySelector('.pantalla:not(.oculto)').id; }), 'pantalla-ajustes');
-
-/* 11. Fila 240 (docs/SOPORTE-TEXTO-SIN-LIMITE.md): sin límite, cuadro grande con guion. */
-modo = 'bien';
-await pagina.evaluate(() => App.ir('abiertos'));
-await pagina.waitForTimeout(200);
-await abrir();
-await comprobar('11. el cuadro no tiene tope de tamaño y abre con 14 renglones',
-  pagina.evaluate(() => { const t = document.getElementById('soporte-texto'); return [t.maxLength, t.rows]; }), [-1, 14]);
-await comprobarQue('11. el guion gris sugiere qué contar',
-  pagina.evaluate(() => { const p = document.getElementById('soporte-texto').placeholder;
-    return p.indexOf('Cuéntalo con todo el detalle que quieras; no hay límite de tamaño. Te sugerimos:') === 0 &&
-      ['· Qué pasa o qué propones', '· En qué pantalla o en qué paso', '· Qué esperabas que pasara, o cómo lo harías tú',
-       '· Casos y ejemplos concretos', '· Otras posibilidades o variantes que se te ocurran'].every((l) => p.indexOf(l) > -1); }));
-await comprobar('11. el contador empieza en «0 palabras»', pagina.locator('#soporte-palabras').textContent(), '0 palabras');
-await comprobar('11. la ventana es ancha (hasta unos 900 px)',
-  pagina.evaluate(() => Math.round(document.querySelector('.soporte-cuadro').getBoundingClientRect().width)), 900);
-const alto0 = await pagina.evaluate(() => document.getElementById('soporte-texto').getBoundingClientRect().height);
-await pagina.fill('#soporte-texto', 'una palabra');
-await comprobar('11. «N palabras», y «1 palabra» en singular',
-  [await pagina.locator('#soporte-palabras').textContent(), await pagina.evaluate(() => Soporte.textoPalabras(1)), await pagina.evaluate(() => Soporte.contarPalabras('uno dos\ntres  cuatro'))],
-  ['2 palabras', '1 palabra', 4]);
-await pagina.fill('#soporte-texto', Array.from({ length: 60 }, (_, i) => 'Línea ' + i + ' de un texto largo').join('\n'));
-const medidas = await pagina.evaluate(() => ({
-  alto: document.getElementById('soporte-texto').getBoundingClientRect().height,
-  maximo: innerHeight - 400,
-  botones: document.getElementById('soporte-enviar').getBoundingClientRect().bottom <= innerHeight }));
-await comprobarQue('11. crece al escribir, sin pasar de casi toda la altura, y los botones siguen a la vista',
-  medidas.alto > alto0 && medidas.alto <= medidas.maximo + 2 && medidas.botones, JSON.stringify([alto0, medidas]));
-/* Un texto de 50.000 caracteres se envía y llega entero. */
-const largo = 'palabra '.repeat(6250);   /* 50.000 caracteres */
-await pagina.click('.soporte-tipo[data-tipo="mejora"]');
-await pagina.fill('#soporte-texto', largo);
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-await comprobar('11. un texto de 50.000 caracteres llega entero', (recibidos[recibidos.length - 1] || {}).texto.length, largo.trim().length);
-
-/* 12. Fila 269: el correo de quien avisa. */
-modo = 'bien';
-await pagina.evaluate(() => { localStorage.removeItem('gestor-soporte-correo'); App.ir('abiertos'); });
-await pagina.waitForTimeout(200);
-await abrir(false);
-await comprobarQue('12. la primera vez sale el campo «Tu correo» con su línea', pagina.evaluate(() =>
-  !!document.getElementById('soporte-correo') && document.querySelector('.soporte-cuadro').textContent.indexOf('Te escribiremos a esta dirección cuando tu aviso esté resuelto.') > -1));
-await pagina.click('.soporte-tipo[data-tipo="error"]');
-await pagina.fill('#soporte-texto', 'Texto del aviso');
-const antes12 = recibidos.length;
-await pagina.click('#soporte-enviar');
-await comprobar('12. correo vacío: dice que lo escriba', await mensaje(), 'Escribe tu correo para avisarte cuando esté resuelto.');
-await comprobar('12. y el texto sigue en la ventana', pagina.inputValue('#soporte-texto'), 'Texto del aviso');
-await pagina.fill('#soporte-correo', 'hola');
-await pagina.click('#soporte-enviar');
-await comprobar('12. con mala forma: «Ese correo no parece correcto»', await mensaje(), 'Ese correo no parece correcto. Revísalo.');
-await comprobar('12. no se ha enviado nada', recibidos.length, antes12);
-await pagina.fill('#soporte-correo', 'ana@ejemplo.es');
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-await comprobar('12. con un correo bueno, el aviso lleva `correo`', (recibidos[recibidos.length - 1] || {}).correo, 'ana@ejemplo.es');
-await abrir(false);
-await comprobar('12. la segunda vez no se pregunta: «Te avisaremos en …» y «Cambiar»', pagina.evaluate(() => {
-  const l = document.getElementById('soporte-correo-sabido');
-  return [!document.getElementById('soporte-correo'), l && l.textContent, !!document.getElementById('soporte-cambiar-correo')]; }),
-  [true, 'Te avisaremos en ana@ejemplo.es · Cambiar', true]);
-await pagina.click('.soporte-tipo[data-tipo="mejora"]');
-await pagina.fill('#soporte-texto', 'Otro aviso');
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-await comprobar('12. y el aviso lleva el mismo `correo`', (recibidos[recibidos.length - 1] || {}).correo, 'ana@ejemplo.es');
-await abrir(false);
-await pagina.click('#soporte-cambiar-correo');
-await comprobar('12. «Cambiar» vuelve a poner el campo, con el correo anterior', pagina.inputValue('#soporte-correo'), 'ana@ejemplo.es');
-await pagina.fill('#soporte-correo', 'berta@ejemplo.es');
-await pagina.click('.soporte-tipo[data-tipo="mejora"]');
-await pagina.fill('#soporte-texto', 'Un tercer aviso');
-await pagina.click('#soporte-enviar');
-await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
-await comprobar('12. el siguiente aviso lleva el nuevo', (recibidos[recibidos.length - 1] || {}).correo, 'berta@ejemplo.es');
-await comprobar('12. correoBueno', pagina.evaluate(() => ['a@b.es', 'hola', 'a@b', 'a b@c.es', ''].map(Soporte.correoBueno)), [true, false, false, false, false]);
-
-/* La petición cortada a propósito (punto 10) deja su propio aviso. */
-const propios = errores.filter(t => t.indexOf('ERR_FAILED') === -1);
-if (propios.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + propios.join('\n')); }
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

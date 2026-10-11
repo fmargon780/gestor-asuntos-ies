@@ -1,3 +1,5 @@
+Mudado a `fmargon780/soporte-apps` el 11-oct-2026; lo vivo está allí.
+
 # Poner en marcha el botón de soporte (para Francisco, una sola vez)
 
 El botón «Soporte» del Gestor ya está en la aplicación, pero no llega a ningún sitio hasta que

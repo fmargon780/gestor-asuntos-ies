@@ -8,7 +8,7 @@
    4. Asuntos que han perdido su carpeta: dos botones por asunto, con su frase; «Buscar su carpeta» funciona.
    5. Los hitos de un asunto que ha perdido su carpeta no salen en la tarjeta de los hitos de asuntos que ya no existen.
    6. Lo guardado a la vez en dos ordenadores, dicho con palabras; el fichero de alumnado lleva a Herramientas.
-   7. «Avisar por Soporte» abre el cuadro con el texto ya escrito.
+   7. «Avisar por Soporte» llama al botón único (Soporte.abrir, tipo «error», con el texto ya escrito); sin botón, un aviso.
    8. Solo consulta: las tarjetas se ven y los botones que cambian algo salen apagados.
    9. Sin tarjetas: «Todo en orden», la pestaña sin número, y desaparecen el trozo de Inicio y el punto del menú. */
 import { chromium } from 'playwright';
@@ -106,18 +106,19 @@ await comprobar('3. orden de las tarjetas: el de la lista',
 /* ================= 7. «AVISAR POR SOPORTE» ================= */
 
 console.log('--- 7. Avisar por Soporte ---');
+/* Fila 326: el botón único viene de Google; aquí va un doble que apunta con qué se le llama. */
+await pagina.evaluate(() => { window.__soporte = []; window.Soporte = { abrir: (o) => { window.__soporte.push(o); return true; } }; });
 await pagina.locator('[data-problema="envolturas"]').getByRole('button', { name: 'Avisar por Soporte' }).click();
-await pagina.waitForSelector('#soporte-texto');
-await comprobar('7. el cuadro de Soporte se abre con el problema ya escrito, y el detalle técnico viaja dentro',
-  pagina.evaluate(() => { const t = document.getElementById('soporte-texto').value; return [t.includes('Una parte de la aplicación no se ha cargado bien'), t.includes('no se ha llegado a aplicar')]; }), [true, true]);
-await pagina.click('#soporte-cancelar');
-await pagina.waitForTimeout(300);
+await comprobar('7. «Avisar por Soporte» llama a Soporte.abrir con tipo «error» y el problema ya escrito, y el detalle técnico viaja dentro',
+  pagina.evaluate(() => { const o = window.__soporte[0]; return [window.__soporte.length, o.tipo, o.texto.includes('Una parte de la aplicación no se ha cargado bien'), o.texto.includes('no se ha llegado a aplicar')]; }), [1, 'error', true, true]);
 await pagina.locator('[data-problema="script"]').getByRole('button', { name: 'Avisar por Soporte' }).click();
-await pagina.waitForSelector('#soporte-texto');
 await comprobar('7. y en la tarjeta de la demostración (el envío de correo anticuado) también',
-  pagina.evaluate(() => document.getElementById('soporte-texto').value.includes('El envío de correo está anticuado')), true);
-await pagina.click('#soporte-cancelar');
-await pagina.waitForTimeout(300);
+  pagina.evaluate(() => [window.__soporte.length, window.__soporte[1].tipo, window.__soporte[1].texto.includes('El envío de correo está anticuado')]), [2, 'error', true]);
+await pagina.evaluate(() => { delete window.Soporte; });
+await pagina.locator('[data-problema="script"]').getByRole('button', { name: 'Avisar por Soporte' }).click();
+await pagina.waitForFunction(() => /Ahora no hay conexión con Soporte\. Inténtalo más tarde\./.test((document.querySelector('.mensajes') || {}).textContent || ''));
+await comprobar('7. sin botón de Soporte sale el aviso «Ahora no hay conexión con Soporte» y la pantalla sigue en pie',
+  pagina.evaluate(() => [!!document.querySelector('[data-problema="script"]'), [...document.querySelectorAll('.mensajes > *')].some((m) => /Ahora no hay conexión con Soporte/.test(m.textContent) && !/bueno/.test(m.className))]), [true, true]);
 await pagina.evaluate(() => ['envolturas', 'bandeja', 'rutas', 'fichas-archivo', 'contacto'].forEach((id) => Problemas.registrar(id, null)));
 await pagina.waitForTimeout(300);
 await comprobar('7. quitadas las de prueba, vuelve la cuenta de la demostración', pagina.locator('#ajustes-tab-problemas .problema').count(), n);

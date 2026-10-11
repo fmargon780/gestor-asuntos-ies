@@ -1,3 +1,5 @@
+Mudado a `fmargon780/soporte-apps` el 11-oct-2026; lo vivo está allí.
+
 # Botón de soporte (fila 213 de la cola)
 
 Diseño cerrado con Francisco el 28-sep-2026, en Cowork.

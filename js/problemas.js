@@ -202,7 +202,11 @@ var Problemas = (function () {
     var acciones = (d.acciones || []).slice();
     if (d.soporte) {
       acciones.push({ texto: 'Avisar por Soporte', explica: d.soporte, cambia: false,
-        alPulsar: function () { if (window.Soporte) Soporte.abrir(textoDeSoporte(actual(id) || d)); } });
+        alPulsar: function () {
+          var abierto = false;
+          try { abierto = !!(window.Soporte && Soporte.abrir({ tipo: 'error', texto: textoDeSoporte(actual(id) || d) })); } catch (e) { abierto = false; }
+          if (!abierto) U.aviso('Ahora no hay conexión con Soporte. Inténtalo más tarde.', 'ambar');
+        } });
     }
     var hechas = (d.acciones || []).length;
     var caja = el('div', 'problema-acciones');

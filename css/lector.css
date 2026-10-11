@@ -23,6 +23,8 @@
    derecha. */
 body.con-lector #aplicacion { margin-right: var(--ancho-lector); }
 body.con-lector .mensajes { right: calc(var(--ancho-lector) + 20px); }
+/* Fila 326: el botón «Soporte» único (js/soporte-cargar.js) se aparta del panel con esta variable. */
+body.con-lector { --soporte-derecha: calc(var(--ancho-lector) + 20px); }
 
 /* El borde que se arrastra. */
 .lector-tirador {

@@ -244,8 +244,7 @@ var CentroDeDatos = (function () {
   function avisarTraido(partes, config) {
     partes = partes.slice();
     if (config && config.centro) partes.push('los datos del centro');
-    if (config && config.buzon) partes.push('la dirección del buzón de soporte');
-    var conConfig = !!(config && (config.centro || config.buzon));
+    var conConfig = !!(config && config.centro);
     U.aviso('Traído del Centro de datos: ' + (conConfig && partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes.join(', ')) + '.', 'bueno');
   }
   function avisarConfiguracion(config) { avisarTraido([], config); }
@@ -284,7 +283,7 @@ var CentroDeDatos = (function () {
         try { config = await CentroDeDatosConfiguracion.tomar(dir, r.indice, apuntes); }
         catch (x) { salida.fallos.push('Datos del centro: ' + U.mensajeDeError(x)); }
       }
-      salida.configuracion = !!(config && (config.centro || config.buzon));
+      salida.configuracion = !!(config && config.centro);
       var bloqueo = (r.indice.contrato || 1) > CONTRATO ? 'contrato' : (r.indice.ocupado ? 'ocupado' : '');
       if (bloqueo) {
         salida.motivo = bloqueo;

@@ -6,32 +6,6 @@ para ir tachando.
 
 ---
 
-- [ ] **El correo de quien avisa (fila 269, `docs/SOPORTE-MANDA-EL-CORREO.md`).** Con la web ya
-      publicada, en un ordenador real: pulsar «Soporte», escribir un aviso con tu correo y enviarlo.
-      Si el vigilante (fila 268) ya está en marcha, cuando la fila del aviso esté HECHA te llega el
-      correo «tu aviso ya está resuelto». Al abrir «Soporte» otra vez, sale «Te avisaremos en…» y
-      «Cambiar».
-- [ ] **El vigilante (fila 268, `docs/VIGILANTE-Y-CORREOS.md`).** Volver a pegar
-      `apps-script/soporte.gs`, ejecutar `prepararTodo` y aceptar el permiso nuevo que pida Google
-      (una sola vez). Llega un correo de resumen que dice a qué direcciones llegarán los avisos,
-      qué repositorios vigila y, de cada app, su dirección y si se llega a la app entera o solo a
-      la entrada de Google. Después «Implementar» → «Administrar implementaciones» → «Nueva
-      versión». A los veinte minutos, en tu Drive, en `SOPORTE-AVISOS`, está `ESTADO-VIGILANTE.json`
-      con una hora de hace menos de veinte minutos. Y envía un aviso de prueba desde cualquier app,
-      de día: te llega «aviso nuevo de un usuario» en menos de un minuto. Para pararlo: en el
-      proyecto de Google, «Activadores», borrar el de `vigilar`.
-- [ ] **Buzón de soporte para todas las apps (fila 261, `docs/BUZON-PARA-TODAS-LAS-APPS.md`).**
-      Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (autorizar el permiso de
-      correo y leer el registro: ningún repositorio en «OJO»; llega el correo de prueba) e
-      «Implementar» → «Administrar implementaciones» → «Nueva versión». Después, enviar un aviso
-      desde Ausencias y Guardias: aparece una IDEA nueva de esa app en el Centro de mando. Si aún
-      tenías pendiente el pegado de la fila 240, es el mismo pegado.
-- [ ] **El botón «Soporte», con el buzón de verdad (fila 213, `docs/BOTON-DE-SOPORTE.md`).**
-      Primero, los cinco pasos de `docs/PONER-EN-MARCHA-SOPORTE.md`. Después: (1) pegar una
-      captura con Ctrl+V en la ventana: se ve en pequeño, se quita con «Quitar la captura»; (2)
-      enviar un aviso: sale «Recibido. Gracias», está entero en Drive (`SOPORTE-AVISOS`) y hay una
-      IDEA nueva en el Centro de mando sin el texto escrito; (3) en la copia sin internet
-      (`ABRIR EL GESTOR.html`) el botón y la ventana funcionan igual y la app arranca como siempre.
 - [ ] **Comprobación al entrar, con lo de verdad (fila 204, `docs/COMPROBACION-AL-ENTRAR.md`).**
       (1) Con las carpetas de Dropbox y la bandeja de verdad: quitar el permiso de la carpeta de la
       bandeja en Chrome y recargar; al entrar, la bandeja sale en «Falta» y «Arreglarlo» lleva al
@@ -148,10 +122,6 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 
 - Con la cuenta personal abierta en el navegador, pulsar «Probar» en Ajustes › Enviar correo: debe llegar el correo de prueba; si no, debe salir el aviso claro («Google no ha dejado pasar el envío…»).
 
-## Fila 240 — soporte con texto sin límite (1-oct-2026)
-
-- Pegar `apps-script/soporte.gs` entero en el proyecto «Gestor - Soporte» (pasos en `docs/PONER-EN-MARCHA-SOPORTE.md`), guardar, y mandar un aviso largo (más de 5.000 caracteres): llega entero al `.txt` de Drive y la fila IDEA de la cola no lleva el texto. Hasta que se pegue, el servidor sigue rechazando los de más de 5.000.
-
 ## Fila 236 — el correo enviado, en PDF (1-oct-2026)
 
 - Enviar un correo real desde la app: aparece el `CORREO` en el asunto. Cuando el destinatario conteste y la respuesta entre por la bandeja y se guarde en el asunto, aparece el HILO como siempre y el `CORREO` del envío sigue en su sitio.
@@ -178,12 +148,6 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 259 — control del registro (2-oct-2026)
 
 - Herramientas → «Control del registro»: poner «Revisar desde el día…» y subir los dos listados reales de Séneca (entrada y salida). Comprobar que se leen enteros (eñes y acentos bien) y que los códigos (`26EM0427`…) coinciden con los de los documentos ya registrados en los asuntos. Mirar que «Con asunto» y «Sin asunto» tienen sentido con lo que se conoce. Los documentos de asuntos abiertos anteriores a la fila 239 (registro en el nombre del fichero) no se miran: esos apuntes pueden salir «Sin asunto» aunque el documento exista; se arreglan con «Es de este asunto…».
-
-## Fila 262 — el buzón admite Focus Lingo (4-oct-2026)
-
-- En GitHub, abrir el permiso «Soporte del Gestor» (https://github.com/settings/personal-access-tokens), «Repository access», añadir `Focus_Lingo` y guardar. El permiso *Contents: Read and write* ya lo tiene.
-- Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (el registro tiene que decir «Bien: fmargon780/Focus_Lingo») e «Implementar» → «Administrar implementaciones» → «Nueva versión». Es el mismo pegado que el de las filas 240 y 261.
-- Cuando el botón de Focus Lingo esté publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva de Focus Lingo en el Centro de mando.
 
 ## Fila 263 — la ruta larga avisa y no impide crear (5-oct-2026)
 
@@ -262,14 +226,6 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 
 - En el centro: abrir Herramientas → «Control del registro»: la fecha sale vacía (ya no 01/01/0020), poner la buena escribiendo el año entero y subir los listados.
 
-## Fila 315 — el buzón admite el Centro de datos (9-oct-2026)
-
-- Tras añadir `centro-de-datos-ies` al permiso de GitHub y pegar el script: `prepararTodo` dice «Bien: fmargon780/centro-de-datos-ies». Con el botón del Centro de datos ya publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva del Centro de datos en el Centro de mando.
-
-## Fila 316 — buzón de soporte desde el Centro de datos (9-oct-2026)
-
-- Con el enlace ya escrito en el Centro de datos: entrar en el gestor en el centro, Ajustes → El centro → «Buzón de soporte» enseña esa dirección con «Se cambia en el Centro de datos», y un aviso de prueba llega al Centro de mando.
-
 ## Fila 317 — contrato 2 del Centro de datos (9-oct-2026)
 
 - Cuando el Centro de datos haya terminado de recolocar (su fila 7): señalar la carpeta «CENTRO DE DATOS» en Ajustes → Este ordenador y ver que el aviso verde trae el personal docente y el no docente.
@@ -297,3 +253,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 325 — la versión nueva, sin franja (10-oct-2026)
 
 - [ ] 11. [SOLO FRANCISCO] En el ordenador del centro, **a partir de la segunda mañana** con esta versión: al pulsar «Entrar» con una versión nueva publicada, el navegador enseña un cuadro para la carpeta de la copia. Elegir «Permitir en cada visita» si lo ofrece. La aplicación dice «Actualizando el Gestor…», se recarga y entra sola, sin franja. Durante la mañana, si llega otra versión, no sale la franja: sale «hay versión nueva» junto al número de versión. Si el cuadro no ofrece «Permitir en cada visita», decírselo a Claude.
+
+## Fila 326 — el botón «Soporte» único (11-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En el centro, con la copia sin internet ya actualizada: abajo a la derecha sale el botón «Soporte». Pulsarlo, elegir «Propongo una mejora», escribir «Prueba del botón único» y enviar. Sale «Recibido. Gracias.» sin pedir el correo, y en el Centro de mando aparece una idea nueva del Gestor. Repetirlo una vez en la web, desde casa. (Esta entrada sustituye a las de las filas 213, 240, 261, 262, 268, 269, 315 y 316: el buzón ya no es de este repositorio.)

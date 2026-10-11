@@ -564,8 +564,6 @@ App.pintarAjustesCentro = async function () {
   App.pintarDiasPapelera();
   if (window.ActividadesInforme) ActividadesInforme.pintarAjustes();   /* fila 309 */
   if (window.ControlRegistroAvisos) ControlRegistroAvisos.pintarAjustes();   /* fila 259 */
-  /* Fila 213, docs/BOTON-DE-SOPORTE.md: la dirección del buzón de soporte. */
-  if (window.Soporte) Soporte.pintarAjustes();
   /* 20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md. */
   if (window.Cargos && Cargos.pintarEnAjustes) await Cargos.pintarEnAjustes();
   if (window.Membrete && Membrete.pintarEnAjustes) await Membrete.pintarEnAjustes();
