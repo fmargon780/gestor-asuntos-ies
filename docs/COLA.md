@@ -82,12 +82,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     (`create_or_update_file`, `push_files`); si git no puede subir, la fila queda EN CURSO y se dice.
     Las reglas 14, 15, 17 y 18, que explicaban cómo subir con ellas, se han retirado.
 
-13. **El reparto de las subidas** (30-sep-2026, fila 242, `docs/REVISOR-EN-LOCAL.md`). Cada push a
-    `main` con código le cuesta una publicación a Vercel, y el plan gratuito solo da 100 al día,
-    de toda la cuenta. **Una sola publicación de código por fila**: la fusión de su rama
-    `fila-<nº>` en `main` tras la APROBADA del revisor (más la de `pruebas` al nivelarla después).
-    Las subidas de solo `docs/` (marca EN CURSO, estimaciones, HECHA) van directas a `main` y no
-    publican nada. Nada de un commit por fichero. Ver `docs/NO-GASTAR-PUBLICACIONES.md`.
+13. **El reparto de las subidas** (fila 242, cambiada el 11-oct-2026 por la fila 331,
+    `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Vercel no publica nada solo: ninguna subida a GitHub crea
+    una publicación. **La única publicación de una fila con código es la hecha a propósito** con
+    `create_deployment` (regla de `CLAUDE.md`), tras fusionar su rama `fila-<nº>` en `main` con la
+    APROBADA del revisor. Las subidas de solo `docs/` (marca EN CURSO, estimaciones, HECHA) van
+    directas a `main` y no cuentan en ningún tope. Nada de un commit por fichero.
 
 16. **Si delegas una fila de documentación en una sesión auxiliar**, pídele explícitamente que lea
     el fichero entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El
@@ -101,8 +101,8 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     `https://gestor-de-asuntos.vercel.app/js/version.js?v=<algo>`: `App.VERSION` igual o posterior
     a la de la fila; b) el estado «Vercel» del commit en GitHub (`success`); c) `list_deployments`
     con el `sha`. Si ninguno funciona, la fila queda **SIN PUBLICACIÓN COMPROBADA** con el SHA de
-    `main` en la nota, y la sesión para con normalidad. **Como mucho un `create_deployment` a mano
-    por sesión**; si responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
+    `main` en la nota, y la sesión para con normalidad. **Un `create_deployment` por fila con código**
+    (es el camino normal, `CLAUDE.md`); si responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
     `docs/PUBLICAR-SIN-PARAR.md`). Al empezar cada sesión se revisan las filas SIN PUBLICACIÓN
     COMPROBADA con estas mismas dos condiciones: **«la web sirve una versión posterior» solo vale
     si además el commit de la fila está en `main`.**
@@ -159,8 +159,6 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 - (2-oct-2026, fila 260) Ese día se mezclaron en el Dropbox del centro los cambios hechos en casa sobre la copia de Drive con los del centro: revisar con Francisco, en el centro, las fichas sin carpeta, los ficheros en conflicto y los números de asunto `A26-…` repetidos (en casa se creó al menos un asunto ese día). Trabajar desde casa directamente contra el Dropbox del centro: `docs/PENDIENTES-DE-DISENAR.md`, punto 2, sin diseñar.
 - (varias fechas) Notas viejas sobre pruebas que fallan en `main` y el botón de soporte: movidas sin tocar a `docs/HISTORIA.md` (sección «Notas movidas de `docs/COLA.md` el 7-oct-2026»).
 
-- Vercel: el tope diario de despliegues es de toda la cuenta, no solo de este proyecto; Francisco
-  decide si separa cuentas, cambia de plan, o coordina cuándo se trabaja cada cola.
 - Del 21-sep-2026: buscador de normativa por texto para rellenar solo la clave de un paso — sigue
   sin diseñarse con Francisco.
 - Del 27-sep-2026 (fila 190): falta que Francisco pueda dar de alta un impreso propio del centro

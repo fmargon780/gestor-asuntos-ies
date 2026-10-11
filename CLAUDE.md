@@ -20,7 +20,7 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    `claude/...` que el entorno permita). **Nunca se nivela ninguna rama a la fuerza** si tiene
    commits que no están en `main`. La rama de una fila no se borra hasta que su trabajo está en
    `main`. Las subidas que solo tocan `docs/` (EN CURSO, estimaciones, HECHA) van directas a
-   `main`: no publican nada.
+   `main`: no publican nada (Vercel ya no publica solo, ver «Vercel no publica nada solo» abajo).
 2. Nada se sube a `pruebas` para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
    la subida a tu rama, sube a una `claude/...`, abre una petición de cambios y fusiónala tú mismo
    al momento (`merge_pull_request`). Nunca dejes una petición de cambios abierta.
@@ -32,10 +32,8 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    en una prueba que en tu sesión pasa, apúntala en una línea en `docs/COLA.md` («Lo que queda por
    hablar con Francisco») y sigue.
 5. Con la aprobación del revisor, la rama de la fila se fusiona en `main` (avance limpio o fusión
-   normal; sin `git push`, petición de cambios fusionada al momento): es la única publicación de
-   código de la fila. Después, `pruebas` se pone igual que `main` (`git push --force origin
-   main:pruebas`) solo si antes `git merge-base --is-ancestor origin/pruebas origin/main` lo
-   confirma; si no, no se toca y se apunta en una línea. No es un paso: nadie la espera.
+   normal; sin `git push`, petición de cambios fusionada al momento) y se publica a propósito, una
+   sola vez (`create_deployment`, regla de abajo): es la única publicación de la fila. La rama `pruebas` ya no existe ni se nivela.
 
 **Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
 Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
@@ -101,6 +99,9 @@ lanzamientos seguidos pasa a BLOQUEADA. Nada de esto se para a pedir permiso ni 
 a Francisco: las decisiones a mitad camino las toma la sesión y las deja escritas en la nota de la
 fila. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
+**Vercel no publica nada solo** (11-oct-2026, `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Ninguna subida a GitHub crea una
+publicación. Una tarea que cambia la app publica **una sola vez, a propósito**, cuando su código ya está en `main`: herramienta `create_deployment` de Vercel con `teamId` `team_gnCjBLTS8m8PNTFVUf7ST0uN`, `name` y `project` `gestor-de-asuntos`, `target` `production` y `gitSource` `{ type: github, org: fmargon780, repo: gestor-asuntos-ies, ref: main }`; después `get_deployment` hasta `READY` y comprobar la dirección publicada. Las subidas de solo documentos no publican y no hay nada que comprobar. Si responde 402 no se reintenta. Nunca se vuelve a encender la publicación automática ni se añade un `ignoreCommand`: las publicaciones canceladas también cuentan en el tope de 100 al día de toda la cuenta.
+
 ## Regla general de publicación (manda sobre cualquier otra regla)
 
 Acordada con Francisco el 26-sep-2026 para todos sus proyectos. Ese día, en otro proyecto,
@@ -127,7 +128,7 @@ verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
    **SIN PUBLICACIÓN COMPROBADA**, con el motivo en una línea, y la sesión termina con normalidad
    (regla 0: para, y el siguiente lanzamiento coge la siguiente PENDIENTE). El tope de Vercel
    **no para la cola**. Tu mensaje final empieza exactamente con: «AVISO: no he podido comprobar
-   que los cambios estén publicados.» **Como mucho un `create_deployment` a mano por sesión**; si
+   que los cambios estén publicados.» **Un `create_deployment` por fila con código** (es el camino normal, ya no el de emergencia); si
    responde 402, no se reintenta. Esto sustituye el «déjalo anotado para que otra sesión lo
    compruebe» de la regla 19 de `docs/COLA.md`.
 4. **Si Francisco dice que no ve un cambio,** lo primero es comprobar si se publicó. Nunca
