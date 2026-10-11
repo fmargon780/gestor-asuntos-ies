@@ -110,6 +110,9 @@ var MedidasPantalla = (function () {
       '<div id="medidas-cuerpo"></div></div>';
     puesta.appendChild(det);
     det.addEventListener('toggle', function () { if (det.open) pintar(); });
+    /* La pantalla de Herramientas se vuelve a pintar con el bloque ya abierto: no hay «toggle». Mientras se ve, se refresca. */
+    setInterval(function () { if (det.open && det.offsetParent !== null) pintar(); }, 2000);
+    det.addEventListener('click', function () { setTimeout(function () { if (det.open) pintar(); }, 0); });
   }
 
   function arrancar() { montar(); }

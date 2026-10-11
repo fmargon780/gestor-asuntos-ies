@@ -83,6 +83,13 @@ console.log('--- 1 y 2. lo que se apunta ---');
   /* ========== 6. tarjeta ========== */
   const tarjeta = await pagina.evaluate(() => !!document.querySelector('#bloque-medidas, [data-bloque="medidas"], .tarjeta-medidas') || !!window.MedidasPantalla);
   comprobar('6. la pantalla de medidas existe', tarjeta, true);
+  /* La tarjeta abierta se refresca sola (el revisor la vio quieta al volver a Herramientas con el bloque ya abierto). */
+  await pagina.click('button.pestana[data-pantalla="herramientas"]');
+  await pagina.waitForSelector('#bloque-medidas', { state: 'visible' });
+  await pagina.evaluate(() => { document.querySelector('#bloque-medidas').open = true; MedidasPantalla.pintar(); });
+  await pagina.evaluate(() => Medidas.cuenta('prueba:refresco'));
+  await pagina.waitForFunction(() => /refresco/.test(document.getElementById('medidas-cuerpo').textContent), null, { timeout: 8000 }).catch(() => {});
+  comprobar('6. la tarjeta abierta se pone al día sola', await pagina.evaluate(() => /refresco/.test(document.getElementById('medidas-cuerpo').textContent)), true);
   await contexto.close();
 }
 
