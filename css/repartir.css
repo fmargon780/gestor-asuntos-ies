@@ -17,3 +17,15 @@
 .repartir-repetido { display: flex; gap: 6px; align-items: center; }
 .tipo-repartir-fila { margin-top: 10px; }
 .tipo-repartir-fila .campo { max-width: 320px; }
+/* Fila 337: el visor grande a la derecha, en los dos cuadros de repartir. */
+.cuadro-repartir.cuadro-ancho { max-width: 96vw; width: 1500px; }
+.repartir-dos { display: flex; gap: 14px; align-items: flex-start; }
+.repartir-izq { flex: 0 0 46%; min-width: 0; }
+.repartir-visor { flex: 1; min-width: 0; height: 75vh; overflow: auto; border: 1px solid var(--linea); background: var(--papel); padding: 8px; }
+.repartir-visor-pagina { display: block; margin: 0 auto 10px; border: 1px solid var(--linea); max-width: 100%; }
+.repartir-visor-imagen { max-width: 100%; display: block; margin: 0 auto; }
+.repartir-visor-vacio { margin: 12px; }
+.repartir-trozo { cursor: pointer; }
+.repartir-trozo.repartir-actual { outline: 2px solid var(--principal, #2a6df4); outline-offset: -2px; }
+.repartir-elegir { max-height: 55vh; overflow: auto; margin: 10px 0; }
+.repartir-elegir-fila { display: flex; gap: 8px; align-items: center; padding: 4px 2px; }

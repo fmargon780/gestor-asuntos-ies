@@ -46,7 +46,7 @@ var RepartirCrear = (function () {
      número de documento: `datos.numeroDoc`, dado una sola vez por reparto. */
   function nombreDelDocumento(tipoDocumento, datos) {
     return Nombres.montarDocumento({ fecha: datos.fecha, codigo: datos.codigo, tipo: tipoDocumento || 'DOCUMENTO',
-      extension: 'pdf', numeroDoc: datos.numeroDoc || '' });
+      extension: datos.extension || 'pdf', numeroDoc: datos.numeroDoc || '' });
   }
 
   /* Los datos del documento, para la ficha del asunto donde queda (fila 239). */
@@ -97,12 +97,13 @@ var RepartirCrear = (function () {
         numero: numero,
         abiertoEl: U.ahora(), abiertoPor: App.E.usuario, repartidoDe: origen.nombre
       });
-      var doc = await PdfHerramientas.sacarPaginas(bytes, indices(trozo));
-      await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos), doc, 'application/pdf');
+      /* Fila 337: un fichero suelto (`trozo.fichero`) se guarda entero, con su extensión. */
+      var doc = trozo.fichero ? bytes : await PdfHerramientas.sacarPaginas(bytes, indices(trozo));
+      await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos), doc, trozo.fichero ? (datos.tipoMime || 'application/octet-stream') : 'application/pdf');
       await apuntarDocumento(nombre, op.tipoDocumento, datos);
       var a = { nombre: nombre, handle: carpeta, leido: Nombres.leer(nombre, App.E.tipos),
                 ficha: App.E.registro.asuntos[nombre] || {} };
-      if (window.Notas) await Notas.anadirAuto(a, 'Viene de ' + origen.nombre + ', ' + RepartirNucleo.textoPaginas(trozo).toLowerCase());
+      if (window.Notas) await Notas.anadirAuto(a, 'Viene de ' + origen.nombre + ', ' + (trozo.fichero ? 'fichero ' + trozo.fichero : RepartirNucleo.textoPaginas(trozo).toLowerCase()));
       a.ficha = App.E.registro.asuntos[nombre] || a.ficha;
       App.E.archivarSinPreguntar = true;
       try { await App.cerrarAsunto(a); } finally { App.E.archivarSinPreguntar = false; }
@@ -191,6 +192,71 @@ var RepartirCrear = (function () {
     return resultados;
   }
 
+  /* ---------- varios ficheros sueltos, uno por persona (fila 337) ----------
+
+     `ficheros`: [{ nombre, handle, tercero }] (solo los que tienen persona). Por cada uno: el asunto de
+     esa persona, ya archivado, con el fichero entero (fecha y registro de su propio nombre, un número de
+     documento para él) y, SOLO si se guardó bien, el fichero sale del asunto de origen por la papelera.
+     `op`: { tipo, tipoDocumento, noCrear, personas, deFuera }. Devuelve [{ nombre, tercero, ok, asunto, motivo }]. */
+  async function repartirFicheros(origen, ficheros, op, progreso) {
+    var resultados = [];
+    var porHacer = ficheros.filter(function (f) { return f.tercero && !(op.noCrear || {})[f.tercero]; });
+    var hechos = 0;
+    if (window.ArchivarCabe) ArchivarCabe.empezarLote();
+    for (var i = 0; i < porHacer.length; i++) {
+      var f = porHacer[i];
+      if (progreso) progreso(++hechos, porHacer.length);
+      var r = { nombre: f.nombre, tercero: f.tercero, ok: false };
+      try {
+        var archivo = await f.handle.getFile();
+        var bytes = new Uint8Array(await archivo.arrayBuffer());
+        var datos = datosDelOriginal(f.nombre);
+        datos.numeroDoc = datos.numeroDoc || (await Numeros.reservar('documentos', '')).numero;
+        datos.extension = (Nombres.extensionDe ? Nombres.extensionDe(f.nombre) : (f.nombre.match(/\.([A-Za-z0-9]{1,8})$/) || [])[1]) || '';
+        datos.tipoMime = archivo.type || '';
+        var hecho = await crearUno(origen, bytes, { fichero: f.nombre, desde: 1, hasta: 1, tercero: f.tercero },
+          (op.personas || {})[f.tercero], op, datos);
+        Object.assign(r, hecho);
+        if (hecho.ok) {
+          try {
+            await Papelera.mandarDocumentoDeAsunto({ handle: origen.handle, nombre: origen.nombre, ficha: origen.ficha }, f.nombre);
+          } catch (e) { r.ok = false; r.motivo = 'repartido, pero no he podido quitarlo del asunto de origen: ' + U.mensajeDeError(e); }
+        }
+      } catch (e) {
+        r.motivo = U.mensajeDeError(e);
+      }
+      resultados.push(r);
+    }
+    var lineas = resultados.map(function (x) {
+      return x.nombre + ' → ' + x.tercero + (x.asunto ? ' (asunto ' + x.asunto + ')' : '') + (x.ok ? '' : ' — NO SE PUDO: ' + (x.motivo || ''));
+    });
+    try {
+      await App.guardarRegistroFresco(function (registro) {
+        var f2 = registro.asuntos[origen.nombre] || (registro.asuntos[origen.nombre] = {});
+        if ((op.deFuera || []).length && window.Relacionados) {
+          f2.relacionados = Relacionados.combinarRelacionados(f2.relacionados || [], f2.categoria, f2.tercero, op.deFuera).finales;
+        }
+        f2.repartos = (f2.repartos || []).concat([{
+          documento: 'ficheros ' + U.ahora(), fecha: U.ahora(),
+          ficheros: resultados.map(function (x) {
+            var s = { nombre: x.nombre, tercero: x.tercero, ok: !!x.ok };
+            if (x.asunto) s.asunto = x.asunto;
+            return s;
+          })
+        }]);
+      });
+      if (window.Notas && lineas.length) {
+        await Notas.anadirAuto({ nombre: origen.nombre, ficha: App.E.registro.asuntos[origen.nombre] || {} },
+          'Reparto de ficheros:\n' + lineas.join('\n'));
+      }
+    } catch (e) {
+      U.accesorio('Reparto hecho, pero no he podido apuntarlo en el asunto de origen', e);
+    }
+    if (window.ArchivarCabe) ArchivarCabe.avisarLote();
+    try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
+    return resultados;
+  }
+
   /* Lo ya repartido de este PDF, si se repartió antes. */
   function repartoAnterior(origen, nombrePdf) {
     var f = (App.E.registro.asuntos || {})[origen.nombre] || origen.ficha || {};
@@ -198,6 +264,6 @@ var RepartirCrear = (function () {
   }
 
   return { datosDelOriginal: datosDelOriginal, nombreDelAsunto: nombreDelAsunto, yaTienen: yaTienen,
-           repartir: repartir, repartoAnterior: repartoAnterior };
+           repartir: repartir, repartirFicheros: repartirFicheros, repartoAnterior: repartoAnterior };
 })();
 window.RepartirCrear = RepartirCrear;

@@ -278,6 +278,23 @@ var FichaDocumentos = (function () {
     }
   }
 
+  /* «Repartir ficheros entre terceros» (fila 337): en la cabecera del bloque, solo con dos documentos o más
+     en un asunto abierto. */
+  function ponerBotonRepartir(bloqueEl, a, cuantos) {
+    if (!bloqueEl) return;
+    var titulo = bloqueEl.querySelector('.ficha-titulo');
+    if (!titulo) return;
+    var viejo = titulo.querySelector('.ficha-documentos-repartir');
+    if (!window.RepartirFicheros || !RepartirFicheros.puede(a, cuantos)) { if (viejo) viejo.remove(); return; }
+    var b = viejo || document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton ficha-documentos-repartir';
+    b.textContent = 'Repartir ficheros entre terceros';
+    b.title = 'Un fichero por persona: crea el asunto de cada una, ya archivado, con su fichero';
+    b.onclick = function () { RepartirFicheros.abrir({ asunto: a, alTerminar: function () { pintar(a); } }); };
+    if (!viejo) titulo.appendChild(b);
+  }
+
   /* Las herramientas de PDF, en una barra encima del documento en el
      visor (fila 168): Separar, Unir, Sacar páginas, Ajustar tamaño y
      Repartir entre terceros, con las mismas condiciones que tenían en el
@@ -328,6 +345,7 @@ var FichaDocumentos = (function () {
       var bloqueEl = caja.closest('.ficha-bloque');
       if (bloqueEl) bloqueEl.classList.toggle('vacio', !lista.length);
       ponerBotonAnadir(bloqueEl, a);
+      ponerBotonRepartir(bloqueEl, a, sinIndice.length);   /* fila 337 */
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';

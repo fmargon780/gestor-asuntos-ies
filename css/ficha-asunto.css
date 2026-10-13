@@ -310,3 +310,7 @@
 .ficha-dato-hito { border-bottom: 0; padding-top: 10px; }
 .ficha-rotulo-hito { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--tinta-suave); }
 .marca-hito { font-size: 11px; color: var(--tinta-suave); margin-left: 4px; }
+
+/* Fila 337: «Repartir ficheros entre terceros» sale con la tarjeta de Documentos abierta (cerrada, el título no cabe en un renglón). */
+.ficha-tarjeta .ficha-documentos-repartir { display: none; margin: 1px 6px 0 0; padding: 0 8px; min-height: 0; height: 20px; line-height: 18px; vertical-align: top; font-size: 12px; }
+.ficha-tarjeta.abierta .ficha-documentos-repartir { display: inline-block; }
