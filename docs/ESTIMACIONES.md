@@ -14,3 +14,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 335 | 60 | Revisión y informe, sin código ni publicación |
 | 342 | 90 | Filtro compartido por los dos cuadros de reparto, listas sin los asignados, cuentas y prueba nueva |
+| 343 | 120 | Corte por alumno leyendo todas las páginas, asignación en todo el alumnado, tercero sin RegAlum, PDF de prueba fabricado y prueba nueva |
