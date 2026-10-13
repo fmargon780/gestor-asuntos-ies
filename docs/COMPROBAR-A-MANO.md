@@ -273,3 +273,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 330 — los cargos, entregados al Centro de datos (11-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Ajustes → Este ordenador → «Carpeta del Centro de datos» dice «Cargos entregados al Centro de datos: …»; pasado un cuarto de hora, la página del Centro de datos dice «Cargos: …» con el mismo número.
+
+## Fila 343 — repartir cortando por alumno (13-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Con el PDF real del Informe final de etapa de Primaria (CEIP Jorge Guillén, 896 páginas), en un asunto sin relacionados: «Repartir entre terceros» debe proponer 150 trozos, con las dos alumnas que tienen dos informes en dos trozos cada una (ámbar suave «Mismo alumno…»).
