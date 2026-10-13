@@ -35,18 +35,42 @@ var Repartir = (function () {
     return pdfjsLib.getDocument({ data: bytes.slice() }).promise;
   }
 
-  async function textos(pdfDoc) {
+  /* `cadaPagina(n, texto)`, si se da, se llama con cada página leída (fila 343: quién es); cada 10 páginas se cede el paso
+     a la pantalla y se pone «Leyendo página N de M…» dentro del cuadro. */
+  async function textos(pdfDoc, cadaPagina) {
     var salida = [];
     for (var n = 1; n <= pdfDoc.numPages; n++) {
+      var t = '';
       try {
         var c = await (await pdfDoc.getPage(n)).getTextContent();
-        salida.push(c.items.map(function (i) { return i.str; }).join(' '));
-      } catch (e) { salida.push(''); }
+        t = c.items.map(function (i) { return i.str; }).join(' ');
+      } catch (e) { t = ''; }
+      salida.push(t);
+      if (cadaPagina) {
+        try { cadaPagina(n, t); } catch (e2) { /* la lectura de quién es no puede romper el cuadro */ }
+        if (n % 10 === 0) {
+          var l = document.getElementById('repartir-leyendo');
+          if (l) l.textContent = 'Leyendo página ' + n + ' de ' + pdfDoc.numPages + '…';
+          await new Promise(function (r) { setTimeout(r, 0); });
+        }
+      }
     }
     return salida;
   }
 
   function textoDe(t) { return E.textos.slice(t.desde - 1, t.hasta).join(' '); }
+
+  /* Fila 343: lo que hace falta para saber quién es cada página: el alumnado, por número escolar y por nombre. */
+  function contextoDeLectura(fuente, alumnado) {
+    var ctx = { personas: [], porId: {} };
+    if (!fuente || !fuente.lista) return ctx;
+    fuente.lista.forEach(function (p, i) {
+      var persona = { tercero: alumnado[i], id: String(p.id || '').trim() };
+      ctx.personas.push(persona);
+      if (persona.id) ctx.porId[persona.id] = persona;
+    });
+    return ctx;
+  }
 
   /* ---------- asignar y marcar ---------- */
 
@@ -78,7 +102,7 @@ var Repartir = (function () {
       }
       if (t.tercero) usados[t.tercero] = true;
     });
-    if (filtroActivo()) return trozos;
+    if (filtroActivo() || E.corte) return trozos;
     /* Fila 339: en el segundo PDF de un asunto (ya hubo otro reparto) no se rellena por orden: sería repetir el primero. */
     if (E.otros && E.otros.hay) return trozos;
     var libres = E.personas.map(function (p) { return p.tercero; }).filter(function (n) { return !usados[n]; });
@@ -90,13 +114,16 @@ var Repartir = (function () {
     if (t.hecho) return 'hecho';
     if (t.quedarse) return '';
     if (!t.tercero) return 'ambar';
+    /* Fila 343: lo que dijo el corte por alumno, mientras no se haya cambiado a mano. */
+    if (t.lectura && t.lectura.tercero === t.tercero) return t.lectura.marca;
     if (!E.hayTexto) return '';
     var r = leer(textoDe(t));
     if (!r) return '';
     return (r.tercero === t.tercero && r.marca === 'verde') ? 'verde' : 'ambar';
   }
 
-  var TEXTO_MARCA = { verde: 'Leído del documento', ambar: 'Revísalo', hecho: 'Hecho', '': '' };
+  var TEXTO_MARCA = { verde: 'Leído del documento', ambar: 'Revísalo', hecho: 'Hecho', '': '',
+    mismo: 'Mismo alumno que el trozo anterior: dos documentos', nueva: 'No está en el alumnado: se crea con los datos del informe' };
 
   /* ---------- pintar ---------- */
 
@@ -202,13 +229,14 @@ var Repartir = (function () {
   function pintarCuadro() {
     var cuerpo = $('cuadro-cuerpo');
     var sinRel = !E.personas.length;
-    var aviso = N.avisoDivision(E.total, E.primera, E.personas.length);
+    var aviso = E.corte ? '' : N.avisoDivision(E.total, E.primera, E.personas.length);
     var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
     var tiposDoc = (App.E.tiposDocumento || []).slice();
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
       (E.filtro ? RepartirFiltro.html(E.filtro) : '') +
-      (sinRel && !filtroActivo() ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
+      (sinRel && !filtroActivo() && !E.corte ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
         'y se busca en todo el alumnado. <button type="button" class="enlace" id="repartir-relacionados">Añadir relacionados</button></p>' : '') +
+      (E.corte ? '<p class="suave repartir-corte">' + esc(E.corte) + '</p>' : '') +
       (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: ' + (filtroActivo() || (E.otros && E.otros.hay) ? 'elige el alumno de cada trozo.' : 'los trozos se han asignado por orden.') + '</p>') +
       '<div class="alta-tipo repartir-arriba">' +
         '<label>El primer trozo empieza en la página <input type="number" min="1" max="' + E.total + '" class="campo campo-plazo" id="repartir-primera" value="' + E.primera + '"' + (E.anterior ? ' disabled' : '') + '></label>' +
@@ -250,6 +278,7 @@ var Repartir = (function () {
   }
 
   function recalcular() {
+    E.corte = '';   /* fila 343: al cambiar el tamaño a mano, vuelve el corte de tamaño fijo */
     E.trozos = asignar(N.proponer(E.total, E.primera, E.porTrozo));
     pintar();
   }
@@ -339,7 +368,7 @@ var Repartir = (function () {
     E.trozos.forEach(function (t) { if (t.tercero) conTrozo[t.tercero] = true; });
     var sinTrozo = E.personas.filter(function (p) { return !conTrozo[p.tercero] && !(E.otros && E.otros.recibieron[p.tercero]); }).map(function (p) { return p.tercero; });
     var yaTienen = await RepartirCrear.yaTienen(E.tipo);
-    var repetidos = aCrear.map(function (t) { return t.tercero; }).filter(function (n) { return yaTienen[n]; });
+    var repetidos = aCrear.map(function (t) { return t.tercero; }).filter(function (n, k, l) { return yaTienen[n] && l.indexOf(n) === k; });
     var sinAsignar = E.trozos.filter(function (t) { return !t.hecho && !t.quedarse && !t.tercero; }).length;
     $('cuadro-cuerpo').innerHTML =
       '<p><strong>Se van a crear ' + aCrear.length + (aCrear.length === 1 ? ' asunto' : ' asuntos') + ' de tipo ' + esc(E.tipo || '—') +
@@ -364,7 +393,8 @@ var Repartir = (function () {
     E.personas.forEach(function (p) { personas[p.tercero] = { categoria: p.categoria }; });
     /* Fila 342: si se ha usado el filtro, quedan relacionados solo los que reciben documento. */
     var deFuera = E.deFuera;
-    if (E.filtro && E.filtro.usado) {
+    /* Fila 343: lo mismo con el corte por alumno (nadie estaba relacionado antes). */
+    if ((E.filtro && E.filtro.usado) || E.corteUsado) {
       var antes = {}, nuevos = {};
       E.originales.forEach(function (n) { antes[n] = true; });
       deFuera = [];
@@ -375,6 +405,7 @@ var Repartir = (function () {
         if (!personas[t.tercero]) personas[t.tercero] = { categoria: 'ALUMNADO' };
       });
     }
+    E.trozos.forEach(function (t) { if (t.tercero && !t.quedarse && !personas[t.tercero]) personas[t.tercero] = { categoria: 'ALUMNADO' }; });
     var cerrar = $('cuadro-aceptar');
     cerrar.disabled = true;
     $('repartir-confirmar').disabled = true;
@@ -412,7 +443,6 @@ var Repartir = (function () {
     try {
       bytes = new Uint8Array(await (await contexto.handle.getFile()).arrayBuffer());
       pdfDoc = await abrirPdf(bytes);
-      tx = await textos(pdfDoc);
     } catch (e) {
       U.fallo('No he podido abrir el PDF', e);
       return;
@@ -425,6 +455,23 @@ var Repartir = (function () {
         alumnado = fuente.lista.map(function (p) { return App.textoTercero(p); });
       }
     } catch (e) { alumnado = []; fuente = null; }
+    /* Fila 343: la lectura del PDF va dentro del cuadro, con su «Leyendo página N de M…», y de paso se mira quién es cada página. */
+    var cuadro = document.querySelector('#capa .cuadro');
+    if (cuadro) cuadro.classList.add('cuadro-ancho', 'cuadro-repartir');
+    var promesa = U.preguntar('Repartir "' + contexto.nombre + '" entre terceros', '', 'Cerrar', true);
+    var cerrado = false;
+    promesa.then(function () { cerrado = true; });
+    var cuerpoLeyendo = $('cuadro-cuerpo');
+    if (cuerpoLeyendo) cuerpoLeyendo.innerHTML = '<p class="suave" id="repartir-leyendo">Leyendo página 1 de ' + pdfDoc.numPages + '…</p>';
+    var ctx = contextoDeLectura(fuente, alumnado), paginas = [];
+    try {
+      tx = await textos(pdfDoc, function (n, t) { paginas.push({ ident: N.identificarPagina(t, ctx), texto: t }); });
+    } catch (e) {
+      if (!cerrado) $('cuadro-aceptar').click();
+      U.fallo('No he podido abrir el PDF', e);
+      return;
+    }
+    if (cerrado) { if (cuadro) cuadro.classList.remove('cuadro-ancho', 'cuadro-repartir'); return; }
     var tipoOrigen = tipoPorNombre((a.leido && a.leido.tipo) || ficha.tipo) || {};
     var tiposDoc = App.E.tiposDocumento || [];
     E = {
@@ -441,6 +488,8 @@ var Repartir = (function () {
     };
     E.originales = E.personas.map(function (p) { return p.tercero; });
     E.cuentas = { ver: '' };
+    E.corte = '';
+    E.corteUsado = false;
     E.filtro = null;
     try { E.filtro = fuente ? await RepartirFiltro.crear(fuente, E.personas) : null; } catch (e3) { E.filtro = null; }
     E.porTrozo = N.porTrozoPropuesto(E.total, 1, E.personas.length);
@@ -453,11 +502,19 @@ var Repartir = (function () {
         return x;
       });
     } else {
-      E.trozos = asignar(N.proponer(E.total, 1, E.porTrozo));
+      var porAlumno = null;
+      if (E.hayTexto) {
+        paginas.forEach(function (p) { p.huella = N.huella(p.texto, p.ident); });
+        porAlumno = N.proponerPorAlumno(paginas);
+      }
+      if (porAlumno) {
+        E.corte = 'Cortado donde cambia el ' + porAlumno.por + ': ' + porAlumno.cuantos + (porAlumno.cuantos === 1 ? ' trozo' : ' trozos');
+        E.corteUsado = true;
+        E.trozos = porAlumno.trozos;
+      } else {
+        E.trozos = asignar(N.proponer(E.total, 1, E.porTrozo));
+      }
     }
-    var cuadro = document.querySelector('#capa .cuadro');
-    if (cuadro) cuadro.classList.add('cuadro-ancho', 'cuadro-repartir');
-    var promesa = U.preguntar('Repartir "' + contexto.nombre + '" entre terceros', '', 'Cerrar', true);
     pintar();
     await promesa;
     if (cuadro) cuadro.classList.remove('cuadro-ancho', 'cuadro-repartir');

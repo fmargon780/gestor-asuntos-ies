@@ -90,7 +90,12 @@ var RepartirNucleo = (function () {
   }
 
   /* «Apellido1 Apellido2, Nombre 1234567» → sus piezas. */
+  var cachePiezas = {};
   function piezas(tercero) {
+    var k = String(tercero || '');
+    return cachePiezas[k] || (cachePiezas[k] = piezasDe(k));
+  }
+  function piezasDe(tercero) {
     var s = String(tercero || '');
     var coma = s.indexOf(',');
     var ap = coma === -1 ? '' : s.slice(0, coma);
@@ -138,12 +143,123 @@ var RepartirNucleo = (function () {
     return leerTrozo(String(nombreFichero || '').replace(/\.[A-Za-z0-9]{1,5}$/, ''), personas);
   }
 
+  /* ---------- cortar por alumno (fila 343, docs/REPARTIR-POR-NUMERO-ESCOLAR.md) ---------- */
+
+  function plano(texto) { return String(texto || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+
+  /* El Nº de identificación escolar que va junto a su etiqueta («Nº I. ESCOLAR», «Nº I.ESCOLAR», «Nº de
+     identificación escolar»…), en la misma línea o justo debajo. En el bloque de la primera hoja
+     («Nº EXPTE.: … Nº I.ESCOLAR:» y los números debajo, en el mismo orden) salta el del expediente. '' si no hay. */
+  function numeroEtiquetado(texto) {
+    var t = plano(texto);
+    var re = /(?:\bn[o°.]*|\bnumero)\s*(?:de\s+)?(?:i\s*\.?\s*escolar|identificacion\s+escolar)\s*:?/g;
+    var m = re.exec(t);
+    if (!m) return '';
+    var fin = m.index + m[0].length;
+    var e = /\bn[o°.]*\s*(?:de\s+)?(?:expte?\b\.?|expediente)\s*:?/.exec(t);
+    var despues = t.slice(fin).match(/\d{5,}/g) || [];
+    if (e && e.index < m.index && !/\d{5,}/.test(t.slice(e.index + e[0].length, m.index))) return despues[1] || despues[0] || '';
+    return despues[0] || '';
+  }
+
+  /* Lo que va junto a «APELLIDOS Y NOMBRE:» o a «APELLIDOS: … NOMBRE: …», como «Apellidos, Nombre». '' si no hay. */
+  function nombreEtiquetado(texto) {
+    var t = String(texto || '').replace(/\s+/g, ' ');
+    var parar = '(?=\\s+(?:N[º°o]\\.?|NIF|DNI|FECHA|SEXO|EXPTE|DOMICILIO|LUGAR)(?![A-Za-z])|\\s*$|:)';
+    var m = new RegExp('APELLIDOS\\s+Y\\s+NOMBRE\\s*:\\s*([^:]{3,80}?)' + parar, 'i').exec(t);
+    if (m) return limpiaNombre(m[1]);
+    m = new RegExp('APELLIDOS\\s*:\\s*([^:]{2,60}?)\\s+NOMBRE\\s*:\\s*([^:]{2,60}?)' + parar, 'i').exec(t);
+    return m ? limpiaNombre(m[1].trim() + ', ' + m[2].trim()) : '';
+  }
+  function limpiaNombre(n) {
+    n = n.trim().replace(/[\s.,;:]+$/, '');
+    if (n && n === n.toUpperCase()) {
+      n = n.toLowerCase().replace(/(^|[\s,-])([a-zñáéíóúü])/g, function (x, a, b) { return a + b.toUpperCase(); });
+    }
+    return n;
+  }
+
+  /* Quién es el de una página. `ctx`: { personas: [{ tercero, id }], porId: { id: persona } }.
+     → { clave, tercero, marca: 'verde'|'ambar'|'nueva', enAlumnado, id, nombre } o null. 'nueva' = no está en el alumnado. */
+  function identificarPagina(texto, ctx) {
+    if (!String(texto || '').trim()) return null;
+    var porId = (ctx && ctx.porId) || {};
+    var etiquetado = numeroEtiquetado(texto);
+    var conocidos = (String(texto).match(/\d{5,}/g) || []).filter(function (n) { return Object.prototype.hasOwnProperty.call(porId, n); });
+    if (conocidos.length) {
+      var id = conocidos.indexOf(etiquetado) !== -1 ? etiquetado : conocidos[0];
+      return { clave: 'id:' + id, tercero: porId[id].tercero, marca: 'verde', enAlumnado: true, id: id };
+    }
+    var nombre = nombreEtiquetado(texto);
+    if (etiquetado) {
+      return { clave: 'id:' + etiquetado, tercero: nombre ? nombre + ' ' + etiquetado : '', marca: 'nueva', enAlumnado: false, id: etiquetado, nombre: nombre };
+    }
+    var r = leerTrozo(texto, (ctx && ctx.personas) || []);
+    if (r) return { clave: 'nom:' + r.tercero, tercero: r.tercero, marca: r.marca, enAlumnado: true, id: '' };
+    if (nombre) return { clave: 'nom:' + normalizar(nombre), tercero: nombre, marca: 'nueva', enAlumnado: false, id: '', nombre: nombre };
+    return null;
+  }
+
+  /* Lo fijo de una página: su texto sin cifras ni fechas y sin las palabras del nombre del alumno. */
+  function huella(texto, ident) {
+    var quitar = {};
+    if (ident && ident.tercero) normalizar(ident.tercero).split(' ').forEach(function (w) { quitar[w] = true; });
+    var set = {};
+    normalizar(String(texto || '').replace(/\d+/g, ' ')).split(' ').forEach(function (w) { if (w.length > 1 && !quitar[w]) set[w] = true; });
+    return Object.keys(set);
+  }
+
+  function mismaHuella(a, b) {
+    if (!a || !b || !a.length || !b.length) return false;
+    var sb = {}, inter = 0;
+    b.forEach(function (w) { sb[w] = true; });
+    a.forEach(function (w) { if (sb[w]) inter++; });
+    return inter / (a.length + b.length - inter) >= 0.9;
+  }
+
+  /* Los trozos por alumno. `paginas[i]` = { ident, huella } de la página i+1. null si menos del 80 % de las
+     páginas tienen alumno (entonces, tamaño fijo). Un trozo nuevo empieza donde cambia el alumno y donde, con el
+     mismo alumno, la página tiene la misma huella que la primera del trozo en curso. Las páginas sin alumno siguen
+     al trozo anterior; las de delante forman «Se queda en este asunto». */
+  function proponerPorAlumno(paginas) {
+    var total = (paginas || []).length;
+    if (!total) return null;
+    var con = paginas.filter(function (p) { return p && p.ident; }).length;
+    if (!con || con / total < 0.8) return null;
+    var trozos = [], cur = null, primero = -1;
+    for (var i = 0; i < total; i++) {
+      var p = paginas[i];
+      var id = p && p.ident;
+      if (primero === -1) { if (!id) continue; primero = i; if (i > 0) trozos.push({ desde: 1, hasta: i, quedarse: true }); }
+      var nuevo = !cur || (id && (id.clave !== cur.clave || mismaHuella(p.huella, cur.huella)));
+      if (nuevo) {
+        cur = { desde: i + 1, hasta: i + 1, clave: id.clave, huella: p.huella, ident: id };
+        trozos.push(cur);
+      } else cur.hasta = i + 1;
+    }
+    var salida = [], previo = null, porId = 0, porNombre = 0, alumnos = 0;
+    trozos.forEach(function (t) {
+      if (t.quedarse) { salida.push(t); return; }
+      alumnos++;
+      if (t.clave.indexOf('id:') === 0) porId++; else porNombre++;
+      var x = { desde: t.desde, hasta: t.hasta, tercero: t.ident.tercero || '' };
+      var marca = t.ident.marca;
+      if (previo && previo.clave === t.clave && x.tercero) marca = 'mismo';
+      if (x.tercero) x.lectura = { tercero: x.tercero, marca: marca };
+      previo = t;
+      salida.push(x);
+    });
+    return { trozos: salida, cuantos: alumnos, por: porId >= porNombre ? 'número escolar' : 'nombre' };
+  }
+
   function textoPaginas(t) { return t.desde === t.hasta ? 'Página ' + t.desde : 'Páginas ' + t.desde + '–' + t.hasta; }
 
   return {
     porTrozoPropuesto: porTrozoPropuesto, avisoDivision: avisoDivision, proponer: proponer,
     moverCorte: moverCorte, asignarPorOrden: asignarPorOrden, normalizar: normalizar, piezas: piezas,
-    compararNombre: compararNombre, leerTrozo: leerTrozo, proponerPorNombre: proponerPorNombre, textoPaginas: textoPaginas
+    compararNombre: compararNombre, leerTrozo: leerTrozo,
+    numeroEtiquetado: numeroEtiquetado, nombreEtiquetado: nombreEtiquetado, identificarPagina: identificarPagina,
+    huella: huella, proponerPorAlumno: proponerPorAlumno, proponerPorNombre: proponerPorNombre, textoPaginas: textoPaginas
   };
 })();
 if (typeof window !== 'undefined') window.RepartirNucleo = RepartirNucleo;

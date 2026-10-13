@@ -39,3 +39,9 @@
 .repartir-cuentas { margin: 0 0 8px; }
 .repartir-cuentas-linea { margin: 0; }
 .repartir-cuentas-lista { margin: 4px 0 0; padding-left: 18px; max-height: 120px; overflow: auto; font-size: 13px; }
+/* Fila 343: el corte por alumno. */
+.repartir-trozo.repartir-mismo { background: color-mix(in srgb, var(--ambar) 45%, transparent); }
+.repartir-trozo.repartir-nueva { background: #eceff1; }
+.repartir-marca-mismo { color: #9a6a00; }
+.repartir-marca-nueva { color: #546e7a; }
+.repartir-corte { margin: 6px 0; }
