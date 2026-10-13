@@ -102,8 +102,10 @@ var RepartirNucleo = (function () {
   }
 
   /* persona: { tercero, dni? } */
-  function compararNombre(texto, persona) {
-    var norm = ' ' + normalizar(texto) + ' ';
+  function compararNombre(texto, persona) { return compararNorm(' ' + normalizar(texto) + ' ', persona); }
+
+  /* Fila 342: lo mismo con el texto ya normalizado (entre espacios), para compararlo con muchas personas. */
+  function compararNorm(norm, persona) {
     var p = piezas(persona && persona.tercero);
     function hay(w) { return norm.indexOf(' ' + w + ' ') !== -1; }
     if (p.id && hay(normalizar(p.id))) return 'verde';
@@ -120,8 +122,9 @@ var RepartirNucleo = (function () {
   function leerTrozo(texto, personas) {
     if (!String(texto || '').trim()) return null;
     var verdes = [], ambares = [];
+    var norm = ' ' + normalizar(texto) + ' ';
     (personas || []).forEach(function (p) {
-      var r = compararNombre(texto, p);
+      var r = compararNorm(norm, p);
       if (r === 'verde') verdes.push(p.tercero); else if (r === 'ambar') ambares.push(p.tercero);
     });
     if (verdes.length === 1 && !ambares.length) return { tercero: verdes[0], marca: 'verde' };

@@ -29,3 +29,13 @@
 .repartir-trozo.repartir-actual { outline: 2px solid var(--principal, #2a6df4); outline-offset: -2px; }
 .repartir-elegir { max-height: 55vh; overflow: auto; margin: 10px 0; }
 .repartir-elegir-fila { display: flex; gap: 8px; align-items: center; padding: 4px 2px; }
+/* Fila 342: el filtro del alumnado y la línea de cuentas. */
+.repartir-filtro { margin: 8px 0; padding: 6px 10px; border: 1px solid var(--linea); border-radius: 8px; }
+.repartir-filtro summary { cursor: pointer; font-weight: 700; }
+.repartir-filtro-cuantos { font-weight: 400; margin-left: 8px; }
+.repartir-pastillas { margin: 6px 0; }
+.repartir-aviso-lectura { display: inline-block; margin-right: 6px; }
+.repartir-abajo { position: sticky; bottom: 0; background: var(--papel); padding-top: 6px; border-top: 1px solid var(--linea); }
+.repartir-cuentas { margin: 0 0 8px; }
+.repartir-cuentas-linea { margin: 0; }
+.repartir-cuentas-lista { margin: 4px 0 0; padding-left: 18px; max-height: 120px; overflow: auto; font-size: 13px; }

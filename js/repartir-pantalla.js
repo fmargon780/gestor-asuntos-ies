@@ -50,15 +50,35 @@ var Repartir = (function () {
 
   /* ---------- asignar y marcar ---------- */
 
-  /* Lo leído manda; al resto, los relacionados que queden, por orden. */
-  function asignar(trozos) {
+  /* Fila 342: con filtro puesto, la lectura es entre TODO el alumnado (para poder avisar de quien está fuera). */
+  function filtroActivo() { return !!(E.filtro && E.filtro.activo()); }
+  function leer(texto) { return filtroActivo() ? E.filtro.leer(texto) : N.leerTrozo(texto, E.personas); }
+
+  /* Los nombres ya asignados a algún trozo (menos el trozo `salvo`). */
+  function asignadosMenos(salvo) {
+    var m = {};
+    E.trozos.forEach(function (x, j) { if (j !== salvo && x.tercero && !x.quedarse) m[x.tercero] = true; });
+    return m;
+  }
+
+  /* Lo leído manda; al resto, los relacionados que queden, por orden. Fila 342: con filtro puesto no se
+     rellena por orden, y lo leído solo se asigna si está en el filtro y aún no tiene trozo; con `conservar`
+     (al cambiar el filtro) no se quita ninguna asignación. */
+  function asignar(trozos, conservar) {
     var usados = {};
+    if (conservar) trozos.forEach(function (t) { if (t.tercero && !t.quedarse) usados[t.tercero] = true; });
     trozos.forEach(function (t) {
-      if (t.quedarse || t.hecho) { if (t.tercero) usados[t.tercero] = true; return; }
-      var r = E.hayTexto ? N.leerTrozo(textoDe(t), E.personas) : null;
-      t.tercero = (r && !usados[r.tercero]) ? r.tercero : '';
+      if (t.quedarse || t.hecho || (conservar && t.tercero)) { if (t.tercero) usados[t.tercero] = true; return; }
+      var r = E.hayTexto ? leer(textoDe(t)) : null;
+      if (filtroActivo()) {
+        var av = RepartirFiltro.avisoDeLectura(E.filtro, r, usados);
+        t.tercero = av && av.tipo === 'libre' ? av.tercero : '';
+      } else {
+        t.tercero = (r && !usados[r.tercero]) ? r.tercero : '';
+      }
       if (t.tercero) usados[t.tercero] = true;
     });
+    if (filtroActivo()) return trozos;
     /* Fila 339: en el segundo PDF de un asunto (ya hubo otro reparto) no se rellena por orden: sería repetir el primero. */
     if (E.otros && E.otros.hay) return trozos;
     var libres = E.personas.map(function (p) { return p.tercero; }).filter(function (n) { return !usados[n]; });
@@ -71,7 +91,7 @@ var Repartir = (function () {
     if (t.quedarse) return '';
     if (!t.tercero) return 'ambar';
     if (!E.hayTexto) return '';
-    var r = N.leerTrozo(textoDe(t), E.personas);
+    var r = leer(textoDe(t));
     if (!r) return '';
     return (r.tercero === t.tercero && r.marca === 'verde') ? 'verde' : 'ambar';
   }
@@ -85,11 +105,12 @@ var Repartir = (function () {
     E.trozos.forEach(function (x, j) { if (j !== i && x.tercero) asignados[x.tercero] = true; });
     var html = '<option value=""' + (!t.quedarse && !t.tercero ? ' selected' : '') + '>Sin asignar</option>' +
       '<option value="' + QUEDARSE + '"' + (t.quedarse ? ' selected' : '') + '>Se queda en este asunto</option>';
-    var nombres = E.personas.map(function (p) { return p.tercero; });
+    var conFiltro = filtroActivo();
+    var nombres = conFiltro ? RepartirFiltro.nombresParaElegir(E.filtro, asignados, t.quedarse ? '' : t.tercero) : E.personas.map(function (p) { return p.tercero; });
     if (t.tercero && nombres.indexOf(t.tercero) === -1) nombres.push(t.tercero);
     return html + nombres.map(function (n) {
       return '<option value="' + esc(n) + '"' + (!t.quedarse && t.tercero === n ? ' selected' : '') + '>' +
-        esc(asignados[n] ? tachado(n) : n) + '</option>';
+        esc(!conFiltro && asignados[n] ? tachado(n) : n) + '</option>';
     }).join('');
   }
 
@@ -109,7 +130,19 @@ var Repartir = (function () {
         '<select class="campo repartir-tercero"' + (t.hecho ? ' disabled' : '') + '>' + opcionesTercero(t, i) + '</select>' +
         (t.hecho ? '' : '<input class="campo repartir-buscar" list="repartir-alumnado" placeholder="Buscar a otra persona del alumnado…">') +
         (marca ? '<span class="repartir-marca repartir-marca-' + marca + '">' + esc(TEXTO_MARCA[marca]) + '</span>' : '') +
+        avisosDelFiltro(t, i) +
       '</div></div>';
+  }
+
+  /* Fila 342: «Fuera del filtro» si lo asignado no está en el filtro; y, si el trozo está sin asignar, lo que
+     se lee en él cuando está fuera del filtro o ya tiene trozo. */
+  function avisosDelFiltro(t, i) {
+    if (!filtroActivo() || t.hecho || t.quedarse) return '';
+    if (t.tercero) {
+      return E.filtro.entra(t.tercero) ? '' : ' <span class="repartir-marca repartir-marca-ambar repartir-fuera">Fuera del filtro</span>';
+    }
+    if (!E.hayTexto) return '';
+    return RepartirFiltro.avisoHTML(RepartirFiltro.avisoDeLectura(E.filtro, leer(textoDe(t)), asignadosMenos(i)));
   }
 
   function seleccionHTML(clase, lista, valor, vacio) {
@@ -139,11 +172,31 @@ var Repartir = (function () {
       if (!t.tercero && !t.hecho && !t.quedarse) { idx = j; break; }
     }
     if (idx === -1) { lista.scrollTop = lista.scrollHeight; return; }
-    var fila = lista.querySelector('.repartir-trozo[data-i="' + idx + '"]');
-    if (fila) {
-      lista.scrollTop = fila.offsetTop;
-      if (window.RepartirVisor && E.pdfDoc) RepartirVisor.pdf($('repartir-visor'), E.pdfDoc, E.trozos[idx].desde, E.trozos[idx].hasta);
-    }
+    mostrar(idx);
+  }
+
+  /* El trozo `idx` arriba de la lista y en el visor grande. */
+  function mostrar(idx) {
+    var lista = document.querySelector('.repartir-lista');
+    var fila = lista && lista.querySelector('.repartir-trozo[data-i="' + idx + '"]');
+    if (!fila) return;
+    lista.scrollTop = fila.offsetTop;
+    if (window.RepartirVisor && E.pdfDoc) RepartirVisor.pdf($('repartir-visor'), E.pdfDoc, E.trozos[idx].desde, E.trozos[idx].hasta);
+  }
+
+  /* Fila 342: la línea de cuentas de abajo. */
+  function cuentasDelCuadro() {
+    var asignados = asignadosMenos(-1);
+    return RepartirFiltro.cuentasHTML({
+      docs: E.trozos.map(function (t, i) { return { t: t, i: i }; }).filter(function (x) { return !x.t.hecho && !x.t.quedarse && !x.t.tercero; })
+        .map(function (x) { return { i: x.i, texto: 'Trozo ' + (x.i + 1) + ', ' + (x.t.desde === x.t.hasta ? 'pág. ' + x.t.desde : 'págs. ' + x.t.desde + '–' + x.t.hasta) }; }),
+      alumnos: filtroActivo() ? E.filtro.nombres().filter(function (n) { return !asignados[n]; }) : null
+    }, E.cuentas);
+  }
+
+  function alCambiarFiltro() {
+    E.trozos = asignar(E.trozos, true);
+    pintar();
   }
 
   function pintarCuadro() {
@@ -153,9 +206,10 @@ var Repartir = (function () {
     var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
     var tiposDoc = (App.E.tiposDocumento || []).slice();
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
-      (sinRel ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
+      (E.filtro ? RepartirFiltro.html(E.filtro) : '') +
+      (sinRel && !filtroActivo() ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
         'y se busca en todo el alumnado. <button type="button" class="enlace" id="repartir-relacionados">Añadir relacionados</button></p>' : '') +
-      (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: ' + (E.otros && E.otros.hay ? 'elige el alumno de cada trozo.' : 'los trozos se han asignado por orden.') + '</p>') +
+      (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: ' + (filtroActivo() || (E.otros && E.otros.hay) ? 'elige el alumno de cada trozo.' : 'los trozos se han asignado por orden.') + '</p>') +
       '<div class="alta-tipo repartir-arriba">' +
         '<label>El primer trozo empieza en la página <input type="number" min="1" max="' + E.total + '" class="campo campo-plazo" id="repartir-primera" value="' + E.primera + '"' + (E.anterior ? ' disabled' : '') + '></label>' +
         '<label>Páginas de cada trozo <input type="number" min="1" class="campo campo-plazo" id="repartir-por" value="' + E.porTrozo + '"' + (E.anterior ? ' disabled' : '') + '></label>' +
@@ -163,7 +217,7 @@ var Repartir = (function () {
       (aviso && !E.anterior ? '<p class="aviso-en-vivo aviso-en-vivo-ambar">' + esc(aviso) + '</p>' : '') +
       '<datalist id="repartir-alumnado">' + E.alumnado.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('') + '</datalist>' +
       '<div class="repartir-lista">' + E.trozos.map(filaHTML).join('') + '</div>' +
-      '<div class="repartir-abajo">' +
+      '<div class="repartir-abajo">' + cuentasDelCuadro() +
         '<label class="etiqueta">Crear para cada persona un asunto de tipo…</label>' + seleccionHTML('repartir-tipo', tipos, E.tipo, 'Elige el tipo') +
         '<label class="etiqueta">Tipo de documento de cada trozo</label>' + seleccionHTML('repartir-tipodoc', tiposDoc, E.tipoDocumento, 'Elige el tipo de documento') +
         (E.trozos.some(function (t) { return t.quedarse; })
@@ -201,6 +255,8 @@ var Repartir = (function () {
   }
 
   function enganchar(cuerpo) {
+    if (E.filtro) RepartirFiltro.enganchar(E.filtro, cuerpo, alCambiarFiltro);
+    RepartirFiltro.enganchaCuentas(cuerpo, E.cuentas, function () { pintar(); }, mostrar);
     var rel = $('repartir-relacionados');
     if (rel) rel.onclick = function () {
       $('cuadro-aceptar').click();
@@ -225,6 +281,8 @@ var Repartir = (function () {
       if (menos) menos.onclick = function () { E.trozos = N.moverCorte(E.trozos, i, -1, E.total); pintar(); };
       var sel = fila.querySelector('.repartir-tercero');
       sel.onchange = function () { elegir(i, sel.value); };
+      var igual = fila.querySelector('.repartir-igualmente');
+      if (igual) igual.onclick = function () { elegir(i, igual.getAttribute('data-tercero')); };
       var buscar = fila.querySelector('.repartir-buscar');
       if (buscar) buscar.onchange = function () {
         var v = buscar.value.trim();
@@ -304,6 +362,19 @@ var Repartir = (function () {
     Array.prototype.forEach.call(document.querySelectorAll('.repartir-repetido input'), function (c) { if (!c.checked) noCrear[c.dataset.tercero] = true; });
     var personas = {};
     E.personas.forEach(function (p) { personas[p.tercero] = { categoria: p.categoria }; });
+    /* Fila 342: si se ha usado el filtro, quedan relacionados solo los que reciben documento. */
+    var deFuera = E.deFuera;
+    if (E.filtro && E.filtro.usado) {
+      var antes = {}, nuevos = {};
+      E.originales.forEach(function (n) { antes[n] = true; });
+      deFuera = [];
+      E.trozos.forEach(function (t) {
+        if (t.hecho || t.quedarse || !t.tercero || antes[t.tercero] || nuevos[t.tercero]) return;
+        nuevos[t.tercero] = true;
+        deFuera.push({ categoria: 'ALUMNADO', nombre: t.tercero });
+        if (!personas[t.tercero]) personas[t.tercero] = { categoria: 'ALUMNADO' };
+      });
+    }
     var cerrar = $('cuadro-aceptar');
     cerrar.disabled = true;
     $('repartir-confirmar').disabled = true;
@@ -313,7 +384,7 @@ var Repartir = (function () {
     try {
       resultados = await RepartirCrear.repartir(E.origen, E.fichero, E.trozos, {
         tipo: E.tipo, tipoDocumento: E.tipoDocumento, tipoDocumentoOrigen: E.tipoDocumentoOrigen,
-        noCrear: noCrear, personas: personas, deFuera: E.deFuera
+        noCrear: noCrear, personas: personas, deFuera: deFuera
       }, function (n, total) { progreso.textContent = 'Creando ' + n + ' de ' + total + '…'; });
     } catch (e) {
       U.fallo('No he podido repartirlo', e);
@@ -347,10 +418,13 @@ var Repartir = (function () {
       return;
     }
     var ficha = (App.E.registro.asuntos || {})[a.nombre] || a.ficha || {};
-    var alumnado = [];
+    var alumnado = [], fuente = null;
     try {
-      if (App.E.datos) alumnado = (await Datos.cargar(App.E.datos, 'ALUMNADO')).lista.map(function (p) { return App.textoTercero(p); });
-    } catch (e) { alumnado = []; }
+      if (App.E.datos) {
+        fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
+        alumnado = fuente.lista.map(function (p) { return App.textoTercero(p); });
+      }
+    } catch (e) { alumnado = []; fuente = null; }
     var tipoOrigen = tipoPorNombre((a.leido && a.leido.tipo) || ficha.tipo) || {};
     var tiposDoc = App.E.tiposDocumento || [];
     E = {
@@ -365,6 +439,10 @@ var Repartir = (function () {
       anterior: RepartirCrear.repartoAnterior({ nombre: a.nombre, ficha: ficha }, contexto.nombre),
       otros: RepartirCrear.otrosRepartos({ nombre: a.nombre, ficha: ficha }, contexto.nombre)   /* fila 339 */
     };
+    E.originales = E.personas.map(function (p) { return p.tercero; });
+    E.cuentas = { ver: '' };
+    E.filtro = null;
+    try { E.filtro = fuente ? await RepartirFiltro.crear(fuente, E.personas) : null; } catch (e3) { E.filtro = null; }
     E.porTrozo = N.porTrozoPropuesto(E.total, 1, E.personas.length);
     if (E.anterior) {
       /* Ya se repartió: lo que salió bien, «Hecho»; lo demás se reintenta. */
