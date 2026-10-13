@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '343', fecha: '2026-10-13', texto: 'Al repartir entre terceros un PDF con un informe por alumno, la app corta sola donde cambia el alumno (por su número escolar o su nombre) y asigna cada trozo, sin tener que relacionar antes a nadie. Quien no está en el alumnado se crea con los datos del informe.' },
   { id: '342', fecha: '2026-10-13', texto: 'Al repartir entre terceros hay un filtro del alumnado con varios criterios: el alumno asignado desaparece de las listas y abajo se ve cuántos documentos quedan sin alumno y cuántos alumnos del filtro sin documento.' },
   { id: '341', fecha: '2026-10-13', texto: 'Los cuadros largos ya no esconden sus botones: Aceptar, Cancelar y los demás se ven siempre abajo.' },
   { id: '340', fecha: '2026-10-13', texto: 'El personal que sigue en el centro, también el no docente, ya no sale como «Ya no está en el centro». Quien de verdad se fue sigue en ámbar, con el motivo, y se le puede crear el asunto igual.' },

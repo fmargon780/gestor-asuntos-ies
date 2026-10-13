@@ -414,6 +414,15 @@ de un colegio, informes de tránsito…) y deja cada trozo en su propio asunto, 
   recolocan; lo que sobra, un trozo más sin asignar; ninguno en cero páginas), asignar por orden y
   comparar nombres (sin tildes, en cualquier orden, «M.ª» = María; verde con el Nº escolar, el DNI o
   nombre y dos apellidos; ámbar con nombre y primer apellido o dos posibles).
+- **Corte por alumno** (fila 343, `docs/REPARTIR-POR-NUMERO-ESCOLAR.md`): al abrir un PDF con texto, `abrir` lee todas
+  las páginas dentro del cuadro («Leyendo página N de M…», cediendo el paso cada 10) y `N.identificarPagina` dice quién
+  es cada una (primero cualquier número que sea el Nº escolar de un alumno del RegAlum; si no, el que va tras la etiqueta
+  «Nº I. ESCOLAR», saltando el del expediente; si no, el nombre). `N.proponerPorAlumno` corta donde cambia el alumno y
+  donde, con el mismo, la página repite la huella (palabras fijas sin cifras ni nombre, parecido ≥ 90 %) de la primera
+  del trozo; solo si ≥ 80 % de las páginas tienen alumno (si no, tamaño fijo). Cada trozo lleva `lectura` ({ tercero,
+  marca }: verde, ámbar, `mismo` o `nueva` = no está en el alumnado, se crea con el nombre y número del informe) y manda
+  mientras no se cambie a mano. Al repartir, todos los que reciben trozo quedan relacionados con el origen. Solo se busca
+  en el RegAlum actual (`fuente.lista`), no en los antiguos.
 - `js/repartir-pantalla.js` (`Repartir`): el cuadro (`U.preguntar` ancho, con «Cerrar»), miniaturas
   perezosas con pdf.js, el desplegable de cada trozo (los relacionados, tachados si ya tienen trozo,
   y «Se queda en este asunto»; debajo, un buscador de todo el alumnado que, si se usa, añade a esa
