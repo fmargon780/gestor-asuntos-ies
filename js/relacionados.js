@@ -197,32 +197,46 @@ var Relacionados = (function () {
       var capa = $('capa');
       $('cuadro-titulo').textContent = opc.titulo || 'Añadir varios relacionados';
       var cuerpo = $('cuadro-cuerpo');
+      /* Fila 338, de arriba abajo: pestañas y buscador, los atajos de alumnado (solo con Alumnado), «Meter un
+         grupo entero» y «Pegar una lista». Lo señalado, «Cancelar» y el botón principal, en un pie fijo. */
       cuerpo.innerHTML =
-        '<div id="rel-grupo-fila"></div>' +
+        '<div id="rel-picker"></div>' +
         '<div id="rel-atajos" class="oculto"></div>' +
-        '<div id="rel-picker"></div>';
+        '<div id="rel-grupo-fila"></div>' +
+        '<div id="rel-pegar-fuera"></div>';
       $('cuadro-aceptar').classList.add('oculto');
+      var sitioBarra = VariosCuadro.abrir();
       capa.classList.remove('oculto');
 
       function cerrarCapa() {
+        VariosCuadro.cerrar();
         capa.classList.add('oculto');
         $('cuadro-aceptar').classList.remove('oculto');
         $('cuadro-cancelar').onclick = null;
       }
-      $('cuadro-cancelar').onclick = function () { cerrarCapa(); resolverUnaVez(null); };
+      var api = null;
+      $('cuadro-cancelar').onclick = VariosCuadro.cancelarCon({
+        marcados: function () { return api ? api.marcados() : []; }, iniciales: opc.marcadosIniciales,
+        salir: function () { cerrarCapa(); resolverUnaVez(null); }
+      });
 
-      var api = App.pintarBuscadorDeTercero($('rel-picker'), null, function (marcados) {
+      api = App.pintarBuscadorDeTercero($('rel-picker'), null, function (marcados) {
         cerrarCapa();
         resolverUnaVez(marcados);
       }, {
         multiple: true, alSenalar: opc.alSenalar,   /* fila 296: «Pegar una lista» */
-        marcadosIniciales: opc.marcadosIniciales, textoBoton: opc.textoBoton, minimo: opc.minimo,
+        marcadosIniciales: opc.marcadosIniciales, minimo: opc.minimo,
+        textoBoton: opc.textoBoton || textoBotonDelAsunto,
+        sitioBarra: sitioBarra, sitioPegar: $('rel-pegar-fuera'),
         alCambiarCategoria: function (categoria) { pintarAtajosDeAlumnado(categoria, api, opc.alSenalar); }
       });
 
       pintarGrupoFila(api, opc.alSenalar);
     });
   }
+
+  /* El botón principal del cuadro cuando se añade a un asunto (fila 338). */
+  function textoBotonDelAsunto(n) { return n === 1 ? 'Añadir al asunto 1' : 'Añadir al asunto los ' + n; }
 
   /* Los tres atajos de alumnado: toda una unidad, todo un nivel, toda
      una enseñanza. Solo salen con la categoría ALUMNADO elegida, y
@@ -257,6 +271,7 @@ var Relacionados = (function () {
 
     caja.className = 'atajos-grupo';
     caja.innerHTML =
+      '<div class="atajos-rotulo">Señalar alumnado por…</div>' +
       '<div class="atajo-fila"><span>Toda una unidad</span>' +
         '<select id="atajo-unidad" class="campo">' +
           '<option value="">Elige…</option>' +

@@ -212,21 +212,27 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
     pintarBarra();
   }
 
+  /* Fila 338: `opciones.sitioPegar` (un elemento) pone «Pegar una lista» ahí, al final del cuadro, y
+     `opciones.sitioBarra` (otro) pone lo señalado, «Cancelar» y el botón principal en un pie fijo. */
+  var htmlPegar = multiple ? '<div id="rel-pegar-fila"><button type="button" class="boton" id="rel-pegar">Pegar una lista</button></div>' +
+    '<div id="rel-pegar-sitio"></div>' : '';   /* fila 296: js/lista-pegada-pantalla.js */
+  var sitioPegar = multiple && opciones.sitioPegar ? opciones.sitioPegar : null;
+  var sitioBarra = multiple && opciones.sitioBarra ? opciones.sitioBarra : null;
+  if (sitioPegar) sitioPegar.innerHTML = htmlPegar;
   contenedor.innerHTML =
-    (multiple ? '<div id="rel-pegar-fila"><button type="button" class="boton" id="rel-pegar">Pegar una lista</button></div>' +
-      '<div id="rel-pegar-sitio"></div>' : '') +   /* fila 296: js/lista-pegada-pantalla.js */
+    (sitioPegar ? '' : htmlPegar) +
     '<div class="categorias-mini" id="rel-categorias"></div>' +
     '<div id="rel-buscador" class="oculto">' +
       '<input id="rel-buscar" class="campo" placeholder="Escribe dos letras del nombre">' +
       '<div id="rel-resultados" class="resultados"></div>' +
     '</div>' +
-    (multiple ? '<div id="rel-marcados-barra" class="marcados-barra oculto"></div>' : '');
+    (multiple && !sitioBarra ? '<div id="rel-marcados-barra" class="marcados-barra oculto"></div>' : '');
 
   var cajaCategorias = contenedor.querySelector('#rel-categorias');
   var cajaBuscador = contenedor.querySelector('#rel-buscador');
   var campoBuscar = contenedor.querySelector('#rel-buscar');
   var cajaResultados = contenedor.querySelector('#rel-resultados');
-  var cajaBarra = multiple ? contenedor.querySelector('#rel-marcados-barra') : null;
+  var cajaBarra = multiple ? (sitioBarra || contenedor.querySelector('#rel-marcados-barra')) : null;
 
   function listaDeMarcados() {
     return Object.keys(estado.marcados).map(function (k) { return estado.marcados[k]; });
@@ -241,16 +247,19 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
   function pintarBarra() {
     if (!multiple || !cajaBarra) return;   /* fila 293: con marcados que ya traen su `persona`, se llama antes de montar la barra */
     var lista = listaDeMarcados();
-    if (!lista.length) { cajaBarra.className = 'marcados-barra oculto'; cajaBarra.innerHTML = ''; return; }
+    if (!lista.length && !sitioBarra) { cajaBarra.className = 'marcados-barra oculto'; cajaBarra.innerHTML = ''; return; }
     cajaBarra.className = 'marcados-barra';
-    cajaBarra.innerHTML =
-      '<div class="marcados-cabecera">' +
-        '<span class="marcados-cuenta">' + lista.length +
-          (lista.length === 1 ? ' señalado' : ' señalados') + '</span>' +
-        '<button type="button" class="boton boton-principal" id="rel-marcados-anadir"' +
-          (opciones.minimo && lista.length < opciones.minimo ? ' disabled' : '') + '>' +
-          (opciones.textoBoton ? opciones.textoBoton(lista.length) : 'Añadir los ' + lista.length + ' señalados') + '</button>' +
-      '</div>' +
+    var textoPrincipal = opciones.textoBoton ? opciones.textoBoton(lista.length) : 'Añadir los ' + lista.length + ' señalados';
+    var apagado = !lista.length || (opciones.minimo && lista.length < opciones.minimo);
+    var botonPrincipal = '<button type="button" class="boton boton-principal" id="rel-marcados-anadir"' + (apagado ? ' disabled' : '') + '>' + textoPrincipal + '</button>';
+    cajaBarra.innerHTML = (sitioBarra
+      /* Fila 338: en el pie fijo, la cuenta arriba, los nombres, y «Cancelar» y el principal en una fila a la derecha. */
+      ? '<div class="marcados-cabecera"><span class="marcados-cuenta' + (lista.length ? '' : ' marcados-cuenta-vacia') + '">' +
+          (lista.length ? lista.length + (lista.length === 1 ? ' señalado' : ' señalados') : 'Nadie señalado todavía') + '</span></div>'
+      : '<div class="marcados-cabecera">' +
+          '<span class="marcados-cuenta">' + lista.length + (lista.length === 1 ? ' señalado' : ' señalados') + '</span>' +
+          botonPrincipal +
+        '</div>') +
       '<div class="marcados-lista">' + lista.map(function (m) {
         var clave = m.categoria + '|' + m.nombre;
         return '<span class="marcado-chip' + (m.perdido ? ' marcado-chip-perdido' : '') + '"' +
@@ -258,9 +267,12 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
           U.escapar(m.nombre) +
           '<button type="button" class="marcado-quitar" data-clave="' + U.escapar(clave) + '" ' +
           'title="Quitarlo de lo señalado">×</button></span>';
-      }).join('') + '</div>';
+      }).join('') + '</div>' +
+      (sitioBarra ? '<div class="marcados-acciones"><button type="button" class="boton" id="rel-cancelar">Cancelar</button>' + botonPrincipal + '</div>' : '');
 
-    contenedor.querySelector('#rel-marcados-anadir').onclick = function () { alElegir(listaDeMarcados()); };
+    cajaBarra.querySelector('#rel-marcados-anadir').onclick = function () { alElegir(listaDeMarcados()); };
+    var cancelarPie = cajaBarra.querySelector('#rel-cancelar');
+    if (cancelarPie) cancelarPie.onclick = function () { var c = document.getElementById('cuadro-cancelar'); if (c) c.click(); };
     Array.prototype.forEach.call(cajaBarra.querySelectorAll('.marcado-quitar'), function (b) {
       var clave = b.dataset.clave;
       b.onclick = function () {
@@ -357,10 +369,10 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
   };
 
   if (multiple) {
-    var botonPegar = contenedor.querySelector('#rel-pegar');
+    var botonPegar = (sitioPegar || contenedor).querySelector('#rel-pegar');
     botonPegar.onclick = function () {
       botonPegar.parentNode.classList.add('oculto');
-      ListaPegada.abrir(contenedor.querySelector('#rel-pegar-sitio'), {
+      ListaPegada.abrir((sitioPegar || contenedor).querySelector('#rel-pegar-sitio'), {
         categoria: function () { return estado.categoria; }, marcar: marcar, alSenalar: opciones.alSenalar,
         alCerrar: function () { botonPegar.parentNode.classList.remove('oculto'); }
       });

@@ -87,7 +87,7 @@ await comprobar('2. el tercero del formulario es «GRUPO Los de prueba», de cat
 await pagina.click('#btn-cambiar-tercero');
 await comprobar('2. «Cambiar» vuelve al cuadro con los mismos señalados',
   pagina.locator('.marcados-cuenta').textContent(), '2 señalados');
-await pagina.click('#cuadro-cancelar');
+await pagina.click('#rel-cancelar');
 await comprobar('2. y cancelar deja el grupo que había', pagina.locator('#tercero-elegido strong').textContent(), 'Grupo Los de prueba · 2 personas');
 
 /* Desde una unidad, con una persona quitada: el nombre sale de la unidad. */

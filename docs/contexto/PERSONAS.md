@@ -664,3 +664,8 @@ Es un asunto de grupo (`ficha.grupo.origen === 'actividad'`) cuyas personas son 
 y quién acompaña) no son relacionados: vive en `_GESTOR/actividades.json`. El nombre del profesorado sigue a la persona si cambia de
 nombre (`js/tercero-renombrar.js` → `Actividades.alRenombrarPersona`). `App.pintarBuscadorDeTercero` acepta `opciones.categorias`
 para ofrecer solo alumnado o solo personal.
+
+## «Añadir varios relacionados», más claro (fila 338, 13-oct-2026)
+
+El cuadro (`Relacionados.elegirVarios` / `agregarVarios` y los miembros de un grupo de Ajustes) usa `js/varios-cuadro.js`: ✕ arriba, cuerpo que se desplaza y pie fijo con lo señalado (alto máximo de unas tres líneas), «Cancelar» y el botón principal. `App.pintarBuscadorDeTercero` admite `opciones.sitioBarra` (dónde pintar el pie) y `opciones.sitioPegar` (dónde «Pegar una lista»). «Cancelar», la ✕ y Esc pasan por una sola pregunta en el propio pie, «¿Descartar los N señalados?» (no cuenta lo que entró señalado). De arriba abajo: pestañas, buscador, «Señalar alumnado por…» (solo con Alumnado), «Meter un grupo entero» y «Pegar una lista». El botón del atajo «Por datos del alumnado» dice «Señalar los N» y solo señala; el principal de un asunto, «Añadir al asunto los N» (cada sitio puede dar su `textoBoton`).
+

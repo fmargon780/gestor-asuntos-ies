@@ -269,18 +269,23 @@ App.editarMiembrosDeGrupo = function (g) {
     var capa = $('capa');
     $('cuadro-titulo').textContent = 'Miembros de ' + g.nombre;
     var cuerpo = $('cuadro-cuerpo');
-    cuerpo.innerHTML = '<div id="grupo-picker"></div>';
+    cuerpo.innerHTML = '<div id="grupo-picker"></div><div id="grupo-pegar"></div>';
     $('cuadro-aceptar').classList.add('oculto');
+    var sitioBarra = window.VariosCuadro ? VariosCuadro.abrir() : null;   /* fila 338: pie fijo, ✕ y pregunta al cancelar */
     capa.classList.remove('oculto');
 
     function cerrar() {
+      if (window.VariosCuadro) VariosCuadro.cerrar();
       capa.classList.add('oculto');
       $('cuadro-aceptar').classList.remove('oculto');
       $('cuadro-cancelar').onclick = null;
     }
-    $('cuadro-cancelar').onclick = function () { cerrar(); resolver(false); };
+    var api = null;
+    $('cuadro-cancelar').onclick = window.VariosCuadro
+      ? VariosCuadro.cancelarCon({ marcados: function () { return api ? api.marcados() : []; }, iniciales: g.miembros, salir: function () { cerrar(); resolver(false); } })
+      : function () { cerrar(); resolver(false); };
 
-    App.pintarBuscadorDeTercero($('grupo-picker'), null, async function (marcados) {
+    api = App.pintarBuscadorDeTercero($('grupo-picker'), null, async function (marcados) {
       cerrar();
       try {
         await Grupos.ponerMiembros(g.id,
@@ -292,7 +297,7 @@ App.editarMiembrosDeGrupo = function (g) {
         U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
         resolver(false);
       }
-    }, { multiple: true, marcadosIniciales: g.miembros });
+    }, { multiple: true, marcadosIniciales: g.miembros, sitioBarra: sitioBarra, sitioPegar: sitioBarra ? $('grupo-pegar') : null });
   });
 };
 
