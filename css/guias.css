@@ -7,7 +7,6 @@
 .cuadro-medio {
   max-width: min(820px, 96vw);
   max-height: calc(100vh - 40px);
-  overflow: auto;
 }
 
 .guia-lectura {

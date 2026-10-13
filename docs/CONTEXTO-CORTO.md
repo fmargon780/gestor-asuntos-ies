@@ -246,6 +246,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 
 ## 6. Reglas de código que no se pueden olvidar
 
+- Todo cuadro nuevo usa la regla común de `css/estilos.css` (`.capa > .cuadro`: título y pie de botones fijos, el cuerpo `#cuadro-cuerpo` se desplaza); nunca `overflow` en el cuadro entero (fila 341).
 - Para **ofrecer** plantillas, siempre `Plantillas.deTipo` o `Plantillas.documentosDeTipo` (dejan fuera las que no están en uso); `datos.lista` y `datos.documentos` a pelo, solo para encontrar una por su `id`. Un cuadro que cambia una plantilla conserva las claves que no conoce (fila 321).
 - Quien copie un fichero de datos a `_GESTOR/datos` lo apunta con `DatosQueTengo.apuntar` (fila 319); de cuándo es, `DatosQueTengo.fechaReal`, nunca la fecha de su copia (fila 324).
 - Para una estadística o un cruce de asuntos archivados se usa `Base.leer` (fila 334), no se abre carpeta por carpeta; lo que se apunta en `base/` se hace siempre por `BasePonerAlDia`.

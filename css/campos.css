@@ -14,7 +14,6 @@
    ancho como el de Campos de Ajustes (`cuadro-ancho`). */
 .cuadro-alto {
   max-height: calc(100vh - 40px);
-  overflow: auto;
 }
 
 /* Fila 254: la ventana de «+ Añadir campo» de la ficha, ancha. Pestañas y

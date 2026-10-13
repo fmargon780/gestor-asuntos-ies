@@ -441,6 +441,14 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .cuadro { background: var(--papel); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(10,25,45,.35); }
 .cuadro h3 { margin: 0 0 12px; }
 .cuadro-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+/* Fila 341 (docs/CUADROS-CON-BOTONES-A-LA-VISTA.md): la regla común de TODOS los cuadros. Nunca más altos que la
+   pantalla; título (y ✕) y pie de botones fijos; solo se desplaza el cuerpo. Un cuadro nuevo no pone
+   `overflow` en el cuadro entero: usa esta regla. */
+.capa > .cuadro { display: flex; flex-direction: column; max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); }
+.capa > .cuadro > h3, .capa > .cuadro > .cuadro-botones { flex: 0 0 auto; }
+.capa > .cuadro > #cuadro-cuerpo { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* Los cuadros que pintan sus propios botones dentro del cuerpo: se quedan pegados abajo del cuerpo. */
+#cuadro-cuerpo .cuadro-botones { position: sticky; bottom: 0; background: var(--papel); padding: 8px 0 2px; margin-top: 12px; }
 
 .mensajes { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 60; }
 /* Fila 326: los avisos suben para no tapar el botón «Soporte», y este se retira mientras haya un cuadro abierto. */
@@ -487,7 +495,6 @@ body:has(#capa:not(.oculto)) #soporte-boton { display: none; }
 .cuadro-ancho {
   max-width: min(1600px, 96vw);
   max-height: calc(100vh - 40px);
-  overflow: auto;
 }
 
 /* El documento se lleva dos tercios del ancho; los campos, un tercio. */
