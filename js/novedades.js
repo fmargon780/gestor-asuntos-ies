@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '338', fecha: '2026-10-13', texto: 'En «Añadir varios relacionados», «Cancelar», lo señalado y el botón de añadir están siempre a la vista, abajo; la ✕ y Esc preguntan antes de descartar lo señalado, y el botón dice «Añadir al asunto los N».' },
   { id: '337', fecha: '2026-10-13', texto: 'Repartir ficheros entre terceros: con un fichero por alumno, la app crea el asunto de cada uno, ya archivado, con su fichero. Y al repartir se ve el documento en grande.' },
   { id: '336', fecha: '2026-10-13', texto: 'Si la recogida de correos se para, Inicio te avisa y te dice cómo arreglarlo.' },
   { id: '334', fecha: '2026-10-11', texto: 'Los asuntos archivados se apuntan ya en unas tablas, con sus hitos, personas y documentos, para los informes que vengan (Herramientas → Puesta a punto).' },

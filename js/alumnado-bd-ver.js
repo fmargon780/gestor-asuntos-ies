@@ -202,7 +202,7 @@ var AlumnadoBDVer = (function () {
       '<div class="bd-grupo-conds" id="bd-grupo-conds"></div>' +
       '<div class="atajo-fila"><label><input type="checkbox" id="bd-grupo-antiguos"> Incluir antiguos</label>' +
         '<span id="bd-grupo-cuantos" class="explica"></span>' +
-        '<button type="button" class="boton" id="bd-grupo-anadir" disabled>Añadirlos</button></div>';
+        '<button type="button" class="boton" id="bd-grupo-anadir" disabled>Señalar</button></div>';
     caja.appendChild(div);
     var $ = function (id) { return div.querySelector('#' + id); };
 
@@ -226,6 +226,8 @@ var AlumnadoBDVer = (function () {
       var s = salen();
       $('bd-grupo-cuantos').textContent = conds.length ? 'Salen ' + s.personas.length + (s.sinFicha ? ' (y ' + s.sinFicha + ' sin ficha en el RegAlum)' : '') : '';
       $('bd-grupo-anadir').disabled = !s.personas.length;
+      /* Fila 338: solo señala (el que mete gente en el asunto está abajo, en el pie). */
+      $('bd-grupo-anadir').textContent = s.personas.length === 1 ? 'Señalar 1' : (s.personas.length ? 'Señalar los ' + s.personas.length : 'Señalar');
     }
 
     $('bd-grupo-dato').onchange = function () {

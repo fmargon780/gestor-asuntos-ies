@@ -160,7 +160,7 @@ await pagina.fill('#lp-texto', 'Ibarra Nieto, Sara\nAguilar Ponce, Pablo');
 await pagina.click('#lp-reconocer');
 await pagina.click('#lp-senalar');
 await comprobar('3. se suman a las que ya había (una repetida no cuenta dos veces)', pagina.locator('.marcados-cuenta').textContent(), '5 señalados');
-await comprobar('3. «Usar los N señalados» sigue como siempre', pagina.locator('#rel-marcados-anadir').textContent(), 'Añadir los 5 señalados');
+await comprobar('3. el botón principal del cuadro de un asunto dice «Añadir al asunto los N»', pagina.locator('#rel-marcados-anadir').textContent(), 'Añadir al asunto los 5');
 
 /* Guardar como grupo. */
 await pagina.click('#rel-pegar');
@@ -189,7 +189,8 @@ await pagina.click('#lp-sustituir-si');
 await pagina.waitForTimeout(400);
 await comprobar('3. al sustituirlo queda un solo grupo con ese nombre y sus miembros nuevos',
   pagina.evaluate(() => Grupos.lista().filter((g) => g.nombre === 'Transporte de prueba').map((g) => g.miembros.length)), [1]);
-await pagina.click('#cuadro-cancelar');
+await pagina.click('#rel-cancelar');
+if (await pagina.locator('#varios-descartar').isVisible()) await pagina.click('#varios-descartar');   /* fila 338: con gente señalada pregunta antes */
 
 /* ================= 4. NUEVO ASUNTO ================= */
 console.log('--- 4. «Nuevo asunto» ---');
@@ -220,6 +221,7 @@ await pagina.click('#lp-senalar');
 await pagina.click('#rel-marcados-anadir');
 await comprobar('4. sin guardar el grupo, el nombre sale vacío y es obligatorio', pagina.evaluate(() => [document.getElementById('grupo-nombre').value, document.getElementById('cuadro-aceptar').disabled]), ['', true]);
 await pagina.click('#cuadro-cancelar');
+
 
 /* ================= 5. + AÑADIR PERSONAS ================= */
 console.log('--- 5. «+ Añadir personas» ---');

@@ -113,14 +113,14 @@ await comprobar('el grupo sale con sus 2 miembros contados',
 console.log('--- "Ver y cambiar los miembros": el que ya no está se ve y se puede quitar ---');
 await pagina.click('#tabla-grupos-personas .tarjeta-tipo button');
 await pagina.getByRole('button', { name: 'Ver y cambiar los miembros' }).click();
-await pagina.waitForSelector('#grupo-picker .marcados-lista');
+await pagina.waitForSelector('#varios-pie .marcados-lista');
 await comprobar('los dos miembros salen en la barra, aunque uno no esté en ningún CSV',
-  pagina.locator('#grupo-picker .marcado-chip').allTextContents()
+  pagina.locator('#varios-pie .marcado-chip').allTextContents()
     .then(ts => ts.map(t => t.replace('×', '').trim()).sort()),
   ['Aguilar Ponce, Marina 1140233', 'Quintero Vidal, Ya No Está 9999'].sort());
-await pagina.waitForSelector('#grupo-picker .marcado-chip-perdido');
+await pagina.waitForSelector('#varios-pie .marcado-chip-perdido');
 await comprobar('el que ya no está en ningún CSV se marca aparte, en gris',
-  pagina.locator('#grupo-picker .marcado-chip-perdido').textContent()
+  pagina.locator('#varios-pie .marcado-chip-perdido').textContent()
     .then(t => t.replace('×', '').trim()),
   'Quintero Vidal, Ya No Está 9999');
 
@@ -134,24 +134,24 @@ await pagina.waitForSelector('#rel-resultados .resultado-marcable');
 await pagina.click('#rel-resultados .resultado-marcable input[type="checkbox"]');
 await pagina.waitForTimeout(150);
 await comprobar('con Bermúdez señalado van ya 3',
-  pagina.locator('#grupo-picker .marcados-cuenta').textContent(), '3 señalados');
+  pagina.locator('#varios-pie .marcados-cuenta').textContent(), '3 señalados');
 
 await pagina.click('.categoria-mini-boton:has-text("PERSONAL")');
 await pagina.fill('#rel-buscar', 'aguado');
 await pagina.waitForSelector('#rel-resultados .resultado-marcable');
 await comprobar('al cambiar de categoría y de búsqueda, los 3 anteriores no se pierden',
-  pagina.locator('#grupo-picker .marcados-cuenta').textContent(), '3 señalados');
+  pagina.locator('#varios-pie .marcados-cuenta').textContent(), '3 señalados');
 
 /* Se quita al que ya no está (la ×), y se deja tal cual el resto. */
 await pagina.evaluate(() => {
-  const chip = Array.from(document.querySelectorAll('#grupo-picker .marcado-chip'))
+  const chip = Array.from(document.querySelectorAll('#varios-pie .marcado-chip'))
     .find(c => c.textContent.indexOf('Ya No Está') !== -1);
   chip.querySelector('.marcado-quitar').click();
 });
 await comprobar('quitar al que ya no está deja 2 señalados',
-  pagina.locator('#grupo-picker .marcados-cuenta').textContent(), '2 señalados');
+  pagina.locator('#varios-pie .marcados-cuenta').textContent(), '2 señalados');
 
-await pagina.click('#grupo-picker .marcados-cabecera .boton-principal');
+await pagina.click('#varios-pie #rel-marcados-anadir');
 await pagina.waitForTimeout(300);
 await comprobar('los miembros del grupo se han guardado sin el que ya no estaba',
   pagina.evaluate(async () => {
@@ -191,8 +191,8 @@ await pagina.waitForSelector('#rel-grupo-fila select');
 await pagina.selectOption('#rel-grupo-elegir', { label: 'Grupo de prueba (2)' });
 await pagina.waitForTimeout(150);
 await comprobar('elegir el grupo entero señala a sus 2 miembros',
-  pagina.locator('#rel-picker .marcados-cuenta').textContent(), '2 señalados');
-await pagina.click('#rel-picker .marcados-cabecera .boton-principal');
+  pagina.locator('#varios-pie .marcados-cuenta').textContent(), '2 señalados');
+await pagina.click('#varios-pie #rel-marcados-anadir');
 await pagina.waitForTimeout(300);
 await comprobar('los dos miembros del grupo quedan relacionados con el asunto', pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');

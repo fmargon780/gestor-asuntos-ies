@@ -5207,3 +5207,8 @@ Cada asunto archivado queda apuntado, además de en su carpeta, en `_GESTOR/base
 ## Fila 337 (13-oct-2026): repartir varios ficheros entre terceros
 
 Un fichero suelto por alumno: botón en la tarjeta «Documentos», lista con la persona propuesta por el nombre del fichero (o el texto del PDF), resumen y reparto con el fichero entero, que sale del origen por la papelera. Visor grande a la derecha en los dos cuadros de repartir. Decisión: el cuadro de trozos de la fila 141 no vuelve a pintarse mientras se está pintando (el campo con foco disparaba su «change» al reemplazarse).
+
+## Fila 338 (13-oct-2026): «Añadir varios relacionados», más claro
+
+Pie fijo con Cancelar y el principal, ✕ y Esc con pregunta de descartar, «Señalar los N» (solo señala) frente a «Añadir al asunto los N», y atajos debajo del buscador. Decisión: la pregunta de descartar va en el propio pie, no en un `U.preguntar`, porque este reutiliza el mismo cuadro y se perdería lo señalado. El «Cancelar» común queda oculto en este modo (Esc lo sigue pulsando).
+
