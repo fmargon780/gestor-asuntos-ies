@@ -81,6 +81,7 @@ window.BandejaLatido = (function () {
   /* Lee la señal y pone o quita el aviso. Devuelve el resultado, o null si
      no toca mirar nada (sin carpeta, sin permiso, directivo, arranque). */
   async function mirar(aLaFuerza) {
+    if (window.Perfil && Perfil.esDirectivo()) { registrar(''); return null; }   /* sin esperar a los 5 minutos: si entra otro nombre, el aviso se va ya */
     if (mirando) return null;
     if (!aLaFuerza && ultimaMirada && Date.now() - ultimaMirada < CADA_MS) return null;
     mirando = true;

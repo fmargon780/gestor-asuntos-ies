@@ -87,6 +87,10 @@ console.log('--- 4. un directivo ---');
   await pagina.waitForFunction(() => Perfil.esDirectivo(), null, { timeout: 30000 });   /* la demostración entra otra vez con ese nombre */
   comprobar('4. es directivo', await pagina.evaluate(() => Perfil.esDirectivo()), true);
   comprobar('4. sin aviso', await aviso(pagina), null);
+  /* Sin forzar la mirada (como en la pantalla): al refrescar, el aviso de antes de entrar con ese nombre ya no está. */
+  await pagina.evaluate(() => Gestor.alRefrescar.forEach((f) => { try { f(); } catch (e) {} }));
+  await pagina.waitForTimeout(500);
+  comprobar('4. y tras refrescar sigue sin aviso', await pagina.evaluate(() => !!document.querySelector('#avisos-linea [data-aviso="recogida-correos"]')), false);
   await contexto.close();
 }
 
