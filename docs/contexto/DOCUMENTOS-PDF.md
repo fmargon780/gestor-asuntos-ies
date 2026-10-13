@@ -606,3 +606,7 @@ nada y devuelve el aviso.
 
 «Repartir ficheros entre terceros» sale en la cabecera de la tarjeta «Documentos» de un asunto abierto con dos o más documentos (`js/repartir-ficheros.js`). Se marcan los ficheros, la persona de cada uno sale del nombre del fichero (`RepartirNucleo.proponerPorNombre`) o, en un PDF con texto, de lo de dentro; nunca por orden. `RepartirCrear.repartirFicheros` crea el asunto archivado de cada persona con el fichero entero (su fecha, su registro y su número de documento) y, solo si salió bien, lo manda a la Papelera desde el origen; apunta una nota «Reparto de ficheros:» y una entrada en `repartos` (`ficheros: [{ nombre, tercero, asunto, ok }]`). Los dos cuadros de repartir (este y el de trozos de la fila 141) llevan a la derecha el visor grande de `js/repartir-visor.js`.
 
+## Repartir: segundo PDF y salto al siguiente trozo (fila 339, 13-oct-2026)
+
+Si el asunto ya tiene en `repartos` el reparto de otro documento (`RepartirCrear.otrosRepartos`), el cuadro de trozos de un PDF NO rellena por orden: cada trozo lleva el alumno leído dentro o queda «Sin asignar» (ámbar), y un PDF escaneado dice «elige el alumno de cada trozo». El resumen no da por «sin trozo» a quien ya recibió algo en otro reparto. Al repintar, la lista conserva su desplazamiento; al elegir un alumno baja al siguiente trozo sin asignar (o hasta el final si no queda ninguno), y lo enseña en el visor grande. Igual en el cuadro de ficheros sueltos.
+

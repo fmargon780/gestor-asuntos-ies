@@ -124,6 +124,19 @@ var RepartirFicheros = (function () {
   }
 
   function pintarLista() {
+    var antes = document.querySelector('.repartir-lista');
+    var top = antes ? antes.scrollTop : 0;
+    pintarListaHtml();
+    var lista = document.querySelector('.repartir-lista');
+    if (!lista) return;
+    lista.scrollTop = top;
+    /* Fila 339: el fichero que toca ahora (el siguiente sin asignar) queda a la vista. */
+    var fila = F.actual >= 0 ? lista.querySelector('.repartir-trozo[data-i="' + F.actual + '"]') : null;
+    if (fila && F.bajar) lista.scrollTop = fila.offsetTop;
+    F.bajar = false;
+  }
+
+  function pintarListaHtml() {
     var cuerpo = $('cuadro-cuerpo');
     var ficheros = F.ficheros;
     var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
@@ -178,6 +191,7 @@ var RepartirFicheros = (function () {
       if (!F.ficheros[j].tercero) { siguiente = j; break; }
     }
     F.actual = siguiente >= 0 ? siguiente : i;
+    F.bajar = valor && siguiente >= 0;
     pintarLista();
   }
 
