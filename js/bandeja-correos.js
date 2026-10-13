@@ -164,6 +164,7 @@
            recoger. */
         if (/\.(envio|listo|error)\.json$/i.test(n)) continue;
         if (n === FICHERO_SEGUIDOS) continue;   /* ese lo escribimos nosotros */
+        if (n === 'latido.json') continue;      /* fila 336: la señal del recolector, no un correo (js/bandeja-latido.js) */
         var d = await Carpetas.leerJson(carpeta, n);
         if (!d || !d.id) continue;
         /* Las fechas se dejan en AAAA-MM-DD, que es lo que entienden
@@ -276,7 +277,7 @@
   });
   /* Lo que usan los otros cuatro ficheros de la bandeja (fila 133). */
   Object.assign(N, {
-    repintarPantalla: repintarPantalla, tienePermiso: tienePermiso,
+    recordarCarpeta: recordarCarpeta, repintarPantalla: repintarPantalla, tienePermiso: tienePermiso,
     elegirCarpeta: elegirCarpeta, olvidarCarpeta: olvidarCarpeta, mirar: mirar,
     soloElDia: soloElDia, fechaLegible: fechaLegible, fechaHoraLegible: fechaHoraLegible
   });

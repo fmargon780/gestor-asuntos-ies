@@ -162,20 +162,61 @@ function recogerCorreos() {
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
-  var hilos = pendiente.getThreads(0, MAX_POR_VUELTA);
+  try {
+    var hilos = pendiente.getThreads(0, MAX_POR_VUELTA);
 
-  for (var i = 0; i < hilos.length; i++) {
-    var hilo = hilos[i];
-    try {
-      guardarHilo(hilo, carpeta, null, 0);
-      hilo.removeLabel(pendiente);
-      hilo.addLabel(hecho);
-    } catch (e) {
-      Logger.log('No he podido guardar "' + hilo.getFirstMessageSubject() + '": ' + e.message);
+    for (var i = 0; i < hilos.length; i++) {
+      var hilo = hilos[i];
+      try {
+        guardarHilo(hilo, carpeta, null, 0);
+        hilo.removeLabel(pendiente);
+        hilo.addLabel(hecho);
+      } catch (e) {
+        Logger.log('No he podido guardar "' + hilo.getFirstMessageSubject() + '": ' + e.message);
+      }
     }
-  }
 
-  seguirHilosConocidos(carpeta);
+    seguirHilosConocidos(carpeta);
+  } finally {
+    escribirLatido(carpeta);   /* fila 336: la señal de que esta vuelta se ha hecho, haya habido correos o no */
+  }
+}
+
+/* ---------- la señal de que el recolector sigue vivo (fila 336) ----------
+
+   Cada vuelta deja en la carpeta de la bandeja un fichero latido.json con
+   la hora. La aplicación lo mira: si es viejo (más de una hora) o no
+   existe, avisa en Inicio de que la recogida está parada. Se escribe solo
+   si la última escritura tiene más de 10 minutos, para no tocar Drive cada
+   minuto. Nunca rompe la vuelta. */
+
+var FICHERO_LATIDO = 'latido.json';
+var MINUTOS_ENTRE_LATIDOS = 10;
+
+function escribirLatido(carpeta) {
+  try {
+    var propiedades = PropertiesService.getScriptProperties();
+    var ahora = new Date().getTime();
+    var ultimo = parseInt(propiedades.getProperty('latido:ultimo') || '0', 10);
+    if (ultimo && ahora - ultimo < MINUTOS_ENTRE_LATIDOS * 60 * 1000) return;
+
+    var contenido = JSON.stringify({
+      hora: new Date(ahora).toISOString(),
+      version: VERSION_SCRIPT,
+      cuenta: miCorreo()
+    });
+    var ficheros = carpeta.getFilesByName(FICHERO_LATIDO);
+    var primero = null;
+    while (ficheros.hasNext()) {
+      var f = ficheros.next();
+      if (!primero) primero = f; else f.setTrashed(true);   /* si hay dos, se usa el primero y el resto a la papelera */
+    }
+    if (primero) primero.setContent(contenido);
+    else carpeta.createFile(FICHERO_LATIDO, contenido, 'application/json');
+    propiedades.setProperty('latido:ultimo', String(ahora));
+  } catch (e) {
+    Logger.log('No he podido escribir ' + FICHERO_LATIDO + ': ' + e.message);
+  }
 }
 
 /* ---------- los hilos que ya están enganchados a un asunto ----------
@@ -390,7 +431,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '27-sep-2026 · fila 210';
+var VERSION_SCRIPT = '13-oct-2026 · fila 336';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 function doPost(e) {
