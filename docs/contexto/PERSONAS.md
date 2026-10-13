@@ -669,3 +669,7 @@ para ofrecer solo alumnado o solo personal.
 
 El cuadro (`Relacionados.elegirVarios` / `agregarVarios` y los miembros de un grupo de Ajustes) usa `js/varios-cuadro.js`: ✕ arriba, cuerpo que se desplaza y pie fijo con lo señalado (alto máximo de unas tres líneas), «Cancelar» y el botón principal. `App.pintarBuscadorDeTercero` admite `opciones.sitioBarra` (dónde pintar el pie) y `opciones.sitioPegar` (dónde «Pegar una lista»). «Cancelar», la ✕ y Esc pasan por una sola pregunta en el propio pie, «¿Descartar los N señalados?» (no cuenta lo que entró señalado). De arriba abajo: pestañas, buscador, «Señalar alumnado por…» (solo con Alumnado), «Meter un grupo entero» y «Pegar una lista». El botón del atajo «Por datos del alumnado» dice «Señalar los N» y solo señala; el principal de un asunto, «Añadir al asunto los N» (cada sitio puede dar su `textoBoton`).
 
+## Quién está «en el centro» (fila 340, 13-oct-2026)
+
+Está en el centro quien sale en el dato más reciente de SU clase de personal (docente, no docente o todo junto; la clase sale del nombre del listado, `Datos.claseDeFichero`, o del `tipoPersonal` de la parte) y no tiene fecha de cese, o la tiene hoy o más adelante (`U.yaPaso`). Una parte del Centro de datos solo descarta los listados de las clases que trae. Quien se fue sigue saliendo en ámbar con «Ya no está en el centro (cesó el … / su último curso aquí: …)» (`App.motivoFuera`, en el buscador y en la cabecera de la ficha) y se le puede crear el asunto igual: solo avisa, nunca bloquea.
+
