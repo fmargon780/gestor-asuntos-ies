@@ -9,7 +9,7 @@
 #actividad-nuevo-caja { margin: 8px 0 4px; }
 
 /* ---------- el formulario: una ventana ancha, en columnas ---------- */
-.cuadro.cuadro-actividad { max-width: min(1280px, 96vw); width: 96vw; max-height: calc(100vh - 40px); overflow: auto; padding-bottom: 0; }
+.cuadro.cuadro-actividad { max-width: min(1280px, 96vw); width: 96vw; max-height: calc(100vh - 40px); }
 .act-form { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(300px, 1.6fr) minmax(230px, 1fr); gap: 20px; align-items: start; }
 @media (max-width: 900px) { .act-form { grid-template-columns: 1fr; } }
 .act-et { margin: 12px 0 5px; }
@@ -42,8 +42,8 @@
 .act-picker-cabecera { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 
 /* La cuenta y los botones, siempre a la vista. */
-.act-cuenta { position: sticky; bottom: 50px; background: var(--papel); border-top: 1px solid var(--linea); margin-top: 14px; padding: 8px 0 2px; font-weight: 600; }
-.cuadro.cuadro-actividad .cuadro-botones { position: sticky; bottom: 0; background: var(--papel); margin-top: 0; padding: 8px 0 14px; }
+.act-cuenta { position: sticky; bottom: 0; background: var(--papel); border-top: 1px solid var(--linea); margin-top: 14px; padding: 8px 0 2px; font-weight: 600; }
+.cuadro.cuadro-actividad .cuadro-botones { margin-top: 0; padding: 8px 0 2px; }
 
 /* ---------- la tarjeta «La actividad» ---------- */
 .ficha-tarjetas.con-actividad .ficha-tarjetas-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -80,7 +80,7 @@
 .ap-exportar .pt-menu { left: 0; right: auto; }
 
 /* ---------- el cuadro de la actividad antigua (fila 310) ---------- */
-.cuadro.cuadro-actividad-antigua { max-width: min(960px, 96vw); width: 96vw; max-height: calc(100vh - 40px); overflow: auto; }
+.cuadro.cuadro-actividad-antigua { max-width: min(960px, 96vw); width: 96vw; max-height: calc(100vh - 40px); }
 .ant-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 @media (max-width: 800px) { .ant-form { grid-template-columns: 1fr; } }
 .ant-fuera { margin-top: 8px; }
