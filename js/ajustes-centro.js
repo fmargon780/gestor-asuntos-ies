@@ -269,7 +269,7 @@ App.editarMiembrosDeGrupo = function (g) {
     var capa = $('capa');
     $('cuadro-titulo').textContent = 'Miembros de ' + g.nombre;
     var cuerpo = $('cuadro-cuerpo');
-    cuerpo.innerHTML = '<div id="grupo-picker"></div>';
+    cuerpo.innerHTML = '<div id="grupo-picker"></div><div id="grupo-pegar"></div>';
     $('cuadro-aceptar').classList.add('oculto');
     var sitioBarra = window.VariosCuadro ? VariosCuadro.abrir() : null;   /* fila 338: pie fijo, ✕ y pregunta al cancelar */
     capa.classList.remove('oculto');
@@ -297,7 +297,7 @@ App.editarMiembrosDeGrupo = function (g) {
         U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
         resolver(false);
       }
-    }, { multiple: true, marcadosIniciales: g.miembros, sitioBarra: sitioBarra });
+    }, { multiple: true, marcadosIniciales: g.miembros, sitioBarra: sitioBarra, sitioPegar: sitioBarra ? $('grupo-pegar') : null });
   });
 };
 

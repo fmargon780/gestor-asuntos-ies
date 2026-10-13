@@ -27,6 +27,7 @@ pagina.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resou
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.goto(BASE + '?demo=1&auto=1');
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
+await pagina.waitForFunction(() => App.E.listaAbiertos && App.E.listaAbiertos.length > 5 && !(window.Demo && Demo.montando), null, { timeout: 60000 });
 await pagina.waitForTimeout(1500);
 
 const abrir = () => pagina.evaluate(() => {
