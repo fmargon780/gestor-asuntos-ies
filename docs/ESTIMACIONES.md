@@ -14,3 +14,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 335 | 60 | Revisión y informe, sin código ni publicación |
 | 338 | 120 | Reordena el cuadro de añadir varios, pie fijo, pregunta al cancelar y textos de botón, con prueba nueva y revisor |
+| 339 | 90 | Salto al siguiente trozo, segundo PDF sin heredar el reparto y aviso «sin trozo» con los otros repartos, con prueba nueva y revisor |
