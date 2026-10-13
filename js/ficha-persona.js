@@ -173,7 +173,7 @@ var FichaPersona = (function () {
     var puesto = dp.destacados.filter(function (f) { return ['DNI', 'Puesto', 'Situación'].indexOf(f.titulo) === -1; });
     var restoPersonal = dp.resto.filter(function (f) { return U.normalizar(f.valor) !== U.normalizar(p.nombre); });   /* el nombre ya está arriba */
     var cab = document.createElement('div');
-    cab.innerHTML = cabeceraSimple(p, [p.puesto, p.enElCentro ? 'En el centro' : 'Ya no está en el centro'].filter(Boolean).join(' · '), dni);
+    cab.innerHTML = cabeceraSimple(p, [p.puesto, p.enElCentro ? 'En el centro' : 'Ya no está en el centro' + (window.App && App.motivoFuera ? App.motivoFuera(p) : '')].filter(Boolean).join(' · '), dni);
     var cabecera = cab.firstChild;
     var ac = document.createElement('div'); ac.id = 'ficha-persona-acciones'; ac.className = 'fp-acciones';
     cabecera.appendChild(ac);

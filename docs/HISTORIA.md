@@ -5235,3 +5235,7 @@ Pie fijo con Cancelar y el principal, ✕ y Esc con pregunta de descartar, «Se�
 
 Aviso del botón de soporte: al repartir un segundo PDF del asunto salía el mismo reparto que el primero y el resumen avisaba de alumnos «sin trozo» que ya habían recibido el suyo. Ahora el segundo PDF solo asigna lo leído, el aviso cuenta los otros repartos, y la lista baja sola al siguiente trozo sin alumno.
 
+## Fila 340 (13-oct-2026): el personal que sí está en el centro salía como «Ya no está en el centro»
+
+Causa: `esteCurso` comparaba a cada persona con el curso más alto de TODOS los listados de personal. Si los no docentes solo estaban subidos hasta el curso pasado (o una parte del Centro de datos de este curso solo traía docentes y hacía descartar el RelPerCenNodocente del mismo curso), todos salían fuera aunque no tuvieran cese. Ahora cada clase de personal (docente, no docente, todo) se mide con el curso más alto de SU clase (`claseDeFichero`, o el `tipoPersonal` de la parte), y una parte solo descarta los listados de las clases que trae. El aviso nunca bloquea: a quien se fue se le crea el asunto igual. `App.motivoFuera` da el motivo igual en el buscador y en la ficha.
+

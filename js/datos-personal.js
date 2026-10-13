@@ -57,6 +57,29 @@
 
   function cursoDelFichero(nombre) { return cursoEnElNombre(nombre) || U.cursoActual(); }
 
+  /* Fila 340: de qué clase de personal es un listado, por su nombre: 'no-docente' (RelPerCenNodocente…),
+     'todo' (RelPerCenTodo…) o 'docente' (el RelPerCen de siempre). Y la de una fila de una parte del Centro de
+     datos: su `tipoPersonal`, o 'todo' si no lo trae. */
+  function claseDeFichero(nombre) {
+    var n = U.normalizar(nombre);
+    if (/no ?docente/.test(n)) return 'no-docente';
+    if (/\btodo\b/.test(n)) return 'todo';
+    return 'docente';
+  }
+  function claseDeFila(fila) { return fila && (fila.tipoPersonal === 'docente' || fila.tipoPersonal === 'no-docente') ? fila.tipoPersonal : 'todo'; }
+
+  /* Qué clases trae una parte del Centro de datos, y si cubre un listado de esa clase (un listado de una clase
+     que la parte no trae no se descarta: es lo único que hay de ella). */
+  function clasesDeParte(parte) {
+    var c = {};
+    (parte.registros || []).forEach(function (r) { c[claseDeFila(r && r.datos)] = true; });
+    return c;
+  }
+  function parteCubre(parte, clase) {
+    var c = clasesDeParte(parte);
+    return !!(c.todo || c[clase] || (clase === 'todo' && c.docente && c['no-docente']));
+  }
+
   async function ficherosQueEmpiezanPor(dir, prefijo) {
     var lista = await Carpetas.ficheros(dir);
     var salida = [];
@@ -117,25 +140,32 @@
       var csvs = ficheros.filter(function (f) { return cursoDelFichero(f.nombre) === c0; });
       if (!csvs.length || !(await ganaLoSubidoAMano(csvs, partes[c0].parte))) delCentro[c0] = partes[c0];
     }
-    ficheros = ficheros.filter(function (f) { return !delCentro[cursoDelFichero(f.nombre)]; });
+    ficheros = ficheros.filter(function (f) {
+      var parte = delCentro[cursoDelFichero(f.nombre)];
+      return !(parte && parteCubre(parte.parte, claseDeFichero(f.nombre)));   /* fila 340 */
+    });
 
     var porPersona = {};
     var resumen = [];
     var cursoMasAlto = '';
+    var altoPorClase = {};   /* fila 340: el curso más alto en que hay datos de cada clase de personal */
 
     /* Una persona de un fichero o de una parte: los datos buenos son los del curso más reciente en que sale. */
-    function anadir(curso, fila) {
+    function anadir(curso, fila, clase) {
+      clase = clase || claseDeFila(fila);
+      if (curso > (altoPorClase[clase] || '')) altoPorClase[clase] = curso;
       var clave = clavePersona(fila.documento, fila.nombre);
       if (!porPersona[clave]) {
         porPersona[clave] = {
           nombre: fila.nombre, documento: fila.documento, nif: '', referencia: '',
           puesto: fila.puesto, fechaCese: fila.cese, enElCentro: false,
           deSeneca: true, categoria: 'PERSONAL', campos: fila.campos,
-          cursos: [], cursoUltimo: ''
+          cursos: [], cursoUltimo: '', cursosPorClase: {}
         };
       }
       var r = porPersona[clave];
       if (r.cursos.indexOf(curso) === -1) r.cursos.push(curso);
+      (r.cursosPorClase[clase] = r.cursosPorClase[clase] || []).push(curso);
       if (curso >= r.cursoUltimo) {
         r.cursoUltimo = curso;
         r.nombre = fila.nombre;
@@ -181,7 +211,7 @@
           nombre: nombre, documento: String(fila[iDoc] || '').trim(),
           puesto: iPuesto === -1 ? '' : String(fila[iPuesto] || '').trim(),
           cese: iCese === -1 ? '' : String(fila[iCese] || '').trim(), campos: campos
-        });
+        }, claseDeFichero(nombreFichero));
       }
       resumen.push({ fichero: nombreFichero, curso: curso, filas: cuantas });
     }
@@ -203,7 +233,14 @@
     Object.keys(porPersona).forEach(function (k) {
       var r = porPersona[k];
       r.cursos.sort();
-      r.esteCurso = r.cursos.indexOf(cursoMasAlto) !== -1;
+      /* Fila 340: está este curso quien sale en el dato más reciente de SU clase de personal (docente, no docente
+         o todo junto; 'todo' se mide con el curso más alto de todos), no en el más reciente de todos: si los no
+         docentes solo se han subido hasta el curso pasado, no por eso han dejado de estar. */
+      r.esteCurso = Object.keys(r.cursosPorClase).some(function (clase) {
+        var alto = clase === 'todo' ? cursoMasAlto : altoPorClase[clase];
+        return r.cursosPorClase[clase].indexOf(alto) !== -1;
+      });
+      delete r.cursosPorClase;
       r.enElCentro = r.esteCurso && !U.yaPaso(r.fechaCese);
       if (r.enElCentro) enElCentro++;
       r.busca = U.normalizar(r.nombre + ' ' + r.documento + ' ' + r.puesto);
@@ -236,7 +273,7 @@
   }
 
   Object.assign(Datos, {
-    cursoDelFichero: cursoDelFichero, cursoEnElNombre: cursoEnElNombre,
+    cursoDelFichero: cursoDelFichero, cursoEnElNombre: cursoEnElNombre, claseDeFichero: claseDeFichero,
     clavePersona: clavePersona
   });
 

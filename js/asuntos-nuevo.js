@@ -470,15 +470,17 @@ App.pieAlumno = function (p) {
 /* Lo que se lee debajo del nombre de alguien del centro. Si ya cesó
    hay que decirlo: sus asuntos viejos siguen ahí, pero abrirle uno
    nuevo casi siempre es una equivocación. */
+/* Fila 340: por qué la aplicación cree que alguien ya no está en el centro, en el buscador y en la ficha: el
+   día de su cese o, si no sale en los datos de personal de este curso, el último curso en que salió. */
+App.motivoFuera = function (p) {
+  if (p.fechaCese && p.esteCurso) return ' (cesó el ' + p.fechaCese + ')';
+  return p.cursoUltimo ? ' (su último curso aquí: ' + p.cursoUltimo + ')' : '';
+};
+
 App.piePersona = function (p) {
   var trozos = [];
   if (p.puesto) trozos.push(p.puesto);
-  if (!p.enElCentro) {
-    var porque = p.fechaCese && p.esteCurso
-      ? ' (cesó el ' + p.fechaCese + ')'
-      : (p.cursoUltimo ? ' (su último curso aquí: ' + p.cursoUltimo + ')' : '');
-    trozos.push('Ya no está en el centro' + porque);
-  }
+  if (!p.enElCentro) trozos.push('Ya no está en el centro' + App.motivoFuera(p));
   if (!p.deSeneca) trozos.push('alta a mano');
   var texto = trozos.join('  ·  ');
   if (p.documento) texto += (texto ? '  ·  ' : '') + 'DNI ' + p.documento;
