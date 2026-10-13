@@ -41,6 +41,14 @@ trozo salvo lo de páginas:
 - La marca de lectura (verde «Leído del documento» / ámbar «Revísalo» / sin marca), con la misma
   comparación de nombres de `RepartirNucleo`.
 
+**Verlo en grande** (pedido por Francisco el 13-oct-2026: con las miniaturas no puede leer de quién
+es cada documento). El cuadro se parte en dos: la lista a la izquierda y, a la derecha, un visor
+grande. Al pulsar una fila (o su miniatura), el fichero se ve ahí, a todo el alto disponible y con
+sus páginas una debajo de otra: el PDF con pdf.js, la imagen tal cual y el Word con el visor de
+Word que ya tiene la app. Al elegir el alumno de esa fila, el visor pasa solo al siguiente fichero
+sin asignar. Lo mismo vale para el cuadro de trozos de la fila 141: al pulsar un trozo, sus páginas
+se ven en grande en ese mismo visor de la derecha.
+
 Para proponer el alumno de cada fichero:
 
 1. Primero, **el nombre del fichero** (con la misma comparación tolerante de nombres).
@@ -93,7 +101,8 @@ fallido. Como un fichero ya repartido sale del origen, el reintento se ve en los
   origen por la papelera tras comprobar que se guardó.
 - `js/ficha-documentos.js` (413 líneas): el botón en la tarjeta «Documentos». Si hay punto de
   enganche, usarlo; si no, uno nuevo.
-- `css/repartir.css`, `index.html` (solo si hay módulo nuevo).
+- `css/repartir.css` (el cuadro en dos columnas, a todo el ancho), `index.html` (solo si hay módulo
+  nuevo). El visor grande, si no cabe en `js/repartir-pantalla.js`, en `js/repartir-visor.js`.
 - `pruebas/repartir-ficheros.mjs` (nueva).
 - `js/novedades.js`: «Repartir ficheros entre terceros: con un fichero por alumno, la app crea el
   asunto de cada uno, ya archivado, con su fichero.»
@@ -143,3 +152,7 @@ entre terceros». No hay nada que tenga que hacer él.
 7. Los ficheros repartidos están en la Papelera.
 8. El botón «Repartir entre terceros» de la barra del visor de un PDF sigue funcionando como antes
    (abre el cuadro de trozos por páginas).
+9. Al pulsar una fila del cuadro de ficheros, el fichero se ve grande a la derecha y se puede leer
+   el nombre del alumno; al elegir su alumno, el visor pasa al siguiente sin asignar.
+10. En el cuadro de trozos (botón de la barra del visor de un PDF), al pulsar un trozo sus páginas
+   se ven grandes a la derecha.

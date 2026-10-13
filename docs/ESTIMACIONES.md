@@ -14,4 +14,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 335 | 60 | Revisión y informe, sin código ni publicación |
 | 336 | 90 | Cambio pequeño en el script de correos y aviso nuevo en Inicio con demo, prueba y revisor |
-| 337 | 120 | Amplía el cuadro de reparto a varios ficheros, con prueba nueva, demo y revisor |
+| 337 | 150 | Amplía el cuadro de reparto a varios ficheros y le añade un visor grande, con prueba nueva, demo y revisor |
