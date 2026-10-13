@@ -251,7 +251,7 @@ var AlumnadoBDVer = (function () {
 
   return {
     texto: texto, vacio: vacio, apartados: apartados, tablaHtml: tablaHtml, tarjetas: tarjetas, comoTabla: comoTabla, huecos: huecos,
-    filtrar: filtrar, valoresDe: valoresDe, pintarGrupo: pintarGrupo, TABLA: TABLA
+    filtrar: filtrar, valoresDe: valoresDe, pintarGrupo: pintarGrupo, etiqueta: etiqueta, TABLA: TABLA
   };
 })();
 window.AlumnadoBDVer = AlumnadoBDVer;

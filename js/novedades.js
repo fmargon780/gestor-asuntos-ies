@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '342', fecha: '2026-10-13', texto: 'Al repartir entre terceros hay un filtro del alumnado con varios criterios: el alumno asignado desaparece de las listas y abajo se ve cuántos documentos quedan sin alumno y cuántos alumnos del filtro sin documento.' },
   { id: '341', fecha: '2026-10-13', texto: 'Los cuadros largos ya no esconden sus botones: Aceptar, Cancelar y los demás se ven siempre abajo.' },
   { id: '340', fecha: '2026-10-13', texto: 'El personal que sigue en el centro, también el no docente, ya no sale como «Ya no está en el centro». Quien de verdad se fue sigue en ámbar, con el motivo, y se le puede crear el asunto igual.' },
   { id: '339', fecha: '2026-10-13', texto: 'Al repartir entre terceros, la lista baja sola al siguiente trozo sin alumno; el segundo PDF de un asunto ya no repite el reparto del primero, y el resumen no avisa de quien ya recibió su trozo en otro PDF.' },

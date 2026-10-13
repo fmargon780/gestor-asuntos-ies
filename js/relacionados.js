@@ -256,12 +256,10 @@ var Relacionados = (function () {
     var unidades = Datos.unidadesDistintas(fuente.lista);
     if (!unidades.length) { caja.className = 'oculto'; caja.innerHTML = ''; return; }
 
+    var ne = nivelesYEnsenanzas(unidades);
     var niveles = {}, ensenanzas = {};
-    unidades.forEach(function (u) {
-      var p = Nombres.nivelYEnsenanza(u.unidad);
-      if (p.nivel) niveles[p.nivel] = true;
-      if (p.ensenanza) ensenanzas[p.ensenanza] = true;
-    });
+    ne.niveles.forEach(function (v) { niveles[v] = true; });
+    ne.ensenanzas.forEach(function (v) { ensenanzas[v] = true; });
 
     function opciones(lista) {
       return '<option value="">Elige…</option>' + lista.map(function (v) {
@@ -308,6 +306,18 @@ var Relacionados = (function () {
       if (v) { var l3 = filtrarPorEnsenanza(fuente.lista, v); if (alSenalar) alSenalar('ensenanza', v, l3); marcarAlumnado(l3); }
       $('atajo-ensenanza').value = '';
     };
+  }
+
+  /* Fila 342: los niveles y las enseñanzas de unas unidades (las de Datos.unidadesDistintas), para los
+     atajos de aquí y para el filtro de js/repartir-filtro.js. */
+  function nivelesYEnsenanzas(unidades) {
+    var niveles = {}, ensenanzas = {};
+    (unidades || []).forEach(function (u) {
+      var p = Nombres.nivelYEnsenanza(u.unidad);
+      if (p.nivel) niveles[p.nivel] = true;
+      if (p.ensenanza) ensenanzas[p.ensenanza] = true;
+    });
+    return { niveles: Object.keys(niveles).sort(), ensenanzas: Object.keys(ensenanzas).sort() };
   }
 
   /* Los tres filtros de los atajos, sueltos y sin efectos: se pueden
@@ -398,6 +408,7 @@ var Relacionados = (function () {
     filtrarPorUnidad: filtrarPorUnidad,
     filtrarPorNivel: filtrarPorNivel,
     filtrarPorEnsenanza: filtrarPorEnsenanza,
+    nivelesYEnsenanzas: nivelesYEnsenanzas,
     NOMBRE_FICHERO_MARCADOR: NOMBRE_FICHERO_MARCADOR,
     nombreCarpetaMarcador: nombreCarpetaMarcador
   };

@@ -29,18 +29,38 @@ var RepartirFicheros = (function () {
 
   /* ---------- asignar y marcar ---------- */
 
+  /* Fila 342: con filtro puesto, la lectura es entre TODO el alumnado (para poder avisar de quien está fuera). */
+  function filtroActivo() { return !!(F.filtro && F.filtro.activo()); }
+
   function leidoDe(f) {
+    if (filtroActivo()) {
+      var n = N.leerTrozo(String(f.nombre || '').replace(/\.[A-Za-z0-9]{1,5}$/, ''), F.filtro.candidatos);
+      if (n) return n;
+      return F.hayTexto && f.texto ? F.filtro.leer(f.texto) : null;
+    }
     var r = N.proponerPorNombre(f.nombre, F.personas);
     if (r) return r;
     return F.hayTexto && f.texto ? N.leerTrozo(f.texto, F.personas) : null;
   }
 
+  /* Los nombres ya asignados a algún fichero (menos el fichero `salvo`). */
+  function asignadosMenos(salvo) {
+    var m = {};
+    F.ficheros.forEach(function (x, j) { if (j !== salvo && x.tercero) m[x.tercero] = true; });
+    return m;
+  }
+
+  /* Ya no quita nada: solo asigna a los que no tienen persona (también al cambiar el filtro). */
   function asignar() {
-    var usados = {};
-    F.ficheros.forEach(function (f) { if (f.tercero) usados[f.tercero] = true; });
+    var usados = asignadosMenos(-1);
     F.ficheros.forEach(function (f) {
       if (f.tercero) return;
       var r = leidoDe(f);
+      if (filtroActivo()) {
+        var av = RepartirFiltro.avisoDeLectura(F.filtro, r, usados);
+        if (av && av.tipo === 'libre') { f.tercero = av.tercero; usados[av.tercero] = true; }
+        return;
+      }
       if (r && !usados[r.tercero]) { f.tercero = r.tercero; usados[r.tercero] = true; }
     });
   }
@@ -102,12 +122,12 @@ var RepartirFicheros = (function () {
   /* ---------- 2. la lista ---------- */
 
   function opcionesTercero(f, i) {
-    var asignados = {};
-    F.ficheros.forEach(function (x, j) { if (j !== i && x.tercero) asignados[x.tercero] = true; });
-    var nombres = F.personas.map(function (p) { return p.tercero; });
+    var asignados = asignadosMenos(i);
+    var conFiltro = filtroActivo();
+    var nombres = conFiltro ? RepartirFiltro.nombresParaElegir(F.filtro, asignados, f.tercero) : F.personas.map(function (p) { return p.tercero; });
     if (f.tercero && nombres.indexOf(f.tercero) === -1) nombres.push(f.tercero);
     return '<option value=""' + (!f.tercero ? ' selected' : '') + '>Sin asignar</option>' + nombres.map(function (n) {
-      return '<option value="' + esc(n) + '"' + (f.tercero === n ? ' selected' : '') + '>' + esc(asignados[n] ? interno().tachado(n) : n) + '</option>';
+      return '<option value="' + esc(n) + '"' + (f.tercero === n ? ' selected' : '') + '>' + esc(!conFiltro && asignados[n] ? interno().tachado(n) : n) + '</option>';
     }).join('');
   }
 
@@ -120,7 +140,31 @@ var RepartirFicheros = (function () {
         '<select class="campo repartir-tercero">' + opcionesTercero(f, i) + '</select>' +
         '<input class="campo repartir-buscar" list="repartir-alumnado" placeholder="Buscar a otra persona del alumnado…">' +
         (marca ? '<span class="repartir-marca repartir-marca-' + marca + '">' + esc(TEXTO_MARCA[marca]) + '</span>' : '') +
+        avisosDelFiltro(f, i) +
       '</div></div>';
+  }
+
+  /* Fila 342: «Fuera del filtro» si lo asignado no está en el filtro; y, sin asignar, lo que se lee en el
+     fichero cuando está fuera del filtro o ya tiene fichero. */
+  function avisosDelFiltro(f, i) {
+    if (!filtroActivo()) return '';
+    if (f.tercero) return F.filtro.entra(f.tercero) ? '' : ' <span class="repartir-marca repartir-marca-ambar repartir-fuera">Fuera del filtro</span>';
+    return RepartirFiltro.avisoHTML(RepartirFiltro.avisoDeLectura(F.filtro, leidoDe(f), asignadosMenos(i)));
+  }
+
+  /* La línea de cuentas de abajo. */
+  function cuentasDelCuadro() {
+    var asignados = asignadosMenos(-1);
+    return RepartirFiltro.cuentasHTML({
+      docs: F.ficheros.map(function (f, i) { return { f: f, i: i }; }).filter(function (x) { return !x.f.tercero; })
+        .map(function (x) { return { i: x.i, texto: x.f.nombre }; }),
+      alumnos: filtroActivo() ? F.filtro.nombres().filter(function (n) { return !asignados[n]; }) : null
+    }, F.cuentas);
+  }
+
+  function alCambiarFiltro() {
+    asignar();
+    pintarLista();
   }
 
   function pintarLista() {
@@ -143,10 +187,11 @@ var RepartirFicheros = (function () {
     var tiposDoc = (App.E.tiposDocumento || []).slice();
     var sel = interno().seleccionHTML;
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
-      (F.personas.length ? '' : '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: se busca en todo el alumnado.</p>') +
+      (F.filtro ? RepartirFiltro.html(F.filtro) : '') +
+      (F.personas.length || filtroActivo() ? '' : '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: se busca en todo el alumnado.</p>') +
       '<datalist id="repartir-alumnado">' + F.alumnado.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('') + '</datalist>' +
       '<div class="repartir-lista">' + ficheros.map(filaHTML).join('') + '</div>' +
-      '<div class="repartir-abajo">' +
+      '<div class="repartir-abajo">' + cuentasDelCuadro() +
         '<label class="etiqueta">Crear para cada persona un asunto de tipo…</label>' + sel('repartir-tipo', tipos, F.tipo, 'Elige el tipo') +
         '<label class="etiqueta">Tipo de documento de cada fichero</label>' + sel('repartir-tipodoc', tiposDoc, F.tipoDocumento, 'Elige el tipo de documento') +
         '<p class="aviso-en-vivo" id="repartir-falta"></p>' +
@@ -196,11 +241,19 @@ var RepartirFicheros = (function () {
   }
 
   function enganchar(cuerpo) {
+    if (F.filtro) RepartirFiltro.enganchar(F.filtro, cuerpo, alCambiarFiltro);
+    RepartirFiltro.enganchaCuentas(cuerpo, F.cuentas, function () { pintarLista(); }, function (i) {
+      ver(i);
+      var fila = document.querySelector('.repartir-lista .repartir-trozo[data-i="' + i + '"]');
+      if (fila) document.querySelector('.repartir-lista').scrollTop = fila.offsetTop;
+    });
     Array.prototype.forEach.call(cuerpo.querySelectorAll('.repartir-trozo'), function (fila) {
       var i = Number(fila.dataset.i);
       fila.onclick = function (ev) { if (!ev.target.closest('button,select,input')) ver(i); };
       var s = fila.querySelector('.repartir-tercero');
       s.onchange = function () { elegir(i, s.value); };
+      var igual = fila.querySelector('.repartir-igualmente');
+      if (igual) igual.onclick = function () { elegir(i, igual.getAttribute('data-tercero')); };
       var buscar = fila.querySelector('.repartir-buscar');
       buscar.onchange = function () {
         var v = buscar.value.trim();
@@ -261,6 +314,19 @@ var RepartirFicheros = (function () {
     Array.prototype.forEach.call(document.querySelectorAll('.repartir-repetido input'), function (c) { if (!c.checked) noCrear[c.dataset.tercero] = true; });
     var personas = {};
     F.personas.forEach(function (p) { personas[p.tercero] = { categoria: p.categoria }; });
+    /* Fila 342: si se ha usado el filtro, quedan relacionados solo los que reciben fichero. */
+    var deFuera = F.deFuera;
+    if (F.filtro && F.filtro.usado) {
+      var antes = {}, nuevos = {};
+      F.originales.forEach(function (n) { antes[n] = true; });
+      deFuera = [];
+      F.ficheros.forEach(function (f) {
+        if (!f.tercero || antes[f.tercero] || nuevos[f.tercero]) return;
+        nuevos[f.tercero] = true;
+        deFuera.push({ categoria: 'ALUMNADO', nombre: f.tercero });
+        if (!personas[f.tercero]) personas[f.tercero] = { categoria: 'ALUMNADO' };
+      });
+    }
     var cerrar = $('cuadro-aceptar');
     cerrar.disabled = true;
     $('repartir-confirmar').disabled = true;
@@ -269,7 +335,7 @@ var RepartirFicheros = (function () {
     var resultados = [];
     try {
       resultados = await RepartirCrear.repartirFicheros(F.origen, F.ficheros.filter(function (f) { return f.tercero; }), {
-        tipo: F.tipo, tipoDocumento: F.tipoDocumento, noCrear: noCrear, personas: personas, deFuera: F.deFuera
+        tipo: F.tipo, tipoDocumento: F.tipoDocumento, noCrear: noCrear, personas: personas, deFuera: deFuera
       }, function (n, total) { progreso.textContent = 'Creando ' + n + ' de ' + total + '…'; });
     } catch (e) {
       U.fallo('No he podido repartirlo', e);
@@ -292,10 +358,13 @@ var RepartirFicheros = (function () {
     var lista = await Carpetas.ficheros(a.handle);
     if (window.IndiceExpediente) lista = IndiceExpediente.fuera(lista);
     var ficha = (App.E.registro.asuntos || {})[a.nombre] || a.ficha || {};
-    var alumnado = [];
+    var alumnado = [], fuente = null;
     try {
-      if (App.E.datos) alumnado = (await Datos.cargar(App.E.datos, 'ALUMNADO')).lista.map(function (p) { return App.textoTercero(p); });
-    } catch (e) { alumnado = []; }
+      if (App.E.datos) {
+        fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
+        alumnado = fuente.lista.map(function (p) { return App.textoTercero(p); });
+      }
+    } catch (e) { alumnado = []; fuente = null; }
     var tipoOrigen = interno().tipoPorNombre((a.leido && a.leido.tipo) || ficha.tipo) || {};
     F = {
       origen: { nombre: a.nombre, handle: a.handle, ficha: ficha },
@@ -304,6 +373,10 @@ var RepartirFicheros = (function () {
       personas: (ficha.relacionados || []).map(function (r) { return { tercero: r.nombre, categoria: r.categoria || 'ALUMNADO' }; }),
       tipo: tipoOrigen.repartirTipo || '', tipoDocumento: tipoOrigen.repartirTipoDocumento || ''
     };
+    F.originales = F.personas.map(function (p) { return p.tercero; });
+    F.cuentas = { ver: '' };
+    F.filtro = null;
+    try { F.filtro = fuente ? await RepartirFiltro.crear(fuente, F.personas) : null; } catch (e3) { F.filtro = null; }
     var cuadro = document.querySelector('#capa .cuadro');
     if (cuadro) cuadro.classList.add('cuadro-ancho', 'cuadro-repartir');
     var promesa = U.preguntar('Repartir ficheros entre terceros', '', 'Cerrar', true);
