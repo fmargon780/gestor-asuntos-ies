@@ -1,7 +1,7 @@
 /* Repartir un PDF entre terceros (fila 141, js/repartir-pantalla.js). */
 .repartir-arriba label { display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; }
 .repartir-arriba .campo-plazo { width: 70px; }
-.repartir-lista { max-height: 55vh; overflow: auto; margin: 10px 0; border-top: 1px solid var(--linea); }
+.repartir-lista { position: relative; max-height: 55vh; overflow: auto; margin: 10px 0; border-top: 1px solid var(--linea); }
 .repartir-trozo { display: flex; gap: 12px; padding: 8px 4px; border-bottom: 1px solid var(--linea); align-items: flex-start; }
 .repartir-trozo.repartir-ambar { background: var(--ambar); }
 .repartir-trozo.repartir-verde { background: var(--verde); }

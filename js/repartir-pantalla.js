@@ -59,6 +59,8 @@ var Repartir = (function () {
       t.tercero = (r && !usados[r.tercero]) ? r.tercero : '';
       if (t.tercero) usados[t.tercero] = true;
     });
+    /* Fila 339: en el segundo PDF de un asunto (ya hubo otro reparto) no se rellena por orden: sería repetir el primero. */
+    if (E.otros && E.otros.hay) return trozos;
     var libres = E.personas.map(function (p) { return p.tercero; }).filter(function (n) { return !usados[n]; });
     trozos.forEach(function (t) { if (!t.quedarse && !t.hecho && !t.tercero && libres.length) t.tercero = libres.shift(); });
     return trozos;
@@ -118,10 +120,30 @@ var Repartir = (function () {
 
   var pintando = false;   /* fila 337: al reemplazar el cuadro, el campo con foco dispara su «change» y volvería a pintar a mitad */
 
-  function pintar() {
+  /* Fila 339: al repintar, la lista conserva su desplazamiento; con `siguienteDesde` (el trozo recién asignado),
+     baja al siguiente trozo sin alumno, o hasta el final si no queda ninguno. */
+  function pintar(siguienteDesde) {
     if (pintando) return;
     pintando = true;
+    var antes = document.querySelector('.repartir-lista');
+    var top = antes ? antes.scrollTop : 0;
     try { pintarCuadro(); } finally { pintando = false; }
+    var lista = document.querySelector('.repartir-lista');
+    if (!lista) return;
+    lista.scrollTop = top;
+    if (typeof siguienteDesde !== 'number') return;
+    var n = E.trozos.length, idx = -1;
+    for (var k = 1; k <= n; k++) {
+      var j = (siguienteDesde + k) % n;
+      var t = E.trozos[j];
+      if (!t.tercero && !t.hecho && !t.quedarse) { idx = j; break; }
+    }
+    if (idx === -1) { lista.scrollTop = lista.scrollHeight; return; }
+    var fila = lista.querySelector('.repartir-trozo[data-i="' + idx + '"]');
+    if (fila) {
+      lista.scrollTop = fila.offsetTop;
+      if (window.RepartirVisor && E.pdfDoc) RepartirVisor.pdf($('repartir-visor'), E.pdfDoc, E.trozos[idx].desde, E.trozos[idx].hasta);
+    }
   }
 
   function pintarCuadro() {
@@ -133,7 +155,7 @@ var Repartir = (function () {
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
       (sinRel ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
         'y se busca en todo el alumnado. <button type="button" class="enlace" id="repartir-relacionados">Añadir relacionados</button></p>' : '') +
-      (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: los trozos se han asignado por orden.</p>') +
+      (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: ' + (E.otros && E.otros.hay ? 'elige el alumno de cada trozo.' : 'los trozos se han asignado por orden.') + '</p>') +
       '<div class="alta-tipo repartir-arriba">' +
         '<label>El primer trozo empieza en la página <input type="number" min="1" max="' + E.total + '" class="campo campo-plazo" id="repartir-primera" value="' + E.primera + '"' + (E.anterior ? ' disabled' : '') + '></label>' +
         '<label>Páginas de cada trozo <input type="number" min="1" class="campo campo-plazo" id="repartir-por" value="' + E.porTrozo + '"' + (E.anterior ? ' disabled' : '') + '></label>' +
@@ -231,7 +253,7 @@ var Repartir = (function () {
       E.trozos.forEach(function (x, j) { if (j !== i && valor && x.tercero === valor && !x.hecho) x.tercero = ''; });
       t.tercero = valor;
     }
-    pintar();
+    pintar(valor && valor !== QUEDARSE ? i : undefined);
   }
 
   /* ---------- el resumen, en el mismo cuadro ---------- */
@@ -257,7 +279,7 @@ var Repartir = (function () {
     }
     var conTrozo = {};
     E.trozos.forEach(function (t) { if (t.tercero) conTrozo[t.tercero] = true; });
-    var sinTrozo = E.personas.filter(function (p) { return !conTrozo[p.tercero]; }).map(function (p) { return p.tercero; });
+    var sinTrozo = E.personas.filter(function (p) { return !conTrozo[p.tercero] && !(E.otros && E.otros.recibieron[p.tercero]); }).map(function (p) { return p.tercero; });
     var yaTienen = await RepartirCrear.yaTienen(E.tipo);
     var repetidos = aCrear.map(function (t) { return t.tercero; }).filter(function (n) { return yaTienen[n]; });
     var sinAsignar = E.trozos.filter(function (t) { return !t.hecho && !t.quedarse && !t.tercero; }).length;
@@ -340,7 +362,8 @@ var Repartir = (function () {
       deFuera: [], alumnado: alumnado, primera: 1,
       tipo: tipoOrigen.repartirTipo || '', tipoDocumento: tipoOrigen.repartirTipoDocumento || '',
       tipoDocumentoOrigen: tiposDoc.indexOf('OFICIO') !== -1 ? 'OFICIO' : (tiposDoc[0] || ''),
-      anterior: RepartirCrear.repartoAnterior({ nombre: a.nombre, ficha: ficha }, contexto.nombre)
+      anterior: RepartirCrear.repartoAnterior({ nombre: a.nombre, ficha: ficha }, contexto.nombre),
+      otros: RepartirCrear.otrosRepartos({ nombre: a.nombre, ficha: ficha }, contexto.nombre)   /* fila 339 */
     };
     E.porTrozo = N.porTrozoPropuesto(E.total, 1, E.personas.length);
     if (E.anterior) {

@@ -257,6 +257,19 @@ var RepartirCrear = (function () {
     return resultados;
   }
 
+  /* Fila 339: lo repartido en OTROS documentos del mismo asunto (trozos de un PDF o ficheros sueltos, fila 337).
+     Devuelve { hay, recibieron: { tercero: true } } con los que recibieron algo que salió bien. */
+  function otrosRepartos(origen, nombrePdf) {
+    var f = (App.E.registro.asuntos || {})[origen.nombre] || origen.ficha || {};
+    var salida = { hay: false, recibieron: {} };
+    (f.repartos || []).forEach(function (r) {
+      if (r.documento === nombrePdf) return;
+      salida.hay = true;
+      (r.trozos || []).concat(r.ficheros || []).forEach(function (t) { if (t.ok && t.tercero) salida.recibieron[t.tercero] = true; });
+    });
+    return salida;
+  }
+
   /* Lo ya repartido de este PDF, si se repartió antes. */
   function repartoAnterior(origen, nombrePdf) {
     var f = (App.E.registro.asuntos || {})[origen.nombre] || origen.ficha || {};
@@ -264,6 +277,6 @@ var RepartirCrear = (function () {
   }
 
   return { datosDelOriginal: datosDelOriginal, nombreDelAsunto: nombreDelAsunto, yaTienen: yaTienen,
-           repartir: repartir, repartirFicheros: repartirFicheros, repartoAnterior: repartoAnterior };
+           repartir: repartir, repartirFicheros: repartirFicheros, repartoAnterior: repartoAnterior, otrosRepartos: otrosRepartos };
 })();
 window.RepartirCrear = RepartirCrear;
