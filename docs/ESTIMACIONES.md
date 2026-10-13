@@ -13,5 +13,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 335 | 60 | Revisión y informe, sin código ni publicación |
-| 341 | 75 | Regla común de CSS para todos los cuadros, revisión uno a uno y prueba nueva |
 | 342 | 90 | Filtro compartido por los dos cuadros de reparto, listas sin los asignados, cuentas y prueba nueva |
