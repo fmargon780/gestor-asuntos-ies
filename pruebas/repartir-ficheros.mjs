@@ -94,8 +94,10 @@ await pagina.evaluate(async ([origen, oficio, sueltos, personas]) => {
 
 console.log('--- el botón y la lista de ficheros ---');
 await pagina.evaluate(async (origen) => { const a = App.E.listaAbiertos.filter(x => x.nombre === origen)[0]; await App.abrirFicha(a); }, ORIGEN);
-await pagina.waitForSelector('.ficha-documentos-repartir', { timeout: 15000 });
-await comprobarP('1. la tarjeta «Documentos» enseña el botón', pagina.locator('.ficha-documentos-repartir').textContent(), 'Repartir ficheros entre terceros');
+await pagina.waitForSelector('.ficha-documentos-repartir', { state: 'attached', timeout: 15000 });
+await comprobarP('1. cerrada la tarjeta, el botón no estorba en su título', pagina.locator('.ficha-documentos-repartir').isVisible(), false);
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+await comprobarP('1. abierta la tarjeta «Documentos», enseña el botón', pagina.locator('.ficha-documentos-repartir').textContent(), 'Repartir ficheros entre terceros');
 await pagina.click('.ficha-documentos-repartir');
 await pagina.waitForSelector('.repartir-elegir');
 await comprobarP('2. la lista de documentos, con casillas sin marcar',
