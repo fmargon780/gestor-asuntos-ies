@@ -116,13 +116,21 @@ var Repartir = (function () {
       '</select>';
   }
 
+  var pintando = false;   /* fila 337: al reemplazar el cuadro, el campo con foco dispara su «change» y volvería a pintar a mitad */
+
   function pintar() {
+    if (pintando) return;
+    pintando = true;
+    try { pintarCuadro(); } finally { pintando = false; }
+  }
+
+  function pintarCuadro() {
     var cuerpo = $('cuadro-cuerpo');
     var sinRel = !E.personas.length;
     var aviso = N.avisoDivision(E.total, E.primera, E.personas.length);
     var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
     var tiposDoc = (App.E.tiposDocumento || []).slice();
-    cuerpo.innerHTML =
+    cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
       (sinRel ? '<p class="aviso aviso-ambar">Este asunto no tiene terceros relacionados: los trozos se quedan sin asignar ' +
         'y se busca en todo el alumnado. <button type="button" class="enlace" id="repartir-relacionados">Añadir relacionados</button></p>' : '') +
       (E.hayTexto ? '' : '<p class="suave">Este PDF es escaneado: los trozos se han asignado por orden.</p>') +
@@ -140,7 +148,9 @@ var Repartir = (function () {
           ? '<label class="etiqueta">Tipo de documento de lo que se queda en este asunto</label>' + seleccionHTML('repartir-tipodoc-origen', tiposDoc, E.tipoDocumentoOrigen, '') : '') +
         '<p class="aviso-en-vivo" id="repartir-falta"></p>' +
         '<button type="button" class="boton boton-principal" id="repartir-ir">Repartir</button>' +
-      '</div>';
+      '</div></div>' +
+      /* Fila 337: el visor grande, a la derecha. */
+      '<div class="repartir-visor" id="repartir-visor"><p class="suave repartir-visor-vacio">Pulsa un trozo para verlo aquí en grande.</p></div></div>';
     enganchar(cuerpo);
     pintarMiniaturas(cuerpo);
   }
@@ -183,6 +193,11 @@ var Repartir = (function () {
     if (por) por.onchange = function () { E.porTrozo = Math.max(1, parseInt(por.value, 10) || 1); recalcular(); };
     Array.prototype.forEach.call(cuerpo.querySelectorAll('.repartir-trozo'), function (fila) {
       var i = Number(fila.dataset.i);
+      fila.onclick = function (ev) {
+        if (ev.target.closest('button,select,input')) return;
+        var tr = E.trozos[i];
+        if (window.RepartirVisor && E.pdfDoc) RepartirVisor.pdf($('repartir-visor'), E.pdfDoc, tr.desde, tr.hasta);
+      };
       var mas = fila.querySelector('.repartir-mas'), menos = fila.querySelector('.repartir-menos');
       if (mas) mas.onclick = function () { E.trozos = N.moverCorte(E.trozos, i, 1, E.total); pintar(); };
       if (menos) menos.onclick = function () { E.trozos = N.moverCorte(E.trozos, i, -1, E.total); pintar(); };
@@ -370,6 +385,9 @@ var Repartir = (function () {
     return fila;
   }
 
-  return { abrir: abrir, puede: puede, filaDeTipo: filaDeTipo, QUEDARSE: QUEDARSE };
+  /* Lo que comparte el cuadro de varios ficheros (js/repartir-ficheros.js, fila 337). */
+  var interno = { abrirPdf: abrirPdf, textos: textos, seleccionHTML: seleccionHTML, tachado: tachado, tipoPorNombre: tipoPorNombre };
+
+  return { abrir: abrir, puede: puede, filaDeTipo: filaDeTipo, QUEDARSE: QUEDARSE, _interno: interno };
 })();
 window.Repartir = Repartir;

@@ -602,3 +602,7 @@ que `rellenarPdf` solo cambia las casillas del mapa, con sus valores, y deja las
 escribiéndose; que las rellenadas quedan en solo lectura; y que un PDF sin formulario no rompe
 nada y devuelve el aviso.
 
+## Repartir ficheros sueltos y el visor grande (fila 337, 13-oct-2026)
+
+«Repartir ficheros entre terceros» sale en la cabecera de la tarjeta «Documentos» de un asunto abierto con dos o más documentos (`js/repartir-ficheros.js`). Se marcan los ficheros, la persona de cada uno sale del nombre del fichero (`RepartirNucleo.proponerPorNombre`) o, en un PDF con texto, de lo de dentro; nunca por orden. `RepartirCrear.repartirFicheros` crea el asunto archivado de cada persona con el fichero entero (su fecha, su registro y su número de documento) y, solo si salió bien, lo manda a la Papelera desde el origen; apunta una nota «Reparto de ficheros:» y una entrada en `repartos` (`ficheros: [{ nombre, tercero, asunto, ok }]`). Los dos cuadros de repartir (este y el de trozos de la fila 141) llevan a la derecha el visor grande de `js/repartir-visor.js`.
+

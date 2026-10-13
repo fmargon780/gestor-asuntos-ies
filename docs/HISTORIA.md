@@ -5203,3 +5203,7 @@ Texto completo, sin tocar, de las líneas de la sección 5 que se acortaron para
 ## Fila 334 (11-oct-2026): tablas para estadísticas y cruces
 
 Cada asunto archivado queda apuntado, además de en su carpeta, en `_GESTOR/base/` (asuntos, hitos, personas y documentos), con un código fijo por persona (SHA-256 de `categoria|clase|valor`, escrito a mano en `js/base-filas.js` para que valga también sin https). Decisiones de la sesión: el SHA-256 es síncrono y propio (no `crypto.subtle`, que no existe en `file://`); un relacionado o un «lo pide» se codifica con la misma regla sobre su nombre (no se busca antes en las listas); las altas `incompleto` solo se reintentan cuando la pasada es de unas claves concretas y el alta tiene menos de diez minutos; las equivalencias de código van en `base/personas-<ordenador>.jsonl`. Detalle en `docs/contexto/ASUNTOS-ARCHIVO.md`.
+
+## Fila 337 (13-oct-2026): repartir varios ficheros entre terceros
+
+Un fichero suelto por alumno: botón en la tarjeta «Documentos», lista con la persona propuesta por el nombre del fichero (o el texto del PDF), resumen y reparto con el fichero entero, que sale del origen por la papelera. Visor grande a la derecha en los dos cuadros de repartir. Decisión: el cuadro de trozos de la fila 141 no vuelve a pintarse mientras se está pintando (el campo con foco disparaba su «change» al reemplazarse).

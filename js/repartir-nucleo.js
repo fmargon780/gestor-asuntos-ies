@@ -129,12 +129,18 @@ var RepartirNucleo = (function () {
     return { tercero: verdes[0] || ambares[0], marca: 'ambar' };
   }
 
+  /* Fila 337: el tercero de un fichero suelto, por lo que dice su NOMBRE (sin la extensión), con la
+     misma comparación que el texto de dentro. null si el nombre no lo resuelve. */
+  function proponerPorNombre(nombreFichero, personas) {
+    return leerTrozo(String(nombreFichero || '').replace(/\.[A-Za-z0-9]{1,5}$/, ''), personas);
+  }
+
   function textoPaginas(t) { return t.desde === t.hasta ? 'Página ' + t.desde : 'Páginas ' + t.desde + '–' + t.hasta; }
 
   return {
     porTrozoPropuesto: porTrozoPropuesto, avisoDivision: avisoDivision, proponer: proponer,
     moverCorte: moverCorte, asignarPorOrden: asignarPorOrden, normalizar: normalizar, piezas: piezas,
-    compararNombre: compararNombre, leerTrozo: leerTrozo, textoPaginas: textoPaginas
+    compararNombre: compararNombre, leerTrozo: leerTrozo, proponerPorNombre: proponerPorNombre, textoPaginas: textoPaginas
   };
 })();
 if (typeof window !== 'undefined') window.RepartirNucleo = RepartirNucleo;
