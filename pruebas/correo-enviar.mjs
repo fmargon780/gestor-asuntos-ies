@@ -257,7 +257,7 @@ const GENERAL = 'https://script.google.com/macros/s/ID123/exec?k=abc';
 {
   const c = nuevoContexto();
   await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO2}")`);
-  c.responder({ status: 200, cuerpo: { ok: true, version: '27-sep-2026 · fila 210' } });
+  c.responder({ status: 200, cuerpo: { ok: true, version: '13-oct-2026 · fila 336' } });
   const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
   comprobar('7. dirección de dominio: primero la general, y si responde bien, una sola llamada', [r.ok, c.peticiones.map((p) => p.url)], [true, [GENERAL]]);
   comprobar('7. y la dirección guardada pasa a ser la general', await ejecutar(c.ctx, 'window.CorreoEnviar.leerUrl()'), GENERAL);

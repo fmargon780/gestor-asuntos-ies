@@ -595,6 +595,18 @@
     await Carpetas.escribirBytes(disco.bandeja, 'factura-septiembre.pdf', PDF_DE_MENTIRA, 'application/pdf');
     await Carpetas.guardarJson(disco.bandeja, uno.id + '.json', uno);
     await Carpetas.guardarJson(disco.bandeja, dos.id + '.json', dos);
+    /* Fila 336: la señal del recolector. Sin parámetro, de hace un momento (sin aviso); `?latido=viejo`, de hace
+       tres días (aviso con fecha); `?latido=ninguno`, sin fichero (aviso sin fecha). */
+    var latido = new URLSearchParams(window.location.search).get('latido') || '';
+    if (latido !== 'ninguno') {
+      var hora = new Date(Date.now() - (latido === 'viejo' ? 3 * 24 * 3600 * 1000 : 60 * 1000)).toISOString();
+      await Carpetas.guardarJson(disco.bandeja, 'latido.json', { hora: hora, version: '13-oct-2026 · fila 336', cuenta: 'demo@correo-demo.es' });
+    }
+    /* La bandeja ya arrancó sin carpeta: con `?latido=` se le dice cuál es (sin él la demostración sigue como siempre). */
+    if (latido && window.BandejaNucleo) {
+      await BandejaNucleo.recordarCarpeta();
+      await Bandeja.mirarDeNuevo(true);
+    }
   }
 
   /* ---------- todo junto ---------- */
