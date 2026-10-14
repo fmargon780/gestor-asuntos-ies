@@ -25,6 +25,7 @@ que cambie algo general).
 | `docs/contexto/WORD-EN-LA-APP.md` | Lo que falta antes de generar un Word, el Word dentro de la aplicación («Guardar PDF», «Imprimir», fila 155) y la subcarpeta «Versiones previas» (fila 160) |
 | `docs/contexto/TABLAS-DE-DATOS.md` | Las tablas de datos (tutorías de Séneca, `datos/Tablas`), sus huecos y el certificado de función tutorial (fila 110) |
 | `docs/contexto/CORREO-Y-SENECA.md` | La bandeja de Gmail, sus adjuntos, las plantillas de correo y el cuadro de Séneca |
+| `docs/contexto/ETIQUETAS.md` | Imprimir etiquetas: modelos de hoja, diseños, familias, hoja empezada y PDF (fila 344) |
 | `docs/contexto/HITOS-Y-GUIAS.md` | Las guías del procedimiento, los hitos de un asunto, "Qué me toca" y "Cuentas" |
 | `docs/contexto/ESTADO-DEL-ASUNTO.md` | El estado del asunto es su hito actual: los dos montones, «Esperando a…», «Estamos en este paso», la guía mínima (fila 129) |
 | `docs/contexto/HITO-MESA.md` | El hito a pantalla completa (la mesa de trabajo), su guion y "Traer los guiones del instituto" (fila 109) |

@@ -14,6 +14,8 @@
 App.pintarHerramientas = async function () {
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
+  /* Fila 344: las etiquetas también se cierran (antes de cualquier espera: se abren desde un asunto con App.ir); su botón se engancha. */
+  if (window.EtiquetasPantalla) { EtiquetasPantalla.cerrar(); EtiquetasPantalla.enlazarBloque(); }
   /* Fila 320: lo mismo con la pantalla de plantillas; y la línea de su bloque («12 de Word · 30 de correo»). */
   if (window.PlantillasPantalla) { PlantillasPantalla.cerrar(); await PlantillasPantalla.pintarBloque(); }
   /* Fila 310: lo mismo con la pantalla de actividades extraescolares, que se reabre si se vuelve de la ficha de una actividad. */

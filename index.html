@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/reservados.css">
 <link rel="stylesheet" href="css/conservacion.css">
 <link rel="stylesheet" href="css/repartir.css">
+<link rel="stylesheet" href="css/etiquetas.css">   <!-- fila 344 -->
 <link rel="stylesheet" href="css/via-contacto.css">
 <link rel="stylesheet" href="css/usabilidad.css">
 <link rel="stylesheet" href="css/copiar-nie.css">
@@ -481,6 +482,7 @@
       <div id="control-registro-vista" class="oculto"></div>
       <div id="plantillas-vista" class="oculto"></div>
       <div id="actividades-vista" class="oculto"></div>
+      <div id="etiquetas-vista" class="oculto"></div>
 
       <div id="herramientas-lista">
 
@@ -508,6 +510,19 @@
         <div class="bloque-cuerpo">
           <p class="explica" id="actividades-resumen"></p>
           <button type="button" class="boton" id="actividades-abrir" data-solo-lectura>Abrir</button>
+        </div>
+      </details>
+
+      <!-- Fila 344 (docs/ETIQUETAS.md): imprimir etiquetas. La vista a todo el ancho (#etiquetas-vista) la pinta
+           js/etiquetas-pantalla.js y sustituye a esta lista mientras está abierta. -->
+      <details class="bloque-ajustes" id="bloque-etiquetas">
+        <summary>
+          <span class="bloque-titulo">Etiquetas</span>
+          <span class="bloque-pie">Sobres, carpetas, exámenes o carnés: elige a quién, la hoja de etiquetas y qué lleva cada una</span>
+        </summary>
+        <div class="bloque-cuerpo">
+          <p class="explica">Para alumnado o personal, con los modelos de hoja más corrientes y diseños propios.</p>
+          <button type="button" class="boton" id="etiquetas-abrir" data-solo-lectura>Abrir las etiquetas</button>
         </div>
       </details>
 
@@ -1706,6 +1721,15 @@
 <script src="js/actividades-antigua.js"></script>   <!-- fila 310 -->
 <script src="js/actividades-exportar.js"></script>
 <script src="js/actividades-pantalla.js"></script>
+<!-- Fila 344: las etiquetas. Después de js/repartir-filtro.js, js/personas-familias.js y js/pdf-herramientas.js. -->
+<script src="js/etiquetas-modelos.js"></script>
+<script src="js/etiquetas-datos.js"></script>
+<script src="js/etiquetas-disenos.js"></script>
+<script src="js/etiquetas-hoja.js"></script>
+<script src="js/etiquetas-pdf.js"></script>
+<script src="js/etiquetas-guardado.js"></script>
+<script src="js/etiquetas-editor.js"></script>
+<script src="js/etiquetas-pantalla.js"></script>
 <script src="js/actividades-ficha.js"></script>
 <script src="js/actividades-tabla.js"></script>   <!-- fila 311: la tabla de datos y el tipo del certificado -->
 <script src="js/informar-al-tutor.js"></script>   <!-- fila 299: «Informar al tutor/a» en la guía de las sanciones -->

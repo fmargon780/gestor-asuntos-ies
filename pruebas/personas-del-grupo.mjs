@@ -244,7 +244,7 @@ await pagina3.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina3.waitForSelector('.pg-tabla');
 await pagina3.waitForTimeout(500);
 await comprobar('7. la tabla se ve entera y sus cuatro botones están apagados',
-  pagina3.evaluate(() => [document.querySelectorAll('.pg-tabla tbody tr').length, ...[...document.querySelectorAll('.pg-botones button')].map((b) => b.disabled)]), [8, true, true, true, true]);
+  pagina3.evaluate(() => [document.querySelectorAll('.pg-tabla tbody tr').length, ...[...document.querySelectorAll('.pg-botones button:not(.pg-etiquetas)')].map((b) => b.disabled)]), [8, true, true, true, true]);   /* fila 344: «Imprimir etiquetas» no escribe nada y sigue encendido */
 await comprobar('7. mirar, filtrar y abrir siguen funcionando; «Quitar del grupo» apagado',
   (async () => {
     await pagina3.check('.pg-solo-falta');
