@@ -255,6 +255,7 @@ var PersonasDelGrupo = (function () {
           '<span class="pg-botones">' +
             '<button type="button" class="boton pg-generar"' + (propia ? '' : ' disabled') + '>Generar para todos ▾</button>' +
             '<button type="button" class="boton pg-anadir"' + (propia ? '' : ' disabled') + '>+ Añadir personas</button>' +
+            (window.EtiquetasPantalla ? '<button type="button" class="boton pg-etiquetas" data-solo-lectura>Imprimir etiquetas</button>' : '') +
             (envio === null ? '' : '<button type="button" class="boton boton-principal pg-enviar"' + (propia && envio ? '' : ' disabled') + '>' +
               (pendiente ? 'Seguir enviando' : 'Enviar…') + ' (' + envio + ')</button>' +
               '<button type="button" class="boton pg-aviso"' + (propia ? '' : ' disabled') + '>Enviar un aviso…</button>') +
@@ -279,6 +280,8 @@ var PersonasDelGrupo = (function () {
       var cambiado = await Relacionados.agregarVarios(a);
       if (cambiado && alCambiar) alCambiar();
     };
+    var bEtiquetas = caja.querySelector('.pg-etiquetas');
+    if (bEtiquetas) bEtiquetas.onclick = function () { EtiquetasPantalla.abrirDesdeGrupo(a, abierto ? 'abierto' : 'archivado'); };
     var bEnviar = caja.querySelector('.pg-enviar'), bAviso = caja.querySelector('.pg-aviso');
     if (bEnviar) bEnviar.onclick = function () { GrupoEnviarPantalla.abrir(a, { trabajo: trabajo, conRegistro: conRegistro }); };
     if (bAviso) bAviso.onclick = function () { GrupoAvisos.abrir(a, '', conRegistro); };

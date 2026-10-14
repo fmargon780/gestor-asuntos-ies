@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '344', fecha: '2026-10-14', texto: 'Nueva pantalla «Etiquetas» en Herramientas: eliges a quién (con el mismo filtro del reparto), la hoja de etiquetas por el código de la caja y qué lleva cada una (Sobre, Alumno, Profesor o un diseño tuyo). Marcas las ya gastadas y la imprimes o guardas en PDF. En un asunto de grupo hay un botón «Imprimir etiquetas».' },
   { id: '343', fecha: '2026-10-13', texto: 'Al repartir entre terceros un PDF con un informe por alumno, la app corta sola donde cambia el alumno (por su número escolar o su nombre) y asigna cada trozo, sin tener que relacionar antes a nadie. Quien no está en el alumnado se crea con los datos del informe.' },
   { id: '342', fecha: '2026-10-13', texto: 'Al repartir entre terceros hay un filtro del alumnado con varios criterios: el alumno asignado desaparece de las listas y abajo se ve cuántos documentos quedan sin alumno y cuántos alumnos del filtro sin documento.' },
   { id: '341', fecha: '2026-10-13', texto: 'Los cuadros largos ya no esconden sus botones: Aceptar, Cancelar y los demás se ven siempre abajo.' },

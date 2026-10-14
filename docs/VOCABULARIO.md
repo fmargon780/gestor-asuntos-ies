@@ -53,6 +53,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Las actividades de cursos anteriores y la pantalla con todas (fila 310) | **actividad antigua**, **«+ Apuntar una actividad antigua»**, **«+ Nueva actividad»**, la pantalla **«Actividades extraescolares»** de Herramientas | «histórico», «actividad pasada» |
 | El certificado de actividades extraescolares del profesorado (fila 311) | **Organización** / **Acompañante** (en el certificado y en la hoja de cálculo; en pantalla, «Organiza» / «Acompaña»), **Actividades desde**, **Actividades hasta**, el tipo **CERTIFICADO ACTIVIDADES EXTRAESCOLARES** | «participó como», «colaborador» |
 | Una plantilla que sigue en la lista pero ya no se ofrece al generar un documento ni al preparar un correo (fila 321) | **fuera de uso** («Dejar fuera de uso…», «Volver a activar», «Fuera de uso desde el 09/10/2026», «plantilla fuera de uso») | inhabilitada, desactivada, archivada |
+| Imprimir etiquetas (fila 344) | la pantalla **«Etiquetas»**, **«Imprimir etiquetas»**, **«Nuevo modelo»** (de hoja de etiquetas, no de plantilla), **«Ajustar márgenes»**, **«Hoja nueva»**, **«Copias por persona»**, **diseño** («Sobre», «Alumno», «Profesor»), casillas **gastadas** | hoja de pegatinas, plantilla de etiqueta |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

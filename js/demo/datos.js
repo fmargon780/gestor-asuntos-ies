@@ -76,17 +76,25 @@
       /* aspirante sin matricular: sin fila propia hasta que se dé de alta a mano */
       /* un alumno antiguo (ya no está matriculado este curso) */
       ['Moya Santana, Elena', '2099998', '4º de E.S.O.', '4º A', '20' + (parseInt(anoMatricula, 10) - 1), 'Baja', '02/02/2010', '600444888', 'tutor.elena@correo-demo.es']
-    ].map(function (fila, i) { return fila.concat([i === 0 ? 'Correo del alumno' : (ALUMNO_CON_CORREO[fila[1]] || '')]); })));
+    ].map(function (fila, i) { return fila.concat([i === 0 ? 'Correo del alumno' : (ALUMNO_CON_CORREO[fila[1]] || '')]); })
+    /* Fila 344 (etiquetas): la dirección de casa y, de los dos hermanos Aguilar, el nombre del tutor; Gallardo Reyes, Vera, sin dirección. */
+    .map(function (fila, i) {
+      if (i === 0) return fila.concat(['Domicilio', 'Código postal', 'Localidad', 'Provincia', 'Nombre Primer tutor', 'Primer apellido Primer tutor', 'Segundo apellido Primer tutor']);
+      var id = fila[1];
+      if (id === '2100008') return fila.concat(['', '', '', '', '', '', '']);
+      if (id === '2100001' || id === '2100002') return fila.concat(['Calle Mayor 4', '14900', 'Lucena', 'Córdoba', 'Rocío', 'Ponce', 'Duarte']);
+      return fila.concat(['Calle Demo ' + (parseInt(id.slice(-2), 10) || 1) + ', 1º', '14900', 'Lucena', 'Córdoba', '', '', '']);
+    })));
 
     /* RelPerCen: profesorado y PAS de este curso. */
     await Carpetas.escribirTexto(d, 'RelPerCen ' + curso + '.csv', csv([
-      ['Empleado/a', 'DNI/Pasaporte', 'Puesto', 'Fecha de toma de posesión', 'Fecha de cese', 'Teléfono', 'Correo'],
-      ['Otero Campos, Marta', '11223344A', 'Matemáticas P.E.S.', '01/09/2015', '', '650111222', 'motero@correo-demo.es'],
-      ['Reyes Palma, Fernando', '22334455B', 'Lengua P.E.S.', '01/09/2010', '', '650222333', 'freyes@correo-demo.es'],
-      ['Uceda Molina, Patricia', '33445566C', 'Jefatura de Estudios', '01/09/2020', '', '650333444', 'puceda@correo-demo.es'],
-      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es'],
+      ['Empleado/a', 'DNI/Pasaporte', 'Puesto', 'Fecha de toma de posesión', 'Fecha de cese', 'Teléfono', 'Correo', 'Especialidad'],
+      ['Otero Campos, Marta', '11223344A', 'Matemáticas P.E.S.', '01/09/2015', '', '650111222', 'motero@correo-demo.es', 'Matemáticas'],
+      ['Reyes Palma, Fernando', '22334455B', 'Lengua P.E.S.', '01/09/2010', '', '650222333', 'freyes@correo-demo.es', 'Lengua'],
+      ['Uceda Molina, Patricia', '33445566C', 'Jefatura de Estudios', '01/09/2020', '', '650333444', 'puceda@correo-demo.es', ''],
+      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es', ''],
       /* Fila 299: una tutora sin correo en su ficha (js/demo/datos-tutor.js). */
-      ['Cabello Ruiz, Esperanza', '77889900G', 'Inglés P.E.S.', '01/09/2018', '', '650555666', '']
+      ['Cabello Ruiz, Esperanza', '77889900G', 'Inglés P.E.S.', '01/09/2018', '', '650555666', '', 'Inglés']
     ]));
 
     /* empresas.csv: alta manual (CONTEXTO.md: Razón social · Nombre

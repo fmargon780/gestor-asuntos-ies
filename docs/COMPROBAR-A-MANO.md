@@ -277,3 +277,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 343 — repartir cortando por alumno (13-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Con el PDF real del Informe final de etapa de Primaria (CEIP Jorge Guillén, 896 páginas), en un asunto sin relacionados: «Repartir entre terceros» debe proponer 150 trozos, con las dos alumnas que tienen dos informes en dos trozos cada una (ámbar suave «Mismo alumno…»).
+
+## Fila 344 — etiquetas (14-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Imprime una hoja de etiquetas en papel normal (Herramientas → Etiquetas, tamaño real 100 %) y ponla a contraluz sobre una hoja de etiquetas de verdad: si no cuadra, «Ajustar márgenes» en ese modelo. Comprueba también que las direcciones del RegAlum real salen en «Sobre» (si faltan, dime los títulos de las columnas de la dirección).

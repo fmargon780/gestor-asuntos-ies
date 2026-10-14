@@ -5247,3 +5247,12 @@ Causa: el cuadro común (`.cuadro`) no tenía alto máximo, y los propios que lo
 Arreglo, una sola regla en `css/estilos.css` (`.capa > .cuadro`): alto máximo de la pantalla menos 40 px, título y pie fijos, solo `#cuadro-cuerpo` se desplaza; los botones que un cuadro pinta dentro del cuerpo (`.cuadro-botones` en `#cuadro-cuerpo`) quedan pegados abajo. Se quitó el `overflow: auto` del cuadro entero en `.cuadro-ancho`, `.cuadro-alto`, `.cuadro-medio`, `.cuadro-actividad` y `.cuadro-actividad-antigua`.
 
 Cuadros revisados (todos pasan por `#capa > .cuadro`, así que cumplen la regla común): común con `U.preguntar` (sin clase), ancho (visor de documentos, ficha del tercero, fichas huérfanas, mapa de guías, separar/unir, preparar documento, archivar, repartir), medio (guías, notas), alto (editar asunto, hitos desde el asunto), actividad y actividad antigua, campos, correo y Séneca, «Guardar en un asunto», «Añadir varios relacionados». Cambiados a la regla común: ancho, alto, medio, actividad y actividad antigua (quitado su `overflow` propio). Ya la cumplían a su manera y se dejan: correo/Séneca, «Guardar en un asunto», campos, «Añadir varios». Fuera de la regla, por no ser cuadros de `#capa`: las pantallas completas (Word, convertir en plantilla, enviar al grupo) y la lista flotante de «Insertar hueco» (su lista ya tiene alto máximo).
+
+## 14-oct-2026 — fila 344: imprimir etiquetas
+
+Nueva pantalla Herramientas → «Etiquetas» (y botón «Imprimir etiquetas» en los asuntos de grupo): a quién (el filtro
+del reparto, `RepartirFiltro`, sin tocarlo; en Personal, clase y departamento; «Pegar una lista»), la hoja de etiquetas,
+el diseño (Sobre, Alumno, Profesor o propio), copias, hoja empezada y PDF a tamaño real. Los modelos de hoja traen las
+medidas de la lista de plantillas de LibreOffice (labels.xml, Avery A4); no se encontraron medidas fiables de los
+códigos de Apli, salvo la equivalencia 02416 = L7164, así que solo ese lleva código de Apli. La copia de pruebas ganó
+direcciones, dos hermanos con tutora común y una alumna sin dirección. Detalle: `docs/contexto/ETIQUETAS.md`.

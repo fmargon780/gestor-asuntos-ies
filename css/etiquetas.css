@@ -1,0 +1,39 @@
+/* Etiquetas (fila 344, js/etiquetas-pantalla.js): el panel a la izquierda, las hojas a la derecha y el pie fijo. */
+.et-cuerpo { display: flex; gap: 16px; align-items: flex-start; margin-top: 8px; }
+.et-panel { flex: 0 0 380px; max-width: 100%; max-height: calc(100vh - 210px); overflow: auto; padding-right: 6px; }
+.et-vista { flex: 1; min-width: 0; max-height: calc(100vh - 210px); overflow: auto; background: #e9e9ec; padding: 10px; border: 1px solid var(--linea); }
+.et-seccion { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--linea); }
+.et-seccion h4, .et-editor h4 { margin: 0 0 6px; }
+.et-pestanas { display: flex; gap: 6px; margin-bottom: 8px; }
+.et-pestana.et-activa { background: var(--principal, #2a6df4); color: #fff; }
+.et-fila { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin: 6px 0; }
+.et-fila .etiqueta { display: flex; flex-direction: column; gap: 3px; }
+.et-fila-margenes .campo { width: 110px; }
+.et-botones { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.et-resumen { font-weight: 700; margin: 8px 0; }
+.et-copias { width: 80px; }
+.et-lista ul { max-height: 220px; overflow: auto; margin: 6px 0; padding-left: 0; list-style: none; }
+.et-lista li { display: flex; justify-content: space-between; gap: 6px; padding: 2px 0; border-bottom: 1px solid var(--linea); }
+.et-renglones-ver { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+.et-renglon { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; padding: 6px; border: 1px solid var(--linea); }
+.et-renglon-n { font-weight: 700; width: 18px; }
+.et-casilla-texto { display: inline-flex; gap: 5px; align-items: center; }
+.et-hoja-caja { margin: 0 auto 16px; width: fit-content; }
+.et-hoja-numero { font-size: 12px; margin-bottom: 3px; color: #555; }
+.et-hoja { position: relative; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); overflow: hidden; }
+.et-casilla { position: absolute; box-sizing: border-box; border: 1px dashed #b9b9c4; overflow: hidden; cursor: pointer; font-family: Helvetica, Arial, sans-serif; color: #000; }
+.et-casilla.et-libre { border-color: #e1e1e8; }
+.et-casilla:hover { outline: 2px solid var(--principal, #2a6df4); outline-offset: -2px; }
+.et-gastada { background: repeating-linear-gradient(45deg, #ddd, #ddd 4px, #f2f2f2 4px, #f2f2f2 8px); }
+.et-lineas { position: absolute; left: 0; right: 0; box-sizing: border-box; }
+.et-linea { white-space: nowrap; overflow: hidden; line-height: 1.2; }
+.et-sin-direccion { background: #fff6d6; }
+.et-corta { background: #ffe9d6; }
+.et-aviso { position: absolute; right: 2px; bottom: 1px; font: 700 9px Helvetica, Arial, sans-serif; color: #9a6a00; background: #fff3c4; padding: 0 3px; }
+.et-aviso-corto { bottom: 12px; }
+.et-pie { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 10px 12px; margin-top: 8px; background: var(--papel, #fff); border-top: 2px solid var(--linea); z-index: 3; }
+.et-pie-cuenta { font-weight: 700; }
+.et-aviso-pie { color: #9a6a00; font-weight: 700; font-size: 13px; }
+.et-pie-botones { display: flex; gap: 8px; margin-left: auto; }
+.et-pie-nota { flex-basis: 100%; font-size: 12px; color: #555; }
+@media (max-width: 900px) { .et-cuerpo { flex-direction: column; } .et-panel { flex: none; max-height: none; width: 100%; } .et-vista { max-height: none; width: 100%; } }
