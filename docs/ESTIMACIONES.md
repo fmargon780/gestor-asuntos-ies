@@ -13,3 +13,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 335 | 60 | Revisión y informe, sin código ni publicación |
+| 344 | 180 | Pantalla nueva de etiquetas: modelos, diseños, familias, hoja empezada y PDF |
