@@ -1,31 +1,31 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
-      "Bash(git *)",
-      "Bash(npm *)",
-      "Bash(node *)",
-      "Bash(npx *)",
-      "Bash(curl *)",
-      "Bash(TZ=*)",
-      "Bash(ls *)",
-      "Bash(cat *)",
-      "Bash(grep *)",
-      "Bash(mkdir *)",
+      "Bash",
       "Read",
       "Edit",
       "Write",
       "Glob",
       "Grep",
       "Agent",
-      "WebFetch(domain:pruebas.fmargon.com)",
-      "WebFetch(domain:asuntos.fmargon.com)",
-      "WebFetch(domain:*.vercel.app)",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
       "mcp__github__*",
       "mcp__GitHub__*",
       "mcp__vercel__*",
-      "mcp__Vercel__*"
+      "mcp__Vercel__*",
+      "mcp__supabase__*",
+      "mcp__Supabase__*"
     ],
-    "deny": []
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(rm -rf / *)",
+      "Bash(rm -rf ~ *)",
+      "Bash(sudo rm *)"
+    ]
   },
   "hooks": {
     "Notification": [
