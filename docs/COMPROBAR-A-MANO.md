@@ -281,3 +281,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 344 — etiquetas (14-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Imprime una hoja de etiquetas en papel normal (Herramientas → Etiquetas, tamaño real 100 %) y ponla a contraluz sobre una hoja de etiquetas de verdad: si no cuadra, «Ajustar márgenes» en ese modelo. Comprueba también que las direcciones del RegAlum real salen en «Sobre» (si faltan, dime los títulos de las columnas de la dirección).
+
+## Fila 349 — comprimir PDF y pasar a A4 (15-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Con un PDF real que llegó enorme al centro: guárdalo en un asunto (se pasa a A4), súbelo a Séneca y mira que el sello sale a su tamaño normal. Y con un PDF que llegue por la bandeja de Gmail, que salga la casilla «Pasarlas a A4» si sus hojas son grandes.
