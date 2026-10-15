@@ -5,12 +5,11 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 15-oct-2026 17:02 (sin filas en curso)
+Última puesta al día: 15-oct-2026 18:10 (sin filas en curso)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 350 | 150 | Buscador en Etiquetas, alineación vertical en vista previa y PDF, caja con sugerencias y lista con casillas en el filtro común (cuatro sitios), prueba nueva |
 | 335 | 60 | Revisión y informe, sin código ni publicación |
