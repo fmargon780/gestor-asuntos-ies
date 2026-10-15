@@ -136,6 +136,8 @@
         }
       } catch (eRes) { U.fallo('No he podido reservar el número del documento', eRes); return; }
     }
+    /* Fila 349: un PDF que entra en la carpeta, con hojas pasadas a A4 y/o comprimido. */
+    var pdfNuevo = N.pdfPreparar ? await N.pdfPreparar(opciones) : { bytes: null, aviso: '', clase: '' };
     try {
       var yaEsta = await Carpetas.ficheros(N.asuntoActual.handle);
       var repetido = yaEsta.some(function (f) {
@@ -146,7 +148,8 @@
         return;
       }
       if (opciones.modo === 'anadir') {
-        await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
+        if (pdfNuevo.bytes) await Carpetas.escribirBytes(N.asuntoActual.handle, nombre, pdfNuevo.bytes, 'application/pdf');
+        else await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
         U.aviso(avisoNumero || 'Documento guardado en la carpeta.', 'bueno');
       } else if (nombre === opciones.nombreActual) {
         /* Fila 239: con la estructura fija, cambiar el registro, los campos o
@@ -156,6 +159,10 @@
         await Carpetas.renombrarFichero(N.asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Nombre del documento cambiado.', 'bueno');
       }
+      if (pdfNuevo.bytes && opciones.modo !== 'anadir') {
+        await Carpetas.escribirBytes(N.asuntoActual.handle, nombre, pdfNuevo.bytes, 'application/pdf');
+      }
+      if (pdfNuevo.aviso) U.aviso(pdfNuevo.aviso, pdfNuevo.clase);
     } catch (e) {
       U.fallo('No he podido guardarlo', e);
       return;

@@ -207,6 +207,7 @@
         '</div>' +
       '</div>' +
 
+      (N.pdfMarcador ? N.pdfMarcador() : '') +   /* fila 349: hojas grandes / firma electrónica */
       '<label class="etiqueta">Tipo de documento</label>' +
       '<select id="doc-tipo" class="campo">' + opcionesDeTipo(tipoInicial) + '</select>' +
       '<div id="doc-campos-tipo"></div>' +
@@ -297,6 +298,9 @@
       var ampliado = partido.classList.toggle('solo-visor');
       $('doc-ampliar').textContent = ampliado ? 'Volver a los campos' : 'Ver más grande';
     };
+
+    /* Fila 349: mira si el PDF trae hojas grandes o firma electrónica. */
+    if (N.pdfEnganchar) N.pdfEnganchar(opciones, fichero);
 
     /* Fila 347: después del repaso de arriba, que pone su `oninput` a todos los campos del cuadro. */
     if (window.Candidaturas) Candidaturas.enganchar(opciones, N.asuntoActual);

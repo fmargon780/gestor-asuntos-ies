@@ -12,6 +12,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 349 | 120 | Compresión de PDF con calidad mínima, casilla de tamaño en el cuadro de nombre, opción en «Ajustar tamaño», detectar firma, prueba nueva |
 | 350 | 150 | Buscador en Etiquetas, alineación vertical en vista previa y PDF, caja con sugerencias y lista con casillas en el filtro común (cuatro sitios), prueba nueva |
 | 335 | 60 | Revisión y informe, sin código ni publicación |

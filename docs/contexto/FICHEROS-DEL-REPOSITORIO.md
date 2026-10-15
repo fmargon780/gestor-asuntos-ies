@@ -180,6 +180,9 @@ de `App` va después del fichero que lo define.
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
 | `js/pdf-margenes.js` | La cuenta y el PDF nuevo de "Ajustar tamaño" (llamado "Preparar el documento" hasta la fila 58): solo bytes, sin disco ni DOM (18-sep-2026, fila 57) |
 | `js/preparar-documento.js` | El cuadro de "Ajustar tamaño": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57; el nombre del botón cambió en la fila 58) |
+| `js/pdf-comprimir.js` | Comprimir un PDF a 5 MB (vuelve a codificar las imágenes de las páginas, de menos a más agresivo, mínimo 150 ppp y JPEG 0,6) y pasar sus hojas a A4 / A3 / A5 / Carta / Oficio: solo bytes, sin disco ni pantalla (15-oct-2026, fila 349, docs/PDF-COMPRIMIR-Y-PASAR-A-A4.md) |
+| `js/documentos-pdf.js` | Lo que el cuadro de ponerle nombre hace con un PDF que entra: la casilla «Pasarlas a A4», la línea ámbar de la firma electrónica y, al guardar, pasar a A4 y comprimir con su aviso (fila 349) |
+| `pruebas/pdf-comprimir-a4.mjs` | Fila 349, con Chromium real: las cuentas con bytes, el cuadro de nombre (casilla, A3, firma, escaneo grande, incomprimible, 1 MB) y «Ajustar tamaño» |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/varios-cuadro.js` | La forma del cuadro de «señalar varios» (`VariosCuadro`, fila 338): ✕ arriba, pie fijo con lo señalado, «Cancelar» y el botón principal, y la pregunta «¿Descartar los N señalados?» |
 | `js/repartir-nucleo.js` | Repartir entre terceros, las cuentas sin disco ni pantalla (`RepartirNucleo`, fila 141): trozos, +1/−1, asignar por orden y comparar nombres |

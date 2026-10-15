@@ -517,6 +517,25 @@ tamaño distinto y una tercera girada 90°, comprobando que su tamaño crudo y s
 que una página sin sitio no escribe nada, y `pareceFirmado`. La parte de pantalla
 (`js/preparar-documento.js`) no tiene prueba de navegador propia todavía.
 
+### Comprimir a 5 MB y pasar las hojas a A4 (15-oct-2026, fila 349, `docs/PDF-COMPRIMIR-Y-PASAR-A-A4.md`)
+
+- **`js/pdf-comprimir.js`** (`window.PdfComprimir`): solo bytes. `comprimir(bytes)` abre el PDF con pdf-lib y, por pasos
+  (primero solo reescribir; luego 300/250/200/175/150 ppp con JPEG 0,8 a 0,6), vuelve a codificar con un lienzo las imágenes
+  de las páginas (JPEG, y las Flate RGB/gris de 8 bits sin predictor; sin tocar máscaras, CMYK ni imágenes de menos de 250 000
+  píxeles) y para en el primer intento que baje de 5 MB (5 × 1024 × 1024). Si ninguno baja, `logrado: false` y quien llama
+  guarda el original. `pasarATamano(bytes, 'A4')` pasa cada hoja mayor que el tamaño elegido (con su orientación, contenido
+  encogido y centrado, el giro respetado; una hoja que ya cabe se copia igual). `esMasGrandeQueA4`: más de un 10 % sobre
+  210 × 297 mm en el lado corto o en el largo.
+- **`js/documentos-pdf.js`**: en el cuadro de ponerle nombre, solo cuando el documento entra en la carpeta (modo `anadir` o
+  `ponerNombre`; cambiar el nombre a uno ya guardado no lo toca). `N.pdfEnganchar` lee el PDF al pintar el formulario
+  (`opciones.pdfListo`) y pinta en `#doc-pdf` la casilla `#doc-pdf-a4` + `#doc-pdf-tamano`, o las líneas ámbar si lleva firma
+  (`PdfMargenes.pareceFirmado`). `N.pdfPreparar` (en `guardar`, antes de escribir) devuelve los bytes nuevos y el aviso: verde
+  «Hojas pasadas a A4. Comprimido de 12,3 MB a 4,8 MB.», ámbar si no baja de 5 MB («se guarda como está»); nunca error rojo.
+  Un PDF con firma no cambia ni un byte. El PDF sellado que devuelve un registro no pasa por aquí.
+- **«Ajustar tamaño»** (`js/preparar-documento.js`): casilla «Pasar las hojas a [tamaño]», marcada si las hojas son grandes,
+  apagada con firma; primero pasa las hojas y después, si hacía falta, el hueco.
+- Se comprueba con `pruebas/pdf-comprimir-a4.mjs` (Chromium real).
+
 ### El impreso, con los datos del centro ya puestos (20-sep-2026, fila 84,
 docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md)
 

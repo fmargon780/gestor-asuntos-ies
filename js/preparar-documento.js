@@ -153,7 +153,11 @@ var PrepararDocumento = (function () {
     var libre;
     try { libre = await todoLibre(pdfDoc, huecoArribaCm(), huecoAbajoCm()); }
     catch (e) { U.aviso('No he podido mirar el documento: ' + U.mensajeDeError(e), 'malo'); return; }
-    if (libre) {
+    /* Fila 349: pasar las hojas a un tamaño (misma cuenta que al guardar un PDF nuevo). */
+    var firmado = PdfMargenes.pareceFirmado(bytes);
+    var hojasGrandes = false;
+    try { hojasGrandes = await PdfComprimir.hayHojasGrandes(bytes); } catch (eH) { hojasGrandes = false; }
+    if (libre && !(hojasGrandes && !firmado)) {
       U.aviso('Este documento ya tiene sitio para el sello y para la firma. No he tocado nada.', 'bueno');
       return;
     }
@@ -175,7 +179,15 @@ var PrepararDocumento = (function () {
       '<label class="interruptor interruptor-fila">' +
         '<input type="checkbox" id="preparar-check-firma"' + (estado.llevaFirma ? ' checked' : '') + '>' +
         '<span>Hueco para la firma</span>' +
-      '</label>';
+      '</label>' +
+      '<label class="interruptor interruptor-fila">' +
+        '<input type="checkbox" id="preparar-check-tamano"' + (hojasGrandes && !firmado ? ' checked' : '') + (firmado ? ' disabled' : '') + '>' +
+        '<span>Pasar las hojas a ' +
+          '<select id="preparar-tamano" class="campo" style="width:auto;display:inline-block"' + (firmado ? ' disabled' : '') + '>' +
+            PdfComprimir.NOMBRES.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('') +
+          '</select></span>' +
+      '</label>' +
+      (firmado ? '<p class="campo-aviso-ambar" id="preparar-tamano-firmado">Lleva firma electrónica: no se pueden cambiar las hojas.</p>' : '');
 
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
@@ -183,8 +195,14 @@ var PrepararDocumento = (function () {
 
     var escalaPrevia = await renderizarEnCanvas(primera, $('preparar-canvas'), 500);
 
+    function tamanoElegido() {
+      var m = $('preparar-check-tamano');
+      return (m && m.checked && !m.disabled) ? $('preparar-tamano').value : '';
+    }
     function refrescar() {
-      var encaje = PdfMargenes.calcularEncaje(visibleBase.width, visibleBase.height,
+      var base = { ancho: visibleBase.width, alto: visibleBase.height };
+      if (tamanoElegido()) base = PdfComprimir.tamanoDestino(base.ancho, base.alto, tamanoElegido());
+      var encaje = PdfMargenes.calcularEncaje(base.ancho, base.alto,
         huecoArribaCm() * PdfMargenes.CM_EN_PT, huecoAbajoCm() * PdfMargenes.CM_EN_PT);
       $('preparar-resumen').textContent = textoResumen(encaje, huecoArribaCm(), huecoAbajoCm(), pdfDoc.numPages);
 
@@ -201,28 +219,37 @@ var PrepararDocumento = (function () {
 
     $('preparar-check-sello').onchange = function () { estado.llevaSello = this.checked; refrescar(); };
     $('preparar-check-firma').onchange = function () { estado.llevaFirma = this.checked; refrescar(); };
+    $('preparar-check-tamano').onchange = refrescar;
+    $('preparar-tamano').onchange = refrescar;
 
     var ok = await promesa;
+    var tamano = tamanoElegido();
     cuadro.classList.remove('cuadro-ancho');
     if (!ok) return;
 
-    var nuevoBytes;
-    try { nuevoBytes = await PdfMargenes.conHueco(bytes, huecoArribaCm(), huecoAbajoCm()); }
-    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
+    var nuevoBytes = bytes, hojasCambiadas = 0;
+    try {
+      if (tamano) {
+        var pasado = await PdfComprimir.pasarATamano(nuevoBytes, tamano);
+        nuevoBytes = pasado.bytes; hojasCambiadas = pasado.hojasCambiadas;
+      }
+      if (!libre) nuevoBytes = await PdfMargenes.conHueco(nuevoBytes, huecoArribaCm(), huecoAbajoCm());
+    } catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
+    if (nuevoBytes === bytes) { U.aviso('No he tocado nada: ya estaba como se pedía.', 'bueno'); return; }
 
-    await guardar(contexto, nuevoBytes);
+    await guardar(contexto, nuevoBytes, hojasCambiadas ? 'Documento preparado. Hojas pasadas a ' + tamano + '.' : '');
   }
 
   /* ---------- guardar: primero a la papelera, luego el nuevo con el mismo nombre ---------- */
 
-  async function guardar(contexto, bytes) {
+  async function guardar(contexto, bytes, mensaje) {
     try {
       if (window.Papelera) {
         if (contexto.modo === 'asunto') await Papelera.mandarDocumentoDeAsunto(contexto.asunto, contexto.nombre);
         else await Papelera.mandarSuelto({ nombre: contexto.nombre });
       }
       await Carpetas.escribirBytes(contexto.dir, contexto.nombre, bytes, 'application/pdf');
-      U.aviso('Documento preparado.', 'bueno');
+      U.aviso(mensaje || 'Documento preparado.', 'bueno');
       if (contexto.alTerminar) contexto.alTerminar();
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
