@@ -229,7 +229,8 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
-  (sello y firma) y Repartir entre terceros, en la barra del visor.
+  (sello, firma y pasar las hojas a A4) y Repartir entre terceros, en la barra del visor. Un PDF que entra
+  se comprime solo si pasa de 5 MB y trae «Pasarlas a A4» si sus hojas son grandes; con firma no se toca.
 - "Quién lo pide y por qué vía": un único cuadro, tanto en Nuevo asunto como en "El encargo" de la ficha; su
   correo sale en el cuadro de Correo. El contacto apuntado (`LoPide.contactoDe`: gana lo escrito a mano a lo del fichero)
   se ve junto a «Lo pide: …» en la cabecera del asunto y del hito, con botón de copiar (`js/contacto-a-la-vista.js`, fila 305).

@@ -252,6 +252,7 @@
         '</div>' +
       '</div>' +
 
+      '<div id="doc-pdf-ajuste"></div>' +   /* fila 349: hojas grandes / firma electrónica */
       '<div class="vista-previa">' +
         '<div class="vista-rotulo">Se guardará así</div>' +
         '<div id="doc-vista" class="vista-nombre"></div>' +
@@ -305,6 +306,8 @@
     $('doc-guardar').onclick = function () {
       return U.mientrasGuarda($('doc-guardar'), function () { return N.guardar(opciones); });
     };
+    /* Fila 349: un PDF que entra, con hojas grandes o de más de 5 MB. */
+    if (window.DocumentosPdf) DocumentosPdf.pintar(opciones, fichero);
     N.refrescar();
   }
 

@@ -82,6 +82,10 @@ const RETIRADAS = [
     motivo: 'falla igual en main sin la fila 306, también en solitario (la lista de Inicio no vuelve a la misma altura tras repintar)' },
   { fichero: 'conflictos-que-cambia.mjs', desde: '8-oct-2026',
     motivo: 'falla igual en main sin la fila 303, también en solitario (no sale de qué ordenador es la otra versión)' },
+  { fichero: 'actividades-aviso.mjs', desde: '15-oct-2026',
+    motivo: 'falla igual en main sin la fila 349, también en solitario (el aviso de Actividades no ofrece «Ir a Grupos de personas»)' },
+  { fichero: 'centro-de-datos.mjs', desde: '15-oct-2026',
+    motivo: 'falla igual en main sin la fila 349, también en solitario' },
 ];
 
 {

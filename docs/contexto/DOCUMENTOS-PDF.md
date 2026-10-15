@@ -622,3 +622,20 @@ Si el asunto ya tiene en `repartos` el reparto de otro documento (`RepartirCrear
 **Filtrar el alumnado al repartir** (fila 342, `js/repartir-filtro.js`, `RepartirFiltro`). Los dos cuadros de repartir llevan una zona plegable «Filtrar el alumnado» con los criterios de «Por datos del alumnado» (`AlumnadoBDVer.filtrar`) y los atajos de unidad, nivel y enseñanza (`Relacionados.filtrarPor…`); un alumno entra si cumple todos, y sin criterios todo funciona como antes. Con filtro: el desplegable de cada trozo o fichero ofrece solo a los del filtro sin documento (el asignado sale de las demás listas); no se rellena nada por orden; lo que la app lee se asigna solo si el alumno está en el filtro y libre (si no, ámbar «Está fuera del filtro» o «Ya tiene documento» con «Asignarlo igualmente»); lo asignado fuera del filtro lleva «Fuera del filtro». Cambiar el filtro no quita asignaciones. Abajo, la línea «Documentos sin alumno: N · Alumnos del filtro sin documento: N» (pulsables). Con el filtro usado, al repartir quedan relacionados con el asunto de origen solo los que reciben documento (`deFuera` se calcula al confirmar).
 
 **El mismo filtro en «Añadir varios relacionados» y «Exportar la lista ▾»** (fila 345, `js/relacionados.js`, `js/filtro-exportar.js`). `pintarAtajosDeAlumnado` ya no pinta los atajos que señalaban al elegir ni «Por datos del alumnado» (`AlumnadoBDVer.pintarGrupo` queda sin uso): pinta `RepartirFiltro.html(f)` con `crear(fuente, [], { abierto: true, alSenalar })`, que añade «Señalar los N» (nadie se señala hasta pulsarlo; lo ya señalado no se quita al cambiar el filtro). `alSenalar` del cuadro recibe el tipo del criterio si es uno solo de unidad/nivel/enseñanza (el nombre del grupo sale como antes) y `'lista'` si hay varios. Dentro de la zona (así sale en relacionados, repartir y Etiquetas alumnado) y en el filtro de personal de Etiquetas, `FiltroExportar.botonHTML` pinta «Exportar la lista ▾» (apagado sin criterios o sin nadie): Excel con `ExportarHoja.libro` (una hoja, títulos en negrita y fijos) y PDF con `ExportarInforme.abrir` (visor de siempre; `datos.palabra` y `tabla.textoTotal` cambian «asuntos» por «alumnos»). Columnas fijas: alumnado Apellidos y nombre · Nº escolar · Unidad · un dato por criterio; personal Apellidos y nombre · Puesto · un dato por criterio. Fichero `AAMMDD Lista filtrada.xlsx/.pdf`. El visor sube a `z-index: 60` para abrirse sobre los cuadros. Prueba: `pruebas/filtro-anadir-varios-y-exportar.mjs`.
+
+- **Pasar las hojas a otro tamaño y comprimir (fila 349, 15-oct-2026, `docs/PDF-COMPRIMIR-Y-PASAR-A-A4.md`).**
+  `PdfMargenes.hojasGrandes(bytes)` (alguna hoja más de un 10 % por encima de 210 × 297 mm, en
+  cualquier orientación) y `PdfMargenes.pasarATamano(bytes, 'A4'|'A3'|'A5'|'Carta'|'Oficio')`: cada hoja
+  pasa al tamaño elegido con su misma orientación, contenido encogido y centrado, nunca se agranda una
+  hoja que ya cabe; con `/Rotate` usa `posicionCruda(..., contenidoAncho, contenidoAlto)` (los dos últimos
+  parámetros son nuevos). `js/pdf-comprimir.js` (`PdfComprimir.comprimir(bytes)`): si pesa más de 5 MB
+  reescribe el PDF y después recodifica sus imágenes JPEG (DCTDecode) por una escalera de 300 ppp / 0,8 a
+  150 ppp / 0,6, parando en la primera que baja de 5 MB; solo se reemplaza una imagen si la nueva pesa
+  menos; las que no son JPEG no se tocan. La resolución sale del ancho de la página que usa la imagen
+  (cuenta por lo bajo). Si no baja, se queda el original y avisa en ámbar. `js/documentos-pdf-ajuste.js`
+  (`DocumentosPdf`): en el cuadro de ponerle nombre (solo `modo: 'anadir'` o `ponerNombre`, es decir lo que
+  entra: fichero nuevo, adjuntos de la bandeja, «Ver todo»; no «Cambiar el nombre» de un documento de
+  siempre) pinta la casilla, y al guardar (`js/documentos-guardar.js`) escribe el PDF tratado con
+  `Carpetas.escribirBytes`. Un PDF con firma (`pareceFirmado`) no se toca. «Ajustar tamaño»
+  (`js/preparar-documento.js`) tiene la misma opción «Pasar las hojas a [A4]», apagada con uno firmado.
+  Pruebas: `pruebas/pdf-comprimir.mjs` (bytes) y `pruebas/pdf-comprimir-pantalla.mjs` (navegador).

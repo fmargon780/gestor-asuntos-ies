@@ -93,12 +93,19 @@ var PdfMargenes = (function () {
      `calcularEncaje` a la posición cruda donde hay que dibujar el
      contenido, según el giro de la página (ver la explicación de
      arriba del fichero). `anchoCrudo`/`altoCrudo` son los de la
-     página SIN girar (los que devuelve `getSize()`). */
-  function posicionCruda(angulo, anchoCrudo, altoCrudo, encaje) {
+     página SIN girar (los que devuelve `getSize()`).
+
+     Fila 349: `contenidoAncho`/`contenidoAlto` (opcionales) son el
+     tamaño crudo del contenido que se dibuja, cuando la hoja nueva no
+     mide lo mismo que la original (pasar a otro tamaño). Sin ellos, el
+     contenido y la hoja miden igual, como en `conHueco`. */
+  function posicionCruda(angulo, anchoCrudo, altoCrudo, encaje, contenidoAncho, contenidoAlto) {
     var s = encaje.escala, X = encaje.x, Y = encaje.y;
-    if (angulo === 90) return { x: anchoCrudo * (1 - s) - Y, y: X };
-    if (angulo === 270) return { x: Y, y: altoCrudo * (1 - s) - X };
-    if (angulo === 180) return { x: anchoCrudo * (1 - s) - X, y: altoCrudo * (1 - s) - Y };
+    var cw = (contenidoAncho === undefined ? anchoCrudo : contenidoAncho) * s;
+    var ch = (contenidoAlto === undefined ? altoCrudo : contenidoAlto) * s;
+    if (angulo === 90) return { x: anchoCrudo - cw - Y, y: X };
+    if (angulo === 270) return { x: Y, y: altoCrudo - ch - X };
+    if (angulo === 180) return { x: anchoCrudo - cw - X, y: altoCrudo - ch - Y };
     return { x: X, y: Y };
   }
 
@@ -140,6 +147,92 @@ var PdfMargenes = (function () {
     return nuevo.save();
   }
 
+
+  /* ---------- Pasar las hojas a otro tamaño (fila 349, docs/PDF-COMPRIMIR-Y-PASAR-A-A4.md) ----------
+
+     Medidas en milímetros: lado corto y lado largo. */
+  var TAMANOS = {
+    A4: { nombre: 'A4', corto: 210, largo: 297 },
+    A3: { nombre: 'A3', corto: 297, largo: 420 },
+    A5: { nombre: 'A5', corto: 148, largo: 210 },
+    Carta: { nombre: 'Carta', corto: 215.9, largo: 279.4 },
+    Oficio: { nombre: 'Oficio', corto: 215.9, largo: 330.2 }
+  };
+  var ORDEN_TAMANOS = ['A4', 'A3', 'A5', 'Carta', 'Oficio'];
+  var MM_EN_PT = 72 / 25.4;
+  var MARGEN_GRANDE = 1.1;   /* "más de un 10 % por encima de un A4" */
+
+  /* ¿Esta hoja (ancho y alto visibles, en puntos) es claramente más
+     grande que un A4, en cualquier orientación? */
+  function esHojaGrande(ancho, alto) {
+    var corto = Math.min(ancho, alto) / MM_EN_PT;
+    var largo = Math.max(ancho, alto) / MM_EN_PT;
+    return corto > TAMANOS.A4.corto * MARGEN_GRANDE || largo > TAMANOS.A4.largo * MARGEN_GRANDE;
+  }
+
+  /* El tamaño de destino de una hoja, en puntos, con su misma
+     orientación (una hoja apaisada queda apaisada). */
+  function destinoDeHoja(ancho, alto, tamano) {
+    var t = TAMANOS[tamano] || TAMANOS.A4;
+    var corto = t.corto * MM_EN_PT, largo = t.largo * MM_EN_PT;
+    return ancho > alto ? { ancho: largo, alto: corto } : { ancho: corto, alto: largo };
+  }
+
+  /* ¿La hoja ya cabe entera en ese tamaño? (entonces no se toca: nunca se agranda) */
+  function cabeEnTamano(ancho, alto, tamano) {
+    var d = destinoDeHoja(ancho, alto, tamano);
+    return ancho <= d.ancho + 0.5 && alto <= d.alto + 0.5;
+  }
+
+  /* Mira las hojas de un PDF y dice si alguna es claramente más grande
+     que un A4. Solo lee: no escribe nada. */
+  async function hojasGrandes(bytes) {
+    var PDFLib = await PdfHerramientas.cargarPdfLib();
+    var doc = await abrir(PDFLib, bytes);
+    var paginas = doc.getPages();
+    var grandes = 0;
+    paginas.forEach(function (p) {
+      var v = tamanoVisible(p);
+      if (esHojaGrande(v.ancho, v.alto)) grandes++;
+    });
+    return { grandes: grandes > 0, cuantas: grandes, total: paginas.length };
+  }
+
+  /* El PDF nuevo con cada hoja pasada a `tamano` ('A4', 'A3'…): el
+     contenido se encoge en proporción y queda centrado; la orientación
+     se conserva; una hoja que ya cabe no se toca. Las mismas cuentas
+     para el cuadro de nombre y para «Ajustar tamaño» del visor. */
+  async function pasarATamano(bytes, tamano) {
+    var PDFLib = await PdfHerramientas.cargarPdfLib();
+    var origen = await abrir(PDFLib, bytes);
+    var nuevo = await PDFLib.PDFDocument.create();
+    var paginas = origen.getPages();
+    for (var i = 0; i < paginas.length; i++) {
+      var pagina = paginas[i];
+      var v = tamanoVisible(pagina);
+      if (cabeEnTamano(v.ancho, v.alto, tamano)) {
+        var copiada = (await nuevo.copyPages(origen, [i]))[0];
+        nuevo.addPage(copiada);
+        continue;
+      }
+      var d = destinoDeHoja(v.ancho, v.alto, tamano);
+      var escala = Math.min(d.ancho / v.ancho, d.alto / v.alto);
+      var encaje = {
+        escala: escala,
+        x: (d.ancho - v.ancho * escala) / 2,
+        y: (d.alto - v.alto * escala) / 2
+      };
+      var crudoAncho = (v.angulo === 90 || v.angulo === 270) ? d.alto : d.ancho;
+      var crudoAlto = (v.angulo === 90 || v.angulo === 270) ? d.ancho : d.alto;
+      var hoja = nuevo.addPage([crudoAncho, crudoAlto]);
+      if (v.angulo) hoja.setRotation(PDFLib.degrees(v.angulo));
+      var embebida = await nuevo.embedPage(pagina);
+      var pos = posicionCruda(v.angulo, crudoAncho, crudoAlto, encaje, v.anchoCrudo, v.altoCrudo);
+      hoja.drawPage(embebida, { x: pos.x, y: pos.y, xScale: escala, yScale: escala });
+    }
+    return nuevo.save();
+  }
+
   /* Si el PDF ya trae una firma digital: buscando en los propios bytes
      las marcas /ByteRange y /Type /Sig (con o sin espacio), sin
      necesidad de interpretar la estructura entera del fichero. */
@@ -157,6 +250,14 @@ var PdfMargenes = (function () {
     calcularEncaje: calcularEncaje,
     conHueco: conHueco,
     pareceFirmado: pareceFirmado,
+    posicionCruda: posicionCruda,
+    TAMANOS: TAMANOS,
+    ORDEN_TAMANOS: ORDEN_TAMANOS,
+    esHojaGrande: esHojaGrande,
+    destinoDeHoja: destinoDeHoja,
+    cabeEnTamano: cabeEnTamano,
+    hojasGrandes: hojasGrandes,
+    pasarATamano: pasarATamano,
     CM_EN_PT: CM_EN_PT
   };
 })();

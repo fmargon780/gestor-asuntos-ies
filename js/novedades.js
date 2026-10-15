@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '349', fecha: '2026-10-15', texto: 'Al guardar un PDF, si pesa más de 5 MB la app lo comprime sola (con aviso del antes y el después), y si sus hojas son más grandes que un A4 trae marcada la casilla «Pasarlas a A4» (con otros tamaños). «Ajustar tamaño» del visor también pasa las hojas a A4. Un PDF con firma electrónica no se toca.' },
   { id: '348', fecha: '2026-10-15', texto: 'En el correo, junto a «Para» y «Copia oculta» sale «+ Tutor/a de 1º ESO G» para añadir el correo del tutor o tutora del alumnado (en un grupo, «+ Tutores (3 grupos)»). Cada plantilla de correo dice ahora a quién va («Va a:») y «Para» se rellena solo con eso.' },
   { id: '347', fecha: '2026-10-15', texto: 'Elecciones al Consejo Escolar: en el asunto de las elecciones, al guardar una solicitud la app pregunta de quién es la candidatura y la apunta en una tarjeta «Candidaturas», por sectores y con su estado. Desde ahí se saca la lista provisional o definitiva en PDF para el tablón.' },
   { id: '346', fecha: '2026-10-15', texto: 'Etiquetas: cada hoja propia elige su tamaño (A3, A4, A5… o a medida), cualquier hoja o diseño se puede cambiar con «Cambiar», y el texto se puede alinear a la derecha.' },

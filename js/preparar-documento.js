@@ -105,6 +105,8 @@ var PrepararDocumento = (function () {
     return !!(tipo && tipo.llevaFirma);   /* por defecto, no */
   }
 
+  var TEXTO_FIRMA_TAMANO = 'Lleva firma electrónica: no se pueden cambiar las hojas para no romperla.';
+
   /* ---------- la línea de texto llano del cuadro ---------- */
 
   function textoResumen(encaje, huecoArribaCm, huecoAbajoCm, paginas) {
@@ -130,7 +132,8 @@ var PrepararDocumento = (function () {
     catch (e) { U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo'); return; }
     var bytes = new Uint8Array(await fichero.arrayBuffer());
 
-    if (PdfMargenes.pareceFirmado(bytes)) {
+    var firmado = PdfMargenes.pareceFirmado(bytes);
+    if (firmado) {
       var sigue = await U.preguntar('Ajustar tamaño: "' + contexto.nombre + '"',
         '<p class="explica">Este PDF ya está firmado digitalmente. Si le hago hueco ahora, la ' +
         'firma dejará de valer. Lo suyo es hacer el hueco antes de firmar. ¿Sigo de todas ' +
@@ -142,10 +145,16 @@ var PrepararDocumento = (function () {
     try { pdfDoc = await abrirConPdfJs(bytes); }
     catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
+    /* Fila 349: hojas más grandes que un A4 (docs/PDF-COMPRIMIR-Y-PASAR-A-A4.md). */
+    var hayGrandes = false;
+    try { hayGrandes = (await PdfMargenes.hojasGrandes(bytes)).grandes; } catch (e) { hayGrandes = false; }
+
     var medidas = await App.margenesPdfLeer();
     var estado = {
       llevaSello: llevaSelloDePartida(contexto),
-      llevaFirma: llevaFirmaDePartida(contexto)
+      llevaFirma: llevaFirmaDePartida(contexto),
+      pasar: hayGrandes && !firmado,
+      tamano: 'A4'
     };
     function huecoArribaCm() { return estado.llevaSello ? medidas.arribaCm : 0; }
     function huecoAbajoCm() { return estado.llevaFirma ? medidas.abajoCm : 0; }
@@ -153,7 +162,7 @@ var PrepararDocumento = (function () {
     var libre;
     try { libre = await todoLibre(pdfDoc, huecoArribaCm(), huecoAbajoCm()); }
     catch (e) { U.aviso('No he podido mirar el documento: ' + U.mensajeDeError(e), 'malo'); return; }
-    if (libre) {
+    if (libre && !hayGrandes) {
       U.aviso('Este documento ya tiene sitio para el sello y para la firma. No he tocado nada.', 'bueno');
       return;
     }
@@ -161,6 +170,9 @@ var PrepararDocumento = (function () {
     var primera = await pdfDoc.getPage(1);
     var visibleBase = primera.getViewport({ scale: 1 });   /* ya con el giro aplicado */
 
+    var opcionesTamano = PdfMargenes.ORDEN_TAMANOS.map(function (clave) {
+      return '<option value="' + clave + '">' + PdfMargenes.TAMANOS[clave].nombre + '</option>';
+    }).join('');
     var cuerpo =
       '<div class="preparar-vista">' +
         '<canvas id="preparar-canvas"></canvas>' +
@@ -175,7 +187,15 @@ var PrepararDocumento = (function () {
       '<label class="interruptor interruptor-fila">' +
         '<input type="checkbox" id="preparar-check-firma"' + (estado.llevaFirma ? ' checked' : '') + '>' +
         '<span>Hueco para la firma</span>' +
-      '</label>';
+      '</label>' +
+      '<div class="preparar-tamano">' +
+        '<label class="interruptor interruptor-fila">' +
+          '<input type="checkbox" id="preparar-check-tamano"' + (estado.pasar ? ' checked' : '') + (firmado ? ' disabled' : '') + '>' +
+          '<span>Pasar las hojas a</span>' +
+        '</label> ' +
+        '<select id="preparar-tamano" class="campo" style="width:auto;display:inline-block"' + (firmado ? ' disabled' : '') + '>' + opcionesTamano + '</select>' +
+        (firmado ? '<p class="campo-aviso-ambar" id="preparar-tamano-firma">' + TEXTO_FIRMA_TAMANO + '</p>' : '') +
+      '</div>';
 
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
@@ -183,10 +203,25 @@ var PrepararDocumento = (function () {
 
     var escalaPrevia = await renderizarEnCanvas(primera, $('preparar-canvas'), 500);
 
+    /* El tamaño de la hoja que se verá al final: el de la primera, o el del tamaño elegido. */
+    function hojaFinal() {
+      var ancho = visibleBase.width, alto = visibleBase.height;
+      if (estado.pasar && !PdfMargenes.cabeEnTamano(ancho, alto, estado.tamano)) {
+        var d = PdfMargenes.destinoDeHoja(ancho, alto, estado.tamano);
+        return { ancho: d.ancho, alto: d.alto };
+      }
+      return { ancho: ancho, alto: alto };
+    }
+
     function refrescar() {
-      var encaje = PdfMargenes.calcularEncaje(visibleBase.width, visibleBase.height,
+      var hoja = hojaFinal();
+      var encaje = PdfMargenes.calcularEncaje(hoja.ancho, hoja.alto,
         huecoArribaCm() * PdfMargenes.CM_EN_PT, huecoAbajoCm() * PdfMargenes.CM_EN_PT);
-      $('preparar-resumen').textContent = textoResumen(encaje, huecoArribaCm(), huecoAbajoCm(), pdfDoc.numPages);
+      var sinBandas = huecoArribaCm() <= 0 && huecoAbajoCm() <= 0;
+      var resumen = (estado.pasar && sinBandas)
+        ? 'Las hojas pasarán a ' + estado.tamano + '.'
+        : textoResumen(encaje, huecoArribaCm(), huecoAbajoCm(), pdfDoc.numPages);
+      $('preparar-resumen').textContent = (estado.pasar && !sinBandas ? 'Las hojas pasarán a ' + estado.tamano + '. ' : '') + resumen;
 
       var pxArriba = huecoArribaCm() * PdfMargenes.CM_EN_PT * escalaPrevia;
       var pxAbajo = huecoAbajoCm() * PdfMargenes.CM_EN_PT * escalaPrevia;
@@ -201,13 +236,25 @@ var PrepararDocumento = (function () {
 
     $('preparar-check-sello').onchange = function () { estado.llevaSello = this.checked; refrescar(); };
     $('preparar-check-firma').onchange = function () { estado.llevaFirma = this.checked; refrescar(); };
+    $('preparar-check-tamano').onchange = function () { estado.pasar = this.checked; refrescar(); };
+    $('preparar-tamano').onchange = function () { estado.tamano = this.value; refrescar(); };
 
     var ok = await promesa;
     cuadro.classList.remove('cuadro-ancho');
     if (!ok) return;
 
-    var nuevoBytes;
-    try { nuevoBytes = await PdfMargenes.conHueco(bytes, huecoArribaCm(), huecoAbajoCm()); }
+    /* Con las bandas ya libres y sin cambiar el tamaño (un PDF firmado con hojas grandes), no hay nada que hacer. */
+    if (libre && !estado.pasar) {
+      U.aviso('Este documento ya tiene sitio para el sello y para la firma. No he tocado nada.', 'bueno');
+      return;
+    }
+    var nuevoBytes = bytes;
+    try {
+      if (estado.pasar) nuevoBytes = await PdfMargenes.pasarATamano(nuevoBytes, estado.tamano);
+      if (!estado.pasar || huecoArribaCm() > 0 || huecoAbajoCm() > 0) {
+        nuevoBytes = await PdfMargenes.conHueco(nuevoBytes, huecoArribaCm(), huecoAbajoCm());
+      }
+    }
     catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     await guardar(contexto, nuevoBytes);
