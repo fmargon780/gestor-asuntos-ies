@@ -82,6 +82,8 @@ const RETIRADAS = [
     motivo: 'falla igual en main sin la fila 306, también en solitario (la lista de Inicio no vuelve a la misma altura tras repintar)' },
   { fichero: 'conflictos-que-cambia.mjs', desde: '8-oct-2026',
     motivo: 'falla igual en main sin la fila 303, también en solitario (no sale de qué ordenador es la otra versión)' },
+  { fichero: 'centro-de-datos.mjs', desde: '15-oct-2026',
+    motivo: 'falla igual en main sin la fila 349, también en solitario (con un guardado en marcha, al entrar toma «h-per-9» y no espera al «h-per-1»)' },
 ];
 
 {
