@@ -13,4 +13,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 345 | 120 | Filtro reutilizado en añadir varios, exportar a Excel y PDF, pruebas viejas que cambian |
+| 346 | 90 | Tamaño de hoja en modelo, PDF y vista previa; «Cambiar» para todo; alinear a la derecha |
 | 335 | 60 | Revisión y informe, sin código ni publicación |
