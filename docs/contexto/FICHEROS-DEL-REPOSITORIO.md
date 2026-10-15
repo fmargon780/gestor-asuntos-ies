@@ -179,6 +179,8 @@ de `App` va después del fichero que lo define.
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
 | `js/pdf-margenes.js` | La cuenta y el PDF nuevo de "Ajustar tamaño" (llamado "Preparar el documento" hasta la fila 58): solo bytes, sin disco ni DOM (18-sep-2026, fila 57) |
+| `js/pdf-comprimir.js` | Bajar un PDF de 5 MB recomprimiendo sus imágenes JPEG (calidad mínima 150 ppp / 0,6): solo bytes, sin disco ni DOM (15-oct-2026, fila 349) |
+| `js/documentos-pdf-ajuste.js` | En el cuadro de nombre de un PDF que entra: casilla «Pasarlas a A4», líneas ámbar si lleva firma, y pasar a A4 / comprimir al guardar (fila 349) |
 | `js/preparar-documento.js` | El cuadro de "Ajustar tamaño": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57; el nombre del botón cambió en la fila 58) |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/varios-cuadro.js` | La forma del cuadro de «señalar varios» (`VariosCuadro`, fila 338): ✕ arriba, pie fijo con lo señalado, «Cancelar» y el botón principal, y la pregunta «¿Descartar los N señalados?» |

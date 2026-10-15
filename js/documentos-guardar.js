@@ -122,6 +122,9 @@
     /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
        Si otro ordenador se ha quedado el que enseñaba la vista previa, se
        guarda igual con el siguiente (fila 275) y se dice al terminar. */
+    /* Fila 349: un PDF que entra, con hojas grandes o de más de 5 MB, se pasa a A4 y/o se
+       comprime antes de guardarlo (no se toca si lleva firma electrónica). */
+    var tratado = window.DocumentosPdf ? await DocumentosPdf.tratar(opciones, $('doc-guardar')) : { bytes: null, avisos: [] };
     var avisoNumero = '';
     if (opciones.numeroNuevo) {
       try {
@@ -146,16 +149,20 @@
         return;
       }
       if (opciones.modo === 'anadir') {
-        await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
+        if (tratado.bytes) await Carpetas.escribirBytes(N.asuntoActual.handle, nombre, tratado.bytes, 'application/pdf');
+        else await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
         U.aviso(avisoNumero || 'Documento guardado en la carpeta.', 'bueno');
       } else if (nombre === opciones.nombreActual) {
         /* Fila 239: con la estructura fija, cambiar el registro, los campos o
            el texto no cambia el nombre: solo se pone al día la ficha. */
+        if (tratado.bytes) await Carpetas.escribirBytes(N.asuntoActual.handle, nombre, tratado.bytes, 'application/pdf');
         U.aviso('Datos del documento guardados.', 'bueno');
       } else {
         await Carpetas.renombrarFichero(N.asuntoActual.handle, opciones.nombreActual, nombre);
+        if (tratado.bytes) await Carpetas.escribirBytes(N.asuntoActual.handle, nombre, tratado.bytes, 'application/pdf');
         U.aviso('Nombre del documento cambiado.', 'bueno');
       }
+      if (window.DocumentosPdf) DocumentosPdf.avisar(tratado);
     } catch (e) {
       U.fallo('No he podido guardarlo', e);
       return;
