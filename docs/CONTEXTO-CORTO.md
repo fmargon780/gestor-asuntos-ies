@@ -144,7 +144,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
   SELLAR" al registrar a mano un fichero distinto (igual que el Word con su PDF); las versiones
   previas quedan plegadas; cada documento se asocia, se trae y se quita de su hito desde la ficha y desde la mesa de cualquier hito, y la tarea que se marcó con él se queda marcada, con «Desmarcar» (fila 282).
-- Terceros relacionados (por unidad, nivel, grupo propio o «Pegar una lista», `js/lista-pegada*.js`) y asunto de grupo (`ficha.grupo`):
+- Terceros relacionados (con el filtro del alumnado de `js/repartir-filtro.js` —varios criterios, «Señalar los N»; «Exportar la lista ▾» a Excel/PDF, `js/filtro-exportar.js`, fila 345—, grupo propio o «Pegar una lista», `js/lista-pegada*.js`) y asunto de grupo (`ficha.grupo`):
   tarjeta «Personas del grupo»: lo generado, registrado y enviado por persona; «Generar para todos» da muestra, barra y el PDF de cada uno con su «Ref.»; los PDF sellados de Séneca se reconocen por esa referencia (`js/grupo-generar.js`, `js/grupo-registro.js`); «Enviar…» manda a todas su PDF registrado y «Enviar un aviso…» un correo sin documento (`js/grupo-enviar*.js`, `js/grupo-avisos.js`).
 - Menú de la izquierda: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas ·
   **Herramientas**, línea, Ajustes. Herramientas (fila 200) es lo que se usa de vez en cuando, no

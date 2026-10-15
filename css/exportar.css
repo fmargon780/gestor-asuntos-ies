@@ -77,3 +77,5 @@ body.con-exportar-visor { overflow: hidden; }
 .exportar-titulo-linea label { font-weight: 600; color: #445; }
 .exportar-titulo-linea input { flex: 1; min-width: 0; }
 .exportar-titulo { overflow-wrap: anywhere; }
+/* Fila 345: el visor también se abre desde dentro de un cuadro (el filtro de «Añadir varios relacionados»): por encima de la capa de los cuadros (z-index 50). */
+.exportar-visor { z-index: 60; }

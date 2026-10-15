@@ -238,10 +238,9 @@ var Relacionados = (function () {
   /* El botón principal del cuadro cuando se añade a un asunto (fila 338). */
   function textoBotonDelAsunto(n) { return n === 1 ? 'Añadir al asunto 1' : 'Añadir al asunto los ' + n; }
 
-  /* Los tres atajos de alumnado: toda una unidad, todo un nivel, toda
-     una enseñanza. Solo salen con la categoría ALUMNADO elegida, y
-     solo con matriculados de este curso (Datos.unidadesDistintas ya
-     filtra por eso). Elegir uno solo señala: no añade nada todavía. */
+  /* Fila 345: con ALUMNADO elegido, la zona «Filtrar el alumnado» de js/repartir-filtro.js (la misma de repartir
+     y de Etiquetas): varios criterios a la vez y «Señalar los N». Elegir un criterio no señala a nadie; lo ya
+     señalado no se quita al cambiar el filtro. Solo con matriculados de este curso (Datos.unidadesDistintas). */
   async function pintarAtajosDeAlumnado(categoria, api, alSenalar) {
     var caja = $('rel-atajos');
     if (!caja) return;
@@ -253,59 +252,25 @@ var Relacionados = (function () {
 
     var fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
     if (!$('rel-atajos')) return;   /* el cuadro se cerró mientras se leía */
-    var unidades = Datos.unidadesDistintas(fuente.lista);
-    if (!unidades.length) { caja.className = 'oculto'; caja.innerHTML = ''; return; }
+    if (!Datos.unidadesDistintas(fuente.lista).length || !window.RepartirFiltro) { caja.className = 'oculto'; caja.innerHTML = ''; return; }
 
-    var ne = nivelesYEnsenanzas(unidades);
-    var niveles = {}, ensenanzas = {};
-    ne.niveles.forEach(function (v) { niveles[v] = true; });
-    ne.ensenanzas.forEach(function (v) { ensenanzas[v] = true; });
-
-    function opciones(lista) {
-      return '<option value="">Elige…</option>' + lista.map(function (v) {
-        return '<option value="' + U.escapar(v) + '">' + U.escapar(v) + '</option>';
-      }).join('');
+    var f = await RepartirFiltro.crear(fuente, [], {
+      abierto: true,
+      alSenalar: function (lista) {
+        if (alSenalar) {
+          var unico = f.conds.length === 1 && f.conds[0].tipo !== 'dato' ? f.conds[0] : null;
+          alSenalar(unico ? unico.tipo : 'lista', unico ? unico.valor : f.conds.map(function (c) { return c.valor; }).join(' '), lista);
+        }
+        api.marcar(lista.map(function (al) { return { categoria: 'ALUMNADO', nombre: App.textoTercero(al), persona: al }; }));
+      }
+    });
+    if (!f || !$('rel-atajos')) return;
+    function pintar() {
+      caja.className = 'atajos-grupo';
+      caja.innerHTML = RepartirFiltro.html(f);
+      RepartirFiltro.enganchar(f, caja, pintar);
     }
-
-    caja.className = 'atajos-grupo';
-    caja.innerHTML =
-      '<div class="atajos-rotulo">Señalar alumnado por…</div>' +
-      '<div class="atajo-fila"><span>Toda una unidad</span>' +
-        '<select id="atajo-unidad" class="campo">' +
-          '<option value="">Elige…</option>' +
-          unidades.map(function (u) {
-            return '<option value="' + U.escapar(u.unidad) + '">' + U.escapar(u.unidad) +
-                   ' (' + u.cuantos + ')</option>';
-          }).join('') +
-        '</select></div>' +
-      '<div class="atajo-fila"><span>Todo un nivel</span>' +
-        '<select id="atajo-nivel" class="campo">' + opciones(Object.keys(niveles).sort()) + '</select></div>' +
-      '<div class="atajo-fila"><span>Toda una enseñanza</span>' +
-        '<select id="atajo-ensenanza" class="campo">' + opciones(Object.keys(ensenanzas).sort()) + '</select></div>';
-
-    function marcarAlumnado(lista) {
-      api.marcar(lista.map(function (al) {
-        return { categoria: 'ALUMNADO', nombre: App.textoTercero(al), persona: al };
-      }));
-    }
-    /* Fila 144: «Por datos del alumnado» (js/alumnado-bd-ver.js). */
-    if (window.AlumnadoBDVer) AlumnadoBDVer.pintarGrupo(caja, fuente, marcarAlumnado);
-
-    $('atajo-unidad').onchange = function () {
-      var v = $('atajo-unidad').value;
-      if (v) { var l1 = filtrarPorUnidad(fuente.lista, v); if (alSenalar) alSenalar('unidad', v, l1); marcarAlumnado(l1); }
-      $('atajo-unidad').value = '';
-    };
-    $('atajo-nivel').onchange = function () {
-      var v = $('atajo-nivel').value;
-      if (v) { var l2 = filtrarPorNivel(fuente.lista, v); if (alSenalar) alSenalar('nivel', v, l2); marcarAlumnado(l2); }
-      $('atajo-nivel').value = '';
-    };
-    $('atajo-ensenanza').onchange = function () {
-      var v = $('atajo-ensenanza').value;
-      if (v) { var l3 = filtrarPorEnsenanza(fuente.lista, v); if (alSenalar) alSenalar('ensenanza', v, l3); marcarAlumnado(l3); }
-      $('atajo-ensenanza').value = '';
-    };
+    pintar();
   }
 
   /* Fila 342: los niveles y las enseñanzas de unas unidades (las de Datos.unidadesDistintas), para los

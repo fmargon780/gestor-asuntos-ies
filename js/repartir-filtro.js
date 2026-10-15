@@ -22,7 +22,8 @@ var RepartirFiltro = (function () {
 
   function esc(t) { return U.escapar(t); }
 
-  async function crear(fuente, relacionados) {
+  async function crear(fuente, relacionados, opciones) {
+    opciones = opciones || {};
     var lista = (fuente && fuente.lista) || [];
     if (!lista.length) return null;
     var datos = null;
@@ -36,7 +37,8 @@ var RepartirFiltro = (function () {
     (relacionados || []).forEach(function (p) { if (!vistos[p.tercero]) { vistos[p.tercero] = true; todos.push(p); } });
     var f = {
       lista: lista, datos: datos, unidades: unidades, niveles: ne.niveles, ensenanzas: ne.ensenanzas, candidatos: todos,
-      conds: [], antiguos: false, abierto: false, usado: false, cache: null, memo: {}
+      conds: [], antiguos: false, abierto: !!opciones.abierto, usado: false, cache: null, memo: {},
+      alSenalar: opciones.alSenalar || null   /* fila 345: con función, sale «Señalar los N» */
     };
     f.activo = function () { return f.conds.length > 0; };
     f.personas = function () { if (!f.cache) f.cache = calcular(f); return f.cache; };
@@ -114,7 +116,10 @@ var RepartirFiltro = (function () {
         return '<span class="bd-grupo-cond">' + esc(textoCond(f, c)) +
           ' <button type="button" class="boton-mini" data-quitar="' + i + '" aria-label="Quitar">✕</button></span>';
       }).join('') + '</div>' +
-      '<p class="repartir-filtro-resumen explica">' + (f.activo() ? esc(cuantos(f.personas().length)) : 'Sin criterios: se ve todo como siempre.') + '</p>' +
+      '<p class="repartir-filtro-resumen explica">' + (f.activo() ? esc(cuantos(f.personas().length)) : (f.alSenalar ? 'Pon algún criterio para ver a quién señalar.' : 'Sin criterios: se ve todo como siempre.')) + '</p>' +
+      (f.alSenalar ? '<p class="repartir-filtro-senalar"><button type="button" class="boton boton-principal" id="rf-senalar"' + (f.activo() && f.personas().length ? '' : ' disabled') + '>' +
+        esc(f.personas().length === 1 ? 'Señalar 1' : 'Señalar los ' + f.personas().length) + '</button></p>' : '') +
+      FiltroExportar.botonHTML(f.activo() && f.personas().length > 0) +
       '</details>';
   }
 
@@ -146,6 +151,9 @@ var RepartirFiltro = (function () {
         cambiar(f, alCambiar);
       };
     });
+    var senalar = q('rf-senalar');
+    if (senalar) senalar.onclick = function () { if (f.alSenalar && f.activo()) f.alSenalar(f.personas().slice()); };
+    FiltroExportar.enganchar(det, function () { return FiltroExportar.listaDeAlumnado(f); });
     var antiguos = q('rf-antiguos');
     if (antiguos) antiguos.onchange = function () { f.antiguos = antiguos.checked; cambiar(f, alCambiar); };
     Array.prototype.forEach.call(det.querySelectorAll('[data-quitar]'), function (b) {

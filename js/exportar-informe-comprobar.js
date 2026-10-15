@@ -24,9 +24,9 @@ var ExportarComprobar = (function () {
              completo: visibles === esperados && desbordan === 0 };
   }
 
-  function textoDeAviso(r) {
+  function textoDeAviso(r, palabra) {
     return 'Este listado no está completo: se ven ' + r.visibles + ' de ' + r.esperados +
-      ' asuntos. No lo guardes ni lo imprimas; avisa con el botón «Soporte».';
+      ' ' + (palabra ? palabra[1] : 'asuntos') + '. No lo guardes ni lo imprimas; avisa con el botón «Soporte».';
   }
 
   return { comprobar: comprobar, textoDeAviso: textoDeAviso };
