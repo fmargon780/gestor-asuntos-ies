@@ -86,3 +86,4 @@
 .correo-campo-cabecera .etiqueta { margin: 0; }
 .correo-tutor-falta { margin: 6px 0 0; }
 .va-a-tabla select { width: auto; }
+.va-a-tabla td { overflow-wrap: normal; word-break: normal; }
