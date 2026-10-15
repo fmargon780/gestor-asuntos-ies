@@ -14,4 +14,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 346 | 90 | Tamaño de hoja en modelo, PDF y vista previa; «Cambiar» para todo; alinear a la derecha |
 | 347 | 150 | Marca en el tipo, campo en el cuadro de nombre, tarjeta con estados, PDF de listas, prueba nueva |
+| 348 | 120 | Botón de tutores en el cuadro de Correo, «Va a» en plantillas, revisión única con lista, saludo, prueba nueva |
 | 335 | 60 | Revisión y informe, sin código ni publicación |
