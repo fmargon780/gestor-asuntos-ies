@@ -834,3 +834,22 @@ Bloque «Actividades extraescolares» en Herramientas (`#actividades-vista`, `js
 (`asunto: null`, `antigua: true`, sin alumnado) se apunta/cambia en `js/actividades-antigua.js` (profesorado de PERSONAL o «que ya no está en el
 centro», con nombre y DNI tal cual) y «Borrar» la saca del registro y la manda a la papelera (clase `actividad`; `Actividades.devolver`).
 La hoja de cálculo, `js/actividades-exportar.js` (`hojas`, pura): pestañas «Actividades» y «Profesorado», con lo filtrado.
+
+## Las candidaturas al Consejo Escolar (15-oct-2026, fila 347, `docs/CANDIDATURAS-CONSEJO-ESCOLAR.md`)
+
+Un tipo con la casilla «Lleva candidaturas» (`tipo.candidaturas: true`, en Ajustes → el tipo → «Datos del tipo»; `Candidaturas.filaDeTipo`) es el
+de una convocatoria: **un solo asunto** con todas las solicitudes, de cualquier sector. Datos en `ficha.candidaturas` (`asuntos.json`):
+`{ id, persona: { categoria, nombre (el del tercero, para relacionarla), visible (solo nombre y apellidos), clave }, sector, estado, motivo,
+documentos, fecha, registro, creadaPor/El, cambiadaPor/El }`; identidad por `id` en `App.IDENTIDAD_LISTA` y unión por elemento en
+`js/conflictos.js`. `js/candidaturas.js`: los datos (`apuntar`, `cambiar` relee y toca solo esa, `quitar`) y el campo **«¿De quién es esta
+candidatura?»** del cuadro de nombre (se engancha desde `js/documentos-formulario.js` —`preparar`, `campoHTML`, `tipoPorDefecto`,
+`enganchar`— y `js/documentos-guardar.js` —`falta`, `alGuardar`, `alRenombrar`—, como `Esperas`): buscador de personas de Nuevo asunto,
+propuesta leyendo el PDF, «No es una candidatura», aviso «Ya tiene candidatura» (el documento se suma a la suya), tipo de documento por
+defecto SOLICITUD DE CANDIDATURA (nombre corto CANDIDATURA). El sector sale solo: Alumnado → «Alumnado», TUTORES LEGALES → «Madres y padres»,
+personal docente → «Profesorado», no docente → «PAS» (`Datos.cargar('PERSONAL')` deja `tipoPersonal` según el nombre del listado); lo
+demás se elige a mano. `js/candidaturas-ficha.js`: la tarjeta «Candidaturas» (`FichaTarjetas`, solo con `Candidaturas.aplica`), un bloque por
+sector, estado en la fila (Presentada, Admitida, Excluida con motivo, Retirada), ⋮ con «Ver su ficha», «Cambiar el sector» y «Quitar la
+candidatura», y «+ Añadir candidatura» sin documento. `js/candidaturas-lista.js`: «Lista de candidaturas ▾» → provisional o definitiva, PDF con
+membrete, solo nombres, firma de la Presidencia de la Junta Electoral (cargo en `cargos.json`) o de Dirección, guardado como
+`AAMMDD LISTA CANDIDATURAS D26-….pdf` (tipo LISTA DE CANDIDATURAS). `DocumentoRenombrar` pone al día los nombres de documento. Prueba:
+`pruebas/candidaturas.mjs`.

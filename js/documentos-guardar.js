@@ -111,6 +111,9 @@
        (fila 96), con el mismo aviso que al crear un asunto. */
     var falta = window.DocCampos ? DocCampos.faltaObligatorio(N.camposDelTipo(N.tipoElegido()), N.valoresDeCampos()) : '';
     if (falta) { U.aviso('Hace falta rellenar "' + falta + '".', 'malo'); return; }
+    /* Fila 347: en el asunto de unas elecciones, de quién es la candidatura (o «No es una candidatura»). */
+    var faltaCandidatura = window.Candidaturas ? Candidaturas.falta() : '';
+    if (faltaCandidatura) { U.aviso(faltaCandidatura, 'malo'); return; }
     var ajustadoFinal = Nombres.montarDocumentoAjustado(datosDelFormulario(opciones));
     var nombre = ajustadoFinal.nombre;
     if (!nombre) return;
@@ -167,6 +170,10 @@
         U.accesorio('Documento guardado, pero no he podido apuntar su registro y sus datos en la ficha', eDatos);
       }
     }
+    if (opciones.modo !== 'anadir' && opciones.nombreActual !== nombre && window.Candidaturas) {
+      try { await Candidaturas.alRenombrar(N.asuntoActual, opciones.nombreActual, nombre); }
+      catch (eC) { U.accesorio('Documento guardado, pero no he podido ponerlo al día en las candidaturas', eC); }
+    }
     try {
       await actualizarPendiente(opciones, nombre);
     } catch (e2) {
@@ -212,6 +219,11 @@
     }
     /* Fila 286: «Es lo que se esperaba. Termina la espera…», si la casilla sigue marcada. */
     if (window.Esperas) await Esperas.alGuardar(N.asuntoActual, nombre);
+    /* Fila 347: la candidatura (y su persona relacionada), si el cuadro la preguntaba. */
+    if (window.Candidaturas) {
+      var dCand = datosDelFormulario(opciones);
+      await Candidaturas.alGuardar(N.asuntoActual, nombre, { fecha: dCand.fecha, registro: dCand.codigo });
+    }
     N.soltarVisor();
     /* Abierto directo para ponerle nombre (opciones.ponerNombre, fila
        174, punto 3): cierra el cuadro entero al terminar, en vez de

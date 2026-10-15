@@ -559,7 +559,8 @@ App.IDENTIDAD_LISTA = {
   relacionados: function (r) { return (r && r.categoria || '') + '|' + (r && r.nombre || ''); },
   pendientesRegistro: function (p) { return typeof p === 'string' ? p : ((p && p.nombre) || ''); },
   encargos: function (e) { return (e && e.id) || ''; },   /* fila 289 */
-  avisosActividad: function (x) { return (x && x.cuando) || ''; }   /* fila 309 */
+  avisosActividad: function (x) { return (x && x.cuando) || ''; },   /* fila 309 */
+  candidaturas: function (c) { return (c && c.id) || ''; }   /* fila 347 */
 };
 
 App.unirPorIdentidad = function (a, b, identidad) {

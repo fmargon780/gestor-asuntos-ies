@@ -99,6 +99,7 @@
     base.hilos = unirLista(a, b, 'hilos');
     base.relacionados = unirLista(a, b, 'relacionados');
     base.pendientesRegistro = unirLista(a, b, 'pendientesRegistro');
+    if ((a.candidaturas || []).length || (b.candidaturas || []).length) base.candidaturas = unirLista(a, b, 'candidaturas');   /* fila 347 */
     return base;
   }
 

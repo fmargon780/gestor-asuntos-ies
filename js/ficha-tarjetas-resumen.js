@@ -185,9 +185,21 @@ var FichaTarjetasResumen = (function () {
     ponerResumen('actividad', partes, false);
   }
 
+  /* Fila 347: la tarjeta «Candidaturas» trae su propio resumen (js/candidaturas-ficha.js). */
+  function resumirCandidaturas() {
+    var caja = $('ficha-candidaturas');
+    if (!caja) return;
+    ponerCuenta('candidaturas', '');
+    var resumen = caja.dataset.resumen || '';
+    if (!resumen) { ponerResumen('candidaturas', [{ texto: 'Leyendo…' }], true); return; }
+    var trozos = resumen.split(' · ');
+    ponerResumen('candidaturas', [{ texto: trozos[0], clase: 'fuerte' }, { texto: trozos.slice(1, 3).join(' · ') }, { texto: trozos.slice(3).join(' · ') }], trozos[0].indexOf('0 ') === 0);
+  }
+
   function resumirTodas() {
     if (!raiz()) return;
     resumirActividad();
+    resumirCandidaturas();
     resumirHitos();
     resumirDocumentos();
     resumirNotas();

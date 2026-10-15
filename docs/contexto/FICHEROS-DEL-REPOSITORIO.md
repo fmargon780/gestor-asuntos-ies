@@ -54,6 +54,11 @@ de `App` va después del fichero que lo define.
 | `js/etiquetas-guardado.js` | `_GESTOR/etiquetas.json`: modelos y diseños propios (fila 344) |
 | `js/etiquetas-editor.js` | Los formularios de un modelo de hoja y de un diseño (fila 344) |
 | `js/etiquetas-pantalla.js` | La pantalla «Etiquetas» de Herramientas y su entrada desde un asunto de grupo (fila 344) |
+| `js/candidaturas.js` | Candidaturas al Consejo Escolar: los datos de `ficha.candidaturas` y el campo «¿De quién es esta candidatura?» del cuadro de nombre (fila 347) |
+| `js/candidaturas-ficha.js` | La tarjeta «Candidaturas» de la ficha del asunto (fila 347) |
+| `js/candidaturas-lista.js` | La lista provisional o definitiva de candidaturas en PDF (fila 347) |
+| `css/candidaturas.css` | Estilos de las candidaturas (fila 347) |
+| `pruebas/candidaturas.mjs` | Las candidaturas, de punta a punta, con Chromium (fila 347) |
 | `css/etiquetas.css` | Estilos de la pantalla de etiquetas (fila 344) |
 | `pruebas/etiquetas.mjs` | La pantalla de etiquetas, de punta a punta, con Chromium (fila 344) |
 | `pruebas/etiquetas-346.mjs` | Etiquetas: tamaño de hoja, «Cambiar» en hoja y diseño y alineación a la derecha, con Chromium (fila 346) |

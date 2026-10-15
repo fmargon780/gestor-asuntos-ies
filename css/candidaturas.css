@@ -1,0 +1,20 @@
+/* Candidaturas al Consejo Escolar (fila 347, docs/CANDIDATURAS-CONSEJO-ESCOLAR.md). */
+.cand-campo { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: var(--papel); }
+.cand-elegida { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0 8px; }
+.cand-nombre { overflow-wrap: anywhere; }
+.cand-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.cand-lista-menu { position: relative; display: inline-block; }
+.cand-lista-menu .fila-menu { left: 0; right: auto; min-width: 200px; }
+.cand-bloques { display: flex; flex-direction: column; gap: 10px; }
+.cand-bloque { border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; }
+.cand-bloque h4 { margin: 0 0 6px; font-size: 14px; }
+.cand-filas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cand-fila { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; border-top: 1px solid var(--linea); padding-top: 6px; }
+.cand-fila:first-child { border-top: 0; padding-top: 0; }
+.cand-fila-datos { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 220px; }
+.cand-cuando { font-size: 13px; }
+.cand-docs { font-size: 13px; overflow-wrap: anywhere; }
+.cand-fila-estado { display: flex; gap: 6px; align-items: center; }
+.cand-estado { width: auto; padding: 4px 6px; }
+.cand-motivo { flex-basis: 100%; margin: 0; }
+.cand-lista-btn { cursor: pointer; }
