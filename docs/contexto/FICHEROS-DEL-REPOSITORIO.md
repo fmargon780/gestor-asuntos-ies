@@ -46,7 +46,7 @@ de `App` va después del fichero que lo define.
 | `js/actividades-tabla.js` | La tabla de datos ACTIVIDADES EXTRAESCOLARES y el certificado del profesorado: `filasDe`, `entre`, `celdas`, `periodoDe`, la pasada del tipo (fila 311) |
 | `pruebas/actividades-certificado.mjs` | El certificado de actividades extraescolares (fila 311), con Chromium |
 | `pruebas/actividades-pantalla.mjs` | La pantalla de actividades y las antiguas (fila 310), con Chromium |
-| `js/etiquetas-modelos.js` | Las hojas de etiquetas A4 (Avery, con medidas contrastadas) y su geometría (fila 344) |
+| `js/etiquetas-modelos.js` | Las hojas de etiquetas (Avery A4, con medidas contrastadas; las propias con su tamaño de hoja) y su geometría (filas 344 y 346) |
 | `js/etiquetas-datos.js` | Qué datos puede llevar una etiqueta, la dirección y las familias de hermanos (fila 344) |
 | `js/etiquetas-disenos.js` | Los diseños Sobre, Alumno y Profesor, los propios y el ajuste de la letra (fila 344) |
 | `js/etiquetas-hoja.js` | De las personas a las hojas: orden, familias, copias, casillas gastadas y vista previa (fila 344) |
@@ -56,6 +56,7 @@ de `App` va después del fichero que lo define.
 | `js/etiquetas-pantalla.js` | La pantalla «Etiquetas» de Herramientas y su entrada desde un asunto de grupo (fila 344) |
 | `css/etiquetas.css` | Estilos de la pantalla de etiquetas (fila 344) |
 | `pruebas/etiquetas.mjs` | La pantalla de etiquetas, de punta a punta, con Chromium (fila 344) |
+| `pruebas/etiquetas-346.mjs` | Etiquetas: tamaño de hoja, «Cambiar» en hoja y diseño y alineación a la derecha, con Chromium (fila 346) |
 | `css/actividades.css` | Estilos del formulario y de la tarjeta de actividades (fila 306) |
 | `pruebas/actividades-aviso.mjs` | El aviso al claustro de una actividad (fila 309), con Chromium |
 | `js/demo/datos-actividades.js` | Tres actividades de la copia de pruebas: prevista, realizada y anulada (fila 306) |

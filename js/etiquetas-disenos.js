@@ -3,7 +3,7 @@
 
    Un diseño es { id, nombre, para: 'alumnado'|'personal'|'ambos', unaPorFamilia, renglones: [renglon] }, con
    renglon = { dato: <clave de EtiquetasDatos.CAMPOS> | 'texto', texto?, negrita, tamano: 'pequeno'|'normal'|'grande',
-   alinea: 'izq'|'centro' }. Los tres primeros los trae la app (`integrado`): se duplican, no se borran.
+   alinea: 'izq'|'centro'|'der' }. Los tres primeros los trae la app (`integrado`): se duplican, no se borran.
 
    - integrados() → los tres diseños de la app.   - nuevoRenglon(), limpiar(d) → un diseño propio bien formado.
    - lineas(diseno, valores) → [{ texto, negrita, pt, alinea }] sin los renglones vacíos.
@@ -39,7 +39,7 @@ var EtiquetasDisenos = (function () {
       id: d.id, nombre: String(d.nombre || '').trim(), para: para,
       unaPorFamilia: !!d.unaPorFamilia && para !== 'personal',
       renglones: (d.renglones || []).map(function (x) {
-        var o = r(x.dato || 'texto', x.negrita, PT[x.tamano] ? x.tamano : 'normal', x.alinea === 'centro' ? 'centro' : 'izq');
+        var o = r(x.dato || 'texto', x.negrita, PT[x.tamano] ? x.tamano : 'normal', x.alinea === 'centro' || x.alinea === 'der' ? x.alinea : 'izq');
         if (o.dato === 'texto') o.texto = String(x.texto || '');
         return o;
       })

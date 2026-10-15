@@ -2,8 +2,9 @@
    etiquetas-editor.js — los formularios de «Etiquetas»: un modelo de hoja y un diseño (fila 344, docs/ETIQUETAS.md).
 
    Se pintan dentro de la propia pantalla (no son cuadros). Nada se guarda aquí: avisan a quien los abrió.
-   - modelo(estado): { tipo: 'modelo', modelo (copia que se edita), existente (id si se cambia uno propio), titulo }.
-   - diseno(estado): { tipo: 'diseno', diseno (copia que se edita), titulo }.
+   - modelo(estado): { tipo: 'modelo', modelo (copia que se edita), existente (id si se cambia uno propio), titulo, aviso? }.
+   - diseno(estado): { tipo: 'diseno', diseno (copia que se edita), titulo, aviso? }.
+   `aviso` (fila 346): lo que se dice arriba cuando se cambia uno de la app y se guardará como copia.
    - html(estado) y enganchar(raiz, estado, cb): `cb` = { guardar(objeto), cancelar(), cambio() }.
    ============================================================ */
 var EtiquetasEditor = (function () {
@@ -14,14 +15,28 @@ var EtiquetasEditor = (function () {
   var MARGENES = [['sup', 'Margen de arriba'], ['inf', 'Margen de abajo'], ['izq', 'Margen izquierdo'], ['der', 'Margen derecho'],
     ['sepH', 'Separación entre columnas'], ['sepV', 'Separación entre filas']];
 
+  function aviso(e) { return e.aviso ? '<p class="aviso aviso-ambar et-aviso-copia">' + esc(e.aviso) + '</p>' : ''; }
+
+  function htmlTamano(m) {
+    var h = EtiquetasModelos.hojaDe(m), otro = h.nombre === 'Otro' || !EtiquetasModelos.tamano(h.nombre);
+    return '<div class="et-fila"><label class="etiqueta">Tamaño de la hoja <select class="campo" id="em-hoja">' +
+      EtiquetasModelos.TAMANOS.map(function (t) {
+        return '<option value="' + t.nombre + '"' + (!otro && t.nombre === h.nombre ? ' selected' : '') + '>' + t.nombre + ' (' + t.ancho + ' × ' + t.alto + ' mm)</option>';
+      }).join('') + '<option value="Otro"' + (otro ? ' selected' : '') + '>Otro (medidas en mm)</option></select></label>' +
+      '<span class="et-fila' + (otro ? '' : ' oculto') + '" id="em-hoja-otro">' +
+      '<label class="etiqueta">Ancho (mm) <input class="campo" id="em-hoja-ancho" type="number" step="0.1" min="50" max="1000" value="' + esc(otro ? h.ancho : '') + '"></label>' +
+      '<label class="etiqueta">Alto (mm) <input class="campo" id="em-hoja-alto" type="number" step="0.1" min="50" max="1000" value="' + esc(otro ? h.alto : '') + '"></label></span></div>';
+  }
+
   function htmlModelo(e) {
     var m = e.modelo;
-    return '<div class="et-editor" id="et-editor"><h4>' + esc(e.titulo) + '</h4>' +
+    return '<div class="et-editor" id="et-editor"><h4>' + esc(e.titulo) + '</h4>' + aviso(e) +
       '<label class="etiqueta">Nombre <input class="campo" id="em-nombre" value="' + esc(m.nombre) + '" maxlength="60"></label>' +
       '<div class="et-fila"><label class="etiqueta">Filas <input class="campo" id="em-filas" type="number" min="1" max="40" value="' + esc(m.filas || '') + '"></label>' +
       '<label class="etiqueta">Columnas <input class="campo" id="em-columnas" type="number" min="1" max="12" value="' + esc(m.columnas || '') + '"></label></div>' +
-      '<p class="explica">La app reparte el A4 entero entre las casillas. Si al imprimir no cuadra, ajusta los márgenes.</p>' +
-      '<details class="et-margenes"' + (e.margenesAbiertos ? ' open' : '') + '><summary>Ajustar márgenes</summary><div class="et-fila et-fila-margenes">' +
+      htmlTamano(m) +
+      '<p class="explica">La app reparte la hoja entera entre las casillas. Si al imprimir no cuadra, ajusta los márgenes.</p>' +
+      '<details class="et-margenes"' + (e.margenesAbiertos ? ' open' : '') + '><summary>Márgenes y separaciones</summary><div class="et-fila et-fila-margenes">' +
       MARGENES.map(function (x) {
         return '<label class="etiqueta">' + x[1] + ' (mm) <input class="campo" data-margen="' + x[0] + '" type="number" step="0.1" value="' + esc(m[x[0]]) + '"></label>';
       }).join('') + '</div></details>' +
@@ -33,18 +48,21 @@ var EtiquetasEditor = (function () {
   function htmlDiseno(e) {
     var d = e.diseno, campos = EtiquetasDatos.CAMPOS.filter(function (c) { return d.para === 'ambos' || c.para === 'ambos' || c.para === d.para; });
     function opcion(valor, texto, actual) { return '<option value="' + esc(valor) + '"' + (valor === actual ? ' selected' : '') + '>' + esc(texto) + '</option>'; }
-    return '<div class="et-editor" id="et-editor"><h4>' + esc(e.titulo) + '</h4>' +
+    function alinear(a, x) { return '<button type="button" class="boton boton-mini" data-alinea-todo="' + a + '">' + x + '</button>'; }
+    return '<div class="et-editor" id="et-editor"><h4>' + esc(e.titulo) + '</h4>' + aviso(e) +
       '<label class="etiqueta">Nombre <input class="campo" id="ed-nombre" value="' + esc(d.nombre) + '" maxlength="60"></label>' +
       '<div class="et-fila"><label class="etiqueta">Vale para <select class="campo" id="ed-para">' +
         opcion('alumnado', 'Alumnado', d.para) + opcion('personal', 'Personal', d.para) + opcion('ambos', 'Los dos', d.para) + '</select></label>' +
       '<label class="et-casilla-texto"><input type="checkbox" id="ed-familia"' + (d.unaPorFamilia ? ' checked' : '') + (d.para === 'personal' ? ' disabled' : '') + '> Una por familia (los hermanos salen en una sola)</label></div>' +
+      '<div class="et-fila et-alinear-todo"><span class="et-casilla-texto">Alinear todo:</span>' +
+        alinear('izq', 'A la izquierda') + alinear('centro', 'Centrado') + alinear('der', 'A la derecha') + '</div>' +
       '<div class="et-renglones">' + d.renglones.map(function (x, i) {
         return '<div class="et-renglon" data-i="' + i + '"><span class="et-renglon-n">' + (i + 1) + '</span>' +
           '<select class="campo" data-r="dato">' + campos.map(function (c) { return opcion(c.clave, c.texto, x.dato); }).join('') + opcion('texto', 'Texto fijo…', x.dato) + '</select>' +
           (x.dato === 'texto' ? '<input class="campo" data-r="texto" value="' + esc(x.texto) + '" placeholder="Escribe el texto">' : '') +
           '<label class="et-casilla-texto"><input type="checkbox" data-r="negrita"' + (x.negrita ? ' checked' : '') + '> Negrita</label>' +
           '<select class="campo" data-r="tamano">' + opcion('pequeno', 'Letra pequeña', x.tamano) + opcion('normal', 'Letra normal', x.tamano) + opcion('grande', 'Letra grande', x.tamano) + '</select>' +
-          '<select class="campo" data-r="alinea">' + opcion('izq', 'A la izquierda', x.alinea) + opcion('centro', 'Centrado', x.alinea) + '</select>' +
+          '<select class="campo" data-r="alinea">' + opcion('izq', 'A la izquierda', x.alinea) + opcion('centro', 'Centrado', x.alinea) + opcion('der', 'A la derecha', x.alinea) + '</select>' +
           '<button type="button" class="boton boton-mini" data-sube="' + i + '" aria-label="Subir"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
           '<button type="button" class="boton boton-mini" data-baja="' + i + '" aria-label="Bajar"' + (i === d.renglones.length - 1 ? ' disabled' : '') + '>↓</button>' +
           '<button type="button" class="boton boton-mini" data-quita="' + i + '" aria-label="Quitar el renglón">✕</button></div>';
@@ -64,6 +82,9 @@ var EtiquetasEditor = (function () {
       m.filas = parseInt(q('em-filas').value, 10) || 0;
       m.columnas = parseInt(q('em-columnas').value, 10) || 0;
       MARGENES.forEach(function (x) { m[x[0]] = num(raiz.querySelector('[data-margen="' + x[0] + '"]').value); });
+      var tam = q('em-hoja').value, t = EtiquetasModelos.tamano(tam);
+      q('em-hoja-otro').classList.toggle('oculto', !!t);
+      m.hoja = t ? { nombre: t.nombre, ancho: t.ancho, alto: t.alto } : { nombre: 'Otro', ancho: num(q('em-hoja-ancho').value), alto: num(q('em-hoja-alto').value) };
       var p = m.filas && m.columnas ? EtiquetasModelos.problema(m) : 'Pon las filas y las columnas.';
       q('em-problema').classList.toggle('oculto', !p);
       q('em-problema').textContent = p;
@@ -71,6 +92,7 @@ var EtiquetasEditor = (function () {
       return p;
     }
     Array.prototype.forEach.call(raiz.querySelectorAll('#et-editor input'), function (i) { i.oninput = function () { leer(); cb.cambio(); }; });
+    q('em-hoja').onchange = function () { leer(); cb.cambio(); };
     q('em-cancelar').onclick = cb.cancelar;
     q('em-guardar').onclick = function () {
       var p = leer();
@@ -96,6 +118,9 @@ var EtiquetasEditor = (function () {
       cb.repintar();
     };
     q('ed-familia').onchange = function () { d.unaPorFamilia = this.checked; cb.cambio(); };
+    Array.prototype.forEach.call(raiz.querySelectorAll('[data-alinea-todo]'), function (b) {
+      b.onclick = function () { var a = b.getAttribute('data-alinea-todo'); d.renglones.forEach(function (x) { x.alinea = a; }); cb.repintar(); };
+    });
     q('ed-mas').onclick = function () { d.renglones.push(EtiquetasDisenos.nuevoRenglon()); cb.repintar(); };
     Array.prototype.forEach.call(raiz.querySelectorAll('.et-renglon'), function (fila) {
       var i = Number(fila.getAttribute('data-i')), x = d.renglones[i];
