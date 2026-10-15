@@ -97,9 +97,10 @@ await comprobar('2. el formulario vuelve a salir limpio: sin grupo de la vez ant
   pagina.evaluate(() => [App.E.nuevo.tercero, document.getElementById('tercero-elegido').classList.contains('oculto')]), [null, true]);
 await pagina.click('#btn-grupo-nuevo');
 await pagina.click('#capa .categoria-mini-boton:text("ALUMNADO")');
-await pagina.waitForSelector('#atajo-unidad');
-await pagina.selectOption('#atajo-unidad', '4º A');
-await comprobar('2. el atajo de la unidad señala a sus cuatro personas',
+await pagina.waitForSelector('#rf-unidad');
+await pagina.selectOption('#rf-unidad', '4º A');
+await pagina.click('#rf-senalar');   /* fila 345: el filtro solo señala al pulsar «Señalar los N» */
+await comprobar('2. el filtro de la unidad señala a sus cuatro personas',
   pagina.locator('.marcados-cuenta').textContent(), '4 señalados');
 await pagina.locator('.marcado-quitar').first().click();
 await pagina.click('#rel-marcados-anadir');
