@@ -131,6 +131,68 @@ var TutorDelGrupo = (function () {
     } catch (e) { return base; }
   }
 
-  return { decidir: decidir, deAsunto: deAsunto, claveDeUnidad: claveDeUnidad, textoDelMotivo: textoDelMotivo };
+  /* ---------- fila 348: todos los tutores que pueden ir en el cuadro de Correo ---------- */
+
+  /* Las unidades del alumnado matriculado de un asunto: el del tercero (si es alumnado) o, en un asunto de grupo, el de sus
+     relacionados. [] si no hay ninguna (no es alumnado, o no está matriculado este curso). */
+  async function unidadesDe(a) {
+    var lista = [], unidades = {}, salida = [];
+    try { lista = ((await Datos.cargar(App.E.datos, 'ALUMNADO')).lista || []).filter(function (p) { return p.matriculado; }); } catch (e) { return []; }
+    function suma(p) {
+      var u = String((p && p.unidad) || '').trim();
+      if (u && !unidades[claveDeUnidad(u)]) { unidades[claveDeUnidad(u)] = true; salida.push(u); }
+    }
+    if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) {
+      var porTexto = {};
+      lista.forEach(function (p) { porTexto[App.textoTercero(p)] = p; });
+      (((a && a.ficha) || {}).relacionados || []).forEach(function (r) { if (r && r.categoria === 'ALUMNADO') suma(porTexto[r.nombre]); });
+    } else if (categoriaDe(a) === 'ALUMNADO' && window.HitosComunicar) {
+      var persona = await HitosComunicar.buscarPersonaDelAsunto(a);
+      if (persona && persona.matriculado) suma(persona);
+    }
+    return salida.sort();
+  }
+
+  /* PURA. De las unidades y de cómo decide cada una: lo que pinta el cuadro. { aplica, unidades: [{ unidad, tutores, motivo }],
+     correos (sin repetir), faltan: [texto por unidad a la que le falta algún correo] }. */
+  function resumenParaElCuadro(porUnidad) {
+    var correos = [], vistos = {}, faltan = [];
+    (porUnidad || []).forEach(function (u) {
+      var sin = !u.tutores.length || u.tutores.some(function (t) { return !(t.correos || []).length; });
+      u.tutores.forEach(function (t) {
+        (t.correos || []).forEach(function (c) {
+          if (!vistos[c.toLowerCase()]) { vistos[c.toLowerCase()] = true; correos.push(c); }
+        });
+      });
+      if (sin) faltan.push('Falta el correo del tutor/a de ' + u.unidad);
+    });
+    return { aplica: (porUnidad || []).length > 0, unidades: porUnidad || [], correos: correos, faltan: faltan };
+  }
+
+  /* Nunca lanza. */
+  async function paraElCuadro(a) {
+    var vacio = resumenParaElCuadro([]);
+    try {
+      var unidades = await unidadesDe(a);
+      if (!unidades.length) return vacio;
+      var tabla = window.TablasDatos ? ((await TablasDatos.cargar()).tablas || {}).TUTORIAS || null : null;
+      var filas = tabla ? tabla.filas : [];
+      var claves = {};
+      filas.forEach(function (f) { if (f.clave) claves[f.clave] = true; });
+      var comunes = {
+        esAlumnado: true, hayTabla: !!tabla, filas: filas, hoy: U.hoyIso(),
+        grupoAtencion: window.TablasDatosLeer ? TablasDatosLeer.GRUPO_ATENCION : '',
+        correosPorClave: tabla ? await correosDePersonal(claves) : {},
+        recordados: window.CorreosAMano ? await CorreosAMano.leerTodos() : {}
+      };
+      return resumenParaElCuadro(unidades.map(function (u) {
+        var r = decidir(Object.assign({ unidad: u }, comunes));
+        return { unidad: u, tutores: r.tutores, motivo: r.motivo };
+      }));
+    } catch (e) { return vacio; }
+  }
+
+  return { decidir: decidir, deAsunto: deAsunto, claveDeUnidad: claveDeUnidad, textoDelMotivo: textoDelMotivo,
+           paraElCuadro: paraElCuadro, resumenParaElCuadro: resumenParaElCuadro };
 })();
 window.TutorDelGrupo = TutorDelGrupo;

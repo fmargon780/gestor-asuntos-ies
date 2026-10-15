@@ -76,9 +76,12 @@ var CorreoCuadro = (function () {
 
   function contenidoCco() {
     var direcciones = Object.keys(cco);
-    if (!direcciones.length && !ccoSinCorreo.length) return '';
+    /* Fila 348: junto al nombre del campo, «+ Tutor/a de …» (si el alumnado tiene tutor), aunque todavía no haya ninguna. */
+    var cabecera = window.CorreoTutorBotones
+      ? CorreoTutorBotones.cabeceraHtml('cco', direcciones.length ? ' <span class="suave">(' + direcciones.length + ')</span>' : '') : '';
+    if (!direcciones.length && !ccoSinCorreo.length) return cabecera;
     return (direcciones.length
-      ? '<label class="etiqueta">Copia oculta <span class="suave">(' + direcciones.length + ')</span></label>' +
+      ? (cabecera || '<label class="etiqueta">Copia oculta <span class="suave">(' + direcciones.length + ')</span></label>') +
         '<div class="marcados-lista">' + direcciones.map(function (d) {
           return '<span class="marcado-chip">' + U.escapar(d) +
             '<button type="button" class="cco-quitar" data-dir="' + U.escapar(d) + '" ' +
@@ -103,6 +106,13 @@ var CorreoCuadro = (function () {
     if (!caja) return;
     caja.innerHTML = contenidoCco();
     engancharCco();
+    if (window.CorreoTutorBotones) CorreoTutorBotones.enganchar({ anadirCco: anadirCco });   /* fila 348 */
+  }
+
+  /* Fila 348: «+ Tutor/a de …» en la copia oculta. */
+  function anadirCco(dirs) {
+    dirs.forEach(function (d) { cco[d] = true; });
+    refrescarCco();
   }
 
   /* ---------- copiar y abrir ---------- */
@@ -137,6 +147,46 @@ var CorreoCuadro = (function () {
      destinatarios, asunto y los documentos que se adjuntan; a la
      derecha el texto del correo. Todo el formulario va dentro de
      `#correo-formulario`, hermano de `#correo-resumen` (fila 115). */
+  /* ---------- fila 348: «Va a:» de la plantilla ---------- */
+
+  var destinoCtx = { persona: null, correoLoPide: '' };
+
+  /* La plantilla con la que se abre el cuadro (la pedida por una receta, la del tipo o ninguna): se fija aquí, antes de pintar
+     «Para», y `bloqueCuerpo` la encuentra ya decidida. */
+  function plantillaInicial(a) {
+    var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
+    var pedida = (n()._interno || {}).plantillaPedida;
+    if (pedida && opciones.some(function (p) { return p.id === pedida; })) { plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
+    if (plantillaElegida === null) plantillaElegida = n().plantillaDeEntrada(a, opciones);
+    if (plantillaElegida && !opciones.some(function (p) { return p.id === plantillaElegida; })) plantillaElegida = '';
+    return opciones.filter(function (p) { return p.id === plantillaElegida; })[0] || null;
+  }
+
+  /* A quién va según el «Va a:»: { elegidos: { dirección: bool }, otro }. */
+  function destinoDe(vaA) {
+    var ctx = destinoCtx;
+    var posibles = Destinatarios.posibles(ctx.persona, vaA === 'quien-lo-pide' ? ctx.correoLoPide : '', {});
+    var elegidos = {};
+    Object.keys(posibles.elegidos).forEach(function (k) { elegidos[k] = false; });
+    if (vaA === 'familia') {
+      Object.keys(posibles.elegidos).forEach(function (k) { elegidos[k] = posibles.elegidos[k]; });
+      return { elegidos: elegidos, otro: '' };
+    }
+    if (vaA === 'tutor') return { elegidos: elegidos, otro: window.CorreoTutorBotones ? CorreoTutorBotones.correos().join(', ') : '' };
+    return { elegidos: elegidos, otro: ctx.correoLoPide || '' };
+  }
+
+  /* Al cambiar de plantilla en el desplegable: si la nueva dice a quién va, «Para» se pone así. */
+  function aplicarDestino(a) {
+    var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
+    var p = opciones.filter(function (x) { return x.id === plantillaElegida; })[0];
+    if (!p || !p.vaA || !$('correo-otro')) return;
+    var d = destinoDe(p.vaA);
+    elegidos = d.elegidos;
+    Array.prototype.forEach.call(document.querySelectorAll('.correo-marca'), function (c) { c.checked = !!elegidos[c.value]; });
+    $('correo-otro').value = d.otro;
+  }
+
   function cuerpoHtml(a, persona, bloqueAdjuntos, opcionesGrupo) {
     elegidos = {};
     cco = {};
@@ -154,6 +204,14 @@ var CorreoCuadro = (function () {
     var posibles = Destinatarios.posibles(persona, correoLoPide, elegidos);
     elegidos = posibles.elegidos;
     var otroInicial = posibles.otro;
+    /* Fila 348: la plantilla con la que se abre dice a quién va, y «Para» lleva solo eso. */
+    destinoCtx = { persona: persona, correoLoPide: correoLoPide };
+    var plantillaDeEntrada = plantillaInicial(a);
+    var vaAInicial = plantillaDeEntrada && plantillaDeEntrada.vaA;
+    if (vaAInicial && !(n()._interno && n()._interno.tutorDelGrupo)) {
+      var d0 = destinoDe(vaAInicial);
+      elegidos = d0.elegidos; otroInicial = d0.otro;
+    }
     /* Fila 299: al tutor o tutora del grupo no se le escribe a la familia: sin su correo, ninguna dirección marcada. */
     if (n()._interno && n()._interno.tutorDelGrupo && !correoLoPide) Object.keys(elegidos).forEach(function (k) { elegidos[k] = false; });
 
@@ -207,7 +265,7 @@ var CorreoCuadro = (function () {
 
   function bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) {
     return avisoLoPideHtml(a) +
-      '<label class="etiqueta" style="margin-top:0">Para</label>' +
+      (window.CorreoTutorBotones && CorreoTutorBotones.cabeceraHtml('para', '', 'margin-top:0') || '<label class="etiqueta" style="margin-top:0">Para</label>') +
       (correos.length
         ? '<div id="correo-lista">' + correos.map(function (c) {
             return '<label class="correo-fila">' +
@@ -225,6 +283,7 @@ var CorreoCuadro = (function () {
       '<input id="correo-otro" class="campo" value="' + U.escapar(otroInicial || '') + '" ' +
         'placeholder="Otro correo, si hace falta" style="margin-top:8px">' +
       (window.CorreoTutor ? CorreoTutor.debajoDeOtroHtml() : '') +   /* fila 299 */
+      (window.CorreoTutorBotones ? CorreoTutorBotones.avisosHtml() : '') +   /* fila 348 */
 
       (opcionesGrupo
         ? '<label class="etiqueta">Añadir un grupo</label>' +
@@ -293,6 +352,7 @@ var CorreoCuadro = (function () {
 
     engancharPlantilla(a);
     engancharCco();
+    if (window.CorreoTutorBotones) CorreoTutorBotones.enganchar({ anadirCco: anadirCco });   /* fila 348 */
     engancharRuta(a);
     if (window.CorreoTutor) CorreoTutor.enganchar();   /* fila 299 */
     if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alAbrir(a, plantillaElegida);   /* fila 299 */
@@ -383,6 +443,7 @@ var CorreoCuadro = (function () {
     plantillaElegida = idElegida;
     $('correo-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
+    aplicarDestino(a);   /* fila 348 */
     if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alElegir(a, plantillaElegida);   /* fila 299 */
   }
 

@@ -195,6 +195,7 @@ var PlantillasPantalla = (function () {
         '<label class="pt-etq">Tipo de asunto <select id="pt-tipo" class="campo" data-solo-lectura>' + opcionesDeTipo() + '</select></label>' +
         '<label class="pt-etq"><input type="checkbox" id="pt-sin-hito" data-solo-lectura' + (E.sinHito ? ' checked' : '') + '> Sin ningún hito</label>' +
         '<label class="pt-etq"><input type="checkbox" id="pt-fuera" data-solo-lectura' + (E.fuera ? ' checked' : '') + '> Fuera de uso</label>' +
+        (E.pestana === 'correo' && window.PlantillaVaARevision ? '<button type="button" class="boton" id="pt-va-a"' + off + '>A quién va cada plantilla</button>' : '') +
         '<button type="button" class="boton boton-principal pt-nueva" id="pt-nueva"' + off + '>+ Nueva plantilla</button>' +
       '</div>' +
       '<div id="pt-cuerpo"></div>';
@@ -207,6 +208,7 @@ var PlantillasPantalla = (function () {
     $('pt-sin-hito').onchange = function () { E.sinHito = this.checked; pintarCuerpo(); };
     $('pt-fuera').onchange = function () { E.fuera = this.checked; pintarCuerpo(); };
     $('pt-nueva').onclick = function () { nueva(); };
+    if ($('pt-va-a')) $('pt-va-a').onclick = function () { PlantillaVaARevision.pasada(true).then(recargar); };   /* fila 348 */
   }
 
   function pintar() {
