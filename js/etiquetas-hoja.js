@@ -79,7 +79,7 @@ var EtiquetasHoja = (function () {
           var alto = p.lineas.reduce(function (s, l) { return s + l.pt * 1.2; }, 0) * pxPt;
           dentro = '<div class="et-lineas" style="padding:0 ' + (EtiquetasDisenos.RELLENO_MM * mm).toFixed(1) + 'px;top:' + Math.max(0, (h - alto) / 2).toFixed(1) + 'px">' +
             p.lineas.map(function (l) {
-              return '<div class="et-linea" style="font-size:' + (l.pt * pxPt).toFixed(2) + 'px;text-align:' + (l.alinea === 'centro' ? 'center' : 'left') + ';font-weight:' + (l.negrita ? 700 : 400) + '">' + esc(l.texto) + '</div>';
+              return '<div class="et-linea" style="font-size:' + (l.pt * pxPt).toFixed(2) + 'px;text-align:' + (l.alinea === 'centro' ? 'center' : (l.alinea === 'der' ? 'right' : 'left')) + ';font-weight:' + (l.negrita ? 700 : 400) + '">' + esc(l.texto) + '</div>';
             }).join('') + '</div>';
           if (c.item.sinDireccion) dentro += '<span class="et-aviso">Sin dirección</span>';
           if (p.corto) dentro += '<span class="et-aviso et-aviso-corto">No cabe</span>';
@@ -87,7 +87,7 @@ var EtiquetasHoja = (function () {
         return '<div class="' + clases + '" data-casilla="' + c.i + '" style="' + estilo + '">' + dentro + '</div>';
       }).join('');
       return '<div class="et-hoja-caja"><div class="et-hoja-numero">Hoja ' + (nh + 1) + ' de ' + paginas.hojas.length + '</div>' +
-        '<div class="et-hoja" data-hoja="' + nh + '" style="width:' + (210 * mm).toFixed(1) + 'px;height:' + (297 * mm).toFixed(1) + 'px">' + casillas + '</div></div>';
+        '<div class="et-hoja" data-hoja="' + nh + '" style="width:' + (g.hojaAncho * mm).toFixed(1) + 'px;height:' + (g.hojaAlto * mm).toFixed(1) + 'px">' + casillas + '</div></div>';
     }).join('');
   }
 

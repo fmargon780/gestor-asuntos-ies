@@ -8,15 +8,31 @@
 
    Un modelo es, siempre: { nombre, filas, columnas, sup, inf, izq, der, sepH, sepV } (mm). El tamaño de
    cada etiqueta sale de repartir lo que queda entre las casillas; así una hoja nueva solo necesita filas y
-   columnas, y «Ajustar márgenes» cambia los demás números.
+   columnas, y «Cambiar» ajusta los demás números. Un modelo propio lleva además su tamaño de hoja,
+   `hoja: { nombre, ancho, alto }` (mm; fila 346); sin `hoja`, es A4.
 
    - todos() → los modelos de la app, completos.   - nuevo(nombre, filas, columnas) → un modelo sin márgenes.
-   - geometria(m) → { filas, columnas, ancho, alto, x0, y0, px, py } (mm; x0/y0: esquina de la casilla 1).
-   - texto(m) → «L7160 · 3 × 7 · 63,5 × 38,1 mm».
+   - geometria(m) → { filas, columnas, ancho, alto, x0, y0, px, py, hojaAncho, hojaAlto } (mm; x0/y0: esquina de la casilla 1).
+   - hojaDe(m) → { nombre, ancho, alto } de la hoja del modelo (A4 si no lleva).   - TAMANOS, tamano(nombre).
+   - texto(m) → «3 × 7 · 63,5 × 38,1 mm · A4».
    ============================================================ */
 var EtiquetasModelos = (function () {
 
   var A4 = { ancho: 210, alto: 297 };
+
+  /* Los tamaños de hoja que se eligen por el nombre (mm); «Otro» lleva sus propias medidas. */
+  var TAMANOS = [
+    { nombre: 'A3', ancho: 297, alto: 420 }, { nombre: 'A4', ancho: 210, alto: 297 }, { nombre: 'A5', ancho: 148, alto: 210 },
+    { nombre: 'Carta', ancho: 216, alto: 279 }, { nombre: 'Oficio', ancho: 216, alto: 356 }
+  ];
+  function tamano(nombre) { return TAMANOS.filter(function (t) { return t.nombre === nombre; })[0] || null; }
+
+  /* La hoja de un modelo: lo guardado antes de la fila 346 no lleva `hoja` y se lee como A4. */
+  function hojaDe(m) {
+    var h = m && m.hoja;
+    if (h && h.ancho > 0 && h.alto > 0) return { nombre: h.nombre || 'Otro', ancho: h.ancho, alto: h.alto };
+    return { nombre: 'A4', ancho: A4.ancho, alto: A4.alto };
+  }
 
   /* [código Avery, código Apli (o ''), columnas, filas, paso horizontal, paso vertical, ancho, alto, izquierda, arriba] en mm */
   var AVERY = [
@@ -48,9 +64,11 @@ var EtiquetasModelos = (function () {
     };
   }
 
-  /* Sin márgenes: el A4 entero repartido en filas × columnas. */
-  function nuevo(nombre, filas, columnas) {
-    return { nombre: String(nombre || '').trim(), filas: filas, columnas: columnas, sup: 0, inf: 0, izq: 0, der: 0, sepH: 0, sepV: 0 };
+  /* Sin márgenes: la hoja entera (A4 si no se dice otra) repartida en filas × columnas. */
+  function nuevo(nombre, filas, columnas, hoja) {
+    var m = { nombre: String(nombre || '').trim(), filas: filas, columnas: columnas, sup: 0, inf: 0, izq: 0, der: 0, sepH: 0, sepV: 0 };
+    if (hoja) m.hoja = { nombre: hoja.nombre, ancho: hoja.ancho, alto: hoja.alto };
+    return m;
   }
 
   function todos() {
@@ -62,27 +80,30 @@ var EtiquetasModelos = (function () {
   }
 
   function geometria(m) {
-    var c = m.columnas, f = m.filas;
-    var ancho = (A4.ancho - m.izq - m.der - (c - 1) * m.sepH) / c;
-    var alto = (A4.alto - m.sup - m.inf - (f - 1) * m.sepV) / f;
-    return { filas: f, columnas: c, ancho: ancho, alto: alto, x0: m.izq, y0: m.sup, px: ancho + m.sepH, py: alto + m.sepV };
+    var c = m.columnas, f = m.filas, h = hojaDe(m);
+    var ancho = (h.ancho - m.izq - m.der - (c - 1) * m.sepH) / c;
+    var alto = (h.alto - m.sup - m.inf - (f - 1) * m.sepV) / f;
+    return { filas: f, columnas: c, ancho: ancho, alto: alto, x0: m.izq, y0: m.sup, px: ancho + m.sepH, py: alto + m.sepV, hojaAncho: h.ancho, hojaAlto: h.alto };
   }
 
   function coma(x) { return String(r2(x)).replace('.', ','); }
 
   function texto(m) {
-    var g = geometria(m);
-    return m.columnas + ' × ' + m.filas + ' · ' + coma(g.ancho) + ' × ' + coma(g.alto) + ' mm';
+    var g = geometria(m), h = hojaDe(m);
+    return m.columnas + ' × ' + m.filas + ' · ' + coma(g.ancho) + ' × ' + coma(g.alto) + ' mm · ' +
+      (h.nombre === 'Otro' ? coma(h.ancho) + ' × ' + coma(h.alto) + ' mm' : h.nombre);
   }
 
   /* Un modelo con números válidos: se dice qué falla (o '' si va bien). */
   function problema(m) {
     if (!(m.filas >= 1 && m.filas <= 40 && m.columnas >= 1 && m.columnas <= 12)) return 'Las filas y las columnas tienen que estar entre 1 y 40 (filas) y 1 y 12 (columnas).';
+    var h = m.hoja || hojaDe(m);
+    if (!(h.ancho >= 50 && h.alto >= 50 && h.ancho <= 1000 && h.alto <= 1000)) return 'La hoja tiene que medir entre 50 y 1.000 mm de ancho y de alto.';
     var g = geometria(m);
     if (!(g.ancho >= 10 && g.alto >= 8)) return 'Con esos márgenes las etiquetas quedan demasiado pequeñas.';
     return '';
   }
 
-  return { A4: A4, todos: todos, nuevo: nuevo, geometria: geometria, texto: texto, problema: problema, r2: r2 };
+  return { A4: A4, TAMANOS: TAMANOS, tamano: tamano, hojaDe: hojaDe, todos: todos, nuevo: nuevo, geometria: geometria, texto: texto, problema: problema, r2: r2 };
 })();
 window.EtiquetasModelos = EtiquetasModelos;

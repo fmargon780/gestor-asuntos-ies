@@ -1,7 +1,7 @@
 /* ============================================================
    etiquetas-pdf.js — el PDF de las etiquetas, a tamaño real (fila 344, docs/ETIQUETAS.md).
 
-   Con pdf-lib (la misma de js/pdf-herramientas.js), en A4, sin escalar: lo que se ve en la vista previa es lo
+   Con pdf-lib (la misma de js/pdf-herramientas.js), con la hoja del modelo (A4 si no dice otra), sin escalar: lo que se ve en la vista previa es lo
    que sale. La letra es Helvetica (normal y negrita), la que también mide la vista previa.
    - medidor() → Promise de `medir(texto, pt, negrita)` (ancho en puntos) para EtiquetasDisenos.ajustar.
    - generar(paginas, modelo, preparadas) → Promise de los bytes del PDF.
@@ -35,7 +35,7 @@ var EtiquetasPdf = (function () {
   async function generar(paginas, modelo, preparadas) {
     var f = await fuentes(), doc = f.doc, rgb = f.PDFLib.rgb;
     var g = EtiquetasModelos.geometria(modelo);
-    var W = 210 * MM, H = 297 * MM, relleno = EtiquetasDisenos.RELLENO_MM * MM;
+    var W = g.hojaAncho * MM, H = g.hojaAlto * MM, relleno = EtiquetasDisenos.RELLENO_MM * MM;
     paginas.hojas.forEach(function (hoja) {
       var pagina = doc.addPage([W, H]);
       hoja.forEach(function (c) {
@@ -48,7 +48,7 @@ var EtiquetasPdf = (function () {
         p.lineas.forEach(function (l) {
           var fu = l.negrita ? f.negrita : f.normal, t = segura(fu, l.texto);
           var w = fu.widthOfTextAtSize(t, l.pt);
-          var x = l.alinea === 'centro' ? x0 + (ancho - w) / 2 : x0 + relleno;
+          var x = l.alinea === 'centro' ? x0 + (ancho - w) / 2 : (l.alinea === 'der' ? x0 + ancho - relleno - w : x0 + relleno);
           pagina.drawText(t, { x: x, y: H - (y + l.pt * 0.95), size: l.pt, font: fu, color: rgb(0, 0, 0) });
           y += l.pt * 1.2;
         });

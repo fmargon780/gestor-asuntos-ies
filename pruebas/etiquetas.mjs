@@ -113,7 +113,7 @@ await pagina.waitForTimeout(300);
 await comprobar('6. el modelo propio queda elegido y cada etiqueta mide un cuarto del A4', pagina.evaluate(() => {
   const m = document.getElementById('et-modelo'); const txt = m.options[m.selectedIndex].textContent;
   return [txt, document.querySelectorAll('.et-hoja[data-hoja="0"] .et-casilla').length, document.getElementById('et-medida-modelo').textContent];
-}), ['Cuatro · 2 × 2 (propio)', 4, '2 × 2 · 105 × 148,5 mm']);
+}), ['Cuatro · 2 × 2 (propio)', 4, '2 × 2 · 105 × 148,5 mm · A4']);
 await comprobar('6. guardado en _GESTOR/etiquetas.json', pagina.evaluate(async () => (await Carpetas.leerJson(App.E.gestor, 'etiquetas.json')).modelos.map((m) => [m.nombre, m.filas, m.columnas])), [['Cuatro', 2, 2]]);
 
 console.log('--- 7. diseño propio ---');

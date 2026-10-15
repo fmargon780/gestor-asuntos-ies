@@ -144,7 +144,7 @@ var EtiquetasPantalla = (function () {
       '<select class="campo" id="et-modelo" data-solo-lectura>' + opciones(filtrarModelos(l, E.buscarModelo, m.id), m.id, function (x) { return x.nombre + ' · ' + x.columnas + ' × ' + x.filas + (x.propio ? ' (propio)' : ''); }) + '</select>' +
       '<p class="explica" id="et-medida-modelo">' + esc(EtiquetasModelos.texto(m)) + '</p>' +
       '<div class="et-botones"><button type="button" class="boton" id="et-modelo-nuevo"' + (soloConsulta() ? ' disabled' : '') + '>Nuevo modelo</button>' +
-      '<button type="button" class="boton" id="et-modelo-ajustar"' + (soloConsulta() ? ' disabled' : '') + '>Ajustar márgenes</button>' +
+      '<button type="button" class="boton" id="et-modelo-cambiar"' + (soloConsulta() ? ' disabled' : '') + '>Cambiar</button>' +
       (propio ? '<button type="button" class="boton" id="et-modelo-borrar"' + (soloConsulta() ? ' disabled' : '') + '>Borrar este modelo</button>' : '') + '</div>';
   }
 
@@ -161,16 +161,18 @@ var EtiquetasPantalla = (function () {
   function htmlDiseno() {
     var l = disenos().filter(vale), d = disenoActual();
     var propio = !!d && !d.integrado && !(E.editor && E.editor.tipo === 'diseno');
+    var ALINEA = { centro: ' · centrado', der: ' · a la derecha' };
     var off = soloConsulta() ? ' disabled' : '';
     return '<select class="campo" id="et-diseno" data-solo-lectura>' + opciones(l, d.id, function (x) { return x.nombre + (x.integrado ? '' : ' (propio)'); }) + '</select>' +
       '<ul class="et-renglones-ver">' + d.renglones.map(function (x) {
         var c = EtiquetasDatos.CAMPOS.filter(function (k) { return k.clave === x.dato; })[0];
-        return '<li>' + esc(x.dato === 'texto' ? '«' + x.texto + '»' : (c ? c.texto : x.dato)) + (x.negrita ? ' · negrita' : '') + '</li>';
+        return '<li>' + esc(x.dato === 'texto' ? '«' + x.texto + '»' : (c ? c.texto : x.dato)) + (x.negrita ? ' · negrita' : '') + (ALINEA[x.alinea] || '') + '</li>';
       }).join('') + '</ul>' +
       (d.unaPorFamilia ? '<p class="explica">Una etiqueta por familia: los hermanos salen juntos.</p>' : '') +
       '<div class="et-botones"><button type="button" class="boton" id="et-diseno-nuevo"' + off + '>Nuevo diseño</button>' +
       '<button type="button" class="boton" id="et-diseno-duplicar"' + off + '>Duplicar</button>' +
-      (propio ? '<button type="button" class="boton" id="et-diseno-editar"' + off + '>Cambiar</button><button type="button" class="boton" id="et-diseno-borrar"' + off + '>Borrar</button>' : '') + '</div>';
+      '<button type="button" class="boton" id="et-diseno-editar"' + off + '>Cambiar</button>' +
+      (propio ? '<button type="button" class="boton" id="et-diseno-borrar"' + off + '>Borrar</button>' : '') + '</div>';
   }
 
   function htmlPanel() {
@@ -287,7 +289,7 @@ var EtiquetasPantalla = (function () {
     $('et-modelo').onchange = function () { E.modeloId = this.value; E.gastadas = {}; EtiquetasGuardado.recordar('modelo', this.value); pintar(); };
     $('et-diseno').onchange = function () { E.disenoId = this.value; EtiquetasGuardado.recordar('diseno', this.value); pintar(); };
     $('et-modelo-nuevo').onclick = function () { abrirEditorModelo(null); };
-    $('et-modelo-ajustar').onclick = function () { abrirEditorModelo(modeloActual()); };
+    $('et-modelo-cambiar').onclick = function () { abrirEditorModelo(modeloActual()); };
     var mb = $('et-modelo-borrar');
     if (mb) mb.onclick = function () { borrarModelo(modeloActual()); };
     $('et-diseno-nuevo').onclick = function () {
@@ -300,7 +302,7 @@ var EtiquetasPantalla = (function () {
       E.editor = { tipo: 'diseno', titulo: 'Duplicar el diseño', diseno: d }; pintar();
     };
     var de = $('et-diseno-editar'), db = $('et-diseno-borrar');
-    if (de) de.onclick = function () { E.editor = { tipo: 'diseno', titulo: 'Cambiar el diseño', diseno: JSON.parse(JSON.stringify(disenoActual())) }; pintar(); };
+    if (de) de.onclick = function () { abrirEditorDiseno(disenoActual()); };
     if (db) db.onclick = function () { borrarDiseno(disenoActual()); };
   }
 
@@ -320,12 +322,30 @@ var EtiquetasPantalla = (function () {
 
   /* ---------- guardar modelos y diseños ---------- */
 
+  /* «Cambiar»: uno propio se sustituye (mismo id); uno de la app se guarda como copia con otro nombre. */
   function abrirEditorModelo(base) {
-    var m;
+    var m, aviso = '';
     if (!base) m = Object.assign(EtiquetasModelos.nuevo('', 0, 0), { filas: '', columnas: '' });
-    else { m = Object.assign({}, base); if (m.integrado) { delete m.integrado; delete m.id; delete m.codigo; delete m.apli; m.nombre = base.nombre + ' (ajustado)'; } }
-    E.editor = { tipo: 'modelo', modelo: m, existente: base && base.propio ? base.id : null, margenesAbiertos: !!base,
-                 titulo: !base ? 'Nuevo modelo de hoja' : (base.propio ? 'Cambiar el modelo' : 'Ajustar los márgenes (se guarda como modelo propio)') };
+    else {
+      m = JSON.parse(JSON.stringify(base));
+      delete m.propio;
+      if (m.integrado) {
+        delete m.integrado; delete m.id; delete m.codigo; delete m.apli; m.nombre = 'Copia de ' + base.nombre;
+        aviso = 'Es un modelo de la app: se guardará como copia con otro nombre.';
+      }
+    }
+    E.editor = { tipo: 'modelo', modelo: m, existente: base && base.propio ? base.id : null, margenesAbiertos: !!base, aviso: aviso,
+                 titulo: !base ? 'Nuevo modelo de hoja' : (base.propio ? 'Cambiar el modelo' : 'Cambiar el modelo (se guarda como copia propia)') };
+    pintar();
+  }
+
+  function abrirEditorDiseno(base) {
+    var d = JSON.parse(JSON.stringify(base)), aviso = '';
+    if (d.integrado) {
+      delete d.id; delete d.integrado; d.nombre = 'Copia de ' + base.nombre;
+      aviso = 'Es un diseño de la app: se guardará como copia con otro nombre.';
+    }
+    E.editor = { tipo: 'diseno', titulo: base.integrado ? 'Cambiar el diseño (se guarda como copia propia)' : 'Cambiar el diseño', diseno: d, aviso: aviso };
     pintar();
   }
 
