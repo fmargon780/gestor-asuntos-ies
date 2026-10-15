@@ -56,7 +56,11 @@ var EtiquetasHoja = (function () {
   function preparar(items, diseno, modelo, medir) {
     var g = EtiquetasModelos.geometria(modelo), memo = new Map();
     items.forEach(function (it) {
-      if (!memo.has(it)) memo.set(it, EtiquetasDisenos.ajustar(EtiquetasDisenos.lineas(diseno, it.valores), g.ancho, g.alto, medir));
+      if (!memo.has(it)) {
+        var a = EtiquetasDisenos.ajustar(EtiquetasDisenos.lineas(diseno, it.valores), g.ancho, g.alto, medir);
+        a.vertical = diseno.vertical || 'centro';   /* fila 350: la letra ya está ajustada; ahora se coloca el bloque */
+        memo.set(it, a);
+      }
     });
     return memo;
   }
@@ -77,7 +81,7 @@ var EtiquetasHoja = (function () {
         var dentro = '';
         if (p) {
           var alto = p.lineas.reduce(function (s, l) { return s + l.pt * 1.2; }, 0) * pxPt;
-          dentro = '<div class="et-lineas" style="padding:0 ' + (EtiquetasDisenos.RELLENO_MM * mm).toFixed(1) + 'px;top:' + Math.max(0, (h - alto) / 2).toFixed(1) + 'px">' +
+          dentro = '<div class="et-lineas" style="padding:0 ' + (EtiquetasDisenos.RELLENO_MM * mm).toFixed(1) + 'px;top:' + EtiquetasDisenos.inicioY(p.vertical, h, alto, EtiquetasDisenos.RELLENO_MM * mm).toFixed(1) + 'px">' +
             p.lineas.map(function (l) {
               return '<div class="et-linea" style="font-size:' + (l.pt * pxPt).toFixed(2) + 'px;text-align:' + (l.alinea === 'centro' ? 'center' : (l.alinea === 'der' ? 'right' : 'left')) + ';font-weight:' + (l.negrita ? 700 : 400) + '">' + esc(l.texto) + '</div>';
             }).join('') + '</div>';

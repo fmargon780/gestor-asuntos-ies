@@ -117,7 +117,7 @@ await pagina.fill('#repartir-por', '1');
 await pagina.dispatchEvent('#repartir-por', 'change');
 await pagina.waitForFunction(() => document.querySelectorAll('.repartir-trozo').length === 6);
 await pagina.evaluate(() => { document.querySelector('.repartir-filtro').open = true; });
-const poner = async (id, valor) => { await pagina.selectOption('#' + id, valor); };
+const poner = async (id, valor) => { await pagina.fill('#' + id, valor); await pagina.press('#' + id, 'Enter'); };   /* fila 350: se elige escribiendo */
 await poner('rf-dato', 'centroProcedencia');
 await poner('rf-valor', 'CEIP Jorge Guillén');
 await pagina.waitForSelector('.bd-grupo-cond');

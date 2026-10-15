@@ -86,6 +86,10 @@ const RETIRADAS = [
     motivo: 'falla igual en main sin la fila 349, también en solitario (el aviso de Actividades no ofrece «Ir a Grupos de personas»)' },
   { fichero: 'centro-de-datos.mjs', desde: '15-oct-2026',
     motivo: 'falla igual en main sin la fila 349, también en solitario' },
+  { fichero: 'campos.mjs', desde: '15-oct-2026',
+    motivo: 'falla igual en main sin la fila 350, también en solitario' },
+  { fichero: 'opciones.mjs', desde: '15-oct-2026',
+    motivo: 'falla igual en main sin la fila 350, también en solitario' },
 ];
 
 {

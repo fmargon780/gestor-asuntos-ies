@@ -11,7 +11,7 @@
    ============================================================ */
 var EtiquetasPantalla = (function () {
 
-  var E = { abierta: false, turno: 0, clase: 'alumnado', copias: 1, gastadas: {}, quitadas: {}, pegado: null, personal: { clase: '', depto: '' },
+  var E = { abierta: false, turno: 0, clase: 'alumnado', copias: 1, gastadas: {}, quitadas: {}, anadidas: {}, pegado: null, personal: { clase: '', depto: '' },
             guardado: { modelos: [], disenos: [] }, editor: null, base: null, volverA: null, listaAbierta: false, medir: null };
 
   function $(id) { return document.getElementById(id); }
@@ -55,13 +55,22 @@ var EtiquetasPantalla = (function () {
     });
   }
 
-  function personasElegidas() {
+  function criterioActivo() {
+    return E.clase === 'alumnado' ? !!(E.filtro && E.filtro.activo()) : !!(E.personal.clase || E.personal.depto);
+  }
+
+  /* Fila 350: las personas que suma el buscador, de esta clase (alumnado o personal). */
+  function anadidasLista() { return Object.keys(E.anadidas).map(function (k) { return E.anadidas[k]; }); }
+
+  /* Las personas de la lista con casilla: las del filtro (o todas, sin filtro) y las que suma el buscador. Sin ningún
+     filtro ni lista pegada ni grupo de partida, y con alguien elegido en el buscador, solo salen las elegidas. */
+  function candidatas() {
     var lista;
     if (E.clase === 'alumnado') {
       lista = E.base || E.matriculados || [];
       if (E.filtro && E.filtro.activo()) {
         var dentro = {};
-        E.filtro.personas().forEach(function (p) { dentro[clave(p)] = true; });
+        E.filtro.todas().forEach(function (p) { dentro[clave(p)] = true; });
         lista = lista.filter(function (p) { return dentro[clave(p)]; });
       }
     } else {
@@ -71,8 +80,16 @@ var EtiquetasPantalla = (function () {
         return true;
       });
     }
-    return sinSalir(porPegado(lista));
+    var extra = anadidasLista();
+    var soloLasElegidas = extra.length && !criterioActivo() && !E.base && !E.pegado;
+    var salida = soloLasElegidas ? [] : porPegado(lista);
+    var vistos = {};
+    salida.forEach(function (p) { vistos[clave(p)] = true; });
+    extra.forEach(function (p) { if (!vistos[clave(p)]) { vistos[clave(p)] = true; salida.push(p); } });
+    return salida;
   }
+
+  function personasElegidas() { return sinSalir(candidatas()); }
 
   /* Fila 345: la lista del filtro de personal (clase y departamento, sin la lista pegada) para «Exportar la lista ▾». */
   function listaDePersonal() {
@@ -86,7 +103,7 @@ var EtiquetasPantalla = (function () {
       if (E.personal.clase && p.tipoPersonal !== E.personal.clase) return false;
       return !(E.personal.depto && EtiquetasDatos.valores(p, 'personal', {}).departamento !== E.personal.depto);
     });
-    return FiltroExportar.listaDePersonal(lista, criterios);
+    return FiltroExportar.listaDePersonal(sinSalir(lista), criterios);   /* fila 350: solo las marcadas */
   }
 
   function exportarPersonal(panel) {
@@ -111,20 +128,65 @@ var EtiquetasPantalla = (function () {
     return lista.map(function (o) { return '<option value="' + esc(o.id) + '"' + (o.id === actual ? ' selected' : '') + '>' + esc(texto(o)) + '</option>'; }).join('');
   }
 
+  var CLASES_PERSONAL = [{ valor: '', texto: 'Todo el personal' }, { valor: 'docente', texto: 'Docente' }, { valor: 'no-docente', texto: 'No docente' }];
+  function textoClasePersonal() {
+    var c = CLASES_PERSONAL.filter(function (o) { return o.valor === (E.personal.clase || ''); })[0];
+    return c && c.valor ? c.texto : '';
+  }
+  function departamentos() {
+    var deptos = {};
+    (E.personal.lista || []).forEach(function (p) { var d = EtiquetasDatos.valores(p, 'personal', {}).departamento; if (d) deptos[d] = true; });
+    return Object.keys(deptos).sort();
+  }
+
+  /* Fila 350: lo que encuentra el buscador (3 letras o más): alumnado por apellidos, nombre o nº escolar; personal por
+     apellidos, nombre o los 4 últimos del documento. Hasta 10, con su unidad o departamento. */
+  function buscarPersonas(texto) {
+    var palabras = nor(texto).split(/\s+/).filter(Boolean);
+    var alumnado = E.clase === 'alumnado';
+    var pool = alumnado ? (E.matriculados || []) : (E.personal.lista || []);
+    var salida = [];
+    pool.forEach(function (p) {
+      var v = alumnado ? null : EtiquetasDatos.valores(p, 'personal', {});
+      var documento = v ? String(v.dni || '') : '';
+      var pajar = nor(p.nombre) + ' ' + (alumnado ? nor(p.id) : nor(documento.slice(-4)));
+      if (palabras.every(function (w) { return pajar.indexOf(w) !== -1; })) {
+        salida.push({ valor: clave(p), texto: p.nombre, detalle: alumnado ? (p.unidad || '') : (v.departamento || ''), persona: p });
+      }
+    });
+    salida.sort(function (a, b) { return nor(a.texto) < nor(b.texto) ? -1 : (nor(a.texto) > nor(b.texto) ? 1 : 0); });
+    return salida.slice(0, 10);
+  }
+
+  function elegirPersona(o) {
+    var aviso = $('et-buscar-aviso'), k = o.valor;
+    function decir(t) { if (aviso) aviso.textContent = t; }
+    /* Sin filtro ni nadie elegido, en la lista están todas: elegir a una deja solo esa, no «ya estaba». */
+    var todosPorDefecto = !anadidasLista().length && !criterioActivo() && !E.base && !E.pegado;
+    var yaEsta = !todosPorDefecto && candidatas().some(function (p) { return clave(p) === k; });
+    if (E.anadidas[k] || yaEsta) {
+      if (E.quitadas[k]) { delete E.quitadas[k]; decir('Estaba desmarcada en la lista: la he vuelto a marcar.'); pintarVista(); }
+      else decir('Ya está en la lista.');
+      return;
+    }
+    E.anadidas[k] = o.persona;
+    decir('Añadida: ' + o.texto + '.');
+    pintarVista();
+  }
+
   function htmlAQuien() {
     var h = '<div class="et-pestanas">' +
       ['alumnado', 'personal'].map(function (c) {
         return '<button type="button" class="boton et-pestana' + (E.clase === c ? ' et-activa' : '') + '" data-clase="' + c + '" data-solo-lectura>' + (c === 'alumnado' ? 'Alumnado' : 'Personal') + '</button>';
       }).join('') + '</div>';
+    /* Fila 350: el buscador de personas, a partir de 3 letras, según la clase elegida. */
+    h += '<div class="et-buscar-persona">' + CajaConSugerencias.html('et-buscar-persona', { placeholder: 'Buscar a una persona…' }) +
+      '<p class="et-buscar-aviso" id="et-buscar-aviso" aria-live="polite"></p></div>';
     if (E.clase === 'alumnado') {
       h += E.filtro ? RepartirFiltro.html(E.filtro) : '<p class="explica">No hay alumnado cargado.</p>';
     } else {
-      var deptos = {};
-      (E.personal.lista || []).forEach(function (p) { var d = EtiquetasDatos.valores(p, 'personal', {}).departamento; if (d) deptos[d] = true; });
-      h += '<div class="et-fila"><label class="etiqueta">Clase de personal <select class="campo" id="et-pclase" data-solo-lectura>' +
-        [['', 'Todo el personal'], ['docente', 'Docente'], ['no-docente', 'No docente']].map(function (o) { return '<option value="' + o[0] + '"' + (E.personal.clase === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
-        '<label class="etiqueta">Departamento <select class="campo" id="et-pdepto" data-solo-lectura><option value="">Todos</option>' +
-        Object.keys(deptos).sort().map(function (d) { return '<option value="' + esc(d) + '"' + (E.personal.depto === d ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('') + '</select></label></div>' +
+      h += '<div class="et-fila"><div class="etiqueta">Clase de personal ' + CajaConSugerencias.html('et-pclase', { valor: textoClasePersonal(), placeholder: 'Todo el personal' }) + '</div>' +
+        '<div class="etiqueta">Departamento ' + CajaConSugerencias.html('et-pdepto', { valor: E.personal.depto, placeholder: 'Todos' }) + '</div></div>' +
         FiltroExportar.botonHTML(false);   /* fila 345: se enciende en listaDePersonal() cuando hay criterio */
     }
     h += '<details class="et-pegar"' + (E.pegado ? ' open' : '') + '><summary>Pegar una lista' + (E.pegado ? ' (' + E.pegado.cuantas + ')' : '') + '</summary>' +
@@ -167,7 +229,7 @@ var EtiquetasPantalla = (function () {
       '<ul class="et-renglones-ver">' + d.renglones.map(function (x) {
         var c = EtiquetasDatos.CAMPOS.filter(function (k) { return k.clave === x.dato; })[0];
         return '<li>' + esc(x.dato === 'texto' ? '«' + x.texto + '»' : (c ? c.texto : x.dato)) + (x.negrita ? ' · negrita' : '') + (ALINEA[x.alinea] || '') + '</li>';
-      }).join('') + '</ul>' +
+      }).join('') + (d.vertical === 'arriba' || d.vertical === 'abajo' ? '<li>Texto ' + d.vertical + '</li>' : '') + '</ul>' +
       (d.unaPorFamilia ? '<p class="explica">Una etiqueta por familia: los hermanos salen juntos.</p>' : '') +
       '<div class="et-botones"><button type="button" class="boton" id="et-diseno-nuevo"' + off + '>Nuevo diseño</button>' +
       '<button type="button" class="boton" id="et-diseno-duplicar"' + off + '>Duplicar</button>' +
@@ -229,21 +291,23 @@ var EtiquetasPantalla = (function () {
     $('et-imprimir').onclick = imprimir;
   }
 
+  function itemsLista() {
+    return candidatas().map(function (p) {
+      return { clave: clave(p), texto: p.nombre + (p.unidad ? ' · ' + p.unidad : ''), anadida: !!E.anadidas[clave(p)] };
+    });
+  }
+
   function htmlLista() {
-    var personas = personasElegidas();
-    if (!personas.length) return '';
-    return '<details class="et-lista"' + (E.listaAbierta ? ' open' : '') + '><summary>Ver y quitar a alguien</summary><ul>' +
-      personas.slice(0, 400).map(function (p) {
-        return '<li><span>' + esc(p.nombre) + (p.unidad ? ' · ' + esc(p.unidad) : '') + '</span> <button type="button" class="boton boton-mini" data-quitar-p="' + esc(clave(p)) + '" aria-label="Quitar a ' + esc(p.nombre) + '">✕</button></li>';
-      }).join('') + (personas.length > 400 ? '<li class="suave">…y ' + (personas.length - 400) + ' más.</li>' : '') + '</ul></details>';
+    var items = itemsLista();
+    return items.length ? ListaConCasillas.html(items, E.quitadas, { id: 'et' }) : '';
   }
 
   function engancharLista() {
-    var det = document.querySelector('#et-lista .et-lista');
-    if (!det) return;
-    det.addEventListener('toggle', function () { E.listaAbierta = det.open; });
-    Array.prototype.forEach.call(det.querySelectorAll('[data-quitar-p]'), function (b) {
-      b.onclick = function () { E.quitadas[b.getAttribute('data-quitar-p')] = true; pintarVista(); };
+    var cont = $('et-lista');
+    if (!cont) return;
+    ListaConCasillas.enganchar(cont, itemsLista(), E.quitadas, {
+      alCambiar: function () { if (E.filtro) E.filtro.cacheMarcadas = null; pintarVista(); },
+      alQuitar: function (k) { delete E.anadidas[k]; delete E.quitadas[k]; pintarVista(); }
     });
   }
 
@@ -269,12 +333,26 @@ var EtiquetasPantalla = (function () {
       return;
     }
     Array.prototype.forEach.call(panel.querySelectorAll('[data-clase]'), function (b) {
-      b.onclick = function () { E.clase = b.getAttribute('data-clase'); E.gastadas = {}; pintar(); };
+      b.onclick = function () { E.clase = b.getAttribute('data-clase'); E.gastadas = {}; E.anadidas = {}; pintar(); };
     });
     if (E.filtro && E.clase === 'alumnado') RepartirFiltro.enganchar(E.filtro, panel, function () { pintar(); });
+    CajaConSugerencias.enganchar(panel, 'et-buscar-persona', { fuente: buscarPersonas, minimo: 3, vaciar: true, alElegir: elegirPersona });
     var pc = $('et-pclase'), pd = $('et-pdepto');
-    if (pc) pc.onchange = function () { E.personal.clase = pc.value; pintarVista(); exportarPersonal(panel); };
-    if (pd) pd.onchange = function () { E.personal.depto = pd.value; pintarVista(); exportarPersonal(panel); };
+    function conTodos(items, actual) {
+      return function (texto) {
+        return nor(texto) === nor(actual()) ? items() : CajaConSugerencias.deLista(items())(texto);
+      };
+    }
+    if (pc) CajaConSugerencias.enganchar(panel, 'et-pclase', {
+      fuente: conTodos(function () { return CLASES_PERSONAL; }, textoClasePersonal),
+      alElegir: function (o) { E.personal.clase = o.valor; if (!o.valor) pc.value = ''; pintarVista(); exportarPersonal(panel); }
+    });
+    if (pd) CajaConSugerencias.enganchar(panel, 'et-pdepto', {
+      fuente: conTodos(function () { return [{ valor: '', texto: 'Todos' }].concat(departamentos().map(function (d) { return { valor: d, texto: d }; })); }, function () { return E.personal.depto; }),
+      alElegir: function (o) { E.personal.depto = o.valor; if (!o.valor) pd.value = ''; pintarVista(); exportarPersonal(panel); }
+    });
+    if (pd) pd.addEventListener('input', function () { if (!pd.value.trim() && E.personal.depto) { E.personal.depto = ''; pintarVista(); exportarPersonal(panel); } });
+    if (pc) pc.addEventListener('input', function () { if (!pc.value.trim() && E.personal.clase) { E.personal.clase = ''; pintarVista(); exportarPersonal(panel); } });
     if (pc) { FiltroExportar.enganchar(panel, function () { return listaDePersonal(); }); exportarPersonal(panel); }
     $('et-pegar-usar').onclick = function () { pegar($('et-pegado').value); };
     var pq = $('et-pegar-quitar');
@@ -429,7 +507,8 @@ var EtiquetasPantalla = (function () {
     E.matriculados = (fuenteAl.lista || []).filter(function (p) { return p.matriculado; });
     E.indice = PersonasFamilias.indice(E.matriculados);
     E.filtro = null;
-    try { E.filtro = await RepartirFiltro.crear({ lista: E.matriculados }, []); } catch (e) { E.filtro = null; }
+    try { E.filtro = await RepartirFiltro.crear({ lista: E.matriculados }, [], { sinLista: true }); } catch (e) { E.filtro = null; }
+    if (E.filtro) { E.filtro.clave = clave; E.filtro.desmarcadas = E.quitadas; }   /* fila 350: lo desmarcado en la lista vale también para exportar */
     var fuentePe = null;
     try { fuentePe = await Datos.cargar(App.E.datos, 'PERSONAL'); } catch (e) { fuentePe = null; }
     E.personal.lista = fuentePe ? (fuentePe.lista || []).filter(function (p) { return p.enElCentro; }) : [];
@@ -448,7 +527,7 @@ var EtiquetasPantalla = (function () {
     var l = $('herramientas-lista'), vista = $('etiquetas-vista');
     if (!vista) return;
     E.abierta = true; E.volverA = op.asunto ? { asunto: op.asunto, modo: op.modo || 'abierto' } : null;
-    E.clase = 'alumnado'; E.gastadas = {}; E.quitadas = {}; E.pegado = null; E.editor = null; E.copias = 1; E.personal = { clase: '', depto: '', lista: [] };
+    E.clase = 'alumnado'; E.gastadas = {}; E.quitadas = {}; E.anadidas = {}; E.pegado = null; E.editor = null; E.copias = 1; E.personal = { clase: '', depto: '', lista: [] };
     var ult = EtiquetasGuardado.ultimo();
     E.modeloId = ult.modelo || null; E.disenoId = ult.diseno || null;
     if (l) l.classList.add('oculto');

@@ -98,7 +98,8 @@ await comprobar('2. el formulario vuelve a salir limpio: sin grupo de la vez ant
 await pagina.click('#btn-grupo-nuevo');
 await pagina.click('#capa .categoria-mini-boton:text("ALUMNADO")');
 await pagina.waitForSelector('#rf-unidad');
-await pagina.selectOption('#rf-unidad', '4º A');
+await pagina.fill('#rf-unidad', '4º A');   /* fila 350: se elige escribiendo */
+await pagina.press('#rf-unidad', 'Enter');
 await pagina.click('#rf-senalar');   /* fila 345: el filtro solo señala al pulsar «Señalar los N» */
 await comprobar('2. el filtro de la unidad señala a sus cuatro personas',
   pagina.locator('.marcados-cuenta').textContent(), '4 señalados');

@@ -14,6 +14,11 @@
    - crear(fuente, relacionados) → el filtro, o null si no hay alumnado.
      `fuente`: lo que devuelve Datos.cargar(…, 'ALUMNADO').
    - f.activo(), f.usado, f.nombres(), f.entra(nombre), f.leer(texto).
+   - Fila 350 (docs/ETIQUETAS-BUSCADOR-VERTICAL-FILTRO.md): cada criterio se elige escribiendo
+     (js/caja-con-sugerencias.js) y, debajo, sale la lista de las personas que cumplen el filtro con su casilla,
+     todas marcadas (js/lista-con-casillas.js). f.todas() son las que cumplen los criterios; f.personas()
+     (y f.nombres(), f.entra) solo las marcadas: son las que cuentan en repartos, «Señalar los N» y exportar.
+     `opciones.sinLista`: sin esa lista (Etiquetas pinta la suya, con las personas que suma el buscador).
    - html(f) y enganchar(f, raiz, alCambiar): la zona.
    - nombresParaElegir, avisoDeLectura: las listas y lo que lee la app.
    - cuentasHTML y enganchar de cuentas: la línea de abajo.
@@ -37,11 +42,17 @@ var RepartirFiltro = (function () {
     (relacionados || []).forEach(function (p) { if (!vistos[p.tercero]) { vistos[p.tercero] = true; todos.push(p); } });
     var f = {
       lista: lista, datos: datos, unidades: unidades, niveles: ne.niveles, ensenanzas: ne.ensenanzas, candidatos: todos,
-      conds: [], antiguos: false, abierto: !!opciones.abierto, usado: false, cache: null, memo: {},
+      conds: [], antiguos: false, abierto: !!opciones.abierto, usado: false, cache: null, cacheMarcadas: null, memo: {},
+      desmarcadas: {}, sinLista: !!opciones.sinLista,
       alSenalar: opciones.alSenalar || null   /* fila 345: con función, sale «Señalar los N» */
     };
     f.activo = function () { return f.conds.length > 0; };
-    f.personas = function () { if (!f.cache) f.cache = calcular(f); return f.cache; };
+    f.todas = function () { if (!f.cache) f.cache = calcular(f); return f.cache; };
+    f.clave = function (p) { return App.textoTercero(p); };
+    f.personas = function () {
+      if (!f.cacheMarcadas) f.cacheMarcadas = f.todas().filter(function (p) { return !f.desmarcadas[f.clave(p)]; });
+      return f.cacheMarcadas;
+    };
     f.nombres = function () { return f.personas().map(function (p) { return App.textoTercero(p); }); };
     f.entra = function (nombre) { return f.nombres().indexOf(nombre) !== -1; };
     /* Lo que se lee en un texto, entre todo el alumnado (no solo el filtro). */
@@ -73,6 +84,7 @@ var RepartirFiltro = (function () {
 
   function cambiar(f, alCambiar) {
     f.cache = null;
+    f.cacheMarcadas = null;
     f.usado = true;
     f.abierto = true;
     alCambiar();
@@ -102,15 +114,12 @@ var RepartirFiltro = (function () {
       '<summary>Filtrar el alumnado' + (f.activo() ? ' <span class="repartir-filtro-cuantos">' + esc(cuantos(f.personas().length)) + '</span>' : '') + '</summary>' +
       (sueltos.length
         ? '<div class="atajo-fila"><span>Por datos del alumnado</span>' +
-            '<select id="rf-dato" class="campo">' + opciones(sueltos.map(function (c) { return { valor: c.clave, texto: AlumnadoBDVer.etiqueta(c) }; }), 'Elige un dato…') + '</select>' +
-            '<select id="rf-valor" class="campo" disabled><option value="">Su valor…</option></select></div>' : '') +
+            CajaConSugerencias.html('rf-dato', { placeholder: 'Escribe un dato…' }) +
+            CajaConSugerencias.html('rf-valor', { placeholder: 'Su valor…', deshabilitada: true }) + '</div>' : '') +
       (f.unidades.length
-        ? '<div class="atajo-fila"><span>Toda una unidad</span><select id="rf-unidad" class="campo">' +
-            opciones(f.unidades.map(function (u) { return { valor: u.unidad, texto: u.unidad + ' (' + u.cuantos + ')' }; }), 'Elige…') + '</select></div>' +
-          '<div class="atajo-fila"><span>Todo un nivel</span><select id="rf-nivel" class="campo">' +
-            opciones(f.niveles.map(function (v) { return { valor: v, texto: v }; }), 'Elige…') + '</select></div>' +
-          '<div class="atajo-fila"><span>Toda una enseñanza</span><select id="rf-ensenanza" class="campo">' +
-            opciones(f.ensenanzas.map(function (v) { return { valor: v, texto: v }; }), 'Elige…') + '</select></div>' : '') +
+        ? '<div class="atajo-fila"><span>Toda una unidad</span>' + CajaConSugerencias.html('rf-unidad', { placeholder: 'Escribe la unidad…' }) + '</div>' +
+          '<div class="atajo-fila"><span>Todo un nivel</span>' + CajaConSugerencias.html('rf-nivel', { placeholder: 'Escribe el nivel…' }) + '</div>' +
+          '<div class="atajo-fila"><span>Toda una enseñanza</span>' + CajaConSugerencias.html('rf-ensenanza', { placeholder: 'Escribe la enseñanza…' }) + '</div>' : '') +
       (sueltos.length ? '<div class="atajo-fila"><label><input type="checkbox" id="rf-antiguos"' + (f.antiguos ? ' checked' : '') + '> Incluir antiguos</label></div>' : '') +
       '<div class="bd-grupo-conds repartir-pastillas">' + f.conds.map(function (c, i) {
         return '<span class="bd-grupo-cond">' + esc(textoCond(f, c)) +
@@ -120,7 +129,13 @@ var RepartirFiltro = (function () {
       (f.alSenalar ? '<p class="repartir-filtro-senalar"><button type="button" class="boton boton-principal" id="rf-senalar"' + (f.activo() && f.personas().length ? '' : ' disabled') + '>' +
         esc(f.personas().length === 1 ? 'Señalar 1' : 'Señalar los ' + f.personas().length) + '</button></p>' : '') +
       FiltroExportar.botonHTML(f.activo() && f.personas().length > 0) +
+      (f.activo() && !f.sinLista ? ListaConCasillas.html(itemsDeLista(f), f.desmarcadas, { id: 'rf' }) : '') +
       '</details>';
+  }
+
+  /* La lista con casillas: las que cumplen los criterios, marcadas o no. */
+  function itemsDeLista(f) {
+    return f.todas().map(function (p) { return { clave: f.clave(p), texto: p.nombre + (p.unidad ? ' · ' + p.unidad : '') }; });
   }
 
   /* Pone un criterio (el mismo tipo y dato lo sustituye). */
@@ -133,24 +148,36 @@ var RepartirFiltro = (function () {
     if (!det) return;
     det.addEventListener('toggle', function () { f.abierto = det.open; });
     var q = function (id) { return det.querySelector('#' + id); };
-    var dato = q('rf-dato'), valor = q('rf-valor');
-    if (dato) dato.onchange = function () {
-      valor.disabled = !dato.value;
-      valor.innerHTML = opciones(dato.value ? AlumnadoBDVer.valoresDe(f.datos, dato.value, f.antiguos).map(function (v) { return { valor: v, texto: v }; }) : [], 'Su valor…');
-    };
-    if (valor) valor.onchange = function () {
-      if (!dato.value || !valor.value) return;
-      poner(f, { tipo: 'dato', clave: dato.value, valor: valor.value });
-      cambiar(f, alCambiar);
-    };
-    [['rf-unidad', 'unidad'], ['rf-nivel', 'nivel'], ['rf-ensenanza', 'ensenanza']].forEach(function (par) {
-      var s = q(par[0]);
-      if (s) s.onchange = function () {
-        if (!s.value) return;
-        poner(f, { tipo: par[1], valor: s.value });
-        cambiar(f, alCambiar);
-      };
+    var dato = q('rf-dato'), valor = q('rf-valor'), datoElegido = '';
+    if (dato) {
+      var sueltos = f.datos.campos.filter(function (c) { return c && c.clave && c.tipo !== 'tabla'; })
+        .map(function (c) { return { valor: c.clave, texto: AlumnadoBDVer.etiqueta(c) }; });
+      CajaConSugerencias.enganchar(det, 'rf-dato', {
+        fuente: CajaConSugerencias.deLista(sueltos),
+        alElegir: function (o) { datoElegido = o.valor; valor.disabled = false; valor.value = ''; valor.focus(); }
+      });
+      dato.addEventListener('input', function () { datoElegido = ''; valor.disabled = true; valor.value = ''; });
+      CajaConSugerencias.enganchar(det, 'rf-valor', {
+        fuente: function (texto) {
+          if (!datoElegido) return [];
+          var valores = AlumnadoBDVer.valoresDe(f.datos, datoElegido, f.antiguos).map(function (v) { return { valor: v, texto: v }; });
+          return CajaConSugerencias.deLista(valores)(texto);
+        },
+        alElegir: function (o) { poner(f, { tipo: 'dato', clave: datoElegido, valor: o.valor }); cambiar(f, alCambiar); }
+      });
+    }
+    [['rf-unidad', 'unidad', function () { return f.unidades.map(function (u) { return { valor: u.unidad, texto: u.unidad + ' (' + u.cuantos + ')' }; }); }],
+     ['rf-nivel', 'nivel', function () { return f.niveles.map(function (v) { return { valor: v, texto: v }; }); }],
+     ['rf-ensenanza', 'ensenanza', function () { return f.ensenanzas.map(function (v) { return { valor: v, texto: v }; }); }]].forEach(function (par) {
+      if (!q(par[0])) return;
+      CajaConSugerencias.enganchar(det, par[0], {
+        fuente: CajaConSugerencias.deLista(par[2]()),
+        alElegir: function (o) { poner(f, { tipo: par[1], valor: o.valor }); cambiar(f, alCambiar); }
+      });
     });
+    if (!f.sinLista) {
+      ListaConCasillas.enganchar(det, itemsDeLista(f), f.desmarcadas, { alCambiar: function () { f.cacheMarcadas = null; f.usado = true; alCambiar(); } });
+    }
     var senalar = q('rf-senalar');
     if (senalar) senalar.onclick = function () { if (f.alSenalar && f.activo()) f.alSenalar(f.personas().slice()); };
     FiltroExportar.enganchar(det, function () { return FiltroExportar.listaDeAlumnado(f); });
