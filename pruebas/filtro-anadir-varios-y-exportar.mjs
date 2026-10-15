@@ -96,16 +96,27 @@ const senalados = () => pagina.evaluate(() => document.querySelectorAll('#varios
 const cuenta = () => pagina.locator('#rel-atajos .repartir-filtro-resumen').textContent();
 
 console.log('--- 2. un criterio no señala a nadie ---');
-const niv = await pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#rf-nivel option'), o => o.value).filter(Boolean));
+/* Fila 350: los criterios se eligen escribiendo; con la caja vacía y el foco dentro salen todos los valores. */
+const elegir = async (id, valor) => { await pagina.fill('#' + id, valor); await pagina.press('#' + id, 'Enter'); };
+await pagina.click('#rf-nivel');
+const niv = await pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#rf-nivel ~ .csg-lista li[data-i] span:first-child'), o => o.textContent).filter(Boolean));
+await pagina.keyboard.press('Escape');
 const nivel1 = niv.filter(v => v.indexOf('1') !== -1)[0];
 comprobar('2. hay un nivel de 1º', !!nivel1, true);
-await pagina.selectOption('#rf-nivel', nivel1);
+await elegir('rf-nivel', nivel1);
 comprobar('2. la cuenta dice 6 alumnos en el filtro y nadie está señalado', [await cuenta(), await senalados()], ['6 alumnos en el filtro', 0]);
 comprobar('2. «Señalar los 6» está a la vista', await pagina.locator('#rf-senalar').textContent(), 'Señalar los 6');
 
+/* Fila 350: la lista con casillas del resultado; solo las marcadas se señalan. */
+comprobar('2. la lista trae las 6 personas, todas marcadas', await pagina.evaluate(() => [document.querySelectorAll('#rel-atajos .cc-lista input[type=checkbox]').length, document.querySelectorAll('#rel-atajos .cc-lista input:checked').length, document.querySelector('#rel-atajos .cc-cuenta').textContent]), [6, 6, '6 de 6 marcadas']);
+await pagina.uncheck('#rel-atajos .cc-lista input[type=checkbox] >> nth=0');
+comprobar('2. desmarcar una baja la cuenta y «Señalar los 5»', [await pagina.locator('#rel-atajos .cc-cuenta').textContent(), await pagina.locator('#rf-senalar').textContent(), await cuenta()], ['5 de 6 marcadas', 'Señalar los 5', '5 alumnos en el filtro']);
+await pagina.click('#rel-atajos [data-cc="todas"]');
+comprobar('2. «Marcar todas» vuelve a 6', await pagina.locator('#rf-senalar').textContent(), 'Señalar los 6');
+
 console.log('--- 3. un segundo criterio ---');
-await pagina.selectOption('#rf-dato', 'repetidor');
-await pagina.selectOption('#rf-valor', 'No');
+await elegir('rf-dato', 'repetidor');
+await elegir('rf-valor', 'No');
 comprobar('3. la cuenta baja a los que cumplen los dos', [await cuenta(), await senalados()], ['4 alumnos en el filtro', 0]);
 
 console.log('--- 4. señalar y añadir ---');
@@ -121,9 +132,9 @@ comprobar('5. sin criterios, la cuenta se apaga y los señalados siguen', [await
 
 console.log('--- 6. exportar ---');
 comprobar('6. sin criterios, «Exportar la lista ▾» está apagado', await pagina.locator('#rel-atajos .filtro-exportar-boton').isDisabled(), true);
-await pagina.selectOption('#rf-nivel', nivel1);
-await pagina.selectOption('#rf-dato', 'repetidor');
-await pagina.selectOption('#rf-valor', 'No');
+await elegir('rf-nivel', nivel1);
+await elegir('rf-dato', 'repetidor');
+await elegir('rf-valor', 'No');
 comprobar('6. con criterios, está encendido', await pagina.locator('#rel-atajos .filtro-exportar-boton').isDisabled(), false);
 await pagina.click('#rel-atajos .filtro-exportar-boton');
 const [descarga] = await Promise.all([pagina.waitForEvent('download', { timeout: 20000 }), pagina.click('#rel-atajos [data-fx="excel"]')]);
@@ -195,9 +206,9 @@ await pagina.click('.et-pestana[data-clase="personal"]');
 await pagina.waitForSelector('#et-pclase', { timeout: 10000 });
 comprobar('8. Etiquetas, personal: el botón sale y está apagado sin criterio', [await pagina.locator('#etiquetas-vista .filtro-exportar-boton').count(), await pagina.locator('#etiquetas-vista .filtro-exportar-boton').isDisabled()], [1, true]);
 comprobar('8. Etiquetas, personal: sin personal en el centro de la prueba, un criterio no enciende el botón', await pagina.evaluate(() => {
-  const s = document.getElementById('et-pclase'); s.value = 'docente'; s.dispatchEvent(new Event('change'));
-  return document.querySelector('#etiquetas-vista .filtro-exportar-boton').disabled;
-}), true);
+  return null;
+}).then(async () => { await pagina.fill('#et-pclase', 'Docente'); await pagina.press('#et-pclase', 'Enter');
+  return pagina.evaluate(() => document.querySelector('#etiquetas-vista .filtro-exportar-boton').disabled); }), true);
 comprobar('8. la lista de personal: Apellidos y nombre · Puesto · una columna por criterio, por apellidos', await pagina.evaluate(() => {
   const l = FiltroExportar.listaDePersonal([{ nombre: 'Zapata, Luis', puesto: 'Conserje' }, { nombre: 'Álvarez, Eva', puesto: 'Profesora' }],
     [{ texto: 'Clase de personal: Docente', columna: 'Clase de personal', valor: () => 'Docente' }]);

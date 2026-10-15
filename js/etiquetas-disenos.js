@@ -6,6 +6,8 @@
    alinea: 'izq'|'centro'|'der' }. Los tres primeros los trae la app (`integrado`): se duplican, no se borran.
 
    - integrados() → los tres diseños de la app.   - nuevoRenglon(), limpiar(d) → un diseño propio bien formado.
+   - Fila 350: `vertical` ('arriba' | 'centro' | 'abajo'; sin él, 'centro' como siempre) coloca el bloque de renglones entero
+     dentro de la etiqueta: `inicioY(vertical, alto, total, relleno)` da dónde empieza (mismas unidades que los tres números).
    - lineas(diseno, valores) → [{ texto, negrita, pt, alinea }] sin los renglones vacíos.
    - ajustar(lineas, anchoMm, altoMm, medir) → { lineas (con su pt final), corto } : la letra baja sola hasta
      que cabe; si aun así una línea no cabe a lo ancho, se corta con «…» y `corto` es true.
@@ -31,11 +33,20 @@ var EtiquetasDisenos = (function () {
     ];
   }
 
+  var VERTICALES = ['arriba', 'centro', 'abajo'];
+
+  /* Dónde empieza el bloque de renglones, medido desde el borde de arriba de la etiqueta. */
+  function inicioY(vertical, alto, total, relleno) {
+    if (vertical === 'arriba') return relleno;
+    if (vertical === 'abajo') return Math.max(0, alto - total - relleno);
+    return Math.max(0, (alto - total) / 2);
+  }
+
   function nuevoRenglon() { return r('apellidosNombre', false, 'normal', 'izq'); }
 
   function limpiar(d) {
     var para = ['alumnado', 'personal', 'ambos'].indexOf(d.para) !== -1 ? d.para : 'ambos';
-    return {
+    var salida = {
       id: d.id, nombre: String(d.nombre || '').trim(), para: para,
       unaPorFamilia: !!d.unaPorFamilia && para !== 'personal',
       renglones: (d.renglones || []).map(function (x) {
@@ -44,6 +55,8 @@ var EtiquetasDisenos = (function () {
         return o;
       })
     };
+    if (VERTICALES.indexOf(d.vertical) !== -1) salida.vertical = d.vertical;
+    return salida;
   }
 
   function lineas(diseno, valores) {
@@ -88,6 +101,6 @@ var EtiquetasDisenos = (function () {
     return { lineas: salida, corto: corto };
   }
 
-  return { PT: PT, MM: MM, RELLENO_MM: RELLENO_MM, integrados: integrados, nuevoRenglon: nuevoRenglon, limpiar: limpiar, lineas: lineas, ajustar: ajustar };
+  return { PT: PT, MM: MM, RELLENO_MM: RELLENO_MM, VERTICALES: VERTICALES, inicioY: inicioY, integrados: integrados, nuevoRenglon: nuevoRenglon, limpiar: limpiar, lineas: lineas, ajustar: ajustar };
 })();
 window.EtiquetasDisenos = EtiquetasDisenos;

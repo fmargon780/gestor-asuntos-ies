@@ -56,6 +56,11 @@ var EtiquetasEditor = (function () {
       '<label class="et-casilla-texto"><input type="checkbox" id="ed-familia"' + (d.unaPorFamilia ? ' checked' : '') + (d.para === 'personal' ? ' disabled' : '') + '> Una por familia (los hermanos salen en una sola)</label></div>' +
       '<div class="et-fila et-alinear-todo"><span class="et-casilla-texto">Alinear todo:</span>' +
         alinear('izq', 'A la izquierda') + alinear('centro', 'Centrado') + alinear('der', 'A la derecha') + '</div>' +
+      '<div class="et-fila et-colocar"><span class="et-casilla-texto">Colocar el texto:</span>' +
+        [['arriba', 'Arriba'], ['centro', 'Centro'], ['abajo', 'Abajo']].map(function (v) {
+          var activo = (d.vertical || 'centro') === v[0];
+          return '<button type="button" class="boton boton-mini' + (activo ? ' et-activa' : '') + '" data-vertical="' + v[0] + '" aria-pressed="' + activo + '">' + v[1] + '</button>';
+        }).join('') + '</div>' +
       '<div class="et-renglones">' + d.renglones.map(function (x, i) {
         return '<div class="et-renglon" data-i="' + i + '"><span class="et-renglon-n">' + (i + 1) + '</span>' +
           '<select class="campo" data-r="dato">' + campos.map(function (c) { return opcion(c.clave, c.texto, x.dato); }).join('') + opcion('texto', 'Texto fijo…', x.dato) + '</select>' +
@@ -120,6 +125,9 @@ var EtiquetasEditor = (function () {
     q('ed-familia').onchange = function () { d.unaPorFamilia = this.checked; cb.cambio(); };
     Array.prototype.forEach.call(raiz.querySelectorAll('[data-alinea-todo]'), function (b) {
       b.onclick = function () { var a = b.getAttribute('data-alinea-todo'); d.renglones.forEach(function (x) { x.alinea = a; }); cb.repintar(); };
+    });
+    Array.prototype.forEach.call(raiz.querySelectorAll('[data-vertical]'), function (b) {
+      b.onclick = function () { d.vertical = b.getAttribute('data-vertical'); cb.repintar(); };
     });
     q('ed-mas').onclick = function () { d.renglones.push(EtiquetasDisenos.nuevoRenglon()); cb.repintar(); };
     Array.prototype.forEach.call(raiz.querySelectorAll('.et-renglon'), function (fila) {

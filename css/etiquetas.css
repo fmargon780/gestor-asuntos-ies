@@ -37,3 +37,26 @@
 .et-pie-botones { display: flex; gap: 8px; margin-left: auto; }
 .et-pie-nota { flex-basis: 100%; font-size: 12px; color: #555; }
 @media (max-width: 900px) { .et-cuerpo { flex-direction: column; } .et-panel { flex: none; max-height: none; width: 100%; } .et-vista { max-height: none; width: 100%; } }
+
+/* Fila 350: la caja en la que se escribe y enseña lo que coincide (js/caja-con-sugerencias.js). */
+.csg { position: relative; display: inline-block; min-width: 190px; max-width: 100%; }
+.csg-entrada { width: 100%; }
+.csg-lista { position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 2px 0 0; padding: 2px 0; list-style: none;
+  background: #fff; border: 1px solid var(--linea); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.15); max-height: 220px; overflow: auto; min-width: 220px; }
+.csg-lista li { padding: 5px 10px; cursor: pointer; }
+.csg-lista li.csg-activo, .csg-lista li[data-i]:hover { background: #e8f0fe; }
+.csg-lista .csg-nota { color: #667; cursor: default; font-size: 13px; }
+.csg-lista .csg-gris { color: #889; }
+.csg-detalle { color: #667; font-size: 12px; }
+.atajo-fila .csg { flex: 1; }
+
+/* La lista de personas con casilla (js/lista-con-casillas.js). */
+.cc { margin-top: 8px; }
+.cc-barra { margin: 0 0 4px; font-size: 13px; }
+.cc-lista { list-style: none; margin: 0; padding: 4px 6px; max-height: 220px; overflow: auto; border: 1px solid var(--linea); border-radius: 6px; background: #fff; }
+.cc-lista li { padding: 2px 0; }
+.cc-lista label { cursor: pointer; }
+.cc-marca { font-size: 11px; color: #19692c; background: #e4f5e8; border-radius: 4px; padding: 0 5px; }
+.et-buscar-persona { margin: 8px 0; }
+.et-buscar-aviso { font-size: 12px; color: #667; margin: 2px 0 0; min-height: 1em; }
+.et-colocar .et-activa { background: var(--principal, #2a6df4); color: #fff; }

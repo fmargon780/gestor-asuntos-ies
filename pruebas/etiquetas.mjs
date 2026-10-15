@@ -35,7 +35,12 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
 await pagina.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 60000 });
 await pagina.waitForTimeout(3000);
 
-const poner = (id, v) => pagina.selectOption('#' + id, v);
+/* Fila 350: los criterios del filtro y los del personal se eligen escribiendo; modelo y diseño siguen siendo listas. */
+const poner = async (id, v) => {
+  if ((await pagina.evaluate((i) => document.getElementById(i).tagName, id)) === 'SELECT') return pagina.selectOption('#' + id, v);
+  await pagina.fill('#' + id, v);
+  await pagina.press('#' + id, 'Enter');
+};
 const textos = () => pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.et-hoja[data-hoja="0"] .et-casilla'), (c) =>
   Array.prototype.map.call(c.querySelectorAll('.et-linea'), (l) => l.textContent)));
 const pie = () => pagina.locator('#et-cuenta').textContent();

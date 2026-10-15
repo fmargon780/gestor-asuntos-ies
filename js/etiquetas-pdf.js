@@ -44,7 +44,7 @@ var EtiquetasPdf = (function () {
         var col = c.i % modelo.columnas, fila = Math.floor(c.i / modelo.columnas);
         var x0 = (g.x0 + col * g.px) * MM, yArriba = (g.y0 + fila * g.py) * MM, ancho = g.ancho * MM, alto = g.alto * MM;
         var total = p.lineas.reduce(function (s, l) { return s + l.pt * 1.2; }, 0);
-        var y = yArriba + Math.max(0, (alto - total) / 2);
+        var y = yArriba + EtiquetasDisenos.inicioY(p.vertical, alto, total, relleno);
         p.lineas.forEach(function (l) {
           var fu = l.negrita ? f.negrita : f.normal, t = segura(fu, l.texto);
           var w = fu.widthOfTextAtSize(t, l.pt);

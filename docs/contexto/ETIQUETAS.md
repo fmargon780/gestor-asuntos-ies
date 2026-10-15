@@ -12,10 +12,12 @@ la ficha). Diseño en `docs/ETIQUETAS.md`.
 | `js/etiquetas-hoja.js` | `construir` (orden, familias, copias), `paginar` (casillas gastadas de la primera hoja), `preparar` y el dibujo de las hojas |
 | `js/etiquetas-pdf.js` | El PDF con pdf-lib, a tamaño real; la misma Helvetica mide la vista previa |
 | `js/etiquetas-guardado.js` | `_GESTOR/etiquetas.json` (`{ modelos, disenos }`) por la cola por fichero; un directivo escribe por `Perfil.escribir`; lo último usado, en `localStorage` (`gestor.etiquetas.ultimo`) |
-| `js/etiquetas-editor.js` | Los formularios de un modelo (nombre, tamaño de hoja, filas, columnas, márgenes) y de un diseño (renglones, «Alinear todo») |
-| `js/etiquetas-pantalla.js` | La pantalla: a quién (`RepartirFiltro` para el alumnado; clase y departamento para el personal; «Pegar una lista»), hoja, diseño, copias, hoja empezada, vista previa y pie fijo |
+| `js/etiquetas-editor.js` | Los formularios de un modelo (nombre, tamaño de hoja, filas, columnas, márgenes) y de un diseño (renglones, «Alinear todo», «Colocar el texto»: Arriba, Centro, Abajo) |
+| `js/etiquetas-pantalla.js` | La pantalla: a quién (buscador de personas, 3 letras; `RepartirFiltro` para el alumnado; clase y departamento, escribiendo, para el personal; «Pegar una lista»; lista con casillas), hoja, diseño, copias, hoja empezada, vista previa y pie fijo |
 
 El alumnado de la copia de pruebas lleva dirección de casa (columnas `Domicilio`, `Código postal`, `Localidad`,
 `Provincia`), los hermanos Aguilar Ponce comparten tutora y dirección, y Gallardo Reyes, Vera, no tiene dirección.
 «Cambiar» está siempre a la vista en la hoja y en el diseño (fila 346): en uno propio lo sustituye con el mismo `id`; en uno de la app abre el formulario con un aviso y lo guarda como «Copia de …», sin tocar el original.
 Pruebas: `pruebas/etiquetas.mjs` y `pruebas/etiquetas-346.mjs`.
+
+**Fila 350 (15-oct-2026, `docs/ETIQUETAS-BUSCADOR-VERTICAL-FILTRO.md`).** Buscador (`#et-buscar-persona`, `CajaConSugerencias` con `minimo: 3`, hasta 10): suma personas a `E.anadidas`; sin filtro, lista pegada ni grupo de partida y con alguien elegido, solo salen las elegidas (`candidatas()`); con filtro, las del filtro más las elegidas. La lista con casillas (`ListaConCasillas`, `#et-lista`) enseña las `candidatas()`; lo desmarcado va a `E.quitadas` (que comparte `E.filtro.desmarcadas`, así «Exportar la lista» solo trae las marcadas). Diseño: `vertical` ('arriba' | 'centro' | 'abajo'; sin él, 'centro' como siempre) y `EtiquetasDisenos.inicioY`, que usan la vista previa y el PDF. Prueba: `pruebas/etiquetas-350.mjs`.
