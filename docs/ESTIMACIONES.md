@@ -15,4 +15,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 347 | 150 | Marca en el tipo, campo en el cuadro de nombre, tarjeta con estados, PDF de listas, prueba nueva |
 | 348 | 120 | Botón de tutores en el cuadro de Correo, «Va a» en plantillas, revisión única con lista, saludo, prueba nueva |
 | 349 | 120 | Compresión de PDF con calidad mínima, casilla de tamaño en el cuadro de nombre, opción en «Ajustar tamaño», detectar firma, prueba nueva |
+| 350 | 150 | Buscador en Etiquetas, alineación vertical en vista previa y PDF, caja con sugerencias y lista con casillas en el filtro común (cuatro sitios), prueba nueva |
 | 335 | 60 | Revisión y informe, sin código ni publicación |
