@@ -129,7 +129,7 @@ var ExportarInforme = (function () {
   }
 
   function totalesHtml(tabla) {
-    var lineas = ['<p class="exportar-total-n"><strong>' + escapar(ExportarAsuntos.textoDeNumeroDeAsuntos(tabla.total)) + '</strong></p>'];
+    var lineas = ['<p class="exportar-total-n"><strong>' + escapar(tabla.textoTotal || ExportarAsuntos.textoDeNumeroDeAsuntos(tabla.total)) + '</strong></p>'];
     tabla.columnas.forEach(function (c, i) {
       if (c.clase === 'numero') lineas.push('<p class="exportar-total">' + escapar(ExportarAsuntos.textoDeTotal(tabla, i)) + '</p>');
     });
@@ -367,7 +367,7 @@ var ExportarInforme = (function () {
     if (!capa || !actual) return { completo: true };
     var r = ExportarComprobar.comprobar(paginas(), actual.esperados);
     var aviso = capa.querySelector('.exportar-aviso');
-    var texto = r.completo ? '' : ExportarComprobar.textoDeAviso(r);
+    var texto = r.completo ? '' : ExportarComprobar.textoDeAviso(r, actual.palabra);
     aviso.textContent = texto;
     aviso.classList.toggle('oculto', r.completo);
     ['.exportar-guardar-pdf', '.exportar-imprimir'].forEach(function (q) {
@@ -400,7 +400,7 @@ var ExportarInforme = (function () {
       /* El reparto de páginas mide: antes, todo tiene que estar cargado (fila 307). */
       await Promise.race([document.fonts && document.fonts.ready, esperar(3000)]);
       var r = montar(hoja, datos, membrete);
-      actual = { nombre: nombre, titulo: titulo, apaisado: r.apaisado, esperados: datos.registros.length };
+      actual = { nombre: nombre, titulo: titulo, apaisado: r.apaisado, esperados: datos.registros.length, palabra: datos.palabra };
       requestAnimationFrame(function () { requestAnimationFrame(function () { if (actual) revisar(); }); });
     } catch (e) {
       hoja.innerHTML = '<p class="explica">No he podido preparar el informe: ' + escapar(U.mensajeDeError(e)) + '</p>';

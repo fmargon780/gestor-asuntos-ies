@@ -74,6 +74,26 @@ var EtiquetasPantalla = (function () {
     return sinSalir(porPegado(lista));
   }
 
+  /* Fila 345: la lista del filtro de personal (clase y departamento, sin la lista pegada) para «Exportar la lista ▾». */
+  function listaDePersonal() {
+    var criterios = [];
+    if (E.personal.clase) criterios.push({ texto: 'Clase de personal: ' + (E.personal.clase === 'docente' ? 'Docente' : 'No docente'), columna: 'Clase de personal',
+      valor: function (p) { return p.tipoPersonal === 'docente' ? 'Docente' : (p.tipoPersonal ? 'No docente' : ''); } });
+    if (E.personal.depto) criterios.push({ texto: 'Departamento: ' + E.personal.depto, columna: 'Departamento',
+      valor: function (p) { return EtiquetasDatos.valores(p, 'personal', {}).departamento; } });
+    if (!criterios.length) return { filas: [] };
+    var lista = (E.personal.lista || []).filter(function (p) {
+      if (E.personal.clase && p.tipoPersonal !== E.personal.clase) return false;
+      return !(E.personal.depto && EtiquetasDatos.valores(p, 'personal', {}).departamento !== E.personal.depto);
+    });
+    return FiltroExportar.listaDePersonal(lista, criterios);
+  }
+
+  function exportarPersonal(panel) {
+    var b = panel.querySelector('.filtro-exportar-boton');
+    if (b) b.disabled = !listaDePersonal().filas.length;
+  }
+
   function ctx() { return { centro: (window.Plantillas && Plantillas.POR_DEFECTO_CENTRO) || 'IES Fuente Lucena', curso: U.cursoActual() }; }
 
   function calcular() {
@@ -104,7 +124,8 @@ var EtiquetasPantalla = (function () {
       h += '<div class="et-fila"><label class="etiqueta">Clase de personal <select class="campo" id="et-pclase" data-solo-lectura>' +
         [['', 'Todo el personal'], ['docente', 'Docente'], ['no-docente', 'No docente']].map(function (o) { return '<option value="' + o[0] + '"' + (E.personal.clase === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
         '<label class="etiqueta">Departamento <select class="campo" id="et-pdepto" data-solo-lectura><option value="">Todos</option>' +
-        Object.keys(deptos).sort().map(function (d) { return '<option value="' + esc(d) + '"' + (E.personal.depto === d ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('') + '</select></label></div>';
+        Object.keys(deptos).sort().map(function (d) { return '<option value="' + esc(d) + '"' + (E.personal.depto === d ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('') + '</select></label></div>' +
+        FiltroExportar.botonHTML(false);   /* fila 345: se enciende en listaDePersonal() cuando hay criterio */
     }
     h += '<details class="et-pegar"' + (E.pegado ? ' open' : '') + '><summary>Pegar una lista' + (E.pegado ? ' (' + E.pegado.cuantas + ')' : '') + '</summary>' +
       '<p class="explica">Un nombre o un número escolar por línea. Solo saldrán esas personas.</p>' +
@@ -250,8 +271,9 @@ var EtiquetasPantalla = (function () {
     });
     if (E.filtro && E.clase === 'alumnado') RepartirFiltro.enganchar(E.filtro, panel, function () { pintar(); });
     var pc = $('et-pclase'), pd = $('et-pdepto');
-    if (pc) pc.onchange = function () { E.personal.clase = pc.value; pintarVista(); };
-    if (pd) pd.onchange = function () { E.personal.depto = pd.value; pintarVista(); };
+    if (pc) pc.onchange = function () { E.personal.clase = pc.value; pintarVista(); exportarPersonal(panel); };
+    if (pd) pd.onchange = function () { E.personal.depto = pd.value; pintarVista(); exportarPersonal(panel); };
+    if (pc) { FiltroExportar.enganchar(panel, function () { return listaDePersonal(); }); exportarPersonal(panel); }
     $('et-pegar-usar').onclick = function () { pegar($('et-pegado').value); };
     var pq = $('et-pegar-quitar');
     if (pq) pq.onclick = function () { E.pegado = null; pintar(); };

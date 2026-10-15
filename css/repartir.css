@@ -45,3 +45,8 @@
 .repartir-marca-mismo { color: #9a6a00; }
 .repartir-marca-nueva { color: #546e7a; }
 .repartir-corte { margin: 6px 0; }
+/* Fila 345: «Señalar los N» y «Exportar la lista ▾» dentro del filtro. */
+.repartir-filtro-senalar { margin: 6px 0; }
+.filtro-exportar { position: relative; display: inline-block; margin: 4px 0; }
+.filtro-exportar-menu { position: absolute; left: 0; top: 100%; z-index: 20; display: flex; flex-direction: column; gap: 2px; padding: 4px; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); min-width: 120px; }
+.filtro-exportar-menu.oculto { display: none; }
