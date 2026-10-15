@@ -36,9 +36,20 @@ var FiltroExportar = (function () {
     var campos = f.datos ? AlumnadoBD.porClave(f.datos) : {};
     var porId = {};
     ((f.datos && f.datos.alumnos) || []).forEach(function (a) { porId[String(a.idEscolar).trim()] = a; });
-    var datoConds = f.conds.filter(function (c) { return c.tipo === 'dato'; });
-    var vistos = {}, datoConds1 = datoConds.filter(function (c) { if (vistos[c.clave]) return false; vistos[c.clave] = true; return true; });
-    var columnas = ['Apellidos y nombre', 'Nº escolar', 'Unidad'].concat(datoConds1.map(function (c) {
+    /* Una columna por cada criterio usado (el mismo no sale dos veces): nivel, enseñanza o un dato del alumnado. */
+    var vistos = {}, usados = f.conds.filter(function (c) {
+      var k = c.tipo === 'dato' ? 'dato:' + c.clave : c.tipo;
+      if (c.tipo === 'unidad' || vistos[k]) return false;   /* la unidad ya tiene su columna fija */
+      vistos[k] = true; return true;
+    });
+    function valorDe(c, p, al) {
+      if (c.tipo === 'nivel') return Nombres.nivelYEnsenanza(p.unidad).nivel || '';
+      if (c.tipo === 'ensenanza') return Nombres.nivelYEnsenanza(p.unidad).ensenanza || '';
+      return al ? AlumnadoBDVer.texto(campos[c.clave], (al.datos || {})[c.clave]) : '';
+    }
+    var columnas = ['Apellidos y nombre', 'Nº escolar', 'Unidad'].concat(usados.map(function (c) {
+      if (c.tipo === 'nivel') return 'Nivel';
+      if (c.tipo === 'ensenanza') return 'Enseñanza';
       return AlumnadoBDVer.etiqueta(campos[c.clave] || { clave: c.clave });
     }));
     var personas = f.personas().slice().sort(function (a, b) {
@@ -46,9 +57,7 @@ var FiltroExportar = (function () {
     });
     var filas = personas.map(function (p) {
       var al = porId[String(p.id || '').trim()];
-      return [p.nombre || '', String(p.id || ''), p.unidad || ''].concat(datoConds1.map(function (c) {
-        return al ? AlumnadoBDVer.texto(campos[c.clave], (al.datos || {})[c.clave]) : '';
-      }));
+      return [p.nombre || '', String(p.id || ''), p.unidad || ''].concat(usados.map(function (c) { return valorDe(c, p, al); }));
     });
     return { columnas: columnas, filas: filas, criterios: f.conds.map(function (c) { return criterioTexto(f, c); }),
              palabra: ['alumno', 'alumnos'] };

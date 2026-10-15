@@ -139,11 +139,11 @@ const hoja = await pagina.evaluate(async (b64) => {
 }, b64);
 comprobar('6. el Excel: título en negrita y fijo, una fila por alumno del filtro, por unidad y apellidos',
   [hoja.negrita, hoja.fija, hoja.filas], [true, true, [
-    ['Apellidos y nombre', 'Nº escolar', 'Unidad', 'Repetidor'],
-    ['Blanco Cid, Berta', '9100002', '1º ESO A', 'No'],
-    ['Campos Díaz, Carlos', '9100003', '1º ESO A', 'No'],
-    ['Iglesias Jaén, Irene', '9100009', '1º ESO A', 'No'],
-    ['Egea Fon, Elena', '9100005', '1º ESO B', 'No']]]);
+    ['Apellidos y nombre', 'Nº escolar', 'Unidad', 'Nivel', 'Repetidor'],
+    ['Blanco Cid, Berta', '9100002', '1º ESO A', nivel1, 'No'],
+    ['Campos Díaz, Carlos', '9100003', '1º ESO A', nivel1, 'No'],
+    ['Iglesias Jaén, Irene', '9100009', '1º ESO A', nivel1, 'No'],
+    ['Egea Fon, Elena', '9100005', '1º ESO B', nivel1, 'No']]]);
 
 await pagina.click('#rel-atajos .filtro-exportar-boton');
 await pagina.click('#rel-atajos [data-fx="pdf"]');
@@ -161,7 +161,7 @@ const visor = await pagina.evaluate(() => {
 comprobar('6. el visor: título, criterios, membrete, fecha, 4 filas y «4 alumnos»',
   [visor.titulo, visor.filtros, visor.membrete, visor.fecha, visor.filas, visor.total, visor.aviso],
   ['Lista filtrada', 'Nivel: ' + nivel1 + ' · Repetidor: No', true, true, 4, '4 alumnos', true]);
-comprobar('6. el visor: columnas fijas y «Guardar PDF» e «Imprimir» a mano', [visor.cabeza, visor.botones], [['Apellidos y nombre', 'Nº escolar', 'Unidad', 'Repetidor'], [true, true]]);
+comprobar('6. el visor: columnas fijas y «Guardar PDF» e «Imprimir» a mano', [visor.cabeza, visor.botones], [['Apellidos y nombre', 'Nº escolar', 'Unidad', 'Nivel', 'Repetidor'], [true, true]]);
 const nombrePdf = await pagina.evaluate(() => ExportarInforme.nombrePdf());
 comprobar('6. el PDF se llama AAMMDD Lista filtrada.pdf', nombrePdf, await pagina.evaluate(() => FiltroExportar.nombreDeFichero('pdf')));
 await pagina.click('#exportar-visor .exportar-cerrar');
