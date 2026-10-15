@@ -4,6 +4,7 @@
 .cand-nombre { overflow-wrap: anywhere; }
 .cand-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
 .cand-lista-menu { position: relative; display: inline-block; }
+.cand-lista-menu .fila-menu { left: 0; right: auto; min-width: 200px; }
 .cand-bloques { display: flex; flex-direction: column; gap: 10px; }
 .cand-bloque { border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; }
 .cand-bloque h4 { margin: 0 0 6px; font-size: 14px; }

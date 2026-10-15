@@ -218,18 +218,38 @@ var CandidaturasFicha = (function () {
     });
   }
 
+  /* «Lista de candidaturas ▾»: un botón de verdad (no el ⋮ de las filas) que despliega las dos listas. */
+  function menuDeLista(a) {
+    var env = document.createElement('div');
+    env.className = 'fila-menu-envoltorio';
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'boton cand-lista-btn';
+    boton.textContent = 'Lista de candidaturas ▾';
+    boton.title = 'Sacar la lista en PDF para el tablón';
+    boton.setAttribute('aria-haspopup', 'true');
+    var menu = document.createElement('div');
+    menu.className = 'fila-menu oculto';
+    function cerrar() { menu.classList.add('oculto'); document.removeEventListener('mousedown', fuera, true); }
+    function fuera(e) { if (!env.contains(e.target)) cerrar(); }
+    [['Lista provisional', 'provisional'], ['Lista definitiva', 'definitiva']].forEach(function (x) {
+      menu.appendChild(botonMenu(x[0], function () { cerrar(); CandidaturasLista.hacer(a, x[1]); }));
+    });
+    boton.onclick = function (e) {
+      e.stopPropagation();
+      if (!menu.classList.contains('oculto')) { cerrar(); return; }
+      menu.classList.remove('oculto');
+      document.addEventListener('mousedown', fuera, true);
+    };
+    env.appendChild(boton); env.appendChild(menu);
+    return env;
+  }
+
   function enganchar(a, caja, ficheros) {
     var anadir = $('cand-anadir');
     if (anadir) anadir.onclick = anadirSinDocumento;
     var menuLista = $('cand-lista-menu');
-    if (menuLista && window.CandidaturasLista) {
-      menuLista.appendChild(U.menuDeAcciones([
-        botonMenu('Lista provisional', function () { CandidaturasLista.hacer(a, 'provisional'); }),
-        botonMenu('Lista definitiva', function () { CandidaturasLista.hacer(a, 'definitiva'); })
-      ], 'Lista de candidaturas ▾'));
-      var btn = menuLista.querySelector('.fila-menu-btn');
-      if (btn) { btn.textContent = 'Lista de candidaturas ▾'; btn.classList.add('boton', 'cand-lista-btn'); btn.title = 'Sacar la lista en PDF para el tablón'; }
-    }
+    if (menuLista && window.CandidaturasLista) menuLista.appendChild(menuDeLista(a));
     Array.prototype.forEach.call(caja.querySelectorAll('.cand-fila'), function (fila) {
       var c = candidatura(fila.getAttribute('data-id'));
       if (!c) return;
