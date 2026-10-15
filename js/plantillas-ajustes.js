@@ -248,11 +248,12 @@
   }
 
   /* La fila de `plantillas.json`: `textoSeneca` solo si trae algo. */
-  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa) {
+  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa, vaA) {
     var fila = { id: id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
     if (previa && previa.fueraDeUso) fila.fueraDeUso = previa.fueraDeUso;   /* fila 321: cambiar una plantilla no pierde la marca */
     if (String(textoSeneca || '').trim()) fila.textoSeneca = textoSeneca;
     if (String(adjuntar || '').trim()) fila.adjuntar = adjuntar;   /* fila 299: «Adjuntar solo» */
+    if (window.PlantillaVaA && PlantillaVaA.valido(vaA)) fila.vaA = vaA;   /* fila 348: «Va a:» */
     return fila;
   }
 
@@ -290,6 +291,7 @@
       campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', (existente && existente.texto) || '', 7) +
       campoSenecaHTML('pl', existente && existente.textoSeneca) +
       (window.PlantillaAdjuntar ? PlantillaAdjuntar.selectHTML('pl-adjuntar', existente && existente.adjuntar) : '') +
+      (window.PlantillaVaA ? PlantillaVaA.selectHTML('pl-va-a', existente ? existente.vaA : 'familia') : '') +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
 
@@ -328,6 +330,7 @@
       var texto = $('pl-texto').value;
       var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
       var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
+      var vaA = window.PlantillaVaA ? PlantillaVaA.leer('pl-va-a') : '';
       if (!nombre || !tipo || !texto.trim()) {
         U.aviso('Hace falta el nombre, el tipo y el texto.', 'malo');
         return;
@@ -336,9 +339,9 @@
         await Plantillas.guardar(App.E.gestor, function (actual) {
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-            if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i]);
+            if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], vaA);
           } else {
-            actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar));
+            actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, vaA));
           }
           return actual;
         });
@@ -374,6 +377,7 @@
         '<p class="nota">El saludo y la firma no van en la plantilla: la app los pone sola en cada mensaje.</p>' : '') +
       campoSenecaHTML('pl2', existente && existente.textoSeneca) +
       (window.PlantillaAdjuntar ? PlantillaAdjuntar.selectHTML('pl2-adjuntar', existente && existente.adjuntar) : '') +
+      (window.PlantillaVaA ? PlantillaVaA.selectHTML('pl2-va-a', existente ? existente.vaA : 'familia') : '') +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl2-previa"></div></div>' +
       '<div id="pl2-aviso"></div>' +
@@ -464,6 +468,7 @@
       var texto = $('pl2-texto').value;
       var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
       var adjuntar2 = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl2-adjuntar') : '';
+      var vaA2 = window.PlantillaVaA ? PlantillaVaA.leer('pl2-va-a') : '';
       if (!nombre || !texto.trim()) {
         $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Hace falta el nombre y el texto.</p>';
         return;
@@ -483,11 +488,11 @@
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
             if (i !== -1) {
-              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i]);
+              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], vaA2);
               guardada = actual.lista[i];
             }
           } else {
-            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2);
+            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, vaA2);
             actual.lista.push(guardada);
           }
           return actual;

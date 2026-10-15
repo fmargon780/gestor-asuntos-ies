@@ -662,3 +662,21 @@ batería completa.
 ## La señal del recolector (fila 336, 13-oct-2026)
 
 `recogerCorreos` (Apps Script) deja al final de cada vuelta `latido.json` en la carpeta de la bandeja (`{ hora, version, cuenta }`, un solo fichero, como mucho cada 10 minutos). `js/bandeja-latido.js` lo lee cada 5 minutos: con más de una hora, o sin fichero, pone el aviso `recogida-correos` en la franja de Inicio (pulsarlo abre los pasos con sus enlaces) y lo quita solo cuando la señal vuelve. No avisa sin bandeja señalada, a un directivo, ni en los 10 primeros minutos de la aplicación abierta. Demo: `?latido=reciente|viejo|ninguno`. `VERSION_SCRIPT` y `SCRIPT_ESPERADO` están en `13-oct-2026 · fila 336`.
+
+## El tutor o tutora del grupo en el cuadro de Correo y «Va a:» de las plantillas (15-oct-2026, fila 348, `docs/CORREO-AL-TUTOR-DEL-GRUPO.md`)
+
+`TutorDelGrupo.paraElCuadro(a)` (`js/tutor-del-grupo.js`) saca los tutores en vigor de todas las unidades del alumnado **matriculado** del asunto
+(el tercero, o los relacionados de un asunto de grupo) con la misma tabla TUTORIAS de la fila 299; `js/correo.js` lo deja en
+`CorreoNucleo._interno.tutoresDelAlumno` antes de pintar el cuadro. `js/correo-tutor-botones.js` (`CorreoTutorBotones`) pinta junto a «Para» y a
+«Copia oculta» el botón «+ Tutor/a de <unidad>» (con varias unidades, «+ Tutores (N grupos)»): añade los correos a «Otro correo» o a la copia
+oculta sin repetir; si falta algún correo, una línea ámbar por unidad con el enlace a Tablas de datos, y sin ninguno el botón sale apagado. No hay
+campo «Copia» aparte en el cuadro (nunca lo hubo): solo «Para» y «Copia oculta». El cuadro de Séneca no lleva nada de esto.
+
+Cada plantilla de correo lleva `vaA`: `'familia'`, `'tutor'` o `'quien-lo-pide'` (`js/plantilla-va-a.js`, el desplegable «Va a:» en los dos editores de
+`js/plantillas-ajustes.js`). Al abrir el cuadro (y al cambiar de plantilla) `CorreoCuadro.destinoDe` rellena «Para» solo con eso; una plantilla sin
+`vaA` se comporta como siempre, y si el cuadro viene de una tarea con «Tutor/a del grupo» (fila 299) manda esa. Una plantilla que va al tutor saluda
+«Buenas:» y su texto pierde un saludo inicial (`PlantillaVaA.sinSaludo`, en `cuerpoDelMedio`). La revisión única (`js/plantilla-va-a-revision.js`):
+a las plantillas sin `vaA` se les pone el que dice `PlantillaVaA.deducir` (su nombre habla del tutor/a → tutor; sin tipo de asunto → quien lo pide;
+el resto → familia), sale el cuadro con la lista y un desplegable por plantilla, y la marca queda en `_GESTOR/plantillas-va-a.json`. No se lanza sola
+en la copia de pruebas (`?demo=1`) ni en «solo consultar»; el botón «A quién va cada plantilla» de Herramientas → Plantillas la abre siempre.
+Prueba: `pruebas/correo-tutor-botones.mjs`.

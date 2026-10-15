@@ -80,3 +80,10 @@
    columna izquierda: ya sale desplegada, con una casilla por documento
    y su tamaño al lado, sin ningún <details> que la esconda. */
 #correo-caja #adjuntos-lista { margin-bottom: 10px; }
+
+/* Fila 348: el nombre del campo y, a su lado, «+ Tutor/a de …». */
+.correo-campo-cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 10px; }
+.correo-campo-cabecera .etiqueta { margin: 0; }
+.correo-tutor-falta { margin: 6px 0 0; }
+.va-a-tabla select { width: auto; }
+.va-a-tabla td { overflow-wrap: normal; word-break: normal; }

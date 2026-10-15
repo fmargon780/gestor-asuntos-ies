@@ -178,6 +178,10 @@
 
   function cuerpoDelMedio(a, idPlantilla, paraSeneca) {
     var saludo = saludoDe(a);
+    /* Fila 348: una plantilla que va al tutor o tutora saluda con «Buenas:», aunque su texto empiece con otro saludo. */
+    var deLaPlantilla = idPlantilla && plantillasDatos ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0] : null;
+    var alTutor = !!(deLaPlantilla && deLaPlantilla.vaA === 'tutor' && window.PlantillaVaA);
+    if (alTutor && !saludoPedido) saludo = PlantillaVaA.SALUDO;
 
     var medio = '', faltan = [];
 
@@ -194,6 +198,7 @@
       var textoPlantilla = plantilla
         ? ((paraSeneca && String(plantilla.textoSeneca || '').trim()) ? plantilla.textoSeneca : plantilla.texto)
         : '';
+      if (plantilla && alTutor) textoPlantilla = PlantillaVaA.sinSaludo(textoPlantilla);
       if (plantilla) {
         var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
         var r = Plantillas.rellenar(textoPlantilla, valoresConLoQueFalta);
@@ -314,6 +319,9 @@
       return;
     }
 
+    /* Fila 348: los tutores de las unidades del alumnado, para los botones «+ Tutor/a de …» del cuadro. */
+    I.tutoresDelAlumno = null;
+    if (window.TutorDelGrupo && TutorDelGrupo.paraElCuadro) { try { I.tutoresDelAlumno = await TutorDelGrupo.paraElCuadro(a); } catch (e) { I.tutoresDelAlumno = null; } }
     caja.innerHTML = window.CorreoCuadro ? CorreoCuadro.cuerpoHtml(a, persona, bloqueAdjuntos, opcionesGrupo) : '';
     if (window.CorreoCuadro) CorreoCuadro.enganchar(a);
   }

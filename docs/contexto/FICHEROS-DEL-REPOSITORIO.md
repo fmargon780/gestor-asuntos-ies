@@ -54,6 +54,10 @@ de `App` va después del fichero que lo define.
 | `js/etiquetas-guardado.js` | `_GESTOR/etiquetas.json`: modelos y diseños propios (fila 344) |
 | `js/etiquetas-editor.js` | Los formularios de un modelo de hoja y de un diseño (fila 344) |
 | `js/etiquetas-pantalla.js` | La pantalla «Etiquetas» de Herramientas y su entrada desde un asunto de grupo (fila 344) |
+| `js/correo-tutor-botones.js` | Los botones «+ Tutor/a de …» junto a «Para» y a «Copia oculta» del cuadro de Correo, y los avisos de lo que falta (fila 348) |
+| `js/plantilla-va-a.js` | «Va a:» de una plantilla de correo: el desplegable, el que le toca a cada una y el saludo «Buenas:» (fila 348) |
+| `js/plantilla-va-a-revision.js` | La revisión única de «Va a:» de las plantillas que ya existen, con su cuadro-lista y su marca en `_GESTOR` (fila 348) |
+| `pruebas/correo-tutor-botones.mjs` | El tutor del grupo en el cuadro de Correo y «Va a:» de las plantillas, con Chromium (fila 348) |
 | `js/candidaturas.js` | Candidaturas al Consejo Escolar: los datos de `ficha.candidaturas` y el campo «¿De quién es esta candidatura?» del cuadro de nombre (fila 347) |
 | `js/candidaturas-ficha.js` | La tarjeta «Candidaturas» de la ficha del asunto (fila 347) |
 | `js/candidaturas-lista.js` | La lista provisional o definitiva de candidaturas en PDF (fila 347) |
