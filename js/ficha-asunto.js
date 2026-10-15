@@ -257,6 +257,7 @@
     N.pintarOtrosDelTercero(a);
     N.pintarRelacionados(a, abierto);
     if (window.ActividadesFicha) ActividadesFicha.pintar(a);   /* fila 306: la tarjeta «La actividad» */
+    if (window.CandidaturasFicha) CandidaturasFicha.pintar(a);   /* fila 347: la tarjeta «Candidaturas» */
     N.pintarPresencia();
     N.pintarSellos(a);
     if (window.OtrosDelTercero) OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a);

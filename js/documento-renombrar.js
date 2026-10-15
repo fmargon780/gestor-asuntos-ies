@@ -67,6 +67,10 @@ var DocumentoRenombrar = (function () {
     if (opciones && opciones.soloFichero) return;
     try { await ponerAlDiaLaFicha(asunto, viejo, nuevo); }
     catch (e) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido apuntar si está pendiente de registro', e); }
+    if (window.Candidaturas) {
+      try { await Candidaturas.alRenombrar(asunto, viejo, nuevo); }   /* fila 347 */
+      catch (e3) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido ponerlo al día en las candidaturas', e3); }
+    }
     try { await ponerAlDiaLosHitos(asunto, viejo, nuevo); }
     catch (e2) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido ponerlo al día en sus hitos', e2); }
   }

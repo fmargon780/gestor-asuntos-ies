@@ -118,10 +118,12 @@
        ninguna opción). */
     var tipoAsunto = N.asuntoActual ? App.tipoDeAsunto(N.asuntoActual) : '';
     var hito = N.hitoActual;
+    /* Fila 347: en el asunto de unas elecciones, el tipo de documento arranca en SOLICITUD DE CANDIDATURA. */
+    if (window.Candidaturas) await Candidaturas.preparar(opciones, N.asuntoActual);
     var tipoInicial = N.propuestaDesdeHito({
       delNombre: previo.tipo,
       delHito: hito ? hito.tipoDocumento : '',
-      delTipo: ultimoTipoDocumento(tipoAsunto)
+      delTipo: (window.Candidaturas && Candidaturas.tipoPorDefecto(opciones, N.asuntoActual)) || ultimoTipoDocumento(tipoAsunto)
     });
     /* El texto adicional del nombre (fila 201, apartado 4): el que ya
        trae el nombre manda (igual que siempre); si no, el del hito, con
@@ -189,6 +191,8 @@
           ? 'Se guardará una copia en la carpeta del asunto. El original se queda donde está.'
           : 'Se le cambia el nombre al fichero que ya está en la carpeta.') +
         '<br><span class="suave">Fichero: ' + U.escapar(opciones.nombreActual) + '</span></p>' +
+
+      (window.Candidaturas ? Candidaturas.campoHTML(opciones, N.asuntoActual) : '') +   /* fila 347 */
 
       '<div class="dos-columnas">' +
         '<div>' +
@@ -293,6 +297,9 @@
       var ampliado = partido.classList.toggle('solo-visor');
       $('doc-ampliar').textContent = ampliado ? 'Volver a los campos' : 'Ver más grande';
     };
+
+    /* Fila 347: después del repaso de arriba, que pone su `oninput` a todos los campos del cuadro. */
+    if (window.Candidaturas) Candidaturas.enganchar(opciones, N.asuntoActual);
 
     $('doc-volver').onclick = function () { N.soltarVisor(); N.pintarLista(); };
     $('doc-guardar').onclick = function () {

@@ -67,6 +67,8 @@ function construirSeccionDatos(tipo) {
   if (window.TiposOrgano) b.cuerpo.appendChild(TiposOrgano.filaDeTipo(tipo));
   /* «Reservado» (fila 135, js/reservados.js). */
   if (window.Reservados) b.cuerpo.appendChild(Reservados.filaDeTipo(tipo));
+  /* «Lleva candidaturas» (fila 347, js/candidaturas.js). */
+  if (window.Candidaturas) b.cuerpo.appendChild(Candidaturas.filaDeTipo(tipo));
   /* «Conservar ___ años después de archivar» (fila 136, js/conservacion.js). */
   if (window.Conservacion) b.cuerpo.appendChild(Conservacion.filaDeTipo(tipo));
   /* «Al repartir, crear asuntos de tipo…» (fila 141, js/repartir-pantalla.js). */

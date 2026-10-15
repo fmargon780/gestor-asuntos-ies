@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '347', fecha: '2026-10-15', texto: 'Elecciones al Consejo Escolar: en el asunto de las elecciones, al guardar una solicitud la app pregunta de quién es la candidatura y la apunta en una tarjeta «Candidaturas», por sectores y con su estado. Desde ahí se saca la lista provisional o definitiva en PDF para el tablón.' },
   { id: '346', fecha: '2026-10-15', texto: 'Etiquetas: cada hoja propia elige su tamaño (A3, A4, A5… o a medida), cualquier hoja o diseño se puede cambiar con «Cambiar», y el texto se puede alinear a la derecha.' },
   { id: '345', fecha: '2026-10-15', texto: 'En «Añadir varios relacionados» hay ahora el mismo filtro que al repartir, con varios criterios a la vez (por ejemplo, 1º de ESO y no repetidor); nadie se señala hasta pulsar «Señalar los N». Y en todos los filtros hay un botón «Exportar la lista ▾» que saca a Excel o a PDF a los que cumplen el filtro.' },
   { id: '344', fecha: '2026-10-14', texto: 'Nueva pantalla «Etiquetas» en Herramientas: eliges a quién (con el mismo filtro del reparto), la hoja de etiquetas por el código de la caja y qué lleva cada una (Sobre, Alumno, Profesor o un diseño tuyo). Marcas las ya gastadas y la imprimes o guardas en PDF. En un asunto de grupo hay un botón «Imprimir etiquetas».' },

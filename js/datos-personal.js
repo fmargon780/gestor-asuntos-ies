@@ -173,7 +173,10 @@
         r.puesto = fila.puesto;
         r.fechaCese = fila.cese;
         r.campos = fila.campos;
-        if (fila.tipoPersonal) r.tipoPersonal = fila.tipoPersonal; else delete r.tipoPersonal;
+        /* Fila 347: la clase de un listado se queda en la persona (el sector de una candidatura sale de ella). */
+        if (fila.tipoPersonal) r.tipoPersonal = fila.tipoPersonal;
+        else if (clase === 'docente' || clase === 'no-docente') r.tipoPersonal = clase;
+        else delete r.tipoPersonal;
         if (fila.puestos) r.puestos = fila.puestos; else delete r.puestos;
         if (fila.sinDocumento) r.sinDocumento = true; else delete r.sinDocumento;
       }
