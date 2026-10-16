@@ -160,6 +160,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 351 | (sin documento todavía; idea de Francisco del 16-oct-2026, al hacer el paso de la fila 314: «Control del registro» coge los dos listados del registro de Séneca, entrada y salida, del Centro de datos, como ya hace el Gestor con el alumnado y el personal, en vez de tener que subirlos a mano en esa pantalla. Hoy el Centro de datos ya los ofrece, pero `js/control-registro.js` solo los lee subidos a mano) | EN DISEÑO (16-oct-2026) · conversación: https://claude.ai/code/session_012zpZx64qmX2JWGxsVFffRK |
 | 352 | (sin documento todavía; idea de Francisco del 16-oct-2026: «Avisar al claustro» va a todo el profesorado que está hoy en el centro, sacado del listado del personal docente que ya llega del Centro de datos, en vez de a un grupo propio fijo que hay que mantener a mano. Hasta que se haga, el paso de la fila 309 de `docs/TE-TOCA.md` queda en espera) | IDEA (16-oct-2026) |
 | 353 | Aviso de usuario: mejora en «Inicio» | IDEA (16-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1R_zF67tcKTP54vciIB3ku6UHAxgbWGOu/view?usp=drivesdk |
+| 354 | Aviso de usuario: error en «Inicio» | IDEA (16-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1YvI2K-S_fYjRF9LSRYQIJj5Gjd28PTjO/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
