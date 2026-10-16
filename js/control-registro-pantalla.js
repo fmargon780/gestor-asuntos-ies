@@ -58,7 +58,14 @@ var ControlRegistroPantalla = (function () {
     var s = E.estado.control.subidas[libro];
     var nombre = libro === 'E' ? 'Entrada' : 'Salida';
     if (!s) return nombre + ': sin subir todavía';
-    return nombre + ': hasta el ' + ControlRegistro.fechaLarga(s.hasta) + ' · subido el ' +
+    var hasta = 'hasta el ' + ControlRegistro.fechaLarga(s.hasta);
+    /* Fila 351: de dónde viene el listado y su fecha real (los subidos antes no lo saben: como siempre). */
+    if (s.via && s.fechaOriginal) {
+      var dia = ControlRegistro.fechaLarga(ControlRegistro.diaEspana(s.fechaOriginal));
+      if (s.via === 'centro-de-datos') return nombre + ': del Centro de datos, ' + esc(dia) + ' · ' + hasta + (s.subidoPor ? ' · lo soltó ' + esc(s.subidoPor) : '');
+      return nombre + ': subido a mano, ' + esc(dia) + ' · ' + hasta + (s.por ? ' · por ' + esc(s.por) : '');
+    }
+    return nombre + ': ' + hasta + ' · subido el ' +
       esc(ControlRegistro.fechaLarga(String(s.el).slice(0, 10))) + (s.por ? ' por ' + esc(s.por) : '');
   }
 
@@ -228,7 +235,9 @@ var ControlRegistroPantalla = (function () {
     await hacer(async function () {
       var ficheros = [];
       for (var i = 0; i < archivos.length; i++) {
-        ficheros.push({ nombre: archivos[i].name, texto: decodificar(await archivos[i].arrayBuffer()) });
+        var modif = archivos[i].lastModified ? new Date(archivos[i].lastModified).toISOString() : '';
+        ficheros.push({ nombre: archivos[i].name, texto: decodificar(await archivos[i].arrayBuffer()),
+          origen: { via: 'a-mano', fechaOriginal: modif, nombreOriginal: archivos[i].name } });
       }
       var r = await ControlRegistro.subir(ficheros);
       if (!r.ok) { U.aviso(r.motivo, 'ambar'); return; }
@@ -237,6 +246,7 @@ var ControlRegistroPantalla = (function () {
         var x = r.porLibro[l];
         if (!x) return;
         partes.push((l === 'E' ? 'Entrada' : 'Salida') + ': ' + x.total + (x.total === 1 ? ' apunte, ' : ' apuntes, ') + x.nuevos + (x.nuevos === 1 ? ' nuevo' : ' nuevos') +
+          (x.antiguo ? ' (listado más antiguo que el que había: solo se añaden los apuntes que faltaban)' : '') +
           (x.fuera ? ' (' + x.fuera + ' anteriores a la fecha, dejados fuera)' : '') + '.');
       });
       E.avisoSubida = esc(partes.join(' '));

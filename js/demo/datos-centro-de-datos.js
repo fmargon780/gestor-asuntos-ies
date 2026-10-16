@@ -5,7 +5,7 @@
    Se llena al señalarla (Ajustes › Este ordenador › Carpeta del Centro de
    datos): un `indice.json` y sus listados inventados, escritos con las
    funciones de siempre. El alumnado y el personal son los de la copia con
-   una persona más cada uno; el registro de entrada, dos apuntes. Nada
+   una persona más cada uno; el registro de entrada y el de salida, dos apuntes cada uno. Nada
    se toma hasta que se señala la carpeta: sin ella, la copia de pruebas
    se comporta como siempre. Las fechas de «subido» van a mañana: el disco
    de mentira da siempre la hora de ahora a sus ficheros.
@@ -78,6 +78,12 @@
       '"2026/29700692/A000000000902","02/10/2026","02/10/2026","HORAS de ejemplo","Comunicación electrónica de la Delegación/Consejería","Completo","Unidad administrativa","Servicio de Ordenación Educativa","","Comunicación electrónica de la Adm.","N"\r\n';
     var rutaEnt = await poner(dir, 'registro-entrada', 'RegLibEntCen.csv', ent);
     entrada('registro-entrada', 'Registro de entrada', 'RegLibEntCen.csv', rutaEnt, 'csv', '2 apuntes');
+    /* Fila 351: el registro de salida, dos apuntes, con las columnas del libro de salida (Destinatario y Modo de envío). */
+    var sal = '"Nº.Registro","Fecha de trabajo","Fecha de registro","Extracto","Clase de documento","Estado","Tipo de destinatario","Destinatario","Destino","Modo de envío","Doc. Adjunta"\r\n' +
+      '"2026/29700692/M000000000801 - ","01/10/2026","01/10/2026","CERTIFICADO de ejemplo","Certificados","Completo","Alumnado","Lara Quintero, Bruno","Alumnado","Bandeja de firmas","S"\r\n' +
+      '"2026/29700692/M000000000802 - ","02/10/2026","02/10/2026","OFICIO de ejemplo","Oficios","Completo","Unidad administrativa","Servicio de Ordenación Educativa","Delegación","Bandeja de firmas","N"\r\n';
+    var rutaSal = await poner(dir, 'registro-salida', 'RegLibSalCen.csv', sal);
+    entrada('registro-salida', 'Registro de salida', 'RegLibSalCen.csv', rutaSal, 'csv', '2 apuntes');
     await Carpetas.escribirTexto(dir, 'configuracion.json', JSON.stringify({
       contrato: 1, actualizado: new Date().toISOString(), actualizadoPor: 'direccion@centro-demo.es',
       centro: { nombre: 'IES Centro de Demostración', codigo: '', direccion: '', localidad: 'Granada', provincia: '', telefono: '958000000' },

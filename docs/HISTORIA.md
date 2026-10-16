@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-oct-2026 — Fila 351: «Control del registro» dice de dónde viene cada listado
+
+La línea de arriba dice, por libro, si el listado viene del Centro de datos o se subió a mano, su fecha real, hasta qué día llega y quién lo subió (`via`, `fechaOriginal`, `subidoPor` en `subidas`). El aviso «registro atrasado» cuenta desde la fecha real del listado. Un listado más antiguo ya no pisa apuntes del más nuevo (`fundirAno` con `soloSiFaltan`). La demo trae también un registro de salida. Pruebas: `pruebas/control-registro.mjs` (apartado 8) y `pruebas/registro-origen.mjs`.
+
 ## 11-oct-2026 — Filas cerradas el 9-oct-2026, salidas de la cola
 
 Texto completo, sin tocar, de las filas HECHA/DESCARTADA del 9-oct-2026 (`docs/COLA.md` por debajo de 40 KB):

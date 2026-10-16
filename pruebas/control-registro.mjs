@@ -104,7 +104,7 @@ comprobar('y no guarda nada', (await ControlRegistro.cargar()).apuntes, {});
 
 await ControlRegistro.ponerDesde('2026-09-01');
 const r = await ControlRegistro.subir([{ nombre: 'RegLibEntCen.csv', texto: ENTRADA }, { nombre: 'RegLibSalCen.csv', texto: SALIDA }]);
-comprobar('sube los dos a la vez: cuentas y fuera de fecha', r.porLibro, { E: { total: 6, nuevos: 5, fuera: 1 }, S: { total: 4, nuevos: 4, fuera: 0 } });
+comprobar('sube los dos a la vez: cuentas y fuera de fecha', r.porLibro, { E: { total: 6, nuevos: 5, fuera: 1, antiguo: false }, S: { total: 4, nuevos: 4, fuera: 0, antiguo: false } });
 let estado = await ControlRegistro.cargar();
 comprobar('un apunte anterior a la fecha no se guarda', !!estado.apuntes['26EM0420'], false);
 comprobar('se guardan 9 apuntes en el fichero del año 2026', Object.keys(estado.apuntes).length, 9);
@@ -189,7 +189,35 @@ const tarde = ControlRegistro.resumenParaAvisos(estado, c, 7, enDias(10));
 comprobar('subido hace 10 días: atrasados los dos libros', tarde.atrasados.map((x) => x.libro), ['E', 'S']);
 const unSolo = JSON.parse(JSON.stringify(estado));
 unSolo.control.subidas.E.el = enDias(8) + 'T10:00:00.000Z';
+unSolo.control.subidas.E.fechaOriginal = unSolo.control.subidas.E.el;
 comprobar('solo uno atrasado: solo ese', ControlRegistro.resumenParaAvisos(unSolo, c, 7, enDias(10)).atrasados.map((x) => x.libro), ['S']);
+
+/* ---------- 8. origen y fecha real del listado (fila 351) ---------- */
+console.log('--- 8. origen y fecha real ---');
+const desdeAhora = (h) => new Date(Date.now() + h * 3600000).toISOString();   /* siempre posterior a lo subido arriba */
+const CD = { via: 'centro-de-datos', fechaOriginal: desdeAhora(24), subidoPor: 'diego@centro.es', nombreOriginal: 'RegLibEntCen.csv' };
+await ControlRegistro.subir([{ nombre: 'RegLibEntCen.csv', texto: ENTRADA, origen: CD }]);
+let sub = (await ControlRegistro.cargar()).control.subidas.E;
+comprobar('subir con origen guarda vía, fecha real y quién lo soltó', [sub.via, sub.fechaOriginal, sub.subidoPor], ['centro-de-datos', CD.fechaOriginal, 'diego@centro.es']);
+comprobar('la fecha de España es el día siguiente a las 22:30 de la hora universal', ControlRegistro.diaEspana('2026-10-15T22:30:00.000Z'), '2026-10-16');
+const antes = (await ControlRegistro.cargar()).apuntes;
+const codigoAntes = Object.keys(antes).find((k) => k.startsWith('26E'));
+const textoViejo = ENTRADA.replace(/SOLICITUD|Solicitud/g, 'CAMBIADO');
+const rViejo = await ControlRegistro.subir([{ nombre: 'viejo.csv', texto: textoViejo, origen: { via: 'a-mano', fechaOriginal: desdeAhora(1) } }]);
+const despues = (await ControlRegistro.cargar());
+comprobar('un listado más antiguo no pisa los apuntes que ya había', despues.apuntes[codigoAntes], antes[codigoAntes]);
+comprobar('ni cambia lo apuntado de ese libro', despues.control.subidas.E.via + despues.control.subidas.E.fechaOriginal, CD.via + CD.fechaOriginal);
+comprobar('y se avisa de que era más antiguo', rViejo.porLibro.E.antiguo, true);
+const rNuevo = await ControlRegistro.subir([{ nombre: 'nuevo.csv', texto: ENTRADA, origen: { via: 'a-mano', fechaOriginal: desdeAhora(48) } }]);
+comprobar('uno más nuevo pasa a ser el apuntado', (await ControlRegistro.cargar()).control.subidas.E.via, 'a-mano');
+const sinOrigen = await ControlRegistro.subir([{ nombre: 'sin.csv', texto: ENTRADA }]);
+comprobar('sin origen cuenta como de ahora (más antiguo que uno de dentro de 2 días)', sinOrigen.porLibro.E.antiguo, true);
+comprobar('lo subido sin origen arriba quedó como «a mano»', [estado.control.subidas.S.via, typeof estado.control.subidas.S.fechaOriginal], ['a-mano', 'string']);
+const viejoSub = JSON.parse(JSON.stringify(await ControlRegistro.cargar()));
+viejoSub.control.subidas.S = { el: enDias(0) + 'T10:00:00.000Z', por: 'x', hasta: '2026-10-02' };
+viejoSub.control.subidas.E = { el: enDias(0) + 'T10:00:00.000Z', fechaOriginal: enDias(-9) + 'T10:00:00.000Z', por: 'x', hasta: '2026-10-02' };
+const rv = ControlRegistro.resumenParaAvisos(viejoSub, ControlRegistro.clasificar(viejoSub, []), 7, enDias(0));
+comprobar('el aviso de atraso cuenta desde la fecha real; sin ella, desde la subida', rv.atrasados.map((x) => x.libro), ['E']);
 
 if (fallos) { console.log('\n' + fallos + ' FALLOS'); process.exit(1); }
 console.log('\nTodo bien.');

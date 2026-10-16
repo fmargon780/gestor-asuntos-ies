@@ -44,6 +44,16 @@ var ControlRegistro = (function () {
     return m ? m[3] + '/' + m[2] + '/' + m[1] : '';
   }
 
+  /* El día (aaaa-mm-dd) de una fecha con hora, en hora de España (toISOString va en hora universal y puede dar el día anterior). */
+  function diaEspana(iso) {
+    var t = Date.parse(iso);
+    if (isNaN(t)) return '';
+    var p = {};
+    new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' })
+      .formatToParts(new Date(t)).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + '-' + p.month + '-' + p.day;
+  }
+
   function hoyIso() {
     var d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -181,10 +191,12 @@ var ControlRegistro = (function () {
   }
 
   /* Funde `nuevos` en el fichero de un año (por código: gana el nuevo). */
-  function fundirAno(ano, nuevos) {
+  function fundirAno(ano, nuevos, soloSiFaltan) {
     return ColaGuardado.poner(CARPETA + '/' + ano, async function () {
       var dir = await carpetaApuntes(true);
       var actual = await leerApuntesDeAno(ano);
+      /* Fila 351: de un listado más antiguo solo entran los apuntes que no estaban. */
+      Object.keys(soloSiFaltan || {}).forEach(function (k) { if (!actual[k]) actual[k] = soloSiFaltan[k]; });
       Object.keys(nuevos).forEach(function (k) { actual[k] = nuevos[k]; });
       await Carpetas.guardarJson(dir, ano + '.json', { _esquema: ESQUEMA, apuntes: actual });
     });
@@ -229,36 +241,61 @@ var ControlRegistro = (function () {
     return n;
   }
 
-  /* Sube uno o varios listados: `ficheros` = [{ nombre, texto }]. Sin la fecha puesta no sube nada.
-     Devuelve { ok, motivo?, porLibro: { E:{total,nuevos,fuera}, S:{…} }, rechazados:[{nombre,motivo}] }. */
+  /* Sube uno o varios listados: `ficheros` = [{ nombre, texto, origen? }], con `origen` = { via: 'centro-de-datos' | 'a-mano',
+     fechaOriginal (ISO con hora), subidoPor, nombreOriginal } (fila 351). Sin él: a mano y fecha de ahora.
+     Un listado más antiguo que el apuntado en `subidas` solo añade los apuntes que faltan. Sin la fecha puesta no sube nada.
+     Devuelve { ok, motivo?, porLibro: { E:{total,nuevos,fuera,antiguo}, S:{…} }, rechazados:[{nombre,motivo}] }. */
+  function origenDeFichero(f) {
+    var o = f.origen || {};
+    return { via: o.via === 'centro-de-datos' ? 'centro-de-datos' : 'a-mano', fechaOriginal: o.fechaOriginal || ahora(),
+      subidoPor: o.subidoPor || '', nombreOriginal: o.nombreOriginal || f.nombre || '' };
+  }
+
+  function marca(iso) { var t = Date.parse(iso); return isNaN(t) ? null : t; }
+
   async function subir(ficheros) {
     var control = await leerControlDisco();
     if (!control.desde) return { ok: false, motivo: 'Pon antes la fecha «Revisar desde el día…».' };
     var existentes = (await cargar()).apuntes;
-    var porLibro = {}, rechazados = [], nuevosPorAno = {};
-    var hastaPorLibro = {};
+    var porLibro = {}, rechazados = [], pisan = {}, soloSiFaltan = {}, vistos = {};
+    var hastaPorLibro = {}, origenPorLibro = {};
     ficheros.forEach(function (f) {
       var r = leerCsv(f.texto);
       if (!r.ok) { rechazados.push({ nombre: f.nombre, motivo: r.motivo }); return; }
-      var res = porLibro[r.libro] = porLibro[r.libro] || { total: 0, nuevos: 0, fuera: 0 };
+      var og = origenDeFichero(f);
+      var previo = control.subidas[r.libro] || {};
+      /* Sin `fechaOriginal` guardada (subido antes de la fila 351), el que llega es el más reciente. */
+      var tPrevio = marca(previo.fechaOriginal), tNuevo = marca(og.fechaOriginal);
+      var antiguo = tPrevio !== null && tNuevo !== null && tNuevo < tPrevio;
+      var res = porLibro[r.libro] = porLibro[r.libro] || { total: 0, nuevos: 0, fuera: 0, antiguo: antiguo };
+      if (!antiguo) {
+        res.antiguo = false;
+        var cand = origenPorLibro[r.libro];
+        if (!cand || tNuevo === null || marca(cand.fechaOriginal) === null || tNuevo >= marca(cand.fechaOriginal)) origenPorLibro[r.libro] = og;
+      }
       r.apuntes.forEach(function (a) {
         res.total++;
         if (a.fecha && a.fecha < control.desde) { res.fuera++; return; }
-        if (!existentes[a.codigo] && !(nuevosPorAno[a.ano] && nuevosPorAno[a.ano][a.codigo])) res.nuevos++;
-        (nuevosPorAno[a.ano] = nuevosPorAno[a.ano] || {})[a.codigo] = a;
-        if (a.fecha && (!hastaPorLibro[r.libro] || a.fecha > hastaPorLibro[r.libro])) hastaPorLibro[r.libro] = a.fecha;
+        if (!existentes[a.codigo] && !vistos[a.codigo]) res.nuevos++;
+        vistos[a.codigo] = true;
+        var destino = antiguo ? soloSiFaltan : pisan;
+        (destino[a.ano] = destino[a.ano] || {})[a.codigo] = a;
+        if (!antiguo && a.fecha && (!hastaPorLibro[r.libro] || a.fecha > hastaPorLibro[r.libro])) hastaPorLibro[r.libro] = a.fecha;
       });
     });
-    var anos = Object.keys(nuevosPorAno);
-    for (var i = 0; i < anos.length; i++) await fundirAno(anos[i], nuevosPorAno[anos[i]]);
-    var libros = Object.keys(porLibro);
+    var anos = Object.keys(pisan);
+    Object.keys(soloSiFaltan).forEach(function (a) { if (anos.indexOf(a) < 0) anos.push(a); });
+    for (var i = 0; i < anos.length; i++) await fundirAno(anos[i], pisan[anos[i]] || {}, soloSiFaltan[anos[i]] || {});
+    var libros = Object.keys(origenPorLibro);
     if (libros.length) {
       await cambiarControl(function (c) {
         libros.forEach(function (l) {
           var previo = c.subidas[l] || {};
           var hasta = hastaPorLibro[l] || previo.hasta || '';
           if (previo.hasta && previo.hasta > hasta) hasta = previo.hasta;
-          c.subidas[l] = { el: ahora(), por: quien(), hasta: hasta };
+          var og = origenPorLibro[l];
+          c.subidas[l] = { el: ahora(), por: quien(), hasta: hasta, via: og.via, fechaOriginal: og.fechaOriginal,
+            subidoPor: og.subidoPor, nombreOriginal: og.nombreOriginal };
         });
       });
     }
@@ -448,7 +485,8 @@ var ControlRegistro = (function () {
     var atrasados = [];
     ['E', 'S'].forEach(function (l) {
       var s = estado.control.subidas[l];
-      var cuando = s && s.el ? String(s.el).slice(0, 10) : '';
+      /* Fila 351: se cuenta desde la fecha real del listado; si no la hay (subido antes), desde cuando se subió. */
+      var cuando = s && s.fechaOriginal ? diaEspana(s.fechaOriginal) : (s && s.el ? String(s.el).slice(0, 10) : '');
       var mas = !cuando || new Date(cuando + 'T00:00:00') < limite;
       if (mas) atrasados.push({ libro: l, desde: cuando });
     });
@@ -462,7 +500,7 @@ var ControlRegistro = (function () {
 
   return {
     DIAS_POR_DEFECTO: DIAS_POR_DEFECTO,
-    hueso: hueso, fechaIso: fechaIso, fechaLarga: fechaLarga, hoyIso: hoyIso, codigoDeNumero: codigoDeNumero,
+    hueso: hueso, fechaIso: fechaIso, fechaLarga: fechaLarga, diaEspana: diaEspana, hoyIso: hoyIso, codigoDeNumero: codigoDeNumero,
     leerCsv: leerCsv, cargar: cargar, ponerDesde: ponerDesde, cuantosQuitaria: cuantosQuitaria, desdeValida: desdeValida, subir: subir,
     decidir: decidir, quitarDecision: quitarDecision,
     ponerClaseSinAsunto: ponerClaseSinAsunto, quitarClaseSinAsunto: quitarClaseSinAsunto,

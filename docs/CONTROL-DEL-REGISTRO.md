@@ -235,3 +235,7 @@ avisa de los apuntes sin asunto y de cuándo toca volver a subirlos.
 ## Cómo se guarda la fecha «Revisar desde el día» (fila 314, 9-oct-2026)
 
 Se guarda al salir del campo o con Intro (no mientras se escribe), solo con año de 2000 a 2099; un `desde` guardado fuera de ese rango cuenta como sin fecha. Si adelantar la fecha quita apuntes, antes pregunta «Se van a quitar N apuntes anteriores al día X» con «Quitar» y «Cancelar»; las decisiones no se pierden. Ver `docs/FECHA-QUE-NO-DEJA-ESCRIBIR-EL-ANO.md`.
+
+## De dónde viene cada listado y su fecha real (fila 351, 16-oct-2026)
+
+`subidas[E|S]` de `_GESTOR/control-registro.json` guarda también `via` (`centro-de-datos` o `a-mano`), `fechaOriginal` (ISO con hora: el `subido` del índice del Centro de datos, o el `lastModified` del fichero subido a mano), `subidoPor` y `nombreOriginal`. La línea de arriba de «Control del registro» dice, por libro, «del Centro de datos, dd/mm/aaaa · hasta el … · lo soltó <quién>» o «subido a mano, dd/mm/aaaa · hasta el … · por <quién>»; lo subido antes de la fila 351 se ve como siempre. Las fechas van en hora de España (`ControlRegistro.diaEspana`). El aviso «registro atrasado» cuenta desde `fechaOriginal` (si no la hay, desde `el`). Un listado con `fechaOriginal` anterior a la de `subidas[l]` solo añade los apuntes que no estaban y no cambia `subidas[l]`. Ver `docs/REGISTRO-ORIGEN-Y-FECHA-REAL.md`.

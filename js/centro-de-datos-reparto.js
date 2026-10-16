@@ -101,7 +101,7 @@ var CentroDeDatosReparto = (function () {
         if (!c.desde) return 'sin-fecha';
         var fi = await h.getFile();
         var texto = decodificar(new Uint8Array(await fi.arrayBuffer()));
-        var s = await ControlRegistro.subir([{ nombre: e.fichero || fi.name, texto: texto }]);
+        var s = await ControlRegistro.subir([{ nombre: e.fichero || fi.name, texto: texto, origen: origenDe(e) }]);
         if (!s.ok) throw new Error(s.motivo);
         if (s.rechazados && s.rechazados.length) throw new Error(s.rechazados[0].motivo);
         if (window.ControlRegistroPantalla && ControlRegistroPantalla._estado.abierta) { try { await ControlRegistroPantalla.recargar(); } catch (x) { /* no está abierta */ } }
