@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-oct-2026 — Fila 354: el personal que está hoy en el centro ya no sale «Ya no está en el centro»
+
+Caso real: Marmolejo González, Francisco Javier (no docente, sin cese). Causa reproducida en prueba: `esteCurso` (fila 340) se medía contra el dato más reciente de SU clase (o el curso más alto de todo para filas sin `tipoPersonal`); basta un listado o parte de un curso posterior de esa clase donde la persona no sale para que pase a «su último curso aquí: 26-27» aunque salga en el curso de hoy sin cese. Regla nueva (decidida con Francisco): está en el centro quien sale en un dato de curso conocido (nombre con curso, o parte del Centro de datos) del curso de hoy o posterior sin cese pasado; con varios datos manda el que no tiene cese o el más tarde. Un listado sin curso en el nombre no cuenta para esa regla y sigue la de la fila 340. Fichero: `js/datos-personal.js`; prueba: `pruebas/personal-en-el-centro.mjs` (casos 8 y 9).
+
 ## 16-oct-2026 — Fila 351: «Control del registro» dice de dónde viene cada listado
 
 La línea de arriba dice, por libro, si el listado viene del Centro de datos o se subió a mano, su fecha real, hasta qué día llega y quién lo subió (`via`, `fechaOriginal`, `subidoPor` en `subidas`). El aviso «registro atrasado» cuenta desde la fecha real del listado. Un listado más antiguo ya no pisa apuntes del más nuevo (`fundirAno` con `soloSiFaltan`). La demo trae también un registro de salida. Pruebas: `pruebas/control-registro.mjs` (apartado 8) y `pruebas/registro-origen.mjs`.

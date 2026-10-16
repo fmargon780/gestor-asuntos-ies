@@ -130,6 +130,18 @@
     return false;
   }
 
+  /* Fila 354: de varias fechas de cese de una persona en los datos de hoy, la que cuenta: vacía si alguna lo es
+     (sigue en el centro); si no, la más tarde. */
+  function cesePrevalente(ceses) {
+    var mejor = '', mejorT = -1;
+    for (var i = 0; i < ceses.length; i++) {
+      var f = ceses[i] ? U.aFecha(ceses[i]) : null;
+      if (!f) return ceses[i] ? ceses[i] : '';
+      if (f.getTime() > mejorT) { mejorT = f.getTime(); mejor = ceses[i]; }
+    }
+    return mejor;
+  }
+
   async function cargarPersonal(dirDatos) {
     if (I.CACHE.PERSONAL) return I.CACHE.PERSONAL;
 
@@ -151,7 +163,7 @@
     var altoPorClase = {};   /* fila 340: el curso más alto en que hay datos de cada clase de personal */
 
     /* Una persona de un fichero o de una parte: los datos buenos son los del curso más reciente en que sale. */
-    function anadir(curso, fila, clase) {
+    function anadir(curso, fila, clase, cursoConocido) {
       clase = clase || claseDeFila(fila);
       if (curso > (altoPorClase[clase] || '')) altoPorClase[clase] = curso;
       var clave = clavePersona(fila.documento, fila.nombre);
@@ -166,6 +178,8 @@
       var r = porPersona[clave];
       if (r.cursos.indexOf(curso) === -1) r.cursos.push(curso);
       (r.cursosPorClase[clase] = r.cursosPorClase[clase] || []).push(curso);
+      /* Fila 354: un dato de personal de curso conocido, del de hoy o posterior, y con qué fecha de cese. */
+      if (cursoConocido && curso >= U.cursoActual()) (r.cesesDeHoy = r.cesesDeHoy || []).push(fila.cese || '');
       if (curso >= r.cursoUltimo) {
         r.cursoUltimo = curso;
         r.nombre = fila.nombre;
@@ -214,7 +228,7 @@
           nombre: nombre, documento: String(fila[iDoc] || '').trim(),
           puesto: iPuesto === -1 ? '' : String(fila[iPuesto] || '').trim(),
           cese: iCese === -1 ? '' : String(fila[iCese] || '').trim(), campos: campos
-        }, claseDeFichero(nombreFichero));
+        }, claseDeFichero(nombreFichero), cursoEnElNombre(nombreFichero) !== '');
       }
       resumen.push({ fichero: nombreFichero, curso: curso, filas: cuantas });
     }
@@ -225,7 +239,7 @@
     cursosPartes.forEach(function (curso) {
       if (curso > cursoMasAlto) cursoMasAlto = curso;
       var filas = DatosPersonalHecho.filasDe(delCentro[curso].parte);
-      filas.forEach(function (fila) { anadir(curso, fila); });
+      filas.forEach(function (fila) { anadir(curso, fila, null, true); });
       resumen.push({ fichero: delCentro[curso].nombre, curso: curso, filas: filas.length, hecho: true, generado: delCentro[curso].parte.generado || '' });
     });
     if (delCentro[cursoMasAlto]) avisos = DatosPersonalHecho.avisosDe(delCentro[cursoMasAlto].parte);
@@ -236,13 +250,22 @@
     Object.keys(porPersona).forEach(function (k) {
       var r = porPersona[k];
       r.cursos.sort();
-      /* Fila 340: está este curso quien sale en el dato más reciente de SU clase de personal (docente, no docente
-         o todo junto; 'todo' se mide con el curso más alto de todos), no en el más reciente de todos: si los no
-         docentes solo se han subido hasta el curso pasado, no por eso han dejado de estar. */
-      r.esteCurso = Object.keys(r.cursosPorClase).some(function (clase) {
-        var alto = clase === 'todo' ? cursoMasAlto : altoPorClase[clase];
-        return r.cursosPorClase[clase].indexOf(alto) !== -1;
-      });
+      /* Fila 354: está en el centro quien sale en un dato de personal de curso conocido (listado con el curso en el
+         nombre, o parte del Centro de datos) del de hoy o posterior, y no tiene un cese ya pasado; tenga los cursos que
+         tenga el resto de los datos. Si sale en varios, manda quien no tiene cese o el cese más tarde. */
+      if (r.cesesDeHoy) {
+        r.esteCurso = true;
+        r.fechaCese = cesePrevalente(r.cesesDeHoy);
+      } else {
+        /* Fila 340: si no, está este curso quien sale en el dato más reciente de SU clase de personal (docente, no
+           docente o todo junto; 'todo' se mide con el curso más alto de todos): si los no docentes solo se han subido
+           hasta el curso pasado, no por eso han dejado de estar. */
+        r.esteCurso = Object.keys(r.cursosPorClase).some(function (clase) {
+          var alto = clase === 'todo' ? cursoMasAlto : altoPorClase[clase];
+          return r.cursosPorClase[clase].indexOf(alto) !== -1;
+        });
+      }
+      delete r.cesesDeHoy;
       delete r.cursosPorClase;
       r.enElCentro = r.esteCurso && !U.yaPaso(r.fechaCese);
       if (r.enElCentro) enElCentro++;

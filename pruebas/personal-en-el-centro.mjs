@@ -111,6 +111,41 @@ comprobar('7. buscador: su último curso aquí', textos.viejo, 'Física  ·  Ya 
 comprobar('7. buscador: quien está, sin aviso', textos.dentro, 'Física');
 comprobar('7. la ficha usa el mismo motivo', textos.motivo, ' (su último curso aquí: 25-26)');
 
+console.log('--- 8: fila 354, datos de personal de cursos posteriores al de hoy ---');
+const SIGUIENTE = String(a1 + 1).padStart(2, '0') + '-' + String(a2 + 1).padStart(2, '0');
+const parteSig = { acuerdoHecho: 1, conjunto: 'personal', parte: 'curso', cursoEscolar: SIGUIENTE, generado: new Date().toISOString(), origen: 'centro-de-datos-ies', campos: [], avisos: [],
+  registros: [reg(fila('Docente Otro, Otto', '10000009K', 'Latín'), 'no-docente')] };
+const parteHoySinClase = { acuerdoHecho: 1, conjunto: 'personal', parte: 'curso', cursoEscolar: CURSO, generado: new Date().toISOString(), origen: 'centro-de-datos-ies', campos: [], avisos: [],
+  registros: [reg(fila('Parte Pili, Pili', '10000010L', 'Física'), '')] };
+await escribir({
+  ['RelPerCenNodocente ' + CURSO + '.csv']: csv([
+    fila('Marmolejo, Paco', '20000003G', 'Auxiliar administrativo/a'),
+    fila('Nodocente Cesado, Cesar', '20000004H', 'Limpieza', fechaEn(-3))]),
+  ['RelPerCen ' + CURSO + '.csv']: csv([
+    fila('Docente Doble, Dora', '10000008J', 'Dibujo', fechaEn(-3)),
+    fila('Docente Hoy, Hugo', '10000011M', 'Música')]),
+  ['RelPerCenNodocente ' + SIGUIENTE + '.csv']: csv([fila('Nodocente Futura, Fina', '20000005J', 'Conserje')]),
+  ['RelPerCenNodocente.csv']: csv([fila('Nodocente Sinaño, Nico', '20000006K', 'Conserje')])
+}, { ['PERSONAL-HECHO ' + SIGUIENTE + '.json']: JSON.stringify(parteSig) });
+q = await quien(['Marmolejo, Paco', 'Nodocente Cesado, Cesar', 'Docente Doble, Dora', 'Docente Hoy, Hugo']);
+comprobar('8. no docente de hoy, sin cese, con datos de un curso posterior de su clase: en el centro', q.r['Marmolejo, Paco'].slice(0, 2), [true, true]);
+comprobar('8. con cese pasado en el curso de hoy: fuera, y se sabe que sale este curso (cesó)', q.r['Nodocente Cesado, Cesar'].slice(0, 2), [false, true]);
+comprobar('8. docente en el curso de hoy con cese pasado, en un solo listado: fuera (cesó)', q.r['Docente Doble, Dora'].slice(0, 2), [false, true]);
+comprobar('8. docente de hoy sin cese con datos posteriores de otra clase: en el centro', q.r['Docente Hoy, Hugo'].slice(0, 2), [true, true]);
+await escribir({}, { ['PERSONAL-HECHO ' + SIGUIENTE + '.json']: JSON.stringify(parteSig), ['PERSONAL-HECHO ' + CURSO + '.json']: JSON.stringify(parteHoySinClase) });
+q = await quien(['Parte Pili, Pili']);
+comprobar('8. fila de una parte de hoy sin clase, con otra parte de un curso posterior: en el centro', q.r['Parte Pili, Pili'].slice(0, 2), [true, true]);
+
+console.log('--- 9: el mismo curso en dos listados con distinta fecha de cese ---');
+await escribir({
+  ['RelPerCen ' + CURSO + '.csv']: csv([fila('Doble Listado, Dora', '10000012N', 'Dibujo', fechaEn(-3)), fila('Doble Listado, Cese', '10000013P', 'Dibujo', fechaEn(-3))]),
+  ['RelPerCenNodocente ' + CURSO + '.csv']: csv([fila('Doble Listado, Dora', '10000012N', 'Dibujo'), fila('Doble Listado, Cese', '10000013P', 'Dibujo', fechaEn(10))]),
+  ['RelPerCen ' + SIGUIENTE + '.csv']: csv([fila('Otro, Alguien', '10000014Q', 'Dibujo')])
+});
+q = await quien(['Doble Listado, Dora', 'Doble Listado, Cese']);
+comprobar('9. docente con cese y no docente sin cese: manda el que no tiene cese', q.r['Doble Listado, Dora'].slice(0, 2), [true, true]);
+comprobar('9. dos ceses: manda el más tarde', q.r['Doble Listado, Cese'].slice(0, 2), [true, true]);
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

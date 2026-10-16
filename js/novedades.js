@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '354', fecha: '2026-10-16', texto: 'El personal que está hoy en el centro (por ejemplo, el personal no docente sin fecha de cese) ya no sale con el aviso «Ya no está en el centro».' },
   { id: '351', fecha: '2026-10-16', texto: 'En «Control del registro», la línea de arriba dice de dónde viene cada listado (del Centro de datos o subido a mano), su fecha y hasta qué día llega. Un listado más antiguo ya no pisa los apuntes del más nuevo.' },
   { id: '350', fecha: '2026-10-15', texto: 'Etiquetas: buscador de personas a partir de tres letras y texto colocado arriba, en el centro o abajo. En todos los filtros del alumnado se escribe para elegir y las personas salen con su casilla, todas marcadas.' },
   { id: '349', fecha: '2026-10-15', texto: 'Al guardar un PDF, si pesa más de 5 MB la app lo comprime sola (con aviso del antes y el después), y si sus hojas son más grandes que un A4 trae marcada la casilla «Pasarlas a A4» (con otros tamaños). «Ajustar tamaño» del visor también pasa las hojas a A4. Un PDF con firma electrónica no se toca.' },

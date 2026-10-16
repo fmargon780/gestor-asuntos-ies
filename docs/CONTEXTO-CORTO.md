@@ -98,6 +98,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   «Curso», carga solo al entrar, la primera vez) y búsqueda por palabras sueltas también en
   documentos, registro de Séneca, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
+- Personal «en el centro» (fila 354): sale en un dato de personal de curso conocido del curso de hoy o posterior y sin cese pasado; si no, vale la regla de la clase (fila 340). `js/datos-personal.js`, `docs/contexto/PERSONAS.md`.
   hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
   ficha, huecos, grupos.
