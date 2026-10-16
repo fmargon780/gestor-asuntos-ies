@@ -244,6 +244,8 @@
     I.plantillaPedida = (extra && extra.plantilla) || '';
     I.avisoActividad = (extra && extra.avisoActividad) || null;   /* fila 309: al enviarse, se apunta el aviso en el asunto */
     I.grupoInicial = (extra && extra.grupoInicial) || '';   /* fila 309: el id de un grupo propio, ya en la copia oculta */
+    I.personasCopiaOculta = (extra && extra.personasCopiaOculta) || null;   /* fila 352: personas [{nombre, persona}] ya en la copia oculta */
+    I.copiaOcultaDocentes = !!(extra && extra.copiaOcultaDocentes);   /* fila 352: la línea de «sin correo» sale en ámbar y habla de docentes */
     /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): el hito desde el que
        se avisa o se pide "Enviar estado", para que {{HITO}}, {{HITON}}
        y {{HITOSM}} salgan resueltos en la plantilla. `avisoLoPide`

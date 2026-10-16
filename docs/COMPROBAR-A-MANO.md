@@ -285,3 +285,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 349 — comprimir PDF y pasar a A4 (15-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Con un PDF real que llegó enorme al centro: guárdalo en un asunto (se pasa a A4), súbelo a Séneca y mira que el sello sale a su tamaño normal. Y con un PDF que llegue por la bandeja de Gmail, que salga la casilla «Pasarlas a A4» si sus hojas son grandes.
+
+## Fila 352 — aviso al claustro desde el personal docente (16-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Con los datos reales, en una actividad pulsa «Avisar al claustro»: la Copia oculta lleva al profesorado que está hoy en el centro y **no** sale el correo de Bonilla Cascado, Manuel (ya no está), ni el del personal no docente. Si a algún docente le falta el correo, sale el aviso ámbar con su nombre.

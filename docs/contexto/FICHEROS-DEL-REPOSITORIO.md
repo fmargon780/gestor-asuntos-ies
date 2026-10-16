@@ -38,7 +38,7 @@ de `App` va después del fichero que lo define.
 | `js/encargos.js`, `js/encargos-nuevo.js`, `js/encargos-mios.js`, `js/encargos-llegada.js` | Los encargos de los directivos (fila 289): `_GESTOR/encargos.json` (`{ encargos: [ … ] }`, documentos en `_GESTOR/encargos/<id>/`), «Nuevo encargo», «Mis encargos» y las tarjetas de «Ver todo»; se funde por `id` en un conflicto de Dropbox |
 | `js/actividades.js` | Las actividades extraescolares (fila 306): `_GESTOR/actividades.json`, `situacion`, `cuenta`, `unidadesDe`, `fechasLegibles`, la pasada que marca el tipo (`tipo.actividades`), `ponerAlDia`, papelera, unir y renombrar |
 | `js/actividades-formulario.js` | El formulario «La actividad» y el botón «Apuntar la actividad» de «Nuevo asunto» (fila 306) |
-| `js/actividades-informe.js` | El aviso al claustro (fila 309): `datos`, `cambios`, `valores` (huecos `{{ACTIVIDAD…}}`), el PDF, guardarlo en el asunto, `avisar`, `alEnviar`, el desplegable de Ajustes |
+| `js/actividades-informe.js` | El aviso al claustro (fila 309): `datos`, `cambios`, `valores` (huecos `{{ACTIVIDAD…}}`), el PDF, guardarlo en el asunto, `docentesDelCentro` (a quién se avisa, fila 352), `avisar`, `alEnviar` |
 | `js/actividades-ficha.js` | La tarjeta «La actividad» de la ficha: «Cambiar», «Anular la actividad», «Apuntar los datos de la actividad» (fila 306) |
 | `js/actividades-pantalla.js` | La pantalla «Actividades extraescolares» de Herramientas: tabla, filtros, abrir la ficha (fila 310) |
 | `js/actividades-antigua.js` | El cuadro de «Apuntar una actividad antigua», cambiar y borrar (fila 310) |

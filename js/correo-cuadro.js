@@ -89,9 +89,13 @@ var CorreoCuadro = (function () {
         }).join('') + '</div>'
       : '') +
       (ccoSinCorreo.length
-        ? '<p class="nota aviso-en-linea">' + ccoSinCorreo.length +
-          (ccoSinCorreo.length === 1 ? ' no tiene correo: ' : ' no tienen correo: ') +
-          U.escapar(ccoSinCorreo.join(', ')) + '</p>'
+        ? ((n()._interno || {}).copiaOcultaDocentes   /* fila 352: el aviso al claustro, en ámbar */
+          ? '<p class="aviso aviso-ambar" id="cco-sin-correo-docentes">' + ccoSinCorreo.length +
+            (ccoSinCorreo.length === 1 ? ' docente del centro no tiene correo: ' : ' docentes del centro no tienen correo: ') +
+            U.escapar(ccoSinCorreo.join(', ')) + '</p>'
+          : '<p class="nota aviso-en-linea">' + ccoSinCorreo.length +
+            (ccoSinCorreo.length === 1 ? ' no tiene correo: ' : ' no tienen correo: ') +
+            U.escapar(ccoSinCorreo.join(', ')) + '</p>')
         : '');
   }
 
@@ -374,6 +378,15 @@ var CorreoCuadro = (function () {
     }
     var grupoInicial = (n()._interno || {}).grupoInicial;
     if (grupoInicial) { n()._interno.grupoInicial = ''; anadirGrupo('grupo:' + grupoInicial); }
+    /* Fila 352: personas sueltas (el aviso al claustro: el profesorado del centro) en la copia oculta, como un grupo. */
+    var personasCco = (n()._interno || {}).personasCopiaOculta;
+    if (personasCco) {
+      n()._interno.personasCopiaOculta = null;
+      var delGrupoCco = combinarCorreosDeGrupo(personasCco);
+      delGrupoCco.direcciones.forEach(function (d) { cco[d] = true; });
+      delGrupoCco.sinCorreo.forEach(function (nombre) { if (ccoSinCorreo.indexOf(nombre) === -1) ccoSinCorreo.push(nombre); });
+      refrescarCco();
+    }
 
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
     $('correo-copiar-asunto').onclick = function () { copiar($('correo-asunto').value, this); };

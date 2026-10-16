@@ -258,13 +258,11 @@ var ActividadesInforme = (function () {
     return despues ? despues.id : id;
   }
 
-  /* El grupo que recibe el aviso: el elegido en Ajustes o, si no, el que se llame «Profesorado» o «Claustro». */
-  function grupoDeAviso() {
-    var lista = (window.Grupos && Grupos.lista()) || [];
-    var id = (App.E.registro && App.E.registro.ajustesAvisos || {}).grupoActividades;
-    var g = id ? lista.filter(function (x) { return x.id === id; })[0] : null;
-    if (!g) g = lista.filter(function (x) { var n = U.normalizar(x.nombre); return n === 'profesorado' || n === 'claustro'; })[0];
-    return g || null;
+  /* Fila 352: a quién se avisa: el personal docente que está hoy en el centro (personal de Datos, nunca un grupo propio). */
+  async function docentesDelCentro() {
+    var fuente = null;
+    try { fuente = App.E.datos ? await Datos.cargar(App.E.datos, 'PERSONAL') : null; } catch (e) { fuente = null; }
+    return ((fuente && fuente.lista) || []).filter(function (p) { return p.enElCentro && p.tipoPersonal === 'docente'; });
   }
 
   /* ---------- «Avisar al claustro» ---------- */
@@ -292,20 +290,20 @@ var ActividadesInforme = (function () {
     } catch (e) { U.fallo('No he podido preparar el informe de la actividad', e); return; }
     var idPlantilla = '';
     try { idPlantilla = await asegurarPlantilla(a); } catch (e) { U.accesorio('No he podido preparar la plantilla del aviso', e); }
-    try { await Grupos.cargar(); } catch (e) { /* se usa lo que haya */ }
-    var grupo = grupoDeAviso();
+    var docentes = await docentesDelCentro();
     var extra = {
-      adjuntosMarcados: [nombreInforme], plantilla: idPlantilla, grupoInicial: grupo ? grupo.id : '',
+      adjuntosMarcados: [nombreInforme], plantilla: idPlantilla,
+      personasCopiaOculta: docentes.map(function (p) { return { nombre: p.nombre, persona: p }; }), copiaOcultaDocentes: true,
       asuntoListo: 'Actividad extraescolar: ' + act.nombre + ' (' + Actividades.fechasLegibles(act) + ')',
       saludo: ultimo ? 'Este aviso sustituye al enviado el ' + fechaDelAviso(ultimo) + '.\n\nBuenas:' : 'Buenas:',
       avisoActividad: { informe: nombreInforme, personas: alumnadoDeAhora(a) }
     };
-    if (!grupo) {
-      extra.avisoAmbar = 'No hay ningún grupo con el profesorado. Créalo en Ajustes → Grupos de personas.';
-      extra.avisoEnlace = { texto: 'Ir a Grupos de personas', alPulsar: function () {
+    if (!docentes.length) {
+      extra.avisoAmbar = 'No hay datos del profesorado del centro. Tráelos desde el Centro de datos.';
+      extra.avisoEnlace = { texto: 'Ir a «Traer el alumnado»', alPulsar: function () {
         var cerrar = document.getElementById('cuadro-aceptar');
         if (cerrar) cerrar.click();
-        App.irASeccionDeAjustes('#bloque-grupos-personas');
+        App.irASeccionDeAjustes('#bloque-traer-alumnado');
       } };
     }
     await CorreoNucleo.abrirCuadro(a, false, extra);
@@ -332,30 +330,11 @@ var ActividadesInforme = (function () {
     return { linea: 'Aviso enviado el ' + fechaDelAviso(ultimo), ambar: textoCambios(c), boton: textoCambios(c) ? 'Volver a avisar' : 'Avisar al claustro' };
   }
 
-  /* ---------- Ajustes → El centro ---------- */
-
-  function pintarAjustes() {
-    var campo = document.getElementById('grupo-aviso-actividades');
-    if (!campo || !window.Grupos) return;
-    var actual = (App.E.registro && App.E.registro.ajustesAvisos || {}).grupoActividades || '';
-    campo.innerHTML = '<option value="">(el grupo «Profesorado» o «Claustro»)</option>' +
-      Grupos.lista().map(function (g) { return '<option value="' + esc(g.id) + '"' + (g.id === actual ? ' selected' : '') + '>' + esc(g.nombre) + '</option>'; }).join('');
-    campo.onchange = async function () {
-      try {
-        await App.guardarRegistroFresco(function (registro) {
-          registro.ajustesAvisos = registro.ajustesAvisos || {};
-          registro.ajustesAvisos.grupoActividades = campo.value;
-        });
-        U.aviso('Guardado.', 'bueno');
-      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
-    };
-  }
-
   return {
     TIPO_DOCUMENTO: TIPO_DOCUMENTO, NOMBRE_PLANTILLA: NOMBRE_PLANTILLA, GENERADO_DE: GENERADO_DE,
     datos: datos, cambios: cambios, textoCambios: textoCambios, valores: valores, pdfDe: pdfDe, guardar: guardar,
-    asegurarPlantilla: asegurarPlantilla, grupoDeAviso: grupoDeAviso, avisar: avisar, alEnviar: alEnviar,
-    estadoDelAviso: estadoDelAviso, pintarAjustes: pintarAjustes
+    asegurarPlantilla: asegurarPlantilla, docentesDelCentro: docentesDelCentro, avisar: avisar, alEnviar: alEnviar,
+    estadoDelAviso: estadoDelAviso
   };
 })();
 window.ActividadesInforme = ActividadesInforme;

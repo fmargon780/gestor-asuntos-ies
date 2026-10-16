@@ -3,11 +3,12 @@
 
    1. La lógica, sin pantalla: `datos` con dos unidades y quien no tiene unidad, `cambios`, `valores` y los huecos {{ACTIVIDAD…}}.
    2. La tarjeta «La actividad»: «Sin avisar al claustro» y «Avisar al claustro».
-   3. El cuadro de Correo: el informe marcado, la plantilla, el texto sin huecos, el grupo en copia oculta y quién no tiene correo.
+   3. El cuadro de Correo: el informe marcado, la plantilla, el texto sin huecos, el profesorado del centro en copia oculta
+      (ni el que se fue ni el no docente) y, en ámbar, quién no tiene correo (fila 352).
    4. El informe: su nombre, su tipo de documento y lo que dice.
    5. Enviar: «Aviso enviado el …».
    6. La lista cambia: aviso ámbar y «Volver a avisar», con su texto de sustitución.
-   7. Ajustes → El centro: el grupo que lo recibe gana al que se llama «Profesorado»; sin grupo, la línea ámbar y su enlace.
+   7. Ajustes → El centro ya no tiene «Grupo que lo recibe»; sin datos del profesorado, la línea ámbar y su enlace (fila 352).
    8. Actividad anulada y solo consulta: el botón apagado. */
 import { chromium } from 'playwright';
 
@@ -118,11 +119,16 @@ const cuerpo = await pagina.inputValue('#correo-cuerpo-texto');
 await comprobar('3. el texto nombra la actividad, su fecha y su lugar, empieza por «Buenas:» y no deja huecos',
   [cuerpo.indexOf('Visita a la Alhambra y al Albaicín') !== -1, /celebra .*\d{4} en Granada/.test(cuerpo), /^Buenas:/.test(cuerpo), /[{}]/.test(cuerpo)], [true, true, true, false]);
 await comprobar('3. el asunto del correo', pagina.inputValue('#correo-asunto').then((s) => /^Actividad extraescolar: Visita a la Alhambra y al Albaicín \(.*\d{4}\)$/.test(s)), true);
-await comprobar('3. «Para» vacío, y el grupo «Profesorado» en la copia oculta (tres con correo)',
-  pagina.evaluate(() => [document.getElementById('correo-otro') ? document.getElementById('correo-otro').value : '', document.getElementById('correo-cco-caja').textContent]).then((r) => [r[0], /motero@correo-demo\.es/.test(r[1]), /puceda@correo-demo\.es/.test(r[1])]),
-  ['', true, true]);
-await comprobar('3. avisa de la persona que no tiene correo', pagina.evaluate(() => /no tiene correo/.test(document.getElementById('correo-cco-caja').textContent)), true);
-await comprobar('3. no hay línea ámbar de «sin grupo»', pagina.evaluate(() => /No hay ningún grupo/.test(document.getElementById('correo-caja').textContent)), false);
+await comprobar('3. «Para» vacío, y en la copia oculta el profesorado del centro con correo (tres)',
+  pagina.evaluate(() => [document.getElementById('correo-otro') ? document.getElementById('correo-otro').value : '', document.getElementById('correo-cco-caja').textContent]).then((r) => [r[0], /motero@correo-demo\.es/.test(r[1]), /freyes@correo-demo\.es/.test(r[1]), /puceda@correo-demo\.es/.test(r[1])]),
+  ['', true, true, true]);
+await comprobar('3. el docente que ya se fue (Bonilla Cascado) y el no docente (Vidal Cano) no salen en la copia oculta',
+  pagina.evaluate(() => /mbonilla@|rvidal@/.test(document.getElementById('correo-cco-caja').textContent)), false);
+await comprobar('3. el docente sin correo sale en una línea ámbar, con su nombre, y no hay otra línea aparte',
+  pagina.evaluate(() => { const l = document.querySelectorAll('#correo-cco-caja .aviso-ambar'); return [l.length, l[0] && l[0].textContent, document.querySelectorAll('#correo-cco-caja .aviso-en-linea').length]; }),
+  [1, '1 docente del centro no tiene correo: Cabello Ruiz, Esperanza', 0]);
+await comprobar('3. enviar no se impide', pagina.evaluate(() => !document.getElementById('correo-enviar').disabled), true);
+await comprobar('3. no hay línea ámbar de «sin datos»', pagina.evaluate(() => /No hay datos del profesorado/.test(document.getElementById('correo-caja').textContent)), false);
 
 await comprobar('3. «Documentos de la carpeta» ya enseña el informe, sin salir de la ficha', pagina.evaluate(() => /INFORME ACTIVIDAD/.test(document.getElementById('ficha-documentos').textContent)), true);
 
@@ -184,48 +190,29 @@ await comprobar('6. el texto empieza por «Este aviso sustituye al enviado el �
 await comprobar('6. el informe marcado es uno nuevo, sin la persona que ya no va',
   Promise.all([pagina.evaluate((f) => [...document.querySelectorAll('#adjuntos-lista .correo-fila')].filter((r) => r.querySelector('.adjunto-marca').checked).map((r) => r.textContent.indexOf(f) !== -1), nuevoInforme[0]), nuevoInforme.length, textoPdf(pagina, asunto, nuevoInforme[0]).then((x) => x.indexOf('Alumnado que va: 7') !== -1)]),
   [[true], 1, true]);
+await comprobar('6. volver a avisar lleva los mismos destinatarios',
+  pagina.evaluate(() => { const t = document.getElementById('correo-cco-caja').textContent; return [/motero@/.test(t), /puceda@/.test(t), /mbonilla@|rvidal@/.test(t)]; }), [true, true, false]);
 await cerrarCuadro(pagina);
 
 /* ================= 7. AJUSTES Y SIN GRUPO ================= */
-console.log('--- 7. el grupo que lo recibe ---');
+console.log('--- 7. Ajustes y sin datos del profesorado ---');
 await pagina.evaluate(() => { App.ir('ajustes'); if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('centro'); });
-await pagina.waitForSelector('#bloque-aviso-actividades');
-await pagina.evaluate(() => { document.getElementById('bloque-aviso-actividades').open = true; });
-await comprobar('7. Ajustes → El centro tiene la sección y el desplegable «Grupo que lo recibe»',
-  pagina.evaluate(() => [document.querySelector('#bloque-aviso-actividades .bloque-titulo').textContent, document.querySelector('label[for="grupo-aviso-actividades"]').textContent, [...document.querySelectorAll('#grupo-aviso-actividades option')].map((o) => o.textContent).filter((x) => x === 'Profesorado').length]),
-  ['Aviso de actividades extraescolares', 'Grupo que lo recibe', 1]);
-await comprobar('7. el buscador de Ajustes la encuentra con «actividades»',
-  pagina.evaluate(async () => {
-    const c = document.getElementById('ajustes-buscar') || document.querySelector('.ajustes-buscador input');
-    if (!c) return 'sin buscador';
-    c.value = 'actividades'; c.dispatchEvent(new Event('input', { bubbles: true }));
-    await new Promise((r) => setTimeout(r, 600));
-    return [...document.querySelectorAll('.ajustes-resultado')].some((x) => /Aviso de actividades extraescolares/.test(x.textContent));
-  }), true);
-await pagina.evaluate(async () => { const c = document.getElementById('ajustes-buscar') || document.querySelector('.ajustes-buscador input'); if (c) { c.value = ''; c.dispatchEvent(new Event('input', { bubbles: true })); } });
-const otro = await pagina.evaluate(async () => {
-  const g = await Grupos.crear('Equipo de pruebas', [{ categoria: 'PERSONAL', nombre: Grupos.lista().filter((x) => x.nombre === 'Profesorado')[0].miembros[0].nombre }]);
-  const id = (g && g.id) || Grupos.lista().filter((x) => x.nombre === 'Equipo de pruebas')[0].id;
-  App.pintarAjustesCentro && await App.pintarAjustesCentro();
-  return id;
-});
-await pagina.selectOption('#grupo-aviso-actividades', otro);
-await pagina.waitForFunction((id) => App.E.registro.ajustesAvisos && App.E.registro.ajustesAvisos.grupoActividades === id, otro, { timeout: 10000 });
-await comprobar('7. el grupo elegido gana al que se llama «Profesorado»', pagina.evaluate(() => ActividadesInforme.grupoDeAviso().nombre), 'Equipo de pruebas');
-await pagina.evaluate(async () => { await App.guardarRegistroFresco((r) => { r.ajustesAvisos.grupoActividades = ''; }); });
-await comprobar('7. sin elegir, vale «Profesorado»', pagina.evaluate(() => ActividadesInforme.grupoDeAviso().nombre), 'Profesorado');
-await pagina.evaluate(async () => { await Copias.guardar(App.E.gestor, 'grupos.json', { grupos: [] }); await Grupos.cargar(); });   /* sin ningún grupo (Grupos.borrar no basta: guardar() vuelve a sumar lo que queda en el disco) */
+await pagina.waitForTimeout(800);
+await comprobar('7. Ajustes → El centro ya no tiene el desplegable «Grupo que lo recibe» ni la sección',
+  pagina.evaluate(() => [!!document.getElementById('grupo-aviso-actividades'), !!document.getElementById('bloque-aviso-actividades'), /Grupo que lo recibe/.test(document.getElementById('pantalla-ajustes').textContent)]), [false, false, false]);
+await pagina.evaluate(() => { window.__cargarOriginal = Datos.cargar; Datos.cargar = async (d, c) => (c === 'PERSONAL' ? { lista: [] } : window.__cargarOriginal(d, c)); });
 await abrirTarjeta(pagina, 'Alhambra');
 await pagina.click('#act-avisar');
 await pagina.waitForSelector('#capa:not(.oculto) #correo-cuerpo-texto', { timeout: 30000 });
 await pagina.waitForTimeout(1200);
-await comprobar('7. sin grupo: línea ámbar con su enlace y la copia oculta vacía',
-  pagina.evaluate(() => { const l = document.querySelector('#correo-caja .aviso-ambar'); return [l && l.textContent.indexOf('No hay ningún grupo con el profesorado. Créalo en Ajustes → Grupos de personas.') === 0, l && l.querySelector('button.enlace') && l.querySelector('button.enlace').textContent, document.getElementById('correo-cco-caja').textContent.trim()]; }),
-  [true, 'Ir a Grupos de personas', '']);
+await comprobar('7. sin datos del profesorado: línea ámbar con su enlace y la copia oculta sin direcciones',
+  pagina.evaluate(() => { const l = document.querySelector('#correo-caja .aviso-ambar'); return [l && l.textContent.indexOf('No hay datos del profesorado del centro. Tráelos desde el Centro de datos.') === 0, l && l.querySelector('button.enlace') && l.querySelector('button.enlace').textContent, document.querySelectorAll('#correo-cco-caja .marcado-chip').length]; }),
+  [true, 'Ir a «Traer el alumnado»', 0]);
 await pagina.click('#correo-caja .aviso-ambar button.enlace');
 await pagina.waitForTimeout(800);
-await comprobar('7. el enlace cierra el cuadro y lleva a Ajustes con «Grupos de personas» a la vista',
-  pagina.evaluate(() => [document.getElementById('capa').classList.contains('oculto'), !document.getElementById('pantalla-ajustes').classList.contains('oculto')]), [true, true]);
+await comprobar('7. el enlace cierra el cuadro y lleva a Ajustes con «Traer el alumnado» a la vista',
+  pagina.evaluate(() => { const b = document.getElementById('bloque-traer-alumnado'); return [document.getElementById('capa').classList.contains('oculto'), !!b && b.offsetParent !== null, !!b && b.open]; }), [true, true, true]);
+await pagina.evaluate(() => { Datos.cargar = window.__cargarOriginal; });
 
 /* ================= 8. ANULADA Y SOLO CONSULTA ================= */
 console.log('--- 8. anulada y solo consulta ---');

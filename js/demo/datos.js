@@ -86,15 +86,23 @@
       return fila.concat(['Calle Demo ' + (parseInt(id.slice(-2), 10) || 1) + ', 1º', '14900', 'Lucena', 'Córdoba', '', '', '']);
     })));
 
-    /* RelPerCen: profesorado y PAS de este curso. */
+    /* RelPerCen: profesorado de este curso (Vidal Cano, el ordenanza, va en el listado de no docentes: fila 352). */
+    var ayer = hace(2).split('-');
+    var ceseDeAyer = ayer[2] + '/' + ayer[1] + '/' + ayer[0];
     await Carpetas.escribirTexto(d, 'RelPerCen ' + curso + '.csv', csv([
       ['Empleado/a', 'DNI/Pasaporte', 'Puesto', 'Fecha de toma de posesión', 'Fecha de cese', 'Teléfono', 'Correo', 'Especialidad'],
       ['Otero Campos, Marta', '11223344A', 'Matemáticas P.E.S.', '01/09/2015', '', '650111222', 'motero@correo-demo.es', 'Matemáticas'],
       ['Reyes Palma, Fernando', '22334455B', 'Lengua P.E.S.', '01/09/2010', '', '650222333', 'freyes@correo-demo.es', 'Lengua'],
       ['Uceda Molina, Patricia', '33445566C', 'Jefatura de Estudios', '01/09/2020', '', '650333444', 'puceda@correo-demo.es', ''],
-      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es', ''],
+      /* Fila 352: uno que ya se fue del centro (cese pasado), para el aviso al claustro. */
+      ['Bonilla Cascado, Manuel', '55667788E', 'Geografía e Historia P.E.S.', '01/09/2016', ceseDeAyer, '650666777', 'mbonilla@correo-demo.es', 'Geografía e Historia'],
       /* Fila 299: una tutora sin correo en su ficha (js/demo/datos-tutor.js). */
       ['Cabello Ruiz, Esperanza', '77889900G', 'Inglés P.E.S.', '01/09/2018', '', '650555666', '', 'Inglés']
+    ]));
+
+    await Carpetas.escribirTexto(d, 'RelPerCenNodocente ' + curso + '.csv', csv([
+      ['Empleado/a', 'DNI/Pasaporte', 'Puesto', 'Fecha de toma de posesión', 'Fecha de cese', 'Teléfono', 'Correo'],
+      ['Vidal Cano, Ramón', '44556677D', 'Ordenanza', '01/09/2012', '', '650444555', 'rvidal@correo-demo.es']
     ]));
 
     /* empresas.csv: alta manual (CONTEXTO.md: Razón social · Nombre
