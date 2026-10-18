@@ -12,4 +12,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 367 | 60 | Ordenar por columna en Inicio: tocar el encabezado de la tabla única, 4 pestañas, prueba nueva, revisor y publicar |
