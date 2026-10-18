@@ -19,5 +19,7 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - No depender de una nube concreta: preparada para cambiar de Dropbox a otra.
 - Menos trabajo a mano: la app reconoce lo que llega y propone dónde va.
 - Que los directivos sigan los asuntos por sí mismos, sin preguntar a Secretaría.
+- Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
+- Libros de texto: primero, el documento de entrega de cada alumno; más adelante, ayudar a la secretaria a controlar la entrega, la devolución y el estado de los libros.
 
 Última reflexión: 18-oct-2026
