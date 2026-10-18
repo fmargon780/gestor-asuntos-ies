@@ -65,6 +65,12 @@ header.cabecera.encogida .filtros {
 header.cabecera.encogida + .explica {
   display: none;
 }
+/* Fila 353: en Inicio, «Ha llegado» y el cuadro de avisos (que viven en
+   la cabecera) también se esconden al bajar; el tablón y el buscador
+   se quedan. Vuelven al desplegarse. */
+header.cabecera.encogida .inicio-fila-superior {
+  display: none;
+}
 
 /* Sin padding vertical propio, ni en reposo ni encogida: añadir
    padding aquí solo agrandaría la cabecera en vez de encogerla (el

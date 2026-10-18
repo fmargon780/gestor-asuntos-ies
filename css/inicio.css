@@ -32,22 +32,42 @@
   .inicio-tablon-hueco { flex-basis: 100%; max-width: none; order: 5; }
 }
 
-/* ---------- la fila de "Ha llegado" + el cuadro de avisos (fila 212,
-   apartado 2) ---------- */
+/* ---------- "Ha llegado" + el cuadro de avisos (fila 212, apartado 2;
+   fila 353, docs/INICIO-MAS-COMPACTO.md) ----------
+
+   Desde la fila 353 viven dentro de la propia cabecera, detrás del
+   buscador, en la misma fila que "+ Nuevo asunto" y el tablón. Si no
+   caben, bajan a una segunda línea (flex-wrap de .cabecera). Con la
+   cabecera encogida se esconden (css/cabecera-fija.css). */
 
 .inicio-fila-superior {
+  flex: 1 1 360px;
+  min-width: 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px 16px;
-  margin-bottom: 14px;
+  gap: 6px 16px;
+  margin: 0;
+}
+@container (max-width: 900px) {
+  .inicio-fila-superior { flex-basis: 100%; order: 6; }
+}
+
+/* El título «Inicio» (fila 353): sigue en la página, solo no se ve. */
+#pantalla-abiertos > header.cabecera > h2.solo-lectores {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .inicio-ha-llegado-linea {
   flex: 1 1 auto;
   min-width: 0;
-  padding-top: 6px;
   font-size: 13.5px;
 }
 .inicio-ha-llegado-etiqueta { color: var(--tinta-suave); }
@@ -398,3 +418,30 @@ button.avisos-linea-trozo:hover {
 .inicio-tabla .liq-importe { text-align: right; white-space: nowrap; }
 .inicio-tabla .liq-importe-ambar { color: var(--ambar-linea, #b26a00); }
 .liq-lista { margin: 4px 0 0; padding-left: 18px; max-height: 160px; overflow-y: auto; font-size: 13px; }
+
+
+/* ---------- plegar el cuadro de avisos (fila 353, apartado 4) ----------
+
+   Plegado es una sola línea: «N avisos ▸». Abierto, el cuadro de
+   siempre con un «▾» delante para volver a plegarlo. */
+.avisos-linea-plegado {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.avisos-linea-plegado:hover { text-decoration: underline; }
+.avisos-linea-pliega {
+  flex: 0 0 auto;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  cursor: pointer;
+}
+.avisos-linea.avisos-linea-cerrado { flex-wrap: nowrap; }

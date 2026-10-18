@@ -272,6 +272,14 @@
     programar(true);
   }
 
+  /* Fila 353: plegar o desplegar el tablón o los avisos cambia el alto de
+     la cabecera: se tira la medida guardada de todas las pantallas y
+     se vuelve a calcular (--cabecera-compensa y los títulos fijos). */
+  function remedir() {
+    alturaPorPantalla = new WeakMap();
+    programar(true);
+  }
+
   function arrancar() {
     window.addEventListener('scroll', programar, { passive: true });
     window.addEventListener('resize', alCambiarTamano, { passive: true });
@@ -290,5 +298,5 @@
 
   /* Por si una prueba quiere forzar la comprobación sin esperar al
      siguiente scroll (p.ej. justo después de abrir un documento). */
-  window.CabeceraFija = { evaluar: aplicar };
+  window.CabeceraFija = { evaluar: aplicar, remedir: remedir };
 })();

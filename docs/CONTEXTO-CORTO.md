@@ -226,7 +226,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   (`alCambiarTipo`, «Cambiar el asunto»), al marcar la casilla en Ajustes o unir tipos (`alMarcarCasilla`, un aviso «N asuntos pasan
   a Por liquidar.» con «Deshacer») y en una pasada al entrar (`alEntrar`, sin aviso, nunca con un guardado en marcha). Quitar la
   casilla no saca a nadie.
-- "Inicio" (antes "Asuntos abiertos"; fila 212, tercera versión, sobre la fila 209): sin columna izquierda, a todo el ancho. Justo debajo de la cabecera, una fila: a la izquierda «Ha llegado: N correos · N documentos por clasificar» (cada trozo abre «Ver todo» solo con esa mitad, con «Ver también…» para volver a las dos; el número de documentos se resalta si hay alguno nuevo); a la derecha, el cuadro de avisos. (Detalle en `docs/HISTORIA.md`, «Recortado de CONTEXTO-CORTO el 11-oct-2026».)
+- "Inicio" (antes "Asuntos abiertos"; fila 212, tercera versión, sobre la fila 209): sin columna izquierda, a todo el ancho. Desde la fila 353 sin título «Inicio» a la vista, y «Ha llegado» y el cuadro de avisos van en la primera fila (la cabecera), detrás del buscador; los avisos («N avisos ▸») y el tablón («Tablón (N) ▸») se pliegan y se recuerda en cada ordenador; al bajar por la lista «Ha llegado» y los avisos se esconden. Antes, justo debajo de la cabecera, una fila: a la izquierda «Ha llegado: N correos · N documentos por clasificar» (cada trozo abre «Ver todo» solo con esa mitad, con «Ver también…» para volver a las dos; el número de documentos se resalta si hay alguno nuevo); a la derecha, el cuadro de avisos. (Detalle en `docs/HISTORIA.md`, «Recortado de CONTEXTO-CORTO el 11-oct-2026».)
   "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
@@ -295,7 +295,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
-- Esconder el tablón, sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
+- Esconder el tablón del todo (desde la fila 353 solo se **pliega** a una línea con su número y la nota más reciente; nunca desaparece), sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
 - Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
 - Mudar el Gestor a Google Apps Script para esquivar el filtro de la red del centro: una página servida por Google no puede abrir carpetas del disco (idea 325).

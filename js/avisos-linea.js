@@ -139,6 +139,14 @@
     return trozo;
   }
 
+  function cambiarPliegue(plegar) {
+    if (window.InicioPlegados) {
+      InicioPlegados.poner('avisos', plegar);
+      pintar();
+      InicioPlegados.remedir();
+    }
+  }
+
   function pintar() {
     var caja = $('avisos-linea');
     if (!caja) return;
@@ -151,8 +159,37 @@
     }
 
     var urgente = ids.some(function (id) { return piezas[id].urgente; });
-    caja.className = 'avisos-linea ' + (urgente ? 'aviso-rojo' : 'aviso-ambar');
+    var plegado = !window.InicioPlegados || InicioPlegados.estaPlegado('avisos');
+    caja.className = 'avisos-linea ' + (urgente ? 'aviso-rojo' : 'aviso-ambar') +
+      (plegado ? ' avisos-linea-cerrado' : '');
     caja.innerHTML = '';
+
+    /* Fila 353 (docs/INICIO-MAS-COMPACTO.md, apartado 4): plegado es una
+       sola línea «N avisos ▸» (N = trozos, no cosas: «3 vencidos» suma 1);
+       al pulsarla se abre el cuadro de siempre. El mismo color de
+       urgencia de hoy. */
+    if (plegado) {
+      var linea = document.createElement('button');
+      linea.type = 'button';
+      linea.id = 'avisos-linea-plegado';
+      linea.className = 'avisos-linea-plegado';
+      linea.textContent = ids.length + (ids.length === 1 ? ' aviso ▸' : ' avisos ▸');
+      linea.setAttribute('aria-expanded', 'false');
+      linea.onclick = function () { cambiarPliegue(false); };
+      caja.appendChild(linea);
+      return;
+    }
+
+    var pliega = document.createElement('button');
+    pliega.type = 'button';
+    pliega.id = 'avisos-linea-pliega';
+    pliega.className = 'avisos-linea-pliega';
+    pliega.title = 'Plegar los avisos';
+    pliega.setAttribute('aria-label', 'Plegar los avisos');
+    pliega.setAttribute('aria-expanded', 'true');
+    pliega.textContent = '▾';
+    pliega.onclick = function () { cambiarPliegue(true); };
+    caja.appendChild(pliega);
 
     var texto = document.createElement('div');
     texto.className = 'avisos-linea-texto';
