@@ -58,7 +58,7 @@ const EN_SOLITARIO_ENTRADAS = [
   ['indice-del-expediente.mjs', 'antes del 7-oct-2026'], ['solo-consulta.mjs', 'antes del 7-oct-2026'],
   ['grupo-enviar.mjs', 'antes del 7-oct-2026'],
   ['grupo-registro.mjs', 'antes del 7-oct-2026'], ['grupo-generar.mjs', 'antes del 7-oct-2026'],
-  ['documentos-sueltos.mjs', 'antes del 7-oct-2026'], ['ha-llegado-sustituye-la-vista.mjs', 'antes del 7-oct-2026'],
+  ['documentos-sueltos.mjs', 'antes del 7-oct-2026'],
   ['repintar-solo-lo-que-cambia.mjs', 'antes del 7-oct-2026'], ['hito-desde-por-clasificar.mjs', 'antes del 7-oct-2026'],
   ['ajustes-por-tipo.mjs', 'antes del 7-oct-2026'], ['mesa-comunicar-del-paso-y-guion.mjs', 'antes del 7-oct-2026'],
   ['notas-asunto-no-se-borran.mjs', 'antes del 7-oct-2026'],
