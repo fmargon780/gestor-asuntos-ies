@@ -27,7 +27,7 @@ async function entrar(usuario) {
   const p = await navegador.newPage({ viewport: { width: 1500, height: 1000 } });
   p.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
   p.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
-  await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) {}");
+  await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{"avisos":false,"tablon":false}'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) {}");
   await p.goto(DIRECCION + (usuario ? '&usuario=' + encodeURIComponent(usuario) : ''));
   await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
   await p.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 40000 });
