@@ -442,6 +442,7 @@ de `App` va después del fichero que lo define.
 | `js/demo/disco.js` | El disco y el almacén de mentira (`window.Demo`: `activar`/`activo`/`disco`/`reiniciar`), misma idea que `pruebas/navegador.mjs` pero dentro de la aplicación publicada |
 | `js/demo/datos.js` | El juego de datos inventados de la copia de pruebas, creado llamando a las mismas funciones que usan las pantallas (`App.crearTipo`, `GuiasDelCentro.guardarPasos`, `App.anotar`, `Hitos.marcar`, `Plantillas.guardar`...), nunca escrito a mano en JSON |
 | `js/demo/franja.js` | La entrada de la copia de pruebas («Entrar con datos de demostración», o sola con `?demo=1&auto=1`) y la franja fija de arriba con «Volver a empezar» |
+| `js/inicio-ordenar.js` | Ordenar la lista de Inicio pulsando el título de una columna (`InicioOrdenar`, fila 367) |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test`; `esbuild` (fila 89) para `npm run copia-local` |
@@ -473,6 +474,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/herramientas.mjs` | Prueba (navegador de verdad, fila 200, 28-sep-2026): la pestaña "Herramientas" en el menú, en su orden; los cuatro bloques (Papelera, Traer el alumnado, Tablas de datos, Restaurar una copia de seguridad) al entrar, y que Mantenimiento ya no los tiene; "Días de aviso" y "Copias de seguridad", una sola sección cada una en El centro; los avisos de papelera vieja y alumnado desfasado llevan a Herramientas |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/inicio-ordenar.mjs` | Prueba (navegador de verdad, fila 367): dos pulsaciones por columna, la flecha, el orden natural al cambiar de pestaña y con «Inicio» del menú, «Por liquidar» y «Exportar» |
 | `pruebas/versiones-previas.mjs` | Prueba (fila 160): registrar deja el «SIN SELLAR» en «Versiones previas», el Word con PDF va y sin PDF no, la ficha las pliega y no las cuenta, el índice no las ve, y ordenar dos veces no cambia nada la segunda |
 | `pruebas/responsable-administracion.mjs` | Prueba (fila 159): «Administración» fija, la guía sin las personas, la pasada única (guía y biblioteca sí, hitos no), los dos hitos de firma sin duplicar y el filtro de «Qué me toca» |
 | `pruebas/responsable-secretaria-con-vb.mjs` | Prueba (fila 234): el responsable fijo «Secretaría con V.º B.º de Dirección», lo que ofrece la guía y el filtro. |

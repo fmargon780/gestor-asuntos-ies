@@ -300,7 +300,7 @@ Junto a «Filtros», `#btn-exportar` («Exportar ▾»: «Hoja de cálculo» e �
 (`js/exportar-ventana.js`, un solo `U.preguntar`) con «Incluir también los archivados», las columnas
 (las de la ficha y los campos propios de los tipos que salen; se recuerdan por ordenador y por destino en
 `gestor-exportar-columnas-hoja|pdf`) y, en el PDF, «Incluir los hitos». Se exporta lo que se ve: las filas de
-`#inicio-tabla-cuerpo` en su orden. Los datos (`js/exportar-datos.js`, `ExportarAsuntos`): una fila neutra por
+`#inicio-tabla-cuerpo` en su orden (el de la columna pulsada, ver abajo). Los datos (`js/exportar-datos.js`, `ExportarAsuntos`): una fila neutra por
 asunto; los archivados se leen del índice del ARCHIVO por curso (solo los cursos que tocan el rango de fechas;
 sin índice, se construye al momento) y de su `_ficha.json`/historial; con Responsable puesto no entra ningún
 archivado (no tiene hito actual); una columna es «de cantidades» por su contenido, no por su nombre; un reservado
@@ -327,6 +327,17 @@ devuelve bloques con posiciones de fila, número de asuntos y sumas. El informe 
 bloque del último nivel sin las columnas por las que se agrupa, y línea de cierre («Tipo: 12 asuntos · Total Importe: …»); sin
 saltos de página entre bloques, título + fila de títulos + primer asunto juntos, cierre con el último asunto y «(continúa)»
 al repetir el título. El total general no cambia. La hoja de cálculo, tampoco. Prueba: `pruebas/informe-agrupado.mjs`.
+
+**Ordenar por columna** (fila 367, `js/inicio-ordenar.js`, `InicioOrdenar`): cada `th[data-col]` de `#inicio-thead-normal` y
+de la cabecera de «Por liquidar» (`PorLiquidar.cabecera`) se puede pulsar; el clic va delegado en `.inicio-tabla`, así
+que sobrevive a que `por-liquidar.js` rehaga su cabecera. Primera pulsación ascendente, segunda al revés, otra columna
+ascendente; flecha `.orden-flecha` (▲/▼) y `aria-sort` puestas por `pintarFlechas()` al final de `InicioTabla.pintar`.
+Se ordena lo que se ve (texto sin tildes ni mayúsculas con `Intl.Collator('es', base)`; Plazo = fecha límite, fecha
+del hito en «En Administración», días parados en «En espera» y «Dormidos», con más días arriba al empezar); sin dato,
+al final en los dos sentidos; empate por fecha de inicio. El estado no se guarda (ni `localStorage` ni `_GESTOR`):
+`InicioTabla.pintar` lo pone a cero cuando cambia la pestaña pintada y un clic en «Inicio» del menú también. Ya no hay
+`#orden-abiertos` ni `App.ORDENES`: el orden natural de «Todos los abiertos» es `App.ordenNatural` (inicio, el más
+antiguo arriba).
 
 **Título del informe** (fila 308, `docs/TITULO-DEL-INFORME-EN-PDF.md`): en la ventana de «Informe en PDF» hay una casilla «Título» (`#exp-titulo`, máx. 120) que trae siempre «Listado de asuntos» y no se recuerda. El título (espacios recortados; vacío vale el de siempre) sale en el `h1` de la hoja, en la barra del visor y en el nombre del fichero (`nombrePdf()`, sin `\ / : * ? " < > |`). La hoja de cálculo no lleva casilla. Prueba: `pruebas/informe-titulo.mjs`.
 

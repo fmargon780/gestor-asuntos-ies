@@ -200,12 +200,6 @@ App.pasaFiltroMonton = function (a, filtro) {
   return l.lado === filtro;
 };
 
-App.ordenElegido = function () {
-  var v = '';
-  try { v = window.localStorage.getItem('orden-abiertos') || ''; } catch (e) {}
-  return App.ORDENES[v] ? v : 'fecha-asc';
-};
-
 /* Si la lista no se ve (la ficha está delante, por ejemplo), no se
    repinta: se deja pendiente y se pinta al volver a ella (fila 101,
    docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). */

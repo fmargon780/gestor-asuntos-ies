@@ -414,14 +414,10 @@ await comprobar('se ha escrito el solicitantes.csv', pagina.evaluate(async () =>
 
 /* --- ordenar los asuntos abiertos --- */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await comprobar('el orden por defecto es por fecha, los más antiguos arriba',
-  pagina.locator('#orden-abiertos').inputValue(), 'fecha-asc');
+await comprobar('ya no existe el desplegable «Ordenar» (fila 367)',
+  pagina.locator('#orden-abiertos').count(), 0);
 /* Los filtros nacen plegados (10-sep-2026): hay que abrirlos para tocarlos. */
 await pagina.click('#btn-filtros');
-await pagina.selectOption('#orden-abiertos', 'fecha-desc');
-await comprobar('se puede cambiar el orden',
-  pagina.locator('#orden-abiertos').inputValue(), 'fecha-desc');
-await pagina.selectOption('#orden-abiertos', 'fecha-asc');
 
 /* --- ajustes --- */
 await pagina.click('.pestana[data-pantalla="ajustes"]');

@@ -380,7 +380,7 @@ window.PorLiquidar = (function () {
 
   function cabecera(conImporte) {
     return '<tr><th class="liq-casilla"><input type="checkbox" id="liq-todos" title="Marcar todos los que se ven"></th>' +
-      '<th>Tercero</th><th>Tipo</th><th>Por liquidar desde</th>' + (conImporte ? '<th>Importe</th>' : '') + '</tr>';
+      '<th data-col="tercero">Tercero</th><th data-col="tipo">Tipo</th><th data-col="desde">Por liquidar desde</th>' + (conImporte ? '<th data-col="importe">Importe</th>' : '') + '</tr>';
   }
 
   /* Pinta la pestaña con `asuntos` (ya filtrados). Cambia la cabecera de

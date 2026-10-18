@@ -129,11 +129,9 @@ App.pintarAbiertos = function () {
   App.pintarFiltroTipoAsunto(App.E.listaAbiertos);
 
   var rotulo = $('cuenta-lista-abiertos');
-  var orden = App.ordenElegido();
-  $('orden-abiertos').value = orden;
-
   var lista = App.listaAbiertosFiltrada();
-  lista.sort(App.ORDENES[orden]);
+  lista.sort(App.ordenNatural);
+  if (window.InicioOrdenar) lista = InicioOrdenar.ordenar(lista, 'todos');   /* fila 367 */
   if (rotulo) rotulo.textContent = lista.length;
   var caja = $('inicio-tabla-cuerpo');
   var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
@@ -540,20 +538,4 @@ if ($('filtro-tipo-asunto')) $('filtro-tipo-asunto').onchange = function () { re
   if ($(id)) $(id).onchange = function () { repintarLaPestanaActiva(); };
 });
 
-$('orden-abiertos').onchange = function () {
-  try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
-  repintarLaPestanaActiva();
-};
-
-/* Pulsar la cabecera "Inicio" de la tabla ordena por fecha de inicio,
-   y otra vez, al revés (fila 209, boceto docs/boceto-inicio-2.html). */
-if ($('th-inicio')) {
-  $('th-inicio').classList.add('inicio-th-pulsable');
-  $('th-inicio').onclick = function () {
-    var nuevo = App.ordenElegido() === 'fecha-asc' ? 'fecha-desc' : 'fecha-asc';
-    $('orden-abiertos').value = nuevo;
-    try { window.localStorage.setItem('orden-abiertos', nuevo); } catch (e) {}
-    repintarLaPestanaActiva();
-  };
-}
 $('btn-recargar').onclick = function () { App.verAbiertos(); };

@@ -222,6 +222,7 @@
   /* ---------- el orquestador ---------- */
 
   var turno = 0;
+  var pestanaPintada = null;   /* fila 367: para saber cuándo cambia la pestaña */
 
   async function pintar() {
     if (!$('inicio-todos-asuntos') || !window.QueMeToca) return;
@@ -243,14 +244,21 @@
     }
     if (window.PorLiquidar && pestanaActual !== 'liq') PorLiquidar.soltarTabla();
 
+    /* Fila 367: cada pestaña vuelve a su orden de siempre al cambiar de pestaña,
+       también cuando la cambia sola un aviso o la pestaña deja de existir. */
+    if (window.InicioOrdenar && pestanaPintada !== pestanaActual) InicioOrdenar.reset();
+    pestanaPintada = pestanaActual;
+
     var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
     if (pestanaActual === 'todos') {
       App.pintarAbiertos();
     } else if (pestanaActual === 'liq') {
-      PorLiquidar.pintarTabla(r.liq);
+      PorLiquidar.pintarTabla(window.InicioOrdenar ? InicioOrdenar.ordenar(r.liq, 'liq') : r.liq);
     } else {
-      pintarTabla(listaDe(pestanaActual, r), pestanaActual);
+      var lista = listaDe(pestanaActual, r);
+      pintarTabla(window.InicioOrdenar ? InicioOrdenar.ordenar(lista, pestanaActual) : lista, pestanaActual);
     }
+    if (window.InicioOrdenar) InicioOrdenar.pintarFlechas();
     if (window.scrollY !== alto) window.scrollTo(0, alto);
 
     /* El trozo activo de la franja de avisos (si lo hay) se resalta
@@ -259,12 +267,9 @@
     if (window.AvisosLinea && AvisosLinea.refrescar) AvisosLinea.refrescar();
   }
 
-  /* ---------- «Ordenar»: se queda igual que antes de esta fila (solo
-     gobierna la pestaña "Todos los abiertos", vía App.ORDENES /
-     App.pintarAbiertos, sin tocar js/asuntos-lista.js): el propio
-     documento de la fila no pide que "En Administración"/"En espera"/
-     "Dormidos" dejen su orden natural (vencidos primero, o más días
-     esperando/dormido arriba) por el que se elija aquí. ---------- */
+  /* ---------- el orden por columna (fila 367, js/inicio-ordenar.js): sin
+     orden activo, cada pestaña se queda con el suyo de siempre (vencidos
+     primero, o más días esperando/dormido arriba). ---------- */
 
   /* ---------- arranque ---------- */
 

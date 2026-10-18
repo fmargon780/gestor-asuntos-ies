@@ -89,49 +89,17 @@ App.esDocumentoDeTrabajo = function (nombre) {
   return true;
 };
 
-/* Cómo se ordenan los asuntos abiertos.
-
-   Por defecto, del más antiguo al más reciente: lo que lleva más
-   tiempo abierto es lo que hay que mirar primero. El orden elegido se
-   recuerda en este ordenador. */
-App.ORDENES = {
-  'fecha-asc':  function (a, b) { return App.claveDeFecha(a.leido.fecha) < App.claveDeFecha(b.leido.fecha) ? -1 : 1; },
-  'fecha-desc': function (a, b) { return App.claveDeFecha(a.leido.fecha) > App.claveDeFecha(b.leido.fecha) ? -1 : 1; },
-  'tipo':       function (a, b) { return App.textoDeOrden(a, 'tipo') < App.textoDeOrden(b, 'tipo') ? -1 : 1; },
-  'tercero':    function (a, b) { return App.textoDeOrden(a, 'tercero') < App.textoDeOrden(b, 'tercero') ? -1 : 1; },
-  'estado':     function (a, b) {
-    var d = App.posEstado(a) - App.posEstado(b);
-    if (d) return d;
-    return App.claveDeFecha(a.leido.fecha) < App.claveDeFecha(b.leido.fecha) ? -1 : 1;
-  },
-  /* Lo que antes vence, arriba. Los que no tienen fecha límite van al
-     final: no urgen, pero siguen estando. */
-  'limite':     function (a, b) {
-    var ka = a.ficha.limite || '9999-99-99';
-    var kb = b.ficha.limite || '9999-99-99';
-    if (ka !== kb) return ka < kb ? -1 : 1;
-    return App.claveDeFecha(a.leido.fecha) < App.claveDeFecha(b.leido.fecha) ? -1 : 1;
-  }
-};
-
-/* Por dónde va el asunto (fila 129: su hito actual). Primero los que
-   van por el principio; los listos para archivar y los sin hitos, al
-   final. */
-App.posEstado = function (a) {
-  var l = App.ladoDe(a);
-  if (l.sinHitos) return 9999;
-  if (l.listo) return 1000;
-  return Math.round(100 * (l.n || 0) / Math.max(l.m || 1, 1));
+/* El orden natural de "Todos los abiertos": del más antiguo al más
+   reciente (lo que lleva más tiempo abierto es lo que hay que mirar
+   primero). Pulsando el título de una columna se ordena por ella
+   (fila 367, js/inicio-ordenar.js). */
+App.ordenNatural = function (a, b) {
+  return App.claveDeFecha(a.leido.fecha) < App.claveDeFecha(b.leido.fecha) ? -1 : 1;
 };
 
 /* Un asunto sin fecha en el nombre se va al final en los dos sentidos. */
 App.claveDeFecha = function (fecha) {
   return /^\d{6}$/.test(fecha) ? fecha : '999999';
-};
-
-App.textoDeOrden = function (a, cual) {
-  if (cual === 'tipo') return U.normalizar(a.leido.tipo || 'zzz');
-  return U.normalizar(a.ficha.tercero || a.leido.resto || 'zzz');
 };
 
 /* ---------- la fecha límite de un asunto ----------

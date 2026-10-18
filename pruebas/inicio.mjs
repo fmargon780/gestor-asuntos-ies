@@ -263,15 +263,17 @@ await comprobar('la celda Tercero de A enseña el tercero, no el nombre entero d
 
 /* ================= 9. ORDENAR POR "FECHA DE INICIO" CAMBIA EL ORDEN ================= */
 
-console.log('--- 9. "Ordenar" por Fecha de inicio cambia el orden ---');
+console.log('--- 9. pulsar el título «Inicio» cambia el orden (fila 367) ---');
 await comprobar('por defecto (los más antiguos arriba), A (260901) va primero',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().getAttribute('data-asunto'), CLAVE_A);
-await pagina.selectOption('#orden-abiertos', 'fecha-desc');
+await pagina.click('#inicio-thead-normal th[data-col="inicio"]');
 await pagina.waitForTimeout(200);
-await comprobar('con "los más recientes arriba", D (260904) va primero',
+await comprobar('al pulsar «Inicio» una vez (ascendente), A (260901) sigue primero',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().getAttribute('data-asunto'), CLAVE_A);
+await pagina.click('#inicio-thead-normal th[data-col="inicio"]');
+await pagina.waitForTimeout(200);
+await comprobar('otra vez (al revés), D (260904) va primero',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().getAttribute('data-asunto'), CLAVE_D);
-await pagina.selectOption('#orden-abiertos', 'fecha-asc');
-await pagina.waitForTimeout(200);
 
 /* ================= 10. SIN "#inicio-legado" NI LOS PLEGADOS VIEJOS ================= */
 

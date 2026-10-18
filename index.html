@@ -230,16 +230,6 @@
                   <button type="button" id="btn-exportar-pdf">Informe en PDF</button>
                 </span>
               </span>
-              <label class="inicio-orden">
-                <span class="filtro-rotulo">Ordenar</span>
-                <select id="orden-abiertos" class="campo">
-                  <option value="fecha-asc">Fecha de inicio · los más antiguos arriba</option>
-                  <option value="fecha-desc">Fecha de inicio · los más recientes arriba</option>
-                  <option value="limite">Plazo · lo que antes vence</option>
-                  <option value="tipo">Tipo de asunto</option>
-                  <option value="tercero">Tercero</option>
-                </select>
-              </label>
             </div>
           </div>
 
@@ -314,8 +304,8 @@
             <table class="inicio-tabla">
               <thead id="inicio-thead-normal">
                 <tr>
-                  <th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th>
-                  <th>Le toca a</th><th id="th-inicio">Inicio</th><th></th>
+                  <th data-col="plazo">Plazo</th><th data-col="tercero">Tercero</th><th data-col="tipo">Tipo</th><th data-col="hito">Hito actual</th>
+                  <th data-col="quien">Le toca a</th><th data-col="inicio">Inicio</th><th></th>
                 </tr>
               </thead>
               <thead id="inicio-thead-liquidar" class="oculto"></thead>
@@ -1747,6 +1737,8 @@
      abiertos"/"Dormidos"). Después de js/inicio.js (lo llama desde
      repintarTodo). Sustituye a js/inicio-plegados.js (fila 192). -->
 <script src="js/inicio-tabla.js"></script>
+<!-- Fila 367, docs/INICIO-ORDENAR-POR-COLUMNA.md: ordenar la lista pulsando el título de una columna. -->
+<script src="js/inicio-ordenar.js"></script>
 <!-- Fila 249, docs/POR-LIQUIDAR.md: los asuntos «Por liquidar» (la pestaña de Inicio)
      y el cuadro «Liquidar» con su PDF. Después de js/inicio-tabla.js. -->
 <script src="js/por-liquidar.js"></script>
