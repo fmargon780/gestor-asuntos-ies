@@ -98,6 +98,11 @@ const preparacion = `
     return h;
   };
 })();
+/* Fila 353: las pruebas parten con el cuadro de avisos y el tablón desplegados (de fábrica salen
+   plegados); pruebas/inicio-compacto.mjs pone window.__PLEGADOS_DE_FABRICA para ver lo de fábrica. */
+if (!window.__PLEGADOS_DE_FABRICA) {
+  try { if (!window.localStorage.getItem('gestor.inicio.plegados')) window.localStorage.setItem('gestor.inicio.plegados', '{"avisos":false,"tablon":false}'); } catch (e) {}
+}
 `;
 
 const DIRECCION = process.env.DIRECCION || 'http://localhost:8123/index.html';

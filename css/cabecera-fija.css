@@ -20,7 +20,7 @@
 header.cabecera,
 header.ficha-cabecera {
   position: sticky;
-  top: 0;
+  top: var(--franja-demo-alto, 0px);   /* fila 353: por debajo de la franja fija de la copia de pruebas */
   z-index: 20;
   background: var(--fondo);
   margin-left: -32px;
@@ -39,6 +39,11 @@ header.ficha-cabecera {
    cabecera desplegada, vale 0px y no añade ningún hueco de más. */
 main.contenido {
   margin-bottom: var(--cabecera-compensa, 0px);
+}
+
+body.solo-consulta header.cabecera,
+body.solo-consulta header.ficha-cabecera {
+  top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto, 0px));
 }
 
 header.cabecera.encogida,
@@ -63,6 +68,12 @@ header.cabecera.encogida .filtros {
   display: none;
 }
 header.cabecera.encogida + .explica {
+  display: none;
+}
+/* Fila 353: en Inicio, «Ha llegado» y el cuadro de avisos (que viven en
+   la cabecera) también se esconden al bajar; el tablón y el buscador
+   se quedan. Vuelven al desplegarse. */
+header.cabecera.encogida .inicio-fila-superior {
   display: none;
 }
 

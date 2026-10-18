@@ -176,15 +176,25 @@ el Escape general de aquí se dispara también y hace algo de más.
   (`OtrosDelTercero.montarArchivado`); si no se puede, el ARCHIVO con la búsqueda puesta.
 - Prueba: `pruebas/tras-cada-accion.mjs`.
 
-### El tablón, en la cabecera, siempre a la vista
+### El tablón, en la cabecera, plegable
 
 Desde la fila 212 (28-sep-2026, `docs/INICIO-A-TODO-EL-ANCHO.md`) el tablón ya no vive en una
 columna del grid de Inicio: cuelga de `#inicio-tablon-hueco`, dentro de `.cabecera`, y por eso no
 le afecta que se abra el panel de la derecha (`con-visor`/`con-lector`) ni el ancho de la zona de
-trabajo. Sigue sin esconderse nunca (decisión de la fila 191); por debajo de unos 900px de zona de
-trabajo baja a su propia línea, debajo de la cabecera (`css/inicio.css`, `@container`). No hay
-ningún botón "Tablón" que lo esconda a mano (fila 191, decisión 4; comprobado en
-`pruebas/tablon.mjs`).
+trabajo. Por debajo de unos 900px de zona de trabajo baja a su propia línea (`css/inicio.css`,
+`@container`).
+
+Desde la fila 353 (18-oct-2026, `docs/INICIO-MAS-COMPACTO.md`) **se pliega**, pero nunca desaparece:
+plegado es una línea «Tablón (N) ▸» (N = notas pendientes que ve este usuario) con el texto
+recortado de la más reciente; abierto es el de siempre, con la cabecera pulsable («▾»). Se recuerda
+en cada ordenador (`js/inicio-plegados.js`, `localStorage` `gestor.inicio.plegados`, de fábrica
+plegado). Regla de apertura (`TablonVista.reglaApertura`, solo al arrancar y al pulsar «Inicio» en
+el menú): con una nota «para el día» de hoy o anterior sin quitar sale abierto, sin guardarlo. En
+Inicio también se quitó el título (`h2.solo-lectores`, sigue en la página porque `js/barra.js` cuelga
+«+ Nuevo asunto» detrás) y «Ha llegado» y el cuadro de avisos viven en la cabecera
+(`#inicio-fila-superior`), plegable el de avisos («N avisos ▸»); con la cabecera encogida ese bloque
+se esconde (`css/cabecera-fija.css`). Plegar o desplegar vuelve a medir la cabecera
+(`CabeceraFija.remedir`). Pruebas: `pruebas/inicio-compacto.mjs`, `pruebas/tablon.mjs`.
 
 ### No pisarse en un mismo asunto
 

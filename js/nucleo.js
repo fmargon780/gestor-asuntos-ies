@@ -615,7 +615,12 @@ App.refrescarFichas = function () {
 App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'herramientas', 'ajustes'];
 
 Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
-  b.onclick = function () { App.ir(b.dataset.pantalla); };
+  b.onclick = function () {
+    App.ir(b.dataset.pantalla);
+    /* Fila 353: pulsar «Inicio» en el menú vuelve a aplicar la regla de
+       apertura del tablón (nota para hoy → sale abierto). */
+    if (b.dataset.pantalla === 'abiertos' && window.InicioPlegados) InicioPlegados.alEntrarEnInicio();
+  };
 });
 
 /* Fila 214: pantallas del menú de verdad (los botones .pestana), las

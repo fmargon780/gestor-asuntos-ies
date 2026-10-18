@@ -27,6 +27,7 @@
 
   var notas = [];
   var arrancado = false;
+  var reglaAplicada = false;
   var fallo = '';           /* lo último que ha ido mal al leer o escribir */
 
   function $(id) { return document.getElementById(id); }
@@ -110,6 +111,12 @@
       notas = await leer();
       fallo = '';
       pintarVista();
+      /* Fila 353: la regla de apertura (una nota para hoy → abierto) se
+         aplica al arrancar, en cuanto hay notas leídas. */
+      if (!reglaAplicada && window.TablonVista && TablonVista.reglaApertura) {
+        reglaAplicada = true;
+        TablonVista.reglaApertura();
+      }
     } catch (e) {
       fallo = U.mensajeDeError(e) || 'no he podido leer las notas';
       pintarVista();

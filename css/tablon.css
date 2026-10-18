@@ -155,3 +155,25 @@
 
 .papel-botones { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .papel-boton { padding: 3px 7px; font-size: 11.5px; border-radius: 6px; }
+
+
+/* ---------- tablón plegable (fila 353, docs/INICIO-MAS-COMPACTO.md) ----------
+
+   Plegado: una sola línea «Tablón (N) ▸» y la nota más reciente
+   recortada. Abierto: el de siempre, con la cabecera pulsable para
+   plegarlo (nunca desaparece del todo, fila 191). */
+.tablon-plegado, .tablon-pliega {
+  font: inherit; color: inherit; background: none; border: 0;
+  padding: 0; cursor: pointer; text-align: left;
+}
+.tablon-plegado {
+  display: flex; align-items: baseline; gap: 6px; width: 100%;
+  padding: 5px 2px; font-size: 13px; min-width: 0;
+}
+.tablon-plegado .tablon-titulo { flex: 0 0 auto; white-space: nowrap; }
+.tablon-plegado-texto {
+  flex: 1 1 auto; min-width: 0; color: var(--tinta-suave);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tablon-plegado:hover .tablon-titulo { text-decoration: underline; }
+.tablon-cabecera .tablon-pliega { display: flex; align-items: center; gap: 8px; }

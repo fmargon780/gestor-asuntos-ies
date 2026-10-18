@@ -26,6 +26,41 @@
   var borrador = '';
   var borradorFecha = '';
 
+  /* Fila 353 (docs/INICIO-MAS-COMPACTO.md): el tablón se pliega a una
+     línea «Tablón (N) ▸» + la nota más reciente. Lo que se deja se
+     recuerda en cada ordenador (js/inicio-plegados.js). `sesionAbierto`
+     es la regla de apertura: con una nota para hoy (o atrasada) sin
+     quitar, sale abierto al arrancar y al pulsar «Inicio» en el menú
+     aunque se hubiera dejado plegado; no se guarda, y si se pliega se
+     queda plegado mientras se siga en Inicio. null = vale lo guardado. */
+  var sesionAbierto = null;
+
+  function estaPlegado() {
+    if (sesionAbierto !== null) return !sesionAbierto;
+    return !window.InicioPlegados || InicioPlegados.estaPlegado('tablon');
+  }
+
+  function remedir() { if (window.InicioPlegados) InicioPlegados.remedir(); }
+
+  function alternarPliegue() {
+    var plegar = !estaPlegado();
+    if (plegar && verTodas) alternarTodas();
+    if (sesionAbierto !== null) sesionAbierto = !plegar;
+    else if (window.InicioPlegados) InicioPlegados.poner('tablon', plegar);
+    pintar();
+    remedir();
+  }
+
+  function reglaApertura() {
+    var hoy = hoyIso();
+    var hay = Tablon.notas().filter(Tablon.laVeo).some(function (n) {
+      return !n.hecha && n.para && n.para <= hoy;
+    });
+    sesionAbierto = hay ? true : null;
+    pintar();
+    remedir();
+  }
+
   function $(id) { return document.getElementById(id); }
   function cambiar(hacer) { return Tablon.cambiar(hacer); }
 
@@ -164,6 +199,15 @@
     var hechas = mias.filter(function (n) { return n.hecha; });
 
     var abierta = notaAbierta || enNueva || !!escrito || !!fechaPuesta;
+
+    /* Plegado: una sola línea. Con algo escrito o una nota en edición no
+       se pliega a la fuerza (se perdería el sitio del cursor). */
+    if (estaPlegado() && !enNueva && !enEdicion && !escrito && !fechaPuesta && !editando && !verTodas) {
+      c.className = 'tablon-compacto tablon-cerrado';
+      c.innerHTML = '';
+      c.appendChild(lineaPlegada(pendientes));
+      return;
+    }
 
     c.className = 'tablon-compacto';
     c.innerHTML = '';
@@ -311,9 +355,44 @@
   function cabecera(cuantas) {
     var h = document.createElement('div');
     h.className = 'tablon-cabecera';
-    h.innerHTML = '<span class="tablon-titulo">Tablón</span>' +
-                  '<span class="cuenta-lista">' + cuantas + '</span>';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'tablon-pliega';
+    b.className = 'tablon-pliega';
+    b.title = 'Plegar el tablón';
+    b.setAttribute('aria-expanded', 'true');
+    b.innerHTML = '<span class="tablon-titulo">Tablón</span>' +
+                  '<span class="cuenta-lista">' + cuantas + '</span><span>▾</span>';
+    b.onclick = alternarPliegue;
+    h.appendChild(b);
     return h;
+  }
+
+  /* La línea de cuando está plegado: «Tablón (N) ▸» y el texto, recortado,
+     de la nota pendiente más reciente (la de creación más nueva) que ve
+     este usuario. */
+  function lineaPlegada(pendientes) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'tablon-plegado';
+    b.className = 'tablon-plegado';
+    b.setAttribute('aria-expanded', 'false');
+    var mas = null;
+    pendientes.forEach(function (n) {
+      if (!mas || (n.creado || '') > (mas.creado || '')) mas = n;
+    });
+    var t = document.createElement('span');
+    t.className = 'tablon-titulo';
+    t.textContent = 'Tablón (' + pendientes.length + ') ▸';
+    b.appendChild(t);
+    if (mas) {
+      var x = document.createElement('span');
+      x.className = 'tablon-plegado-texto';
+      x.textContent = String(mas.texto).replace(/\s+/g, ' ');
+      b.appendChild(x);
+    }
+    b.onclick = alternarPliegue;
+    return b;
   }
 
   /* ---------- escribir una nota ---------- */
@@ -585,6 +664,6 @@
     U.aviso('Elige categoría, tipo y tercero. La nota va en la descripción.', 'bueno');
   }
 
-  window.TablonVista = { pintar: pintar, ocupado: ocupado };
+  window.TablonVista = { pintar: pintar, ocupado: ocupado, reglaApertura: reglaApertura };
 
 })();

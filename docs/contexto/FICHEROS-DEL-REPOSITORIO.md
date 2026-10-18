@@ -116,6 +116,7 @@ de `App` va después del fichero que lo define.
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla; `App.anotar`/`App.anotarLista` (las lápidas y la fusión por elemento de la fila 176) |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
+| `js/inicio-plegados.js` | Fila 353: si el cuadro de avisos y el tablón de Inicio están plegados (`localStorage` `gestor.inicio.plegados`, de fábrica plegados) y aviso de volver a medir la cabecera (`window.InicioPlegados`); antes de `js/avisos-linea.js` |
 | `js/avisos-linea.js` | Fila 193: todos los avisos de arriba de Inicio, en una sola línea (`window.AvisosLinea`), antes que los módulos que le pasan su trozo |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/asuntos-lista-montones.js` | Las tres tarjetas de arriba, los montones por tipo de asunto, a qué montón va cada asunto, las cuentas y el filtro por montón (fila 133, sacado de `js/asuntos-lista.js`) |

@@ -158,7 +158,9 @@
 
     <section id="pantalla-abiertos" class="pantalla">
       <header class="cabecera">
-        <h2>Inicio</h2>
+        <!-- Fila 353: el título se queda en la página (js/barra.js cuelga
+             "+ Nuevo asunto" detrás) pero oculto a la vista: solo lectores. -->
+        <h2 class="solo-lectores">Inicio</h2>
         <!-- El tablón compacto (fila 212, docs/INICIO-A-TODO-EL-ANCHO.md):
              en el hueco libre entre "+ Nuevo asunto" (lo cuelga js/barra.js
              justo detrás del <h2>) y el buscador. js/tablon.js cuelga
@@ -168,18 +170,16 @@
           <input id="buscar-abiertos" class="campo"
                  placeholder="Buscar en todos los asuntos abiertos: nombre, tipo o tercero">
         </div>
+        <!-- Fila 353 (docs/INICIO-MAS-COMPACTO.md): "Ha llegado" (js/inicio.js)
+             y el cuadro de avisos (js/avisos-linea.js) suben a la fila de la
+             cabecera, detrás del buscador. Se esconden con la cabecera
+             encogida (css/cabecera-fija.css). Antes (fila 212) eran una fila
+             aparte debajo de la cabecera. -->
+        <div id="inicio-fila-superior" class="inicio-fila-superior">
+          <div id="inicio-ha-llegado-linea" class="inicio-ha-llegado-linea"></div>
+          <div id="avisos-linea" class="oculto"></div>
+        </div>
       </header>
-
-      <!-- Fila 212 (docs/INICIO-A-TODO-EL-ANCHO.md, apartado 2): una sola
-           fila justo debajo de la cabecera, en vez de la franja de avisos
-           sola y del botón "Ver todo (N)" (que desaparece: los enlaces de
-           "Ha llegado" hacen ahora lo suyo). A la izquierda, lo que ha
-           llegado (js/inicio.js); a la derecha, el cuadro pequeño de
-           avisos (js/avisos-linea.js, fila 193). -->
-      <div id="inicio-fila-superior" class="inicio-fila-superior">
-        <div id="inicio-ha-llegado-linea" class="inicio-ha-llegado-linea"></div>
-        <div id="avisos-linea" class="oculto"></div>
-      </div>
 
       <!-- Elemento de compatibilidad, invisible a ojo (css/inicio.css):
            varias pruebas de pruebas/ siguen pulsando
@@ -1203,6 +1203,7 @@
      avisos de arriba, en una sola línea. Después de js/puente.js (se
      engancha a window.Gestor.alRefrescar), antes de los módulos de
      abajo, que le pasan su trozo con AvisosLinea.registrar. -->
+<script src="js/inicio-plegados.js"></script>
 <script src="js/avisos-linea.js"></script>
 
 <!-- Los módulos que se enganchan al puente. -->

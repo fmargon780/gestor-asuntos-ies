@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '353', fecha: '2026-10-18', texto: 'Inicio ocupa menos: el título se va, “Ha llegado” y los avisos suben a la primera fila, y los avisos y el tablón se pueden plegar.' },
   { id: '352', fecha: '2026-10-16', texto: 'El aviso al claustro de una actividad va ahora solo al profesorado que está hoy en el centro, sacado del personal docente. Ya no hay que mantener un grupo.' },
   { id: '354', fecha: '2026-10-16', texto: 'El personal que está hoy en el centro (por ejemplo, el personal no docente sin fecha de cese) ya no sale con el aviso «Ya no está en el centro».' },
   { id: '351', fecha: '2026-10-16', texto: 'En «Control del registro», la línea de arriba dice de dónde viene cada listado (del Centro de datos o subido a mano), su fecha y hasta qué día llega. Un listado más antiguo ya no pisa los apuntes del más nuevo.' },
