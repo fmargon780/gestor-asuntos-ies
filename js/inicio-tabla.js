@@ -64,6 +64,7 @@
       filtroAviso = null;
     } else {
       filtroAviso = { id: id, texto: texto, nombres: new Set(asuntos.map(function (a) { return a.nombre; })) };
+      if (pestanaActual !== 'todos' && window.InicioOrden) InicioOrden.reiniciar();   /* fila 367 */
       pestanaActual = 'todos';
       try { window.localStorage.setItem(CLAVE_PESTANA, 'todos'); } catch (e) {}
     }
@@ -83,6 +84,7 @@
     if (PESTANAS.indexOf(cual) === -1 || cual === pestanaActual) return;
     pestanaActual = cual;
     filtroAviso = null;   /* cambiar de pestaña a mano quita el chip */
+    if (window.InicioOrden) InicioOrden.reiniciar();   /* fila 367: cada pestaña, con su orden de siempre */
     try { window.localStorage.setItem(CLAVE_PESTANA, cual); } catch (e) {}
     pintar();
   }
@@ -181,6 +183,7 @@
     if (!caja) return;
     var rotulo = $('cuenta-lista-abiertos');
     if (rotulo) rotulo.textContent = lista.length;
+    if (window.InicioOrden) InicioOrden.decorar(pestana);   /* fila 367: la flecha */
     caja.innerHTML = '';
     if (!lista.length) {
       caja.innerHTML = '<tr><td colspan="7" class="vacio">' +
@@ -190,6 +193,7 @@
         '</td></tr>';
       return;
     }
+    lista = window.InicioOrden ? InicioOrden.ordenar(lista, pestana) : lista;   /* fila 367 */
     lista.forEach(function (entry) { caja.appendChild(fila(entry, pestana)); });
   }
 
@@ -239,6 +243,7 @@
     /* Fila 249: sin tipos que liquidar, la pestaña no existe: se vuelve a «Todos los abiertos». */
     if (pestanaActual === 'liq' && !(window.PorLiquidar && PorLiquidar.hayTipos())) {
       pestanaActual = 'todos';
+      if (window.InicioOrden) InicioOrden.reiniciar();   /* fila 367 */
       pintarPestanas(r);
     }
     if (window.PorLiquidar && pestanaActual !== 'liq') PorLiquidar.soltarTabla();
@@ -258,13 +263,6 @@
        guardado, sin recalcular ningún aviso. */
     if (window.AvisosLinea && AvisosLinea.refrescar) AvisosLinea.refrescar();
   }
-
-  /* ---------- «Ordenar»: se queda igual que antes de esta fila (solo
-     gobierna la pestaña "Todos los abiertos", vía App.ORDENES /
-     App.pintarAbiertos, sin tocar js/asuntos-lista.js): el propio
-     documento de la fila no pide que "En Administración"/"En espera"/
-     "Dormidos" dejen su orden natural (vencidos primero, o más días
-     esperando/dormido arriba) por el que se elija aquí. ---------- */
 
   /* ---------- arranque ---------- */
 

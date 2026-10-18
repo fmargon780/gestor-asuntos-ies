@@ -221,13 +221,6 @@
   gap: 10px;
   margin-left: auto;
 }
-.inicio-orden {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.inicio-orden .filtro-rotulo { white-space: nowrap; }
-.inicio-orden .campo { width: auto; min-width: 200px; }
 
 /* ---------- el chip "Filtrado por…" (fila 209, apartado 7) ---------- */
 
@@ -315,8 +308,9 @@ table.inicio-tabla {
   border-bottom: 1px solid var(--linea);
   vertical-align: middle;
 }
-.inicio-th-pulsable { cursor: pointer; }
-.inicio-th-pulsable:hover { color: var(--azul); }
+.inicio-tabla th.th-ordenable { cursor: pointer; }
+.inicio-tabla th.th-ordenable:hover { text-decoration: underline; text-decoration-color: var(--tinta-suave); text-underline-offset: 3px; }
+.inicio-tabla th .orden-flecha { white-space: nowrap; }
 .inicio-tabla th {
   font-size: 11.5px;
   color: var(--tinta-suave);

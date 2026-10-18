@@ -617,6 +617,10 @@ App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'herramientas', 'aj
 Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
   b.onclick = function () {
     App.ir(b.dataset.pantalla);
+    /* Fila 367: pulsar «Inicio» en el menú devuelve la lista a su orden de siempre. */
+    if (b.dataset.pantalla === 'abiertos' && window.InicioOrden && InicioOrden.reiniciar() && App.repintarLaPestanaActiva) {
+      App.repintarLaPestanaActiva();
+    }
     /* Fila 353: pulsar «Inicio» en el menú vuelve a aplicar la regla de
        apertura del tablón (nota para hoy → sale abierto). */
     if (b.dataset.pantalla === 'abiertos' && window.InicioPlegados) InicioPlegados.alEntrarEnInicio();

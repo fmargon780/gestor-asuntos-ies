@@ -388,6 +388,7 @@ window.PorLiquidar = (function () {
   function pintarTabla(asuntos) {
     var caja = $('inicio-tabla-cuerpo');
     if (!caja) return;
+    if (window.InicioOrden) asuntos = InicioOrden.ordenar(asuntos, 'liq');   /* fila 367 */
     visibles = asuntos;
     Object.keys(marcados).forEach(function (n) {
       if (!asuntos.some(function (a) { return a.nombre === n; })) delete marcados[n];
@@ -397,6 +398,7 @@ window.PorLiquidar = (function () {
     var normal = $('inicio-thead-normal'), liq = $('inicio-thead-liquidar');
     if (normal) normal.classList.add('oculto');
     if (liq) { liq.classList.remove('oculto'); liq.innerHTML = cabecera(conImporte); }
+    if (window.InicioOrden) InicioOrden.decorar('liq');   /* fila 367: la flecha y las pulsaciones */
     var barra = $('inicio-liquidar-barra');
     if (barra) barra.classList.remove('oculto');
     var rotulo = $('cuenta-lista-abiertos');

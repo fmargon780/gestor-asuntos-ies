@@ -230,16 +230,6 @@
                   <button type="button" id="btn-exportar-pdf">Informe en PDF</button>
                 </span>
               </span>
-              <label class="inicio-orden">
-                <span class="filtro-rotulo">Ordenar</span>
-                <select id="orden-abiertos" class="campo">
-                  <option value="fecha-asc">Fecha de inicio · los más antiguos arriba</option>
-                  <option value="fecha-desc">Fecha de inicio · los más recientes arriba</option>
-                  <option value="limite">Plazo · lo que antes vence</option>
-                  <option value="tipo">Tipo de asunto</option>
-                  <option value="tercero">Tercero</option>
-                </select>
-              </label>
             </div>
           </div>
 
@@ -315,7 +305,7 @@
               <thead id="inicio-thead-normal">
                 <tr>
                   <th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th>
-                  <th>Le toca a</th><th id="th-inicio">Inicio</th><th></th>
+                  <th>Le toca a</th><th>Inicio</th><th></th>
                 </tr>
               </thead>
               <thead id="inicio-thead-liquidar" class="oculto"></thead>
@@ -1143,6 +1133,7 @@
 <script src="js/soporte-cargar.js"></script>
 <script src="js/novedades.js"></script>
 <script src="js/novedades-ventana.js"></script>
+<script src="js/inicio-ordenar.js"></script>
 <script src="js/asuntos-lista.js"></script>
 <script src="js/asuntos-lista-montones.js"></script>
 <script src="js/asuntos-lista-pintar.js"></script>

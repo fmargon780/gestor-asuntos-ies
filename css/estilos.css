@@ -126,7 +126,6 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .cabecera .acciones { flex-wrap: wrap; justify-content: flex-end; }
 #buscar-abiertos { width: 230px; min-width: 0; }
 #filtro-estado { width: 170px; min-width: 0; }
-#orden-abiertos { width: 250px; min-width: 0; }
 h3 { margin: 30px 0 8px; font-size: 16px; }
 
 /* ---------- listas ---------- */
@@ -537,7 +536,6 @@ body:has(#capa:not(.oculto)) #soporte-boton { display: none; }
   color: #5a6472;
   white-space: nowrap;
 }
-#orden-abiertos { width: auto; }
 
 /* La pantalla "Cuentas" (fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md):
    una tabla sencilla, nada de gráficos (lo que pide el encargo). */
