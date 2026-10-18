@@ -157,6 +157,11 @@ await pagina.waitForTimeout(700);
 await comprobar('la cabecera se encoge', pagina.evaluate(() => document.querySelector('#pantalla-abiertos > header.cabecera').classList.contains('encogida')), true);
 await comprobar('«Ha llegado» y los avisos desaparecen', pagina.evaluate(() => [document.getElementById('inicio-ha-llegado-linea'), document.getElementById('avisos-linea')].map((e) => e.getBoundingClientRect().height > 0)), [false, false]);
 await comprobar('el buscador y el tablón se quedan', pagina.evaluate(() => [document.getElementById('buscar-abiertos'), document.getElementById('inicio-tablon-hueco')].map((e) => e.getBoundingClientRect().height > 0)), [true, true]);
+await comprobar('la cabecera pegada queda por debajo de la franja de la copia de pruebas (no tapa el buscador)',
+  pagina.evaluate(() => {
+    const f = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--franja-demo-alto')) || 0;
+    return f > 0 && document.getElementById('buscar-abiertos').getBoundingClientRect().top >= f - 1;
+  }), true);
 await comprobar('los títulos fijos de la tabla siguen bajo la cabecera',
   pagina.evaluate(() => {
     const c = document.querySelector('#pantalla-abiertos > header.cabecera').getBoundingClientRect();

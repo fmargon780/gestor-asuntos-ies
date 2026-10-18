@@ -222,7 +222,7 @@
 
     try {
       document.documentElement.style.setProperty(
-        '--cabecera-fija-alto', Math.round(cabeceraActual.getBoundingClientRect().height) + 'px'
+        '--cabecera-fija-alto', Math.round(cabeceraActual.getBoundingClientRect().height + (parseFloat(window.getComputedStyle(cabeceraActual).top) || 0)) + 'px'
       );
     } catch (e) { /* medir el alto es solo para Ajustes; sin él no pasa nada */ }
     titulosDeInicioFijos(pantalla);
