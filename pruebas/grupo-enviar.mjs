@@ -31,7 +31,7 @@ async function nuevaPagina(extra) {
   const p = await navegador.newPage({ viewport: { width: 1500, height: 1000 } });
   p.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
   p.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
-  await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); " + (extra || '') + " } catch (e) {}");
+  await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{\"avisos\":false,\"tablon\":false}'); " + (extra || '') + " } catch (e) {}");
   await p.goto(DIRECCION);
   await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
   await p.waitForFunction(() => window.Demo && Demo.montando === false, null, { timeout: 60000 });   /* fila 299: la demostración tarda un poco más en montarse */

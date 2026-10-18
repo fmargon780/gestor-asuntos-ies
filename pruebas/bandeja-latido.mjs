@@ -23,7 +23,7 @@ function comprobar(titulo, real, esperado) {
 async function abrir(parametros) {
   const contexto = await navegador.newContext({ viewport: { width: 1400, height: 900 } });
   const pagina = await contexto.newPage();
-  await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{"avisos":false,"tablon":false}'); } catch (e) {}");
+  await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{\"avisos\":false,\"tablon\":false}'); } catch (e) {}");
   const errores = [];
   pagina.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errores.push(m.text()); });
   pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));

@@ -23,7 +23,7 @@ const pagina = await navegador.newPage({ viewport: { width: 1500, height: 1000 }
 const errores = [];
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
-await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{"avisos":false,"tablon":false}'); } catch (e) {}");
+await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{\"avisos\":false,\"tablon\":false}'); } catch (e) {}");
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
 await pagina.waitForSelector('[data-aviso="recurrentes"]', { timeout: 30000 });
