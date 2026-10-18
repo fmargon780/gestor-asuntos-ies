@@ -88,6 +88,9 @@ await comprobar('4. se puede ordenar también en «En Administración»', flecha
 await irAPestana('todos');
 await comprobar('4. y al volver a «Todos los abiertos» no hay flecha', flechas(), []);
 await comprobar('4. con el orden de siempre (los más antiguos arriba)', antiguosArriba(), true);
+await pulsar(TH + 'tercero"]');
+await pulsar('.inicio-pestana[data-pestana="todos"]');
+await comprobar('4. pulsar la pestaña en la que ya estás quita el orden', flechas(), []);
 await pulsar(TH + 'tipo"]');
 await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.click('.pestana[data-pantalla="abiertos"]');

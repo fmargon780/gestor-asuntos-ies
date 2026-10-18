@@ -81,7 +81,12 @@
   /* ---------- cambiar de pestaña ---------- */
 
   function cambiar(cual) {
-    if (PESTANAS.indexOf(cual) === -1 || cual === pestanaActual) return;
+    if (PESTANAS.indexOf(cual) === -1) return;
+    /* Fila 367: pulsar la pestaña en la que ya estás también devuelve la lista a su orden de siempre. */
+    if (cual === pestanaActual) {
+      if (window.InicioOrden && InicioOrden.reiniciar()) pintar();
+      return;
+    }
     pestanaActual = cual;
     filtroAviso = null;   /* cambiar de pestaña a mano quita el chip */
     if (window.InicioOrden) InicioOrden.reiniciar();   /* fila 367: cada pestaña, con su orden de siempre */
