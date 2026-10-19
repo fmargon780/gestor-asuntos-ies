@@ -174,7 +174,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 364 | Tema: guardar sin perder nada y archivar más rápido. Junta las ideas 360 y 361: saber si los tres guardados fallidos de `asuntos.json` perdieron algo y por qué hay tantos reintentos, y acortar lo que tarda archivar un asunto. Primero la 361, que es la más seria. | DECIDIDA (18-oct-2026) · tema |
 | 365 | Tema: arreglar una prueba interna. Junta la idea 358: que la prueba `pruebas/centro-de-datos.mjs` no falle sin motivo real. No cambia nada en pantalla. | DECIDIDA (18-oct-2026) · tema |
 | 366 | Control de entrega, devolución y estado de los libros de texto, para ayudar a la secretaria; quizá app propia; sale de la reflexión del 18-oct-2026 (tema 363) | IDEA (18-oct-2026) |
-| 368 | Aviso de usuario: mejora en «Inicio» | EN DISEÑO (19-oct-2026) · conversación: https://claude.ai/code/session_019ZXvrBz6LYWhiDcGQ6atLd · aviso completo: https://drive.google.com/file/d/16HZgbiZcBoVQz21ZdIDDXXEEnEB689G6/view?usp=drivesdk |
+| 368 | `docs/INICIO-COLOCACION-Y-COLUMNAS.md` (aviso del botón de soporte de Francisco, diseñado con él el 19-oct-2026: en Inicio, «Actualizar», «Filtros» y «Exportar» suben al renglón de las pestañas y todo lo de un renglón queda a la misma altura; el cuadro de avisos se abre flotando, sin mover la lista; cada persona ordena las columnas arrastrando su título, un solo orden para todas las pestañas, guardado por persona en `_GESTOR`; «Restablecer columnas» en el cuadro de Filtros) · aviso completo: https://drive.google.com/file/d/16HZgbiZcBoVQz21ZdIDDXXEEnEB689G6/view?usp=drivesdk | PENDIENTE (19-oct-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
