@@ -158,6 +158,31 @@ const f6 = await pagina.evaluate(async () => {
 });
 await comprobar('6. una desmarcada: baja personas(), nombres(), entra() y lo exportado, y la lista sale', f6, { todas: datos.dosB.length, marcadas: datos.dosB.length - 1, nombres: datos.dosB.length - 1, exportadas: datos.dosB.length - 1, entra: false, html: true });
 
+console.log('--- 7. más de 200 personas: salen todas (fila 373) ---');
+const f7 = await pagina.evaluate(() => {
+  const items = []; const desmarcadas = {};
+  for (let i = 1; i <= 300; i++) items.push({ clave: 'p' + i, texto: 'Alumno ' + i });
+  const caja = document.createElement('div'); document.body.appendChild(caja);
+  let cambios = 0;
+  const pintar = () => { caja.innerHTML = ListaConCasillas.html(items, desmarcadas, { id: 'et' }); ListaConCasillas.enganchar(caja, items, desmarcadas, { alCambiar: () => { cambios++; pintar(); } }); };
+  pintar();
+  const salen = caja.querySelectorAll('.cc-lista input').length;
+  const sinMas = caja.textContent.indexOf('más (cuentan igual)') === -1;
+  const ultima = caja.querySelector('[data-cc-clave="p300"]');
+  ultima.scrollIntoView();
+  ultima.click();
+  const tras = caja.querySelector('.cc-cuenta').textContent;
+  const sigueAbajo = caja.querySelector('.cc-lista').scrollTop > 0;
+  caja.querySelector('[data-cc="ninguna"]').click();
+  const ninguna = caja.querySelector('.cc-cuenta').textContent;
+  caja.querySelector('[data-cc="todas"]').click();
+  const todas = caja.querySelector('.cc-cuenta').textContent;
+  caja.remove();
+  return { salen, sinMas, tras, sigueAbajo, ninguna, todas };
+});
+await comprobar('7. con 300 personas salen las 300, sin «más (cuentan igual)», desmarcar la última baja la cuenta en uno y la lista no vuelve arriba, y «Marcar todas» / «Desmarcar todas» valen con todas', Promise.resolve(f7),
+  { salen: 300, sinMas: true, tras: '299 de 300 marcadas', sigueAbajo: true, ninguna: '0 de 300 marcadas', todas: '300 de 300 marcadas' });
+
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' fallos' : '\nTodo bien');

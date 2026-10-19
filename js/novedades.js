@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '373', fecha: '2026-10-19', texto: 'Las listas de personas con casilla (Etiquetas, repartos, exportar) enseñan ya todos los nombres, sin cortar en 200.' },
   { id: '367', fecha: '2026-10-18', texto: 'En Inicio, pulsa el título de una columna para ordenar la lista por ella; otra vez, al revés.' },
   { id: '353', fecha: '2026-10-18', texto: 'Inicio ocupa menos: el título se va, “Ha llegado” y los avisos suben a la primera fila, y los avisos y el tablón se pueden plegar.' },
   { id: '352', fecha: '2026-10-16', texto: 'El aviso al claustro de una actividad va ahora solo al profesorado que está hoy en el centro, sacado del personal docente. Ya no hay que mantener un grupo.' },

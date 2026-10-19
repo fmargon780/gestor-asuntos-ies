@@ -215,6 +215,19 @@ await comprobarP('7. termina sin fallos', pagina.locator('#repartir-progreso').t
 await comprobarP('7. quedan relacionados solo los 2 que recibieron fichero', relacionados(ORIGEN2),
   ['Egea Fon, Elena', 'Fuentes Gil, Felipe'].map(nombre).sort());
 
+/* Fila 373: el filtro del alumnado enseña todas las personas, sin cortar en 200. */
+const f373 = await pagina.evaluate(async () => {
+  const lista = [];
+  for (let i = 1; i <= 250; i++) lista.push({ nombre: 'Apellido' + String(i).padStart(3, '0') + ', Nombre', unidad: '1º ESO A', matriculado: true, idEscolar: '8' + String(i).padStart(6, '0') });
+  const f = await RepartirFiltro.crear({ lista: lista }, []);
+  f.conds.push({ tipo: 'unidad', valor: '1º ESO A' });
+  const caja = document.createElement('div'); caja.innerHTML = RepartirFiltro.html(f); document.body.appendChild(caja);
+  const r = { casillas: caja.querySelectorAll('.cc-lista input').length, sinMas: caja.textContent.indexOf('más (cuentan igual)') === -1, cuenta: caja.querySelector('.cc-cuenta').textContent };
+  caja.remove();
+  return r;
+});
+comprobar('8. filtro del alumnado con 250 personas: salen las 250 y no sale «más (cuentan igual)»', f373, { casillas: 250, sinMas: true, cuenta: '250 de 250 marcadas' });
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();
 if (fallos) { console.log('\n' + fallos + ' fallo(s)'); process.exit(1); }
