@@ -83,7 +83,7 @@ await comprobar('2. «Ha llegado» se ha ido con la página', Promise.resolve(c.
 
 console.log('--- 5. fondo opaco ---');
 await comprobar('5. pestañas y títulos con fondo opaco',
-  pagina.evaluate(() => ['#inicio-pestanas', '.inicio-tabla thead th'].map((s) => {
+  pagina.evaluate(() => ['.inicio-tabla-cabecera', '.inicio-tabla thead th'].map((s) => {
     const col = getComputedStyle(document.querySelector(s)).backgroundColor;
     return !/rgba\(0, 0, 0, 0\)|transparent/.test(col);
   })), [true, true]);

@@ -125,6 +125,7 @@ await comprobar('el segundo asunto también se crea sin número',
 console.log('--- Inicio avisa mientras queda pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('el aviso cuenta el aspirante sin número',
   pagina.locator('[data-aviso="aspirantes"]').textContent()
     .then(t => t.indexOf('1 aspirante sin Nº de identificación escolar') !== -1), true);

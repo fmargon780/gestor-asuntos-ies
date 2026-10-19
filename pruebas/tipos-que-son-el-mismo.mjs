@@ -126,6 +126,7 @@ await comprobar('5. los que no', pagina.evaluate(() => [
 console.log('--- 6 y 7. el aviso y el cuadro ---');
 await pagina.evaluate(async () => { await App.verAbiertos(); App.ir('abiertos'); await TiposParecidos.repintarAviso(); });
 await pagina.waitForTimeout(500);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('6. el trozo del aviso sale en Inicio', pagina.evaluate(() => /tipos de asunto parecidos|Tipos de asunto parecidos: \d+ parejas/i.test(document.body.textContent)), true);
 await pagina.evaluate(() => { TiposParecidosCuadro.abrir(); });
 await pagina.waitForSelector('#capa:not(.oculto) #tp-lista .tp-fila');

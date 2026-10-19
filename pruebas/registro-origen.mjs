@@ -150,6 +150,7 @@ await comprobar('y se ven sus apuntes', pagina.evaluate(() => document.querySele
 console.log('--- 4. avisos de Inicio ---');
 await pagina.evaluate(() => ControlRegistroPantalla.cerrar());
 await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await pagina.evaluate(() => ControlRegistroAvisos.calcular(true));
 await pagina.waitForFunction(() => /de registro sin asunto/.test(document.body.innerText), null, { timeout: 15000 });
 await comprobar('Inicio avisa de apuntes de registro sin asunto', pagina.evaluate(() => /apuntes? de registro sin asunto/.test(document.body.innerText)), true);

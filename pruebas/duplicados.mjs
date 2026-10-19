@@ -508,6 +508,7 @@ await crearCarpeta(DESC_C);
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('con un tercer miembro el grupo ya no es el que se descartó, y vuelve a avisar',
   pagina.locator('[data-aviso="duplicados"]').isVisible(), true);
 await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
