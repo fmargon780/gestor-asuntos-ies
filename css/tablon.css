@@ -69,7 +69,7 @@
 .tablon-fila-compacta-fecha {
   flex: 0 0 auto; font-size: 11px; font-weight: 600; color: var(--tinta-suave);
 }
-.tablon-fila-compacta-fecha.papel-hoy { color: var(--azul); }
+.tablon-fila-compacta-fecha.papel-hoy { color: var(--azul); background: none; border-color: transparent; }
 .tablon-fila-compacta-fecha.papel-atrasada { color: var(--rojo-linea, #a4302a); }
 .tablon-fila-compacta-privada { flex: 0 0 auto; font-size: 11px; }
 .tablon-fila-compacta .fila-menu-btn { background: none; border: 0; box-shadow: none; padding: 2px 4px; }
