@@ -251,6 +251,7 @@ await comprobar('5. el botón pasa a «Seguir enviando (1)»; la que falta, «Pe
   Promise.all([textoBoton(pagina, '.pg-enviar'), celdas(pagina, 6).then((c) => c[c.length - 2])]), [['Seguir enviando (1)', false], 'Pendiente de enviar']);
 await comprobar('5. en Inicio, el aviso «1 envío por terminar»', (async () => {
   await pagina.evaluate(() => { GrupoEnviar.avisar(); App.ir('abiertos'); });
+  await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
   await pagina.waitForSelector('[data-aviso="envios-pendientes"]', { timeout: 10000 });
   return pagina.locator('[data-aviso="envios-pendientes"]').textContent();
 })(), '1 envío por terminar');

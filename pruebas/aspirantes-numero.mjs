@@ -125,11 +125,13 @@ await comprobar('el segundo asunto también se crea sin número',
 console.log('--- Inicio avisa mientras queda pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('el aviso cuenta el aspirante sin número',
   pagina.locator('[data-aviso="aspirantes"]').textContent()
     .then(t => t.indexOf('1 aspirante sin Nº de identificación escolar') !== -1), true);
 
 console.log('--- pulsar el aviso filtra la tabla (fila 209): hay un asunto suyo abierto ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="aspirantes"]');
 await pagina.waitForTimeout(300);
 await comprobar('sale el chip "Filtrado por…" (el aspirante tiene un asunto abierto)',
@@ -183,6 +185,7 @@ await comprobar('la carpeta archivada no se toca (ahora dentro de la carpeta del
 console.log('--- ya no queda ningún aspirante pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await comprobar('el aviso desaparece', pagina.locator('[data-aviso="aspirantes"]').count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }

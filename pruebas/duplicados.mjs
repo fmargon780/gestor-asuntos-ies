@@ -250,6 +250,7 @@ await pagina.waitForTimeout(300);
 
 await comprobar('ya no existe ninguna franja encima de la lista',
   pagina.locator('#franja-unir').count(), 0);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('el aviso se ve, con el grupo de TRANSPORTE',
   pagina.locator('[data-aviso="duplicados"]').isVisible(), true);
 await comprobar('dice cuántos posibles duplicados hay',
@@ -285,7 +286,9 @@ await pagina.evaluate(async (datos) => {
   });
 }, { existente: EXISTENTE, nueva: NUEVA });
 
+await pagina.keyboard.press('Escape');   /* fila 368: el cuadro de avisos flota sobre el botón */
 await pagina.click('#btn-recargar');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 await comprobar('se sale de la pantalla de asuntos abiertos',
@@ -330,6 +333,7 @@ console.log('--- unir, desde la pantalla de Duplicados ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
@@ -403,7 +407,9 @@ await pagina.evaluate(async (datos) => {
 }, { a: SANC_A, b: SANC_B });
 
 await pagina.click('#btn-recargar');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="duplicados"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
@@ -463,7 +469,9 @@ const DESC_B = '260908 BECA 26-27 Distinto, Marta 1112223';
 await crearCarpeta(DESC_A);
 await crearCarpeta(DESC_B);
 await pagina.click('#btn-recargar');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="duplicados"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
@@ -500,8 +508,10 @@ await crearCarpeta(DESC_C);
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('con un tercer miembro el grupo ya no es el que se descartó, y vuelve a avisar',
   pagina.locator('[data-aviso="duplicados"]').isVisible(), true);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 await comprobar('el grupo sale con los tres asuntos',

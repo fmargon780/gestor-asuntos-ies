@@ -54,7 +54,7 @@ for (const ancho of [1920, 1366, 900]) {
   await comprobar('sin fila suelta entre la cabecera y las pestañas',
     p.evaluate(() => {
       const c = document.querySelector('#pantalla-abiertos > header.cabecera').getBoundingClientRect();
-      const t = document.getElementById('inicio-pestanas').getBoundingClientRect();
+      const t = document.querySelector('#pantalla-abiertos .inicio-tabla-cabecera').getBoundingClientRect();
       return t.top - c.bottom < 60;
     }), true);
   await comprobar('nada se monta encima ni se sale por los lados',
@@ -165,7 +165,7 @@ await comprobar('la cabecera pegada queda por debajo de la franja de la copia de
 await comprobar('los títulos fijos de la tabla siguen bajo la cabecera',
   pagina.evaluate(() => {
     const c = document.querySelector('#pantalla-abiertos > header.cabecera').getBoundingClientRect();
-    const p = document.getElementById('inicio-pestanas').getBoundingClientRect();
+    const p = document.querySelector('#pantalla-abiertos .inicio-tabla-cabecera').getBoundingClientRect();
     return p.top >= c.bottom - 2 && p.top <= c.bottom + 60;
   }), true);
 await pagina.evaluate(() => window.scrollTo(0, 0));
@@ -174,7 +174,7 @@ await comprobar('al subir del todo vuelven', pagina.evaluate(() => [document.get
 
 /* ================= 6. AL CAMBIAR DE PESTAÑA NO SALTA ================= */
 console.log('--- 6. cambiar de pestaña no mueve lo de arriba ---');
-const alto = () => pagina.evaluate(() => Math.round(document.getElementById('inicio-pestanas').getBoundingClientRect().top));
+const alto = () => pagina.evaluate(() => Math.round(document.querySelector('#pantalla-abiertos .inicio-tabla-cabecera').getBoundingClientRect().top));
 const antes = await alto();
 for (const nombre of ['adm', 'todos']) {
   const b = pagina.locator('.inicio-pestana[data-pestana="' + nombre + '"]');

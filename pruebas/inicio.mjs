@@ -224,7 +224,9 @@ await comprobar('el número junto al nombre de la pestaña',
 /* ================= 6. PULSAR EL AVISO DE VENCIDOS FILTRA LA TABLA ================= */
 
 console.log('--- 6. pulsar el aviso de vencidos filtra la tabla; "Quitar" lo devuelve ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="vencidos"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(300);
 await comprobar('cambia a la pestaña "Todos los abiertos"',

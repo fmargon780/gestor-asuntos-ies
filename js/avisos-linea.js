@@ -115,6 +115,7 @@
     if (!p) return;
     if (p.asuntos && p.asuntos.length && window.InicioTabla && InicioTabla.filtrarPorAviso) {
       InicioTabla.filtrarPorAviso(id, p.texto, p.asuntos);
+      cerrarFlotante();   /* fila 368: el cuadro flota y se aparta */
       return;
     }
     if (typeof p.alPulsar === 'function') p.alPulsar();
@@ -147,6 +148,45 @@
     }
   }
 
+  /* Fila 368 (docs/INICIO-COLOCACION-Y-COLUMNAS.md, parte 1.3): abierto, el cuadro flota por encima de la lista, como
+     un desplegable, sin empujar nada. Se cierra al volver a pulsar «N avisos», con Esc, al pulsar fuera y cuando la
+     cabecera fija se encoge; todo eso cuenta como plegarlo. Si no cabe en la ventana, tiene su propia barra. */
+  function estaAbierto() {
+    var caja = $('avisos-linea');
+    return !!caja && !!caja.querySelector('.avisos-linea-panel');
+  }
+
+  function cerrarFlotante() {
+    if (estaAbierto()) cambiarPliegue(true);
+  }
+
+  /* El alto máximo del cuadro: lo que queda de ventana por debajo de él. */
+  function ajustarPanel() {
+    var panel = document.querySelector('#avisos-linea .avisos-linea-panel');
+    if (!panel) return;
+    panel.style.maxHeight = '';
+    var arriba = panel.getBoundingClientRect().top;
+    panel.style.maxHeight = Math.max(120, Math.floor(window.innerHeight - arriba - 12)) + 'px';
+  }
+
+  function vigilarCierres() {
+    document.addEventListener('mousedown', function (ev) {
+      var caja = $('avisos-linea');
+      if (!estaAbierto() || caja.contains(ev.target)) return;
+      if (ev.target.closest && ev.target.closest('.capa, .mensajes')) return;   /* un cuadro abierto desde un aviso no pliega el cuadro */
+      cerrarFlotante();
+    }, true);
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && estaAbierto()) cerrarFlotante();
+    });
+    window.addEventListener('resize', ajustarPanel);
+    var cab = document.querySelector('#pantalla-abiertos > header.cabecera');
+    if (cab && window.MutationObserver) {
+      new MutationObserver(function () { if (cab.classList.contains('encogida')) cerrarFlotante(); })
+        .observe(cab, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
   function pintar() {
     var caja = $('avisos-linea');
     if (!caja) return;
@@ -158,38 +198,43 @@
       return;
     }
 
+    var panelViejo = caja.querySelector('.avisos-linea-panel');
+    var barra = panelViejo ? panelViejo.scrollTop : 0;
     var urgente = ids.some(function (id) { return piezas[id].urgente; });
     var plegado = !window.InicioPlegados || InicioPlegados.estaPlegado('avisos');
-    caja.className = 'avisos-linea ' + (urgente ? 'aviso-rojo' : 'aviso-ambar') +
-      (plegado ? ' avisos-linea-cerrado' : '');
+    var color = urgente ? 'aviso-rojo' : 'aviso-ambar';
+    caja.className = 'avisos-linea ' + color + (plegado ? ' avisos-linea-cerrado' : ' avisos-linea-abierto');
     caja.innerHTML = '';
 
     /* Fila 353 (docs/INICIO-MAS-COMPACTO.md, apartado 4): plegado es una
        sola línea «N avisos ▸» (N = trozos, no cosas: «3 vencidos» suma 1);
        al pulsarla se abre el cuadro de siempre. El mismo color de
-       urgencia de hoy. */
+       urgencia de hoy. Fila 368: abierto, la misma línea («N avisos ▾») sigue
+       en su sitio y el cuadro cuelga de ella, flotando. */
+    var etiqueta = ids.length + (ids.length === 1 ? ' aviso' : ' avisos');
+    var linea = document.createElement('button');
+    linea.type = 'button';
     if (plegado) {
-      var linea = document.createElement('button');
-      linea.type = 'button';
       linea.id = 'avisos-linea-plegado';
       linea.className = 'avisos-linea-plegado';
-      linea.textContent = ids.length + (ids.length === 1 ? ' aviso ▸' : ' avisos ▸');
+      linea.textContent = etiqueta + ' ▸';
       linea.setAttribute('aria-expanded', 'false');
       linea.onclick = function () { cambiarPliegue(false); };
       caja.appendChild(linea);
       return;
     }
+    linea.id = 'avisos-linea-pliega';
+    linea.className = 'avisos-linea-plegado avisos-linea-pliega';
+    linea.title = 'Plegar los avisos';
+    linea.setAttribute('aria-label', 'Plegar los avisos');
+    linea.setAttribute('aria-expanded', 'true');
+    linea.textContent = etiqueta + ' ▾';
+    linea.onclick = function () { cambiarPliegue(true); };
+    caja.appendChild(linea);
 
-    var pliega = document.createElement('button');
-    pliega.type = 'button';
-    pliega.id = 'avisos-linea-pliega';
-    pliega.className = 'avisos-linea-pliega';
-    pliega.title = 'Plegar los avisos';
-    pliega.setAttribute('aria-label', 'Plegar los avisos');
-    pliega.setAttribute('aria-expanded', 'true');
-    pliega.textContent = '▾';
-    pliega.onclick = function () { cambiarPliegue(true); };
-    caja.appendChild(pliega);
+    var panel = document.createElement('div');
+    panel.className = 'avisos-linea-panel ' + color;
+    caja.appendChild(panel);
 
     var texto = document.createElement('div');
     texto.className = 'avisos-linea-texto';
@@ -202,7 +247,7 @@
       }
       texto.appendChild(trozoDe(id));
     });
-    caja.appendChild(texto);
+    panel.appendChild(texto);
 
     /* Fila 212 (docs/INICIO-A-TODO-EL-ANCHO.md, apartado 2): "Ocultar
        por hoy" pasa de botón de texto a una ✕ pequeña, porque el cuadro
@@ -215,7 +260,10 @@
     ocultar.setAttribute('aria-label', 'Ocultar por hoy');
     ocultar.textContent = '✕';
     ocultar.onclick = ocultarPorHoy;
-    caja.appendChild(ocultar);
+    panel.appendChild(ocultar);
+
+    ajustarPanel();
+    panel.scrollTop = barra;
   }
 
   /* `asuntos` (fila 209, opcional, 5º parámetro: nunca rompe a quien
@@ -229,6 +277,7 @@
   }
 
   function enganchar() {
+    vigilarCierres();
     if (!window.Gestor) return;
     window.Gestor.alRefrescar.push(pintar);
   }

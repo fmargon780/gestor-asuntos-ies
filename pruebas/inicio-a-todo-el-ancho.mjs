@@ -181,6 +181,7 @@ await pagina.waitForTimeout(300);
 /* ================= 4. EL CUADRO DE AVISOS, PEQUEÑO, CON SU ✕ ================= */
 
 console.log('--- 4. el cuadro de avisos no ocupa todo el ancho, y su ✕ lo oculta sin tocar "Ha llegado" ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="vencidos"]');
 const anchoPantalla = await pagina.evaluate(() => document.getElementById('pantalla-abiertos').clientWidth);
 const anchoAvisos = await pagina.evaluate(() => document.getElementById('avisos-linea').getBoundingClientRect().width);

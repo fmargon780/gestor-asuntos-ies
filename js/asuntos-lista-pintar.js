@@ -393,6 +393,7 @@ App.filaTablaAsunto = function (a, opciones) {
   if (tapado) tr.classList.add('inicio-tabla-fila-tapada');
 
   /* ---------- Plazo ---------- */
+  var celdas = {};   /* fila 368: se colocan al final, en el orden de columnas de esta persona (js/inicio-columnas.js) */
   var tdPlazo = document.createElement('td');
   if (pestana === 'adm' && opciones.hito) {
     var pm = Plazos.etiquetaMeToca(opciones.hito.fecha);
@@ -412,7 +413,7 @@ App.filaTablaAsunto = function (a, opciones) {
       tdPlazo.innerHTML = '<span class="marca-plazo">Sin novedades desde hace ' + opciones.dias + ' días</span>';
     }
   }
-  tr.appendChild(tdPlazo);
+  celdas.plazo = tdPlazo;
 
   /* ---------- Tercero ---------- */
   var tdTercero = document.createElement('td');
@@ -435,7 +436,7 @@ App.filaTablaAsunto = function (a, opciones) {
   tdTercero.appendChild(spanTercero);
   var marcaNota = window.NotasDirectivos && NotasDirectivos.marca(a);   /* fila 290 */
   if (marcaNota) tdTercero.appendChild(marcaNota);
-  tr.appendChild(tdTercero);
+  celdas.tercero = tdTercero;
 
   /* ---------- Tipo ---------- */
   var tdTipo = document.createElement('td');
@@ -446,7 +447,7 @@ App.filaTablaAsunto = function (a, opciones) {
   /* Fila 239: el número del asunto, junto al tipo. */
   var numeroDeAsunto = (a.ficha && a.ficha.numero) || (a.leido && a.leido.numero) || '';
   if (numeroDeAsunto) tdTipo.innerHTML += '<span class="marca-numero" title="Número del asunto">' + U.escapar(numeroDeAsunto) + '</span>';
-  tr.appendChild(tdTipo);
+  celdas.tipo = tdTipo;
 
   /* ---------- Hito actual ---------- */
   var lado = App.ladoDe(a);
@@ -454,18 +455,21 @@ App.filaTablaAsunto = function (a, opciones) {
   tdHito.className = 'inicio-tabla-hito';
   tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
   if (window.HacerEsteHitoSello) tdHito.insertAdjacentHTML('beforeend', HacerEsteHitoSello.coletillaHTML(a));   /* fila 285 */
-  tr.appendChild(tdHito);
+  celdas.hito = tdHito;
   if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
 
   /* ---------- Le toca a ---------- */
   var tdQuien = document.createElement('td');
   tdQuien.textContent = App.textoLeTocaA(a, lado);
-  tr.appendChild(tdQuien);
+  celdas.quien = tdQuien;
 
   /* ---------- Inicio ---------- */
   var tdInicio = document.createElement('td');
   tdInicio.textContent = a.leido.fecha ? U.fechaCorta(U.fechaLegible(a.leido.fecha)) : '';
-  tr.appendChild(tdInicio);
+  celdas.inicio = tdInicio;
+
+  /* Las seis columnas en el orden de esta persona; el «⋮» va siempre al final. */
+  (window.InicioColumnas ? InicioColumnas.orden() : ['plazo', 'tercero', 'tipo', 'hito', 'quien', 'inicio']).forEach(function (c) { tr.appendChild(celdas[c]); });
 
   /* ---------- ⋮ ---------- */
   var tdMenu = document.createElement('td');

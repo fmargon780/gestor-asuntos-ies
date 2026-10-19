@@ -11,9 +11,12 @@
    (en los dos sentidos). Sin columna elegida, cada pestaña conserva
    su orden natural y no hay flecha.
 
-   El orden no se guarda: vuelve al natural al cambiar de pestaña y
-   al pulsar «Inicio» en el menú (reiniciar). Se conserva al volver
-   de la ficha, al repintar, buscar y filtrar.
+   El orden de las filas no se guarda: vuelve al natural al cambiar de
+   pestaña y al pulsar «Inicio» en el menú (reiniciar). Se conserva al
+   volver de la ficha, al repintar, buscar y filtrar.
+
+   Fila 368: el título también se arrastra para cambiar el orden de las
+   columnas (js/inicio-columnas.js, un orden por persona).
 
    Cada pintado de tabla llama a `ordenar(lista, pestana)` antes de
    pintar y a `decorar(pestana)` después (js/asuntos-lista-pintar.js,
@@ -23,9 +26,7 @@ window.InicioOrden = (function () {
 
   var estado = { col: null, dir: 1 };
 
-  /* Las columnas con título pulsable, por posición de su <th>. */
-  var COLUMNAS_NORMAL = ['plazo', 'tercero', 'tipo', 'hito', 'quien', 'inicio'];
-  var COLUMNAS_LIQUIDAR = [null, 'tercero', 'tipo', 'desde', 'importe'];
+  /* Las columnas con título pulsable se reconocen por el `data-col` de su <th> (index.html y js/por-liquidar.js). */
 
   var comparador = new Intl.Collator('es', { sensitivity: 'base' });
 
@@ -132,22 +133,96 @@ window.InicioOrden = (function () {
     return habia;
   }
 
-  /* Pone la flecha y engancha las pulsaciones en la cabecera que se ve. */
+  /* ---------- arrastrar el título de una columna (fila 368, docs/INICIO-COLOCACION-Y-COLUMNAS.md) ----------
+
+     Solo es arrastre si el ratón se mueve unos píxeles con el botón pulsado; si no, es un clic y ordena. Mientras se
+     arrastra, una marca vertical enseña dónde caerá la columna. El orden se guarda por persona
+     (js/inicio-columnas.js). En «Por liquidar» no se arrastra nada. */
+  var UMBRAL_ARRASTRE = 5;
+  var ignorarClic = false;
+
+  function huecosDe(ths) {
+    var cajas = ths.map(function (th) { return th.getBoundingClientRect(); });
+    var bordes = cajas.map(function (c) { return c.left; });
+    bordes.push(cajas[cajas.length - 1].right);
+    return bordes;
+  }
+
+  function huecoMasCercano(bordes, x) {
+    var mejor = 0;
+    bordes.forEach(function (b, i) { if (Math.abs(b - x) < Math.abs(bordes[mejor] - x)) mejor = i; });
+    return mejor;
+  }
+
+  function engancharArrastre(th, cab) {
+    th.onpointerdown = function (ev) {
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      if (!window.InicioColumnas) return;
+      var ths = Array.prototype.filter.call(cab.querySelectorAll('th'), function (t) { return t.dataset.col; });
+      var x0 = ev.clientX, y0 = ev.clientY, arrastrando = false, marca = null, hueco = null;
+
+      function mover(e) {
+        if (!arrastrando) {
+          if (Math.abs(e.clientX - x0) < UMBRAL_ARRASTRE && Math.abs(e.clientY - y0) < UMBRAL_ARRASTRE) return;
+          arrastrando = true;
+          th.classList.add('th-arrastrada');
+          marca = document.createElement('div');
+          marca.className = 'th-marca-hueco';
+          document.body.appendChild(marca);
+        }
+        var bordes = huecosDe(ths);
+        hueco = huecoMasCercano(bordes, e.clientX);
+        var tabla = cab.parentNode.getBoundingClientRect();
+        var arriba = th.getBoundingClientRect().top;
+        marca.style.left = Math.round(bordes[hueco] - 1) + 'px';
+        marca.style.top = Math.round(arriba) + 'px';
+        marca.style.height = Math.max(24, Math.min(tabla.bottom, window.innerHeight) - arriba) + 'px';
+      }
+
+      function soltar() {
+        window.removeEventListener('pointermove', mover, true);
+        window.removeEventListener('pointerup', soltar, true);
+        window.removeEventListener('pointercancel', soltar, true);
+        if (!arrastrando) return;
+        th.classList.remove('th-arrastrada');
+        if (marca) marca.remove();
+        ignorarClic = true;
+        setTimeout(function () { ignorarClic = false; }, 0);
+        if (hueco !== null && InicioColumnas.mover(th.dataset.col, hueco)) repintar();
+      }
+
+      window.addEventListener('pointermove', mover, true);
+      window.addEventListener('pointerup', soltar, true);
+      window.addEventListener('pointercancel', soltar, true);
+    };
+  }
+
+  /* Pone los títulos en el orden de esta persona (el «⋮» y la casilla se quedan donde están). */
+  function colocarTitulos(cab) {
+    var fila = cab.querySelector('tr');
+    if (!fila || !window.InicioColumnas) return;
+    var porCol = {};
+    Array.prototype.forEach.call(fila.querySelectorAll('th[data-col]'), function (th) { porCol[th.dataset.col] = th; });
+    var fijo = fila.querySelector('th:not([data-col])');
+    InicioColumnas.orden().forEach(function (c) { if (porCol[c]) fila.insertBefore(porCol[c], fijo); });
+  }
+
+  /* Pone la flecha, engancha las pulsaciones y el arrastre en la cabecera que se ve. */
   function decorar(pestana) {
     var cab = document.getElementById(pestana === 'liq' ? 'inicio-thead-liquidar' : 'inicio-thead-normal');
     if (!cab) return;
-    var columnas = pestana === 'liq' ? COLUMNAS_LIQUIDAR : COLUMNAS_NORMAL;
+    if (pestana !== 'liq') colocarTitulos(cab);
     var ths = cab.querySelectorAll('th');
-    Array.prototype.forEach.call(ths, function (th, i) {
-      var col = columnas[i];
+    Array.prototype.forEach.call(ths, function (th) {
+      var col = th.dataset.col;
       var vieja = th.querySelector('.orden-flecha');
       if (vieja) vieja.remove();
       th.classList.remove('th-ordenable', 'th-ordenada');
       th.removeAttribute('aria-sort');
       if (!col) return;
       th.classList.add('th-ordenable');
-      th.dataset.col = col;
-      th.onclick = function () { pulsar(col); };
+      th.onclick = function () { if (!ignorarClic) pulsar(col); };
+      if (pestana !== 'liq') engancharArrastre(th, cab);
       if (estado.col === col) {
         th.classList.add('th-ordenada');
         th.setAttribute('aria-sort', estado.dir === 1 ? 'ascending' : 'descending');

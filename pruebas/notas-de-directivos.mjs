@@ -87,9 +87,11 @@ console.log('--- 2. Administración ---');
 await pagina.evaluate(async () => { await Demo.entrarComo('Revisor'); });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 40000 });
 await pagina.waitForTimeout(5000);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('2. el cuadro de avisos dice «2 notas de directivos» (la de la demostración y la enviada)', sinVer(pagina), '2 notas de directivos');
 await comprobar('2. la fila del asunto lleva la marca de nota sin ver; la del asunto con nota vista, no',
   pagina.evaluate(() => { const f = (t) => [...document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]')].find((r) => r.textContent.indexOf(t) !== -1); return [f('Aguilar Ponce, Marina').querySelectorAll('.marca-nota-directivo').length, f('Aguilar Ponce, Marina').querySelector('.marca-nota-directivo').title, f('Aguilar Ponce, Pablo').querySelectorAll('.marca-nota-directivo').length]; }), [1, 'Nota de un directivo sin ver', 0]);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('#avisos-linea [data-aviso="notas-directivos"]');
 await pagina.waitForTimeout(800);
 await comprobar('2. pulsarlo filtra la tabla a esos asuntos, con «Filtrado por»',
@@ -122,6 +124,7 @@ await pagina.waitForTimeout(1500);
 await comprobar('2. «Vista» (sin documentos pendientes): deja de estar resaltada, sigue en la lista una sola vez y no se duplica',
   pagina.evaluate(() => { const l = document.getElementById('ficha-notas-lista'); return [l.querySelectorAll('.nota-fila').length && [...l.querySelectorAll('.nota-fila')].filter((f) => /justificante de pago/.test(f.textContent)).length, [...l.querySelectorAll('.nota-fila')].filter((f) => /justificante de pago/.test(f.textContent) && f.classList.contains('nota-directivo-sin-ver')).length]; }), [1, 0]);
 await comprobar('2. en disco: `vistaPor` y `vistaEl`, y el mismo número de notas', Promise.all([notasDe(pagina, MARINA).then((l) => l.filter((n) => /justificante de pago/.test(n.texto)).map((n) => [n.vistaPor, !!n.vistaEl])), numeroDeNotas()]), [[['Revisor', true]], n0]);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('2. el número del aviso baja', sinVer(pagina), '1 nota de directivo');
 /* «Guardar en el asunto» en la otra nota sin ver (la de la demostración) */
 await comprobar('2. la nota de la demostración sigue sin ver, con su documento',
@@ -142,6 +145,7 @@ const nuevaSinVer = await pagina.evaluate(async () => {
   App.pintarAbiertos(); return true;
 });
 await pagina.waitForTimeout(800);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('2. el aviso vuelve a contar', sinVer(pagina), '1 nota de directivo');
 await pagina.evaluate(() => { window.__cierre = App.cerrarAsunto(Gestor.asuntos().filter((a) => a.nombre.indexOf('Aguilar Ponce, Pablo') !== -1)[0]); });
 await pagina.waitForSelector('#capa:not(.oculto)');

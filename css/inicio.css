@@ -11,6 +11,17 @@
 
 #inicio-cuerpo { margin-bottom: 20px; }
 
+/* Fila 368: lo que comparte renglón en la cabecera de Inicio mide lo mismo y va centrado sobre la misma línea. */
+#pantalla-abiertos { --alto-renglon: 38px; --alto-renglon-tabla: 34px; }
+#pantalla-abiertos #btn-nuevo-asunto,
+#pantalla-abiertos #buscar-abiertos {
+  height: var(--alto-renglon);
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#pantalla-abiertos #btn-nuevo-asunto { display: inline-flex; align-items: center; }
+
 /* ---------- el hueco del tablón, en la propia cabecera ----------
 
    Entre "+ Nuevo asunto" (lo cuelga js/barra.js justo detrás del
@@ -44,7 +55,7 @@
   flex: 1 1 360px;
   min-width: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;   /* fila 368: «Ha llegado» y «N avisos» sobre la misma línea */
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px 16px;
@@ -175,21 +186,23 @@
 .inicio-pestanas {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-wrap: wrap;
 }
 .inicio-pestana {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
+  gap: 5px;
+  height: var(--alto-renglon-tabla);
+  box-sizing: border-box;
+  padding: 0 7px;
   border: 0;
   border-radius: 7px;
   background: none;
   color: var(--tinta-suave);
   font: inherit;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 12.5px;
   cursor: pointer;
 }
 .inicio-pestana:hover { background: var(--fondo-hover, #f1f4f8); }
@@ -199,13 +212,13 @@
 }
 .inicio-pestana .cuenta {
   display: inline-block;
-  min-width: 20px;
+  min-width: 18px;
   text-align: center;
   background: var(--fondo-hover, #eef1f5);
   color: var(--azul);
   border-radius: 10px;
-  padding: 0 6px;
-  font-size: 12px;
+  padding: 0 5px;
+  font-size: 11.5px;
 }
 .inicio-pestana .cuenta:empty { display: none; }
 .inicio-pestana.activa .cuenta { background: rgba(255, 255, 255, .25); color: #fff; }
@@ -218,9 +231,25 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 4px;
   margin-left: auto;
 }
+/* Fila 368: los botones del renglón de las pestañas, del mismo alto que ellas. */
+.inicio-tabla-cabecera-acciones .boton,
+.inicio-tabla-cabecera-acciones .exportar-envoltorio > .boton {
+  height: var(--alto-renglon-tabla);
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 9px;
+  padding-right: 9px;
+  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+}
+.inicio-tabla-cabecera-acciones .boton.boton-reservados { font-size: 12px; padding-left: 6px; padding-right: 6px; }
+#restablecer-columnas { font-size: 12.5px; flex: 0 0 100%; text-align: right; }
+#restablecer-columnas.oculto { display: none; }
 
 /* ---------- el chip "Filtrado por…" (fila 209, apartado 7) ---------- */
 
@@ -265,16 +294,22 @@
    (`display: contents`) para que solo las pestañas se fijen: así su contenedor
    es toda la zona de la tabla y no solo su fila. */
 #inicio-todos-asuntos { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
-#inicio-todos-asuntos > .inicio-tabla-cabecera { display: contents; }
-#inicio-todos-asuntos > .inicio-tabla-cabecera > #inicio-pestanas {
+/* Fila 368 (docs/INICIO-COLOCACION-Y-COLUMNAS.md, parte 1): las pestañas y sus botones (cuenta, Actualizar, Filtros,
+   Exportar) comparten renglón, los botones pegados al borde derecho, y todo el renglón se queda fijo. Si no caben
+   en uno, los botones pasan al renglón de abajo, alineados a la derecha. */
+#inicio-todos-asuntos > .inicio-tabla-cabecera {
   flex: 0 0 100%;
   position: sticky;
   top: var(--cabecera-fija-alto, 0px);
   z-index: 19;
   background: var(--fondo);
   padding: 6px 0;
+  margin: 0;
+  gap: 6px 8px;
+  align-items: center;
 }
-#inicio-todos-asuntos > .inicio-tabla-cabecera > .inicio-tabla-cabecera-acciones { margin: 0 0 12px auto; }
+#inicio-todos-asuntos > .inicio-tabla-cabecera > #inicio-pestanas { flex: 0 1 auto; padding: 0; }
+#inicio-todos-asuntos > .inicio-tabla-cabecera > .inicio-tabla-cabecera-acciones { margin: 0 0 0 auto; flex: 0 1 auto; }
 #inicio-todos-asuntos > #filtros-abiertos,
 #inicio-todos-asuntos > #inicio-filtrado-por,
 #inicio-todos-asuntos > .inicio-tabla-envoltorio { flex: 0 0 100%; min-width: 0; }
@@ -439,3 +474,64 @@ button.avisos-linea-trozo:hover {
   cursor: pointer;
 }
 .avisos-linea.avisos-linea-cerrado { flex-wrap: nowrap; }
+
+
+/* ---------- el cuadro de avisos flota (fila 368, docs/INICIO-COLOCACION-Y-COLUMNAS.md, parte 1.3) ----------
+
+   La línea «N avisos ▸/▾» es siempre del mismo tamaño y no se mueve. Abierto, el cuadro (.avisos-linea-panel) cuelga
+   de ella por debajo, por encima de la lista y de la cabecera fija de la tabla (la cabecera de la pantalla tiene
+   z-index 20, la de la tabla 19), sin empujar nada. Si no cabe en la ventana, tiene su propia barra. */
+.avisos-linea {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  min-height: var(--alto-renglon, 38px);
+  padding: 0 12px;
+  font-size: 13px;
+  max-width: none;
+}
+.avisos-linea-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  display: block;
+  width: max-content;
+  max-width: min(520px, calc(100vw - 280px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radio);
+  padding: 10px 40px 10px 14px;
+  text-align: left;
+  box-shadow: 0 6px 20px rgba(10, 25, 45, .22);
+}
+.avisos-linea-panel .avisos-linea-texto { line-height: 1.7; }
+.avisos-linea-panel button.avisos-linea-trozo { text-align: left; }
+.avisos-linea-panel .btn-traer-aviso { display: block; margin-top: 8px; }
+.avisos-linea-panel .avisos-linea-ocultar { position: absolute; top: 8px; right: 8px; }
+@media (max-width: 900px) {
+  .avisos-linea-panel { max-width: calc(100vw - 48px); }
+}
+
+/* Con sitio de sobra, las pestañas y los botones recuperan su tamaño de siempre (fila 368). */
+@media (min-width: 1700px) {
+  .inicio-pestana { padding: 0 12px; font-size: 13.5px; gap: 6px; }
+  .inicio-tabla-cabecera-acciones .boton,
+  .inicio-tabla-cabecera-acciones .exportar-envoltorio > .boton { padding-left: 14px; padding-right: 14px; font-size: 14px; }
+  .inicio-tabla-cabecera-acciones .boton.boton-reservados { font-size: 12px; padding-left: 9px; padding-right: 9px; }
+}
+
+/* Arrastrar el título de una columna (fila 368): la columna que se coge y la marca de dónde caerá. */
+.inicio-tabla th[data-col] { user-select: none; -webkit-user-select: none; }
+.inicio-tabla th.th-arrastrada { opacity: .55; cursor: grabbing; }
+.th-marca-hueco {
+  position: fixed;
+  width: 3px;
+  background: var(--azul);
+  border-radius: 2px;
+  z-index: 40;
+  pointer-events: none;
+}

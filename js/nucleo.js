@@ -254,6 +254,7 @@ $('btn-entrar').onclick = async function () {
     await App.cargarCampos();
     if (window.Grupos) await Grupos.cargar();
     await App.cargarRegistro();
+    if (window.InicioColumnas) await InicioColumnas.cargar();   /* fila 368: el orden de columnas de esta persona, antes del primer pintado */
     finCargar();
 
     Documentos.configurar({
