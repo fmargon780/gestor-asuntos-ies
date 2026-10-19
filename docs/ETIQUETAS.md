@@ -91,11 +91,11 @@ sin pasar por Word ni por una hoja de cálculo.
 
 ### 8. Hoja empezada
 
-- La vista previa dibuja la primera hoja con sus casillas. Al pulsar una casilla se marca como
-  **gastada** (tachada en gris) y no se imprime en ella; al pulsarla otra vez, se desmarca.
-- La impresión empieza en la primera casilla libre y salta las gastadas. Solo afecta a la primera
-  hoja.
-- Un botón «Hoja nueva» quita todas las marcas.
+- La vista previa dibuja todas las hojas con sus casillas. Al pulsar una casilla de **cualquier hoja** se marca como
+  **gastada** (rayada en gris) y no se imprime en ella; al pulsarla otra vez, se desmarca. Arrastrando de una casilla
+  a otra de la misma hoja se marca (o se libera, si la de partida estaba rayada) el rectángulo entero (fila 374).
+- La impresión salta las gastadas de todas las hojas; una hoja toda gastada sale como página en blanco.
+- Un botón «Quitar todos los huecos» quita todas las marcas de todas las hojas.
 
 ### 9. Vista previa e impresión
 
@@ -139,7 +139,7 @@ sin pasar por Word ni por una hoja de cálculo.
 - Herramientas → «Etiquetas» abre la pantalla. Filtro por una unidad: la cuenta coincide.
 - Modelo 3×8 y diseño «Alumno»: la vista previa tiene 24 casillas por hoja y el nombre, la unidad y
   el número escolar de cada alumno, por orden de apellidos.
-- Marcar 5 casillas como gastadas: la primera etiqueta va en la sexta; «Hoja nueva» las desmarca.
+- Marcar 5 casillas como gastadas: la primera etiqueta va en la sexta; «Quitar todos los huecos» las desmarca.
 - Diseño «Sobre» con dos hermanos en la lista: sale una sola etiqueta «Familia de …» para los dos;
   la familia sin dirección sale con el aviso «Sin dirección».
 - «Copias por persona» = 3: cada persona sale tres veces seguidas y la cuenta de etiquetas lo dice.

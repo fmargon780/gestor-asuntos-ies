@@ -244,8 +244,8 @@ var EtiquetasPantalla = (function () {
       '<section class="et-seccion"><h4>Qué lleva cada etiqueta</h4>' + htmlDiseno() + '</section>' +
       '<section class="et-seccion"><h4>Copias y hoja empezada</h4>' +
         '<label class="etiqueta">Copias por persona <input class="campo et-copias" id="et-copias" type="number" min="1" max="50" value="' + E.copias + '" data-solo-lectura></label>' +
-        '<p class="explica">Pulsa en el dibujo las etiquetas de la primera hoja que ya están gastadas.</p>' +
-        '<button type="button" class="boton" id="et-hoja-nueva" data-solo-lectura>Hoja nueva</button></section>';
+        '<p class="explica">Pulsa o arrastra sobre las etiquetas ya gastadas de cualquier hoja.</p>' +
+        '<button type="button" class="boton" id="et-hoja-nueva" data-solo-lectura>Quitar todos los huecos</button></section>';
   }
 
   function pintar() {
@@ -313,18 +313,71 @@ var EtiquetasPantalla = (function () {
 
   /* ---------- las pulsaciones ---------- */
 
+  /* Fila 374: pulsar una etiqueta de cualquier hoja la raya o la libera; arrastrar marca el rectángulo hasta otra de la
+     misma hoja. Con el dedo, el rectángulo pide dejarlo quieto un momento antes de arrastrar (si no, la página se desplaza). */
+  function enganchaHuecos(cont) {
+    var ini = null;
+    function casillaEn(hoja, ev) {
+      var g = EtiquetasModelos.geometria(E.modelo), r = hoja.getBoundingClientRect(), k = r.width / g.hojaAncho;
+      var col = Math.floor(((ev.clientX - r.left) / k - g.x0) / g.px), fila = Math.floor(((ev.clientY - r.top) / k - g.y0) / g.py);
+      col = Math.max(0, Math.min(E.modelo.columnas - 1, col)); fila = Math.max(0, Math.min(E.modelo.filas - 1, fila));
+      return fila * E.modelo.columnas + col;
+    }
+    function resaltar(fin) {
+      var rect = EtiquetasHoja.rectangulo(E.modelo, ini.casilla, fin);
+      Array.prototype.forEach.call(ini.hoja.querySelectorAll('.et-casilla'), function (c) {
+        c.classList.toggle('et-marcando', rect.indexOf(Number(c.getAttribute('data-casilla'))) !== -1);
+      });
+      ini.fin = fin;
+    }
+    function acabar() {
+      if (!ini) return;
+      clearTimeout(ini.espera);
+      Array.prototype.forEach.call(ini.hoja.querySelectorAll('.et-marcando'), function (c) { c.classList.remove('et-marcando'); });
+      ini = null;
+    }
+    cont.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
+    cont.addEventListener('touchmove', function (ev) { if (ini && ini.armado && ev.cancelable) ev.preventDefault(); }, { passive: false });
+    cont.addEventListener('pointerdown', function (ev) {
+      var c = ev.target.closest && ev.target.closest('.et-casilla'), hoja = c && c.closest('.et-hoja');
+      if (!c || !hoja || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+      acabar();
+      var i = Number(c.getAttribute('data-casilla'));
+      ini = { hoja: hoja, nh: Number(hoja.getAttribute('data-hoja')), casilla: i, fin: i, x: ev.clientX, y: ev.clientY, id: ev.pointerId, armado: ev.pointerType !== 'touch' };
+      ini.estaba = !!E.gastadas[ini.nh + ':' + i];
+      if (ini.armado) { ev.preventDefault(); try { cont.setPointerCapture(ev.pointerId); } catch (e) {} }
+      else ini.espera = setTimeout(function () {
+        if (!ini) return;
+        ini.armado = true; try { cont.setPointerCapture(ini.id); } catch (e) {}
+        resaltar(ini.casilla);
+      }, 400);
+    });
+    cont.addEventListener('pointermove', function (ev) {
+      if (!ini || ev.pointerId !== ini.id) return;
+      if (!ini.armado) { if (Math.abs(ev.clientX - ini.x) + Math.abs(ev.clientY - ini.y) > 10) acabar(); return; }
+      var fin = casillaEn(ini.hoja, ev);
+      if (fin !== ini.fin || !ini.hoja.querySelector('.et-marcando')) resaltar(fin);
+    });
+    cont.addEventListener('pointerup', function (ev) {
+      if (!ini || ev.pointerId !== ini.id) return;
+      var a = ini, fin = a.armado ? casillaEn(a.hoja, ev) : a.casilla;
+      var c = ev.target.closest && ev.target.closest('.et-casilla');
+      if (!a.armado && (!c || c.closest('.et-hoja') !== a.hoja || Number(c.getAttribute('data-casilla')) !== a.casilla)) { acabar(); return; }
+      acabar();
+      EtiquetasHoja.rectangulo(E.modelo, a.casilla, fin).forEach(function (i) {
+        if (a.estaba) delete E.gastadas[a.nh + ':' + i]; else E.gastadas[a.nh + ':' + i] = true;
+      });
+      pintarVista();
+    });
+    cont.addEventListener('pointercancel', acabar);
+  }
+
   function enganchar() {
     var panel = $('et-panel'), vista = $('etiquetas-vista');
     $('et-volver').onclick = function () {
       if (E.volverA) { var v = E.volverA; cerrar(); App.abrirFicha(v.asunto, v.modo); } else cerrar();
     };
-    $('et-vista-hojas').onclick = function (ev) {
-      var c = ev.target.closest('.et-casilla'), hoja = ev.target.closest('.et-hoja');
-      if (!c || !hoja || hoja.getAttribute('data-hoja') !== '0') return;
-      var i = Number(c.getAttribute('data-casilla'));
-      if (E.gastadas[i]) delete E.gastadas[i]; else E.gastadas[i] = true;
-      pintarVista();
-    };
+    enganchaHuecos($('et-vista-hojas'));
     if (E.editor) {
       EtiquetasEditor.enganchar(panel, E.editor, {
         guardar: guardarEditor, cancelar: function () { E.editor = null; pintar(); },
@@ -455,7 +508,7 @@ var EtiquetasPantalla = (function () {
 
   async function borrarModelo(m) {
     if (!m || !m.propio || !(await U.preguntar('Borrar el modelo', '<p>Se borra el modelo «' + esc(m.nombre) + '».</p>', 'Sí, borrarlo'))) return;
-    try { E.guardado = await EtiquetasGuardado.cambiar(function (d) { d.modelos = d.modelos.filter(function (x) { return x.id !== m.id; }); }); E.modeloId = null; pintar(); }
+    try { E.guardado = await EtiquetasGuardado.cambiar(function (d) { d.modelos = d.modelos.filter(function (x) { return x.id !== m.id; }); }); E.modeloId = null; E.gastadas = {}; pintar(); }
     catch (e) { U.fallo('No he podido borrar el modelo', e); }
   }
 

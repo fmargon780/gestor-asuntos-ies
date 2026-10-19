@@ -6,7 +6,8 @@
      familia (diseño «Una por familia»), ordenadas (alumnado: unidad y apellidos; personal: apellidos) y con las
      copias seguidas. `op`: { copias, indice (PersonasFamilias.indice), ctx: { centro, curso } }.
    - paginar(items, modelo, gastadas) → { hojas: [[{ i (casilla), item|null }]], etiquetas }. Las casillas
-     `gastadas` (números de casilla, solo de la primera hoja) no llevan etiqueta.
+     `gastadas` ({ "hoja:casilla": true }, las dos desde 0, de cualquier hoja; fila 374) no llevan etiqueta.
+   - rectangulo(modelo, a, b) → los números de casilla del rectángulo que forman las casillas a y b (fila 374).
    - preparar(items, diseno, modelo, medir) → Map etiqueta → sus líneas ya ajustadas { lineas, corto }.
    - vistaHtml(paginas, modelo, preparadas, escala) → el HTML de las hojas (escala: píxeles por mm).
    ============================================================ */
@@ -44,13 +45,20 @@ var EtiquetasHoja = (function () {
     while (k < items.length || h === 0) {
       var hoja = [];
       for (var i = 0; i < por; i++) {
-        if (h === 0 && malas[i]) { hoja.push({ i: i, item: null, gastada: true }); continue; }
+        if (malas[h + ':' + i]) { hoja.push({ i: i, item: null, gastada: true }); continue; }
         hoja.push({ i: i, item: k < items.length ? items[k++] : null });
       }
       hojas.push(hoja);
       h++;
     }
     return { hojas: hojas, etiquetas: items.length };
+  }
+
+  function rectangulo(modelo, a, b) {
+    var c = modelo.columnas, f0 = Math.min(Math.floor(a / c), Math.floor(b / c)), f1 = Math.max(Math.floor(a / c), Math.floor(b / c));
+    var c0 = Math.min(a % c, b % c), c1 = Math.max(a % c, b % c), r = [];
+    for (var f = f0; f <= f1; f++) for (var k = c0; k <= c1; k++) r.push(f * c + k);
+    return r;
   }
 
   function preparar(items, diseno, modelo, medir) {
@@ -95,6 +103,6 @@ var EtiquetasHoja = (function () {
     }).join('');
   }
 
-  return { construir: construir, paginar: paginar, preparar: preparar, vistaHtml: vistaHtml };
+  return { construir: construir, paginar: paginar, rectangulo: rectangulo, preparar: preparar, vistaHtml: vistaHtml };
 })();
 window.EtiquetasHoja = EtiquetasHoja;

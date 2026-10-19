@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '374', fecha: '2026-10-19', texto: 'Etiquetas: ya se pueden marcar huecos en cualquier hoja, y arrastrando se marca de una vez una fila, una columna o un rectángulo.' },
   { id: '372', fecha: '2026-10-19', texto: 'Las notas del tablón pueden llevar hora: a la hora del aviso (por defecto 15 minutos antes) sale una ventana con sonido, con «Entendido» y «Recordar en 10 minutos».' },
   { id: '373', fecha: '2026-10-19', texto: 'Las listas de personas con casilla (Etiquetas, repartos, exportar) enseñan ya todos los nombres, sin cortar en 200.' },
   { id: '367', fecha: '2026-10-18', texto: 'En Inicio, pulsa el título de una columna para ordenar la lista por ella; otra vez, al revés.' },

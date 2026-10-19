@@ -20,10 +20,11 @@
 .et-casilla-texto { display: inline-flex; gap: 5px; align-items: center; }
 .et-hoja-caja { margin: 0 auto 16px; width: fit-content; }
 .et-hoja-numero { font-size: 12px; margin-bottom: 3px; color: #555; }
-.et-hoja { position: relative; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); overflow: hidden; }
+.et-hoja { user-select: none; -webkit-user-select: none; position: relative; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); overflow: hidden; }
 .et-casilla { position: absolute; box-sizing: border-box; border: 1px dashed #b9b9c4; overflow: hidden; cursor: pointer; font-family: Helvetica, Arial, sans-serif; color: #000; }
 .et-casilla.et-libre { border-color: #e1e1e8; }
 .et-casilla:hover { outline: 2px solid var(--principal, #2a6df4); outline-offset: -2px; }
+.et-casilla.et-marcando { outline: 3px solid var(--principal, #2a6df4); outline-offset: -3px; background-color: rgba(42,109,244,.18); }
 .et-gastada { background: repeating-linear-gradient(45deg, #ddd, #ddd 4px, #f2f2f2 4px, #f2f2f2 8px); }
 .et-lineas { position: absolute; left: 0; right: 0; box-sizing: border-box; }
 .et-linea { white-space: nowrap; overflow: hidden; line-height: 1.2; }

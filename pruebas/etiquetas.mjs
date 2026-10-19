@@ -4,7 +4,7 @@
 
    1. Herramientas → «Etiquetas» abre la pantalla a todo el ancho; filtro por una unidad: la cuenta coincide.
    2. Modelo 3×8 y diseño «Alumno»: 24 casillas por hoja, nombre, unidad y número escolar, por apellidos.
-   3. Casillas gastadas: la primera etiqueta va en la sexta; «Hoja nueva» las desmarca.
+   3. Casillas gastadas: la primera etiqueta va en la sexta; «Quitar todos los huecos» las desmarca (fila 374).
    4. Diseño «Sobre»: dos hermanos, una sola etiqueta «Familia de …»; la familia sin dirección, con su aviso.
    5. «Copias por persona» = 3.
    6. «Nuevo modelo» 2×2: cada etiqueta, un cuarto del A4.
@@ -76,7 +76,7 @@ const t3 = await pagina.evaluate(() => Array.prototype.map.call(document.querySe
   .filter((x) => x[1] || x[2]));
 await comprobar('3. cinco gastadas y la primera etiqueta en la sexta', [t3.slice(0, 5).map((x) => x[1]), t3[5]], [[true, true, true, true, true], [5, false, 'Castro Reina, Noa']]);
 await pagina.click('#et-hoja-nueva');
-await comprobar('3. «Hoja nueva» las desmarca', pagina.evaluate(() => document.querySelectorAll('.et-gastada').length), 0);
+await comprobar('3. «Quitar todos los huecos» las desmarca', pagina.evaluate(() => document.querySelectorAll('.et-gastada').length), 0);
 
 console.log('--- 4. Sobre y hermanos ---');
 await pagina.click('.repartir-filtro-resumen ~ * >> nth=-1').catch(() => {});
