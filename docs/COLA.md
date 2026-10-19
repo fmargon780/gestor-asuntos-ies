@@ -161,6 +161,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 370 | Tema: avisos a hora fija en el tablón. Junta la idea 369: poder poner fecha y hora de vencimiento a una nota del tablón de Inicio, y que la app avise en ese momento (correo, ventana o sonido), para que no se pase una cita. Ojo con la fila 353 (el tablón sale abierto si hay nota para hoy). | SUSTITUIDA (19-oct-2026): diseñada como fila 372 |
 | 371 | Aviso de usuario: mejora en «Herramientas» | IDEA (19-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1FhJZnDeN9b17Y_CJryaxOIVIxtElX0Bt/view?usp=drivesdk |
 | 372 | `docs/TABLON-AVISO-A-HORA-FIJA.md` (tema 370, idea 369; diseñado con Francisco el 19-oct-2026: las notas del tablón pueden llevar día, hora y antelación —15 minutos por defecto—; a la hora del aviso sale una ventana con sonido, con «Entendido» y «Recordar en 10 minutos», a quien ve la nota; si la app estaba cerrada, sale al abrirla con «era a las …»; pasada la hora, la nota queda en gris con «pasada» y ya no abre el tablón) | PENDIENTE (19-oct-2026) |
+| 373 | Aviso de usuario: error en «Herramientas» | IDEA (19-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1UVUGD3oQdxLRITF9kxpJZFzVDEUBk6xD/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
