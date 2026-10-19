@@ -11,6 +11,7 @@ para ir tachando.
       bandeja en Chrome y recargar; al entrar, la bandeja sale en «Falta» y «Arreglarlo» lleva al
       bloque de la bandeja en Ajustes › Mantenimiento. (2) En la copia sin internet
       (`ABRIR EL GESTOR.html`) aparece la fila «Copia sin internet al día»; en la web, no.
+- [ ] **El sonido del aviso del tablón (fila 372, `docs/TABLON-AVISO-A-HORA-FIJA.md`).** En el ordenador del instituto, con el sonido encendido: pegar una nota con hora de dos o tres minutos más tarde y «a la hora justa», y pulsar en cualquier parte de la página. Ver: a la hora sale la ventana «Aviso del tablón» y suena un pitido corto; sin pulsar nada antes, sale sin sonido.
 - [ ] **La ruta copiada por el botón «Ruta», en el ordenador del instituto (fila 227,
       `docs/RUTA-NORMAL-DE-WINDOWS.md`).** Pulsar «Ruta» en la ficha de un asunto (o en el cuadro
       de Correo o de Séneca) y pegar lo copiado en la barra del explorador de archivos de Windows,

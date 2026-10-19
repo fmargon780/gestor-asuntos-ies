@@ -296,6 +296,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
+- (Fila 372) Las notas del tablón pueden llevar hora y antelación: a su hora sale la ventana «Aviso del tablón» con sonido (`js/tablon-avisos.js`); «Entendido» es de cada persona y va en la propia nota.
 - Esconder el tablón del todo (desde la fila 353 solo se **pliega** a una línea con su número y la nota más reciente; nunca desaparece), sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
 - Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).

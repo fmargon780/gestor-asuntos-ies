@@ -541,6 +541,26 @@
         color: 'azul', autor: App.E.usuario || 'Revisor', creado: U.ahora(),
         para: '', privada: false, hecha: false, hechaPor: '', hechaEl: ''
       });
+      /* Fila 372 (avisos a hora fija): una nota compartida con hora dos minutos
+         después de cargar la demo y «a la hora justa», y otra de ayer ya pasada y
+         sin atender (da la ventana con «era a las 9:30» al entrar). Solo con
+         `?avisos=1`: la ventana taparía las demás revisiones. */
+      if (!/[?&]avisos=1(&|$)/.test(location.search)) return lista;
+      var d = function (t) {
+        return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+      };
+      var dentro = new Date(Date.now() + 2 * 60000), ayer = new Date(Date.now() - 86400000);
+      lista.push({
+        id: U.nuevoId('n'), texto: 'Reunión de tutores de 1º ESO en el dpto. de orientación: darles los carnés de estudiante',
+        color: 'amarillo', autor: App.E.usuario || 'Revisor', creado: U.ahora(),
+        para: d(dentro), hora: String(dentro.getHours()).padStart(2, '0') + ':' + String(dentro.getMinutes()).padStart(2, '0'),
+        antes: 0, atendido: [], privada: false, hecha: false, hechaPor: '', hechaEl: ''
+      });
+      lista.push({
+        id: U.nuevoId('n'), texto: 'Entregar la hoja de guardias en jefatura',
+        color: 'rosa', autor: App.E.usuario || 'Revisor', creado: U.ahora(),
+        para: d(ayer), hora: '09:30', antes: 15, atendido: [], privada: false, hecha: false, hechaPor: '', hechaEl: ''
+      });
       return lista;
     });
   }

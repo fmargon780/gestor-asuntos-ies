@@ -25,6 +25,8 @@
      17-sep-2026). Se actualiza con cada tecla, no solo al repintar. */
   var borrador = '';
   var borradorFecha = '';
+  var borradorHora = '';
+  var borradorAntes = null;   /* null = la de fábrica (15 minutos antes) */
 
   /* Fila 353 (docs/INICIO-MAS-COMPACTO.md): el tablón se pliega a una
      línea «Tablón (N) ▸» + la nota más reciente. Lo que se deja se
@@ -53,8 +55,9 @@
 
   function reglaApertura() {
     var hoy = hoyIso();
+    /* Fila 372: una nota con hora ya pasada (de hoy o de otro día) no lo abre. */
     var hay = Tablon.notas().filter(Tablon.laVeo).some(function (n) {
-      return !n.hecha && n.para && n.para <= hoy;
+      return !n.hecha && n.para && n.para <= hoy && !(n.hora && TablonHora.pasada(n));
     });
     sesionAbierto = hay ? true : null;
     pintar();
@@ -99,6 +102,12 @@
       var ua = urgencia(a), ub = urgencia(b);
       if (ua !== ub) return ua - ub;
       if (a.para && b.para && a.para !== b.para) return a.para < b.para ? -1 : 1;
+      /* Fila 372: el mismo día, por hora; las de ese día sin hora, detrás. */
+      if (a.para && a.para === b.para && (a.hora || b.hora)) {
+        if (!a.hora) return 1;
+        if (!b.hora) return -1;
+        if (a.hora !== b.hora) return a.hora < b.hora ? -1 : 1;
+      }
       return (b.creado || '') < (a.creado || '') ? -1 : 1;
     });
   }
@@ -181,6 +190,9 @@
     var escrito = campoTexto ? campoTexto.value : borrador;
     var campoFecha = $('tablon-para');
     var fechaPuesta = campoFecha ? campoFecha.value : borradorFecha;
+    var campoHora = $('tablon-hora'), campoAntes = $('tablon-antes');
+    var horaPuesta = campoHora ? campoHora.value : borradorHora;
+    var antesPuesto = campoAntes ? Number(campoAntes.value) : borradorAntes;
 
     /* Tampoco se pierde el foco ni el cursor: ni del campo de la nota
        nueva, ni del de una nota que se esté cambiando ahora mismo. */
@@ -212,7 +224,7 @@
     c.className = 'tablon-compacto';
     c.innerHTML = '';
     c.appendChild(cabecera(pendientes.length));
-    c.appendChild(formulario(escrito, fechaPuesta, abierta));
+    c.appendChild(formulario(escrito, fechaPuesta, abierta, horaPuesta, antesPuesto));
 
     var fallo = Tablon.fallo();
     if (fallo) {
@@ -273,6 +285,11 @@
       var marca = document.createElement('span');
       marca.className = 'tablon-fila-compacta-fecha' + (u === 0 ? ' papel-atrasada' : (u === 1 ? ' papel-hoy' : ''));
       marca.textContent = u === 0 ? 'Atrasada' : (u === 1 ? 'Hoy' : legible(n.para));
+      /* Fila 372: con hora, relojito y hora; pasada, en gris y sin «Atrasada». */
+      if (n.hora) {
+        marca.textContent = TablonHora.marca(n);
+        marca.className = 'tablon-fila-compacta-fecha' + (TablonHora.pasada(n) ? ' tablon-pasada' : (u === 1 ? ' papel-hoy' : ''));
+      }
       fila.appendChild(marca);
     }
     if (n.privada) {
@@ -424,7 +441,7 @@
      campo (mismo id, mismo elemento lógico:
      pruebas/tablon-no-se-borra.mjs escribe directamente en
      #tablon-texto sin tener que abrir nada antes). */
-  function formulario(escrito, fechaPuesta, abierta) {
+  function formulario(escrito, fechaPuesta, abierta, horaPuesta, antesPuesto) {
     var caja = document.createElement('div');
     caja.className = 'tablon-nueva' + (abierta ? ' tablon-nueva-abierta' : '');
 
@@ -433,6 +450,8 @@
        de aquí y no de un campo vacío (fila 33, 17-sep-2026). */
     borrador = escrito;
     borradorFecha = fechaPuesta;
+    borradorHora = fechaPuesta ? (horaPuesta || '') : '';
+    borradorAntes = typeof antesPuesto === 'number' ? antesPuesto : null;
 
     var texto = document.createElement('textarea');
     texto.id = 'tablon-texto';
@@ -471,10 +490,17 @@
     para.className = 'campo tablon-fecha';
     para.title = 'Para qué día es, si tiene día';
     para.value = fechaPuesta;
-    para.onchange = function () { borradorFecha = para.value; };
     fila.appendChild(para);
 
     caja.appendChild(fila);
+
+    /* Fila 372: hora y «Avisar», junto al día; sin día no hay hora. */
+    var horaCtl = TablonHora.controles('tablon-hora', 'tablon-antes', borradorHora, borradorAntes, function (h, a) {
+      borradorHora = h; borradorAntes = a;
+    });
+    horaCtl.fijarFecha(fechaPuesta);
+    para.onchange = function () { borradorFecha = para.value; horaCtl.fijarFecha(para.value); };
+    caja.appendChild(horaCtl);
 
     caja.appendChild(casillaSoloParaMi('tablon-solo-mia', soloParaMi, function (valor) {
       soloParaMi = valor;
@@ -499,22 +525,39 @@
     if (!texto) { campo.focus(); return; }
     var campoFecha = $('tablon-para');
     var para = campoFecha ? (campoFecha.value || '') : '';
+    var campoHora = $('tablon-hora'), campoAntes = $('tablon-antes');
+    var hora = para && campoHora ? (campoHora.value || '') : '';
+    var antes = hora && campoAntes ? Number(campoAntes.value) : (hora ? Tablon.ANTES_DE_FABRICA : 0);
     var quien = Tablon.quienSoy();
     var privada = soloParaMi;
     campo.value = '';
     if (campoFecha) campoFecha.value = '';
     borrador = '';
     borradorFecha = '';
+    borradorHora = '';
+    borradorAntes = null;
     notaAbierta = false;
     cambiar(function (lista) {
-      lista.push({
+      var nota = {
         id: 'n' + Date.now() + Math.floor(Math.random() * 1000),
         texto: texto, color: colorElegido, autor: quien,
         creado: new Date().toISOString(), para: para, privada: privada,
+        hora: hora, antes: antes, atendido: [],
         hecha: false, hechaPor: '', hechaEl: ''
-      });
+      };
+      darPorAtendidoSiPasado(nota);
+      lista.push(nota);
       return lista;
     });
+  }
+
+  /* Fila 372, decisión 9: una nota que nace (o cambia) con su aviso ya
+     pasado la da por atendida quien la escribe; a los demás les sale. */
+  function darPorAtendidoSiPasado(nota) {
+    var aviso = Tablon.momentoAviso(nota), quien = Tablon.quienSoy();
+    if (aviso && quien && aviso.getTime() <= TablonAvisos.ahora().getTime()) {
+      nota.atendido.push({ q: quien, m: Tablon.claveAviso(nota) });
+    }
   }
 
   /* ---------- marcar hecha y borrar: comunes al papel entero (dentro
@@ -563,6 +606,19 @@
       var casilla = casillaSoloParaMi('papel-solo-mia', n.privada);
       d.appendChild(casilla);
 
+      /* Fila 372: «Cambiar» también gana el día, la hora y la antelación. */
+      var cambiaDia = document.createElement('input');
+      cambiaDia.type = 'date';
+      cambiaDia.id = 'papel-para';
+      cambiaDia.className = 'campo tablon-fecha';
+      cambiaDia.title = 'Para qué día es, si tiene día';
+      cambiaDia.value = n.para;
+      d.appendChild(cambiaDia);
+      var cambiaHora = TablonHora.controles('papel-hora', 'papel-antes', n.hora, n.hora ? n.antes : null);
+      cambiaHora.fijarFecha(n.para);
+      cambiaDia.onchange = function () { cambiaHora.fijarFecha(cambiaDia.value); };
+      d.appendChild(cambiaHora);
+
       var botones = document.createElement('div');
       botones.className = 'papel-botones';
       botones.appendChild(boton('Guardar', function () {
@@ -575,6 +631,16 @@
             if (x.id !== n.id) return;
             x.texto = nuevo;
             x.privada = privadaAhora;
+            var antiguaClave = Tablon.claveAviso(x);
+            x.para = cambiaDia.value || '';
+            var v = cambiaHora.valores();
+            x.hora = x.para ? v.hora : '';
+            x.antes = x.hora ? v.antes : 0;
+            /* Cambiar el día, la hora o la antelación vuelve a armar el aviso. */
+            if (Tablon.claveAviso(x) !== antiguaClave) {
+              x.atendido = [];
+              darPorAtendidoSiPasado(x);
+            }
             /* Una nota se hace privada para su autor. Si la escribió el
                compañero y la escondes tú, dejarías de verla sin poder
                volver atrás, así que pasa a ser tuya. */
@@ -603,6 +669,10 @@
       marca.className = 'papel-fecha' + (u === 0 ? ' papel-atrasada' : (u === 1 ? ' papel-hoy' : ''));
       marca.textContent = u === 0 ? 'Se pasó el ' + legible(n.para)
                         : (u === 1 ? 'Para hoy' : 'Para el ' + legible(n.para));
+      if (n.hora) {
+        marca.className = 'papel-fecha' + (TablonHora.pasada(n) ? ' tablon-pasada' : (u === 1 ? ' papel-hoy' : ''));
+        marca.textContent = TablonHora.marcaLarga(n);
+      }
       d.appendChild(marca);
     }
 

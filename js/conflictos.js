@@ -251,7 +251,19 @@
     ((real && real.notas) || []).concat(conflicto.notas).forEach(function (n) {
       var k = clave(n);
       if (!mapa[k]) orden.push(k);
-      mapa[k] = mapa[k] ? Object.assign({}, mapa[k], n) : n;
+      if (!mapa[k]) { mapa[k] = n; return; }
+      /* Fila 372: quién ha atendido el aviso se une, no se pisa; y solo vale el
+         «Entendido» del momento actual de la nota (el de una hora vieja no revive). */
+      var unidos = (mapa[k].atendido || []).concat(n.atendido || []);
+      mapa[k] = Object.assign({}, mapa[k], n);
+      var hora = mapa[k].para && mapa[k].hora ? mapa[k].para + ' ' + mapa[k].hora + ' ' + (typeof mapa[k].antes === 'number' ? mapa[k].antes : 15) : '';
+      var vistos = {};
+      mapa[k].atendido = unidos.filter(function (a) {
+        if (!a || a.m !== hora) return false;
+        var clave = String(a.q).toLowerCase() + '|' + a.m;
+        if (vistos[clave]) return false;
+        return (vistos[clave] = true);
+      });
     });
 
     var fusionTablon = { notas: orden.map(function (k) { return mapa[k]; }) };

@@ -177,3 +177,34 @@
 }
 .tablon-plegado:hover .tablon-titulo { text-decoration: underline; }
 .tablon-cabecera .tablon-pliega { display: flex; align-items: center; gap: 8px; }
+
+/* ---------- hora y aviso de una nota (fila 372, docs/TABLON-AVISO-A-HORA-FIJA.md) ---------- */
+
+.tablon-fila-hora { justify-content: flex-start; }
+.tablon-hora { width: 96px; font-size: 12.5px; padding: 5px 7px; }
+.tablon-avisar { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--tinta-suave); }
+.tablon-avisar[hidden] { display: none; }
+.tablon-avisar select { font-size: 12.5px; padding: 5px 7px; }
+.tablon-fila-compacta-fecha.tablon-pasada,
+.papel-fecha.tablon-pasada { color: var(--tinta-suave); opacity: .8; }
+
+/* La ventana del aviso: por encima de todo (los cuadros están en 50, la franja de la copia de pruebas en 70). */
+.tablon-aviso-fondo {
+  position: fixed; inset: 0; z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(20, 30, 45, .45);
+}
+.tablon-aviso-caja {
+  width: 420px; max-width: calc(100vw - 32px);
+  background: var(--papel); border: 2px solid #e3d074; border-radius: var(--radio);
+  box-shadow: 0 12px 36px rgba(20, 30, 45, .35); padding: 18px 20px 16px;
+}
+.tablon-aviso-caja.color-azul  { border-color: #a9c9e6; }
+.tablon-aviso-caja.color-verde { border-color: #a7d8b8; }
+.tablon-aviso-caja.color-rosa  { border-color: #f0b8c8; }
+.tablon-aviso-caja h2 { margin: 0 0 10px; font-size: 17px; }
+.tablon-aviso-texto { font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tablon-aviso-dia { margin-top: 10px; font-weight: 600; }
+.tablon-aviso-era { color: var(--rojo-linea, #a4302a); font-weight: 600; }
+.tablon-aviso-mas { margin-top: 8px; font-size: 12.5px; color: var(--tinta-suave); }
+.tablon-aviso-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: flex-end; }

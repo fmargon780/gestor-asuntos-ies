@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '372', fecha: '2026-10-19', texto: 'Las notas del tablón pueden llevar hora: a la hora del aviso (por defecto 15 minutos antes) sale una ventana con sonido, con «Entendido» y «Recordar en 10 minutos».' },
   { id: '373', fecha: '2026-10-19', texto: 'Las listas de personas con casilla (Etiquetas, repartos, exportar) enseñan ya todos los nombres, sin cortar en 200.' },
   { id: '367', fecha: '2026-10-18', texto: 'En Inicio, pulsa el título de una columna para ordenar la lista por ella; otra vez, al revés.' },
   { id: '353', fecha: '2026-10-18', texto: 'Inicio ocupa menos: el título se va, “Ha llegado” y los avisos suben a la primera fila, y los avisos y el tablón se pueden plegar.' },

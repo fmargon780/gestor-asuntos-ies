@@ -25,6 +25,11 @@
 
   var COLORES = ['amarillo', 'azul', 'verde', 'rosa'];
 
+  /* Fila 372 (docs/TABLON-AVISO-A-HORA-FIJA.md): cuántos minutos antes de
+     la hora se avisa; el primero es «a la hora justa». */
+  var ANTELACIONES = [0, 15, 30, 60];
+  var ANTES_DE_FABRICA = 15;
+
   var notas = [];
   var arrancado = false;
   var reglaAplicada = false;
@@ -36,6 +41,35 @@
 
   /* ---------- leer y escribir ---------- */
 
+  function horaValida(n) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(n.para || '') && /^([01]\d|2[0-3]):[0-5]\d$/.test(n.hora || '') ? n.hora : '';
+  }
+
+  function antesValido(v) {
+    return typeof v === 'number' && ANTELACIONES.indexOf(v) !== -1 ? v : ANTES_DE_FABRICA;
+  }
+
+  /* El momento de la cita y el del aviso (hora local), si la nota tiene hora. */
+  function cita(n) {
+    if (!n.hora) return null;
+    var d = n.para.split('-'), h = n.hora.split(':');
+    return new Date(+d[0], +d[1] - 1, +d[2], +h[0], +h[1]);
+  }
+
+  function momentoAviso(n) {
+    var c = cita(n);
+    return c ? new Date(c.getTime() - n.antes * 60000) : null;
+  }
+
+  /* Cada «Entendido» se guarda con el momento al que respondía: si luego
+     se cambia el día, la hora o la antelación, el viejo ya no cuenta. */
+  function claveAviso(n) { return n.hora ? n.para + ' ' + n.hora + ' ' + n.antes : ''; }
+
+  function atendidaPorMi(n) {
+    var yo = U.normalizar(quienSoy()), k = claveAviso(n);
+    return !!yo && n.atendido.some(function (a) { return a.m === k && U.normalizar(a.q) === yo; });
+  }
+
   function normalizar(leido) {
     var lista = (leido && leido.notas) || [];
     return lista.filter(function (n) { return n && n.texto; }).map(function (n) {
@@ -46,6 +80,13 @@
         autor: String(n.autor || ''),
         creado: String(n.creado || ''),
         para: /^\d{4}-\d{2}-\d{2}$/.test(n.para || '') ? n.para : '',
+        /* Fila 372: hora (solo con día), antelación y quién ha atendido
+           el aviso. Opcionales: las notas viejas siguen valiendo. */
+        hora: horaValida(n),
+        antes: horaValida(n) ? antesValido(n.antes) : 0,
+        atendido: (Array.isArray(n.atendido) ? n.atendido : []).filter(function (a) {
+          return a && a.q && a.m;
+        }).map(function (a) { return { q: String(a.q), m: String(a.m) }; }),
         privada: !!n.privada,
         hecha: !!n.hecha,
         hechaPor: String(n.hechaPor || ''),
@@ -85,6 +126,10 @@
     }
   }
 
+  /* Una lectura nueva del fichero, sin tocar lo que se está enseñando
+     (la usa la ventana del aviso, justo antes de salir). */
+  async function leerFresco() { return await leer(); }
+
   /* ---------- quién soy, y qué notas veo ----------
 
      Una nota privada es de quien la escribió. Se comparan los nombres
@@ -111,6 +156,7 @@
       notas = await leer();
       fallo = '';
       pintarVista();
+      if (window.TablonAvisos) TablonAvisos.revisar();
       /* Fila 353: la regla de apertura (una nota para hoy → abierto) se
          aplica al arrancar, en cuanto hay notas leídas. */
       if (!reglaAplicada && window.TablonVista && TablonVista.reglaApertura) {
@@ -152,7 +198,14 @@
     fallo: function () { return fallo; },
     laVeo: laVeo,
     quienSoy: quienSoy,
-    cambiar: cambiar
+    cambiar: cambiar,
+    leerFresco: leerFresco,
+    ANTELACIONES: ANTELACIONES,
+    ANTES_DE_FABRICA: ANTES_DE_FABRICA,
+    cita: cita,
+    momentoAviso: momentoAviso,
+    claveAviso: claveAviso,
+    atendidaPorMi: atendidaPorMi
   };
 
 })();
