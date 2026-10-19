@@ -12,4 +12,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 371 | 180 | Campos nuevos en las notas, ventana de aviso con temporizador y sonido, «Cambiar» con día y hora, fusión de conflictos, copia de pruebas y revisor |
+| 372 | 180 | Campos nuevos en las notas, ventana de aviso con temporizador y sonido, «Cambiar» con día y hora, fusión de conflictos, copia de pruebas y revisor |

@@ -1,4 +1,4 @@
-# Tablón: avisos a hora fija (fila 371)
+# Tablón: avisos a hora fija (fila 372)
 
 Tema 370 de la cola (junta la idea 369), diseñado con Francisco el 19-oct-2026.
 Aviso completo del botón de soporte: https://drive.google.com/file/d/1g-Ce_G5QH3sBhGWeglxV8hbc9B-RXd4N/view?usp=drivesdk
