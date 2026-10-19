@@ -12,6 +12,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 372 | 180 | Campos nuevos en las notas, ventana de aviso con temporizador y sonido, «Cambiar» con día y hora, fusión de conflictos, copia de pruebas y revisor |
 | 374 | 90 | Huecos por hoja en `paginar`, pulsar y arrastrar con Pointer Events (toque largo en táctil), hoja rayada en blanco en el PDF, textos, pruebas y revisor |
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
