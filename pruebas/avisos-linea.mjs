@@ -120,9 +120,12 @@ await comprobar('el chip desaparece', pagina.locator('#inicio-filtrado-por').isH
 await comprobar('la tabla vuelve a enseñar el único asunto que hay',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
 
+/* Fila 368: pulsar un aviso que filtra cierra el cuadro flotante; se vuelve a abrir. */
+await pagina.click('#avisos-linea-plegado');
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(200);
 await comprobar('vuelve a filtrar', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.click('#avisos-linea-plegado');
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(200);
 await comprobar('pulsarlo otra vez lo quita también', pagina.locator('#inicio-filtrado-por').isHidden(), true);
@@ -130,6 +133,7 @@ await comprobar('pulsarlo otra vez lo quita también', pagina.locator('#inicio-f
 /* ================= 3. "OCULTAR POR HOY" LA QUITA ================= */
 
 console.log('--- 3. "Ocultar por hoy" quita la franja entera ---');
+if (!(await pagina.locator('#avisos-linea-ocultar').isVisible())) await pagina.click('#avisos-linea-plegado');
 await pagina.click('#avisos-linea-ocultar');
 await pagina.waitForTimeout(200);
 await comprobar('la franja desaparece', pagina.locator('#avisos-linea').isHidden(), true);

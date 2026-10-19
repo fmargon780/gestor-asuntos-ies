@@ -173,6 +173,7 @@
     document.addEventListener('mousedown', function (ev) {
       var caja = $('avisos-linea');
       if (!estaAbierto() || caja.contains(ev.target)) return;
+      if (ev.target.closest && ev.target.closest('.capa, .mensajes')) return;   /* un cuadro abierto desde un aviso no pliega el cuadro */
       cerrarFlotante();
     }, true);
     document.addEventListener('keydown', function (ev) {

@@ -75,6 +75,7 @@ console.log('--- 2. el cuadro de avisos flota ---');
   const p = await abrir(1366);
   await p.waitForSelector('#avisos-linea-plegado', { timeout: 20000 });
   const primera = () => p.evaluate(() => Math.round(document.querySelector('#inicio-tabla-cuerpo tr[data-asunto]').getBoundingClientRect().top));
+  await p.waitForTimeout(1500);
   const antes = await primera();
   const abierto = () => p.evaluate(() => !!document.querySelector('#avisos-linea .avisos-linea-panel'));
   await p.click('#avisos-linea-plegado');
