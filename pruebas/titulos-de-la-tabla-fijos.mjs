@@ -51,7 +51,7 @@ await pagina.waitForTimeout(300);
 
 const cajas = () => pagina.evaluate(() => {
   const r = (s) => { const e = document.querySelector(s); const b = e.getBoundingClientRect(); return { top: Math.round(b.top), bottom: Math.round(b.bottom) }; };
-  return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('#inicio-pestanas'), th: r('.inicio-tabla thead th'), scrollY: Math.round(window.scrollY),
+  return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('.inicio-tabla-cabecera'), th: r('.inicio-tabla thead th'), scrollY: Math.round(window.scrollY),
     ha: (() => { const e = document.querySelector('#inicio-fila-superior'); return e ? Math.round(e.getBoundingClientRect().bottom) : null; })() };
 });
 /* Fila 302 (7-oct-2026): espera a que las cajas dejen de moverse (dos lecturas seguidas iguales) en vez de una
@@ -137,7 +137,7 @@ await demo.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeig
 const medirDemo = () => demo.evaluate(() => {
   const r = (s) => { const b = document.querySelector(s).getBoundingClientRect(); return { top: Math.round(b.top), bottom: Math.round(b.bottom) }; };
   const e = document.querySelector('.inicio-tabla-envoltorio');
-  return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('#inicio-pestanas'), th: r('.inicio-tabla thead th'),
+  return { cab: r('#pantalla-abiertos header.cabecera'), pest: r('.inicio-tabla-cabecera'), th: r('.inicio-tabla thead th'),
     cabe: !e.classList.contains('desborda'), y: Math.round(window.scrollY) };
 });
 /* esperar a que las posiciones se estabilicen (dos lecturas seguidas iguales), no una pausa fija */

@@ -188,7 +188,7 @@
     var b = botonNuevo('Traer el fichero desde donde lo tengas', false);
     b.className += ' btn-traer-aviso';
     var ocultar = document.getElementById('avisos-linea-ocultar');
-    if (ocultar) caja.insertBefore(b, ocultar); else caja.appendChild(b);
+    if (ocultar) ocultar.parentNode.insertBefore(b, ocultar); else caja.appendChild(b);   /* fila 368: la ✕ vive en el cuadro flotante */
   }
 
   function vigilarElAviso() {

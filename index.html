@@ -284,6 +284,8 @@
                   <input type="date" id="filtro-fecha-hasta" class="campo" aria-label="Fechas: hasta"></label>
               </span>
             </div>
+            <!-- Fila 368: solo sale si la persona ha movido alguna columna (js/inicio-columnas.js). -->
+            <button type="button" id="restablecer-columnas" class="enlace oculto">Restablecer columnas</button>
           </div>
 
           <!-- El chip "Filtrado por…" (fila 209, apartado 7): sale al
@@ -304,8 +306,8 @@
             <table class="inicio-tabla">
               <thead id="inicio-thead-normal">
                 <tr>
-                  <th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th>
-                  <th>Le toca a</th><th>Inicio</th><th></th>
+                  <th data-col="plazo">Plazo</th><th data-col="tercero">Tercero</th><th data-col="tipo">Tipo</th>
+                  <th data-col="hito">Hito actual</th><th data-col="quien">Le toca a</th><th data-col="inicio">Inicio</th><th></th>
                 </tr>
               </thead>
               <thead id="inicio-thead-liquidar" class="oculto"></thead>
@@ -1134,6 +1136,7 @@
 <script src="js/novedades.js"></script>
 <script src="js/novedades-ventana.js"></script>
 <script src="js/inicio-ordenar.js"></script>
+<script src="js/inicio-columnas.js"></script>
 <script src="js/asuntos-lista.js"></script>
 <script src="js/asuntos-lista-montones.js"></script>
 <script src="js/asuntos-lista-pintar.js"></script>

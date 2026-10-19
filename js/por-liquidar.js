@@ -346,7 +346,6 @@ window.PorLiquidar = (function () {
     var candado = window.Reservados ? Reservados.candadoHtml(a) : '';
     span.innerHTML = candado + '<b>' + (tapado ? 'Reservado' : U.escapar(QueMeToca.terceroDe(a) || a.nombre)) + '</b>';
     tdTercero.appendChild(span);
-    tr.appendChild(tdTercero);
 
     var tdTipo = document.createElement('td');
     var tipo = nombreDeTipo(a);
@@ -354,7 +353,8 @@ window.PorLiquidar = (function () {
       U.escapar(Nombres.tipoParaVer(tipo, App.E.tipos)) + '</span>';
     var numero = (a.ficha && a.ficha.numero) || (a.leido && a.leido.numero) || '';
     if (numero) tdTipo.innerHTML += '<span class="marca-numero" title="Número del asunto">' + U.escapar(numero) + '</span>';
-    tr.appendChild(tdTipo);
+
+    ordenTerceroTipo().forEach(function (c) { tr.appendChild(c === 'tipo' ? tdTipo : tdTercero); });
 
     var tdDesde = document.createElement('td');
     tdDesde.textContent = U.fechaCorta(U.fechaLegible(a.ficha.porLiquidar.desde));
@@ -378,9 +378,14 @@ window.PorLiquidar = (function () {
     return tr;
   }
 
+  /* Fila 368: Tercero y Tipo siguen el orden elegido en Inicio (js/inicio-columnas.js); las propias, detrás, como siempre. */
+  var TITULOS = { tercero: 'Tercero', tipo: 'Tipo' };
+  function ordenTerceroTipo() { return window.InicioColumnas ? InicioColumnas.ordenLiquidar() : ['tercero', 'tipo']; }
+
   function cabecera(conImporte) {
     return '<tr><th class="liq-casilla"><input type="checkbox" id="liq-todos" title="Marcar todos los que se ven"></th>' +
-      '<th>Tercero</th><th>Tipo</th><th>Por liquidar desde</th>' + (conImporte ? '<th>Importe</th>' : '') + '</tr>';
+      ordenTerceroTipo().map(function (c) { return '<th data-col="' + c + '">' + TITULOS[c] + '</th>'; }).join('') +
+      '<th data-col="desde">Por liquidar desde</th>' + (conImporte ? '<th data-col="importe">Importe</th>' : '') + '</tr>';
   }
 
   /* Pinta la pestaña con `asuntos` (ya filtrados). Cambia la cabecera de
