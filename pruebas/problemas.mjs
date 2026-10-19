@@ -50,6 +50,7 @@ await comprobar('1. el botón «Ajustes» del menú lleva el punto ámbar, con e
   pagina.locator('.pestana[data-pantalla="ajustes"] #punto-problemas').evaluate((p) => [!p.classList.contains('oculto'), p.title]), [true, n + ' problemas por resolver']);
 
 console.log('--- 2. del trozo a la pestaña ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="problemas"]');
 await pagina.waitForTimeout(800);
 await comprobar('2. abre Ajustes en la pestaña «Problemas (N)»',
@@ -164,6 +165,7 @@ await pagina.locator('[data-problema="carpetas"]').getByRole('button', { name: '
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction(() => !document.querySelector('[data-problema="carpetas"]'), null, { timeout: 15000 });
 await pagina.waitForTimeout(500);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('4. sin asuntos perdidos, el número baja en la pestaña, en Inicio y en el menú',
   pagina.evaluate((k) => [document.querySelector('[data-ajustes-pestana="problemas"]').textContent.trim(), document.querySelector('[data-aviso="problemas"]').textContent, document.getElementById('punto-problemas').title],
     n - 1),

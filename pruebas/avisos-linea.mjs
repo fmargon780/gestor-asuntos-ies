@@ -92,6 +92,7 @@ await pagina.waitForSelector('#avisos-linea:not(.oculto)');
 
 console.log('--- 1. una sola franja, con los trozos que tocan ---');
 await comprobar('la franja se ve', pagina.locator('#avisos-linea').isVisible(), true);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('hay al menos dos trozos', pagina.locator('.avisos-linea-trozo').count().then((n) => n >= 2), true);
 await comprobar('el trozo de vencidos dice "1 vencido"',
   pagina.locator('[data-aviso="vencidos"]').textContent(), '1 vencido');
@@ -103,6 +104,7 @@ await comprobar('la franja es roja: hay algo vencido',
 /* ================= 2. PULSAR "VENCIDOS" FILTRA LA TABLA (fila 209) ================= */
 
 console.log('--- 2. pulsar "vencidos" filtra la tabla con el chip "Filtrado por…" ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(300);
 await comprobar('sale el chip "Filtrado por…"', pagina.locator('#inicio-filtrado-por').isVisible(), true);
@@ -121,11 +123,11 @@ await comprobar('la tabla vuelve a enseñar el único asunto que hay',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
 
 /* Fila 368: pulsar un aviso que filtra cierra el cuadro flotante; se vuelve a abrir. */
-await pagina.click('#avisos-linea-plegado');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(200);
 await comprobar('vuelve a filtrar', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
-await pagina.click('#avisos-linea-plegado');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(200);
 await comprobar('pulsarlo otra vez lo quita también', pagina.locator('#inicio-filtrado-por').isHidden(), true);
@@ -133,7 +135,7 @@ await comprobar('pulsarlo otra vez lo quita también', pagina.locator('#inicio-f
 /* ================= 3. "OCULTAR POR HOY" LA QUITA ================= */
 
 console.log('--- 3. "Ocultar por hoy" quita la franja entera ---');
-if (!(await pagina.locator('#avisos-linea-ocultar').isVisible())) await pagina.click('#avisos-linea-plegado');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await pagina.click('#avisos-linea-ocultar');
 await pagina.waitForTimeout(200);
 await comprobar('la franja desaparece', pagina.locator('#avisos-linea').isHidden(), true);

@@ -166,9 +166,12 @@ await comprobar('"Copias de seguridad" es una sola sección, con la caducidad de
 console.log('--- 5. los avisos de la franja llevan a Herramientas ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="papelera-vieja"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="frescura"]');
 
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="papelera-vieja"]');
 await pagina.waitForTimeout(200);
 await comprobar('el aviso de papelera vieja lleva a Herramientas, con Papelera abierta',
@@ -178,7 +181,9 @@ await comprobar('el aviso de papelera vieja lleva a Herramientas, con Papelera a
   })), { pantalla: 'herramientas', papeleraAbierta: true });
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="frescura"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="frescura"]');
 await pagina.waitForTimeout(200);
 /* Fila 291: el trozo lleva a su tarjeta de «Problemas»; su botón «Traer el alumnado» es el que lleva a Herramientas. */

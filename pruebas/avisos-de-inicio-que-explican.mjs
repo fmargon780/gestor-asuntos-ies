@@ -26,15 +26,19 @@ pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor.inicio.plegados', '{\"avisos\":false,\"tablon\":false}'); } catch (e) {}");
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="recurrentes"]', { timeout: 30000 });
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="aspirantes"]', { timeout: 30000 });
 await pagina.waitForTimeout(800);
 
 const facturas = () => pagina.evaluate(() => Object.keys(App.E.registro.asuntos).filter((k) => /FACTURA/.test(k)).length);
 
 console.log('--- 1. los asuntos que se repiten ---');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await comprobar('1. el aviso lo dice', pagina.locator('[data-aviso="recurrentes"]').textContent(), '1 asunto que se repite toca crearlo');
 const antes = await facturas();
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="recurrentes"]');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('1. se abre un cuadro con la lista (tipo y tercero) y los botones «Crear 1 asunto» y «Cancelar»',
@@ -43,19 +47,25 @@ await comprobar('1. se abre un cuadro con la lista (tipo y tercero) y los botone
   ['Crear 1 asunto', 'Cancelar', ['FACTURA · Copistería Central 99887766X']]);
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(500);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await comprobar('1. «Cancelar»: no se ha creado ninguno y el aviso sigue', [await facturas(), await pagina.locator('[data-aviso="recurrentes"]').count()], [antes, 1]);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="recurrentes"]');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction((n) => Object.keys(App.E.registro.asuntos).filter((k) => /FACTURA/.test(k)).length === n, antes + 1, { timeout: 15000 });
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await comprobar('1. «Crear»: se crea y el aviso desaparece', pagina.waitForFunction(() => !document.querySelector('[data-aviso="recurrentes"]'), null, { timeout: 15000 }).then(() => true), true);
 
 console.log('--- 2. los aspirantes sin número ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.waitForTimeout(800);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.waitForSelector('[data-aviso="aspirantes"]');
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await comprobar('2. el aviso lo dice', pagina.locator('[data-aviso="aspirantes"]').textContent(), '1 aspirante sin Nº de identificación escolar');
 await comprobar('2. antes de pulsar, la línea no se ve', pagina.locator('#personas-aviso-aspirantes').isHidden(), true);
+await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('[data-aviso="aspirantes"]');
 await pagina.waitForTimeout(500);
 await comprobar('2. lleva a la lista de alumnado y encima sale la línea con lo que hay que hacer',
