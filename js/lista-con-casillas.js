@@ -6,16 +6,14 @@
    Solo cuentan las marcadas. Lo desmarcado se guarda en `desmarcadas` ({ clave: true }), que vive tanto como
    el cuadro: al rehacerse la lista, las personas nuevas entran marcadas y las que siguen desmarcadas, así.
 
-   - html(items, desmarcadas, op) → «N de M marcadas», «Marcar todas», «Desmarcar todas» y la lista (hasta
-     `op.tope`, 200; el resto cuenta igual). `items`: [{ clave, texto, anadida? }] (anadida: lleva la marca
-     «añadida» y una ✕ para quitarla). `op`: { id, tope, abierta }.
+   - html(items, desmarcadas, op) → «N de M marcadas», «Marcar todas», «Desmarcar todas» y la lista (todos
+     los items, sin tope). `items`: [{ clave, texto, anadida? }] (anadida: lleva la marca
+     «añadida» y una ✕ para quitarla). `op`: { id }.
    - enganchar(raiz, items, desmarcadas, { alCambiar, alQuitar }): alCambiar() tras marcar o desmarcar;
      alQuitar(clave) al pulsar la ✕ de una añadida. Conserva la posición de la lista y el foco al repintar.
    - marcadas(items, desmarcadas) → los items marcados.
    ============================================================ */
 var ListaConCasillas = (function () {
-
-  var TOPE = 200;
 
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
 
@@ -29,15 +27,14 @@ var ListaConCasillas = (function () {
 
   function html(items, desmarcadas, op) {
     op = op || {};
-    var tope = op.tope || TOPE;
     return '<div class="cc" data-cc-id="' + esc(op.id || '') + '">' +
       '<p class="cc-barra"><span class="cc-cuenta" aria-live="polite">' + esc(cuenta(items, desmarcadas)) + '</span> · ' +
       '<button type="button" class="enlace" data-cc="todas">Marcar todas</button> · ' +
       '<button type="button" class="enlace" data-cc="ninguna">Desmarcar todas</button></p>' +
-      '<ul class="cc-lista">' + items.slice(0, tope).map(function (it) {
+      '<ul class="cc-lista">' + items.map(function (it) {
         return '<li><label><input type="checkbox" data-cc-clave="' + esc(it.clave) + '"' + (desmarcadas[it.clave] ? '' : ' checked') + '> <span>' + esc(it.texto) + '</span></label>' +
           (it.anadida ? ' <span class="cc-marca">añadida</span> <button type="button" class="boton boton-mini" data-cc-quitar="' + esc(it.clave) + '" aria-label="Quitar a ' + esc(it.texto) + '">✕</button>' : '') + '</li>';
-      }).join('') + (items.length > tope ? '<li class="suave">…y ' + (items.length - tope) + ' más (cuentan igual).</li>' : '') + '</ul></div>';
+      }).join('') + '</ul></div>';
   }
 
   function enganchar(raiz, items, desmarcadas, op) {
