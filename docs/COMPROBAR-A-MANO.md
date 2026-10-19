@@ -289,3 +289,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 352 — aviso al claustro desde el personal docente (16-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Con los datos reales, en una actividad pulsa «Avisar al claustro»: la Copia oculta lleva al profesorado que está hoy en el centro y **no** sale el correo de Bonilla Cascado, Manuel (ya no está), ni el del personal no docente. Si a algún docente le falta el correo, sale el aviso ámbar con su nombre.
+- [ ] **El orden de columnas de Inicio, con los datos reales y en dos ordenadores (fila 368, `docs/INICIO-COLOCACION-Y-COLUMNAS.md`).**
+      En el ordenador del centro, arrastrar los títulos de Inicio hasta dejar Inicio · Tipo · Tercero · Plazo · Hito actual · Le
+      toca a; después entrar con el mismo nombre en otro ordenador. Ver: que sale en el mismo orden en los dos, y que
+      «Restablecer columnas» (en «Filtros») vuelve al de siempre.
