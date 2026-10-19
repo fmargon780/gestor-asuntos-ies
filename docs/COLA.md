@@ -174,6 +174,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 364 | Tema: guardar sin perder nada y archivar más rápido. Junta las ideas 360 y 361: saber si los tres guardados fallidos de `asuntos.json` perdieron algo y por qué hay tantos reintentos, y acortar lo que tarda archivar un asunto. Primero la 361, que es la más seria. | DECIDIDA (18-oct-2026) · tema |
 | 365 | Tema: arreglar una prueba interna. Junta la idea 358: que la prueba `pruebas/centro-de-datos.mjs` no falle sin motivo real. No cambia nada en pantalla. | DECIDIDA (18-oct-2026) · tema |
 | 366 | Control de entrega, devolución y estado de los libros de texto, para ayudar a la secretaria; quizá app propia; sale de la reflexión del 18-oct-2026 (tema 363) | IDEA (18-oct-2026) |
+| 368 | Aviso de usuario: mejora en «Inicio» | IDEA (19-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16HZgbiZcBoVQz21ZdIDDXXEEnEB689G6/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
