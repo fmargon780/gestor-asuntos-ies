@@ -174,6 +174,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 383 | Cuando creamos un asunto desde un documento que está en la bandeja de documentos Por Clasificar, el sistema nos lleva directamente al asunto creado? Si la respuesta es negativa, hay que modificar el comportamiento y hacer que nos dirija, o al menos que nos lo ofrezca de forma predeterminada y visible. | IDEA (20-oct-2026): apuntada por Francisco desde el Centro de mando |
 | 384 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1yeI_N1loBPHLPw6aIv-fsDKFXuamVNhS/view?usp=drivesdk |
 | 385 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1jP5_vPA0mibX-IgfbhK9pGbvoZLgO3Fn/view?usp=drivesdk |
+| 386 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1KqvA6l5fleeh98jtyBrFCzsS3xVBZ1tQ/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
