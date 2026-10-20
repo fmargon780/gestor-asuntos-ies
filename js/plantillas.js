@@ -80,6 +80,9 @@ var Plantillas = (function () {
     { clave: 'provincia', etiqueta: 'Provincia del centro' },
     { clave: 'direccionCentro', etiqueta: 'Dirección del centro' },
     { clave: 'codigoCentro', etiqueta: 'Código del centro' },
+    /* Fila 375 (docs/TELEFONO-Y-CORREO-DEL-CENTRO.md): los del centro, del Centro de datos. No son `telefono` ni `correo`, que son de la persona del asunto. */
+    { clave: 'telefono del centro', etiqueta: 'Teléfono del centro (del Centro de datos)' },
+    { clave: 'correo del centro', etiqueta: 'Correo común del centro (del Centro de datos)' },
     { clave: 'cargo', etiqueta: 'Cargo de quien firma' },
     { clave: 'firma', etiqueta: 'Firma completa, ya rellena' },
     /* Administraciones (fila 167): el departamento elegido en el asunto. */
@@ -350,7 +353,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
+  var SIN_FALTA = ['telefono del centro', 'correo del centro', 'hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que

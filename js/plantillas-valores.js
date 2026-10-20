@@ -202,6 +202,14 @@
     return Plantillas.enMemoria() || I.limpio(null);
   }
 
+  /* Fila 375: el teléfono y el correo común del centro, tal como los apuntó el Centro de datos
+     (`_GESTOR/centro-de-datos.json`, `configuracion`). Vacíos si no han llegado. */
+  async function telefonoYCorreoDelCentro() {
+    var ap = null;
+    try { ap = window.CentroDeDatos ? (await CentroDeDatos.leerApuntes()).configuracion : null; } catch (e) { ap = null; }
+    return { telefono: String((ap && ap.telefono) || '').trim(), correo: String((ap && ap.direccionDelCentro) || '').trim() };
+  }
+
   /* La función de la que habla 3.1: un solo argumento, el asunto tal y
      como lo trae `App.E.listaAbiertos`/`App.E.listaArchivo` (con
      `.ficha`, `.leido` y, si tiene carpeta, `.handle`). Async porque
@@ -221,6 +229,7 @@
     var fechaBase = /^\d{4}-\d{2}-\d{2}$/.test(op.fecha || '') ? op.fecha : '';
     var dateBase = fechaBase ? new Date(+fechaBase.slice(0, 4), +fechaBase.slice(5, 7) - 1, +fechaBase.slice(8, 10)) : null;
 
+    var delCentro = await telefonoYCorreoDelCentro();
     var valores = {
       nombre: soloElNombreDe(terceroTexto),
       nombreNatural: nombreNaturalDe(terceroTexto, categoria),
@@ -247,6 +256,8 @@
       provincia: datosCentro.provincia || '',
       direccionCentro: datosCentro.direccion || '',
       codigoCentro: datosCentro.codigo || '',
+      'telefono del centro': delCentro.telefono,
+      'correo del centro': delCentro.correo,
       cargo: datosCentro.cargo || '',
       consejeria: datosCentro.consejeria || I.POR_DEFECTO_CONSEJERIA || '',
       campos: camposDelAsuntoDe(a)
@@ -416,6 +427,7 @@
 
   Plantillas.nombreNaturalDe = nombreNaturalDe;   /* fila 309 */
   Plantillas.valoresDeAsunto = valoresDeAsunto;
+  Plantillas.telefonoYCorreoDelCentro = telefonoYCorreoDelCentro;   /* fila 375 */
   Plantillas.asuntoParaPersona = asuntoParaPersona;
   Plantillas.valoresDePersona = valoresDePersona;
 })();
