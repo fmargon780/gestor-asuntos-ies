@@ -665,6 +665,10 @@
     App.E.tipos = [];
     await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, []);
     await escribirDatos();
+    /* Fila 375: el teléfono y el correo del centro, como si ya vinieran del Centro de datos (sin señalar su carpeta). */
+    try {
+      if (window.CentroDeDatos) await CentroDeDatos.apuntarConfiguracion({ actualizado: '', actualizadoPor: '', tomadoEl: new Date().toISOString(), vienen: [], telefono: '958000000', direccionDelCentro: 'secretaria@centro-demo.es', web: '' });
+    } catch (e) { /* sin esos dos datos, los huecos salen en blanco */ }
     /* Fila 249: quien ocupa Secretaría, para «Recibe» al liquidar. */
     try { if (window.Cargos) await Cargos.anadirOcupante('secretaria', 'Fernando Reyes Palma', '2020-09-01', 'H'); } catch (e) { /* sin cargo, «Recibe» sale vacío */ }
     try { if (window.Demo.cargos) await Demo.cargos.escribir(); } catch (e) { /* sin cargos de Dirección */ }   /* fila 330 */
