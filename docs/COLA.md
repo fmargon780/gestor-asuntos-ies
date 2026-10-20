@@ -169,6 +169,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 378 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ooLwLICNXK2XVIPKe1ULkgRV85VGdjJw/view?usp=drivesdk |
 | 379 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1QlUpSEmy8lu1Sfa4cIxmy1mzmQkFLJVF/view?usp=drivesdk |
 | 380 | Aviso de usuario: mejora en «Ajustes» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1RXPVAxxKuLX5BSQ4XC_rOr2-1cMBd4Hm/view?usp=drivesdk |
+| 381 | Aviso de usuario: mejora en «Inicio» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1dBeEMvzO0qiF7LbLkRAgxtEcQSW9U_i3/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
