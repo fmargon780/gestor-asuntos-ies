@@ -4,7 +4,7 @@
    Granada» (asunto de grupo con 2º B y 3º A); una BAJA MEDICA (personal).
 
    1. «+ Tutor/a de <unidad>» junto a «Para» y a «Copia oculta»: añade el correo a su campo, sin repetir al pulsar otra vez.
-   2. Sin correo en la ficha del tutor: botón apagado y aviso ámbar «Falta el correo del tutor/a de …»; sin tutor, igual.
+   2. Sin correo en la ficha del tutor: botón apagado y aviso ámbar «Falta el correo del tutor/a de …»; sin tutor, «No sé quién es el tutor o tutora de … Las tutorías se suben al Centro de datos.».
    3. Dos tutores: se añaden los dos. Un tercero que no es alumnado: no sale el botón.
    4. Asunto de grupo con dos unidades: «+ Tutores (2 grupos)», añade los que hay y avisa de la unidad que falta.
    5. «Va a:» de la plantilla: con «El tutor o tutora», «Para» lleva solo a los tutores y el saludo es «Buenas:»; con «La familia», solo la familia.
@@ -81,7 +81,7 @@ await comprobar('2. tutora sin correo: botón apagado y aviso ámbar', Promise.a
 await comprobar('2. el aviso lleva su enlace a las tablas de datos', pagina.locator('.correo-tutor-completar').count(), 1);
 await cerrar();
 await abrir('SANCION Klein Soto');
-await comprobar('2. unidad sin tutor: botón apagado y aviso', Promise.all([botones().then((b) => b[0][2]), faltas()]), [true, ['Falta el correo del tutor/a de 1º C']]);
+await comprobar('2. unidad sin tutor: botón apagado y aviso', Promise.all([botones().then((b) => b[0][2]), faltas()]), [true, ['No sé quién es el tutor o tutora de 1º C. Las tutorías se suben al Centro de datos.']]);
 await cerrar();
 
 /* ===== 3. Dos tutores, y quien no es alumnado ===== */
@@ -98,7 +98,7 @@ await cerrar();
 console.log('--- 4. asunto de grupo ---');
 await abrir('GRUPO Visita Granada');
 await comprobar('4. un solo botón por campo: «+ Tutores (2 grupos)»', botones(), [['para', '+ Tutores (2 grupos)', false], ['cco', '+ Tutores (2 grupos)', false]]);
-await comprobar('4. y el aviso de la unidad a la que le falta el correo', faltas(), ['Falta el correo del tutor/a de 3º A']);
+await comprobar('4. y el aviso de la unidad a la que le falta el correo', faltas(), ['No sé quién es el tutor o tutora de 3º A. Las tutorías se suben al Centro de datos.']);
 await pagina.click('.correo-tutor-anadir[data-zona="cco"]');
 await comprobar('4. añade los correos que hay', (await para()).cco.sort(), [FERNANDO, PATRICIA]);
 await cerrar();
