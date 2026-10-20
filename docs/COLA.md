@@ -171,6 +171,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 380 | Aviso de usuario: mejora en «Ajustes» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1RXPVAxxKuLX5BSQ4XC_rOr2-1cMBd4Hm/view?usp=drivesdk |
 | 381 | Aviso de usuario: mejora en «Inicio» | IDEA (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1dBeEMvzO0qiF7LbLkRAgxtEcQSW9U_i3/view?usp=drivesdk |
 | 382 | Aviso de usuario: error en «Ficha de un asunto» | EN DISEÑO (20-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1h4ZM6kobzH4i0pfiI_VpHKEp7bW46MEH/view?usp=drivesdk |
+| 383 | Cuando creamos un asunto desde un documento que está en la bandeja de documentos Por Clasificar, el sistema nos lleva directamente al asunto creado? Si la respuesta es negativa, hay que modificar el comportamiento y hacer que nos dirija, o al menos que nos lo ofrezca de forma predeterminada y visible. | IDEA (20-oct-2026): apuntada por Francisco desde el Centro de mando |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
