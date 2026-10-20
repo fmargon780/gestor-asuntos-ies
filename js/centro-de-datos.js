@@ -189,7 +189,7 @@ var CentroDeDatos = (function () {
     var mejor = null;
     Object.keys((apuntes && apuntes.tomado) || {}).forEach(function (k) {
       var deClave = k.split('|')[0];
-      if (deClave !== clave && !(clave === 'personal' && deClave === 'hecho-personal')) return;   /* fila 327 */
+      if (deClave !== clave && !(clave === 'personal' && deClave === 'hecho-personal') && !(clave === 'tutorias' && deClave === 'hecho-tutorias')) return;   /* filas 327 y 376 */
       var a = apuntes.tomado[k];
       if (!mejor || new Date(a.subido) > new Date(mejor.subido)) mejor = a;
     });
@@ -231,7 +231,7 @@ var CentroDeDatos = (function () {
     }
     var personalEnBruto = de('personal').filter(function (e) { return !(e.cursoEscolar && conParte[e.cursoEscolar]); });
     var elegidas = [].concat(unica('alumnado', 'alumnado'), unica('alumnado-bd', 'alumnado de la base de datos'), personalEnBruto,
-      delCurso('tutorias'), de('consejo-escolar'), delCurso('registro-entrada'), delCurso('registro-salida'));
+      de('consejo-escolar'), delCurso('registro-entrada'), delCurso('registro-salida'));
     var lista = todas.filter(function (e) { return elegidas.indexOf(e) !== -1; });   /* en el orden del índice */
     return { lista: lista, avisos: avisos, cursoActual: cursoActual };
   }
@@ -367,6 +367,17 @@ var CentroDeDatos = (function () {
         delPersonal.fallos.forEach(function (f) { salida.fallos.push(f); });
         if (delPersonal.cursos.length) salida.tomados.push('personal');
       }
+      /* Fila 376: las tutorías ya preparadas (todos los cursos). El PDF de la función tutorial ya no se toma. */
+      var delTutor = null;
+      if (window.CentroDeDatosTutorias) {
+        try { delTutor = await CentroDeDatosTutorias.tomar(dir, r.indice, apuntes, op, ctx); }
+        catch (x) { salida.fallos.push('Tutorías: ' + U.mensajeDeError(x)); }
+      }
+      if (delTutor) {
+        Object.keys(delTutor.nuevos).forEach(function (k) { nuevos[k] = delTutor.nuevos[k]; });
+        delTutor.fallos.forEach(function (f) { salida.fallos.push(f); });
+        if (delTutor.cursos.length) salida.tomados.push('tutorias');
+      }
       await R.terminar(ctx);
       await apuntar(nuevos);
       if (delPersonal && delPersonal.cursos.length && window.Problemas) Problemas.recalcular('personal');   /* fila 327: sus avisos */
@@ -382,6 +393,7 @@ var CentroDeDatos = (function () {
           }
         });
         if (delPersonal && delPersonal.cursos.length && !vistos.personal) partes.push(TITULOS.personal + ' (' + fechaCorta(delPersonal.subido, false) + ')');
+        if (delTutor && delTutor.cursos.length && !vistos.tutorias) partes.push(TITULOS.tutorias + ' (' + fechaCorta(delTutor.subido, false) + ')');
         avisarTraido(partes, config);
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');

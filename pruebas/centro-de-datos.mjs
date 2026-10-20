@@ -137,28 +137,28 @@ const TODO = [
   { clave: 'matricula', fichero: 'otra.csv', ruta: 'listados/matricula/otra.csv', texto: 'a;b\r\n', subido: MANANA, huella: 'h-mat-1' }
 ];
 await montar({ listados: TODO });
-await comprobar('traer: se toman los cinco del gestor y no «matricula»',
+await comprobar('traer: se toman los cuatro del gestor (la función tutorial en PDF ya no, fila 376) y no «matricula»',
   pagina.evaluate(async () => { const r = await CentroDeDatos.traer({ avisar: false, pedir: true }); return [r.ok, r.tomados, r.fallos]; }),
-  [true, ['alumnado', 'personal', 'alumnado-bd', 'tutorias', 'consejo-escolar'], []]);
+  [true, ['alumnado', 'personal', 'alumnado-bd', 'consejo-escolar'], []]);
 await comprobar('el RegAlum queda copiado byte a byte',
   pagina.evaluate(async (bytes) => {
     const h = await App.E.datos.getFileHandle('RegAlum.csv');
     const mio = new Uint8Array(await (await h.getFile()).arrayBuffer());
     return mio.length === bytes.length && bytes.every((b, i) => b === mio[i]);
   }, REGALUM_LATIN1), true);
-await comprobar('el personal conserva su nombre, el de la base de datos se valida y copia, la tutoría va tal cual',
+await comprobar('el personal conserva su nombre, el de la base de datos se valida y copia, el PDF de la tutoría no se copia (fila 376)',
   pagina.evaluate(async () => {
     const dentro = async (n) => { try { await App.E.datos.getFileHandle(n); return true; } catch (e) { return false; } };
     return [await dentro('RelPerCen 26-27.csv'), await dentro('ALUMNADO-BD.json'), await dentro('Función Tutorial 2025-2026.pdf')];
-  }), [true, true, true]);
+  }), [true, true, false]);
 await comprobar('el Consejo Escolar va a Tablas con su nombre limpio',
   pagina.evaluate(async () => { const t = await App.E.datos.getDirectoryHandle('Tablas'); const n = []; for await (const [k] of t.entries()) n.push(k); return n; }),
   ['RegMieConEsc 2025-2026.csv']);
 await comprobar('quedan apuntados por clave y variante',
-  apuntes(), ['alumnado-bd|', 'alumnado|', 'consejo-escolar|2025-2026', 'personal|26-27', 'tutorias|']);
+  apuntes(), ['alumnado-bd|', 'alumnado|', 'consejo-escolar|2025-2026', 'personal|26-27']);
 await comprobar('y sale un solo aviso verde con lo traído',
   pagina.evaluate(() => window.__avisos.filter((a) => /Traído del Centro de datos/.test(a[0])).map((a) => [a[0].replace(/\(\d+-\w+\)/g, '(F)'), a[1]])),
-  [['Traído del Centro de datos: Alumnado (F), Personal (F), Alumnado de la base de datos (F), Función tutorial (F), Consejo Escolar (F).', 'bueno']]);
+  [['Traído del Centro de datos: Alumnado (F), Personal (F), Alumnado de la base de datos (F), Consejo Escolar (F).', 'bueno']]);
 await comprobar('el alumnado nuevo ya se ve en la aplicación (sin recargar la página)',
   pagina.evaluate(async () => { await new Promise((r) => setTimeout(r, 1500)); const f = await Datos.cargar(App.E.datos, 'ALUMNADO'); return f.lista.length; }), 4);
 
@@ -289,7 +289,7 @@ await comprobar('las líneas grises dicen de cuándo son los datos, en los tres 
     await CentroDeDatosVer.pintar();
     const t = (sel) => [...document.querySelectorAll(sel + ' .centro-linea')].map((x) => x.dataset.clave);
     return [t('[data-centro-lineas="seneca"]'), t('[data-centro-lineas="tablas"]')];
-  }), [[], ['tutorias', 'consejo-escolar']]);
+  }), [[], ['consejo-escolar']]);
 await comprobar('fila 319: lo del personal lo dice la tabla «Lo que tengo ahora»: del Centro de datos y quién lo subió',
   pagina.evaluate(async () => { const ap = (await DatosQueTengo.leerApuntes(true)).ficheros; const k = Object.keys(ap).find((n) => /^RelPerCen/.test(n)); return DatosQueTengo.porDondeLlego(ap[k]); }),   /* el disco de esta prueba no da fecha a los ficheros: se mira el apunte */
   'Del Centro de datos. Lo subió direccion.');
@@ -341,8 +341,8 @@ await montar({ contrato: 2, cursoActual: CURSO, listados: [
   ent('tutorias', '25-26', 'Función Tutorial 2035-2036.pdf', 'pdf viejo', { cursoEscolar: '25-26' }),
   ent('tutorias', CURSO, 'Función Tutorial 2036-2037.pdf', 'pdf nuevo', { cursoEscolar: CURSO })
 ] });
-await comprobar('tutorías de dos cursos: solo se copia la de este',
-  pagina.evaluate(async () => { await CentroDeDatos.traer({}); const dentro = async (n) => { try { await App.E.datos.getFileHandle(n); return true; } catch (e) { return false; } }; return [await dentro('Función Tutorial 2035-2036.pdf'), await dentro('Función Tutorial 2036-2037.pdf')]; }), [false, true]);
+await comprobar('tutorías en PDF de dos cursos: ya no se copia ninguna (fila 376: el tutor viene de las fichas)',
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); const dentro = async (n) => { try { await App.E.datos.getFileHandle(n); return true; } catch (e) { return false; } }; return [await dentro('Función Tutorial 2035-2036.pdf'), await dentro('Función Tutorial 2036-2037.pdf')]; }), [false, false]);
 await limpiar();
 await montar({ contrato: 2, cursoActual: CURSO, listados: [ent('tutorias', '24-25', 'Función Tutorial 2024-2025.pdf', 'pdf viejo', { cursoEscolar: '24-25' })] });
 await comprobar('con solo la tutoría de un curso viejo no se copia ninguna',

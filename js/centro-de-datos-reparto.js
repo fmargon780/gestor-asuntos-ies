@@ -7,7 +7,8 @@
 
      alumnado, personal  → TraerDatos.copiarUno (js/traer-datos.js)
      alumnado-bd         → AlumnadoBD.aceptar (js/alumnado-bd.js)
-     tutorias            → copia del PDF a _GESTOR/datos (lo lee TablasDatos)
+     tutorias            → ya no (fila 376): el tutor viene de las partes `hecho/tutorias`,
+                           js/centro-de-datos-tutorias.js
      consejo-escolar     → TablasDatosPantalla.anadirFicherosDelConsejo
      registro-*          → ControlRegistro.subir (pide la fecha «Revisar desde»)
 
@@ -49,7 +50,6 @@ var CentroDeDatosReparto = (function () {
     if (!d) return 0;
     if (e.clave === 'alumnado') return Carpetas.fechaFichero(d, 'RegAlum.csv');
     if (e.clave === 'personal') return Carpetas.fechaFichero(d, nombreDePersonal(e, elegidas));
-    if (e.clave === 'tutorias') return Carpetas.fechaFichero(d, e.fichero || '');
     if (e.clave === 'alumnado-bd') {
       var copia = await AlumnadoBD.leer();
       var t = copia && new Date(copia.generado).getTime();
@@ -88,8 +88,6 @@ var CentroDeDatosReparto = (function () {
         ctx.repasar = ctx.repasar || r.copiado;
         return r.copiado;
       }
-      case 'tutorias':
-        await Carpetas.copiarFicheroEn(datos(), h, e.fichero || h.name); ctx.tablas = true; return true;
       case 'consejo-escolar': {
         var puestos = await TablasDatosPantalla.anadirFicherosDelConsejo([await h.getFile()], { sustituir: true, silencioso: true });
         ctx.tablas = true;

@@ -355,6 +355,7 @@ de `App` va después del fichero que lo define.
 | `js/docx-tabla.js` | `Docx.ponerTabla`, `Docx.resaltarFaltas` y `Docx.textoDelDocumento`: las tablas de datos en un Word y lo que falta en amarillo (fila 110) |
 | `js/genero.js` | El masculino o el femenino en las plantillas: `Genero.resolver` (formas dobles como «alumno/a», marcas `:tutor1`/`:firmante`…), los sexos de cada persona (`sexosDeAsunto`, `_GESTOR/sexos.json`) y la casilla Sexo de «Datos y contacto» (fila 111) |
 | `js/tablas-datos-leer.js` | Leer las tablas de datos: el PDF de funciones tutoriales de Séneca por posiciones, y CSV/Excel de `datos/Tablas` (fila 110) |
+| `js/tablas-datos-tutorias.js` | Lee las fichas `TUTORIAS-HECHO <curso>.json` y las deja como la tabla TUTORIAS de siempre; avisa de los PDF sueltos de un curso que el Centro de datos no trae (fila 376) |
 | `js/tablas-datos-consejo.js` | La tabla CONSEJO ESCOLAR (`TablasDatosConsejo`, fila 238): leer los CSV `RegMieConEsc`, unirlos en una fila por nombramiento y sus celdas para el Word. Carga después de `js/tablas-datos-cursos.js` |
 | `pruebas/consejo-escolar.mjs` | Prueba (navegador de verdad, fila 238): leer, unir, tabla por nombre, Word, subir ficheros y `{{DNI}}` de reserva |
 | `js/tablas-datos-cursos.js` | Entender el campo «Cursos que pide» («2017/18, 19-20», «2017-2018 a 2019-2020»…) para filtrar `{{TABLA TUTORIAS}}` (`TablasDatosCursos`, fila 123) |
@@ -387,6 +388,7 @@ de `App` va después del fichero que lo define.
 | `js/demo/entrega.js` | `?entregar=1`, `?recibe=0`, `?sinescribir=1` de la copia de pruebas (fila 328) |
 | `pruebas/centro-de-datos-entregar.mjs` | Prueba en navegador (fila 328): la entrega de empresas, sus id, no repetir, cambios, vacía, fallos, solo escribir ese fichero, solo permiso de leer y la comprobación al entrar |
 | `js/centro-de-datos-personal.js` | Toma las partes del personal ya preparadas por el Centro de datos (huella SHA-256, copia a `_GESTOR/datos/PERSONAL-HECHO <curso>.json`, apunte `hecho-personal|<curso>`) (fila 327) |
+| `js/centro-de-datos-tutorias.js` | Toma las partes de tutorías ya preparadas por el Centro de datos, de todos los cursos (huella SHA-256, copia a `_GESTOR/datos/TUTORIAS-HECHO <curso>.json`, apunte `hecho-tutorias|<curso>`) (fila 376) |
 | `js/datos-personal-hecho.js` | Convierte una parte del personal en las filas de un RelPerCen (`filasDe`, `vale`, `avisosDe`) (fila 327) |
 | `js/problemas-personal.js` | Las tres tarjetas de Ajustes → Problemas con los avisos del personal del curso más alto (fila 327) |
 | `js/demo/personal-hecho.js` | `?personalhecho=avisos|limpio|amano` de la copia de pruebas (fila 327) |

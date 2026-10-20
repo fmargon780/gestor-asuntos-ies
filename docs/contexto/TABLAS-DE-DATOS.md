@@ -11,19 +11,22 @@ de datos (`App.E.datos`, `_GESTOR/datos`), y se unen a la persona por los dígit
 (`clave`, lo mismo que `Datos.clavePersona`, ahora exportada); si solo se tienen los 4 últimos
 caracteres, por esos 4 y el nombre.
 
-- **TUTORIAS**: los PDF cuyo nombre normalizado empieza por `funcion tutorial` o `relfuntut`. Los lee
-  `js/tablas-datos-leer.js` (`TablasDatosLeer.tutoriasDePdf`) con pdf.js **por posiciones**: los
-  trozos se agrupan en líneas (misma página, ±3 de altura) y cada trozo va a la columna cuya
-  cabecera (`Unidad`, `Empleado/a`, `D.N.I.`, `Periodo`) empieza a su izquierda. Bloque 1,
-  «procedentes de tutorías de unidades»; bloque 2, «Pedagogía Terapéutica… Diversificación», con
-  grupo «Pedagogía Terapéutica, Audición y Lenguaje o Diversificación». Una línea sin DNI ni periodo
-  se pega al nombre de la fila de arriba (nombres partidos, «(Sustituto/a)», que se quita); un punto
-  suelto tras el apellido se quita; los pies y el margen («Pág.», «Ref.Doc.»…) se quitan **trozo a
-  trozo, antes de agrupar en líneas** (fila 221): si no, un trozo suelto del margen a la misma
-  altura que una fila de datos entra en su línea y la hace descartar entera. Curso: «curso
-  escolar 2025/2026» del texto, o del nombre del fichero. Fila: `{ curso, grupo, nombre, dni, desde,
-  hasta, clave }`, sin duplicados exactos (el mismo PDF bajado dos veces). **Ojo**: pdf.js vacía el
-  buffer que se le da; se le pasa siempre una copia.
+- **TUTORIAS** (fila 376, `docs/TUTOR-DESDE-EL-CENTRO-DE-DATOS.md`): salen **solo** de las fichas que deja
+  el Centro de datos (`hecho/tutorias/<curso>/curso.json`), copiadas a `_GESTOR/datos/TUTORIAS-HECHO <curso>.json`
+  por `js/centro-de-datos-tutorias.js` (`CentroDeDatosTutorias`, como el personal de la fila 327: huella SHA-256,
+  apunte `hecho-tutorias|<curso>`, **todos los cursos** del índice, `acuerdoHecho` mayor que 1 = aviso ámbar y
+  nada). `js/tablas-datos-tutorias.js` (`TablasDatosTutorias`) las lee todas y las deja en la misma forma de
+  siempre: `{ curso: '2025/2026', grupo, nombre, dni, desde, hasta, clave }` (cada línea de `tutores` de cada
+  grupo y cada una de `funcionesSinGrupo`, con el grupo «Pedagogía Terapéutica, Audición y Lenguaje o
+  Diversificación»; una línea sin documento o sin `desde`/`hasta` no da fila, como no la daba el PDF; sin
+  duplicados exactos). **El Gestor ya no lee el PDF** de la función tutorial: `CentroDeDatos.elegir` no toma el
+  listado `tutorias` y `TablasDatos.cargar` no abre ningún PDF. Un PDF suelto en `_GESTOR/datos` de un curso que
+  el Centro de datos no trae sale en ámbar («El curso X está en un PDF suelto, pero no en el Centro de datos.
+  Súbelo al Centro de datos.»); si su curso sí está, se ignora sin aviso. `TablasDatosLeer.tutoriasDePdf` /
+  `tutoriasDeTrozos` se quedan solo como el lector de referencia de las pruebas (`pruebas/tutor-desde-el-centro-de-datos.mjs`
+  compara PDF y fichas con los mismos datos de dos cursos). «Tablas de datos» ya no tiene subida de tutorías: dice
+  «Las tutorías se suben al Centro de datos.». Los textos antiguos de este apartado sobre la lectura por
+  posiciones del PDF (trozos, columnas, «Ref.Doc.») siguen siendo ciertos para `tutoriasDeTrozos`.
 - **CONSEJO ESCOLAR** (fila 238, `docs/CERTIFICADO-CONSEJO-ESCOLAR.md`, `js/tablas-datos-consejo.js`,
   `TablasDatosConsejo`): los CSV de Séneca `RegMieConEsc <año>-<año>.csv` (con o sin prefijo de
   números y guiones bajos), de la carpeta de datos o de `datos/Tablas/`, unidos en una tabla, una fila
@@ -126,7 +129,7 @@ Séneca, la tabla en Word, la especialidad que falta en amarillo, un CSV en Lati
 
 **Quién es el tutor o tutora de una unidad** (fila 299, `js/tutor-del-grupo.js`): `TutorDelGrupo` lee las filas de TUTORIAS de `TablasDatos` del curso de hoy y del bloque de unidades (no el de Pedagogía Terapéutica), en vigor hoy, para el correo de un hito (`docs/contexto/CORREO-Y-SENECA.md`). Si la tabla no está o la unidad del alumno no casa, el cuadro de Correo lo dice en ámbar.
 
-**De dónde llegan los listados** (fila 312, `docs/BEBER-DEL-CENTRO-DE-DATOS.md`): además de subirlos a mano, el gestor los coge de la carpeta «CENTRO DE DATOS» de Drive si está señalada en Ajustes → Este ordenador (`js/centro-de-datos*.js`). Las tutorías (PDF) se copian a `_GESTOR/datos` con su nombre; los del Consejo Escolar pasan por `TablasDatosPantalla.anadirFicherosDelConsejo(ficheros, { sustituir, silencioso })`; lo tomado se apunta en `_GESTOR/centro-de-datos.json` y bajo «Tablas de datos» sale «Datos del Centro de datos, del …».
+**De dónde llegan los listados** (fila 312, `docs/BEBER-DEL-CENTRO-DE-DATOS.md`): además de subirlos a mano, el gestor los coge de la carpeta «CENTRO DE DATOS» de Drive si está señalada en Ajustes → Este ordenador (`js/centro-de-datos*.js`). Las tutorías ya no (fila 376: vienen de las partes `hecho/tutorias`, arriba); los del Consejo Escolar pasan por `TablasDatosPantalla.anadirFicherosDelConsejo(ficheros, { sustituir, silencioso })`; lo tomado se apunta en `_GESTOR/centro-de-datos.json` y bajo «Tablas de datos» sale «Datos del Centro de datos, del …».
 
 ## La tabla ACTIVIDADES EXTRAESCOLARES (10-oct-2026, fila 311)
 

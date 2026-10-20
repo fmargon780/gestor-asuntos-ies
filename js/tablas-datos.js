@@ -5,8 +5,9 @@
    Tablas que la aplicación lee de la carpeta de datos, unidas a la
    persona por su DNI (los dígitos, como `clavePersona` de js/datos.js):
 
-   - TUTORIAS: los PDF «Función Tutorial 2025-2026.pdf» (o que empiecen
-     por «RelFunTut») de Séneca, leídos por js/tablas-datos-leer.js.
+   - TUTORIAS: las fichas de tutorías que deja el Centro de datos
+     (`TUTORIAS-HECHO <curso>.json`), leídas por js/tablas-datos-tutorias.js
+     (fila 376: ya no se lee el PDF de Séneca).
    - PROFESORADO: no se lee otra vez, sale de `Datos` (los RelPerCen).
    - Cualquier CSV o Excel de la subcarpeta `Tablas`: una tabla por
      fichero, con su cabecera tal cual.
@@ -52,27 +53,11 @@ var TablasDatos = (function () {
     var lista = [];
     try { lista = await Carpetas.ficheros(dir); } catch (e) { lista = []; }
 
-    var tut = { nombre: 'TUTORIAS', ficheros: [], cursos: [], cabecera: COLUMNAS_TUTORIAS, filas: [] };
-    for (var i = 0; i < lista.length; i++) {
-      var n = lista[i].nombre;
-      var norm = U.normalizar(n);
-      if (!/\.pdf$/i.test(n) || !(/^funcion tutorial/.test(norm) || /^relfuntut/.test(norm))) continue;
-      try {
-        var filas = await L.tutoriasDePdf(await leerBytes(dir, n), n);
-        if (!filas.length) throw new Error('No he encontrado ninguna fila de tutoría en el PDF.');
-        tut.ficheros.push(n);
-        filas.forEach(function (f) { if (tut.cursos.indexOf(f.curso) === -1) tut.cursos.push(f.curso); });
-        tut.filas = tut.filas.concat(filas);
-      } catch (e) { salida.errores.push({ fichero: n, motivo: U.mensajeDeError(e) }); }
-    }
-    /* Sin repetir entre ficheros (el mismo PDF bajado dos veces). */
-    var vistos = {};
-    tut.filas = tut.filas.filter(function (f) {
-      var k = [f.curso, f.grupo, f.dni, f.desde, f.hasta].join('|');
-      return vistos[k] ? false : (vistos[k] = true);
-    });
-    tut.cursos.sort();
-    if (tut.ficheros.length) salida.tablas.TUTORIAS = tut;
+    /* Fila 376: las tutorías salen solo de las fichas del Centro de datos (js/tablas-datos-tutorias.js), todos los
+       cursos que traigan. Un PDF de función tutorial suelto no se lee: si su curso falta, un aviso ámbar. */
+    var tut = await TablasDatosTutorias.leer(dir, lista, COLUMNAS_TUTORIAS);
+    if (tut.tabla) salida.tablas.TUTORIAS = tut.tabla;
+    tut.errores.forEach(function (e) { salida.errores.push(e); });
 
     var sub = null;
     try { sub = await dir.getDirectoryHandle('Tablas'); } catch (e) { sub = null; }

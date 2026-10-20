@@ -180,7 +180,7 @@ await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
 await comprobar('11. el cuadro se abre, con la línea ámbar y sin dirección', [c.arriba, c.otro, c.marcadas, c.saludo],
-  ['No sé quién es el tutor o tutora de 1º C. Sube la relación de tutorías de Séneca en Herramientas → Tablas de datos.', '', [], 'Buenas:']);
+  ['No sé quién es el tutor o tutora de 1º C. Las tutorías se suben al Centro de datos.', '', [], 'Buenas:']);
 await comprobar('11. sin «No tengo el correo de…» (no hay a quién)', c.lineas, []);
 await cerrarCuadro();
 

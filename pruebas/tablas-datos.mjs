@@ -85,6 +85,18 @@ const filas1 = await pagina.evaluate(async () => {
     const h = await datos.getFileHandle(n, { create: true });
     const w = await h.createWritable(); await w.write(new Blob([bytes])); await w.close();
   }
+  /* Fila 376: la tabla sale de la ficha del Centro de datos (la misma relación, dicha como `curso.json`); los PDF de
+     arriba se quedan sueltos de un curso que el Centro de datos sí trae: no se leen y no dan aviso. */
+  const lineaDe = (f) => ({ id: f.clave, documento: f.dni, empleado: f.nombre, desde: f.desde, hasta: f.hasta, sustituto: false });
+  const grupos = [];
+  filas.filter((f) => f.grupo !== TablasDatosLeer.GRUPO_ATENCION).forEach((f) => {
+    let r = grupos.find((g) => g.id === f.grupo);
+    if (!r) { r = { id: f.grupo, datos: { unidad: f.grupo, tutores: [] } }; grupos.push(r); }
+    r.datos.tutores.push(lineaDe(f));
+  });
+  const ficha = { acuerdoHecho: 1, conjunto: 'tutorias', parte: 'curso', cursoEscolar: '25-26', registros: grupos,
+    funcionesSinGrupo: filas.filter((f) => f.grupo === TablasDatosLeer.GRUPO_ATENCION).map(lineaDe) };
+  await Carpetas.escribirTexto(datos, 'TUTORIAS-HECHO 25-26.json', JSON.stringify(ficha));
   return filas;
 });
 await comprobar('1. siete filas: cinco de unidades y una de atención a la diversidad (más los tres periodos)',
@@ -167,7 +179,7 @@ const r23 = await pagina.evaluate(async () => {
     faltanB: b.faltan.indexOf('Especialidad') === -1
   };
 });
-await comprobar('2. la tabla de tutorías, leída de los dos PDF sin repetir', Promise.resolve(r23.tablas), [['TUTORIAS', 7]]);
+await comprobar('2. la tabla de tutorías, leída de la ficha del Centro de datos (los PDF sueltos no se leen)', Promise.resolve(r23.tablas), [['TUTORIAS', 7]]);
 await comprobar('2. <w:tbl> con cuatro columnas', Promise.resolve(r23.columnas), 4);
 await comprobar('2. cabecera en negrita (Cargo · Curso · Toma de posesión · Cese, fila 123)', Promise.resolve([r23.cabecera, r23.negrita]), [true, true]);
 await comprobar('2. Juana: la cabecera y sus dos periodos (unidad y atención a la diversidad)', Promise.resolve(r23.filasJuana), 3);

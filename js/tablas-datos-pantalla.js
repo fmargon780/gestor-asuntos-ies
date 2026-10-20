@@ -25,9 +25,10 @@
     d.id = 'bloque-tablas-datos';
     d.innerHTML =
       '<summary><span class="bloque-titulo">Tablas de datos</span>' +
-        '<span class="bloque-pie">Las tutorías de Séneca y lo que dejes en la subcarpeta Tablas de los datos</span></summary>' +
+        '<span class="bloque-pie">Las tutorías del Centro de datos y lo que dejes en la subcarpeta Tablas de los datos</span></summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="explica">Los PDF «Función Tutorial» de Séneca (uno por curso) y cualquier CSV o Excel de ' +
+        '<p class="explica" id="tablas-datos-tutorias-linea">Las tutorías se suben al Centro de datos.</p>' +
+        '<p class="explica">Además, cualquier CSV o Excel de ' +
         '<code>_GESTOR/datos/Tablas</code>. Se unen a cada persona por su DNI y sirven para los huecos ' +
         '<code>{{ESPECIALIDAD}}</code>, <code>{{TABLA TUTORIAS}}</code>, <code>{{DATO …}}</code> y <code>{{TABLA …}}</code>.</p>' +
         '<div id="tablas-datos-lista" class="lista"></div>' +
@@ -95,7 +96,7 @@
     var filas = r.tablas.map(function (t) {
       return '<div class="fila-tipo"><span class="nombre-tipo">' + U.escapar(t.nombre === 'TUTORIAS' ? 'Tutorías' : t.nombre) + '</span>' +
         '<span class="suave" style="flex:1">' + U.escapar(t.filas + (t.filas === 1 ? ' fila' : ' filas') +
-          (t.cursos.length ? ' · cursos ' + t.cursos.join(', ') : '') + ' · ' + (t.origen === 'actividades' ? 'sale de las actividades extraescolares, no de un fichero' : t.ficheros.join(', '))) + '</span></div>';
+          (t.cursos.length ? ' · cursos ' + t.cursos.join(', ') : '') + ' · ' + (t.origen === 'actividades' ? 'sale de las actividades extraescolares, no de un fichero' : (t.origen === 'centro-de-datos' ? 'vienen del Centro de datos' : t.ficheros.join(', ')))) + '</span></div>';
     });
     /* El profesorado sale de los RelPerCen (no se lee otra vez). */
     try {
