@@ -328,13 +328,12 @@ await pagina.evaluate(() => window.scrollTo(0, 400));
 await pagina.waitForTimeout(500);
 await comprobarQue('11. la cabecera está encogida',
   pagina.evaluate(() => document.querySelector('.ficha-cabecera').classList.contains('encogida')));
-/* La fila de copiar se esconde con la cabecera encogida (fila 58,
-   igual que la línea gris de debajo del nombre): no hay sitio, y el
-   nombre ya lleva los tres puntos. */
-await comprobarQue('11. la fila de copiar se esconde, sin sitio en la cabecera encogida',
+/* Fila 382: la fila de copiar sigue a la vista con la cabecera encogida;
+   solo se esconde la línea gris (pruebas/botones-de-copiar-al-bajar.mjs). */
+await comprobarQue('11. la fila de copiar sigue a la vista, con la cabecera encogida',
   pagina.evaluate(() => {
     const b = document.querySelector('.ficha-copiar-fila');
-    return !!b && getComputedStyle(b).display === 'none';
+    return !!b && getComputedStyle(b).display !== 'none' && b.getBoundingClientRect().height > 0;
   }));
 await comprobarQue('11. los tres puntos siguen visibles',
   pagina.evaluate(() => {
