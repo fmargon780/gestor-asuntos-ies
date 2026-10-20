@@ -1,8 +1,8 @@
 /* ============================================================
    demo/datos-tutor.js — lo que necesita el correo al tutor o tutora del
    grupo (fila 299, docs/CORREO-AL-TUTOR-DEL-GRUPO.md) en la copia de pruebas:
-     1. la relación de funciones tutoriales de este curso (un PDF «Función Tutorial»
-        en la carpeta de datos, dibujado como el de Séneca): 4º A con un tutor que
+     1. la relación de funciones tutoriales de este curso y del anterior (fila 376: las fichas
+        `TUTORIAS-HECHO <curso>.json` que deja el Centro de datos, en la carpeta de datos): 4º A con un tutor que
         tiene correo en PERSONAL (Otero Campos, Marta), 1º Bach A con una tutora sin
         correo (Cabello Ruiz, Esperanza, que js/demo/datos.js da de alta en RelPerCen
         sin correo), 2º B con dos tutores en vigor (Reyes Palma, Fernando y Uceda Molina,
@@ -22,34 +22,45 @@
 (function () {
   'use strict';
 
+  /* Fila 376: las tutorías llegan como las deja el Centro de datos (`hecho/tutorias/<curso>/curso.json`, ya copiadas a la
+     carpeta de datos como `TUTORIAS-HECHO <curso>.json`), de dos cursos: el de hoy y el anterior. */
+  function lineaDeTutor(empleado, documento, inicio) {
+    var partes = empleado.split(', ');
+    return { id: documento, documento: documento, empleado: empleado, apellidos: partes[0], nombre: partes[1],
+             periodo: '01/09/' + inicio + ' - 31/08/' + (inicio + 1), desde: inicio + '-09-01', hasta: (inicio + 1) + '-08-31',
+             sustituto: false, hoy: true, enPersonal: true };
+  }
+
+  function parteDeTutorias(inicio, grupos, sinGrupo) {
+    var corto = String(inicio).slice(2) + '-' + String(inicio + 1).slice(2);
+    return {
+      nombre: 'TUTORIAS-HECHO ' + corto + '.json',
+      parte: {
+        acuerdoHecho: 1, conjunto: 'tutorias', parte: 'curso', cursoEscolar: corto, generado: new Date().toISOString(),
+        origen: 'centro-de-datos-ies', hoy: '', campos: [], avisos: [],
+        registros: grupos.map(function (g) {
+          var tutores = g[1].map(function (t) { return lineaDeTutor(t[0], t[1], inicio); });
+          return { id: g[0], datos: { unidad: g[0], tutores: tutores, tutorHoy: tutores.length === 1 ? tutores[0].empleado : '' } };
+        }),
+        funcionesSinGrupo: sinGrupo.map(function (t) { return lineaDeTutor(t[0], t[1], inicio); })
+      }
+    };
+  }
+
   async function escribirTutorias() {
     var hoy = new Date();
     var inicio = hoy.getMonth() >= 8 ? hoy.getFullYear() : hoy.getFullYear() - 1;
-    var periodo = '01/09/' + inicio + ' - 31/08/' + (inicio + 1);
-    var PDFLib = await PdfHerramientas.cargarPdfLib();
-    var doc = await PDFLib.PDFDocument.create();
-    var fuente = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
-    var p = doc.addPage([595, 842]);
-    var y = 800;
-    function linea(trozos, salto) {
-      trozos.forEach(function (t) { p.drawText(t[1], { x: t[0], y: y, size: 8, font: fuente }); });
-      y -= (salto || 14);
+    var cursos = [
+      parteDeTutorias(inicio,
+        [['4º A', [['Otero Campos, Marta', '11223344A']]], ['1º Bach A', [['Cabello Ruiz, Esperanza', '77889900G']]],
+         ['2º B', [['Reyes Palma, Fernando', '22334455B'], ['Uceda Molina, Patricia', '33445566C']]]],
+        [['Vidal Cano, Ramón', '44556677D']]),
+      /* El curso anterior: Otero Campos, Marta ya era tutora (de otro grupo), para el certificado de dos cursos. */
+      parteDeTutorias(inicio - 1, [['3º A', [['Otero Campos, Marta', '11223344A']]]], [['Vidal Cano, Ramón', '44556677D']])
+    ];
+    for (var i = 0; i < cursos.length; i++) {
+      await Carpetas.escribirTexto(App.E.datos, cursos[i].nombre, JSON.stringify(cursos[i].parte));
     }
-    var X = { unidad: 40, nombre: 110, dni: 330, periodo: 420 };
-    linea([[40, 'Relación de funciones tutoriales']]);
-    linea([[40, 'D./Dña. Directora del centro certifica que durante el curso escolar ' + inicio + '/' + (inicio + 1) + ' han ejercido:']], 20);
-    linea([[40, 'Funciones tutoriales procedentes de tutorías de unidades']]);
-    linea([[X.unidad, 'Unidad'], [X.nombre, 'Empleado/a'], [X.dni, 'D.N.I.'], [X.periodo, 'Periodo']]);
-    [['4º A', 'Otero Campos, Marta', '11223344A'], ['1º Bach A', 'Cabello Ruiz, Esperanza', '77889900G'],
-     ['2º B', 'Reyes Palma, Fernando', '22334455B'], ['2º B', 'Uceda Molina, Patricia', '33445566C']].forEach(function (f) {
-      linea([[X.unidad, f[0]], [X.nombre, f[1]], [X.dni, f[2]], [X.periodo, periodo]]);
-    });
-    y -= 6;
-    linea([[40, 'Funciones tutoriales correspondientes a Pedagogía Terapéutica, Audición y Lenguaje y Diversificación Curricular']]);
-    linea([[X.nombre, 'Empleado/a'], [X.dni, 'D.N.I.'], [X.periodo, 'Periodo']]);
-    linea([[X.nombre, 'Vidal Cano, Ramón'], [X.dni, '44556677D'], [X.periodo, periodo]], 30);
-    linea([[40, 'Pág. 1 de 1'], [300, 'Ref.Doc.: CerFunTut']]);
-    await Carpetas.escribirBytes(App.E.datos, 'Función Tutorial ' + inicio + '-' + (inicio + 1) + '.pdf', await doc.save(), 'application/pdf');
     if (window.TablasDatos) TablasDatos.olvidar();
   }
 

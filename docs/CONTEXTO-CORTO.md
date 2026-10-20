@@ -85,6 +85,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
 - Medidas, «Qué hay de nuevo» y el botón «Soporte» común.
+- El tutor y las tutorías vienen solo de las fichas `hecho/tutorias` del Centro de datos, todos los cursos; el Gestor ya no lee el PDF de la función tutorial (fila 376).
 
 ## 6. Reglas de código que no se pueden olvidar
 

@@ -81,7 +81,7 @@ var TutorDelGrupo = (function () {
   function textoDelMotivo(motivo, unidad) {
     if (motivo === 'sin-unidad') return 'Este alumno no tiene unidad este curso.';
     if (motivo === 'sin-tabla' || motivo === 'sin-tutor') {
-      return 'No sé quién es el tutor o tutora de ' + unidad + '. Sube la relación de tutorías de Séneca en Herramientas → Tablas de datos.';
+      return 'No sé quién es el tutor o tutora de ' + unidad + '. Las tutorías se suben al Centro de datos.';
     }
     return '';
   }

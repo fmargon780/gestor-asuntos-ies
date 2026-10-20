@@ -87,9 +87,9 @@ comprobar('6. alumno sin unidad', motivo(base({ unidad: '' })), [0, 'sin-unidad'
 comprobar('6. sin tabla de tutorías', motivo(base({ hayTabla: false, filas: [] })), [0, 'sin-tabla']);
 comprobar('6. ninguna fila en vigor para su unidad', motivo(base({ unidad: '3º ESO C' })), [0, 'sin-tutor']);
 comprobar('6. la línea ámbar, con unidad', TutorDelGrupo.textoDelMotivo('sin-tutor', '3º ESO C'),
-  'No sé quién es el tutor o tutora de 3º ESO C. Sube la relación de tutorías de Séneca en Herramientas → Tablas de datos.');
+  'No sé quién es el tutor o tutora de 3º ESO C. Las tutorías se suben al Centro de datos.');
 comprobar('6. la línea ámbar, sin tabla', TutorDelGrupo.textoDelMotivo('sin-tabla', '1º ESO A'),
-  'No sé quién es el tutor o tutora de 1º ESO A. Sube la relación de tutorías de Séneca en Herramientas → Tablas de datos.');
+  'No sé quién es el tutor o tutora de 1º ESO A. Las tutorías se suben al Centro de datos.');
 comprobar('6. la línea ámbar, sin unidad', TutorDelGrupo.textoDelMotivo('sin-unidad', ''), 'Este alumno no tiene unidad este curso.');
 comprobar('6. para un tercero que no es alumno, ninguna línea', [TutorDelGrupo.textoDelMotivo('no-alumnado', ''), TutorDelGrupo.textoDelMotivo('grupo', ''), TutorDelGrupo.textoDelMotivo('', '')], ['', '', '']);
 
