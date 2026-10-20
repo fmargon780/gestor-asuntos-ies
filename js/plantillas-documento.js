@@ -126,6 +126,14 @@
     if (window.Membrete) {
       try {
         /* Fila 149: cada plantilla dice si lleva el logo del centro (sin la clave, sí). */
+        /* Fila 375: el pie común con el teléfono y el correo del centro, solo en los Word con {{MEMBRETE}}
+           (antes de que el hueco desaparezca). */
+        if (Docx.ponerPie && Plantillas.telefonoYCorreoDelCentro) {
+          try {
+            var delCentro = await Plantillas.telefonoYCorreoDelCentro();
+            buffer = await Docx.ponerPie(buffer, { telefono: delCentro.telefono, correo: delCentro.correo, hueco: 'MEMBRETE' });
+          } catch (ePie) { /* sin pie, el documento sigue generándose */ }
+        }
         var membrete = await Membrete.montar({ conLogoCentro: plantillaDoc.conLogoCentro !== false });
         if (membrete) buffer = await Docx.ponerImagen(buffer, 'MEMBRETE', membrete.bytes, membrete.ancho, membrete.alto);
       } catch (e) { /* sin membrete, el documento sigue generándose */ }

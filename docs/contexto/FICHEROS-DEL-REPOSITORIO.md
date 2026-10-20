@@ -351,6 +351,7 @@ de `App` va después del fichero que lo define.
 | `js/docx-crear.js`, `js/pdf-a-parrafos.js` | Fila 281: un PDF sin Word a un Word nuevo (el texto en párrafos; `Docx.interno` para el ZIP) |
 | `js/docx-sustituir.js`, `js/convertir-en-plantilla.js`, `js/convertir-en-plantilla-propuestas.js`, `js/convertir-en-plantilla-pantalla.js`, `css/convertir-en-plantilla.css`, `js/demo/datos-plantilla.js` | Fila 280: «Convertir en plantilla» desde un documento de un asunto (ver `docs/contexto/WORD-EN-LA-APP.md`) |
 | `js/docx-imagen.js` | `Docx.ponerImagen`: meter el membrete en `{{MEMBRETE}}` (fila 81; sacado de `js/docx.js` en la fila 110) |
+| `js/docx-pie.js` | `Docx.ponerPie`: el pie común con el teléfono y el correo del centro en los Word con `{{MEMBRETE}}` (fila 375) |
 | `js/docx-tabla.js` | `Docx.ponerTabla`, `Docx.resaltarFaltas` y `Docx.textoDelDocumento`: las tablas de datos en un Word y lo que falta en amarillo (fila 110) |
 | `js/genero.js` | El masculino o el femenino en las plantillas: `Genero.resolver` (formas dobles como «alumno/a», marcas `:tutor1`/`:firmante`…), los sexos de cada persona (`sexosDeAsunto`, `_GESTOR/sexos.json`) y la casilla Sexo de «Datos y contacto» (fila 111) |
 | `js/tablas-datos-leer.js` | Leer las tablas de datos: el PDF de funciones tutoriales de Séneca por posiciones, y CSV/Excel de `datos/Tablas` (fila 110) |

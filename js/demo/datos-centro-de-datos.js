@@ -87,7 +87,7 @@
     await Carpetas.escribirTexto(dir, 'configuracion.json', JSON.stringify({
       contrato: 1, actualizado: new Date().toISOString(), actualizadoPor: 'direccion@centro-demo.es',
       centro: { nombre: 'IES Centro de Demostración', codigo: '', direccion: '', localidad: 'Granada', provincia: '', telefono: '958000000' },
-      correo: { direccionDelCentro: '', firma: 'Un saludo.\n{usuario}\n{centro}' },
+      correo: { direccionDelCentro: 'secretaria@centro-demo.es', firma: 'Un saludo.\n{usuario}\n{centro}' },
       soporte: { buzon: '' }
     }));
     var indice = { contrato: 2, actualizado: new Date().toISOString(), cursoActual: curso, ocupado: false, web: '', listados: listados };
