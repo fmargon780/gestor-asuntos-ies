@@ -510,8 +510,12 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   primer pintado y "revelar" solo les cambia `hidden` y a qué copia el clic, nunca añade un nodo
   nuevo: añadirlo tarde es una mutación dentro de `#ficha-asunto-cuerpo`, y antes de esta fila
   `js/hitos-panel.js` vigilaba esa caja entera (ver más abajo), así que ese repintado de sobra le
-  podía cerrar a Francisco un hito que acababa de desplegar para mirarlo. Se esconde entera con
-  la cabecera encogida (`.ficha-cabecera.encogida .ficha-copiar-fila`), igual que la línea gris.
+  podía cerrar a Francisco un hito que acababa de desplegar para mirarlo. Con la cabecera
+  encogida **sigue a la vista** (fila 382, `docs/BOTONES-DE-COPIAR-AL-BAJAR.md`): solo se esconde la
+  línea gris (`.ficha-subtitulo`); la fila va en un solo renglón (`nowrap`) y, si la segunda línea no
+  cabe, `.ficha-apertura` baja entera a un renglón debajo, a la derecha. `js/cabecera-fija.js`
+  vigila el alto de la cabecera con un `ResizeObserver` y vuelve a medir (`remedir`) cuando cambia
+  (Nombre y DNI llegan después de medir). Prueba: `pruebas/botones-de-copiar-al-bajar.mjs`.
   Se comprueba con `pruebas/copiar-fila.mjs` (los cuatro botones, con RegAlum/RelPerCen/empresas
   de mentira) y con los puntos 3 y 4 de `pruebas/cabecera-del-asunto.mjs`.
 - **`js/ficha-menus.js`** (nuevo): el menú pequeño reutilizable —abrir, cerrar con Escape (en

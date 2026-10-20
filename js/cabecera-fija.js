@@ -181,6 +181,7 @@
     if (cabecera !== cabeceraActual) {
       if (cabeceraActual) cabeceraActual.classList.remove('encogida');
       cabeceraActual = cabecera;
+      vigilarAlto(cabecera);
     }
     if (pantallaNueva) {
       pantallaActual = pantalla;
@@ -278,6 +279,27 @@
   function remedir() {
     alturaPorPantalla = new WeakMap();
     programar(true);
+  }
+
+  /* Fila 382: Nombre y DNI de la ficha llegan después de medir y pueden
+     hacer que la fila de copiar baje de renglón: si la cabecera encogida
+     cambia de alto, se vuelve a medir. */
+  var altoCabeceraVisto = 0;
+  var vigiaAlto = null;
+  function vigilarAlto(cabecera) {
+    if (!window.ResizeObserver) return;
+    if (!vigiaAlto) {
+      vigiaAlto = new ResizeObserver(function () {
+        var c = cabeceraActual;
+        var alto = c ? Math.round(c.getBoundingClientRect().height) : 0;
+        if (alto === altoCabeceraVisto) return;
+        altoCabeceraVisto = alto;
+        if (c && c.classList.contains('encogida')) remedir();
+      });
+    }
+    vigiaAlto.disconnect();
+    altoCabeceraVisto = 0;
+    if (cabecera) vigiaAlto.observe(cabecera);
   }
 
   function arrancar() {

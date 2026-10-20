@@ -40,7 +40,11 @@
 .ficha-cabecera.encogida { margin-bottom: 0; }
 .ficha-cabecera.encogida .ficha-linea1 { flex-wrap: nowrap; }
 .ficha-cabecera.encogida .ficha-linea2 { margin-top: 4px; }
-.ficha-cabecera.encogida .ficha-apertura { display: none; }
+/* Fila 382: la fila de copiar (dentro de .ficha-apertura) sigue a la vista;
+   solo se esconde la línea gris. Si la segunda línea no cabe, la apertura
+   entera baja a un renglón debajo, alineada a la derecha. */
+.ficha-cabecera.encogida .ficha-apertura { flex: 0 0 auto; }
+.ficha-cabecera.encogida .ficha-subtitulo { display: none; }
 .ficha-cabecera.encogida #ficha-volver-origen { display: none; }
 .ficha-cabecera.encogida .ficha-nombre { font-size: 16px; overflow: hidden; }
 .ficha-cabecera.encogida .ficha-nombre-texto {
@@ -76,11 +80,11 @@
 /* La fila de copiar de un gesto (18-sep-2026, fila 58,
    docs/AJUSTES-DE-USO-2026-09-18.md, 1): Asunto, Nombre, NIE y DNI/CIF,
    siempre a la vista bajo el nombre, sin menú. Discreta: botones
-   pequeños en una sola línea que envuelve antes que desaparecer. Se
-   esconde con la cabecera encogida, igual que la línea gris de debajo
-   (menos sitio, y el nombre ya lleva los tres puntos). */
+   pequeños en una sola línea que envuelve antes que desaparecer. Con la
+   cabecera encogida sigue a la vista (fila 382, docs/BOTONES-DE-COPIAR-AL-BAJAR.md),
+   en un solo renglón que no se parte ni se encoge. */
 .ficha-copiar-fila { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
-.ficha-cabecera.encogida .ficha-copiar-fila { display: none; }
+.ficha-cabecera.encogida .ficha-copiar-fila { flex-wrap: nowrap; flex: 0 0 auto; }
 .boton-copiar-fila { padding: 1px 8px; font-size: 11.5px; color: var(--tinta-suave); }
 .ficha-nombre-menu-boton {
   display: inline-flex; align-items: center; justify-content: center;
