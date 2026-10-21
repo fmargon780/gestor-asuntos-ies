@@ -14,4 +14,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
 | 382 | 70 | Solo CSS de la cabecera encogida de la ficha, volver a medir su alto, poner al día 3-4 pruebas y una nueva, revisor |
-| 385 | 80 | Comprobar categoría en dos sitios de Por clasificar, barrera en el botón Crear, marca tipoEnLinea, dos pruebas nuevas, revisor |
