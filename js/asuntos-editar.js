@@ -428,6 +428,9 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
     try { await App.anotar(a.nombre, datos); }
     catch (e) { U.fallo('No se ha podido cambiar', e); return; }
     U.aviso('Asunto actualizado.', 'bueno');
+    /* Fila 408: el tipo ha cambiado pero el nombre sale igual (los dos tipos se escriben igual en la
+       carpeta): no se renombra nada, y se dice, para que no parezca que no se ha hecho. */
+    if (p.tipo !== d.tipo) U.aviso('El tipo ha cambiado, pero la carpeta se queda con el mismo nombre: los dos tipos se escriben igual en ella.', 'ambar');
     try { await App.verAbiertos(); }
     catch (e2) { U.accesorio('Asunto actualizado, pero no he podido poner la lista al día. Pulsa Recargar', e2); }
     await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);

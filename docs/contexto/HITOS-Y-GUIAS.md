@@ -460,6 +460,7 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   "En curso" solo no cuenta como trabajo (lo pone la aplicación sola al crear los hitos).
   `visibles` los salta y `huerfanos` los pliega abajo. Nota en el asunto. Solo se pregunta si la
   carpeta y la ficha ya han salido bien. Prueba: `pruebas/cambiar-tipo-y-guia.mjs`.
+- **Tipo de la ficha distinto del de la carpeta** (fila 408, `docs/CAMBIAR-TIPO-RENOMBRA-Y-TRAE-GUIA.md`, `js/tipo-del-nombre-al-dia.js`): al entrar, cada asunto abierto con otro tipo de verdad en la ficha que en el nombre se renombra (solo el tipo; fecha, número y resto igual) y la ficha guarda `guiaPorOfrecer: { de, a }`. La primera persona que entre con permiso para cambiar asuntos recibe la pregunta de traer la guía; conteste lo que conteste la marca se quita. Si el nombre nuevo choca con otra carpeta, se deja y avisa en ámbar. En «solo consultar» no se toca nada. Al editar un asunto y salir el mismo nombre con otro tipo (dos tipos que se escriben igual), avisa en ámbar.
 - **Crear, cambiar y borrar hitos desde el asunto** (28-sep-2026, fila 206,
   `docs/HITOS-DESDE-EL-ASUNTO.md`, `js/hitos-desde-el-asunto.js`): desde el «···» de la mesa,
   «+ Crear un hito», «Cambiar este hito» y «Borrar este hito» (apagado si el hito tiene trabajo),
