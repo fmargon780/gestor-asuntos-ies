@@ -57,6 +57,14 @@
     return contextoPromesa;
   }
 
+  /* Fila 385: ¿el tipo adivinado es de la categoría de la persona adivinada?
+     Sin una de las dos cosas, no hay nada que comparar y vale. */
+  function tipoEncaja(propuesta) {
+    if (!propuesta || !propuesta.tipo || !propuesta.tercero) return true;
+    var t = (App.E.tipos || []).filter(function (x) { return x.tipo === propuesta.tipo.tipo; })[0];
+    return !t || App.tipoEncajaConTercero(t, propuesta.tercero.persona);
+  }
+
   /* La línea de lo encontrado, separada por puntos. Lo que no se haya
      encontrado, no sale. */
   function textoDeLaPropuesta(propuesta) {
@@ -71,7 +79,7 @@
     }
     var fecha = U.fechaCorta(propuesta.fecha);
     if (fecha) trozos.push(fecha);
-    if (propuesta.tipo) trozos.push(propuesta.tipo.tipo);
+    if (propuesta.tipo && tipoEncaja(propuesta)) trozos.push(propuesta.tipo.tipo);   /* fila 385: si no encaja con la persona, se quita solo el tipo */
     if (propuesta.tercero) trozos.push(propuesta.tercero.nombre);
     return trozos.join(' · ');
   }
@@ -199,14 +207,14 @@
     var tipoObj = propuesta && propuesta.tipo && propuesta.tercero &&
       (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
     var sugerencias = (propuesta && propuesta.sugerencias) || [];
-    if (tipoObj) {
+    if (tipoObj && tipoEncaja(propuesta)) {
       boton.title = 'Crea el asunto con lo leído y mete el documento dentro';
     } else if (propuesta && propuesta.tercero) {
       boton.title = 'Deja el tercero elegido, a la espera de que se elija el tipo de asunto';
     } else {
       boton.title = '';
     }
-    boton.className = (tipoObj || (propuesta && propuesta.tercero)) && sugerencias.length
+    boton.className = ((tipoObj && tipoEncaja(propuesta)) || (propuesta && propuesta.tercero)) && sugerencias.length
       ? 'boton' : 'boton boton-principal';
   }
 

@@ -121,7 +121,21 @@ $('btn-crear').onclick = function () {
   return U.mientrasGuarda($('btn-crear'), App.crearAsuntoDelFormulario);
 };
 
+/* Fila 385 (docs/CREAR-DESDE-POR-CLASIFICAR-CON-TIPO.md): nunca se crea
+   un asunto sin tipo o sin tercero, lo llame quien lo llame. Sin error
+   y sin tocar la pantalla: su botón ya dice qué falta. */
+App.faltaTipoOTercero = function () {
+  return !App.E.nuevo.tipo || !App.E.nuevo.tercero;
+};
+
+/* ¿El tipo y la persona son de la misma categoría? Solo entonces se
+   crea de un clic (fila 385). `tipo` es el objeto del tipo. */
+App.tipoEncajaConTercero = function (tipo, tercero) {
+  return !!(tipo && tercero && tipo.categoria === tercero.categoria);
+};
+
 App.crearAsuntoDelFormulario = async function () {
+  if (App.faltaTipoOTercero()) return;
   if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
   /* Fila 239: por si se pulsa antes de que la vista previa haya calculado el número. */
@@ -299,9 +313,16 @@ App.crearAsuntoConPropuesta = async function (tipo, tercero, documentoSuelto) {
   App.E.pendiente = documentoSuelto;
   delete App.E.reciales[documentoSuelto.nombre];
   App.actualizarTitulo();
+  /* Fila 385: si el tipo y la persona no son de la misma categoría, no se crea
+     nada: Nuevo asunto con la persona como sugerencia y sin tipo. */
+  if (!App.tipoEncajaConTercero(tipo, tercero)) {
+    App.nuevoAsuntoCon({ tercero: tercero });
+    return;
+  }
   App.ir('nuevo');
   App.elegirCategoria(tipo.categoria);
   App.elegirTipo(tipo);
   App.fijarTercero(tercero);
+  if (!App.E.nuevo.tipo) return;   /* fila 385: el tipo se descartó por el camino */
   await $('btn-crear').onclick();
 };

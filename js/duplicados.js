@@ -324,6 +324,7 @@
      sigue como si no hubiera nada. */
   U.envolver($('btn-crear'), 'boton(#btn-crear).onclick', 'duplicados.js', function (creaOriginal) {
     return async function (ev) {
+      if (App.faltaTipoOTercero && App.faltaTipoOTercero()) return;   /* fila 385: sin tipo no hay ni aviso de parecido */
       try {
         var d = App.datosDelFormulario();
         var candidatos = await comprobarAntesDeCrear(
