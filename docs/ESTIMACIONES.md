@@ -17,3 +17,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 364 | 110 | Averiguar el guardado y los reintentos, cambios pendientes también en el navegador, aviso rojo fijo, contador de medidas, prueba, revisor |
 | 398 | 120 | Medir archivar, marca «archivándose», traslado por detrás con «Archivando…», deshacer si falla, prueba de dos seguidos, revisor |
 | 405 | 80 | «⋮» en las preguntas del guion, cambiar su texto solo aquí sin perder la respuesta, ocultarlas con sus respuestas, aviso al borrar en la guía, prueba, revisor |
+| 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
