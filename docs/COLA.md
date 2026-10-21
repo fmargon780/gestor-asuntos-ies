@@ -187,6 +187,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 396 | Aviso de usuario: mejora en «Ficha de un asunto» | EN TEMA 397 (21-oct-2026) · aviso completo: https://drive.google.com/file/d/1bdzbX2dyJZCAOp3nZaDhP0Cy3z8cfhsH/view?usp=drivesdk |
 | 397 | Tema: ficha del asunto con Hitos y Documentos a la vez. Junta la idea 396: al entrar en un asunto, ver a la vez Hitos (a la izquierda) y Documentos de la carpeta (a la derecha), que son las dos secciones de trabajo diario; las demás quedan como consulta aparte. Aprovechar para revisar el orden de la ficha pensando en las tareas habituales. Diseñarlo junto al tema 390, que también cambia la lista de documentos de la ficha; ojo también con el 391 y la fila 382. | DECIDIDA (21-oct-2026) · tema |
 | 398 | Archivar sin esperar (parte 2 del tema 364, idea 360): `docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md`, parte 2. El asunto sale de la lista al pulsar «Archivar» y el traslado sigue por detrás con «Archivando…»; si falla, vuelve a la lista con aviso. Empieza solo con la fila 364 HECHA. Ejemplo real: el primer asunto que archive Francisco después de publicarla | PENDIENTE (21-oct-2026) |
+| 399 | Aviso de usuario: mejora en «Inicio» | IDEA (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1Fikj22o3wUexB4AnhmjD_0tReHwRfEjG/view?usp=drivesdk |
+| 400 | Aviso de usuario: mejora en «Inicio» | IDEA (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1I9pb_dFZ971YWp8NnwzhlcBw0qJvUtDw/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
