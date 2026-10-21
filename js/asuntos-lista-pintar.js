@@ -289,7 +289,7 @@ App.tarjetaAsunto = function (a, modo) {
   principal.textContent = modo === 'abierto' ? 'Cerrar' : 'Reabrir';
   principal.onclick = async function () {
     await U.mientrasGuarda(principal, function () {
-      return modo === 'abierto' ? App.cerrarAsunto(a) : App.reabrirAsunto(a);
+      return modo === 'abierto' ? ArchivarFondo.archivar(a) : App.reabrirAsunto(a);
     });
   };
   acciones.appendChild(principal);
@@ -299,7 +299,14 @@ App.tarjetaAsunto = function (a, modo) {
   /* Con una acción larga en marcha sobre este asunto (fila 100,
      App.conOcupado), la tarjeta sale con sus botones apagados aunque
      se repinte. */
-  if (App.E.ocupados && App.E.ocupados[a.nombre]) {
+  if (window.ArchivarFondo && ArchivarFondo.enOtroOrdenador(a.ficha)) {   /* fila 398 */
+    var otro = document.createElement('p');
+    otro.className = 'nota archivandose-otro';
+    otro.textContent = 'Archivándose en otro ordenador…';
+    div.appendChild(otro);
+    div.classList.add('tarjeta-ocupada');
+    Array.prototype.forEach.call(div.querySelectorAll('button, select'), function (b) { b.disabled = true; });
+  } else if (App.E.ocupados && App.E.ocupados[a.nombre]) {
     div.classList.add('tarjeta-ocupada');
     Array.prototype.forEach.call(div.querySelectorAll('button, select'), function (b) { b.disabled = true; });
   }
@@ -486,7 +493,7 @@ App.filaTablaAsunto = function (a, opciones) {
   var pasaAPorLiquidar = window.PorLiquidar && PorLiquidar.exige(a) && !PorLiquidar.estaPorLiquidar(a);
   archivar.textContent = pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Archivar';
   archivar.onclick = async function () {
-    await U.mientrasGuarda(archivar, function () { return pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : App.cerrarAsunto(a); });
+    await U.mientrasGuarda(archivar, function () { return pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : ArchivarFondo.archivar(a); });
   };
   tdMenu.appendChild(U.menuDeAcciones([copiar, archivar]));
   tr.appendChild(tdMenu);
@@ -505,7 +512,14 @@ App.filaTablaAsunto = function (a, opciones) {
   /* Con una acción larga en marcha sobre este asunto (fila 100,
      App.conOcupado), la fila sale con sus botones apagados aunque se
      repinte. */
-  if (App.E.ocupados && App.E.ocupados[a.nombre]) {
+  if (window.ArchivarFondo && ArchivarFondo.enOtroOrdenador(a.ficha)) {   /* fila 398 */
+    var otroFila = document.createElement('small');
+    otroFila.className = 'nota archivandose-otro';
+    otroFila.textContent = ' Archivándose en otro ordenador…';
+    tdTercero.appendChild(otroFila);
+    tr.classList.add('inicio-tabla-fila-ocupada');
+    Array.prototype.forEach.call(tr.querySelectorAll('button'), function (b) { b.disabled = true; });
+  } else if (App.E.ocupados && App.E.ocupados[a.nombre]) {
     tr.classList.add('inicio-tabla-fila-ocupada');
     Array.prototype.forEach.call(tr.querySelectorAll('button'), function (b) { b.disabled = true; });
   }

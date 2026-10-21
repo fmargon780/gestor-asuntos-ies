@@ -329,7 +329,7 @@
         if (!abierto) return App.reabrirAsunto(a);
         if (pasaAPorLiquidar) return PorLiquidar.archivarOPasar(a);
         if (yaPorLiquidar) { if (window.InicioTabla) InicioTabla.cambiar('liq'); return Promise.resolve(); }
-        return App.cerrarAsunto(a);
+        return ArchivarFondo.archivar(a);
       });
       /* Reabierto: a su ficha de asunto abierto (fila 119). */
       if (!abierto && window.Navegacion && Navegacion.abrirAbierto(a.nombre)) return;

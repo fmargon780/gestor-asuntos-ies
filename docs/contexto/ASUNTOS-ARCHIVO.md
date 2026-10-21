@@ -538,3 +538,26 @@ entero desde ellos. En pantalla no cambia nada salvo la tarjeta «Tablas para in
   usa `Base.leer`, no se abre carpeta por carpeta.
 - **Medidas** (fila 332): la pasada completa apunta `base.poner-al-dia` y deja en la foto del día `apuntados`, `archivados` e `incompletos`.
 - Prueba: `pruebas/base.mjs`.
+
+### Archivar sin esperar (fila 398, 21-oct-2026, `docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md`, parte 2)
+
+Los botones «Archivar» (tabla de Inicio, ficha, mesa del hito, Por liquidar) llaman a
+`ArchivarFondo.archivar(a)` (`js/archivar-fondo.js`), que lanza `App.cerrarAsunto` sin esperarlo. Las preguntas
+salen igual, antes; en el punto donde `App.cerrarAsunto` ya no pregunta nada (tras la confirmación) llama a
+`ArchivarFondo.empieza`: el asunto sale de la lista (`App.E.listaAbiertos` y `ArchivarFondo.oculta` en
+`App.verAbiertos`), quien pulsó recupera la pantalla y se escribe en su ficha la marca
+`archivandose: { equipo, por, desde, categoria, tercero }`. El traslado y las demás envolturas de
+`App.cerrarAsunto` siguen por detrás; arriba sale `#archivando-fondo` («Archivando…», con los números si hay
+más de uno) hasta que acaba toda la cadena. Otro ordenador ve la marca (menos de una hora) como
+«Archivándose en otro ordenador…» con la tarjeta/fila apagada (`ArchivarFondo.enOtroOrdenador`); la de más de
+una hora se da por abandonada. El equipo se identifica con un número al azar en `localStorage`
+(`gestor-equipo-archivar`). Si falla el traslado de la carpeta (`ArchivarFondo.fallo`): aviso rojo con cierre
+(`GuardadoPendiente.avisoConCierre(texto, detalle)`, el detalle en letra pequeña), el asunto vuelve a la lista y
+se quita la marca; si quedó copia a medias el texto lo dice. Si se cierra la pestaña con algo en marcha, el
+navegador avisa (`beforeunload`); al volver, la primera vez que se pinta la lista, `alPintarLista` termina de
+uno en uno lo que este ordenador dejó marcado (con `App.E.archivarSinPreguntar` mientras dura cada uno). Los
+archivados por lotes (`App.E.archivarSinPreguntar`) y quien llama a `App.cerrarAsunto` directamente siguen
+esperando. Los guardados de datos que fallan van por el guardado pendiente de la parte 1. Se comprueba con
+`pruebas/archivar-sin-esperar.mjs`; las pruebas que archivan por pantalla esperan a
+`ArchivarFondo.hayEnMarcha()`.
+

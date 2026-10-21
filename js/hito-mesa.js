@@ -325,7 +325,7 @@ var HitoMesa = (function () {
          guardado ni su navegación al terminar. */
       var real = document.querySelector('#ficha-archivar button');
       if (real) { real.click(); return; }
-      U.mientrasGuarda(archivarBtn, function () { return App.cerrarAsunto(a); });
+      U.mientrasGuarda(archivarBtn, function () { return ArchivarFondo.archivar(a); });
     };
     if (abierto && completo && !completoAntes && !(window.HacerEsteHito && HacerEsteHito.enCurso(a, h))) preguntarGuionCompleto(a, h, fila);
     if (!abierto || !window.FichaMenus) return;

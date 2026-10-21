@@ -158,6 +158,23 @@ Francisco no tiene ahora ningún asunto listo para archivar. El ejemplo real ser
 asunto que archive después de publicar esta parte**. Antes, Claude Code lo comprueba en la copia
 de pruebas con un asunto inventado.
 
+### Cómo sabemos que está bien (fila 398, para el revisor)
+
+(Sección escrita al coger la fila, regla 2 de la cola. Qué quiere Francisco: pulsar «Archivar» y seguir
+trabajando sin esperar, sin que el asunto desaparezca por el camino si algo falla.)
+
+1. En Inicio, en la lista de asuntos abiertos, abrir el menú de uno y pulsar «Archivar», aceptar el cuadro:
+   el asunto sale de la lista enseguida y se puede abrir otro asunto sin esperar.
+2. Mientras tanto arriba sale un aviso pequeño «Archivando…», y se quita solo al acabar; sale «Asunto archivado.»
+   y ningún aviso rojo.
+3. En ARCHIVO aparece ese asunto archivado.
+4. Archivar dos asuntos seguidos sin esperar entre uno y otro: los dos salen de la lista al momento y los dos
+   acaban en ARCHIVO.
+5. **[SOLO FRANCISCO]** El ejemplo real: el primer asunto que archive después de publicar. Un traslado que falle
+   de verdad (Dropbox con un fichero abierto) no se puede forzar con la demostración; la prueba
+   `pruebas/archivar-sin-esperar.mjs` lo fuerza con un disco de mentira: el asunto vuelve a la lista y sale el aviso
+   rojo con botón de cerrar.
+
 ### Cómo sabré que está bien (parte 2)
 
 1. Al pulsar «Archivar», el asunto sale de la lista al instante y puedo abrir otro sin esperar.

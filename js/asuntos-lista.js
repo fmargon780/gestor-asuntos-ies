@@ -37,6 +37,7 @@ App.verAbiertosPorTurno = async function (yaLeido) {
   App.E.listaAbiertos = hay.carpetas
     .filter(function (c) {
       if (c.nombre.charAt(0) === '_') return false;
+      if (window.ArchivarFondo && ArchivarFondo.oculta(c.nombre)) return false;   /* fila 398: se está archivando por detrás */
       if (App.E.registro.asuntos[c.nombre]) return true;
       return !Carpetas.esCarpetaTemporalDeSincronizacion(c.nombre);
     })
@@ -74,6 +75,7 @@ App.verAbiertosPorTurno = async function (yaLeido) {
   App.pintarFiltroEstado();
   App.pintarAbiertos();
   await App.pintarSueltos();
+  if (window.ArchivarFondo) ArchivarFondo.alPintarLista();   /* fila 398: terminar lo que quedó a medias */
 };
 
 /* Windows y Dropbox dejan por ahí ficheros suyos que no son trabajo

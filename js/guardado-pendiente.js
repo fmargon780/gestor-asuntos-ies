@@ -86,13 +86,19 @@ var GuardadoPendiente = (function () {
     } catch (e) { /* solo pintar */ }
   }
 
-  function avisoConCierre(texto) {
+  function avisoConCierre(texto, detalle) {
     try {
       var d = document.createElement('div');
       d.className = 'guardado-pendiente-cerrable';
       d.setAttribute('role', 'alert');
       var t = document.createElement('span');
       t.textContent = texto;
+      if (detalle) {
+        var s = document.createElement('small');
+        s.className = 'guardado-pendiente-detalle';
+        s.textContent = detalle;
+        t.appendChild(s);
+      }
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'mensaje-boton';
@@ -332,7 +338,7 @@ var GuardadoPendiente = (function () {
     cubre: cubre, superponer: superponer, apuntarAsuntos: apuntarAsuntos, apuntarCompleto: apuntarCompleto,
     esperar: esperar, guardado: guardado, guardadoNormal: guardadoNormal, alCargar: alCargar,
     empiezaCambio: empiezaCambio, acabaCambio: acabaCambio, anotaComprobada: anotaComprobada,
-    sueltaComprobadas: sueltaComprobadas, hayPendiente: hayPendiente
+    sueltaComprobadas: sueltaComprobadas, hayPendiente: hayPendiente, avisoConCierre: avisoConCierre
   };
 })();
 window.GuardadoPendiente = GuardadoPendiente;
