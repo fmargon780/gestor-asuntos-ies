@@ -187,7 +187,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 403 | Tema: contadores de Inicio que cuadran. Junta la idea 400: la suma de los contadores de Inicio no coincide con el total de asuntos abiertos; que cuadren, o que se vea qué asuntos no entran en ningún contador. | DECIDIDA (21-oct-2026) · tema |
 | 404 | Tema: desactivar un tipo de asunto. Junta la idea 401: hoy un tipo de asunto se crea, se cambia o se borra; poder también desactivarlo, para que no se use mientras esté desactivado, sin perderlo ni tocar los asuntos que ya lo tienen. | DECIDIDA (21-oct-2026) · tema |
 | 398 | Archivar sin esperar (parte 2 del tema 364, idea 360): `docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md`, parte 2. El asunto sale de la lista al pulsar «Archivar» y el traslado sigue por detrás con «Archivando…»; si falla, vuelve a la lista con aviso. Empieza solo con la fila 364 HECHA. Ejemplo real: el primer asunto que archive Francisco después de publicarla | PENDIENTE (21-oct-2026) |
-| 406 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | IDEA (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1_8ih2-Cch09576FTjmG7T27y-JP9bD9A/view?usp=drivesdk |
+| 406 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | EN TEMA 407 (21-oct-2026) · aviso completo: https://drive.google.com/file/d/1_8ih2-Cch09576FTjmG7T27y-JP9bD9A/view?usp=drivesdk |
+| 407 | Tema: copiar un hito a otra guía. Junta la idea 406: poder copiar un hito con sus tareas desde la guía de un tipo de asunto y ponerlo en la guía de otro tipo, para no rehacer a mano pasos que se repiten entre tipos de asunto. | DECIDIDA (21-oct-2026) · tema |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
