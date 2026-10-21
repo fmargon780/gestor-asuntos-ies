@@ -294,3 +294,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
       En el ordenador del centro, arrastrar los títulos de Inicio hasta dejar Inicio · Tipo · Tercero · Plazo · Hito actual · Le
       toca a; después entrar con el mismo nombre en otro ordenador. Ver: que sale en el mismo orden en los dos, y que
       «Restablecer columnas» (en «Filtros») vuelve al de siempre.
+
+## Fila 408 — cambiar el tipo renombra la carpeta y trae la guía (21-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Al entrar con los datos reales: el asunto A26-0465 de Álvaro Baute sale en Inicio con el tipo «Expulsión del Centro»; su carpeta conserva 261020, A26-0465 y el alumno (solo cambia el tipo); y te pregunta si traer la guía de «Expulsión del Centro» (lo ya hecho en sus hitos sigue ahí).
