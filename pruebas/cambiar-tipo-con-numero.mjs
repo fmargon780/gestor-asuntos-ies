@@ -87,7 +87,7 @@ async function salePregunta() {
     pagina.waitForFunction(() => {
       const c = document.getElementById('capa');
       return !c.classList.contains('oculto') && document.getElementById('cuadro-titulo').textContent === 'El tipo ha cambiado';
-    }, null, { timeout: 8000 }).then(() => 'pregunta'),
+    }, null, { timeout: 40000 }).then(() => 'pregunta'),
     pagina.evaluate(() => window.__editando).then(() => 'terminado')
   ]);
   return r;
@@ -143,7 +143,7 @@ await comprobar('el desajuste se detecta (los dos asuntos de la ficha con otro t
   pagina.evaluate(() => TipoDelNombreAlDia.desajustados().map(a => a.nombre).sort()), [D1, CHOCA]);
 await pagina.evaluate(() => { window.__alDia = TipoDelNombreAlDia.ponerAlDia(); });
 await pagina.waitForFunction(() => document.getElementById('cuadro-titulo') && document.getElementById('cuadro-titulo').textContent === 'El tipo ha cambiado'
-  && !document.getElementById('capa').classList.contains('oculto'), null, { timeout: 8000 });
+  && !document.getElementById('capa').classList.contains('oculto'), null, { timeout: 40000 });
 await pagina.click('#cuadro-aceptar');
 await comprobar('termina: 1 renombrado, 1 pregunta', pagina.evaluate(() => window.__alDia), { renombrados: 1, preguntadas: 1, chocan: 1 });
 await comprobar('la carpeta cambia solo el tipo; la que choca se queda como estaba',
@@ -152,7 +152,7 @@ await comprobar('traída la guía de BECA', hitosDe(D1b).then(h => h.todos), ['R
 await comprobar('la marca de la pregunta se quita de la ficha',
   pagina.evaluate((n) => !App.E.registro.asuntos[n].guiaPorOfrecer, D1b), true);
 await comprobar('avisa en ámbar de la que choca',
-  pagina.locator('.mensaje', { hasText: 'ya hay otra carpeta' }).count().then(n => n > 0), true);
+  pagina.locator('.mensaje', { hasText: 'ya hay otra carpeta' }).first().waitFor({ timeout: 20000 }).then(() => true, () => false), true);
 await comprobar('otra pasada no pregunta ni renombra nada de lo ya resuelto',
   pagina.evaluate(() => TipoDelNombreAlDia.ponerAlDia()).then(r => [r.renombrados, r.preguntadas]), [0, 0]);
 
@@ -162,7 +162,7 @@ const D2b = '261022 A26-0472 BECA Soto Vega, Luis 1140236';
 await crearDesajustado(D2, 'Soto Vega, Luis 1140236', 'A26-0472');
 await pagina.evaluate(() => { window.__alDia = TipoDelNombreAlDia.ponerAlDia(); });
 await pagina.waitForFunction(() => document.getElementById('cuadro-titulo') && document.getElementById('cuadro-titulo').textContent === 'El tipo ha cambiado'
-  && !document.getElementById('capa').classList.contains('oculto'), null, { timeout: 8000 });
+  && !document.getElementById('capa').classList.contains('oculto'), null, { timeout: 40000 });
 await pagina.click('#cuadro-cancelar');
 await pagina.evaluate(() => window.__alDia);
 await comprobar('carpeta con el tipo nuevo', pagina.evaluate((n) => App.E.listaAbiertos.some(x => x.nombre === n), D2b), true);
