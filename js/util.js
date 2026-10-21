@@ -281,11 +281,13 @@ var U = (function () {
   }
 
   function fallo(texto, e) {
+    if (e && e.yaAvisado) return;   /* fila 364: js/guardado-pendiente.js ya ha avisado, con su aviso fijo */
     if (window.Medidas) Medidas.cuentaError('fallo', e);   /* fila 332 */
     avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'malo');
   }
 
   function accesorio(texto, e) {
+    if (e && e.yaAvisado) return;   /* fila 364 */
     if (window.Medidas) Medidas.cuentaError('accesorio', e);   /* fila 332 */
     avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'ambar');
   }

@@ -82,6 +82,19 @@ En la copia de pruebas, simular que la escritura falla siempre (por ejemplo, for
 `InvalidStateError`) y comprobar: sale el aviso rojo, el cambio sigue ahí al recargar la pestaña,
 y al dejar de forzar el fallo se guarda y el aviso se quita. Dejar la prueba en `pruebas/`.
 
+### Cómo sabemos que está bien (fila 364, para el revisor)
+
+(Sección escrita al coger la fila, regla 2 de la cola. Qué quiere Francisco: que un cambio que no se
+puede guardar no desaparezca, y que la pantalla no mienta mientras tanto.)
+
+1. En Inicio, abrir un asunto de la demostración, cambiarle la fecha límite y guardar: sale el aviso
+   verde «Fecha límite guardada.» y **no** sale ningún aviso rojo fijo arriba.
+2. Nuevo asunto: crear uno, abrirlo y archivarlo: sale «Asunto archivado.» y ningún aviso rojo fijo.
+3. **[SOLO FRANCISCO]** Forzar un fallo de Dropbox no se puede con la demostración: la semana siguiente a
+   publicar, en Herramientas → Puesta a punto → Medidas, no aparece «Cambios que nunca llegaron a guardarse».
+   (La prueba `pruebas/guardado-pendiente.mjs` ya lo fuerza con un disco de mentira: aviso rojo fijo, cambio que
+   no se pierde al recargar, y se guarda solo.)
+
 ### Cómo sabré que está bien (parte 1)
 
 1. En Herramientas → Puesta a punto → Medidas, la semana siguiente a publicar esto no aparece

@@ -242,7 +242,11 @@ var Copias = (function () {
   /* Lo que hay que llamar en vez de Carpetas.guardarJson para los
      ficheros compartidos: guarda la copia del día (verificada) y
      comprueba el esquema antes de escribir. */
-  function guardar(gestor, nombre, objeto) {
+  /* Fila 364 (js/guardado-pendiente.js): si la escritura acaba con un error de sincronización
+     después de los reintentos, el contenido queda pendiente y se reintenta solo; esta promesa
+     espera, fuera de la fila, a que salga de verdad. `opciones.sinPendiente`: el reintento del
+     propio módulo y asuntos.json (que apunta solo lo que cambió, App.guardarRegistroFresco). */
+  function guardar(gestor, nombre, objeto, opciones) {
     /* Cuenta como guardado en marcha (fila 99): las tareas de fondo
        esperan a la siguiente pasada. */
     var hacer = async function () {
@@ -250,7 +254,16 @@ var Copias = (function () {
       await comprobarEsquemaAntesDeEscribir(gestor, nombre, objeto);
       await Carpetas.guardarJson(gestor, nombre, objeto);
     };
-    return window.ColaGuardado ? window.ColaGuardado.ocupado(hacer) : hacer();
+    var hecho = window.ColaGuardado ? window.ColaGuardado.ocupado(hacer) : hacer();
+    var GP = window.GuardadoPendiente;
+    if (!GP || (opciones && opciones.sinPendiente) || nombre === 'asuntos.json' || !GP.cubre(nombre)) return hecho;
+    return hecho.then(function (r) {
+      GP.guardadoNormal(nombre);
+      return r;
+    }, function (e) {
+      if (window.Reintentar && Reintentar.esErrorDeSincronizacion(e)) return GP.apuntarCompleto(gestor, nombre, objeto);
+      throw e;
+    });
   }
 
   /* Mira los ficheros compartidos y dice cuáles están rotos (existen

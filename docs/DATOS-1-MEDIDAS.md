@@ -79,7 +79,7 @@ Los rótulos son estos, escritos así. Lo que no esté aquí no se mide en esta 
 | `archivo.leer-indice` | `IndiceArchivo.leerDisco` |
 | `leer:<fichero>`, `escribir:<fichero>` | `Carpetas.leerTexto`, `escribirTexto` y `escribirBytes`: el tiempo, y `Medidas.peso` con los bytes |
 | `guardar.espera:<fichero>`, `guardar.dura:<fichero>` | `ColaGuardado.poner`: lo que espera en la fila y lo que tarda su función |
-| `reintento:<fichero>` (cuenta), `sin-remedio:<fichero>` (cuenta) | `js/reintentar-escritura.js`: cada reintento, y cada vez que se rinde |
+| `reintento:<fichero>` (cuenta), `sin-remedio:<fichero>` (cuenta), `tarde:<fichero>` (cuenta) | `js/reintentar-escritura.js`: cada reintento. Desde la fila 364, `sin-remedio` es solo un cambio de datos que **nunca** llegó a guardarse (`js/guardado-pendiente.js`: se tiró porque otro ordenador cerró el asunto; también lo que no cubre ese módulo, como un PDF), y `tarde` es un cambio que salió en un reintento posterior |
 | `conflicto:<fichero>` (cuenta) | `js/conflictos.js`: cada copia en conflicto encontrada |
 | `fallo:<nombre del error>`, `accesorio:<nombre del error>` (cuentas) | `U.fallo` y `U.accesorio`: solo `e.name` y solo si está en una lista fija (`FicheroRoto`, `LecturaVacia`, `EsquemaMasNuevo`, `CopiaNoVerificada`, `AsuntoCerrado`, `SoloConsulta`, `NotFoundError`, `NotAllowedError`, `NotReadableError`, `InvalidStateError`, `NoModificationAllowedError`, `AbortError`, `QuotaExceededError`, `TypeError`); si no, `otro`. **Nunca el mensaje** |
 

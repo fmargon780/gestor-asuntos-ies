@@ -45,7 +45,8 @@ var MedidasPantalla = (function () {
       case 'guardar.espera': return 'Esperar turno para guardar ' + fichero(resto);
       case 'guardar.dura': return 'Guardar ' + fichero(resto) + ', entero';
       case 'reintento': return 'Reintentos al escribir ' + fichero(resto);
-      case 'sin-remedio': return 'Escrituras que no han salido: ' + fichero(resto);
+      case 'sin-remedio': return 'Cambios que nunca llegaron a guardarse: ' + fichero(resto);
+      case 'tarde': return 'Cambios que salieron tarde, en un reintento: ' + fichero(resto);   /* fila 364 */
       case 'conflicto': return 'Copias en conflicto de ' + fichero(resto);
       case 'fallo': return 'Avisos rojos (' + (ERRORES[resto] || resto) + ')';
       case 'accesorio': return 'Avisos ámbar (' + (ERRORES[resto] || resto) + ')';
