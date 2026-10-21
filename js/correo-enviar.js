@@ -44,7 +44,7 @@ window.CorreoEnviar = (function () {
 
   /* La versión de este mismo cambio (ha de coincidir con VERSION_SCRIPT
      de apps-script/gestor-correos.gs). */
-  var SCRIPT_ESPERADO = '13-oct-2026 · fila 336';
+  var SCRIPT_ESPERADO = '21-oct-2026 · fila 411';
   var CLAVE_VERSION_CONOCIDA = 'gestor-envio-script-version';
 
   /* El número de fila de una versión ('24-sep-2026 · fila 130' -> 130):
@@ -77,9 +77,11 @@ window.CorreoEnviar = (function () {
      (JSON válido de una llamada que Google ha contestado), nunca ante
      un fallo de red o de dirección: eso no dice nada de qué versión
      tiene el script. */
-  function registrarVersionScript(version) {
+  function registrarVersionScript(version, cuenta) {
+    if (cuenta) guardarCuentaConocida(cuenta);   /* fila 411 */
     guardarVersionConocida(version || '');
-    if (window.Problemas) Problemas.recalcular('script');   /* fila 291 */
+    pintarCuenta();
+    if (window.Problemas) { Problemas.recalcular('script'); Problemas.recalcular('cuenta'); }   /* fila 291, fila 411 */
   }
 
   /* ¿Sabemos que el script es más viejo que esta app? Sin ninguna
@@ -104,6 +106,91 @@ window.CorreoEnviar = (function () {
     Problemas.registrar('script', d);
   }
   if (window.Problemas) Problemas.calculador('script', calcularProblema);
+
+  /* ---------- la cuenta de Administración (fila 411, docs/CORREO-DESDE-LA-CUENTA-COMUN.md) ----------
+
+     El Gestor recoge y envía solo desde la cuenta común. El script dice con qué cuenta trabaja en cada
+     respuesta (`cuenta`) y la app la guarda como guarda la versión; con qué cuenta recoge sale de
+     `latido.json` (js/bandeja-latido.js). Si cualquiera de las dos no es la de Administración, ámbar. */
+  var CLAVE_CUENTA_CONOCIDA = 'gestor-envio-script-cuenta';
+
+  function leerCuentaConocida() {
+    try { return (window.localStorage.getItem(CLAVE_CUENTA_CONOCIDA) || '').trim(); } catch (e) { return ''; }
+  }
+
+  function guardarCuentaConocida(cuenta) {
+    try { window.localStorage.setItem(CLAVE_CUENTA_CONOCIDA, String(cuenta || '').trim()); } catch (e) { /* sin memoria: nada */ }
+  }
+
+  /* PURA. Mismas direcciones, sin distinguir mayúsculas ni espacios. */
+  function mismaCuenta(a, b) {
+    return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+  }
+
+  function datosDelCentro() { return (window.Plantillas && Plantillas.enMemoria && Plantillas.enMemoria()) || null; }
+
+  function cuentaDeAdministracion() {
+    var d = datosDelCentro();
+    return (d && d.cuentaAdministracion) || (window.Plantillas && Plantillas.POR_DEFECTO_CUENTA_ADMIN) || '';
+  }
+
+  function nombreDelRemitente() {
+    var d = datosDelCentro();
+    return (d && d.remitente) || (window.Plantillas && Plantillas.POR_DEFECTO_REMITENTE) || '';
+  }
+
+  function esDeDirectivo() { return !!(window.Perfil && Perfil.esDirectivo && Perfil.esDirectivo()); }
+
+  function cuentaQueRecoge() {
+    return (window.BandejaLatido && BandejaLatido.cuenta && BandejaLatido.cuenta()) || '';
+  }
+
+  /* PURA. Qué dice la línea de Ajustes: { texto, ambar } con las cuentas que se conocen. */
+  function lineaDeCuenta(envia, recoge, admin) {
+    var fuera = (envia && !mismaCuenta(envia, admin)) || (recoge && !mismaCuenta(recoge, admin));
+    var texto;
+    if (!envia && !recoge) {
+      texto = 'Este ordenador envía y recoge con: todavía no se sabe. Pulsa «Probar».';
+    } else if (envia && (!recoge || mismaCuenta(envia, recoge))) {
+      texto = 'Este ordenador envía' + (recoge ? ' y recoge' : '') + ' con: ' + envia;
+    } else if (envia) {
+      texto = 'Este ordenador envía con: ' + envia + ' · recoge con: ' + recoge;
+    } else {
+      texto = 'Este ordenador recoge con: ' + recoge + ' · envía con: todavía no se sabe (pulsa «Probar»)';
+    }
+    if (fuera) texto += '. Este ordenador no usa la cuenta de Administración. Conecta el script de ' + admin + '.';
+    return { texto: texto, ambar: !!fuera };
+  }
+
+  function estadoDeCuenta() {
+    return lineaDeCuenta(leerCuentaConocida(), cuentaQueRecoge(), cuentaDeAdministracion());
+  }
+
+  function pintarCuenta() {
+    var caja = document.getElementById('envio-correo-cuenta');
+    if (!caja) return;
+    var e = estadoDeCuenta();
+    caja.innerHTML = '<p class="' + (e.ambar ? 'aviso aviso-ambar' : 'nota') + '">' + U.escapar(e.texto) + '</p>';
+  }
+
+  /* La tarjeta de «Problemas»: solo si se conoce alguna cuenta y no es la de Administración; nunca en un perfil de directivo. */
+  function calcularProblemaCuenta() {
+    if (!window.Problemas || !window.ProblemasTextos) return;
+    var envia = leerCuentaConocida();
+    var recoge = esDeDirectivo() ? '' : cuentaQueRecoge();
+    var admin = cuentaDeAdministracion();
+    var fuera = (envia && !mismaCuenta(envia, admin)) || (recoge && !mismaCuenta(recoge, admin));
+    if (esDeDirectivo() || !fuera) { Problemas.registrar('cuenta', null); return; }
+    var d = ProblemasTextos.cuenta(admin, envia, recoge);
+    d.acciones[0].alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    Problemas.registrar('cuenta', d);
+  }
+  if (window.Problemas) Problemas.calculador('cuenta', calcularProblemaCuenta);
+
+  function repintarCuenta() {
+    pintarCuenta();
+    if (window.Problemas) Problemas.recalcular('cuenta');
+  }
 
   function textoAvisoVersion() {
     return 'El script de Gmail es más antiguo que la app (tienes ' +
@@ -216,11 +303,20 @@ window.CorreoEnviar = (function () {
   }
 
   async function llamar(cuerpo, limiteMs) {
+    /* Fila 411: el nombre que ve quien recibe el correo, siempre el del centro. */
+    if (cuerpo && !cuerpo.nombreRemitente) {
+      if (!datosDelCentro() && window.Plantillas && window.App && App.E && App.E.gestor) {
+        try { await Plantillas.cargarReciente(App.E.gestor); } catch (e) { /* se usa el de siempre */ }
+      }
+      var nombre = nombreDelRemitente();
+      if (nombre) cuerpo.nombreRemitente = nombre;
+    }
     if (enDemo()) {
       return new Promise(function (r) {
         setTimeout(function () {
-          registrarVersionScript(SCRIPT_ESPERADO);   /* fila 291: el script de mentira está al día; «Probar» quita el aviso de la demostración */
-          r({ ok: true, version: SCRIPT_ESPERADO, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() });
+          var cuentaDemo = cuentaDeAdministracion();
+          registrarVersionScript(SCRIPT_ESPERADO, cuentaDemo);   /* fila 291: el script de mentira está al día; «Probar» quita el aviso de la demostración */
+          r({ ok: true, version: SCRIPT_ESPERADO, cuenta: cuentaDemo, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() });
         }, 300);
       });
     }
@@ -262,7 +358,7 @@ window.CorreoEnviar = (function () {
        (clave equivocada, por ejemplo) no dice nada de la versión, y no
        se toca lo que ya se supiera. */
     if (datos.ok === true || Object.prototype.hasOwnProperty.call(datos, 'version')) {
-      registrarVersionScript(datos.version);
+      registrarVersionScript(datos.version, datos.cuenta);
     }
     return datos;
   }
@@ -294,11 +390,11 @@ window.CorreoEnviar = (function () {
       '</summary>' +
       '<div class="bloque-cuerpo">' +
         '<p class="explica">Para que el botón "Enviar" del cuadro de Correo mande el mensaje de ' +
-        'verdad, conecta tu propia cuenta de Google, una vez. Se guarda solo en este navegador: ' +
-        'cada uno conecta la suya.</p>' +
+        'verdad, conecta la cuenta de Administración del centro, una vez. Se guarda solo en este navegador: ' +
+        'en cada ordenador hay que conectarla.</p>' +
         '<ol>' +
           '<li>Abre <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> ' +
-          'con tu cuenta del centro y entra en el proyecto «Gestor - Correos».</li>' +
+          'con la cuenta de Administración y entra en el proyecto «Gestor - Correos».</li>' +
           '<li>Copia el código nuevo desde ' +
           '<a href="https://github.com/fmargon780/gestor-asuntos-ies/blob/main/apps-script/gestor-correos.gs" ' +
           'target="_blank" rel="noopener">GitHub</a> y pégalo en lugar del viejo. Guarda.</li>' +
@@ -312,7 +408,7 @@ window.CorreoEnviar = (function () {
           '<li>Pega aquí abajo la URL con la clave al final, así: <code>URL?k=clave</code>, y pulsa ' +
           '«Probar».</li>' +
         '</ol>' +
-        '<p class="nota">Si en el paso 3 no aparece «Cualquier usuario», la cuenta del centro no deja ' +
+        '<p class="nota">Si en el paso 3 no aparece «Cualquier usuario», la cuenta de Administración no deja ' +
         'publicar así y el envío no puede funcionar; díselo a Claude.</p>' +
         '<p class="nota">Cada vez que pegues código nuevo en el script: «Implementar» → «Gestionar ' +
         'implementaciones» → lápiz → Versión: «Nueva versión» → «Implementar». Así se conserva la ' +
@@ -324,6 +420,7 @@ window.CorreoEnviar = (function () {
           '<button type="button" class="boton" id="envio-correo-probar">Probar</button>' +
         '</div>' +
         '<div id="envio-correo-aviso"></div>' +
+        '<div id="envio-correo-cuenta"></div>' +
         '<div id="envio-correo-version-aviso"></div>' +
       '</div>';
     pantalla.appendChild(d);
@@ -353,6 +450,7 @@ window.CorreoEnviar = (function () {
     if (!bloqueDeAjustes()) return;
     pintarResumenBloque();
     pintarAvisoVersion();
+    pintarCuenta();
     var guardar = document.getElementById('envio-correo-guardar');
     var probarBtn = document.getElementById('envio-correo-probar');
     var aviso = document.getElementById('envio-correo-aviso');
@@ -478,6 +576,9 @@ window.CorreoEnviar = (function () {
     /* fila 178 */
     SCRIPT_ESPERADO: SCRIPT_ESPERADO,
     scriptDesactualizado: scriptDesactualizado,
+    /* fila 411 */
+    cuentaConocida: leerCuentaConocida, cuentaDeAdministracion: cuentaDeAdministracion, nombreDelRemitente: nombreDelRemitente,
+    mismaCuenta: mismaCuenta, lineaDeCuenta: lineaDeCuenta, estadoDeCuenta: estadoDeCuenta, repintarCuenta: repintarCuenta,
     versionConocida: leerVersionConocida,
     /* solo para las pruebas */
     _numeroDeFila: numeroDeFila,

@@ -302,3 +302,12 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 398 — archivar sin esperar (21-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Con el primer asunto real que archives después de publicar (`docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md`, parte 2): al pulsar «Archivar» sale de la lista al instante y puedes abrir otro; arriba sale «Archivando…» y se quita solo cuando la carpeta ya está en el archivo de Dropbox. Si Dropbox tiene un fichero abierto y el traslado falla, el asunto vuelve a la lista y sale un aviso rojo con botón de cerrar.
+
+## Fila 411 — correo desde la cuenta común (21-oct-2026)
+
+Después de los pasos de `docs/TE-TOCA.md` (fila 411):
+
+- [ ] [SOLO FRANCISCO] Etiquetas «GESTOR» un correo en la cuenta común y aparece en «Ha llegado» del Gestor, en el ordenador de Francisco y en el de Diego.
+- [ ] [SOLO FRANCISCO] Envías un correo desde un asunto: quien lo recibe ve «Administración · IES Fuente Lucena» y la dirección 29700692.administracion@g.educaand.es.
+- [ ] [SOLO FRANCISCO] Ese correo queda en «Enviados» de la cuenta común, no en la de Francisco.
+- [ ] [SOLO FRANCISCO] Un correo etiquetado «GESTOR» en la cuenta personal de Francisco ya no aparece en el Gestor.

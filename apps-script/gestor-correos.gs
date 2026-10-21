@@ -43,6 +43,14 @@
    (CacheService). Una petición sin identificador se envía como siempre.
    Versión del script: VERSION_SCRIPT, más abajo.
 
+   21-oct-2026, fila 411, docs/CORREO-DESDE-LA-CUENTA-COMUN.md: el Gestor
+   recoge y envía solo desde la cuenta común de Administración. Todo
+   correo lleva el nombre de remitente que manda la app
+   (`nombreRemitente`, opción `name` de Gmail); cada respuesta del script
+   dice con qué cuenta trabaja (`cuenta`); y una respuesta dentro de un
+   hilo guardado desde otro buzón busca ese hilo por `rfc822msgid:`
+   con las `matriculas` que manda la app.
+
    26-sep-2026, fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md: la memoria
    de un `idEnvio` ya no dura solo 6 horas (el máximo de CacheService):
    además se apunta en `PropertiesService.getScriptProperties()`,
@@ -431,7 +439,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '13-oct-2026 · fila 336';
+var VERSION_SCRIPT = '21-oct-2026 · fila 411';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 function doPost(e) {
@@ -494,7 +502,10 @@ function enviarUnaVez(cuerpo) {
 }
 
 function conVersion(r) {
-  if (r && typeof r === 'object') r.version = VERSION_SCRIPT;
+  if (r && typeof r === 'object') {
+    r.version = VERSION_SCRIPT;
+    r.cuenta = miCorreo();   /* fila 411: con qué cuenta trabaja este script; Ajustes avisa si no es la de Administración */
+  }
   return r;
 }
 
@@ -591,9 +602,13 @@ function enviarCorreo(cuerpo) {
 
   var opciones = { attachments: attachments };
   if (cco) opciones.bcc = cco;
+  /* Fila 411: el nombre que ve quien recibe el correo («Administración · IES Fuente Lucena»).
+     Una app vieja no lo manda: se envía como hasta ahora. */
+  var nombreRemitente = String(cuerpo.nombreRemitente || '').trim();
+  if (nombreRemitente) opciones.name = nombreRemitente;
 
   var hiloId = String(cuerpo.hilo || '').trim();
-  var hilo = hiloId ? hiloParaResponder(hiloId, para, cco) : null;
+  var hilo = hiloId ? hiloParaResponder(hiloId, para, cco, cuerpo.matriculas) : null;
 
   try {
     var mensaje;
@@ -613,15 +628,31 @@ function enviarCorreo(cuerpo) {
    hilo: si el hilo existe pero se le añade alguien nuevo de golpe,
    mejor un correo nuevo que mezclar destinatarios sin que nadie lo
    haya decidido. */
-function hiloParaResponder(hiloId, para, cco) {
+function hiloParaResponder(hiloId, para, cco, matriculas) {
   var hilo;
-  try { hilo = GmailApp.getThreadById(hiloId); } catch (e) { return null; }
+  try { hilo = GmailApp.getThreadById(hiloId); } catch (e) { hilo = null; }
+  /* Fila 411: un hilo guardado desde otro buzón (el de Francisco) no existe en la cuenta común:
+     se busca por los identificadores de mensaje, de la última a la primera, como en hiloDeSeguido. */
+  if (!hilo) hilo = hiloPorMatriculas(matriculas);
   if (!hilo) return null;
   var yaEnHilo = direccionesDelHilo(hilo.getMessages());
   var pedidas = todasLasDirecciones(para + ',' + cco);
   if (!pedidas.length) return null;
   var todasDentro = pedidas.every(function (d) { return yaEnHilo.indexOf(d) !== -1; });
   return todasDentro ? hilo : null;
+}
+
+function hiloPorMatriculas(matriculas) {
+  if (!matriculas || !matriculas.length) return null;
+  for (var i = matriculas.length - 1; i >= 0; i--) {
+    var m = String(matriculas[i] || '').replace(/[<>\s]/g, '');
+    if (!m) continue;
+    try {
+      var encontrados = GmailApp.search('rfc822msgid:' + m, 0, 1);
+      if (encontrados.length) return encontrados[0];
+    } catch (e) { /* una búsqueda que falla no impide mandar el correo nuevo */ }
+  }
+  return null;
 }
 
 function todasLasDirecciones(texto) {

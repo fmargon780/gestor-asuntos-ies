@@ -43,7 +43,7 @@ var Problemas = (function () {
 
   /* El orden de las tarjetas. */
   var ORDEN = ['alumnado', 'personal-sin-dni', 'personal-dos-listados', 'personal-listado', 'carpetas', 'hitos', 'conflictos', 'conservacion', 'envolturas',
-    'bandeja', 'script', 'rutas', 'configurar', 'fichas-archivo', 'contacto'];
+    'bandeja', 'script', 'cuenta', 'rutas', 'configurar', 'fichas-archivo', 'contacto'];
 
   var tarjetas = {};        /* id -> { desc, firma, el } */
   var calculadores = [];    /* { id, calcular, cada, ultimo } */

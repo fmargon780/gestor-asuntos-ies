@@ -183,6 +183,28 @@ var ProblemasTextos = (function () {
     };
   }
 
+  /* h2) Este ordenador no trabaja con la cuenta de Administración (fila 411). `envia` y `recoge`: las cuentas conocidas ('' si no se sabe). */
+  function cuenta(admin, envia, recoge) {
+    var cuales = [];
+    if (envia) cuales.push('envía con ' + envia);
+    if (recoge) cuales.push('recoge con ' + recoge);
+    return {
+      titulo: 'Este ordenador no usa la cuenta de Administración',
+      que: 'Este ordenador ' + cuales.join(' y ') + ', y los correos del centro tienen que salir y entrar por ' + admin + '.',
+      porque: 'El script de Gmail de este ordenador está conectado a otra cuenta de Google.',
+      quien: QUIEN,
+      pasos: [
+        'Entra en script.google.com con ' + admin + ' y abre el proyecto «Gestor - Correos».',
+        'Aquí, en Este ordenador → «Enviar correo», pega la dirección de esa cuenta y pulsa «Probar».',
+        'En «Bandeja de correos», señala la carpeta GESTOR-BANDEJA del Drive de esa cuenta.'
+      ],
+      soporte: 'Para que lo haga quien montó la aplicación.',
+      acciones: [
+        { texto: 'Ver «Enviar correo»', cambia: false, id: 'problema-cuenta-ver', explica: 'Abre «Enviar correo», para ver con qué cuenta trabaja y probar el envío.' }
+      ]
+    };
+  }
+
   /* i) La ruta más larga no cabe. `m`: lo que devuelve Nombres.medidor. */
   function rutas(m) {
     var clave = (m.masOcupa && m.masOcupa.clave) || '';
@@ -286,7 +308,7 @@ var ProblemasTextos = (function () {
     personalSinDni: personalSinDni, personalDosListados: personalDosListados, personalListado: personalListado,
     NO_SE_SABE: NO_SE_SABE, QUIEN: QUIEN, plural: plural,
     alumnado: alumnado, carpetas: carpetas, hitos: hitos, conflictos: conflictos, conservacion: conservacion,
-    envolturas: envolturas, bandeja: bandeja, script: script, rutas: rutas, configurar: configurar,
+    envolturas: envolturas, bandeja: bandeja, script: script, cuenta: cuenta, rutas: rutas, configurar: configurar,
     fichasArchivo: fichasArchivo, contacto: contacto
   };
 })();

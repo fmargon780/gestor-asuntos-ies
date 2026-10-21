@@ -109,7 +109,7 @@ console.log('--- 6. la regla de la hora ---');
 console.log('--- 7. el script de Gmail ---');
 {
   const gs = fs.readFileSync(new URL('../apps-script/gestor-correos.gs', import.meta.url), 'utf8');
-  comprobar('7. versión de la fila 336', /var VERSION_SCRIPT = '13-oct-2026 · fila 336';/.test(gs), true);
+  comprobar('7. versión de la fila 411', /var VERSION_SCRIPT = '21-oct-2026 · fila 411';/.test(gs), true);
   comprobar('7. escribe latido.json al final de recogerCorreos', /finally \{\s*escribirLatido\(carpeta\);/.test(gs) && /FICHERO_LATIDO = 'latido\.json'/.test(gs), true);
   comprobar('7. cada 10 minutos', /MINUTOS_ENTRE_LATIDOS = 10/.test(gs), true);
 }

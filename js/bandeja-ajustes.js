@@ -34,8 +34,8 @@
       '</summary>' +
       '<div class="bloque-cuerpo">' +
         '<p class="explica">En Gmail le pones a un correo la etiqueta <code>GESTOR</code>. ' +
-        'Un script lo recoge y deja su ficha en la carpeta <code>GESTOR-BANDEJA</code> de tu Drive. ' +
-        'Señálala aquí una vez y los correos saldrán arriba, en la pantalla de asuntos abiertos, ' +
+        'Un script lo recoge, en la cuenta de Administración, y deja su ficha en la carpeta <code>GESTOR-BANDEJA</code> de su Drive. ' +
+        'Señálala aquí una vez, en cada ordenador, y los correos saldrán arriba, en la pantalla de asuntos abiertos, ' +
         'con el asunto ya propuesto.</p>' +
         '<div id="estado-bandeja" class="lista"></div>' +
         '<div class="alta-tipo" id="botones-bandeja"></div>' +

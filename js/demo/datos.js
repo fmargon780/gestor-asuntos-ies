@@ -636,7 +636,7 @@
     var latido = new URLSearchParams(window.location.search).get('latido') || '';
     if (latido !== 'ninguno') {
       var hora = new Date(Date.now() - (latido === 'viejo' ? 3 * 24 * 3600 * 1000 : 60 * 1000)).toISOString();
-      await Carpetas.guardarJson(disco.bandeja, 'latido.json', { hora: hora, version: '13-oct-2026 · fila 336', cuenta: 'demo@correo-demo.es' });
+      await Carpetas.guardarJson(disco.bandeja, 'latido.json', { hora: hora, version: '13-oct-2026 · fila 336', cuenta: (window.Plantillas && Plantillas.POR_DEFECTO_CUENTA_ADMIN) || '29700692.administracion@g.educaand.es' });
     }
     /* La bandeja ya arrancó sin carpeta: con `?latido=` se le dice cuál es (sin él la demostración sigue como siempre). */
     if (latido && window.BandejaNucleo) {

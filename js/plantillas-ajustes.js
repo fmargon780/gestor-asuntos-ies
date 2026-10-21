@@ -47,6 +47,10 @@
     if ($('plantillas-direccion-normativa')) {
       $('plantillas-direccion-normativa').value = datosDeAjustes.direccionNormativa;
     }
+    /* Fila 411: el nombre del remitente y la cuenta de Administración. */
+    if ($('plantillas-remitente')) $('plantillas-remitente').value = datosDeAjustes.remitente;
+    if ($('plantillas-cuenta-admin')) $('plantillas-cuenta-admin').value = datosDeAjustes.cuentaAdministracion;
+    if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();
     if (window.HitosNormativa) HitosNormativa.refrescar();
     if (window.CentroDeDatosConfiguracion) CentroDeDatosConfiguracion.marcarCampos();   /* fila 313: lo que viene del Centro de datos no se escribe aquí */
   }
@@ -68,6 +72,24 @@
     campo.parentNode.insertBefore(ayuda, campo.nextSibling);
   }
 
+  /* Fila 411 (docs/CORREO-DESDE-LA-CUENTA-COMUN.md): los dos campos del correo, creados desde aquí
+     (como la ayuda de la dirección de normativa) para no tocar index.html. */
+  function montarCamposDeCorreo() {
+    if ($('plantillas-remitente')) return;
+    var boton = $('plantillas-guardar-firma');
+    if (!boton) return;
+    var caja = document.createElement('div');
+    caja.id = 'plantillas-correo-campos';
+    caja.innerHTML =
+      '<label class="etiqueta" for="plantillas-remitente">Nombre del remitente de los correos</label>' +
+      '<input id="plantillas-remitente" class="campo" placeholder="' + U.escapar(Plantillas.POR_DEFECTO_REMITENTE) + '">' +
+      '<p class="nota">Es lo que ve quien recibe un correo del Gestor, lo envíe quien lo envíe.</p>' +
+      '<label class="etiqueta" for="plantillas-cuenta-admin">Cuenta de correo de Administración</label>' +
+      '<input id="plantillas-cuenta-admin" class="campo" placeholder="' + U.escapar(Plantillas.POR_DEFECTO_CUENTA_ADMIN) + '">' +
+      '<p class="nota">La cuenta común desde la que el Gestor recoge y envía. Si un ordenador trabaja con otra, Ajustes avisa.</p>';
+    boton.parentNode.insertBefore(caja, boton);
+  }
+
   async function guardarFirma() {
     var firma = $('plantillas-firma').value;
     var centro = $('plantillas-centro').value.trim() || Plantillas.POR_DEFECTO_CENTRO;
@@ -75,6 +97,8 @@
     var direccion = $('plantillas-direccion').value.trim();
     var codigo = $('plantillas-codigo').value.trim();
     var cargo = $('plantillas-cargo').value.trim();
+    var remitente = $('plantillas-remitente') ? ($('plantillas-remitente').value.trim() || Plantillas.POR_DEFECTO_REMITENTE) : datosDeAjustes.remitente;
+    var cuentaAdministracion = $('plantillas-cuenta-admin') ? ($('plantillas-cuenta-admin').value.trim() || Plantillas.POR_DEFECTO_CUENTA_ADMIN) : datosDeAjustes.cuentaAdministracion;
     var provincia = $('plantillas-provincia') ? $('plantillas-provincia').value.trim() : datosDeAjustes.provincia;
     var direccionNormativa = $('plantillas-direccion-normativa')
       ? $('plantillas-direccion-normativa').value.trim().replace(/\/$/, '')
@@ -87,11 +111,14 @@
         actual.direccion = direccion;
         actual.codigo = codigo;
         actual.cargo = cargo;
+        actual.remitente = remitente;
+        actual.cuentaAdministracion = cuentaAdministracion;
         actual.provincia = provincia;
         actual.direccionNormativa = direccionNormativa;
         return actual;
       });
       if (window.HitosNormativa) HitosNormativa.refrescar();
+      if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();
       U.aviso('Firma y centro guardados.', 'bueno');
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
@@ -511,6 +538,7 @@
 
   function enganchar() {
     ayudarConLaDireccionNormativa();
+    montarCamposDeCorreo();
     if (!window.Gestor) return;
     window.Gestor.alRefrescar.push(function () {
       if (!App.E.gestor) return;

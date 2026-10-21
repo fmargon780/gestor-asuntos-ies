@@ -51,7 +51,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-biblioteca-hitos', donde: 'dia', otras: 'hitos, tareas, plazos, guías, biblioteca' },
     { id: 'bloque-tipos-organo', donde: 'dia', otras: 'órgano, dirección, secretaría, jefatura, encarga' },
     /* El centro */
-    { id: 'bloque-datos-centro', donde: 'centro', otras: 'nombre del instituto, código, dirección, localidad, provincia, firma' },
+    { id: 'bloque-datos-centro', donde: 'centro', otras: 'nombre del instituto, código, dirección, localidad, provincia, firma, remitente, nombre del remitente, cuenta de Administración' },
     { id: 'bloque-cargos', donde: 'centro', otras: 'director, secretaria, jefatura, quién firma' },
     { id: 'bloque-perfiles', donde: 'centro', otras: 'usuarios, directivos, perfil, correo, quién entra' },
     { id: 'bloque-membrete', donde: 'centro', otras: 'logo, cabecera, Junta, Consejería' },
