@@ -186,7 +186,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 402 | Tema: ir al asunto tras añadirle un documento. Junta la idea 399: al añadir un documento de Por clasificar a un asunto que ya existe, que la app ofrezca ir a ese asunto para seguir trabajando con él. Al crear un asunto desde Por clasificar ya lleva a él (idea 383); aquí falta el caso de añadir a uno existente. | DECIDIDA (21-oct-2026) · tema |
 | 403 | Tema: contadores de Inicio que cuadran. Junta la idea 400: la suma de los contadores de Inicio no coincide con el total de asuntos abiertos; que cuadren, o que se vea qué asuntos no entran en ningún contador. | DECIDIDA (21-oct-2026) · tema |
 | 404 | Tema: desactivar un tipo de asunto. Junta la idea 401: hoy un tipo de asunto se crea, se cambia o se borra; poder también desactivarlo, para que no se use mientras esté desactivado, sin perderlo ni tocar los asuntos que ya lo tienen. | DECIDIDA (21-oct-2026) · tema |
-| 405 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1BXrQ_UT99PQZZ_gw-9qcyV-gMROjue1Z/view?usp=drivesdk |
+| 405 | Aviso de usuario: error en «Ficha de un asunto» | EN DISEÑO (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1BXrQ_UT99PQZZ_gw-9qcyV-gMROjue1Z/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
