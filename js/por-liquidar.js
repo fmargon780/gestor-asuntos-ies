@@ -92,7 +92,7 @@ window.PorLiquidar = (function () {
      tipo que hay que liquidar, el asunto pasa a «Por liquidar» (con su
      aviso y «Deshacer»); para los demás, el archivado de siempre. */
   async function archivarOPasar(a) {
-    if (!exige(a) || estaPorLiquidar(a)) return App.cerrarAsunto(a);
+    if (!exige(a) || estaPorLiquidar(a)) return ArchivarFondo.archivar(a);
     await pasar(a, { auto: false });
     U.aviso('Pasa a Por liquidar.', 'bueno', {
       boton: 'Deshacer',

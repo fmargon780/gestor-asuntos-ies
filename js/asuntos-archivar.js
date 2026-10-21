@@ -166,6 +166,10 @@ App.cerrarAsunto = async function (a) {
     'Si algo falla, la carpeta se queda donde está.</p>', 'Archivar el asunto');
   if (!confirmar) return;
 
+  /* Fila 398: sin más preguntas. Si lo llamó ArchivarFondo.archivar, el asunto sale ya de
+     la lista y quien pulsó recupera la pantalla; el traslado sigue por detrás. */
+  if (window.ArchivarFondo) await ArchivarFondo.empieza(a, categoria, tercero);
+
   try {
     /* La tarjeta de la lista puede llevar un rato pintada: si un
        intento anterior llegó a completarse (o el otro ordenador la
@@ -184,7 +188,7 @@ App.cerrarAsunto = async function (a) {
         var totalFicherosYa = await Carpetas.contarFicheros(handleYaArchivada);
         await App.anotar(a.nombre, {
           estado: 'cerrado', categoria: categoria, tercero: tercero,
-          cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa
+          cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa, archivandose: undefined
         });
         await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleYaArchivada);
         App.E.recienArchivados[a.nombre] = true;
@@ -211,6 +215,7 @@ App.cerrarAsunto = async function (a) {
     if (!haciendoFusion) await Carpetas.mover(App.E.abiertos, a.nombre, destino);
   } catch (e) {
     if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
+    if (window.ArchivarFondo && ArchivarFondo.fallo(a, e, 'el archivo')) return;
     U.aviso(mensajeDeFallo('archivar', e, 'Asuntos abiertos', 'el archivo'), 'malo');
     return;
   }
@@ -224,7 +229,7 @@ App.cerrarAsunto = async function (a) {
     var totalFicheros = await Carpetas.contarFicheros(handleArchivado);
     await App.anotar(a.nombre, {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
-      cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros
+      cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros, archivandose: undefined
     });
     /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');

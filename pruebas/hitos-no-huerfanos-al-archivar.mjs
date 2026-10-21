@@ -91,6 +91,8 @@ async function abrirFichaYArchivar(clave) {
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)', { timeout: 15000 });
+  /* Fila 398: archivar sigue por detrás; se espera a que acabe del todo. */
+  await pagina.waitForFunction(() => !window.ArchivarFondo.hayEnMarcha(), null, { timeout: 15000 });
 }
 
 /* Parchea Carpetas.escribirTexto para que, cuando se le pida escribir
