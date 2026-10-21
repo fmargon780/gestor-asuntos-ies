@@ -220,6 +220,14 @@ buscador único justo debajo (`#buscar-tercero`) y sus resultados.
   repintado: quien reabra ese mismo asunto más tarde para trabajar con la lista de hitos, no la
   mesa, tiene que cerrarla con «← Volver a los hitos» (`.mesa-volver`).
 
+**Aviso de persona en otra lista** (fila 386, `docs/AVISO-PERSONA-EN-OTRA-LISTA.md`): con una
+categoría elegida (ALUMNADO o PERSONAL, por el tipo o por la pastilla), si el buscador de Nuevo asunto
+no encuentra a nadie, o se pulsa «Dar de alta», `App.avisoPersonaEnOtraLista`
+(`js/asuntos-nuevo-alta.js`) busca el texto en la otra de esas dos listas. Si hay alguien, pinta un
+aviso por persona (máximo 5) con «Es esa persona: elegir otro tipo» (`App.fijarTercero`, deja
+`tipoEnLinea` en false) y «Es otra persona» (apunta el texto en `App.E.nuevo.otraPersona` y sigue como
+siempre). No toca el cuadro de correo ni «Cambiar el asunto». Prueba: `pruebas/persona-en-otra-lista.mjs`.
+
 Se comprueba con `pruebas/nuevo-asunto-persona-primero.mjs`, y con las pruebas viejas de este
 formulario puestas al día para el camino nuevo (`nuevo-asunto-sin-repetir.mjs`,
 `tipo-desde-el-asunto.mjs`, `quien-encarga-cada-tipo.mjs`, `navegador.mjs`, `hitos.mjs`…). Lo de la

@@ -105,6 +105,48 @@ App.buscarEnCategorias = async function (texto, categorias, topePorCategoria) {
   return salida;
 };
 
+/* Fila 386 (docs/AVISO-PERSONA-EN-OTRA-LISTA.md): con un tipo o una
+   categoría de ALUMNADO o PERSONAL elegidos, si la persona buscada no
+   está en esa lista pero sí en la otra, se avisa en vez de dejar dar de
+   alta un duplicado. Devuelve true si ha pintado el aviso en `caja`.
+   `alOtra` se llama al pulsar «Es otra persona». */
+App.avisoPersonaEnOtraLista = async function (texto, caja, alOtra) {
+  var cat = App.E.nuevo.categoria;
+  if (cat !== 'ALUMNADO' && cat !== 'PERSONAL') return false;
+  var clave = U.normalizar(texto);
+  if (App.E.nuevo.otraPersona === clave) return false;
+  var otra = cat === 'ALUMNADO' ? 'PERSONAL' : 'ALUMNADO';
+  var hallados = (await App.buscarEnCategorias(texto, [otra], 5))[0].resultados;
+  if (!hallados.length) return false;
+  caja.innerHTML = '';
+  var lista = Nombres.textoCategoria(cat, 'lista');
+  hallados.forEach(function (p) {
+    var d = document.createElement('div');
+    d.className = 'aviso-otra-lista';
+    d.style.cssText = 'border:1px solid #d9a400;background:#fff8e1;border-radius:6px;padding:8px;margin:6px 0';
+    var frase = App.E.nuevo.tipo
+      ? 'Este tipo es de ' + U.escapar(lista.toLowerCase()) + '.'
+      : 'Has elegido <strong>' + U.escapar(lista) + '</strong>.';
+    d.innerHTML = '<div><strong>' + U.escapar(p.nombre) + '</strong> está en <strong>' +
+      U.escapar(Nombres.textoCategoria(p.categoria, 'lista')) + '</strong>. ' + frase + '</div>';
+    var si = document.createElement('button');
+    si.className = 'boton boton-esa-persona';
+    si.style.marginRight = '6px';
+    si.textContent = App.E.nuevo.tipo ? 'Es esa persona: elegir otro tipo' : 'Es esa persona: cambiar';
+    si.onclick = function () { App.E.nuevo.tipoEnLinea = false; App.fijarTercero(p); };
+    var no = document.createElement('button');
+    no.className = 'boton boton-otra-persona';
+    no.textContent = 'Es otra persona';
+    no.onclick = function () { App.E.nuevo.otraPersona = clave; alOtra(); };
+    var fila = document.createElement('div');
+    fila.style.marginTop = '6px';
+    fila.appendChild(si); fila.appendChild(no);
+    d.appendChild(fila);
+    caja.appendChild(d);
+  });
+  return true;
+};
+
 /* Tras dar de alta, queda elegido sin tener que volver a pulsarlo
    (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 3): si estamos en
    Nuevo asunto y en la misma categoría, se llama a App.fijarTercero con
