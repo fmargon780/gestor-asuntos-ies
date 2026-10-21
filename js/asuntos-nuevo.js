@@ -322,6 +322,7 @@ App.nuevoAsuntoCon = function (opciones) {
     App.E.nuevo.tipoEnLinea = true;   /* fila 257: el tipo ya viene reconocido: una línea con «Cambiar», no la parrilla */
     App.pintarTipos();
     if (tercero) App.fijarTercero(tercero);
+    if (!App.E.nuevo.tipo) { App.E.nuevo.tipoEnLinea = false; App.pintarTipos(); }   /* fila 385: fijarTercero descartó el tipo (otra categoría): vuelve la parrilla */
   } else if (tercero) {
     App.E.nuevo.terceroPropuesto = tercero;
     App.pintarTipos();

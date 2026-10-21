@@ -451,7 +451,7 @@ App.empezarAsuntoCon = function (s) {
     (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
   var fecha = propuesta && propuesta.fecha ? isoDeFechaLector(propuesta.fecha) : '';
 
-  if (tipoObj && propuesta.tercero) {
+  if (tipoObj && propuesta.tercero && App.tipoEncajaConTercero(tipoObj, propuesta.tercero.persona)) {   /* fila 385 */
     App.crearAsuntoConPropuesta(tipoObj, propuesta.tercero.persona, s);
     return;
   }
