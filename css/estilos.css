@@ -631,3 +631,10 @@ body.solo-consulta #lector { height: calc(100vh - var(--franja-demo-alto, 0px) -
 .marca-version { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 9px; background: #fff4d6; color: #8a5a00;
   border: 1px solid #e0b34a; font-size: 11px; cursor: pointer; white-space: nowrap; }
 .marca-version:hover { background: #ffe9ad; }
+
+/* Fila 364 (js/guardado-pendiente.js): el aviso fijo de «un cambio no se ha guardado todavía» y los avisos de un cambio tirado. */
+.guardado-pendiente-avisos { position: fixed; top: 0; left: 0; right: 0; z-index: 60; display: flex; flex-direction: column; pointer-events: none; }
+.guardado-pendiente-avisos > * { pointer-events: auto; }
+.guardado-pendiente-fijo, .guardado-pendiente-cerrable { background: var(--rojo-linea); color: #fff; padding: 10px 18px; font-size: 14px; font-weight: 600; text-align: center; box-shadow: 0 2px 8px rgba(10,25,45,.3); }
+.guardado-pendiente-fijo.oculto { display: none; }
+.guardado-pendiente-cerrable { border-top: 1px solid rgba(255,255,255,.4); }

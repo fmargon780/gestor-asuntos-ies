@@ -61,7 +61,7 @@ console.log('--- 1 y 2. lo que se apunta ---');
   d = await hoy(pagina);
   comprobar('1. «asunto.archivar» y «asunto.abrir» apuntados', [!!(d.tiempos['asunto.archivar'] && d.tiempos['asunto.archivar'].n >= 1), !!(d.tiempos['asunto.abrir'] && d.tiempos['asunto.abrir'].n >= 1)], [true, true]);
   const claves = Object.keys(d.tiempos).concat(Object.keys(d.cuentas), Object.keys(d.pesos));
-  const raros = claves.filter((k) => !/^(entrar|lista|asunto|archivo|leer|escribir|reintento|sin-remedio|conflicto|fallo|accesorio|cola|guardar)[.:]/.test(k) && k !== 'entrar.total');
+  const raros = claves.filter((k) => !/^(entrar|lista|asunto|archivo|leer|escribir|reintento|sin-remedio|tarde|conflicto|fallo|accesorio|cola|guardar)[.:]/.test(k) && k !== 'entrar.total');
   comprobar('2. ningún rótulo fuera de las familias conocidas', raros, []);
   comprobar('2. rótulos de ficheros', await pagina.evaluate(() => [
     Medidas.rotuloDeFichero({ name: 'x' }, 'asuntos.json'),

@@ -284,6 +284,9 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: asuntos, hitos, tablón,
   CSV de terceros, índice, borrados); nunca `Copias.guardar` directo de `asuntos.json`.
   Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.
+- Un cambio de un fichero de datos que no se puede escribir (Dropbox) no se tira: queda pendiente
+  (`GuardadoPendiente`, también en el navegador), se reintenta solo y sale un aviso rojo fijo arriba;
+  quien guardó espera a que salga de verdad. Se tira solo si otro ordenador cerró el asunto.
 - Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
   (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia.
 - Las listas de la ficha (`hilos`, `relacionados`, `pendientesRegistro`, `notas`) se funden por

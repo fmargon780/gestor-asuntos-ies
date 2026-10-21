@@ -472,6 +472,8 @@ App.cargarRegistro = async function () {
     if (e.name !== 'LecturaVacia') throw e;
     console.warn(e.message);
   }
+  /* Fila 364: lo que sigue sin guardarse se sigue viendo, y lo de la sesión anterior se recupera. */
+  if (window.GuardadoPendiente) await GuardadoPendiente.alCargar(App.E.registro);
 };
 
 /* La única forma correcta de escribir el registro entero (fila 61,
@@ -493,15 +495,41 @@ App.enFila = function (fichero, fn) {
   return window.ColaGuardado ? window.ColaGuardado.poner(fichero, fn) : fn();
 };
 
-App.guardarRegistroFresco = function (cambiar) {
-  return App.enFila(App.FICHERO_ASUNTOS, async function () {
+/* Fila 364 (docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md, js/guardado-pendiente.js): si la
+   escritura acaba con un error de sincronización después de los reintentos de siempre, el cambio
+   no se tira: queda pendiente (también en el navegador), la pantalla ya lo enseña y se reintenta
+   solo. Quien lo pidió espera, sin bloquear la cola, a que salga de verdad. Antes de cada guardado
+   se pone encima del disco lo que siga pendiente, para que un cambio posterior nunca lo deshaga.
+   `esReintento` es el reintento solo del propio módulo: nunca apunta ni espera. */
+App.guardarRegistroFresco = async function (cambiar, esReintento) {
+  var GP = window.GuardadoPendiente;
+  var quedaPendiente = await App.enFila(App.FICHERO_ASUNTOS, async function () {
     var registro = await App.leerRegistroDelDisco();
-    await cambiar(registro);
-    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, registro);
+    var aplicado = GP ? await GP.superponer(registro, true) : false;
+    if (esReintento && !aplicado) return null;
+    var antes = GP ? JSON.stringify(registro) : null;
+    if (GP) GP.empiezaCambio();
+    try { await cambiar(registro); }
+    catch (e) { if (GP) GP.sueltaComprobadas(); throw e; }
+    try {
+      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, registro, { sinPendiente: true });
+    } catch (e) {
+      var claves = (GP && !esReintento && Reintentar.esErrorDeSincronizacion(e)) ? GP.apuntarAsuntos(antes, registro) : null;
+      if (GP) GP.sueltaComprobadas();
+      if (!claves) throw e;
+      App.E.asuntosEnDisco = Math.max(App.E.asuntosEnDisco, App.contarAsuntos(registro));
+      App.E.registro = registro;
+      App.refrescarFichas();
+      return claves;
+    }
+    if (GP) GP.sueltaComprobadas();
     App.E.asuntosEnDisco = App.contarAsuntos(registro);
     App.E.registro = registro;
+    if (aplicado) GP.guardado(GP.ASUNTOS, true);
     App.refrescarFichas();
+    return null;
   });
+  if (quedaPendiente) await GP.esperar(GP.ASUNTOS, quedaPendiente);
 };
 
 /* Un asunto con una acción larga en marcha (archivar, reabrir,
@@ -529,6 +557,7 @@ App.conOcupado = async function (nombre, fn) {
    la cola, con el disco ya releído: quien llama lo enseña con
    U.fallo/U.aviso. */
 App.comprobarNoCerrado = async function (clave) {
+  if (window.GuardadoPendiente) GuardadoPendiente.anotaComprobada(clave);   /* fila 364: ese cambio se tira si luego resulta cerrado */
   if (!window.Borrados) return;
   if (await Borrados.estaCerrada(App.E.gestor, 'asuntos', clave)) {
     var e = new Error('Este asunto ya está archivado en el otro ordenador. Recarga la lista.');

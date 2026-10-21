@@ -43,7 +43,14 @@ var Reintentar = (function () {
         return await intento();
       } catch (e) {
         /* Fila 332: cuántas veces se reintenta y cuántas se rinde (`nombre`: solo al escribir; el rótulo sale de una tabla fija). */
-        if (window.Medidas && nombre !== undefined && esErrorDeSincronizacion(e)) Medidas.cuenta((i === ESPERAS_MS.length ? 'sin-remedio:' : 'reintento:') + Medidas.rotuloDeFichero(dir, nombre));
+        /* Fila 364: «sin-remedio» solo cuenta lo que nunca llega a guardarse. Un fichero de datos cubierto por
+           el guardado pendiente (js/guardado-pendiente.js) no se rinde aquí: si sale tarde cuenta `tarde:`, y
+           si se tira, `sin-remedio:` lo apunta el propio módulo. */
+        if (window.Medidas && nombre !== undefined && esErrorDeSincronizacion(e)) {
+          var ultimo = i === ESPERAS_MS.length;
+          if (!ultimo) Medidas.cuenta('reintento:' + Medidas.rotuloDeFichero(dir, nombre));
+          else if (!(window.GuardadoPendiente && GuardadoPendiente.cubre(nombre) && dir && dir.name === '_GESTOR')) Medidas.cuenta('sin-remedio:' + Medidas.rotuloDeFichero(dir, nombre));
+        }
         if (!esErrorDeSincronizacion(e) || i === ESPERAS_MS.length) throw e;
         await esperar(ESPERAS_MS[i]);
       }
