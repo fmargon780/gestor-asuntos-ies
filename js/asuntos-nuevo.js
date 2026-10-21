@@ -382,6 +382,8 @@ App.buscarTercero = async function () {
   var total = 0;
   porCategoria.forEach(function (p) { total += p.resultados.length; });
 
+  if (!total && filtro && await App.avisoPersonaEnOtraLista(texto, caja, App.buscarTercero)) return;   /* fila 386 */
+
   if (!total) {
     var vacio = document.createElement('div');
     vacio.className = 'vacio';
@@ -511,6 +513,12 @@ App.botonAlta = function (texto) {
   b.style.marginTop = '6px';
   b.textContent = App.E.nuevo.categoria === 'ALUMNADO'
     ? '+ Dar de alta un solicitante' : '+ Dar de alta uno nuevo';
-  b.onclick = function () { App.altaTercero(App.E.nuevo.categoria, texto); };
+  b.onclick = async function () {
+    /* Fila 386: antes de abrir el alta, ¿está ya en la otra lista (Alumnado/Personal)? */
+    var caja = $('resultados-tercero');
+    var cat = App.E.nuevo.categoria;
+    if (await App.avisoPersonaEnOtraLista(texto, caja, function () { App.altaTercero(cat, texto); })) return;
+    App.altaTercero(cat, texto);
+  };
   return b;
 };
