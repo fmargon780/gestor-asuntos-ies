@@ -190,6 +190,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 406 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | EN TEMA 407 (21-oct-2026) · aviso completo: https://drive.google.com/file/d/1_8ih2-Cch09576FTjmG7T27y-JP9bD9A/view?usp=drivesdk |
 | 407 | Tema: copiar un hito a otra guía. Junta la idea 406: poder copiar un hito con sus tareas desde la guía de un tipo de asunto y ponerlo en la guía de otro tipo, para no rehacer a mano pasos que se repiten entre tipos de asunto. | DECIDIDA (21-oct-2026) · tema |
 | 408 | Aviso de usuario: error en «Inicio» | EN DISEÑO (21-oct-2026) · aviso completo: https://drive.google.com/file/d/1zWRjZwZxzblfOOiuXk6DMP-IB6AMyOs0/view?usp=drivesdk |
+| 409 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (21-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1j_VfP7GZePWWpWtoF10LBjZf7r-B5v4i/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
