@@ -30,6 +30,10 @@ var Plantillas = (function () {
   var ARCHIVO = 'plantillas.json';
   var POR_DEFECTO_FIRMA = 'Un saludo.\n{usuario}\n{centro}';
   var POR_DEFECTO_CENTRO = 'IES Fuente Lucena';
+  /* Fila 411 (docs/CORREO-DESDE-LA-CUENTA-COMUN.md): el nombre que ve quien recibe un correo del Gestor, y la
+     cuenta común de Administración desde la que el Gestor recoge y envía. Se cambian en Ajustes → El centro. */
+  var POR_DEFECTO_REMITENTE = 'Administración · IES Fuente Lucena';
+  var POR_DEFECTO_CUENTA_ADMIN = '29700692.administracion@g.educaand.es';
   /* 20-sep-2026, fila 79, apartado 4.7: la dirección base del sistema
      de normativa del centro, para montar el enlace de una referencia.
      Vacía, las citas se ven sin enlace y no se rompe nada. */
@@ -176,6 +180,8 @@ var Plantillas = (function () {
     return {
       firma: l.firma || POR_DEFECTO_FIRMA,
       centro: l.centro || POR_DEFECTO_CENTRO,
+      remitente: l.remitente || POR_DEFECTO_REMITENTE,
+      cuentaAdministracion: l.cuentaAdministracion || POR_DEFECTO_CUENTA_ADMIN,
       localidad: l.localidad || '',
       direccion: l.direccion || '',
       codigo: l.codigo || '',
@@ -473,6 +479,7 @@ var Plantillas = (function () {
     borrarConPapelera: borrarConPapelera, enUso: enUso, porId: porId, fueraDeUsoDeLaTarea: fueraDeUsoDeLaTarea, avisoFueraDeUso: avisoFueraDeUso,
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
+    POR_DEFECTO_REMITENTE: POR_DEFECTO_REMITENTE, POR_DEFECTO_CUENTA_ADMIN: POR_DEFECTO_CUENTA_ADMIN,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, direccionDeNormativa: direccionDeNormativa, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
     cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
     documentoPorId: documentoPorId, enMemoria: function () { return cache; },

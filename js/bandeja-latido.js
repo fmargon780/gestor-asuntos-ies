@@ -34,6 +34,7 @@ window.BandejaLatido = (function () {
   var ENLACE_PAPELERA = 'https://script.google.com/home/trash';
   var ENLACE_CODIGO = 'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-ies/main/apps-script/gestor-correos.gs';
 
+  var cuentaDelLatido = '';   /* fila 411: la cuenta con la que el script recoge, de la última señal leída */
   var abierta = Date.now();
   var ultimaMirada = 0;
   var mirando = false;
@@ -61,7 +62,7 @@ window.BandejaLatido = (function () {
   function pasos() {
     return '<p>Hay que despertar el programa de Google que recoge los correos:</p>' +
       '<ol>' +
-      '<li>Abre <a href="' + ENLACE_SCRIPT + '" target="_blank" rel="noopener">script.google.com</a> con la cuenta del centro ' +
+      '<li>Abre <a href="' + ENLACE_SCRIPT + '" target="_blank" rel="noopener">script.google.com</a> con la cuenta de Administración ' +
       'y busca «Gestor - Correos». Si no está, mira la <a href="' + ENLACE_PAPELERA + '" target="_blank" rel="noopener">papelera</a> y pulsa «Restaurar».</li>' +
       '<li>Ábrelo, elige <code>prepararTodo</code> en el desplegable de arriba y pulsa «Ejecutar».</li>' +
       '<li>Si la aplicación avisa de que el script es viejo, pega antes <a href="' + ENLACE_CODIGO + '" target="_blank" rel="noopener">el código nuevo</a> ' +
@@ -93,6 +94,8 @@ window.BandejaLatido = (function () {
       var senal = null;
       try { senal = await Carpetas.leerJson(carpeta, FICHERO); } catch (e) { senal = null; }
       ultimaMirada = Date.now();
+      cuentaDelLatido = (senal && typeof senal === 'object' && typeof senal.cuenta === 'string') ? senal.cuenta.trim() : '';
+      if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();   /* fila 411 */
       var r = juzgar(senal, Date.now());
       var enArranque = !esDemo() && Date.now() - abierta < ARRANQUE_MS;
       registrar(enArranque ? '' : texto(r));
@@ -111,5 +114,5 @@ window.BandejaLatido = (function () {
   enganchar();
   if (!window.Gestor) document.addEventListener('DOMContentLoaded', enganchar);
 
-  return { mirar: mirar, _juzgar: juzgar, _texto: texto, FICHERO: FICHERO };
+  return { mirar: mirar, cuenta: function () { return cuentaDelLatido; }, _juzgar: juzgar, _texto: texto, FICHERO: FICHERO };
 })();

@@ -474,6 +474,15 @@ var CorreoCuadro = (function () {
 
   /* ---------- ENVIAR: resumen y confirmación (fila 115) ---------- */
 
+  /* Fila 411: las matrículas (Message-ID) del hilo, para que el script lo busque en la cuenta común si el
+     identificador es de otro buzón. */
+  function matriculasDelUltimoHilo(a) {
+    var hilos = a.ficha && a.ficha.hilos;
+    if (!hilos || !hilos.length) return [];
+    var m = hilos[hilos.length - 1].matriculas;
+    return Array.isArray(m) ? m.filter(Boolean) : [];
+  }
+
   function ultimoHiloDelAsunto(a) {
     var hilos = a.ficha && a.ficha.hilos;
     if (!hilos || !hilos.length) return '';
@@ -601,6 +610,7 @@ var CorreoCuadro = (function () {
         asunto: datos.asunto,
         cuerpo: datos.cuerpo,
         hilo: ultimoHiloDelAsunto(a),
+        matriculas: matriculasDelUltimoHilo(a),
         adjuntos: adjuntosBase64,
         idEnvio: idEnvio || ''
       });
@@ -615,7 +625,7 @@ var CorreoCuadro = (function () {
          verdad, "Esta vez no" ya no pinta nada. */
       var interno = n()._interno;
       if (interno && $('cuadro-aceptar') && (interno.avisoLoPide || $('cuadro-aceptar').textContent === 'Todavía no')) $('cuadro-aceptar').textContent = 'Cerrar';   /* fila 285: tras enviar, ya no es «Todavía no» */
-      if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto); } catch (e) { /* accesorio */ } }
+      if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto, respuesta.matricula ? [respuesta.matricula] : []); } catch (e) { /* accesorio */ } }
       if (n().marcarEnvioRealizado) n().marcarEnvioRealizado();
       if (n().apuntarElRastro) n().apuntarElRastro(a);
       if (interno && interno.avisoActividad && window.ActividadesInforme) { var av = interno.avisoActividad; interno.avisoActividad = null; await ActividadesInforme.alEnviar(a, av); }   /* fila 309 */
@@ -644,10 +654,10 @@ var CorreoCuadro = (function () {
      correo guardado desde la bandeja): así la respuesta del tercero
      entra sola. No crítico: si falla, el correo ya ha salido. */
   /* Fila 176: fundido con App.anotarLista, no mandado entero. */
-  async function anadirHiloAlAsunto(a, hiloId, asuntoTexto) {
+  async function anadirHiloAlAsunto(a, hiloId, asuntoTexto, matriculas) {
     var huella = {
       id: hiloId, asunto: String(asuntoTexto || a.nombre).toLowerCase(), visto: 1,
-      matriculas: [], metidoPor: App.E.usuario, metidoEl: U.ahora()
+      matriculas: matriculas || [], metidoPor: App.E.usuario, metidoEl: U.ahora()
     };
     await App.anotarLista(a.nombre, 'hilos', { anadir: [huella] });
     if (a.ficha) a.ficha.hilos = App.unirPorIdentidad(a.ficha.hilos, [huella], App.IDENTIDAD_LISTA.hilos);
