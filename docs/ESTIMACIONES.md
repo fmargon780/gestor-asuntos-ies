@@ -13,8 +13,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
-| 382 | 70 | Solo CSS de la cabecera encogida de la ficha, volver a medir su alto, poner al día 3-4 pruebas y una nueva, revisor |
-| 364 | 110 | Averiguar el guardado y los reintentos, cambios pendientes también en el navegador, aviso rojo fijo, contador de medidas, prueba, revisor |
-| 398 | 120 | Medir archivar, marca «archivándose», traslado por detrás con «Archivando…», deshacer si falla, prueba de dos seguidos, revisor |
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |

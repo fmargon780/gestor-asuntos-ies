@@ -298,3 +298,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 408 — cambiar el tipo renombra la carpeta y trae la guía (21-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Al entrar con los datos reales: el asunto A26-0465 de Álvaro Baute sale en Inicio con el tipo «Expulsión del Centro»; su carpeta conserva 261020, A26-0465 y el alumno (solo cambia el tipo); y te pregunta si traer la guía de «Expulsión del Centro» (lo ya hecho en sus hitos sigue ahí).
+
+## Fila 398 — archivar sin esperar (21-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Con el primer asunto real que archives después de publicar (`docs/GUARDAR-SIN-PERDER-Y-ARCHIVAR-RAPIDO.md`, parte 2): al pulsar «Archivar» sale de la lista al instante y puedes abrir otro; arriba sale «Archivando…» y se quita solo cuando la carpeta ya está en el archivo de Dropbox. Si Dropbox tiene un fichero abierto y el traslado falla, el asunto vuelve a la lista y sale un aviso rojo con botón de cerrar.
