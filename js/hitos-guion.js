@@ -96,6 +96,7 @@
   function unir(guionDelPaso, hito) {
     var estado = (hito && hito.guionHecho) || {};
     var elegido = (hito && hito.guionElegido) || {};
+    var textos = (hito && hito.guionTextos) || {};   /* fila 405: texto de una pregunta «solo aquí» */
     var ocultos = {};
     ((hito && hito.guionOcultos) || []).forEach(function (id) { ocultos[id] = true; });
     var propios = (hito && hito.guionPropio) || [];
@@ -125,9 +126,12 @@
     var lista = [], plegadas = [];
     (guionDelPaso || []).forEach(function (g) {
       if (!g.pregunta) { var l = lineaDeGuia(g); if (l) lista.push(l); return; }
+      /* Fila 405: una pregunta escondida en este asunto se va con las líneas
+         de todas sus respuestas (lo ya marcado queda guardado, sin verse). */
+      if (ocultos[g.id]) return;
       var opciones = g.opciones || [];
       var op = opciones.filter(function (o) { return o.id === elegido[g.id]; })[0] || null;
-      lista.push({ id: g.id, texto: g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
+      lista.push({ id: g.id, texto: textos[g.id] || g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
                    propio: false, hecho: !!op, noaplica: false, quien: '', cuando: '', pregunta: true,
                    elegida: op ? op.id : '', opciones: opciones.map(function (o) { return { id: o.id, texto: o.texto }; }),
                    deOpcion: null });
@@ -259,6 +263,18 @@
           cuando: original.cuando, valor: original.valor, documento: original.documento };
       }
       delete h.guionHecho[original.id];
+    });
+  }
+
+  /* Fila 405: «Cambiar» solo aquí de una pregunta de las tareas. Guarda un
+     texto alternativo por id de pregunta (`guionTextos`) y no toca las
+     respuestas ni la elegida. Con texto vacío, vuelve el de la guía. */
+  function cambiarPreguntaAqui(clave, idHito, idPregunta, nuevoTexto) {
+    var texto = String(nuevoTexto || '').trim();
+    return editarHito(clave, idHito, function (h) {
+      var textos = Object.assign({}, h.guionTextos || {});
+      if (texto) textos[idPregunta] = texto; else delete textos[idPregunta];
+      h.guionTextos = textos;
     });
   }
 
@@ -417,6 +433,7 @@
   Hitos.marcarGuionPorAccion = marcarGuionPorAccion;
   Hitos.anadirGuionPropio = anadirGuionPropio;
   Hitos.cambiarGuionAqui = cambiarGuionAqui;
+  Hitos.cambiarPreguntaAqui = cambiarPreguntaAqui;
   Hitos.cambiarGuionPropioTexto = cambiarGuionPropioTexto;
   Hitos.borrarGuionPropio = borrarGuionPropio;
   Hitos.ocultarGuionDeGuia = ocultarGuionDeGuia;

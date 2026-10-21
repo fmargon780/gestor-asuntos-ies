@@ -102,10 +102,13 @@ var HitoMesaGuion = (function () {
   }
 
   /* Fila 116: una pregunta de las tareas, con un botón por respuesta. */
-  function preguntaGuionHTML(g, abierto, siguiente) {
+  function preguntaGuionHTML(g, abierto, siguiente, a) {
+    /* Fila 405: el «⋮» y el 💬 como en cualquier tarea, solo con el hito abierto. */
+    var botones = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
+    var debajo = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
     return '<div class="guion-paso guion-pregunta' + (g.elegida ? ' hecho' : '') + (siguiente ? ' guion-siguiente' : '') + '" data-id="' + U.escapar(g.id) + '">' +
-      '<div class="guion-paso-linea"><span class="guion-pregunta-marca">¿</span><span class="guion-paso-texto">' +
-        U.escapar(g.texto) + '</span></div>' +
+      '<div class="guion-paso-fila"><div class="guion-paso-linea"><span class="guion-pregunta-marca">¿</span><span class="guion-paso-texto">' +
+        U.escapar(g.texto) + '</span></div>' + botones + '</div>' + debajo +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       '<div class="guion-respuestas">' + (g.opciones || []).map(function (o) {
         var es = o.id === g.elegida;
@@ -116,7 +119,7 @@ var HitoMesaGuion = (function () {
   }
 
   function lineaHTML(g, abierto, siguiente, a, h) {
-    if (g.pregunta) return preguntaGuionHTML(g, abierto, siguiente);
+    if (g.pregunta) return preguntaGuionHTML(g, abierto, siguiente, a);
     var html = pasoHTML(g, abierto, siguiente, a, h);
     return g.deOpcion ? html.replace('class="guion-paso', 'class="guion-paso guion-de-opcion') : html;
   }
@@ -204,6 +207,13 @@ var HitoMesaGuion = (function () {
     });
     var porId = {};
     guion.forEach(function (g) { porId[g.id] = g; });
+    /* Fila 405: el «⋮» y el 💬 de una pregunta (no tiene casilla ni «No aplica»). */
+    Array.prototype.forEach.call(caja.querySelectorAll('.guion-pregunta'), function (el) {
+      var g = porId[el.dataset.id];
+      if (g && window.HitoMesaTareaMenu) {
+        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto); });
+      }
+    });
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso:not(.guion-pregunta):not(.guion-paso-plegada)'), function (el) {
       var id = el.dataset.id;
       var casilla = el.querySelector('.guion-casilla');

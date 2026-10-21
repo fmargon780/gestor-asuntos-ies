@@ -76,6 +76,7 @@ window.DondeSeGuardaTareas = (function () {
       tipoCorto: ctx.tipoCorto,
       otros: DondeSeGuarda.otrosAbiertos(a).length,
       conTrabajo: extra.conTrabajo || 0,
+      respondida: extra.respondida || 0,
       hitoNuevo: ctx.propio ? { titulo: h.titulo, tareas: ctx.tareas + (extra.tareasMas || 0) } : null,
       apagada: ctx.apagada
     });
@@ -187,7 +188,8 @@ window.DondeSeGuardaTareas = (function () {
       var donde = await preguntar(a, h, ctx, texto);
       if (!donde) return false;
       if (donde === 'aqui' || ctx.apagada) {
-        if (g.propio) { if (texto !== g.texto) await Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto); }
+        if (g.pregunta) { if (texto !== g.texto) await Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto); }
+        else if (g.propio) { if (texto !== g.texto) await Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto); }
         else await Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto);
         if (ctx.tipo) U.aviso(SOLO_AQUI, 'bueno');
         repintar();
@@ -205,7 +207,11 @@ window.DondeSeGuardaTareas = (function () {
             if (!l) return false;
             l.lista[l.i].texto = texto;
           },
-          deshacerAqui: function () { return Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto); }
+          /* Fila 405: una pregunta con texto «solo aquí» vuelve a seguir a la guía. */
+          despues: g.pregunta ? function () { return Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, ''); } : null,
+          deshacerAqui: function () {
+            return g.pregunta ? Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto) : Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto);
+          }
         });
       }
       if (idOriginal) {
@@ -267,6 +273,19 @@ window.DondeSeGuardaTareas = (function () {
     return n;
   }
 
+  /* Fila 405: de los otros asuntos abiertos del tipo, en cuántos está ya
+     respondida la pregunta `idPregunta` del hito de origen `idOrigen`. */
+  async function respondidasEnOtros(a, idOrigen, idPregunta) {
+    var datos = await Hitos.leer();
+    var n = 0;
+    DondeSeGuarda.otrosAbiertos(a).forEach(function (c) {
+      var e = datos.porAsunto[c];
+      var x = e && (e.hitos || []).filter(function (y) { return y.origenGuia === idOrigen && !y.delTipoAnterior; })[0];
+      if (x && x.guionElegido && x.guionElegido[idPregunta]) n++;
+    });
+    return n;
+  }
+
   /* Pasa a «solo aquí» la tarea `g` en los otros asuntos donde ya está
      hecha, para que, al quitarla de la guía, no pierdan lo marcado. */
   async function conservarHechas(a, h, g) {
@@ -294,11 +313,14 @@ window.DondeSeGuardaTareas = (function () {
         repintar();
         return true;
       }
-      var hechas = ctx.enGuia ? await hechasEnOtros(a, ctx.tipo, h.origenGuia, g.id) : 0;
+      /* Fila 405: una pregunta no se «conserva» en los asuntos que la tienen
+         respondida: dejan de verla (y se avisa antes). */
+      var respondidas = (g.pregunta && ctx.enGuia) ? await respondidasEnOtros(a, h.origenGuia, g.id) : 0;
+      var hechas = (ctx.enGuia && !g.pregunta) ? await hechasEnOtros(a, ctx.tipo, h.origenGuia, g.id) : 0;
       var notas = window.NotasHito ? NotasHito.delTarea(a, g.id) : [];
-      var nota = (g.hecho || g.noaplica || notas.length)
-        ? 'Esta tarea ' + (g.hecho || g.noaplica ? 'está marcada' : 'tiene notas') + ' en este asunto.' : '';
-      var donde = await preguntar(a, h, ctx, g.texto, { conTrabajo: hechas, nota: nota });
+      var nota = g.pregunta ? (g.elegida ? 'Esta pregunta está respondida en este asunto.' : '') : ((g.hecho || g.noaplica || notas.length)
+        ? 'Esta tarea ' + (g.hecho || g.noaplica ? 'está marcada' : 'tiene notas') + ' en este asunto.' : '');
+      var donde = await preguntar(a, h, ctx, g.texto, { conTrabajo: hechas, respondida: respondidas, nota: nota });
       if (!donde) return false;
       if (donde === 'aqui' || ctx.apagada || !ctx.enGuia) {
         await Hitos.ocultarGuionDeGuia(a.nombre, h.id, g.id);
@@ -313,7 +335,7 @@ window.DondeSeGuardaTareas = (function () {
           if (!l) return false;
           l.lista.splice(l.i, 1);
         },
-        antesDeTocar: function () { return conservarHechas(a, h, g); },
+        antesDeTocar: g.pregunta ? null : function () { return conservarHechas(a, h, g); },
         deshacerAqui: function () { return Hitos.ocultarGuionDeGuia(a.nombre, h.id, g.id); }
       });
     } catch (err) {
