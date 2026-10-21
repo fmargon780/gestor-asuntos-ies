@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '405', fecha: '2026-10-21', texto: 'Las preguntas que aparecen entre las tareas de un hito vuelven a tener los tres puntitos: se pueden anotar, cambiar y borrar como cualquier otra tarea.' },
   { id: '382', fecha: '2026-10-20', texto: 'En la ficha de un asunto, los botones de copiar (Asunto, Ruta, Nombre, DNI…) ya no se esconden al bajar por la lista.' },
   { id: '374', fecha: '2026-10-19', texto: 'Etiquetas: ya se pueden marcar huecos en cualquier hoja, y arrastrando se marca de una vez una fila, una columna o un rectángulo.' },
   { id: '372', fecha: '2026-10-19', texto: 'Las notas del tablón pueden llevar hora: a la hora del aviso (por defecto 15 minutos antes) sale una ventana con sonido, con «Entendido» y «Recordar en 10 minutos».' },

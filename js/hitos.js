@@ -157,6 +157,8 @@ var Hitos = (function () {
     if (h && Array.isArray(h.guionOcultos) && h.guionOcultos.length) salida.guionOcultos = h.guionOcultos;
     /* Fila 116: la respuesta a cada pregunta del guion, solo si la hay. */
     if (h && h.guionElegido && typeof h.guionElegido === 'object' && Object.keys(h.guionElegido).length) salida.guionElegido = h.guionElegido;
+    /* Fila 405: el texto de una pregunta cambiado «solo aquí», por id de pregunta. */
+    if (h && h.guionTextos && typeof h.guionTextos === 'object' && Object.keys(h.guionTextos).length) salida.guionTextos = h.guionTextos;
     /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md), solo si los hay: la marca
        del paso («Nos toca» / «Esperamos a…») y el «Esperando a…» puesto a
        mano, con desde cuándo, el motivo y los ficheros que había. */

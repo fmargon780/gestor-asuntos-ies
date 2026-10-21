@@ -570,6 +570,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/documentos-en-la-tarjeta.mjs` | Prueba (navegador de verdad, fila 114, 24-sep-2026): con 8 documentos, la tarjeta cerrada enseña como mucho 5 nombres y «y N más», sin la línea «8 documentos», sin renglones aplastados ni cortados, con `title`, y «y N más» abre la tarjeta |
 | `apps-script/gestor-correos.gs` | El script de Gmail: recoger correos, y, desde la fila 115, la aplicación web (`doPost`) que el navegador llama directamente para enviar de verdad (`enviarCorreo`, `hiloParaResponder`, `prepararEnvio`) |
 | `docs/BOTON-DE-SOPORTE.md`, `docs/PONER-EN-MARCHA-SOPORTE.md` | El diseño de la fila 213 y los pasos del buzón (mudados a `fmargon780/soporte-apps` el 11-oct-2026; lo vivo está allí). El botón único: `docs/BOTON-UNICO-DE-SOPORTE.md` |
+| `pruebas/menu-en-las-preguntas-del-hito.mjs` | Prueba (navegador, fila 405, 21-oct-2026): el «⋮» de una pregunta de las tareas — opciones, «Cambiar» solo aquí (conserva la respuesta), «Borrar» solo aquí y a la guía con el aviso «En N asuntos ya está respondida» |
 | `pruebas/preguntas-en-el-guion.mjs` | Prueba (sin navegador, fila 116, 24-sep-2026): preguntas en el guion de un hito — normalizar (un solo nivel), `guionDe` sin y con respuesta, cambiar de respuesta con líneas marcadas (plegadas), la cuenta y el marcado automático dentro de la respuesta elegida |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |

@@ -270,6 +270,14 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   es un hito-pregunta; si solo cambia las tareas del mismo hito, una pregunta en el guion. Editor:
   casilla «Es una pregunta» en cada línea, con «+ Añadir respuesta» y «+ Añadir línea». En el hito,
   `guionElegido: { idPregunta: idOpcion }` (`Hitos.elegirEnGuion`; `normalizarHito` lo conserva).
+  Fila 405 (`docs/MENU-EN-LAS-PREGUNTAS-DEL-HITO.md`): la pregunta lleva su «⋮» y su 💬 como cualquier
+  tarea (Anotar · Cambiar · Borrar · Abrir en la guía; sin casilla y sin «Pasar a la guía»;
+  `HitoMesaTareaMenu.engancharFila`). «Cambiar» solo aquí guarda `guionTextos: { idPregunta: texto }`
+  (`Hitos.cambiarPreguntaAqui`; `unir()` lo usa y no toca respuestas ni `guionElegido`). «Borrar» solo
+  aquí la mete en `guionOcultos` y `unir()` esconde la pregunta con las líneas de todas sus respuestas.
+  «Borrar» a la guía no usa `conservarHechas`; el emergente avisa «En N asuntos ya está respondida; allí
+  dejará de verse.» (`respondidasEnOtros`, `DondeSeGuarda.textoConsecuencia`, opción `respondida`).
+  Prueba: `pruebas/menu-en-las-preguntas-del-hito.mjs`.
   `Hitos.guionDe` devuelve lo que se ve (la pregunta, hecha si está respondida, y detrás las líneas
   de la respuesta elegida, `deOpcion`) y, en `.plegadas`, lo ya marcado de otra respuesta. En la
   mesa (`js/hito-mesa-guion.js`), un botón por respuesta, las líneas de la elegida sangradas y lo

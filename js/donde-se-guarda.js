@@ -69,6 +69,10 @@ window.DondeSeGuarda = (function () {
       if (o.conTrabajo) {
         lineas.push('En ' + o.conTrabajo + ' no se tocará, porque ya ' + (o.conTrabajo === 1 ? 'tiene' : 'tienen') + ' trabajo.');
       }
+      /* Fila 405: al quitar una pregunta de la guía, donde ya está respondida deja de verse. */
+      if (o.respondida) {
+        lineas.push('En ' + (o.respondida === 1 ? '1 asunto' : o.respondida + ' asuntos') + ' ya está respondida; allí dejará de verse.');
+      }
     }
     return lineas;
   }

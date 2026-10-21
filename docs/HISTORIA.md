@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-oct-2026 — Fila 405: los tres puntitos «⋮» también en las preguntas de las tareas del hito
+
+Aviso de usuario: al convertir una tarea en pregunta desaparecían sus tres puntitos. Causa: `preguntaGuionHTML` no pintaba la envoltura `.guion-paso-fila` y el bucle de `HitoMesaTareaMenu.engancharFila` excluía `.guion-pregunta` (para no enganchar la casilla). Ahora la pregunta lleva «⋮» y 💬 (Anotar · Cambiar · Borrar · Abrir en la guía). «Cambiar» solo aquí guarda `guionTextos[idPregunta]` (no una sustituta, para no perder respuestas ni `guionElegido`); «Borrar» solo aquí la esconde con sus respuestas vía `guionOcultos`; «Borrar» a la guía no copia la pregunta como tarea y avisa «En N asuntos ya está respondida; allí dejará de verse.» Prueba: `pruebas/menu-en-las-preguntas-del-hito.mjs`.
+
 ## 16-oct-2026 — Fila 354: el personal que está hoy en el centro ya no sale «Ya no está en el centro»
 
 Caso real: Marmolejo González, Francisco Javier (no docente, sin cese). Causa reproducida en prueba: `esteCurso` (fila 340) se medía contra el dato más reciente de SU clase (o el curso más alto de todo para filas sin `tipoPersonal`); basta un listado o parte de un curso posterior de esa clase donde la persona no sale para que pase a «su último curso aquí: 26-27» aunque salga en el curso de hoy sin cese. Regla nueva (decidida con Francisco): está en el centro quien sale en un dato de curso conocido (nombre con curso, o parte del Centro de datos) del curso de hoy o posterior sin cese pasado; con varios datos manda el que no tiene cese o el más tarde. Un listado sin curso en el nombre no cuenta para esa regla y sigue la de la fila 340. Fichero: `js/datos-personal.js`; prueba: `pruebas/personal-en-el-centro.mjs` (casos 8 y 9).
