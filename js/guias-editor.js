@@ -173,6 +173,7 @@
        `restaurarAbierto`, más abajo, y lo usan tanto `pintar()` como
        `GuiasOpcionesEditor.caja()` (fila 60, ver la nota junto a detallesAbiertos). */
     var abiertos = {};
+    if (window.GuiasMasAjustes) GuiasMasAjustes.reiniciar();   /* fila 418 */
     /* El acordeón (fila 122, js/guias-plegado.js): un solo hito abierto. */
     var plegado = GuiasPlegado.crear({ nivel: function () { return nivel; }, recoger: recoger, responsables: opcionesResp });
     /* Lo que la caja de opciones (js/guias-opciones-editor.js) toma prestado. */
@@ -243,7 +244,7 @@
        como están en ese momento. */
     function pasoExtraHTML(p, i) {
       var otros = nivel.filter(function (x, k) { return k !== i; });
-      return '<details class="paso-extra">' +
+      return '<details class="paso-extra" open>' +
         '<summary>Responsable, a quién le toca y plazo <span class="suave">(opcional)</span></summary>' +
         '<div class="paso-extra-cuerpo">' +
           '<label class="etiqueta">Responsable por defecto</label>' +
@@ -253,7 +254,7 @@
               '>' + U.escapar(r.nombre) + '</option>';
           }).join('') + (window.ResponsableOrganismo ? ResponsableOrganismo.opcionesExtra(p) : '') + '</select>' +
           /* Fila 129: a quién le toca este hito (js/guias-toca.js). */
-          (window.GuiasToca ? GuiasToca.html(p, opcionesResp) : '') +
+          (window.GuiasToca ? '<div class="paso-toca-bloque">' + GuiasToca.html(p, opcionesResp) + '</div>' : '') +
           '<label class="etiqueta">Plazo</label>' +
           '<div class="paso-plazo-fila">' +
             '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="' +
@@ -509,6 +510,9 @@
         };
 
         if (pregunta) d.appendChild(GuiasOpcionesEditor.caja(opcionesCtx, p, i));
+
+        /* Fila 418: lo que no es título, responsable, plazo ni tareas, tras «Más ajustes». */
+        if (window.GuiasMasAjustes) GuiasMasAjustes.montar(d, p);
 
         caja.appendChild(d);
       });

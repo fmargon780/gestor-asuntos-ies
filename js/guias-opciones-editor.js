@@ -130,6 +130,9 @@ var GuiasOpcionesEditor = (function () {
           pintar();
         };
 
+        /* Fila 418: la explicación y «es una pregunta», tras «Más ajustes». */
+        if (window.GuiasMasAjustes) GuiasMasAjustes.montar(sc, sp);
+
         dentro.appendChild(sc);
       });
 

@@ -51,6 +51,17 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   pura). Desde la fila 122 salieron también de `js/guias.js` la barra de formato
   (`js/guias-barra.js`) y la caja de opciones de un paso-pregunta con sus pasos
   (`js/guias-opciones-editor.js`, `GuiasOpcionesEditor.caja(ctx, p, i)`).
+- **«Más ajustes» en el hito de la guía** (fila 418, `docs/HITOS-UN-SOLO-SITIO.md` parte C,
+  `js/guias-mas-ajustes.js`). Al abrir un hito solo se ven título, responsable, plazo y tareas. La
+  explicación, «A quién le toca», normativa y formularios, solo informativo, avisar a quien lo
+  pide, recibe varios documentos, texto/tipo de documento y «es una pregunta» llevan la clase
+  `paso-ajuste` (siguen siendo hijos directos del recuadro: `recoger()` los lee igual) y el CSS los
+  esconde hasta que el recuadro lleva `mas-abierto` (botón «Más ajustes», cerrado al abrir; se
+  recuerda por id mientras el editor sigue abierto). Debajo del título, la línea gris
+  (`GuiasMasAjustes.linea`): «Solo informativo · Avisa a quien lo pide · Recibe varios documentos ·
+  Normativa (N) · Documentos (N) · Campos (N) · Texto para documentos · A quién le toca: …»; con el
+  hito cerrado no repite lo que ya sale en sus marcas. Un hito-pregunta se queda como estaba. No
+  cambia ningún dato guardado.
 - **El editor, en acordeón** (fila 122, `docs/GUIA-EN-ACORDEON.md`, `js/guias-plegado.js`). Cada
   paso cerrado es una línea: número, título y marcas (`GuiasPlegado.marcas`: Pregunta, Solo
   informativo, Normativa (N), Documentos (N), Guion (N), el responsable), con ↑ ↓ y «Quitar».
