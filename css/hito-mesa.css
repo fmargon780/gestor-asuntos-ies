@@ -325,3 +325,7 @@ details.mesa-normativa > summary { cursor: pointer; }
 /* Fila 286 (docs/ESPERAS-QUE-SE-CIERRAN.md): la casilla del cuadro de nombre y «Hecho · sin respuesta». */
 .doc-termina-espera { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 4px; font-weight: 600; }
 .hito-sin-respuesta { color: #8a5a00; }
+
+/* Fila 423: el hueco del botón «Ruta» de cada documento de la mesa. */
+.ruta-documento-lugar { display: inline-flex; align-items: center; flex: 0 0 auto; }
+.ruta-documento-lugar:empty { display: none; }

@@ -68,3 +68,7 @@ body.visor-arrastrando { user-select: none; cursor: col-resize; }
   #visor-lateral { width: 100%; }
   .visor-tirador { display: none; }
 }
+
+/* Fila 423: el botón «Ruta» junto al nombre del documento. */
+.visor-ruta { flex: 0 0 auto; }
+.visor-ruta:empty { display: none; }

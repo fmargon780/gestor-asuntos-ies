@@ -318,7 +318,7 @@ var HitosPanelLista = (function () {
         b.onclick = async function () {
           try {
             var handle = await a.handle.getFileHandle(b.dataset.doc);
-            if (window.Visor) window.Visor.abrir(handle, b.dataset.doc);
+            if (window.Visor) window.Visor.abrir(handle, b.dataset.doc, { asunto: a, carpeta: a.handle, modo: abierto ? 'abierto' : 'archivado' });
           } catch (e) { /* puede que ya no esté: el próximo repintado lo dirá */ }
         };
       });

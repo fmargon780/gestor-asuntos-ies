@@ -246,12 +246,14 @@ window.RutaCarpetas = (function () {
      archivos (fila 227: nunca `file:///`); sin ruta apuntada, vacío:
      ya no se copia el nombre suelto (fila 152, antes de esto Bing lo
      buscaba). */
-  function de(a, modo) {
+  function de(a, modo, doc) {
     var archivado = modo === 'archivado';
     var base = rutaDe(archivado ? 'archivo' : 'abiertos').ruta;
     if (!base) return { texto: '', completa: false };
+    /* Fila 423: `doc` ({ nombre, subcarpeta }) lleva la ruta hasta el documento. */
+    var delDoc = doc ? [doc.subcarpeta, doc.nombre] : [];
     return {
-      texto: unir(sinFileUrl(base), (archivado ? piezasDelArchivo(a) : []).concat([a.nombre])),
+      texto: unir(sinFileUrl(base), (archivado ? piezasDelArchivo(a) : []).concat([a.nombre], delDoc)),
       completa: true
     };
   }
@@ -290,7 +292,7 @@ window.RutaCarpetas = (function () {
      `rutas.json` para todo el centro (si no estaba). Primero se copia
      y después se guarda: el navegador solo deja copiar justo después
      del clic. */
-  function guardarYCopiar(cual, valor, a, modo, boton) {
+  function guardarYCopiar(cual, valor, a, modo, boton, doc) {
     valor = String(valor || '').trim();
     if (!valor) return false;
     var p = partir(valor);
@@ -305,7 +307,7 @@ window.RutaCarpetas = (function () {
     } else {
       guardar(cual, valor);
     }
-    var r = de(a, modo);
+    var r = de(a, modo, doc);
     if (r.completa) copiarConAviso(r.texto, boton);
     if (paraElCentro) {
       guardarComun(paraElCentro, true).catch(function (e) {
@@ -317,13 +319,13 @@ window.RutaCarpetas = (function () {
 
   /* Desde la ficha del asunto: con `U.preguntar`, el único cuadro de
      diálogo que hay cuando no hay ninguno abierto todavía. */
-  async function pedirRutaConPreguntar(a, modo, boton) {
+  async function pedirRutaConPreguntar(a, modo, boton, doc) {
     var cual = modo === 'archivado' ? 'archivo' : 'abiertos';
     var idCampo = 'ruta-pedida-ficha';
     var ok = await U.preguntar('Ruta de la carpeta ' + nombreCarpeta(cual), cuerpoPedirRutaHTML(idCampo, cual), 'Guardar y copiar');
     if (!ok) return;
     var campo = document.getElementById(idCampo);
-    guardarYCopiar(cual, campo ? campo.value : '', a, modo, boton);
+    guardarYCopiar(cual, campo ? campo.value : '', a, modo, boton, doc);
   }
 
   /* Desde dentro del cuadro de Correo o de Séneca: en línea, en un
@@ -345,6 +347,53 @@ window.RutaCarpetas = (function () {
       var campo = document.getElementById(idCampo);
       if (guardarYCopiar(cual, campo ? campo.value : '', a, modo, boton)) cerrar();
     };
+  }
+
+  /* Fila 423: el botón «Ruta» de un documento (ficha, mesa del hito, versiones
+     previas y visor). Copia la ruta del documento con su extensión; si falta la
+     ruta de Dropbox o la del centro, la pide con el mismo cuadro de siempre
+     (que pide la de la carpeta) y después copia la del documento. `modo` es
+     'abierto' o 'archivado'; `doc`, { nombre, subcarpeta } (la subcarpeta, solo
+     en «Versiones previas», con su nombre real en el disco). */
+  function botonDocumento(a, modo, doc) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton boton-chico boton-copiar-fila ruta-documento';
+    b.textContent = 'Ruta';
+    b.title = 'Copiar la ruta de este documento, para pegarla al adjuntarlo';
+    b.onclick = async function (ev) {
+      ev.stopPropagation();
+      ev.preventDefault();
+      await cargarComun();
+      var r = de(a, modo, doc);
+      if (!r.completa) { pedirRutaConPreguntar(a, modo, b, doc); return; }
+      copiarConAviso(r.texto, b);
+    };
+    return b;
+  }
+
+  /* Para las filas que se pintan como texto (la mesa del hito): un hueco con
+     el nombre del documento (y su subcarpeta), que `enganchar` rellena con el
+     mismo botón de arriba. */
+  /* El modo del asunto cuando quien abre el documento no lo trae: el de la ficha
+     que está a la vista, si es ese asunto (`App.abrirFicha(a, modo)`). */
+  function modoDe(a, modo) {
+    if (modo) return modo;
+    var N = window.FichaNucleo;
+    return (N && a && N.actual && N.actual.nombre === a.nombre && N.modoActual) || 'abierto';
+  }
+
+  function huecoHTML(nombre, subcarpeta) {
+    return '<span class="ruta-documento-lugar" data-doc="' + U.escapar(nombre) + '"' +
+      (subcarpeta ? ' data-sub="' + U.escapar(subcarpeta) + '"' : '') + '></span>';
+  }
+
+  function enganchar(raiz, a, modo) {
+    if (!raiz || !a) return;
+    Array.prototype.forEach.call(raiz.querySelectorAll('.ruta-documento-lugar'), function (l) {
+      l.innerHTML = '';
+      l.appendChild(botonDocumento(a, modo, { nombre: l.dataset.doc, subcarpeta: l.dataset.sub || '' }));
+    });
   }
 
   /* `opciones.enLinea`: cuando el botón vive dentro de un cuadro ya
@@ -449,6 +498,7 @@ window.RutaCarpetas = (function () {
 
   return {
     leer: leer, guardar: guardar, unir: unir, de: de, boton: boton,
+    botonDocumento: botonDocumento, modoDe: modoDe, huecoHTML: huecoHTML, enganchar: enganchar,
     montarEnCuadro: montarEnCuadro, ponerBloque: ponerBloque, sinFileUrl: sinFileUrl,
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
     pintarBloque: pintarBloque, comunConocido: comunConocido

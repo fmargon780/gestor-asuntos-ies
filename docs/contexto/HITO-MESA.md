@@ -455,3 +455,10 @@ comprobación del tipo la cuenta como «sin plantilla».
 - Cada tarea pendiente (ni hecha ni «No aplica») con acción `comunicar` lleva en su línea «Enviar correo» (o «Enviar por Séneca» si `canalDe` da `seneca`), y con `generar`, «Generar documento»; `registrar`, las sin acción y las preguntas no llevan. Sale en todas las pendientes, también con el hito hecho; solo con el asunto abierto (no archivado); en solo consulta, apagado con su título.
 - Código: `HitoMesaRecetas.botonDeTareaHTML` (lo pinta `HitoMesaGuion.pasoHTML` delante del 💬/«⋮») y `HitoMesaRecetas.lanzarTarea`, que llama a los mismos `comunicarPaso` (tras `HitoMesaComunicar.candidatos`) y `generarPaso` de los menús de la cabecera; el marcado de la tarea es el de siempre (`idPasoGuion`). La cabecera no cambia.
 - Copia de pruebas: la tarea de comunicar de CERTIFICADO DE NOTAS lleva la plantilla de correo `pl-demo-certificado` (`js/demo/datos-hacer-hito.js`). Prueba: `pruebas/boton-de-la-accion-en-la-tarea.mjs`.
+
+## Botón «Ruta» de cada documento (22-oct-2026, fila 423)
+
+Cada documento de la mesa (los del hito, los de otros hitos, los sueltos, los gemelos y las versiones previas, no las
+plantillas de «Generar documento») lleva el hueco `.ruta-documento-lugar` (`RutaCarpetas.huecoHTML`) que
+`HitoMesaDocumentos.enganchar` rellena con `RutaCarpetas.enganchar(fila, a, modo)` (`modo` sale de `abierto`). Las
+previas traen su subcarpeta real en `nombresDeLaCarpeta.carpetaDePrevias` (`js/hitos-panel.js`). Ver `docs/contexto/DOCUMENTOS.md`.

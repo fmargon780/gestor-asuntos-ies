@@ -29,3 +29,7 @@ body.con-word-visor { overflow: hidden; }
   body.con-word-visor .word-visor-hoja section.docx { box-shadow: none; margin: 0; page-break-after: always; }
   @page { margin: 0; }
 }
+
+/* Fila 423: el botón «Ruta» junto al nombre del documento. */
+.word-visor-ruta { flex: 0 0 auto; }
+.word-visor-ruta:empty { display: none; }

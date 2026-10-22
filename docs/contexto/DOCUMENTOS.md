@@ -516,3 +516,17 @@ sola persona pendiente). «No es de este trabajo» (`grupo-no-es:<asunto>` en `A
 desde `HacerEsteHitoSello.alRefrescar`; 15 s entre pasadas; no en solo consulta, ni con guardado en marcha, ni con el
 compañero al mando). Con todos los de la última plantilla registrados: `Hitos.marcarGuionPorAccion(a, hito, 'registrar')`
 una vez (`ficha.registroPorPersonaMarcado`) y «Los N están registrados.».
+
+## Botón «Ruta» de cada documento (22-oct-2026, fila 423, `docs/RUTA-DE-UN-DOCUMENTO.md`)
+
+Detrás del ⧉ de cada documento de la ficha, en cada documento de la mesa del hito, en las versiones previas
+(ficha y mesa) y en la barra del visor (PDF y Word) hay un botón pequeño «Ruta» que copia la ruta entera del
+documento, con su extensión, para pegarla al adjuntarlo en Séneca. Un solo constructor:
+`RutaCarpetas.botonDocumento(a, modo, { nombre, subcarpeta })` (`js/copiar-ruta.js`); `de(a, modo, doc)` da la
+ruta (carpeta del asunto abierto o archivado + `_Previas`/`Versiones previas` + nombre). Las filas pintadas
+como texto (la mesa) llevan un hueco `RutaCarpetas.huecoHTML` que `RutaCarpetas.enganchar` rellena con el mismo
+botón. El visor recibe `opts.asunto`, `opts.modo` y `opts.subcarpeta` (`modoDe` lo saca de la ficha a la vista si
+quien abre no lo trae); `VersionesPrevias.listar` marca cada fichero con su subcarpeta real (`carpeta`). Si falta
+la ruta de Dropbox o la del centro, pide la de la carpeta con el cuadro de siempre y después copia la del
+documento. Sale también en solo consulta y para directivos (copiar no escribe). Prueba:
+`pruebas/ruta-de-un-documento.mjs`.

@@ -73,6 +73,7 @@
       '<div class="visor-tirador" id="visor-tirador" title="Arrastra para ensanchar o estrechar"></div>' +
       '<div class="visor-cabecera">' +
         '<div class="visor-nombre" id="visor-nombre"></div>' +
+        '<span class="visor-ruta" id="visor-ruta"></span>' +
         '<div class="visor-botones">' +
           '<button type="button" class="boton" id="visor-menos" title="Reducir">−</button>' +
           '<span class="visor-zoom" id="visor-zoom"></span>' +
@@ -157,6 +158,17 @@
     });
   }
 
+  /* Fila 423: el botón «Ruta» junto al nombre, si el documento es de un asunto
+     (`opts.asunto`, con `opts.modo` y `opts.subcarpeta`). */
+  function pintarRuta(nombre, opts) {
+    var lugar = $('visor-ruta');
+    if (!lugar) return;
+    lugar.innerHTML = '';
+    if (opts.asunto && window.RutaCarpetas) {
+      lugar.appendChild(RutaCarpetas.botonDocumento(opts.asunto, RutaCarpetas.modoDe(opts.asunto, opts.modo), { nombre: nombre, subcarpeta: opts.subcarpeta || '' }));
+    }
+  }
+
   function pintarAcciones(botones) {
     if (!acciones) return;
     acciones.innerHTML = '';
@@ -176,7 +188,8 @@
     if (window.WordVisor && /\.docx$/i.test(nombre || '')) {
       var asunto = opts.asunto || (window.App && App.asuntoDeLaFicha ? App.asuntoDeLaFicha() : null);
       return WordVisor.abrir({ handle: handle, nombre: nombre, asunto: asunto,
-        carpeta: opts.carpeta || (asunto && asunto.handle) || null, hito: opts.hito || null });
+        carpeta: opts.carpeta || (asunto && asunto.handle) || null, hito: opts.hito || null,
+        rutaDe: opts.asunto && window.RutaCarpetas ? { modo: RutaCarpetas.modoDe(opts.asunto, opts.modo), subcarpeta: opts.subcarpeta || '' } : null });
     }
     construir();
     try {
@@ -187,6 +200,7 @@
       nivel = 100;
       alAncho = true;
       ponerNombre(nombre || fichero.name);
+      pintarRuta(nombre || fichero.name, opts);
       pintarAcciones(opts.acciones || null);
       panel.classList.remove('oculto');
       document.body.classList.add('con-visor');
