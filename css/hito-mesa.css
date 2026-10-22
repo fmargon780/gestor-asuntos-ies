@@ -166,6 +166,7 @@ details.mesa-normativa > summary { cursor: pointer; }
 .guion-paso-fila { display: flex; align-items: center; gap: 10px; }
 .guion-paso-fila .guion-paso-linea { flex: 1 1 auto; min-width: 0; }
 .guion-paso-fila .guion-accion-boton { flex: 0 0 auto; }
+.guion-paso-fila .guion-accion-tarea { flex: 0 0 auto; white-space: nowrap; }   /* fila 410 */
 .guion-paso.hecho:not(.guion-pregunta) .guion-paso-explicacion,
 .guion-paso.hecho:not(.guion-pregunta) .guion-paso-botones,
 .guion-paso.hecho:not(.guion-pregunta) .guion-dato { display: none; }

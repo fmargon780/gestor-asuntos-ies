@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '410', fecha: '2026-10-22', texto: 'Dentro de cada tarea de un hito que lleva un correo o un documento ya sale su botón («Enviar correo», «Enviar por Séneca» o «Generar documento»): al usarlo, la tarea se marca sola.' },
   { id: '411', fecha: '2026-10-21', texto: 'El correo sale y se recoge desde la cuenta común de Administración, con el nombre «Administración · IES Fuente Lucena». Ajustes dice con qué cuenta trabaja cada ordenador y avisa si no es la común.' },
   { id: '405', fecha: '2026-10-21', texto: 'Las preguntas que aparecen entre las tareas de un hito vuelven a tener los tres puntitos: se pueden anotar, cambiar y borrar como cualquier otra tarea.' },
   { id: '382', fecha: '2026-10-20', texto: 'En la ficha de un asunto, los botones de copiar (Asunto, Ruta, Nombre, DNI…) ya no se esconden al bajar por la lista.' },

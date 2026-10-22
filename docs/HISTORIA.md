@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 22-oct-2026 — Fila 410: el botón de la acción dentro de la propia tarea del hito
+
+Aviso de usuario (21-oct-2026): al llegar a una tarea con un correo asociado no ocurría nada. Decidido con Francisco: cada tarea pendiente de comunicar o de generar lleva su botón («Enviar correo» / «Enviar por Séneca» / «Generar documento»), delante del 💬 y el «⋮»; hace lo mismo que elegir esa tarea en la cabecera (`comunicarPaso`/`generarPaso`, reutilizados vía `HitoMesaRecetas.lanzarTarea`) y la tarea se marca por su `idPasoGuion`. Registrar no lleva botón. La prueba de la fila 154 («ningún paso lleva botón») se cambió por «solo comunicar y generar». Prueba nueva: `pruebas/boton-de-la-accion-en-la-tarea.mjs`.
+
 ## 21-oct-2026 — Fila 405: los tres puntitos «⋮» también en las preguntas de las tareas del hito
 
 Aviso de usuario: al convertir una tarea en pregunta desaparecían sus tres puntitos. Causa: `preguntaGuionHTML` no pintaba la envoltura `.guion-paso-fila` y el bucle de `HitoMesaTareaMenu.engancharFila` excluía `.guion-pregunta` (para no enganchar la casilla). Ahora la pregunta lleva «⋮» y 💬 (Anotar · Cambiar · Borrar · Abrir en la guía). «Cambiar» solo aquí guarda `guionTextos[idPregunta]` (no una sustituta, para no perder respuestas ni `guionElegido`); «Borrar» solo aquí la esconde con sus respuestas vía `guionOcultos`; «Borrar» a la guía no copia la pregunta como tarea y avisa «En N asuntos ya está respondida; allí dejará de verse.» Prueba: `pruebas/menu-en-las-preguntas-del-hito.mjs`.
