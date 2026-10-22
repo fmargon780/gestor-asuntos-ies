@@ -311,3 +311,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Envías un correo desde un asunto: quien lo recibe ve «Administración · IES Fuente Lucena» y la dirección 29700692.administracion@g.educaand.es.
 - [ ] [SOLO FRANCISCO] Ese correo queda en «Enviados» de la cuenta común, no en la de Francisco.
 - [ ] [SOLO FRANCISCO] Un correo etiquetado «GESTOR» en la cuenta personal de Francisco ya no aparece en el Gestor.
+
+- [ ] [SOLO FRANCISCO] (fila 414) En Ajustes → tipo «Elecc. Consejo Escolar» → guía, el hito de recepción de candidaturas tiene «Recibe varios documentos» (marcarla es el paso de la fila 415); al guardar una candidatura real, la casilla de espera no sale, el hito sigue abierto y la candidatura queda dentro.

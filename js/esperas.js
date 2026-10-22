@@ -94,7 +94,10 @@ var Esperas = (function () {
     if (!caja && opciones && !soloConsulta() && entraUnDocumento(opciones)) {
       try {
         var hv = deEspera(a);
-        if (hv && hv.variosDocumentos) await Hitos.anadirDocumento(a.nombre, hv.id, nombre);
+        if (hv && hv.variosDocumentos) {
+          await Hitos.anadirDocumento(a.nombre, hv.id, nombre);
+          if (window.HitosPanel && HitosPanel.programarRepintado) HitosPanel.programarRepintado();
+        }
       } catch (ev) { U.accesorio('Documento guardado, pero no he podido unirlo al hito', ev); }
       return;
     }
