@@ -17,3 +17,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
 | 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
 | 418 | 70 | «Más ajustes» plegado y línea gris en el editor del paso, pruebas y revisor |
+| 421 | 75 | arreglar la espera del guardado y quitar pausas fijas de la prueba, comprobar que falla con la espera rota, sacarla de RETIRADAS, tres pasadas completas, revisor |

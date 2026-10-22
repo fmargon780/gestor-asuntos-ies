@@ -1,6 +1,6 @@
 # Que la prueba del Centro de datos no falle sin motivo
 
-Fila 420 de `docs/COLA.md`. Diseñada con Francisco el 22-oct-2026.
+Fila 421 de `docs/COLA.md`. Diseñada con Francisco el 22-oct-2026.
 
 ## Por qué
 
@@ -98,7 +98,7 @@ El listado de alumnado (`RegAlum.csv` de Séneca), punto 4 de «Qué hay que hac
 
 ## Publicar
 
-Cambia `pruebas/`, así que va por la rama `fila-420` y el revisor en local antes de `main`, como
+Cambia `pruebas/`, así que va por la rama `fila-421` y el revisor en local antes de `main`, como
 cualquier fila con código (`CLAUDE.md`). No cambia nada de `js/`: no se publica en Vercel ni se
 comprueba `App.VERSION`. La fila es HECHA cuando su commit está en `main`. Sin línea en
 `js/novedades.js` (no hay nada visible).
