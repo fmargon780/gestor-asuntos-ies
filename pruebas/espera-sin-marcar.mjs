@@ -86,6 +86,14 @@ await comprobar('3. llega a un hito ya existente y se quita (retocarMarcas)',
     const r = Hitos.pasosQueFaltan(hs, pasos, []);
     return [hs.map((h) => !!h.variosDocumentos), r.hitos.map((h) => !!h.variosDocumentos)];
   }), [[false, true, false], [true, false, false]]);
+await comprobar('3. «Solo en este asunto» se queda y la guía no lo pisa',
+  pagina.evaluate(() => {
+    const pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe('Elecc. Consejo Escolar')));
+    const hs = pasos.map((p) => Hitos.pasoAHito(p));
+    hs[1].variosDocumentos = false; hs[1].variosPropio = true;
+    const r = Hitos.pasosQueFaltan(hs.map((h) => Hitos.normalizarHito(h)), pasos, []);
+    return [!!r.hitos[1].variosDocumentos, !!r.hitos[1].variosPropio];
+  }), [false, true]);
 await comprobar('3. la biblioteca de hitos no se lleva la opción',
   pagina.evaluate(() => {
     const p = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe('Elecc. Consejo Escolar')[1]));

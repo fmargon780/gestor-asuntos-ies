@@ -143,7 +143,7 @@
             n++;
           }
           /* Fila 414: «Recibe varios documentos» llega igual a los hitos que ya existen. */
-          if (!!h.variosDocumentos !== !!p.variosDocumentos) { h.variosDocumentos = !!p.variosDocumentos; n++; }
+          if (!h.variosPropio && !!h.variosDocumentos !== !!p.variosDocumentos) { h.variosDocumentos = !!p.variosDocumentos; n++; }
         }
         if (h.clase === 'decision') (h.opciones || []).forEach(function (o) { recorrer(o.hitos); });
       });

@@ -114,6 +114,7 @@
       if ('soloInformativo' in cambios) h.soloInformativo = !!cambios.soloInformativo;
       /* Fila 414: «Recibe varios documentos». */
       if ('variosDocumentos' in cambios) h.variosDocumentos = !!cambios.variosDocumentos;
+      if ('variosPropio' in cambios) { if (cambios.variosPropio) h.variosPropio = true; else delete h.variosPropio; }
       /* Fila 285 («Hacer este hito»): dónde está parada la cadena de tareas, o nada. */
       if ('cadena' in cambios) { if (cambios.cadena) h.cadena = cambios.cadena; else delete h.cadena; }
       /* Fila 286: «No ha llegado nada» (el hito se da por hecho sin respuesta). */

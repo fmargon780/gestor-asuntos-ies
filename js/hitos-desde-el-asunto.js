@@ -320,6 +320,7 @@ window.HitosDesdeElAsunto = (function () {
           }
           h.plazo = campos.plazo;
           h.variosDocumentos = !!campos.variosDocumentos;
+          delete h.variosPropio;
           colocarTrasAncla(lista, h, idAncla);
         }
         tocados++;
@@ -558,9 +559,14 @@ window.HitosDesdeElAsunto = (function () {
   }
 
   async function cambiarSoloAsunto(a, h, esNivelSuperior, datos, callado) {
+    /* Fila 414: si difiere de la guía, queda como «propio» y la sincronización con la guía no lo pisa. */
+    var tipoA = tipoDe(a);
+    var pasoG = (tipoA && h.origenGuia && !h.delTipoAnterior)
+      ? GuiasDelCentro.pasosDe(tipoA).filter(function (p) { return p.id === h.origenGuia; })[0] : null;
     await Hitos.guardarCampos(a.nombre, h.id, {
       titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo,
-      variosDocumentos: !!datos.variosDocumentos
+      variosDocumentos: !!datos.variosDocumentos,
+      variosPropio: !!pasoG && !!pasoG.variosDocumentos !== !!datos.variosDocumentos
     });
     if (esNivelSuperior) {
       await Hitos.cambiar(function (d) {
