@@ -92,7 +92,6 @@ await esperar(() => HitoMesa.estaAbierta && HitoMesa.estaAbierta());
 await comprobar('mesa de «Recoger los papeles»', pagina.evaluate(() => !!document.querySelector('#ficha-guia .hito[data-id="h1"] .mesa-notas')), true);
 
 console.log('--- 2. la mesa ---');
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 const mesa = () => pagina.evaluate(() => Array.prototype.map.call(
   document.querySelectorAll('#ficha-guia .hito[data-id="h1"] .mesa-notas .hito-notas .registro-linea'), x => [x.querySelector('.nota-texto').textContent, x.classList.contains('registro-auto')]));
 await comprobar('solo las líneas de ese hito, una sola lista', mesa(), [['Generado «Justificante»', true], ['Llamada de la madre', false]]);
@@ -109,14 +108,12 @@ await comprobar('y en la ficha, con la etiqueta de ese hito', pagina.evaluate(()
 }), '⚑ Recoger los papeles');
 
 console.log('--- 4. lo automático ---');
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('guion'));
 await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .guion-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .guion-casilla');
 /* Con la única tarea hecha, la mesa pregunta si se da el hito por hecho: que no. */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(800);
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 await comprobar('marcar una tarea deja su línea en gris', mesa().then(l => l.filter(x => x[0].indexOf('Tarea hecha') === 0)), [['Tarea hecha: Comprobar el DNI', true]]);
 await comprobar('la línea de dar por hecho y de reabrir', pagina.evaluate(() =>
   [RegistroAsunto.notaDeEstado('encurso', 'hecho'), RegistroAsunto.notaDeEstado('hecho', 'encurso'), RegistroAsunto.notaDeEstado('encurso', 'pendiente')]), ['Dado por hecho', 'Reabierto', '']);

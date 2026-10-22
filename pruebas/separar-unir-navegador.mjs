@@ -56,6 +56,8 @@ async function comprobar(titulo, promesa, esperado) {
    del asunto las herramientas de PDF están en la barra del visor: se
    abre el documento y se pulsa ahí. */
 async function pulsarDeLaBarra(locatorFila, texto) {
+  /* Fila 425: un documento abierto ocupa el sitio de la lista; «← Carpeta» la devuelve para abrir otro. */
+  if (await pagina.locator('#visor-volver').isVisible()) await pagina.click('#visor-volver');
   await locatorFila.locator('.ficha-documento').click();
   await pagina.waitForSelector('#visor-acciones .visor-barra-pdf');
   await pagina.locator('#visor-acciones .visor-barra-pdf').getByRole('button', { name: texto, exact: true }).click();
@@ -208,7 +210,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
+await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { state: 'attached' });   /* fila 425: el visor, aún abierto, vuelve a ocupar el sitio de la lista */
 
 await pulsarDeLaBarra(filaDe(TROZO_2), 'Sacar páginas');
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');

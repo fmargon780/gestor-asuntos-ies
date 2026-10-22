@@ -23,6 +23,7 @@
 
    Con FOTOS=<carpeta>, deja una foto de la mesa a 1905 px. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -100,6 +101,7 @@ async function preparar(ancho, alto) {
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
+  await verLaLista(pagina);   /* fila 425: al entrar se abre sola la mesa del hito actual; aquí se parte de la lista */
   return { pagina, errores };
 }
 
@@ -111,7 +113,7 @@ function leerHito(pagina, id) {
 }
 
 async function abrirMesa(pagina, id) {
-  await pagina.locator('#ficha-guia .hito[data-id="' + id + '"] .hito-titulo').click();
+  await abrirHito(pagina, '' + id + '');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + id + '"]');
   await pagina.waitForTimeout(300);
 }
@@ -130,15 +132,15 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('1. la lista es compacta: ningún hito desplegado',
     pagina.locator('#ficha-guia .hito-cuerpo:visible').count(), 0);
   await abrirMesa(pagina, 'm1');
-  await comprobar('1. la mesa se abre, con sus dos zonas (fila 145)',
-    pagina.locator('.hito-en-mesa .mesa-col:visible').count(), 2);
+  await comprobar('1. la mesa se abre, con el hito en una sola columna (fila 425)',
+    pagina.locator('.hito-en-mesa .mesa-col:visible').count(), 1);
   await comprobar('1. los demás hitos no se ven', pagina.locator('#ficha-guia .hito[data-id="m3"]').isVisible(), false);
   await comprobar('1. el guion, con su cuenta', pagina.locator('.hito-en-mesa .mesa-guion-cuenta').textContent(), '0 de 3');
   if (ancho === 1905) {
-    await comprobar('1. a 1905 px, las dos zonas una al lado de otra y a la vista, sin bajar',
+    await comprobar('1. a 1905 px, el hito a la izquierda y la carpeta a la derecha, una al lado de otra y a la vista, sin bajar (fila 425)',
       pagina.evaluate(() => {
-        const c = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-col')).map((e) => e.getBoundingClientRect());
-        return c.length === 2 && c[0].right <= c[1].left &&
+        const c = ['trabajo-izq', 'trabajo-der'].map((id) => document.getElementById(id).getBoundingClientRect());
+        return c[0].right <= c[1].left &&
           c.every((r) => Math.abs(r.top - c[0].top) < 2 && r.top < window.innerHeight - 100) && window.scrollY === 0;
       }), true);
     if (process.env.FOTOS) await pagina.screenshot({ path: process.env.FOTOS + '/mesa.png' });
@@ -185,7 +187,6 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
   await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
   /* 4. Fila 147: los documentos se trabajan en su tarjeta grande. */
-  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
 
   /* 4. */
   await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[0] + '"] .mesa-doc-marca').check();
@@ -221,7 +222,6 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* 6. */
   await pagina.locator('.hito-en-mesa .mesa-tira-hito', { hasText: 'Recoger la solicitud' }).click();
   await pagina.waitForTimeout(300);
-  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
   await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .hito-doc-abrir').click();
   await pagina.waitForSelector('body.con-visor');
   await pagina.waitForTimeout(300);
@@ -229,9 +229,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-grande-docs').isVisible(), true);
   await pagina.keyboard.press('Escape');   /* cierra el documento */
   await pagina.waitForTimeout(200);
-  await pagina.keyboard.press('Escape');   /* fila 147: vuelve al guion */
-  await pagina.waitForTimeout(200);
-  await comprobar('6. el siguiente Escape vuelve al guion, con la mesa abierta',
+  /* Fila 425: ya no hay «volver al guion»; el siguiente Escape es el de la lista de hitos (7). */
+  await comprobar('6. cerrado el documento, la mesa sigue abierta',
     pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-guion').isVisible(), true);
 
   /* 7. */
@@ -239,8 +238,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.waitForTimeout(200);
   await comprobar('7. Escape vuelve a la lista de hitos',
     pagina.evaluate(() => !document.getElementById('ficha-guia').classList.contains('con-mesa')), true);
-  await comprobar('7. con la tarjeta de Hitos todavía abierta',
-    pagina.evaluate(() => FichaTarjetas.abierta()), 'hitos');
+  await comprobar('7. con «Trabajo» todavía abierta',
+    pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
   await pagina.click('.pestana[data-pantalla="abiertos"]');
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
   await pagina.click('.inicio-pestana[data-pestana="adm"]');
@@ -257,8 +256,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.waitForTimeout(200);
   await comprobar('7b. «← Volver a los hitos» cierra la mesa',
     pagina.evaluate(() => !document.getElementById('ficha-guia').classList.contains('con-mesa')), true);
-  await comprobar('7b. y deja la tarjeta Hitos en grande',
-    pagina.evaluate(() => FichaTarjetas.abierta()), 'hitos');
+  await comprobar('7b. y deja «Trabajo» abierta',
+    pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
 
   /* 8. */
   const r8 = await pagina.evaluate(async () => {

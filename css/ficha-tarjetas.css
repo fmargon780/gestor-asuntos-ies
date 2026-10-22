@@ -1,89 +1,31 @@
 /* ============================================================
-   ficha-tarjetas.css — la ficha del asunto en tarjetas (24-sep-2026,
-   fila 107, docs/FICHA-EN-TARJETAS.md, js/ficha-tarjetas.js).
+   ficha-tarjetas.css — las pestañas de la ficha del asunto y la vista de
+   trabajo (24-sep-2026, fila 107; 22-oct-2026, fila 425,
+   docs/FICHA-VISTA-DE-TRABAJO.md, js/ficha-tarjetas.js).
 
-   Cuadrícula de tarjetas del mismo tamaño que llena el alto visible
-   (el alto lo pone js/ficha-tarjetas.js); una abierta ocupa todo el
-   sitio y las demás pasan a pestañas pequeñas arriba.
+   Siempre hay una fila de pestañas; solo se ve la abierta. «Trabajo» son
+   dos columnas de igual ancho que llenan el alto visible (el alto lo pone
+   js/ficha-tarjetas.js; cada columna se desplaza por su cuenta); las demás
+   se abren a todo el ancho.
    ============================================================ */
 
 .ficha-tarjetas { margin-top: 10px; }
+/* Con la vista de dos columnas, la página usa todo el ancho (como la mesa del hito desde la fila 109) y
+   las columnas llegan hasta abajo: menos relleno al pie. */
+.contenido:has(.ficha-tarjetas[data-abierta="trabajo"]) { max-width: none; padding-bottom: 14px; }
 
-.ficha-tarjetas-rejilla {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-.ficha-tarjetas.con-tramite .ficha-tarjetas-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@media (max-width: 1100px) {
-  .ficha-tarjetas .ficha-tarjetas-rejilla,
-  .ficha-tarjetas.con-tramite .ficha-tarjetas-rejilla {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: none; grid-auto-rows: minmax(0, 1fr);
-  }
-}
-/* Con el documento abierto a la derecha, el hueco se estrecha: dos
-   columnas, como en una pantalla estrecha. */
-body.con-visor .ficha-tarjetas:not([data-abierta]) .ficha-tarjetas-rejilla,
-body.con-lector .ficha-tarjetas:not([data-abierta]) .ficha-tarjetas-rejilla {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: none; grid-auto-rows: minmax(0, 1fr);
-}
-
-/* Cada tarjeta: mismo tamaño, no crece; lo que no cabe se corta. */
-.ficha-tarjeta {
-  display: flex; flex-direction: column; min-height: 0; min-width: 0;
-  overflow: hidden; cursor: pointer; margin: 0;
-}
-.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta:hover { border-color: #b9c6d6; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.ficha-tarjeta { margin: 0; min-width: 0; }
+.ficha-tarjetas[data-abierta] .ficha-tarjeta:not(.abierta) { display: none; }
 .ficha-tarjeta.vacio {          /* la clase de "bloque vacío" de antes no encoge la tarjeta */
   display: flex; flex-direction: column; align-items: stretch; padding: 16px 18px;
   font-size: inherit; color: inherit; margin-top: 0;
 }
-.ficha-tarjeta > .ficha-titulo { flex: none; }
 .ficha-tarjeta .ficha-cuenta:empty { display: none; }
-
-.ficha-tarjeta-resumen { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
-/* `flex: none` (fila 114): un renglón no se encoge nunca por debajo de su
-   alto; lo que no cabe se corta entero (y en Documentos, «y N más»). */
-.ficha-resumen-linea {
-  flex: none;
-  font-size: 13px; line-height: 1.35; color: var(--tinta);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
-}
-.ficha-resumen-linea.fuerte { font-weight: 600; }
-.ficha-resumen-linea.suave { color: var(--tinta-suave); font-size: 12px; }
-button.ficha-resumen-linea {
-  font: inherit; font-size: 13px; background: none; border: 0; padding: 0;
-  color: var(--azul); cursor: pointer; max-width: 100%;
-}
-button.ficha-resumen-linea:hover { text-decoration: underline; }
-.ficha-resumen-mas { font-weight: 600; }
-.ficha-tarjeta-vacia .ficha-resumen-linea { color: var(--tinta-suave); }
-
-/* Cerrada: solo el resumen. Las "siempre" (Datos y contacto, Datos del
-   trámite) ya son una línea: enseñan su cuerpo, cortado. */
-.ficha-tarjeta-cuerpo { min-height: 0; }
-.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta:not(.ficha-tarjeta-siempre) > .ficha-tarjeta-cuerpo { display: none; }
-.ficha-tarjeta-siempre > .ficha-tarjeta-resumen { display: none; }
-.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta-siempre > .ficha-tarjeta-cuerpo { flex: 1; overflow: hidden; }
 .ficha-tarjeta[data-tarjeta="contacto"] { padding: 0; }
 .ficha-tarjeta[data-tarjeta="contacto"] .ficha-bloque { border: 0; margin: 0; box-shadow: none; }
 
-/* Abierta: solo ella, entera, con su contenido de siempre. */
-.ficha-tarjetas[data-abierta] .ficha-tarjetas-rejilla { display: block; }
-.ficha-tarjetas[data-abierta] .ficha-tarjeta:not(.abierta) { display: none; }
-.ficha-tarjeta.abierta { cursor: default; overflow: visible; min-height: inherit; }
-.ficha-tarjeta.abierta > .ficha-tarjeta-resumen { display: none; }
-.ficha-tarjeta.abierta > .ficha-tarjeta-cuerpo { display: block; }
-/* Fila 112: con un hito abierto, el título «Hitos 2/5» ya está en la pestaña. */
-.ficha-tarjeta.abierta:has(#ficha-guia.con-mesa) > .ficha-titulo { display: none; }
-.ficha-tarjeta.abierta:has(#ficha-guia.con-mesa) { padding-top: 10px; }
-
-/* Las pestañas de arriba, con una tarjeta abierta. */
-.ficha-tarjetas-pestanas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.ficha-tarjetas[data-abierta] .ficha-tarjetas-pestanas { margin-bottom: 8px; }
+/* Las pestañas de arriba. */
+.ficha-tarjetas-pestanas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
 .ficha-pestana {
   font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
   background: var(--papel); color: var(--tinta-suave);
@@ -93,13 +35,43 @@ button.ficha-resumen-linea:hover { text-decoration: underline; }
 .ficha-pestana.activa { background: var(--azul); border-color: var(--azul); color: #fff; }
 .ficha-pestana-cuenta { font-weight: 400; opacity: .8; }
 
-/* La franja de documentos de la tarjeta abierta. */
-.ficha-tarjeta-franja:empty { display: none; }
-.ficha-tarjeta-franja { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
-.ficha-chip-doc {
-  font: inherit; font-size: 12px; cursor: pointer; max-width: 320px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  background: #eef3f9; color: var(--tinta); border: 1px solid #d3deea; border-radius: 14px; padding: 3px 10px;
+/* ---------- «Trabajo»: el hito a la izquierda, la carpeta a la derecha ---------- */
+.ficha-trabajo { background: none; border: 0; box-shadow: none; padding: 0; }
+.trabajo-columnas {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px;
+  align-items: stretch; min-height: 360px;
 }
-.ficha-chip-doc:hover { border-color: var(--azul); }
-.ficha-chip-doc.activo { background: var(--azul); border-color: var(--azul); color: #fff; }
+.trabajo-col { min-width: 0; min-height: 0; overflow: auto; }
+.trabajo-izq { padding: 16px 18px; }
+.trabajo-izq #ficha-guia.explica { margin: 0; }
+.trabajo-der { display: flex; flex-direction: column; gap: 12px; }
+.trabajo-der > #trabajo-der-arriba { flex: none; }
+.trabajo-der > .trabajo-carpeta { flex: 1 1 auto; }
+.trabajo-columnas.encima { outline: 2px dashed var(--azul); outline-offset: -3px; }
+
+/* Con un documento abierto a la derecha, ocupa el sitio de la lista (js/ficha-trabajo-visor.js). */
+.trabajo-der.con-documento { overflow: hidden; }
+.trabajo-der.con-documento .trabajo-carpeta { display: none; }
+.trabajo-der > #visor-lateral.en-trabajo,
+.trabajo-der > #word-visor.en-trabajo { flex: 1 1 0; min-height: 0; }
+
+/* Los documentos de la carpeta, al lado de un hito: su marca y la casilla de adjuntar. */
+.ficha-documento-fila > .ficha-documento-marca { display: none; flex: 0 0 auto; margin: 0 2px 0 0; cursor: pointer; }
+.ficha-documentos.con-casillas .ficha-documento-fila > .ficha-documento-marca { display: inline-block; }
+/* Media columna: los botones de cada documento, más compactos, para que quepan en menos renglones. */
+.trabajo-carpeta .ficha-documento-fila > .boton:not(.boton-chico) { padding: 4px 10px; font-size: 12.5px; }
+/* El nombre, con la casilla, ocupa su renglón; los botones, el de debajo. */
+.trabajo-carpeta .ficha-documento-fila > .ficha-documento { flex: 1 1 calc(100% - 40px); min-width: 240px; }
+.ficha-marca-hito {
+  flex: none; font-size: 11px; font-weight: 600; white-space: nowrap; color: #1d4f86;
+  background: #e3eefb; border-radius: 10px; padding: 0 7px; margin: 0 6px;
+}
+.ficha-documento-traer { flex: none; }
+.ficha-documento-traer.oculto { display: none; }
+
+/* Pantalla estrecha: una columna debajo de otra, y la página baja. */
+@media (max-width: 1100px) {
+  .trabajo-columnas { grid-template-columns: minmax(0, 1fr); height: auto !important; }
+  .trabajo-col { overflow: visible; }
+  .trabajo-der.con-documento { min-height: 70vh; }
+}

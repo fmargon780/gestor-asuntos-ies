@@ -80,12 +80,6 @@ var HitoMesaDocumentos = (function () {
     return leido && leido.fecha && window.Plazos ? Plazos.legible(leido.fecha) : '';
   }
 
-  /* Fila 147: lo que enseña la tarjeta pequeña: el tipo y el registro de
-     cada documento principal, sin gemelos. */
-  function resumen(h) {
-    return agrupar(h.documentos || [], null).map(function (g) { return { nombre: g.nombre, tipo: tipoDe(g.nombre), registro: codigoDe(g.nombre) }; });
-  }
-
   function tipoDe(n) {
     var leido = window.Documentos && Documentos.leerNombre ? Documentos.leerNombre(n) : null;
     return (leido && leido.tipo) || sinExtension(n);
@@ -101,84 +95,9 @@ var HitoMesaDocumentos = (function () {
     return '';
   }
 
-  /* Fila 164 (docs/HITOS-ACCIONES-EN-EL-HITO.md, punto 4): todos los
-     documentos del asunto, a la vista en cada hito. Arriba los de este
-     hito; debajo, «De otros hitos», con la etiqueta del hito del que
-     vienen; al final, los de la carpeta sin hito. Un documento sigue en
-     un solo hito: esto es solo verlo (Abrir, Enviar, marcar para
-     adjuntar), sin el ⋯, que es del hito al que pertenece. */
-  var RE_INTERNO = /^(_|\.|~\$)|\.json$/i;
-
-  function otrosDelAsunto(h, hitos, nombresDeLaCarpeta) {
-    var propios = h.documentos || [];
-    var vistos = {};
-    propios.forEach(function (n) { vistos[n] = true; });
-    var numerados = window.Hitos && Hitos.numerados ? Hitos.numerados(hitos || []) : [];
-    var deOtros = [];
-    (window.Hitos ? Hitos.visibles(hitos || []) : []).forEach(function (x) {
-      if (x.id === h.id) return;
-      var n = numerados.indexOf(x) + 1;
-      var etiqueta = (n ? n + ' · ' : '') + (x.titulo || 'Hito');
-      agrupar(x.documentos || [], null).forEach(function (g) {
-        if (vistos[g.nombre]) return;
-        vistos[g.nombre] = true;
-        g.gemelos.forEach(function (y) { vistos[y] = true; });
-        deOtros.push({ nombre: g.nombre, etiqueta: etiqueta, idHito: x.id });   /* fila 282: de qué hito viene, para el «⋯» */
-      });
-    });
-    var sueltos = [];
-    if (nombresDeLaCarpeta) {
-      var restantes = nombresDeLaCarpeta.filter(function (n) { return !vistos[n] && !RE_INTERNO.test(n) && extension(n); });
-      /* Los gemelos (SIN SELLAR, Word) de un documento ya a la vista, fuera. */
-      var claves = {};
-      Object.keys(vistos).forEach(function (n) { claves[claveGemelo(n)] = true; });
-      agrupar(restantes, null).forEach(function (g) {
-        if (claves[claveGemelo(g.nombre)] && (esSinSellar(g.nombre) || esWord(g.nombre))) return;
-        sueltos.push({ nombre: g.nombre, gemelos: g.gemelos });
-      });
-    }
-    return { deOtros: deOtros, sueltos: sueltos };
-  }
-
-  /* Una fila de otro hito o de la carpeta sin hito. Fila 282: con la mesa abierta, lleva su «⋯» (js/hitos-sacar-documento.js,
-     clase propia: `HitosDocumentoMenu` no la coge). */
-  function filaAjenaHTML(nombre, etiqueta, idHito, conMenu) {
-    return '<div class="mesa-doc mesa-doc-ajeno" data-doc="' + U.escapar(nombre) + '" data-hito-origen="' + U.escapar(idHito || '') + '">' +
-      '<input type="checkbox" class="mesa-doc-marca" title="Seleccionar">' +
-      '<div class="mesa-doc-nombre"><span class="mesa-doc-tipo">' + U.escapar(tipoDe(nombre)) + '</span>' +
-        '<button type="button" class="hito-doc-abrir" data-doc="' + U.escapar(nombre) + '">' + U.escapar(nombre) + '</button>' +
-        (etiqueta ? '<span class="mesa-doc-de-hito">' + U.escapar(etiqueta) + '</span>' : '') +
-      '</div>' +
-      '<span class="mesa-doc-fecha">' + U.escapar(fechaDe(nombre)) + '</span>' +
-      '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
-      '<span class="mesa-doc-estado ' + estadoDe(nombre, false).clase + '">' + U.escapar(estadoDe(nombre, false).texto) + '</span>' +
-      '<span class="mesa-doc-acciones">' + ruta(nombre) + '<button type="button" class="enlace mesa-doc-abrir">Abrir</button>' +
-        '<button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>' +
-        (conMenu ? '<button type="button" class="mesa-doc-menu-ajeno" title="Más opciones">⋯</button>' : '') + '</span>' +
-    '</div>';
-  }
-
-  /* Solo en el hito que está en la mesa: pintarlos en todos los hitos
-     (escondidos) repetiría todos los documentos del asunto en cada uno. */
-  function enLaMesa(a, h) {
-    var ab = window.HitoMesa && HitoMesa.abierta ? HitoMesa.abierta() : null;
-    return !!(ab && a && ab.clave === a.nombre && ab.idHito === h.id);
-  }
-
-  function otrosHTML(h, hitos, nombresDeLaCarpeta, abierto) {
-    var o = otrosDelAsunto(h, hitos, nombresDeLaCarpeta);
-    return (o.deOtros.length ? '<div class="mesa-docs-apartado">De otros hitos</div>' +
-        o.deOtros.map(function (d) { return filaAjenaHTML(d.nombre, d.etiqueta, d.idHito, abierto); }).join('') : '') +
-      (o.sueltos.length ? '<div class="mesa-docs-apartado">En la carpeta, sin hito</div>' +
-        o.sueltos.map(function (d) { return filaAjenaHTML(d.nombre, '', '', abierto); }).join('') : '');
-  }
-
-  /* «Documentos del hito · 2 (y 5 más del asunto)». */
-  function cuentaTitulo(h, hitos, nombresDeLaCarpeta) {
-    var propios = agrupar(h.documentos || [], null).length;
-    var o = otrosDelAsunto(h, hitos, nombresDeLaCarpeta);
-    var mas = o.deOtros.length + o.sueltos.length;
-    return propios + (mas ? ' (y ' + mas + ' más del asunto)' : '');
+  /* «Documentos del hito · 2». */
+  function cuentaTitulo(h) {
+    return String(agrupar(h.documentos || [], null).length);
   }
 
   function ruta(nombre, subcarpeta) {
@@ -206,10 +125,9 @@ var HitoMesaDocumentos = (function () {
     var previas = (nombresDeLaCarpeta && nombresDeLaCarpeta.previas) || [];
     var docs = (h.documentos || []).filter(function (n) { return previas.indexOf(n) === -1; });
     var plegadas = previasHTML(h, previas, nombresDeLaCarpeta && nombresDeLaCarpeta.carpetaDePrevias);
-    /* Fila 282: el «⋯» de las filas ajenas, solo con la mesa abierta para trabajar y nunca en solo consulta. */
-    var otros = enLaMesa(a, h) ? otrosHTML(h, hitos, nombresDeLaCarpeta, abierto && !(window.SoloConsulta && SoloConsulta.activo())) : '';
+    /* Fila 425: solo los del propio hito; los demás de la carpeta se ven en la columna de la derecha. */
     /* Fila 145: vacío, una sola línea gris. */
-    if (!docs.length) return (abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '') + plegadas + otros;
+    if (!docs.length) return (abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '') + plegadas;
     return agrupar(docs, nombresDeLaCarpeta).map(function (g) {
       var falta = !!(nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(g.nombre) === -1);
       var estado = estadoDe(g.nombre, falta);
@@ -237,7 +155,7 @@ var HitoMesaDocumentos = (function () {
             '<button type="button" class="enlace mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">Abrir</button>' + ruta(x) + '</div>';
         }).join('') +
       '</div>';
-    }).join('') + plegadas + otros;
+    }).join('') + plegadas;
   }
 
   /* ---------- con la mesa abierta ---------- */
@@ -296,9 +214,18 @@ var HitoMesaDocumentos = (function () {
     await HitosSacarDocumento.mover(a, nombres, elegido);
   }
 
+  /* Los documentos marcados para adjuntar: las casillas de los documentos del hito (a la izquierda) y las de la
+     carpeta (a la derecha, fila 425), sin repetir. */
   function marcados(fila) {
-    return Array.prototype.filter.call(fila.querySelectorAll('.mesa-doc-marca'), function (c) { return c.checked; })
-      .map(function (c) { return c.closest('.mesa-doc').dataset.doc; });
+    var nombres = [];
+    function sumar(n) { if (n && nombres.indexOf(n) === -1) nombres.push(n); }
+    Array.prototype.forEach.call((fila || document).querySelectorAll('.mesa-doc-marca'), function (c) {
+      if (c.checked) sumar(c.closest('.mesa-doc').dataset.doc);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#ficha-documentos .ficha-documento-marca'), function (c) {
+      if (c.checked) sumar(c.closest('.ficha-documento-fila').dataset.doc);
+    });
+    return nombres;
   }
 
   function pintarSeleccion(fila, a, h, hitos) {
@@ -363,18 +290,21 @@ var HitoMesaDocumentos = (function () {
   }
 
   /* Soltar un fichero: lo mismo que "Desde el ordenador" (js/documentos.js,
-     con el hito), con el fichero ya elegido. */
-  /* Fila 145: sobre toda la columna derecha, sin recuadro. Fila 147: y
-     sobre la tarjeta grande de documentos (con su zona de soltar al pie). */
-  function engancharSoltar(fila, a, h) {
-    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-col-derecha, .mesa-grande-docs'), function (zona) {
-      engancharZona(zona, a, h);
-    });
-  }
+     con el hito), con el fichero ya elegido. Fila 425: sobre cualquier parte
+     de «Trabajo» (las dos columnas) el fichero entra en el hito abierto; sin
+     hito abierto (la lista de hitos), no se hace nada. */
+  var ultimaMesa = null;   /* { fila, a, h, hitos } de la mesa abierta, para la casilla de la carpeta */
 
-  function engancharZona(zona, a, h) {
+  function soltarAlHito(destino) {
+    var zona = document.getElementById('trabajo-columnas');
+    if (!zona) return;
+    if (!destino) {
+      zona.ondragover = zona.ondragleave = zona.ondrop = null;
+      zona.classList.remove('encima');
+      return;
+    }
     zona.ondragover = function (ev) { ev.preventDefault(); zona.classList.add('encima'); };
-    zona.ondragleave = function () { zona.classList.remove('encima'); };
+    zona.ondragleave = function (ev) { if (!ev.relatedTarget || !zona.contains(ev.relatedTarget)) zona.classList.remove('encima'); };
     zona.ondrop = function (ev) {
       ev.preventDefault();
       zona.classList.remove('encima');
@@ -382,9 +312,14 @@ var HitoMesaDocumentos = (function () {
       if (!ficheros || !ficheros.length) return;
       if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287: un directivo no guarda documentos */
       if (window.Documentos && Documentos.abrir) {
-        Documentos.abrir(a, { hito: h, ficheroSoltado: ficheros[0] });
+        Documentos.abrir(destino.a, { hito: destino.h, ficheroSoltado: ficheros[0] });
       }
     };
+  }
+
+  /* Fila 425: marcar o desmarcar la casilla de un documento de la carpeta cambia la barra de lo marcado. */
+  function alMarcar() {
+    if (ultimaMesa && ultimaMesa.fila && ultimaMesa.fila.isConnected) pintarSeleccion(ultimaMesa.fila, ultimaMesa.a, ultimaMesa.h, ultimaMesa.hitos);
   }
 
   function enganchar(fila, a, h, hitos, abierto) {
@@ -413,14 +348,14 @@ var HitoMesaDocumentos = (function () {
         if (window.HitosPanel) HitosPanel.programarRepintado();
       };
     });
+    ultimaMesa = { fila: fila, a: a, h: h, hitos: hitos };
     pintarSeleccion(fila, a, h, hitos);
-    if (abierto && window.HitosSacarDocumento) HitosSacarDocumento.engancharAjenos(fila, a, h, hitos);   /* fila 282 */
     pintarPlantillas(fila, a, h, abierto);
-    if (abierto) engancharSoltar(fila, a, h);
+    soltarAlHito(abierto ? { a: a, h: h } : null);
     if (abierto && window.HitoMesaComunicar) HitoMesaComunicar.pintar(fila, a, h);
   }
 
-  return { filasHTML: filasHTML, enganchar: enganchar, cuentaTitulo: cuentaTitulo, otrosDelAsunto: otrosDelAsunto, resumen: resumen, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
-           moverAOtroHito: moverAOtroHito };
+  return { filasHTML: filasHTML, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
+           moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar };
 })();
 window.HitoMesaDocumentos = HitoMesaDocumentos;

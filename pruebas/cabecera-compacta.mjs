@@ -11,10 +11,11 @@
      3. El título del guion («QUÉ HAY QUE HACER» desde la fila 145), a 250 px o menos del borde de arriba.
      4. El nombre del hito, sus etiquetas y «Marcar hito como hecho», en
         una sola línea.
-     5. Pulsar otra vez la pestaña «Hitos»: primero a la lista de hitos;
-        otra vez, a las tarjetas. Sin salir nunca de la ficha.
+     5. «← Hitos» (fila 425; antes, pulsar otra vez la pestaña «Hitos»): a la lista de hitos,
+        con «Trabajo» abierta y sin salir de la ficha.
    A 800×900: nada se sale por la derecha (sin desplazamiento lateral). */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -88,7 +89,6 @@ async function preparar(ancho, alto) {
   }, [ASUNTO, DOCS]);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
-  await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
   return { pagina, errores };
 }
@@ -99,7 +99,7 @@ function alto(pagina, selector) {
 }
 
 async function abrirMesa(pagina) {
-  await pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-titulo').click();
+  await abrirHito(pagina, 'm1');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]');
   await pagina.waitForTimeout(300);
 }
@@ -127,8 +127,6 @@ async function abrirMesa(pagina) {
       .filter((b) => /Volver a las tarjetas|Volver a la lista de hitos|Asuntos abiertos ›/.test(b.textContent) && b.offsetParent).length), 0);
   await comprobar('2. sin el título «Hitos» del recuadro',
     pagina.evaluate(() => { const t = document.querySelector('.ficha-tarjeta.abierta > .ficha-titulo'); return !!(t && t.offsetParent); }), false);
-  await comprobar('2. la pestaña abierta dice cómo volver',
-    pagina.locator('.ficha-pestana.activa').getAttribute('title'), 'Volver a las tarjetas');
 
   /* 3. */
   const guion = await alto(pagina, '.mesa-guion .mesa-bloque-titulo');
@@ -137,7 +135,9 @@ async function abrirMesa(pagina) {
   /* Fila 302 (7-oct-2026): con la fila de botones del hito («Hacer este hito», «Generar documento»…) añadida
      después, el guion queda a unos 320 px; el tope pasa de 250 a 360 px (el 40 % de los 920 px de alto):
      sigue viéndose entero sin bajar. */
-  await comprobar('3. «QUÉ HAY QUE HACER» a 360 px o menos del borde (sin bajar)', Promise.resolve(guion.top <= 360), true);
+  /* Fila 425: con la fila de pestañas siempre a la vista y la columna del hito en una tarjeta, el guion queda a
+     unos 375 px; el tope pasa a 420 px (algo menos de la mitad de los 920 px): sigue a la vista sin bajar. */
+  await comprobar('3. «QUÉ HAY QUE HACER» a 420 px o menos del borde (sin bajar)', Promise.resolve(guion.top <= 420), true);
 
   /* 4. */
   const t = await alto(pagina, '.mesa-titulo');
@@ -145,20 +145,18 @@ async function abrirMesa(pagina) {
   const h = await alto(pagina, '.mesa-marcar-hecho');
   /* Fila 302: «Marcar como hecho» ya no va en la línea del nombre sino en la fila de botones del hito,
      justo debajo (a menos de 40 px del nombre). */
+  /* Fila 425: la columna del hito mide media pantalla y la fila de botones puede ocupar dos renglones: «Hecho»
+     queda a menos de 100 px del nombre (antes, 40). */
   await comprobar('4. nombre y etiquetas en una sola línea, y «Hecho» en la fila de botones justo debajo',
-    Promise.resolve([Math.abs(t.top - et.top) < 14, h.top >= t.bottom - 2 && h.top - t.bottom < 40]), [true, true]);
+    Promise.resolve([Math.abs(t.top - et.top) < 14, h.top >= t.bottom - 2 && h.top - t.bottom < 100]), [true, true]);
 
   /* 5. */
-  await pagina.click('.ficha-pestana.activa');
+  await pagina.click('#mesa-volver-hitos');
   await pagina.waitForTimeout(300);
-  await comprobar('5. pestaña «Hitos» otra vez: a la lista de hitos',
-    pagina.evaluate(() => [!!document.querySelector('#ficha-guia.con-mesa'), document.getElementById('ficha-tarjetas').dataset.abierta || '']),
-    [false, 'hitos']);
-  await pagina.click('.ficha-pestana.activa');
-  await pagina.waitForTimeout(300);
-  await comprobar('5. y otra vez: a las tarjetas, sin salir de la ficha',
-    pagina.evaluate(() => [document.getElementById('ficha-tarjetas').dataset.abierta || '',
-      !document.getElementById('pantalla-asunto').classList.contains('oculto')]), ['', true]);
+  await comprobar('5. «← Hitos»: a la lista de hitos, con «Trabajo» abierta y sin salir de la ficha',
+    pagina.evaluate(() => [!!document.querySelector('#ficha-guia.con-mesa'), document.getElementById('ficha-tarjetas').dataset.abierta || '',
+      !document.getElementById('pantalla-asunto').classList.contains('oculto')]),
+    [false, 'trabajo', true]);
 
   await comprobar('sin errores en la página', Promise.resolve(errores), []);
   await pagina.close();

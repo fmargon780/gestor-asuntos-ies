@@ -34,6 +34,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -320,7 +321,7 @@ console.log('--- 8. desde la mesa del hito ---');
 await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
-await pagina.locator('#ficha-guia .hito[data-id="h1"] .hito-titulo').click();
+await abrirHito(pagina, 'h1');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="h1"]');
 await pagina.waitForTimeout(300);
 await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');

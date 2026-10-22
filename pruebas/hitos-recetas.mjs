@@ -14,6 +14,7 @@
    d. «Generar documento ▾» enseña arriba el paso con receta de generar,
       y «Registrar» el de registrar como título de su menú. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -89,24 +90,20 @@ await pagina.evaluate(async (a1) => {
   HitosPanel.programarRepintado();
 }, ASUNTO);
 await pagina.waitForTimeout(800);
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
-await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-titulo').click();
+await abrirHito(pagina, 'p3');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="p3"]');
 await pagina.waitForTimeout(400);
 
-console.log('--- b. todos los documentos del asunto, en cada hito ---');
-await comprobar('«De otros hitos», con la etiqueta del hito de cada uno',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno')).map((d) =>
-    [d.dataset.doc, (d.querySelector('.mesa-doc-de-hito') || {}).textContent || ''])),
-  [['260905 SOLICITUD.pdf', '1 · Recibir'], ['260906 INFORME.pdf', '2 · Revisar'], ['260907 SUELTO.pdf', '']]);
-await comprobar('y los apartados, en su orden',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-docs-apartado')).map((x) => x.textContent)),
-  ['De otros hitos', 'En la carpeta, sin hito']);
-await comprobar('el título cuenta los del hito y los demás',
-  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '· 0 (y 3 más del asunto)');
-await comprobar('los de otros hitos no llevan el ⋯ (son de su hito)',
-  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno .hito-doc-menu-boton').length), 0);
+console.log('--- b. los documentos del asunto, en la carpeta de la derecha (fila 425) ---');
+await comprobar('la carpeta enseña los tres; ninguno es de este hito, así que sin «Hito N» y con «Traer a este hito»',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((d) =>
+    [d.dataset.doc, (d.querySelector('.ficha-marca-hito') || {}).textContent || '', !!(d.querySelector('.ficha-documento-traer') || {}).offsetParent])),
+  [['260905 SOLICITUD.pdf', '', true], ['260906 INFORME.pdf', '', true], ['260907 SUELTO.pdf', '', true]]);
+await comprobar('el título del hito cuenta solo los suyos',
+  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '· 0');
+await comprobar('a la izquierda ya no hay filas «De otros hitos» ni «sin hito»',
+  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno, .hito-en-mesa .mesa-docs-apartado').length), 0);
 
 console.log('--- d. «Generar documento ▾» y «Registrar» ---');
 await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');

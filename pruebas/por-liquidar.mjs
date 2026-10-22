@@ -117,7 +117,7 @@ await abrirFichaDe('Esteban');
 const claveEsteban = await pagina.evaluate(() => FichaNucleo.actual.nombre);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
-await pagina.locator('.hito .hito-titulo').first().click();
+/* Fila 425: al entrar se abre sola la mesa del hito actual. */
 await pagina.waitForSelector('.hito-en-mesa .mesa-marcar-hecho');
 await pagina.click('.hito-en-mesa .mesa-marcar-hecho');
 await pagina.waitForTimeout(800);

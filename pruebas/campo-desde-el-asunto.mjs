@@ -45,6 +45,14 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 425: «Campos del asunto» es una pestaña; esta prueba trabaja dentro de ella (al entrar en una ficha, con ella ya abierta). */
+await pagina.addInitScript(() => {
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function (a) { FichaTarjetas.abrirAlEntrar('tramite'); return alEntrar(a); };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
@@ -274,14 +282,14 @@ await comprobar('10. en modo consulta el botón y los «⋮» no se ven',
     menu: Array.prototype.every.call(document.querySelectorAll('.campo-aqui-menu'), (b) => getComputedStyle(b.closest('.ficha-menu-envoltorio') || b).display === 'none' || getComputedStyle(b).display === 'none')
   })), { boton: 'none', menu: true });
 
-/* 11. Fila 254: pulsar el botón no abre ni cierra la tarjeta. */
+/* 11. Fila 254: pulsar el botón no abre ni cierra la tarjeta (fila 425: ni cambia de pestaña). */
 await pagina.evaluate((n) => { FichaNucleo.ocupacionActual = null; App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'); }, ASUNTO_1);
 await pagina.waitForSelector('#ficha-campo-anadir');
 await pagina.waitForTimeout(400);
 await pagina.click('#ficha-campo-anadir');
 await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-await comprobar('11. el botón no abre la tarjeta en grande',
-  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta || ''), '');
+await comprobar('11. el botón no cambia de pestaña',
+  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta || ''), 'tramite');
 
 /* 12. La ventana ancha: 1280 de ancho, tres columnas o más, solo baja la rejilla. */
 await pagina.setViewportSize({ width: 1280, height: 800 });

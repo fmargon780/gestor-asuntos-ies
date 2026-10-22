@@ -14,6 +14,7 @@
    (d) En la mesa, "Marcar como hecho" deja abierta la mesa del hito
        siguiente. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -166,7 +167,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
-await pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-titulo').click();
+await abrirHito(pagina, 'm1');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]');
 await pagina.waitForTimeout(300);
 

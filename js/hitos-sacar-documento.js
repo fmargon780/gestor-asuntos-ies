@@ -16,9 +16,9 @@
    deshace nada sin que se vea. No envuelve nada; no llama a
    `HitosRequisitos.desmarcarPorDocumento` salvo desde ese botón.
 
-   `engancharAjenos(fila, a, h, hitos)`: el «⋯» de las filas «De otros hitos» y
-   «En la carpeta, sin hito» de la mesa («Traer a este hito», «Quitar de su
-   hito»).
+   Desde la fila 425 «Traer a este hito» es un botón de cada documento de la
+   carpeta (js/ficha-documentos.js); las filas «De otros hitos» de la mesa
+   ya no existen.
    ============================================================ */
 var HitosSacarDocumento = (function () {
 
@@ -154,24 +154,6 @@ var HitosSacarDocumento = (function () {
     return { movidos: movidos, asociados: asociados, tareas: tareas };
   }
 
-  /* ---------- el «⋯» de las filas de otros hitos y sin hito (la mesa) ---------- */
-
-  function engancharAjenos(fila, a, h, hitos) {
-    if (!window.FichaMenus) return;
-    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-ajeno .mesa-doc-menu-ajeno'), function (boton) {
-      var nombre = boton.closest('.mesa-doc').dataset.doc;
-      var deOtroHito = boton.closest('.mesa-doc').dataset.hitoOrigen !== '';
-      var opciones = [];
-      if (h.clase !== 'decision') opciones.push({ texto: 'Traer a este hito', alPulsar: function () { mover(a, [nombre], h); } });
-      if (deOtroHito) {
-        if (opciones.length) opciones.push({ raya: true });
-        opciones.push({ texto: 'Quitar de su hito', clase: 'ficha-menu-peligro', alPulsar: function () { quitar(a, [nombre]); } });
-      }
-      if (!opciones.length) { boton.remove(); return; }
-      FichaMenus.montar(boton, opciones);
-    });
-  }
-
-  return { quitar: quitar, mover: mover, engancharAjenos: engancharAjenos, etiqueta: etiqueta, conGemelos: conGemelos };
+  return { quitar: quitar, mover: mover, etiqueta: etiqueta, conGemelos: conGemelos };
 })();
 window.HitosSacarDocumento = HitosSacarDocumento;

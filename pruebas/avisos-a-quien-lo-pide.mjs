@@ -14,6 +14,7 @@
    Reutiliza el disco de mentira de pruebas/navegador.mjs, con el mismo
    patrón de escritura directa en _GESTOR que pruebas/inicio.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -101,6 +102,7 @@ await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
 
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="h2"] .hito-casilla').check();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#correo-formulario');
@@ -122,8 +124,10 @@ console.log('--- 2. "Esta vez no" cierra, y no vuelve a preguntar por ese hito -
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="h2"] .hito-casilla').uncheck();
 await pagina.waitForTimeout(300);
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="h2"] .hito-casilla').check();
 await pagina.waitForTimeout(500);
 await comprobar('la segunda vez no se abre ningún cuadro',
@@ -139,6 +143,7 @@ await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
 
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="h2"] .hito-casilla').check();
 await pagina.waitForTimeout(500);
 await comprobar('sin "Lo pide" con correo, no se abre ningún cuadro',

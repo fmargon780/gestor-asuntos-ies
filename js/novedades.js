@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '425', fecha: '2026-10-22', texto: 'Al entrar en un asunto ves a la vez el hito, a la izquierda, y los documentos de la carpeta, a la derecha (pestaña «Trabajo»).' },
   { id: '423', fecha: '2026-10-22', texto: 'Cada documento tiene ahora su botón «Ruta»: copia la ruta del documento para pegarla al adjuntarlo en Séneca.' },
   { id: '414', fecha: '2026-10-22', texto: 'Al añadir un documento a un asunto en espera, «Es lo que se esperaba» ya no sale marcada. En la guía, un hito puede llevar «Recibe varios documentos» para que no salga.' },
   { id: '410', fecha: '2026-10-22', texto: 'Dentro de cada tarea de un hito que lleva un correo o un documento ya sale su botón («Enviar correo», «Enviar por Séneca» o «Generar documento»): al usarlo, la tarea se marca sola.' },

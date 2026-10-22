@@ -2,6 +2,7 @@
    (docs/SOLO-CONSULTA-EN-ESTE-ORDENADOR.md): «En este ordenador, solo consultar».
    Con los datos de demostración y la marca puesta antes de cargar. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
 let fallos = 0;
@@ -43,7 +44,7 @@ await pagina.waitForTimeout(800);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(500);
 const h = await pagina.evaluate(async (n) => (await Hitos.hitosDe(n))[0].id, abiertos[0]);
-await pagina.locator('#ficha-guia .hito[data-id="' + h + '"] .hito-titulo').click();
+await abrirHito(pagina, '' + h + '');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa');
 await pagina.waitForTimeout(800);
 await comprobar('1. tras pasear por las pantallas, la ficha y la mesa: cero escrituras', escrituras(), 0);

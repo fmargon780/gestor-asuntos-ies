@@ -13,6 +13,7 @@
       apellido de una persona; «Quién lo pide» no propone «el propio interesado»; «Cambiar el asunto» cambia el nombre del
       grupo y sigue siendo un grupo. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
 let fallos = 0;
@@ -181,7 +182,7 @@ await pagina.waitForTimeout(1200);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(400);
 const h = await pagina.evaluate(async (n) => (await Hitos.hitosDe(n))[0].id, demo);
-await pagina.locator('#ficha-guia .hito[data-id="' + h + '"] .hito-titulo').click();
+await abrirHito(pagina, '' + h + '');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa');
 await pagina.waitForTimeout(600);
 await comprobar('6. en la mesa de su primer hito no hay «Hacer este hito» (el tipo sí lo tiene en un asunto de una persona)',

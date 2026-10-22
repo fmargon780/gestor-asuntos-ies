@@ -304,9 +304,9 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: 'Espejo' }).first().click();
 await pagina.waitForSelector('#ficha-documentos', { state: 'attached' });
 await pagina.waitForTimeout(1200);
-await pagina.locator('.ficha-tarjeta', { hasText: 'Hitos' }).first().click();
-await pagina.getByText('Preparar el certificado', { exact: true }).first().click();
-await pagina.getByText('Pulsa para trabajar con ellos').first().click();
+/* Fila 425: al entrar se abre sola la mesa del hito actual; si no es este, su celda de la tira. */
+await pagina.waitForSelector('.hito-en-mesa .mesa-titulo');
+if ((await pagina.locator('.hito-en-mesa .mesa-titulo').textContent()) !== 'Preparar el certificado') await pagina.locator('.mesa-tira-hito', { hasText: 'Preparar el certificado' }).click();
 await pagina.waitForSelector('.hito-doc-menu-boton');
 await pagina.locator('.hito-doc-menu-boton').first().click();
 await comprobar('13. en la mesa del hito el menú del Word lleva «Convertir en plantilla», antes de «Pasar a versiones previas»',

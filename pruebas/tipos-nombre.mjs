@@ -13,6 +13,7 @@
 
    Datos inventados. Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -153,7 +154,7 @@ await pagina.locator('.tarjeta-nombre', { hasText: 'Uno, Ana' }).first().click()
 await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(400);
-await pagina.locator('#ficha-guia .hito[data-id="b2"] .hito-titulo').click();
+await abrirHito(pagina, 'b2');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="b2"]');
 await pagina.waitForTimeout(300);
 /* Fila 145: dentro del desplegable «Generar documento ▾». */

@@ -10,6 +10,7 @@
    7. Borrar el paso de la guía: el campo pasa a ser del asunto, con su valor.
    Más: las funciones puras, y sin errores en la consola. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
 let fallos = 0;
@@ -63,7 +64,7 @@ async function abrirMesa(nombre, idHito) {
   await pagina.waitForTimeout(500);
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
-  await pagina.locator('#ficha-guia .hito[data-id="' + idHito + '"] .hito-titulo').click();
+  await abrirHito(pagina, '' + idHito + '');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + idHito + '"]');
   await pagina.waitForTimeout(400);
 }

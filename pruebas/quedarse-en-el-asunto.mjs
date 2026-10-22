@@ -12,6 +12,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -131,6 +132,7 @@ await comprobar('3. la ficha sigue enseñando el mismo asunto',
 
 console.log('--- 4. marcar un hito como hecho ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito .hito-casilla').first().click();
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito.hito-hecho');
@@ -151,9 +153,9 @@ await comprobar('5. el documento enseña ya el hito debajo de su nombre',
 
 console.log('--- 6. apuntar un documento a un hito, desde el propio hito ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+await verLaLista(pagina);
 const laFilaDelHito = pagina.locator('#ficha-guia .hito').first();
 await laFilaDelHito.locator('.hito-desplegar').click();
-await laFilaDelHito.locator('.mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
 await pagina.waitForSelector('.hito-anadir-documento:not(.oculto)');
 await laFilaDelHito.locator('.hito-anadir-documento').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');

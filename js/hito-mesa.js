@@ -1,16 +1,18 @@
 /* ============================================================
-   hito-mesa.js — el hito a pantalla completa: la mesa de trabajo
-   (24-sep-2026, fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md).
+   hito-mesa.js — el hito entero, en la columna izquierda de «Trabajo»
+   (24-sep-2026, fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md; fila 425,
+   docs/FICHA-VISTA-DE-TRABAJO.md).
 
-   Dentro de la tarjeta "Hitos" abierta en grande (fila 107), la lista
-   de hitos es compacta: una línea por hito. Pulsar uno abre su mesa,
-   que ocupa todo el sitio: la cabecera (camino, título, etiquetas de
-   estado, plazo y responsable, "Marcar hito como hecho", menú ⋯ y la
-   tira de hitos) y, debajo, lo que pinta js/hitos-panel-lista.js en el
-   cuerpo del hito. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), en la
-   cabecera, los desplegables «Generar documento ▾» y «Comunicar ▾»; desde
-   la fila 147 (docs/MESA-TARJETAS-QUE-SE-ABREN.md), tres tarjetas (guion,
-   documentos, notas e historia): una en grande y dos de resumen.
+   Dentro de la pestaña «Trabajo» (js/ficha-tarjetas.js), la lista de
+   hitos es compacta: una línea por hito. Al entrar en un asunto se abre
+   la mesa del hito actual (el primero sin hacer); con todos hechos, la
+   lista. Pulsar un hito de la lista, o una celda de la tira, abre su
+   mesa: la cabecera (camino, título, etiquetas de estado, plazo y
+   responsable, «Marcar hito como hecho», menú «Hito ▾» y la tira de
+   hitos) y, debajo, de arriba abajo y en una sola columna, lo que pinta
+   js/hitos-panel-lista.js en el cuerpo del hito: tareas, campos,
+   documentos del hito y registro. Los desplegables «Generar documento ▾»
+   y «Comunicar ▾» (fila 145) van en la cabecera.
 
    No hay pantalla nueva: la mesa es el mismo `.hito` con su
    `.hito-cuerpo` visible y la clase `con-mesa` en `#ficha-guia`, que
@@ -18,8 +20,7 @@
    que un repintado no la cierra: js/hitos-panel.js llama a `aplicar`
    después de cada repintado.
 
-   - Escape (js/usabilidad.js, `cerrarSiAbierta`) vuelve a la lista; el
-     siguiente, a lo de la fila 107.
+   - Escape (js/usabilidad.js, `cerrarSiAbierta`) vuelve a la lista.
    - Desde "Qué me toca" (`HitosPanel.desplegarAlAbrir`) se entra
      directo en la mesa de ese hito.
 
@@ -30,9 +31,8 @@ var HitoMesa = (function () {
 
   var abierta = null;   /* { clave, idHito } */
   var ultimo = null;    /* { caja, a, hitos, ajustes, abierto } del último pintado */
-  /* Fila 147: qué tarjeta está en grande ('guion', 'docs' o 'notas'), por
-     asunto e hito, para que un repintado no devuelva al guion. */
-  var tarjetaAbierta = null;   /* { clave, idHito, cual } */
+  /* Fila 425: el asunto en el que se pidió ver la lista de hitos (← Hitos); ahí no se abre el hito solo. */
+  var listaElegida = null;
 
   function $(id) { return document.getElementById(id); }
 
@@ -41,17 +41,16 @@ var HitoMesa = (function () {
   /* ---------- abrir y cerrar ---------- */
 
   function abrir(a, idHito) {
-    /* Fila 147: al abrir un hito (o cambiar con la tira), el guion en grande. */
     var otro = !abierta || abierta.clave !== a.nombre || abierta.idHito !== idHito;
-    if (otro) tarjetaAbierta = null;
+    listaElegida = null;
     abierta = { clave: a.nombre, idHito: idHito };
     /* Fila 164: los documentos de otros hitos se pintan solo en el de la mesa. */
     if (otro && window.HitosPanel && HitosPanel.programarRepintado) HitosPanel.programarRepintado();
     if (ultimo && ultimo.a && ultimo.a.nombre === a.nombre) {
       aplicar(ultimo.caja, ultimo.a, ultimo.hitos, ultimo.ajustes, ultimo.abierto);
     }
-    if (window.FichaTarjetas && FichaTarjetas.abierta && FichaTarjetas.abierta() !== 'hitos' && FichaTarjetas.abrir) {
-      FichaTarjetas.abrir('hitos');
+    if (window.FichaTarjetas && FichaTarjetas.abierta && FichaTarjetas.abierta() !== 'trabajo' && FichaTarjetas.abrir) {
+      FichaTarjetas.abrir('trabajo');
     }
     window.scrollTo(0, 0);
   }
@@ -65,13 +64,21 @@ var HitoMesa = (function () {
 
   /* Para "Qué me toca": se abrirá en cuanto se pinte ese asunto. */
   function abrirAlPintar(clave, idHito) {
-    if (!abierta || abierta.clave !== clave || abierta.idHito !== idHito) tarjetaAbierta = null;
+    listaElegida = null;
     abierta = { clave: clave, idHito: idHito };
   }
 
-  function cerrar() {
+  /* Fila 425: al entrar en una ficha, el hito de partida es el actual. Si es otra ficha (no el repintado
+     de la que ya estaba a la vista), se olvida lo que se hubiera abierto o elegido antes. */
+  function alEntrarEnLaFicha(a, mismaALaVista) {
+    if (mismaALaVista) return;
     abierta = null;
-    tarjetaAbierta = null;
+    listaElegida = null;
+  }
+
+  function cerrar() {
+    if (abierta) listaElegida = abierta.clave;
+    abierta = null;
     if (ultimo) aplicar(ultimo.caja, ultimo.a, ultimo.hitos, ultimo.ajustes, ultimo.abierto);
   }
 
@@ -86,39 +93,16 @@ var HitoMesa = (function () {
     return true;
   }
 
-  /* ---------- la tarjeta en grande (fila 147) ---------- */
-
-  function tarjetaDe(clave, idHito) {
-    return (tarjetaAbierta && tarjetaAbierta.clave === clave && tarjetaAbierta.idHito === idHito) ? tarjetaAbierta.cual : 'guion';
-  }
-
-  function ponerTarjeta() {
-    if (!abierta || !ultimo || !ultimo.caja) return;
-    var fila = ultimo.caja.querySelector('.hito-en-mesa[data-id="' + abierta.idHito + '"]');
-    var cols = fila && fila.querySelector(':scope > .hito-cuerpo > .mesa-columnas');
-    if (cols) cols.dataset.tarjeta = tarjetaDe(abierta.clave, abierta.idHito);
-  }
-
-  /* Cambiar de tarjeta es solo cambiar cuál se ve: no se repinta nada, así
-     que no se pierde lo que se esté escribiendo. */
-  function abrirTarjeta(cual) {
-    if (!abierta) return;
-    tarjetaAbierta = { clave: abierta.clave, idHito: abierta.idHito, cual: cual || 'guion' };
-    ponerTarjeta();
-  }
-
-  /* Para Escape: true si había otra tarjeta en grande y se ha vuelto al guion. */
-  function volverAlGuionSiOtra() {
-    if (!estaAbierta() || tarjetaDe(abierta.clave, abierta.idHito) === 'guion') return false;
-    abrirTarjeta('guion');
-    return true;
-  }
-
   /* ---------- después de cada repintado de los hitos ---------- */
 
   function aplicar(caja, a, hitos, ajustes, abierto) {
     if (!caja) return;
     ultimo = { caja: caja, a: a, hitos: hitos, ajustes: ajustes, abierto: abierto };
+    /* Fila 425: sin hito pedido, el actual (el primero sin hacer); con todos hechos, la lista. */
+    if (a && (!abierta || abierta.clave !== a.nombre) && listaElegida !== a.nombre && window.EstadoHito && EstadoHito.idActual) {
+      var porDefecto = EstadoHito.idActual(hitos, ajustes);
+      if (porDefecto) abierta = { clave: a.nombre, idHito: porDefecto };
+    }
     var fila = null;
     if (abierta && a && abierta.clave === a.nombre) {
       fila = caja.querySelector('.hito[data-id="' + abierta.idHito + '"]');
@@ -131,7 +115,11 @@ var HitoMesa = (function () {
       if (cuerpo) cuerpo.classList.toggle('oculto', !enMesa);
     });
     caja.classList.toggle('con-mesa', !!fila);
+    var columnas = $('trabajo-columnas');
+    if (columnas) columnas.classList.toggle('con-hito', !!fila);
+    if (window.FichaDocumentos && FichaDocumentos.marcarHito) FichaDocumentos.marcarHito(a, hitos, fila ? abierta.idHito : null, !!(fila && abierto));   /* fila 425: «Hito N» y casillas en la carpeta */
     if (!fila) {
+      if (window.HitoMesaDocumentos && HitoMesaDocumentos.soltarAlHito) HitoMesaDocumentos.soltarAlHito(null);
       if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
       return;
     }
@@ -139,8 +127,6 @@ var HitoMesa = (function () {
     pintarCabecera(fila, a, h, hitos, ajustes, abierto);
     if (window.HitoMesaGuion) HitoMesaGuion.pintar(fila, a, h, abierto);
     if (window.HitoMesaDocumentos) HitoMesaDocumentos.enganchar(fila, a, h, hitos, abierto);
-    if (window.HitoMesaTarjetas) HitoMesaTarjetas.pintar(fila, a, h, hitos);
-    ponerTarjeta();
     if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
   }
 
@@ -429,7 +415,7 @@ var HitoMesa = (function () {
       return window.Registro && !Registro.tieneRegistro(n, a) && !/SIN SELLAR/i.test(n) && !/\.docx?$/i.test(n);
     });
     function registrar(nombre) {
-      abrirTarjeta('docs');
+      verDocumentos();
       if (window.HitosDocumentoMenu && HitosDocumentoMenu.registrar) HitosDocumentoMenu.registrar(a, h, nombre);
     }
     /* Fila 164: las tareas pendientes con receta de registrar, como título del menú. */
@@ -445,6 +431,12 @@ var HitoMesa = (function () {
       if (!sin.length) { U.aviso('No hay ningún documento de este hito sin registrar. Añádelo primero.', 'ambar'); return; }
       registrar(sin[0]);
     };
+  }
+
+  /* Fila 425: lo que hacía «abrir antes la tarjeta de documentos»: llevar el bloque a la vista, a la izquierda. */
+  function verDocumentos() {
+    var docs = document.querySelector('.hito-en-mesa .mesa-grande-docs');
+    if (docs && docs.scrollIntoView) docs.scrollIntoView({ block: 'nearest' });
   }
 
   function tipoDe(a) { return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || ''; }
@@ -490,9 +482,28 @@ var HitoMesa = (function () {
     var boton = cab.querySelector('.mesa-abrir-panel[data-panel="' + cual + '"]');
     if (!panel || !boton) return;
     panel.classList.remove('oculto');
+    colocarPanel(panel);
     boton.setAttribute('aria-expanded', 'true');
     boton.classList.add('abierto');
     panelAbierto = { clave: a.nombre, idHito: h.id, panel: cual };
+  }
+
+  /* Fila 425: la columna del hito es la mitad de la pantalla: el desplegable, de 420 px y pegado por defecto al borde
+     derecho de su botón, no se sale por los lados de esa columna (se taparía con el menú de la izquierda o la carpeta). */
+  function colocarPanel(panel) {
+    panel.style.left = '';
+    panel.style.right = '';
+    var col = document.getElementById('trabajo-izq');
+    if (!col || !panel.offsetParent) return;
+    var c = col.getBoundingClientRect();
+    var r = panel.getBoundingClientRect();
+    var dx = 0;
+    if (r.left < c.left + 4) dx = c.left + 4 - r.left;
+    else if (r.right > c.right - 4) dx = Math.min(0, c.right - 4 - r.right);
+    if (!dx) return;
+    var base = panel.offsetParent.getBoundingClientRect();
+    panel.style.right = 'auto';
+    panel.style.left = Math.round(r.left + dx - base.left) + 'px';
   }
 
   function cerrarPaneles() {
@@ -521,9 +532,8 @@ var HitoMesa = (function () {
     abrir: abrir, abrirConPanel: abrirConPanel, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
     cerrarSiAbierta: cerrarSiAbierta, estaAbierta: estaAbierta,
     abierta: function () { return abierta; }, textoPlazo: textoPlazo,
-    cerrarPanelSiAbierto: cerrarPanelSiAbierto,
-    tarjetaDe: tarjetaDe, abrirTarjeta: abrirTarjeta, volverAlGuionSiOtra: volverAlGuionSiOtra,
-    tarjeta: function () { return abierta ? tarjetaDe(abierta.clave, abierta.idHito) : null; }
+    cerrarPanelSiAbierto: cerrarPanelSiAbierto, verDocumentos: verDocumentos,
+    alEntrarEnLaFicha: alEntrarEnLaFicha
   };
 })();
 window.HitoMesa = HitoMesa;

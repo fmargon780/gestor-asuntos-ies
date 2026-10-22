@@ -5,6 +5,7 @@
    Asunto abierto y archivado; sin la ruta del centro, la pide con el cuadro de siempre y
    después copia la del documento. Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -119,10 +120,10 @@ await pagina.click('#visor-cerrar');
 console.log('--- 3. la mesa del hito ---');
 await pagina.evaluate(async ([ABIERTO, FACTURA]) => { await Hitos.anadirDocumento(ABIERTO, 'h1', FACTURA); await Hitos.anadirDocumento(ABIERTO, 'h1', '261018 FACTURA vieja.pdf'); }, [ABIERTO, FACTURA]);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.waitForTimeout(400);
-await pagina.locator('#ficha-guia .hito[data-id="h1"] .hito-titulo').click();
+await pagina.evaluate(() => HitosPanel.programarRepintado());   /* fila 425: la mesa de h1 ya está abierta; que se repinte con los documentos nuevos */
+await pagina.waitForTimeout(800);
+await abrirHito(pagina, 'h1');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="h1"]');
-await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
 await pagina.waitForSelector('.hito-en-mesa .mesa-doc .ruta-documento >> visible=true');
 await comprobar('3. el documento de la mesa del hito lleva «Ruta» y copia la del documento',
   pegado(() => pagina.click('.hito-en-mesa .mesa-doc .ruta-documento >> visible=true')), BASE + FACTURA);

@@ -4,6 +4,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -327,6 +328,7 @@ await comprobar('el festivo y el no lectivo se han guardado en hitos.json', pagi
 console.log('--- escenario 3: marcar un hito hecho pone el siguiente en curso ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await abrirFicha();
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-casilla').check();
 await pagina.waitForTimeout(500);
 await comprobar('p1 queda hecho',
@@ -344,6 +346,7 @@ await comprobar('y nada se escribe en el estado viejo de la ficha', pagina.evalu
 }, CLAVE), '');
 
 console.log('--- escenario 4: la lista se corta en la decisión, y al elegir aparece la rama ---');
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito[data-id="p2"] .hito-casilla').check();
 await pagina.waitForTimeout(500);
 await comprobar('sigue sin verse nada de después de la decisión',
@@ -371,9 +374,8 @@ await comprobar('p4 enseña el tercero del asunto como responsable',
 console.log('--- escenario 5: cambiar de rama ---');
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
-await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-titulo').click();
+await abrirHito(pagina, 'p3a1');
 /* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .mesa-resumen[data-tarjeta="notas"]').click();
 await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entregado en mano el lunes');
 /* Fila 145: sin botón «Añadir nota»; Intro guarda. */
 await pagina.press('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Enter');
@@ -388,7 +390,7 @@ await comprobar('la nota se ha guardado',
 
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
-await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-titulo').click();
+await abrirHito(pagina, 'p3');
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cambiar-rama').click();
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cuerpo .hito-opcion', { hasText: 'Por email' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
@@ -416,8 +418,7 @@ await pagina.evaluate(async (clave) => {
 
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
+await abrirHito(pagina, 'p1');
 await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento');
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
@@ -436,8 +437,7 @@ await comprobar('y queda guardado en hitos.json',
 console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desaparece ---');
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
+await abrirHito(pagina, 'p1');
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
@@ -473,8 +473,7 @@ await pagina.evaluate(async (clave) => {
 await pagina.waitForTimeout(400);
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
+await abrirHito(pagina, 'p1');
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 DNI Marina.pdf"] .hito-doc-menu-boton').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');

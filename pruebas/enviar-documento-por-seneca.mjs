@@ -13,6 +13,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -81,13 +82,12 @@ async function abrirMesa() {
     return !!(m && m.offsetParent);
   });
   if (!yaAbierta) {
-    await pagina.locator('#ficha-guia .hito[data-id="c1"] .hito-titulo').click();
+    await abrirHito(pagina, 'c1');
   }
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]:visible');
   await pagina.waitForTimeout(300);
   /* La tarjeta grande de «Documentos del hito» (no el resumen cerrado):
      ahí es donde vive de verdad la fila de cada documento, con «Enviar ▾». */
-  await pagina.evaluate(() => { if (window.HitoMesa) HitoMesa.abrirTarjeta('docs'); });
   await pagina.waitForTimeout(200);
 }
 

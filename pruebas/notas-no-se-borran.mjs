@@ -14,6 +14,7 @@
    Reutiliza el disco de mentira de pruebas/navegador.mjs, y la guía de
    mentira del patrón de pruebas/hitos.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -128,10 +129,9 @@ await comprobar('el campo de la nota sigue siendo el mismo elemento (no se ha re
 
 console.log('--- 4) lo mismo con la nota de un hito ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await abrirHito(pagina, 'p1');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 /* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.click('#ficha-guia .hito[data-id="p1"] .hito-nota-texto');

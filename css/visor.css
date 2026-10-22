@@ -72,3 +72,16 @@ body.visor-arrastrando { user-select: none; cursor: col-resize; }
 /* Fila 423: el botón «Ruta» junto al nombre del documento. */
 .visor-ruta { flex: 0 0 auto; }
 .visor-ruta:empty { display: none; }
+
+/* Fila 425 (docs/FICHA-VISTA-DE-TRABAJO.md): el visor, dentro de la columna derecha de «Trabajo»
+   (js/ficha-trabajo-visor.js): ocupa el sitio de la lista de documentos, sin empujar la página. */
+.visor-volver { display: none; flex: 0 0 auto; padding: 5px 10px; font-size: 13px; }
+#visor-lateral.en-trabajo {
+  position: relative; top: auto; right: auto; bottom: auto; width: auto; z-index: auto;
+  border: 1px solid var(--linea); border-radius: var(--radio); box-shadow: none; overflow: hidden;
+}
+#visor-lateral.en-trabajo .visor-volver { display: inline-block; }
+#visor-lateral.en-trabajo .visor-tirador { display: none; }
+body.con-visor.visor-en-trabajo #aplicacion { padding-right: 0; }
+/* En solo consulta, lo que va a pantalla completa empieza debajo de la franja (css/estilos.css): dentro de «Trabajo» no. */
+body.solo-consulta #visor-lateral.en-trabajo, body.solo-consulta #word-visor.en-trabajo { top: auto; }

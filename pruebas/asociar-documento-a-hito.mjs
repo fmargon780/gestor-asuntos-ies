@@ -87,6 +87,11 @@ await pagina.waitForSelector('#ficha-guia .hito');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
+/* Fila 425: con la mesa de un hito abierta, la tira lleva los títulos de todos: la fila de un hito se busca por su propia línea. */
+function filaHito(titulo) {
+  return pagina.locator('#ficha-guia .hito', { has: pagina.locator('.hito-titulo', { hasText: titulo }) }).filter({ has: pagina.locator('.hito-linea') }).last();
+}
+
 function filaDe(nombreDoc) {
   return pagina.locator('.ficha-documento-fila', { has: pagina.locator('.ficha-documento', { hasText: nombreDoc }) });
 }
@@ -114,7 +119,7 @@ await comprobar('2. el documento A enseña el hito debajo de su nombre',
 await comprobar('2. el documento B sigue sin ninguno',
   filaDe(DOC_B).locator('.ficha-documento-hito').count(), 0);
 await comprobar('2. el hito "Pedir presupuesto" enseña el documento debajo',
-  pagina.locator('#ficha-guia .hito', { hasText: 'Pedir presupuesto' }).locator('.hito-documento').textContent()
+  filaHito('Pedir presupuesto').locator('.hito-documento').textContent()
     .then((t) => t.trim().indexOf(DOC_A) !== -1), true);
 
 console.log('--- 3. cambiar de hito: se quita del primero, se pone en el segundo ---');
@@ -135,17 +140,18 @@ await pagina.waitForFunction((doc) => {
   const et = fila && fila.querySelector('.ficha-documento-hito');
   if (!et || et.textContent.trim() !== 'Comprobar la factura') return false;
   const hitos = Array.from(document.querySelectorAll('#ficha-guia .hito'));
-  const antes = hitos.find((h) => h.textContent.indexOf('Pedir presupuesto') !== -1);
-  const ahora = hitos.find((h) => h.textContent.indexOf('Comprobar la factura') !== -1);
+  const propio = (h) => ((h.querySelector(':scope > .hito-linea .hito-titulo') || {}).textContent || '');
+  const antes = hitos.find((h) => propio(h).indexOf('Pedir presupuesto') !== -1);
+  const ahora = hitos.find((h) => propio(h).indexOf('Comprobar la factura') !== -1);
   return !!antes && !antes.querySelector('.hito-documento') &&
          !!ahora && ahora.querySelector('.hito-documento') &&
          ahora.querySelector('.hito-documento').textContent.indexOf(doc) !== -1;
 }, DOC_A);
 
 await comprobarQue('3. "Pedir presupuesto" ya no lo enseña',
-  await pagina.locator('#ficha-guia .hito', { hasText: 'Pedir presupuesto' }).locator('.hito-documento').count() === 0);
+  await filaHito('Pedir presupuesto').locator('.hito-documento').count() === 0);
 await comprobar('3. "Comprobar la factura" lo enseña ahora',
-  pagina.locator('#ficha-guia .hito', { hasText: 'Comprobar la factura' }).locator('.hito-documento').textContent()
+  filaHito('Comprobar la factura').locator('.hito-documento').textContent()
     .then((t) => t.trim().indexOf(DOC_A) !== -1), true);
 
 console.log('--- 4. «Quitar del hito» lo suelta del todo (fila 282: antes «Ninguno») ---');

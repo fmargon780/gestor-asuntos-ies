@@ -159,13 +159,9 @@ await comprobar('5. el fichero del disco lleva la marca y la actividad', pagina.
 /* ================= 6. LA TARJETA ================= */
 console.log('--- 6. la tarjeta «La actividad» ---');
 await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
-await pagina.evaluate(() => { if (window.HitoMesa && HitoMesa.cerrarSiAbierta) HitoMesa.cerrarSiAbierta(); FichaTarjetas.cerrar(); });
 await pagina.waitForTimeout(500);
-await comprobar('6. la tarjeta es la primera y se llama «La actividad»',
-  pagina.evaluate(() => [document.querySelector('.ficha-tarjetas-rejilla .ficha-tarjeta').dataset.tarjeta, document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-titulo').textContent.trim()]), ['actividad', 'La actividad']);
-await comprobar('6. cerrada, su resumen',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-resumen-linea').allTextContents(),
-  ['Visita al Museo de la Ciencia', '20-nov-2026 · Granada', '9 alumnos/as · 3 profesores/as', 'Prevista']);
+await comprobar('6. la pestaña va justo detrás de «Trabajo» y se llama «La actividad» (fila 425)',
+  pagina.evaluate(() => [Array.from(document.querySelectorAll('.ficha-tarjetas-rejilla > .ficha-tarjeta')).slice(0, 2).map((e) => e.dataset.tarjeta), document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-titulo').textContent.trim()]), [['trabajo', 'actividad'], 'La actividad']);
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(500);
 await comprobar('6. abierta: las unidades con «van N de M» y el profesorado separado',
@@ -219,16 +215,18 @@ await comprobar('6. «Deshacer la anulación»: vuelve a «Prevista»', pagina.l
 console.log('--- 7. realizada, plantilla vieja, papelera ---');
 const realizada = await pagina.evaluate(() => Actividades.lista().filter((x) => /Parque de las Ciencias/.test(x.nombre))[0].asunto.nombre);
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), realizada);
-await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]');
+await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
+await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(800);
 await comprobar('7. la actividad de la demostración con la fecha ya pasada dice «Realizada»',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-resumen-linea').last().textContent().then((t) => /Realizada$/.test(t)), true);
+  pagina.locator('#ficha-actividad .act-situacion').textContent().then((t) => /Realizada$/.test(t.trim())), true);
 const anulada = await pagina.evaluate(() => Actividades.lista().filter((x) => /Grazalema/.test(x.nombre))[0].asunto.nombre);
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), anulada);
-await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]');
+await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
+await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(600);
 await comprobar('7. y la anulada de la demostración, «Anulada»',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-resumen-linea').last().textContent().then((t) => /Anulada$/.test(t)), true);
+  pagina.locator('#ficha-actividad .act-situacion').textContent().then((t) => /Anulada$/.test(t.trim())), true);
 
 await comprobar('7. la plantilla de participación del profesorado no se ofrece en un asunto de actividad, y otra plantilla sí',
   pagina.evaluate((n) => {
@@ -267,7 +265,7 @@ await comprobar('7. si se unen dos asuntos con actividad, la del que se va pasa 
 /* Cambiar el nombre corto cambia el nombre del grupo y de la carpeta, por el camino de «Cambiar el asunto». */
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), nombre);
 await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
-await pagina.evaluate(() => { FichaTarjetas.cerrar(); FichaTarjetas.abrir('actividad'); });
+await pagina.evaluate(() => { FichaTarjetas.abrir('actividad'); });
 await pagina.waitForSelector('#act-cambiar');
 await pagina.click('#act-cambiar');
 await pagina.waitForSelector('#act-corto');
@@ -304,10 +302,6 @@ const sinDatos = await pagina.evaluate(async () => {
 });
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), sinDatos);
 await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
-await pagina.evaluate(() => FichaTarjetas.cerrar());
-await pagina.waitForTimeout(500);
-await comprobar('7. cerrada, la tarjeta de ese asunto dice que falta apuntar y ofrece el botón',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-resumen-linea').allTextContents(), ['Sin apuntar todavía', 'Apuntar los datos de la actividad']);
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForSelector('#act-apuntar-datos');
 await comprobar('7. un asunto de ese tipo sin actividad ofrece «Apuntar los datos de la actividad»', pagina.locator('#act-apuntar-datos').textContent(), 'Apuntar los datos de la actividad');

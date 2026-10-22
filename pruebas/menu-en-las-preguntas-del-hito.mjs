@@ -10,6 +10,7 @@
       y, al aceptar, la quita de la guía y se va con las tareas de su respuesta;
       lo elegido queda guardado. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -82,7 +83,7 @@ async function abrirMesaDe(nombreCorto, idHito) {
   if (!yaAbierta) {
     await pagina.evaluate(() => { if (window.HitoMesa) HitoMesa.cerrar(); });
     await pagina.waitForTimeout(150);
-    await pagina.locator('#ficha-guia .hito[data-id="' + idHito + '"] .hito-titulo').click();
+    await abrirHito(pagina, '' + idHito + '');
   }
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + idHito + '"]');
   await pagina.waitForTimeout(300);

@@ -325,3 +325,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 423 — botón «Ruta» de cada documento (22-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En Séneca, al adjuntar, pega la ruta copiada con «Ruta» de la factura D26-00259 en la ventana de elegir fichero: abre directamente la factura, sin buscarla.
+
+## Fila 425 — la ficha con vista de trabajo, parte A (22-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Abre el asunto de Nicolás Amortegui (A26-0464) y el de Elecciones al Consejo Escolar: se ven a la vez el hito (a la izquierda) y la carpeta (a la derecha), y en Elecciones los documentos del hito abierto llevan su marca «Hito N».

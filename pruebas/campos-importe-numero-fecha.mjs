@@ -43,6 +43,14 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 425: «Campos del asunto» es una pestaña; esta prueba trabaja dentro de ella (al entrar en una ficha, con ella ya abierta). */
+await pagina.addInitScript(() => {
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function (a) { FichaTarjetas.abrirAlEntrar('tramite'); return alEntrar(a); };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');

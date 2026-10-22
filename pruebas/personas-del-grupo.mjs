@@ -77,10 +77,11 @@ const demo = await pagina.evaluate(() => App.E.listaAbiertos.filter((a) => /GRUP
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), demo);
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(1800);
-await comprobar('2. el resumen de la tarjeta cerrada',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '8 personas · 5 generados · 4 registrados · 1 enviado');   /* la tercera, colocada sola por su «Ref.» (fila 294); fila 295: y Sara y Vera, con su PDF registrado */
 await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina.waitForSelector('.pg-tabla');
+/* Fila 425: ya no hay resumen de tarjeta cerrada; la misma cuenta es la cabeza de la tabla. */
+await comprobar('2. la cuenta de la tabla',
+  pagina.locator('.pg-cuenta').textContent(), '8 personas · 5 generados · 4 registrados · 1 enviado');   /* la tercera, colocada sola por su «Ref.» (fila 294); fila 295: y Sara y Vera, con su PDF registrado */
 const columnas = () => pagina.locator('.pg-tabla thead th').allTextContents();
 await comprobar('2. las columnas', columnas(), ['Persona', 'Unidad', 'Generado', 'Registrado', 'Enviado', '']);
 await comprobar('2. una fila por persona, a todo el ancho de la tarjeta',
@@ -109,7 +110,9 @@ await pagina.locator('.pg-tabla tbody tr').nth(1).locator('.pg-abrir').click();
 await pagina.waitForTimeout(2000);
 await comprobar('2. pulsar la fecha abre el documento de esa persona, con su nombre dentro',
   pagina.evaluate(() => [document.body.classList.contains('con-word-visor'), (document.getElementById('word-visor').textContent || '').indexOf('Iker Delgado Prieto') !== -1]), [true, true]);
+await comprobar('2. el documento se abre en «Trabajo» (fila 425), no en la pestaña de las personas', pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
 await pagina.evaluate(() => document.querySelector('.word-visor-cerrar').click());
+await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 
 await pagina.locator('.pg-tabla tbody tr').nth(4).locator('.pg-mas').click();
 await pagina.locator('.pg-menu button', { hasText: 'Quitar del grupo' }).click();

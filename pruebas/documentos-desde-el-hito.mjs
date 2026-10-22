@@ -156,7 +156,7 @@ await comprobar('sin hito: nada cuenta como dato que falta', Promise.resolve(r4.
 /* ---------- 5. el botón y generar ---------- */
 console.log('--- 5. el botón en el hito ---');
 await pagina.evaluate((A) => App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === A)[0], 'abierto'), A);
-await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"]');
+await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"]', { state: 'attached' });   /* fila 425: puede estar abierta la mesa de otro hito */
 await pagina.waitForTimeout(500);
 await comprobar('sale en el hito cuyo paso tiene una plantilla (aunque sea de otro tipo)',
   pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-generar').count(), 1);

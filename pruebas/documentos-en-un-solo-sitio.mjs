@@ -113,6 +113,7 @@ await comprobar('un PDF trae la barra con sus herramientas',
   pagina.locator('#visor-acciones:not(.oculto) .visor-barra-pdf button').allTextContents()
     .then(ts => ts.map(t => t.trim()).filter(t => ['Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño'].includes(t))),
   ['Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño']);
+await pagina.click('#visor-volver');   /* fila 425: el documento ocupa el sitio de la lista; «← Carpeta» la devuelve */
 await filaDe(FOTO).locator('.ficha-documento').click();
 await pagina.waitForTimeout(300);
 await comprobar('una imagen, no',

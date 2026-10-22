@@ -33,3 +33,13 @@ body.con-word-visor { overflow: hidden; }
 /* Fila 423: el botón «Ruta» junto al nombre del documento. */
 .word-visor-ruta { flex: 0 0 auto; }
 .word-visor-ruta:empty { display: none; }
+
+/* Fila 425 (docs/FICHA-VISTA-DE-TRABAJO.md): el Word, dentro de la columna derecha de «Trabajo»
+   (js/ficha-trabajo-visor.js), en lugar de la lista de documentos. */
+.word-visor-volver { display: none; flex: 0 0 auto; }
+.word-visor.en-trabajo {
+  position: relative; inset: auto; z-index: auto;
+  border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden;
+}
+.word-visor.en-trabajo .word-visor-volver { display: inline-block; }
+body.con-word-visor.visor-en-trabajo { overflow: auto; }

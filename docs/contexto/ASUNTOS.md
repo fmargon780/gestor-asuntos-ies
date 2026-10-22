@@ -355,7 +355,7 @@ al lado.
   deja ni el separador ni un hueco. Se esconde entera con la cabecera encogida
   (`.ficha-cabecera.encogida .ficha-apertura { display: none; }`, `css/ficha-asunto.css`).
 - **Tarjetas** (24-sep-2026, fila 107, `docs/FICHA-EN-TARJETAS.md`; antes, tres columnas y dos
-  plegables, `js/ficha-plegables.js`, retirado): ver "La ficha en tarjetas", más abajo.
+  plegables, `js/ficha-plegables.js`, retirado; desde la fila 425, pestañas): ver "La ficha en pestañas", más abajo.
 - **"Datos del asunto" se desmonta y pasa a llamarse "Datos del trámite"**: `datosDelAsunto(a)`
   (ya no lleva `p`, la fecha límite se quitó) solo deja los campos propios del tipo
   (`filasDeCampos`), Vía de comunicación, Lo pide y En el archivo — el resto ya se ve en la
@@ -363,57 +363,47 @@ al lado.
   entero no se pinta**, ni el título ni la tarjeta (antes `filas()` pintaba "Nada que enseñar
   aquí."; `filasHtml()`, nueva, es la parte de `filas()` que solo dibuja, reutilizada aquí y por
   `filas()` para los sitios que sí quieren ese aviso).
-- `js/ficha-documentos.js` sigue poniendo `.vacio` a su bloque con la carpeta vacía; en una
-  tarjeta (`.ficha-tarjeta.vacio`) ya no encoge nada: la tarjeta tiene el tamaño de las demás.
-- Se comprueba con `pruebas/ficha-disposicion.mjs` (el orden de las tarjetas, la línea gris,
-  "Datos del trámite" con y sin campos propios, los resúmenes de "Otros asuntos" y "Personas", que
-  un repintado no cierra la tarjeta abierta y las columnas según el ancho).
+- `js/ficha-documentos.js` sigue poniendo `.vacio` a su bloque con la carpeta vacía.
+- Se comprueba con `pruebas/ficha-disposicion.mjs` (el orden de las pestañas, la línea gris,
+  "Datos del trámite" con y sin campos propios, los números de "Otros asuntos" y "Personas" y que
+  un repintado no cambia de pestaña).
 
-### La ficha en tarjetas (24-sep-2026, fila 107, docs/FICHA-EN-TARJETAS.md)
+### La ficha en pestañas, con la vista de trabajo (fila 107, 24-sep-2026; fila 425, 22-oct-2026, docs/FICHA-VISTA-DE-TRABAJO.md)
 
 `js/ficha-tarjetas.js` (`window.FichaTarjetas`) y `css/ficha-tarjetas.css`. `js/ficha-asunto.js`
 solo monta el HTML con `FichaTarjetas.html(tramite)` y avisa con `FichaTarjetas.alEntrar()` (en
 `App.abrirFicha`, antes de pintar) y `FichaTarjetas.alPintar(caja, a)` (al final de
 `pintarLaFicha`): puntos previstos, nada se envuelve. Los huecos de dentro (`#ficha-guia`,
 `#ficha-documentos`, `#ficha-contacto-caja`, `#ficha-notas`, `#ficha-otros`, `#ficha-relacionados`,
-Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
+Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo. La cuadrícula de tarjetas
+con resumen (fila 107) y la franja de documentos en chips (fila 109) **se retiraron en la fila 425**.
 
-- **Cuadrícula**: `.ficha-tarjetas-rejilla`, 3 columnas × 2 filas (4 con "Datos del trámite"), dos
-  por debajo de 1100px o con el visor/lector abierto. Todas del mismo tamaño; `ajustarAlto()` les
-  da el alto que queda hasta abajo de la ventana (sin desplazarse), al pintar, al cambiar de tamaño
-  y al abrir o cerrar el documento de la derecha. Lo que no cabe se corta.
-- **Resúmenes** de la tarjeta cerrada (`.ficha-tarjeta-resumen`), sacados de lo que cada módulo
-  ya pinta dentro (su cuerpo sigue en el DOM, oculto), con un `MutationObserver` que ignora lo que
-  pinta este fichero: Hitos ("N de M hechos" y el siguiente, con su plazo), Documentos (cuántos y
-  sus nombres, que se abren en el panel de la derecha sin abrir la tarjeta), Notas (la última:
-  quién, cuándo, el texto; de `App.E.registro`), Otros asuntos (la cuenta de verdad en
-  `#ficha-otros[data-cuenta]`, que pone `js/otros-del-tercero.js`) y Personas. "Datos y contacto"
-  y "Datos del trámite" (`.ficha-tarjeta-siempre`) enseñan su propio cuerpo, que ya es un resumen.
-  Sin contenido: "ninguno todavía", en gris.
-- **Documentos, legibles** (24-sep-2026, fila 114, `docs/DOCUMENTOS-EN-LA-TARJETA.md`): los
-  resúmenes viven en `js/ficha-tarjetas-resumen.js` (`FichaTarjetasResumen.crear`, sacado de
-  `js/ficha-tarjetas.js`). Cada renglón lleva `title` con su texto y `flex: none` (antes se
-  aplastaban unos encima de otros). Documentos ya no dice «N documentos» (va en el círculo): como
-  mucho 5 nombres, o los que quepan enteros (`medir()`, que llama `ajustarAlto()`: alto de la caja
-  entre el de un renglón), y «y N más» (`.ficha-resumen-mas`), que abre la tarjeta en grande.
-- **Abrir en grande**: pulsar la tarjeta (menos en un botón, enlace o campo). `data-abierta` en
-  `#ficha-tarjetas`; las demás pasan a pestañas (`#ficha-tarjetas-pestanas`, con su cuenta). Desde
-  la fila 112 no hay "← Volver a las tarjetas": se vuelve pulsando otra vez la pestaña abierta
-  (`title` "Volver a las tarjetas"); en Hitos con un hito abierto, primero a la lista
-  (`HitoMesa.cerrarSiAbierta()`). **Escape** (`js/usabilidad.js`, `FichaTarjetas.cerrarSiAbierta()`,
-  después de cerrar el visor si estaba) vuelve a la cuadrícula; el siguiente, lo de siempre.
-- **Franja de documentos** (`.ficha-tarjeta-franja`) en la tarjeta abierta, menos Documentos: chips
-  que pulsan por debajo el mismo `button.ficha-documento` de la lista (sin repintar). En Hitos, los
-  del hito desplegado (`.hito-cuerpo` visible → sus `.hito-documento[data-doc]`); si no hay, todos.
-  El chip del documento a la vista (`Visor.nombreAbierto()`, nuevo), marcado.
-- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde la pestaña "En Administración" de
-  Inicio (fila 209; antes "Me toca"/"Qué me toca"), `FichaTarjetas.abrirAlEntrar('hitos')` antes
-  de `App.abrirFicha`. Un repintado de la misma ficha
-  mantiene la tarjeta abierta (el estado vive en el módulo) y `U.conservandoLoEscrito` lo escrito.
-- En modo consulta, las pestañas, los chips y los nombres del resumen siguen activos
-  (`esControlDeSoloLectura`).
-- Se comprueba con `pruebas/ficha-en-tarjetas.mjs` (a 1905×1000 y 1280×800). Las pruebas que
-  trabajan dentro de la ficha entran con su tarjeta ya abierta (`window.__tarjeta`) o la abren con
+- **Pestañas** (`#ficha-tarjetas-pestanas`, siempre visibles): «Trabajo» (la primera, abierta al entrar),
+  «La actividad» y «Candidaturas» (solo donde existen, fila 306 y 347), «Datos y contacto», «Campos del
+  asunto» (si lo hay), «Registro», «Otros asuntos de este tercero» y «Personas y entidades
+  relacionadas», con su cuenta (`FichaTarjetasResumen`, ahora solo los números). Solo se ve la abierta
+  (`data-abierta` en `#ficha-tarjetas`); las demás se abren **a todo el ancho**. `abrir('hitos')` y
+  `abrir('documentos')` valen como `abrir('trabajo')` (las pestañas de antes).
+- **«Trabajo»** (`#trabajo-columnas`): dos columnas de igual ancho que llenan el alto hasta abajo de la
+  ventana (`ajustarAlto()`, al pintar, al cambiar de tamaño y de clase del `<body>`; cada columna se
+  desplaza por su cuenta). **Izquierda** (`#trabajo-izq`): `#ficha-guia`, la tira de hitos y el hito
+  entero en una columna (`docs/contexto/HITO-MESA.md`). **Derecha** (`#trabajo-der`): «Documentos de la
+  carpeta» (`#trabajo-carpeta`, `#ficha-documentos`, el pintado de `js/ficha-documentos.js`, con su
+  «+ Añadir documento», «Generar documento» y «Repartir…»), o el documento abierto en lugar de la
+  lista (`js/ficha-trabajo-visor.js`: mete `#visor-lateral` y `#word-visor` en la columna y les pone
+  `en-trabajo`; «← Carpeta» los cierra; fuera de la ficha son lo de siempre; abrir uno desde otra pestaña lleva antes a
+  «Trabajo» y, al cerrarlo, se vuelve a la de antes si nadie ha cambiado de pestaña mientras tanto (`vinoDe`, `olvidar()`);
+  `soltar()` los devuelve a `<body>` antes de rehacer la ficha entera —el iframe de un PDF se recarga al cambiar de padre— y al imprimir). Por
+  debajo de 1100 px, una columna debajo de otra y la página baja. Los documentos del hito abierto
+  llevan «Hito N», y cada uno una casilla de adjuntar y «Traer a este hito» (`FichaDocumentos.marcarHito`).
+- **Qué se recuerda**: al entrar, siempre «Trabajo» (y, en ella, el hito actual: `HitoMesa`); desde la
+  pestaña «En Administración» de Inicio (fila 209) o «Nuevo asunto», `FichaTarjetas.abrirAlEntrar('trabajo')`
+  antes de `App.abrirFicha`. Un repintado de la misma ficha mantiene la pestaña abierta (el estado vive
+  en el módulo) y `U.conservandoLoEscrito` lo escrito. **Escape** (`js/usabilidad.js`): cierra el documento,
+  luego el desplegable de la cabecera, luego la mesa (a la lista de hitos) y luego sale de la ficha.
+- En modo consulta, las pestañas siguen activas (`esControlDeSoloLectura`).
+- Se comprueba con `pruebas/ficha-vista-de-trabajo.mjs` (a 1905×1000 y 1600×900), `pruebas/ficha-en-pestanas.mjs` y `pruebas/ficha-disposicion.mjs`.
+  Las pruebas que trabajan dentro de la ficha ya están en «Trabajo» al entrar, o abren otra pestaña con
   `FichaTarjetas.abrir(id)`.
 
 **La cabecera de la ficha, agrupada por el trámite** (18-sep-2026, fila 52,

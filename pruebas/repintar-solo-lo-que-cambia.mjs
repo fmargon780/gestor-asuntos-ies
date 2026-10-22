@@ -12,6 +12,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -105,7 +106,8 @@ const r1 = await pagina.evaluate(async (B) => {
   Object.keys(originales).forEach(f => { Carpetas[f] = originales[f]; });
   return { cuenta, pendiente: App.E.listaPendiente };
 }, B);
-const permitidas = ['ficheros', 'leerJson:hitos.json', 'leerTexto:hitos.json', 'guardarJson:hitos.json', 'escribirTexto:hitos.json'];
+/* Fila 425: con la mesa del hito abierta (ahora, al entrar), pintarla lee una vez la biblioteca de hitos. */
+const permitidas = ['ficheros', 'leerJson:hitos.json', 'leerTexto:hitos.json', 'guardarJson:hitos.json', 'escribirTexto:hitos.json', 'leerJson:hitos-biblioteca.json'];
 await comprobar('solo mira la carpeta y relee y escribe hitos.json',
   Promise.resolve(Object.keys(r1.cuenta).filter(k => permitidas.indexOf(k) === -1 &&
     !/^(escribirTexto|guardarJson):hitos-\d{6}\.json$/.test(k) &&
@@ -124,6 +126,7 @@ await comprobar('al volver a la lista se pinta, y el asunto ya va con los de ter
 /* ---------- 2. marcar un hito ---------- */
 console.log('--- 2. marcar un hito cambia el paso de la cabecera ---');
 await pagina.evaluate((B) => App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto'), B);
+await verLaLista(pagina);   /* fila 425: al entrar se abre la mesa del hito actual; la casilla de la lista, con «← Hitos» */
 await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.waitForFunction(() => {
