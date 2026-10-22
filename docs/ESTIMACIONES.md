@@ -15,3 +15,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
+| 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
