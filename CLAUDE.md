@@ -41,7 +41,7 @@ Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas com
 1. Mientras programas, pasa solo las pruebas de lo que tocas: `npm test -- <palabra> [<palabra>…]`
    (el ejecutor lanza las que llevan esas palabras en el nombre), más las pruebas nuevas de la fila.
 2. La pasada completa (`npm test` sin palabras) se hace **una sola vez**, justo antes de la subida
-   del cambio. Si sale en verde, se sube; no se repite «para confirmar».
+   del cambio (salvo que sea larga: ver «Pasada completa de pruebas: una vez al día si tarda»). Si sale en verde, se sube; no se repite «para confirmar».
 3. Si en esa pasada falla una prueba: arréglalo y repite **solo esa prueba y las de lo que hayas
    vuelto a tocar**, no las 170. Y además:
    - (11-oct-2026, fila 333, `docs/PRUEBAS-SEGUNDO-INTENTO-A-SOLAS.md`) El ejecutor repite solo, una
@@ -53,6 +53,37 @@ Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas com
    - Una prueba que falla **también en el segundo intento**: si es de tu cambio, se arregla. Si
      falla igual en `main` sin tu cambio, va a `RETIRADAS` (mismo fichero) con fecha y motivo, y se
      dice en la nota de la fila en una línea.
+
+## Pasada completa de pruebas: una vez al día si tarda (norma de Francisco, 22-oct-2026)
+
+Sustituye a «la pasada completa, una sola vez justo antes de subir» cuando esa pasada es larga.
+Manda sobre cualquier otra regla de `docs/COLA.md` o de `docs/` que diga lo contrario.
+
+1. **`docs/PASADA-DIARIA.md`** guarda una sola línea viva, que se sustituye cada vez:
+   `Última pasada completa: <fecha y hora de Madrid> · <minutos> min · <verde | con fallos> · commit <sha corto de main>`.
+   Si no existe, la primera sesión que haga una pasada completa lo crea.
+2. **Pasada corta (10 minutos o menos, o sin dato todavía):** todo sigue como antes. Pruebas de lo
+   tocado mientras se trabaja; la completa, una vez justo antes de subir. Al terminarla se apunta en
+   `docs/PASADA-DIARIA.md` cuánto ha tardado.
+3. **Pasada larga (más de 10 minutos según `docs/PASADA-DIARIA.md`):** modo diario.
+   a. Al empezar la sesión, si la fecha apuntada no es la de hoy (hora de Madrid), **lo primero** es
+      la pasada completa sobre `main` recién bajado, antes de tocar la fila. Se apunta el resultado.
+   b. Si sale en verde, se sigue con la fila normal.
+   c. Si falla una prueba, se repite a solas. Si a solas pasa, es fallo de carga: se apunta en una
+      línea y no cuenta como fallo. Si a solas también falla, se añade una fila nueva
+      «Arreglar la prueba <nombre>, que falla en la pasada diaria del <fecha>» **encima de todas las
+      PENDIENTE** de la cola (solo una DEVUELTA va delante), y esta misma sesión trabaja esa fila en
+      vez de la que iba a hacer.
+   d. Durante la fila, solo las pruebas de lo tocado, más las fijas que este repositorio obligue
+      siempre. **No se repite la pasada completa antes de subir.** El revisor, donde lo haya, sigue
+      igual.
+   e. Si la sesión hace varias filas seguidas, la pasada diaria se hace una sola vez, al principio.
+   f. Si en el día no se lanza ninguna fila, no se hace pasada: nada se programa solo.
+4. **El mensaje final** de la primera fila del día empieza su resumen con
+   «Pasada completa del día: <minutos> min, <en verde | con N fallos, arreglo apuntado el primero>.»
+   Las demás filas del día no la mencionan.
+5. Si una pasada completa (la diaria o una corta) tarda más o menos de lo apuntado, se actualiza el
+   dato: la frontera de 10 minutos se mira siempre con la última medida.
 
 **Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
 EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una
