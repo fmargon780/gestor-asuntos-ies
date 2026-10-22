@@ -63,9 +63,9 @@ async function cerrarCuadro() {
 console.log('--- 1. la casilla ---');
 await comprobar('1. Marta espera (le toca a otro)', lado('Otero Campos, Marta'), 'terceros');
 await entra('Otero Campos, Marta', 'parte de alta A.pdf');
-await comprobar('1. la casilla sale marcada, con el título del hito',
+await comprobar('1. la casilla sale SIN marcar (fila 414), con el título del hito',
   pagina.evaluate(() => { const c = document.getElementById('doc-termina-espera'); return c ? [c.checked, c.parentNode.textContent] : null; }),
-  [true, 'Es lo que se esperaba. Termina la espera de «Esperar el parte de alta».']);
+  [false, 'Es lo que se esperaba. Termina la espera de «Esperar el parte de alta».']);
 await cerrarCuadro();
 await entra('Aguilar Ponce, Marina', 'justificante A.pdf');
 await comprobar('1. en un asunto que le toca a Administración, no sale', casilla(), 0);
@@ -84,6 +84,7 @@ await cerrarCuadro();
 /* ===== 2. Guardar con ella ===== */
 console.log('--- 2. guardar con la casilla ---');
 await entra('Otero Campos, Marta', 'parte de alta A.pdf');
+await pagina.check('#doc-termina-espera');   // fila 414: la casilla sale sin marcar
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(3500);
 await comprobar('2. aviso verde «Espera terminada…» con «Deshacer»', avisos().then((m) => m.filter((t) => /^Espera terminada: «Esperar el parte de alta»\. Ahora toca: «Archivar el parte de alta»\./.test(t)).length), 1);
@@ -99,13 +100,13 @@ await comprobar('2. el asunto vuelve a esperar', lado('Otero Campos, Marta'), 't
 /* ===== 3. Sin casilla, y con algo obligatorio ===== */
 console.log('--- 3. casilla quitada y obligatorio pendiente ---');
 await entra('Otero Campos, Marta', 'parte de alta B.pdf');
-await pagina.uncheck('#doc-termina-espera');
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(2500);
-await comprobar('3. con la casilla quitada, el asunto sigue en espera', lado('Otero Campos, Marta'), 'terceros');
+await comprobar('3. con la casilla sin tocar (fila 414), el asunto sigue en espera', lado('Otero Campos, Marta'), 'terceros');
 await comprobar('3. y el documento está guardado', hito2('Otero Campos, Marta').then((h) => h.documentos.length), 1);
 await cerrarCuadro();
 await entra('Otero Campos, Marta', 'parte de alta C.pdf');
+await pagina.check('#doc-termina-espera');
 await pagina.evaluate(() => { window.__fo = Hitos.faltanObligatorios; Hitos.faltanObligatorios = () => [{ texto: 'el parte original' }]; });
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(2500);
@@ -122,6 +123,7 @@ await pagina.evaluate(async () => {
   window.__a = a;
 });
 await entra('Otero Campos, Marta', 'parte de alta D.pdf');
+await pagina.check('#doc-termina-espera');
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(3500);
 await pagina.evaluate(() => { const N = Documentos._interno; N.pintarFormulario({ modo: 'anadir', nombreActual: 'parte de alta E.pdf', handle: { kind: 'file', name: 'parte de alta E.pdf', getFile: () => Promise.resolve(new File(['x'], 'parte de alta E.pdf')) } }); });

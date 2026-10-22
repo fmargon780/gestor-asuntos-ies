@@ -112,6 +112,7 @@ var Hitos = (function () {
          hito de arriba, nunca en el de una opción (igual que en su paso
          de guía). */
       soloInformativo: !!(h && h.soloInformativo),
+      /* Fila 414: recibe varios documentos (como `toca`, llega de la guía). */
       /* 28-sep-2026, fila 201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md,
          apartado 1: el texto y el tipo de documento que propone este
          hito al añadir o nombrar un documento desde él (apartado 4,
@@ -164,6 +165,7 @@ var Hitos = (function () {
        mano, con desde cuándo, el motivo y los ficheros que había. */
     if (h && (h.toca === 'nos' || h.toca === 'espera')) salida.toca = h.toca;
     if (h && h.toca === 'espera' && h.tocaA) salida.tocaA = String(h.tocaA);
+    if (h && h.variosDocumentos && !esDecision) salida.variosDocumentos = true;   /* fila 414: solo si lo lleva */
     if (h && h.esperandoA) {
       salida.esperandoA = String(h.esperandoA);
       salida.esperandoDesde = String(h.esperandoDesde || '');
@@ -496,6 +498,7 @@ var Hitos = (function () {
       /* Una pregunta tampoco lleva estos dos (fila 79, apartados 4.6 y
          4.7): igual que los requisitos, son de los pasos de arriba. */
       soloInformativo: esDecision ? false : !!p.soloInformativo,
+      variosDocumentos: esDecision ? false : !!p.variosDocumentos,
       normativa: esDecision ? [] : (p.normativa || []),
       formularios: esDecision ? [] : (p.formularios || []),
       /* Fila 201: igual que los de arriba, solo de los pasos de arriba. */

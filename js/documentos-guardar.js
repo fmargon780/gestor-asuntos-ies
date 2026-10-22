@@ -225,7 +225,7 @@
       }
     }
     /* Fila 286: «Es lo que se esperaba. Termina la espera…», si la casilla sigue marcada. */
-    if (window.Esperas) await Esperas.alGuardar(N.asuntoActual, nombre);
+    if (window.Esperas) await Esperas.alGuardar(N.asuntoActual, nombre, opciones);
     /* Fila 347: la candidatura (y su persona relacionada), si el cuadro la preguntaba. */
     if (window.Candidaturas) {
       var dCand = datosDelFormulario(opciones);

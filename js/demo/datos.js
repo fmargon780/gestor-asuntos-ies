@@ -241,6 +241,16 @@
     consejo.nombreCorto = 'CertConsEsc';
     await App.guardarTipos();
 
+    /* Fila 414: elecciones al Consejo Escolar. Su hito de recepción de candidaturas le toca a terceros y
+       «Recibe varios documentos» está puesto: cada candidatura que entra se une al hito sin cerrarlo. */
+    var elecciones = await crearTipoConGuia('Elecc. Consejo Escolar', 'PERSONAL', [
+      { titulo: 'Convocar las elecciones', cuerpo: '<p>Publicar el calendario electoral.</p>', responsable: 'yo' },
+      { titulo: 'Recepción de candidaturas', cuerpo: '<p>Llegan las solicitudes de candidatura.</p>', toca: 'espera', tocaA: 'Candidatos', variosDocumentos: true },
+      { titulo: 'Proclamar las candidaturas', cuerpo: '<p>Publicar la lista de candidatos.</p>', responsable: 'yo' }
+    ], null);
+    elecciones.candidaturas = true;
+    await App.guardarTipos();
+
     var notas = null;
     if (window.Demo.hacer) {
       var idPlantilla = await Demo.hacer.crearPlantilla();
@@ -253,7 +263,8 @@
     await crearReclamacion();   /* fila 284: guía de la tabla de plazos, sin plazo (lo pone js/plazos-del-centro.js) */
 
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
-             'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo, 'CERTIFICADO DE NOTAS': notas };
+             'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo, 'CERTIFICADO DE NOTAS': notas,
+             'Elecc. Consejo Escolar': elecciones };
   }
 
   /* ---------- plantilla de correo ---------- */
@@ -453,6 +464,13 @@
     });
     /* Fila 234: su hito actual es de «Secretaría con V.º B.º de Dirección». */
     await marcarPrimerHito(consejoClave, 'hecho', 'Certificado preparado.');
+
+    /* 6c bis. fila 414: unas elecciones con la recepción de candidaturas como hito actual. */
+    var ramon = Nombres.terceroPersonal({ nombre: 'Vidal Cano, Ramón', documento: '44556677D' });
+    var eleccionesClave = await crearAsunto(tipos['Elecc. Consejo Escolar'], 'PERSONAL', ramon, hace(8), {
+      abiertoEl: hace(8) + 'T09:00:00.000Z'
+    });
+    await marcarPrimerHito(eleccionesClave, 'hecho', 'Elecciones convocadas.');
 
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */

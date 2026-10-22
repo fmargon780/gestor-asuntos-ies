@@ -125,7 +125,7 @@ window.HitosDesdeElAsuntoGuia = (function () {
       .map(function (g) { return { id: g.id, texto: g.texto }; });
     var paso = Guias.normalizar([{
       titulo: actual.titulo, cuerpo: actual.cuerpo || '', responsable: actual.responsable || '', plazo: actual.plazo || null,
-      toca: actual.toca, tocaA: actual.tocaA, guion: tareas
+      toca: actual.toca, tocaA: actual.tocaA, variosDocumentos: actual.variosDocumentos, guion: tareas
     }])[0];
     if (!paso) throw new Error('El hito no tiene título.');
     await GuiasDelCentro.recargar();

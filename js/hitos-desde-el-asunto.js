@@ -144,6 +144,7 @@ window.HitosDesdeElAsunto = (function () {
       colocarDespuesDe: ($('hda-despues') || {}).value || '',
       responsable: ($('hda-responsable') || {}).value || '',
       plazo: plazoDelFormulario(),
+      variosDocumentos: !!($('hda-varios-documentos') || {}).checked,   /* fila 414 */
       tambienGuia: window.DondeSeGuarda ? DondeSeGuarda.elegido() === 'guia' : false
     };
   }
@@ -197,6 +198,11 @@ window.HitosDesdeElAsunto = (function () {
         '<span class="suave">desde</span>' +
         '<select id="hda-plazo-desde" class="campo">' + opcionesDesde + '</select>' +
       '</div>' +
+      /* Fila 414: no se ofrece en una pregunta ni al crear desde la biblioteca. */
+      (opts.sinVarios ? '' :
+        '<label class="interruptor hda-varios-documentos-fila"><input type="checkbox" id="hda-varios-documentos"' +
+        (opts.variosDocumentos ? ' checked' : '') + '><span>Recibe varios documentos</span></label>' +
+        '<p class="suave">Con esto, al añadir un documento al asunto no se ofrece terminar la espera; el hito se cierra a mano.</p>') +
       (opts.bloque || '')
     );
   }
@@ -313,6 +319,7 @@ window.HitosDesdeElAsunto = (function () {
             delete h.responsableNombre;
           }
           h.plazo = campos.plazo;
+          h.variosDocumentos = !!campos.variosDocumentos;
           colocarTrasAncla(lista, h, idAncla);
         }
         tocados++;
@@ -473,6 +480,7 @@ window.HitosDesdeElAsunto = (function () {
       titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, clase: 'paso', estado: 'pendiente'
     });
     nuevo.plazo = datos.plazo;
+    nuevo.variosDocumentos = !!datos.variosDocumentos;
     var resultado = null;
     await Hitos.cambiar(function (d) {
       var entrada = d.porAsunto[a.nombre] || { creados: U.hoyIso(), hitos: [] };
@@ -489,7 +497,7 @@ window.HitosDesdeElAsunto = (function () {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
     var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
-    var nuevoPaso = Guias.normalizar([{ titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo }])[0];
+    var nuevoPaso = Guias.normalizar([{ titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo, variosDocumentos: datos.variosDocumentos }])[0];
     colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
     var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
     await avisarGuia(tipo, a, antes, { tocados: llegados, saltados: 0 },
@@ -526,6 +534,7 @@ window.HitosDesdeElAsunto = (function () {
       cuerpoFormulario({
         idPropio: h.id, nivel: esNivelSuperior ? nivel : [], colocarActual: colocarActual,
         responsables: responsables, responsable: h.responsable || '', plazo: h.plazo || null,
+        variosDocumentos: !!h.variosDocumentos, sinVarios: h.clase === 'decision',
         titulo: h.titulo, cuerpo: h.cuerpo, bloque: bloque
       }), 'Guardar');
     enganchar();
@@ -550,7 +559,8 @@ window.HitosDesdeElAsunto = (function () {
 
   async function cambiarSoloAsunto(a, h, esNivelSuperior, datos, callado) {
     await Hitos.guardarCampos(a.nombre, h.id, {
-      titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo
+      titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo,
+      variosDocumentos: !!datos.variosDocumentos
     });
     if (esNivelSuperior) {
       await Hitos.cambiar(function (d) {
@@ -585,10 +595,11 @@ window.HitosDesdeElAsunto = (function () {
     paso.cuerpo = datos.cuerpo;
     paso.responsable = datos.responsable;
     paso.plazo = datos.plazo;
+    paso.variosDocumentos = !!datos.variosDocumentos;
     colocarTrasAncla(pasos, paso, idPasoAncla);
     await GuiasDelCentro.guardarPasos(tipo, pasos);
     var r = await propagarCambio(tipo, h.origenGuia,
-      { titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo },
+      { titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo, variosDocumentos: datos.variosDocumentos },
       idPasoAncla, a.nombre);
     await avisarGuia(tipo, a, antes, r, null);
   }

@@ -341,6 +341,8 @@
            solo en los hitos que no son pregunta. */
         var soloInfEl = caja.querySelector(':scope > .paso-solo-informativo-fila .paso-solo-informativo');
         if (soloInfEl) nivel[i].soloInformativo = soloInfEl.checked;
+        var variosEl = caja.querySelector(':scope > .paso-varios-documentos-fila .paso-varios-documentos');   /* fila 414 */
+        if (variosEl) nivel[i].variosDocumentos = variosEl.checked;
         /* «Avisar a quien lo pide» (fila 195). */
         var avisoLoPideEl = caja.querySelector(':scope > .paso-avisar-lopide-fila .paso-avisar-lopide');
         if (avisoLoPideEl) {

@@ -46,15 +46,21 @@ var Esperas = (function () {
 
   /* ---------- 1. la casilla del cuadro de nombre ---------- */
 
+  /* ¿Este cuadro es de un documento que ENTRA en el asunto? (no el PDF sellado de un registro) */
+  function entraUnDocumento(opciones) {
+    if (!opciones) return false;
+    if (!(opciones.modo === 'anadir' || !!opciones.ponerNombre)) return false;
+    return !(opciones.propuesta && opciones.propuesta.registro);
+  }
+
   function casillaHTML(opciones, a, hitoDelCuadro) {
     if (cerradaEnEsteCuadro || soloConsulta() || !opciones) return '';
-    var entra = opciones.modo === 'anadir' || !!opciones.ponerNombre;
-    if (!entra) return '';
-    if (opciones.propuesta && opciones.propuesta.registro) return '';   /* el PDF sellado de un registro */
+    if (!entraUnDocumento(opciones)) return '';
     var h = deEspera(a);
     if (!h) return '';
+    if (h.variosDocumentos) return '';   /* fila 414: recibe varios; alGuardar lo une sin cerrarlo */
     if (hitoDelCuadro && hitoDelCuadro.id !== h.id) return '';
-    return '<label class="opcion doc-termina-espera"><input type="checkbox" id="doc-termina-espera" data-hito="' + U.escapar(h.id) + '" checked>' +
+    return '<label class="opcion doc-termina-espera"><input type="checkbox" id="doc-termina-espera" data-hito="' + U.escapar(h.id) + '">' +
       '<span>Es lo que se esperaba. Termina la espera de «' + U.escapar(h.titulo || 'este hito') + '».</span></label>';
   }
 
@@ -80,9 +86,19 @@ var Esperas = (function () {
   }
 
   /* Tras guardar el documento: lo que haga falta si la casilla está marcada. */
-  async function alGuardar(a, nombre) {
+  async function alGuardar(a, nombre, opciones) {
     var caja = $('doc-termina-espera');
-    if (!caja || !caja.checked || !a) return;
+    if (!a) return;
+    /* Fila 414: en un hito que recibe varios documentos, cada uno que entra se une a él, sin cerrarlo
+       ni marcar tareas ni requisitos. */
+    if (!caja && opciones && !soloConsulta() && entraUnDocumento(opciones)) {
+      try {
+        var hv = deEspera(a);
+        if (hv && hv.variosDocumentos) await Hitos.anadirDocumento(a.nombre, hv.id, nombre);
+      } catch (ev) { U.accesorio('Documento guardado, pero no he podido unirlo al hito', ev); }
+      return;
+    }
+    if (!caja || !caja.checked) return;
     try {
       var h = await fresco(a, caja.dataset.hito);
       if (!h || h.estado === 'hecho') return;

@@ -127,6 +127,18 @@ var GuiasPasoBloques = (function () {
         '<span>Solo informativo: se ve, pero no reclama trabajo</span>';
       d.appendChild(filaInf);
 
+      /* Fila 414: «Recibe varios documentos» (docs/ESPERA-SIN-MARCAR-Y-VARIOS-DOCUMENTOS.md). */
+      var filaVarios = document.createElement('label');
+      filaVarios.className = 'interruptor paso-varios-documentos-fila';
+      filaVarios.innerHTML = '<input type="checkbox" class="paso-varios-documentos"' +
+        (p.variosDocumentos ? ' checked' : '') + '>' +
+        '<span>Recibe varios documentos</span>';
+      d.appendChild(filaVarios);
+      var ayudaVarios = document.createElement('p');
+      ayudaVarios.className = 'suave paso-varios-documentos-ayuda';
+      ayudaVarios.textContent = 'Con esto, al añadir un documento al asunto no se ofrece terminar la espera; el hito se cierra a mano.';
+      d.appendChild(ayudaVarios);
+
       /* «Avisar a quien lo pide» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md,
          punto 1): casilla + plantilla, un campo más del paso. */
       if (window.AvisosLoPide) {

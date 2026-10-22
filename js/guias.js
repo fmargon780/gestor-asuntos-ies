@@ -221,6 +221,8 @@ var Guias = (function () {
         salida.avisarLoPide = false;
         salida.avisarLoPidePlantilla = '';
       }
+      /* Fila 414: «Recibe varios documentos», solo si lo lleva y no es una pregunta. */
+      if (p && p.variosDocumentos && !salida.opciones.length) salida.variosDocumentos = true;
       return salida;
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
