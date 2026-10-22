@@ -145,7 +145,6 @@ const abierto = await pagina.evaluate(() => {
 });
 await pagina.waitForSelector('.paso-responsable', { state: 'attached' });
 await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] > .paso-cabecera > .paso-resumen');   /* la guía es un acordeón */
-await pagina.locator('details.paso-extra > summary').first().click();
 await comprobar('«Una Administración…» es la última opción del desplegable',
   pagina.evaluate(() => Array.from(document.querySelector('.paso-responsable').options).map((o) => o.textContent).pop()), 'Una Administración…');
 await pagina.selectOption('.paso-responsable', '__adm__');

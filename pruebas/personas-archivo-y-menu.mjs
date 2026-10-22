@@ -179,7 +179,6 @@ await pagina.fill('#guia-pasos .paso-titulo', 'Paso base');
 await pagina.click('#guia-anadir');
 await pagina.waitForTimeout(150);
 await pagina.locator('#guia-pasos .paso-titulo').nth(1).fill('Paso con plazo suelto');
-await pagina.locator('#guia-pasos .paso-extra summary').nth(1).click();
 await pagina.locator('#guia-pasos .paso-plazo-dias').nth(1).fill('10');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(200);
