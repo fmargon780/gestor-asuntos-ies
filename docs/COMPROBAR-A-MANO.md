@@ -317,3 +317,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 416 — la guía manda en los hitos (22-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Tipo «Elecc. Consejo Escolar», hito «Registrar de salida en Séneca»: cambia su título en la guía y mira que sale nuevo en los asuntos abiertos donde no está empezado y sigue viejo donde ya hay una tarea marcada. Quita un hito de la guía y mira que desaparece solo de los que no lo habían empezado.
+
+## Fila 417 — traer un hito de otro tipo (22-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En la guía de «Certificado», «+ Traer un hito de otro tipo», busca «Registrar de salida»: sale bajo «Elecc. Consejo Escolar»; lo eliges, entra con sus tareas, y si lo cambias aquí el de «Elecc. Consejo Escolar» sigue igual.
