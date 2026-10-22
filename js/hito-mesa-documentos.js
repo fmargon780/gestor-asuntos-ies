@@ -152,7 +152,7 @@ var HitoMesaDocumentos = (function () {
       '<span class="mesa-doc-fecha">' + U.escapar(fechaDe(nombre)) + '</span>' +
       '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
       '<span class="mesa-doc-estado ' + estadoDe(nombre, false).clase + '">' + U.escapar(estadoDe(nombre, false).texto) + '</span>' +
-      '<span class="mesa-doc-acciones"><button type="button" class="enlace mesa-doc-abrir">Abrir</button>' +
+      '<span class="mesa-doc-acciones">' + ruta(nombre) + '<button type="button" class="enlace mesa-doc-abrir">Abrir</button>' +
         '<button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>' +
         (conMenu ? '<button type="button" class="mesa-doc-menu-ajeno" title="Más opciones">⋯</button>' : '') + '</span>' +
     '</div>';
@@ -181,9 +181,13 @@ var HitoMesaDocumentos = (function () {
     return propios + (mas ? ' (y ' + mas + ' más del asunto)' : '');
   }
 
+  function ruta(nombre, subcarpeta) {
+    return window.RutaCarpetas ? RutaCarpetas.huecoHTML(nombre, subcarpeta) : '';   /* fila 423: «Ruta» de un documento, un solo botón para todos los sitios */
+  }
+
   /* Fila 160: «N versiones previas · ver», plegado: las de este hito (las
      suyas y los gemelos de las suyas) que viven en «Versiones previas». */
-  function previasHTML(h, previas) {
+  function previasHTML(h, previas, carpetas) {
     if (!previas || !previas.length) return '';
     var claves = {};
     (h.documentos || []).forEach(function (n) { claves[claveGemelo(n)] = true; });
@@ -193,6 +197,7 @@ var HitoMesaDocumentos = (function () {
       ' · ver</summary>' + suyas.map(function (n) {
         return '<div class="mesa-previa-fila"><span class="mesa-previa-nombre">' + U.escapar(n) + '</span>' +
           '<button type="button" class="enlace mesa-previa-abrir" data-doc="' + U.escapar(n) + '">Abrir</button>' +
+          ruta(n, (carpetas || {})[n]) +
           '<button type="button" class="enlace mesa-previa-sacar" data-doc="' + U.escapar(n) + '">Sacar de versiones previas</button></div>';
       }).join('') + '</details>';
   }
@@ -200,7 +205,7 @@ var HitoMesaDocumentos = (function () {
   function filasHTML(a, h, hitos, nombresDeLaCarpeta, abierto) {
     var previas = (nombresDeLaCarpeta && nombresDeLaCarpeta.previas) || [];
     var docs = (h.documentos || []).filter(function (n) { return previas.indexOf(n) === -1; });
-    var plegadas = previasHTML(h, previas);
+    var plegadas = previasHTML(h, previas, nombresDeLaCarpeta && nombresDeLaCarpeta.carpetaDePrevias);
     /* Fila 282: el «⋯» de las filas ajenas, solo con la mesa abierta para trabajar y nunca en solo consulta. */
     var otros = enLaMesa(a, h) ? otrosHTML(h, hitos, nombresDeLaCarpeta, abierto && !(window.SoloConsulta && SoloConsulta.activo())) : '';
     /* Fila 145: vacío, una sola línea gris. */
@@ -223,13 +228,13 @@ var HitoMesaDocumentos = (function () {
         '<span class="mesa-doc-registro">' + U.escapar(codigoDe(g.nombre) || '—') + '</span>' +
         '<span class="mesa-doc-estado ' + estado.clase + '">' + U.escapar(estado.texto) + '</span>' +
         '<span class="mesa-doc-acciones">' +
-          (falta ? '' : '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>') +
+          (falta ? '' : ruta(g.nombre) + '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>') +
           (abierto && window.HitosDocumentoMenu ? HitosDocumentoMenu.botonHTML(g.nombre) : '') +
         '</span>' +
         g.gemelos.map(function (x) {
           return '<div class="mesa-doc-gemelo-fila"><span class="mesa-doc-gemelo-nombre"><span class="mesa-doc-gemelo-que">' +
             (esSinSellar(x) ? 'Original sin sellar' : 'Borrador en Word') + '</span> · ' + U.escapar(x) + '</span>' +
-            '<button type="button" class="enlace mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">Abrir</button></div>';
+            '<button type="button" class="enlace mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">Abrir</button>' + ruta(x) + '</div>';
         }).join('') +
       '</div>';
     }).join('') + plegadas + otros;
@@ -237,10 +242,10 @@ var HitoMesaDocumentos = (function () {
 
   /* ---------- con la mesa abierta ---------- */
 
-  async function abrirEnVisor(a, nombre) {
+  async function abrirEnVisor(a, nombre, modo) {
     try {
       var handle = await a.handle.getFileHandle(nombre);
-      if (window.Visor) Visor.abrir(handle, nombre, { asunto: a, carpeta: a.handle });
+      if (window.Visor) Visor.abrir(handle, nombre, { asunto: a, carpeta: a.handle, modo: modo });
     } catch (e) { U.aviso('No he podido abrirlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
@@ -384,11 +389,13 @@ var HitoMesaDocumentos = (function () {
 
   function enganchar(fila, a, h, hitos, abierto) {
     if (!h) return;
+    var modo = abierto ? 'abierto' : 'archivado';
+    if (window.RutaCarpetas) RutaCarpetas.enganchar(fila, a, modo);   /* fila 423 */
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-gemelo'), function (b) {
-      b.onclick = function () { abrirEnVisor(a, b.dataset.doc); };
+      b.onclick = function () { abrirEnVisor(a, b.dataset.doc, modo); };
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-abrir'), function (b) {
-      b.onclick = function () { abrirEnVisor(a, b.closest('.mesa-doc').dataset.doc); };
+      b.onclick = function () { abrirEnVisor(a, b.closest('.mesa-doc').dataset.doc, modo); };
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-enviar'), function (b) {
       menuEnviarUno(b, a, h, b.closest('.mesa-doc').dataset.doc);
@@ -397,7 +404,7 @@ var HitoMesaDocumentos = (function () {
       c.onchange = function () { pintarSeleccion(fila, a, h, hitos); };
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-abrir'), function (b) {
-      b.onclick = function () { if (window.VersionesPrevias) VersionesPrevias.abrir(a, b.dataset.doc); };
+      b.onclick = function () { if (window.VersionesPrevias) VersionesPrevias.abrir(a, b.dataset.doc, modo); };
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-sacar'), function (b) {
       b.onclick = async function () {

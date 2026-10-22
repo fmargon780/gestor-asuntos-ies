@@ -74,7 +74,10 @@ var VersionesPrevias = (function () {
     for (var i = 0; i < nombres.length; i++) {
       var sub = dirAsunto ? await existente(dirAsunto, nombres[i]) : null;
       if (!sub) continue;
-      try { salida = salida.concat(await Carpetas.ficheros(sub)); } catch (e) { /* esa, no */ }
+      try {
+        /* Fila 423: cada uno lleva el nombre real de la subcarpeta donde está (`carpeta`). */
+        salida = salida.concat((await Carpetas.ficheros(sub)).map(function (f) { f.carpeta = nombres[i]; return f; }));
+      } catch (e) { /* esa, no */ }
     }
     return salida;
   }
@@ -136,16 +139,16 @@ var VersionesPrevias = (function () {
   }
 
   /* Abrir uno de «Versiones previas» en el visor de siempre. */
-  async function abrir(a, nombre) {
-    var sub = null;
+  async function abrir(a, nombre, modo) {
+    var sub = null, nombreSub = '';
     var candidatas = [CARPETA_NUEVA, CARPETA_ANTIGUA];
     for (var i = 0; i < candidatas.length && !sub; i++) {
       var d = a && a.handle ? await existente(a.handle, candidatas[i]) : null;
-      if (d && await Carpetas.existeFichero(d, nombre)) sub = d;
+      if (d && await Carpetas.existeFichero(d, nombre)) { sub = d; nombreSub = candidatas[i]; }
     }
     try {
       var h = await sub.getFileHandle(nombre);
-      if (window.Visor) Visor.abrir(h, nombre, { asunto: a, carpeta: a.handle });
+      if (window.Visor) Visor.abrir(h, nombre, { asunto: a, carpeta: a.handle, modo: modo, subcarpeta: nombreSub });   /* fila 423 */
     } catch (e) { U.fallo('No he podido abrirlo', e); }
   }
 

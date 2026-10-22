@@ -216,7 +216,10 @@
       catch (e) { nombresDeLaCarpeta = null; }
       /* Fila 160: lo de «Versiones previas», aparte (la mesa lo pliega). */
       if (nombresDeLaCarpeta && window.VersionesPrevias) {
-        nombresDeLaCarpeta.previas = (await VersionesPrevias.listar(a.handle)).map(function (f) { return f.nombre; });
+        var listaPrevias = await VersionesPrevias.listar(a.handle);
+        nombresDeLaCarpeta.previas = listaPrevias.map(function (f) { return f.nombre; });
+        nombresDeLaCarpeta.carpetaDePrevias = {};   /* fila 423: nombre del fichero → su subcarpeta real */
+        listaPrevias.forEach(function (f) { nombresDeLaCarpeta.carpetaDePrevias[f.nombre] = f.carpeta || ''; });
       }
       if (actual !== a || turno !== turnoRepintado) return;
     }

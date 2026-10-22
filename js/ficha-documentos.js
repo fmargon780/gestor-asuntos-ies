@@ -100,6 +100,9 @@ var FichaDocumentos = (function () {
     };
     fila.appendChild(copiar);
 
+    /* Fila 423: «Ruta», justo detrás del ⧉: copia la ruta entera del documento. */
+    if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: f.nombre }));
+
     /* El nombre nunca se estruja (17-sep-2026, fila 36,
        docs/FILAS-QUE-NO-SE-ESTRUJAN.md): si falta sitio, la fila se parte.
        Desde la fila 168, en el menú de tres puntos solo quedan «Pasar a
@@ -381,6 +384,7 @@ var FichaDocumentos = (function () {
     if (!window.VersionesPrevias) return;
     var previas = await VersionesPrevias.listar(a.handle);
     if (!previas.length) return;
+    var modo = window.RutaCarpetas ? RutaCarpetas.modoDe(a) : 'abierto';
     var det = document.createElement('details');
     det.className = 'ficha-previas';
     det.innerHTML = '<summary>' + previas.length + (previas.length === 1 ? ' versión previa' : ' versiones previas') + ' · ver</summary>';
@@ -392,7 +396,7 @@ var FichaDocumentos = (function () {
       nombre.textContent = f.nombre;
       var abrir = document.createElement('button');
       abrir.type = 'button'; abrir.className = 'enlace ficha-previa-abrir'; abrir.textContent = 'Abrir';
-      abrir.onclick = function () { if (window.Visor) Visor.abrir(f.handle, f.nombre, { asunto: a, carpeta: a.handle }); };
+      abrir.onclick = function () { if (window.Visor) Visor.abrir(f.handle, f.nombre, { asunto: a, carpeta: a.handle, modo: modo, subcarpeta: f.carpeta }); };
       var sacar = document.createElement('button');
       sacar.type = 'button'; sacar.textContent = 'Sacar de versiones previas';
       sacar.onclick = async function () {
@@ -402,6 +406,7 @@ var FichaDocumentos = (function () {
       };
       fila.appendChild(nombre);
       fila.appendChild(abrir);
+      if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, modo, { nombre: f.nombre, subcarpeta: f.carpeta }));   /* fila 423: su nombre real en el disco */
       fila.appendChild(U.menuDeAcciones([sacar]));
       det.appendChild(fila);
     });
@@ -411,7 +416,7 @@ var FichaDocumentos = (function () {
   /* Se abre en la columna de la derecha, al lado del programa, para
      poder trabajar con el papel delante. */
   async function abrirDocumento(f, a) {
-    if (window.Visor) return window.Visor.abrir(f.handle, f.nombre, { acciones: a ? barraPdf(f, a) : null });
+    if (window.Visor) return window.Visor.abrir(f.handle, f.nombre, { acciones: a ? barraPdf(f, a) : null, asunto: a || null, modo: a && window.RutaCarpetas ? RutaCarpetas.modoDe(a) : '' });
     try {
       var fichero = await f.handle.getFile();
       var url = URL.createObjectURL(fichero);

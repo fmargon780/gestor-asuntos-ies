@@ -71,6 +71,7 @@ var WordVisor = (function () {
     capa.innerHTML =
       '<div class="word-visor-barra">' +
         '<span class="word-visor-nombre"></span>' +
+        '<span class="word-visor-ruta"></span>' +
         '<span class="word-visor-botones">' +
           '<button type="button" class="boton boton-principal word-visor-pdf">Guardar PDF</button>' +
           '<button type="button" class="boton word-visor-imprimir">Imprimir</button>' +
@@ -92,6 +93,12 @@ var WordVisor = (function () {
     actual = { blob: blob, nombre: op.nombre || (blob && blob.name) || 'documento.docx', carpeta: op.carpeta || null,
                asunto: op.asunto || null, hito: op.hito || null, alCerrar: op.alCerrar || null, soloVer: !!op.soloVer };
     capa.querySelector('.word-visor-nombre').textContent = actual.nombre;
+    /* Fila 423: «Ruta» junto al nombre, solo si el Word es un documento de un asunto (lo dice quien lo abre). */
+    var lugarRuta = capa.querySelector('.word-visor-ruta');
+    lugarRuta.innerHTML = '';
+    if (op.rutaDe && actual.asunto && window.RutaCarpetas) {
+      lugarRuta.appendChild(RutaCarpetas.botonDocumento(actual.asunto, op.rutaDe.modo, { nombre: actual.nombre, subcarpeta: op.rutaDe.subcarpeta }));
+    }
     capa.querySelector('.word-visor-pdf').disabled = !actual.carpeta;
     capa.querySelector('.word-visor-pdf').classList.toggle('oculto', actual.soloVer);   /* fila 320: una plantilla se mira, no hay asunto donde guardar el PDF */
     capa.querySelector('.word-visor-pdf').title = actual.carpeta ? '' : 'Ábrelo desde la ficha del asunto para guardar el PDF en su carpeta';
