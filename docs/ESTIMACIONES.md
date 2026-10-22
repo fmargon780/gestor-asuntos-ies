@@ -19,3 +19,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 418 | 70 | «Más ajustes» plegado y línea gris en el editor del paso, pruebas y revisor |
 | 421 | 75 | arreglar la espera del guardado y quitar pausas fijas de la prueba, comprobar que falla con la espera rota, sacarla de RETIRADAS, tres pasadas completas, revisor |
 | 422 | 120 | dato «desactivado», filtro común de tipos para elegir (crear, cambiar, bandeja, reparto, encargos, lector), recurrencia parada y recalculada al activar, tarjeta gris y botón en Ajustes, avisos, pruebas, revisor |
+| 423 | 90 | función de ruta de un documento en RutaCarpetas, botón común en ficha, mesa, previas y visor (pasarle el asunto al visor), cuadro de pedir ruta con destino, prueba nueva, revisor |
