@@ -9,6 +9,7 @@
       abre el mismo editor de siempre, con esa tarea resaltada, y el
       cambio se ve en otro asunto abierto del mismo tipo. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -69,7 +70,7 @@ async function abrirMesaDe(nombreCorto) {
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(300);
-  await pagina.locator('#ficha-guia .hito[data-id="c1"] .hito-titulo').click();
+  await abrirHito(pagina, 'c1');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]');
   await pagina.waitForTimeout(300);
 }

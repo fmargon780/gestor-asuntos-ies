@@ -15,6 +15,7 @@
      7. Sin documentos, la columna derecha dice «Ninguno todavía.».
    Con CAPTURAS=1, deja pruebas/capturas/mesa-del-hito-enfocada.png (1905×1000). */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -83,9 +84,8 @@ async function preparar(ancho, alto) {
   }, ASUNTO);
   await pagina.locator('.tarjeta-nombre', { hasText: 'Inventada Prueba' }).first().click();
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
-  await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
-  await pagina.locator('#ficha-guia .hito[data-id="c1"] .hito-titulo').click();
+  await abrirHito(pagina, 'c1');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]');
   await pagina.waitForTimeout(500);
   return { pagina, errores };
@@ -96,18 +96,18 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   const { pagina, errores } = await preparar(ancho, alto);
 
   /* 1. */
-  await comprobar('1. dos zonas, la izquierda más ancha y ninguna tercera',
+  /* Fila 425: el hito entero en una sola columna, la izquierda de «Trabajo»; la carpeta, a la derecha. */
+  await comprobar('1. el hito en una sola columna, sin tarjetas de resumen ni tercera zona',
     pagina.evaluate(() => {
       const c = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-col')).filter((e) => e.offsetParent);
-      const r = c.map((e) => e.getBoundingClientRect());
-      return [c.length, !!(c[0].querySelector('.mesa-grande-guion') || {}).offsetParent, c[1].classList.contains('mesa-col-derecha'),
-        r[0].width > r[1].width, !!document.querySelector('.hito-en-mesa .mesa-col-consulta, .hito-en-mesa .mesa-col-docs')];
-    }), [2, true, true, true, false]);
+      return [c.length, !!(c[0].querySelector('.mesa-grande-guion') || {}).offsetParent, c[0].classList.contains('mesa-col-hito'),
+        document.querySelectorAll('.hito-en-mesa .mesa-resumen').length, !!document.querySelector('.hito-en-mesa .mesa-col-consulta, .hito-en-mesa .mesa-col-docs')];
+    }), [1, true, true, 0, false]);
   if (ancho === 1905) {
-    await comprobar('1. a 1905 px, las dos una al lado de otra',
+    await comprobar('1. a 1905 px, el hito a la izquierda y la carpeta a la derecha, una al lado de otra',
       pagina.evaluate(() => {
-        const r = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-col')).map((e) => e.getBoundingClientRect());
-        return r[0].right <= r[1].left && Math.abs(r[0].top - r[1].top) < 2;
+        const i = document.getElementById('trabajo-izq').getBoundingClientRect(), d = document.getElementById('trabajo-der').getBoundingClientRect();
+        return i.right <= d.left && Math.abs(i.top - d.top) < 2;
       }), true);
   }
 
@@ -186,12 +186,12 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-panel')).filter((p) => p.offsetParent).length), 0);
 
   /* 7. */
-  /* Fila 147: lo dice la tarjeta pequeña de documentos. */
+  /* Fila 425: lo dice el bloque «Documentos del hito», en una línea. */
   await comprobar('7. sin documentos, «Ninguno todavía.» en una línea',
     pagina.evaluate(() => {
-      const e = document.querySelector('.hito-en-mesa .mesa-col-derecha .mesa-resumen[data-tarjeta="docs"] .mesa-resumen-vacio');
-      return e ? e.textContent.trim() : null;
-    }), 'Ninguno todavía.');
+      const e = document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-sin-docs');
+      return e ? e.textContent.trim().indexOf('Ninguno todavía.') === 0 : null;
+    }), true);
   await comprobar('7. sin el botón «Añadir nota» (Intro guarda)',
     pagina.evaluate(() => !!(document.querySelector('.hito-en-mesa .hito-nota-anadir') || {}).offsetParent), false);
 

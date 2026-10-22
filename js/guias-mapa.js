@@ -216,7 +216,7 @@ var GuiasMapa = (function () {
     await promesa;
     if (cuadro) cuadro.classList.remove('cuadro-ancho');
     if (elegido && window.HitoMesa) {
-      if (window.FichaTarjetas && FichaTarjetas.abierta() !== 'hitos') FichaTarjetas.abrir('hitos');
+      if (window.FichaTarjetas && FichaTarjetas.abierta() !== 'trabajo') FichaTarjetas.abrir('trabajo');
       HitoMesa.abrir(a, elegido);
     }
   }

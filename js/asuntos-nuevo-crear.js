@@ -286,7 +286,7 @@ App.crearAsuntoDelFormulario = async function () {
     var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
     if (primerHitoId && recien) {
       if (window.HitosPanel) HitosPanel.desplegarAlAbrir(recien.nombre, primerHitoId);
-      if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
+      if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('trabajo');
     }
     if (!(recien && window.Navegacion && Navegacion.abrirAbierto(nombre))) App.ir('abiertos');
 

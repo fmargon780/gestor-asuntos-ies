@@ -121,9 +121,10 @@ await pagina.waitForTimeout(150);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ALUMNO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('.ficha-copiar-fila');
-/* Una lista larga de verdad: el hueco de la guía se alarga para tener por dónde bajar. */
-await pagina.addStyleTag({ content: '#ficha-guia { min-height: 2500px; }' });
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+/* Una lista larga de verdad: con «Trabajo» la página no baja (cada columna se desplaza sola, fila 425), así que se
+   alarga el hueco de otra pestaña, a todo el ancho, para tener por dónde bajar. */
+await pagina.addStyleTag({ content: '#ficha-notas { min-height: 2500px; }' });
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 
 const visibles = () => pagina.evaluate(() => {
   const dentro = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= window.innerWidth + 1; };

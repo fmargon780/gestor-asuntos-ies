@@ -46,10 +46,6 @@
 .cuadro.cuadro-actividad .cuadro-botones { margin-top: 0; padding: 8px 0 2px; }
 
 /* ---------- la tarjeta «La actividad» ---------- */
-.ficha-tarjetas.con-actividad .ficha-tarjetas-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@media (max-width: 1100px) {
-  .ficha-tarjetas.con-actividad .ficha-tarjetas-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); }
-}
 .act-ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; width: 100%; }
 .act-ficha h4 { margin: 0 0 6px; font-size: 14.5px; }
 .act-ficha dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 14px; }

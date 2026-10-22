@@ -70,6 +70,7 @@ var WordVisor = (function () {
     capa.className = 'word-visor oculto';
     capa.innerHTML =
       '<div class="word-visor-barra">' +
+        '<button type="button" class="boton word-visor-volver" title="Volver a la lista de documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
         '<span class="word-visor-nombre"></span>' +
         '<span class="word-visor-ruta"></span>' +
         '<span class="word-visor-botones">' +
@@ -81,6 +82,7 @@ var WordVisor = (function () {
       '<div class="word-visor-hoja"><p class="explica">Abriendo…</p></div>';
     document.body.appendChild(capa);
     capa.querySelector('.word-visor-cerrar').onclick = cerrar;
+    capa.querySelector('.word-visor-volver').onclick = cerrar;
     capa.querySelector('.word-visor-imprimir').onclick = imprimir;
     capa.querySelector('.word-visor-pdf').onclick = function (ev) { guardarPdf(ev.currentTarget); };
   }
@@ -106,6 +108,7 @@ var WordVisor = (function () {
     hoja.innerHTML = '<p class="explica">Abriendo…</p>';
     capa.classList.remove('oculto');
     document.body.classList.add('con-word-visor');
+    if (window.FichaTrabajoVisor) FichaTrabajoVisor.alAbrir();   /* fila 425: en la columna derecha de «Trabajo» */
     try {
       var docx = await librerias();
       hoja.innerHTML = '';
@@ -121,6 +124,7 @@ var WordVisor = (function () {
     if (!capa) return;
     capa.classList.add('oculto');
     document.body.classList.remove('con-word-visor');
+    if (window.FichaTrabajoVisor) FichaTrabajoVisor.ubicar();   /* fila 425: otra vez la lista de la carpeta */
     capa.querySelector('.word-visor-hoja').innerHTML = '';
     var f = capa.querySelector('.word-visor-franja');
     if (f) f.remove();

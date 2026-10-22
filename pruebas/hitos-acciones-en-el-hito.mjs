@@ -15,6 +15,7 @@
       hecho: «1 de 3»).
    Y «Registrar» de la cabecera registra el único documento sin registro. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -89,12 +90,11 @@ await pagina.waitForTimeout(900);
 console.log('--- 5. los números cuadran ---');
 await comprobar('la marca de la cabecera dice «Hito 3 de 4» (sin el informativo)',
   pagina.evaluate(() => (document.querySelector('#ficha-estado-hito .marca-hito') || {}).textContent), 'Hito 3 de 4 · Comunicar');
-await comprobar('la pestaña de hitos dice «3/4»',
-  pagina.evaluate(() => (document.querySelector('.ficha-cuenta[data-cuenta-tarjeta="hitos"]') || {}).textContent), '3/4');
+/* Fila 425: «Trabajo» no lleva número; la cuenta de hitos solo está en «Hito N de M». */
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
-await pagina.locator('#ficha-guia .hito[data-id="p4"] .hito-titulo').click();
+await abrirHito(pagina, 'p4');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="p4"]');
 await pagina.waitForTimeout(300);
 await comprobar('la mesa dice «Hito 3 de 4» y la tira numera igual (el informativo, sin número)',
@@ -131,8 +131,9 @@ await pagina.evaluate(() => { window.__registrado = null; HitosDocumentoMenu.reg
 await pagina.click('.hito-en-mesa .mesa-registrar');
 await comprobar('registra el único documento del hito sin registro (lo mismo que el ⋯ del documento)',
   pagina.evaluate(() => window.__registrado), ['p4', '260910 OFICIO.pdf']);
-await comprobar('y abre la tarjeta de documentos',
-  pagina.evaluate(() => HitoMesa.tarjeta()), 'docs');
+await comprobar('y lleva el bloque de documentos a la vista (fila 425)',
+  pagina.evaluate(() => { const d = document.querySelector('.hito-en-mesa .mesa-grande-docs').getBoundingClientRect();
+    const c = document.getElementById('trabajo-izq').getBoundingClientRect(); return d.top >= c.top - 1 && d.top < c.bottom; }), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();

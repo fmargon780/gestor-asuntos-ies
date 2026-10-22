@@ -72,6 +72,7 @@
     panel.innerHTML =
       '<div class="visor-tirador" id="visor-tirador" title="Arrastra para ensanchar o estrechar"></div>' +
       '<div class="visor-cabecera">' +
+        '<button type="button" class="boton visor-volver" id="visor-volver" title="Volver a la lista de documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
         '<div class="visor-nombre" id="visor-nombre"></div>' +
         '<span class="visor-ruta" id="visor-ruta"></span>' +
         '<div class="visor-botones">' +
@@ -93,6 +94,7 @@
     marcaZoom = $('visor-zoom');
 
     $('visor-cerrar').onclick = cerrar;
+    $('visor-volver').onclick = cerrar;
     $('visor-menos').onclick = function () { cambiarZoom(-1); };
     $('visor-mas').onclick = function () { cambiarZoom(1); };
     $('visor-ancho').onclick = function () { alAncho = true; pintarDocumento(); };
@@ -204,6 +206,7 @@
       pintarAcciones(opts.acciones || null);
       panel.classList.remove('oculto');
       document.body.classList.add('con-visor');
+      if (window.FichaTrabajoVisor) FichaTrabajoVisor.alAbrir();   /* fila 425: en la columna derecha de «Trabajo» */
       pintarDocumento();
       marcador = opts.marcador || null;
       nombreAbierto = nombre || fichero.name;
@@ -232,6 +235,7 @@
     pintarAcciones(null);
     soltar();
     nombreAbierto = '';
+    if (window.FichaTrabajoVisor) FichaTrabajoVisor.ubicar();   /* fila 425: otra vez la lista de la carpeta */
     if (marcador !== null) { marcador = null; avisar(); }
   }
 

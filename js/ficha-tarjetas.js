@@ -1,28 +1,24 @@
 /* ============================================================
-   ficha-tarjetas.js — la ficha del asunto en tarjetas (24-sep-2026,
-   fila 107, docs/FICHA-EN-TARJETAS.md).
+   ficha-tarjetas.js — las pestañas de la ficha del asunto y la vista de
+   trabajo (24-sep-2026, fila 107; 22-oct-2026, fila 425,
+   docs/FICHA-VISTA-DE-TRABAJO.md).
 
-   Debajo de la cabecera de la ficha, en vez de tres columnas, una
-   cuadrícula de tarjetas del mismo tamaño que llena el alto visible sin
-   desplazarse: Hitos, Documentos de la carpeta, Datos y contacto (y
-   Campos del asunto, si lo hay) arriba; Notas, Otros asuntos de este
-   tercero y Personas y entidades relacionadas abajo.
+   Debajo de la cabecera de la ficha hay siempre una fila de pestañas:
+   «Trabajo» (la primera, y la que está abierta al entrar), «La actividad»
+   y «Candidaturas» (donde existen), «Datos y contacto», «Campos del
+   asunto» (si lo hay), «Registro», «Otros asuntos de este tercero» y
+   «Personas y entidades relacionadas».
 
-   - Cada tarjeta cerrada enseña un resumen. Los resúmenes se sacan de
-     lo que ya pinta cada módulo dentro de la tarjeta (el cuerpo sigue
-     ahí, solo oculto), con un `MutationObserver` que no mira nunca lo
-     que pinta este fichero (resúmenes, franja, pestañas).
-   - Pulsar una tarjeta (menos en un botón o un enlace suyo) la abre en
-     grande con su contenido completo de siempre; las demás pasan a una
-     fila de pestañas pequeñas, con "Volver a las tarjetas". Escape
-     (js/usabilidad.js, `cerrarSiAbierta`) vuelve a la cuadrícula.
-   - Toda tarjeta abierta, menos Documentos, lleva arriba una franja con
-     los documentos como chips (en Hitos, los del hito desplegado si
-     tiene); pulsar uno lo abre en el panel de la derecha (el mismo
-     botón de la lista de documentos, pulsado por debajo), sin repintar.
-   - Al entrar en una ficha, siempre la cuadrícula; desde "Qué me toca"
-     (`abrirAlEntrar('hitos')`), con Hitos abierta. Un repintado de la
-     misma ficha no cierra la tarjeta abierta.
+   - «Trabajo» son dos columnas de igual ancho: a la izquierda el hito
+     entero de arriba abajo (`#ficha-guia`, que pinta js/hitos-panel.js y
+     js/hito-mesa.js) y a la derecha los documentos de la carpeta
+     (`#ficha-documentos`, js/ficha-documentos.js), o el documento abierto
+     en lugar de la lista (js/ficha-trabajo-visor.js). Sustituye a las
+     antiguas pestañas «Hitos» y «Documentos de la carpeta».
+   - Las demás pestañas se abren a todo el ancho.
+   - Al entrar en una ficha, siempre «Trabajo»; desde «Qué me toca»
+     (`abrirAlEntrar('trabajo')`) también. Un repintado de la misma ficha
+     no cambia de pestaña.
 
    js/ficha-asunto.js monta el HTML con `html(tramite)` y llama a
    `alEntrar()` al abrir una ficha y a `alPintar(raiz, a)` al terminar
@@ -30,21 +26,23 @@
    ============================================================ */
 var FichaTarjetas = (function () {
 
-  /* En el orden de la cuadrícula. `siempre`: el cuerpo se ve también con
-     la tarjeta cerrada (ya es, él mismo, un resumen de una línea). */
+  /* En el orden de las pestañas. */
   var TARJETAS = [
+    { id: 'trabajo', titulo: 'Trabajo' },
     { id: 'actividad', titulo: 'La actividad' },   /* fila 306: solo en un asunto de actividad extraescolar */
     { id: 'candidaturas', titulo: 'Candidaturas' },   /* fila 347: solo en el asunto de unas elecciones */
-    { id: 'hitos', titulo: 'Hitos' },
-    { id: 'documentos', titulo: 'Documentos de la carpeta' },
-    { id: 'contacto', titulo: 'Datos y contacto', siempre: true },
-    { id: 'tramite', titulo: 'Campos del asunto', siempre: true },
+    { id: 'contacto', titulo: 'Datos y contacto' },
+    { id: 'tramite', titulo: 'Campos del asunto' },
     { id: 'notas', titulo: 'Registro' },
     { id: 'otros', titulo: 'Otros asuntos de este tercero' },
     { id: 'relacionados', titulo: 'Personas y entidades relacionadas' }
   ];
 
-  var abierta = null;          /* id de la tarjeta abierta en grande, o null */
+  /* Las pestañas de antes (fila 425): «Hitos» y «Documentos de la carpeta» son ahora «Trabajo». */
+  var ALIAS = { hitos: 'trabajo', documentos: 'trabajo' };
+  function idDe(id) { return ALIAS[id] || id || 'trabajo'; }
+
+  var abierta = 'trabajo';     /* id de la pestaña abierta */
   var pendienteAlEntrar = null;
   var asuntoActual = null;
   var turnoResumen = null;
@@ -55,29 +53,43 @@ var FichaTarjetas = (function () {
   /* ---------- el HTML (lo pide js/ficha-asunto.js) ---------- */
 
   function tarjeta(id, titulo, dentro, alLado) {
-    var t = TARJETAS.filter(function (x) { return x.id === id; })[0];
-    return '<section class="ficha-bloque ficha-tarjeta' + (t && t.siempre ? ' ficha-tarjeta-siempre' : '') +
-        '" data-tarjeta="' + id + '">' +
+    return '<section class="ficha-bloque ficha-tarjeta' + (id === abierta ? ' abierta' : '') + '" data-tarjeta="' + id + '">' +
       (titulo ? '<h3 class="ficha-titulo">' + U.escapar(titulo) + (alLado || '') + '</h3>' : '') +
-      '<div class="ficha-tarjeta-resumen"></div>' +
-      '<div class="ficha-tarjeta-franja"></div>' +
       '<div class="ficha-tarjeta-cuerpo">' + dentro + '</div>' +
+    '</section>';
+  }
+
+  /* Fila 425: el hito a la izquierda y la carpeta a la derecha. Los huecos de dentro
+     (#ficha-guia, #ficha-documentos, #ficha-cuenta-docs) son los de siempre. */
+  function trabajo() {
+    return '<section class="ficha-tarjeta ficha-trabajo' + (abierta === 'trabajo' ? ' abierta' : '') + '" data-tarjeta="trabajo">' +
+      '<div class="trabajo-columnas" id="trabajo-columnas">' +
+        '<div class="trabajo-col trabajo-izq ficha-bloque" id="trabajo-izq">' +
+          '<div id="ficha-guia" class="explica">Leyendo…</div>' +
+        '</div>' +
+        '<div class="trabajo-col trabajo-der" id="trabajo-der">' +
+          '<div id="trabajo-der-arriba"></div>' +
+          '<section class="ficha-bloque trabajo-carpeta" id="trabajo-carpeta">' +
+            '<h3 class="ficha-titulo">Documentos de la carpeta<span class="ficha-cuenta" id="ficha-cuenta-docs"></span></h3>' +
+            '<div id="ficha-documentos" class="explica">Leyendo…</div>' +
+          '</section>' +
+        '</div>' +
+      '</div>' +
     '</section>';
   }
 
   function html(tramite, a) {
     var conActividad = !!(window.Actividades && Actividades.tarjetaAplica(a));   /* fila 306 */
     var conCandidaturas = !!(window.Candidaturas && Candidaturas.aplica(a));   /* fila 347 */
-    return '<div class="ficha-tarjetas' + (tramite ? ' con-tramite' : '') + (conActividad || conCandidaturas ? ' con-actividad' : '') + '" id="ficha-tarjetas">' +
+    if (abierta === 'actividad' && !conActividad) abierta = 'trabajo';
+    if (abierta === 'candidaturas' && !conCandidaturas) abierta = 'trabajo';
+    if (abierta === 'tramite' && !tramite) abierta = 'trabajo';
+    return '<div class="ficha-tarjetas" id="ficha-tarjetas" data-abierta="' + abierta + '">' +
       '<div class="ficha-tarjetas-pestanas" id="ficha-tarjetas-pestanas"></div>' +
       '<div class="ficha-tarjetas-rejilla" id="ficha-tarjetas-rejilla">' +
+        trabajo() +
         (conActividad ? tarjeta('actividad', 'La actividad', '<div id="ficha-actividad" class="explica">Leyendo…</div>') : '') +
         (conCandidaturas ? tarjeta('candidaturas', 'Candidaturas', '<div id="ficha-candidaturas" class="explica">Leyendo…</div>') : '') +
-        tarjeta('hitos', 'Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>',
-                '<span class="ficha-cuenta" data-cuenta-tarjeta="hitos"></span>') +
-        tarjeta('documentos', 'Documentos de la carpeta',
-                '<div id="ficha-documentos" class="explica">Leyendo…</div>',
-                '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
         /* "Datos y contacto" trae su propio título (js/ficha-tercero.js). */
         tarjeta('contacto', '', '<div id="ficha-contacto-caja"></div>') +
         (tramite ? tarjeta('tramite', 'Campos del asunto', tramite,
@@ -93,22 +105,23 @@ var FichaTarjetas = (function () {
     '</div>';
   }
 
-  /* ---------- entrar, pintar, abrir y cerrar ---------- */
+  /* ---------- entrar, pintar y cambiar de pestaña ---------- */
 
-  /* Al entrar en una ficha, la cuadrícula. Pero si es la misma que ya
-     está a la vista (la aplicación la vuelve a abrir sola tras guardar
-     algo, por ejemplo al cerrar el cuadro de Correo o al generar un
-     documento), se queda la tarjeta que estuviera abierta. */
+  /* Al entrar en una ficha, «Trabajo». Pero si es la misma que ya está a
+     la vista (la aplicación la vuelve a abrir sola tras guardar algo, por
+     ejemplo al cerrar el cuadro de Correo o al generar un documento), se
+     queda la pestaña que estuviera abierta. */
   function alEntrar(a) {
     var r = raiz();
     var mismaALaVista = !!(a && asuntoActual && asuntoActual.nombre === a.nombre && r && r.offsetParent);
     if (pendienteAlEntrar) abierta = pendienteAlEntrar;
-    else if (!mismaALaVista) abierta = null;
+    else if (!mismaALaVista) abierta = 'trabajo';
     pendienteAlEntrar = null;
+    if (window.HitoMesa && HitoMesa.alEntrarEnLaFicha) HitoMesa.alEntrarEnLaFicha(a, mismaALaVista);   /* fila 425: el hito de partida */
   }
 
   /* "Qué me toca": llamar justo antes de App.abrirFicha. */
-  function abrirAlEntrar(id) { pendienteAlEntrar = id || null; }
+  function abrirAlEntrar(id) { pendienteAlEntrar = id ? idDe(id) : null; }
 
   function alPintar(caja, a) {
     asuntoActual = a || null;
@@ -116,12 +129,11 @@ var FichaTarjetas = (function () {
     if (!r) return;
     if (window.AsuntoDeGrupo) AsuntoDeGrupo.titularTarjeta(r, a);   /* fila 293 */
     var rejilla = $('ficha-tarjetas-rejilla');
-    if (abierta && !r.querySelector('.ficha-tarjeta[data-tarjeta="' + abierta + '"]')) abierta = null;
-    rejilla.addEventListener('click', alPulsar);
+    if (!r.querySelector('.ficha-tarjeta[data-tarjeta="' + abierta + '"]')) abierta = 'trabajo';
     new MutationObserver(function (cambios) {
       var deVerdad = cambios.some(function (c) {
         var t = c.target.nodeType === 1 ? c.target : c.target.parentNode;
-        return t && !t.closest('.ficha-tarjeta-resumen, .ficha-tarjeta-franja, .ficha-cuenta[data-cuenta-tarjeta]');
+        return t && !t.closest('.ficha-cuenta[data-cuenta-tarjeta]');
       });
       if (deVerdad) programarResumen();
     }).observe(rejilla, { childList: true, subtree: true, characterData: true });
@@ -131,53 +143,30 @@ var FichaTarjetas = (function () {
     engancharVentana();
   }
 
-  function abrir(id) {
+  /* `deParte` (js/ficha-trabajo-visor.js): el cambio no lo pide quien mira, sino un documento que se abre. */
+  function abrir(id, deParte) {
+    id = idDe(id);
     if (!raiz() || !raiz().querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"]')) return;
+    if (!deParte && window.FichaTrabajoVisor) FichaTrabajoVisor.olvidar();
     abierta = id;
     aplicar();
     window.scrollTo(0, 0);
   }
 
-  function cerrar() {
-    abierta = null;
-    aplicar();
-  }
-
-  /* Para Escape (js/usabilidad.js): cierra la tarjeta abierta y dice si
-     había una; si no, Escape hace lo de siempre en la ficha. */
-  function cerrarSiAbierta() {
-    var r = raiz();
-    if (!abierta || !r || !r.offsetParent) return false;
-    cerrar();
-    return true;
-  }
-
   function aplicar() {
     var r = raiz();
     if (!r) return;
-    if (abierta) r.dataset.abierta = abierta; else delete r.dataset.abierta;
+    r.dataset.abierta = abierta;
     Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta'), function (t) {
       t.classList.toggle('abierta', t.dataset.tarjeta === abierta);
     });
     pintarPestanas();
-    pintarFranja();
     ajustarAlto();
+    /* El documento que esté abierto se pone en la columna derecha de «Trabajo», o se saca de ahí. */
+    if (window.FichaTrabajoVisor) FichaTrabajoVisor.ubicar();
   }
 
-  /* Pulsar en la tarjeta, menos en lo que ya hace algo por sí mismo. */
-  function alPulsar(ev) {
-    var t = ev.target.closest && ev.target.closest('.ficha-tarjeta');
-    if (!t) return;
-    if (abierta) {
-      /* Desplegar un hito cambia los documentos de la franja. */
-      if (abierta === 'hitos') setTimeout(pintarFranja, 60);
-      return;
-    }
-    if (ev.target.closest('button, a, input, textarea, select, label, summary, [contenteditable]')) return;
-    abrir(t.dataset.tarjeta);
-  }
-
-  /* ---------- las pestañas de arriba, con una tarjeta abierta ---------- */
+  /* ---------- las pestañas de arriba ---------- */
 
   function tituloDe(id) {
     var viva = raiz() && raiz().querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"]');
@@ -188,7 +177,7 @@ var FichaTarjetas = (function () {
 
   function cuentaDe(id) {
     var r = raiz();
-    var el = r && r.querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"] .ficha-cuenta');
+    var el = r && r.querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"] .ficha-cuenta[data-cuenta-tarjeta]');
     return el ? (el.textContent || '').trim() : '';
   }
 
@@ -196,9 +185,17 @@ var FichaTarjetas = (function () {
     var caja = $('ficha-tarjetas-pestanas');
     var r = raiz();
     if (!caja || !r) return;
+    var firma = [];
+    var tarjetas = Array.prototype.slice.call(r.querySelectorAll('.ficha-tarjeta'));
+    tarjetas.forEach(function (t) {
+      var id = t.dataset.tarjeta;
+      firma.push(id + '|' + tituloDe(id) + '|' + cuentaDe(id) + '|' + (id === abierta ? '1' : '0'));
+    });
+    firma = firma.join('\n');
+    if (caja.dataset.firma === firma) return;   /* solo se rehace si cambia algo: no despierta al observador en balde */
+    caja.dataset.firma = firma;
     caja.innerHTML = '';
-    if (!abierta) return;
-    Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta'), function (t) {
+    tarjetas.forEach(function (t) {
       var id = t.dataset.tarjeta;
       var b = document.createElement('button');
       b.type = 'button';
@@ -206,127 +203,54 @@ var FichaTarjetas = (function () {
       b.dataset.tarjeta = id;
       var cuenta = cuentaDe(id);
       b.innerHTML = U.escapar(tituloDe(id)) + (cuenta ? ' <span class="ficha-pestana-cuenta">' + U.escapar(cuenta) + '</span>' : '');
-      /* Fila 112: sin «Volver a las tarjetas»; se vuelve pulsando otra vez
-         la pestaña abierta: desde un hito abierto, a la lista de hitos;
-         desde ahí, a las tarjetas (lo mismo que Escape). */
-      if (id === abierta) b.title = 'Volver a las tarjetas';
-      b.onclick = function () {
-        if (id !== abierta) { abrir(id); return; }
-        if (id === 'hitos' && window.HitoMesa && HitoMesa.cerrarSiAbierta()) { pintarPestanas(); return; }
-        cerrar();
-      };
+      b.onclick = function () { if (id !== abierta) abrir(id); };
       caja.appendChild(b);
     });
   }
 
-  /* ---------- la franja de documentos ---------- */
-
-  /* Los documentos de la carpeta, tal como los pinta js/ficha-documentos.js. */
-  function documentosDeLaCarpeta() {
-    var caja = $('ficha-documentos');
-    if (!caja) return [];
-    /* El índice del expediente (fila 137) no cuenta como documento. */
-    return Array.prototype.map.call(caja.querySelectorAll('button.ficha-documento:not(.ficha-documento-indice)'), function (b) {
-      var spans = b.querySelectorAll(':scope > span');
-      var nombre = spans.length ? spans[spans.length - 1].textContent : b.textContent;
-      return { nombre: nombre, boton: b };
-    });
-  }
-
-  function abrirDocumento(nombre) {
-    var doc = documentosDeLaCarpeta().filter(function (d) { return d.nombre === nombre; })[0];
-    if (doc) doc.boton.click();
-  }
-
-  /* En Hitos: los del hito desplegado; si no hay ninguno, o no tiene
-     documentos, todos los de la carpeta. */
-  function nombresParaLaFranja() {
-    var todos = documentosDeLaCarpeta().map(function (d) { return d.nombre; });
-    if (abierta !== 'hitos') return todos;
-    var guia = $('ficha-guia');
-    var cuerpo = guia && Array.prototype.filter.call(guia.querySelectorAll('.hito-cuerpo'), function (c) {
-      return !c.classList.contains('oculto');
-    })[0];
-    if (!cuerpo) return todos;
-    var delHito = Array.prototype.map.call(
-      cuerpo.querySelectorAll('.hito-documento[data-doc]'), function (s) { return s.dataset.doc; })
-      .filter(function (n) { return todos.indexOf(n) !== -1; });
-    return delHito.length ? delHito : todos;
-  }
-
-  function nombreEnElVisor() {
-    if (!document.body.classList.contains('con-visor')) return '';
-    return (window.Visor && Visor.nombreAbierto) ? (Visor.nombreAbierto() || '') : '';
-  }
-
-  function pintarFranja() {
-    var r = raiz();
-    if (!r) return;
-    Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta-franja'), function (f) {
-      var t = f.closest('.ficha-tarjeta');
-      /* Con la mesa de un hito abierta, la franja no sale: la mesa ya
-         tiene sus documentos (fila 109). */
-      var conMesa = abierta === 'hitos' && document.querySelector('#ficha-guia.con-mesa');
-      if (!abierta || t.dataset.tarjeta !== abierta || abierta === 'documentos' || conMesa) {
-        if (f.childNodes.length) f.innerHTML = '';
-        delete f.dataset.firma;
-        return;
-      }
-      var nombres = nombresParaLaFranja();
-      var enVisor = nombreEnElVisor();
-      var firma = nombres.join('\n') + '|' + enVisor;
-      if (f.dataset.firma === firma) return;
-      f.dataset.firma = firma;
-      f.innerHTML = '';
-      nombres.forEach(function (n) {
-        var chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'ficha-chip-doc' + (n === enVisor ? ' activo' : '');
-        chip.textContent = n;
-        chip.title = 'Verlo al lado';
-        chip.onclick = function (ev) { ev.stopPropagation(); abrirDocumento(n); };
-        f.appendChild(chip);
-      });
-    });
-  }
-
-  /* ---------- los resúmenes de las tarjetas cerradas ---------- */
+  /* ---------- los números de las pestañas ---------- */
 
   function programarResumen() {
     clearTimeout(turnoResumen);
-    turnoResumen = setTimeout(function () { resumirTodas(); pintarFranja(); pintarPestanas(); ajustarAlto(); }, 80);
+    turnoResumen = setTimeout(function () { resumirTodas(); pintarPestanas(); ajustarAlto(); }, 80);
   }
 
-  /* Los resúmenes viven en js/ficha-tarjetas-resumen.js (fila 114). */
-  var resumen = FichaTarjetasResumen.crear({
-    raiz: raiz, documentos: function () { return documentosDeLaCarpeta(); },
-    abrirDocumento: function (n) { abrirDocumento(n); }, abrir: function (id) { abrir(id); },
-    asunto: function () { return asuntoActual; }
-  });
+  /* Los números viven en js/ficha-tarjetas-resumen.js. */
+  var resumen = FichaTarjetasResumen.crear({ raiz: raiz, asunto: function () { return asuntoActual; } });
   function resumirTodas() { resumen.todas(); }
 
-  /* ---------- que llene el alto visible, sin bajar ---------- */
+  /* ---------- «Trabajo» llena el alto visible, sin bajar ---------- */
+
+  var ANCHO_DE_UNA_COLUMNA = 1100;
+
+  /* Lo que hay por debajo de un elemento hasta el final de la página: los hermanos que le siguen en
+     cada nivel y el relleno de cada contenedor. No depende de cuánto estire la página, así que no se
+     queda en un punto fijo. */
+  function debajoDe(el) {
+    var total = 0;
+    var nodo = el;
+    while (nodo && nodo.parentElement && nodo !== document.body) {
+      for (var sig = nodo.nextElementSibling; sig; sig = sig.nextElementSibling) {
+        var e = getComputedStyle(sig);
+        if (e.display === 'none' || e.position === 'fixed' || e.position === 'absolute') continue;
+        total += sig.offsetHeight + (parseFloat(e.marginTop) || 0) + (parseFloat(e.marginBottom) || 0);
+      }
+      var p = getComputedStyle(nodo.parentElement);
+      total += (parseFloat(p.paddingBottom) || 0) + (parseFloat(p.borderBottomWidth) || 0) + (parseFloat(getComputedStyle(nodo).marginBottom) || 0);
+      nodo = nodo.parentElement;
+    }
+    return total;
+  }
 
   function ajustarAlto() {
+    var columnas = $('trabajo-columnas');
     var r = raiz();
-    var rejilla = $('ficha-tarjetas-rejilla');
-    if (!r || !rejilla || !rejilla.offsetParent) return;
-    var caja = rejilla.getBoundingClientRect();
-    var arriba = caja.top + window.scrollY;
-    /* Lo que queda por debajo de la rejilla (el relleno de abajo de la
-       pantalla) también tiene que caber sin desplazarse. */
-    var debajo = Math.max(0, document.documentElement.scrollHeight - (caja.bottom + window.scrollY));
-    var hueco = Math.max(300, window.innerHeight - arriba - debajo - 2);
-    if (abierta) {
-      rejilla.style.height = '';
-      rejilla.style.minHeight = hueco + 'px';
-    } else {
-      var columnas = getComputedStyle(rejilla).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
-      var filas = Math.ceil(rejilla.querySelectorAll('.ficha-tarjeta').length / columnas);
-      rejilla.style.minHeight = '';
-      rejilla.style.height = Math.max(hueco, filas * 130) + 'px';
-      resumen.medir();   /* cuántos documentos caben enteros (fila 114) */
-    }
+    if (!columnas || !r || abierta !== 'trabajo' || !columnas.offsetParent) return;
+    if (window.innerWidth <= ANCHO_DE_UNA_COLUMNA) { if (columnas.style.height) columnas.style.height = ''; return; }   /* una columna debajo de otra: la página baja */
+    var arriba = columnas.getBoundingClientRect().top + window.scrollY;
+    var hueco = Math.max(360, window.innerHeight - arriba - debajoDe(columnas) - 1);
+    var nuevo = Math.floor(hueco) + 'px';
+    if (columnas.style.height !== nuevo) columnas.style.height = nuevo;
   }
 
   var ventanaEnganchada = false;
@@ -334,18 +258,16 @@ var FichaTarjetas = (function () {
     if (ventanaEnganchada) return;
     ventanaEnganchada = true;
     window.addEventListener('resize', ajustarAlto);
-    /* Abrir o cerrar el documento de la derecha cambia el ancho (y con él
-       las columnas), y el chip que va marcado. */
-    new MutationObserver(function () { ajustarAlto(); pintarFranja(); })
+    /* Una clase del <body> (documento abierto, marco…) cambia el ancho disponible. */
+    new MutationObserver(function () { ajustarAlto(); })
       .observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    if (window.Visor && Visor.alCambiar) Visor.alCambiar(function () { pintarFranja(); });
   }
 
   return {
     html: html, alEntrar: alEntrar, alPintar: alPintar, abrirAlEntrar: abrirAlEntrar,
-    abrir: abrir, cerrar: cerrar, cerrarSiAbierta: cerrarSiAbierta,
+    abrir: abrir,
     abierta: function () { return abierta; },
-    alCambiarLaMesa: function () { pintarFranja(); },
+    alCambiarLaMesa: function () { ajustarAlto(); },
     ajustarAlto: ajustarAlto
   };
 })();

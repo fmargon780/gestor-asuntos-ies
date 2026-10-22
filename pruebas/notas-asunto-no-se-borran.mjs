@@ -127,10 +127,10 @@ await pagina.evaluate(async (asunto) => {
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.click('#ficha-guia .hito .hito-desplegar');
+/* Fila 425: al entrar se abre sola la mesa del hito actual: no hay que desplegarlo. */
+await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 /* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 await pagina.waitForSelector('#ficha-guia .hito-nota-texto');
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
@@ -199,13 +199,12 @@ await comprobar('6. y el foco y el cursor también',
   }), [true, 11, 11]);
 
 console.log('--- 7. la ficha en tarjetas (fila 107, 24-sep-2026): el orden ---');
-/* docs/FICHA-EN-TARJETAS.md, 1: arriba Hitos, Documentos, Datos y
-   contacto; abajo Notas, Otros asuntos, Personas. Sustituye a la
-   comprobación de las tres columnas de la fila 51. */
-await comprobar('7. el orden de las tarjetas',
+/* docs/FICHA-EN-TARJETAS.md, 1 (fila 425: pestañas): «Trabajo», Datos y contacto, Campos, Registro,
+   Otros asuntos, Personas. Sustituye a la comprobación de las tres columnas de la fila 51. */
+await comprobar('7. el orden de las pestañas',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
   /* Fila 245: «Campos del asunto» sale siempre en un asunto abierto (con «+ Añadir campo»). */
-  ['hitos', 'documentos', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
+  ['trabajo', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
 
 console.log('--- 8. la nota ya no se guarda sola mientras se escribe (fila 58) ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
@@ -242,9 +241,7 @@ console.log('--- 10. salir de la ficha con una nota sin guardar avisa ---');
    solo el evento "click" sintético). */
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'Nota sin guardar de verdad');
-/* Con la tarjeta de Notas abierta, el primer Escape vuelve a la
-   cuadrícula (fila 107); el segundo es el que sale de la ficha. */
-await pagina.keyboard.press('Escape');
+/* Fila 425: ya no hay «cerrar la tarjeta»: un solo Escape sale de la ficha. */
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('10. el aviso es el que toca',

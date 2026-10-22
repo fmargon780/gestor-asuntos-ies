@@ -62,7 +62,7 @@
        escribir directa de js/notas.js solo sigue metiendo texto en la
        MISMA nota mientras la ficha se repinta sola por debajo. */
     if (window.Notas) window.Notas.olvidarBorrador();
-    /* Al entrar, siempre la cuadrícula de tarjetas (fila 107). */
+    /* Al entrar, siempre la pestaña «Trabajo» (fila 425). */
     FichaTarjetas.alEntrar(a);
     if (window.Navegacion) Navegacion.apuntar();   /* fila 119: de dónde se viene */
     App.ir('asunto');
@@ -205,6 +205,7 @@
     var abierto = (N.modoActual === 'abierto');
     var tipo = tipoDe(a);
     var tramite = N.datosDelAsunto(a);
+    if (window.FichaTrabajoVisor) FichaTrabajoVisor.soltar();   /* fila 425: el documento abierto no se pierde con la ficha */
     caja.innerHTML =
       /* Dos líneas (24-sep-2026, fila 112, docs/CABECERA-COMPACTA.md):
          volver, tipo, nombre y «⋯», con «Archivar» a la derecha; debajo,

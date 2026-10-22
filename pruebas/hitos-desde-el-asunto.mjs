@@ -15,6 +15,7 @@
       hito nace con lo del modelo (aquí, su responsable) y también en
       la guía. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -101,7 +102,7 @@ async function irAHito(idHito) {
     } else {
       await pagina.evaluate(() => { if (window.HitoMesa) HitoMesa.cerrar(); });
       await pagina.waitForTimeout(150);
-      await pagina.locator('#ficha-guia .hito[data-id="' + idHito + '"] .hito-titulo').click();
+      await abrirHito(pagina, '' + idHito + '');
     }
     await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + idHito + '"]');
   }

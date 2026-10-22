@@ -117,6 +117,8 @@ await comprobar('1. pulsar una fila abre la ficha del asunto',
 
 await pagina.keyboard.press('Escape');
 await pagina.waitForTimeout(150);
+/* Fila 425: con la mesa del hito abierta al entrar, el primer Escape la cierra; el siguiente sale de la ficha. */
+if (await pagina.locator('#pantalla-asunto').isVisible()) { await pagina.keyboard.press('Escape'); await pagina.waitForTimeout(150); }
 await comprobar('1. al volver, se está en Personas, con la misma persona elegida',
   pagina.locator('.pestana[data-pantalla="personas"]').evaluate(el => el.classList.contains('activa')), true);
 await comprobar('1. la ficha de Ana sigue enseñada',

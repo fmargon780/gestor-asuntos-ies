@@ -3,7 +3,9 @@
    Con Chromium real y los datos inventados de la copia de pruebas (?demo=1&auto=1), en el asunto de
    Aguilar Ponce, Marina (MATRICULA): sus dos primeros hitos llevan una tarea de «reunir un documento».
    1-6: la lógica (la tarea se queda marcada, «Desmarcar», mover, asociar, dos hitos, gemelos);
-   7: «Mover a otro hito» de la barra de marcados; 8: los menús de la mesa y de la ficha. */
+   7: «Mover a otro hito» de la barra de marcados; 8: «Traer a este hito» y los menús de la ficha.
+   Fila 425 (docs/FICHA-VISTA-DE-TRABAJO.md): los documentos de otros hitos y los sin hito ya no salen en la mesa:
+   se ven en la carpeta de la derecha, con su casilla, «Hito N» y «Traer a este hito». */
 import { chromium } from 'playwright';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
@@ -109,17 +111,17 @@ const cerrarCuadro = async () => { await pagina.waitForTimeout(600); if (await p
 const abrirMesa = async (i) => {
   await pagina.evaluate(async (i) => { const hs = await window.__h.hitos(); HitoMesa.abrir(window.__h.a(), hs[i].id); }, i);
   await pagina.waitForTimeout(800);
-  await pagina.evaluate(() => HitoMesa.abrirTarjeta('documentos'));
-  await pagina.waitForSelector('.hito-en-mesa .mesa-docs-apartado', { timeout: 10000 });
+  await pagina.waitForSelector('.hito-en-mesa', { timeout: 10000 });
+  await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { timeout: 10000 });
   await cerrarCuadro();
 };
 await anadir(1, UNO, false);
 await abrirMesa(0);
-await comprobar('7. en la mesa del hito 1, «uno» sale en «De otros hitos» y «dos» en «sin hito»', pagina.evaluate((n) => ({
-  otros: Array.from(document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno')).filter((f) => f.dataset.hitoOrigen).map((f) => f.dataset.doc),
-  sueltos: Array.from(document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno')).filter((f) => !f.dataset.hitoOrigen).map((f) => f.dataset.doc).filter((d) => d === n) }), DOS),
-  { otros: [UNO], sueltos: [DOS] });
-await pagina.locator('.hito-en-mesa .mesa-doc-ajeno', { hasText: UNO }).locator('.mesa-doc-marca').check();
+await comprobar('7. en la carpeta, con el hito 1 abierto, «uno» (del hito 2) y «dos» (sin hito) no llevan «Hito N» y sí «Traer a este hito»', pagina.evaluate((n) => ({
+  marcas: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-marca-hito')).length,
+  traer: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-documento-traer') && f.querySelector('.ficha-documento-traer').offsetParent).map((f) => f.dataset.doc).filter((d) => n.indexOf(d) !== -1) }), [UNO, DOS]),
+  { marcas: 0, traer: [DOS, UNO] });
+await pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: UNO }).locator('.ficha-documento-marca').check();
 await pagina.click('.hito-en-mesa .mesa-sel-mover');
 await pagina.waitForSelector('#mesa-mover-destino');
 await comprobar('7. el desplegable lleva, el primero, «Este hito (…)»', pagina.locator('#mesa-mover-destino option').first().textContent(), 'Este hito (1 · Recibir la solicitud)');
@@ -128,26 +130,21 @@ await pagina.waitForTimeout(1500);
 await comprobar('7. el documento queda en un solo hito (el 1)', (await H('docs')).map((x) => x.length), [1, 0, 0]);
 await H('limpiar');
 
-console.log('--- 8. los menús de la mesa y de la ficha ---');
+console.log('--- 8. «Traer a este hito» y los menús de la ficha ---');
 await anadir(1, UNO, true);
 await abrirMesa(0);
-const ajeno = pagina.locator('.hito-en-mesa .mesa-doc-ajeno', { hasText: UNO }).first();
-await comprobar('8. la fila «De otros hitos» lleva «Ruta», «Abrir», «Enviar ▾» y «⋯»', ajeno.evaluate((f) => Array.from(f.querySelectorAll('.mesa-doc-acciones button')).filter((b) => !b.closest('.ficha-menu')).map((b) => b.textContent)), ['Ruta', 'Abrir', 'Enviar ▾', '⋯']);
+const fila = pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: UNO }).first();
+await comprobar('8. la fila de la carpeta lleva «Ruta», «Traer a este hito» y «Asociar a un hito»', fila.evaluate((f) => Array.from(f.querySelectorAll('button.boton')).filter((b) => b.offsetParent && !b.closest('.ficha-menu')).map((b) => b.textContent)).then((l) => ['Ruta', 'Traer a este hito', 'Asociar a un hito'].filter((t) => l.indexOf(t) !== -1)), ['Ruta', 'Traer a este hito', 'Asociar a un hito']);
 await cerrarCuadro();
-await ajeno.locator('.mesa-doc-menu-ajeno').click();
-await comprobar('8. «⋯»: «Traer a este hito» y «Quitar de su hito»', pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Traer a este hito', 'Quitar de su hito']);
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar de su hito' }).click();
-await pagina.waitForTimeout(1200);
-await comprobar('8. «Quitar de su hito»: avisa, deja la tarea marcada y el documento pasa a «sin hito»', [(await avisos()).slice(-1)[0], await H('tarea', 1),
-  await pagina.locator('.hito-en-mesa .mesa-doc-ajeno', { hasText: UNO }).first().getAttribute('data-hito-origen')],
-  ['Quitado del hito. La tarea «Reunir el libro de familia» sigue marcada.|bueno|Desmarcar', [true, UNO], '']);
-const suelto = pagina.locator('.hito-en-mesa .mesa-doc-ajeno', { hasText: UNO }).first();
-await suelto.locator('.mesa-doc-menu-ajeno').click();
-await comprobar('8. en «sin hito», el «⋯» solo trae «Traer a este hito»', pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Traer a este hito']);
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').click();
+await fila.locator('.ficha-documento-traer').click();
 await pagina.waitForTimeout(1200);
 await cerrarCuadro();
-await comprobar('8. «Traer a este hito»: «Asociado a…» y sube a los documentos del hito', [(await avisos()).slice(-2)[0].startsWith('Marcado') || (await avisos()).some((a) => /^Asociado a «1 · Recibir la solicitud»\.\|bueno\|$/.test(a)), (await H('docs'))[0]], [true, [UNO]]);
+await comprobar('8. «Traer a este hito»: avisa «Movido a…», el documento sube a los del hito y deja la tarea de antes marcada',
+  [(await avisos()).some((a) => /^Movido a «1 · Recibir la solicitud»\./.test(a)), (await H('docs'))[0], (await H('docs'))[1], await H('tarea', 1)], [true, [UNO], [], [true, UNO]]);
+await comprobar('8. y la carpeta le pone «Hito 1» y quita su «Traer a este hito»', pagina.evaluate((n) => {
+  const f = Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((x) => x.dataset.doc === n)[0];
+  return [(f.querySelector('.ficha-marca-hito') || {}).textContent, !!(f.querySelector('.ficha-documento-traer') || {}).offsetParent];
+}, UNO), ['Hito 1', false]);
 await comprobar('8. en la ficha, «Asociar a un hito» lleva «Quitar del hito», una raya y los hitos, sin «Ninguno»', pagina.evaluate(async () => {
   FichaTarjetas.abrir('documentos');
   const fila = Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.textContent.indexOf('prueba uno.pdf') !== -1)[0];
@@ -165,15 +162,15 @@ await comprobar('8. sin hito, el menú de la ficha solo trae los hitos', pagina.
 await pagina.keyboard.press('Escape');
 await H('limpiar');
 
-console.log('--- 9. en modo consulta, las filas ajenas no llevan «⋯» ---');
+console.log('--- 9. en modo consulta, la carpeta no deja traer ni marcar (fila 425) ---');
 await anadir(1, UNO, false);
 await pagina.evaluate(() => SoloConsulta.guardar(true));
 await pagina.evaluate(() => HitosPanel.programarRepintado());
 await pagina.waitForTimeout(800);
 await pagina.evaluate(async () => { const hs = await window.__h.hitos(); HitoMesa.abrir(window.__h.a(), hs[0].id); });
 await pagina.waitForTimeout(1200);
-await pagina.evaluate(() => HitoMesa.abrirTarjeta('documentos'));
-await comprobar('9. las filas «De otros hitos» y «sin hito» no llevan «⋯»', pagina.locator('.hito-en-mesa .mesa-doc-menu-ajeno').count(), 0);
+await comprobar('9. «Traer a este hito» y las casillas de la carpeta, apagados o sin verse', pagina.evaluate(() =>
+  Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-traer, #ficha-documentos .ficha-documento-marca')).every((b) => b.disabled || !b.offsetParent)), true);
 await pagina.evaluate(() => SoloConsulta.guardar(false));
 
 await comprobar('sin errores en la consola', errores, []);

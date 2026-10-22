@@ -1,7 +1,7 @@
 /* ============================================================
    hito-mesa.css — el hito a pantalla completa: la mesa de trabajo
    (24-sep-2026, fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md,
-   js/hito-mesa.js).
+   js/hito-mesa.js; fila 425, docs/FICHA-VISTA-DE-TRABAJO.md).
 
    Con la mesa abierta, `#ficha-guia` lleva `con-mesa`: se esconden los
    demás hitos, la cuenta y "+ Añadir un hito", y el hito abierto ocupa
@@ -85,66 +85,25 @@
 }
 .mesa-panel.oculto { display: none; }
 
-/* ---------- dos zonas: qué hay que hacer y lo que ya existe ---------- */
-.contenido:has(#ficha-guia.con-mesa) { max-width: none; }
+/* ---------- el hito entero, en una columna (fila 425) ----------
+   Tareas → Campos de este hito → Documentos del hito → Registro → Normativa.
+   La columna es la izquierda de «Trabajo» (css/ficha-tarjetas.css). */
 #ficha-guia.con-mesa #ficha-guia-nota { display: none; }
-.mesa-columnas {
-  display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 20px; align-items: start;
-}
-body.con-visor .mesa-columnas, body.con-lector .mesa-columnas { grid-template-columns: minmax(0, 1fr); }
-@media (max-width: 1100px) {
-  .mesa-columnas { grid-template-columns: minmax(0, 1fr); }
-}
+.mesa-columnas { display: block; }
 .mesa-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.mesa-col-derecha { background: #f6f7f9; border-radius: 10px; padding: 12px 14px; }
-.mesa-col-derecha.encima { outline: 2px dashed var(--azul); background: #e3eefb; }
 .mesa-bloque { display: flex; flex-direction: column; gap: 8px; }
 .mesa-bloque + .mesa-bloque { border-top: 1px solid var(--linea); padding-top: 10px; }
 .mesa-bloque-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .mesa-bloque-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--tinta-suave); }
+.mesa-grande-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--tinta-suave); display: inline-flex; align-items: center; gap: 12px; }
+.mesa-grande-titulo .boton { font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.mesa-docs-cuenta { font-weight: 400; }
 .mesa-sin-docs { margin: 0; font-size: 13px; color: var(--tinta-suave); }
 .mesa-soltar-pista { display: block; font-size: 11px; }
 details.mesa-normativa > summary { cursor: pointer; }
 .mesa-normativa .hito-normativa-titulo { display: none; }
 .mesa-normativa.oculto { display: none; }
 .hito-en-mesa .nota-nueva textarea { resize: none; overflow: hidden; min-height: 110px; }
-
-/* ---------- las tres tarjetas (fila 147, docs/MESA-TARJETAS-QUE-SE-ABREN.md) ----------
-   Una en grande a la izquierda y las otras dos, de resumen, a la derecha.
-   Cuál está en grande lo dice `data-tarjeta` de `.mesa-columnas`. */
-.mesa-columnas[data-tarjeta="guion"] .mesa-grande:not([data-tarjeta="guion"]),
-.mesa-columnas[data-tarjeta="docs"] .mesa-grande:not([data-tarjeta="docs"]),
-.mesa-columnas[data-tarjeta="notas"] .mesa-grande:not([data-tarjeta="notas"]),
-.mesa-columnas[data-tarjeta="guion"] .mesa-resumen[data-tarjeta="guion"],
-.mesa-columnas[data-tarjeta="docs"] .mesa-resumen[data-tarjeta="docs"],
-.mesa-columnas[data-tarjeta="notas"] .mesa-resumen[data-tarjeta="notas"] { display: none; }
-.mesa-grande { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.mesa-grande-titulo { font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; }
-.mesa-grande-titulo .boton { font-size: 13px; font-weight: 400; }
-.mesa-volver-guion { font-size: 13px; }
-
-.mesa-resumen {
-  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px;
-  cursor: pointer; display: flex; flex-direction: column; gap: 4px; min-width: 0;
-}
-.mesa-resumen:hover, .mesa-resumen:focus-visible { border-color: var(--azul); outline: none; }
-.mesa-resumen-cabecera { display: flex; gap: 6px; align-items: baseline; }
-.mesa-resumen-cuenta { font-size: 12px; color: var(--tinta-suave); }
-.mesa-resumen-cuerpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.mesa-resumen-linea { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.mesa-resumen-hecho { color: var(--tinta-suave); }
-.mesa-resumen-hecho .mesa-resumen-marca { color: #2f8a55; font-weight: 700; }
-.mesa-resumen-pendiente .mesa-resumen-marca { color: #8a95a3; }
-.mesa-resumen-siguiente { font-weight: 700; }
-.mesa-resumen-doc { display: flex; gap: 8px; align-items: center; }
-.mesa-resumen-doc-tipo { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.mesa-resumen-etq { flex: 0 0 auto; font-size: 11px; font-weight: 600; border-radius: 10px; padding: 0 7px; }
-.mesa-resumen-reg { background: #e2f4e6; color: #1f6b33; }
-.mesa-resumen-sinreg { background: #fde8e6; color: #a4302a; }
-.mesa-resumen-mas, .mesa-resumen-vacio { font-size: 12px; color: var(--tinta-suave); }
-.mesa-resumen-pie { font-size: 11px; color: var(--tinta-suave); margin-top: 2px; }
-
 
 /* El guion */
 .mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
@@ -191,16 +150,20 @@ details.mesa-normativa > summary { cursor: pointer; }
 
 /* Los documentos, en tabla */
 .hito-en-mesa .hito-documentos { display: flex; flex-direction: column; gap: 0; }
+/* Fila 425: la columna del hito mide media pantalla; si el nombre, la fecha, el registro, el estado y los botones no caben
+   en un renglón, fecha, registro, estado y botones bajan al siguiente (antes, una rejilla de seis columnas). */
 .hito-documento.mesa-doc {
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto auto; gap: 4px 14px; align-items: center;
+  display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center;
   border: 0; border-bottom: 1px solid var(--linea); border-radius: 0; background: none; padding: 6px 2px; font-size: 13px;
 }
-.mesa-doc-nombre { display: flex; flex-direction: column; min-width: 0; }
+.mesa-doc-nombre { display: flex; flex-direction: column; min-width: 0; flex: 1 1 240px; }
+.hito-documento.mesa-doc > .mesa-doc-marca { flex: 0 0 auto; }
+.hito-documento.mesa-doc > .mesa-doc-acciones { margin-left: auto; }
 .mesa-doc-tipo { font-weight: 700; }
 .mesa-doc-nombre .hito-doc-abrir { text-align: left; color: var(--tinta-suave); font-size: 12px; text-decoration: none; white-space: normal; overflow-wrap: anywhere; }
 /* Fila 147: fecha y registro en su columna; los gemelos, debajo, sangrados. */
 .mesa-doc-fecha, .mesa-doc-registro { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
-.mesa-doc-gemelo-fila { grid-column: 2 / -1; display: flex; gap: 10px; align-items: baseline; padding-left: 16px; font-size: 12px; color: var(--tinta-suave); }
+.mesa-doc-gemelo-fila { flex: 1 1 100%; display: flex; gap: 10px; align-items: baseline; padding-left: 16px; font-size: 12px; color: var(--tinta-suave); }
 .mesa-doc-gemelo-nombre { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .mesa-doc-gemelo-que { font-style: italic; }
 .mesa-doc-nombre .hito-doc-abrir:hover { text-decoration: underline; }
@@ -214,7 +177,6 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-seleccion { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; background: #e3eefb; border-radius: 8px; padding: 6px 8px; font-size: 12px; }
 .mesa-seleccion.oculto { display: none; }
 .mesa-soltar { border: 1px dashed #b9c6d6; border-radius: 8px; padding: 14px; text-align: center; font-size: 12px; color: var(--tinta-suave); }
-.mesa-grande-docs.encima .mesa-soltar, .mesa-soltar.encima { background: #e3eefb; border-color: var(--azul); }
 .mesa-plantilla { display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 4px 0; }
 .mesa-plantilla-nombre { flex: 1; min-width: 0; }
 .mesa-icono-doc { font-size: 10px; font-weight: 700; color: #fff; background: #2b6cb0; border-radius: 3px; padding: 1px 4px; }
@@ -273,11 +235,6 @@ details.mesa-normativa > summary { cursor: pointer; }
 #pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-comunicar,
 #pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-generar-documento { display: none; }
 
-/* Fila 164: los documentos de otros hitos y los de la carpeta sin hito, en la mesa de cada hito. */
-.mesa-docs-apartado { margin: 14px 0 4px; font-size: 12px; font-weight: 600; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .03em; }
-.mesa-doc-de-hito { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 8px; background: #eef2f7; color: #3c4a5c; font-size: 11px; white-space: nowrap; }
-.mesa-doc-ajeno .mesa-doc-tipo { font-weight: 500; }
-.mesa-docs-cuenta { font-weight: 400; color: var(--tinta-suave); font-size: .9em; }
 
 /* Fila 164: los pasos con receta, arriba de «Comunicar ▾» y «Generar documento ▾». */
 .mesa-recetas { display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--borde, #dde3ea); }

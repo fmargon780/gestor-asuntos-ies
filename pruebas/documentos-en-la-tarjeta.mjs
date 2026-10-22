@@ -1,14 +1,12 @@
-/* Prueba en navegador de verdad de la tarjeta cerrada «Documentos de la
-   carpeta» (24-sep-2026, fila 114 de docs/COLA.md,
-   docs/DOCUMENTOS-EN-LA-TARJETA.md). Nombres inventados.
+/* Prueba en navegador de verdad de los «Documentos de la carpeta» en la columna derecha de «Trabajo»
+   (24-sep-2026, fila 114 de docs/COLA.md, docs/DOCUMENTOS-EN-LA-TARJETA.md; adaptada el 22-oct-2026 a la
+   fila 425, docs/FICHA-VISTA-DE-TRABAJO.md: ya no hay tarjeta cerrada con «y N más»). Nombres inventados.
 
    Con 8 documentos, a 1905×1000 y a 1280×800:
-     1. Sin la línea «8 documentos».
-     2. Como mucho 5 nombres, más «y N más», y los nombres + N = 8.
-     3. Ningún renglón más bajo que su alto de línea, y ninguno cortado
-        por abajo (todos dentro de la caja del resumen).
-     4. Cada renglón lleva `title` con su texto entero.
-     5. «y N más» abre la tarjeta en grande. */
+     1. Sin la línea «8 documentos» (el número va en el círculo del título).
+     2. Salen los 8, con el nombre entero de cada uno.
+     3. Ningún renglón se solapa con el siguiente.
+     4. La columna se desplaza por su cuenta si no caben, y la página no baja. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -84,29 +82,20 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await abrirFicha(pagina);
   await pagina.waitForTimeout(300);
   const r = await pagina.evaluate(() => {
-    const caja = document.querySelector('.ficha-tarjeta[data-tarjeta="documentos"] > .ficha-tarjeta-resumen');
-    const lineas = Array.from(caja.querySelectorAll('.ficha-resumen-linea'));
-    const cb = caja.getBoundingClientRect();
+    const col = document.getElementById('trabajo-der');
+    const filas = Array.from(col.querySelectorAll('#ficha-documentos .ficha-documento-fila'));
     return {
-      textos: lineas.map((l) => l.textContent),
-      nombres: lineas.filter((l) => !l.classList.contains('ficha-resumen-mas')).length,
-      mas: (caja.querySelector('.ficha-resumen-mas') || {}).textContent || '',
-      aplastadas: lineas.filter((l) => l.getBoundingClientRect().height + 0.5 < parseFloat(getComputedStyle(l).lineHeight)).length,
-      cortadas: lineas.filter((l) => l.getBoundingClientRect().bottom > cb.bottom + 0.5).length,
-      sinTitle: lineas.filter((l) => l.title !== l.textContent).length
+      nombres: filas.map((f) => f.dataset.doc),
+      solapadas: filas.filter((f, i) => i && f.getBoundingClientRect().top < filas[i - 1].getBoundingClientRect().bottom - 1).length,
+      cuenta: (document.getElementById('ficha-cuenta-docs') || {}).textContent,
+      lineaN: Array.from(col.querySelectorAll('#ficha-documentos > *')).some((e) => /^8 documentos$/.test(e.textContent.trim())),
+      paginaBaja: document.documentElement.scrollHeight > window.innerHeight + 2
     };
   });
-  console.log('   (' + r.nombres + ' nombres y «' + r.mas + '»)');
-  await comprobar('1. sin la línea «8 documentos»', Promise.resolve(r.textos.some((t) => /documentos$/.test(t))), false);
-  await comprobar('2. como mucho 5 nombres', Promise.resolve(r.nombres >= 1 && r.nombres <= 5), true);
-  await comprobar('2. «y N más» cuenta el resto', Promise.resolve(r.mas), 'y ' + (8 - r.nombres) + ' más');
-  await comprobar('3. ningún renglón aplastado', Promise.resolve(r.aplastadas), 0);
-  await comprobar('3. ninguno cortado por abajo', Promise.resolve(r.cortadas), 0);
-  await comprobar('4. cada renglón, con su texto entero en el title', Promise.resolve(r.sinTitle), 0);
-  await pagina.click('.ficha-resumen-mas');
-  await pagina.waitForTimeout(300);
-  await comprobar('5. «y N más» abre Documentos en grande',
-    pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'documentos');
+  await comprobar('1. sin la línea «8 documentos»; el número, en el círculo', Promise.resolve([r.lineaN, r.cuenta]), [false, '8']);
+  await comprobar('2. salen los 8, con el nombre entero', Promise.resolve(r.nombres.slice().sort()), DOCS.slice().sort());
+  await comprobar('3. ningún renglón solapa al siguiente', Promise.resolve(r.solapadas), 0);
+  await comprobar('4. la página no baja (la columna se desplaza sola)', Promise.resolve(r.paginaBaja), false);
   await comprobar('sin errores en la consola', Promise.resolve(errores), []);
   await pagina.close();
 }

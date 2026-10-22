@@ -16,6 +16,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -132,6 +133,7 @@ await comprobar('se ha guardado en guias.json',
 
 console.log('--- los pasos de la guía se vuelven hitos, solos ---');
 await pagina.waitForTimeout(600);
+await verLaLista(pagina);   /* fila 425: al entrar, la mesa del hito actual; la lista, con «← Hitos» */
 await comprobar('salen los dos, sin marcar',
   textoGuia().then(t => t.indexOf('0 de 2 hitos hechos') !== -1), true);
 await comprobar('con el título del primer paso',
@@ -153,6 +155,7 @@ await comprobar('se han creado en hitos.json',
   ['Pedir el sobre de matrícula', 'Comprobar el pago de la Seguridad Escolar']);
 
 console.log('--- marcar un hito hecho se guarda en hitos.json ---');
+await verLaLista(pagina);
 await pagina.locator('#ficha-guia .hito-casilla').first().check();
 await pagina.waitForTimeout(400);
 await comprobar('se apunta en hitos.json',

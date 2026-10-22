@@ -13,6 +13,7 @@
       también la ofrece (buscador en línea, sin cerrar el editor).
    6. Si el organismo se borra, el hito sigue enseñando su nombre guardado. */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -71,7 +72,7 @@ const hito = (id) => pagina.evaluate(async ([asunto, id]) => {
   return Hitos.buscar(d.porAsunto[asunto].hitos, id);
 }, [ASUNTO, id]);
 async function abrirMesa(id) {
-  await pagina.locator('#ficha-guia .hito[data-id="' + id + '"] .hito-titulo').click();
+  await abrirHito(pagina, '' + id + '');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + id + '"]');
   await pagina.waitForTimeout(300);
 }

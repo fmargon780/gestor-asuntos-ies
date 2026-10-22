@@ -6,10 +6,14 @@ del hito, su guion o "Traer los guiones del instituto".
 
 ## Dónde vive
 
-Dentro de la tarjeta "Hitos" abierta en grande (fila 107, `docs/contexto/ASUNTOS.md`, "La ficha en
-tarjetas"). La lista de hitos es compacta: una línea por hito (casilla, título, plazo, responsable)
-y nada se despliega. Pulsar el título o ▾ abre su **mesa** (`HitoMesa.abrir(a, idHito)`,
-`js/hito-mesa.js`).
+En la **columna izquierda de la pestaña «Trabajo»** (fila 425, `docs/FICHA-VISTA-DE-TRABAJO.md`,
+`docs/contexto/ASUNTOS.md`, «La ficha en pestañas»). La lista de hitos es compacta: una línea por hito
+(casilla, título, plazo, responsable) y nada se despliega. Al entrar en un asunto se abre **la mesa del
+hito actual** (el primero sin hacer, `EstadoHito.idActual`; con todos hechos, la lista). Pulsar el
+título o ▾ de la lista, o una celda de la tira, abre la **mesa** de ese hito (`HitoMesa.abrir(a,
+idHito)`, `js/hito-mesa.js`). «← Hitos» enseña la lista y, mientras no se salga del asunto, un repintado
+no vuelve a abrir ningún hito (`listaElegida`); otro asunto, o volver a entrar, empieza otra vez por el
+actual (`HitoMesa.alEntrarEnLaFicha`, que llama `FichaTarjetas.alEntrar`).
 
 **No hay pantalla nueva**: la mesa es el mismo `.hito` con su `.hito-cuerpo` visible. `#ficha-guia`
 lleva `con-mesa` y el hito abierto `hito-en-mesa`; el CSS (`css/hito-mesa.css`) esconde los demás
@@ -22,21 +26,20 @@ de un documento, generar o meter un papel en un hito) abre la mesa de ese hito
 (`HitoMesa.abrirAlPintar`).
 
 - **Escape** (`js/usabilidad.js`): primero cierra el documento de la derecha si está; luego un
-  desplegable de la cabecera (fila 145); luego, si la tarjeta en grande no es el guion, vuelve al
-  guion (fila 147); luego la mesa
-  (`HitoMesa.cerrarSiAbierta`); luego la tarjeta (fila 107); luego sale de la ficha.
+  desplegable de la cabecera (fila 145); luego la mesa (`HitoMesa.cerrarSiAbierta`, vuelve a la lista de
+  hitos); luego sale de la ficha. (Desde la fila 425 ya no hay «volver al guion» ni «cerrar la tarjeta».)
 - **«← Volver a los hitos»** (fila 194, botón propio al principio de la tira de hitos,
   `#mesa-volver-hitos`, con texto compacto «← Hitos» y el texto entero en el `title`; no estira
   como las celdas de hito, `.mesa-tira-volver`): hace lo mismo que ese Escape en ese punto (cierra
-  la mesa, deja la tarjeta Hitos en grande), llamando directamente a la misma función `cerrar()`.
+  la mesa y enseña la lista), llamando directamente a la misma función `cerrar()`.
   Va dentro de la tira, no en una fila propia, para no bajar «QUÉ HAY QUE HACER» de los 250 px de
   la cabecera compacta (fila 145, `pruebas/cabecera-compacta.mjs`).
-- Con la mesa abierta, la franja de documentos de la tarjeta no sale (`FichaTarjetas.alCambiarLaMesa`).
-- Con el visor o el lector abierto, o por debajo de 1100 px, la zona derecha baja debajo del guion
-  (fila 145).
+- Un documento abierto (visor o Word) ocupa la columna derecha de «Trabajo», en lugar de la lista de la
+  carpeta; el hito sigue a la izquierda (`js/ficha-trabajo-visor.js`). Por debajo de 1100 px, las dos
+  columnas van una debajo de otra.
 - Volver a abrir la misma ficha (lo hace la aplicación tras cerrar el cuadro de Correo o al generar)
-  ya no cierra la tarjeta abierta: `FichaTarjetas.alEntrar(a)` solo vuelve a la cuadrícula si es
-  otro asunto.
+  ya no cambia de pestaña ni de hito: `FichaTarjetas.alEntrar(a)` y `HitoMesa.alEntrarEnLaFicha` solo
+  empiezan de cero si es otro asunto.
 
 ## La mesa enfocada (25-sep-2026, fila 145, `docs/MESA-DEL-HITO-ENFOCADA.md`)
 
@@ -54,7 +57,7 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
 - **A la derecha, cinco botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
   **«Registrar»** (fila 154, no en un hito-pregunta: con un documento del hito sin registro, lo
   registra; con varios, menú para elegir; sin ninguno, aviso ámbar; es `HitosDocumentoMenu.registrar`,
-  lo mismo que el ⋯ del documento, y abre antes la tarjeta de documentos), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
+  lo mismo que el ⋯ del documento, y lleva antes el bloque «Documentos del hito» a la vista, `HitoMesa.verDocumentos`), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
   hecho, «Hecho ✓ (desmarcar)») y **«Hito ▾»** (fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`, antes
   «···»): arriba, sin repetir la palabra, **Crear · Cambiar · Borrar** (fila 206, no en un
   hito-pregunta: ver más abajo; mismas funciones, solo el texto cambia), y debajo de una raya
@@ -131,33 +134,21 @@ apagado si el hito no está vacío).
   154): `js/hitos-panel.js` pone `asunto-con-hitos` en `#pantalla-asunto` al pintar y
   `css/hito-mesa.css` los esconde (siguen en el DOM, con su menú). Como un tipo sin guía recibe la guía
   mínima, en la práctica todo asunto abierto tiene hitos: se comunica y se genera desde la mesa.
-  **Atajo (fila 267)**: «Generar documento» en la tarjeta «Documentos de la carpeta» de la ficha
+  **Atajo (fila 267)**: «Generar documento» en «Documentos de la carpeta» (columna derecha de «Trabajo») de la ficha
   (`js/ficha-generar-documento.js`) no genera: calcula al pulsar el hito actual (o el último si están
   todos hechos) y llama a `HitoMesa.abrirConPanel(a, idHito, 'generar')`, que deja apuntado
   `panelAbierto` y abre la mesa con «Generar documento ▾» desplegado. Solo con `asunto-con-hitos`
   (CSS) y en asunto abierto.
 
-### Tres tarjetas (fila 147, 25-sep-2026, `docs/MESA-TARJETAS-QUE-SE-ABREN.md`)
+### El hito en una columna (fila 425, 22-oct-2026, `docs/FICHA-VISTA-DE-TRABAJO.md`; antes, tres tarjetas: fila 147)
 
-Rejilla `2fr 1fr` a todo el ancho (con la mesa abierta, `.contenido` pierde su ancho máximo). Con el
-visor o el lector abiertos, o por debajo de 1100 px, la derecha baja. La mesa tiene tres tarjetas:
-«Qué hay que hacer», «Documentos del hito» y «Registro». **Una está en grande** a la
-izquierda (`.mesa-col-grande`, secciones `.mesa-grande[data-tarjeta="guion|docs|notas"]`, las tres
-siempre en el DOM: los botones del guion pulsan los de siempre por debajo) y **las otras dos, de
-resumen**, a la derecha (`.mesa-resumen`, en `.mesa-col-derecha`, con «Normativa (N)» plegada al pie).
-Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no repinta nada).
+El hito entero, de arriba abajo y en una sola columna (`.mesa-columnas > .mesa-col-hito`), con este
+orden: **Tareas** (`.mesa-grande-guion`) → **Campos de este hito** (`.mesa-campos-hito`) → **Documentos
+del hito** (`.mesa-grande-docs`) → **Registro** (`.mesa-grande-notas`) y «Normativa (N)» plegada al pie.
+La columna es la izquierda de «Trabajo»; la pinta `HitosPanelLista.cuerpoDeHito`. Ya no hay tarjetas de
+resumen ni cambio de tarjeta (`.mesa-resumen`, `HitoMesa.abrirTarjeta`, «← Volver al guion» y
+`js/hito-mesa-tarjetas.js` desaparecieron). Los botones del guion pulsan los de siempre por debajo.
 
-- **Cambiar**: pulsar una tarjeta pequeña (o Intro/espacio con el foco) la abre en grande;
-  «← Volver al guion», la pequeña del guion o Escape vuelven. `HitoMesa.abrirTarjeta(cual)`,
-  `HitoMesa.tarjetaDe(clave, idHito)`, `HitoMesa.volverAlGuionSiOtra()` (`js/usabilidad.js`, entre el
-  desplegable de la cabecera y cerrar la mesa). Se recuerda por asunto e hito: guardar, llegar un
-  documento o la presencia no devuelven al guion; abrir otro hito (tira, lista, «Qué me toca»,
-  cerrar la mesa) sí. La acción «Registrar» del guion abre antes la de documentos.
-- **Los resúmenes** (`js/hito-mesa-tarjetas.js`, sin botones): el guion con «N de M», ✓ hechos, ☐
-  pendientes y «→» el siguiente en negrita (sin los «No aplica»); los documentos con su número, el tipo
-  y el registro en verde o «Sin registrar» en rojo claro (sin gemelos, cinco y «y N más»; vacío,
-  «Ninguno todavía.»); las notas con «N notas», la primera línea de la última y «Última: quién · día»
-  (sin notas, lo último de la historia, o «Sin notas»).
 - **Guion en grande** (`js/hito-mesa-guion.js`): el título, la barra y «N de M» en la misma línea
   (fila 154: sin contar los «No aplica», ni en lo hecho ni en el total: `Hitos.cuentaGuion`).
   **Desde la fila 154 (`docs/HITOS-ACCIONES-EN-EL-HITO.md`) los pasos son una lista para marcar, sin
@@ -197,19 +188,24 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   `js/guias-guion.js` (el mismo de Ajustes, sin duplicar: `bloqueHTML`/`enganchar`/`leer`/`normalizar`
   sobre una copia en memoria del `guion` de ese paso) y guarda con `GuiasDelCentro.cambiarPasos`, igual
   que «+ Añadir un paso a la guía del tipo». Sin salir a Ajustes.
-- **Documentos en grande** (fila 164: con **todos los documentos del asunto**, `otrosDelAsunto`: debajo
-  de los del hito, «De otros hitos», cada uno con la etiqueta `.mesa-doc-de-hito` «N · título» de su
-  hito, y al final «En la carpeta, sin hito», sin gemelos ni ficheros internos; se abren, se envían y se
-  marcan para adjuntar como los propios; `.mesa-doc-ajeno`. Fila 282: con la mesa abierta para trabajar (nunca en solo consulta), llevan su «⋯» (`.mesa-doc-menu-ajeno`, montado por `HitosSacarDocumento.engancharAjenos`): «De otros hitos» → «Traer a este hito» y «Quitar de su hito»; «sin hito» → «Traer a este hito» (no en un hito de decisión). `otrosDelAsunto` devuelve también `idHito`. El título dice
-  «Documentos del hito · 2 (y 5 más del asunto)», `cuentaTitulo`): «Añadir documento» junto al título, la barra de marcados encima, la tabla
-  (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
-  estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
-  documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir») y, al pie, una zona de soltar de
-  ancho completo. Soltar funciona sobre esta tarjeta y sobre toda la columna derecha.
+- **Documentos del hito** (fila 425: solo los del propio hito; los demás de la carpeta se ven en la
+  columna derecha de «Trabajo», `js/ficha-documentos.js`): «Añadir documento» junto al título, la barra
+  de marcados encima, la tabla (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha,
+  registro `.mesa-doc-registro`, estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y
+  ⋯) y los gemelos debajo de su documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir»). El
+  título dice «Documentos del hito · 2» (`cuentaTitulo`). Cada documento de la carpeta (derecha) lleva
+  una casilla `.ficha-documento-marca` (solo con un hito abierto para trabajar): lo marcado allí se
+  suma a lo marcado a la izquierda (`HitoMesaDocumentos.marcados`, `alMarcar`) y se adjunta al
+  «Comunicar» y al «Enviar» del hito; los del hito abierto llevan la marca «Hito N» (`.ficha-marca-hito`,
+  `FichaDocumentos.marcarHito`, que llama `HitoMesa.aplicar`) y los demás «Traer a este hito»
+  (`.ficha-documento-traer`, `HitosSacarDocumento.mover`; no en un hito de decisión). **Soltar** un PDF
+  sobre cualquier parte de «Trabajo» (las dos columnas, `#trabajo-columnas`,
+  `HitoMesaDocumentos.soltarAlHito`) lo mete en el hito abierto; la zona pequeña de la siguiente tarea
+  sigue. Sin hito abierto (la lista), no se suelta nada.
 - **Registro en grande**: la caja de cinco líneas que crece (Intro guarda, Mayúsculas+Intro salta) y,
   debajo, una sola lista por fechas, lo más nuevo arriba, con lo automático en gris pequeño (fila 229).
-- **Modo consulta**: se puede cambiar de tarjeta y abrir documentos (`js/ficha-consulta.js` deja
-  encendidos `.mesa-volver-guion`, `.mesa-doc-abrir` y `.mesa-doc-gemelo`).
+- **Modo consulta**: se pueden cambiar de pestaña y abrir documentos (`js/ficha-consulta.js` deja
+  encendidos `.mesa-doc-abrir` y `.mesa-doc-gemelo`).
 
 La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan como se describe más abajo.
 
@@ -220,7 +216,7 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   trae `url`) y «No aplica». Marcado: tachado, quién y cuándo en el `title`. Un **hito-pregunta** enseña
   «¿Qué supuesto es?» con las opciones en tarjetas (la elegida en verde); elegir otra llama a
   `HitosPanelLista.cambiarRama` (la misma pregunta de siempre si la rama de ahora tiene cosas apuntadas).
-- **Documentos** (`js/hito-mesa-documentos.js`): tabla de `.hito-documento[data-doc]` (ver «Tres tarjetas»). Los gemelos (`SIN SELLAR`, `.doc/.docx` con la misma clave: sin extensión, sin «SIN
+- **Documentos** (`js/hito-mesa-documentos.js`): tabla de `.hito-documento[data-doc]` (ver «El hito en una columna»). Los gemelos (`SIN SELLAR`, `.doc/.docx` con la misma clave: sin extensión, sin «SIN
   SELLAR» y sin código de registro) cuelgan debajo, de la carpeta aunque no estén apuntados. «viene del
   hito N» si ya estaba en uno anterior. **«Enviar ▾»** de cada documento (25-sep-2026, fila 153,
   docs/ENVIAR-DOCUMENTO-POR-SENECA.md): un menú (`FichaMenus.montar`), «Por correo» / «Por Séneca», que
@@ -350,8 +346,8 @@ otra vez el botón. Una sola escritura de `guias.json` con `Copias.guardar` y un
 ha traído. El borrador (296 modelos, 1.064 pasos) está en `biblioteca-centro.json`: si se vuelve a
 generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se perderían.
 
-Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, `pruebas/mesa-tarjetas-que-se-abren.mjs`
-(a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`), `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
+Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, `pruebas/ficha-vista-de-trabajo.mjs`
+(a 1905×1000 y 1600×900; con `FOTOS=<carpeta>`, una foto), `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
 (el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «Cambiar en la guía») y
 `pruebas/enviar-documento-por-seneca.mjs` («Enviar ▾» de un documento, por correo o por Séneca, y el guion al
 terminar) y `pruebas/hitos-acciones-en-el-hito.mjs` (fila 154: sin botones en los pasos, «Registrar» en la
@@ -385,7 +381,7 @@ guion, y un modelo viejo se convierte al meterlo en una guía (`ReunirMigracion.
 
 ### El registro de la mesa (30-sep-2026, fila 229; antes «Notas e historia»)
 
-La tarjeta «Registro» de la mesa enseña, en **una sola lista** por fechas (ya no hay dos columnas,
+El bloque «Registro» de la mesa enseña, en **una sola lista** por fechas (ya no hay dos columnas,
 «notas» e «Historia»), solo las líneas de este hito: las notas del asunto escritas desde aquí
 (`ficha.notas` con su `hito`) y lo automático del hito (`h.notas`, en gris). Encima, la caja
 «Anotar algo que ha pasado…» (Intro guarda). Ver «El registro del asunto» en
@@ -421,7 +417,7 @@ La fila 235 hizo que todo cambio de hitos o tareas desde un asunto preguntara «
 - Pruebas: `pruebas/donde-se-guarda.mjs` (reescrita en la fila 416), `pruebas/hitos-desde-el-asunto.mjs`,
   `pruebas/menu-en-las-preguntas-del-hito.mjs` y la nueva `pruebas/la-guia-manda-en-los-hitos.mjs`.
 
-**Campos de este hito (fila 255)**: en la columna derecha, debajo de los tres resúmenes, la tarjeta `.mesa-campos-hito` (la pinta `CamposDeHito.tarjetaHtml` desde `cuerpoDeHito`, se engancha en `engancharCuerpo`): los campos del hito con su control según la clase, guardados al cambiar, con «⋮» y «+ Añadir campo» en el título; sin campos, una tarjeta pequeña con solo el botón; en modo consulta y en el ARCHIVO, solo lectura.
+**Campos de este hito (fila 255)**: en la columna del hito, entre las tareas y los documentos (fila 425), la tarjeta `.mesa-campos-hito` (la pinta `CamposDeHito.tarjetaHtml` desde `cuerpoDeHito`, se engancha en `engancharCuerpo`): los campos del hito con su control según la clase, guardados al cambiar, con «⋮» y «+ Añadir campo» en el título; sin campos, una tarjeta pequeña con solo el botón; en modo consulta y en el ARCHIVO, solo lectura.
 
 ## Tareas con la plantilla fuera de uso (9-oct-2026, fila 321)
 

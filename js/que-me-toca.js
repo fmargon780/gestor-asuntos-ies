@@ -305,8 +305,8 @@
      Inicio: js/inicio.js). */
   function abrirMesaDelHito(a, h) {
     if (window.HitosPanel) window.HitosPanel.desplegarAlAbrir(a.nombre, h.id);
-    /* Con la tarjeta de Hitos abierta en grande (fila 107). */
-    if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
+    /* Con la pestaña «Trabajo» abierta (fila 425). */
+    if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('trabajo');
     App.abrirFicha(a, 'abierto');
   }
 

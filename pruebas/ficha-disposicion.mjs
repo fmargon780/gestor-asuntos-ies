@@ -85,11 +85,14 @@ async function abrirFicha(nombre) {
 console.log('--- el asunto con de todo ---');
 await abrirFicha(RICO);
 
-/* Fila 107 (docs/FICHA-EN-TARJETAS.md): las tres columnas pasan a una
-   cuadrícula de tarjetas; con "Campos del asunto", cuatro arriba. */
-await comprobar('1. el orden de las tarjetas',
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): las tres columnas pasan a tarjetas; desde la fila 425 son pestañas, con
+   «Trabajo» (hito y carpeta) la primera. */
+await comprobar('1. el orden de las pestañas',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
-  ['hitos', 'documentos', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
+  ['trabajo', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
+await comprobar('1. y las pestañas de arriba, en el mismo orden',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas-pestanas .ficha-pestana')).map((b) => b.dataset.tarjeta)),
+  ['trabajo', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
 
 await comprobarQue('2. #ficha-notas está antes que #ficha-otros en el documento',
   pagina.evaluate(() => {
@@ -110,6 +113,7 @@ await comprobarQue('3. no trae la fecha límite', Promise.resolve(subtitulo.inde
 await comprobar('4. "Datos del asunto" ya no existe',
   pagina.locator('.ficha-bloque .ficha-titulo', { hasText: 'Datos del asunto' }).count(), 0);
 
+await pagina.evaluate(() => FichaTarjetas.abrir('tramite'));
 await comprobar('5. "Campos del asunto" sale, con la referencia del campo propio',
   /* Solo las que se ven: la fila «Formularios» nace oculta y solo se
      enseña si hay alguno (fila 101). */
@@ -124,16 +128,18 @@ await comprobarQue('5. no trae Tipo, Tercero, Estado ni Fecha límite',
     return ['Tipo', 'Tercero', 'Estado', 'Fecha límite'].every((t) => texto.indexOf(t) === -1);
   }));
 
-console.log('--- 6. "Otros asuntos" y "Personas", ahora tarjetas con su resumen ---');
-await comprobar('6. el resumen de "Otros asuntos" (es el único de ese tercero)',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="otros"] .ficha-tarjeta-resumen').textContent(), 'ninguno todavía');
-await comprobar('6. el resumen de "Relacionados" trae la cuenta y el nombre',
-  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '1 personaAlguien Del Cole');
+console.log('--- 6. "Otros asuntos" y "Personas", con su número en la pestaña ---');
+await comprobar('6. «Otros asuntos» no lleva número (es el único de ese tercero)',
+  pagina.locator('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="otros"] .ficha-pestana-cuenta').count(), 0);
+await comprobar('6. «Personas y entidades relacionadas» lleva el 1',
+  pagina.locator('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="relacionados"] .ficha-pestana-cuenta').textContent(), '1');
 
-await pagina.click('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen');
+await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="relacionados"]');
 await pagina.waitForTimeout(150);
-await comprobar('se abre en grande al pulsar',
+await comprobar('se abre al pulsar su pestaña',
   pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
+await comprobar('y enseña a la persona',
+  pagina.locator('#ficha-relacionados').textContent().then((t) => t.indexOf('Alguien Del Cole') !== -1), true);
 
 /* Forzar un repintado de la ficha entera (un cambio en la ficha por
    debajo, como en pruebas/cabecera-fija.mjs, escenario 6; desde la fila
@@ -147,7 +153,7 @@ await pagina.evaluate(async () => {
 await pagina.waitForTimeout(500);
 await comprobar('sigue abierta tras el repintado',
   pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
-await pagina.evaluate(() => FichaTarjetas.cerrar());
+await pagina.evaluate(() => FichaTarjetas.abrir('trabajo'));
 
 /* Se deja la ficha como estaba, para no complicar los escenarios de
    más abajo (que vuelven a abrir este mismo asunto desde la lista). */
@@ -183,27 +189,23 @@ await comprobarQue('con un documento dentro, el bloque de Documentos no lleva "v
   }));
 
 /* ============================================================
-   8. LA CUADRÍCULA, SEGÚN EL ANCHO (fila 107)
+   8. «TRABAJO», SEGÚN EL ANCHO (fila 425; antes, la cuadrícula de la fila 107)
    ============================================================ */
-console.log('--- 8. la cuadrícula, según el ancho ---');
+console.log('--- 8. «Trabajo», según el ancho ---');
 await abrirFicha(RICO);
 
 async function columnas() {
   return pagina.evaluate(() =>
-    getComputedStyle(document.querySelector('.ficha-tarjetas-rejilla')).gridTemplateColumns.trim().split(/\s+/).length);
+    getComputedStyle(document.getElementById('trabajo-columnas')).gridTemplateColumns.trim().split(/\s+/).length);
 }
 
 await pagina.setViewportSize({ width: 1600, height: 900 });
 await pagina.waitForTimeout(200);
-await comprobar('a 1600px, con "Campos del asunto", cuatro columnas', columnas(), 4);
+await comprobar('a 1600px, dos columnas', columnas(), 2);
 await pagina.setViewportSize({ width: 1000, height: 900 });
 await pagina.waitForTimeout(200);
-await comprobar('por debajo de 1100px, dos columnas', columnas(), 2);
+await comprobar('por debajo de 1100px, una columna', columnas(), 1);
 await pagina.setViewportSize({ width: 1600, height: 900 });
-await pagina.evaluate(() => document.body.classList.add('con-lector'));
-await pagina.waitForTimeout(200);
-await comprobar('con el lector abierto, dos columnas', columnas(), 2);
-await pagina.evaluate(() => document.body.classList.remove('con-lector'));
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

@@ -1,23 +1,21 @@
-/* Prueba en navegador de verdad de la mesa del hito en tarjetas (25-sep-2026,
-   fila 147 de docs/COLA.md, docs/MESA-TARJETAS-QUE-SE-ABREN.md).
+/* Prueba en navegador de verdad de la mesa del hito, en una sola columna
+   (25-sep-2026, fila 147 de docs/COLA.md; adaptada el 22-oct-2026 a la fila 425,
+   docs/FICHA-VISTA-DE-TRABAJO.md: antes eran tres tarjetas, una en grande y dos de resumen).
 
    A 1905×1000 y a 1280×800, sobre un asunto inventado con un hito de cinco
    pasos de guion (dos hechos), dos documentos (uno registrado, con su
    gemelo sin sellar) y dos notas:
-     1. Al abrir el hito, en grande está el guion; a la derecha, las
-        tarjetas pequeñas de Documentos y de Notas, sin botones dentro. La de
-        Documentos dice «26SM0617» y «Sin registrar».
-     2. Pulsar la de Documentos: la tabla sale en grande, con el nombre del
-        fichero entero (sin «…») y el gemelo debajo; a la derecha, la tarjeta
-        pequeña del guion con «2 de 5» y el siguiente paso en negrita.
-     3. Escape vuelve al guion y la mesa sigue abierta. Otro Escape la cierra.
-     4. Abrir Notas, escribir sin guardar, forzar un repintado: la tarjeta
-        sigue abierta y el texto en la caja. Intro guarda; la nota sale arriba
-        y en el resumen de la tarjeta pequeña.
-     5. Cambiar de hito con la tira: se abre con el guion en grande.
-     6. Con CAPTURAS=1, una captura de cada tarjeta abierta a 1905×1000 en
-        pruebas/capturas/ (datos inventados). */
+     1. Al abrir el hito, el guion, los documentos del hito y el registro están a la vez,
+        de arriba abajo, sin tarjetas de resumen.
+     2. En los documentos, el nombre del fichero entero (sin «…») y el gemelo debajo,
+        con «26SM0617» y «Sin registrar».
+     3. Escape cierra la mesa (la lista de hitos) y no se vuelve a abrir sola.
+     4. Escribir una nota sin guardar y forzar un repintado: el texto sigue en la caja.
+        Intro guarda; la nota sale arriba del registro.
+     5. Cambiar de hito con la tira: se abre su mesa.
+     6. Con CAPTURAS=1, una captura a 1905×1000 en pruebas/capturas/ (datos inventados). */
 import { chromium } from 'playwright';
+import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -86,24 +84,18 @@ async function preparar(ancho, alto) {
     await App.verAbiertos();
   }, [ASUNTO, REGISTRADO, SIN_REG]);
   await pagina.locator('.tarjeta-nombre', { hasText: 'Inventada Prueba' }).first().click();
-  await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
-  await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-  await pagina.waitForTimeout(400);
-  await pagina.locator('#ficha-guia .hito[data-id="c1"] .hito-titulo').click();
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]');
   await pagina.waitForTimeout(500);
   return { pagina, errores };
 }
 
-/* Qué se ve: la tarjeta grande y las pequeñas de la derecha. */
+/* Qué se ve: los bloques del hito, de arriba abajo. */
 function queSeVe(pagina) {
   return pagina.evaluate(() => {
     const vis = (e) => !!(e && e.offsetParent);
     const m = document.querySelector('.hito-en-mesa');
-    return {
-      grande: Array.from(m.querySelectorAll('.mesa-grande')).filter(vis).map((e) => e.dataset.tarjeta),
-      pequenas: Array.from(m.querySelectorAll('.mesa-resumen')).filter(vis).map((e) => e.dataset.tarjeta)
-    };
+    return Array.from(m.querySelectorAll('.mesa-col-hito > section')).filter(vis)
+      .map((e) => e.dataset.tarjeta || (e.classList.contains('mesa-campos-hito') ? 'campos' : '?'));
   });
 }
 
@@ -120,28 +112,21 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   const fotos = ancho === 1905;
 
   /* 1. */
-  await comprobar('1. en grande, el guion; a la derecha, Documentos y Notas', queSeVe(pagina),
-    { grande: ['guion'], pequenas: ['docs', 'notas'] });
-  await comprobar('1. las tarjetas pequeñas, sin botones dentro',
-    pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-resumen button, .hito-en-mesa .mesa-resumen input').length), 0);
-  await comprobar('1. la de Documentos dice «26SM0617» y «Sin registrar», con la cuenta',
-    pagina.evaluate(() => {
-      const t = document.querySelector('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]');
-      return [Array.from(t.querySelectorAll('.mesa-resumen-etq')).map((e) => e.textContent).sort(),
-        t.querySelector('.mesa-resumen-cuenta').textContent];
-    }), [['26SM0617', 'Sin registrar'], '· 2']);
-  await comprobar('1. la de Notas, la primera línea de la última y quién',
-    pagina.evaluate(() => {
-      const t = document.querySelector('.hito-en-mesa .mesa-resumen[data-tarjeta="notas"]');
-      return [t.querySelector('.mesa-resumen-nota').textContent, t.querySelector('.mesa-resumen-pie').textContent.indexOf('Última: Ana') === 0,
-        t.querySelector('.mesa-resumen-cuenta').textContent];
-    }), ['Traen el certificado el lunes', true, '· 2 líneas']);
-  if (fotos) await capturar(pagina, 'mesa-tarjeta-guion');
+  await comprobar('1. tareas, campos, documentos y registro, de arriba abajo', queSeVe(pagina), ['guion', 'campos', 'docs', 'notas']);
+  await comprobar('1. sin tarjetas de resumen ni «← Volver al guion»',
+    pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-resumen, .hito-en-mesa .mesa-volver-guion').length), 0);
+  await comprobar('1. el guion dice «2 de 5»',
+    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '2 de 5');
+  await comprobar('1. los documentos dicen cuántos son',
+    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-docs-cuenta').textContent), '· 2');
+  await comprobar('1. el registro dice «2 líneas»',
+    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-docs-cuenta').textContent), '· 2 líneas');
+  if (fotos) await capturar(pagina, 'mesa-una-columna');
 
   /* 2. */
-  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
-  await comprobar('2. pulsar Documentos la abre en grande; el guion pasa a la derecha', queSeVe(pagina),
-    { grande: ['docs'], pequenas: ['guion', 'notas'] });
+  await comprobar('2. «26SM0617» y «Sin registrar»',
+    pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-grande-docs .mesa-doc-estado, .hito-en-mesa .mesa-grande-docs .mesa-doc-registro')).map((e) => e.textContent).filter((t) => t !== '—').sort()),
+    ['26SM0617', 'Registrado', 'Sin registrar']);
   await comprobar('2. el nombre del fichero, entero y sin «…»',
     pagina.evaluate((reg) => {
       const b = document.querySelector('.hito-en-mesa .mesa-grande-docs .hito-documento[data-doc="' + reg + '"] .hito-doc-abrir');
@@ -156,41 +141,27 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       return [!!g && g.textContent.indexOf('Original sin sellar') === 0, !!g && g.getBoundingClientRect().top >= n.getBoundingClientRect().bottom - 1,
         !!g && g.querySelector('.mesa-doc-gemelo').textContent];
     }, REGISTRADO), [true, true, 'Abrir']);
-  await comprobar('2. la pequeña del guion dice «2 de 5» y el siguiente, en negrita',
-    pagina.evaluate(() => {
-      const t = document.querySelector('.hito-en-mesa .mesa-resumen[data-tarjeta="guion"]');
-      const s = t.querySelector('.mesa-resumen-siguiente');
-      return [t.querySelector('.mesa-resumen-cuenta').textContent, s && s.textContent, s && Number(getComputedStyle(s).fontWeight) >= 600];
-    }), ['· 2 de 5', '→ Registrar la solicitud en Séneca', true]);
-  if (fotos) await capturar(pagina, 'mesa-tarjeta-documentos');
 
   /* 3. */
   await pagina.keyboard.press('Escape');
-  await pagina.waitForTimeout(200);
-  await comprobar('3. Escape vuelve al guion, con la mesa abierta',
-    pagina.evaluate(() => [document.getElementById('ficha-guia').classList.contains('con-mesa'),
-      Array.from(document.querySelectorAll('.hito-en-mesa .mesa-grande')).filter((e) => e.offsetParent).map((e) => e.dataset.tarjeta)]),
-    [true, ['guion']]);
-  await pagina.keyboard.press('Escape');
-  await pagina.waitForTimeout(200);
-  await comprobar('3. otro Escape cierra la mesa',
+  await pagina.waitForTimeout(300);
+  await comprobar('3. Escape cierra la mesa y enseña la lista de hitos',
+    pagina.evaluate(() => [document.getElementById('ficha-guia').classList.contains('con-mesa'), document.querySelectorAll('#ficha-guia .hito').length]), [false, 2]);
+  await pagina.evaluate(() => HitosPanel.programarRepintado());
+  await pagina.waitForTimeout(500);
+  await comprobar('3. un repintado no la reabre',
     pagina.evaluate(() => document.getElementById('ficha-guia').classList.contains('con-mesa')), false);
 
   /* 4. */
-  await pagina.locator('#ficha-guia .hito[data-id="c1"] .hito-titulo').click();
+  await abrirHito(pagina, 'c1');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]');
   await pagina.waitForTimeout(300);
-  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="notas"]').focus();
-  await pagina.keyboard.press('Enter');
-  await comprobar('4. Intro sobre la tarjeta de Notas la abre en grande', queSeVe(pagina),
-    { grande: ['notas'], pequenas: ['guion', 'docs'] });
   const caja = '.hito-en-mesa .mesa-grande-notas .hito-nota-texto';
   await pagina.click(caja);
   await pagina.keyboard.type('Pendiente de la firma');
   await pagina.evaluate(() => HitosPanel.programarRepintado());
   await pagina.waitForTimeout(900);
-  await comprobar('4. tras un repintado, la tarjeta sigue abierta y el texto en la caja',
-    Promise.all([queSeVe(pagina).then((v) => v.grande), pagina.inputValue(caja)]), [['notas'], 'Pendiente de la firma']);
+  await comprobar('4. tras un repintado, el texto sigue en la caja', pagina.inputValue(caja), 'Pendiente de la firma');
   await pagina.press(caja, 'Enter');
   await pagina.waitForTimeout(1000);
   await comprobar('4. Intro guarda: la nota sale arriba y la caja se vacía',
@@ -198,23 +169,16 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       const n = document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-notas .hito-nota');
       return [n && n.textContent.indexOf('Pendiente de la firma') !== -1, document.querySelector('.hito-en-mesa .hito-nota-texto').value];
     }), [true, '']);
-  await comprobar('4. y la tarjeta sigue en grande',
-    queSeVe(pagina).then((v) => v.grande), ['notas']);
   await comprobar('4. «Registro»: una sola lista por fechas, sin columna de Historia (fila 229)',
     pagina.evaluate(() => [document.querySelectorAll('.hito-en-mesa .mesa-grande-notas .hito-notas').length,
       document.querySelectorAll('.hito-en-mesa .mesa-historia, .hito-en-mesa .mesa-notas-columnas').length,
       document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-grande-titulo').textContent]), [1, 0, 'Registro']);
-  if (fotos) await capturar(pagina, 'mesa-tarjeta-notas');
-  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
-  await comprobar('4. la pequeña de Notas trae la nueva',
-    pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="notas"] .mesa-resumen-nota').textContent(), 'Pendiente de la firma');
 
   /* 5. */
   await pagina.locator('.hito-en-mesa .mesa-tira-hito[data-id="c2"]').click();
   await pagina.waitForSelector('.hito-en-mesa[data-id="c2"]');
   await pagina.waitForTimeout(300);
-  await comprobar('5. cambiar de hito con la tira abre el guion en grande', queSeVe(pagina),
-    { grande: ['guion'], pequenas: ['docs', 'notas'] });
+  await comprobar('5. cambiar de hito con la tira abre su mesa', queSeVe(pagina).then((v) => v.indexOf('guion') !== -1 && v.indexOf('notas') !== -1), true);
 
   if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
   await pagina.close();

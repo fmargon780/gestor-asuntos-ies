@@ -52,6 +52,47 @@ var FichaDocumentos = (function () {
     return SIN_SELLAR.test(String(nombre || ''));
   }
 
+  /* Fila 425 (docs/FICHA-VISTA-DE-TRABAJO.md): esta lista es la columna derecha de «Trabajo». Con un
+     hito abierto a la izquierda, los documentos que son suyos llevan la marca «Hito N»; los demás,
+     «Traer a este hito»; y cada uno, una casilla para adjuntarlo al «Comunicar» y al «Enviar» del hito.
+     `js/hito-mesa.js` avisa con `marcarHito` cada vez que cambia la mesa. */
+  var enMesa = { clave: '', hitos: [], idHito: '', editable: false };
+  var marcadosCarpeta = {};      /* nombre → true: las casillas marcadas, que sobreviven a un repintado de la lista */
+  var marcadosDeAsunto = '';
+
+  function marcarHito(a, hitos, idHito, editable) {
+    var clave = a ? a.nombre : '';
+    if (clave !== enMesa.clave || (idHito || '') !== enMesa.idHito) marcadosCarpeta = {};
+    enMesa = { clave: clave, hitos: hitos || [], idHito: idHito || '', editable: !!editable };
+    aplicarMarcas(a);
+  }
+
+  function aplicarMarcas(a) {
+    var caja = $('ficha-documentos');
+    if (!caja || !window.Hitos) return;
+    var h = enMesa.idHito ? Hitos.buscar(enMesa.hitos, enMesa.idHito) : null;
+    var n = h && Hitos.numerados ? Hitos.numerados(enMesa.hitos).indexOf(h) + 1 : 0;
+    var suyos = h ? (h.documentos || []) : [];
+    var conCasillas = !!(h && enMesa.editable);
+    var puedeTraer = conCasillas && h.clase !== 'decision';
+    caja.classList.toggle('con-casillas', conCasillas);
+    Array.prototype.forEach.call(caja.querySelectorAll('.ficha-documento-fila'), function (fila) {
+      var es = !!h && suyos.indexOf(fila.dataset.doc) !== -1;
+      var marca = fila.querySelector('.ficha-marca-hito');
+      if (es && !marca) {
+        marca = document.createElement('span');
+        marca.className = 'ficha-marca-hito';
+        var boton = fila.querySelector('button.ficha-documento');
+        fila.insertBefore(marca, boton ? boton.nextSibling : null);
+      }
+      if (marca) {
+        if (es) marca.textContent = n ? 'Hito ' + n : 'Hito'; else marca.remove();
+      }
+      var traer = fila.querySelector('.ficha-documento-traer');
+      if (traer) traer.classList.toggle('oculto', !(puedeTraer && !es));
+    });
+  }
+
   /* `hitosVisibles`/`hitoDe` (18-sep-2026, fila 58,
      docs/AJUSTES-DE-USO-2026-09-18.md, 6): asociar un documento a un
      hito, desde el propio documento. `hitoDe` es el mapa nombre de
@@ -84,6 +125,20 @@ var FichaDocumentos = (function () {
 
     var fila = document.createElement('div');
     fila.className = 'ficha-documento-fila';
+    fila.dataset.doc = f.nombre;
+    /* Fila 425: la casilla de adjuntar, solo con un hito abierto a la izquierda (la lista le pone `con-casillas`). */
+    if (!esIndice) {
+      var casilla = document.createElement('input');
+      casilla.type = 'checkbox';
+      casilla.className = 'ficha-documento-marca';
+      casilla.title = 'Adjuntar al correo del hito';
+      casilla.checked = !!marcadosCarpeta[f.nombre];
+      casilla.onchange = function () {
+        if (casilla.checked) marcadosCarpeta[f.nombre] = true; else delete marcadosCarpeta[f.nombre];
+        if (window.HitoMesaDocumentos && HitoMesaDocumentos.alMarcar) HitoMesaDocumentos.alMarcar();
+      };
+      fila.appendChild(casilla);
+    }
     fila.appendChild(b);
 
     /* Fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md): ⧉, justo detrás del
@@ -182,6 +237,23 @@ var FichaDocumentos = (function () {
           alPulsar: accionAsociar(h)
         };
       })));
+    }
+
+    /* Fila 425: «Traer a este hito», lo que hacía el «⋯» de las filas «De otros hitos» de la mesa. Solo se ve
+       (`aplicarMarcas`) con un hito abierto a la izquierda del que el documento todavía no es. */
+    if (window.HitosSacarDocumento && !esIndice) {
+      var traer = document.createElement('button');
+      traer.type = 'button';
+      traer.className = 'boton boton-chico ficha-documento-traer oculto';
+      traer.title = 'Apuntar este documento al hito que está abierto a la izquierda';
+      traer.textContent = 'Traer a este hito';
+      traer.onclick = async function () {
+        var h = enMesa.idHito && window.Hitos ? Hitos.buscar(enMesa.hitos, enMesa.idHito) : null;
+        if (!h) return;
+        try { await HitosSacarDocumento.mover(a, [f.nombre], h); }
+        catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
+      };
+      fila.appendChild(traer);
     }
 
     /* Fila 280: «Convertir en plantilla» (js/convertir-en-plantilla.js), antes de «Pasar a versiones previas». */
@@ -338,6 +410,7 @@ var FichaDocumentos = (function () {
     var caja = $('ficha-documentos');
     var cuenta = $('ficha-cuenta-docs');
     if (!caja) return;
+    if (marcadosDeAsunto !== a.nombre) { marcadosDeAsunto = a.nombre; marcadosCarpeta = {}; }
     try {
       var lista = await Carpetas.ficheros(a.handle);
       /* El índice del expediente (fila 137) se ve, pero no cuenta. */
@@ -370,6 +443,7 @@ var FichaDocumentos = (function () {
       grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo, a, hitos.visibles, hitos.porDocumento);
       grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo, a, hitos.visibles, hitos.porDocumento);
       await pintarPrevias(caja, a);
+      aplicarMarcas(a);   /* fila 425: «Hito N», casillas y «Traer a este hito» */
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido leer la carpeta: ' + U.mensajeDeError(e);
@@ -431,6 +505,7 @@ var FichaDocumentos = (function () {
     pintar: function (a, alBorrar) {
       alBorrarActual = alBorrar || null;
       return pintar(a);
-    }
+    },
+    marcarHito: marcarHito
   };
 })();

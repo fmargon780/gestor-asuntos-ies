@@ -65,8 +65,8 @@
     if (el.classList.contains('ficha-documento')) return true;
     if (el.classList.contains('hito-desplegar')) return true;
     if (el.classList.contains('marca-hito')) return true;
-    /* Fila 147: cambiar de tarjeta en la mesa y abrir un documento solo miran. */
-    if (el.classList.contains('mesa-volver-guion') || el.classList.contains('mesa-doc-abrir') || el.classList.contains('mesa-doc-gemelo')) return true;   /* fila 129: abre la mesa del hito */
+    /* Fila 147: abrir un documento solo mira (fila 425: ya no hay «← Volver al guion»). */
+    if (el.classList.contains('mesa-doc-abrir') || el.classList.contains('mesa-doc-gemelo')) return true;   /* fila 129: abre la mesa del hito */
     if (el.classList.contains('boton-presencia-tomar')) return true;
     if (el.hasAttribute('data-solo-lectura')) return true;   /* fila 293: la tabla «Personas del grupo» (abrir, buscar, filtrar) */
     if (el.hasAttribute('data-puerta-perfil')) return true;   /* fila 290: la caja de nota del directivo y abrir sus documentos */
@@ -82,9 +82,8 @@
        docs/AJUSTES-DE-USO-2026-09-18.md, 1): copiar no cambia nada del
        asunto, así que sigue activa en consulta. */
     if (el.classList.contains('contacto-copiar') || el.classList.contains('boton-copiar-fila') || el.classList.contains('hitos-ver-mapa')) return true;
-    /* Las pestañas, los chips de documentos y los nombres del resumen de
-       las tarjetas (fila 107) solo abren o cambian de vista. */
-    if (el.closest('.ficha-tarjetas-pestanas, .ficha-tarjeta-franja, .ficha-tarjeta-resumen')) return true;
+    /* Las pestañas solo cambian de vista (fila 107). */
+    if (el.closest('.ficha-tarjetas-pestanas')) return true;
     var texto = (el.textContent || '').trim();
     return texto === 'Copiar';
   }
