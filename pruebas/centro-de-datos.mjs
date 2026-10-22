@@ -28,6 +28,15 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Espera a una condición (no a una pausa fija): mira cada 50 ms; el tope solo sirve para no colgarse. */
+await pagina.addInitScript(() => {
+  window.__esperar = async (cond, tope = 20000) => {
+    const fin = Date.now() + tope;
+    let v = await cond();
+    while (!v && Date.now() < fin) { await new Promise((r) => setTimeout(r, 50)); v = await cond(); }
+    return v;
+  };
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;
@@ -70,8 +79,14 @@ await pagina.evaluate(async (regalum) => {
   d._hijos.set('RegAlum.csv', window.__disco.fich('RegAlum.csv', csv));
 }, REGALUM_LATIN1);
 await pagina.click('#btn-entrar');
+await pagina.evaluate(() => {
+  window.__entroYa = false;
+  const original = CentroDeDatosEntregar.alEntrar;
+  CentroDeDatosEntregar.alEntrar = function () { window.__entroYa = true; return original.apply(this, arguments); };
+});
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.waitForTimeout(2500);
+/* la comprobación del Centro de datos «al entrar» (a los 1,5 s) ya ha terminado */
+await pagina.waitForFunction(() => window.__entroYa === true, null, { timeout: 20000 });
 
 /* Los avisos que salen en pantalla, para contarlos. */
 await pagina.evaluate(() => {
@@ -121,7 +136,7 @@ await comprobar('sin apuntes: ninguna línea gris y ningún apunte',
 await comprobar('Ajustes tiene el bloque «Carpeta del Centro de datos» en Este ordenador, con su explicación',
   pagina.evaluate(async () => {
     await App.pintarAjustes();
-    await new Promise((r) => setTimeout(r, 400));
+    await __esperar(() => document.querySelector('#ajustes-tab-ordenador #bloque-centro-de-datos'));
     const b = document.querySelector('#ajustes-tab-ordenador #bloque-centro-de-datos');
     return [!!b, b && b.querySelector('.bloque-titulo').textContent, document.getElementById('centro-de-datos-carpeta').textContent];
   }), [true, 'Carpeta del Centro de datos', 'Sin carpeta señalada en este ordenador: se usa lo que traiga el otro.']);
@@ -160,7 +175,7 @@ await comprobar('y sale un solo aviso verde con lo traído',
   pagina.evaluate(() => window.__avisos.filter((a) => /Traído del Centro de datos/.test(a[0])).map((a) => [a[0].replace(/\(\d+-\w+\)/g, '(F)'), a[1]])),
   [['Traído del Centro de datos: Alumnado (F), Personal (F), Alumnado de la base de datos (F), Función tutorial (F), Consejo Escolar (F).', 'bueno']]);
 await comprobar('el alumnado nuevo ya se ve en la aplicación (sin recargar la página)',
-  pagina.evaluate(async () => { await new Promise((r) => setTimeout(r, 1500)); const f = await Datos.cargar(App.E.datos, 'ALUMNADO'); return f.lista.length; }), 4);
+  pagina.evaluate(async () => { await __esperar(async () => (await Datos.cargar(App.E.datos, 'ALUMNADO')).lista.length === 4); const f = await Datos.cargar(App.E.datos, 'ALUMNADO'); return f.lista.length; }), 4);
 
 /* ================= 3. NO REPETIR NI RETROCEDER ================= */
 console.log('--- 3. no repetir ni retroceder ---');
@@ -193,17 +208,21 @@ await comprobar('con «solo consultar» no escribe nada',
     try { const r = await CentroDeDatos.traer({ avisar: true }); return [r.ok, r.motivo, (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella]; }
     finally { SoloConsulta.activo = original; }
   }), [false, 'solo consulta', 'h-per-1']);
+/* El «guardado en marcha» de mentira es un interruptor que la prueba enciende y apaga ella misma: da igual
+   cuántas tareas de la página pregunten a `hayGuardado`. La función original se devuelve siempre. */
 await comprobar('al entrar, con un guardado en marcha, espera y luego lo toma',
   pagina.evaluate(async () => {
     const original = ColaGuardado.hayGuardado;
-    let veces = 0;
-    ColaGuardado.hayGuardado = () => ++veces <= 2;
-    CentroDeDatos._alEntrarDeNuevo();
-    await new Promise((r) => setTimeout(r, 1700));
-    const antes = (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella;
-    await new Promise((r) => setTimeout(r, 5200));
-    ColaGuardado.hayGuardado = original;
-    return [antes, (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella, veces >= 3];
+    let guardando = true;
+    ColaGuardado.hayGuardado = () => guardando;
+    try {
+      CentroDeDatos._alEntrarDeNuevo();
+      await new Promise((r) => setTimeout(r, 3000));   /* la única pausa fija: comprueba que NO se toma mientras hay guardado */
+      const antes = (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella;
+      guardando = false;
+      const tomado = await __esperar(async () => (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella === 'h-per-9');
+      return [antes, (await CentroDeDatos.leerApuntes(true)).tomado['personal|26-27'].huella, !!tomado];
+    } finally { ColaGuardado.hayGuardado = original; }
   }), ['h-per-1', 'h-per-9', true]);
 await montar({ contrato: 3, listados: [{ ...TODO[1], huella: 'h-per-10', subido: new Date(Date.now() + 5 * 86400000).toISOString() }] });
 await pagina.evaluate(() => { window.__avisos.length = 0; });
@@ -225,14 +244,14 @@ await comprobar('sin «Revisar desde» los dos del registro no se toman',
 await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.evaluate(() => ControlRegistroPantalla.abrir());
 await pagina.waitForSelector('#cr-desde');
-await pagina.waitForTimeout(800);
+await pagina.waitForSelector('.centro-registro-aviso');
 await comprobar('en «Control del registro» sale la línea de que hay listados nuevos',
   pagina.evaluate(() => { const a = document.querySelector('.centro-registro-aviso'); return a && a.textContent; }),
   'Hay listados nuevos del registro en el Centro de datos. Pon la fecha «Revisar desde» y se traerán solos.');
 await pagina.fill('#cr-desde', '2026-09-01');
 await pagina.dispatchEvent('#cr-desde', 'change');
 await pagina.waitForFunction(() => !document.querySelector('.centro-registro-aviso'), null, { timeout: 15000 });
-await pagina.waitForTimeout(1500);
+await pagina.evaluate(() => __esperar(async () => Object.keys((await ControlRegistro.cargar()).apuntes).length > 5 && !!(await CentroDeDatos.leerApuntes(true)).tomado['registro-entrada|']));
 await comprobar('al ponerla se toman en ese momento, como si se hubieran subido a mano',
   pagina.evaluate(async () => [Object.keys((await ControlRegistro.cargar()).apuntes).length > 5, (await CentroDeDatos.leerApuntes(true)).tomado['registro-entrada|'].huella]),
   [true, 'h-ent-1']);
@@ -265,8 +284,7 @@ await comprobar('Ajustes dice de cuándo es el índice, cuántos listados trae y
   pagina.evaluate(async () => {
     await CentroDeDatosVer.pintar();
     const b = document.getElementById('bloque-centro-de-datos');
-    b.open = true;
-    await new Promise((r) => setTimeout(r, 100));
+    if (!b.open) await new Promise((r) => { b.addEventListener('toggle', r, { once: true }); b.open = true; });
     await CentroDeDatosVer.pintar();
     const p = document.getElementById('centro-de-datos-indice');
     return [document.getElementById('centro-de-datos-carpeta').textContent, /^Índice del \d+-\w+-\d{4} \d\d:\d\d · 1 listado para el gestor/.test(p.textContent), !!p.querySelector('a[href^="https://script.google.com"]')];
@@ -316,7 +334,7 @@ await montar({ contrato: 2, cursoActual: CURSO, ocupado: false, listados: [
 await comprobar('contrato 2: ya no sale «es más nuevo», se toma lo que toca y quedan tres ficheros de personal',
   pagina.evaluate(async () => { const r = await CentroDeDatos.traer({ avisar: false, pedir: true }); return [r.ok, r.motivo || '', r.tomados.length, window.__avisos.some((a) => /más nuevo/.test(a[0]))]; }), [true, '', 3, false]);
 await comprobar('en `_GESTOR/datos` están los tres y `Datos` ve a las personas de los tres',
-  pagina.evaluate(async () => { const n = []; for await (const [k] of App.E.datos.entries()) if (/^RelPerCen/.test(k)) n.push(k); await new Promise((r) => setTimeout(r, 1500)); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); const nombres = p.lista.map((x) => x.nombre); return [n.sort().filter((k) => /26-27|25-26/.test(k)), ['Docente Uno, Ana', 'No Docente Dos, Luis', 'Antiguo Tres, Eva'].map((x) => nombres.indexOf(x) !== -1)]; }),
+  pagina.evaluate(async () => { const n = []; for await (const [k] of App.E.datos.entries()) if (/^RelPerCen/.test(k)) n.push(k); const trio = ['Docente Uno, Ana', 'No Docente Dos, Luis', 'Antiguo Tres, Eva']; await __esperar(async () => { const q = await Datos.cargar(App.E.datos, 'PERSONAL'); return trio.every((x) => q.lista.some((y) => y.nombre === x)); }); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); const nombres = p.lista.map((x) => x.nombre); return [n.sort().filter((k) => /26-27|25-26/.test(k)), ['Docente Uno, Ana', 'No Docente Dos, Luis', 'Antiguo Tres, Eva'].map((x) => nombres.indexOf(x) !== -1)]; }),
   [['RelPerCen 25-26.csv', 'RelPerCen 26-27.csv', 'RelPerCenNodocente 26-27.csv'], [true, true, true]]);
 
 await limpiar();
@@ -334,7 +352,7 @@ await comprobar('`RelPerCen.csv` del curso de hoy se guarda como `RelPerCen <cur
 await limpiar();
 await montar({ contrato: 2, cursoActual: CURSO, listados: [ent('personal', '25-26/docentes', 'RelPerCen.csv', persona('Viejo Siete, Juan', '77777777G'), { cursoEscolar: '25-26', ambito: 'docentes' })] });
 await comprobar('`RelPerCen.csv` de 25-26 se guarda como `RelPerCen 25-26.csv` y `Datos` lo lee como de 25-26',
-  pagina.evaluate(async () => { await CentroDeDatos.traer({}); await new Promise((r) => setTimeout(r, 1200)); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); return [Datos.cursoDelFichero('RelPerCen 25-26.csv'), p.ficheros.filter((f) => f.fichero === 'RelPerCen 25-26.csv').map((f) => f.curso)]; }), ['25-26', ['25-26']]);
+  pagina.evaluate(async () => { await CentroDeDatos.traer({}); await __esperar(async () => (await Datos.cargar(App.E.datos, 'PERSONAL')).ficheros.some((f) => f.fichero === 'RelPerCen 25-26.csv')); const p = await Datos.cargar(App.E.datos, 'PERSONAL'); return [Datos.cursoDelFichero('RelPerCen 25-26.csv'), p.ficheros.filter((f) => f.fichero === 'RelPerCen 25-26.csv').map((f) => f.curso)]; }), ['25-26', ['25-26']]);
 
 await limpiar();
 await montar({ contrato: 2, cursoActual: CURSO, listados: [
