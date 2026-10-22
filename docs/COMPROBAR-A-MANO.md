@@ -321,3 +321,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 417 — traer un hito de otro tipo (22-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En la guía de «Certificado», «+ Traer un hito de otro tipo», busca «Registrar de salida»: sale bajo «Elecc. Consejo Escolar»; lo eliges, entra con sus tareas, y si lo cambias aquí el de «Elecc. Consejo Escolar» sigue igual.
+
+## Fila 423 — botón «Ruta» de cada documento (22-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En Séneca, al adjuntar, pega la ruta copiada con «Ruta» de la factura D26-00259 en la ventana de elegir fichero: abre directamente la factura, sin buscarla.
