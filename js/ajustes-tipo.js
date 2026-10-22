@@ -363,31 +363,6 @@ async function construirSeccionCampos(tipo) {
 function construirSeccionPasos(tipo) {
   var b = seccionDeTipo('pasos', 'Guía', 'La guía del tipo, con sus preguntas y bifurcaciones.');
 
-  /* El aviso de la biblioteca (20-sep-2026, fila 79, apartado 4.4):
-     misma clase .aviso-compartido que ya usan los campos compartidos,
-     un aviso por hito desactualizado. */
-  async function pintarAvisosBiblioteca(pasos) {
-    if (!window.GuiasBiblioteca) return;
-    var desactualizados;
-    try { desactualizados = await GuiasBiblioteca.pasosDesactualizados(pasos); }
-    catch (e) { return; }
-    if (!desactualizados.length) return;
-    desactualizados.forEach(function (entrada) {
-      var aviso = document.createElement('div');
-      aviso.className = 'aviso-compartido';
-      aviso.innerHTML = '"' + U.escapar(entrada.modelo.nombre) + '" ha cambiado en la biblioteca. ' +
-        '<button type="button" class="enlace">Ver el cambio</button>';
-      aviso.querySelector('button').onclick = async function () {
-        await GuiasBiblioteca.abrirComparacion(entrada);
-        try {
-          await GuiasDelCentro.guardarPasos(tipo.tipo, pasos);
-        } catch (e2) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e2), 'malo'); }
-        repintar();
-      };
-      b.cuerpo.appendChild(aviso);
-    });
-  }
-
   function repintar() {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
     b.cuerpo.innerHTML = pasos.length
@@ -422,7 +397,6 @@ function construirSeccionPasos(tipo) {
     }
     b.cuerpo.appendChild(boton);
     if (mapa) b.cuerpo.appendChild(mapa);
-    pintarAvisosBiblioteca(pasos);
   }
   repintar();
   return b.sec;

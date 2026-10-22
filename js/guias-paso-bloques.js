@@ -48,26 +48,19 @@ var GuiasPasoBloques = (function () {
   }
 
   function anadir(d, p, i, pregunta, ctx) {
-    /* «De dónde viene» (28-sep-2026, fila 201,
-       docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 2): una etiqueta
-       fija junto al título, plegado el hito o no (no vive dentro de
-       ningún `<details>`, así que el CSS del acordeón, fila 122, no la
-       esconde). Pulsarla, si viene de la biblioteca, abre el nombre
-       del modelo y «Ver en la biblioteca». */
-    if (window.GuiasBiblioteca) {
-      var cabecera = d.querySelector(':scope > .paso-cabecera');
-      if (cabecera) {
-        cabecera.insertAdjacentHTML('beforeend', GuiasBiblioteca.chipOrigenHTML(p));
-        GuiasBiblioteca.engancharChipOrigen(cabecera, p);
-      }
+    /* Fila 417: un hito traído de otra guía lleva, hasta que se guarde la guía, un
+       aviso ámbar si su plazo contaba desde un hito de aquella guía. */
+    if (p.avisoPlazoAjeno && !pregunta) {
+      var cab = d.querySelector(':scope > .paso-cabecera');
+      if (cab) cab.insertAdjacentHTML('afterend',
+        '<div class="paso-aviso-plazo">El plazo contaba desde un hito de otro tipo: revísalo.</div>');
     }
 
-    /* Apartado 3, punto 1: mientras se escribe el título de un hito
-       propio (sin origenBiblioteca todavía), si se parece a algo de la
-       biblioteca, se dice debajo con «Usarlo» (sustituye el paso a
-       medio escribir por el modelo elegido, como «+ Traer de la
-       biblioteca»). Si no se pulsa, el paso sigue siendo propio. */
-    if (!p.origenBiblioteca && window.GuiasBiblioteca && window.HitosBiblioteca) {
+    /* Mientras se escribe el título de un hito nuevo, si se parece a un hito de otra
+       guía (o de «Sin tipo»), se dice debajo con «Usarlo» (sustituye el hito a medio
+       escribir por una copia suelta del elegido, como «+ Traer un hito de otro tipo»).
+       Si no se pulsa, el hito sigue siendo el que era. */
+    if (window.GuiasBiblioteca && window.HitosBiblioteca && !pregunta) {
       (function (indice) {
         var tituloInput = d.querySelector(':scope > .paso-cabecera > .paso-titulo');
         if (!tituloInput) return;
@@ -80,16 +73,17 @@ var GuiasPasoBloques = (function () {
           var texto = tituloInput.value.trim();
           if (texto.length < 3) { aviso.classList.add('oculto'); aviso.innerHTML = ''; return; }
           espera = setTimeout(async function () {
-            var modelos = await GuiasBiblioteca.modelosParecidosATitulo(texto);
+            var parecidos = await GuiasBiblioteca.modelosParecidosATitulo(texto, ctx.nombreTipo, p.id);
             if (!aviso.isConnected || tituloInput.value.trim() !== texto) return;
-            if (!modelos.length) { aviso.classList.add('oculto'); aviso.innerHTML = ''; return; }
-            var modelo = modelos[0];
+            if (!parecidos.length) { aviso.classList.add('oculto'); aviso.innerHTML = ''; return; }
+            var elegido = parecidos[0];
             aviso.classList.remove('oculto');
-            aviso.innerHTML = 'En la biblioteca hay «' + U.escapar(modelo.nombre) + '» · ' +
+            aviso.innerHTML = 'En «' + U.escapar(elegido.tipo) + '» hay «' + U.escapar(elegido.titulo) + '» · ' +
               '<button type="button" class="enlace paso-titulo-usarlo">Usarlo</button>';
             aviso.querySelector('.paso-titulo-usarlo').onclick = function () {
               ctx.recoger();
-              ctx.nivel()[indice] = HitosBiblioteca.modeloAPaso(modelo, indice > 0 ? ctx.nivel()[indice - 1].id : '');
+              ctx.nivel()[indice] = GuiasBiblioteca.pasoDeElegido(elegido.modelo ? { modelo: elegido.modelo } : { hito: elegido.hito },
+                indice > 0 ? ctx.nivel()[indice - 1].id : '');
               ctx.plegado.abrir(ctx.nivel()[indice].id);
               ctx.pintar();
             };
@@ -237,38 +231,6 @@ var GuiasPasoBloques = (function () {
           ctx.pintar();
         });
         if (window.Formularios) Formularios.engancharEmbebido(d);
-      }
-
-      /* "Guardar en la biblioteca" (apartados 4.2 y 4.3): junto al
-         resto de los mandos del paso. Sin nada que subir (paso al
-         día con su modelo), el botón no se pinta. */
-      if (window.GuiasBiblioteca && window.HitosBiblioteca) {
-        (function (indice) {
-          HitosBiblioteca.leer().then(function (biblioteca) {
-            /* Puede que ya se haya vuelto a pintar (otra tecla, otro
-               paso movido) mientras se leía la biblioteca: `d` ya
-               no estaría en el documento, y tocarlo no serviría de
-               nada (o peor, duplicaría el botón en el sitio viejo). */
-            if (!d.isConnected) return;
-            var pasoActual = ctx.nivel()[indice];
-            if (!pasoActual || pasoActual.opciones.length) return;   /* se ha vuelto pregunta mientras leíamos */
-            var modelo = pasoActual.origenBiblioteca ? HitosBiblioteca.buscar(biblioteca, pasoActual.origenBiblioteca.id) : null;
-            var diffs = modelo ? HitosBiblioteca.diferencias(pasoActual, modelo) : [];
-            /* Ya viene de la biblioteca: el botón solo sale si ha
-               cambiado y Francisco todavía no ha decidido "Solo en
-               este tipo" para este mismo cambio (apartado 4.2). */
-            if (pasoActual.origenBiblioteca &&
-                (!modelo || pasoActual.origenBiblioteca.divergido || !diffs.length)) return;
-            var mandosDelPaso = d.querySelector('.paso-mandos');
-            if (!mandosDelPaso) return;
-            mandosDelPaso.insertAdjacentHTML('beforeend', GuiasBiblioteca.botonHTML());
-            GuiasBiblioteca.engancharBoton(d, pasoActual, modelo, diffs, ctx.nombreTipo, function (origenNuevo) {
-              ctx.recoger();
-              ctx.nivel()[indice].origenBiblioteca = origenNuevo;
-              ctx.pintar();
-            });
-          }).catch(function () { /* sin biblioteca legible, el botón simplemente no sale */ });
-        })(i);
       }
     }
   }

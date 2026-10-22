@@ -354,6 +354,7 @@
   window.GuiasDelCentro = {
     escribir: escribirGuia,
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
+    todas: function () { return JSON.parse(JSON.stringify(guias || {})); },   /* fila 417: el buscador «Traer un hito de otro tipo» */
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,
     ultimoReparto: function () { return ultimoRepartoGuardado; },   /* fila 416 */

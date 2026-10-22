@@ -8,14 +8,13 @@
    disco de mentira en memoria para _GESTOR.
 
    Comprueba:
-   1. Crear un modelo desde un paso, y traerlo (HitosBiblioteca.modeloAPaso)
-      a dos tipos: los dos pasos quedan iguales, con el mismo origenBiblioteca.
-   2. Cambiar el paso de uno de los dos tipos: HitosBiblioteca.diferencias
-      lo detecta, y las dos respuestas de la pregunta (Guardar en la
-      biblioteca): "Solo en este tipo" no toca el modelo; "Subir también"
-      sube la revisión.
-   3. El otro tipo, con la revisión vieja, avisa (apartado 4.4); tras
-      "Dejarlo como está" (revision al día sin traer el cambio), calla.
+   1. Crear un modelo desde un paso y traerlo a un tipo (modeloAPaso).
+   2. Fila 417 (docs/HITOS-UN-SOLO-SITIO.md, parte B): «Traer un hito de otro
+      tipo». El buscador lista los hitos de arriba de las guías de los demás
+      tipos (sin preguntas, sin los de dentro de una rama), agrupados por tipo,
+      y los modelos que ninguna guía usa quedan en «Sin tipo». Traer uno es una
+      copia suelta: id nuevo, sin origenBiblioteca, y cambiarla no toca el
+      original.
    4. Borrar un modelo no rompe los pasos ya insertados: siguen siendo
       pasos normales, sin lanzar ningún error.
    5. Un paso-pregunta no se puede guardar en la biblioteca.
@@ -103,15 +102,6 @@ function ficheroFalso(nombre, texto) {
 const gestorFalso = dirFalso('_GESTOR');
 win.Gestor = { carpetaGestor: () => gestorFalso };
 
-/* La misma condición de aviso que usa GuiasBiblioteca.pasosDesactualizados
-   (apartado 4.4): por revisión, no por diferencia de contenido, así que
-   "Solo en este tipo" y "Dejarlo como está" pueden callar el aviso para
-   siempre aunque el contenido siga siendo distinto del modelo. */
-function necesitaAviso(paso, modelo) {
-  return !!(paso.origenBiblioteca && !paso.origenBiblioteca.divergido &&
-    modelo && paso.origenBiblioteca.revision < modelo.revision);
-}
-
 /* ================= 1 · crear un modelo y traerlo a dos tipos ================= */
 console.log('--- 1. crear un modelo y traerlo a dos tipos ---');
 const pasoOriginal = {
@@ -129,44 +119,44 @@ comprobar('los dos pasos traídos llevan el mismo origenBiblioteca (menos el id 
 comprobar('los dos pasos traídos tienen el mismo título que el modelo', [pasoTipoA.titulo, pasoTipoB.titulo],
   ['Registrar de salida en Séneca', 'Registrar de salida en Séneca']);
 
-/* ============ 2 · cambiar el paso de un tipo: las dos respuestas ============ */
-console.log('--- 2. cambiar el paso de un tipo: "solo aquí" y "subir también" ---');
-const pasoTipoACambiado = Object.assign({}, pasoTipoA, { titulo: 'Registrar de salida (con el sello nuevo)' });
+/* ============ 2 · traer un hito de otro tipo (fila 417) ============ */
+console.log('--- 2. el buscador de hitos de otros tipos y la copia suelta ---');
+const GUIAS = {
+  'Elecc. Consejo Escolar': [
+    { id: 'e1', titulo: 'Registrar de salida en Séneca', cuerpo: 'Sellar y anotar.', opciones: [], responsable: 'administracion',
+      plazo: { dias: 5, desde: 'e0', cuenta: 'habiles' }, guion: [{ id: 'g1', texto: 'Anotar el número' }] },
+    { id: 'e2', titulo: '¿Cómo ha llegado?', opciones: [{ id: 'o1', titulo: 'En mano', pasos: [{ id: 'e3', titulo: 'Dentro de la rama', opciones: [] }] }] },
+    { id: 'e4', titulo: '', opciones: [] }
+  ],
+  'Certificado': [{ id: 'c1', titulo: 'Entregar el certificado', opciones: [] }],
+  'Matrícula': [{ id: 'm1', titulo: 'Abrir el expediente', opciones: [] }]
+};
+const grupos = HitosBiblioteca.hitosDeOtrosTipos(GUIAS, 'Certificado');
+comprobar('agrupa por tipo (en orden), sin el tipo que se escribe', grupos.map((g) => g.tipo), ['Elecc. Consejo Escolar', 'Matrícula']);
+comprobar('solo los hitos de arriba, sin preguntas, sin los de una rama y sin título vacío',
+  grupos[0].hitos.map((h) => h.titulo), ['Registrar de salida en Séneca']);
 
-let biblioteca = await HitosBiblioteca.leer();
-let modeloDeA = HitosBiblioteca.buscar(biblioteca, pasoTipoA.origenBiblioteca.id);
-comprobar('el cambio se detecta', HitosBiblioteca.diferencias(pasoTipoACambiado, modeloDeA).length > 0, true);
+const copia = HitosBiblioteca.copiaSuelta(GUIAS['Elecc. Consejo Escolar'][0], 'c1');
+comprobar('la copia tiene id nuevo', copia.id !== 'e1' && !!copia.id, true);
+comprobar('la copia no lleva origenBiblioteca', 'origenBiblioteca' in copia, false);
+comprobar('la copia trae el título, la explicación y las tareas con sus ids',
+  [copia.titulo, copia.cuerpo, copia.guion], ['Registrar de salida en Séneca', 'Sellar y anotar.', [{ id: 'g1', texto: 'Anotar el número' }]]);
+comprobar('el plazo, que contaba desde un hito de la otra guía, cuenta desde el de arriba y se avisa',
+  [copia.plazo, copia.avisoPlazoAjeno], [{ dias: 5, desde: 'c1', cuenta: 'habiles' }, true]);
+comprobar('sin hito de arriba, la copia llega sin plazo (y avisa)',
+  (({ plazo, avisoPlazoAjeno }) => [plazo, avisoPlazoAjeno])(HitosBiblioteca.copiaSuelta(GUIAS['Elecc. Consejo Escolar'][0], '')), [null, true]);
+copia.titulo = 'Cambiado en Certificado';
+comprobar('cambiar la copia no toca el original', GUIAS['Elecc. Consejo Escolar'][0].titulo, 'Registrar de salida en Séneca');
+comprobar('un hito sin plazo no lleva aviso de plazo',
+  HitosBiblioteca.copiaSuelta(GUIAS['Matrícula'][0], 'c1').avisoPlazoAjeno, undefined);
 
-/* "Solo en este tipo": no toca el modelo, y el paso queda "divergido". */
-const pasoSoloAqui = Object.assign({}, pasoTipoACambiado,
-  { origenBiblioteca: { id: pasoTipoA.origenBiblioteca.id, revision: pasoTipoA.origenBiblioteca.revision, divergido: true } });
-biblioteca = await HitosBiblioteca.leer();
-comprobar('"Solo en este tipo" no cambia la revision del modelo',
-  HitosBiblioteca.buscar(biblioteca, modelo1.id).revision, 1);
-comprobar('"Solo en este tipo" ya no cuenta como cambio (no vuelve a avisar)',
-  necesitaAviso(pasoSoloAqui, HitosBiblioteca.buscar(biblioteca, modelo1.id)), false);
-
-/* "Subir también a la biblioteca": sube la revision. */
-const modeloActualizado = await HitosBiblioteca.actualizarDesdePaso(modelo1.id, pasoTipoACambiado, 'Francisco');
-comprobar('"Subir también" sube la revision', modeloActualizado.revision, 2);
-comprobar('"Subir también" copia el título nuevo', modeloActualizado.titulo, 'Registrar de salida (con el sello nuevo)');
-
-/* ============ 3 · el aviso en el otro tipo, y "Dejarlo como está" ============ */
-console.log('--- 3. el aviso en el otro tipo (apartado 4.4) ---');
-comprobar('el tipo B, con la revision vieja, sigue sin estar al día',
-  necesitaAviso(pasoTipoB, modeloActualizado), true);
-const diffsDeB = HitosBiblioteca.diferencias(pasoTipoB, modeloActualizado);
-comprobar('y el aviso trae al menos el título como diferencia',
-  diffsDeB.some((d) => d.campo === 'titulo'), true);
-
-/* "Dejarlo como está": no trae el cambio, pero apunta la revision al
-   día para que el aviso no vuelva a salir por lo mismo. */
-const pasoBDejadoComoEsta = Object.assign({}, pasoTipoB,
-  { origenBiblioteca: { id: modelo1.id, revision: modeloActualizado.revision, divergido: false } });
-comprobar('tras "Dejarlo como está", el aviso calla',
-  necesitaAviso(pasoBDejadoComoEsta, modeloActualizado), false);
-comprobar('pero el paso conserva su propio título (no se ha traído el cambio)',
-  pasoBDejadoComoEsta.titulo, 'Registrar de salida en Séneca');
+const suelto = await HitosBiblioteca.leer();
+comprobar('un modelo que ninguna guía usa sale en «Sin tipo»', HitosBiblioteca.modelosSinTipo(suelto, GUIAS).map((m) => m.id), [modelo1.id]);
+const guiasConUso = Object.assign({}, GUIAS, { 'Certificado': [pasoTipoA] });
+comprobar('y deja de salir si una guía lo usa', HitosBiblioteca.modelosSinTipo(suelto, guiasConUso), []);
+const dsModelo = HitosBiblioteca.copiaSueltaDeModelo(modelo1, 'c1');
+comprobar('traer uno de «Sin tipo» es una copia suelta: título, id nuevo y sin vínculo',
+  [dsModelo.titulo, dsModelo.id !== pasoTipoA.id, 'origenBiblioteca' in dsModelo], ['Registrar de salida en Séneca', true, false]);
 
 /* ================= 4 · borrar un modelo no rompe los pasos ================= */
 console.log('--- 4. borrar un modelo no rompe los pasos ya insertados ---');
@@ -175,6 +165,7 @@ const bibliotecaSinModelo = await HitosBiblioteca.leer();
 comprobar('el modelo ya no está', HitosBiblioteca.buscar(bibliotecaSinModelo, modelo1.id), null);
 comprobar('sin su modelo, comparar no rompe nada (lista vacía, no un error)',
   HitosBiblioteca.diferencias(pasoTipoA, null), []);
+comprobar('y su copia suelta sigue siendo un paso normal', (await HitosBiblioteca.leer()).modelos.length, 0);
 
 /* ================= 5 · un paso-pregunta no se puede guardar ================= */
 console.log('--- 5. un paso-pregunta no se puede guardar en la biblioteca ---');

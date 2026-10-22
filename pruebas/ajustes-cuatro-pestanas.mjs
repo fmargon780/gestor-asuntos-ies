@@ -45,9 +45,9 @@ await comprobar('2. cada pestaña tiene su línea gris, distinta', [new Set(line
 
 console.log('--- 2. cada sección en su sitio ---');
 const sitio = (id) => pagina.evaluate((i) => { const e = document.getElementById(i); if (!e) return null; const c = e.closest('.ajustes-tab'); return c ? c.id : (e.closest('#herramientas-puesta-cuerpo') ? 'herramientas' : '?'); }, id);
-await comprobar('2. «Lo de cada día»: tipos de documento, grupos, biblioteca de hitos y quién encarga, en ese orden',
+await comprobar('2. «Lo de cada día»: tipos de documento, grupos y quién encarga, en ese orden',
   pagina.$$eval('#ajustes-tab-dia > details.bloque-ajustes', (e) => e.map((x) => x.id)),
-  ['bloque-tipos-documento', 'bloque-grupos-personas', 'bloque-biblioteca-hitos', 'bloque-tipos-organo']);
+  ['bloque-tipos-documento', 'bloque-grupos-personas', 'bloque-tipos-organo']);
 await comprobar('2. «El centro», en el orden del documento', titulos('#ajustes-tab-centro > details.bloque-ajustes'),
   ['Datos del centro y firma', 'Cargos del centro', 'Quién usa la aplicación', 'Membrete', 'Sello y firma en el papel', 'Calendario y responsables',
     'Días de aviso', 'Copias de seguridad', 'Impresos', 'Alumnado y personal']);   /* filas 309 y 326 (ya no hay «Buzón de soporte») */

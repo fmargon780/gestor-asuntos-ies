@@ -16,7 +16,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | La tarjeta de la mesa de un hito donde viven sus campos (fila 255) | **Campos de este hito** (con «+ Añadir campo») | datos del hito |
 | El modo de un ordenador que no guarda nada en las carpetas (fila 260) | **solo consulta** («En este ordenador, solo consultar») | «solo lectura», «modo lectura» |
 | La lista de tareas de un hito | **tareas del hito** | guion |
-| Un hito guardado para reutilizar en varias guías | **hito de la biblioteca** | modelo, hito modelo |
+| Traer a una guía un hito que ya tiene otro tipo (fila 417; la biblioteca es un buscador, no un almacén) | **«+ Traer un hito de otro tipo»**; los que ninguna guía usa, **«Sin tipo»** | hito de la biblioteca, modelo, hito modelo |
 | La persona o entidad de un asunto | **tercero** | interesado, «con quién es el asunto» |
 | Los tutores legales de un alumno, como grupo | **familia** | «la familia (tutores legales)», tutores (en general) |
 | El profesor tutor de la unidad de un alumno (fila 299; no es la familia) | **tutor/a del grupo** («Tutor/a del grupo», «tutor o tutora del grupo») | «la tutoría» a solas, tutor (a secas) |
@@ -29,7 +29,6 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Eliminar algo que no va a la papelera (sacar de una lista) | **quitar** | |
 | Dejar un cuadro sin hacer nada | **cancelar** | dejarlo |
 | El aviso de que el orden de los hitos de una guía ha llegado a los asuntos (fila 300) | «El orden nuevo ha llegado a N asuntos abiertos.» (con 1: «…a 1 asunto abierto.»), detrás de la frase de los hitos nuevos si la hay | «reordenados», «sincronizados» |
-| Los tres botones de la pregunta de la biblioteca al guardar una guía (fila 297) | «Cancelar» · «Solo aquí» · «También en la biblioteca»; la tabla, «Antes» · «Ahora» · «En la biblioteca» | «Este tipo» / «La biblioteca» |
 | El bloque de hitos que le tocan a Administración, con o sin fecha | **En Administración** | Me toca |
 | El bloque de asuntos cuyo hito actual espera a otro responsable | **En espera** | Esperamos a otros |
 | Una tarea que existe solo en este asunto, no en la guía | **solo aquí** | propia, propio del asunto |

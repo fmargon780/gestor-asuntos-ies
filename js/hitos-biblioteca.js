@@ -310,25 +310,6 @@ var HitosBiblioteca = (function () {
     return salida;
   }
 
-  /* Fila 297: lo que el usuario ha cambiado en un hito entre `antes` (cómo
-     estaba al abrir la guía; con `null`, el propio modelo) y `ahora`, con
-     los mismos campos y textos que `diferencias`. Devuelve una lista de
-     { campo, etiqueta, antes, ahora, biblioteca }; `biblioteca` solo lleva
-     texto si el modelo tiene un valor distinto del de «antes». Un campo que
-     ahora ya vale lo mismo que el modelo no es un cambio que haya que subir. */
-  function cambiosEntre(antes, ahora, modelo) {
-    var salida = [];
-    CAMPOS_COMPARABLES.forEach(function (c) {
-      var mk = c.modeloClave || c.clave;
-      var libre = textoLegibleDe(c.clave, modelo ? modelo[mk] : undefined);
-      var a = antes ? textoLegibleDe(c.clave, antes[c.clave]) : libre;
-      var b = textoLegibleDe(c.clave, ahora[c.clave]);
-      if (a === b || b === libre) return;
-      salida.push({ campo: c.clave, etiqueta: c.etiqueta, antes: a, ahora: b, biblioteca: libre !== a ? libre : '' });
-    });
-    return salida;
-  }
-
   /* ==========================================================
      CREAR, ACTUALIZAR Y BORRAR UN MODELO
      ========================================================== */
@@ -339,73 +320,71 @@ var HitosBiblioteca = (function () {
     return modelo;
   }
 
-  /* Sube la revisión del modelo con los campos nuevos del paso.
-     Devuelve el modelo ya actualizado (con su revisión nueva), o null
-     si el modelo ya no existe (se borró desde el otro ordenador). */
-  async function actualizarDesdePaso(idModelo, paso, usuario) {
-    var resultado = null;
-    await cambiar(function (d) {
-      var m = buscar(d, idModelo);
-      if (!m) return d;
-      var nuevo = pasoAModelo(paso, m.nombre, m.revision + 1, usuario);
-      nuevo.id = m.id;
-      nuevo.creadoEl = m.creadoEl;
-      Object.assign(m, nuevo);
-      resultado = m;
-      return d;
-    });
-    return resultado;
-  }
-
-  /* Fila 297: sube a un modelo solo los campos `claves` de un hito (por la
-     misma puerta, `cambiar`); lo demás del modelo se queda como estaba. La
-     revisión sube igual. Los campos que el modelo no guarda (el aviso a quien
-     lo pide) no se copian. Devuelve el modelo, o null si ya no existe. */
-  async function subirCampos(idModelo, paso, claves, usuario) {
-    var resultado = null;
-    await cambiar(function (d) {
-      var m = buscar(d, idModelo);
-      if (!m) return d;
-      var nuevo = pasoAModelo(paso, m.nombre, m.revision + 1, usuario);
-      CAMPOS_COMPARABLES.forEach(function (c) {
-        var mk = c.modeloClave || c.clave;
-        if (claves.indexOf(c.clave) !== -1 && mk in nuevo) m[mk] = nuevo[mk];
-      });
-      m.revision = nuevo.revision;
-      m.actualizadoEl = nuevo.actualizadoEl;
-      m.actualizadoPor = nuevo.actualizadoPor;
-      resultado = m;
-      return d;
-    });
-    return resultado;
-  }
-
-  async function crearDesdeCero(nombre, usuario) {
-    var modelo = normalizarModelo({ nombre: nombre, titulo: nombre, revision: 1, actualizadoPor: usuario });
-    await cambiar(function (d) { d.modelos.push(modelo); return d; });
-    return modelo;
-  }
-
-  async function renombrar(idModelo, nombreNuevo) {
-    await cambiar(function (d) {
-      var m = buscar(d, idModelo);
-      if (m) m.nombre = nombreNuevo;
-      return d;
-    });
-  }
-
-  /* Editar un modelo con el mismo editor de un paso (apartado 4.5):
-     `paso` es lo que ese editor ha devuelto, ya normalizado como paso
-     de guía. */
-  async function editar(idModelo, paso, usuario) {
-    return actualizarDesdePaso(idModelo, paso, usuario);
-  }
+  /* Fila 417 (docs/HITOS-UN-SOLO-SITIO.md, parte B): ya no se sube ni se
+     cambia nada de un modelo desde las guías; solo se crea (las pruebas y la
+     carga del centro) y se quita (los «Sin tipo» del buscador). */
 
   async function borrar(idModelo) {
     await cambiar(function (d) {
       d.modelos = d.modelos.filter(function (m) { return m.id !== idModelo; });
       return d;
     });
+  }
+
+  /* ==========================================================
+     «TRAER UN HITO DE OTRO TIPO» (fila 417)
+
+     La biblioteca ya no es un almacén aparte: el buscador lista los
+     hitos de las guías de los demás tipos, y los modelos de la biblioteca
+     que ninguna guía usa quedan en «Sin tipo». Traer uno es hacer una
+     copia suelta: id nuevo, sin `origenBiblioteca`, y cambiarla no toca
+     el original (ni al revés).
+     ========================================================== */
+
+  /* `guiasPorTipo` es guias.json entero ({ TIPO: [pasos] }). Solo los hitos
+     de arriba de cada guía (no los de dentro de una pregunta), sin los
+     hitos-pregunta ni los que no tienen título. Los tipos, por nombre. */
+  function hitosDeOtrosTipos(guiasPorTipo, tipoActual) {
+    return Object.keys(guiasPorTipo || {}).filter(function (t) { return t !== tipoActual; })
+      .sort(function (a, b) { return a.localeCompare(b, 'es'); })
+      .map(function (t) {
+        return {
+          tipo: t,
+          hitos: (guiasPorTipo[t] || []).filter(function (p) {
+            return p && esPasoValido(p) && !(p.opciones && p.opciones.length) && String(p.titulo || '').trim();
+          })
+        };
+      }).filter(function (g) { return g.hitos.length; });
+  }
+
+  /* Los modelos que ninguna guía usa (ningún paso con su `origenBiblioteca.id`). */
+  function modelosSinTipo(datos, guiasPorTipo) {
+    return (datos.modelos || []).filter(function (m) { return !tiposQueUsan(m.id, guiasPorTipo).length; });
+  }
+
+  /* Un hito de otra guía, como hito suelto de la que se está escribiendo.
+     `desde` es el id del hito que queda encima. El plazo de la guía de origen
+     contaba desde un hito de aquella guía: aquí cuenta desde el de arriba (o
+     se queda sin plazo si no hay ninguno) y el hito lleva `avisoPlazoAjeno`
+     para que el editor diga «revísalo». */
+  function copiaSuelta(paso, desde) {
+    var copia = JSON.parse(JSON.stringify(paso));
+    copia.id = (window.Guias ? Guias.nuevoId() : nuevoId());
+    delete copia.origenBiblioteca;
+    delete copia.divergido;
+    copia.opciones = [];
+    if (copia.plazo && copia.plazo.dias) {
+      copia.plazo = desde ? { dias: copia.plazo.dias, desde: desde, cuenta: copia.plazo.cuenta } : null;
+      copia.avisoPlazoAjeno = true;
+    } else copia.plazo = null;
+    return copia;
+  }
+
+  /* Un modelo de «Sin tipo», igual: copia suelta, sin vínculo con la biblioteca. */
+  function copiaSueltaDeModelo(modelo, desde) {
+    var paso = modeloAPaso(modelo, desde);
+    delete paso.origenBiblioteca;
+    return paso;
   }
 
   /* En qué tipos está en uso un modelo (para el aviso de "borrar uno
@@ -454,9 +433,9 @@ var HitosBiblioteca = (function () {
     enlaceDeNormativa: enlaceDeNormativa, esDeNormativa: esDeNormativa,
     leer: leer, cambiar: cambiar, buscar: buscar,
     esPasoValido: esPasoValido, modeloAPaso: modeloAPaso,
-    diferencias: diferencias, cambiosEntre: cambiosEntre, subirCampos: subirCampos,
-    crearDesdePaso: crearDesdePaso, actualizarDesdePaso: actualizarDesdePaso,
-    crearDesdeCero: crearDesdeCero, renombrar: renombrar, editar: editar, borrar: borrar,
+    diferencias: diferencias, crearDesdePaso: crearDesdePaso, borrar: borrar,
+    hitosDeOtrosTipos: hitosDeOtrosTipos, modelosSinTipo: modelosSinTipo,
+    copiaSuelta: copiaSuelta, copiaSueltaDeModelo: copiaSueltaDeModelo,
     tiposQueUsan: tiposQueUsan, naceSoloInformativo: naceSoloInformativo,
     /* para las pruebas */
     _normalizarModelo: normalizarModelo, _pasoAModelo: pasoAModelo

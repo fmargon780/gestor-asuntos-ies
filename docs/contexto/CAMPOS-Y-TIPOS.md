@@ -180,10 +180,8 @@ tipo». La línea de la lista de comprobación «Falta la plantilla del aviso al
 3. **Pasos del trámite** — vista de solo lectura con `Guias.vista(GuiasDelCentro.pasosDe(tipo),
    [], false)` y un botón "Escribir la guía"/"Cambiar la guía" que llama a
    `GuiasDelCentro.escribir(tipo.tipo)` (ya existía, sin tocar `js/guias-enganche.js`); al
-   resolver, se repinta solo esta sección. Debajo, un aviso ámbar por cada paso que venga de la
-   biblioteca de hitos y se haya quedado atrás (20-sep-2026, fila 79, apartado 4.4,
-   `GuiasBiblioteca.pasosDesactualizados`), con "Ver el cambio" (ver
-   `docs/contexto/HITOS-Y-GUIAS.md`).
+   resolver, se repinta solo esta sección. (Los avisos ámbar «ha cambiado en la biblioteca · Ver el
+   cambio» de la fila 79 desaparecieron en la fila 417: ver `docs/contexto/HITOS-Y-GUIAS.md`.)
 4. **Plantillas de correo y de Séneca** — `PlantillasAjustes.pintarDeTipo(contenedor, tipo)`
    (nueva en `js/plantillas-ajustes.js`): tarjetas filtradas por `p.tipo === tipo.tipo` y un
    botón "+ Nueva plantilla" (`#tipo-plantillas-nueva`) que abre el mismo cuadro de siempre

@@ -13,8 +13,8 @@
       dice de qué hito y de qué tipo es.
    2. El propio hito (mismo `pasoId` en `evitar`) no cuenta como
       "otro": no avisa de que se parece a sí mismo.
-   3. Un texto igual en un modelo de la biblioteca: se detecta, con el
-      nombre del modelo; y tampoco avisa de sí mismo (`evitar.modeloId`).
+   3. (Fila 417) Un texto igual en un modelo de la biblioteca ya no se mira: la
+      biblioteca no es un almacén aparte, solo cuentan las guías de los tipos.
    4. Un texto igual en el «Texto por defecto» de otro tipo de
       documento (campos.json): se detecta; y tampoco de sí mismo
       (`evitar.tipoDocumento`).
@@ -123,15 +123,12 @@ const par2 = await GuiasBiblioteca.textoDocumentosParecido('Certificado de notas
 comprobar('el propio hito (evitar.pasoId) no cuenta como "otro"', par2, null);
 
 /* ================= 3 · un modelo de la biblioteca ================= */
-console.log('--- 3. un texto igual en un modelo de la biblioteca ---');
+console.log('--- 3. un modelo de la biblioteca ya no cuenta (fila 417) ---');
 const modelo = await HitosBiblioteca.crearDesdePaso(
   { id: 'm1', titulo: 'Sellar la solicitud', opciones: [], textoDocumentos: 'Solicitud de beca de comedor' },
   'Sellar la solicitud', 'Francisco');
 const par3 = await GuiasBiblioteca.textoDocumentosParecido('SOLICITUD DE BECA DE COMEDOR', {});
-comprobar('se detecta, con el nombre del modelo', par3,
-  { texto: 'Solicitud de beca de comedor', origen: 'el hito «Sellar la solicitud» de la biblioteca' });
-const par3b = await GuiasBiblioteca.textoDocumentosParecido('Solicitud de beca de comedor', { modeloId: modelo.id });
-comprobar('el propio modelo (evitar.modeloId) no cuenta como "otro"', par3b, null);
+comprobar('el texto de un modelo de la biblioteca no se avisa', par3, null);
 
 /* ============ 4 · el texto por defecto de otro tipo de documento ============ */
 console.log('--- 4. un texto igual en el "Texto por defecto" de otro tipo de documento ---');

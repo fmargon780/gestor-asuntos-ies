@@ -215,39 +215,36 @@ Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de sal
 `_GESTOR/hitos-biblioteca.json` (el decimosexto fichero compartido), y se trae a la guía de un tipo
 como **copia**.
 
-- **Traer uno** (`js/guias-biblioteca.js`, `GuiasBiblioteca.engancharPanelTraer`): en el cuadro de
-  la guía, junto a "Añadir un paso", el botón "+ Traer de la biblioteca" abre un panel **dentro del
-  propio cuadro** (nunca un segundo `U.preguntar`). El paso insertado (`HitosBiblioteca.modeloAPaso`)
-  lleva `origenBiblioteca: { id, revision, divergido }`, que lo distingue de uno escrito a mano.
-- **Guardar en la biblioteca** (`GuiasBiblioteca.botonHTML`/`engancharBoton`): junto a los mandos de
-  cada paso. Si el paso no viene de la biblioteca, pide un nombre y crea un modelo con `revision: 1`.
-  Si viene de la biblioteca y ha cambiado, ofrece "Solo en este tipo" (el paso queda `divergido:
-  true` y no vuelve a avisar de ese cambio) o "Subir también" (sube la `revision` del modelo). Los
-  dos casos usan un panel en línea, con el mismo patrón que `guia-enlace-fila`: el cuadro de la guía
-  sigue abierto, así que no cabe un segundo `U.preguntar`.
-- **Al pulsar Guardar de la guía** (`GuiasBiblioteca.revisarAlGuardar`, llamado desde
-  `Guias.editar`): esto SÍ ocurre después de que `U.preguntar` haya cerrado `#capa`, así que aquí sí
-  se abre un `U.preguntar` por cada hito cambiado **esta vez** (fila 297, uno detrás de otro, nunca dos a
-  la vez). El editor toma una foto de los hitos al abrir (tras las conversiones a tareas y tras la primera
-  lectura del cuadro, `recoger()`), y se compara por `id` de hito, ambos lados normalizados con `Guias.normalizar`
-  (`HitosBiblioteca.cambiosEntre`, con los mismos `CAMPOS_COMPARABLES`/`textoLegibleDe` que `diferencias`). El
-  título dice el hito («Has cambiado el hito «X». ¿Es solo para <tipo>, o también para la biblioteca?», con
-  «(1 de N)» si hay varios); la tabla, «Antes · Ahora» y, si la biblioteca difiere de «Antes», «En la
-  biblioteca»; tres botones (Cancelar · Solo aquí · También en la biblioteca). «También…» sube solo los campos
-  cambiados (`HitosBiblioteca.subirCampos`, por `cambiar`); «Solo aquí» deja `divergido`. Nada se escribe hasta
-  la última respuesta; `revisarAlGuardar` devuelve `true` si se cancela y el editor reabre «Cambiar la guía»
-  con lo escrito. Un hito ya `divergido`, o ya distinto de su modelo y sin tocar, no pregunta.
-- **El aviso en los demás tipos** (`GuiasBiblioteca.pasosDesactualizados`/`abrirComparacion`, llamado
-  desde `js/ajustes-tipo.js`, sección "Pasos del trámite"): una línea `.aviso-compartido` por paso
-  con `origenBiblioteca.revision` por detrás de la del modelo, con "Ver el cambio" (comparación campo
-  a campo, `GuiasBiblioteca.comparacionHTML`) y las opciones "Traer el cambio" (conserva la marca
-  `soloInformativo` del tipo, nunca la pisa el modelo) / "Dejarlo como está" (calla el aviso sin
-  tocar el paso). Se escribe con `GuiasDelCentro.guardarPasos(tipo, pasos)`, sin reabrir el editor.
-- **La comparación** siempre por los mismos campos (`HitosBiblioteca.diferencias`,
-  `CAMPOS_COMPARABLES`): título, explicación, responsable, a quién le toca, plazo, normativa y
-  tareas (`guion`). **Desde la fila 199 (27-sep-2026) ya no compara `comunicacion` ni
-  `plantillasDocumento` aparte**: ese contenido vive en tareas del guion, y ahí sí se compara.
-  **`soloInformativo` no cuenta como cambio**: es una decisión de cada tipo, no del modelo.
+- **Traer un hito de otro tipo** (fila 417, `docs/HITOS-UN-SOLO-SITIO.md` parte B; **sustituye** a
+  «Traer de la biblioteca», «Guardar en la biblioteca», la pregunta «¿solo aquí o también en la
+  biblioteca?» (filas 79 y 297), los avisos «Ver el cambio» de Ajustes de un tipo, la comparación
+  campo a campo y el bloque de la biblioteca en Ajustes → El centro). La biblioteca es ya un
+  **buscador**: el botón «+ Traer un hito de otro tipo» del editor de la guía abre un panel dentro
+  del cuadro (`GuiasBiblioteca.engancharPanelTraer`, nunca un segundo `U.preguntar`) con los hitos
+  de arriba de las guías de los demás tipos (`GuiasDelCentro.todas()`,
+  `HitosBiblioteca.hitosDeOtrosTipos`: sin preguntas, sin los de dentro de una rama, sin título),
+  agrupados por tipo, más el grupo «Sin tipo» (`HitosBiblioteca.modelosSinTipo`: los modelos de
+  `_GESTOR/hitos-biblioteca.json` que ninguna guía usa), cuyos hitos llevan «Quitar» (confirma en la
+  misma fila con un segundo toque). La caja filtra por el título. Elegir uno hace una **copia
+  suelta** (`HitosBiblioteca.copiaSuelta` / `copiaSueltaDeModelo`, `GuiasBiblioteca.pasoDeElegido`):
+  id nuevo, sin `origenBiblioteca`, con todas sus tareas y campos; cambiarla no toca el original ni
+  al revés. El plazo, que contaba desde un hito de la guía de origen, pasa a contar desde el hito de
+  arriba de la guía (sin plazo si no hay ninguno) y el hito sale con la línea ámbar «El plazo contaba
+  desde un hito de otro tipo: revísalo.» (`avisoPlazoAjeno`, solo mientras se edita; no se guarda).
+  **«Usarlo»** al escribir el título de un hito nuevo (fila 202) busca en el mismo sitio
+  (`GuiasBiblioteca.modelosParecidosATitulo`, `js/guias-biblioteca-guardias.js`): «En «<tipo>» hay
+  «…» · Usarlo». La guardia de parecidos del texto de los documentos
+  (`GuiasBiblioteca.textoDocumentosParecido`) mira en las guías de todos los tipos y en los tipos de
+  documento, ya no en la biblioteca. **Ya no existen**: la etiqueta de origen del paso, «Guardar en
+  la biblioteca», la pregunta al guardar la guía, «lo usan N tipos más», los avisos de hito
+  desactualizado (ni en Ajustes de un tipo ni en su resumen) ni el bloque «Biblioteca de hitos»
+  (se borró `js/guias-biblioteca-ajustes.js`). **No se borra** ningún dato:
+  `_GESTOR/hitos-biblioteca.json`, `origenBiblioteca` y `divergido` se quedan en los ficheros sin
+  leerse (salvo para decidir qué modelos son «Sin tipo»). «Cargar la biblioteca del centro»
+  (fila 80) y «Crear un hito» desde un asunto con modelo de la biblioteca (`hitos-desde-el-asunto.js`)
+  siguen como estaban. Pruebas: `pruebas/traer-hito-de-otro-tipo.mjs` (navegador) y
+  `pruebas/biblioteca-de-hitos.mjs` (lógica).
+
 - **Solo informativo** (apartado 4.6): campo `soloInformativo` en un paso de guía, un modelo y un
   hito. Se ve en gris con la etiqueta "Informativo", no sale en "Qué me toca" ni en "Dormidos", no
   cuenta como pendiente. Se enciende/apaga con un clic: la casilla del editor del paso, o "Pedírmelo
@@ -277,40 +274,7 @@ como **copia**.
   `docs/contexto/DOCUMENTOS.md`, «El nombre y el registro de un documento»): nunca obligan a nada,
   siempre se pueden cambiar antes de guardar. Un hito de una opción de una pregunta, ninguno de los
   dos (igual que `soloInformativo`).
-- **De dónde viene cada hito, y la biblioteca se ofrece sola** (28-sep-2026, fila 202,
-  docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartados 2 y 3; código nuevo repartido en
-  `js/guias-biblioteca-guardias.js`, `js/guias-biblioteca-ajustes.js` y `js/guias-paso-bloques.js`,
-  sacados de `js/guias-biblioteca.js` que volvía a pasar de 400 líneas):
-  - **La etiqueta de origen** (`GuiasBiblioteca.chipOrigenHTML`/`engancharChipOrigen`), junto al
-    título de cada paso, siempre a la vista (no dentro de ningún `<details>`, así que el acordeón
-    del paso no la esconde): «De la biblioteca» (`origenBiblioteca` sin `divergido`), «De la
-    biblioteca · cambiado aquí» (con `divergido`) o «Propio de este tipo» (sin `origenBiblioteca`).
-    Pulsarla, si viene de la biblioteca, abre un panel con el nombre del modelo y «Ver en la
-    biblioteca», que llama a `GuiasBiblioteca.editarModeloPorId` (el mismo editor que «Cambiar» del
-    bloque de Ajustes; al abrirlo, el cuadro de la guía que estuviera abierto se da por cancelado,
-    como pulsar Cancelar, porque solo puede haber un `#capa`).
-  - **La biblioteca se ofrece sola al escribir el título** (`GuiasBiblioteca.
-    modelosParecidosATitulo`, con `U.parecidos`): desde tres letras, si hay un modelo parecido, sale
-    debajo del campo «En la biblioteca hay "…" · Usarlo»; pulsar «Usarlo» sustituye el paso a medio
-    escribir por `HitosBiblioteca.modeloAPaso(modelo)`, igual que «+ Traer de la biblioteca». Si no
-    se pulsa, el paso sigue siendo propio.
-  - **La pregunta de una sola frase** al guardar un paso que ha cambiado (sustituye a "Solo en este
-    tipo"/"Subir también" de más arriba): «¿Este cambio es solo para <TIPO>, o también para la
-    biblioteca? (lo usan N tipos más)» → «Solo aquí» / «También en la biblioteca»
-    (`GuiasBiblioteca.preguntaCambioSoloAqui`/`otrosTiposQueUsan`, que relee `guias.json` entero para
-    contar los tipos, como ya hacía `borrarModelo`).
-  - **«Guardar en la biblioteca» avisa de un modelo parecido** por el título (`U.parecidos`) antes de
-    crear uno nuevo: «Ya hay uno parecido: "…". ¿Crear otro o usar ese?»; «Usar ese» liga el paso al
-    modelo existente con `divergido: true` (conserva lo escrito aquí, no lo pisa con el modelo).
-  - **La guardia de parecidos del texto de los documentos** (`GuiasBiblioteca.
-    textoDocumentosParecido(texto, evitar)`): al escribir el texto de un hito
-    (`js/guias-paso-bloques.js`) o el «Texto por defecto» de un tipo de documento
-    (`js/ajustes-centro.js`, `App.editarTextoPorDefectoDocumento`), compara (con `U.normalizar`, salvo
-    tildes/mayúsculas/espacios) contra cualquier otro hito de `guias.json`, cualquier modelo de la
-    biblioteca y el «Texto por defecto» de cualquier otro tipo de documento; si hay uno igual, avisa
-    de dónde sale («Ese mismo texto ya lo tiene…») y ofrece copiarlo tal cual. `evitar` (`{pasoId}`,
-    `{modeloId}` o `{tipoDocumento}`) es el propio sitio donde se escribe, para no avisar de que se
-    parece a sí mismo.
+- **De dónde viene cada hito, y la biblioteca se ofrece sola** (fila 202) — **superado por la fila 417**: ya no hay etiqueta de origen; «Usarlo» busca en las guías de todos los tipos (ver «Traer un hito de otro tipo»). La guardia de parecidos del texto de los documentos y el texto/tipo de documento del hito siguen.
 - **Normativa** (apartado 4.7, `js/hitos-normativa.js`; enlace retocado la fila 87,
   `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`): campo `normativa`, lista de
   `{ cita, bloque, clave, url }`. Con `clave`, el enlace abre la vista de un solo artículo del
@@ -321,10 +285,6 @@ como **copia**.
   nada, la cita se ve como texto. Se ve igual en un hito y en la vista de solo lectura de los pasos
   de un tipo (`Guias.vista`). `HitosNormativa.refrescar()` mantiene la dirección base en caché,
   actualizada por `window.Gestor.alRefrescar`.
-- **El bloque de Ajustes → El centro** (`GuiasBiblioteca.pintarAjustes`, colgado solo de
-  `#ajustes-tab-centro`): lista de modelos, crear uno desde cero, editarlo (reutiliza `Guias.editar`
-  con una lista de un solo paso) y borrarlo (avisa, sin bloquear, de en qué tipos está en uso;
-  `HitosBiblioteca.tiposQueUsan`).
 - **Nombre corto del tipo** (apartado 4.9, `Nombres.tipoParaCarpeta(tipo)`): campo `nombreCorto` en
   `tipos.json`. Entra en el nombre de la carpeta y del asunto en vez del nombre de siempre; vacío, se
   usa el nombre de siempre. Se escribe en la sección "Datos del tipo" de `js/ajustes-tipo.js`, con

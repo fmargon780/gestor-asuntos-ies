@@ -9,8 +9,8 @@
         sale desplegada (se recuerda por sección, no por tipo).
      3. Se añade un campo y se guarda: el resumen pasa de 2 a 3 sin salir
         de la pantalla.
-     4. Un hito desactualizado pone el aviso ámbar en el título de "Guía",
-        aun plegado.
+     4. (Fila 417) Ya no hay aviso de «hito desactualizado»: el título de "Guía"
+        solo dice cuántos hitos hay.
      5. "El centro": bloques plegados, en el orden nuevo.
      6. "Problemas" (antes Mantenimiento): sin conflictos ni fichas sin carpeta, esos
         bloques no se ven; con una ficha sin carpeta de mentira, su
@@ -170,20 +170,16 @@ await comprobar('y ya está guardado de verdad en campos.json', pagina.evaluate(
 /* ================================================================
    4. Un hito desactualizado avisa en el título, aun plegado.
    ================================================================ */
-console.log('--- 4. el aviso de hito desactualizado, en el título ---');
-await pagina.evaluate(() => {
-  window.GuiasBiblioteca.pasosDesactualizados = async (pasos) =>
-    pasos.length ? [{ modelo: { nombre: pasos[0].titulo }, paso: pasos[0] }] : [];
-});
+console.log('--- 4. sin aviso de hito desactualizado (fila 417) ---');
 await pagina.evaluate(() => App.cerrarTipoDeAsunto());
 await abrirTipo('MATRICULA');
 await pagina.waitForTimeout(300);
 await comprobar('"Guía" sigue plegada',
   pagina.locator('#pantalla-tipo-asunto details[data-seccion="pasos"]').evaluate((d) => d.open), false);
-await comprobar('su título avisa del hito desactualizado', resumen('pasos'), '2 hitos · ⚠ 1 hito desactualizado');
-await comprobar('en ámbar',
+await comprobar('su título solo cuenta los hitos', resumen('pasos'), '2 hitos');
+await comprobar('y no sale en ámbar',
   pagina.locator('#pantalla-tipo-asunto details[data-seccion="pasos"] .bloque-resumen')
-    .evaluate((s) => s.classList.contains('bloque-resumen-ambar')), true);
+    .evaluate((s) => s.classList.contains('bloque-resumen-ambar')), false);
 
 /* ================================================================
    5. "El centro": plegado y en el orden nuevo.

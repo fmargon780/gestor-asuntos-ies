@@ -1,53 +1,20 @@
 /* ============================================================
-   guias-biblioteca.js — la pintura de la biblioteca de hitos del
-   centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md).
+   guias-biblioteca.js — «+ Traer un hito de otro tipo» (fila 417,
+   docs/HITOS-UN-SOLO-SITIO.md, parte B; antes «+ Traer de la biblioteca»,
+   20-sep-2026, fila 79).
 
-   El modelo vive en js/hitos-biblioteca.js; aquí solo la pantalla:
-
-     1. El panel "+ Traer de la biblioteca", dentro del propio cuadro
-        de la guía (nunca un segundo U.preguntar: "solo hay un cuadro
-        de diálogo", regla de siempre).
-     2. El botón "Guardar en la biblioteca" de cada hito, con su propio
-        panel en línea (mismo patrón que "guia-enlace-fila" de
-        js/guias.js) mientras el cuadro de la guía sigue abierto.
-     3. La revisión automática al pulsar Guardar (apartado 4.3): pasa
-        DESPUÉS de que el cuadro de la guía se haya cerrado (U.preguntar
-        ya ha resuelto su promesa y ha ocultado #capa), así que aquí sí
-        puede abrir un U.preguntar por cada hito cambiado, uno detrás
-        de otro.
-     4. El aviso de los demás tipos (apartado 4.4) y su "Ver el
-        cambio", llamados desde js/ajustes-tipo.js.
-     5. El bloque de Ajustes → El centro, colgado solo (mismo patrón
-        que js/hitos-ajustes.js).
+   La biblioteca ya no es un almacén aparte, es un buscador: un panel
+   dentro del propio cuadro de la guía (nunca un segundo U.preguntar:
+   «solo hay un cuadro de diálogo») con los hitos de las guías de los
+   demás tipos, agrupados por tipo, y al final «Sin tipo» (los modelos
+   de _GESTOR/hitos-biblioteca.json que ninguna guía usa), cada uno con
+   su «Quitar». Elegir uno es traer una copia suelta (el modelo está en
+   js/hitos-biblioteca.js). Ya no hay etiqueta de origen, ni pregunta al
+   guardar, ni «Guardar en la biblioteca», ni avisos «Ver el cambio».
 
    Se carga después de js/hitos-biblioteca.js y de js/hitos-normativa.js.
    ============================================================ */
 var GuiasBiblioteca = (function () {
-
-  function usuario() { return (window.App && App.E && App.E.usuario) || ''; }
-
-  /* ==========================================================
-     LA COMPARACIÓN, CAMPO A CAMPO (un solo componente, para 4.3 y 4.4)
-     ========================================================== */
-
-  function comparacionHTML(diffs) {
-    return '<table class="tabla-comparacion">' +
-      '<thead><tr><th></th><th>Este tipo</th><th>La biblioteca</th></tr></thead><tbody>' +
-      diffs.map(function (d) {
-        return '<tr><td>' + U.escapar(d.etiqueta) + '</td><td>' + U.escapar(d.antes) +
-          '</td><td>' + U.escapar(d.despues) + '</td></tr>';
-      }).join('') + '</tbody></table>';
-  }
-
-  /* ==========================================================
-     1. "+ TRAER DE LA BIBLIOTECA" (apartado 4.1)
-
-     Un panel dentro del propio cuadro de la guía: se engancha justo
-     detrás del botón que lo abre, oculto de partida, y se rellena cada
-     vez que se abre (la biblioteca puede haber cambiado desde el otro
-     ordenador). `alElegir(modelo)` recibe el hito de la biblioteca elegido; quien
-     llama decide qué hacer con él (insertarlo como hito nuevo).
-     ========================================================== */
 
   function resumenDeModelo(m) {
     var trozos = [];
@@ -61,40 +28,103 @@ var GuiasBiblioteca = (function () {
 
   function panelTraerHTML() {
     return '<div class="biblioteca-panel oculto" id="biblioteca-panel-traer">' +
-      '<input type="search" class="campo" id="biblioteca-buscar" placeholder="Buscar por nombre">' +
+      '<input type="search" class="campo" id="biblioteca-buscar" placeholder="Buscar un hito por su título">' +
       '<div class="biblioteca-panel-lista" id="biblioteca-panel-lista"></div>' +
       '<button type="button" class="boton" id="biblioteca-panel-cerrar">Cerrar</button>' +
       '</div>';
   }
 
-  /* `cuadro` es el nodo raíz del cuadro de la guía (donde ya está
-     insertado panelTraerHTML()). `botonAbrir` lo abre y lo cierra;
-     `alElegir` recibe el hito de la biblioteca elegido y el panel se cierra solo. */
-  async function engancharPanelTraer(cuadro, botonAbrir, alElegir) {
+  /* Todas las guías y los modelos sin tipo, tal como están ahora. */
+  async function leerFuentes(tipoActual) {
+    var guias = (window.GuiasDelCentro && GuiasDelCentro.todas) ? GuiasDelCentro.todas() : {};
+    var grupos = HitosBiblioteca.hitosDeOtrosTipos(guias, tipoActual).map(function (g) {
+      return { nombre: g.tipo, sinTipo: false, items: g.hitos.map(function (p) {
+        return { titulo: p.titulo, resumen: resumenDeModelo(p), hito: p };
+      }) };
+    });
+    var biblioteca = { modelos: [] };
+    try { biblioteca = await HitosBiblioteca.leer(); } catch (e) { /* sin biblioteca legible, solo las guías */ }
+    var sueltos = HitosBiblioteca.modelosSinTipo(biblioteca, guias);
+    if (sueltos.length) {
+      grupos.push({ nombre: 'Sin tipo', sinTipo: true, items: sueltos.map(function (m) {
+        return { titulo: m.nombre, resumen: resumenDeModelo(m), modelo: m };
+      }) });
+    }
+    return grupos;
+  }
+
+  /* `cuadro` es el nodo raíz del cuadro de la guía (donde ya está insertado
+     panelTraerHTML()). `botonAbrir` lo abre y lo cierra. `alElegir(elegido)`
+     recibe `{ hito }` (un hito de otra guía) o `{ modelo }` (uno de «Sin
+     tipo»); el panel se cierra solo y quien llama hace la copia suelta.
+     `tipoActual` es el tipo cuya guía se escribe (no se ofrece a sí mismo). */
+  async function engancharPanelTraer(cuadro, botonAbrir, alElegir, tipoActual) {
     var panel = cuadro.querySelector('#biblioteca-panel-traer');
     var buscar = cuadro.querySelector('#biblioteca-buscar');
     var lista = cuadro.querySelector('#biblioteca-panel-lista');
     if (!panel || !botonAbrir) return;
 
-    var modelos = [];
+    var grupos = [];
 
     function pintarLista() {
       var q = U.normalizar(buscar.value || '');
-      var filtrados = modelos.filter(function (m) { return !q || U.normalizar(m.nombre).indexOf(q) !== -1; });
-      lista.innerHTML = filtrados.length ? '' :
-        '<div class="vacio">' + (modelos.length ? 'Nada encontrado.' : 'La biblioteca está vacía todavía.') + '</div>';
-      filtrados.forEach(function (m) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'biblioteca-panel-item';
-        b.innerHTML = '<span class="nombre-tipo">' + U.escapar(m.nombre) + '</span>' +
-          '<span class="suave">' + U.escapar(resumenDeModelo(m)) + '</span>';
-        b.onclick = function () {
-          panel.classList.add('oculto');
-          alElegir(m);
-        };
-        lista.appendChild(b);
+      lista.innerHTML = '';
+      var hubo = false;
+      grupos.forEach(function (g) {
+        var items = g.items.filter(function (it) { return !q || U.normalizar(it.titulo).indexOf(q) !== -1; });
+        if (!items.length) return;
+        hubo = true;
+        var cab = document.createElement('div');
+        cab.className = 'biblioteca-panel-grupo' + (g.sinTipo ? ' biblioteca-panel-sin-tipo' : '');
+        cab.textContent = g.nombre;
+        lista.appendChild(cab);
+        items.forEach(function (it) {
+          var fila = document.createElement('div');
+          fila.className = 'biblioteca-panel-fila-item';
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'biblioteca-panel-item';
+          b.innerHTML = '<span class="nombre-tipo">' + U.escapar(it.titulo) + '</span>' +
+            '<span class="suave">' + U.escapar(it.resumen) + '</span>';
+          b.onclick = function () {
+            panel.classList.add('oculto');
+            alElegir(it.modelo ? { modelo: it.modelo } : { hito: it.hito });
+          };
+          fila.appendChild(b);
+          if (it.modelo) fila.appendChild(botonQuitar(it.modelo, fila));
+          lista.appendChild(fila);
+        });
       });
+      if (!hubo) {
+        lista.innerHTML = '<div class="vacio">' + (grupos.length ? 'Nada encontrado.' : 'Todavía no hay hitos en otros tipos.') + '</div>';
+      }
+    }
+
+    /* «Quitar» de un «Sin tipo»: se confirma en la propia fila (no hay un
+       segundo cuadro): el primer toque pide confirmar, el segundo lo borra. */
+    function botonQuitar(modelo, fila) {
+      var q = document.createElement('button');
+      q.type = 'button';
+      q.className = 'boton boton-peligro biblioteca-quitar';
+      q.textContent = 'Quitar';
+      var armado = false;
+      q.onclick = async function () {
+        if (!armado) {
+          armado = true;
+          q.textContent = '¿Seguro? Quitar';
+          setTimeout(function () { if (q.isConnected && armado) { armado = false; q.textContent = 'Quitar'; } }, 5000);
+          return;
+        }
+        q.disabled = true;
+        try {
+          await HitosBiblioteca.borrar(modelo.id);
+          grupos.forEach(function (g) { g.items = g.items.filter(function (it) { return !it.modelo || it.modelo.id !== modelo.id; }); });
+          grupos = grupos.filter(function (g) { return g.items.length; });
+          pintarLista();
+          U.aviso('Quitado.', 'bueno');
+        } catch (e) { q.disabled = false; U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo'); }
+      };
+      return q;
     }
 
     botonAbrir.onclick = async function () {
@@ -102,7 +132,7 @@ var GuiasBiblioteca = (function () {
       panel.classList.toggle('oculto');
       if (!abrir) return;
       lista.innerHTML = '<div class="vacio">Leyendo…</div>';
-      try { modelos = (await HitosBiblioteca.leer()).modelos; } catch (e) { modelos = []; }
+      try { grupos = await leerFuentes(tipoActual); } catch (e) { grupos = []; }
       pintarLista();
       buscar.value = '';
       buscar.focus();
@@ -112,275 +142,15 @@ var GuiasBiblioteca = (function () {
     if (cerrar) cerrar.onclick = function () { panel.classList.add('oculto'); };
   }
 
-  /* ==========================================================
-     2. "GUARDAR EN LA BIBLIOTECA" DE UN HITO (apartados 4.2 y 4.3)
-
-     Un panel en línea, con el mismo patrón que "guia-enlace-fila" de
-     js/guias.js: el cuadro de la guía sigue abierto, así que no se
-     puede abrir un segundo U.preguntar. `paso` es pasos[i] tal y como
-     está ahora mismo (ya releído con recoger()); `onGuardado(origen)`
-     recibe el `origenBiblioteca` nuevo (o null si se canceló, o si el
-     hito no ha cambiado nada).
-     ========================================================== */
-
-  function botonHTML() {
-    return '<button type="button" class="boton paso-guardar-biblioteca" ' +
-      'title="Guardar este hito en la biblioteca del centro">Guardar en la biblioteca</button>' +
-      '<div class="paso-guardar-biblioteca-ayuda suave">Para poder usarlo en otros tipos</div>' +
-      '<div class="biblioteca-panel-fila oculto">' +
-        '<div class="biblioteca-panel-fila-nombre">' +
-          '<label class="etiqueta">Nombre en la biblioteca</label>' +
-          '<input class="campo biblioteca-nombre-nuevo">' +
-          '<button type="button" class="boton boton-principal biblioteca-nombre-ok">Crear</button>' +
-        '</div>' +
-        /* Apartado 3, punto 3: si ya hay un modelo parecido por el
-           título, se pregunta antes de crear uno igual. */
-        '<div class="biblioteca-panel-fila-parecido oculto">' +
-          '<p class="biblioteca-parecido-texto"></p>' +
-          '<button type="button" class="boton biblioteca-parecido-usar">Usar ese</button>' +
-          '<button type="button" class="boton boton-principal biblioteca-parecido-crear">Crear otro</button>' +
-        '</div>' +
-        '<div class="biblioteca-panel-fila-diff oculto">' +
-          '<p class="biblioteca-panel-fila-pregunta"></p>' +
-          '<div class="biblioteca-diff-cuerpo"></div>' +
-          '<button type="button" class="boton boton-principal biblioteca-diff-subir">También en la biblioteca</button>' +
-          '<button type="button" class="boton biblioteca-diff-solo">Solo aquí</button>' +
-        '</div>' +
-        '<button type="button" class="boton biblioteca-panel-fila-cancelar">Cancelar</button>' +
-      '</div>';
+  /* Del elegido en el panel al hito nuevo de la guía (copia suelta). */
+  function pasoDeElegido(elegido, desde) {
+    return elegido.modelo ? HitosBiblioteca.copiaSueltaDeModelo(elegido.modelo, desde)
+                          : HitosBiblioteca.copiaSuelta(elegido.hito, desde);
   }
-
-  /* `raiz` es el `.paso-editor` de este hito, ya con botonHTML()
-     insertado dentro de `.paso-mandos`. `estado` decide qué hueco del
-     panel se ve: 'nuevo' (4.2, primera vez) o 'diff' (4.2 → 4.3, ya
-     viene de la biblioteca y ha cambiado). Sin ninguno de los dos, el
-     botón entero no se pinta (lo decide quien llama, más abajo).
-     `nombreTipo` (fila 201, apartado 3.2): para la pregunta de una
-     sola frase cuando el hito ha cambiado. */
-  function engancharBoton(raiz, paso, modelo, diffs, nombreTipo, onGuardado) {
-    var boton = raiz.querySelector('.paso-guardar-biblioteca');
-    var panel = raiz.querySelector('.biblioteca-panel-fila');
-    if (!boton || !panel) return;
-    var esNuevo = !paso.origenBiblioteca;
-
-    boton.onclick = function () {
-      panel.classList.remove('oculto');
-      panel.querySelector('.biblioteca-panel-fila-nombre').classList.toggle('oculto', !esNuevo);
-      panel.querySelector('.biblioteca-panel-fila-parecido').classList.add('oculto');
-      panel.querySelector('.biblioteca-panel-fila-diff').classList.toggle('oculto', esNuevo);
-      if (esNuevo) {
-        panel.querySelector('.biblioteca-panel-fila-nombre').classList.remove('oculto');
-        var campo = panel.querySelector('.biblioteca-nombre-nuevo');
-        campo.value = paso.titulo || '';
-        campo.focus();
-      } else {
-        panel.querySelector('.biblioteca-diff-cuerpo').innerHTML = comparacionHTML(diffs);
-        var preguntaEl = panel.querySelector('.biblioteca-panel-fila-pregunta');
-        preguntaEl.textContent = GuiasBiblioteca.preguntaCambioSoloAqui(nombreTipo, 0);
-        GuiasBiblioteca.otrosTiposQueUsan(modelo.id, nombreTipo).then(function (otros) {
-          if (panel.isConnected) preguntaEl.textContent = GuiasBiblioteca.preguntaCambioSoloAqui(nombreTipo, otros);
-        });
-      }
-    };
-
-    panel.querySelector('.biblioteca-panel-fila-cancelar').onclick = function () {
-      panel.classList.add('oculto');
-    };
-
-    /* Apartado 3, punto 3: antes de crear un modelo nuevo, si hay uno
-       parecido por el título, se pregunta "¿Crear otro o usar ese?". */
-    panel.querySelector('.biblioteca-nombre-ok').onclick = async function () {
-      var nombre = panel.querySelector('.biblioteca-nombre-nuevo').value.trim();
-      if (!nombre) return;
-      var biblioteca = await HitosBiblioteca.leer();
-      var nombres = biblioteca.modelos.map(function (m) { return m.nombre; });
-      var cerca = U.parecidos(nombre, nombres)[0];
-      var parecido = cerca ? biblioteca.modelos.filter(function (m) { return m.nombre === cerca.nombre; })[0] : null;
-
-      if (parecido) {
-        panel.querySelector('.biblioteca-panel-fila-nombre').classList.add('oculto');
-        var fp = panel.querySelector('.biblioteca-panel-fila-parecido');
-        fp.classList.remove('oculto');
-        fp.querySelector('.biblioteca-parecido-texto').textContent =
-          'Ya hay uno parecido: «' + parecido.nombre + '». ¿Crear otro o usar ese?';
-        fp.querySelector('.biblioteca-parecido-crear').onclick = async function () {
-          var m = await HitosBiblioteca.crearDesdePaso(paso, nombre, usuario());
-          panel.classList.add('oculto');
-          onGuardado({ id: m.id, revision: m.revision, divergido: false });
-        };
-        fp.querySelector('.biblioteca-parecido-usar').onclick = function () {
-          panel.classList.add('oculto');
-          /* Se usa el que ya está: este paso queda ligado a él, pero
-             marcado como cambiado (su contenido es el que Francisco ha
-             escrito aquí, no el del modelo), igual que "Solo aquí". */
-          onGuardado({ id: parecido.id, revision: parecido.revision, divergido: true });
-        };
-        return;
-      }
-
-      var m = await HitosBiblioteca.crearDesdePaso(paso, nombre, usuario());
-      panel.classList.add('oculto');
-      onGuardado({ id: m.id, revision: m.revision, divergido: false });
-    };
-
-    panel.querySelector('.biblioteca-diff-subir').onclick = async function () {
-      var m = await HitosBiblioteca.actualizarDesdePaso(modelo.id, paso, usuario());
-      panel.classList.add('oculto');
-      onGuardado(m ? { id: m.id, revision: m.revision, divergido: false } : paso.origenBiblioteca);
-    };
-
-    panel.querySelector('.biblioteca-diff-solo').onclick = function () {
-      panel.classList.add('oculto');
-      /* "Queda marcado como cambiado aquí": conserva la revision que
-         ya tenía y no vuelve a avisar de este mismo cambio. */
-      onGuardado({ id: paso.origenBiblioteca.id, revision: paso.origenBiblioteca.revision, divergido: true });
-    };
-  }
-
-  /* ==========================================================
-     3. LA REVISIÓN AL PULSAR GUARDAR (apartado 4.3; rehecha en la
-     fila 297, docs/PREGUNTA-DE-LA-BIBLIOTECA-AL-GUARDAR.md)
-
-     Se llama DESPUÉS de que el U.preguntar de la guía haya cerrado
-     #capa. Solo pregunta por los hitos de la biblioteca que el usuario
-     ha cambiado esta vez (`foto`: los hitos tal como estaban al abrir
-     «Cambiar la guía», ya convertidos), uno detrás de otro, con tres
-     botones. Nada se escribe hasta contestar la última: si se cancela
-     alguna, no se toca nada y devuelve true (el editor vuelve al cuadro
-     de la guía). Muta `pasos` en el sitio.
-     ========================================================== */
-
-  function pasosConOrigen(pasos) {
-    /* Solo los de arriba: normativa y soloInformativo (y por tanto la
-       comparación) no existen en los subpasos de una opción. */
-    return (pasos || []).filter(function (p) { return p.origenBiblioteca && !p.origenBiblioteca.divergido; });
-  }
-
-  /* La tabla de lo cambiado esta vez: Antes · Ahora (y «En la biblioteca»
-     solo si algún renglón tiene un valor distinto del de «Antes»). */
-  function cambiosHTML(cambios) {
-    var conBiblioteca = cambios.some(function (c) { return c.biblioteca; });
-    return '<table class="tabla-comparacion"><thead><tr><th></th><th>Antes</th><th>Ahora</th>' +
-      (conBiblioteca ? '<th>En la biblioteca</th>' : '') + '</tr></thead><tbody>' +
-      cambios.map(function (c) {
-        return '<tr><td>' + U.escapar(c.etiqueta) + '</td><td>' + U.escapar(c.antes) + '</td><td>' +
-          U.escapar(c.ahora) + '</td>' + (conBiblioteca ? '<td>' + U.escapar(c.biblioteca) + '</td>' : '') + '</tr>';
-      }).join('') + '</tbody></table>';
-  }
-
-  /* Un cuadro con tres botones: Cancelar · Solo aquí · También en la
-     biblioteca. Devuelve 'subir', 'solo' o null (Cancelar o Escape). */
-  async function preguntarTres(titulo, cuerpoHtml) {
-    var cancelar = $('cuadro-cancelar');
-    var solo = document.createElement('button');
-    solo.type = 'button'; solo.id = 'cuadro-solo-aqui'; solo.className = 'boton'; solo.textContent = 'Solo aquí';
-    cancelar.parentNode.insertBefore(solo, cancelar.nextSibling);
-    var eleccion = null;
-    solo.onclick = function () { eleccion = 'solo'; cancelar.click(); };
-    var ok = await U.preguntar(titulo, cuerpoHtml, 'También en la biblioteca');
-    solo.remove();
-    return ok ? 'subir' : eleccion;
-  }
-
-  /* `nombreTipo` (fila 201): el nombre del tipo y cuántos otros tipos usan
-     ya ese modelo, en el título. */
-  async function revisarAlGuardar(pasos, nombreTipo, foto) {
-    var biblioteca = await HitosBiblioteca.leer();
-    /* Los dos lados, normalizados como al guardar la guía (lo que el cuadro lee sin que nadie toque nada,
-       como la plantilla del aviso con el aviso apagado, no cuenta como cambio). */
-    var antes = {}, ahora = {};
-    Guias.normalizar(foto || []).forEach(function (p) { antes[p.id] = p; });
-    Guias.normalizar(pasos).forEach(function (p) { ahora[p.id] = p; });
-    var lista = [];
-    pasosConOrigen(pasos).forEach(function (paso) {
-      var modelo = HitosBiblioteca.buscar(biblioteca, paso.origenBiblioteca.id);
-      if (!modelo) return;
-      /* Sin foto de este hito (se trajo en esta edición): se compara con su modelo, como siempre. */
-      var previo = antes[paso.id] || null;
-      var cambios = HitosBiblioteca.cambiosEntre(previo, ahora[paso.id] || paso, modelo);
-      if (cambios.length) lista.push({ paso: paso, ahora: ahora[paso.id] || paso, modelo: modelo, cambios: cambios, titulo: (previo || paso).titulo || paso.titulo });
-    });
-
-    for (var i = 0; i < lista.length; i++) {
-      var it = lista[i];
-      var otros = await GuiasBiblioteca.otrosTiposQueUsan(it.modelo.id, nombreTipo);
-      it.respuesta = await preguntarTres(
-        GuiasBiblioteca.preguntaCambioSoloAqui(nombreTipo, otros, it.titulo,
-          lista.length > 1 ? '(' + (i + 1) + ' de ' + lista.length + ')' : ''), cambiosHTML(it.cambios));
-      if (!it.respuesta) return true;   /* Cancelar: no se guarda nada, se olvida lo contestado */
-    }
-
-    for (var j = 0; j < lista.length; j++) {
-      var r = lista[j], paso = r.paso;
-      if (r.respuesta === 'subir') {
-        var m = await HitosBiblioteca.subirCampos(r.modelo.id, r.ahora, r.cambios.map(function (c) { return c.campo; }), usuario());
-        paso.origenBiblioteca = m ? { id: m.id, revision: m.revision, divergido: false } : paso.origenBiblioteca;
-      } else {
-        paso.origenBiblioteca = { id: paso.origenBiblioteca.id, revision: paso.origenBiblioteca.revision, divergido: true };
-      }
-    }
-    return false;
-  }
-
-  function $(id) { return document.getElementById(id); }
-
-  /* ==========================================================
-     4. EL AVISO EN LOS DEMÁS TIPOS (apartado 4.4)
-     ========================================================== */
-
-  /* `pasos` son los de UN tipo (GuiasDelCentro.pasosDe(tipo.tipo)).
-     Devuelve solo los que están desactualizados, con su modelo y sus
-     diferencias ya calculadas, listos para pintar. */
-  async function pasosDesactualizados(pasos) {
-    var biblioteca = await HitosBiblioteca.leer();
-    var salida = [];
-    pasosConOrigen(pasos).forEach(function (p) {
-      var modelo = HitosBiblioteca.buscar(biblioteca, p.origenBiblioteca.id);
-      if (!modelo || p.origenBiblioteca.revision >= modelo.revision) return;
-      var diffs = HitosBiblioteca.diferencias(p, modelo);
-      if (diffs.length) salida.push({ paso: p, modelo: modelo, diffs: diffs });
-    });
-    return salida;
-  }
-
-  /* "Ver el cambio": Traer el cambio / Dejarlo como está. Devuelve el
-     hito ya actualizado (o el mismo, con la revision al día) para que
-     quien llama vuelva a guardar la guía entera con GuiasDelCentro. */
-  async function abrirComparacion(entrada) {
-    $('cuadro-cancelar').textContent = 'Cancelar';
-    var traer = await U.preguntar('"' + entrada.modelo.nombre + '" ha cambiado en la biblioteca',
-      comparacionHTML(entrada.diffs), 'Traer el cambio');
-    $('cuadro-cancelar').textContent = 'Cancelar';
-
-    if (traer) {
-      var idDeAntes = entrada.paso.id;
-      var informativoDeAntes = entrada.paso.soloInformativo;
-      Object.assign(entrada.paso, HitosBiblioteca.modeloAPaso(entrada.modelo,
-        entrada.paso.plazo && entrada.paso.plazo.desde));   /* fila 284: el «desde» de la guía se queda */
-      /* El id del hito no cambia (sigue siendo el mismo dentro de la
-         guía); "la marca soloInformativo del tipo se conserva, no la
-         pisa el modelo" (apartado 4.4). */
-      entrada.paso.id = idDeAntes;
-      entrada.paso.soloInformativo = informativoDeAntes;
-    } else {
-      entrada.paso.origenBiblioteca = { id: entrada.modelo.id, revision: entrada.modelo.revision, divergido: false };
-    }
-    return entrada.paso;
-  }
-
-  /* Las secciones 6, 7 y 8 (apartados 2 y 3 de
-     docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md: la etiqueta de origen, el
-     buscador al escribir el título y la guardia de parecidos del texto
-     de los documentos) viven en js/guias-biblioteca-guardias.js, que
-     extiende este mismo `GuiasBiblioteca` (416 líneas: partir antes de
-     seguir metiendo código, fila 201). */
 
   return {
     panelTraerHTML: panelTraerHTML, engancharPanelTraer: engancharPanelTraer,
-    botonHTML: botonHTML, engancharBoton: engancharBoton,
-    revisarAlGuardar: revisarAlGuardar,
-    pasosDesactualizados: pasosDesactualizados, abrirComparacion: abrirComparacion,
-    comparacionHTML: comparacionHTML, cambiosHTML: cambiosHTML, resumenDeModelo: resumenDeModelo
+    pasoDeElegido: pasoDeElegido, resumenDeModelo: resumenDeModelo
   };
 })();
 window.GuiasBiblioteca = GuiasBiblioteca;

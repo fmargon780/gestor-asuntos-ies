@@ -48,7 +48,6 @@ var AjustesReparto = (function () {
     /* Lo de cada día */
     { id: 'bloque-tipos-documento', donde: 'dia', otras: 'tipos de documento, documentos' },
     { id: 'bloque-grupos-personas', donde: 'dia', otras: 'grupos, personas, clases' },
-    { id: 'bloque-biblioteca-hitos', donde: 'dia', otras: 'hitos, tareas, plazos, guías, biblioteca' },
     { id: 'bloque-tipos-organo', donde: 'dia', otras: 'órgano, dirección, secretaría, jefatura, encarga' },
     /* El centro */
     { id: 'bloque-datos-centro', donde: 'centro', otras: 'nombre del instituto, código, dirección, localidad, provincia, firma, remitente, nombre del remitente, cuenta de Administración' },

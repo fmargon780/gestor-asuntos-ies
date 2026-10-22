@@ -159,7 +159,6 @@ var AjustesPlegado = (function () {
     return document.querySelector('#pantalla-tipo-asunto details[data-seccion="' + id + '"]');
   }
 
-  var turnoPasos = 0;
 
   function resumirTipo() {
     var tipo = App.E.tipoAjustesActual;
@@ -177,20 +176,7 @@ var AjustesPlegado = (function () {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
     var textoPasos = pasos.length ? plural(pasos.length, 'hito', 'hitos') : 'sin guía';
     var secPasos = seccionDelTipo('pasos');
-    var avisoYa = secPasos && secPasos.dataset.desactualizados;
-    ponerResumen(secPasos, textoPasos + (avisoYa ? ' · ' + avisoYa : ''), !!avisoYa);
-    if (secPasos && pasos.length && window.GuiasBiblioteca && GuiasBiblioteca.pasosDesactualizados) {
-      var turno = ++turnoPasos;
-      GuiasBiblioteca.pasosDesactualizados(pasos).then(function (lista) {
-        if (turno !== turnoPasos) return;
-        var n = (lista || []).length;
-        secPasos.dataset.desactualizados = n ? '⚠ ' + plural(n, 'hito desactualizado', 'hitos desactualizados') : '';
-        ponerResumen(secPasos, textoPasos + (n ? ' · ' + secPasos.dataset.desactualizados : ''), !!n);
-      }, function () {});
-    } else if (secPasos) {
-      secPasos.dataset.desactualizados = '';
-      ponerResumen(secPasos, textoPasos);
-    }
+    ponerResumen(secPasos, textoPasos);
 
     var secCorreo = seccionDelTipo('correo');
     if (secCorreo) {

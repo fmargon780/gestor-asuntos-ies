@@ -224,35 +224,6 @@
 .paso-mandos { display: flex; gap: 4px; }
 .paso-mandos .boton { padding: 6px 9px; }
 
-/* ---------- de dónde viene el hito (28-sep-2026, fila 201, apartado 2,
-   docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md): la etiqueta, siempre a la
-   vista (nunca dentro de un `<details>`), y su panel al pulsarla. ---------- */
-.chip-origen {
-  font-size: 11px;
-  border-radius: 999px;
-  padding: 2px 10px;
-  border: 1px solid var(--linea);
-  background: var(--fondo);
-  color: var(--tinta-suave);
-  white-space: nowrap;
-  cursor: default;
-}
-.chip-origen:disabled { opacity: 1; }
-.chip-origen-biblioteca, .chip-origen-cambiado { cursor: pointer; }
-.chip-origen-biblioteca { background: var(--azul-claro); border-color: var(--azul); color: var(--azul); }
-.chip-origen-cambiado { background: var(--ambar); border-color: var(--ambar-linea); color: var(--tinta); }
-.chip-origen-panel {
-  flex-basis: 100%;
-  margin-top: 4px;
-  padding: 8px 10px;
-  border: 1px solid var(--linea);
-  border-radius: 8px;
-  background: var(--papel);
-  font-size: 13px;
-}
-.chip-origen-panel.oculto { display: none; }
-.chip-origen-panel p { margin: 0 0 6px; }
-
 /* ---------- apartado 3, punto 1: la biblioteca se ofrece sola al
    escribir el título de un hito nuevo. ---------- */
 .paso-titulo-parecido {
@@ -261,13 +232,6 @@
   color: var(--tinta-suave);
 }
 .paso-titulo-parecido.oculto { display: none; }
-
-/* ---------- apartado 3, punto 3: la ayuda bajo "Guardar en la
-   biblioteca", y la pregunta de una sola frase al guardar un cambio. ---------- */
-.paso-guardar-biblioteca-ayuda { font-size: 12px; margin-top: 2px; }
-.biblioteca-panel-fila-pregunta { font-weight: 600; margin: 0 0 8px; }
-.biblioteca-panel-fila-parecido { margin-top: 8px; }
-.biblioteca-parecido-texto { margin: 0 0 8px; }
 
 /* ---------- apartado 3, punto 4: la guardia de parecidos del texto de
    los documentos. ---------- */
@@ -413,28 +377,17 @@
 }
 .biblioteca-panel-item:hover { border-color: var(--azul); }
 
-.paso-guardar-biblioteca { margin-left: auto; }
-.biblioteca-panel-fila {
-  margin-top: 10px;
-  border: 1px solid var(--linea);
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: var(--fondo);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.biblioteca-panel-grupo { font-weight: 600; font-size: 13px; margin-top: 6px; color: var(--tinta-suave); }
+.biblioteca-panel-sin-tipo { border-top: 1px solid var(--linea); padding-top: 8px; }
+.biblioteca-panel-fila-item { display: flex; gap: 6px; align-items: stretch; }
+.biblioteca-panel-fila-item .biblioteca-panel-item { flex: 1; }
+.biblioteca-quitar { padding: 6px 10px; white-space: nowrap; }
+/* Fila 417: el plazo traído de otra guía, a revisar. */
+.paso-aviso-plazo {
+  margin: 4px 0; padding: 6px 10px; font-size: 13px;
+  background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: 8px; color: var(--tinta);
 }
-.biblioteca-panel-fila-nombre { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
-.biblioteca-panel-fila-nombre .campo { flex: 1; min-width: 180px; }
 
-.tabla-comparacion { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tabla-comparacion th, .tabla-comparacion td {
-  border: 1px solid var(--linea);
-  padding: 6px 8px;
-  text-align: left;
-  vertical-align: top;
-}
-.tabla-comparacion th { background: var(--fondo); }
 
 /* publicado 10-sep-2026 13:55 */
 
