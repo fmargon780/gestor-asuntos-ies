@@ -32,8 +32,9 @@ await pagina.addInitScript(preparacion);
 await pagina.addInitScript(() => {
   window.__esperar = async (cond, tope = 20000) => {
     const fin = Date.now() + tope;
-    let v = await cond();
-    while (!v && Date.now() < fin) { await new Promise((r) => setTimeout(r, 50)); v = await cond(); }
+    const mirar = async () => { try { return await cond(); } catch (e) { return false; } };   /* un fichero a medio escribir no es un fallo: se vuelve a mirar */
+    let v = await mirar();
+    while (!v && Date.now() < fin) { await new Promise((r) => setTimeout(r, 50)); v = await mirar(); }
     return v;
   };
 });
