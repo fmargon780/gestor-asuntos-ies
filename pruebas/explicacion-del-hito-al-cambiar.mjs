@@ -178,12 +178,12 @@ await abrirMesaDe('Actual', 'c2');
 await elegirDelMenu('Cambiar');
 await comprobar('4. «Resolver» no tiene explicación: la caja sale vacía', pagina.evaluate(() => document.getElementById('hda-cuerpo').textContent), '');
 await PONER('<p>Solo aquí:</p><ul><li>uno</li></ul>');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
+/* Fila 416: sin pregunta; un hito de la guía se cambia en la guía y llega al otro asunto, que no lo ha empezado. */
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 await comprobar('4. cambia aquí', cuerpoHito(ASUNTO_1, 'c2'), '<p>Solo aquí:</p><ul><li>uno</li></ul>');
-await comprobar('4. la guía sigue sin explicación', cuerpoPaso('c2'), '');
-await comprobar('4. el otro asunto, igual', cuerpoHito(ASUNTO_2, 'c2'), '');
+await comprobar('4. la guía lleva la explicación', cuerpoPaso('c2'), '<p>Solo aquí:</p><ul><li>uno</li></ul>');
+await comprobar('4. el otro asunto, que no lo había empezado, también', cuerpoHito(ASUNTO_2, 'c2'), '<p>Solo aquí:</p><ul><li>uno</li></ul>');
 /* Los datos se leen del disco cada vez (no hay caché): al volver a abrir la
    mesa, la explicación sigue ahí, sin que la guía la pise. */
 await volver();
@@ -199,7 +199,7 @@ await elegirDelMenu('Crear');
 await comprobar('5. «Crear» lleva la caja «Explicación» vacía', pagina.evaluate(() => ({ hay: !!document.getElementById('hda-cuerpo'), t: document.getElementById('hda-cuerpo').textContent })), { hay: true, t: '' });
 await pagina.fill('#hda-titulo', 'Nota con viñetas');
 await PONER('<p>Pasos:</p><ul><li>uno</li><li>dos</li></ul>');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
+await pagina.check('#hda-solo-aqui');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 const idNota = (await leerHitos(ASUNTO_1)).filter((h) => h.titulo === 'Nota con viñetas')[0].id;
