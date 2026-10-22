@@ -34,7 +34,7 @@ Aunque el documento de la fila no las diga:
   de código uno a uno con las herramientas de GitHub): ver `CLAUDE.md`, apartado «Trabajar en la
   rama de la fila; a `main` solo con el revisor». Como mucho tres subidas por fila: marca EN CURSO
   (solo `docs/`), el código con sus pruebas, y la marca HECHA.
-- **Nada se sube hasta que `npm test` entero está en verde en local.** Subir la mitad y seguir
+- **Nada se sube hasta que `npm test` entero está en verde en local** (desde el 22-oct-2026, la pasada completa es diaria: ver `CLAUDE.md`). Subir la mitad y seguir
   trabajando está prohibido: la web publica cada subida.
 - **No leas el repositorio entero.** Solo los ficheros de la lista, y `grep` para lo demás.
 - **Cambios quirúrgicos.** Nada de reescribir ficheros enteros.
@@ -64,7 +64,7 @@ retocar para que pasen. Nada más.
    (por ejemplo `hitos.mjs` y `estado-sigue-a-los-hitos.mjs`, que pasaban antes del `21980a1`).
    Pon al día cada prueba que falle para que busque las palabras nuevas de `docs/VOCABULARIO.md`.
    Si una prueba falla por otra cosa que no sea un texto cambiado, arregla el fallo en el código.
-3. `npm test` entero en verde, una subida, y comprobar la publicación (`CLAUDE.md`).
+3. `npm test` entero en verde (desde el 22-oct-2026, la pasada completa es diaria: ver `CLAUDE.md`), una subida, y comprobar la publicación (`CLAUDE.md`).
 4. Marca la 179 como **SUSTITUIDA por las filas 189 y 190**.
 
 ### Fila 189 — Vocabulario, segunda parte: los textos que faltan
