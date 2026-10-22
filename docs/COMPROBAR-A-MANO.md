@@ -313,3 +313,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Un correo etiquetado «GESTOR» en la cuenta personal de Francisco ya no aparece en el Gestor.
 
 - [ ] [SOLO FRANCISCO] (fila 414) En Ajustes → tipo «Elecc. Consejo Escolar» → guía, el hito de recepción de candidaturas tiene «Recibe varios documentos» (marcarla es el paso de la fila 415); al guardar una candidatura real, la casilla de espera no sale, el hito sigue abierto y la candidatura queda dentro.
+
+## Fila 416 — la guía manda en los hitos (22-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Tipo «Elecc. Consejo Escolar», hito «Registrar de salida en Séneca»: cambia su título en la guía y mira que sale nuevo en los asuntos abiertos donde no está empezado y sigue viejo donde ya hay una tarea marcada. Quita un hito de la guía y mira que desaparece solo de los que no lo habían empezado.
