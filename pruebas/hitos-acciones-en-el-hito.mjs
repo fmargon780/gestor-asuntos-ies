@@ -105,8 +105,12 @@ await comprobar('la barra del guion no cuenta el «No aplica»: «1 de 3»',
   pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '1 de 3');
 
 console.log('--- 1. las acciones, solo en el hito ---');
-await comprobar('ningún paso del guion lleva botón de acción',
-  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-guion button.guion-accion-boton, .hito-en-mesa .mesa-guion .guion-paso .boton').length), 0);
+await comprobar('ningún paso del guion lleva el botón de acción de antes',
+  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-guion button.guion-accion-boton').length), 0);
+/* Fila 410: solo las tareas pendientes de comunicar y de generar llevan su botón; registrar y las sin acción, no. */
+await comprobar('solo comunicar y generar llevan botón dentro de la tarea',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-guion .guion-paso .guion-accion-tarea'))
+    .map(b => b.closest('.guion-paso').dataset.id + ':' + b.textContent.trim())), ['g2:Enviar correo', 'g4:Generar documento']);
 await comprobar('la cabecera lleva Generar, Comunicar, Registrar, Marcar y ···',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button.boton'))
     .filter(b => b.offsetParent).map(b => b.textContent.trim())),

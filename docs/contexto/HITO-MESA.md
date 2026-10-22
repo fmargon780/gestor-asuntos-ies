@@ -458,3 +458,9 @@ comprobación del tipo la cuenta como «sin plantilla».
 - La casilla «Es lo que se esperaba…» vive en el cuadro de nombre (ver `docs/contexto/DOCUMENTOS.md`).
 
 - Fila 305: `.mesa-etiquetas` lleva la marca de `ContactoALaVista` («Lo pide: … · Tel. … ⧉»); no hace crecer la cabecera (el nombre se recorta, el dato no).
+
+## Botón de la acción dentro de la tarea (22-oct-2026, fila 410, `docs/BOTON-DE-LA-ACCION-EN-LA-TAREA.md`)
+
+- Cada tarea pendiente (ni hecha ni «No aplica») con acción `comunicar` lleva en su línea «Enviar correo» (o «Enviar por Séneca» si `canalDe` da `seneca`), y con `generar`, «Generar documento»; `registrar`, las sin acción y las preguntas no llevan. Sale en todas las pendientes, también con el hito hecho; solo con el asunto abierto (no archivado); en solo consulta, apagado con su título.
+- Código: `HitoMesaRecetas.botonDeTareaHTML` (lo pinta `HitoMesaGuion.pasoHTML` delante del 💬/«⋮») y `HitoMesaRecetas.lanzarTarea`, que llama a los mismos `comunicarPaso` (tras `HitoMesaComunicar.candidatos`) y `generarPaso` de los menús de la cabecera; el marcado de la tarea es el de siempre (`idPasoGuion`). La cabecera no cambia.
+- Copia de pruebas: la tarea de comunicar de CERTIFICADO DE NOTAS lleva la plantilla de correo `pl-demo-certificado` (`js/demo/datos-hacer-hito.js`). Prueba: `pruebas/boton-de-la-accion-en-la-tarea.mjs`.

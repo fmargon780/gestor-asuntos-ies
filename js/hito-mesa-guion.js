@@ -6,8 +6,10 @@
    - "Tareas del hito", la cuenta "N de M" y una barra de progreso.
    - Cada tarea: casilla, texto en negrita, explicación en gris, su
      normativa como etiqueta "§ cita" y "No aplica". Desde la fila 154
-     (docs/HITOS-ACCIONES-EN-EL-HITO.md), sin botones de acción: las
-     acciones viven en la cabecera del hito (js/hito-mesa.js). Hecho: en
+     (docs/HITOS-ACCIONES-EN-EL-HITO.md), las acciones viven en la cabecera
+     del hito (js/hito-mesa.js); desde la fila 410
+     (docs/BOTON-DE-LA-ACCION-EN-LA-TAREA.md), cada tarea pendiente de
+     comunicar o de generar lleva además su botón. Hecho: en
      gris, con quién y cuándo al lado; «No aplica»: tachado.
    - Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): sin frases al pie. Al
      final de la lista, una sola caja «Nueva tarea… (escribe y pulsa
@@ -70,9 +72,10 @@ var HitoMesaGuion = (function () {
     var claveAccion = accionDe(g);
     var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
       : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
-    /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): las tareas ya no llevan
-       botones de acción; las acciones viven solo en la cabecera del hito.
-       Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
+    /* Fila 154: las acciones viven en la cabecera del hito; fila 410: y cada
+       tarea pendiente de comunicar o de generar lleva su botón, delante del
+       💬 y del «⋮». Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
+    var botonAccion = (abierto && window.HitoMesaRecetas) ? HitoMesaRecetas.botonDeTareaHTML(a, h, g) : '';
     var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
@@ -87,7 +90,7 @@ var HitoMesaGuion = (function () {
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
         (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" title="Vuelve a activarla en Herramientas → Plantillas, o pon otra en la tarea">plantilla fuera de uso</span>' : '') +
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
-        quienCuando + botonesTarea + '</div>' +
+        quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
@@ -224,6 +227,11 @@ var HitoMesaGuion = (function () {
             return apuntarTarea(a, h, porId[id], hecha ? 'hecha' : 'sin hacer').then(function () { return r; });
           });
         });
+      };
+      /* Fila 410: el botón de la acción de la tarea. */
+      var accionTarea = el.querySelector('.guion-accion-tarea');
+      if (accionTarea && porId[id]) accionTarea.onclick = function () {
+        HitoMesaRecetas.lanzarTarea(a, h, porId[id], fila, accionTarea);
       };
       /* Fila 138: un dato se marca al escribirlo. */
       var dato = el.querySelector('.guion-dato');

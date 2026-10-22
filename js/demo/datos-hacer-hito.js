@@ -16,6 +16,7 @@
   'use strict';
 
   var FICHERO = 'Certificado de notas.docx';
+  var ID_CORREO = 'pl-demo-certificado';
 
   async function crearPlantilla() {
     var P = window.Demo.plantilla;
@@ -31,6 +32,9 @@
       id = Plantillas.idNuevoDocumento();
       actual.documentos.push({ id: id, tipo: 'CERTIFICADO DE NOTAS', categoria: 'ALUMNADO', nombre: 'Certificado de notas',
         fichero: FICHERO, tipoDocumento: 'CERTIFICADO', texto: '', firmante: '', vistoBueno: '', conLogoCentro: false });
+      /* Fila 410: una plantilla de correo del tipo, la que lleva la tarea de comunicar. */
+      actual.lista.push({ id: ID_CORREO, tipo: 'CERTIFICADO DE NOTAS', categoria: 'ALUMNADO', nombre: 'Envío del certificado de notas',
+        texto: 'Le enviamos el certificado de notas que nos solicitó.' });
       return actual;
     });
     return id;
@@ -41,7 +45,7 @@
     return [
       { id: 'g-hacer-generar', texto: 'Generar el certificado', accion: 'generar', receta: { plantilla: idPlantilla } },
       { id: 'g-hacer-registrar', texto: 'Registrar la salida en Séneca', accion: 'registrar' },
-      { id: 'g-hacer-comunicar', texto: 'Enviar el certificado por correo', accion: 'comunicar', receta: { via: 'correo', a: 'tercero' } }
+      { id: 'g-hacer-comunicar', texto: 'Enviar el certificado por correo', accion: 'comunicar', receta: { via: 'correo', a: 'tercero', plantilla: ID_CORREO } }
     ];
   }
 

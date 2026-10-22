@@ -85,13 +85,18 @@ var HitoMesaRecetas = (function () {
     return p && !Plantillas.enUso(p) ? p : null;
   }
 
+  /* El canal que abrirá una tarea de comunicar: el de la receta, o el primero de siempre. */
+  function canalDe(a, h, g) {
+    var canales = window.HitosComunicar && HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
+    return ((g && g.receta && g.receta.via) || canales[0] || 'correo');
+  }
+
   async function comunicarPaso(a, h, g, lista) {
     var receta = g.receta || {};
     /* Fila 321: la plantilla de la tarea está fuera de uso: no se prepara nada. */
     var fuera = await plantillaFueraDeUso(g);
     if (fuera) { Plantillas.avisoFueraDeUso(fuera); return; }
-    var canales = window.HitosComunicar && HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
-    var via = receta.via || canales[0] || 'correo';
+    var via = canalDe(a, h, g);
     var op = await opcionesDePaso(a, h, g, lista, via);
     if (via === 'correo' && window.HitoMesaComunicar) {
       var marcados = window.HitoMesaDocumentos && HitoMesaDocumentos.marcados ? HitoMesaDocumentos.marcados(document) : [];
@@ -125,6 +130,27 @@ var HitoMesaRecetas = (function () {
     } catch (e) { U.fallo('No he podido generar el documento', e); }
   }
 
+  /* ---------- el botón dentro de la propia tarea (fila 410) ---------- */
+
+  /* «Enviar correo», «Enviar por Séneca» o «Generar documento», en la línea de cada tarea pendiente con esa
+     acción (registrar no lleva). Vacío si no toca. */
+  function botonDeTareaHTML(a, h, g) {
+    if (!g || g.pregunta || g.hecho || g.noaplica) return '';
+    var texto = g.accion === 'generar' ? 'Generar documento'
+      : (g.accion === 'comunicar' ? (canalDe(a, h, g) === 'seneca' ? 'Enviar por Séneca' : 'Enviar correo') : '');
+    if (!texto) return '';
+    var consulta = window.SoloConsulta && SoloConsulta.activo();
+    return '<button type="button" class="boton boton-chico guion-accion-tarea" data-accion="' + g.accion + '"' +
+      (consulta ? ' disabled title="En este ordenador solo se puede consultar"' : '') + '>' + texto + '</button>';
+  }
+
+  /* Lo mismo que elegir esa tarea en el menú de la cabecera. */
+  async function lanzarTarea(a, h, g, fila, boton) {
+    if (g.accion === 'generar') return generarPaso(a, h, g, fila, boton);
+    var lista = window.HitoMesaComunicar ? await HitoMesaComunicar.candidatos(a, h) : [];
+    return comunicarPaso(a, h, g, lista);
+  }
+
   /* `extra`: { lista } (los candidatos de Comunicar) o { fila } (la mesa). */
   function enganchar(caja, a, h, accion, extra) {
     var bloque = caja && caja.querySelector('.mesa-recetas[data-accion="' + accion + '"]');
@@ -140,6 +166,6 @@ var HitoMesaRecetas = (function () {
     });
   }
 
-  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, opcionesDePaso: opcionesDePaso };
+  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, botonDeTareaHTML: botonDeTareaHTML, lanzarTarea: lanzarTarea, opcionesDePaso: opcionesDePaso };
 })();
 window.HitoMesaRecetas = HitoMesaRecetas;
