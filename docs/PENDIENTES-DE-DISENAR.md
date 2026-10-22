@@ -72,10 +72,6 @@ centro puede bloquearlo); dejar la copia de Drive solo para consultar (es la fil
 
 **Mientras tanto:** en casa, solo consulta, y nunca cambiar nada sobre la copia de Drive.
 
-## Mover un hito desde la mesa, en los demás asuntos (fila 300)
-
-«Hito ▾» → «Cambiar» → «Colocar después de», guardado «A la guía», solo mueve el hito en los demás asuntos si está vacío (`propagarCambio`); «Cambiar la guía» (fila 300) recoloca todos los sin hacer. Hablar con Francisco si deben ser la misma regla.
-
 ## 3. Aviso de actividad extraescolar solo al profesorado afectado (idea 306, 8-oct-2026)
 
 Proyecto futuro, apuntado por Francisco: hoy no está listo. El aviso de una actividad extraescolar

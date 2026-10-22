@@ -407,6 +407,21 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   (`aplicarModoConsulta`) o si la guía de ese tipo todavía no ha terminado de cargar (en ese caso
   no se marca nada como "ya intentado": el siguiente repintado lo reintenta). Tocar los hitos de
   un asunto nunca cambia la guía del tipo.
+- **La guía manda: lo cambiado y lo quitado en la guía llega a los asuntos abiertos sin empezar** (fila 416, 22-oct-2026,
+  `docs/HITOS-UN-SOLO-SITIO.md` parte A, `js/hitos-sincronizar.js`, `js/guias-enganche.js`). **Todo** guardado de la guía
+  (`escribirGuia`, `guardarPasos`, `cambiarPasos` y lo que llega desde un asunto) pasa los pasos de antes: `guardarPasos` los lee
+  él solo antes de escribir. `Hitos.llevarGuiaAAbiertos(tipo, pasos, pasosAntes, claveActual)` devuelve
+  `{ llegados, recolocados, cambiados, quitados, saltados, tocados, otros }` (sin `pasosAntes` sigue devolviendo el número de
+  siempre); `Hitos.textoDelReparto(r)` hace la frase verde y `GuiasDelCentro.ultimoReparto()` guarda el último reparto.
+  `Hitos.cambiosDeLaGuia(hitos, pasosAntes, pasosAhora, esVacio)` (pura) trabaja a cualquier profundidad: un paso **cambiado** (los
+  campos que `Hitos.pasoAHito` copia al hito, salvo `soloInformativo`, y el texto de las respuestas) se copia al hito del asunto
+  si está **sin empezar** (`HitosDesdeElAsunto.estaVacio`); un paso **quitado** se quita del asunto si no está empezado (su id sigue
+  en `pasosConocidos`, para que no vuelva) y, si está empezado, el hito se queda y **antes** se copian sus tareas de la guía a
+  `guionPropio` con los mismos ids (lo marcado se conserva); una respuesta que la guía ya no tiene se va si se queda sin hitos y no
+  está elegida. Las tareas se siguen leyendo en vivo de la guía. El orden es el de la fila 300 (para todos los sin hacer; en el
+  asunto desde el que se cambia lo coloca `propagarCambio`). Los asuntos archivados y los unidos (fila 207) nunca se tocan. Si la
+  guía se queda vacía no se reparte nada. Desde un asunto ya no hay pregunta «¿Dónde se guarda?» para hitos ni tareas (ver
+  `docs/contexto/HITO-MESA.md`). Prueba: `pruebas/la-guia-manda-en-los-hitos.mjs`.
 - **El orden nuevo de la guía llega a los asuntos abiertos** (fila 300, 7-oct-2026,
   `docs/ORDEN-DE-LA-GUIA-LLEGA-A-LOS-ASUNTOS.md`, `js/hitos-sincronizar.js`). Solo `escribirGuia`
   («Cambiar la guía» desde Ajustes, la ficha o la mesa) pasa los pasos de antes:
@@ -418,9 +433,8 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   hitos **sin hacer** de la guía (pendiente o en curso; no `delTipoAnterior`, no hechos, no
   `noaplica`, no los solo de este asunto) en los mismos huecos, en el orden de la guía. Si el primer
   hito sin hacer no es el que está en curso, el de antes vuelve a pendiente (conserva todo) y el
-  primero pasa a en curso, salvo que el actual lleve `cadena` (un «Hacer este hito» a medias). Mover
-  un hito desde la mesa («A la guía») sigue con `propagarCambio`: otra regla (en
-  `docs/PENDIENTES-DE-DISENAR.md`). Prueba: `pruebas/orden-de-la-guia-llega-a-los-asuntos.mjs`.
+  primero pasa a en curso, salvo que el actual lleve `cadena` (un «Hacer este hito» a medias). Desde la
+  fila 416 todo guardado de la guía pasa `pasosAntes`, así que el orden llega siempre. Prueba: `pruebas/orden-de-la-guia-llega-a-los-asuntos.mjs`.
 - **Los pasos nuevos de la guía llegan a los asuntos abiertos** (fila 118, 24-sep-2026,
   `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`, `js/hitos-sincronizar.js`). Al guardar la guía de un
   tipo (`escribirGuia` y `guardarPasos` de `js/guias-enganche.js`, este también para «Traer el
@@ -464,8 +478,8 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 - **Crear, cambiar y borrar hitos desde el asunto** (28-sep-2026, fila 206,
   `docs/HITOS-DESDE-EL-ASUNTO.md`, `js/hitos-desde-el-asunto.js`): desde el «···» de la mesa,
   «+ Crear un hito», «Cambiar este hito» y «Borrar este hito» (apagado si el hito tiene trabajo),
-  con el bloque «¿Dónde se guarda?» (fila 235) que reparte el cambio a los asuntos abiertos del tipo, pero
-  solo a los que están vacíos. Detalle completo en `docs/contexto/HITO-MESA.md`, junto al resto del
+  (desde la fila 416, sin pregunta: la guía manda) que reparte el cambio a los asuntos abiertos del tipo, pero
+  solo a los que están sin empezar. Detalle completo en `docs/contexto/HITO-MESA.md`, junto al resto del
   «···» de la mesa.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).

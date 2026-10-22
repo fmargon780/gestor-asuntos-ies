@@ -1,7 +1,8 @@
 /* ============================================================
-   hitos-desde-el-asunto-guia.js — lo que hay detrás de «¿Dónde se
-   guarda?» cuando la respuesta es «A la guía» (30-sep-2026, fila 235,
-   docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md, puntos 4 y 5).
+   hitos-desde-el-asunto-guia.js — lo que hay detrás de guardar en la
+   guía desde un asunto (30-sep-2026, fila 235,
+   docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md, puntos 4 y 5; desde la fila 416
+   ya no hay pregunta «¿Dónde se guarda?», la guía manda).
 
    - `llevarHitoEntero(a, h)`: un hito que solo existe en este asunto
      (sin paso en la guía) entra en la guía del tipo con su título,
@@ -38,21 +39,6 @@ window.HitosDesdeElAsuntoGuia = (function () {
     return { pasos: copia(GuiasDelCentro.pasosDe(tipo)), otros: otros };
   }
 
-  /* De los otros asuntos abiertos del tipo que tienen el hito de origen
-     `idOrigen`, cuántos tienen trabajo en él (no se tocarán). */
-  async function conTrabajo(tipo, idOrigen, claveActual) {
-    if (!idOrigen) return 0;
-    var datos = await Hitos.leer();
-    var n = 0;
-    HitosDesdeElAsunto.clavesAbiertasDelTipo(tipo).forEach(function (c) {
-      if (c === claveActual) return;
-      var e = datos.porAsunto[c];
-      var h = e && (e.hitos || []).filter(function (x) { return x.origenGuia === idOrigen && !x.delTipoAnterior; })[0];
-      if (h && !HitosDesdeElAsunto.estaVacio(h, c)) n++;
-    });
-    return n;
-  }
-
   /* La frase verde de después, cuando ha ido a la guía. */
   function textoGuardado(tipoCorto, otros, saltados) {
     var t = 'Guardado en la guía de ' + tipoCorto +
@@ -85,7 +71,7 @@ window.HitosDesdeElAsuntoGuia = (function () {
         });
       }
       if (igual(ahora.pasos, reg.despues.pasos)) {
-        if (!igual(reg.antes.pasos, reg.despues.pasos)) await GuiasDelCentro.guardarPasos(reg.tipo, copia(reg.antes.pasos));
+        if (!igual(reg.antes.pasos, reg.despues.pasos)) await GuiasDelCentro.guardarPasos(reg.tipo, copia(reg.antes.pasos), { sinLlevar: true });   /* fila 416: los asuntos ya se han restaurado arriba */
       } else {
         parcial = true;
       }
@@ -140,7 +126,7 @@ window.HitosDesdeElAsuntoGuia = (function () {
       return d;
     });
     try {
-      await GuiasDelCentro.guardarPasos(tipo, pasos);
+      await GuiasDelCentro.guardarPasos(tipo, pasos, { claveActual: a.nombre });
     } catch (err) {
       await dejarComoEstaba(a.nombre, hitoAntes);
       throw err;
@@ -185,7 +171,6 @@ window.HitosDesdeElAsuntoGuia = (function () {
 
   return {
     instantanea: instantanea,
-    conTrabajo: conTrabajo,
     textoGuardado: textoGuardado,
     avisarConDeshacer: avisarConDeshacer,
     deshacer: deshacer,

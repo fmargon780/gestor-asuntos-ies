@@ -313,10 +313,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* Fila 224: la caja «Nueva tarea…» añade solo a este asunto. */
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Pedir el certificado de empadronamiento');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
-  /* Fila 235: Intro abre «¿Dónde se guarda?»; aquí, «Solo en este asunto». */
-  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-  await pagina.check('input[name="dsg-donde"][value="aqui"]');
-  await pagina.click('#cuadro-aceptar');
+  /* Fila 416: Intro guarda solo en este asunto, sin preguntar. */
   await pagina.waitForSelector('.hito-en-mesa .guion-paso .guion-tarea-propia');
   await comprobar('9. la caja queda vacía tras Intro',
     pagina.inputValue('.hito-en-mesa .guion-nueva-tarea'), '');
@@ -326,8 +323,6 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   const filaTarea = pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' });
   await filaTarea.locator('.guion-tarea-menu-boton').click();
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar a la guía' }).click();
-  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-  await pagina.click('#cuadro-aceptar');   /* «A la guía» viene marcada */
   await pagina.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('.mensaje'),
     (m) => m.textContent.indexOf('Guardado en la guía de') !== -1));
   await pagina.waitForTimeout(500);
@@ -351,9 +346,6 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       .locator('.guion-casilla').isChecked(), false);
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Solo para Ana');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
-  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-  await pagina.check('input[name="dsg-donde"][value="aqui"]');
-  await pagina.click('#cuadro-aceptar');
   await pagina.waitForTimeout(800);
   await comprobar('9. la tarea que no se pasa no toca la guía', pagina.evaluate(async () => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');

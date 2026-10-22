@@ -243,17 +243,14 @@
       return false;
     }
     var res = await llevarAAbiertos(nombreTipo, pasos, pasosAntes);
-    var llegados = res.llegados, recolocados = res.recolocados;
     try {
       pintarTabla();
       pintarGuiaNuevo();
       await window.Gestor.recargar();
+      /* Fila 416: a cuántos asuntos ha llegado cada cosa y en cuántos no se ha tocado por tener ya trabajo. */
       U.aviso(pasos.length
         ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' hitos.' +
-          (llegados ? ' Los hitos nuevos han llegado a ' +
-            (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.') : '') +
-          (recolocados ? ' El orden nuevo ha llegado a ' +
-            (recolocados === 1 ? '1 asunto abierto.' : recolocados + ' asuntos abiertos.') : '')
+          (textoDelReparto(res) ? ' ' + textoDelReparto(res) : '')
         : nombreTipo + ' se queda sin guía.', 'bueno');
       return true;
     } catch (e) {
@@ -267,8 +264,17 @@
      cambio", que ya ha hecho su propia pregunta (Traer el cambio /
      Dejarlo como está) y solo necesita que el resultado quede escrito.
      Se relee antes de escribir, como escribirGuia. */
-  async function guardarPasos(nombreTipo, pasosNuevos) {
+  /* Fila 416 (docs/HITOS-UN-SOLO-SITIO.md): todo guardado de la guía
+     recuerda la guía como era (`pasosAntes`) para que lo cambiado y lo
+     quitado lleguen a los asuntos abiertos sin empezar. `opciones`:
+     { claveActual }, el asunto desde el que se cambia (no cuenta en
+     «a cuántos ha llegado»), y { sinLlevar: true }, para guardar sin
+     repartir (el «Deshacer» ya restaura los asuntos él solo). El reparto
+     queda en `ultimoReparto()`. */
+  async function guardarPasos(nombreTipo, pasosNuevos, opciones) {
+    opciones = opciones || {};
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
+    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
     await guardarTipo(nombreTipo, pasosNuevos);
     /* Fila 255: los campos de un paso que ya no está pasan a ser del asunto. */
@@ -276,16 +282,20 @@
       try { await CamposDeHito.limpiarMarcas(nombreTipo, pasosNuevos); }
       catch (e) { U.accesorio('La guía se ha guardado, pero no he podido soltar los campos de un hito borrado', e); }
     }
-    var llegados = (await llevarAAbiertos(nombreTipo, pasosNuevos)).llegados;
-    if (llegados) {
-      U.aviso('Los hitos nuevos de ' + nombreTipo + ' han llegado a ' +
-        (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.'), 'bueno');
-    }
+    var reparto = opciones.sinLlevar ? REPARTO_VACIO()
+      : await llevarAAbiertos(nombreTipo, pasosNuevos, pasosAntes, opciones.claveActual);
+    ultimoRepartoGuardado = reparto;
+    var texto = textoDelReparto(reparto);
+    if (texto) U.aviso(texto, 'bueno');
     pintarTabla();
     pintarGuiaNuevo();
     await window.Gestor.recargar();
-    return llegados;
+    return reparto.tocados;
   }
+
+  function REPARTO_VACIO() { return { llegados: 0, recolocados: 0, cambiados: 0, quitados: 0, saltados: 0, tocados: 0, otros: 0 }; }
+  var ultimoRepartoGuardado = REPARTO_VACIO();
+  function textoDelReparto(r) { return (window.Hitos && Hitos.textoDelReparto) ? Hitos.textoDelReparto(r) : ''; }
 
   /* Fila 118 (docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md): los hitos nuevos
      de la guía, a los asuntos abiertos de ese tipo que ya tienen hitos
@@ -293,16 +303,16 @@
      falla, ámbar, nunca rojo. Devuelve { llegados, recolocados }: a cuántos
      asuntos han llegado hitos nuevos y a cuántos el orden nuevo (fila 300:
      solo si llega `pasosAntes`, que solo pasa «Cambiar la guía»). */
-  async function llevarAAbiertos(nombreTipo, pasos, pasosAntes) {
-    var nada = { llegados: 0, recolocados: 0 };
+  async function llevarAAbiertos(nombreTipo, pasos, pasosAntes, claveActual) {
+    var nada = REPARTO_VACIO();
     if (!pasos || !pasos.length || !window.Hitos || !Hitos.llevarGuiaAAbiertos) return nada;
     try {
-      var r = await Hitos.llevarGuiaAAbiertos(nombreTipo, pasos, pasosAntes);
-      if (typeof r === 'number') r = { llegados: r, recolocados: 0 };
-      if ((r.llegados || r.recolocados) && window.HitosPanel) HitosPanel.programarRepintado();
+      var r = await Hitos.llevarGuiaAAbiertos(nombreTipo, pasos, pasosAntes || [], claveActual);
+      if (typeof r === 'number') r = Object.assign(REPARTO_VACIO(), { llegados: r, tocados: r, otros: r });
+      if (r.tocados && window.HitosPanel) HitosPanel.programarRepintado();
       return r;
     } catch (e) {
-      U.accesorio('Guía guardada, pero no he podido llevar los hitos nuevos a los asuntos abiertos', e);
+      U.accesorio('Guía guardada, pero no he podido llevar los cambios a los asuntos abiertos', e);
       return nada;
     }
   }
@@ -310,11 +320,11 @@
   /* Fila 120 (docs/GUION-DESDE-EL-HITO.md): relee guias.json, deja que
      `cambiar` toque una copia de los pasos del tipo y la guarda por
      guardarPasos. Si `cambiar` devuelve false, no se guarda nada. */
-  async function cambiarPasos(nombreTipo, cambiar) {
+  async function cambiarPasos(nombreTipo, cambiar, opciones) {
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
     var copia = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
     if (cambiar(copia) === false) return false;
-    await guardarPasos(nombreTipo, copia);
+    await guardarPasos(nombreTipo, copia, opciones);
     return true;
   }
 
@@ -346,6 +356,7 @@
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,
+    ultimoReparto: function () { return ultimoRepartoGuardado; },   /* fila 416 */
     ponerAlDia: ponerAlDia, alEntrarEnNuevo: alEntrarEnNuevo,   /* fila 273 */
     recargar: cargar,   /* fila 138: tras pasar «lo que hay que reunir» al guion */
     asegurarGuia: asegurarGuia,

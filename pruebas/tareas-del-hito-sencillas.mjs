@@ -120,23 +120,20 @@ await comprobar('2. la tarea de la guía trae Anotar/Cambiar/Borrar/Abrir en la 
 await elegirDelMenu('Cambiar');
 await pagina.fill('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Avisar a la tutoría (por iPasen)');
 await pagina.press('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Enter');
-/* Fila 235: Intro abre «¿Dónde se guarda?»; aquí, «Solo en este asunto». */
-await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
-await comprobar('2. el texto cambia en este asunto y lleva «solo aquí»',
-  pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Avisar a la tutoría (por iPasen)' }).locator('.guion-tarea-propia').isVisible(), true);
-await comprobar('2. la guía no cambia', pagina.evaluate(async () => {
+/* Fila 416: Cambiar una tarea de la guía va a la guía, sin preguntar. */
+await pagina.waitForTimeout(800);
+await comprobar('2. el texto cambia en este asunto',
+  pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Avisar a la tutoría (por iPasen)' }).count(), 1);
+await comprobar('2. la guía lleva el texto nuevo', pagina.evaluate(async () => {
   const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
   return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion[0].texto;
-}), 'Avisar a la tutoría');
+}), 'Avisar a la tutoría (por iPasen)');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Dos', 'c1');
-await comprobar('2. y el otro asunto abierto sigue con el texto de antes',
+await comprobar('2. y el otro asunto abierto ve el texto nuevo (la guía manda)',
   pagina.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="g1"] .guion-paso-texto') || {}).textContent),
-  'Avisar a la tutoría');
+  'Avisar a la tutoría (por iPasen)');
 
 /* 3. «Anotar»: la nota lleva el nombre de la tarea delante, y sale el 💬.
    De vuelta en «Sola Uno» (donde se comprueba la nota guardada). */
@@ -162,21 +159,18 @@ await comprobar('3. y el texto guardado empieza por el nombre de la tarea',
    (la de la prueba 3), pide confirmación de una línea. */
 await abrirMenuDeTarea('g2');
 await elegirDelMenu('Borrar');
-await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
+await pagina.waitForTimeout(800);
 await comprobar('4. desaparece de este asunto',
   pagina.evaluate(() => !document.querySelector('.hito-en-mesa .guion-paso[data-id="g2"]')), true);
-await comprobar('4. la guía no cambia', pagina.evaluate(async () => {
+await comprobar('4. se quita de la guía (fila 416)', pagina.evaluate(async () => {
   const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
   return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion.length;
-}), 2);
+}), 1);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Dos', 'c1');
-await comprobar('4. y el otro asunto abierto la sigue teniendo',
-  pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-paso[data-id="g2"]')), true);
+await comprobar('4. y el otro asunto abierto ya no la tiene',
+  pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-paso[data-id="g2"]')), false);
 
 /* 5. El botón «Hito ▾»: solo Crear · Cambiar · Borrar arriba. */
 await pagina.click('.hito-en-mesa .mesa-mas');

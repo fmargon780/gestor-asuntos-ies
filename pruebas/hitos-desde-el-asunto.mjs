@@ -4,11 +4,12 @@
    guía y a los asuntos abiertos, solo donde el hito está vacío.
 
    A. Crear con guía: llega en su sitio a otro asunto abierto del tipo.
-   B. Crear solo en este asunto: no toca la guía ni el otro asunto.
+   B. Crear solo en este asunto (casilla «Solo para este asunto»): no toca la guía ni el otro asunto.
    C. Cambiar (con guía): se cambia y se mueve en el vacío; el que
       tiene trabajo no se toca.
-   D. Borrar: apagado con trabajo; con la casilla, se va de la guía y
+   D. Borrar: apagado con trabajo; sin preguntar, se va de la guía y
       del abierto vacío, se queda en el que tiene trabajo.
+   (Fila 416: sin «¿Dónde se guarda?»; la guía manda.)
    E. (fila 224) Crear buscando en la biblioteca: al escribir parte de
       un título que ya existe ahí, sale para elegirlo; al elegirlo, el
       hito nace con lo del modelo (aquí, su responsable) y también en
@@ -149,14 +150,11 @@ await abrirMesaDe('Actual', 'c1');
 await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Recabar la documentación');
 await pagina.selectOption('#hda-despues', 'c1');
-/* Fila 235: ya no hay casilla; el bloque «¿Dónde se guarda?» sale con la guía marcada. */
-await comprobar('A. sin la casilla vieja «También en la guía»',
-  pagina.evaluate(() => !document.querySelector('#hda-tambien-guia')), true);
-await comprobar('A. «A la guía de …» marcada, y dice a cuántos abiertos llega',
-  pagina.evaluate(() => ({
-    marcada: document.querySelector('input[name="dsg-donde"]:checked').value,
-    nota: (document.querySelector('.dsg-nota') || {}).textContent
-  })), { marcada: 'guia', nota: 'Llegará a 2 asuntos abiertos de este tipo.' });
+/* Fila 416: sin pregunta «¿Dónde se guarda?»; solo la casilla «Solo para este asunto», desmarcada. */
+await comprobar('A. sin la pregunta «¿Dónde se guarda?» ni la casilla vieja',
+  pagina.evaluate(() => !document.querySelector('.dsg') && !document.querySelector('#hda-tambien-guia')), true);
+await comprobar('A. la casilla «Solo para este asunto» sale desmarcada',
+  pagina.evaluate(() => { const c = document.querySelector('#hda-solo-aqui'); return c ? c.checked : 'NO ESTA'; }), false);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
@@ -186,7 +184,7 @@ await volver();
 await abrirMesaDe('Actual', 'c1');
 await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Nota solo mía');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
+await pagina.check('#hda-solo-aqui');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
@@ -213,9 +211,9 @@ await comprobar('C. en este asunto: título cambiado y movido al principio',
 await comprobar('C. en el asunto vacío: también cambia y se mueve',
   leerHitos(ASUNTO_2).then((hs) => hs.map((h) => h.titulo)),
   ['Recabar y comprobar la documentación', 'Comunicar', 'Resolver']);
-await comprobar('C. en el asunto con trabajo: se queda como estaba',
+await comprobar('C. en el asunto con trabajo: el título se queda (el orden sí sigue a la guía, fila 300)',
   leerHitos(ASUNTO_3).then((hs) => hs.map((h) => h.titulo)),
-  ['Comunicar', 'Recabar la documentación', 'Resolver']);
+  ['Recabar la documentación', 'Comunicar', 'Resolver']);
 await comprobar('C. la guía también cambia y se mueve',
   leerGuia().then((g) => g.map((p) => p.titulo)),
   ['Recabar y comprobar la documentación', 'Comunicar', 'Resolver']);
@@ -232,10 +230,8 @@ await volver();
 
 await abrirMesaDe('Actual', idNuevo);
 await elegirDelMenu('Borrar');
-await pagina.waitForSelector('input[name="dsg-donde"]');
-await comprobar('D. «Borrar» lleva las dos opciones, con «A la guía» marcada',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('input[name="dsg-donde"]'), (r) => r.value + (r.checked ? '*' : ''))),
-  ['guia*', 'aqui']);
+await comprobar('D. «Borrar» ya no pregunta dónde se guarda',
+  pagina.evaluate(() => !document.querySelector('input[name="dsg-donde"]')), true);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 

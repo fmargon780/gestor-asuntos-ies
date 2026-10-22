@@ -166,6 +166,8 @@ var Hitos = (function () {
     if (h && (h.toca === 'nos' || h.toca === 'espera')) salida.toca = h.toca;
     if (h && h.toca === 'espera' && h.tocaA) salida.tocaA = String(h.tocaA);
     if (h && h.variosDocumentos && !esDecision) salida.variosDocumentos = true;   /* fila 414: solo si lo lleva */
+    /* Fila 416: algo de este hito (título, explicación, responsable, plazo, «solo informativo») se cambió a mano solo en este asunto: la guía ya no lo pisa. */
+    if (h && h.cambioAqui) salida.cambioAqui = true;
     if (h && h.variosPropio && !esDecision) salida.variosPropio = true;   /* fila 414: cambiado «solo en este asunto»: la guía ya no lo pisa */
     if (h && h.esperandoA) {
       salida.esperandoA = String(h.esperandoA);

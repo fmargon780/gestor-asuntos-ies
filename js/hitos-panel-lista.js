@@ -178,6 +178,7 @@ var HitosPanelLista = (function () {
         '<span class="hito-titulo">' + U.escapar(h.titulo) +
           (h.clase === 'decision' ? ' <span class="suave">— ' + U.escapar(elegidaTxt) + '</span>' : '') +
           (h.soloInformativo ? ' <span class="etiqueta-informativo">Informativo</span>' : '') +
+          (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +   /* fila 416 */
         '</span>' +
         '<span class="hito-meta">' + metaDeHito(h, ajustes, contexto) + '</span>' +
         /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */

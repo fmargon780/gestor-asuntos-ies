@@ -74,18 +74,23 @@ cuentan + desde qué hito, `js/guias-plazo.js`, con id propio, `GuiasPlazo.htmlC
 sin guía, el plazo se guarda igual en el propio hito (`Hitos.guardarCampos` gana el campo `plazo`,
 que `Hitos.aplicarPlazosDependientes` ya sabe recalcular tenga o no origen en la guía).
 
-El bloque **«¿Dónde se guarda?»** (fila 235, ver más abajo; antes, una casilla «También en la guía de <tipo corto>» marcada por defecto) decide si el cambio entra
-en `_GESTOR/guias.json` y llega, en el sitio exacto elegido, a los asuntos abiertos del mismo tipo —
-pero solo a los hitos **vacíos** (`HitosDesdeElAsunto.estaVacio(h, aOClave)`: sin nada que perder —
-distinto de hecho, sin ninguna tarea marcada ni con valor, sin tareas propias, sin notas (las del
-hito y las del asunto, con su etiqueta), sin documentos, sin rama elegida y sin una fecha puesta a
-mano; «en curso» solo no cuenta como trabajo, igual que `HitosCambioDeTipo.tieneAlgo` en negativo).
-Un hito con trabajo nunca se toca; el aviso de después dice cuántos asuntos han recibido el cambio y,
-si alguno se ha quedado sin tocar, cuántos por tener trabajo. Al crear, el reparto a los abiertos lo
-hace solo el mecanismo ya existente de la fila 118 (`GuiasDelCentro.guardarPasos` →
-`Hitos.llevarGuiaAAbiertos`, que ya incluye el propio asunto); al cambiar o borrar, que si tocan
-hitos que YA EXISTEN en cada asunto, hace falta el reparto propio de este fichero
-(`propagarCambio`/`propagarBorrado`, dentro de un solo `Hitos.cambiar`).
+**La guía manda** (fila 416, 22-oct-2026, `docs/HITOS-UN-SOLO-SITIO.md` parte A; sustituye a la pregunta «¿Dónde se guarda?» de
+la fila 235, que ya no sale para hitos ni tareas): crear, cambiar o borrar un hito **de la guía** va a
+`_GESTOR/guias.json` y llega a los demás asuntos abiertos del tipo con las reglas de `docs/contexto/HITOS-Y-GUIAS.md`
+(solo a los hitos **sin empezar**, `HitosDesdeElAsunto.estaVacio`); **en el propio asunto el cambio se aplica siempre**
+(`propagarCambio(…, soloActual)` y `propagarBorrado(…, soloActual)`, dentro de un solo `Hitos.cambiar`). «+ Crear un hito» lleva la
+casilla **«Solo para este asunto»** (`#hda-solo-aqui`, desmarcada al abrirse, solo con tipo): el hito se crea sin `origenGuia` y sale con
+la marca «solo aquí» (`HitosDesdeElAsunto.marcaSoloAquiHTML`, en el título de la mesa y en la lista); «Hito ▾» → **«Pasar a la guía»**
+(solo en un hito «solo aquí» de nivel superior) lo lleva entero con sus tareas (`HitosDesdeElAsunto.pasarALaGuia` →
+`HitosDesdeElAsuntoGuia.llevarHitoEntero`), sin pregunta. Cambiar o borrar un hito «solo aquí», un asunto sin tipo o un hito dentro de una
+pregunta se queda en el asunto, con «Guardado solo en este asunto.» (dentro de una pregunta, «…: dentro de una pregunta no se puede
+cambiar la guía desde aquí.»). «Borrar» ya no tiene casilla: solo confirma, y dice en una línea que también se quita de la guía.
+`estaVacio` = `sinTrabajo` (lo de siempre: hecho, tarea marcada o con valor, tareas propias, notas, documentos, rama elegida,
+fecha a mano; es lo que decide si se puede **borrar**) **más** los cambios hechos a mano solo en ese asunto: `cambioAqui`
+(que escribe `Hitos.guardarCampos` al cambiar título, explicación, responsable, plazo o «solo informativo»), `variosPropio`,
+`guionOcultos` y `guionTextos` no vacíos y requisitos con valor; una pregunta cuenta como empezada si lo está algún hito de sus
+respuestas. El aviso de después dice a cuántos asuntos ha llegado y, **siempre**, en cuántos no se ha tocado por tener ya trabajo
+(`Hitos.textoDelReparto`).
 
 **Simplificación a propósito** (como ya hace `Hitos.mover`, "complicaría las bifurcaciones sin que
 Francisco lo haya pedido"): «Colocar después de» solo ofrece los hitos de **nivel superior** del
@@ -292,15 +297,15 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
     `tarea`/`tareaTexto`) con el nombre de la tarea delante («Revisar DNI o NIE: …»). La tarea
     lleva entonces un 💬 (con el número si hay más de una) que despliega o pliega sus notas
     (`NotasHito.delTarea`).
-  - **Cambiar** (fila 235; antes «Cambiar aquí» / «Cambiar en la guía»): el texto se edita en la
-    propia línea (Intro abre «¿Dónde se guarda?», Escape cancela). «Solo en este asunto», de la guía: `Hitos.cambiarGuionAqui(clave, idHito,
-    original, texto)` esconde el id original en `guionOcultos` y pone una propia con `enLugarDe` en
-    su mismo sitio, con su marca de hecha; desde ese momento lleva «solo aquí». «Solo aquí»:
-    `Hitos.cambiarGuionPropioTexto`, sin más.
+  - **Cambiar** (fila 235; desde la fila 416 sin pregunta): el texto se edita en la propia línea (Intro
+    guarda, Escape cancela). De la guía, va a la guía y llega a todos los abiertos. De una «solo aquí»
+    (`Hitos.cambiarGuionPropioTexto`), de un hito que no está en la guía o dentro de una pregunta, se queda en el
+    asunto (`Hitos.cambiarGuionAqui(clave, idHito, original, texto)` esconde el id original en `guionOcultos` y
+    pone una propia con `enLugarDe` en su mismo sitio, con su marca de hecha).
   - **Abrir en la guía** (tarea de la guía; antes «Cambiar en la guía»): `HitoMesaGuion.cambiarGuionDelPaso(a, h, idResaltar)`,
     el mismo editor de siempre (`js/guias-guion.js`) con esa tarea a la vista y resaltada
     (`.guion-fila-resaltada`); el título de la ventana dice «Cambiar en la guía de <tipo>».
-  - **Pasar a la guía** (tarea «solo aquí»): el emergente «¿Dónde se guarda?» con «A la guía» marcada y, aceptado, la tarea (texto,
+  - **Pasar a la guía** (tarea «solo aquí»; sin pregunta desde la fila 416, `DondeSeGuardaTareas.pasar`): la tarea (texto,
     explicación, acción, normativa, reunir/obligatorio) se añade al final del `guion` del paso de
     la guía con `GuiasDelCentro.cambiarPasos` (id nuevo de `GuiasGuion.normalizar`, como antes),
     y `Hitos.pasarGuionPropioAGuia` quita la propia de este asunto y traslada su marca de hecha (si
@@ -386,49 +391,35 @@ La tarjeta «Registro» de la mesa enseña, en **una sola lista** por fechas (ya
 «Anotar algo que ha pasado…» (Intro guarda). Ver «El registro del asunto» en
 `docs/contexto/ASUNTOS.md`.
 
-## «¿Dónde se guarda?» al crear, cambiar o borrar (30-sep-2026, fila 235, `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md`)
+## Guardar en la guía desde un asunto (30-sep-2026, fila 235; sin pregunta desde la fila 416, `docs/HITOS-UN-SOLO-SITIO.md`)
 
-Todo cambio de hitos o de tareas hecho desde un asunto pregunta, antes de guardarse, dónde se guarda. La
-pregunta es siempre la misma y sale sola, sin ir a buscarla:
+La fila 235 hizo que todo cambio de hitos o tareas desde un asunto preguntara «¿Dónde se guarda?». La fila 416 (parte A) lo
+**quita**: la guía manda (ver arriba y `docs/contexto/HITOS-Y-GUIAS.md`). Lo que queda de la fila 235:
 
-- **`js/donde-se-guarda.js`** (`DondeSeGuarda`): el bloque (`bloqueHTML`, `textoConsecuencia`, puras) con dos
-  radios `name="dsg-donde"`: «A la guía de <tipo corto>» (marcada siempre al abrirse) y «Solo en este
-  asunto». Debajo de la primera, en letra pequeña: «Llegará a N asuntos abiertos de este tipo.» (N = los
-  demás abiertos del tipo, `otrosAbiertos`), «No hay más asuntos abiertos de este tipo. Valdrá para los
-  próximos.» si N es 0, «En M no se tocará, porque ya tienen trabajo.» y, si el hito no está en la guía,
-  «El hito "X" todavía no está en la guía: irá con sus N tareas.». Sin tipo no hay bloque (se guarda solo
-  en el asunto); dentro de una pregunta, «A la guía» sale apagada con el motivo. Teclado: flechas cambian
-  la opción, Intro acepta, Escape cancela sin guardar (`js/usabilidad.js`). `preguntar` es el emergente
-  pequeño de las tareas.
-- **Hitos** (`js/hitos-desde-el-asunto.js`): los tres cuadros ya no llevan la casilla; el bloque va al pie y
-  el botón dice «Guardar» («Borrar» en el de borrar). «Cambiar» un hito propio del asunto también ofrece
-  «A la guía». `js/hitos-desde-el-asunto-guia.js` (`HitosDesdeElAsuntoGuia`): `llevarHitoEntero` (un hito
-  sin paso en la guía entra con título, plazo, responsable y todas sus tareas —con los mismos ids, así que
-  lo marcado no se pierde—, detrás del hito anterior que venga de la guía; se enlaza primero aquí para que
-  el reparto de la fila 118 no lo repita), `instantanea` + `deshacer` + `avisarConDeshacer`.
-  **Explicación del hito** (fila 228, `docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md`): «Crear» y «Cambiar» llevan la
-  caja `#hda-cuerpo` (`contenteditable`, misma barra `GuiasBarra` y mismo limpiado `Guias.limpiar` que
-  `.paso-cuerpo` de la guía; vacía si no dice nada). Campo `cuerpo` en `Hitos.guardarCampos` («solo aquí»), en
-  el paso de la guía y en `propagarCambio`; con la biblioteca, la caja se rellena con `modelo.explicacion` y el
-  paso nuevo lleva el texto cambiado. `llevarHitoEntero` se lleva también el `cuerpo`. «Deshacer» deja guía y
-  otros asuntos como estaban; aquí se queda. El cuadro lleva `cuadro-alto cuadro-hda` (botones fijos abajo).
-  Prueba: `pruebas/explicacion-del-hito-al-cambiar.mjs`.
-- **Tareas** (`js/donde-se-guarda-tareas.js`, `DondeSeGuardaTareas.nueva/cambiar/pasar/borrar`): Intro en
-  «Nueva tarea…» abre el emergente; Escape deja lo escrito; la caja se vacía al elegir. A la guía = tocar
-  el `guion` del paso (`GuiasDelCentro.cambiarPasos`), que llega solo a los demás asuntos; un hito propio
-  se lleva entero. Borrar una tarea de la guía deja «solo aquí», en los abiertos donde estaba hecha, esa
-  tarea (`conservarHechas`). Borrar una «solo aquí» no pregunta.
-- **El aviso de después**: «Guardado en la guía de <tipo> y en N asuntos abiertos.» (más «En M no se ha
-  tocado porque ya tenían trabajo.») con botón **«Deshacer»** (8 s, `U.aviso` con acción) o «Guardado solo
-  en este asunto.». «Deshacer» devuelve la guía y los demás asuntos a la instantánea de antes y deja el
-  cambio en este asunto como «solo aquí»; si algo ha cambiado por otro lado, no lo pisa y avisa en ámbar.
-- **«No me carga el mapa previo»** (punto 6 del documento): con datos de demostración no se reprodujo
-  (`pruebas/donde-se-guarda.mjs`, 6b y 7: tras crear un hito «solo en este asunto» o en la guía, «Cambiar la
-  guía…», «Ver mapa» y el mapa del asunto enseñan la guía previa entera). Único punto débil encontrado y
-  arreglado: `GuiasDelCentro.recargar()` vaciaba la guía en memoria si la lectura fallaba (ahora conserva
-  la última buena).
-- Pruebas: `pruebas/donde-se-guarda.mjs` (nueva), y puestas al día `pruebas/hitos-desde-el-asunto.mjs`,
-  `pruebas/tareas-del-hito-sencillas.mjs` y `pruebas/hito-mesa.mjs`.
+- **`js/donde-se-guarda.js`** (`DondeSeGuarda`): el bloque con radios `name="dsg-donde"` ya **solo lo usan los campos** de un hito o
+  del asunto (filas 245 y 255); para hitos y tareas se quitó el código de «hito nuevo», «apagada», «con trabajo» y «respondida».
+  Sigue dando `tipoDe`, `nombreCortoDe`, `otrosAbiertos` e `introAcepta`.
+- **Hitos** (`js/hitos-desde-el-asunto.js`, `js/hitos-desde-el-asunto-guia.js`): `llevarHitoEntero` (un hito sin paso en la guía entra
+  con título, plazo, responsable y todas sus tareas —con los mismos ids, así que lo marcado no se pierde—, detrás del hito anterior que
+  venga de la guía; se enlaza primero aquí para que el reparto de la fila 118 no lo repita), `instantanea` + `deshacer` +
+  `avisarConDeshacer`. «Deshacer» devuelve la guía (`guardarPasos(…, { sinLlevar: true })`) y los demás asuntos a la instantánea de
+  antes y deja el cambio en este asunto como «solo aquí»; si algo ha cambiado por otro lado, no lo pisa y avisa en ámbar.
+  **Explicación del hito** (fila 228, `docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md`): «Crear» y «Cambiar» llevan la caja `#hda-cuerpo`
+  (`contenteditable`, misma barra `GuiasBarra` y mismo limpiado `Guias.limpiar` que `.paso-cuerpo` de la guía). El cuadro lleva
+  `cuadro-alto cuadro-hda`. Prueba: `pruebas/explicacion-del-hito-al-cambiar.mjs`.
+- **Tareas** (`js/donde-se-guarda-tareas.js`, `DondeSeGuardaTareas.nueva/cambiar/pasar/borrar`): «Nueva tarea…» guarda **solo en este
+  asunto** (marca «solo aquí»); «Cambiar» y «Borrar» una tarea de la guía van a la guía (tocar el `guion` del paso con
+  `GuiasDelCentro.cambiarPasos(…, { claveActual })`, que llega solo a los demás asuntos); borrar una tarea hecha en otros asuntos la deja
+  «solo aquí» allí (`conservarHechas`); borrar una **pregunta** respondida en otros asuntos avisa antes («En N asuntos ya está
+  respondida; allí dejará de verse.»). «Pasar a la guía» (⋮ de una «solo aquí») la lleva a la guía, o con el hito entero si el hito no
+  está en la guía. Esconder una tarea de la guía solo en este asunto (`ocultarGuionDeGuia`) ya no se ofrece, pero los escondidos
+  que existan se respetan.
+- **El aviso de después**: «Guardado en la guía de <tipo> y en N asuntos abiertos.» (más «En M no se ha tocado porque ya tenían
+  trabajo.») con botón **«Deshacer»** (8 s) o «Guardado solo en este asunto.».
+- **«No me carga el mapa previo»** (punto 6 del documento de la fila 235): con datos de demostración no se reprodujo
+  (`GuiasDelCentro.recargar()` conserva la última guía buena si la lectura falla).
+- Pruebas: `pruebas/donde-se-guarda.mjs` (reescrita en la fila 416), `pruebas/hitos-desde-el-asunto.mjs`,
+  `pruebas/menu-en-las-preguntas-del-hito.mjs` y la nueva `pruebas/la-guia-manda-en-los-hitos.mjs`.
 
 **Campos de este hito (fila 255)**: en la columna derecha, debajo de los tres resúmenes, la tarjeta `.mesa-campos-hito` (la pinta `CamposDeHito.tarjetaHtml` desde `cuerpoDeHito`, se engancha en `engancharCuerpo`): los campos del hito con su control según la clase, guardados al cambiar, con «⋮» y «+ Añadir campo» en el título; sin campos, una tarjeta pequeña con solo el botón; en modo consulta y en el ARCHIVO, solo lectura.
 

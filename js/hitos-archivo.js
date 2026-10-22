@@ -99,6 +99,9 @@
 
   function guardarCampos(clave, idHito, cambios) {
     return editar(clave, idHito, function (h) {
+      /* Fila 416 (docs/HITOS-UN-SOLO-SITIO.md): lo cambiado a mano solo en este asunto lo hace «empezado»
+         (HitosDesdeElAsunto.estaVacio): los cambios de la guía ya no lo tocan. */
+      if (['titulo', 'cuerpo', 'responsable', 'plazo', 'soloInformativo'].some(function (k) { return k in cambios; })) h.cambioAqui = true;
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
       /* Fila 228: la explicación del hito (con formato), limpiada como la de la guía. */
       if ('cuerpo' in cambios) h.cuerpo = window.Guias ? Guias.limpiar(cambios.cuerpo || '') : String(cambios.cuerpo || '');
