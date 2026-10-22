@@ -361,6 +361,19 @@ App.cargarTipos = async function () {
   App.E.tipos = t;
 };
 
+/* Fila 422 (docs/DESACTIVAR-UN-TIPO.md): un tipo desactivado lleva
+   `desactivado: true` en tipos.json; sin ese dato, está activo. Sigue
+   existiendo para todo lo que ya lo usa (asuntos, ajustes, búsquedas),
+   pero no se ofrece para asuntos nuevos ni cambiados: todos los sitios
+   donde se ELIGE un tipo piden la lista a `App.tiposParaElegir`. */
+App.tipoDesactivado = function (t) {
+  return !!(t && t.desactivado);
+};
+
+App.tiposParaElegir = function () {
+  return (App.E.tipos || []).filter(function (t) { return !t.desactivado; });
+};
+
 App.cargarTiposDocumento = async function () {
   var t = await Carpetas.leerJson(App.E.gestor, App.FICHERO_TIPOS_DOC);
   if (!t || !t.length) {

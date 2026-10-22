@@ -81,6 +81,17 @@ function construirSeccionDatos(tipo) {
   cambiar.onclick = function () { App.renombrarTipo(tipo); };
   b.cuerpo.appendChild(cambiar);
 
+  /* Desactivar / Activar (fila 422, js/tipos-desactivar.js). */
+  if (window.TiposDesactivar) {
+    if (tipo.desactivado) {
+      var avisoApagado = document.createElement('p');
+      avisoApagado.className = 'nota';
+      avisoApagado.textContent = 'Desactivado: no se ofrece al crear asuntos nuevos. Los que ya lo tienen siguen igual.';
+      b.cuerpo.appendChild(avisoApagado);
+    }
+    b.cuerpo.appendChild(TiposDesactivar.botonDe(tipo));
+  }
+
   /* Unir con otro tipo (27-sep-2026, fila 207, docs/UNIR-DOS-TIPOS.md):
      el cuadro y la lógica viven en js/tipos-unir.js. */
   if (window.TiposUnir) {

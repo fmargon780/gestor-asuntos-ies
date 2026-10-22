@@ -24,7 +24,8 @@ window.TipoEnLinea = (function () {
   /* Los tipos que se parecen a `texto`, los más usados primero.
      `categoria`, si viene, limita la búsqueda a esa categoría. */
   function buscar(texto, categoria) {
-    var tipos = (App.E.tipos || []).filter(function (t) { return !categoria || t.categoria === categoria; });
+    /* Fila 422: un tipo desactivado no se ofrece. */
+    var tipos = App.tiposParaElegir().filter(function (t) { return !categoria || t.categoria === categoria; });
     var deNombre = {};   /* nombre (o corto, o alias) -> tipos que lo llevan */
     tipos.forEach(function (t) {
       [t.tipo, t.nombreCorto].concat(t.alias || []).forEach(function (n) {
@@ -65,7 +66,8 @@ window.TipoEnLinea = (function () {
       estado.buscando = false;
       var t = objeto(estado.tipo);
       var marca = t
-        ? '<span class="resultado-categoria">' + U.escapar(t.categoria) + '</span>'
+        ? '<span class="resultado-categoria">' + U.escapar(t.categoria) + '</span>' +
+          (t.desactivado ? ' <span class="suave tipo-marca-desactivado">Desactivado</span>' : '')
         : (estado.tipo ? ' <span class="suave">(no está en la lista)</span>' : '');
       caja.innerHTML = '<div class="elegido"><div class="elegido-caja">' +
         '<div>' + (o.rotulo ? U.escapar(o.rotulo) + ' ' : '') +
@@ -140,6 +142,7 @@ window.TipoEnLinea = (function () {
             nombres: (App.E.tipos || []).map(function (t) { return t.tipo; }),
             detalle: function (n) { var t = objeto(n); return t ? t.categoria : ''; },
             ver: function (n) { var t = objeto(n); if (t) elegir(t); },
+            alActivar: function (n) { var t = objeto(n); if (t) elegir(t); },   /* fila 422 */
             crear: function (n) { o.alCrear(n); }
           });
         }

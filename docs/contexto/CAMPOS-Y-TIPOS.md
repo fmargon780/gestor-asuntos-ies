@@ -398,3 +398,23 @@ título del hito sobre sus campos con valor; Nuevo asunto no los pide (guarda so
 Ajustes → Campos tiene el desplegable «Hito» (sin «Obligatorio» si hay hito); al guardarse la guía
 (`guardarPasos`), los campos de un paso borrado pasan a ser del asunto (`limpiarMarcas`).
 
+### Desactivar un tipo (22-oct-2026, fila 422, `docs/DESACTIVAR-UN-TIPO.md`, `js/tipos-desactivar.js`)
+
+Un tipo apagado lleva `desactivado: true` en `tipos.json` (sin el dato está activo; al activar se borra la clave). Sigue entero y sus asuntos
+no cambian, pero **no se ofrece** para asuntos nuevos o cambiados: todos los sitios donde se elige un tipo piden la lista a
+`App.tiposParaElegir()` (`js/nucleo.js`; `App.tipoDesactivado(t)`). Ya la usan la parrilla y los contadores de Nuevo asunto
+(`js/asuntos-nuevo.js`), el buscador de «Cambiar el asunto» y de la línea del tipo (`TipoEnLinea.buscar`), la propuesta de la bandeja
+(`js/bandeja-propuesta.js`), el lector de documentos (`ContextoDocumentos.delCentro`: lo desactivado «no se reconoce»), el reparto
+(`js/repartir-pantalla.js`, `js/repartir-ficheros.js`) y el alta de un asunto que se repite (`Recurrentes.alta`, salvo el tipo que llega ya elegido
+desde su pantalla). Siguen viendo todos los tipos: Ajustes, la lista y los filtros de asuntos, «Unir» (el que se queda conserva su estado),
+`TiposParecidos` y la línea de un asunto que ya tiene ese tipo (sale con «Desactivado»).
+
+- **Ajustes › Tipos de asunto**: botón «Desactivar» / «Activar» junto a «Cambiar el nombre» (y en el menú ⋮ de la tarjeta). «Desactivar»
+  pregunta antes (cuántos asuntos abiertos, que siguen igual, y cuántos que se repiten se paran); «Activar» no pregunta. Usa el mismo camino de
+  escritura que «Borrar», así que en modo consulta sale el aviso ámbar de siempre. La tarjeta sale en gris, **al final de su categoría**
+  (también en la búsqueda), con la marca «Desactivado»; el contador de la categoría cuenta todos.
+- **Recurrencia** (`js/recurrentes.js`): `pendientes()` salta los de un tipo desactivado; su botón «Activo / Parado» no se toca. Al activar el tipo,
+  `Recurrentes.alActivarTipo` apunta `noAntesDe: <hoy>` en cada uno y `proxima()` no devuelve fecha igual o anterior a ese día (no se crea ninguno ese
+  día ni los atrasados). La sección «Se repite» del tipo dice «Parado porque el tipo está desactivado» mientras lo esté.
+- **Mismo nombre que un tipo desactivado**: «Buscar o crear» de Ajustes (`BuscarOCrear.pintarZona`), «+ Crear tipo nuevo» (`js/tipo-al-vuelo.js`) y los
+  cuadros de parecidos avisan «Ya existe y está desactivado» y ofrecen «Activarlo» (o «Activarlo y usarlo»); no se crea uno repetido.

@@ -57,7 +57,7 @@ var ContextoDocumentos = (function () {
       });
       otras.push({ categoria: 'ADMINISTRACIONES', lista: entradas });
     } catch (e) { /* sin administraciones.json, se sigue */ }
-    return { tipos: App.E.tipos, alumnado: alumnado, personal: personal, empresas: empresas, otras: otras };
+    return { tipos: App.tiposParaElegir(), alumnado: alumnado, personal: personal, empresas: empresas, otras: otras };
   }
 
   return { delCentro: delCentro };

@@ -183,7 +183,7 @@ var RepartirFicheros = (function () {
   function pintarListaHtml() {
     var cuerpo = $('cuadro-cuerpo');
     var ficheros = F.ficheros;
-    var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
+    var tipos = App.tiposParaElegir().map(function (t) { return t.tipo; });
     var tiposDoc = (App.E.tiposDocumento || []).slice();
     var sel = interno().seleccionHTML;
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +

@@ -144,7 +144,7 @@ App.pintarCategorias = function () {
   var caja = $('categorias-lista');
   caja.innerHTML = '';
   Nombres.CATEGORIAS.forEach(function (cat) {
-    var cuantos = App.E.tipos.filter(function (t) { return t.categoria === cat; }).length;
+    var cuantos = App.tiposParaElegir().filter(function (t) { return t.categoria === cat; }).length;
     var b = document.createElement('button');
     b.className = 'categoria-boton' + (App.E.nuevo.categoria === cat ? ' elegido' : '');
     b.setAttribute('data-categoria', cat);
@@ -237,8 +237,8 @@ App.pintarTipos = function () {
   caja.innerHTML = '';
   var categoriaPersona = categoriaDeLaParrilla();
   var deEsta = categoriaPersona
-    ? App.E.tipos.filter(function (t) { return t.categoria === categoriaPersona; })
-    : App.E.tipos.slice();
+    ? App.tiposParaElegir().filter(function (t) { return t.categoria === categoriaPersona; })
+    : App.tiposParaElegir();   /* fila 422: sin los desactivados */
   caja.classList.toggle('tipos-todas-categorias', !categoriaPersona);
   if (!deEsta.length) {
     caja.innerHTML = '<div class="vacio">' + (categoriaPersona

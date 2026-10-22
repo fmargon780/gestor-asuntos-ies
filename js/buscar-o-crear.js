@@ -65,6 +65,19 @@ window.BuscarOCrear = (function () {
       var donde = o.detalle ? o.detalle(mismo.nombre) : '';
       var aviso = document.createElement('div');
       aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
+      /* Fila 422: el mismo nombre que un tipo desactivado: avisa y ofrece activarlo. */
+      var apagado = o.deTipos && window.TiposDesactivar ? TiposDesactivar.porNombre(mismo.nombre) : null;
+      if (apagado && apagado.desactivado) {
+        aviso.innerHTML = 'Ya existe y está desactivado: ' + U.escapar(mismo.nombre) + nota +
+          (donde ? ', en ' + U.escapar(donde) : '') +
+          '. <button type="button" class="enlace" data-bc="activar">Activarlo</button>';
+        aviso.querySelector('[data-bc="activar"]').onclick = async function () {
+          await TiposDesactivar.activar(apagado);
+          if (o.alActivar) o.alActivar(mismo.nombre);
+        };
+        zona.appendChild(aviso);
+        return;
+      }
       aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + nota + (donde ? ', en ' + U.escapar(donde) : '') +
         '. <button type="button" class="enlace" data-bc="ver">Verlo</button>';
       aviso.querySelector('[data-bc="ver"]').onclick = function () { o.ver(mismo.nombre); };
@@ -133,7 +146,9 @@ window.BuscarOCrear = (function () {
       '<ul class="lista-repetidos">' + filas.map(function (x, i) {
         return '<li><span class="tipo-parecido-nombre">' + U.escapar(x.tipo.tipo) + '</span> ' +
           '<span class="resultado-categoria">' + U.escapar(x.tipo.categoria || '') + '</span> ' +
-          '<button type="button" class="enlace" data-bc-fila="' + i + '">' + U.escapar(o.boton) + '</button></li>';
+          (x.tipo.desactivado ? '<span class="suave">Desactivado</span> ' : '') +
+          '<button type="button" class="enlace" data-bc-fila="' + i + '">' +
+          U.escapar(o.boton === 'Usar este' && x.tipo.desactivado ? 'Activarlo y usarlo' : o.boton) + '</button></li>';
       }).join('') + '</ul>';
     var promesa = U.preguntar('¿Es otro tipo de verdad?', cuerpo, o.seguir);
     var caja = document.getElementById('cuadro-cuerpo');
@@ -141,6 +156,11 @@ window.BuscarOCrear = (function () {
       b.onclick = function () {
         var x = filas[Number(b.getAttribute('data-bc-fila'))];
         document.getElementById('cuadro-cancelar').click();
+        /* Fila 422: «Usar este» sobre un tipo desactivado lo activa antes. */
+        if (o.boton === 'Usar este' && x.tipo.desactivado && window.TiposDesactivar) {
+          TiposDesactivar.activar(x.tipo).then(function () { if (o.alPulsar) o.alPulsar(x.tipo); });
+          return;
+        }
         if (o.alPulsar) o.alPulsar(x.tipo);
       };
     });

@@ -91,8 +91,23 @@
     return 12;
   }
 
-  /* La próxima fecha en que toca crear este asunto. */
+  /* La próxima fecha en que toca crear este asunto.
+
+     Fila 422: si su tipo se ha vuelto a activar (`r.noAntesDe` es el día
+     en que se activó), la fecha tiene que ser posterior a ese día: no se
+     crea ninguno ese día ni los que «se habrían creado» mientras estuvo
+     apagado. */
   function proxima(r) {
+    var f = proximaSinPausa(r);
+    var desde = deIso(r.noAntesDe);
+    if (f && desde) {
+      var dia = parseInt(r.dia, 10) || 1;
+      while (f <= desde) f = conDia(f.getFullYear(), f.getMonth() + saltoEnMeses(r.periodo), dia);
+    }
+    return f;
+  }
+
+  function proximaSinPausa(r) {
     var dia = parseInt(r.dia, 10) || 1;
     var hoy = new Date();
     hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
@@ -119,12 +134,22 @@
     return f2;
   }
 
+  /* Fila 422: ¿está desactivado el tipo de este asunto que se repite? */
+  function tipoDesactivado(nombre) {
+    var lista = (window.App && App.E && App.E.tipos) || [];
+    for (var i = 0; i < lista.length; i++) {
+      if (lista[i].tipo === nombre) return !!lista[i].desactivado;
+    }
+    return false;
+  }
+
   /* Los que ya tocan hoy o antes. */
   function pendientes() {
     var hoy = new Date();
     hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
     return lista.filter(function (r) {
       if (r.parado) return false;
+      if (tipoDesactivado(r.tipo)) return false;   /* fila 422 */
       var f = proxima(r);
       return f && f <= hoy;
     });
@@ -355,8 +380,14 @@
 
     var caja = document.createElement('div');
     caja.className = 'lista';
+    if (tipoDesactivado(filtroTipo)) {
+      var parado = document.createElement('p');
+      parado.className = 'nota recurrente-tipo-parado';
+      parado.textContent = 'Parado porque el tipo está desactivado.';
+      caja.appendChild(parado);
+    }
     if (!deEsteTipo.length) {
-      caja.innerHTML = '<div class="vacio">Todavía no se repite ningún asunto de este tipo.</div>';
+      caja.insertAdjacentHTML('beforeend', '<div class="vacio">Todavía no se repite ningún asunto de este tipo.</div>');
     } else {
       deEsteTipo.forEach(function (r) {
         caja.appendChild(filaDeRecurrente(r, [function () { pintarEnContenedor(contenedor, filtroTipo); }]));
@@ -385,7 +416,8 @@
      de `pintarTabla`/`pintarPanel` cuando se guarda, para que esa
      sección se repinte con la fila nueva. */
   async function alta(tipoPreset, alGuardar) {
-    var tipos = window.Gestor.tipos();
+    /* Fila 422: sin los desactivados, salvo el que llega ya elegido desde su pantalla de Ajustes. */
+    var tipos = window.Gestor.tipos().filter(function (t) { return !t.desactivado || t.tipo === tipoPreset; });
     if (!tipos.length) {
       U.aviso('Primero hacen falta tipos de asunto, aquí mismo en Ajustes.', 'malo');
       return;
@@ -513,13 +545,33 @@
 
   /* Público, para la sección "Se repite" de la pantalla de un tipo
      (17-sep-2026, fila 39, js/ajustes-tipo.js). */
+  /* Fila 422 (js/tipos-desactivar.js): cuántos asuntos que se repiten de
+     este tipo están en marcha, y qué hacer al volver a activar el tipo. */
+  async function contarDeTipo(nombre) {
+    if (!yaLeido) await cargar();
+    return lista.filter(function (r) { return r.tipo === nombre && !r.parado; }).length;
+  }
+
+  async function alActivarTipo(nombre) {
+    if (!yaLeido) await cargar();
+    var propios = lista.filter(function (r) { return r.tipo === nombre; });
+    if (!propios.length) return;
+    var hoy = fechaIso(new Date());
+    propios.forEach(function (r) { r.noAntesDe = hoy; });
+    await guardar();
+    pintarPanel();
+  }
+
   window.Recurrentes = {
     pintarEnContenedor: pintarEnContenedor,
+    contarDeTipo: contarDeTipo,
+    alActivarTipo: alActivarTipo,
     alta: alta,
     /* para pruebas/recurrentes.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md, 2.3;
        fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 2) */
     _cargar: cargar,
     _pendientes: pendientes,
+    _proxima: proxima,
     _crearLosQueTocan: crearLosQueTocan,
     _pintarPanel: pintarPanel,
     _cerradoHoy: cerradoHoy,

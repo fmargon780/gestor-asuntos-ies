@@ -275,7 +275,10 @@ var TiposParecidos = (function () {
   async function confirmarNombre(nombre, o) {
     var lista = paraNombreNuevo(nombre, o.salvo);
     var igual = lista.filter(function (x) { return x.motivo === 'igual'; })[0];
-    if (igual) { U.aviso('Ese tipo ya existe: ' + igual.tipo.tipo + '.', 'malo'); return null; }
+    if (igual) {
+      U.aviso('Ese tipo ya existe' + (igual.tipo.desactivado ? ' y está desactivado (se activa en Ajustes)' : '') + ': ' + igual.tipo.tipo + '.', 'malo');
+      return null;
+    }
     if (!lista.length) return [];
     var sigue = await BuscarOCrear.confirmarTipo(nombre, lista, o);
     return sigue ? lista.slice(0, 4) : null;

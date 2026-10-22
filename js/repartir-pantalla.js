@@ -230,7 +230,7 @@ var Repartir = (function () {
     var cuerpo = $('cuadro-cuerpo');
     var sinRel = !E.personas.length;
     var aviso = E.corte ? '' : N.avisoDivision(E.total, E.primera, E.personas.length);
-    var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; });
+    var tipos = App.tiposParaElegir().map(function (t) { return t.tipo; });
     var tiposDoc = (App.E.tiposDocumento || []).slice();
     cuerpo.innerHTML = '<div class="repartir-dos"><div class="repartir-izq">' +
       (E.filtro ? RepartirFiltro.html(E.filtro) : '') +
@@ -526,7 +526,8 @@ var Repartir = (function () {
   function filaDeTipo(tipo) {
     var fila = document.createElement('div');
     fila.className = 'tipo-repartir-fila';
-    var tipos = (App.E.tipos || []).map(function (t) { return t.tipo; }).filter(function (n) { return n !== tipo.tipo; });
+    var tipos = App.tiposParaElegir().map(function (t) { return t.tipo; }).filter(function (n) { return n !== tipo.tipo; });
+    if (tipo.repartirTipo && tipos.indexOf(tipo.repartirTipo) === -1) tipos.push(tipo.repartirTipo);   /* fila 422: el ya elegido se sigue viendo */
     fila.innerHTML =
       '<label class="etiqueta">Al repartir un PDF entre terceros, crear asuntos de tipo…</label>' +
       seleccionHTML('tipo-repartir-tipo', tipos, tipo.repartirTipo || '', 'Sin elegir') +

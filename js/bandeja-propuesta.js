@@ -93,7 +93,7 @@
     var texto = U.normalizar((datos.asunto || '') + ' ' + (datos.texto || ''));
     if (!texto) return null;
     var mejor = null;
-    (App.E.tipos || []).forEach(function (t) {
+    App.tiposParaElegir().forEach(function (t) {   /* fila 422: sin los desactivados */
       if (categoria && t.categoria !== categoria) return;
       var h = U.normalizar(t.tipo);
       if (h.length < 4) return;

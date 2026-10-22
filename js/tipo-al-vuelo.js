@@ -111,6 +111,19 @@
     /* Fila 279: mira también los nombres antiguos y los cortos, y cada uno lleva «Usar este». */
     var rel = TiposParecidos.paraNombreNuevo(nombre);
     var igual = rel.filter(function (x) { return x.motivo === 'igual'; })[0];
+    if (igual && igual.tipo.desactivado) {
+      /* Fila 422: ya existe pero está desactivado: se avisa y se ofrece activarlo (no se crea uno repetido). */
+      aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
+      aviso.innerHTML = 'Ya existe y está desactivado: ' + U.escapar(igual.tipo.tipo) + (igual.corto ? ' (es su nombre corto)' : '') +
+        ', en ' + U.escapar(igual.tipo.categoria) +
+        '. <button type="button" class="enlace" id="tipo-al-vuelo-activar">Activarlo</button>';
+      crearBtn.disabled = true;
+      $('tipo-al-vuelo-activar').onclick = async function () {
+        await TiposDesactivar.activar(igual.tipo);
+        usarExistente(igual.tipo);
+      };
+      return;
+    }
     if (igual) {
       aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
       aviso.innerHTML = 'Ya existe: ' + U.escapar(igual.tipo.tipo) + (igual.corto ? ' (es su nombre corto)' : '') +
@@ -127,10 +140,16 @@
       var texto = x.motivo === 'antiguo'
         ? U.escapar(nombre) + ' es como se llamaba antes ' + U.escapar(x.tipo.tipo) + '.'
         : 'Se parece a: ' + U.escapar(x.tipo.tipo) + '.';
-      return '<div>' + texto + ' <button type="button" class="enlace" data-usar="' + i + '">Usar este</button></div>';
+      return '<div>' + texto + (x.tipo.desactivado ? ' <span class="suave">(desactivado)</span>' : '') +
+        ' <button type="button" class="enlace" data-usar="' + i + '">' +
+        (x.tipo.desactivado ? 'Activarlo y usarlo' : 'Usar este') + '</button></div>';
     }).join('');
     Array.prototype.forEach.call(aviso.querySelectorAll('[data-usar]'), function (b) {
-      b.onclick = function () { usarExistente(rel[Number(b.getAttribute('data-usar'))].tipo); };
+      b.onclick = async function () {
+        var t = rel[Number(b.getAttribute('data-usar'))].tipo;
+        if (t.desactivado) await TiposDesactivar.activar(t);   /* fila 422 */
+        usarExistente(t);
+      };
     });
   }
 

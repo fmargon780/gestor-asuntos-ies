@@ -237,7 +237,7 @@ App.construirInterruptorDeTipo = function (tipo, campo, porDefecto, texto, ayuda
    Quitar, porque los campos ya viven dentro de esa pantalla. */
 App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
   var f = document.createElement('div');
-  f.className = 'tarjeta-tipo tarjeta-tipo-pulsable';
+  f.className = 'tarjeta-tipo tarjeta-tipo-pulsable' + (tipo.desactivado ? ' tarjeta-tipo-desactivado' : '');
   f.dataset.tipo = tipo.tipo;
   f.tabIndex = 0;
   f.setAttribute('role', 'button');
@@ -247,7 +247,8 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
   linea1.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(tipo.tipo) + '</span>' +
     (mostrarCategoria ? '<span class="marca-categoria">' + U.escapar(tipo.categoria) + '</span>' : '') +
     ((tipo.alias && tipo.alias.length)
-      ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+      ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '') +
+    (tipo.desactivado ? '<span class="marca-desactivado">Desactivado</span>' : '');
   f.appendChild(linea1);
 
   /* Los días de plazo de este tipo, de solo lectura: se edita en un
@@ -266,6 +267,8 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
 
   f.appendChild(App.botonMenuTarjeta([
     { texto: 'Cambiar el nombre', onclick: function () { App.renombrarTipo(tipo); } },
+    { texto: tipo.desactivado ? 'Activar' : 'Desactivar',
+      onclick: function () { if (window.TiposDesactivar) { return tipo.desactivado ? TiposDesactivar.activar(tipo) : TiposDesactivar.desactivar(tipo); } } },
     { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipo(tipo); } }
   ]));
 
@@ -403,11 +406,14 @@ App.pintarTiposAjustes = function () {
   if (enBusqueda) {
     var cercanos = BuscarOCrear.coincidencias($('buscar-tipos').value, App.E.tipos.map(function (t) { return t.tipo; }));
     items = App.E.tipos.filter(function (t) { return cercanos.indexOf(t.tipo) !== -1; });
+    items = items.filter(function (t) { return !t.desactivado; }).concat(items.filter(function (t) { return t.desactivado; }));
     info.textContent = 'Buscando en todas las categorías · ' + items.length +
       (items.length === 1 ? ' resultado' : ' resultados');
     info.classList.remove('oculto');
   } else {
     items = App.E.tipos.filter(function (t) { return t.categoria === App.E.categoriaAjustes; });
+    /* Fila 422: los desactivados, en gris, al final de su categoría. */
+    items = items.filter(function (t) { return !t.desactivado; }).concat(items.filter(function (t) { return t.desactivado; }));
     info.classList.add('oculto');
     info.textContent = '';
   }
@@ -421,6 +427,7 @@ App.pintarTiposAjustes = function () {
       return t ? t.categoria : '';
     },
     ver: function (n) { App.verTipoPorNombre(n); },
+    alActivar: function () { App.pintarTiposAjustes(); },   /* fila 422: ya lo repinta TiposDesactivar */
     crear: function (n) { App.crearTipoDesdeCaja(n); }
   });
 

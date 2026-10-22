@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 22-oct-2026 10:00 (filas 416, 417 y 418 PENDIENTE, conversación de diseño)
+Última puesta al día: 22-oct-2026 18:45 (fila 422 terminada)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -16,5 +16,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
 | 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
-| 422 | 120 | dato «desactivado», filtro común de tipos para elegir (crear, cambiar, bandeja, reparto, encargos, lector), recurrencia parada y recalculada al activar, tarjeta gris y botón en Ajustes, avisos, pruebas, revisor |
 | 423 | 90 | función de ruta de un documento en RutaCarpetas, botón común en ficha, mesa, previas y visor (pasarle el asunto al visor), cuadro de pedir ruta con destino, prueba nueva, revisor |
