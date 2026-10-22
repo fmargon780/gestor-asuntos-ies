@@ -5338,3 +5338,12 @@ rojo fijo arriba; el verde sale cuando se guarda de verdad. Detalle en `docs/GUA
 ## 22-oct-2026 — pasada completa de pruebas, una vez al día
 
 Las filas tardaban hora y media, y la pasada completa de unas 320 pruebas se llevaba unos 30 minutos de cada fila. Francisco decidió hacerla una vez al día, en la primera fila que se lance, en todas sus apps cuya pasada pase de 10 minutos (regla de `CLAUDE.md`, `docs/PASADA-DIARIA.md`).
+
+## Filas SUSTITUIDA movidas desde `docs/COLA.md` (22-oct-2026, fila 421)
+
+| 358 | `pruebas/centro-de-datos.mjs`, comprobación «con un guardado en marcha, espera y luego lo toma», falla en un entorno de sesión (otra tarea de fondo consume las dos primeras preguntas de `hayGuardado`); debería esperar a una condición y no contar llamadas; sale del informe de la fila 335 | SUSTITUIDA (22-oct-2026): diseñada en el tema 365 |
+| 365 | Tema: arreglar una prueba interna. Junta la idea 358: que la prueba `pruebas/centro-de-datos.mjs` no falle sin motivo real. No cambia nada en pantalla. | SUSTITUIDA (22-oct-2026): diseñado; sigue en la fila 421 |
+| 379 | Aviso de usuario: mejora en «Ficha de un asunto» | SUSTITUIDA (22-oct-2026): diseñada en el tema 391 |
+| 391 | Tema: copiar la ruta de un documento. Junta la idea 379: un botón en cada documento de la ficha del asunto que copia su ruta completa, igual que hoy se copia la de la carpeta, para ir directo a él al adjuntarlo en Séneca. Ojo con la fila 382 (botones de copiar de la ficha). | SUSTITUIDA (22-oct-2026): diseñado en la fila 423 |
+| 401 | Aviso de usuario: mejora en «Ajustes» | SUSTITUIDA (22-oct-2026): diseñada en el tema 404 · aviso completo: https://drive.google.com/file/d/1s-UVORC3FYo0qiK7mILE7DnuN6mLfqrJ/view?usp=drivesdk |
+| 404 | Tema: desactivar un tipo de asunto. Junta la idea 401: hoy un tipo de asunto se crea, se cambia o se borra; poder también desactivarlo, para que no se use mientras esté desactivado, sin perderlo ni tocar los asuntos que ya lo tienen. | SUSTITUIDA (22-oct-2026): diseñado en la fila 422 |
