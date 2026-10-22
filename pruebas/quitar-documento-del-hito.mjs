@@ -132,7 +132,7 @@ console.log('--- 8. los menús de la mesa y de la ficha ---');
 await anadir(1, UNO, true);
 await abrirMesa(0);
 const ajeno = pagina.locator('.hito-en-mesa .mesa-doc-ajeno', { hasText: UNO }).first();
-await comprobar('8. la fila «De otros hitos» lleva «Abrir», «Enviar ▾» y «⋯»', ajeno.evaluate((f) => Array.from(f.querySelectorAll('.mesa-doc-acciones button')).filter((b) => !b.closest('.ficha-menu')).map((b) => b.textContent)), ['Abrir', 'Enviar ▾', '⋯']);
+await comprobar('8. la fila «De otros hitos» lleva «Ruta», «Abrir», «Enviar ▾» y «⋯»', ajeno.evaluate((f) => Array.from(f.querySelectorAll('.mesa-doc-acciones button')).filter((b) => !b.closest('.ficha-menu')).map((b) => b.textContent)), ['Ruta', 'Abrir', 'Enviar ▾', '⋯']);
 await cerrarCuadro();
 await ajeno.locator('.mesa-doc-menu-ajeno').click();
 await comprobar('8. «⋯»: «Traer a este hito» y «Quitar de su hito»', pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Traer a este hito', 'Quitar de su hito']);
