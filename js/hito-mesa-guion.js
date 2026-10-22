@@ -278,9 +278,8 @@ var HitoMesaGuion = (function () {
       ev.preventDefault();
       var texto = nueva.value.trim();
       if (!texto || nueva.dataset.preguntando) return;
-      /* Fila 235: Intro abre «¿Dónde se guarda?»; Escape deja lo escrito
-         en la caja. La caja se vacía en cuanto hay una respuesta que
-         guarda (antes del repintado, para que no vuelva el texto). */
+      /* Fila 416: Intro guarda la tarea solo en este asunto, sin preguntar. La caja se
+         vacía al guardar (antes del repintado, para que no vuelva el texto). */
       nueva.dataset.preguntando = '1';
       DondeSeGuardaTareas.nueva(a, h, texto, function () {
         var actual = document.getElementById('guion-nueva-tarea');

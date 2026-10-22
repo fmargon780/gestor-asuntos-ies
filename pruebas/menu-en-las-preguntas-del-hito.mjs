@@ -4,12 +4,11 @@
 
    1. Tiene los tres puntitos y sigue sin casilla.
    2. Sus opciones, sin «Pasar a la guía».
-   3. «Cambiar» solo aquí: cambia el texto, conserva la respuesta elegida
-      y no toca la guía ni el otro asunto.
-   4. «Borrar» solo aquí: se va con las tareas de su respuesta; lo elegido
-      queda guardado.
-   5. «Borrar» a la guía: avisa «En N asuntos ya está respondida…» y la quita.
-   6. El texto del aviso sin respondidas. */
+   3. «Cambiar» va a la guía, sin preguntar (fila 416): cambia el texto, conserva
+      la respuesta elegida y el otro asunto ve el texto nuevo.
+   4. «Borrar» avisa «En N asuntos ya está respondida…» (cancelar no quita nada)
+      y, al aceptar, la quita de la guía y se va con las tareas de su respuesta;
+      lo elegido queda guardado. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -120,7 +119,7 @@ await pagina.click(Q + ' .guion-tarea-menu-boton');
 await comprobar('2. trae Anotar · Cambiar · Borrar · Abrir en la guía', opcionesDelMenu(), ['Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
 await pagina.keyboard.press('Escape');
 
-/* 3. «Cambiar», solo aquí: el texto cambia al momento y la respuesta elegida se queda. */
+/* 3. «Cambiar»: a la guía, sin preguntar. El texto cambia y la respuesta elegida se queda. */
 await pagina.click(Q + ' .guion-respuesta[data-opcion="si"]');
 await pagina.waitForTimeout(400);
 await comprobar('3. antes de cambiar, sale la línea de la respuesta «Sí»',
@@ -129,38 +128,49 @@ await pagina.click(Q + ' .guion-tarea-menu-boton');
 await elegirDelMenu('Cambiar');
 await pagina.fill(Q + ' .guion-tarea-editar-texto', '¿Se avisa a la familia?');
 await pagina.press(Q + ' .guion-tarea-editar-texto', 'Enter');
-await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
+await pagina.waitForTimeout(800);
+await comprobar('3. no sale ningún emergente de dónde se guarda',
+  pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')), true);
 await comprobar('3. el texto nuevo se ve en la pregunta',
   pagina.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"] .guion-paso-texto') || {}).textContent), '¿Se avisa a la familia?');
 await comprobar('3. la respuesta elegida («Sí») se conserva',
   pagina.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"] .guion-respuesta.elegida') || {}).dataset.opcion), 'si');
 await comprobar('3. y la línea de su respuesta sigue',
   pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-paso[data-id="l1"]')), true);
-await comprobar('3. la guía no cambia', pagina.evaluate(async () => {
+await comprobar('3. la guía lleva el texto nuevo', pagina.evaluate(async () => {
   const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
   return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion[1].texto;
-}), '¿Hay que avisar a la familia?');
+}), '¿Se avisa a la familia?');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Dos', 'c1');
-await comprobar('3. el otro asunto sigue con el texto de antes',
-  pagina.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"] .guion-paso-texto') || {}).textContent), '¿Hay que avisar a la familia?');
+await comprobar('3. el otro asunto ve el texto nuevo',
+  pagina.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"] .guion-paso-texto') || {}).textContent), '¿Se avisa a la familia?');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 
-/* 4. «Borrar», solo aquí: se va la pregunta y las tareas de su respuesta. Lo elegido queda guardado. */
+/* 4. «Borrar»: avisa de las respondidas; cancelar no quita nada; aceptar la quita de la guía. */
 await abrirMesaDe('Sola Uno', 'c1');
 await pagina.click(Q + ' .guion-tarea-menu-boton');
 await elegirDelMenu('Borrar');
-await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+await pagina.waitForSelector('#capa:not(.oculto) #cuadro-aceptar');
 await comprobar('4. avisa de que en 1 asunto ya está respondida',
-  pagina.evaluate(() => document.querySelector('#capa .dsg').textContent.indexOf('En 1 asunto ya está respondida; allí dejará de verse.') !== -1), true);
-await pagina.check('input[name="dsg-donde"][value="aqui"]');
+  pagina.evaluate(() => document.querySelector('#capa').textContent.indexOf('En 1 asunto ya está respondida; allí dejará de verse.') !== -1), true);
+await pagina.keyboard.press('Escape');
+await pagina.waitForTimeout(300);
+await comprobar('4. cancelar no la quita de la guía', pagina.evaluate(async () => {
+  const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+  return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion.map((g) => g.id);
+}), ['g1', 'q1']);
+await pagina.click(Q + ' .guion-tarea-menu-boton');
+await elegirDelMenu('Borrar');
+await pagina.waitForSelector('#capa:not(.oculto) #cuadro-aceptar');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
+await pagina.waitForTimeout(800);
+await comprobar('4. la pregunta sale de la guía del tipo', pagina.evaluate(async () => {
+  const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+  return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion.map((g) => g.id);
+}), ['g1']);
 await comprobar('4. la pregunta desaparece de este asunto',
   pagina.evaluate(() => !document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"]')), true);
 await comprobar('4. y también la tarea de su respuesta',
@@ -171,31 +181,6 @@ await comprobar('4. lo elegido queda guardado',
     const h = d.porAsunto[asunto].hitos.filter((x) => x.origenGuia === 'c1')[0];
     return h.guionElegido.q1;
   }, ASUNTO_1), 'si');
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-
-/* 5. «Borrar» a la guía desde «Sola Dos»: avisa en cuántos asuntos ya está respondida, la quita de la guía. */
-await abrirMesaDe('Sola Dos', 'c1');
-await pagina.click(Q + ' .guion-tarea-menu-boton');
-await elegirDelMenu('Borrar');
-await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
-await comprobar('5. el emergente lleva la frase del aviso',
-  pagina.evaluate(() => document.querySelector('#capa .dsg').textContent.indexOf('En 1 asunto ya está respondida; allí dejará de verse.') !== -1), true);
-await pagina.check('input[name="dsg-donde"][value="guia"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(700);
-await comprobar('5. la pregunta sale de la guía del tipo', pagina.evaluate(async () => {
-  const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
-  return guias.CONVALIDACION.filter((p) => p.id === 'c1')[0].guion.map((g) => g.id);
-}), ['g1']);
-await comprobar('5. y desaparece de este asunto',
-  pagina.evaluate(() => !document.querySelector('.hito-en-mesa .guion-paso[data-id="q1"]')), true);
-
-/* 6. El texto del emergente, sin respondidas, no lleva la frase. */
-await comprobar('6. con 0 asuntos respondidos no sale la frase',
-  pagina.evaluate(() => DondeSeGuarda.textoConsecuencia({ otros: 2, respondida: 0 }).join(' ').indexOf('respondida') === -1), true);
-await comprobar('6. con 3, dice «En 3 asuntos…»',
-  pagina.evaluate(() => DondeSeGuarda.textoConsecuencia({ otros: 3, respondida: 3 }).slice(-1)[0]), 'En 3 asuntos ya está respondida; allí dejará de verse.');
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);
 await pagina.close();

@@ -275,6 +275,7 @@ var HitoMesa = (function () {
       }).join('') + '</div>' +
       '<div class="mesa-titulo-fila">' +
         '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
+        (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +
         '<div class="mesa-etiquetas">' +
           /* Fila 239: el número del asunto, si lo tiene. */
           (a && a.ficha && a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +
@@ -389,10 +390,15 @@ var HitoMesa = (function () {
     if (window.HitosDesdeElAsunto && !decision) {
       opcionesMas.push({ texto: 'Crear', clase: 'mesa-hda-crear', alPulsar: function () { HitosDesdeElAsunto.abrirCrear(a, h.id); } });
       opcionesMas.push({ texto: 'Cambiar', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
-      var puedeBorrar = HitosDesdeElAsunto.estaVacio(h, a);
+      var puedeBorrar = HitosDesdeElAsunto.sinTrabajo(h, a);
       opcionesMas.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,
         title: puedeBorrar ? '' : 'Tiene trabajo: no se puede borrar',
         alPulsar: function () { HitosDesdeElAsunto.abrirBorrar(a, h); } });
+      /* Fila 416: un hito «solo aquí» (sin paso en la guía) se puede llevar entero a la guía, sin preguntar. */
+      if (HitosDesdeElAsunto.esSoloAqui(a, h) && window.HitosDesdeElAsuntoGuia &&
+          HitosDesdeElAsunto.nivelSuperior(hitos).some(function (x) { return x.id === h.id; })) {
+        opcionesMas.push({ texto: 'Pasar a la guía', clase: 'mesa-hda-pasar', alPulsar: function () { HitosDesdeElAsunto.pasarALaGuia(a, h); } });
+      }
       opcionesMas.push({ raya: true });
     }
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */

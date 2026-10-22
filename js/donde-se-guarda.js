@@ -2,20 +2,20 @@
    donde-se-guarda.js — el bloque «¿Dónde se guarda?» (30-sep-2026,
    fila 235, docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md, punto 1).
 
-   Toda creación, cambio o borrado de un hito o de una tarea hecho desde
-   un asunto pregunta, antes de guardarse, dónde se guarda. La pregunta
-   es siempre la misma y sale sola:
+   Desde la fila 416 (docs/HITOS-UN-SOLO-SITIO.md) los hitos y las tareas
+   ya no preguntan dónde se guardan: la guía manda. Este bloque lo siguen
+   usando los CAMPOS de un hito o del asunto (js/campo-desde-el-asunto.js,
+   js/campos-de-hito.js, filas 245 y 255):
 
-     (•) A la guía de <tipo corto>   ← marcada siempre al abrirse
+     (•) En el tipo <tipo corto>   ← marcada siempre al abrirse
          Llegará a N asuntos abiertos de este tipo.
      ( ) Solo en este asunto
 
-   Este fichero solo sabe pintar el bloque, leer la elección, llevar el
+   Este fichero sabe pintar el bloque, leer la elección, llevar el
    teclado (flechas cambian la opción, Intro acepta, Escape cancela, que
-   ya hace js/usabilidad.js) y abrir el emergente pequeño de las tareas.
-   Lo que se hace después con cada elección vive en
-   js/hitos-desde-el-asunto.js (hitos) y js/donde-se-guarda-tareas.js
-   (tareas).
+   ya hace js/usabilidad.js) y abrir el emergente pequeño. También da los
+   ayudantes que comparten los hitos: `tipoDe`, `nombreCortoDe`,
+   `otrosAbiertos`, `introAcepta`.
 
    Funciones puras: `textoConsecuencia`, `bloqueHTML`.
    ============================================================ */
@@ -44,11 +44,11 @@ window.DondeSeGuarda = (function () {
     }).map(function (x) { return x.nombre; });
   }
 
-  /* PURA. Las líneas de letra pequeña de debajo de «A la guía».
-     o = { otros, conTrabajo, hitoNuevo: { titulo, tareas } | null, apagada: texto | '' }
+  /* PURA. Las líneas de letra pequeña de debajo de «A la guía de…» (hoy solo
+     la usan los campos de un hito, filas 245 y 255).
+     o = { otros, hitoCampo: { titulo } | null }
      Fila 245: con `o.vacio` (un campo nuevo) la frase acaba en «, vacío». */
   function textoConsecuencia(o) {
-    if (o.apagada) return [o.apagada];
     var lineas = [];
     /* Fila 255: un campo que se añade a un hito. */
     if (o.hitoCampo) {
@@ -56,23 +56,11 @@ window.DondeSeGuarda = (function () {
         ? 'El hito «' + o.hitoCampo.titulo + '» lo tendrá en ' + (o.otros === 1 ? '1 asunto abierto' : o.otros + ' asuntos abiertos') + ' de este tipo, vacío.'
         : 'No hay más asuntos abiertos de este tipo. Valdrá para los próximos.'];
     }
-    if (o.hitoNuevo) {
-      var n = o.hitoNuevo.tareas || 0;
-      lineas.push('El hito «' + (o.hitoNuevo.titulo || '') + '» todavía no está en la guía: irá con ' +
-        (n === 1 ? 'su tarea' : n === 0 ? 'sus tareas (ninguna)' : 'sus ' + n + ' tareas') + '.');
-    }
     if (!o.otros) {
       lineas.push('No hay más asuntos abiertos de este tipo. Valdrá para los próximos.');
     } else {
       lineas.push('Llegará a ' + (o.otros === 1 ? '1 asunto abierto' : o.otros + ' asuntos abiertos') + ' de este tipo' +
         (o.vacio ? ', vacío.' : '.'));
-      if (o.conTrabajo) {
-        lineas.push('En ' + o.conTrabajo + ' no se tocará, porque ya ' + (o.conTrabajo === 1 ? 'tiene' : 'tienen') + ' trabajo.');
-      }
-      /* Fila 405: al quitar una pregunta de la guía, donde ya está respondida deja de verse. */
-      if (o.respondida) {
-        lineas.push('En ' + (o.respondida === 1 ? '1 asunto' : o.respondida + ' asuntos') + ' ya está respondida; allí dejará de verse.');
-      }
     }
     return lineas;
   }
@@ -81,17 +69,16 @@ window.DondeSeGuarda = (function () {
      Fila 245: `o.opcionTipo` cambia el texto de la primera opción («En el
      tipo X», para un campo); su valor sigue siendo 'guia'. */
   function bloqueHTML(o) {
-    var apagada = !!o.apagada;
     var notas = textoConsecuencia(o).map(function (t) {
       return '<span class="dsg-nota">' + U.escapar(t) + '</span>';
     }).join('');
     return '<div class="dsg" role="radiogroup" aria-label="¿Dónde se guarda?">' +
       '<div class="etiqueta">¿Dónde se guarda?</div>' +
-      '<label class="dsg-opcion' + (apagada ? ' dsg-apagada' : '') + '">' +
-        '<input type="radio" name="dsg-donde" value="guia"' + (apagada ? ' disabled' : ' checked') + '> ' +
+      '<label class="dsg-opcion">' +
+        '<input type="radio" name="dsg-donde" value="guia" checked> ' +
         '<span>' + U.escapar(o.opcionTipo || ('A la guía de ' + (o.tipoCorto || ''))) + '</span></label>' +
       '<div class="dsg-notas">' + notas + '</div>' +
-      '<label class="dsg-opcion"><input type="radio" name="dsg-donde" value="aqui"' + (apagada ? ' checked' : '') + '> ' +
+      '<label class="dsg-opcion"><input type="radio" name="dsg-donde" value="aqui"> ' +
         '<span>Solo en este asunto</span></label>' +
       '</div>';
   }

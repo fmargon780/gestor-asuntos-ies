@@ -247,6 +247,113 @@
     return { hitos: lista, movidos: movidos, actual: actual };
   }
 
+  /* ==========================================================
+     Fila 416 (docs/HITOS-UN-SOLO-SITIO.md, parte A): la guía manda.
+     Un hito CAMBIADO o QUITADO en la guía llega a los hitos de los asuntos
+     abiertos que están «sin empezar» (`esVacio`, que es
+     HitosDesdeElAsunto.estaVacio); los empezados no se tocan. Función
+     pura (ni disco ni pantalla, no cambia `hitos`). `pasosAntes` y
+     `pasosAhora`: la guía como era y como queda. Devuelve
+     { hitos, cambiados, quitados, saltados, huboQuitado }: la lista nueva y,
+     en hitos del asunto, cuántos se han puesto como la guía, cuántos se han
+     quitado y cuántos se han dejado como estaban por estar empezados. */
+  var CAMPOS_DEL_PASO = ['titulo', 'cuerpo', 'responsable', 'responsableNombre', 'plazo', 'toca', 'tocaA', 'requisitos',
+    'normativa', 'formularios', 'textoDocumentos', 'tipoDocumento', 'avisarLoPide', 'avisarLoPidePlantilla', 'variosDocumentos'];
+
+  function paraComparar(p) {
+    var n = Hitos.pasoAHito(p);
+    var o = {};
+    CAMPOS_DEL_PASO.forEach(function (k) { o[k] = n[k]; });
+    o.opciones = (n.opciones || []).map(function (x) { return { id: x.id, texto: x.texto }; });
+    return JSON.stringify(o);
+  }
+
+  function pasosPorId(pasos, out) {
+    out = out || {};
+    (pasos || []).forEach(function (p) {
+      if (p && p.id) out[p.id] = p;
+      if (esPregunta(p)) p.opciones.forEach(function (o) { pasosPorId(o.pasos, out); });
+    });
+    return out;
+  }
+
+  /* Las tareas «solo aquí» que sustituyen a las de un paso que se quita
+     (mismos ids: lo marcado se conserva). Sin las escondidas aquí ni las
+     que ya estén; de una pregunta, las de la respuesta elegida. */
+  function tareasDelPasoQuitado(h, paso) {
+    var ya = {};
+    (h.guionPropio || []).forEach(function (g) { ya[g.id] = true; if (g.enLugarDe) ya[g.enLugarDe] = true; });
+    (h.guionOcultos || []).forEach(function (id) { ya[id] = true; });
+    var elegido = h.guionElegido || {};
+    var nuevas = [];
+    (function recoger(lineas) {
+      (lineas || []).forEach(function (g) {
+        if (g.pregunta) {
+          var op = (g.opciones || []).filter(function (o) { return o.id === elegido[g.id]; })[0];
+          if (op) recoger(op.lineas);
+          return;
+        }
+        if (!g.id || ya[g.id]) return;
+        nuevas.push({
+          id: g.id, texto: g.texto || '', explicacion: g.explicacion || '', accion: g.accion || '',
+          normativa: g.normativa || null, reunir: g.reunir || '', obligatorio: !!g.obligatorio, receta: g.receta || null
+        });
+      });
+    })((paso && paso.guion) || []);
+    if (nuevas.length) h.guionPropio = (h.guionPropio || []).concat(nuevas);
+  }
+
+  function ponerComoLaGuia(h, p) {
+    var n = Hitos.pasoAHito(p);
+    CAMPOS_DEL_PASO.forEach(function (k) {
+      /* `pasoAHito` ya trae cada campo como lo guarda `normalizarHito`; los que solo existen cuando están puestos, se quitan. */
+      if (n[k] === undefined) delete h[k];
+      else h[k] = JSON.parse(JSON.stringify(n[k]));
+    });
+    if (h.clase === 'decision') {
+      /* El texto de cada respuesta que la guía sigue teniendo. */
+      (h.opciones || []).forEach(function (o) {
+        var po = (p.opciones || []).filter(function (x) { return x.id === o.id; })[0];
+        if (po) o.texto = String(po.titulo || '');
+      });
+    }
+  }
+
+  function cambiosDeLaGuia(hitos, pasosAntes, pasosAhora, esVacio) {
+    var lista = JSON.parse(JSON.stringify(hitos || [])).map(Hitos.normalizarHito);
+    var antes = pasosPorId(pasosAntes), ahora = pasosPorId(pasosAhora);
+    var cuenta = { cambiados: 0, quitados: 0, saltados: 0, tareasCopiadas: 0 };
+    var vacio = typeof esVacio === 'function' ? esVacio : function () { return false; };
+
+    function nivel(ls) {
+      for (var i = ls.length - 1; i >= 0; i--) {
+        var h = ls[i];
+        if (!h || !h.origenGuia || h.delTipoAnterior) continue;
+        var id = String(h.origenGuia);
+        var pAntes = antes[id], pAhora = ahora[id];
+        /* Dentro de una pregunta: a cualquier profundidad, tenga la que tenga el de arriba. */
+        if (h.clase === 'decision') {
+          (h.opciones || []).forEach(function (o) { nivel(o.hitos || []); });
+          if (!pAhora) {
+            /* La respuesta que la guía ya no tiene se va si se ha quedado sin hitos y no está elegida. */
+            h.opciones = (h.opciones || []).filter(function (o) { return (o.hitos || []).length || h.elegida === o.id; });
+          }
+        }
+        if (!pAntes) continue;   /* no estaba en la guía de antes: no es un cambio de la guía */
+        if (!pAhora) {
+          if (vacio(h)) { ls.splice(i, 1); cuenta.quitados++; }
+          else { tareasDelPasoQuitado(h, pAntes); cuenta.saltados++; cuenta.tareasCopiadas++; }
+          continue;
+        }
+        if (paraComparar(pAntes) === paraComparar(pAhora)) continue;
+        if (vacio(h)) { ponerComoLaGuia(h, pAhora); cuenta.cambiados++; }
+        else cuenta.saltados++;
+      }
+    }
+    nivel(lista);
+    return { hitos: lista, cambiados: cuenta.cambiados, quitados: cuenta.quitados, saltados: cuenta.saltados, tareasCopiadas: cuenta.tareasCopiadas };
+  }
+
   /* Aplica pasosQueFaltan a una entrada de `porAsunto` ya leída (dentro
      de un Hitos.cambiar). Devuelve lo mismo que pasosQueFaltan. */
   function completarEntrada(entrada, pasos) {
@@ -270,12 +377,18 @@
 
   /* Al guardar la guía de un tipo: todos los asuntos abiertos de ese
      tipo que ya tienen hitos, en UNA sola escritura de hitos.json, por
-     la cola de guardado. Devuelve a cuántos asuntos ha llegado algo; con
-     `pasosAntes` (solo «Cambiar la guía», fila 300) recoloca además el
-     orden y devuelve { llegados, recolocados }. */
-  async function llevarAAbiertos(tipo, pasos, pasosAntes) {
+     la cola de guardado. Con `pasosAntes` (la guía como era; desde la
+     fila 416 la pasa todo guardado de la guía) además: el orden nuevo
+     (fila 300), los hitos cambiados y los quitados (fila 416, solo en los
+     que están sin empezar). Devuelve un número (los asuntos a los que han
+     llegado hitos nuevos) si no llega `pasosAntes`, y si llega, un objeto
+     { llegados, recolocados, cambiados, quitados, saltados, tocados, otros }:
+     cuántos asuntos han recibido cada cosa, en cuántos no se ha tocado
+     nada por estar ya empezados, y en cuántos ha llegado algo (`tocados`;
+     `otros`, sin contar `claveActual`). */
+  async function llevarAAbiertos(tipo, pasos, pasosAntes, claveActual) {
     var conOrden = Array.isArray(pasosAntes);
-    var vacio = conOrden ? { llegados: 0, recolocados: 0 } : 0;
+    var vacio = conOrden ? { llegados: 0, recolocados: 0, cambiados: 0, quitados: 0, saltados: 0, tocados: 0, otros: 0 } : 0;
     if (!tipo || !window.Gestor || typeof Gestor.asuntos !== 'function') return vacio;
     var claves = Gestor.asuntos().filter(function (a) {
       var t = (window.App && typeof App.tipoDeAsunto === 'function')
@@ -283,32 +396,67 @@
       return t === tipo && !tieneTipoUnido(a.nombre);
     }).map(function (a) { return a.nombre; });
     if (!claves.length) return vacio;
-    var llegados = 0, recolocados = 0;
+    var esVacio = (window.HitosDesdeElAsunto && HitosDesdeElAsunto.estaVacio) || null;
+    var r = { llegados: 0, recolocados: 0, cambiados: 0, quitados: 0, saltados: 0, tocados: 0, otros: 0 };
     var enCurso = [];
     await Hitos.cambiar(function (d) {
-      llegados = 0; recolocados = 0;
+      r = { llegados: 0, recolocados: 0, cambiados: 0, quitados: 0, saltados: 0, tocados: 0, otros: 0 };
       enCurso = [];
       claves.forEach(function (clave) {
         var entrada = d.porAsunto[clave];
         if (!entrada || !(entrada.hitos || []).length) return;   /* se crearán enteros al abrirlo */
-        var r = completarEntrada(entrada, pasos);
-        if (r.anadidos) llegados++;
-        if (r.enCurso) enCurso.push({ clave: clave, hito: r.enCurso });
+        var conocidosAntes = pasosConocidosDe(entrada, entrada.hitos);
+        var c = completarEntrada(entrada, pasos);
+        var tocado = false;
+        if (c.anadidos) { r.llegados++; tocado = true; }
+        if (c.enCurso) enCurso.push({ clave: clave, hito: c.enCurso });
         if (conOrden) {
-          var o = ordenDeLaGuia(entrada.hitos, pasosAntes, pasos);
+          /* Fila 416: hitos cambiados o quitados en la guía. Los ids que se quitan siguen en `pasosConocidos`. */
+          var k = cambiosDeLaGuia(entrada.hitos, pasosAntes, pasos, esVacio ? function (h) { return esVacio(h, clave); } : null);
+          if (k.cambiados || k.quitados || k.tareasCopiadas) {
+            entrada.hitos = k.hitos;
+            entrada.pasosConocidos = unirSinRepetir(conocidosAntes, entrada.pasosConocidos);
+            if (k.cambiados) r.cambiados++;
+            if (k.quitados) {
+              r.quitados++;
+              var en = Hitos.recomputeEnCurso(entrada.hitos);
+              if (en) enCurso.push({ clave: clave, hito: en });
+            }
+            tocado = !!(k.cambiados || k.quitados) || tocado;
+          }
+          if (k.saltados && clave !== claveActual) r.saltados++;
+          /* El asunto desde el que se cambia ya coloca el hito donde se ha pedido (HitosDesdeElAsunto.propagarCambio). */
+          var o = clave === claveActual ? { movidos: 0 } : ordenDeLaGuia(entrada.hitos, pasosAntes, pasos);
           if (o.movidos) {
             entrada.hitos = o.hitos;
-            recolocados++;
+            r.recolocados++;
+            tocado = true;
             if (o.actual) enCurso.push({ clave: clave, hito: o.actual });
           }
         }
+        if (tocado) { r.tocados++; if (clave !== claveActual) r.otros++; }
       });
       return d;
     });
     for (var i = 0; i < enCurso.length; i++) {
       await Hitos.aplicarEstadoDelHito(enCurso[i].clave, enCurso[i].hito);
     }
-    return conOrden ? { llegados: llegados, recolocados: recolocados } : llegados;
+    return conOrden ? r : r.llegados;
+  }
+
+  /* Fila 416: la frase verde de después de guardar una guía, sin el
+     «Guardado»: a cuántos asuntos ha llegado cada cosa y, siempre, en
+     cuántos no se ha tocado porque ya tenían trabajo. '' si no hay nada. */
+  function textoDelReparto(r) {
+    if (!r || typeof r !== 'object') return '';
+    function n(x) { return x === 1 ? '1 asunto abierto' : x + ' asuntos abiertos'; }
+    var t = [];
+    if (r.llegados) t.push('Los hitos nuevos han llegado a ' + n(r.llegados) + '.');
+    if (r.cambiados) t.push('Los cambios han llegado a ' + n(r.cambiados) + '.');
+    if (r.quitados) t.push('El hito quitado se ha quitado en ' + n(r.quitados) + '.');
+    if (r.recolocados) t.push('El orden nuevo ha llegado a ' + n(r.recolocados) + '.');
+    if (r.saltados) t.push('En ' + r.saltados + ' no se ha tocado porque ya ' + (r.saltados === 1 ? 'tenía' : 'tenían') + ' trabajo.');
+    return t.join(' ');
   }
 
   /* La red de seguridad al abrir la ficha (js/hitos-panel.js): solo
@@ -336,5 +484,7 @@
   Hitos.ordenDeLaGuia = ordenDeLaGuia;
   Hitos.pasosConocidosDe = pasosConocidosDe;
   Hitos.llevarGuiaAAbiertos = llevarAAbiertos;
+  Hitos.cambiosDeLaGuia = cambiosDeLaGuia;   /* fila 416 */
+  Hitos.textoDelReparto = textoDelReparto;
   Hitos.completarAsuntoConGuia = completarAsunto;
 })();
