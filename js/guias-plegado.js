@@ -102,11 +102,24 @@ var GuiasPlegado = (function () {
         else cab.appendChild(r);
       }
       var p = buscar(o.nivel(), el.dataset.pasoId);
+      /* Fila 418: lo activado dentro de «Más ajustes», en una línea gris bajo el título. */
+      var gris = el.querySelector(':scope > .paso-ajustes-linea');
+      var textoGris = window.GuiasMasAjustes ? GuiasMasAjustes.linea(p, o.responsables, el.classList.contains('paso-plegado')) : '';
+      if (textoGris) {
+        if (!gris) {
+          gris = document.createElement('div');
+          gris.className = 'paso-ajustes-linea suave';
+          cab.insertAdjacentElement('afterend', gris);
+        }
+        gris.textContent = textoGris;
+      } else if (gris) gris.remove();
       var t = p && p.titulo ? p.titulo : 'Hito sin título';
-      r.innerHTML = '<span class="paso-resumen-titulo' + (p && p.titulo ? '' : ' suave') + '">' + U.escapar(t) + '</span>' +
+      var html = '<span class="paso-resumen-titulo' + (p && p.titulo ? '' : ' suave') + '">' + U.escapar(t) + '</span>' +
         marcas(p, o.responsables).map(function (m) {
           return '<span class="paso-marca">' + U.escapar(m) + '</span>';
         }).join('');
+      /* Fila 418: sin tocar el DOM si no ha cambiado (un clic que empieza en la línea no se pierde). */
+      if (r.dataset.html !== html) { r.innerHTML = html; r.dataset.html = html; }
     }
 
     function aplicar() {
@@ -128,6 +141,8 @@ var GuiasPlegado = (function () {
     function enganchar() {
       var c = caja();
       if (!c) return;
+      /* Fila 418: la línea gris sigue a lo que se marca dentro de «Más ajustes». */
+      c.addEventListener('change', function () { o.recoger(); aplicar(); });
       c.addEventListener('click', function (ev) {
         var t = ev.target;
         if (!t || !t.closest) return;

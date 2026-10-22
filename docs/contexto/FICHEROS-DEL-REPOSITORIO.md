@@ -234,6 +234,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
+| `js/guias-mas-ajustes.js` | «Más ajustes» en el hito de la guía: esconde explicación, a quién le toca, normativa y demás tras un botón, y calcula la línea gris con lo activado (`GuiasMasAjustes`, fila 418) |
 | `js/guias-plegado.js` | El editor de la guía en acordeón: un solo paso abierto, la línea resumida con sus marcas (`GuiasPlegado`, fila 122) |
 | `js/guias-plazo.js` | El desplegable «Días hábiles / lectivos / naturales» del plazo de cada paso de la guía (`GuiasPlazo`, fila 131). Antes de `js/guias.js` |
 | `js/guias-toca.js` | «Nos toca» / «Esperamos a…» de cada paso de la guía, en el editor y en la fila cerrada (`GuiasToca`, fila 129). Antes de `js/guias.js` |

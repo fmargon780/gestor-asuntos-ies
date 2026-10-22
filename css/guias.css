@@ -452,3 +452,13 @@
 /* Fila 224: la tarea a la vista al abrir «Cambiar en la guía» desde el
    «⋮» de una tarea, dentro de este mismo editor. */
 .guion-fila-resaltada { background: #fff8e6; border: 1px solid #e6c377; border-radius: 8px; }
+
+/* ---------- fila 418: «Más ajustes» en el hito de la guía ---------- */
+.paso-editor:not(.mas-abierto) > .paso-ajuste,
+.subpaso-editor:not(.mas-abierto) > .paso-ajuste,
+.paso-editor:not(.mas-abierto) > .paso-extra > .paso-extra-cuerpo > .paso-ajuste { display: none !important; }
+.paso-extra[open] > summary { display: none; }
+.paso-extra[open] > .paso-extra-cuerpo { margin-top: 0; }
+.paso-mas-ajustes-boton { align-self: flex-start; margin: 8px 0 4px; }
+.paso-ajustes-linea { font-size: 12px; margin: 2px 0 0 0; }
+.paso-plegado > .paso-ajustes-linea { display: block !important; margin-left: 30px; }

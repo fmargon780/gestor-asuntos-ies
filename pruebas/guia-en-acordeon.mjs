@@ -125,6 +125,7 @@ await comprobar('mover uno cerrado no lo abre', abiertos(), ['Registrar la entra
 /* ================= 5 ================= */
 console.log('--- 5. tras repintar ---');
 await linea(2);
+await pagina.click('#guia-pasos > .paso-editor[data-pos="2"] > .paso-mas-ajustes-boton');   /* fila 418: «es una pregunta» va en «Más ajustes» */
 await pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] > .paso-es-pregunta-fila .paso-es-pregunta').check();
 await comprobar('marcar «es una pregunta» repinta y el paso sigue abierto', abiertos(), ['Archivar']);
 await comprobar('(ya con sus dos opciones a la vista)',
@@ -168,6 +169,46 @@ await comprobar('lo de un paso cerrado no se pierde (guion: la de siempre + la m
   [2, 2, 'r1', true]);
 await comprobar('el paso nuevo de la opción, guardado', Promise.resolve(guardada[1].opciones[0].pasos.map(p => p.titulo)),
   ['Poner el sello', 'Escanear']);
+
+/* ================= 10 (fila 418) ================= */
+console.log('--- 10. «Más ajustes» y la línea gris ---');
+await abrirEditor({});
+await linea(2);   /* «Avisar a la familia», solo informativo */
+const visibles = (pos) => pagina.evaluate((pos) => {
+  const d = document.querySelector('#guia-pasos > .paso-editor[data-pos="' + pos + '"]');
+  const v = (sel) => { const e = d.querySelector(sel); return !!e && e.offsetParent !== null; };
+  return { titulo: v(':scope > .paso-cabecera .paso-titulo'), resp: v('.paso-responsable'), plazo: v('.paso-plazo-dias'),
+    tareas: v(':scope > .paso-guion'), explicacion: v(':scope > .paso-cuerpo'), toca: v('.paso-toca'),
+    normativa: v(':scope > .paso-normativa'), solo: v('.paso-solo-informativo'), varios: v('.paso-varios-documentos'),
+    avisar: v('.paso-avisar-lopide'), textoDoc: v('.paso-texto-documentos'), boton: v(':scope > .paso-mas-ajustes-boton') };
+}, pos);
+await comprobar('abierto: se ven título, responsable, plazo y tareas; lo demás, no',
+  visibles(2),
+  { titulo: true, resp: true, plazo: true, tareas: true, explicacion: false, toca: false, normativa: false, solo: false, varios: false, avisar: false, textoDoc: false, boton: true });
+await comprobar('la línea gris dice «Solo informativo» también abierto',
+  pagina.evaluate(() => document.querySelector('#guia-pasos > .paso-editor[data-pos="2"] > .paso-ajustes-linea')?.textContent || ''), 'Solo informativo');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="2"] > .paso-mas-ajustes-boton');
+await comprobar('«Más ajustes» abierto: aparecen todos los ajustes',
+  visibles(2),
+  { titulo: true, resp: true, plazo: true, tareas: true, explicacion: true, toca: true, normativa: true, solo: true, varios: true, avisar: true, textoDoc: true, boton: true });
+await pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] .paso-varios-documentos').check();
+await pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] .paso-avisar-lopide').check();
+await comprobar('al activar algo dentro, la línea gris lo dice en el momento',
+  pagina.evaluate(() => document.querySelector('#guia-pasos > .paso-editor[data-pos="2"] > .paso-ajustes-linea')?.textContent || ''),
+  'Solo informativo · Avisa a quien lo pide · Recibe varios documentos');
+await linea(0);
+await comprobar('con el hito cerrado, su línea gris sigue (sin repetir lo que ya está en sus marcas)',
+  pagina.evaluate(() => document.querySelector('#guia-pasos > .paso-editor[data-pos="2"] > .paso-ajustes-linea')?.textContent || ''),
+  'Avisa a quien lo pide · Recibe varios documentos');
+await comprobar('y la línea gris se ve con el hito cerrado',
+  pagina.evaluate(() => { const e = document.querySelector('#guia-pasos > .paso-editor[data-pos="2"] > .paso-ajustes-linea'); return !!e && e.offsetParent !== null; }), true);
+await comprobar('un hito sin nada dentro no lleva línea gris',
+  pagina.evaluate(() => !!document.querySelector('#guia-pasos > .paso-editor[data-pos="3"] > .paso-ajustes-linea')), false);
+await comprobar('«Más ajustes» cerrado al abrir otro hito',
+  pagina.evaluate(() => document.querySelector('#guia-pasos > .paso-editor[data-pos="0"]').classList.contains('mas-abierto')), false);
+await pagina.click('#cuadro-aceptar');
+const g2 = await pagina.evaluate(() => window.__guardada);
+await comprobar('lo marcado dentro se guarda igual', Promise.resolve([g2[2].soloInformativo, g2[2].variosDocumentos, g2[2].avisarLoPide]), [true, true, true]);
 
 /* ================= 7 ================= */
 console.log('--- 7. desde el mapa ---');
