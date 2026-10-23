@@ -346,3 +346,10 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 439 — cada documento en una sola línea (23-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En el asunto A26-0464 (Nicolás Amortegui), los cuatro documentos de la carpeta caben a la vista sin bajar y se lee en cada línea lo necesario para saber cuál es.
+
+## Fila 440 — todo el correo de la cuenta común entra solo (23-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Un correo que Gmail manda a spam no aparece en «Ha llegado».
+- [ ] [SOLO FRANCISCO] Al descartar un correo desaparece; si contestan en esa conversación, el mensaje nuevo sí aparece.
+- [ ] [SOLO FRANCISCO] Un correo antiguo al que pones la etiqueta GESTOR aparece en «Ha llegado».
+- [ ] [SOLO FRANCISCO] Una respuesta a un correo de un asunto entra en ese asunto y no sale repetida en «Ha llegado».
