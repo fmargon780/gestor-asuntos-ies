@@ -267,6 +267,20 @@
   color: var(--tinta-suave);
   margin-top: 2px;
 }
+/* Fila 436: la línea de datos de un documento, igual en todas las listas; larga, se corta con «…». */
+.doc-datos {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--tinta-suave);
+  margin-top: 2px;
+}
+.ficha-documento-datos { text-align: left; }
 /* La etiqueta PDF o JPG no se parte en dos líneas cuando el nombre es
    largo: se queda entera a la izquierda. */
 .ficha-documentos .marca-ext { flex: 0 0 auto; margin-right: 0; }
@@ -318,3 +332,4 @@
 /* Fila 337: «Repartir ficheros entre terceros» sale con la tarjeta de Documentos abierta (cerrada, el título no cabe en un renglón). */
 .ficha-tarjeta .ficha-documentos-repartir { display: none; margin: 1px 6px 0 0; padding: 0 8px; min-height: 0; height: 20px; line-height: 18px; vertical-align: top; font-size: 12px; }
 .ficha-tarjeta.abierta .ficha-documentos-repartir { display: inline-block; }
+.hitosdoc-fila > span, .correo-fila > span { min-width: 0; }

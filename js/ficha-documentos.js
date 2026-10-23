@@ -104,7 +104,7 @@ var FichaDocumentos = (function () {
     var ext = Nombres.extensionDe(f.nombre);
     var sinSellar = esSinSellar(f.nombre);
     var hitoDelDoc = hitoDe[f.nombre] || null;
-    var lineaDeDatos = window.DocumentosDatos ? DocumentosDatos.resumen(DocumentosDatos.deFichero(a && a.ficha, f.nombre)) : '';
+    var lineaDeDatos = window.DocumentosDatos ? DocumentosDatos.lineaHTML(a, f.nombre, null, 'ficha-documento-datos') : '';
     /* Fila 137: el índice del expediente no se registra ni se asocia a hitos. */
     var esIndice = !!(window.IndiceExpediente && IndiceExpediente.es(f.nombre));
     var b = document.createElement('button');
@@ -120,7 +120,7 @@ var FichaDocumentos = (function () {
                   '<span>' + U.escapar(f.nombre) + '</span>' +
                   (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '') +
                   /* Fila 239: lo que ya no entra en el nombre (registro, campos, texto), de la ficha. */
-                  (lineaDeDatos ? '<div class="ficha-documento-datos">' + U.escapar(lineaDeDatos) + '</div>' : '');
+                  lineaDeDatos;
     b.onclick = function () { abrirDocumento(f, a); };
 
     var fila = document.createElement('div');

@@ -69,6 +69,7 @@ de `App` va después del fichero que lo define.
 | `js/candidaturas-lista.js` | La lista provisional o definitiva de candidaturas en PDF (fila 347) |
 | `css/candidaturas.css` | Estilos de las candidaturas (fila 347) |
 | `pruebas/documentos-persona-de-las-listas.mjs` | El campo de documento «Persona de las listas» de punta a punta, con Chromium (fila 435) |
+| `pruebas/documentos-linea-de-datos.mjs` | La línea de datos «Campo: valor» bajo cada documento (fila 436): campos con nombre, candidato, solo campos, corte con «…», adjuntos de correo |
 | `pruebas/candidaturas.mjs` | Las candidaturas, de punta a punta, con Chromium (fila 347) |
 | `css/etiquetas.css` | Estilos de la pantalla de etiquetas (fila 344) |
 | `pruebas/etiquetas.mjs` | La pantalla de etiquetas, de punta a punta, con Chromium (fila 344) |
@@ -293,7 +294,7 @@ de `App` va después del fichero que lo define.
 | `js/versiones-previas.js` | `VersionesPrevias` (fila 160): la subcarpeta de previas de cada asunto, `_Previas` (fila 239) o la «Versiones previas» de antes (mover, sacar, listar, qué va allí) y el botón de Ajustes › Mantenimiento |
 | `js/numeros.js` | `Numeros` (fila 239): el número único de asunto (`A26-0137`) y de documento (`D26-01234`), el contador de `_GESTOR/numeros.json` y el número de cada fichero de origen |
 | `js/tipos-cortos.js` | `TiposDocumentoCortos` (nombre corto de los tipos de documento) y `TiposLargos` (los tipos de más de 25 y su lista «Arreglarlo»), fila 239 |
-| `js/documentos-datos.js` | `DocumentosDatos` (fila 239): registro, campos y texto de cada documento con número, en `ficha.documentos` |
+| `js/documentos-datos.js` | `DocumentosDatos` (fila 239): registro, campos y texto de cada documento con número, en `ficha.documentos`; `linea`/`lineaHTML` (fila 436) pintan la línea de datos de todas las listas de documentos |
 | `js/largo-de-rutas.js` | `LargoDeRutas` (fila 239): el bloque «Largo de las rutas» de Ajustes → El centro |
 | `js/word-faltan.js` | `WordFaltan` (fila 155): «Faltan datos para este documento», antes de guardar el Word |
 | `js/lib/docx-preview.min.js`, `js/lib/jszip.min.js`, `js/lib/html2canvas.min.js` | Librerías del visor de Word (fila 155): docx-preview 0.4.1 (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0), html2canvas 1.4.1 (MIT); se cargan al abrir el primer Word |

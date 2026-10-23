@@ -59,7 +59,9 @@ var CorreoAdjuntos = (function () {
         '<input type="checkbox" class="adjunto-marca" value="' + U.escapar(f.nombre) + '"' +
           (marcado ? ' checked' : '') + '>' +
         '<span><strong>' + U.escapar(f.nombre) + '</strong>' +
-        '<span class="suave"> · ' + tamanoLegible(f.tam) + '</span></span>' +
+        '<span class="suave"> · ' + tamanoLegible(f.tam) + '</span>' +
+        /* Fila 436: la línea de datos, para saber cuál es sin abrirlo. */
+        (window.DocumentosDatos ? DocumentosDatos.lineaHTML(a, f.nombre, null) : '') + '</span>' +
         '</label>';
     }).join('');
 

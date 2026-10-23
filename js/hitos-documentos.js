@@ -14,12 +14,14 @@
    ============================================================ */
 var HitosDocumentos = (function () {
 
-  function filaDeDocumento(nombre, marcado, yaNoEsta) {
+  function filaDeDocumento(nombre, marcado, yaNoEsta, a) {
     return '<label class="hitosdoc-fila' + (yaNoEsta ? ' hitosdoc-fila-falta' : '') + '">' +
       '<input type="checkbox" class="hitosdoc-marca" value="' + U.escapar(nombre) + '"' +
         (marcado ? ' checked' : '') + '>' +
       '<span>' + U.escapar(nombre) +
         (yaNoEsta ? ' <span class="suave">(ya no está)</span>' : '') +
+        /* Fila 436: la línea de datos de cada documento. */
+        (!yaNoEsta && window.DocumentosDatos ? DocumentosDatos.lineaHTML(a, nombre, null) : '') +
       '</span></label>';
   }
 
@@ -45,9 +47,9 @@ var HitosDocumentos = (function () {
     var cuerpo = ficheros.length
       ? '<div id="hitosdoc-lista">' +
           ficheros.map(function (f) {
-            return filaDeDocumento(f.nombre, apuntadosDeAntes.indexOf(f.nombre) !== -1, false);
+            return filaDeDocumento(f.nombre, apuntadosDeAntes.indexOf(f.nombre) !== -1, false, a);
           }).join('') +
-          faltantes.map(function (n) { return filaDeDocumento(n, true, true); }).join('') +
+          faltantes.map(function (n) { return filaDeDocumento(n, true, true, a); }).join('') +
         '</div>'
       : '<p class="explica">La carpeta de este asunto todavía no tiene ningún documento.</p>';
 
