@@ -6,6 +6,13 @@ para ir tachando.
 
 ---
 
+- [ ] **Persona de las listas con el asunto real (fila 435, `docs/DOCUMENTOS-CON-PERSONA-Y-LINEA-DE-DATOS.md`, parte A).**
+      En Ajustes → Tipos de documento → JUSTIFICANTE → Campos del nombre, añade el campo «Alumno» de clase
+      «Persona de las listas» (Alumnado). En el asunto de transporte de Nicolás Amortegui (A26-0464), nombra un
+      JUSTIFICANTE y escribe «Amortegui»: sale Nicolás y se elige con un clic. Si eliges a otra persona de las
+      listas, al guardar sale en «Personas y entidades relacionadas»; Nicolás, que es el titular, no se repite.
+      [SOLO FRANCISCO]
+
 - [ ] **Comprobación al entrar, con lo de verdad (fila 204, `docs/COMPROBACION-AL-ENTRAR.md`).**
       (1) Con las carpetas de Dropbox y la bandeja de verdad: quitar el permiso de la carpeta de la
       bandeja en Chrome y recargar; al entrar, la bandeja sale en «Falta» y «Arreglarlo» lleva al
