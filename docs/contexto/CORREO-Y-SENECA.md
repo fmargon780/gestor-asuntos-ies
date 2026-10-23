@@ -20,9 +20,19 @@ Se comprueba con `pruebas/correos.mjs`.
 
 ### De un correo a un asunto
 
-En Gmail, la etiqueta `GESTOR` en un correo lo pone a disposición: un script de Apps Script lo
-recoge cada 5 minutos y deja su ficha, el hilo en PDF y los adjuntos en la carpeta
-`GESTOR-BANDEJA` de Drive. La aplicación lee esa carpeta y propone tercero, tipo y fecha.
+Desde la fila 440 (23-oct-2026, `docs/TODO-EL-CORREO-ENTRA.md`) **todo correo que recibe la cuenta
+común entra solo**, sin etiquetas: un script de Apps Script lo recoge cada minuto y deja su ficha,
+el hilo en PDF y los adjuntos en la carpeta `GESTOR-BANDEJA` de Drive. Reglas del script
+(`recogerCorreos`/`recogerLoQueLlega`, `apps-script/gestor-correos.gs`): solo entra lo recibido
+después de la fecha de arranque (propiedad `arranque-bandeja`, se apunta la primera vez que corre
+esta versión y no cambia); quedan fuera el spam, la papelera y lo que envía la propia cuenta («Probar»,
+envíos a grupos en copia oculta, borradores); los hilos que ya están en `seguidos.json` (por id o
+por matrícula) entran por su asunto y no en «Ha llegado»; lo ya recogido se apunta por hilo
+(`recogido:<id>` = fecha del mensaje más nuevo) y solo vuelve a entrar si llega un mensaje recibido
+más nuevo (la respuesta a un correo descartado). Al recogerlo el hilo se archiva en Gmail y lleva
+`GESTOR/Hecho`. La etiqueta `GESTOR` queda solo para traer a mano un correo antiguo. Descartar
+borra la ficha de la bandeja; el correo sigue en Gmail. Prueba: `pruebas/todo-el-correo-entra.mjs`.
+El script lo pega Francisco a mano (`docs/TE-TOCA.md`). La aplicación lee esa carpeta y propone tercero, tipo y fecha.
 "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro
 de otra página.** Cada usuario tiene su propia bandeja. Desde el 20-sep-2026 (fila 86), si el
 correo trae su PDF, pulsar la tarjeta entera hace lo mismo que ese botón (clase
@@ -683,4 +693,4 @@ Prueba: `pruebas/correo-tutor-botones.mjs`.
 
 ## El correo, desde la cuenta común de Administración (fila 411, 21-oct-2026)
 
-`docs/CORREO-DESDE-LA-CUENTA-COMUN.md`. El Gestor recoge (etiqueta `GESTOR` → `GESTOR-BANDEJA`) y envía solo con la cuenta común (29700692.administracion@g.educaand.es); las cuentas personales no se recogen. En Ajustes → El centro (`js/plantillas-ajustes.js`, campos creados desde JS; `plantillas.json`: `remitente` y `cuentaAdministracion`, con valores por defecto en `js/plantillas.js`) están «Nombre del remitente de los correos» («Administración · IES Fuente Lucena») y «Cuenta de correo de Administración». `CorreoEnviar.llamar()` añade `nombreRemitente` a toda petición (envío, grupos, «Probar») y el script lo pasa como opción `name` de Gmail; una petición sin él sale como antes. Cada respuesta del script lleva `cuenta` (`conVersion`), que la app guarda en `localStorage` junto a la versión; con qué cuenta recoge sale de `latido.json` (`BandejaLatido.cuenta()`). La línea «Este ordenador envía y recoge con: …» de Ajustes → Este ordenador → «Enviar correo» (`CorreoEnviar.lineaDeCuenta`, pura) sale en ámbar si alguna cuenta conocida no es la de Administración (sin distinguir mayúsculas; sin saber nada, no es ámbar), y lo mismo hace la tarjeta `cuenta` de «Problemas» (nunca para un directivo). Una respuesta dentro de un hilo guardado desde otro buzón se busca en la cuenta común por `rfc822msgid:` con las `matriculas` que manda `js/correo-cuadro.js` (de la última a la primera); si no aparece, correo nuevo. Un correo enviado deja ahora su matrícula en el hilo del asunto. Prueba: `pruebas/correo-cuenta-comun.mjs`.
+`docs/CORREO-DESDE-LA-CUENTA-COMUN.md`. El Gestor recoge (todo el correo de la cuenta común → `GESTOR-BANDEJA`; etiqueta `GESTOR` solo para lo antiguo, fila 440) y envía solo con la cuenta común (29700692.administracion@g.educaand.es); las cuentas personales no se recogen. En Ajustes → El centro (`js/plantillas-ajustes.js`, campos creados desde JS; `plantillas.json`: `remitente` y `cuentaAdministracion`, con valores por defecto en `js/plantillas.js`) están «Nombre del remitente de los correos» («Administración · IES Fuente Lucena») y «Cuenta de correo de Administración». `CorreoEnviar.llamar()` añade `nombreRemitente` a toda petición (envío, grupos, «Probar») y el script lo pasa como opción `name` de Gmail; una petición sin él sale como antes. Cada respuesta del script lleva `cuenta` (`conVersion`), que la app guarda en `localStorage` junto a la versión; con qué cuenta recoge sale de `latido.json` (`BandejaLatido.cuenta()`). La línea «Este ordenador envía y recoge con: …» de Ajustes → Este ordenador → «Enviar correo» (`CorreoEnviar.lineaDeCuenta`, pura) sale en ámbar si alguna cuenta conocida no es la de Administración (sin distinguir mayúsculas; sin saber nada, no es ámbar), y lo mismo hace la tarjeta `cuenta` de «Problemas» (nunca para un directivo). Una respuesta dentro de un hilo guardado desde otro buzón se busca en la cuenta común por `rfc822msgid:` con las `matriculas` que manda `js/correo-cuadro.js` (de la última a la primera); si no aparece, correo nuevo. Un correo enviado deja ahora su matrícula en el hilo del asunto. Prueba: `pruebas/correo-cuenta-comun.mjs`.

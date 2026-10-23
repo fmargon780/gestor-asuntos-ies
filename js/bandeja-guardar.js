@@ -363,8 +363,8 @@
     var ok = await U.preguntar('Descartar este correo',
       '<p>Se quita de la bandeja sin crear ningún asunto.</p>' +
       '<p class="nota">' + U.escapar(d.asunto || '') + '</p>' +
-      '<p class="nota">El correo sigue en tu Gmail, con la etiqueta GESTOR/Hecho. ' +
-      'Si vuelves a ponerle la etiqueta GESTOR, volverá a la bandeja.</p>',
+      '<p class="nota">El correo sigue en Gmail. ' +
+      'Si contestan en esta conversación, o si le pones la etiqueta GESTOR, volverá a la bandeja.</p>',
       'Descartar');
     if (!ok) return;
     await borrarDeLaBandeja(item);

@@ -181,7 +181,7 @@
   /* El fichero que lee el recolector de Apps Script. Se reescribe
      entero cada vez que cambia alguna huella: es corto y así nunca se
      queda a medias. Si no se puede escribir, el script sigue haciendo
-     lo de siempre con la etiqueta GESTOR.
+     lo de siempre (todo lo que llega, más la etiqueta GESTOR para lo antiguo).
 
      Las matrículas de todas las huellas que compartan identificador de
      hilo se juntan sin repetir: así el recolector del otro buzón puede

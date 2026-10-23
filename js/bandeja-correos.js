@@ -1,8 +1,9 @@
 /* ============================================================
    bandeja-correos.js — los correos que esperan a ser un asunto.
 
-   En Gmail, a un correo se le pone la etiqueta GESTOR. Un script de
-   Google Apps Script lo recoge cada pocos minutos y deja tres cosas
+   Todo correo que llega a la cuenta común (fila 440) lo recoge solo un
+   script de Google Apps Script cada pocos minutos; la etiqueta GESTOR
+   queda para traer a mano un correo antiguo. Por cada uno deja tres cosas
    en una carpeta de Drive llamada GESTOR-BANDEJA:
 
      <id>.json          la ficha del correo
