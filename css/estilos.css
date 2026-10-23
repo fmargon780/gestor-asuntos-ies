@@ -460,6 +460,11 @@ body:has(#capa:not(.oculto)) #soporte-boton { display: none; }
 /* El botón de un aviso («Ir al asunto», fila 119). */
 .mensaje-boton { display: inline-block; margin-left: 12px; padding: 3px 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; pointer-events: auto; }
 .mensaje-boton:hover { background: rgba(255,255,255,.15); }
+/* La ✕ de un aviso que no se borra solo (fila 449). */
+.mensaje-cerrar { margin-left: 10px; padding: 0 6px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 16px; line-height: 1; cursor: pointer; pointer-events: auto; opacity: .85; }
+.mensaje-cerrar:hover { opacity: 1; }
+/* Mientras hay un cuadro abierto, el aviso fijo se aparta: no tapa sus botones. */
+body:has(#capa:not(.oculto)) .mensaje-fijo { display: none; }
 
 @media (max-width: 900px) {
   .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }

@@ -47,6 +47,7 @@ App.irVista = function (cual, soloQue) {
   var estabaEnClasificar = App.E.vista === 'clasificar';
   var vistaNueva = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
   var esClasificar = vistaNueva === 'clasificar';
+  if (!esClasificar && window.U && U.quitarAvisosFijos) U.quitarAvisosFijos();   /* fila 449: salir de «Ver todo» */
 
   /* Fila 214: guardar el desplazamiento de antes de entrar en
      "clasificar" ANTES de esconder #inicio-cuerpo (más abajo, con la

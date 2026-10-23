@@ -436,7 +436,9 @@ var Carpetas = (function () {
      Misma precaución que al renombrar: primero se prueba con move(), y
      si Dropbox no lo permite se copia, se comprueba que la copia pesa
      lo mismo, y solo entonces se borra el original. */
-  async function moverFichero(dirOrigen, nombre, dirDestino, nombreDestino) {
+  /* `opciones.toleraNoBorrar` (fila 449): si la copia sale completa y no se puede borrar el original
+     (tras reintentarlo una vez), no se lanza error: devuelve 'sin-borrar' en vez de true. */
+  async function moverFichero(dirOrigen, nombre, dirDestino, nombreDestino, opciones) {
     var destino = nombreDestino || nombre;
     var h = await dirOrigen.getFileHandle(nombre);
 
@@ -459,7 +461,14 @@ var Carpetas = (function () {
       throw new Error('La copia no ha salido completa. No se ha borrado el original.');
     }
 
-    await dirOrigen.removeEntry(nombre);
+    try {
+      await dirOrigen.removeEntry(nombre);
+    } catch (e3) {
+      try { await dirOrigen.removeEntry(nombre); } catch (e4) {
+        if (opciones && opciones.toleraNoBorrar) return 'sin-borrar';
+        throw e4;
+      }
+    }
     return true;
   }
 

@@ -88,10 +88,12 @@
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
     await N.apuntarHuella(elAsunto.nombre, d);
-    await borrarDeLaBandeja(item);
+    var sinQuitar = await borrarDeLaBandeja(item);
+    /* Fila 449: ya está en el asunto; que siga en la bandeja no es un fallo de guardar. */
+    if (sinQuitar && sinQuitar.length) U.accesorio('El correo ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo');
     var texto = resultado.metidos ? 'Guardado en ' + elAsunto.nombre + '.' : 'Anotado en ' + elAsunto.nombre + '.';
     /* Fila 119: se queda en la bandeja, con «Ir al asunto». */
-    if (window.Navegacion) Navegacion.avisoConIr(texto, 'bueno', elAsunto.nombre);
+    if (window.Navegacion) Navegacion.avisoAnadido(texto, elAsunto.nombre);   /* fila 449 */
     else U.aviso(texto, 'bueno');
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
     /* Fila 174, punto 5: los adjuntos de este correo, uno detrás de
@@ -350,12 +352,18 @@
     if (d.pdf) fuera.push(d.pdf);
     if (d.pdfMensaje) fuera.push(d.pdfMensaje);
     (d.adjuntos || []).forEach(function (a) { fuera.push(a); });
+    var sinQuitar = [];
     for (var i = 0; i < fuera.length; i++) {
-      try { await N.carpeta().removeEntry(fuera[i]); } catch (e) { /* ya no estaba */ }
+      try { await N.carpeta().removeEntry(fuera[i]); } catch (e) {
+        if (e && e.name === 'NotFoundError') continue;   /* ya no estaba */
+        /* Fila 449: se reintenta una vez; si sigue sin poder, se cuenta. */
+        try { await N.carpeta().removeEntry(fuera[i]); } catch (e2) { if (!e2 || e2.name !== 'NotFoundError') sinQuitar.push(fuera[i]); }
+      }
     }
     N.ponerCorreos((N.correos() || []).filter(function (x) { return x.fichero !== item.fichero; }));
     if (N.pendiente() && N.pendiente().fichero === item.fichero) { N.ponerPendiente(null); N.pintarAvisoPendiente(); }
     N.repintarPantalla();
+    return sinQuitar;
   }
 
   async function descartar(item) {

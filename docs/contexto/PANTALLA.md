@@ -172,6 +172,17 @@ el Escape general de aquí se dispara también y hace algo de más.
   `Navegacion.avisoConIr(texto, clase, nombre)` (sin botón si el asunto no está en abiertos). En
   meter un documento suelto (sale al cerrar el cuadro de ponerle nombre), guardar un correo de la
   bandeja, unir y devolver un asunto de la papelera.
+- **Guardar en un asunto desde «Ver todo»** (fila 449, `docs/IR-AL-ASUNTO-TRAS-ANADIR.md`): el
+  documento suelto (`App.llevarSueltoA`) y el correo de la bandeja (`guardarEnAsunto`) sacan
+  `Navegacion.avisoAnadido(texto, nombre, idHito)`. Estando en «Ver todo» el aviso es **fijo**
+  (`accion.fijo` de `U.aviso`: sin temporizador, con ✕; `U.quitarAvisosFijos` lo quita al guardar otro
+  y al salir de «Ver todo», desde `App.ir` y `App.irVista`). «Ir al asunto» abre la ficha con el hito
+  (`HitoMesa.abrir`, el del documento o el en curso) y apunta el origen `{ verTodo, soloQue, alto }`:
+  `#ficha-volver` dice «← Volver a Ver todo» y `Navegacion.volver` vuelve a `App.irVista('clasificar',
+  soloQue)` a la misma altura. Fuera de «Ver todo» (guardado desde un hito) es el aviso de 8 s de siempre.
+  `Carpetas.moverFichero(..., { toleraNoBorrar: true })` reintenta el borrado y devuelve `'sin-borrar'`;
+  `borrarDeLaBandeja` devuelve lo que no pudo quitar; en ambos casos, aviso ámbar. Prueba:
+  `pruebas/ir-al-asunto-tras-anadir.mjs`.
 - «Abrir el que ya existe» de un duplicado archivado abre su ficha de archivado
   (`OtrosDelTercero.montarArchivado`); si no se puede, el ARCHIVO con la búsqueda puesta.
 - Prueba: `pruebas/tras-cada-accion.mjs`.

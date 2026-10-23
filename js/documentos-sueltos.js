@@ -364,8 +364,10 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
     return;
   }
 
+  var sinBorrar = false;
   try {
-    await Carpetas.moverFichero(App.E.abiertos, s.nombre, destino);
+    /* Fila 449: si la copia sale bien y no se puede quitar el original de la bandeja, el documento SÍ está en el asunto. */
+    sinBorrar = (await Carpetas.moverFichero(App.E.abiertos, s.nombre, destino, undefined, { toleraNoBorrar: true })) === 'sin-borrar';
   } catch (e) {
     /* Con el motivo (fila 100): antes se callaba. */
     U.fallo('El documento no ha podido entrar en el asunto. Sigue en Por clasificar', e);
@@ -407,8 +409,9 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   } catch (e2) {
     U.accesorio('Documento guardado, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
+  if (sinBorrar) U.accesorio('El documento ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo');   /* fila 449 */
   /* Se queda en Por clasificar (fila 119). */
-  if (window.Navegacion) Navegacion.avisoConIr('Documento guardado en ' + nombreAsunto + '.', 'bueno', nombreAsunto);
+  if (window.Navegacion) Navegacion.avisoAnadido('Documento guardado en ' + nombreAsunto + '.', nombreAsunto, hito && hito.id);   /* fila 449 */
   else U.aviso('Documento guardado en ' + nombreAsunto + '.', 'bueno');
   /* El hito sigue desplegado al volver a la ficha. */
   if (hito && window.HitosPanel) {

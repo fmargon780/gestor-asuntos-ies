@@ -680,6 +680,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b)
 var MENU_PANTALLAS = ['nuevo', 'archivo', 'personas', 'herramientas', 'ajustes'];
 
 App.ir = function (cual) {
+  if (cual !== 'abiertos' && window.U && U.quitarAvisosFijos) U.quitarAvisosFijos();   /* fila 449: salir de «Ver todo» */
   /* De qué pantalla se viene, para la comprobación de más abajo. Se
      mira antes de que las líneas de abajo cambien qué pantalla está a
      la vista. */

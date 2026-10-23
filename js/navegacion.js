@@ -27,6 +27,7 @@ window.Navegacion = (function () {
   var origen = null;          /* { pantalla, alto } */
   var forzado = null;         /* el origen de la PRÓXIMA ficha que se abra */
   var enVolver = false;       /* fila 194: para que App.ir no reapunte al salir por Volver */
+  var desdeVerTodo = null;    /* fila 449: { soloQue, alto } de «Ver todo» al pulsar «Ir al asunto» de su aviso */
 
   function pantallaVisible() {
     var lista = (window.App && App.PANTALLAS) || [];
@@ -43,6 +44,10 @@ window.Navegacion = (function () {
 
   function apuntar() {
     if (enVolver) return;
+    if (desdeVerTodo) {   /* fila 449: la ficha se abre desde el aviso de «Ver todo» */
+      origen = { pantalla: 'abiertos', alto: desdeVerTodo.alto, verTodo: true, soloQue: desdeVerTodo.soloQue };
+      desdeVerTodo = null; forzado = null; return;
+    }
     if (forzado) { origen = { pantalla: forzado, alto: null }; forzado = null; return; }
     var v = pantallaVisible();
     if (!v || v === 'asunto') return;          /* de ficha a ficha: el origen de la primera */
@@ -102,6 +107,8 @@ window.Navegacion = (function () {
     if (!document.getElementById('pantalla-' + destino)) destino = defecto || 'abiertos';
     enVolver = true;
     App.ir(destino);
+    /* Fila 449: la ficha venía del aviso de «Ver todo»: se vuelve allí, a la misma parte y a la misma altura. */
+    if (o && o.verTodo && destino === 'abiertos' && App.irVista) App.irVista('clasificar', o.soloQue);
     enVolver = false;
     if (o && o.pantalla === destino) ponerAltura(o.alto);
   }
@@ -113,12 +120,13 @@ window.Navegacion = (function () {
     return (App.E.listaAbiertos || []).filter(function (x) { return x.nombre === nombre; })[0] || null;
   }
 
-  /* Devuelve true si la ha abierto. */
-  function abrirAbierto(nombre) {
+  /* Devuelve true si la ha abierto. `idHito` (fila 449, opcional): abre la ficha con ese hito en la mesa. */
+  function abrirAbierto(nombre, idHito) {
     var a = nombre ? buscarAbierto(nombre) : null;
     if (!a || typeof App.abrirFicha !== 'function') return false;
     trasVolverA('abiertos');
     App.abrirFicha(a, 'abierto');
+    if (idHito && window.HitoMesa && HitoMesa.abrir) HitoMesa.abrir(a, idHito);
     return true;
   }
 
@@ -138,7 +146,37 @@ window.Navegacion = (function () {
     });
   }
 
+  /* Fila 449 (docs/IR-AL-ASUNTO-TRAS-ANADIR.md): el aviso de «Documento guardado en…» / «Guardado en…» /
+     «Anotado en…». Si se está en «Ver todo» no se borra solo: se queda hasta la ✕, «Ir al asunto», guardar
+     otro o salir de «Ver todo» (U.quitarAvisosFijos, desde App.ir y App.irVista). «Ir al asunto» abre
+     «Trabajo» con `idHito` (o el hito en curso) y su «← Volver a Ver todo» vuelve aquí. Fuera de «Ver todo»
+     (guardado desde un hito de la ficha) es el aviso de siempre, con sus 8 s. */
+  function enVerTodo() {
+    var p = document.getElementById('pantalla-abiertos');
+    return !!(window.App && App.E && App.E.vista === 'clasificar' && p && !p.classList.contains('oculto') && pantallaVisible() === 'abiertos');
+  }
+
+  function avisoAnadido(texto, nombre, idHito) {
+    U.quitarAvisosFijos();   /* nunca dos a la vez */
+    if (!buscarAbierto(nombre)) { U.aviso(texto, 'bueno'); return; }   /* ARCHIVO sin reabrir: sin botón */
+    var fijo = enVerTodo();
+    U.aviso(texto, 'bueno', {
+      boton: 'Ir al asunto',
+      fijo: fijo,
+      alPulsar: async function () {
+        if (fijo) desdeVerTodo = { soloQue: App.E.soloQueClasificar || '', alto: altoActual() };
+        if (abrirAbierto(nombre, idHito)) { desdeVerTodo = null; return; }
+        desdeVerTodo = null;
+        if (App.verAbiertos) { try { await App.verAbiertos(); } catch (e) { /* se sigue */ } }
+        if (fijo) desdeVerTodo = { soloQue: App.E.soloQueClasificar || '', alto: altoActual() };
+        if (!abrirAbierto(nombre, idHito)) App.ir('abiertos');
+        desdeVerTodo = null;
+      }
+    });
+  }
+
   return {
+    avisoAnadido: avisoAnadido,
     apuntar: apuntar,
     volver: volver,
     trasVolverA: trasVolverA,
