@@ -82,6 +82,16 @@ var FichaMenus = (function () {
       cerrar();
       if (yaAbierto) return;
       menu.classList.remove('oculto');
+      /* Fila 439: si no cabe por debajo (borde de la ventana o de la tarjeta con desplazamiento), se abre hacia arriba. */
+      menu.classList.remove('ficha-menu-arriba');
+      var limite = window.innerHeight, p = envoltorio.parentNode;
+      while (p && p !== document.body) {
+        var o = getComputedStyle(p).overflowY;
+        if (o === 'auto' || o === 'scroll' || o === 'hidden') { limite = Math.min(limite, p.getBoundingClientRect().bottom); break; }
+        p = p.parentNode;
+      }
+      var m = menu.getBoundingClientRect(), b = disparador.getBoundingClientRect();
+      if (m.bottom > limite && b.top - m.height - 4 > 0) menu.classList.add('ficha-menu-arriba');
       abierto = propio;
     };
 

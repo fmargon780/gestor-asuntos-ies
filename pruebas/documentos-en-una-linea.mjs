@@ -97,6 +97,17 @@ await comprobar('4. el documento de la mesa mide un solo renglón y «Ruta» va 
   const r = d.querySelector('.ruta-documento');
   return [d.getBoundingClientRect().height < 56, !!r && r.getBoundingClientRect().left >= n.getBoundingClientRect().right - 1 && Math.abs(r.getBoundingClientRect().top - n.getBoundingClientRect().top) < 12];
 }), [true, true]);
+await comprobar('4. la fila de la mesa cabe en su columna (no se corta por la derecha)', pagina.evaluate(() => {
+  const d = document.querySelector('.hito-en-mesa .mesa-doc'); const c = d.closest('.mesa-col') || d.parentElement;
+  return d.getBoundingClientRect().right <= c.getBoundingClientRect().right + 1 && d.scrollWidth <= d.clientWidth + 1;
+}), true);
+await pagina.locator('.hito-en-mesa .mesa-doc .hito-doc-menu-boton').first().click();
+await comprobar('4. el menú ⋯ de la mesa cabe dentro de su tarjeta', pagina.evaluate(() => {
+  const m = Array.from(document.querySelectorAll('.ficha-menu:not(.oculto)')).pop(); if (!m) return false;
+  const r = m.getBoundingClientRect(); const c = m.closest('.trabajo-col') || document.body;
+  return r.top >= 0 && r.bottom <= Math.min(innerHeight, c.getBoundingClientRect().bottom) + 1;
+}), true);
+await pagina.keyboard.press('Escape');
 const previas = await pagina.evaluate(async () => {
   const det = document.querySelector('.hito-en-mesa .mesa-previas, #ficha-documentos .ficha-previas');
   if (!det) return null;
