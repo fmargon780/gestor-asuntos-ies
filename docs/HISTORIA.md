@@ -5376,3 +5376,10 @@ Las filas tardaban hora y media, y la pasada completa de unas 320 pruebas se lle
 | 429 | Fallo de la simulación del tema 397: «Generar documento» en un hito sin plantilla propia no ofrece las del tipo del asunto (matrícula). | SUSTITUIDA (23-oct-2026): diseñada en el tema 432 |
 | 430 | Fallo de la simulación del tema 397: al marcar la última tarea sale «Este hito ya está completo…» aunque solo se quería marcar la tarea (y también al traer un documento). | SUSTITUIDA (23-oct-2026): diseñada en el tema 432 |
 | 432 | Tema: arreglos del hito en la pestaña «Trabajo». Junta las ideas 427, 428, 429 y 430: los fallos vistos al simular el tema 397 al trabajar un hito (Registrar no ve documentos sin registrar, el aviso de correo del tutor saca del asunto y se propone una plantilla equivocada, Generar no ofrece las plantillas del tipo, y salta «Este hito ya está completo» al marcar la última tarea). Comprobar primero cuáles siguen pasando tras las filas 425 y 426. | SUSTITUIDA (23-oct-2026): diseñado y apuntado en la fila 434 (`docs/ARREGLOS-DEL-HITO-EN-TRABAJO.md`) |
+
+## Filas sacadas de `docs/COLA.md` el 23-oct-2026 (tema 431 diseñado, regla 20)
+
+| Nº | Instrucción | Estado |
+|---|---|---|
+| 420 | Aviso de usuario: mejora en «Inicio» | SUSTITUIDA (23-oct-2026): diseñada en el tema 431 · aviso completo: https://drive.google.com/file/d/1QXOVgL_ZfvVrnd2qNZtrT1SOGkl0phk2/view?usp=drivesdk |
+| 431 | Tema: todo el correo de la cuenta común entra en la app. Junta la idea 420: ahora que el Gestor trabaja con la cuenta común de Administración (fila 411), que todos los correos que llegan a esa cuenta entren en la app sin tener que etiquetarlos GESTOR; la persona decide después si crea asunto con cada correo o no. | SUSTITUIDA (23-oct-2026): diseñado en las filas 440 y 441 · tema |
