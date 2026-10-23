@@ -5383,3 +5383,12 @@ Las filas tardaban hora y media, y la pasada completa de unas 320 pruebas se lle
 |---|---|---|
 | 420 | Aviso de usuario: mejora en «Inicio» | SUSTITUIDA (23-oct-2026): diseñada en el tema 431 · aviso completo: https://drive.google.com/file/d/1QXOVgL_ZfvVrnd2qNZtrT1SOGkl0phk2/view?usp=drivesdk |
 | 431 | Tema: todo el correo de la cuenta común entra en la app. Junta la idea 420: ahora que el Gestor trabaja con la cuenta común de Administración (fila 411), que todos los correos que llegan a esa cuenta entren en la app sin tener que etiquetarlos GESTOR; la persona decide después si crea asunto con cada correo o no. | SUSTITUIDA (23-oct-2026): diseñado en las filas 440 y 441 · tema |
+
+## Filas sacadas de `docs/COLA.md` el 23-oct-2026 (reflexión de ideas, regla 20)
+
+| Nº | Instrucción | Estado |
+|---|---|---|
+| 378 | Aviso de usuario: mejora en «Ficha de un asunto» | SUSTITUIDA (23-oct-2026): diseñada en el tema 390 |
+| 380 | Aviso de usuario: mejora en «Ajustes» | SUSTITUIDA (23-oct-2026): diseñada en el tema 390 |
+| 390 | Tema: datos de los documentos, elegirlos de las listas y verlos en la ficha. Junta las ideas 378 y 380: que los campos de un tipo de documento puedan ir unidos a las listas de la app (alumnado, personal, familias…) y se elijan buscando, no escritos a mano; y que la lista de documentos de la ficha del asunto enseñe esos datos anotados de cada documento, no solo el tipo, el nombre y el registro. Ejemplo: Presentación de Candidaturas con el nombre del candidato. Sumado el 23-oct-2026 (diseño del tema 432), reflexión de Francisco: al elegir un documento para adjuntarlo o enviarlo, con solo el nombre y el registro no hay certeza de que sea el correcto sin abrirlo, y es muy importante en el día a día; vale para toda la app, no solo el hito. Alternativas vistas: una línea de datos bajo el nombre (tipo, para quién, de qué hito, fecha, registrado/firmado/enviado), una miniatura de la primera página al pasar el ratón, o un resumen al pulsar una vez sin abrirlo; la recomendada, las dos primeras juntas. | SUSTITUIDA (23-oct-2026): diseñado, filas 435 y 436 |
+| 437 | Idea suelta (del tema 390): miniatura de la primera página de un documento al pasar el ratón por encima, para saber cuál es sin abrirlo. | DESCARTADA (23-oct-2026): la línea de datos bajo cada documento (filas 436 y 439) ya dice cuál es sin abrirlo. |
