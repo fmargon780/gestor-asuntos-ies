@@ -205,7 +205,8 @@ var U = (function () {
 
   /* Avisos flotantes de la esquina. Nunca detienen nada. */
   /* `accion` (opcional, fila 119): { boton: 'Ir al asunto', alPulsar: fn }.
-     Pone un botón en el aviso, que dura algo más (8 s) y se cierra al pulsarlo. */
+     Pone un botón en el aviso, que dura algo más (8 s) y se cierra al pulsarlo.
+     Con `fijo: true` (fila 449) no se borra solo: lleva una ✕ para cerrarlo. */
   function aviso(texto, clase, accion) {
     /* Fila 260: un intento de guardar en un ordenador de solo consulta no es un fallo: ámbar y la frase sola. */
     var teSC = window.SoloConsulta && (SoloConsulta.textoError ? SoloConsulta.textoError() : SoloConsulta.TEXTO_ERROR);
@@ -222,8 +223,28 @@ var U = (function () {
       b.onclick = function () { d.remove(); accion.alPulsar(); };
       d.appendChild(b);
     }
+    /* Fila 449: `accion.fijo` deja el aviso hasta cerrarlo (✕, el botón, o U.quitarAvisosFijos al salir de «Ver todo»). */
+    if (accion && accion.fijo) {
+      d.className += ' mensaje-fijo';
+      d.setAttribute('data-aviso-fijo', '1');
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'mensaje-cerrar';
+      x.title = 'Cerrar este aviso';
+      x.setAttribute('aria-label', 'Cerrar este aviso');
+      x.textContent = '✕';
+      x.onclick = function () { d.remove(); };
+      d.appendChild(x);
+      caja.appendChild(d);
+      return;
+    }
     caja.appendChild(d);
     setTimeout(function () { d.remove(); }, clase === 'malo' ? 9000 : (accion ? 8000 : 4500));
+  }
+
+  /* Fila 449: quita los avisos que no se borran solos (solo hay uno a la vez, pero se quitan todos). */
+  function quitarAvisosFijos() {
+    Array.prototype.forEach.call(document.querySelectorAll('#mensajes [data-aviso-fijo]'), function (d) { d.remove(); });
   }
 
   /* Cuadro de confirmación. Devuelve una promesa con true o false.
@@ -388,7 +409,7 @@ var U = (function () {
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, fechaCorta: fechaCorta, cursoActual: cursoActual,
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
-    ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
+    ahora: ahora, aviso: aviso, quitarAvisosFijos: quitarAvisosFijos, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
     fallo: fallo, accesorio: accesorio,
     mientrasGuarda: mientrasGuarda,
     envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas,

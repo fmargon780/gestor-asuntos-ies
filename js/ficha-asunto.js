@@ -206,6 +206,9 @@
     var tipo = tipoDe(a);
     var tramite = N.datosDelAsunto(a);
     if (window.FichaTrabajoVisor) FichaTrabajoVisor.soltar();   /* fila 425: el documento abierto no se pierde con la ficha */
+    /* Fila 449: abierta desde el aviso de «Ver todo», «← Volver» dice adónde lleva. */
+    var origenDeFicha = window.Navegacion ? Navegacion.origen() : null;
+    var vuelveAVerTodo = !!(origenDeFicha && origenDeFicha.verTodo);
     caja.innerHTML =
       /* Dos líneas (24-sep-2026, fila 112, docs/CABECERA-COMPACTA.md):
          volver, tipo, nombre y «⋯», con «Archivar» a la derecha; debajo,
@@ -214,7 +217,7 @@
       '<header class="ficha-cabecera">' +
         '<div class="ficha-linea1">' +
           '<div class="ficha-volver-fila">' +
-            '<button type="button" class="boton" id="ficha-volver" title="Volver a la lista">← Volver</button>' +
+            '<button type="button" class="boton" id="ficha-volver" title="' + (vuelveAVerTodo ? 'Volver a Ver todo' : 'Volver a la lista') + '">' + (vuelveAVerTodo ? '← Volver a Ver todo' : '← Volver') + '</button>' +
             '<div id="ficha-volver-origen"></div>' +
           '</div>' +
           '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
