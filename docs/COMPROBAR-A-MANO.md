@@ -342,3 +342,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 436 — la línea de datos en las listas de documentos, parte B (23-oct-2026)
 
 - [ ] [SOLO FRANCISCO] En la carpeta del asunto real de Elecciones al Consejo Escolar, bajo la solicitud de candidatura de Francisco Manuel Garrido Mérida, se lee «Candidato: Garrido Mérida, Francisco Manuel»; la misma línea sale en los documentos del hito y en la lista de adjuntos de un correo. En el JUSTIFICANTE del asunto A26-0464 (parte A) sale «Alumno: …».
+
+## Fila 439 — cada documento en una sola línea (23-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En el asunto A26-0464 (Nicolás Amortegui), los cuatro documentos de la carpeta caben a la vista sin bajar y se lee en cada línea lo necesario para saber cuál es.
