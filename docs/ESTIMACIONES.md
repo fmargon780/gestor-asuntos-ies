@@ -19,4 +19,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 425 | 180 | pestaña Trabajo y dos columnas, mesa del hito en una sola columna, carpeta con marcas y casillas de adjuntar, visor en la columna derecha, quitar cuadrícula, adaptar pruebas de disposición y mesa, prueba nueva, revisor |
 | 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
 | 441 | 60 | contestar con el asunto del cuadro: decidir hilo o correo nuevo en el script, SCRIPT_ESPERADO, pruebas y revisor |
-| 449 | 90 | aviso fijo con ✕ que se quita al salir de Ver todo, Ir al asunto al hito, «← Volver a Ver todo», borrado de la bandeja que falla tras copiar (sueltos y correos), prueba nueva, revisor |

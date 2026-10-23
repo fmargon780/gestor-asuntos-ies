@@ -355,3 +355,4 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Una respuesta a un correo de un asunto entra en ese asunto y no sale repetida en «Ha llegado».
 - [ ] [SOLO FRANCISCO] (fila 441) Contestas desde un asunto a un correo recibido, dejando el asunto que trae el cuadro: el destinatario lo recibe con ese asunto, no con «Re:» y el suyo; si contesta, su respuesta entra en el mismo asunto de la app.
 - [ ] [SOLO FRANCISCO] (fila 441) Si en el cuadro escribes el mismo asunto que puso el remitente, la respuesta sale dentro de su conversación.
+- [ ] [SOLO FRANCISCO] (fila 449) Guardas un documento de «Ver todo» en el asunto A26-0464 (Nicolás Amortegui) en el ordenador del centro: el aviso «Ir al asunto» se queda hasta cerrarlo, abre «Trabajo» en el hito y «← Volver a Ver todo» te devuelve; lo mismo con un correo de Gmail.
