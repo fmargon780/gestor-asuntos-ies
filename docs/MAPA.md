@@ -20,6 +20,6 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Menos trabajo a mano: la app reconoce lo que llega y propone dónde va.
 - Que los directivos sigan los asuntos por sí mismos, sin preguntar a Secretaría.
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
-- Libros de texto: primero, el documento de entrega de cada alumno; más adelante, ayudar a la secretaria a controlar la entrega, la devolución y el estado de los libros.
+- Libros de texto, en un mismo tema: el documento de entrega de cada alumno y ayudar a la secretaria a controlar la entrega, la devolución y el estado de los libros.
 
 Última reflexión: 23-oct-2026
