@@ -243,6 +243,7 @@
   background: var(--papel); color: var(--tinta);
   border: 1px solid var(--linea); border-radius: 8px; padding: 7px 11px;
   cursor: pointer; word-break: break-word;
+  flex-wrap: wrap;   /* fila 436: la línea de datos y la del hito van debajo del nombre */
 }
 .ficha-documentos .ficha-documento:hover { background: var(--azul-claro); border-color: var(--azul); }
 /* El original sin sellar que se conserva al registrar (18-sep-2026,
@@ -270,8 +271,10 @@
 /* Fila 436: la línea de datos de un documento, igual en todas las listas; larga, se corta con «…». */
 .doc-datos {
   display: block;
+  /* Ancho propio 0 y mínimo 100%: la línea llena el sitio que le dejan, pero su texto largo nunca ensancha la fila. */
+  width: 0;
+  min-width: 100%;
   max-width: 100%;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

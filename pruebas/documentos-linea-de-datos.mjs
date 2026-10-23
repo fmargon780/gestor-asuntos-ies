@@ -71,6 +71,15 @@ const css = await pagina.evaluate(() => {
   const e = document.querySelector('#prueba-linea .doc-datos'); const c = getComputedStyle(e);
   return [c.textOverflow, c.whiteSpace, c.overflow, e.scrollWidth > e.clientWidth];
 });
+const ancho = await pagina.evaluate(() => {
+  const largo = 'Motivo: ' + 'muy largo '.repeat(20);
+  document.body.insertAdjacentHTML('beforeend', '<div id="prueba-mesa" style="width:500px"><div class="hito-documento mesa-doc"><div class="mesa-doc-nombre"><span>nombre</span><div class="doc-datos">' + largo + '</div></div><span class="mesa-doc-acciones"><button>Abrir</button></span></div>' +
+    '<div class="ficha-documentos"><button class="ficha-documento" style="width:300px"><span class="marca-ext">PDF</span><span>nombre.pdf</span><div class="doc-datos ficha-documento-datos">' + largo + '</div></button></div></div>');
+  const f = document.querySelector('#prueba-mesa .mesa-doc'), b = document.querySelector('#prueba-mesa .ficha-documento');
+  const d = b.querySelector('.doc-datos'), n = b.querySelector('span:nth-child(2)');
+  return [f.scrollWidth <= f.clientWidth, b.scrollWidth <= b.clientWidth, d.getBoundingClientRect().top > n.getBoundingClientRect().bottom - 2];
+});
+await comprobar('5. una línea larga no ensancha la fila del hito y en la carpeta va debajo del nombre', ancho, [true, true, true]);
 await comprobar('5. si es larga se corta con «…»', css, ['ellipsis', 'nowrap', 'hidden', true]);
 
 /* La lista de adjuntos de un correo pinta la línea. */
