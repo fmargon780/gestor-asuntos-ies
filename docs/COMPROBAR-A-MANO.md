@@ -353,3 +353,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Al descartar un correo desaparece; si contestan en esa conversación, el mensaje nuevo sí aparece.
 - [ ] [SOLO FRANCISCO] Un correo antiguo al que pones la etiqueta GESTOR aparece en «Ha llegado».
 - [ ] [SOLO FRANCISCO] Una respuesta a un correo de un asunto entra en ese asunto y no sale repetida en «Ha llegado».
+- [ ] [SOLO FRANCISCO] (fila 441) Contestas desde un asunto a un correo recibido, dejando el asunto que trae el cuadro: el destinatario lo recibe con ese asunto, no con «Re:» y el suyo; si contesta, su respuesta entra en el mismo asunto de la app.
+- [ ] [SOLO FRANCISCO] (fila 441) Si en el cuadro escribes el mismo asunto que puso el remitente, la respuesta sale dentro de su conversación.

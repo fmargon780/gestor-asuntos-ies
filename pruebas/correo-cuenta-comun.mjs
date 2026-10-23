@@ -4,7 +4,7 @@
    Script (apps-script/gestor-correos.gs):
      1. Con `nombreRemitente`, el correo (nuevo o dentro de un hilo) sale con la opción `name`.
      2. Sin `nombreRemitente` (app vieja), sale como siempre: sin `name`.
-     3. Cada respuesta dice con qué cuenta trabaja el script (`cuenta`) y la versión de la fila 411.
+     3. Cada respuesta dice con qué cuenta trabaja el script (`cuenta`) y la versión de la fila 441.
      4. Un hilo guardado desde otro buzón (no existe por id) se busca por `rfc822msgid:` con las
         `matriculas`, de la última a la primera, y se responde dentro de él.
      5. Si tampoco se encuentra, o no hay matrículas, correo nuevo, sin ruido.
@@ -91,7 +91,7 @@ console.log('--- 1-3. nombre del remitente y cuenta ---');
   const r = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x', nombreRemitente: REMITENTE });
   comprobar('1. correo nuevo con el nombre del remitente', [r.ok, c.enviados[0].opciones.name], [true, REMITENTE]);
   comprobar('3. la respuesta dice la cuenta del script', r.cuenta, ADMIN);
-  comprobar('3. y la versión de la fila 411', r.version, '21-oct-2026 · fila 411');
+  comprobar('3. y la versión de la fila 441', r.version, '23-oct-2026 · fila 441');
   const r2 = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x' });
   comprobar('2. sin nombre (app vieja): sin opción name', [r2.ok, 'name' in c.enviados[1].opciones], [true, false]);
   const r3 = enviar(c, { prueba: true, nombreRemitente: REMITENTE });
@@ -131,7 +131,7 @@ const uFuente = fs.readFileSync(new URL('../js/util.js', import.meta.url), 'utf8
 function contextoApp(datosCentro) {
   const almacen = new Map();
   const peticiones = [];
-  let respuesta = { ok: true, version: '21-oct-2026 · fila 411', cuenta: ADMIN };
+  let respuesta = { ok: true, version: '23-oct-2026 · fila 441', cuenta: ADMIN };
   const ctx = {
     console,
     document: { getElementById: () => null, readyState: 'complete', addEventListener: () => {} },
@@ -189,12 +189,12 @@ console.log('--- 7. la cuenta de cada ordenador ---');
   comprobar('7. se guarda la cuenta que dice el script', await ejecutar(c.ctx, 'CorreoEnviar.cuentaConocida()'), ADMIN);
   comprobar('7. y coincide: línea normal', await ejecutar(c.ctx, 'CorreoEnviar.estadoDeCuenta()'),
     { texto: 'Este ordenador envía con: ' + ADMIN, ambar: false });
-  c.responder({ ok: true, version: '21-oct-2026 · fila 411', cuenta: 'fmargon780@g.educaand.es' });
+  c.responder({ ok: true, version: '23-oct-2026 · fila 441', cuenta: 'fmargon780@g.educaand.es' });
   await ejecutar(c.ctx, 'CorreoEnviar.probar()');
   const e = await ejecutar(c.ctx, 'CorreoEnviar.estadoDeCuenta()');
   comprobarQue('7. otra cuenta: ámbar con el aviso y la cuenta a conectar',
     e.ambar === true && e.texto.indexOf('Este ordenador no usa la cuenta de Administración. Conecta el script de ' + ADMIN + '.') !== -1, JSON.stringify(e));
-  c.responder({ ok: true, version: '21-oct-2026 · fila 411', cuenta: ADMIN.toUpperCase() });
+  c.responder({ ok: true, version: '23-oct-2026 · fila 441', cuenta: ADMIN.toUpperCase() });
   await ejecutar(c.ctx, 'CorreoEnviar.probar()');
   comprobar('7. sin distinguir mayúsculas', (await ejecutar(c.ctx, 'CorreoEnviar.estadoDeCuenta()')).ambar, false);
 }

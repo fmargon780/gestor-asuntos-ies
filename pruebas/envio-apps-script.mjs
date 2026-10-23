@@ -301,6 +301,20 @@ console.log('--- 9-11. el hilo ---');
   });
   comprobar('11. un hilo que no existe en este buzón no revienta nada', r11.ok, true);
   comprobar('11. sale como correo nuevo', c.enviados[c.enviados.length - 1].tipo, 'nuevo');
+
+  /* Fila 441: sale con el asunto del cuadro; solo dentro del hilo si es el mismo */
+  const r12 = llamarDoPost(c, {
+    clave: clave, para: 'proveedor@correo.es', asunto: '  RV: re: CONTRATO ', cuerpo: 'x', hilo: 'hilo-abc'
+  });
+  comprobar('441. mismo asunto con prefijos repetidos, mayúsculas y espacios: dentro del hilo', [r12.ok, c.enviados[c.enviados.length - 1].tipo, r12.hilo], [true, 'respuesta', 'hilo-abc']);
+  const r13 = llamarDoPost(c, {
+    clave: clave, para: 'proveedor@correo.es', asunto: 'Prueba tema 431', cuerpo: 'x', hilo: 'hilo-abc'
+  });
+  const ult = c.enviados[c.enviados.length - 1];
+  comprobar('441. asunto distinto: correo nuevo con ese asunto', [r13.ok, ult.tipo, ult.asunto], [true, 'nuevo', 'Prueba tema 431']);
+  comprobar('441. el hilo nuevo se devuelve para enganchar el asunto', !!r13.hilo && r13.hilo !== 'hilo-abc', true);
+  const r14 = llamarDoPost(c, { clave: clave, para: 'proveedor@correo.es', cuerpo: 'x', hilo: 'hilo-abc' });
+  comprobar('441. app vieja sin asunto: dentro del hilo, como hasta ahora', c.enviados[c.enviados.length - 1].tipo, 'respuesta');
 }
 
 /* ============================================================

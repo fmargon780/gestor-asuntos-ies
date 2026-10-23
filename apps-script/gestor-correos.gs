@@ -43,6 +43,13 @@
    (CacheService). Una petición sin identificador se envía como siempre.
    Versión del script: VERSION_SCRIPT, más abajo.
 
+   23-oct-2026, fila 441, docs/CONTESTAR-CON-NUESTRO-ASUNTO.md: el correo
+   sale con el asunto escrito en el cuadro de Correo. Si es el del hilo
+   (sin «Re:», mayúsculas ni espacios de más) y los destinatarios ya
+   estaban en él, dentro de la conversación; si no, correo nuevo con ese
+   asunto (su hilo queda enganchado al asunto de la app como cualquier
+   envío). Si esta fecha no está en la copia pegada, está vieja.
+
    21-oct-2026, fila 411, docs/CORREO-DESDE-LA-CUENTA-COMUN.md: el Gestor
    recoge y envía solo desde la cuenta común de Administración. Todo
    correo lleva el nombre de remitente que manda la app
@@ -582,7 +589,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '21-oct-2026 · fila 411';
+var VERSION_SCRIPT = '23-oct-2026 · fila 441';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 function doPost(e) {
@@ -752,6 +759,9 @@ function enviarCorreo(cuerpo) {
 
   var hiloId = String(cuerpo.hilo || '').trim();
   var hilo = hiloId ? hiloParaResponder(hiloId, para, cco, cuerpo.matriculas) : null;
+  /* Fila 441: el correo sale con el asunto escrito en el cuadro. Si no es el del hilo (sin «Re:»,
+     mayúsculas ni espacios de más), correo nuevo con ese asunto; el hilo nuevo lo devuelve abajo. */
+  if (hilo && String(cuerpo.asunto || '').trim() && !mismoAsunto(cuerpo.asunto, asuntoDelHilo(hilo))) hilo = null;
 
   try {
     var mensaje;
@@ -764,6 +774,28 @@ function enviarCorreo(cuerpo) {
   } catch (err) {
     return { ok: false, motivo: 'Gmail no ha podido enviarlo: ' + (err && err.message ? err.message : err) };
   }
+}
+
+function asuntoDelHilo(hilo) {
+  try { return hilo.getFirstMessageSubject(); } catch (e) { return null; }
+}
+
+/* Fila 441: dos asuntos son el mismo si coinciden sin prefijos Re:/RV:/Fw:/Fwd: (repetidos, en
+   cualquier mayúscula), sin mayúsculas ni espacios de más. Si no se puede leer el del hilo, se
+   responde dentro, como hasta ahora. */
+function mismoAsunto(a, b) {
+  if (b === null || b === undefined) return true;
+  return asuntoSinPrefijos(a) === asuntoSinPrefijos(b);
+}
+
+function asuntoSinPrefijos(texto) {
+  var s = String(texto || '');
+  var antes;
+  do {
+    antes = s;
+    s = s.replace(/^\s*(re|rv|fw|fwd)\s*:\s*/i, '');
+  } while (s !== antes);
+  return s.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
 /* Solo se responde DENTRO del hilo cuando todas las direcciones que se
