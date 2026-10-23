@@ -338,3 +338,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Abre el asunto de Nicolás Amortegui (A26-0464) y el de Elecciones al Consejo Escolar: se ven a la vez el hito (a la izquierda) y la carpeta (a la derecha), y en Elecciones los documentos del hito abierto llevan su marca «Hito N».
 
 - (Fila 426, 23-oct-2026) En el asunto de Nicolás (4º ESO E), la franja «Datos del asunto» de «Trabajo» enseña 4º ESO E y su NIE, y se copian con un clic.
+
+## Fila 436 — la línea de datos en las listas de documentos, parte B (23-oct-2026)
+
+- [ ] [SOLO FRANCISCO] En la carpeta del asunto real de Elecciones al Consejo Escolar, bajo la solicitud de candidatura de Francisco Manuel Garrido Mérida, se lee «Candidato: Garrido Mérida, Francisco Manuel»; la misma línea sale en los documentos del hito y en la lista de adjuntos de un correo. En el JUSTIFICANTE del asunto A26-0464 (parte A) sale «Alumno: …».

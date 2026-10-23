@@ -40,12 +40,20 @@ silencioso de la fila 130/177. Solo lo creado desde esta versión lleva número 
 [valores], valores: {mapa}, texto, hito, generadoDe }`. Se escribe con `DocumentosDatos.anotar` (dentro de
 `App.guardarRegistroFresco`; `anadirRegistro` suma un registro sin repetir). El registro de Séneca de un
 documento con número se apunta en la ficha (puede haber varios); el índice del ARCHIVO lo suma a los que
-salen de los nombres. La fila del documento en la ficha enseña «Registro 26EM0123 · campos · texto».
+salen de los nombres. La fila del documento enseña la línea de datos (ver abajo).
 
 Forma de `valores` (mapa id del campo → valor): texto para los campos de texto, lista y fecha; para un campo de
 clase «Persona de las listas» (fila 435) un objeto: `{ categoria, nombre (App.textoTercero), visible ("Apellidos,
 Nombre") }` si se eligió de las listas, o `{ visible, manual: true }` si se escribió a mano. `campos` (los valores en
 orden) lleva siempre solo texto (`visible`). `DocCampos.textoDe(valor)` da el texto de cualquiera de los dos.
+
+**La línea de datos (fila 436).** `DocumentosDatos.linea(a, nombreFichero, { soloCampos })` / `lineaHTML(...)` es la
+única función que pinta la línea bajo el nombre de un documento: «Registro … · Candidato: … · Nombre del campo:
+valor · texto». El nombre del campo sale de `DocCampos.campos(d.tipo)` por su id (campo ya borrado: solo el valor);
+«Candidato: <visible>» sale de `ficha.candidaturas` si el fichero está en sus `documentos`. `soloCampos` quita el
+registro y el texto. Clase `.doc-datos` (una línea, «…» al cortar, `title` con el texto entero). La usan la carpeta
+(`ficha-documentos.js`, también en «Trabajo»), los documentos del hito (`hito-mesa-documentos.js`, con `soloCampos`),
+«Apuntar un documento» (`hitos-documentos.js`) y los adjuntos de un correo (`correo-adjuntos.js`).
 
 ## «_Previas» (`js/versiones-previas.js`)
 

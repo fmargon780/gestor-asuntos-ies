@@ -141,6 +141,8 @@ var HitoMesaDocumentos = (function () {
           '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '">' +
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +
           (origen ? '<span class="mesa-doc-origen">' + U.escapar(origen) + '</span>' : '') +
+          /* Fila 436: solo los campos anotados; el registro ya tiene su columna. */
+          (!falta && window.DocumentosDatos ? DocumentosDatos.lineaHTML(a, g.nombre, { soloCampos: true }) : '') +
         '</div>' +
         '<span class="mesa-doc-fecha">' + U.escapar(fechaDe(g.nombre)) + '</span>' +
         '<span class="mesa-doc-registro">' + U.escapar(codigoDe(g.nombre) || '—') + '</span>' +
