@@ -66,6 +66,13 @@
    trozo citado de los anteriores (`soloLoNuevo`). `guardarHilo` ya no
    repite los adjuntos de los mensajes que un hilo seguido ya había
    guardado: solo los del mensaje `desde` en adelante.
+   23-oct-2026, fila 440, docs/TODO-EL-CORREO-ENTRA.md: todo correo que
+   recibe la cuenta común entra solo en «Ha llegado», sin etiquetas,
+   desde el momento en que esta versión corre por primera vez (se apunta
+   en la propiedad `arranque-bandeja` y no cambia). Quedan fuera el spam,
+   la papelera y lo que envía la propia cuenta. La etiqueta GESTOR sigue
+   sirviendo para traer un correo antiguo. Si esta fecha no está en la
+   copia pegada en script.google.com, está vieja.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -83,17 +90,24 @@
    Qué hace, cada minuto (recogerCorreos, con el disparador puesto por
    prepararTodo):
 
-   1. Mira los correos que tengan la etiqueta GESTOR.
+   1. Mira los correos que tengan la etiqueta GESTOR (para traer a mano
+      un correo antiguo).
    2. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
       Drive: remitente, fecha, asunto, texto y direcciones.
    3. Guarda también el hilo en PDF y sus documentos adjuntos.
    4. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
-      volver a recogerlo.
-   5. Y después lee seguidos.json, que escribe el Gestor de Asuntos con
+      volver a recogerlo, y lo archiva en Gmail (sale de la bandeja de
+      entrada; si llega una respuesta, Gmail lo devuelve y se vuelve a
+      recoger y archivar).
+   5. Después lee seguidos.json, que escribe el Gestor de Asuntos con
       los hilos que ya están enganchados a un asunto. De esos hilos ya
       no hay etiqueta que valga: se miran uno por uno y, si han crecido,
       se recogen otra vez. Así entran las respuestas del tercero y
       también los correos que manda Francisco desde Gmail.
+   6. Por último (fila 440) recoge, sin etiqueta, todo hilo con algún
+      mensaje RECIBIDO después de la fecha de arranque que todavía no
+      se haya recogido (`recogerLoQueLlega`). Salta los hilos que ya
+      están en seguidos.json y los mensajes que envía la propia cuenta.
 
    El Gestor de Asuntos lee esa carpeta en js/bandeja-correos.js.
    Este script no crea carpetas de asuntos ni toca nada del centro.
@@ -110,6 +124,13 @@ var MAX_ENCARGOS_POR_VUELTA = 20;
 var MAX_BYTES_ENVIO = 20 * 1024 * 1024;
 var PROPIEDAD_CLAVE = 'clave-envio';
 
+/* Fila 440: desde cuándo entra todo el correo de la cuenta común
+   (milisegundos, se apunta la primera vez y no cambia) y, por hilo, la
+   fecha del mensaje más nuevo que ya se recogió ('recogido:<id>'). */
+var PROPIEDAD_ARRANQUE = 'arranque-bandeja';
+var PREFIJO_RECOGIDO = 'recogido:';
+var DIAS_RECORDAR_RECOGIDO = 90;
+
 /* Fila 178: memoria permanente de los `idEnvio` ya mandados, agrupados
    por día de envío ('enviados-AAMMDD' -> JSON con la lista de ids),
    en PropertiesService (no caduca como CacheService, que solo aguanta
@@ -121,6 +142,7 @@ var DIAS_RECORDAR_ENVIO_PERMANENTE = 60;
 /* ---------- lo que hay que ejecutar una sola vez ---------- */
 
 function prepararTodo() {
+  fechaDeArranque();
   etiqueta(ETIQUETA);
   etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
@@ -167,6 +189,7 @@ function prepararEnvio() {
 
 function recogerCorreos() {
   try { limpiarEnviosViejos(); } catch (e) { Logger.log('No he podido limpiar enviados-*: ' + e.message); }
+  var arranque = fechaDeArranque();
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
@@ -177,17 +200,137 @@ function recogerCorreos() {
       var hilo = hilos[i];
       try {
         guardarHilo(hilo, carpeta, null, 0);
+        apuntarRecogido(hilo, hilo.getMessages());
         hilo.removeLabel(pendiente);
         hilo.addLabel(hecho);
+        hilo.moveToArchive();
       } catch (e) {
         Logger.log('No he podido guardar "' + hilo.getFirstMessageSubject() + '": ' + e.message);
       }
     }
 
-    seguirHilosConocidos(carpeta);
+    var seguidos = leerSeguidos(carpeta);
+    seguirHilosConocidos(carpeta, seguidos);
+    try { recogerLoQueLlega(carpeta, arranque, seguidos, MAX_POR_VUELTA - hilos.length); }
+    catch (e) { Logger.log('No he podido recoger lo que llega: ' + e.message); }
+    try { limpiarRecogidosViejos(); } catch (e) { Logger.log('No he podido limpiar recogido:*: ' + e.message); }
   } finally {
     escribirLatido(carpeta);   /* fila 336: la señal de que esta vuelta se ha hecho, haya habido correos o no */
   }
+}
+
+/* ---------- todo lo que llega a la cuenta común (fila 440) ----------
+
+   Un hilo se recoge cuando tiene un mensaje RECIBIDO (no escrito por la
+   propia cuenta, ni borrador) más nuevo que el corte: la fecha de
+   arranque o, si es más nueva, la del último mensaje que ya se recogió
+   de ese hilo. Así no depende de ninguna etiqueta, y una respuesta a un
+   correo ya descartado vuelve a entrar. Quedan fuera el spam y la
+   papelera (Gmail no los busca) y los hilos que ya viven en un asunto
+   (seguidos.json), que entran por seguirHilosConocidos. */
+
+function fechaDeArranque() {
+  var propiedades = PropertiesService.getScriptProperties();
+  var guardada = parseInt(propiedades.getProperty(PROPIEDAD_ARRANQUE) || '0', 10);
+  if (guardada) return guardada;
+  var ahoraMs = new Date().getTime();
+  propiedades.setProperty(PROPIEDAD_ARRANQUE, String(ahoraMs));
+  return ahoraMs;
+}
+
+function ultimoRecogido(id) {
+  return parseInt(PropertiesService.getScriptProperties().getProperty(PREFIJO_RECOGIDO + id) || '0', 10) || 0;
+}
+
+/* Apunta la fecha del mensaje más nuevo del hilo (recibido o enviado):
+   lo que llegue después de ella es nuevo. */
+function apuntarRecogido(hilo, mensajes) {
+  var maximo = 0;
+  for (var i = 0; i < mensajes.length; i++) {
+    var t = mensajes[i].getDate().getTime();
+    if (t > maximo) maximo = t;
+  }
+  if (maximo) PropertiesService.getScriptProperties().setProperty(PREFIJO_RECOGIDO + hilo.getId(), String(maximo));
+}
+
+function hayRecibidoNuevo(mensajes, corte) {
+  var mia = String(miCorreo() || '').toLowerCase();
+  for (var i = 0; i < mensajes.length; i++) {
+    var m = mensajes[i];
+    if (typeof m.isDraft === 'function' && m.isDraft()) continue;
+    if (mia && quien(m.getFrom()).correo === mia) continue;
+    if (m.getDate().getTime() > corte) return true;
+  }
+  return false;
+}
+
+/* ¿Este hilo ya está enganchado a un asunto? Por identificador de hilo
+   y por matrícula, como hiloDeSeguido. */
+function hiloYaSeguido(hilo, mensajes, seguidos) {
+  var id = hilo.getId();
+  var matriculasSeguidas = {};
+  for (var i = 0; i < seguidos.length; i++) {
+    var s = seguidos[i] || {};
+    if (s.id && s.id === id) return true;
+    var ms = s.matriculas || [];
+    for (var j = 0; j < ms.length; j++) if (ms[j]) matriculasSeguidas[String(ms[j]).replace(/[<>\s]/g, '').toLowerCase()] = true;
+  }
+  for (var k = 0; k < mensajes.length; k++) {
+    var m = matricula(mensajes[k]);
+    if (m && matriculasSeguidas[m]) return true;
+  }
+  return false;
+}
+
+function recogerLoQueLlega(carpeta, arranque, seguidos, hueco) {
+  if (hueco <= 0) return 0;
+  var hecho = etiqueta(ETIQUETA_HECHO);
+  var desde = Math.floor(arranque / 1000);
+  var consultas = [
+    /* En la bandeja de entrada: lo nuevo y las respuestas a lo ya recogido. */
+    'in:inbox -from:me after:' + desde,
+    /* Fuera de ella (alguien lo archivó antes de que pasara el script) y sin recoger todavía. */
+    '-in:inbox -in:spam -in:trash -label:' + ETIQUETA_HECHO.replace(/\//g, '-') + ' -from:me after:' + desde
+  ];
+  var vistos = {};
+  var recogidos = 0;
+  for (var c = 0; c < consultas.length && recogidos < hueco; c++) {
+    var encontrados = GmailApp.search(consultas[c], 0, MAX_POR_VUELTA * 2);
+    for (var i = 0; i < encontrados.length && recogidos < hueco; i++) {
+      var hilo = encontrados[i];
+      var id = hilo.getId();
+      if (vistos[id]) continue;
+      vistos[id] = true;
+      try {
+        var mensajes = hilo.getMessages();
+        if (!hayRecibidoNuevo(mensajes, Math.max(arranque, ultimoRecogido(id)))) continue;
+        if (hiloYaSeguido(hilo, mensajes, seguidos)) continue;
+        guardarHilo(hilo, carpeta, null, 0);
+        apuntarRecogido(hilo, mensajes);
+        recogidos++;
+        hilo.addLabel(hecho);
+        hilo.moveToArchive();
+      } catch (e) {
+        Logger.log('No he podido recoger "' + hilo.getFirstMessageSubject() + '": ' + e.message);
+      }
+    }
+  }
+  return recogidos;
+}
+
+/* Una vez al día: olvida los 'recogido:<id>' de hilos de más de
+   DIAS_RECORDAR_RECOGIDO días, para no llenar las propiedades. */
+function limpiarRecogidosViejos() {
+  var propiedades = PropertiesService.getScriptProperties();
+  var hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyMMdd');
+  if (propiedades.getProperty('recogido-limpieza') === hoy) return;
+  var limite = new Date().getTime() - DIAS_RECORDAR_RECOGIDO * 86400000;
+  var todas = propiedades.getProperties();
+  for (var k in todas) {
+    if (k.indexOf(PREFIJO_RECOGIDO) !== 0) continue;
+    if ((parseInt(todas[k], 10) || 0) < limite) propiedades.deleteProperty(k);
+  }
+  propiedades.setProperty('recogido-limpieza', hoy);
 }
 
 /* ---------- la señal de que el recolector sigue vivo (fila 336) ----------
@@ -243,8 +386,8 @@ function escribirLatido(carpeta) {
    Si el fichero no existe o está roto, no pasa nada: el script sigue
    con su trabajo de siempre sin quejarse. */
 
-function seguirHilosConocidos(carpeta) {
-  var lista = leerSeguidos(carpeta);
+function seguirHilosConocidos(carpeta, seguidos) {
+  var lista = seguidos || leerSeguidos(carpeta);
   var cuantos = Math.min(lista.length, MAX_SEGUIDOS_POR_VUELTA);
 
   for (var i = 0; i < cuantos; i++) {

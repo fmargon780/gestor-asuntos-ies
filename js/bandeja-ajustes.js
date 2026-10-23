@@ -30,11 +30,12 @@
     d.innerHTML =
       '<summary>' +
         '<span class="bloque-titulo">Bandeja de correos</span>' +
-        '<span class="bloque-pie">La carpeta de Drive donde caen los correos etiquetados en Gmail</span>' +
+        '<span class="bloque-pie">La carpeta de Drive donde caen los correos que llegan a la cuenta común</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="explica">En Gmail le pones a un correo la etiqueta <code>GESTOR</code>. ' +
-        'Un script lo recoge, en la cuenta de Administración, y deja su ficha en la carpeta <code>GESTOR-BANDEJA</code> de su Drive. ' +
+        '<p class="explica">Todo lo que llega a la cuenta común de Administración entra solo, sin etiquetas (menos el spam y lo que envía la propia cuenta). ' +
+        'Un script lo recoge y deja su ficha en la carpeta <code>GESTOR-BANDEJA</code> de su Drive. ' +
+        'La etiqueta <code>GESTOR</code> sirve para traer un correo antiguo: se la pones en Gmail y entra. ' +
         'Señálala aquí una vez, en cada ordenador, y los correos saldrán arriba, en la pantalla de asuntos abiertos, ' +
         'con el asunto ya propuesto.</p>' +
         '<div id="estado-bandeja" class="lista"></div>' +

@@ -132,7 +132,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el
   cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
-  bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
+  bandeja de Gmail (fila 440: entra todo lo que llega a la cuenta común; la etiqueta `GESTOR` solo trae un correo antiguo), que lee el PDF y propone tipo, fecha, registro y tercero;
   sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro. Desde un hito (fila 201):
   el cuadro sale con el tipo de documento y el texto adicional (huecos ya rellenos) que tenga ESE
   hito si los tiene, si no los del tipo de documento elegido («Texto por defecto», Ajustes); sin

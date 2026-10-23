@@ -53,7 +53,7 @@ window.BandejaLatido = (function () {
     if (r.estado === 'viejo') {
       var cuando = window.Bandeja && Bandeja.fechaHoraLegible ? Bandeja.fechaHoraLegible(r.hora) : '';
       return 'La recogida de correos está parada' + (cuando ? ' desde ' + cuando : '') +
-        '. Los correos con la etiqueta GESTOR no llegan.';
+        '. Los correos nuevos no llegan.';
     }
     if (r.estado === 'ninguno') return 'La recogida de correos no da señales: puede estar parada o sin actualizar.';
     return '';

@@ -52,7 +52,7 @@ console.log('--- 2 y 5. señal vieja ---');
 {
   const { contexto, pagina, errores } = await abrir('&latido=viejo');
   const t = await aviso(pagina);
-  comprobar('2. aviso con fecha', /^La recogida de correos está parada desde \d{2}-[a-z]{3}-\d{4} · \d{2}:\d{2}\. Los correos con la etiqueta GESTOR no llegan\.$/.test(t || ''), true);
+  comprobar('2. aviso con fecha', /^La recogida de correos está parada desde \d{2}-[a-z]{3}-\d{4} · \d{2}:\d{2}\. Los correos nuevos no llegan\.$/.test(t || ''), true);
   await pagina.click('#avisos-linea [data-aviso="recogida-correos"]');
   await pagina.waitForSelector('#capa:not(.oculto)');
   const cuadro = await pagina.evaluate(() => ({

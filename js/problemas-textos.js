@@ -154,7 +154,7 @@ var ProblemasTextos = (function () {
       pasos: [
         'Abre Drive y busca «GESTOR-BANDEJA». Si hay dos carpetas con ese nombre, la buena es la que está suelta en «Mi unidad», no dentro de otra carpeta.',
         'Aquí, en Este ordenador → «Bandeja de correos», pulsa «Cambiar la carpeta» y señala la buena.',
-        'Si solo hay una, comprueba en Gmail que los correos que esperas llevan la etiqueta GESTOR.',
+        'Si solo hay una, comprueba en Gmail que los correos que esperas han llegado a la cuenta común y no están en spam.',
         'Si sigue sin llegar nada, el fallo está en el script de Google. ' + QUIEN
       ],
       soporte: 'Si después de esto sigue sin llegar nada.',
