@@ -127,12 +127,13 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('2. «26SM0617» y «Sin registrar»',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-grande-docs .mesa-doc-estado, .hito-en-mesa .mesa-grande-docs .mesa-doc-registro')).map((e) => e.textContent).filter((t) => t !== '—').sort()),
     ['26SM0617', 'Registrado', 'Sin registrar']);
-  await comprobar('2. el nombre del fichero, entero y sin «…»',
+  /* Fila 439: una sola línea; un nombre larguísimo puede cortarse con «…» y entonces se ve entero en el title. */
+  await comprobar('2. el nombre del fichero, entero (o cortado con «…» y entero en el title)',
     pagina.evaluate((reg) => {
       const b = document.querySelector('.hito-en-mesa .mesa-grande-docs .hito-documento[data-doc="' + reg + '"] .hito-doc-abrir');
       const s = getComputedStyle(b);
-      return [b.textContent, b.scrollWidth <= b.clientWidth + 1, s.textOverflow !== 'ellipsis' || s.overflow === 'visible'];
-    }, REGISTRADO), [REGISTRADO, true, true]);
+      return [b.textContent, b.title, b.scrollWidth <= b.clientWidth + 1 || (s.textOverflow === 'ellipsis' && b.title === b.textContent)];
+    }, REGISTRADO), [REGISTRADO, REGISTRADO, true]);
   await comprobar('2. el gemelo, debajo de su documento, con su «Abrir»',
     pagina.evaluate((reg) => {
       const f = document.querySelector('.hito-en-mesa .mesa-grande-docs .hito-documento[data-doc="' + reg + '"]');

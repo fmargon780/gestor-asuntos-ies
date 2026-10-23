@@ -117,10 +117,8 @@ var FichaDocumentos = (function () {
        coge el ÚLTIMO `<span>` de este botón para saber qué nombre
        copiar, y un tercer `<span>` aquí se lo llevaría por delante. */
     b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
-                  '<span>' + U.escapar(f.nombre) + '</span>' +
-                  (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '') +
-                  /* Fila 239: lo que ya no entra en el nombre (registro, campos, texto), de la ficha. */
-                  lineaDeDatos;
+                  '<span class="ficha-documento-nombre" title="' + U.escapar(f.nombre) + '">' + U.escapar(f.nombre) + '</span>' +
+                  (hitoDelDoc ? '<div class="ficha-documento-hito" title="' + U.escapar(hitoDelDoc.titulo) + '">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '');
     b.onclick = function () { abrirDocumento(f, a); };
 
     var fila = document.createElement('div');
@@ -141,29 +139,29 @@ var FichaDocumentos = (function () {
     }
     fila.appendChild(b);
 
-    /* Fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md): ⧉, justo detrás del
-       nombre, copia el nombre sin la extensión (antes, «Copiar» del menú,
-       que ponía js/copiar.js). */
-    var copiar = document.createElement('button');
-    copiar.type = 'button';
-    copiar.className = 'boton boton-chico ficha-documento-copiar';
-    copiar.title = 'Copiar el nombre, sin la extensión';
-    copiar.textContent = '⧉';
-    copiar.onclick = function (ev) {
-      ev.stopPropagation();
-      U.copiar(String(f.nombre).replace(/\.[A-Za-z0-9]{1,8}$/, '').trim(), copiar);
-    };
-    fila.appendChild(copiar);
-
-    /* Fila 423: «Ruta», justo detrás del ⧉: copia la ruta entera del documento. */
+    /* Fila 423: «Ruta», pegado al nombre: copia la ruta entera del documento. Fila 439: es lo único que
+       queda a la vista; lo demás, en el menú ⋮ de la derecha, y los datos, en gris, tras «Ruta». */
     if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: f.nombre }));
 
-    /* El nombre nunca se estruja (17-sep-2026, fila 36,
-       docs/FILAS-QUE-NO-SE-ESTRUJAN.md): si falta sitio, la fila se parte.
-       Desde la fila 168, en el menú de tres puntos solo quedan «Pasar a
-       versiones previas» y «Borrar»; las herramientas de PDF, en la barra
-       del visor (`barraPdf`). */
+    /* Fila 439: las entradas del menú ⋮, en este orden: copiar el nombre, Registrar, Cambiar el nombre,
+       Asociar a un hito, Traer a este hito, y lo que ya tenía el menú. Cada una sale solo cuando hoy saldría su botón. */
     var enMenu = [];
+    function entrada(texto, clase, ayuda, alPulsar) {
+      var e = document.createElement('button');
+      e.type = 'button';
+      e.className = clase || '';
+      e.title = ayuda || '';
+      e.textContent = texto;
+      e.onclick = alPulsar;
+      return e;
+    }
+
+    /* Fila 168: copia el nombre sin la extensión (antes, ⧉; antes aún, «Copiar» del menú). */
+    var copiar = entrada('Copiar el nombre', 'ficha-documento-copiar', 'Copiar el nombre, sin la extensión', function (ev) {
+      ev.stopPropagation();
+      U.copiar(String(f.nombre).replace(/\.[A-Za-z0-9]{1,8}$/, '').trim(), copiar);
+    });
+    enMenu.push(copiar);
 
     if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre, a)) {
       var pendiente = Registro.pendiente(a, f.nombre);
@@ -174,34 +172,24 @@ var FichaDocumentos = (function () {
         fila.appendChild(marca);
       }
 
-      var reg = document.createElement('button');
-      reg.type = 'button';
-      reg.className = 'boton' + (pendiente ? ' boton-ambar' : '');
-      reg.title = 'Dar registro de entrada o salida a este documento';
-      reg.textContent = 'Registrar';
-      reg.onclick = async function () {
+      var reg = entrada('Registrar', 'ficha-documento-registrar', 'Dar registro de entrada o salida a este documento', async function () {
         reg.disabled = true;
         await Registro.abrirCuadro(a, f.nombre, function () { pintar(a); });
         reg.disabled = false;
-      };
-      fila.appendChild(reg);
+      });
+      enMenu.push(reg);
     }
 
     /* «Cambiar el nombre», siempre a la vista (fila 168): el mismo cuadro que
        el de la ventana de documentos, ya abierto en este documento. */
     if (!esIndice) {
-      var nombrar = document.createElement('button');
-      nombrar.type = 'button';
-      nombrar.className = 'boton ficha-documento-nombrar';
-      nombrar.title = 'Cambiarle el nombre a este documento, según la norma';
-      nombrar.textContent = 'Cambiar el nombre';
-      nombrar.onclick = async function () {
+      var nombrar = entrada('Cambiar el nombre', 'ficha-documento-nombrar', 'Cambiarle el nombre a este documento, según la norma', async function () {
         nombrar.disabled = true;
         try { await App.verDocumentos(a, { ponerNombre: f.nombre }); }
         finally { nombrar.disabled = false; }
         pintar(a);
-      };
-      fila.appendChild(nombrar);
+      });
+      enMenu.push(nombrar);
     }
 
     /* "Asociar a un hito" (18-sep-2026, fila 58,
@@ -210,12 +198,15 @@ var FichaDocumentos = (function () {
        de más abajo, que es solo para acciones de un único paso. Solo
        sale si el asunto tiene hitos con los que asociar. */
     if (window.FichaMenus && !esIndice && hitosVisibles && hitosVisibles.length) {
-      var asociar = document.createElement('button');
-      asociar.type = 'button';
-      asociar.className = 'boton boton-chico ficha-documento-asociar';
-      asociar.title = 'Asociar este documento a un hito';
-      asociar.textContent = 'Asociar a un hito';
-      fila.appendChild(asociar);
+      /* El desplegable de hitos cuelga de un ancla sin tamaño junto al ⋮; la entrada del menú la pulsa. */
+      var ancla = document.createElement('button');
+      ancla.type = 'button';
+      ancla.className = 'ficha-documento-ancla';
+      ancla.tabIndex = -1;
+      ancla.setAttribute('aria-hidden', 'true');
+      fila.appendChild(ancla);
+      var asociar = entrada('Asociar a un hito', 'ficha-documento-asociar', 'Asociar este documento a un hito', function () { ancla.click(); });
+      enMenu.push(asociar);
 
       /* Fila 282: «Quitar del hito» y «mover» por la función común (js/hitos-sacar-documento.js): la tarea que se marcó
          con el documento se queda marcada, con su aviso y «Desmarcar». */
@@ -229,7 +220,7 @@ var FichaDocumentos = (function () {
         };
       }
 
-      FichaMenus.montar(asociar, (hitoDelDoc ? [
+      FichaMenus.montar(ancla, (hitoDelDoc ? [
         { texto: 'Quitar del hito', alPulsar: accionAsociar(null) }, { raya: true }
       ] : []).concat(hitosVisibles.map(function (h) {
         return {
@@ -242,18 +233,13 @@ var FichaDocumentos = (function () {
     /* Fila 425: «Traer a este hito», lo que hacía el «⋯» de las filas «De otros hitos» de la mesa. Solo se ve
        (`aplicarMarcas`) con un hito abierto a la izquierda del que el documento todavía no es. */
     if (window.HitosSacarDocumento && !esIndice) {
-      var traer = document.createElement('button');
-      traer.type = 'button';
-      traer.className = 'boton boton-chico ficha-documento-traer oculto';
-      traer.title = 'Apuntar este documento al hito que está abierto a la izquierda';
-      traer.textContent = 'Traer a este hito';
-      traer.onclick = async function () {
+      var traer = entrada('Traer a este hito', 'ficha-documento-traer oculto', 'Apuntar este documento al hito que está abierto a la izquierda', async function () {
         var h = enMesa.idHito && window.Hitos ? Hitos.buscar(enMesa.hitos, enMesa.idHito) : null;
         if (!h) return;
         try { await HitosSacarDocumento.mover(a, [f.nombre], h); }
         catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
-      };
-      fila.appendChild(traer);
+      });
+      enMenu.push(traer);
     }
 
     /* Fila 280: «Convertir en plantilla» (js/convertir-en-plantilla.js), antes de «Pasar a versiones previas». */
@@ -291,6 +277,9 @@ var FichaDocumentos = (function () {
       });
       enMenu.push(borrar);
     }
+
+    /* Fila 239 y 439: lo que ya no entra en el nombre (registro, campos, texto), en gris, tras «Ruta»; largo, se corta con «…». */
+    if (lineaDeDatos) fila.insertAdjacentHTML('beforeend', lineaDeDatos);
 
     if (enMenu.length) fila.appendChild(U.menuDeAcciones(enMenu));
 
@@ -465,11 +454,8 @@ var FichaDocumentos = (function () {
     previas.forEach(function (f) {
       var fila = document.createElement('div');
       fila.className = 'ficha-previa-fila';
-      var nombre = document.createElement('span');
-      nombre.className = 'ficha-previa-nombre';
-      nombre.textContent = f.nombre;
       var abrir = document.createElement('button');
-      abrir.type = 'button'; abrir.className = 'enlace ficha-previa-abrir'; abrir.textContent = 'Abrir';
+      abrir.type = 'button'; abrir.className = 'ficha-previa-abrir'; abrir.textContent = f.nombre; abrir.title = 'Verlo al lado del programa';
       abrir.onclick = function () { if (window.Visor) Visor.abrir(f.handle, f.nombre, { asunto: a, carpeta: a.handle, modo: modo, subcarpeta: f.carpeta }); };
       var sacar = document.createElement('button');
       sacar.type = 'button'; sacar.textContent = 'Sacar de versiones previas';
@@ -478,7 +464,6 @@ var FichaDocumentos = (function () {
         catch (e) { U.fallo('No he podido sacarlo', e); }
         pintar(a);
       };
-      fila.appendChild(nombre);
       fila.appendChild(abrir);
       if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, modo, { nombre: f.nombre, subcarpeta: f.carpeta }));   /* fila 423: su nombre real en el disco */
       fila.appendChild(U.menuDeAcciones([sacar]));

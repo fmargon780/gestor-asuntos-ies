@@ -143,6 +143,7 @@ await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 const filaDelDoc = pagina.locator('.ficha-documento-fila', {
   has: pagina.locator('.ficha-documento', { hasText: NUEVO_DOC })
 });
+await filaDelDoc.locator('.fila-menu-btn').click();   // fila 439: «Asociar a un hito» está en el ⋮
 await filaDelDoc.locator('.ficha-documento-asociar').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
 await pagina.getByRole('button', { name: TITULO_HITO, exact: true }).click();

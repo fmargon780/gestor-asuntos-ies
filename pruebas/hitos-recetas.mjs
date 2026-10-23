@@ -98,7 +98,7 @@ await pagina.waitForTimeout(400);
 console.log('--- b. los documentos del asunto, en la carpeta de la derecha (fila 425) ---');
 await comprobar('la carpeta enseña los tres; ninguno es de este hito, así que sin «Hito N» y con «Traer a este hito»',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((d) =>
-    [d.dataset.doc, (d.querySelector('.ficha-marca-hito') || {}).textContent || '', !!(d.querySelector('.ficha-documento-traer') || {}).offsetParent])),
+    [d.dataset.doc, (d.querySelector('.ficha-marca-hito') || {}).textContent || '', !!d.querySelector('.ficha-documento-traer') && !d.querySelector('.ficha-documento-traer').classList.contains('oculto')])),
   [['260905 SOLICITUD.pdf', '', true], ['260906 INFORME.pdf', '', true], ['260907 SUELTO.pdf', '', true]]);
 await comprobar('el título del hito cuenta solo los suyos',
   pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '· 0');

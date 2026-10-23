@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '439', fecha: '2026-10-23', texto: 'Cada documento ocupa ahora una sola línea: nombre, «Ruta» y sus datos; el resto de opciones, en los tres puntitos de la derecha.' },
   { id: '426', fecha: '2026-10-23', texto: 'En «Trabajo», la franja «Datos del asunto» tiene a mano los datos del interesado para copiarlos, y el registro del hito enseña también las notas del asunto.' },
   { id: '425', fecha: '2026-10-22', texto: 'Al entrar en un asunto ves a la vez el hito, a la izquierda, y los documentos de la carpeta, a la derecha (pestaña «Trabajo»).' },
   { id: '423', fecha: '2026-10-22', texto: 'Cada documento tiene ahora su botón «Ruta»: copia la ruta del documento para pegarla al adjuntarlo en Séneca.' },

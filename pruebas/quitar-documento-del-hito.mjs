@@ -119,7 +119,7 @@ await anadir(1, UNO, false);
 await abrirMesa(0);
 await comprobar('7. en la carpeta, con el hito 1 abierto, «uno» (del hito 2) y «dos» (sin hito) no llevan «Hito N» y sí «Traer a este hito»', pagina.evaluate((n) => ({
   marcas: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-marca-hito')).length,
-  traer: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-documento-traer') && f.querySelector('.ficha-documento-traer').offsetParent).map((f) => f.dataset.doc).filter((d) => n.indexOf(d) !== -1) }), [UNO, DOS]),
+  traer: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-documento-traer') && !f.querySelector('.ficha-documento-traer').classList.contains('oculto')).map((f) => f.dataset.doc).filter((d) => n.indexOf(d) !== -1) }), [UNO, DOS]),
   { marcas: 0, traer: [DOS, UNO] });
 await pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: UNO }).locator('.ficha-documento-marca').check();
 await pagina.click('.hito-en-mesa .mesa-sel-mover');
@@ -134,8 +134,9 @@ console.log('--- 8. «Traer a este hito» y los menús de la ficha ---');
 await anadir(1, UNO, true);
 await abrirMesa(0);
 const fila = pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: UNO }).first();
-await comprobar('8. la fila de la carpeta lleva «Ruta», «Traer a este hito» y «Asociar a un hito»', fila.evaluate((f) => Array.from(f.querySelectorAll('button.boton')).filter((b) => b.offsetParent && !b.closest('.ficha-menu')).map((b) => b.textContent)).then((l) => ['Ruta', 'Traer a este hito', 'Asociar a un hito'].filter((t) => l.indexOf(t) !== -1)), ['Ruta', 'Traer a este hito', 'Asociar a un hito']);
+await comprobar('8. la fila de la carpeta lleva «Ruta», «Traer a este hito» y «Asociar a un hito»', fila.evaluate((f) => Array.from(f.querySelectorAll('button.boton, .fila-menu button')).filter((b) => !b.classList.contains('oculto') && !b.closest('.ficha-menu')).map((b) => b.textContent)).then((l) => ['Ruta', 'Traer a este hito', 'Asociar a un hito'].filter((t) => l.indexOf(t) !== -1)), ['Ruta', 'Traer a este hito', 'Asociar a un hito']);
 await cerrarCuadro();
+await fila.locator('.fila-menu-btn').click();   // fila 439: «Traer a este hito» está en el ⋮
 await fila.locator('.ficha-documento-traer').click();
 await pagina.waitForTimeout(1200);
 await cerrarCuadro();
@@ -143,7 +144,7 @@ await comprobar('8. «Traer a este hito»: avisa «Movido a…», el documento s
   [(await avisos()).some((a) => /^Movido a «1 · Recibir la solicitud»\./.test(a)), (await H('docs'))[0], (await H('docs'))[1], await H('tarea', 1)], [true, [UNO], [], [true, UNO]]);
 await comprobar('8. y la carpeta le pone «Hito 1» y quita su «Traer a este hito»', pagina.evaluate((n) => {
   const f = Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((x) => x.dataset.doc === n)[0];
-  return [(f.querySelector('.ficha-marca-hito') || {}).textContent, !!(f.querySelector('.ficha-documento-traer') || {}).offsetParent];
+  return [(f.querySelector('.ficha-marca-hito') || {}).textContent, !!f.querySelector('.ficha-documento-traer') && !f.querySelector('.ficha-documento-traer').classList.contains('oculto')];
 }, UNO), ['Hito 1', false]);
 await comprobar('8. en la ficha, «Asociar a un hito» lleva «Quitar del hito», una raya y los hitos, sin «Ninguno»', pagina.evaluate(async () => {
   FichaTarjetas.abrir('documentos');

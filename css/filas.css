@@ -82,3 +82,55 @@
 
 /* La lista de personas y empresas (#lista-personas) ya envuelve bien:
    cada resultado es un bloque de texto normal, sin botones al lado. */
+
+/* ---------- fila 439 (docs/DOCUMENTOS-EN-UNA-LINEA.md): cada documento, en una sola línea ----------
+   Casilla · tipo · nombre · «Ruta» · datos en gris · ⋮. El nombre no se corta antes que los datos: se corta primero la
+   línea de datos, con «…». En pantalla estrecha puede bajar a dos renglones, nunca a una fila de botones. */
+.ficha-documentos .ficha-documento-fila {
+  flex-wrap: nowrap; gap: 8px; padding: 3px 8px;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+}
+.ficha-documentos .ficha-documento-fila:hover { background: var(--azul-claro); border-color: var(--azul); }
+.ficha-documentos .ficha-documento-fila > .ficha-documento {
+  flex: 0 1 auto; min-width: 8em; width: auto; padding: 3px 0; gap: 8px;
+  background: none; border: 0; flex-wrap: nowrap; overflow: hidden;
+}
+.ficha-documentos .ficha-documento-fila > .ficha-documento:hover { background: none; }
+.ficha-documentos .ficha-documento-fila > .ficha-documento-marca { flex: 0 0 auto; min-width: 13px; }
+.ficha-documento-nombre { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ficha-documento-fila > .ficha-documento .ficha-documento-hito { flex: 0 1 auto; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10em; }
+.ficha-documento-fila > .ruta-documento { flex: 0 0 auto; }
+.ficha-documento-fila > .doc-datos {
+  flex: 1 1 0; width: auto; min-width: 8em; max-width: none; margin: 0; text-align: left;   /* ocupa lo que sobra; el nombre se corta antes de dejarla sin sitio (se ve entero en su title) */
+}
+.ficha-documento-fila > .fila-menu-envoltorio { margin-left: auto; }
+.ficha-documento-ancla { width: 0; height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; opacity: 0; flex: 0 0 0; }
+.ficha-documento-fila .ficha-menu-envoltorio { flex: 0 0 0; }
+.fila-menu button.oculto { display: none; }
+
+.mesa-doc-nombre { flex-direction: row; align-items: center; gap: 8px; flex: 1 1 0; min-width: 8em; }
+.mesa-doc-tipo { flex: 0 0 auto; }
+.mesa-doc-nombre .hito-doc-abrir { flex: 0 1 auto; min-width: 7em; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mesa-doc-nombre .mesa-doc-origen { flex: 0 0 auto; white-space: nowrap; }
+.mesa-doc-nombre > .ruta-documento-lugar { flex: 0 0 auto; }
+.mesa-doc-nombre > .doc-datos { flex: 1 1 0; width: auto; min-width: 0; max-width: none; margin: 0; }
+.hito-en-mesa .hito-documentos { flex-wrap: nowrap; }   /* una columna de verdad: en varias líneas (wrap) cada fila medía lo que su contenido */
+.hito-documento.mesa-doc { gap: 4px 10px; min-width: 0; }
+
+.mesa-previa-abrir, .ficha-previa-abrir {
+  font: inherit; font-size: 13px; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; color: inherit;
+  flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mesa-previa-abrir:hover, .ficha-previa-abrir:hover { text-decoration: underline; }
+.mesa-previa-menu { margin-left: auto; }
+.ficha-previa-fila > .fila-menu-envoltorio { margin-left: auto; }
+
+@media (max-width: 700px) {
+  .ficha-documentos .ficha-documento-fila { flex-wrap: wrap; }
+  .ficha-documento-fila > .doc-datos { flex-basis: 100%; }
+  .mesa-doc-nombre { flex-wrap: wrap; }
+  .mesa-doc-nombre .hito-doc-abrir { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; max-width: 100%; }
+}
+
+.fila-menu.fila-menu-arriba { top: auto; bottom: 36px; }
+.ficha-menu.ficha-menu-arriba { top: auto; bottom: calc(100% + 4px); }

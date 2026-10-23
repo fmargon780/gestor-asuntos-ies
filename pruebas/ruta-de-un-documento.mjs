@@ -92,9 +92,9 @@ await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO + '"] .no
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('.ficha-documento-fila');
-await comprobarQue('1. el botón «Ruta» va justo detrás del ⧉ de cada documento',
+await comprobarQue('1. el botón «Ruta» va justo detrás del nombre de cada documento',
   pagina.evaluate(() => {
-    const c = document.querySelector('.ficha-documento-fila .ficha-documento-copiar');
+    const c = document.querySelector('.ficha-documento-fila .ficha-documento');
     const r = c && c.nextElementSibling;
     return !!r && r.classList.contains('ruta-documento') && r.textContent.trim() === 'Ruta' && r.classList.contains('boton-chico');
   }));
@@ -128,7 +128,7 @@ await pagina.waitForSelector('.hito-en-mesa .mesa-doc .ruta-documento >> visible
 await comprobar('3. el documento de la mesa del hito lleva «Ruta» y copia la del documento',
   pegado(() => pagina.click('.hito-en-mesa .mesa-doc .ruta-documento >> visible=true')), BASE + FACTURA);
 await comprobar('5. con el visor abierto desde la mesa también sale',
-  (async () => { await pagina.click('.hito-en-mesa .mesa-doc-abrir >> visible=true'); await pagina.waitForSelector('#visor-lateral:not(.oculto) #visor-ruta .ruta-documento'); return true; })(), true);
+  (async () => { await pagina.click('.hito-en-mesa .mesa-doc .hito-doc-abrir >> visible=true'); await pagina.waitForSelector('#visor-lateral:not(.oculto) #visor-ruta .ruta-documento'); return true; })(), true);
 await pagina.click('#visor-cerrar');
 await pagina.evaluate(() => { const d = document.querySelector('.hito-en-mesa .mesa-previas'); if (d) d.open = true; });
 await comprobar('4. la previa de la mesa del hito lleva su botón y copia ...\\_Previas\\nombre.pdf',

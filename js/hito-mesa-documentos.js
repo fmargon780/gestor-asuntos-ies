@@ -114,11 +114,20 @@ var HitoMesaDocumentos = (function () {
     if (!suyas.length) return '';
     return '<details class="mesa-previas"><summary>' + suyas.length + (suyas.length === 1 ? ' versión previa' : ' versiones previas') +
       ' · ver</summary>' + suyas.map(function (n) {
-        return '<div class="mesa-previa-fila"><span class="mesa-previa-nombre">' + U.escapar(n) + '</span>' +
-          '<button type="button" class="enlace mesa-previa-abrir" data-doc="' + U.escapar(n) + '">Abrir</button>' +
-          ruta(n, (carpetas || {})[n]) +
-          '<button type="button" class="enlace mesa-previa-sacar" data-doc="' + U.escapar(n) + '">Sacar de versiones previas</button></div>';
+        /* Fila 439: una sola línea: el nombre (se abre al pulsarlo), «Ruta» y ⋮ con «Sacar de versiones previas». */
+        return '<div class="mesa-previa-fila"><button type="button" class="mesa-previa-abrir" data-doc="' + U.escapar(n) + '" title="Verlo al lado del programa">' +
+          U.escapar(n) + '</button>' + ruta(n, (carpetas || {})[n]) +
+          '<span class="mesa-previa-menu" data-doc="' + U.escapar(n) + '"></span></div>';
       }).join('') + '</details>';
+  }
+
+  function datosDeLaLinea(a, nombre, falta) {
+    var fecha = fechaDe(nombre);
+    var campos = !falta && window.DocumentosDatos ? DocumentosDatos.linea(a, nombre, { soloCampos: true }) : '';
+    var texto = [fecha, codigoDe(nombre) || '—', campos].filter(Boolean).join(' · ');
+    return '<div class="doc-datos mesa-doc-datos" title="' + U.escapar(texto) + '"><span class="mesa-doc-fecha">' + U.escapar(fecha) + '</span>' +
+      (fecha ? ' · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
+      (campos ? ' · ' + U.escapar(campos) : '') + '</div>';
   }
 
   function filasHTML(a, h, hitos, nombresDeLaCarpeta, abierto) {
@@ -138,17 +147,17 @@ var HitoMesaDocumentos = (function () {
       return '<div class="hito-documento mesa-doc" data-doc="' + U.escapar(g.nombre) + '">' +
         '<input type="checkbox" class="mesa-doc-marca" title="Seleccionar"' + (falta ? ' disabled' : '') + '>' +
         '<div class="mesa-doc-nombre"><span class="mesa-doc-tipo">' + U.escapar(tipoDe(g.nombre)) + '</span>' +
-          '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '">' +
+          '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '" title="' + U.escapar(g.nombre) + '">' +
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +
           (origen ? '<span class="mesa-doc-origen">' + U.escapar(origen) + '</span>' : '') +
-          /* Fila 436: solo los campos anotados; el registro ya tiene su columna. */
-          (!falta && window.DocumentosDatos ? DocumentosDatos.lineaHTML(a, g.nombre, { soloCampos: true }) : '') +
+          /* Fila 439: «Ruta», pegado al nombre, y los datos en gris, en la misma línea. */
+          (falta ? '' : ruta(g.nombre)) +
+          /* Fila 439: la fecha, el registro y los campos anotados (fila 436), en gris, en la misma línea; larga, se corta con «…». */
+          datosDeLaLinea(a, g.nombre, falta) +
         '</div>' +
-        '<span class="mesa-doc-fecha">' + U.escapar(fechaDe(g.nombre)) + '</span>' +
-        '<span class="mesa-doc-registro">' + U.escapar(codigoDe(g.nombre) || '—') + '</span>' +
         '<span class="mesa-doc-estado ' + estado.clase + '">' + U.escapar(estado.texto) + '</span>' +
         '<span class="mesa-doc-acciones">' +
-          (falta ? '' : ruta(g.nombre) + '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>') +
+          (falta ? '' : '<button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>') +
           (abierto && window.HitosDocumentoMenu ? HitosDocumentoMenu.botonHTML(g.nombre) : '') +
         '</span>' +
         g.gemelos.map(function (x) {
@@ -332,14 +341,19 @@ var HitoMesaDocumentos = (function () {
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-gemelo'), function (b) {
       b.onclick = function () { abrirEnVisor(a, b.dataset.doc, modo); };
     });
-    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-abrir'), function (b) {
-      b.onclick = function () { abrirEnVisor(a, b.closest('.mesa-doc').dataset.doc, modo); };
-    });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-enviar'), function (b) {
       menuEnviarUno(b, a, h, b.closest('.mesa-doc').dataset.doc);
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-marca'), function (c) {
       c.onchange = function () { pintarSeleccion(fila, a, h, hitos); };
+    });
+    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-menu'), function (h) {
+      var sacar = document.createElement('button');
+      sacar.type = 'button';
+      sacar.className = 'mesa-previa-sacar';
+      sacar.dataset.doc = h.dataset.doc;
+      sacar.textContent = 'Sacar de versiones previas';
+      h.appendChild(U.menuDeAcciones([sacar]));
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-abrir'), function (b) {
       b.onclick = function () { if (window.VersionesPrevias) VersionesPrevias.abrir(a, b.dataset.doc, modo); };
