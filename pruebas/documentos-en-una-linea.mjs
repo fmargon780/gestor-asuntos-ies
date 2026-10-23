@@ -74,7 +74,12 @@ await pagina.keyboard.press('Escape');
 console.log('--- 3. datos largos ---');
 const datos = await fila(UNO).evaluate((f) => { const d = f.querySelector('.doc-datos'); const c = getComputedStyle(d); return [c.textOverflow, d.scrollWidth > d.clientWidth, d.title.length > 100, d.getBoundingClientRect().height < 24]; });
 await comprobar('3. los datos largos se cortan con «…», enteros en el title y sin partir la línea', datos, ['ellipsis', true, true, true]);
-await comprobar('3. el nombre se ve entero', fila(UNO).evaluate((f) => { const n = f.querySelector('.ficha-documento-nombre'); return n.scrollWidth <= n.clientWidth + 1; }), true);
+await comprobar('3. los datos tienen sitio (8em) y el nombre se ve entero en su title', fila(UNO).evaluate((f) => { const n = f.querySelector('.ficha-documento-nombre'); return [f.querySelector('.doc-datos').getBoundingClientRect().width >= 80, n.title === n.textContent]; }), [true, true]);
+
+console.log('--- 3b. el ⋮ de la última fila no se corta ---');
+await fila(DOS).locator('.fila-menu-btn').click();
+await comprobar('3b. el menú ⋮ cabe dentro de la ventana y de la tarjeta', fila(DOS).evaluate((f) => { const m = f.querySelector('.fila-menu'); const r = m.getBoundingClientRect(); const c = m.closest('.trabajo-col, .trabajo-der') || document.body; return r.top >= 0 && r.bottom <= Math.min(innerHeight, c.getBoundingClientRect().bottom) + 1; }), true);
+await pagina.keyboard.press('Escape');
 
 console.log('--- 4. la mesa del hito y las versiones previas ---');
 await pagina.evaluate(async () => {

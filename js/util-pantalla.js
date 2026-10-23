@@ -137,6 +137,20 @@
      pieza (js/copiar.js, con el botón "Copiar") puede seguir
      añadiendo botones al menú después de montado, buscándolo por su
      clase ("fila-menu"). */
+  /* Fila 439: si el menú no cabe por debajo (el borde de la ventana o de la tarjeta con desplazamiento que lo
+     contiene), se abre hacia arriba, siempre que arriba quepa. */
+  function ajustarAlBorde(menu, boton) {
+    menu.classList.remove('fila-menu-arriba');
+    var limite = window.innerHeight, p = menu.parentNode;
+    while (p && p !== document.body) {
+      var o = getComputedStyle(p).overflowY;
+      if (o === 'auto' || o === 'scroll' || o === 'hidden') { limite = Math.min(limite, p.getBoundingClientRect().bottom); break; }
+      p = p.parentNode;
+    }
+    var m = menu.getBoundingClientRect(), b = boton.getBoundingClientRect();
+    if (m.bottom > limite && b.top - m.height - 4 > 0) menu.classList.add('fila-menu-arriba');
+  }
+
   function menuDeAcciones(botones) {
     var envoltorio = document.createElement('div');
     envoltorio.className = 'fila-menu-envoltorio';
@@ -170,6 +184,7 @@
       e.stopPropagation();
       if (abierto()) { cerrar(); return; }
       menu.classList.remove('oculto');
+      ajustarAlBorde(menu, boton);
       boton.setAttribute('aria-expanded', 'true');
       document.addEventListener('mousedown', alPulsarFuera, true);
       document.addEventListener('keydown', alPulsarTecla, true);

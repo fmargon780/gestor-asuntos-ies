@@ -117,8 +117,8 @@ var FichaDocumentos = (function () {
        coge el ÚLTIMO `<span>` de este botón para saber qué nombre
        copiar, y un tercer `<span>` aquí se lo llevaría por delante. */
     b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
-                  '<span class="ficha-documento-nombre">' + U.escapar(f.nombre) + '</span>' +
-                  (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '');
+                  '<span class="ficha-documento-nombre" title="' + U.escapar(f.nombre) + '">' + U.escapar(f.nombre) + '</span>' +
+                  (hitoDelDoc ? '<div class="ficha-documento-hito" title="' + U.escapar(hitoDelDoc.titulo) + '">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '');
     b.onclick = function () { abrirDocumento(f, a); };
 
     var fila = document.createElement('div');
