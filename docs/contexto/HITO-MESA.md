@@ -186,9 +186,9 @@ resumen ni cambio de tarjeta (`.mesa-resumen`, `HitoMesa.abrirTarjeta`, «← Vo
   que «+ Añadir un paso a la guía del tipo». Sin salir a Ajustes.
 - **Documentos del hito** (fila 425: solo los del propio hito; los demás de la carpeta se ven en la
   columna derecha de «Trabajo», `js/ficha-documentos.js`): «Añadir documento» junto al título, la barra
-  de marcados encima, la tabla (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha,
-  registro `.mesa-doc-registro`, estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y
-  ⋯) y los gemelos debajo de su documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir»). El
+  de marcados encima, una sola línea por documento (fila 439: casilla, tipo en negrita, el nombre del fichero (abre el visor),
+  «Ruta», fecha y registro `.mesa-doc-registro` y campos en gris cortados con «…», estado «Registrado»/«Sin registrar», Enviar y
+  ⋯; ya no hay «Abrir» suelto) y los gemelos debajo de su documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir»). El
   título dice «Documentos del hito · 2» (`cuentaTitulo`). Cada documento de la carpeta (derecha) lleva
   una casilla `.ficha-documento-marca` (solo con un hito abierto para trabajar): lo marcado allí se
   suma a lo marcado a la izquierda (`HitoMesaDocumentos.marcados`, `alMarcar`) y se adjunta al

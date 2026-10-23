@@ -70,7 +70,7 @@ await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
-console.log('--- 1. la fila de un documento con nombre largo envuelve, sin aplastar el nombre ---');
+console.log('--- 1. la fila de un documento con nombre largo sigue en una línea, sin aplastar el nombre ---');
 const medidas = await pagina.evaluate(() => {
   const fila = document.querySelector('#ficha-documentos .ficha-documento-fila');
   const boton = fila.querySelector('.ficha-documento');
@@ -81,13 +81,11 @@ const medidas = await pagina.evaluate(() => {
     altoFila: fila.getBoundingClientRect().height
   };
 });
-/* Las dos reglas de css/filas.css en sí: sin ellas (flex-wrap: nowrap
-   por defecto, min-width: 0 de css/registro.css), el nombre se aplasta
-   estrujado en vez de bajar los botones a otra línea. */
-await comprobar('1. la fila envuelve en vez de estrujar (flex-wrap)', medidas.flexWrap, 'wrap');
-await comprobar('1. el nombre no baja de 240px de ancho mínimo', medidas.minWidth, '240px');
-await comprobar('1. el botón del nombre mide más de 200px de ancho', medidas.anchoNombre > 200, true);
-await comprobar('1. la fila no se dispara de alto (no pasa de dos líneas)', medidas.altoFila < 160, true);
+/* Fila 439: la fila es de una sola línea (el resto de opciones, en el ⋮); un nombre largo se corta con «…», sin aplastarse. */
+await comprobar('1. la fila no se parte en renglones (flex-wrap)', medidas.flexWrap, 'nowrap');
+await comprobar('1. el nombre no baja de 8em de ancho mínimo', medidas.minWidth, '104px');
+await comprobar('1. el botón del nombre mide más de 100px de ancho', medidas.anchoNombre > 100, true);
+await comprobar('1. la fila ocupa un solo renglón', medidas.altoFila < 60, true);
 
 console.log('--- 2. el menú de tres puntos: abre, ofrece Borrar, y borra como antes ---');
 await pagina.click('#ficha-documentos .fila-menu-btn');

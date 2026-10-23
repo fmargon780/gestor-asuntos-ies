@@ -229,7 +229,7 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 - Orden de Inicio (fila 367): se pulsa el título de una columna para ordenar (otra vez, al revés; flecha ▲/▼); vuelve al orden de siempre al cambiar de pestaña o pulsar «Inicio» en el menú; ya no hay desplegable «Ordenar» (`js/inicio-ordenar.js`). Fila 368: cada persona arrastra los títulos para ordenar las columnas (un orden para todas las pestañas, en `_GESTOR/preferencias/<nombre>.json`, «Restablecer columnas» en «Filtros», `js/inicio-columnas.js`); pestañas y botones comparten renglón fijo, y el cuadro de avisos abierto flota sin empujar la lista.
   "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
+- Cada documento, en una sola línea (casilla, tipo, nombre, «Ruta», datos en gris cortados con «…», ⋮; copiar el nombre, Registrar, «Cambiar el nombre», Asociar y Traer, dentro del ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
   (sello, firma y pasar las hojas a A4) y Repartir entre terceros, en la barra del visor. Un PDF que entra
   se comprime solo si pasa de 5 MB y trae «Pasarlas a A4» si sus hojas son grandes; con firma no se toca.
 - "Quién lo pide y por qué vía": un único cuadro, tanto en Nuevo asunto como en "El encargo" de la ficha; su

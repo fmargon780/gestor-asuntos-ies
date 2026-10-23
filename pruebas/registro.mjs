@@ -137,6 +137,7 @@ await comprobar('el documento sin registro lleva botón Registrar y sin marca de
   filaDeDocumento(FACTURA), { pendiente: false, registrar: true });
 
 console.log('--- registrar desde la ficha del asunto ---');
+await pagina.locator('#ficha-documentos .fila-menu-btn').first().click();   // fila 439: «Registrar» está en el ⋮
 await pagina.getByRole('button', { name: 'Registrar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el título del cuadro dice qué documento se registra',

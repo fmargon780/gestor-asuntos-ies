@@ -6,13 +6,21 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ### Las opciones de cada documento, en su fila (fila 168)
 
-`docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`. En la ficha del asunto (`js/ficha-documentos.js`), cada
-fila de «Documentos de la carpeta» lleva, de izquierda a derecha: el nombre (abre el visor), **⧉**
-(`.ficha-documento-copiar`: copia el nombre sin la extensión con `U.copiar`), la etiqueta del hito,
-«Sin registrar» + «Registrar» (solo sin registro), **«Poner nombre»** (`App.verDocumentos(a,
-{ ponerNombre })`, repinta al cerrar), «Asociar a un hito» (fila 282: «Quitar del hito» arriba si tiene hito, raya y los hitos; ya no hay «Ninguno») y ⋮ con **solo** «Pasar a versiones
-previas» y «Borrar». En el título, **«+ Añadir documento»** (`irDirectoAAnadir`). El índice del
-expediente no lleva «Poner nombre», «Registrar» ni «Asociar».
+`docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`, y desde la fila 439 (`docs/DOCUMENTOS-EN-UNA-LINEA.md`) **una sola línea por
+documento**. En la ficha del asunto (`js/ficha-documentos.js`, `filaDeDocumento`), cada fila de «Documentos de la
+carpeta» lleva, de izquierda a derecha: casilla (con un hito abierto), tipo y nombre (abre el visor; la etiqueta del
+hito y «Hito N» detrás), **«Ruta»** pegado al nombre, «Sin registrar» (solo sin registro), los datos en gris
+(`.doc-datos`, cortados con «…», enteros en el `title`; el nombre no se corta antes que ellos) y ⋮. El menú ⋮ trae,
+en orden: **Copiar el nombre** (`.ficha-documento-copiar`, `U.copiar` sin extensión), **Registrar** (solo sin registro),
+**Cambiar el nombre** (`App.verDocumentos(a, { ponerNombre })`, repinta al cerrar), **Asociar a un hito** (fila 282:
+«Quitar del hito» arriba si tiene hito, raya y los hitos; el desplegable cuelga de un ancla sin tamaño
+`.ficha-documento-ancla` junto al ⋮, que pulsa la entrada), **Traer a este hito** (fila 425; `aplicarMarcas` la
+muestra solo con un hito abierto del que el documento no es), «Convertir en plantilla», «Pasar a versiones previas» y
+«Borrar». En la mesa del hito (`js/hito-mesa-documentos.js`) la línea es casilla · tipo · nombre · «Ruta» · fecha,
+registro y campos en gris (`datosDeLaLinea`) · estado · «Enviar ▾» · ⋯; las versiones previas (ficha y mesa), nombre
+(abre) · «Ruta» · ⋮ con «Sacar de versiones previas». CSS al final de `css/filas.css`; en pantalla estrecha (700 px)
+puede bajar a dos renglones. En el título, **«+ Añadir documento»** (`irDirectoAAnadir`). El índice del
+expediente no lleva «Cambiar el nombre», «Registrar» ni «Asociar».
 
 Las herramientas de PDF (Separar, Unir, Sacar páginas, Ajustar tamaño si hay `PrepararDocumento`,
 Repartir si `Repartir.puede(a)`) salen del menú y van a **una barra encima del documento en el
@@ -528,7 +536,7 @@ una vez (`ficha.registroPorPersonaMarcado`) y «Los N están registrados.».
 
 ## Botón «Ruta» de cada documento (22-oct-2026, fila 423, `docs/RUTA-DE-UN-DOCUMENTO.md`)
 
-Detrás del ⧉ de cada documento de la ficha, en cada documento de la mesa del hito, en las versiones previas
+Pegado al nombre de cada documento de la ficha, en cada documento de la mesa del hito, en las versiones previas
 (ficha y mesa) y en la barra del visor (PDF y Word) hay un botón pequeño «Ruta» que copia la ruta entera del
 documento, con su extensión, para pegarla al adjuntarlo en Séneca. Un solo constructor:
 `RutaCarpetas.botonDocumento(a, modo, { nombre, subcarpeta })` (`js/copiar-ruta.js`); `de(a, modo, doc)` da la

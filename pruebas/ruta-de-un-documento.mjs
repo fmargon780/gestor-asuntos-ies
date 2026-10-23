@@ -92,9 +92,9 @@ await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO + '"] .no
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('.ficha-documento-fila');
-await comprobarQue('1. el botón «Ruta» va justo detrás del ⧉ de cada documento',
+await comprobarQue('1. el botón «Ruta» va justo detrás del nombre de cada documento',
   pagina.evaluate(() => {
-    const c = document.querySelector('.ficha-documento-fila .ficha-documento-copiar');
+    const c = document.querySelector('.ficha-documento-fila .ficha-documento');
     const r = c && c.nextElementSibling;
     return !!r && r.classList.contains('ruta-documento') && r.textContent.trim() === 'Ruta' && r.classList.contains('boton-chico');
   }));
