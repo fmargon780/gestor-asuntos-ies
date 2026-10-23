@@ -329,3 +329,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 425 — la ficha con vista de trabajo, parte A (22-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Abre el asunto de Nicolás Amortegui (A26-0464) y el de Elecciones al Consejo Escolar: se ven a la vez el hito (a la izquierda) y la carpeta (a la derecha), y en Elecciones los documentos del hito abierto llevan su marca «Hito N».
+
+- (Fila 426, 23-oct-2026) En el asunto de Nicolás (4º ESO E), la franja «Datos del asunto» de «Trabajo» enseña 4º ESO E y su NIE, y se copian con un clic.
