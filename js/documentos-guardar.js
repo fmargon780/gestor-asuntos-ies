@@ -181,6 +181,11 @@
       try { await Candidaturas.alRenombrar(N.asuntoActual, opciones.nombreActual, nombre); }
       catch (eC) { U.accesorio('Documento guardado, pero no he podido ponerlo al día en las candidaturas', eC); }
     }
+    /* Fila 435: las personas elegidas en campos «Persona de las listas» pasan a las relacionadas del asunto. */
+    if (window.DocCampos) {
+      try { await DocCampos.relacionar(N.asuntoActual, N.camposDelTipo(N.tipoElegido()), N.valoresDeCampos()); }
+      catch (eRel) { U.accesorio('Documento guardado, pero no he podido relacionar a la persona con el asunto', eRel); }
+    }
     try {
       await actualizarPendiente(opciones, nombre);
     } catch (e2) {

@@ -42,6 +42,11 @@ silencioso de la fila 130/177. Solo lo creado desde esta versión lleva número 
 documento con número se apunta en la ficha (puede haber varios); el índice del ARCHIVO lo suma a los que
 salen de los nombres. La fila del documento en la ficha enseña «Registro 26EM0123 · campos · texto».
 
+Forma de `valores` (mapa id del campo → valor): texto para los campos de texto, lista y fecha; para un campo de
+clase «Persona de las listas» (fila 435) un objeto: `{ categoria, nombre (App.textoTercero), visible ("Apellidos,
+Nombre") }` si se eligió de las listas, o `{ visible, manual: true }` si se escribió a mano. `campos` (los valores en
+orden) lleva siempre solo texto (`visible`). `DocCampos.textoDe(valor)` da el texto de cualquiera de los dos.
+
 ## «_Previas» (`js/versiones-previas.js`)
 
 Lo nuevo va a `_Previas`; una «Versiones previas» que ya exista se sigue leyendo, y si el asunto ya la

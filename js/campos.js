@@ -66,7 +66,8 @@
                         "valores": [], "obligatorio": true } ]
        }
 
-   `clase` es 'texto', 'lista' (usa `valores`) o 'fecha'. Un campo sin
+   `clase` es 'texto', 'lista' (usa `valores`), 'fecha' o 'persona' (fila 435: usa `listas`, las
+   categorías de terceros en las que busca, p. ej. ['ALUMNADO']). Un campo sin
    nombre no sobrevive. Solo se escribe la clave cuando hay alguno.
 
    `textoPorTipoDocumento` (28-sep-2026, fila 201,
@@ -151,8 +152,8 @@ var Campos = (function () {
   }
 
   function normalizarCampoDeDocumento(c) {
-    var clase = (c && (c.clase === 'lista' || c.clase === 'fecha')) ? c.clase : 'texto';
-    return {
+    var clase = (c && (c.clase === 'lista' || c.clase === 'fecha' || c.clase === 'persona')) ? c.clase : 'texto';
+    var salida = {
       id: String((c && c.id) || '') || U.nuevoId('d'),
       nombre: String((c && c.nombre) || '').trim(),
       clase: clase,
@@ -160,6 +161,17 @@ var Campos = (function () {
         ? c.valores.map(function (v) { return String(v).trim(); }).filter(Boolean) : [],
       obligatorio: !!(c && c.obligatorio)
     };
+    /* Fila 435: «Persona de las listas» guarda en qué categorías de terceros busca. */
+    if (clase === 'persona') {
+      var validas = (window.Nombres && Nombres.CATEGORIAS) || null;
+      var vistas = {};
+      salida.listas = ((c && Array.isArray(c.listas)) ? c.listas : []).filter(function (k) {
+        if (typeof k !== 'string' || vistas[k] || (validas && validas.indexOf(k) === -1)) return false;
+        vistas[k] = true;
+        return true;
+      });
+    }
+    return salida;
   }
 
   function normalizarListaDeDocumento(lista) {

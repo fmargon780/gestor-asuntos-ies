@@ -68,6 +68,7 @@ de `App` va después del fichero que lo define.
 | `js/candidaturas-ficha.js` | La tarjeta «Candidaturas» de la ficha del asunto (fila 347) |
 | `js/candidaturas-lista.js` | La lista provisional o definitiva de candidaturas en PDF (fila 347) |
 | `css/candidaturas.css` | Estilos de las candidaturas (fila 347) |
+| `pruebas/documentos-persona-de-las-listas.mjs` | El campo de documento «Persona de las listas» de punta a punta, con Chromium (fila 435) |
 | `pruebas/candidaturas.mjs` | Las candidaturas, de punta a punta, con Chromium (fila 347) |
 | `css/etiquetas.css` | Estilos de la pantalla de etiquetas (fila 344) |
 | `pruebas/etiquetas.mjs` | La pantalla de etiquetas, de punta a punta, con Chromium (fila 344) |
@@ -117,7 +118,7 @@ de `App` va después del fichero que lo define.
 | `js/documentos-formulario.js` | El formulario del nombre del documento, los campos de su tipo y la lista de tipos (fila 133, sacado de `js/documentos.js`) |
 | `js/documentos-guardar.js` | Los botones de opción, leer el formulario, la vista previa del nombre y guardar el documento (fila 133, sacado de `js/documentos.js`) |
 | `js/documentos-tipo-nuevo.js` | Crear un tipo de documento sin salir del cuadro (fila 133, sacado de `js/documentos.js`) |
-| `js/documentos-campos.js` | `DocCampos` (fila 96): los campos propios de un tipo de documento (`campos.json`, `porTipoDocumento`), reconocerlos al renombrar, ponerlos en orden para el nombre y su editor en Ajustes → Tipos de documento |
+| `js/documentos-campos.js` | `DocCampos` (fila 96): los campos propios de un tipo de documento (`campos.json`, `porTipoDocumento`; clase «Persona de las listas», fila 435), reconocerlos al renombrar, ponerlos en orden para el nombre y su editor en Ajustes → Tipos de documento |
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla; `App.anotar`/`App.anotarLista` (las lápidas y la fusión por elemento de la fila 176) |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |

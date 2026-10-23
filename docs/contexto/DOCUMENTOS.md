@@ -34,10 +34,19 @@ bandeja: extensión limpia de 10 caracteres como mucho, o ninguna. Los asuntos q
 ### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
 
 `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`, `js/documentos-campos.js` (`window.DocCampos`). Cada
-tipo de DOCUMENTO puede llevar campos propios (texto, lista cerrada o fecha; obligatorios si se
+tipo de DOCUMENTO puede llevar campos propios (texto, lista cerrada, fecha o, desde la fila 435, «Persona de las listas»; obligatorios si se
 quiere), que entran en el nombre **entre el tipo y el texto adicional**:
 `AAMMDD [REGISTRO] TIPO [CAMPOS] [TEXTO ADICIONAL].ext` (`Nombres.montarDocumento`, `datos.campos`) en los documentos de antes; desde la fila 239 los campos van a la ficha (`DocumentosDatos`).
 No son los campos del tipo de ASUNTO, que siguen fuera del nombre de los documentos.
+
+**«Persona de las listas»** (fila 435, 23-oct-2026, `docs/DOCUMENTOS-CON-PERSONA-Y-LINEA-DE-DATOS.md`, parte A).
+Clase `persona` de `Campos.normalizarCampoDeDocumento`, con `listas: [categorías de Nombres.CATEGORIAS]` (al menos
+una: `DocCampos.editar` no deja guardar sin ninguna, «Marca al menos una lista»). En el cuadro de nombre
+(`DocCampos.pintar`) es una `CajaConSugerencias` que busca con `Datos.buscar` solo en las listas marcadas (lista
+al lado de cada resultado); si lo escrito no coincide con nada queda «escrito a mano». Al guardar, la elegida de
+las listas pasa sola, sin preguntar, a `relacionados` del asunto (`DocCampos.relacionar`, vía `App.anotarLista`;
+no el titular, no la escrita a mano, nunca se quita). El tipo SOLICITUD DE CANDIDATURA y `js/candidaturas.js` no
+se tocan. Prueba: `pruebas/documentos-persona-de-las-listas.mjs`.
 
 - Se configuran en Ajustes → El centro → Tipos de documento, menú ⋮ → «Campos del nombre»
   (`DocCampos.editar`: añadir, quitar, subir y bajar). La tarjeta los enseña en una línea.

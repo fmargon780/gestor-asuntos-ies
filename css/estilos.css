@@ -557,6 +557,9 @@ body:has(#capa:not(.oculto)) #soporte-boton { display: none; }
 .doc-campos-tipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0 12px; }
 .doccampos-fila { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
 .doccampos-fila .campo { flex: 1 1 160px; width: auto; }
+.doccampos-listas { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.doc-persona { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.doc-persona .csg { flex: 1 1 180px; }
 
 /* Fila 95: el camino del editor de la guía al entrar en una pregunta
    de dentro, y la marca de un paso de opción que es una pregunta. */
