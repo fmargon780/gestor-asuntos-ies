@@ -1,18 +1,27 @@
 /* ============================================================
    etiquetas-pantalla.js — la pantalla «Etiquetas» de Herramientas (fila 344, docs/ETIQUETAS.md).
 
-   A todo el ancho: a la izquierda, a quién (el filtro del reparto, js/repartir-filtro.js), la hoja, el diseño
-   y las copias; a la derecha, la vista previa de las hojas tal cual saldrán; abajo, el pie fijo con las cuentas
-   y «Guardar PDF» e «Imprimir». Se abre desde Herramientas o, con las personas de un asunto de grupo ya
-   elegidas, desde su tarjeta «Personas del grupo». Imprimir no escribe nada; solo guardar un modelo o un diseño.
+   A todo el ancho: a la izquierda, a quién (el filtro del reparto, js/repartir-filtro.js) y las copias; a la
+   derecha, las tarjetas Hoja, Diseño y Orden (js/etiquetas-tarjetas.js) y debajo la vista previa de las hojas tal
+   cual saldrán; abajo, el pie fijo con las cuentas y «Guardar PDF» e «Imprimir». Se abre desde Herramientas o, con
+   las personas de un asunto de grupo ya elegidas, desde su tarjeta «Personas del grupo». Imprimir no escribe nada;
+   solo guardar un modelo o un diseño.
+
+   Fila 450 (docs/ETIQUETAS-RECUERDA-TU-TRABAJO.md): el trabajo a medias se recuerda solo en este ordenador
+   (`EtiquetasGuardado.trabajo()`), cada pestaña (Alumnado, Personal) con lo suyo: `E.pest[clase]` guarda sus
+   huecos, desmarcadas, añadidas, lista pegada y el orden en que entraron las personas; E.gastadas, E.quitadas,
+   E.anadidas, E.entrada y E.pegado son los de la pestaña que se ve. Sin grupo, clase, departamento, lista pegada
+   ni nadie buscado, no hay nadie elegido y la hoja sale vacía.
 
    Los cálculos viven en js/etiquetas-datos.js, -disenos.js, -hoja.js y -modelos.js; el PDF, en -pdf.js; los
    formularios, en -editor.js; lo guardado (`_GESTOR/etiquetas.json`), en -guardado.js.
    ============================================================ */
 var EtiquetasPantalla = (function () {
 
-  var E = { abierta: false, turno: 0, clase: 'alumnado', copias: 1, gastadas: {}, quitadas: {}, anadidas: {}, pegado: null, personal: { clase: '', depto: '' },
+  var E = { abierta: false, listo: false, turno: 0, clase: 'alumnado', copias: 1, gastadas: {}, quitadas: {}, anadidas: {}, entrada: [], vistas: {}, pegado: null,
+            personal: { clase: '', depto: '', todo: false }, pest: null, orden: 'grupo', tarjeta: '',
             guardado: { modelos: [], disenos: [] }, editor: null, base: null, volverA: null, listaAbierta: false, medir: null };
+  var CLASES = ['alumnado', 'personal'];
 
   function $(id) { return document.getElementById(id); }
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
@@ -46,27 +55,36 @@ var EtiquetasPantalla = (function () {
 
   function sinSalir(lista) { return lista.filter(function (p) { return !E.quitadas[clave(p)]; }); }
 
-  function porPegado(lista) {
-    if (!E.pegado) return lista;
-    var fichas = E.pegado.fichas;
-    return lista.filter(function (p) {
-      var x = EtiquetasDatos.partes(p.nombre);
-      return fichas[nor(p.nombre)] || fichas[nor((x.pila + ' ' + x.apellidos).trim())] || (p.id && fichas[nor(p.id)]);
+  /* `fichas`: { línea normalizada: su puesto en la lista pegada (desde 1) }. 0 = no está. */
+  function puestoEnPegado(pegado, p) {
+    var x = EtiquetasDatos.partes(p.nombre), f = pegado.fichas, mejor = 0;
+    [nor(p.nombre), nor((x.pila + ' ' + x.apellidos).trim()), p.id ? nor(p.id) : null].forEach(function (k) {
+      if (k && f[k] && (!mejor || f[k] < mejor)) mejor = f[k];
     });
+    return mejor;
   }
 
+  function porPegado(lista, pegado) {
+    pegado = pegado === undefined ? E.pegado : pegado;
+    if (!pegado) return lista;
+    return lista.filter(function (p) { return puestoEnPegado(pegado, p) > 0; });
+  }
+
+  /* Hay alguien elegido de partida: grupo/clase/departamento, un asunto de grupo o una lista pegada. */
   function criterioActivo() {
-    return E.clase === 'alumnado' ? !!(E.filtro && E.filtro.activo()) : !!(E.personal.clase || E.personal.depto);
+    if (E.pegado) return true;
+    return E.clase === 'alumnado' ? !!(E.base || (E.filtro && E.filtro.activo())) : !!(E.personal.clase || E.personal.depto || E.personal.todo);
   }
 
   /* Fila 350: las personas que suma el buscador, de esta clase (alumnado o personal). */
   function anadidasLista() { return Object.keys(E.anadidas).map(function (k) { return E.anadidas[k]; }); }
 
-  /* Las personas de la lista con casilla: las del filtro (o todas, sin filtro) y las que suma el buscador. Sin ningún
-     filtro ni lista pegada ni grupo de partida, y con alguien elegido en el buscador, solo salen las elegidas. */
+  /* Las personas de la lista con casilla: las del filtro y las que suma el buscador. Sin grupo, clase, departamento,
+     lista pegada ni grupo de partida no hay nadie de partida (fila 450): solo salen las que suma el buscador. */
   function candidatas() {
-    var lista;
-    if (E.clase === 'alumnado') {
+    var lista = [];
+    if (!criterioActivo()) lista = [];
+    else if (E.clase === 'alumnado') {
       lista = E.base || E.matriculados || [];
       if (E.filtro && E.filtro.activo()) {
         var dentro = {};
@@ -81,8 +99,7 @@ var EtiquetasPantalla = (function () {
       });
     }
     var extra = anadidasLista();
-    var soloLasElegidas = extra.length && !criterioActivo() && !E.base && !E.pegado;
-    var salida = soloLasElegidas ? [] : porPegado(lista);
+    var salida = porPegado(lista);
     var vistos = {};
     salida.forEach(function (p) { vistos[clave(p)] = true; });
     extra.forEach(function (p) { if (!vistos[clave(p)]) { vistos[clave(p)] = true; salida.push(p); } });
@@ -113,10 +130,19 @@ var EtiquetasPantalla = (function () {
 
   function ctx() { return { centro: (window.Plantillas && Plantillas.POR_DEFECTO_CENTRO) || 'IES Fuente Lucena', curso: U.cursoActual() }; }
 
+  /* Fila 450, orden «en el orden en que los marco»: bloque 0 = las que entraron de golpe (por grupo y apellidos, o por
+     el puesto en la lista pegada); después, una a una, las añadidas o vueltas a marcar, en el orden en que se marcaron. */
+  function rango(p) {
+    var i = E.entrada.indexOf(clave(p));
+    if (i !== -1) return { b: 1 + i, n: null };
+    var n = E.pegado ? puestoEnPegado(E.pegado, p) : 0;
+    return { b: 0, n: n || null };
+  }
+
   function calcular() {
     var personas = personasElegidas(), diseno = disenoActual(), modelo = modeloActual();
     E.personasN = personas.length;
-    E.items = EtiquetasHoja.construir(personas, E.clase, diseno, { copias: E.copias, indice: E.indice, ctx: ctx() });
+    E.items = EtiquetasHoja.construir(personas, E.clase, diseno, { copias: E.copias, indice: E.indice, ctx: ctx(), orden: E.orden, rango: rango });
     E.pag = EtiquetasHoja.paginar(E.items, modelo, E.gastadas);
     E.prep = EtiquetasHoja.preparar(E.items, diseno, modelo, E.medir);
     E.diseno = diseno; E.modelo = modelo;
@@ -124,14 +150,11 @@ var EtiquetasPantalla = (function () {
 
   /* ---------- pintar ---------- */
 
-  function opciones(lista, actual, texto) {
-    return lista.map(function (o) { return '<option value="' + esc(o.id) + '"' + (o.id === actual ? ' selected' : '') + '>' + esc(texto(o)) + '</option>'; }).join('');
-  }
-
   var CLASES_PERSONAL = [{ valor: '', texto: 'Todo el personal' }, { valor: 'docente', texto: 'Docente' }, { valor: 'no-docente', texto: 'No docente' }];
   function textoClasePersonal() {
     var c = CLASES_PERSONAL.filter(function (o) { return o.valor === (E.personal.clase || ''); })[0];
-    return c && c.valor ? c.texto : '';
+    if (c && c.valor) return c.texto;
+    return E.personal.todo ? 'Todo el personal' : '';
   }
   function departamentos() {
     var deptos = {};
@@ -161,15 +184,14 @@ var EtiquetasPantalla = (function () {
   function elegirPersona(o) {
     var aviso = $('et-buscar-aviso'), k = o.valor;
     function decir(t) { if (aviso) aviso.textContent = t; }
-    /* Sin filtro ni nadie elegido, en la lista están todas: elegir a una deja solo esa, no «ya estaba». */
-    var todosPorDefecto = !anadidasLista().length && !criterioActivo() && !E.base && !E.pegado;
-    var yaEsta = !todosPorDefecto && candidatas().some(function (p) { return clave(p) === k; });
+    var yaEsta = candidatas().some(function (p) { return clave(p) === k; });
     if (E.anadidas[k] || yaEsta) {
-      if (E.quitadas[k]) { delete E.quitadas[k]; decir('Estaba desmarcada en la lista: la he vuelto a marcar.'); pintarVista(); }
+      if (E.quitadas[k]) { delete E.quitadas[k]; entrar(k); decir('Estaba desmarcada en la lista: la he vuelto a marcar.'); pintarVista(); }
       else decir('Ya está en la lista.');
       return;
     }
     E.anadidas[k] = o.persona;
+    entrar(k);
     decir('Añadida: ' + o.texto + '.');
     pintarVista();
   }
@@ -195,53 +217,13 @@ var EtiquetasPantalla = (function () {
       '<div class="et-botones"><button type="button" class="boton" id="et-pegar-usar" data-solo-lectura>Usar esta lista</button>' +
       (E.pegado ? '<button type="button" class="boton" id="et-pegar-quitar" data-solo-lectura>Quitar la lista</button>' : '') + '</div>' +
       '<p class="explica" id="et-pegado-aviso">' + esc(E.pegado ? E.pegado.aviso : '') + '</p></details>';
-    h += '<p class="et-resumen" id="et-resumen" aria-live="polite"></p><div id="et-lista"></div>';
+    h += '<div class="et-botones"><button type="button" class="boton" id="et-empezar" data-solo-lectura>Empezar de cero</button></div>' +
+      '<p class="et-resumen" id="et-resumen" aria-live="polite"></p><div id="et-lista"></div>';
     return h;
   }
 
-  function htmlHoja() {
-    var l = modelos(), m = E.modelo || modeloActual();
-    var propio = !!(m && m.propio);
-    return '<label class="etiqueta">Buscar por código o por filas × columnas <input class="campo" id="et-buscar-modelo" data-solo-lectura value="' + esc(E.buscarModelo || '') + '" placeholder="L7160, 3x8…"></label>' +
-      '<select class="campo" id="et-modelo" data-solo-lectura>' + opciones(filtrarModelos(l, E.buscarModelo, m.id), m.id, function (x) { return x.nombre + ' · ' + x.columnas + ' × ' + x.filas + (x.propio ? ' (propio)' : ''); }) + '</select>' +
-      '<p class="explica" id="et-medida-modelo">' + esc(EtiquetasModelos.texto(m)) + '</p>' +
-      '<div class="et-botones"><button type="button" class="boton" id="et-modelo-nuevo"' + (soloConsulta() ? ' disabled' : '') + '>Nuevo modelo</button>' +
-      '<button type="button" class="boton" id="et-modelo-cambiar"' + (soloConsulta() ? ' disabled' : '') + '>Cambiar</button>' +
-      (propio ? '<button type="button" class="boton" id="et-modelo-borrar"' + (soloConsulta() ? ' disabled' : '') + '>Borrar este modelo</button>' : '') + '</div>';
-  }
-
-  function filtrarModelos(l, texto, actual) {
-    var q = nor(texto).replace(/\s+/g, '').replace(/[x×]/g, 'x');
-    if (!q) return l;
-    return l.filter(function (m) {
-      if (m.id === actual) return true;
-      var a = nor(m.nombre + (m.codigo || '') + (m.apli || '')).replace(/\s+/g, ''), b = (m.filas + 'x' + m.columnas), c = (m.columnas + 'x' + m.filas);
-      return a.indexOf(q) !== -1 || b === q || c === q;
-    });
-  }
-
-  function htmlDiseno() {
-    var l = disenos().filter(vale), d = disenoActual();
-    var propio = !!d && !d.integrado && !(E.editor && E.editor.tipo === 'diseno');
-    var ALINEA = { centro: ' · centrado', der: ' · a la derecha' };
-    var off = soloConsulta() ? ' disabled' : '';
-    return '<select class="campo" id="et-diseno" data-solo-lectura>' + opciones(l, d.id, function (x) { return x.nombre + (x.integrado ? '' : ' (propio)'); }) + '</select>' +
-      '<ul class="et-renglones-ver">' + d.renglones.map(function (x) {
-        var c = EtiquetasDatos.CAMPOS.filter(function (k) { return k.clave === x.dato; })[0];
-        return '<li>' + esc(x.dato === 'texto' ? '«' + x.texto + '»' : (c ? c.texto : x.dato)) + (x.negrita ? ' · negrita' : '') + (ALINEA[x.alinea] || '') + '</li>';
-      }).join('') + (d.vertical === 'arriba' || d.vertical === 'abajo' ? '<li>Texto ' + d.vertical + '</li>' : '') + '</ul>' +
-      (d.unaPorFamilia ? '<p class="explica">Una etiqueta por familia: los hermanos salen juntos.</p>' : '') +
-      '<div class="et-botones"><button type="button" class="boton" id="et-diseno-nuevo"' + off + '>Nuevo diseño</button>' +
-      '<button type="button" class="boton" id="et-diseno-duplicar"' + off + '>Duplicar</button>' +
-      '<button type="button" class="boton" id="et-diseno-editar"' + off + '>Cambiar</button>' +
-      (propio ? '<button type="button" class="boton" id="et-diseno-borrar"' + off + '>Borrar</button>' : '') + '</div>';
-  }
-
   function htmlPanel() {
-    if (E.editor) return EtiquetasEditor.html(E.editor);
     return '<section class="et-seccion"><h4>A quién</h4>' + htmlAQuien() + '</section>' +
-      '<section class="et-seccion"><h4>Hoja de etiquetas</h4>' + htmlHoja() + '</section>' +
-      '<section class="et-seccion"><h4>Qué lleva cada etiqueta</h4>' + htmlDiseno() + '</section>' +
       '<section class="et-seccion"><h4>Copias y hoja empezada</h4>' +
         '<label class="etiqueta">Copias por persona <input class="campo et-copias" id="et-copias" type="number" min="1" max="50" value="' + E.copias + '" data-solo-lectura></label>' +
         '<p class="explica">Pulsa o arrastra sobre las etiquetas ya gastadas de cualquier hoja.</p>' +
@@ -256,8 +238,9 @@ var EtiquetasPantalla = (function () {
       '<div class="pt-barra"><button type="button" class="boton" id="et-volver" data-solo-lectura>' + (E.volverA ? '← Volver al asunto' : '← Volver a Herramientas') + '</button>' +
         '<h3 class="pt-titulo">Etiquetas</h3></div>' +
       '<div class="et-cuerpo"><div class="et-panel" id="et-panel">' + htmlPanel() + '</div>' +
-      '<div class="et-vista" id="et-vista-hojas"></div></div>' +
+      '<div class="et-derecha"><div class="et-tarjetas" id="et-tarjetas"></div><div class="et-vista" id="et-vista-hojas"></div></div></div>' +
       '<div class="et-pie" id="et-pie"></div>';
+    EtiquetasTarjetas.pintar(ganchos);
     enganchar();
     pintarVista();
   }
@@ -268,7 +251,8 @@ var EtiquetasPantalla = (function () {
     if (!cont) return;
     var ancho = Math.max(300, cont.clientWidth - 24);
     var escala = Math.max(1.2, Math.min(3, ancho / 210));
-    cont.innerHTML = EtiquetasHoja.vistaHtml(E.pag, E.modelo, E.prep, escala);
+    cont.innerHTML = EtiquetasHoja.vistaHtml(E.pag, E.modelo, E.prep, escala) +
+      (E.personasN ? '' : '<p class="explica et-vacio">Elige un grupo, busca personas o pega una lista.</p>');
     var sinDir = 0, cortas = 0;
     E.items.forEach(function (it, i) {
       if (E.items.indexOf(it) !== i) return;
@@ -278,8 +262,7 @@ var EtiquetasPantalla = (function () {
     var res = $('et-resumen');
     if (res) res.textContent = E.personasN + (E.personasN === 1 ? ' persona' : ' personas') + ' · ' + E.items.length + (E.items.length === 1 ? ' etiqueta' : ' etiquetas');
     var lista = $('et-lista');
-    if (lista && !E.editor) lista.innerHTML = htmlLista();
-    if (lista && !E.editor) engancharLista();
+    if (lista) { lista.innerHTML = htmlLista(); engancharLista(); }
     var avisos = (sinDir ? '<span class="et-aviso-pie">' + sinDir + (sinDir === 1 ? ' familia sin dirección' : ' familias sin dirección') + '</span>' : '') +
       (cortas ? '<span class="et-aviso-pie">' + cortas + (cortas === 1 ? ' etiqueta con el texto cortado' : ' etiquetas con el texto cortado') + '</span>' : '');
     $('et-pie').innerHTML =
@@ -289,6 +272,7 @@ var EtiquetasPantalla = (function () {
       '<span class="et-pie-nota">En el cuadro de impresión, elige tamaño real (100 %), no «Ajustar».</span>';
     $('et-guardar-pdf').onclick = guardarPdf;
     $('et-imprimir').onclick = imprimir;
+    guardarTrabajo();
   }
 
   function itemsLista() {
@@ -306,8 +290,8 @@ var EtiquetasPantalla = (function () {
     var cont = $('et-lista');
     if (!cont) return;
     ListaConCasillas.enganchar(cont, itemsLista(), E.quitadas, {
-      alCambiar: function () { if (E.filtro) E.filtro.cacheMarcadas = null; pintarVista(); },
-      alQuitar: function (k) { delete E.anadidas[k]; delete E.quitadas[k]; pintarVista(); }
+      alCambiar: function () { notarMarcadas(); if (E.filtro) E.filtro.cacheMarcadas = null; pintarVista(); },
+      alQuitar: function (k) { delete E.anadidas[k]; delete E.quitadas[k]; delete E.vistas[k]; salir(k); pintarVista(); }
     });
   }
 
@@ -378,16 +362,10 @@ var EtiquetasPantalla = (function () {
       if (E.volverA) { var v = E.volverA; cerrar(); App.abrirFicha(v.asunto, v.modo); } else cerrar();
     };
     enganchaHuecos($('et-vista-hojas'));
-    if (E.editor) {
-      EtiquetasEditor.enganchar(panel, E.editor, {
-        guardar: guardarEditor, cancelar: function () { E.editor = null; pintar(); },
-        cambio: function () { pintarVista(); }, repintar: function () { pintar(); }
-      });
-      return;
-    }
     Array.prototype.forEach.call(panel.querySelectorAll('[data-clase]'), function (b) {
-      b.onclick = function () { E.clase = b.getAttribute('data-clase'); E.gastadas = {}; E.anadidas = {}; pintar(); };
+      b.onclick = function () { cambiarPestana(b.getAttribute('data-clase')); pintar(); };
     });
+    $('et-empezar').onclick = empezarDeCero;
     if (E.filtro && E.clase === 'alumnado') RepartirFiltro.enganchar(E.filtro, panel, function () { pintar(); });
     CajaConSugerencias.enganchar(panel, 'et-buscar-persona', { fuente: buscarPersonas, minimo: 3, vaciar: true, alElegir: elegirPersona });
     var pc = $('et-pclase'), pd = $('et-pdepto');
@@ -398,56 +376,39 @@ var EtiquetasPantalla = (function () {
     }
     if (pc) CajaConSugerencias.enganchar(panel, 'et-pclase', {
       fuente: conTodos(function () { return CLASES_PERSONAL; }, textoClasePersonal),
-      alElegir: function (o) { E.personal.clase = o.valor; if (!o.valor) pc.value = ''; pintarVista(); exportarPersonal(panel); }
+      alElegir: function (o) { E.personal.clase = o.valor; E.personal.todo = !o.valor; pintarVista(); exportarPersonal(panel); }
     });
     if (pd) CajaConSugerencias.enganchar(panel, 'et-pdepto', {
       fuente: conTodos(function () { return [{ valor: '', texto: 'Todos' }].concat(departamentos().map(function (d) { return { valor: d, texto: d }; })); }, function () { return E.personal.depto; }),
       alElegir: function (o) { E.personal.depto = o.valor; if (!o.valor) pd.value = ''; pintarVista(); exportarPersonal(panel); }
     });
     if (pd) pd.addEventListener('input', function () { if (!pd.value.trim() && E.personal.depto) { E.personal.depto = ''; pintarVista(); exportarPersonal(panel); } });
-    if (pc) pc.addEventListener('input', function () { if (!pc.value.trim() && E.personal.clase) { E.personal.clase = ''; pintarVista(); exportarPersonal(panel); } });
+    if (pc) pc.addEventListener('input', function () { if (!pc.value.trim() && (E.personal.clase || E.personal.todo)) { E.personal.clase = ''; E.personal.todo = false; pintarVista(); exportarPersonal(panel); } });
     if (pc) { FiltroExportar.enganchar(panel, function () { return listaDePersonal(); }); exportarPersonal(panel); }
     $('et-pegar-usar').onclick = function () { pegar($('et-pegado').value); };
     var pq = $('et-pegar-quitar');
     if (pq) pq.onclick = function () { E.pegado = null; pintar(); };
     $('et-copias').oninput = function () { E.copias = Math.max(1, Math.min(50, parseInt(this.value, 10) || 1)); pintarVista(); };
-    $('et-hoja-nueva').onclick = function () { E.gastadas = {}; pintarVista(); };
-    $('et-buscar-modelo').oninput = function () {
-      E.buscarModelo = this.value;
-      var m = modeloActual();
-      $('et-modelo').innerHTML = opciones(filtrarModelos(modelos(), E.buscarModelo, m.id), m.id, function (x) { return x.nombre + ' · ' + x.columnas + ' × ' + x.filas + (x.propio ? ' (propio)' : ''); });
-    };
-    $('et-modelo').onchange = function () { E.modeloId = this.value; E.gastadas = {}; EtiquetasGuardado.recordar('modelo', this.value); pintar(); };
-    $('et-diseno').onchange = function () { E.disenoId = this.value; EtiquetasGuardado.recordar('diseno', this.value); pintar(); };
-    $('et-modelo-nuevo').onclick = function () { abrirEditorModelo(null); };
-    $('et-modelo-cambiar').onclick = function () { abrirEditorModelo(modeloActual()); };
-    var mb = $('et-modelo-borrar');
-    if (mb) mb.onclick = function () { borrarModelo(modeloActual()); };
-    $('et-diseno-nuevo').onclick = function () {
-      E.editor = { tipo: 'diseno', titulo: 'Nuevo diseño', diseno: { nombre: '', para: E.clase, unaPorFamilia: false, renglones: [EtiquetasDisenos.nuevoRenglon()] } };
-      pintar();
-    };
-    $('et-diseno-duplicar').onclick = function () {
-      var d = JSON.parse(JSON.stringify(disenoActual()));
-      delete d.id; delete d.integrado; d.nombre = 'Copia de ' + d.nombre;
-      E.editor = { tipo: 'diseno', titulo: 'Duplicar el diseño', diseno: d }; pintar();
-    };
-    var de = $('et-diseno-editar'), db = $('et-diseno-borrar');
-    if (de) de.onclick = function () { abrirEditorDiseno(disenoActual()); };
-    if (db) db.onclick = function () { borrarDiseno(disenoActual()); };
+    $('et-hoja-nueva').onclick = function () { vaciar(E.gastadas); pintarVista(); };
   }
 
-  function pegar(texto) {
+  /* La lista pegada de una pestaña: cada línea con su puesto (el orden «en que los marco» la respeta). */
+  function hacerPegado(texto, lista) {
     var fichas = {}, cuantas = 0;
     String(texto || '').split(/\r?\n/).forEach(function (l) {
       var t = nor(l).trim();
-      if (t) { fichas[t] = true; cuantas++; }
+      if (t) { cuantas++; if (!fichas[t]) fichas[t] = cuantas; }
     });
-    if (!cuantas) { E.pegado = null; pintar(); return; }
+    if (!cuantas) return null;
+    var pegado = { fichas: fichas, texto: texto, cuantas: cuantas, aviso: '' };
+    var halladas = porPegado(lista, pegado).length;
+    pegado.aviso = halladas + ' de ' + cuantas + (cuantas === 1 ? ' línea encontrada.' : ' líneas encontradas.');
+    return pegado;
+  }
+
+  function pegar(texto) {
     var lista = E.clase === 'alumnado' ? (E.base || E.matriculados || []) : (E.personal.lista || []);
-    E.pegado = { fichas: fichas, texto: texto, cuantas: cuantas, aviso: '' };
-    var halladas = porPegado(lista).length;
-    E.pegado.aviso = halladas + ' de ' + cuantas + (cuantas === 1 ? ' línea encontrada.' : ' líneas encontradas.');
+    E.pegado = hacerPegado(texto, lista);
     pintar();
   }
 
@@ -490,7 +451,8 @@ var EtiquetasPantalla = (function () {
           var i = d.modelos.findIndex(function (x) { return x.id === id; });
           if (i === -1) d.modelos.push(guardar); else d.modelos[i] = guardar;
         });
-        E.modeloId = id; E.gastadas = {};
+        E.modeloId = id; vaciarHuecos();
+        EtiquetasGuardado.recordar('modelo', id);
       } else {
         var dis = EtiquetasDisenos.limpiar(obj), idd = obj.id || EtiquetasGuardado.nuevoId('d');
         dis.id = idd;
@@ -499,6 +461,7 @@ var EtiquetasPantalla = (function () {
           if (i === -1) d.disenos.push(dis); else d.disenos[i] = dis;
         });
         E.disenoId = idd;
+        EtiquetasGuardado.recordar('diseno', idd);
       }
       E.editor = null;
       U.aviso('Guardado.', 'bueno');
@@ -508,7 +471,7 @@ var EtiquetasPantalla = (function () {
 
   async function borrarModelo(m) {
     if (!m || !m.propio || !(await U.preguntar('Borrar el modelo', '<p>Se borra el modelo «' + esc(m.nombre) + '».</p>', 'Sí, borrarlo'))) return;
-    try { E.guardado = await EtiquetasGuardado.cambiar(function (d) { d.modelos = d.modelos.filter(function (x) { return x.id !== m.id; }); }); E.modeloId = null; E.gastadas = {}; pintar(); }
+    try { E.guardado = await EtiquetasGuardado.cambiar(function (d) { d.modelos = d.modelos.filter(function (x) { return x.id !== m.id; }); }); E.modeloId = null; vaciarHuecos(); pintar(); }
     catch (e) { U.fallo('No he podido borrar el modelo', e); }
   }
 
@@ -516,6 +479,132 @@ var EtiquetasPantalla = (function () {
     if (!d || d.integrado || !(await U.preguntar('Borrar el diseño', '<p>Se borra el diseño «' + esc(d.nombre) + '».</p>', 'Sí, borrarlo'))) return;
     try { E.guardado = await EtiquetasGuardado.cambiar(function (x) { x.disenos = x.disenos.filter(function (y) { return y.id !== d.id; }); }); E.disenoId = null; pintar(); }
     catch (e) { U.fallo('No he podido borrar el diseño', e); }
+  }
+
+  /* ---------- las tarjetas Hoja, Diseño y Orden (js/etiquetas-tarjetas.js) ---------- */
+
+  var ganchos = {
+    E: E, nor: nor, modelos: modelos, disenos: disenos, vale: vale, soloConsulta: soloConsulta,
+    elegirModelo: function (id) { E.modeloId = id; vaciarHuecos(); EtiquetasGuardado.recordar('modelo', id); pintar(); },
+    elegirDiseno: function (id) { E.disenoId = id; EtiquetasGuardado.recordar('diseno', id); pintar(); },
+    elegirOrden: function (id) { E.orden = id; E.tarjeta = ''; EtiquetasGuardado.recordar('orden', id); pintar(); },
+    nuevoModelo: function () { abrirEditorModelo(null); },
+    cambiarModelo: function () { abrirEditorModelo(modeloActual()); },
+    borrarModelo: function () { borrarModelo(modeloActual()); },
+    nuevoDiseno: function () {
+      E.editor = { tipo: 'diseno', titulo: 'Nuevo diseño', diseno: { nombre: '', para: E.clase, unaPorFamilia: false, renglones: [EtiquetasDisenos.nuevoRenglon()] } };
+      pintar();
+    },
+    duplicarDiseno: function () {
+      var d = JSON.parse(JSON.stringify(disenoActual()));
+      delete d.id; delete d.integrado; d.nombre = 'Copia de ' + d.nombre;
+      E.editor = { tipo: 'diseno', titulo: 'Duplicar el diseño', diseno: d }; pintar();
+    },
+    cambiarDiseno: function () { abrirEditorDiseno(disenoActual()); },
+    borrarDiseno: function () { borrarDiseno(disenoActual()); },
+    editor: {
+      guardar: function (obj) { return guardarEditor(obj); }, cancelar: function () { E.editor = null; pintar(); },
+      cambio: function () { pintarVista(); }, repintar: function () { pintar(); }
+    }
+  };
+
+  /* ---------- el trabajo a medias: una pestaña cada vez, y recordado en este ordenador (fila 450) ---------- */
+
+  function vaciar(o) { Object.keys(o).forEach(function (k) { delete o[k]; }); }
+  function pestanaNueva() { return { gastadas: {}, quitadas: {}, anadidas: {}, entrada: [], pegado: null }; }
+  function nuevoTrabajo() { E.pest = { alumnado: pestanaNueva(), personal: pestanaNueva() }; }
+
+  /* Los huecos dependen de la hoja: al cambiar de modelo se quitan en las dos pestañas. */
+  function vaciarHuecos() { CLASES.forEach(function (c) { vaciar(E.pest[c].gastadas); }); }
+
+  function guardarEnPestana() {
+    var P = E.pest[E.clase];
+    P.pegado = E.pegado; P.entrada = E.entrada;
+  }
+
+  function cargarPestana(c) {
+    var P = E.pest[c];
+    E.clase = c;
+    E.gastadas = P.gastadas; E.quitadas = P.quitadas; E.anadidas = P.anadidas; E.entrada = P.entrada; E.pegado = P.pegado;
+    E.vistas = Object.assign({}, E.quitadas);
+    if (E.filtro && c === 'alumnado') { E.filtro.desmarcadas = E.quitadas; E.filtro.cache = null; E.filtro.cacheMarcadas = null; }
+  }
+
+  function cambiarPestana(c) {
+    if (c === E.clase) return;
+    guardarEnPestana();
+    cargarPestana(c);
+  }
+
+  /* Una persona entra en la selección «una a una»: va detrás de las que entraron de golpe. */
+  function salir(k) { var i = E.entrada.indexOf(k); if (i !== -1) E.entrada.splice(i, 1); }
+  function entrar(k) { salir(k); E.entrada.push(k); delete E.vistas[k]; }
+
+  /* Tras marcar o desmarcar en la lista: las que se acaban de volver a marcar pasan al final. */
+  function notarMarcadas() {
+    Object.keys(E.vistas).forEach(function (k) { if (!E.quitadas[k]) entrar(k); });
+    E.vistas = Object.assign({}, E.quitadas);
+  }
+
+  function empezarDeCero() {
+    vaciar(E.anadidas); vaciar(E.quitadas); vaciar(E.gastadas); vaciar(E.vistas); E.entrada.length = 0;
+    E.pegado = null; E.copias = 1;
+    if (E.clase === 'alumnado') {
+      E.base = null;
+      if (E.filtro) { E.filtro.conds = []; E.filtro.antiguos = false; E.filtro.abierto = false; E.filtro.cache = null; E.filtro.cacheMarcadas = null; }
+    } else E.personal.clase = E.personal.depto = '', E.personal.todo = false;
+    pintar();
+  }
+
+  function claves(o) { return Object.keys(o); }
+
+  function guardarTrabajo() {
+    if (!E.listo) return;
+    guardarEnPestana();
+    var t = { v: 1, clase: E.clase, copias: E.copias };
+    CLASES.forEach(function (c) {
+      var P = E.pest[c];
+      t[c] = { anadidas: claves(P.anadidas), quitadas: claves(P.quitadas), entrada: P.entrada.slice(), gastadas: claves(P.gastadas), pegado: P.pegado ? P.pegado.texto : null };
+    });
+    t.alumnado.conds = E.filtro ? E.filtro.conds : [];
+    t.alumnado.antiguos = !!(E.filtro && E.filtro.antiguos);
+    t.alumnado.base = E.base ? E.base.map(clave) : null;
+    t.personal.clase = E.personal.clase; t.personal.depto = E.personal.depto; t.personal.todo = !!E.personal.todo;
+    EtiquetasGuardado.guardarTrabajo(t);
+  }
+
+  /* Lo guardado vuelve a la pantalla; quien ya no está en los listados simplemente no sale. */
+  function restaurar(t) {
+    if (!t || t.v !== 1) return;
+    CLASES.forEach(function (c) {
+      var s = t[c], P = E.pest[c];
+      if (!s) return;
+      var lista = c === 'alumnado' ? (E.matriculados || []) : (E.personal.lista || []), por = {};
+      lista.forEach(function (p) { por[clave(p)] = p; });
+      (Array.isArray(s.anadidas) ? s.anadidas : []).forEach(function (k) { if (por[k]) P.anadidas[k] = por[k]; });
+      (Array.isArray(s.quitadas) ? s.quitadas : []).forEach(function (k) { P.quitadas[k] = true; });
+      (Array.isArray(s.entrada) ? s.entrada : []).forEach(function (k) { if (typeof k === 'string') P.entrada.push(k); });
+      (Array.isArray(s.gastadas) ? s.gastadas : []).forEach(function (k) { P.gastadas[k] = true; });
+      if (typeof s.pegado === 'string') P.pegado = hacerPegado(s.pegado, lista);
+    });
+    var a = t.alumnado || {};
+    if (E.filtro && Array.isArray(a.conds)) {
+      E.filtro.conds = a.conds.filter(function (c) { return c && typeof c.tipo === 'string' && typeof c.valor === 'string'; });
+      E.filtro.antiguos = !!a.antiguos;
+      E.filtro.abierto = E.filtro.conds.length > 0;
+    }
+    if (Array.isArray(a.base)) {
+      var por2 = {};
+      (E.matriculados || []).forEach(function (p) { por2[clave(p)] = p; });
+      var base = a.base.map(function (k) { return por2[k]; }).filter(Boolean);
+      if (base.length) E.base = base;
+    }
+    var pe = t.personal || {};
+    if (pe.clase === 'docente' || pe.clase === 'no-docente') E.personal.clase = pe.clase;
+    if (typeof pe.depto === 'string') E.personal.depto = pe.depto;
+    E.personal.todo = !!pe.todo && !E.personal.clase;
+    if (typeof t.copias === 'number') E.copias = Math.max(1, Math.min(50, Math.round(t.copias) || 1));
+    if (t.clase === 'personal') E.clase = 'personal';
   }
 
   /* ---------- PDF e imprimir ---------- */
@@ -580,9 +669,11 @@ var EtiquetasPantalla = (function () {
     var l = $('herramientas-lista'), vista = $('etiquetas-vista');
     if (!vista) return;
     E.abierta = true; E.volverA = op.asunto ? { asunto: op.asunto, modo: op.modo || 'abierto' } : null;
-    E.clase = 'alumnado'; E.gastadas = {}; E.quitadas = {}; E.anadidas = {}; E.pegado = null; E.editor = null; E.copias = 1; E.personal = { clase: '', depto: '', lista: [] };
+    E.listo = false; E.editor = null; E.copias = 1; E.tarjeta = ''; E.personal = { clase: '', depto: '', todo: false, lista: [] };
+    nuevoTrabajo(); cargarPestana('alumnado');
     var ult = EtiquetasGuardado.ultimo();
     E.modeloId = ult.modelo || null; E.disenoId = ult.diseno || null;
+    E.orden = EtiquetasTarjetas.ORDENES.some(function (o) { return o.id === ult.orden; }) ? ult.orden : 'grupo';
     if (l) l.classList.add('oculto');
     ['control-registro-vista', 'plantillas-vista', 'actividades-vista'].forEach(function (id) { var o = $(id); if (o) o.classList.add('oculto'); });
     vista.classList.remove('oculto');
@@ -594,6 +685,9 @@ var EtiquetasPantalla = (function () {
       E.medir = await EtiquetasPdf.medidor();
     } catch (e) { if (mio === E.turno) { vista.innerHTML = '<p class="aviso aviso-ambar">No he podido preparar las etiquetas: ' + esc(e && e.message) + '</p>'; } return; }
     if (mio !== E.turno) return;
+    /* Desde «Personas del grupo» empieza con esas personas y sustituye lo guardado; si no, vuelve lo que se dejó. */
+    if (!op.nombres) { restaurar(EtiquetasGuardado.trabajo()); cargarPestana(E.clase); }
+    E.listo = true;
     pintar();
   }
 
@@ -604,7 +698,7 @@ var EtiquetasPantalla = (function () {
   }
 
   function cerrar() {
-    E.abierta = false; E.volverA = null; E.turno++;
+    E.abierta = false; E.listo = false; E.volverA = null; E.turno++;
     var l = $('herramientas-lista'), vista = $('etiquetas-vista');
     if (l) l.classList.remove('oculto');
     if (vista) { vista.classList.add('oculto'); vista.innerHTML = ''; }

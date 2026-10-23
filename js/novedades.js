@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '450', fecha: '2026-10-23', texto: 'Etiquetas recuerda sola lo que dejaste a medias en cada ordenador (personas, hoja, diseño, orden, copias y huecos), con «Empezar de cero». Hay un orden nuevo para las etiquetas y tres tarjetas encima de la hoja: Hoja, Diseño y Orden.' },
   { id: '449', fecha: '2026-10-23', texto: 'Al guardar un documento o un correo de «Ver todo» en un asunto que ya existe, el aviso con «Ir al asunto» se queda hasta que lo cierres con la ✕. «Ir al asunto» abre «Trabajo» en el hito, y su «← Volver a Ver todo» te devuelve a donde estabas.' },
   { id: '441', fecha: '2026-10-23', texto: 'Al contestar un correo desde la aplicación, sale con el asunto que escribas en el cuadro de Correo. Si no lo cambias, sigue dentro de la conversación; si pones otro, sale como correo nuevo con ese asunto.' },
   { id: '440', fecha: '2026-10-23', texto: 'Todo el correo que llega a la cuenta común entra solo en «Ha llegado», sin etiquetas (menos el spam y lo que envía la propia cuenta). Descartar un correo lo quita de ahí, y si contestan en esa conversación, vuelve.' },

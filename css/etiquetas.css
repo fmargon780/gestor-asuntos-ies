@@ -1,7 +1,8 @@
 /* Etiquetas (fila 344, js/etiquetas-pantalla.js): el panel a la izquierda, las hojas a la derecha y el pie fijo. */
 .et-cuerpo { display: flex; gap: 16px; align-items: flex-start; margin-top: 8px; }
 .et-panel { flex: 0 0 380px; max-width: 100%; max-height: calc(100vh - 210px); overflow: auto; padding-right: 6px; }
-.et-vista { flex: 1; min-width: 0; max-height: calc(100vh - 210px); overflow: auto; background: #e9e9ec; padding: 10px; border: 1px solid var(--linea); }
+.et-derecha { flex: 1; min-width: 0; }
+.et-vista { min-width: 0; max-height: calc(100vh - 300px); overflow: auto; background: #e9e9ec; padding: 10px; border: 1px solid var(--linea); }
 .et-seccion { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--linea); }
 .et-seccion h4, .et-editor h4 { margin: 0 0 6px; }
 .et-pestanas { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -37,7 +38,20 @@
 .et-aviso-pie { color: #9a6a00; font-weight: 700; font-size: 13px; }
 .et-pie-botones { display: flex; gap: 8px; margin-left: auto; }
 .et-pie-nota { flex-basis: 100%; font-size: 12px; color: #555; }
-@media (max-width: 900px) { .et-cuerpo { flex-direction: column; } .et-panel { flex: none; max-height: none; width: 100%; } .et-vista { max-height: none; width: 100%; } }
+/* Fila 450: las tarjetas Hoja, Diseño y Orden encima de la hoja, y lo que se despliega debajo. */
+.et-tarjetas-fila { display: flex; gap: 8px; flex-wrap: wrap; }
+.et-tarjeta { flex: 1 1 150px; text-align: left; display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; background: var(--papel, #fff); border: 1px solid var(--linea); border-radius: 8px; cursor: pointer; font: inherit; color: inherit; }
+.et-tarjeta:hover { border-color: var(--principal, #2a6df4); }
+.et-tarjeta-abierta { border-color: var(--principal, #2a6df4); box-shadow: 0 0 0 1px var(--principal, #2a6df4); }
+.et-tarjeta-titulo { font-size: 12px; color: #667; text-transform: uppercase; letter-spacing: .03em; }
+.et-tarjeta-valor { font-weight: 700; }
+.et-despliegue { margin: 8px 0; padding: 10px 12px; border: 1px solid var(--linea); border-radius: 8px; background: var(--papel, #fff); }
+.et-despliegue .campo { max-width: 100%; }
+.et-ordenes { display: flex; gap: 8px; flex-wrap: wrap; }
+.et-orden.et-activa { background: var(--principal, #2a6df4); color: #fff; }
+.et-vacio { text-align: center; color: #667; margin: 12px 0; }
+.et-vista { margin-top: 8px; }
+@media (max-width: 900px) { .et-cuerpo { flex-direction: column; } .et-panel { flex: none; max-height: none; width: 100%; } .et-vista { max-height: none; width: 100%; } .et-derecha { width: 100%; } }
 
 /* Fila 350: la caja en la que se escribe y enseña lo que coincide (js/caja-con-sugerencias.js). */
 .csg { position: relative; display: inline-block; min-width: 190px; max-width: 100%; }

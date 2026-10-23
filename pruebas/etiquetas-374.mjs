@@ -7,6 +7,7 @@
    4. Arrastrar una fila entera, un 2×2 en la hoja 3, y arrastrar desde una rayada la libera.
    5. «Quitar todos los huecos» limpia todas las hojas. */
 import { chromium } from 'playwright';
+import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 import vm from 'node:vm';
 import fs from 'node:fs';
 
@@ -39,6 +40,7 @@ await comprobar('2. 2×2 (en cualquier sentido)', EH.rectangulo(M, 8, 4), [4, 5,
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const errores = [];
 const pagina = await navegador.newPage({ viewport: { width: 1500, height: 1000 } });
+tarjetasSolas(pagina);
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
@@ -53,6 +55,11 @@ await pagina.evaluate(() => { document.getElementById('bloque-etiquetas').open =
 await pagina.click('#etiquetas-abrir');
 await pagina.waitForSelector('.et-hoja');
 await pagina.selectOption('#et-modelo', 'avery-L7160');
+/* Fila 450: sin nadie elegido la hoja sale vacía; se pega la lista de todo el alumnado. */
+const todos = await pagina.evaluate(async () => (await Datos.cargar(App.E.datos, 'ALUMNADO')).lista.filter((p) => p.matriculado).map((p) => p.nombre).join('\n'));
+await pagina.evaluate(() => { document.querySelector('.et-pegar').open = true; });
+await pagina.fill('#et-pegado', todos);
+await pagina.click('#et-pegar-usar');
 await pagina.fill('#et-copias', '3');
 await pagina.waitForTimeout(400);
 

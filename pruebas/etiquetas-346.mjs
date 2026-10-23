@@ -7,6 +7,7 @@
    5. «Cambiar» el diseño «Sobre» lo guarda como copia; el «Sobre» sigue igual.
    6. «Alinear todo» a la derecha, cambiar uno a centrado, y en el PDF el texto a la derecha acaba a 2,5 mm del borde. */
 import { chromium } from 'playwright';
+import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 import fs from 'node:fs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
@@ -21,6 +22,7 @@ async function comprobar(titulo, promesa, esperado) {
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const errores = [];
 const pagina = await navegador.newPage({ viewport: { width: 1500, height: 1000 }, acceptDownloads: true });
+tarjetasSolas(pagina);
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
@@ -49,6 +51,11 @@ await pagina.waitForSelector('#bloque-etiquetas');
 await pagina.evaluate(() => { document.getElementById('bloque-etiquetas').open = true; });
 await pagina.click('#etiquetas-abrir');
 await esperarVista();
+/* Fila 450: sin nadie elegido la hoja sale vacía; se elige una unidad para que haya etiquetas que guardar en PDF. */
+await pagina.evaluate(() => { document.querySelector('.repartir-filtro').open = true; });
+await pagina.fill('#rf-unidad', '2º B');
+await pagina.press('#rf-unidad', 'Enter');
+await pagina.waitForSelector('.bd-grupo-cond');
 
 console.log('--- 1. A3 de 2 × 4 ---');
 await pagina.click('#et-modelo-nuevo');

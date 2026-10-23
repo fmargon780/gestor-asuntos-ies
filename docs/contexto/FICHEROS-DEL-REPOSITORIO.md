@@ -57,6 +57,7 @@ de `App` va después del fichero que lo define.
 | `js/etiquetas-pdf.js` | El PDF de las etiquetas a tamaño real, con pdf-lib (fila 344) |
 | `js/etiquetas-guardado.js` | `_GESTOR/etiquetas.json`: modelos y diseños propios (fila 344) |
 | `js/etiquetas-editor.js` | Los formularios de un modelo de hoja y de un diseño (fila 344) |
+| `js/etiquetas-tarjetas.js` | Las tarjetas Hoja, Diseño y Orden encima de la hoja de Etiquetas y su despliegue (fila 450) |
 | `js/etiquetas-pantalla.js` | La pantalla «Etiquetas» de Herramientas y su entrada desde un asunto de grupo (fila 344) |
 | `js/correo-tutor-botones.js` | Los botones «+ Tutor/a de …» junto a «Para» y a «Copia oculta» del cuadro de Correo, y los avisos de lo que falta (fila 348) |
 | `js/plantilla-va-a.js` | «Va a:» de una plantilla de correo: el desplegable, el que le toca a cada una y el saludo «Buenas:» (fila 348) |

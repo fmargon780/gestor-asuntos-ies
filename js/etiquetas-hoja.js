@@ -3,8 +3,11 @@
 
    Sin pintar nada en la pantalla salvo `vistaHtml`, que devuelve el dibujo de las hojas.
    - construir(personas, clase, diseno, op) → [{ valores, sinDireccion, personas }]: una por persona, o una por
-     familia (diseño «Una por familia»), ordenadas (alumnado: unidad y apellidos; personal: apellidos) y con las
-     copias seguidas. `op`: { copias, indice (PersonasFamilias.indice), ctx: { centro, curso } }.
+     familia (diseño «Una por familia»), ordenadas y con las copias seguidas. `op`: { copias, indice
+     (PersonasFamilias.indice), ctx: { centro, curso }, orden, rango }. `orden` (fila 450): 'grupo' (alumnado: unidad y
+     apellidos; personal: apellidos; el de siempre), 'apellidos', 'nombre' o 'marcado' (`rango(persona)` →
+     { b: bloque, n: puesto en la lista pegada | null }: las del bloque 0 por grupo y apellidos o por la lista
+     pegada, y detrás las demás por bloque).
    - paginar(items, modelo, gastadas) → { hojas: [[{ i (casilla), item|null }]], etiquetas }. Las casillas
      `gastadas` ({ "hoja:casilla": true }, las dos desde 0, de cualquier hoja; fila 374) no llevan etiqueta.
    - rectangulo(modelo, a, b) → los números de casilla del rectángulo que forman las casillas a y b (fila 374).
@@ -20,13 +23,31 @@ var EtiquetasHoja = (function () {
     return u + '|' + U.normalizar(p.nombre || '');
   }
 
+  function claveNombre(p) {
+    var x = EtiquetasDatos.partes(p.nombre || '');
+    return U.normalizar(x.pila || '') + '|' + U.normalizar(x.apellidos || '');
+  }
+
+  function comparador(clase, orden, rango) {
+    function por(clave) { return function (a, b) { var x = clave(a), y = clave(b); return x < y ? -1 : (x > y ? 1 : 0); }; }
+    var grupo = por(function (p) { return claveOrden(p, clase); });
+    if (orden === 'apellidos') return por(function (p) { return U.normalizar(p.nombre || ''); });
+    if (orden === 'nombre') return por(claveNombre);
+    if (orden === 'marcado' && rango) {
+      return function (a, b) {
+        var x = rango(a), y = rango(b);
+        if (x.b !== y.b) return x.b - y.b;
+        if (x.n != null && y.n != null && x.n !== y.n) return x.n - y.n;
+        return x.n != null && y.n != null ? 0 : grupo(a, b);
+      };
+    }
+    return grupo;
+  }
+
   function construir(personas, clase, diseno, op) {
     op = op || {};
     var copias = Math.max(1, Math.min(50, parseInt(op.copias, 10) || 1));
-    var ordenadas = personas.slice().sort(function (a, b) {
-      var x = claveOrden(a, clase), y = claveOrden(b, clase);
-      return x < y ? -1 : (x > y ? 1 : 0);
-    });
+    var ordenadas = personas.slice().sort(comparador(clase, op.orden, op.rango));
     var grupos;
     if (diseno.unaPorFamilia && clase === 'alumnado' && op.indice) grupos = EtiquetasDatos.familias(ordenadas, op.indice);
     else grupos = ordenadas.map(function (p) { return [p]; });

@@ -13,6 +13,7 @@
    9. Desde el asunto de grupo, «Imprimir etiquetas» abre la pantalla con sus personas.
    10. Pestaña Personal con el diseño «Profesor». */
 import { chromium } from 'playwright';
+import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 import fs from 'node:fs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
@@ -27,6 +28,7 @@ async function comprobar(titulo, promesa, esperado) {
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const errores = [];
 const pagina = await navegador.newPage({ viewport: { width: 1500, height: 1000 }, acceptDownloads: true });
+tarjetasSolas(pagina);
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
@@ -37,6 +39,7 @@ await pagina.waitForTimeout(3000);
 
 /* Fila 350: los criterios del filtro y los del personal se eligen escribiendo; modelo y diseño siguen siendo listas. */
 const poner = async (id, v) => {
+  await pagina.asegurar('#' + id);
   if ((await pagina.evaluate((i) => document.getElementById(i).tagName, id)) === 'SELECT') return pagina.selectOption('#' + id, v);
   await pagina.fill('#' + id, v);
   await pagina.press('#' + id, 'Enter');
@@ -81,6 +84,11 @@ await comprobar('3. «Quitar todos los huecos» las desmarca', pagina.evaluate((
 console.log('--- 4. Sobre y hermanos ---');
 await pagina.click('.repartir-filtro-resumen ~ * >> nth=-1').catch(() => {});
 await pagina.evaluate(() => { document.querySelector('[data-quitar="0"]').click(); });
+await pagina.waitForTimeout(300);
+/* Fila 450: sin filtro ya no sale todo el alumnado; los hermanos y la alumna sin dirección se piden con una lista pegada. */
+await pagina.evaluate(() => { document.querySelector('.et-pegar').open = true; });
+await pagina.fill('#et-pegado', 'Aguilar Ponce, Marina\nAguilar Ponce, Pablo\nGallardo Reyes, Vera');
+await pagina.click('#et-pegar-usar');
 await pagina.waitForTimeout(300);
 await poner('et-diseno', 'sobre');
 await pagina.waitForTimeout(300);
@@ -189,6 +197,7 @@ await pagina.click('#etiquetas-abrir');
 await esperarVista();
 await pagina.click('[data-clase="personal"]');
 await poner('et-diseno', 'profesor');
+await poner('et-pclase', 'Todo el personal');   /* fila 450: sin criterio no hay nadie; «Todo el personal» lo pide */
 await pagina.waitForTimeout(300);
 const prof = (await textos()).filter((x) => x.length);
 await comprobar('10. el diseño Profesor lleva apellidos, nombre y departamento (o puesto)', prof.map((x) => x.join(' | ')).sort(),

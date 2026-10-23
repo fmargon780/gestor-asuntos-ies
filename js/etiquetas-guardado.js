@@ -7,12 +7,15 @@
    - leer() → { modelos, disenos }.
    - cambiar(fn) → lee, aplica `fn(datos)` y guarda; devuelve lo guardado.
    - nuevoId(prefijo) → un identificador que no se repite.
-   - ultimo() / recordar(clave, valor): lo último que se usó en ESTE ordenador (localStorage).
+   - ultimo() / recordar(clave, valor): lo último que se usó en ESTE ordenador (localStorage): modelo, diseño y orden.
+   - trabajo() / guardarTrabajo(obj) (fila 450): el trabajo a medias de la pantalla (personas, filtro, lista pegada,
+     copias, huecos de cada pestaña), también solo en ESTE ordenador. Nunca da error: sin almacenamiento, no guarda.
    ============================================================ */
 var EtiquetasGuardado = (function () {
 
   var FICHERO = 'etiquetas.json';
   var CLAVE = 'gestor.etiquetas.ultimo';
+  var CLAVE_TRABAJO = 'gestor.etiquetas.trabajo';
 
   function normalizar(d) {
     d = d && typeof d === 'object' ? d : {};
@@ -53,6 +56,13 @@ var EtiquetasGuardado = (function () {
     try { var u = ultimo(); u[clave] = valor; localStorage.setItem(CLAVE, JSON.stringify(u)); } catch (e) { /* sin almacenamiento */ }
   }
 
-  return { FICHERO: FICHERO, leer: leer, cambiar: cambiar, nuevoId: nuevoId, ultimo: ultimo, recordar: recordar };
+  function trabajo() {
+    try { var t = JSON.parse(localStorage.getItem(CLAVE_TRABAJO) || 'null'); return t && typeof t === 'object' ? t : null; } catch (e) { return null; }
+  }
+  function guardarTrabajo(obj) {
+    try { localStorage.setItem(CLAVE_TRABAJO, JSON.stringify(obj)); } catch (e) { /* sin almacenamiento */ }
+  }
+
+  return { trabajo: trabajo, guardarTrabajo: guardarTrabajo, FICHERO: FICHERO, leer: leer, cambiar: cambiar, nuevoId: nuevoId, ultimo: ultimo, recordar: recordar };
 })();
 window.EtiquetasGuardado = EtiquetasGuardado;

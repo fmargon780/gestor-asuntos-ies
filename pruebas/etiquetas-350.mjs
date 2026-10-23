@@ -10,6 +10,7 @@
    5. Personal: la caja del departamento se escribe.
    6. El filtro común: lo desmarcado no cuenta en f.personas() ni en la lista que se exporta. */
 import { chromium } from 'playwright';
+import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
 let fallos = 0;
@@ -23,6 +24,7 @@ async function comprobar(titulo, promesa, esperado) {
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const errores = [];
 const pagina = await navegador.newPage({ viewport: { width: 1500, height: 1000 }, acceptDownloads: true });
+tarjetasSolas(pagina);
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
@@ -56,7 +58,8 @@ console.log('(datos: ' + datos.total + ' alumnos; ' + datos.ver.length + ' con �
 
 console.log('--- 1. el buscador ---');
 await abrirEtiquetas();
-await comprobar('1. al abrir, sin filtro, salen todos', resumen(), datos.total + ' personas · ' + datos.total + ' etiquetas');
+await comprobar('1. al abrir, sin filtro, no sale nadie y la hoja lo dice (fila 450)', [await resumen(), await pagina.locator('.et-vacio').textContent()],
+  ['0 personas · 0 etiquetas', 'Elige un grupo, busca personas o pega una lista.']);
 await escribir('et-buscar-persona', 've');
 await comprobar('1. con 2 letras no sale nadie y se dice', pagina.evaluate(() => [document.querySelectorAll('#et-buscar-persona ~ .csg-lista li[data-i]').length, document.querySelector('#et-buscar-persona ~ .csg-lista').textContent]), [0, 'Escribe al menos 3 letras.']);
 await escribir('et-buscar-persona', 'ver');
