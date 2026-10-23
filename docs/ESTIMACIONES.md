@@ -17,3 +17,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
 | 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
 | 425 | 180 | pestaña Trabajo y dos columnas, mesa del hito en una sola columna, carpeta con marcas y casillas de adjuntar, visor en la columna derecha, quitar cuadrícula, adaptar pruebas de disposición y mesa, prueba nueva, revisor |
+| 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
