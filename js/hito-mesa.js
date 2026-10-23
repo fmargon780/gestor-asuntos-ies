@@ -189,29 +189,6 @@ var HitoMesa = (function () {
     return hacer();
   }
 
-  /* Fila 173, punto 6: la primera vez que un hito pasa a tener el guion
-     completo por una acción del usuario EN ESTA SESIÓN, se pregunta si
-     se da por hecho. Memoria en esta variable del módulo, no en disco:
-     una sola vez por hito y sesión, y nunca al abrir una mesa que ya
-     estaba completa (la primera vez que se ve un hito, se apunta su
-     estado tal cual, sin preguntar). */
-  var guionCompletoVisto = {};
-
-  async function preguntarGuionCompleto(a, h, fila) {
-    $('cuadro-cancelar').textContent = 'Todavía no';
-    var ok = await U.preguntar('Este hito ya está completo',
-      '<p>Ya están hechas todas las tareas de este hito. ¿Lo damos por hecho?</p>', 'Darlo por hecho');
-    $('cuadro-cancelar').textContent = 'Cancelar';
-    if (!ok) return;
-    var casilla = fila.querySelector(':scope > .hito-linea .hito-casilla');
-    if (!casilla || casilla.checked) return;
-    casilla.checked = true;
-    var marcado = window.HitosPanelLista && HitosPanelLista.marcarDesdeCasilla
-      ? await HitosPanelLista.marcarDesdeCasilla(casilla, a, h)
-      : false;
-    if (marcado) irAlSiguienteTrasMarcar(a);
-  }
-
   function pintarCabecera(fila, a, h, hitos, ajustes, abierto) {
     var cab = fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
     if (!cab || !h) return;
@@ -227,10 +204,6 @@ var HitoMesa = (function () {
     var guion = Hitos.guionDe ? Hitos.guionDe(a, h) : [];
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };
     var completo = cuenta.total > 0 && cuenta.hechos === cuenta.total && h.estado !== 'hecho';
-    var claveCompleto = a.nombre + '|' + h.id;
-    var completoAntes = Object.prototype.hasOwnProperty.call(guionCompletoVisto, claveCompleto)
-      ? guionCompletoVisto[claveCompleto] : completo;
-    guionCompletoVisto[claveCompleto] = completo;
 
     /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): arriba, la tira de hitos a
        todo el ancho; debajo, una línea con el título, lo de plazo y
@@ -280,7 +253,6 @@ var HitoMesa = (function () {
             (window.Formularios ? Formularios.listaHTML(h.formularios, 'Impresos') : '') + '</div></div>' : '') +
           (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
             '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
-          (abierto && !decision ? '<button type="button" class="boton mesa-registrar" title="Registrar un documento de este hito">Registrar</button>' : '') +
           (abierto && !decision && window.Esperas ? Esperas.botonHTML(a, h) : '') +   /* fila 286 */
           (abierto && !decision
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
@@ -314,7 +286,6 @@ var HitoMesa = (function () {
       if (real) { real.click(); return; }
       U.mientrasGuarda(archivarBtn, function () { return ArchivarFondo.archivar(a); });
     };
-    if (abierto && completo && !completoAntes && !(window.HacerEsteHito && HacerEsteHito.enCurso(a, h))) preguntarGuionCompleto(a, h, fila);
     if (!abierto || !window.FichaMenus) return;
 
     /* "Marcar como hecho": pulsa por debajo la misma casilla de siempre
@@ -332,8 +303,6 @@ var HitoMesa = (function () {
         : false;
       if (ok && seMarca) irAlSiguienteTrasMarcar(a);
     };
-
-    engancharRegistrar(cab.querySelector('.mesa-registrar'), a, h);
 
     FichaMenus.montar(cab.querySelector('.mesa-etq-estado'), ESTADOS.map(function (e) {
       return { texto: e.texto, alPulsar: function () {
@@ -402,35 +371,6 @@ var HitoMesa = (function () {
       opcionesMas.push({ texto: 'Enviar estado', clase: 'mesa-enviar-estado', alPulsar: function () { AvisosLoPide.enviarEstado(a); } });
     }
     if (mas) FichaMenus.montar(mas, opcionesMas);
-  }
-
-  /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): «Registrar» en la
-     cabecera, en vez de en una tarea del guion. Con un solo documento sin
-     registrar, lo registra; con varios, pregunta cuál; sin ninguno, lo
-     dice. Lo mismo que «Registrar» del ⋯ de un documento (marca la tarea
-     del guion con acción `registrar`). */
-  function engancharRegistrar(boton, a, h) {
-    if (!boton) return;
-    var sin = (h.documentos || []).filter(function (n) {
-      return window.Registro && !Registro.tieneRegistro(n, a) && !/SIN SELLAR/i.test(n) && !/\.docx?$/i.test(n);
-    });
-    function registrar(nombre) {
-      verDocumentos();
-      if (window.HitosDocumentoMenu && HitosDocumentoMenu.registrar) HitosDocumentoMenu.registrar(a, h, nombre);
-    }
-    /* Fila 164: las tareas pendientes con receta de registrar, como título del menú. */
-    var pasos = window.HitoMesaRecetas ? HitoMesaRecetas.pendientes(a, h, 'registrar') : [];
-    if ((sin.length > 1 || (sin.length && pasos.length)) && window.FichaMenus) {
-      FichaMenus.montar(boton, pasos.map(function (g) {
-        var sentido = g.receta && g.receta.sentido ? ' (' + g.receta.sentido + ')' : '';
-        return { texto: 'Tarea: ' + g.texto + sentido, deshabilitado: true, clase: 'mesa-registrar-paso', alPulsar: function () {} };
-      }).concat(pasos.length ? [{ raya: true }] : []).concat(sin.map(function (n) { return { texto: n, alPulsar: function () { registrar(n); } }; })));
-      return;
-    }
-    boton.onclick = function () {
-      if (!sin.length) { U.aviso('No hay ningún documento de este hito sin registrar. Añádelo primero.', 'ambar'); return; }
-      registrar(sin[0]);
-    };
   }
 
   /* Fila 425: lo que hacía «abrir antes la tarjeta de documentos»: llevar el bloque a la vista, a la izquierda. */

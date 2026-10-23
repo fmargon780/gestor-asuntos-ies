@@ -219,7 +219,27 @@ var RegistroSellado = (function () {
     }
   }
 
-  async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
+  /* Fila 434 (docs/ARREGLOS-DEL-HITO-EN-TRABAJO.md, punto 5): al unir el PDF sellado a un documento
+     que es de un hito, se marca sola la primera tarea de registrar que ese hito tenga pendiente.
+     `opciones.noMarcar` lo usa quien marca la tarea por su cuenta (el registro por personas). */
+  async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello, opciones) {
+    var nuevo = await asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello);
+    if (nuevo && !(opciones && opciones.noMarcar)) await marcarRegistrarDelHito(asunto, nombreDocumentoOriginal, nuevo);
+    return nuevo;
+  }
+
+  async function marcarRegistrarDelHito(asunto, original, nuevo) {
+    if (!window.Hitos || !Hitos.marcarGuionPorAccion || !Hitos.hitosDe) return;
+    try {
+      var hitos = await Hitos.hitosDe(asunto.nombre);
+      var h = (hitos || []).filter(function (x) {
+        return (x.documentos || []).some(function (n) { return n === original || n === nuevo; });
+      })[0];
+      if (h) await Hitos.marcarGuionPorAccion(asunto, h.id, 'registrar');
+    } catch (e) { /* no crítico: el documento ya está registrado */ }
+  }
+
+  async function asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
     var previoNumerado = Documentos.leerNombre(nombreDocumentoOriginal, asunto && asunto.ficha);
     if (previoNumerado.numero && previoNumerado.fecha && previoNumerado.tipo) {
       return asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previoNumerado);

@@ -33,6 +33,8 @@
       P.p([P.r('En Localidad de pruebas, a {{HOY}}')])
     ]), P.WORD);
     await docx('Justificante común.docx', 'JUSTIFICANTE');
+    /* Fila 434: una plantilla de documento del tipo MATRICULA, para ver «Generar documento» en hitos que no traen la suya. */
+    await docx('Resguardo de matrícula.docx', 'RESGUARDO DE MATRÍCULA');
     await Plantillas.guardar(App.E.gestor, function (actual) {
       function fila(tipo, categoria, nombre, fichero, tipoDocumento) {
         actual.documentos.push({ id: Plantillas.idNuevoDocumento(), tipo: tipo, categoria: categoria, nombre: nombre, fichero: fichero,
@@ -42,6 +44,7 @@
       fila('BAJA MEDICA', 'PERSONAL', 'Aviso de revisión', 'Aviso de revisión.docx', 'AVISO');
       fila('FACTURA', 'EMPRESAS', 'Justificante de pago', 'Justificante común.docx', 'JUSTIFICANTE');
       fila('SEGURO ESCOLAR', 'ALUMNADO', 'Justificante de cobro', 'Justificante común.docx', 'JUSTIFICANTE');
+      fila('MATRICULA', 'ALUMNADO', 'Resguardo de matrícula', 'Resguardo de matrícula.docx', 'JUSTIFICANTE');
       return actual;
     });
     /* Fila 321: con `&fueradeuso=1`, «Certificado de notas» (Word, en la tarea de generar de su hito) y «Acuse de recibo del parte»

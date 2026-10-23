@@ -62,6 +62,8 @@ de `App` va después del fichero que lo define.
 | `js/plantilla-va-a.js` | «Va a:» de una plantilla de correo: el desplegable, el que le toca a cada una y el saludo «Buenas:» (fila 348) |
 | `js/plantilla-va-a-revision.js` | La revisión única de «Va a:» de las plantillas que ya existen, con su cuadro-lista y su marca en `_GESTOR` (fila 348) |
 | `pruebas/correo-tutor-botones.mjs` | El tutor del grupo en el cuadro de Correo y «Va a:» de las plantillas, con Chromium (fila 348) |
+| `pruebas/arreglos-del-hito-sin-ventana.mjs` | Sin ventana al completar el hito, tarea de registrar marcada sola con el PDF sellado y sin «Registrar» en la cabecera, con Chromium (fila 434) |
+| `pruebas/arreglos-del-hito-demo.mjs` | Correo del tutor escrito en el aviso, plantilla del hito 2 de matrícula y «Generar documento» del tipo, con Chromium (fila 434) |
 | `js/candidaturas.js` | Candidaturas al Consejo Escolar: los datos de `ficha.candidaturas` y el campo «¿De quién es esta candidatura?» del cuadro de nombre (fila 347) |
 | `js/candidaturas-ficha.js` | La tarjeta «Candidaturas» de la ficha del asunto (fila 347) |
 | `js/candidaturas-lista.js` | La lista provisional o definitiva de candidaturas en PDF (fila 347) |

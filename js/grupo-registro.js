@@ -169,7 +169,7 @@ var GrupoRegistro = (function () {
       var plan = await planDe(a, d, lista);
       if (plan && escribir) {
         if (plan.tipo === 'una') {
-          if (await RegistroSellado.asociar(a, d.nombre, plan.original, d.sello)) { colocados++; continue; }
+          if (await RegistroSellado.asociar(a, d.nombre, plan.original, d.sello, { noMarcar: true })) { colocados++; continue; }
         } else if (await partir(a, d, plan.trozos, lista)) { partidos++; continue; }
       }
       var s = d.sello;
@@ -303,7 +303,7 @@ var GrupoRegistro = (function () {
         var x = pend.filter(function (p) { return String(p.i) === quien.value; })[0];
         if (!x) return;
         quien.disabled = true;
-        var nuevo = await RegistroSellado.asociar(a, s.nombre, x.fichero, s.sello);
+        var nuevo = await RegistroSellado.asociar(a, s.nombre, x.fichero, s.sello, { noMarcar: true });
         if (nuevo) delete analisis[a.nombre + '|' + s.nombre];
         alCambiar();
       };

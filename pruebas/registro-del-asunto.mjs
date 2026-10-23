@@ -111,9 +111,7 @@ await comprobar('y en la ficha, con la etiqueta de ese hito', pagina.evaluate(()
 console.log('--- 4. lo automático ---');
 await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .guion-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .guion-casilla');
-/* Con la única tarea hecha, la mesa pregunta si se da el hito por hecho: que no. */
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.click('#cuadro-cancelar');
+/* Fila 434: con la única tarea hecha ya no sale ninguna pregunta. */
 await pagina.waitForTimeout(800);
 await comprobar('marcar una tarea deja su línea en gris', mesa().then(l => l.filter(x => x[0].indexOf('Tarea hecha') === 0)), [['Tarea hecha: Comprobar el DNI', true]]);
 await comprobar('la línea de dar por hecho y de reabrir', pagina.evaluate(() =>

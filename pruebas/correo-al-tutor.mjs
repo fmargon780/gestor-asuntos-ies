@@ -144,8 +144,8 @@ await abrirComunicar();
 await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
-await comprobar('9. «Otro correo» vacío y la línea «No tengo el correo de…»', [c.otro, c.marcadas, c.lineas],
-  ['', [], ['No tengo el correo de Cabello Ruiz, Esperanza. Escríbelo aquí y lo recordaré.']]);
+await comprobar('9. «Otro correo» vacío, sin la línea «No tengo el correo de…» (fila 434: la casilla es la del aviso ámbar)', [c.otro, c.marcadas, c.lineas],
+  ['', [], []]);
 await comprobar('9. sin NOTIFICACION: la línea ámbar de la plantilla', c.avisoDoc,
   'Esta plantilla adjunta el documento NOTIFICACION, y en este asunto todavía no hay ninguno.');
 await comprobar('9. el saludo «Buenas:»', c.saludo, 'Buenas:');

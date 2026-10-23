@@ -54,9 +54,17 @@ var CorreoTutor = (function () {
           ', escrito a mano' + (p.aMano.cuando ? ' el ' + fechaLegible(p.aMano.cuando) : '') +
           ' · <button type="button" class="enlace correo-tutor-cambiar" data-clave="' + U.escapar(p.clave) + '">Cambiar</button></p>';
       }
-      return '<p class="nota correo-tutor-linea" data-clave="' + U.escapar(p.clave) + '">No tengo el correo de ' + U.escapar(p.nombre) +
-        '. Escríbelo aquí y lo recordaré.</p>';
+      return '';   /* fila 434: la casilla para escribirlo es la del aviso ámbar (js/correo-tutor-botones.js) */
     }).join('');
+  }
+
+  /* Fila 434: el correo se acaba de guardar a mano desde el aviso: este tutor ya no falta. */
+  function apuntarAMano(clave, correo) {
+    var t = actual();
+    if (!t) return;
+    (t.tutores || []).forEach(function (p) {
+      if (p.clave === clave) { p.tieneCorreo = false; p.correos = []; p.aMano = { correo: correo, cuando: U.hoyIso() }; }
+    });
   }
 
   function enganchar() {
@@ -107,6 +115,6 @@ var CorreoTutor = (function () {
   }
 
   return { SALUDO: SALUDO, extraDe: extraDe, arribaHtml: arribaHtml, debajoDeOtroHtml: debajoDeOtroHtml, enganchar: enganchar,
-           aRecordar: aRecordar, recordarAlEnviar: recordarAlEnviar };
+           aRecordar: aRecordar, apuntarAMano: apuntarAMano, recordarAlEnviar: recordarAlEnviar };
 })();
 window.CorreoTutor = CorreoTutor;

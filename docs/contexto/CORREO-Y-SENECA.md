@@ -669,7 +669,7 @@ batería completa.
 (el tercero, o los relacionados de un asunto de grupo) con la misma tabla TUTORIAS de la fila 299; `js/correo.js` lo deja en
 `CorreoNucleo._interno.tutoresDelAlumno` antes de pintar el cuadro. `js/correo-tutor-botones.js` (`CorreoTutorBotones`) pinta junto a «Para» y a
 «Copia oculta» el botón «+ Tutor/a de <unidad>» (con varias unidades, «+ Tutores (N grupos)»): añade los correos a «Otro correo» o a la copia
-oculta sin repetir; si falta algún correo, una línea ámbar por unidad con el enlace a Tablas de datos, y sin ninguno el botón sale apagado. No hay
+oculta sin repetir; si falta algún correo, una línea ámbar por tutor sin correo con una casilla y «Guardar» (fila 434: apunta el correo al momento en `_GESTOR/correos-a-mano.json` con `CorreosAMano.guardar`, lo pone en «Otro correo» y quita el aviso; sin tutor en la tabla o sin clave, solo el aviso; ya no hay enlace a Tablas de datos ni la línea «No tengo el correo de…» de `CorreoTutor`), y sin ningún correo el botón sale apagado. No hay
 campo «Copia» aparte en el cuadro (nunca lo hubo): solo «Para» y «Copia oculta». El cuadro de Séneca no lleva nada de esto.
 
 Cada plantilla de correo lleva `vaA`: `'familia'`, `'tutor'` o `'quien-lo-pide'` (`js/plantilla-va-a.js`, el desplegable «Va a:» en los dos editores de

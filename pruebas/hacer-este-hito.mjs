@@ -166,9 +166,9 @@ console.log('--- 6. un hito sin esas tareas ---');
 await pagina.close();
 pagina = await paginaNueva(false);
 await abrirMesa('Aguilar Ponce, Marina');
-await comprobar('6. sin botón «Hacer este hito», y los tres menús siguen',
+await comprobar('6. sin botón «Hacer este hito» ni «Registrar» (fila 434), y los menús siguen',
   Promise.all([pagina.locator('.hito-en-mesa .mesa-hacer-hito').count(), pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), pagina.locator('.hito-en-mesa .mesa-registrar').count()]),
-  [0, ['Generar documento ▾', 'Comunicar ▾'], 1]);
+  [0, ['Generar documento ▾', 'Comunicar ▾'], 0]);
 await pagina.close();
 
 /* ===== 7. Solo consulta ===== */

@@ -50,7 +50,7 @@ async function cerrar() {
   await pagina.waitForTimeout(300);
 }
 const botones = () => pagina.evaluate(() => [...document.querySelectorAll('#correo-formulario .correo-tutor-anadir')].map((b) => [b.dataset.zona, b.textContent, b.disabled]));
-const faltas = () => pagina.evaluate(() => [...document.querySelectorAll('#correo-formulario .correo-tutor-falta')].map((p) => p.textContent.replace(/ · .*$/, '')));
+const faltas = () => pagina.evaluate(() => [...document.querySelectorAll('#correo-formulario .correo-tutor-falta')].map((p) => p.childNodes[0].textContent));
 const para = () => pagina.evaluate(() => ({
   marcadas: [...document.querySelectorAll('#correo-formulario .correo-marca')].filter((c) => c.checked).map((c) => c.value),
   otro: document.getElementById('correo-otro').value, saludo: document.getElementById('correo-cuerpo-texto').value.split('\n')[0],
@@ -77,8 +77,8 @@ await cerrar();
 console.log('--- 2. sin correo ---');
 await abrir('SANCION Fuentes Calvo');
 await comprobar('2. tutora sin correo: botón apagado y aviso ámbar', Promise.all([botones(), faltas()]),
-  [[['para', '+ Tutor/a de 1º Bach A', true], ['cco', '+ Tutor/a de 1º Bach A', true]], ['Falta el correo del tutor/a de 1º Bach A']]);
-await comprobar('2. el aviso lleva su enlace a las tablas de datos', pagina.locator('.correo-tutor-completar').count(), 1);
+  [[['para', '+ Tutor/a de 1º Bach A', true], ['cco', '+ Tutor/a de 1º Bach A', true]], ['Falta el correo de Cabello Ruiz, Esperanza (tutor/a de 1º Bach A)']]);
+await comprobar('2. el aviso lleva su casilla y «Guardar», y ya no el enlace a las tablas de datos (fila 434)', Promise.all([pagina.locator('.correo-tutor-escribir').count(), pagina.locator('.correo-tutor-guardar').count(), pagina.locator('.correo-tutor-completar').count()]), [1, 1, 0]);
 await cerrar();
 await abrir('SANCION Klein Soto');
 await comprobar('2. unidad sin tutor: botón apagado y aviso', Promise.all([botones().then((b) => b[0][2]), faltas()]), [true, ['Falta el correo del tutor/a de 1º C']]);

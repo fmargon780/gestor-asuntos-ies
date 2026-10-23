@@ -113,10 +113,10 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
 
   /* 2. */
   /* Fila 154: más «Registrar», que antes vivía en un paso del guion. */
-  await comprobar('2. en la cabecera, exactamente los cinco botones',
+  await comprobar('2. en la cabecera, exactamente los botones (sin «Registrar», fila 434)',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button'))
       .filter((b) => b.offsetParent && !b.closest('.mesa-panel') && !b.closest('.ficha-menu')).map((b) => b.textContent.trim())),
-    ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', 'Hito ▾']);   /* fila 285: el hito de la prueba tiene tareas de generar */
+    ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Marcar como hecho', 'Hito ▾']);   /* fila 434: sin «Registrar»; fila 285: el hito de la prueba tiene tareas de generar */
   await comprobar('2. plazo y responsable, en texto pequeño y pulsable (no etiquetas de color)',
     pagina.evaluate(() => ['.mesa-etq-plazo', '.mesa-etq-resp'].map((s) => {
       const e = document.querySelector('.hito-en-mesa ' + s);

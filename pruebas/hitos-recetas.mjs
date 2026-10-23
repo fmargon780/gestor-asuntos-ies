@@ -117,15 +117,7 @@ await pagina.evaluate(async (a1) => {
   HitosPanel.programarRepintado();
 }, ASUNTO);
 await pagina.waitForTimeout(800);
-await pagina.click('.hito-en-mesa .mesa-registrar');
-await pagina.waitForTimeout(200);
-await comprobar('«Registrar» enseña el paso con su receta como título, y el documento',
-  pagina.evaluate(() => {
-    const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-    return menu ? Array.from(menu.querySelectorAll('.ficha-menu-opcion')).map((o) => [o.textContent, o.disabled]) : null;
-  }), [['Tarea: Registrar la salida (salida)', true], ['260907 SUELTO.pdf', false]]);
-await pagina.keyboard.press('Escape');
-await pagina.mouse.click(5, 5);
+await comprobar('no hay botón «Registrar» en la cabecera (fila 434)', pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-registrar').length), 0);
 
 console.log('--- a. la receta de comunicar ---');
 await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');

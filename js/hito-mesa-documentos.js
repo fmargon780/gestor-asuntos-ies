@@ -259,7 +259,8 @@ var HitoMesaDocumentos = (function () {
     /* Fila 164: arriba, los pasos pendientes con receta de generar. */
     caja.innerHTML = (abierto && window.HitoMesaRecetas ? HitoMesaRecetas.bloqueHTML(a, h, 'generar') : '') +
       g.delPaso.map(filaP).join('') +
-      (g.delTipo.length ? '<details class="mesa-otras-plantillas"><summary>Otras plantillas (' + g.delTipo.length + ')</summary>' +
+      (g.delTipo.length ? '<details class="mesa-otras-plantillas"' + (g.delPaso.length ? '' : ' open') + '><summary>' +   /* fila 434: sin plantilla propia, las del tipo se ven abiertas */
+        (g.delPaso.length ? 'Otras plantillas (' : 'Plantillas del tipo (') + g.delTipo.length + ')</summary>' +
         g.delTipo.map(filaP).join('') + '</details>' : '') +
       (abierto && window.PlantillaBuscar ? '<button type="button" class="enlace mesa-buscar-plantilla">Buscar otra plantilla…</button>' +
         '<div class="mesa-buscar-caja"></div>' : '');

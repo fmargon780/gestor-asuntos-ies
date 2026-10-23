@@ -111,10 +111,10 @@ await comprobar('ningún paso del guion lleva el botón de acción de antes',
 await comprobar('solo comunicar y generar llevan botón dentro de la tarea',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-guion .guion-paso .guion-accion-tarea'))
     .map(b => b.closest('.guion-paso').dataset.id + ':' + b.textContent.trim())), ['g2:Enviar correo', 'g4:Generar documento']);
-await comprobar('la cabecera lleva Generar, Comunicar, Registrar, Marcar y ···',
+await comprobar('la cabecera lleva Generar, Comunicar, Marcar y ··· (sin «Registrar», fila 434)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button.boton'))
     .filter(b => b.offsetParent).map(b => b.textContent.trim())),
-  ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', 'Hito ▾']);   /* fila 285 */
+  ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Marcar como hecho', 'Hito ▾']);   /* fila 285 */
 await comprobar('con hitos, la barra de arriba no enseña «Comunicar»',
   pagina.evaluate(() => { const b = document.querySelector('#ficha-acciones .boton-comunicar'); return !!(b && b.offsetParent); }), false);
 
@@ -126,14 +126,8 @@ await comprobar('un paso hecho dice quién al lado, y no va tachado',
 await comprobar('un paso «No aplica» va tachado',
   pagina.evaluate(() => getComputedStyle(document.querySelector('.hito-en-mesa .guion-paso[data-id="g3"] .guion-paso-texto')).textDecorationLine), 'line-through');
 
-console.log('--- «Registrar» de la cabecera ---');
-await pagina.evaluate(() => { window.__registrado = null; HitosDocumentoMenu.registrar = (a, h, n) => { window.__registrado = [h.id, n]; }; });
-await pagina.click('.hito-en-mesa .mesa-registrar');
-await comprobar('registra el único documento del hito sin registro (lo mismo que el ⋯ del documento)',
-  pagina.evaluate(() => window.__registrado), ['p4', '260910 OFICIO.pdf']);
-await comprobar('y lleva el bloque de documentos a la vista (fila 425)',
-  pagina.evaluate(() => { const d = document.querySelector('.hito-en-mesa .mesa-grande-docs').getBoundingClientRect();
-    const c = document.getElementById('trabajo-izq').getBoundingClientRect(); return d.top >= c.top - 1 && d.top < c.bottom; }), true);
+console.log('--- ya no hay «Registrar» en la cabecera (fila 434) ---');
+await comprobar('la cabecera no lleva «Registrar»', pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-registrar').length), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();

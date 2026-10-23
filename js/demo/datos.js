@@ -273,6 +273,14 @@
     await Plantillas.guardar(App.E.gestor, function (actual) {
       actual.centro = 'IES Fuente Lucena (copia de pruebas)';
       actual.localidad = 'Localidad de pruebas';
+      /* Fila 434: la primera del tipo es la que se propone al abrir «Comunicar» en cualquier hito sin plantilla propia
+         (js/correo.js, plantillaDeEntrada): la de pedir documentación, que va con los hitos del principio; la de confirmar
+         la matrícula, que es la final, queda detrás y se elige a mano. */
+      actual.lista.push({
+        id: Plantillas.idNuevo(), tipo: 'MATRICULA', categoria: 'ALUMNADO',
+        nombre: 'Documentación pendiente de matrícula',
+        texto: 'Para completar la matrícula nos falta documentación. Por favor, tráigala al centro cuanto antes.'
+      });
       actual.lista.push({
         id: Plantillas.idNuevo(), tipo: 'MATRICULA', categoria: 'ALUMNADO',
         nombre: 'Confirmación de matrícula',

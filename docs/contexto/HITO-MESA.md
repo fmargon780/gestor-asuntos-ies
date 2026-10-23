@@ -54,10 +54,8 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   no está hecho), el plazo («Sin plazo» o «Vence el 15-oct · quedan N días hábiles», en rojo o ámbar si
   vence) y el responsable. Siguen siendo pulsables con `FichaMenus` (`.mesa-etq-estado`,
   `.mesa-etq-plazo`, `.mesa-etq-resp`, clase `mesa-meta`). «Hecho» sí es etiqueta verde.
-- **A la derecha, cinco botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
-  **«Registrar»** (fila 154, no en un hito-pregunta: con un documento del hito sin registro, lo
-  registra; con varios, menú para elegir; sin ninguno, aviso ámbar; es `HitosDocumentoMenu.registrar`,
-  lo mismo que el ⋯ del documento, y lleva antes el bloque «Documentos del hito» a la vista, `HitoMesa.verDocumentos`), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
+- **A la derecha, los botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
+  (fila 434: sin «Registrar» en la cabecera; la tarea de registrar se marca sola al unir el PDF sellado a un documento del hito, `RegistroSellado.asociar`, salvo `{ noMarcar: true }` del registro por personas; «Registrar» del ⋯ del documento sigue, y lleva el bloque «Documentos del hito» a la vista con `HitoMesa.verDocumentos`) «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
   hecho, «Hecho ✓ (desmarcar)») y **«Hito ▾»** (fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`, antes
   «···»): arriba, sin repetir la palabra, **Crear · Cambiar · Borrar** (fila 206, no en un
   hito-pregunta: ver más abajo; mismas funciones, solo el texto cambia), y debajo de una raya
@@ -116,10 +114,8 @@ apagado si el hito no está vacío).
   del hito que haya quedado «en curso» (`EstadoHito.idActual`, incluida una pregunta sin responder).
   Sin ninguno (todos hechos o «No aplica»), se enseña bajo el título «Todos los hitos están hechos.»
   con un botón que pulsa el de verdad de «Archivar el asunto» de la cabecera de la ficha
-  (`#ficha-archivar button`). Cuando el guion de un hito se completa por una acción del usuario en
-  esta sesión (marcar una línea, generar, registrar, comunicar, añadir), se pregunta una vez con
-  `U.preguntar` si se da por hecho (memoria en `HitoMesa` por hito y sesión, nunca en disco; nunca al
-  abrir una mesa que ya estaba completa).
+  (`#ficha-archivar button`). Fila 434: ya no sale la ventana «Este hito ya está completo»: con todas las tareas hechas, «Marcar como hecho» queda
+  resaltado (`mesa-hecho-resaltado`) y el hito solo se cierra cuando la persona lo pulsa.
 - **Los desplegables** (`.mesa-desplegable` > `.mesa-abrir-panel` + `.mesa-panel`): dentro de la página,
   no son un `U.preguntar`. «Generar documento ▾» lleva `.mesa-plantillas` (las del paso, «Otras
   plantillas», «Buscar otra plantilla…», que rellena `js/hito-mesa-documentos.js`) y los formularios
