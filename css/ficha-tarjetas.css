@@ -69,6 +69,25 @@
 .ficha-documento-traer { flex: none; }
 .ficha-documento-traer.oculto { display: none; }
 
+/* La franja «Datos del asunto» (fila 426, js/ficha-datos-a-mano.js): arriba de la columna derecha. */
+.datos-mano { padding: 0; }
+.datos-mano-cabeza {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; min-width: 0;
+}
+.datos-mano-cabeza:focus-visible { outline: 2px solid var(--azul); outline-offset: -2px; border-radius: 8px; }
+.datos-mano-flecha { flex: none; color: var(--tinta-suave); font-size: 12px; }
+.datos-mano-titulo { flex: none; font-weight: 700; font-size: 13.5px; }
+.datos-mano-linea {
+  flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--tinta-suave);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.datos-mano-linea.vacia { font-style: italic; }
+.datos-mano-linea .dato-copiable { margin-left: 2px; }
+.datos-mano-cuerpo { padding: 4px 14px 12px; border-top: 1px solid var(--linea); max-height: 60vh; overflow: auto; }
+.datos-mano-cuerpo.oculto { display: none; }
+.dm-sub { margin: 10px 0 6px; font-size: 13px; font-weight: 700; }
+.trabajo-der.con-documento .datos-mano-cuerpo { max-height: 30vh; }
+
 /* Pantalla estrecha: una columna debajo de otra, y la página baja. */
 @media (max-width: 1100px) {
   .trabajo-columnas { grid-template-columns: minmax(0, 1fr); height: auto !important; }

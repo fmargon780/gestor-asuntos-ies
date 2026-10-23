@@ -253,8 +253,9 @@ var HitosPanelLista = (function () {
     /* Fila 229 (docs/REGISTRO-DEL-ASUNTO.md): «Registro», una sola lista por
        fechas con las líneas de este hito: las que se han anotado (notas del
        asunto escritas desde aquí, js/notas-migracion.js) y lo que apunta la
-       aplicación sola (`h.notas`), en gris. */
-    var lineasHito = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h] }) : [];
+       aplicación sola (`h.notas`), en gris; desde la fila 426, también las notas
+       a mano del asunto que no van unidas a ningún hito, con «del asunto». */
+    var lineasHito = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h], conSueltas: true }) : [];
     var grandeNotas = '<section class="mesa-bloque mesa-grande-notas" data-tarjeta="notas">' +
       '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Registro</span>' +
         (lineasHito.length ? '<span class="mesa-docs-cuenta">· ' + lineasHito.length + (lineasHito.length === 1 ? ' línea' : ' líneas') + '</span>' : '') + '</div>' +

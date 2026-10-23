@@ -284,10 +284,15 @@
     return { html: html, tutores: [] };
   }
 
-  async function abrirVerTodo(persona, categoria, resumen, a) {
-    var construido = categoria === 'ALUMNADO' ? FichaTerceroAlumno.ventana(persona, resumen, a)
+  /* `enLinea` (fila 426): lo pide la franja «Datos del asunto», que pinta lo mismo que «Ver todo» pero sin cuadro. */
+  function construirVerTodo(persona, categoria, resumen, a, enLinea) {
+    return categoria === 'ALUMNADO' ? FichaTerceroAlumno.ventana(persona, resumen, a, enLinea)
       : categoria === 'PERSONAL' ? ventanaPersonal(persona)
       : ventanaGenerica(persona, categoria);
+  }
+
+  async function abrirVerTodo(persona, categoria, resumen, a) {
+    var construido = construirVerTodo(persona, categoria, resumen, a, false);
 
     var promesa = U.preguntar(construido.titulo || persona.nombre, construido.html, 'Cerrar', true);
     var cuadro = document.querySelector('#capa .cuadro');
@@ -313,7 +318,7 @@
   }
 
   window.FichaTercero = {
-    pintarLinea: pintarLinea, datosBasicos: datosBasicos,
+    pintarLinea: pintarLinea, datosBasicos: datosBasicos, construirVerTodo: construirVerTodo, datoConCopiar: datoConCopiar,
     /* para las pruebas: la cascada CSV -> ficha.contacto -> nada, sin
        tener que montar un DOM entero para leer el resultado. */
     _buscarPersona: buscarPersona

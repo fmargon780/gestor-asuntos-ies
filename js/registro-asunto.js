@@ -10,8 +10,10 @@
      llevan `auto: true`.
    - Lo automático de cada hito vive en `h.notas` de `hitos.json`.
    Aquí (RegistroAsunto):
-   - `lineas(a, { hito, hitos, notas })`: las dos fuentes fundidas, la más
-     reciente arriba; con `hito`, solo las de ese hito.
+   - `lineas(a, { hito, hitos, notas, conSueltas })`: las dos fuentes fundidas, la más
+     reciente arriba; con `hito`, solo las de ese hito; con `conSueltas`
+     (fila 426, docs/FICHA-VISTA-DE-TRABAJO.md), también las notas escritas a
+     mano que no van unidas a ningún hito, con `delAsunto: true`.
    - `html(lineas, opciones)`: la lista pintada (ficha y mesa).
    - `auto(a, texto, hito)`: apunta una línea automática (accesorio:
      si falla, ámbar, nunca rojo).
@@ -54,8 +56,9 @@ var RegistroAsunto = (function () {
     var salida = [];
     (opciones.notas || notasDe(a)).forEach(function (n, i) {
       if (!n || !String(n.texto || '').trim()) return;
-      if (filtro && n.hito !== filtro) return;
-      salida.push({ texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
+      var suelta = !!(filtro && opciones.conSueltas && !n.hito && !esAuto(n));
+      if (filtro && n.hito !== filtro && !suelta) return;
+      salida.push({ delAsunto: suelta, texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
         hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, auto: esAuto(n),
         propia: n, orden: i, fuente: 'asunto' });
     });
@@ -92,6 +95,7 @@ var RegistroAsunto = (function () {
       '<div class="nota-cabeza">' +
         '<span class="nota-cuando">' + U.escapar(window.Notas ? Notas.cuando(l.cuando) : l.cuando) + '</span>' +
         (l.quien ? '<span class="nota-quien">' + U.escapar(l.quien) + '</span>' : '') + hito +
+        (l.delAsunto ? '<span class="registro-del-asunto" title="Nota del asunto, no unida a ningún hito">del asunto</span>' : '') +
         (editable ? '<span class="registro-menu"><button type="button" class="registro-mas" title="Cambiar o borrar" aria-label="Cambiar o borrar esta línea">⋮</button>' +
           '<span class="registro-acciones oculto"><button type="button" class="boton registro-cambiar">Cambiar</button>' +
           '<button type="button" class="boton registro-borrar">Borrar</button></span></span>' : '') +

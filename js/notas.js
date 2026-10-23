@@ -379,6 +379,8 @@
             aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
           }
           if (alGuardar) alGuardar();
+          /* Fila 426: el Registro del hito enseña también las notas sueltas del asunto. */
+          if (window.HitosPanel && HitosPanel.programarRepintado) HitosPanel.programarRepintado();
         })
         .catch(function (e) {
           if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + U.mensajeDeError(e);

@@ -144,7 +144,7 @@ apagado si el hito no está vacío).
 
 El hito entero, de arriba abajo y en una sola columna (`.mesa-columnas > .mesa-col-hito`), con este
 orden: **Tareas** (`.mesa-grande-guion`) → **Campos de este hito** (`.mesa-campos-hito`) → **Documentos
-del hito** (`.mesa-grande-docs`) → **Registro** (`.mesa-grande-notas`) y «Normativa (N)» plegada al pie.
+del hito** (`.mesa-grande-docs`) → **Registro** (`.mesa-grande-notas`; fila 426: además de las líneas del hito, las notas escritas a mano del asunto que no van unidas a ningún hito, con la etiqueta «del asunto»: `RegistroAsunto.lineas(a, { hito, hitos, conSueltas: true })`; las líneas automáticas sin hito no salen, siguen en la pestaña Registro) y «Normativa (N)» plegada al pie.
 La columna es la izquierda de «Trabajo»; la pinta `HitosPanelLista.cuerpoDeHito`. Ya no hay tarjetas de
 resumen ni cambio de tarjeta (`.mesa-resumen`, `HitoMesa.abrirTarjeta`, «← Volver al guion» y
 `js/hito-mesa-tarjetas.js` desaparecieron). Los botones del guion pulsan los de siempre por debajo.

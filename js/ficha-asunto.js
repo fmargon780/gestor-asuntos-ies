@@ -254,6 +254,7 @@
     N.pintarAvisoDeTipo(a, tipo);
     N.pintarGuia(a, tipo, abierto);
     N.pintarContacto(a);
+    if (window.FichaDatosAMano) FichaDatosAMano.pintar(a);   /* fila 426: la franja «Datos del asunto» de «Trabajo» */
     N.pintarDocumentos(a);
     N.pintarOtrosDelTercero(a);
     N.pintarRelacionados(a, abierto);

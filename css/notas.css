@@ -65,3 +65,4 @@
 .nota-directivo-doc { display: inline-flex; gap: 6px; align-items: center; }
 .nota-directivo-error { color: #b3261e; }
 .marca-nota-directivo { margin-left: 6px; color: #b07f00; font-size: 13px; cursor: help; }
+.registro-del-asunto { flex: none; font-size: 11px; font-weight: 600; color: #5b4a1d; background: #f6ecd0; border-radius: 10px; padding: 0 7px; margin-left: 6px; white-space: nowrap; }

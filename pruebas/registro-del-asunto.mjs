@@ -94,7 +94,8 @@ await comprobar('mesa de «Recoger los papeles»', pagina.evaluate(() => !!docum
 console.log('--- 2. la mesa ---');
 const mesa = () => pagina.evaluate(() => Array.prototype.map.call(
   document.querySelectorAll('#ficha-guia .hito[data-id="h1"] .mesa-notas .hito-notas .registro-linea'), x => [x.querySelector('.nota-texto').textContent, x.classList.contains('registro-auto')]));
-await comprobar('solo las líneas de ese hito, una sola lista', mesa(), [['Generado «Justificante»', true], ['Llamada de la madre', false]]);
+/* Fila 426: la nota a mano sin hito sale también en el Registro del hito (con «del asunto»). */
+await comprobar('las líneas de ese hito y las notas sueltas del asunto, una sola lista', mesa(), [['Sin hito, a mano', false], ['Generado «Justificante»', true], ['Llamada de la madre', false]]);
 
 console.log('--- 3. anotar desde la mesa ---');
 const ta = '#ficha-guia .hito[data-id="h1"] .hito-nota-texto';

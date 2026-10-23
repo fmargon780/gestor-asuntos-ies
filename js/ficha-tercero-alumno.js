@@ -327,10 +327,10 @@ var FichaTerceroAlumno = (function () {
   /* ---------- la ventana «Ver todo» ---------- */
 
   /* Devuelve { html, titulo, montar(raiz), alCerrar() } para
-     js/ficha-tercero.js. Desde la fila 252 pinta la misma ficha que
+     js/ficha-tercero.js (`enLinea`, fila 426: pintada en la franja «Datos del asunto» y no en un cuadro). Desde la fila 252 pinta la misma ficha que
      Personas y empresas (js/ficha-persona.js), sin «Sus asuntos». `a` es
      el asunto de la ficha (para «Correo a la familia»). */
-  function ventana(persona, resumen, a) {
+  function ventana(persona, resumen, a, enLinea) {
     var tutores = Datos.tutoresDe(persona);
     var alumno = contactoDelAlumno(persona);
     var otrosFamilia = (tutores.otros || []).slice();
@@ -347,6 +347,10 @@ var FichaTerceroAlumno = (function () {
         alPedirCorreo: function () {
           /* Un solo cuadro a la vez (U.preguntar): se cierra esta ventana y,
              al cerrarse, se abre el de Correo (alCerrar). */
+          if (enLinea) {   /* fila 426: dentro de la franja «Datos del asunto» no hay cuadro que cerrar */
+            if (a && window.CorreoNucleo) CorreoNucleo.abrirCuadro(a, false, { correoPreferente: correosFamilia.join(', ') });
+            return;
+          }
           irACorreo = true;
           var cerrar = document.getElementById('cuadro-aceptar');
           if (cerrar) cerrar.click();
@@ -362,6 +366,6 @@ var FichaTerceroAlumno = (function () {
              tutores: tutores, textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores, otrosFamilia); } };
   }
 
-  return { ventana: ventana, familia: familia, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,
+  return { ventana: ventana, familia: familia, contactoDelAlumno: contactoDelAlumno, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,
            telefonoLegible: telefonoLegible, etiquetaDeTutor: etiquetaDeTutor };
 })();

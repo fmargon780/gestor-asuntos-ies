@@ -117,8 +117,9 @@ const mesa = () => pagina.evaluate(() => {
   };
 });
 /* Fila 229: una sola lista por fechas, con lo automático en gris. */
-await comprobar('solo las líneas de ese hito, en una lista (la más nueva arriba)', mesa(), {
-  notas: ['Trae la solicitud el lunes', AUTO, 'Ha llamado la madre'], auto: [false, true, false]
+/* Fila 426: y la nota a mano del asunto sin hito. */
+await comprobar('las líneas de ese hito y la nota suelta del asunto, en una lista (la más nueva arriba)', mesa(), {
+  notas: ['Trae la solicitud el lunes', AUTO, 'Nota del asunto', 'Ha llamado la madre'], auto: [false, true, false, false]
 });
 
 console.log('--- 5. escribir en la mesa ---');

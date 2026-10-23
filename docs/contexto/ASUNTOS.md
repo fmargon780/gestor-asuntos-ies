@@ -387,7 +387,7 @@ con resumen (fila 107) y la franja de documentos en chips (fila 109) **se retira
 - **«Trabajo»** (`#trabajo-columnas`): dos columnas de igual ancho que llenan el alto hasta abajo de la
   ventana (`ajustarAlto()`, al pintar, al cambiar de tamaño y de clase del `<body>`; cada columna se
   desplaza por su cuenta). **Izquierda** (`#trabajo-izq`): `#ficha-guia`, la tira de hitos y el hito
-  entero en una columna (`docs/contexto/HITO-MESA.md`). **Derecha** (`#trabajo-der`): «Documentos de la
+  entero en una columna (`docs/contexto/HITO-MESA.md`). **Derecha** (`#trabajo-der`): arriba la franja «Datos del asunto» (fila 426, `js/ficha-datos-a-mano.js`, `FichaDatosAMano.pintar`, en `#trabajo-der-arriba`: cerrada, una línea con ⧉ por dato —alumnado: NIE, curso, unidad, teléfono y correo del primer contacto; otro tercero: NIF/DNI, teléfono, correo—, cortada con «…» por el final; abierta al pulsarla, el mismo «Ver todo» de «Datos y contacto» (`FichaTercero.construirVerTodo(…, enLinea)`) y los campos del asunto (`FichaNucleo.datosDelAsunto`); se recuerda en el asunto, en otro sale cerrada; las pestañas «Datos y contacto» y «Campos del asunto» siguen) y debajo «Documentos de la
   carpeta» (`#trabajo-carpeta`, `#ficha-documentos`, el pintado de `js/ficha-documentos.js`, con su
   «+ Añadir documento», «Generar documento» y «Repartir…»), o el documento abierto en lugar de la
   lista (`js/ficha-trabajo-visor.js`: mete `#visor-lateral` y `#word-visor` en la columna y les pone
