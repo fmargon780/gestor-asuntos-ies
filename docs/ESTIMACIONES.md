@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 23-oct-2026 16:10 (fila 449 diseñada)
+Última puesta al día: 23-oct-2026 (fila 450 en curso)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -19,3 +19,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 425 | 180 | pestaña Trabajo y dos columnas, mesa del hito en una sola columna, carpeta con marcas y casillas de adjuntar, visor en la columna derecha, quitar cuadrícula, adaptar pruebas de disposición y mesa, prueba nueva, revisor |
 | 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
 | 441 | 60 | contestar con el asunto del cuadro: decidir hilo o correo nuevo en el script, SCRIPT_ESPERADO, pruebas y revisor |
+| 450 | 150 | partir etiquetas-pantalla.js, guardado del trabajo por pestaña, orden de etiquetas, tres tarjetas encima de la hoja, «Empezar de cero», adaptar las pruebas de Etiquetas, prueba nueva, revisor |
