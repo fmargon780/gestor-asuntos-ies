@@ -18,3 +18,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
 | 425 | 180 | pestaña Trabajo y dos columnas, mesa del hito en una sola columna, carpeta con marcas y casillas de adjuntar, visor en la columna derecha, quitar cuadrícula, adaptar pruebas de disposición y mesa, prueba nueva, revisor |
 | 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
+| 440 | 120 | recolector: todo lo recibido entra desde la fecha de arranque, archivar con GESTOR/Hecho, respuestas a descartados, no duplicar hilos seguidos; textos de la app; pruebas y revisor |
+| 441 | 60 | contestar con el asunto del cuadro: decidir hilo o correo nuevo en el script, SCRIPT_ESPERADO, pruebas y revisor |
