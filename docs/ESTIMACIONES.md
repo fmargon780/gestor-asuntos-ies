@@ -18,4 +18,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 410 | 80 | botón de correo y de documento en la línea de cada tarea pendiente con acción, datos de demostración, prueba, revisor |
 | 425 | 180 | pestaña Trabajo y dos columnas, mesa del hito en una sola columna, carpeta con marcas y casillas de adjuntar, visor en la columna derecha, quitar cuadrícula, adaptar pruebas de disposición y mesa, prueba nueva, revisor |
 | 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
-| 436 | 120 | línea «Campo: valor» y candidato en una sola función, usada en carpeta, hito, apuntar a hito, adjuntos de correo y demás listas; pruebas y revisor |
