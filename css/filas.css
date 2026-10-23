@@ -128,4 +128,5 @@
   .ficha-documentos .ficha-documento-fila { flex-wrap: wrap; }
   .ficha-documento-fila > .doc-datos { flex-basis: 100%; }
   .mesa-doc-nombre { flex-wrap: wrap; }
+  .mesa-doc-nombre .hito-doc-abrir { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; max-width: 100%; }
 }

@@ -82,10 +82,11 @@ const medidas = await pagina.evaluate(() => {
   };
 });
 /* Fila 439: la fila es de una sola línea (el resto de opciones, en el ⋮); un nombre largo se corta con «…», sin aplastarse. */
-await comprobar('1. la fila no se parte en renglones (flex-wrap)', medidas.flexWrap, 'nowrap');
+/* Esta prueba va con 480 px de ancho (móvil): ahí la fila puede bajar a dos renglones, nunca a una fila de botones. */
+await comprobar('1. en pantalla estrecha la fila puede envolver (flex-wrap)', medidas.flexWrap, 'wrap');
 await comprobar('1. el nombre no baja de 8em de ancho mínimo', medidas.minWidth, '104px');
 await comprobar('1. el botón del nombre mide más de 100px de ancho', medidas.anchoNombre > 100, true);
-await comprobar('1. la fila ocupa un solo renglón', medidas.altoFila < 60, true);
+await comprobar('1. la fila no se dispara de alto (no pasa de dos renglones)', medidas.altoFila < 100, true);
 
 console.log('--- 2. el menú de tres puntos: abre, ofrece Borrar, y borra como antes ---');
 await pagina.click('#ficha-documentos .fila-menu-btn');

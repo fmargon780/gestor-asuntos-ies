@@ -147,7 +147,7 @@ var HitoMesaDocumentos = (function () {
       return '<div class="hito-documento mesa-doc" data-doc="' + U.escapar(g.nombre) + '">' +
         '<input type="checkbox" class="mesa-doc-marca" title="Seleccionar"' + (falta ? ' disabled' : '') + '>' +
         '<div class="mesa-doc-nombre"><span class="mesa-doc-tipo">' + U.escapar(tipoDe(g.nombre)) + '</span>' +
-          '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '">' +
+          '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '" title="' + U.escapar(g.nombre) + '">' +
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +
           (origen ? '<span class="mesa-doc-origen">' + U.escapar(origen) + '</span>' : '') +
           /* Fila 439: «Ruta», pegado al nombre, y los datos en gris, en la misma línea. */
