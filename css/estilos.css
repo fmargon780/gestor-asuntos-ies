@@ -201,6 +201,11 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin-right: 8px;
   font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+/* Fila 451: «Dormido · N días», en ámbar, junto al nombre. */
+.marca-dormido {
+  display: inline-block; background: var(--ambar); color: #8a6100; border: 1px solid var(--ambar-linea);
+  border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin-left: 8px; white-space: nowrap;
+}
 /* La etiqueta de color del estado del asunto. El color sale del sitio
    que ocupa en la lista de Ajustes, y hay seis que se van repitiendo. */
 .marca-estado {

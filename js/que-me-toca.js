@@ -68,7 +68,7 @@
         items.push({ asunto: a, hito: h });
       });
     });
-    return { ajustes: datos.ajustes, items: items };
+    return { ajustes: datos.ajustes, items: items, porAsunto: datos.porAsunto };
   }
 
   /* Días que lleva parado desde 'desde' (0 si no tiene: un hito
@@ -106,7 +106,7 @@
 
   function vencidos(items) {
     return items.filter(function (it) {
-      var p = it.hito.fecha ? Plazos.de(it.hito.fecha) : null;
+      var p = it.hito && it.hito.fecha ? Plazos.de(it.hito.fecha) : null;
       return p && p.clase === 'plazo-vencido';
     }).length;
   }
@@ -162,9 +162,19 @@
     };
   };
 
-  function ultimaActividad(ficha) {
-    return [ficha.notaEl, ficha.situacionEl, ficha.editadoEl, ficha.abiertoEl]
-      .filter(Boolean).sort().pop() || '';
+  /* Fila 451: también cuenta marcar o desmarcar un hito (`actividadEl` de su
+     entrada en hitos.json, que escribe Hitos.marcar, y `hechoEl` de cada hito)
+     y el cambio de situación (`situacionEl`, que ahora sí se guarda). */
+  function ultimaActividad(a) {
+    var ficha = a.ficha || {};
+    var fechas = [ficha.notaEl, ficha.situacionEl, ficha.editadoEl, ficha.abiertoEl];
+    var datos = window.Hitos && Hitos.ultimosLeidos ? Hitos.ultimosLeidos() : null;
+    var entrada = datos && datos.porAsunto && datos.porAsunto[a.nombre];
+    if (entrada) {
+      fechas.push(entrada.actividadEl);
+      (entrada.hitos || []).forEach(function (h) { fechas.push(h.hechoEl); });
+    }
+    return fechas.filter(Boolean).sort().pop() || '';
   }
 
   function diasDesdeIso(iso) {
@@ -173,73 +183,43 @@
     return Math.floor((Date.now() - d.getTime()) / 86400000);
   }
 
-  /* Los abiertos sin novedades desde hace `App.diasDormido()` días o
-     más, sin los que se han ocultado a propósito y todavía no toca
-     volver a avisar de ellos (`ficha.dormidoOcultoHasta`). */
+  /* Fila 451: los días que lleva dormido un asunto, o null si no lo está
+     (sin novedades desde hace `App.diasDormido()` días o más, sin los
+     ocultados a propósito con `ficha.dormidoOcultoHasta` todavía en el
+     futuro, ni los que están en «Por liquidar», quietos a propósito). */
+  function diasDormidoDe(a) {
+    var f = a.ficha || {};
+    if (f.dormidoOcultoHasta && f.dormidoOcultoHasta > U.hoyIso()) return null;
+    if (f.porLiquidar && f.porLiquidar.desde) return null;
+    var ultima = ultimaActividad(a);
+    if (!ultima) return null;
+    var dias = diasDesdeIso(ultima);
+    return dias >= App.diasDormido() ? dias : null;
+  }
+
+  /* Los abiertos dormidos, de más a menos días (para las pruebas y los avisos). */
   function reunirDormidos() {
-    var umbral = App.diasDormido();
-    var hoy = U.hoyIso();
     var asuntos = window.Gestor ? window.Gestor.asuntos() : [];
     var salida = [];
     asuntos.forEach(function (a) {
-      var f = a.ficha || {};
-      if (f.dormidoOcultoHasta && f.dormidoOcultoHasta > hoy) return;
-      var ultima = ultimaActividad(f);
-      if (!ultima) return;
-      var dias = diasDesdeIso(ultima);
-      if (dias >= umbral) salida.push({ asunto: a, dias: dias });
+      var dias = diasDormidoDe(a);
+      if (dias !== null) salida.push({ asunto: a, dias: dias });
     });
     salida.sort(function (a, b) { return b.dias - a.dias; });
     return salida;
   }
 
-  function bloqueDormidos(lista) {
-    if (!lista.length) return null;
-    var d = document.createElement('div');
-    d.className = 'qmt-bloque qmt-bloque-dormidos';
-    d.innerHTML = '<h3 class="qmt-bloque-titulo">Dormidos ' +
-      '<span class="cuenta-lista">' + lista.length + '</span></h3>';
-    var caja = document.createElement('div');
-    caja.className = 'qmt-lista';
-    lista.forEach(function (it) {
-      var a = it.asunto;
-      var tapado = window.Reservados && Reservados.tapar(a);   /* fila 135 */
-      var tercero = tapado ? '' : terceroDe(a);
-      var fila = document.createElement('div');
-      fila.className = 'qmt-fila qmt-fila-dormido';
-      fila.style.cursor = 'default';
-      fila.innerHTML =
-        '<span class="qmt-fila-titulo">' + (window.Reservados ? Reservados.candadoHtml(a) : '') +
-          U.escapar(window.Reservados ? Reservados.nombreParaVer(a) : a.nombre) + '</span>' +
-        (tercero ? '<span class="qmt-fila-tercero">' + U.escapar(tercero) + '</span>' : '') +
-        '<span class="qmt-fila-espera">Sin novedades desde hace ' + it.dias + ' días</span>';
-
-      var abrir = document.createElement('button');
-      abrir.type = 'button';
-      abrir.className = 'boton';
-      abrir.textContent = 'Abrir';
-      abrir.onclick = function () { App.abrirFicha(a, 'abierto'); };
-      fila.appendChild(abrir);
-
-      var ocultar = document.createElement('button');
-      ocultar.type = 'button';
-      ocultar.className = 'boton';
-      ocultar.textContent = 'Ocultar por 30 días';
-      ocultar.onclick = async function () {
-        var hasta = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-        try {
-          await App.anotar(a.nombre, { dormidoOcultoHasta: hasta });
-          pintar();
-        } catch (e) {
-          U.aviso('No he podido ocultarlo: ' + U.mensajeDeError(e), 'malo');
-        }
-      };
-      fila.appendChild(ocultar);
-
-      caja.appendChild(fila);
-    });
-    d.appendChild(caja);
-    return d;
+  /* Del menú ⋮ de la fila de un asunto dormido: dejar de avisar 30 días. */
+  async function ocultarDormido(a) {
+    var hasta = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    try {
+      await App.anotar(a.nombre, { dormidoOcultoHasta: hasta });
+      if (a.ficha) a.ficha.dormidoOcultoHasta = hasta;
+      U.aviso('No avisaré de este asunto como dormido hasta el ' + hasta + '.', 'bueno');
+      if (window.Inicio) Inicio.repintar();
+    } catch (e) {
+      U.aviso('No he podido ocultarlo: ' + U.mensajeDeError(e), 'malo');
+    }
   }
 
   /* ---------- el aviso de aspirantes sin Nº de identificación escolar ----------
@@ -315,7 +295,7 @@
     vencidos: vencidos, unoPorAsunto: unoPorAsunto,
     contarAspirantesSinNumero: contarAspirantesSinNumero,
     reunirAspirantesSinNumero: reunirAspirantesSinNumero,
-    reunirDormidos: reunirDormidos,
+    reunirDormidos: reunirDormidos, diasDormidoDe: diasDormidoDe, ocultarDormido: ocultarDormido,
     leerFiltroResponsable: leerFiltro, guardarFiltroResponsable: guardarFiltro,
     abrirMesaDelHito: abrirMesaDelHito,
     /* Pequeñas ayudas que también usa js/inicio.js para pintar "Me

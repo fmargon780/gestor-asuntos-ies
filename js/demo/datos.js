@@ -483,7 +483,7 @@
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */
     await crearAsunto(tipos.FACTURA, 'EMPRESAS', dobla, hace(60), {
-      abiertoEl: hace(60) + 'T09:00:00.000Z', sinNumero: true,
+      abiertoEl: hace(75) + 'T09:00:00.000Z', sinNumero: true,   /* fila 451: claramente dormido (más de los 60 días de aviso) */
       datos: { campos: { 'propio:p-importe-factura': { valor: '125,5', enNombre: false },
                          'propio:p-fecha-factura': { valor: hace(58), enNombre: false } } }
     });

@@ -178,7 +178,8 @@ App.FILTROS_MONTON = [
   { valor: 'esperando', texto: 'Con «Esperando a…»' },
   { valor: 'listo', texto: 'Listos para archivar' },
   { valor: 'sinhitos', texto: 'Sin hitos' },
-  { valor: 'porliquidar', texto: 'Por liquidar' }   /* fila 249 */
+  { valor: 'porliquidar', texto: 'Por liquidar' },   /* fila 249 */
+  { valor: 'dormidos', texto: 'Solo dormidos' }   /* fila 451 */
 ];
 
 App.pintarFiltroEstado = function () {
@@ -194,6 +195,7 @@ App.pintarFiltroEstado = function () {
 App.pasaFiltroMonton = function (a, filtro) {
   if (!filtro) return true;
   if (filtro === 'porliquidar') return !!(window.PorLiquidar && PorLiquidar.estaPorLiquidar(a));
+  if (filtro === 'dormidos') return !!(window.QueMeToca && QueMeToca.diasDormidoDe(a) !== null);   /* fila 451 */
   var l = App.ladoDe(a);
   if (filtro === 'esperando') return !!l.esperando;
   if (filtro === 'listo') return !!l.listo;

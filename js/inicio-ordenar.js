@@ -72,7 +72,6 @@ window.InicioOrden = (function () {
     if (col === 'plazo') {
       if (pestana === 'adm') return textoLimpio(e.hito && e.hito.fecha);
       if (pestana === 'esp') return e.hito ? -QueMeToca.diasParado(e.hito) : null;   /* más días, arriba */
-      if (pestana === 'dorm') return typeof e.dias === 'number' ? -e.dias : null;     /* más días sin novedades, arriba */
       return textoLimpio(a.ficha && a.ficha.limite);
     }
     return null;
@@ -90,7 +89,7 @@ window.InicioOrden = (function () {
   }
 
   /* Una copia de `lista` ordenada según la columna elegida (o la misma
-     lista si no hay ninguna). `pestana`: adm, esp, todos, dorm o liq. */
+     lista si no hay ninguna). `pestana`: adm, esp, todos o liq. */
   function ordenar(lista, pestana) {
     if (!estado.col) return lista;
     var col = estado.col, dir = estado.dir;

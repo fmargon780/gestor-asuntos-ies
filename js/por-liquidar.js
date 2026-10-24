@@ -76,13 +76,20 @@ window.PorLiquidar = (function () {
   async function pasar(a, opciones) {
     var o = opciones || {};
     var estado = { desde: U.hoyIso(), auto: !!o.auto };
+    delete rechazados[a.nombre];
     await App.anotar(a.nombre, { porLiquidar: estado });
     if (a.ficha) a.ficha.porLiquidar = estado;
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Pasa a Por liquidar');
     if (!o.sinRepintar) repintar(a);
   }
 
+  /* Fila 451: los que alguien ha sacado de «Por liquidar» (el «Deshacer»): la pasada
+     de cada pintado de Inicio no los vuelve a pasar en esta sesión. */
+  var rechazados = {};
+  function rechazado(a) { return !!(a && rechazados[a.nombre]); }
+
   async function quitar(a) {
+    rechazados[a.nombre] = true;
     await App.anotar(a.nombre, { porLiquidar: null });
     if (a.ficha) a.ficha.porLiquidar = null;
     repintar(a);
@@ -158,12 +165,18 @@ window.PorLiquidar = (function () {
      crean o se completan al abrir su ficha, js/hitos-sincronizar.js), le quedan
      cosas por hacer aunque ahora no lo parezca. Un asunto cuyo tipo vino de unir
      dos tipos (`tipoUnidoDe`) no recibe los pasos de la guía nueva. */
-  function sinNadaPorHacer(a, datos) {
+  function pasosPorCargar(a, datos) {
     var entrada = datos.porAsunto && datos.porAsunto[a.nombre];
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(nombreDeTipo(a))) || [];
     var recibePasos = pasos.length && !(a.ficha && a.ficha.tipoUnidoDe);
-    if (!entrada || !entrada.hitos || !entrada.hitos.length) return !recibePasos;
-    if (recibePasos && Hitos.pasosQueFaltan && Hitos.pasosQueFaltan(entrada.hitos, pasos, entrada.pasosConocidos).anadidos) return false;
+    if (!entrada || !entrada.hitos || !entrada.hitos.length) return !!recibePasos;
+    return !!(recibePasos && Hitos.pasosQueFaltan && Hitos.pasosQueFaltan(entrada.hitos, pasos, entrada.pasosConocidos).anadidos);
+  }
+
+  function sinNadaPorHacer(a, datos) {
+    if (pasosPorCargar(a, datos)) return false;
+    var entrada = datos.porAsunto && datos.porAsunto[a.nombre];
+    if (!entrada || !entrada.hitos || !entrada.hitos.length) return true;
     return !!Hitos.aQuienLeToca(entrada.hitos, datos.ajustes).listo;
   }
 
@@ -441,7 +454,7 @@ window.PorLiquidar = (function () {
 
   return {
     exige: exige, hayTipos: hayTipos, estaPorLiquidar: estaPorLiquidar, tipoDe: tipoDe, lista: lista,
-    revisar: revisar, alCambiarTipo: alCambiarTipo, alMarcarCasilla: alMarcarCasilla,
+    revisar: revisar, pasosPorCargar: pasosPorCargar, rechazado: rechazado, alCambiarTipo: alCambiarTipo, alMarcarCasilla: alMarcarCasilla,
     pasar: pasar, quitar: quitar, destapar: destapar, archivarOPasar: archivarOPasar,
     textoDelBoton: textoDelBoton, alMarcarHecho: alMarcarHecho, alDesmarcar: alDesmarcar,
     importeDe: importeDe, campoImporte: campoImporte, sumar: sumar, euros: euros,

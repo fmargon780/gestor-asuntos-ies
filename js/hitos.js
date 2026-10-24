@@ -218,6 +218,7 @@ var Hitos = (function () {
     Object.keys(origen).forEach(function (clave) {
       var e = origen[clave] || {};
       porAsunto[clave] = { creados: String(e.creados || ''), hitos: normalizarLista(e.hitos) };
+      if (e.actividadEl) porAsunto[clave].actividadEl = String(e.actividadEl);   /* fila 451: última vez que se marcó o desmarcó un hito */
       /* Fila 118 (js/hitos-sincronizar.js): los pasos de la guía que ya han pasado por el asunto. */
       if (window.Hitos && Hitos.pasosConocidosDe) porAsunto[clave].pasosConocidos = Hitos.pasosConocidosDe(e, porAsunto[clave].hitos);
     });
@@ -601,6 +602,7 @@ var Hitos = (function () {
       var h = buscar(entrada.hitos, idHito);
       if (!h) return d;
       h.estado = nuevoEstado;
+      entrada.actividadEl = U.ahora();   /* fila 451: marcar o desmarcar es actividad (el asunto deja de estar dormido) */
       /* Fila 129: el «Esperando a…» se quita al terminar su hito. */
       if ((nuevoEstado === 'hecho' || nuevoEstado === 'noaplica') && Hitos.quitarEspera) Hitos.quitarEspera(h);
       if (nota) h.notas.push({ texto: String(nota), quien: (window.App && App.E.usuario) || '', cuando: U.ahora() });

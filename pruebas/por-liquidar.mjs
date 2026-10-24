@@ -11,7 +11,7 @@
    4. Dar por hecho el último hito pasa el asunto solo, con «Deshacer».
    5. «Liquidar»: el cuadro, el PDF en cada carpeta, el registro, el ARCHIVO.
    6. Reabrir uno: vuelve a abierto, sin «Por liquidar», y el PDF sigue.
-   7. A 1280 px, las cinco pestañas caben y la tabla no desborda.
+   7. A 1280 px, las cuatro pestañas caben y la tabla no desborda.
    8. Sin ningún tipo con la casilla, la pestaña no existe. */
 import { chromium } from 'playwright';
 
@@ -223,14 +223,14 @@ await comprobar('6. reabierto: vuelve a abiertos, no en «Por liquidar», y el P
 await pagina.evaluate(() => App.verAbiertos());
 await pagina.waitForTimeout(500);
 await irAPestana('liq');
-await comprobar('7. cinco pestañas, a 1280 px caben en una fila y la tabla no desborda',
+await comprobar('7. cuatro pestañas, a 1280 px caben en una fila y la tabla no desborda',
   pagina.evaluate(() => {
     const p = document.getElementById('inicio-pestanas');
     const botones = [...p.querySelectorAll('.inicio-pestana')].filter((b) => !b.classList.contains('oculto'));
     const tops = new Set(botones.map((b) => Math.round(b.getBoundingClientRect().top)));
     return { n: botones.length, unaFila: tops.size === 1, paginaAncha: document.documentElement.scrollWidth <= window.innerWidth,
       tabla: !document.querySelector('.inicio-tabla-envoltorio').classList.contains('desborda') };
-  }), { n: 5, unaFila: true, paginaAncha: true, tabla: true });
+  }), { n: 4, unaFila: true, paginaAncha: true, tabla: true });
 
 /* ===== 8. Sin tipos que liquidar ===== */
 

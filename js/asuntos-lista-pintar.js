@@ -380,13 +380,15 @@ App.textoLeTocaA = function (a, lado) {
    apertura) y, al final, el menú de tres puntos con «Copiar el
    nombre» y «Archivar».
 
-   `opciones`: { pestana: 'adm'|'esp'|'todos'|'dorm', hito, dias }.
+   `opciones`: { pestana: 'adm'|'esp'|'todos', hito, dias, sinHito, cargarPasos }.
    - pestana 'adm': `hito` es el hito de Administración de este asunto
      (para la columna Plazo y para pulsar la fila, que abre su mesa).
    - pestana 'esp': `hito` es el hito que espera a otro, `dias` los que
      lleva esperando (columna Plazo).
-   - pestana 'dorm': `dias` son los que lleva sin novedades (para la
-     columna Plazo, solo si el asunto no tiene plazo propio). */
+   - `sinHito` (fila 451, solo en 'adm'): el asunto no tiene ningún hito por
+     hacer; en la columna del hito sale «Añade un hito o archívalo» (o
+     «Abre el asunto para cargar sus pasos» con `cargarPasos`).
+   - Si el asunto está dormido, su nombre lleva la marca «Dormido · N días». */
 App.filaTablaAsunto = function (a, opciones) {
   opciones = opciones || {};
   var pestana = opciones.pestana || 'todos';
@@ -416,8 +418,6 @@ App.filaTablaAsunto = function (a, opciones) {
     var p = App.plazoDe(a);
     if (p) {
       tdPlazo.innerHTML = '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>';
-    } else if (pestana === 'dorm' && typeof opciones.dias === 'number') {
-      tdPlazo.innerHTML = '<span class="marca-plazo">Sin novedades desde hace ' + opciones.dias + ' días</span>';
     }
   }
   celdas.plazo = tdPlazo;
@@ -441,6 +441,14 @@ App.filaTablaAsunto = function (a, opciones) {
     spanTercero.innerHTML = candadoTercero + '<b>' + U.escapar((window.AsuntoDeGrupo && AsuntoDeGrupo.terceroEnLista(a)) || QueMeToca.terceroDe(a) || a.nombre) + '</b>';   /* fila 293: «Grupo X · N» */
   }
   tdTercero.appendChild(spanTercero);
+  var diasDormido = window.QueMeToca ? QueMeToca.diasDormidoDe(a) : null;   /* fila 451 */
+  if (diasDormido !== null) {
+    var marcaDormido = document.createElement('span');
+    marcaDormido.className = 'marca-dormido';
+    marcaDormido.title = 'Sin novedades desde hace ' + diasDormido + ' días';
+    marcaDormido.textContent = 'Dormido · ' + diasDormido + (diasDormido === 1 ? ' día' : ' días');
+    tdTercero.appendChild(marcaDormido);
+  }
   var marcaNota = window.NotasDirectivos && NotasDirectivos.marca(a);   /* fila 290 */
   if (marcaNota) tdTercero.appendChild(marcaNota);
   celdas.tercero = tdTercero;
@@ -460,10 +468,16 @@ App.filaTablaAsunto = function (a, opciones) {
   var lado = App.ladoDe(a);
   var tdHito = document.createElement('td');
   tdHito.className = 'inicio-tabla-hito';
-  tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
-  if (window.HacerEsteHitoSello) tdHito.insertAdjacentHTML('beforeend', HacerEsteHitoSello.coletillaHTML(a));   /* fila 285 */
-  celdas.hito = tdHito;
-  if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
+  if (opciones.sinHito) {   /* fila 451: nada por hacer, y aquí va lo que se puede hacer */
+    tdHito.innerHTML = '<span class="suave inicio-sin-hito">' +
+      (opciones.cargarPasos ? 'Abre el asunto para cargar sus pasos' : 'Añade un hito o archívalo') + '</span>';
+    celdas.hito = tdHito;
+  } else {
+    tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
+    if (window.HacerEsteHitoSello) tdHito.insertAdjacentHTML('beforeend', HacerEsteHitoSello.coletillaHTML(a));   /* fila 285 */
+    celdas.hito = tdHito;
+    if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
+  }
 
   /* ---------- Le toca a ---------- */
   var tdQuien = document.createElement('td');
@@ -495,7 +509,16 @@ App.filaTablaAsunto = function (a, opciones) {
   archivar.onclick = async function () {
     await U.mientrasGuarda(archivar, function () { return pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : ArchivarFondo.archivar(a); });
   };
-  tdMenu.appendChild(U.menuDeAcciones([copiar, archivar]));
+  var acciones = [copiar];
+  if (diasDormido !== null && !(window.Perfil && Perfil.esDirectivo())) {   /* fila 451: lo que hacía «Ocultar por 30 días» de Dormidos */
+    var dejarDeAvisar = document.createElement('button');
+    dejarDeAvisar.type = 'button';
+    dejarDeAvisar.textContent = 'Dejar de avisar 30 días';
+    dejarDeAvisar.onclick = function () { QueMeToca.ocultarDormido(a); };
+    acciones.push(dejarDeAvisar);
+  }
+  acciones.push(archivar);
+  tdMenu.appendChild(U.menuDeAcciones(acciones));
   tr.appendChild(tdMenu);
 
   /* Pulsar la fila entera (para que "Le toca a" e "Inicio" también

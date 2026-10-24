@@ -390,7 +390,7 @@ var ExportarAsuntos = (function () {
     return op ? op.textContent : s.value;
   }
 
-  var PESTANAS = { adm: 'En Administración', esp: 'En espera', todos: 'Todos los abiertos', dorm: 'Dormidos' };
+  var PESTANAS = { adm: 'En Administración', esp: 'En espera', todos: 'Todos los abiertos' };
 
   /* Los filtros puestos ahora mismo, en valores y en palabras. */
   function filtrosActuales() {
