@@ -119,7 +119,7 @@ await comprobar('el texto de antes ya no existe en el código de la pantalla', p
 
 console.log('--- sin saber dónde está Dropbox ---');
 await comprobar('sin nada apuntado, vale la suposición de 45 y el caso corriente sigue sin aviso', pagina.evaluate(async () => {
-  localStorage.removeItem('gestor-ruta-dropbox');
+  localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-nube');
   const m = await Nombres.medidor();
   const r = Nombres.montarAsunto({ fecha: '2026-09-07', tipo: 'INFORMACION PERSONAL', tercero: 'X'.repeat(31), numero: 'A26-0001', categoria: 'ALUMNADO' });
   return [m.partes.filter(p => p.clave === 'dropbox')[0].largo, r.noCabe];

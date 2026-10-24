@@ -238,7 +238,7 @@ await lanzar();
 await pagina.click('#cuadro-aceptar');
 await comprobar('11. termina', resultado(), 'fin');
 await comprobar('11. el aviso rojo dice el paso, el fichero y la causa, y que no se ha movido nada', avisos('malo'),
-  ['No se ha podido archivar: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque Dropbox está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en Asuntos abiertos.']);
+  ['No se ha podido archivar: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque la nube está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en Asuntos abiertos.']);
 await comprobar('11. la carpeta sigue entera en Asuntos abiertos', enAbiertos(), 1);
 await comprobar('11. y no ha quedado copia a medias en el archivo', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
@@ -292,7 +292,7 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await comprobar('reabrir: termina', pagina.evaluate(() => window.__rb), 'fin');
 await comprobar('reabrir: dice el paso, el fichero y que la carpeta sigue en el archivo', avisos('malo'),
-  ['No se ha podido reabrir: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque Dropbox está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en el archivo.']);
+  ['No se ha podido reabrir: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque la nube está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en el archivo.']);
 await pagina.evaluate(() => { window.__disco.abiertos.getDirectoryHandle = window.__abOriginal; });
 
 console.log('--- 13) archivar varios de golpe ---');

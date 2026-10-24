@@ -330,7 +330,7 @@ window.CampoDesdeElAsunto = (function () {
     }
     try {
       await vigilar(escribirEnAsunto(a, Campos.claveDeCampo(cfg), { valor: r.valor }), 'Sigo guardando el campo «' + nombre +
-        '». Si tarda mucho, mira que Dropbox no esté sincronizando.', 6000);
+        '». Si tarda mucho, mira que la nube no esté sincronizando.', 6000);
     } catch (e) { U.fallo('No he podido rellenar el campo', e); return; }
     U.aviso('Campo «' + nombre + '» rellenado.', 'bueno');
     repintar(a);
@@ -358,7 +358,7 @@ window.CampoDesdeElAsunto = (function () {
       var entrada = entradaLimpia(cfg, hito && hito.marca);
       var guardando = r.donde === 'tipo' ? guardarEnElTipo(a, tipo, entrada, r.valor) : guardarSoloAqui(a, entrada, r.valor, hito);
       await vigilar(guardando, 'Sigo guardando el campo «' + Campos.nombreDeCampo(cfg, App.E.campos) +
-        '». Si tarda mucho, mira que Dropbox no esté sincronizando.', 6000);
+        '». Si tarda mucho, mira que la nube no esté sincronizando.', 6000);
     } catch (e) {
       U.fallo('No he podido añadir el campo', e);
     }

@@ -498,7 +498,18 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   (deducido y sin campo en la copia sin internet). El mismo botón, en línea (sin
   `U.preguntar`, `RutaCarpetas.montarEnCuadro`), va también en la cabecera de los cuadros de Correo
   y de Séneca (`docs/contexto/CORREO-Y-SENECA.md`). Abrir la carpeta sigue descartado. Prueba:
-  `pruebas/copiar-ruta.mjs`. Sustituye al icono `.boton-nie` que antes
+  `pruebas/copiar-ruta.mjs`. **Desde la fila 456** (`docs/PASAR-A-DRIVE.md`) la raíz puede ser de Dropbox
+  o de Google Drive: `partir` reconoce también el trozo `Mi unidad` / `My Drive` (el campo `dropbox` que
+  devuelve es la raíz de la nube, sea cual sea), `RutaCarpetas.nubeEnUso()` / `nombreNube()` dicen cuál
+  (manda la ruta real de este ordenador; si no, `nube` de `rutas.json`; si no, Dropbox), `rutas.json`
+  guarda `{ nube: "dropbox" | "drive", abiertos, archivo }` y `localStorage` usa `gestor-ruta-nube`
+  (se sigue leyendo la vieja `gestor-ruta-dropbox`). `Nombres.topes` toma el largo de esa raíz (40
+  caracteres si no se conoce y es Drive; 45 si es Dropbox). Los textos de las carpetas de la app dicen
+  «la nube»; la comprobación al entrar, «Carpetas de la app» y «Ruta de la nube en este ordenador». Los
+  atajos de Google (`.gdoc`, `.gsheet`, `.gslides`, `.gform`, `.gdraw`, `.gmap`, `.gsite`, `.gjam`;
+  `Carpetas.esFicheroDeGoogle`, `js/ficheros-de-google.js`) no salen en las listas de documentos del
+  asunto, de «Por clasificar» ni del ARCHIVO (sí se copian al trasladar una carpeta). Prueba:
+  `pruebas/nube-drive.mjs`. Sustituye al icono `.boton-nie` que antes
   vivía pegado al `<h2>` (quitado de `js/copiar.js`) y a "Copiar el nombre del asunto" del menú
   de tres puntos. Reutiliza `Copiar.boton` (el mismo copiado con aviso "Copiado" de siempre,
   ahora expuesto en `window.Copiar` junto con `nieDeAsunto`, `categoriaDe` y `copiar`); "Asunto"

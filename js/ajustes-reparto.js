@@ -61,8 +61,8 @@ var AjustesReparto = (function () {
     { id: 'bloque-impresos', donde: 'centro', otras: 'casillas, PDF, anexo, catálogo, formularios' },
     { id: 'bloque-alumnado-personal', donde: 'centro', otras: 'RegAlum, RelPerCen, Séneca, CSV, fichero viejo, épocas, grupos, unidades, alumnado, personal' },
     /* Este ordenador */
-    { id: 'bloque-carpetas', donde: 'ordenador', otras: 'Dropbox, abiertos, ARCHIVO, señalar carpetas, solo consultar' },
-    { id: 'bloque-rutas', donde: 'ordenador', otras: 'ruta, copiar ruta, dónde está Dropbox' },
+    { id: 'bloque-carpetas', donde: 'ordenador', otras: 'Dropbox, Drive, nube, abiertos, ARCHIVO, señalar carpetas, solo consultar' },
+    { id: 'bloque-rutas', donde: 'ordenador', otras: 'ruta, copiar ruta, dónde está Dropbox, dónde está la nube, Google Drive' },
     { id: 'bloque-largo-rutas', donde: 'ordenador', otras: 'largo, caracteres, nombre largo' },
     { id: 'bloque-alumnado-bd', donde: 'ordenador', otras: 'base de datos, Drive, matrícula' },
     { id: 'bloque-centro-de-datos', donde: 'ordenador', otras: 'centro de datos, listados, Séneca, Drive' },

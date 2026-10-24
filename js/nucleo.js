@@ -306,7 +306,7 @@ App.avisoFicherosRotos = function (rotos) {
   caja.classList.remove('oculto');
   caja.innerHTML = '<strong>' +
     (rotos.length === 1 ? 'Un fichero no se puede leer.' : rotos.length + ' ficheros no se pueden leer.') +
-    '</strong><p>Puede ser un corte a media escritura, o un conflicto de Dropbox mal resuelto ' +
+    '</strong><p>Puede ser un corte a media escritura, o un conflicto de la nube mal resuelto ' +
     'a mano. No se entra para no escribir encima de nada. Restaura la última copia de cada uno:</p>';
 
   var lista = document.createElement('ul');
@@ -467,7 +467,7 @@ App.leerRegistroDelDisco = async function () {
     }
     if (i >= App.LECTURA_VACIA_ESPERAS_MS.length) {
       var e = new Error('asuntos.json ha llegado vacío y hace un momento tenía ' + enMemoria +
-        ' asuntos. No he guardado nada para no borrarlos. Espera un poco (Dropbox puede estar ' +
+        ' asuntos. No he guardado nada para no borrarlos. Espera un poco (la nube puede estar ' +
         'sincronizando) y vuelve a intentarlo.');
       e.name = 'LecturaVacia';
       throw e;

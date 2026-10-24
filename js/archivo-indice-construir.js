@@ -24,7 +24,7 @@
     var salida = [];
     var contenido = await Carpetas.contenido(handle);
     contenido.ficheros.forEach(function (f) {
-      if (Carpetas.esCarpetaTemporalDeSincronizacion(f.nombre)) return;
+      if (Carpetas.esCarpetaTemporalDeSincronizacion(f.nombre) || Carpetas.esFicheroDeGoogle(f.nombre)) return;   /* fila 456 */
       if (window.IndiceExpediente && IndiceExpediente.es(f.nombre)) return;   /* fila 137 */
       salida.push(f.nombre);
     });
@@ -32,7 +32,7 @@
       var sub = contenido.carpetas[i];
       if (Carpetas.esCarpetaTemporalDeSincronizacion(sub.nombre)) continue;
       var subFicheros = await Carpetas.ficheros(sub.handle);
-      subFicheros.forEach(function (f) { salida.push(f.nombre); });
+      subFicheros.forEach(function (f) { if (!Carpetas.esFicheroDeGoogle(f.nombre)) salida.push(f.nombre); });
     }
     return salida;
   }

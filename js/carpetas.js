@@ -153,7 +153,7 @@ var Carpetas = (function () {
       return await h.getFile();
     } catch (e2) {
       throw new Error('No he podido copiar "' + nombre + '": ha desaparecido a mitad de la copia ' +
-        '(seguramente Dropbox estaba sincronizando). No se ha borrado nada.');
+        '(seguramente la nube estaba sincronizando). No se ha borrado nada.');
     }
   }
 

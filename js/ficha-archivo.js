@@ -123,7 +123,7 @@ var FichaArchivo = (function () {
              (el borrado de arriba no ha llegado a ejecutarse), y el botón de abajo la
              recoge sola cuando se pulse. */
           U.aviso('El asunto se ha archivado. Su ficha no se ha podido guardar todavía dentro ' +
-            'de la carpeta porque Dropbox la estaba sincronizando. No se ha perdido nada: se ' +
+            'de la carpeta porque la nube la estaba sincronizando. No se ha perdido nada: se ' +
             'hará sola la próxima vez que pulses «Poner en orden las fichas del ARCHIVO» en ' +
             'Ajustes → Mantenimiento.', 'ambar');
         } else {

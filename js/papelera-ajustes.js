@@ -260,7 +260,7 @@
     borrar.onclick = async function () {
       var ok = await U.preguntar('Borrar del todo',
         '<p><strong>' + U.escapar(ficha.nombre) + '</strong></p>' +
-        '<p class="nota">Esto sí lo quita de verdad. Dropbox aún lo guarda 30 días más en su ' +
+        '<p class="nota">Esto sí lo quita de verdad. La nube aún lo guarda 30 días más en su ' +
         'propia papelera.</p>', 'Borrar del todo');
       if (!ok) return;
       try {

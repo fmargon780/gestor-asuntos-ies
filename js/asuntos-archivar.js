@@ -64,7 +64,7 @@ function mensajeDeFallo(verbo, e, sigueEn, dondeCopia) {
   if (!e || !e.paso) return texto + U.mensajeDeError(e);
   texto += 'ha fallado ' + e.paso + (e.fichero ? ' «' + e.fichero + '»' : '') + '. ';
   texto += (e.name === 'NotFoundError' && e.destino)
-    ? 'Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque Dropbox está sincronizando esa carpeta.'
+    ? 'Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque la nube está sincronizando esa carpeta.'
     : conPunto(U.mensajeDeError(e));
   texto += (e.limpiezaFallida || e.copiaAMedias)
     ? ' Puede haber quedado una copia a medias en ' + dondeCopia + '; al repetir, se juntan.'

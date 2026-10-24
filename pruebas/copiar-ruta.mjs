@@ -146,10 +146,10 @@ await pagina.fill('#ruta-pedida-ficha', 'C:\\Users\\francisco\\Dropbox\\IES\\ASU
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 await comprobar('10. al guardar, lo de delante de Dropbox queda en este ordenador',
-  pagina.evaluate(() => localStorage.getItem('gestor-ruta-dropbox')), 'C:\\Users\\francisco\\Dropbox');
+  pagina.evaluate(() => localStorage.getItem('gestor-ruta-nube')), 'C:\\Users\\francisco\\Dropbox');
 await pagina.waitForTimeout(300);
 await comprobar('10. y lo de detrás, en _GESTOR/rutas.json para todo el centro',
-  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS' });
+  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', nube: 'dropbox' });
 const RUTA_ABIERTO = 'C:\\Users\\francisco\\Dropbox\\IES\\ASUNTOS ABIERTOS\\' + ABIERTO;
 await comprobar('y se copia ya la ruta completa, con \\ (nunca file:///)',
   pagina.evaluate(() => navigator.clipboard.readText()), RUTA_ABIERTO);
@@ -184,6 +184,7 @@ console.log('--- 3. archivado ---');
    completa antigua: no pregunta, y `rutas.json` se rellena solo. */
 await pagina.evaluate(() => {
   localStorage.removeItem('gestor-ruta-dropbox');
+  localStorage.removeItem('gestor-ruta-nube');
   localStorage.setItem('gestor-ruta-archivo', '/home/francisco/Dropbox/ARCHIVO/');
 });
 await pagina.evaluate(async ([ARCHIVADO, TERCERO]) => {
@@ -203,7 +204,7 @@ await comprobar('copia /home/... con ARCHIVO / categoría / tercero / nombre, co
 await comprobarQue('11. sin abrir ningún cuadro',
   pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')));
 await comprobar('11. y rutas.json queda relleno con lo de detrás de Dropbox',
-  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', archivo: 'ARCHIVO' });
+  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', nube: 'dropbox', archivo: 'ARCHIVO' });
 await comprobar('14. el aviso verde enseña también esta ruta',
   avisoConRuta(), 'Ruta copiada: ' + RUTA_ARCHIVADO);
 
@@ -250,7 +251,7 @@ await comprobar('parte común guardada con / sobre una base de Windows: todo con
 
 /* ---------- 7 y 8. el botón «Ruta» en los cuadros de Comunicar ---------- */
 console.log('--- 7 y 8. el botón «Ruta» en los cuadros ---');
-await pagina.evaluate(() => { localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-archivo'); });
+await pagina.evaluate(() => { localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-nube'); localStorage.removeItem('gestor-ruta-archivo'); });
 await abrirAbierto();
 
 /* Abrir el cuadro de Correo desde la cabecera de la ficha ("Comunicar"). */
@@ -280,12 +281,12 @@ await pagina.click('#ruta-en-linea-guardar');
 await pagina.waitForTimeout(200);
 await comprobarQue('una ruta que no acaba en la carpeta pedida no se guarda (sigue abierto)',
   pagina.evaluate(() => !document.getElementById('correo-ruta-en-linea').classList.contains('oculto') &&
-    !localStorage.getItem('gestor-ruta-dropbox')));
+    !localStorage.getItem('gestor-ruta-nube')));
 await pagina.fill('#correo-ruta-en-linea input', '/home/francisco/Dropbox/IES/ASUNTOS ABIERTOS/');
 await pagina.click('#ruta-en-linea-guardar');
 await pagina.waitForFunction(() => document.getElementById('correo-ruta-en-linea').classList.contains('oculto'));
 await comprobar('guarda la parte de este ordenador',
-  pagina.evaluate(() => localStorage.getItem('gestor-ruta-dropbox')), '/home/francisco/Dropbox');
+  pagina.evaluate(() => localStorage.getItem('gestor-ruta-nube')), '/home/francisco/Dropbox');
 await comprobarQue('y no se pierde el "Otro correo" escrito a mano',
   pagina.evaluate(() => document.getElementById('correo-otro').value === 'alguien@example.com'));
 await comprobarQue('ni lo escrito a mano en el cuerpo',
@@ -294,7 +295,7 @@ await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 
 /* Séneca: el botón también sale, y sin ruta el campo también en línea. */
-await pagina.evaluate(() => localStorage.removeItem('gestor-ruta-dropbox'));
+await pagina.evaluate(() => { localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-nube'); });
 /* Fila 154: con hitos, «Comunicar» de arriba va escondido; su menú se pulsa por debajo. */
 await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate(() => {

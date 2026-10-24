@@ -172,7 +172,7 @@
     guardarFallos(fallos);
     if (avisarDe.length) {
       U.aviso('La papelera lleva ' + DIAS_FALLANDO_PARA_AVISAR + ' días sin poder borrar del todo: ' +
-        avisarDe.join(', ') + '. Puede que Dropbox lo tenga cogido.', 'ambar');
+        avisarDe.join(', ') + '. Puede que la nube lo tenga cogido.', 'ambar');
     }
     return resultado;
   }

@@ -44,7 +44,7 @@ var ProblemasTextos = (function () {
     var dias = diasDeCopias();
     return {
       titulo: n === 1 ? '1 asunto ha perdido su carpeta' : n + ' asuntos han perdido su carpeta',
-      que: 'La app tiene apuntado el asunto, pero no encuentra su carpeta en Dropbox.',
+      que: 'La app tiene apuntado el asunto, pero no encuentra su carpeta en la nube.',
       porque: 'Alguien cambió el nombre de la carpeta o la movió a mano, o el asunto se archivó y la app no se enteró.',
       antes: 'Asunto por asunto:',
       elementos: elementos.map(function (e) {
@@ -90,7 +90,7 @@ var ProblemasTextos = (function () {
     var n = elementos.length;
     return {
       titulo: n === 1 ? '1 cosa se guardó a la vez en dos ordenadores' : n + ' cosas se guardaron a la vez en dos ordenadores',
-      que: 'Dropbox ha guardado dos versiones y la app no ha podido unirlas sola.',
+      que: 'La nube ha guardado dos versiones y la app no ha podido unirlas sola.',
       porque: 'Dos personas cambiaron lo mismo casi en el mismo momento.',
       antes: 'Una por una:',
       elementos: elementos.map(function (e) {
@@ -209,8 +209,8 @@ var ProblemasTextos = (function () {
   function rutas(m) {
     var clave = (m.masOcupa && m.masOcupa.clave) || '';
     var arreglo = {
-      dropbox: 'Pon la carpeta de Dropbox más cerca de la raíz del disco, para que su ruta sea más corta.',
-      archivo: 'La carpeta ARCHIVO no se mueve. Acorta la ruta de Dropbox de este ordenador.',
+      dropbox: 'Pon la carpeta de la nube más cerca de la raíz del disco, para que su ruta sea más corta.',
+      archivo: 'La carpeta ARCHIVO no se mueve. Acorta la ruta de la nube de este ordenador.',
       categoria: 'Ponle un nombre más breve a la categoría más larga.',
       tercero: 'Acorta el nombre del tercero más largo, en su ficha.',
       tipo: 'Ponle un nombre corto más breve al tipo de asunto más largo, en los Ajustes de ese tipo.',

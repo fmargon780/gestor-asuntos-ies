@@ -203,7 +203,7 @@ var Reservados = (function () {
     fila.innerHTML =
       '<label class="tipo-reservado-casilla"><input type="checkbox" class="tipo-reservado"> ' +
       'Reservado (expedientes disciplinarios, salud, protección…)</label>' +
-      '<p class="nota">Solo evita que se vea sin querer en la aplicación. La carpeta sigue visible en Dropbox.</p>';
+      '<p class="nota">Solo evita que se vea sin querer en la aplicación. La carpeta sigue visible en la nube.</p>';
     var casilla = fila.querySelector('.tipo-reservado');
     casilla.checked = tipo.reservado === true;
     casilla.onchange = async function () {

@@ -56,11 +56,22 @@
    `RutaCarpetas.montarEnCuadro(lugar, contenedorEnLinea, a, modo)`.
    Lleva la clase `boton-copiar-fila`: en modo consulta sigue encendido
    (copiar no cambia nada).
+
+   Fila 456 (24-oct-2026, docs/PASAR-A-DRIVE.md): la raíz puede ser de
+   Dropbox o de Google Drive («raíz de nube»). El navegador sigue sin dar
+   la ruta de una carpeta señalada: sale, como siempre, de la dirección
+   `file://` de la copia sin internet o de `localStorage`, que ahora se
+   llama `gestor-ruta-nube` (se sigue leyendo la vieja `gestor-ruta-dropbox`
+   si no está la nueva). Se reconoce Drive porque la ruta lleva el trozo
+   «Mi unidad» o «My Drive» (la raíz acaba en ese trozo), o porque
+   `_GESTOR/rutas.json` dice `nube: "drive"`. `rutas.json` guarda ahora
+   `{ nube: "dropbox" | "drive", abiertos, archivo }`.
    ============================================================ */
 window.RutaCarpetas = (function () {
 
   var CLAVES = { abiertos: 'gestor-ruta-abiertos', archivo: 'gestor-ruta-archivo' };
-  var CLAVE_DROPBOX = 'gestor-ruta-dropbox';
+  var CLAVE_NUBE = 'gestor-ruta-nube';
+  var CLAVE_DROPBOX = 'gestor-ruta-dropbox';   /* la de antes de la fila 456: solo se lee */
   var FICHERO = 'rutas.json';
 
   function leerLocal(clave) {
@@ -90,6 +101,21 @@ window.RutaCarpetas = (function () {
   /* ---------- las dos mitades de una ruta (fila 161) ---------- */
 
   function esTrozoDropbox(t) { return t === 'Dropbox' || /^Dropbox \(/.test(t); }
+  /* Fila 456: la raíz de Google Drive para ordenadores acaba en «Mi unidad»
+     (o «My Drive» si Windows está en inglés). */
+  function esTrozoDrive(t) { return /^(Mi unidad|My Drive)$/i.test(t); }
+  function esTrozoNube(t) { return esTrozoDropbox(t) || esTrozoDrive(t); }
+
+  /* 'dropbox', 'drive' o '' según el trozo de nube que lleve la ruta. */
+  function nubeDeRuta(ruta) {
+    ruta = sinFileUrl(String(ruta || '').trim());
+    var trozos = ruta.split(/[\\\/]+/);
+    for (var i = 0; i < trozos.length; i++) {
+      if (esTrozoDropbox(trozos[i])) return 'dropbox';
+      if (esTrozoDrive(trozos[i])) return 'drive';
+    }
+    return '';
+  }
 
   /* Una ruta en `file:` pasa a ruta normal (fila 227: con el separador
      que toque, nunca mezclado), para poder partirla o copiarla. */
@@ -103,9 +129,11 @@ window.RutaCarpetas = (function () {
     return r;
   }
 
-  /* { dropbox, comun } o null si la ruta no lleva ningún trozo
-     `Dropbox`. `dropbox` es lo de delante, con el trozo incluido y con
-     el separador de siempre; `comun`, lo de detrás, con `/`. */
+  /* { dropbox, comun } o null si la ruta no lleva ningún trozo de nube
+     (`Dropbox` o, desde la fila 456, `Mi unidad` / `My Drive`). `dropbox`
+     (el nombre se queda por las pruebas y por quien ya lo usa) es la raíz
+     de la nube: lo de delante, con el trozo incluido y con el separador
+     de siempre; `comun`, lo de detrás, con `/`. */
   function partir(ruta) {
     ruta = sinFileUrl(String(ruta || '').trim());
     if (!ruta) return null;
@@ -114,7 +142,7 @@ window.RutaCarpetas = (function () {
       m = re.exec(ruta);
       var fin = m ? m.index : ruta.length;
       var t = ruta.slice(inicio, fin);
-      if (esTrozoDropbox(t)) {
+      if (esTrozoNube(t)) {
         var resto = ruta.slice(fin).split(/[\\\/]+/).filter(Boolean).join('/');
         return { dropbox: ruta.slice(0, fin), comun: resto };
       }
@@ -141,7 +169,7 @@ window.RutaCarpetas = (function () {
     return ultimoTrozo(comun).toLowerCase() === String(h.name).toLowerCase();
   }
 
-  /* ---------- dónde está Dropbox en ESTE ordenador ---------- */
+  /* ---------- dónde está la nube en ESTE ordenador ---------- */
 
   function direccion() { return window.location; }
 
@@ -158,7 +186,7 @@ window.RutaCarpetas = (function () {
   function dropboxDeEsteOrdenador() {
     var deLaCopia = dropboxDeLaCopia();
     if (deLaCopia) return { valor: deLaCopia, deducido: true };
-    var apuntado = leerLocal(CLAVE_DROPBOX);
+    var apuntado = leerLocal(CLAVE_NUBE) || leerLocal(CLAVE_DROPBOX);
     if (apuntado) return { valor: apuntado, deducido: false };
     var antiguas = [leer('abiertos'), leer('archivo')];
     for (var i = 0; i < antiguas.length; i++) {
@@ -171,6 +199,16 @@ window.RutaCarpetas = (function () {
   /* ---------- la parte de dentro de Dropbox, para todo el centro ---------- */
 
   var comun = {};   /* lo último leído de _GESTOR/rutas.json */
+
+  /* Fila 456: la nube en uso, 'dropbox' o 'drive'. Manda la ruta real de este
+     ordenador si lleva un trozo de nube; si no, lo que diga `rutas.json`; si
+     tampoco, Dropbox (como siempre). */
+  function nubeEnUso() {
+    var deLaRuta = nubeDeRuta(dropboxDeEsteOrdenador().valor);
+    if (deLaRuta) return deLaRuta;
+    return comun.nube === 'drive' ? 'drive' : 'dropbox';
+  }
+  function nombreNube() { return nubeEnUso() === 'drive' ? 'Google Drive' : 'Dropbox'; }
 
   function limpiarComun(v) {
     return String(v || '').split(/[\\\/]+/).map(function (t) { return t.trim(); }).filter(Boolean).join('/');
@@ -212,7 +250,10 @@ window.RutaCarpetas = (function () {
     ['abiertos', 'archivo'].forEach(function (cual) {
       if (comun[cual]) return;
       var p = partir(leer(cual));
-      if (p && p.comun && cuadraCon(cual, p.comun)) falta[cual] = p.comun;
+      if (p && p.comun && cuadraCon(cual, p.comun)) {
+        falta[cual] = p.comun;
+        if (!comun.nube && !falta.nube) falta.nube = nubeDeRuta(p.dropbox) || 'dropbox';   /* fila 456 */
+      }
     });
     if (Object.keys(falta).length) {
       try { await guardarComun(falta, true); }
@@ -276,8 +317,8 @@ window.RutaCarpetas = (function () {
   function cuerpoPedirRutaHTML(idCampo, cual) {
     var nombre = nombreCarpeta(cual);
     var c = comun[cual];
-    var ejemplo = c ? 'C:\\Users\\tu usuario\\Dropbox\\' + c.split('/').join('\\')
-                    : 'C:\\Users\\tu usuario\\Dropbox\\...\\' + nombre;
+    var delante = nubeEnUso() === 'drive' ? 'G:\\Mi unidad\\' : 'C:\\Users\\tu usuario\\Dropbox\\';
+    var ejemplo = c ? delante + c.split('/').join('\\') : delante + '...\\' + nombre;
     return '<label class="etiqueta" style="margin-top:0">Pega la ruta de la carpeta <b>' + U.escapar(nombre) +
         '</b> de este ordenador</label>' +
       '<input id="' + idCampo + '" class="campo" placeholder="' + U.escapar(ejemplo) + '">' +
@@ -302,8 +343,9 @@ window.RutaCarpetas = (function () {
         U.aviso('Esa ruta no acaba en la carpeta ' + nombreCarpeta(cual) + '. Pega la de esa carpeta.', 'malo');
         return false;
       }
-      if (!dropboxDeLaCopia()) guardarLocal(CLAVE_DROPBOX, p.dropbox);
+      if (!dropboxDeLaCopia()) guardarLocal(CLAVE_NUBE, p.dropbox);
       if (!comun[cual]) { comun[cual] = limpiarComun(p.comun); paraElCentro = {}; paraElCentro[cual] = p.comun; }
+      if (paraElCentro && !comun.nube) { comun.nube = nubeDeRuta(p.dropbox) || 'dropbox'; paraElCentro.nube = comun.nube; }
     } else {
       guardar(cual, valor);
     }
@@ -444,12 +486,12 @@ window.RutaCarpetas = (function () {
       '<summary><span class="bloque-titulo">Rutas de las carpetas</span>' +
       '<span class="bloque-pie">Para el botón «Ruta» de la ficha del asunto</span></summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="nota">Dentro de Dropbox (para todo el centro): es igual en los dos ordenadores.</p>' +
-        '<label class="etiqueta">Carpeta de asuntos abiertos, dentro de Dropbox (para todo el centro)</label>' +
+        '<p class="nota">Dentro de la nube (Dropbox o Google Drive), para todo el centro: es igual en los dos ordenadores.</p>' +
+        '<label class="etiqueta">Carpeta de asuntos abiertos, dentro de la nube (para todo el centro)</label>' +
         '<input id="ruta-comun-abiertos" class="campo" placeholder="ADMINISTRACIÓN/.../ASUNTOS ABIERTOS">' +
-        '<label class="etiqueta">Carpeta ARCHIVO, dentro de Dropbox (para todo el centro)</label>' +
+        '<label class="etiqueta">Carpeta ARCHIVO, dentro de la nube (para todo el centro)</label>' +
         '<input id="ruta-comun-archivo" class="campo" placeholder="ADMINISTRACIÓN/.../ARCHIVO">' +
-        '<label class="etiqueta">Dropbox en este ordenador</label>' +
+        '<label class="etiqueta">Ruta de la nube en este ordenador</label>' +
         '<div id="ruta-dropbox-lugar"></div>' +
       '</div>';
     tab.appendChild(det);
@@ -478,11 +520,11 @@ window.RutaCarpetas = (function () {
         ' <span class="nota">(sale sola de la dirección de esta copia)</span></p>';
       return;
     }
-    lugar.innerHTML = '<input id="ruta-dropbox" class="campo" placeholder="C:\\Users\\tu usuario\\Dropbox">';
+    lugar.innerHTML = '<input id="ruta-dropbox" class="campo" placeholder="C:\\Users\\tu usuario\\Dropbox  o  G:\\Mi unidad">';
     var campo = document.getElementById('ruta-dropbox');
     campo.value = db.valor;
     campo.onchange = function () {
-      guardarLocal(CLAVE_DROPBOX, campo.value);
+      guardarLocal(CLAVE_NUBE, campo.value);
       U.aviso('Guardado en este ordenador.', 'bueno');
     };
   }
@@ -501,6 +543,8 @@ window.RutaCarpetas = (function () {
     botonDocumento: botonDocumento, modoDe: modoDe, huecoHTML: huecoHTML, enganchar: enganchar,
     montarEnCuadro: montarEnCuadro, ponerBloque: ponerBloque, sinFileUrl: sinFileUrl,
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
-    pintarBloque: pintarBloque, comunConocido: comunConocido
+    pintarBloque: pintarBloque, comunConocido: comunConocido,
+    nubeEnUso: nubeEnUso, nombreNube: nombreNube, nubeDeRuta: nubeDeRuta,
+    raizDeLaNube: dropboxDeEsteOrdenador
   };
 })();

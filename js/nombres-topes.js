@@ -41,6 +41,9 @@
      usuario de Windows razonablemente largo. Si la ruta apuntada en
      este ordenador (`gestor-ruta-dropbox`) es más larga, manda ella. */
   var RAIZ_DROPBOX_POR_DEFECTO = 45;
+  /* Fila 456: con Google Drive la raíz es corta (`G:\Mi unidad\`); si no se
+     conoce la ruta real, 40 caracteres. */
+  var RAIZ_DRIVE_POR_DEFECTO = 40;
   var SUBCARPETA_VERSIONES = 'Versiones previas';
   var TOPE_TOTAL_RUTA = 259;   /* lo que Windows admite de ruta completa (fila 263) */
   var MINIMO_ASUNTO = 40;
@@ -57,10 +60,15 @@
         RutaCarpetas.dropboxDeEsteOrdenador().valor) || '';
     } catch (e) { sabida = ''; }
     if (!sabida) {
-      try { sabida = (window.localStorage && window.localStorage.getItem('gestor-ruta-dropbox')) || ''; }
-      catch (e2) { sabida = ''; }
+      try {
+        sabida = (window.localStorage && (window.localStorage.getItem('gestor-ruta-nube') ||
+          window.localStorage.getItem('gestor-ruta-dropbox'))) || '';
+      } catch (e2) { sabida = ''; }
     }
-    return sabida ? String(sabida).length + 1 : RAIZ_DROPBOX_POR_DEFECTO;
+    if (sabida) return String(sabida).length + 1;
+    var nube = '';
+    try { nube = (window.RutaCarpetas && RutaCarpetas.nubeEnUso && RutaCarpetas.nubeEnUso()) || ''; } catch (e3) { nube = ''; }
+    return nube === 'drive' ? RAIZ_DRIVE_POR_DEFECTO : RAIZ_DROPBOX_POR_DEFECTO;
   }
 
   function categoriaMasLarga() {
@@ -199,7 +207,7 @@
     var asuntoPeor = [ 'x'.repeat(LARGO_FECHA), 'A00-0000', tipoAsunto.toUpperCase(), tercero ].filter(Boolean).join(' ');
     var r = cabeEnRuta(asuntoPeor, tercero, categoria, largoTipoDoc);
     var partes = [
-      { clave: 'dropbox', texto: 'dónde está Dropbox en este ordenador', largo: raizDeEsteOrdenador() },
+      { clave: 'dropbox', texto: 'dónde está la nube en este ordenador', largo: raizDeEsteOrdenador() },
       { clave: 'archivo', texto: 'la ruta de la carpeta ARCHIVO', largo: comun.length + 1 },
       { clave: 'categoria', texto: 'la categoría más larga', largo: categoria.length + 1 },
       { clave: 'tercero', texto: 'el tercero más largo (' + tercero + ')', largo: tercero.length + 1 },
@@ -223,7 +231,7 @@
      ============================================================ */
   var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
   /* Documentos: ni recortando el texto libre cabe en la ruta (fila 177). En rojo. */
-  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: el tercero o el tipo son demasiado largos. ' +
+  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de la nube: el tercero o el tipo son demasiado largos. ' +
     'Mira Ajustes → El centro → Largo de las rutas, o ponle al tipo un nombre corto más breve.';
   /* Asuntos (fila 263): la ruta larga avisa, pero nunca impide crear ni guardar. En ámbar. */
   var AVISO_RUTA_LARGA_NUEVO = 'La ruta de esta carpeta sale muy larga. El asunto se crea igual; ' +

@@ -192,7 +192,7 @@ await comprobar('3. avisa en verde de que el asunto se ha archivado (eso sí ha 
 await pagina.waitForSelector('.mensaje.ambar', { timeout: 8000 });
 await comprobar('3. avisa en ámbar, en castellano, de que la ficha no se ha guardado todavía',
   pagina.locator('.mensaje.ambar').filter({
-    hasText: 'Su ficha no se ha podido guardar todavía dentro de la carpeta porque Dropbox la estaba sincronizando'
+    hasText: 'Su ficha no se ha podido guardar todavía dentro de la carpeta porque la nube la estaba sincronizando'
   }).count(), 1);
 await comprobar('3. el aviso dice que no se ha perdido nada',
   pagina.locator('.mensaje.ambar').filter({ hasText: 'No se ha perdido nada' }).count(), 1);

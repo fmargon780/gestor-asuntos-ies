@@ -157,7 +157,7 @@ await comprobar('y la de «Versiones previas» (carpeta antigua) lleva su nombre
 /* ---------- sin la ruta del centro: la pide y copia la del documento ---------- */
 console.log('--- sin ruta: la pide ---');
 await pagina.evaluate(async () => {
-  localStorage.removeItem('gestor-ruta-dropbox');
+  localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-nube');
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
   await g.removeEntry('rutas.json');
 });

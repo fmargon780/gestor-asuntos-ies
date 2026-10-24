@@ -124,7 +124,7 @@
   /* ---------- las comprobaciones ---------- */
 
   async function carpetas() {
-    var T = 'Carpetas de Dropbox';
+    var T = 'Carpetas de la app';
     var arreglar = llevarA('#estado-carpetas');
     var faltan = [];
     if (!App.E.abiertos) faltan.push('la de asuntos abiertos');
@@ -287,7 +287,7 @@
   }
 
   async function ruta() {
-    var T = 'Ruta de Dropbox en este ordenador';
+    var T = 'Ruta de la nube en este ordenador';
     var arreglar = llevarA('#ruta-dropbox-lugar');
     var R = window.RutaCarpetas;
     if (!R) return resultado('ruta', T, 'omitida', '');
@@ -295,7 +295,7 @@
     if (db.deducido) return resultado('ruta', T, 'bien', 'Sale sola de la dirección de esta copia.');
     await R.cargarComun();
     var faltan = [];
-    if (!db.valor) faltan.push('dónde está Dropbox en este ordenador');
+    if (!db.valor) faltan.push('dónde está la nube en este ordenador');
     ['abiertos', 'archivo'].forEach(function (c) {
       if (!R.comunConocido(c) && !R.leer(c)) faltan.push('la ruta de la carpeta ' + (c === 'archivo' ? 'ARCHIVO' : 'de asuntos abiertos'));
     });
@@ -375,7 +375,7 @@
     var m = await Nombres.medidor();
     if (!m.conocido) return resultado('largo-rutas', T, 'bien', 'Todavía no se puede calcular: hay que apuntar antes la ruta de la carpeta ARCHIVO.');
     if (m.margen < 0) {
-      return resultado('largo-rutas', T, 'falta', 'El caso más largo no cabe en la ruta de Dropbox: se pasa ' + (-m.margen) +
+      return resultado('largo-rutas', T, 'falta', 'El caso más largo no cabe en la ruta de la nube: se pasa ' + (-m.margen) +
         ' caracteres. Lo que más ocupa es ' + m.masOcupa.texto + '.', llevarA('#largo-rutas-margen'));
     }
     return resultado('largo-rutas', T, 'bien', 'Quedan ' + m.margen + ' caracteres de margen.');
@@ -408,13 +408,13 @@
   }
 
   var LISTA = [
-    ['carpetas', 'Carpetas de Dropbox', carpetas],
+    ['carpetas', 'Carpetas de la app', carpetas],
     ['alumnado', 'Base de datos de alumnado', alumnado],
     ['centro-de-datos', 'Carpeta del Centro de datos', centroDeDatos],
     ['bandeja', 'Bandeja de Gmail', bandeja],
     ['entrada', 'Carpeta de entrada de documentos sueltos', entrada],
     ['envio', 'Envío de correo', envio],
-    ['ruta', 'Ruta de Dropbox en este ordenador', ruta],
+    ['ruta', 'Ruta de la nube en este ordenador', ruta],
     ['centro-datos', 'Datos del centro', datosDelCentro],
     ['centro-cargos', 'Cargos: Dirección y Secretaría', cargos],
     ['centro-festivos', 'Festivos del curso', festivos],

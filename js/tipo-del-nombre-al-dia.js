@@ -78,7 +78,7 @@ window.TipoDelNombreAlDia = (function () {
       return 'fallo';
     }
     var r = window.Nombres && Nombres.cabeEnRuta ? Nombres.cabeEnRuta(nuevo, '', a.ficha.categoria) : { cabe: true };
-    if (!r.cabe) U.aviso('«' + nuevo + '» no cabe en la ruta de Dropbox: acórtalo cuando puedas.', 'ambar');   /* igual que al editar: avisa, no impide */
+    if (!r.cabe) U.aviso('«' + nuevo + '» no cabe en la ruta de la nube: acórtalo cuando puedas.', 'ambar');   /* igual que al editar: avisa, no impide */
     return 'renombrado';
   }
 

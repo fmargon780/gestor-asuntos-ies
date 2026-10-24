@@ -71,7 +71,7 @@ await pagina.evaluate(() => App.abrirTipoDeAsunto(App.E.tipos.filter(t => t.tipo
 await pagina.waitForSelector('#pantalla-tipo-asunto .tipo-reservado', { state: 'attached' });
 await pagina.evaluate(() => { document.querySelector('#pantalla-tipo-asunto details[data-seccion="datos"]').open = true; });
 await comprobar('dice lo que no hace', pagina.locator('#pantalla-tipo-asunto .tipo-reservado-fila').textContent()
-  .then(t => t.indexOf('La carpeta sigue visible en Dropbox') !== -1), true);
+  .then(t => t.indexOf('La carpeta sigue visible en la nube') !== -1), true);
 await pagina.check('#pantalla-tipo-asunto .tipo-reservado');
 await esperar(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');

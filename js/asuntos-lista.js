@@ -91,6 +91,7 @@ App.esDocumentoDeTrabajo = function (nombre) {
   if (!n) return false;
   if (n.charAt(0) === '.' || n.charAt(0) === '_') return false;
   if (n.indexOf('~$') === 0) return false;
+  if (window.Carpetas && Carpetas.esFicheroDeGoogle && Carpetas.esFicheroDeGoogle(n)) return false;   /* fila 456 */
   if (App.FICHEROS_DEL_SISTEMA.indexOf(n.toLowerCase()) !== -1) return false;
   return true;
 };

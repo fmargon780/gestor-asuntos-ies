@@ -318,7 +318,7 @@ var U = (function () {
     if (nombre === 'SoloConsulta') return (window.SoloConsulta && SoloConsulta.textoError) ? SoloConsulta.textoError() : 'Solo consulta: no se ha guardado nada.';   /* fila 260 */
     if (nombre === 'NotFoundError') {
       return 'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo esté ' +
-        'sincronizando Dropbox en este momento.';
+        'sincronizando la nube en este momento.';
     }
     if (nombre === 'NotAllowedError') {
       return 'El navegador ha retirado el permiso sobre la carpeta. Vuelve a señalarla en Ajustes.';
@@ -330,7 +330,7 @@ var U = (function () {
     if (nombre === 'QuotaExceededError') return 'No queda sitio en el disco.';
     if (nombre === 'AbortError') return 'La operación se ha interrumpido.';
     if (nombre === 'NotReadableError') {
-      return 'No he podido leer un fichero: seguramente Dropbox lo estaba sincronizando. ' +
+      return 'No he podido leer un fichero: seguramente la nube lo estaba sincronizando. ' +
         'Espera un momento y vuelve a intentarlo.';
     }
     if (nombre === 'TypeMismatchError') return 'Hay un fichero donde tendría que haber una carpeta, o al revés.';

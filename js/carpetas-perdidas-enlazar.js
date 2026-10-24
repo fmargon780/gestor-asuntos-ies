@@ -99,7 +99,7 @@ var CarpetasPerdidasEnlazar = (function () {
   /* c) El asunto termina archivado en la carpeta del ARCHIVO. */
   async function pasarAlArchivo(clave, carpeta, foto, hitosAhora) {
     var handle = await CarpetasPerdidasBuscar.carpetaDe(carpeta);
-    if (!handle) throw new Error('No encuentro esa carpeta en el ARCHIVO. Puede que se haya movido o que Dropbox la esté sincronizando.');
+    if (!handle) throw new Error('No encuentro esa carpeta en el ARCHIVO. Puede que se haya movido o que la nube la esté sincronizando.');
     var registro = App.E.registro.asuntos;
     var fichaPerdido = registro[clave];
     var fichaCarpeta = await FichaArchivo.leer(handle);

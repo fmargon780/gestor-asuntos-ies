@@ -42,6 +42,7 @@ var IndiceExpediente = (function () {
   function esDocumento(nombre) {
     var n = String(nombre || '');
     if (!n || es(n)) return false;
+    if (window.Carpetas && Carpetas.esFicheroDeGoogle && Carpetas.esFicheroDeGoogle(n)) return false;   /* fila 456 */
     if (n.charAt(0) === '.' || n.charAt(0) === '_' || n.indexOf('~$') === 0) return false;
     if (window.Carpetas && Carpetas.esCarpetaTemporalDeSincronizacion && Carpetas.esCarpetaTemporalDeSincronizacion(n)) return false;
     return true;

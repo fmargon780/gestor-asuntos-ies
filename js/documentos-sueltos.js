@@ -341,14 +341,14 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
     return;
   }
 
-  /* Las rutas muy largas dan problemas en un Dropbox sincronizado: se
+  /* Las rutas muy largas dan problemas en una carpeta sincronizada: se
      avisa y se deja decidir, como al crear un asunto. */
   var ruta = nombreAsunto + '/' + s.nombre;
   if (ruta.length > App.LARGO_MAXIMO_NOMBRE) {
     var seguir = await U.preguntar('La ruta es muy larga',
       '<p>El documento quedaría en una ruta de ' + ruta.length + ' caracteres:</p>' +
       '<p class="nota">' + U.escapar(ruta) + '</p>' +
-      '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>',
+      '<p>Las rutas muy largas dan problemas en una carpeta sincronizada.</p>',
       'Guardarlo igual');
     if (!seguir) return;
   }

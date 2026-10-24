@@ -111,7 +111,7 @@ App.refrescarVista = function () {
   $('btn-crear').disabled = !nombre || nombre.length < 8;
 };
 
-/* Las rutas muy largas dan problemas en un Dropbox sincronizado: se
+/* Las rutas muy largas dan problemas en una carpeta sincronizada en la nube: se
    avisa y se deja decidir, en vez de cortar el nombre a lo tonto. */
 App.LARGO_MAXIMO_NOMBRE = 180;
 
@@ -150,7 +150,7 @@ App.crearAsuntoDelFormulario = async function () {
     var seguir = await U.preguntar('El nombre es muy largo',
       '<p>Este nombre tiene ' + nombre.length + ' caracteres:</p>' +
       '<p class="nota">' + U.escapar(nombre) + '</p>' +
-      '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>', 'Crear igual');
+      '<p>Las rutas muy largas dan problemas en una carpeta sincronizada en la nube.</p>', 'Crear igual');
     if (!seguir) return;
   }
 

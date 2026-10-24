@@ -124,7 +124,7 @@ var Documentos = (function () {
   async function pintarLista() {
     var caja = $('doc-cuerpo');
     if (!caja) return;
-    var lista = await Carpetas.ficheros(N.asuntoActual.handle);
+    var lista = (await Carpetas.ficheros(N.asuntoActual.handle)).filter(function (f) { return !Carpetas.esFicheroDeGoogle(f.nombre); });   /* fila 456 */
 
     var html = '<p class="explica">' +
       (lista.length ? 'Los documentos guardados en esta carpeta.'

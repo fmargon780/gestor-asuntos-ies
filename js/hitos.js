@@ -305,7 +305,7 @@ var Hitos = (function () {
       if (i >= ESPERAS_LECTURA_VACIA_MS.length) {
         var e = new Error('hitos.json ha llegado vacío y hace un momento tenía los hitos de ' +
           vistosConDatos + ' asuntos. No he guardado nada para no borrarlos. Espera un poco ' +
-          '(Dropbox puede estar sincronizando) y vuelve a intentarlo.');
+          '(la nube puede estar sincronizando) y vuelve a intentarlo.');
         e.name = 'LecturaVacia';
         throw e;
       }

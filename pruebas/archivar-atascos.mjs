@@ -152,7 +152,7 @@ const r5 = await pagina.evaluate(() => {
   return { traducido: window.U.mensajeDeError(deNavegador), talCual: window.U.mensajeDeError(nuestro) };
 });
 await comprobar('5. NotFoundError sale en castellano', r5.traducido,
-  'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo esté sincronizando Dropbox en este momento.');
+  'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo esté sincronizando la nube en este momento.');
 await comprobar('5. un error nuestro, ya en castellano, pasa tal cual', r5.talCual,
   'Ya hay una carpeta llamada "X" en el destino.');
 

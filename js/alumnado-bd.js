@@ -274,7 +274,7 @@ var AlumnadoBD = (function () {
     if (centro && !$('bloque-alumnado-bd')) {
       var det = bloque('bloque-alumnado-bd', 'Carpeta de la base de datos de alumnado', 'De dónde sale el alumnado de la base de datos, en este ordenador',
         '<p class="explica">Señala la carpeta de Google Drive para ordenador que tiene ' +
-        '<code>' + FICHERO + '</code>: la deja ahí la base de datos de alumnado. Es de este ordenador, como las del Dropbox: el otro usa la copia.</p>' +
+        '<code>' + FICHERO + '</code>: la deja ahí la base de datos de alumnado. Es de este ordenador, como las de la nube: el otro usa la copia.</p>' +
         '<p class="explica" id="alumnado-bd-carpeta"></p>' +
         '<div class="aviso aviso-ambar oculto" id="alumnado-bd-aviso"></div>' +
         '<div class="alta-tipo"><button type="button" class="boton" id="alumnado-bd-senalar">Señalar la carpeta</button>' +
@@ -309,7 +309,7 @@ var AlumnadoBD = (function () {
     var p = $('alumnado-bd-carpeta');
     if (p) {
       var dir = await carpeta();
-      p.textContent = dir ? 'Carpeta señalada: ' + dir.name + '.' : 'Sin carpeta señalada en este ordenador: se usa la copia del Dropbox.';
+      p.textContent = dir ? 'Carpeta señalada: ' + dir.name + '.' : 'Sin carpeta señalada en este ordenador: se usa la copia de la nube.';
       var olv = $('alumnado-bd-olvidar');
       if (olv) olv.classList.toggle('oculto', !dir);
       /* Fila 319: con la carpeta a la vista y con permiso, si no tiene el fichero se avisa (sin permiso no se mira ni se pide). */
