@@ -33,7 +33,8 @@ App.mirarLaCarpeta = async function () {
     var hay = await Carpetas.contenido(App.E.abiertos);
 
     var antes = App.E.sueltos.map(function (f) { return f.nombre; });
-    var ahora = hay.ficheros
+    var entrada = window.Entrada ? await Entrada.leer(hay) : { ficheros: hay.ficheros };   /* fila 455 */
+    var ahora = entrada.ficheros
       .filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); })
       .map(function (f) { return f.nombre; });
     var llegados = ahora.filter(function (n) { return antes.indexOf(n) === -1; });

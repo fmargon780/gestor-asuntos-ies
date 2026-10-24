@@ -249,7 +249,7 @@ App.crearAsuntoDelFormulario = async function () {
     }
     if (traido) {
       try {
-        await Carpetas.moverFichero(App.E.abiertos, traido.nombre, carpeta);
+        await Carpetas.moverFichero(((window.Entrada && Entrada.dir()) || App.E.abiertos), traido.nombre, carpeta);
       } catch (e2) {
         U.accesorio('El asunto está creado, pero el documento no ha podido entrar', e2);
         traido = null;

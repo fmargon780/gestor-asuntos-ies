@@ -63,7 +63,9 @@ App.pintarSueltos = async function () {
   var caja = $('lista-sueltos');
   if (!lista.length) {
     caja.innerHTML = '';
-    caja.innerHTML = '<div class="vacio">' + (App.E.sueltos.length
+    caja.innerHTML = '<div class="vacio">' + (App.E.entradaNoEsta
+      ? Entrada.FRASE_NO_ESTA
+      : App.E.sueltos.length
       ? 'Ningún documento coincide con lo que buscas.'
       : 'No hay documentos sueltos. Todo lo que ha llegado está ya dentro de su asunto.') +
       '</div>';
@@ -170,7 +172,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo, compacta) {
       boton.textContent = texto;
       boton.onclick = function () {
         accion({
-          modo: 'suelto', dir: App.E.abiertos, nombre: s.nombre, handle: s.handle,
+          modo: 'suelto', dir: ((window.Entrada && Entrada.dir()) || App.E.abiertos), nombre: s.nombre, handle: s.handle,
           alTerminar: function () { App.pintarSueltos(); }
         });
       };
@@ -367,7 +369,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   var sinBorrar = false;
   try {
     /* Fila 449: si la copia sale bien y no se puede quitar el original de la bandeja, el documento SÍ está en el asunto. */
-    sinBorrar = (await Carpetas.moverFichero(App.E.abiertos, s.nombre, destino, undefined, { toleraNoBorrar: true })) === 'sin-borrar';
+    sinBorrar = (await Carpetas.moverFichero(((window.Entrada && Entrada.dir()) || App.E.abiertos), s.nombre, destino, undefined, { toleraNoBorrar: true })) === 'sin-borrar';
   } catch (e) {
     /* Con el motivo (fila 100): antes se callaba. */
     U.fallo('El documento no ha podido entrar en el asunto. Sigue en Por clasificar', e);

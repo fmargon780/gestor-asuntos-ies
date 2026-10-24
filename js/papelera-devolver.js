@@ -81,24 +81,30 @@
   /* Cuando el asunto de un documento ya no existe: se ofrece llevarlo
      a "Por clasificar" en vez de a su asunto. */
   async function devolverDocumentoComoSuelto(ficha) {
-    if (await Carpetas.existeFichero(App.E.abiertos, ficha.nombre)) {
+    /* Fila 455: «Por clasificar» es la carpeta de entrada. */
+    var entrada = (window.Entrada && Entrada.dir()) || (window.Entrada && Entrada.estado() === 'no-esta' ? null : App.E.abiertos);
+    if (!entrada) return { ok: false, motivo: Entrada.FRASE_NO_ESTA };
+    if (await Carpetas.existeFichero(entrada, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay algo llamado "' + ficha.nombre + '" en Por clasificar.' };
     }
     var pap = await I.carpetaPapelera();
     var sub = await pap.getDirectoryHandle(ficha.carpeta);
-    await Carpetas.moverFichero(sub, ficha.nombre, App.E.abiertos, ficha.nombre);
+    await Carpetas.moverFichero(sub, ficha.nombre, entrada, ficha.nombre);
     await quitarDeIndice(ficha.id);
     await limpiarSubcarpeta(ficha);
     return { ok: true };
   }
 
   async function devolverSuelto(ficha) {
-    if (await Carpetas.existeFichero(App.E.abiertos, ficha.nombre)) {
+    /* Fila 455: «Por clasificar» es la carpeta de entrada. */
+    var entrada = (window.Entrada && Entrada.dir()) || (window.Entrada && Entrada.estado() === 'no-esta' ? null : App.E.abiertos);
+    if (!entrada) return { ok: false, motivo: Entrada.FRASE_NO_ESTA };
+    if (await Carpetas.existeFichero(entrada, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay algo llamado "' + ficha.nombre + '" en Por clasificar.' };
     }
     var pap = await I.carpetaPapelera();
     var sub = await pap.getDirectoryHandle(ficha.carpeta);
-    await Carpetas.moverFichero(sub, ficha.nombre, App.E.abiertos, ficha.nombre);
+    await Carpetas.moverFichero(sub, ficha.nombre, entrada, ficha.nombre);
     await quitarDeIndice(ficha.id);
     await limpiarSubcarpeta(ficha);
     return { ok: true };

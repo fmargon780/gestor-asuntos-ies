@@ -547,3 +547,7 @@ quien abre no lo trae); `VersionesPrevias.listar` marca cada fichero con su subc
 la ruta de Dropbox o la del centro, pide la de la carpeta con el cuadro de siempre y después copia la del
 documento. Sale también en solo consulta y para directivos (copiar no escribe). Prueba:
 `pruebas/ruta-de-un-documento.mjs`.
+
+## La carpeta de entrada de documentos sueltos (fila 455, `docs/PASAR-A-DRIVE.md`)
+
+«Por clasificar» y `js/documentos-vigilancia.js` leen los sueltos de la carpeta de **entrada** (`js/entrada.js`, handle `entrada` en `Almacen`), no siempre de la raíz de `abiertos`. Tres casos: sin señalar y sin `nube: "drive"` en `_GESTOR/rutas.json` → la raíz de abiertos (lo de siempre); señalada → esa carpeta (si es la misma que abiertos, `isSameEntry`, se trata como abiertos); señalada sin encontrarla, o sin señalar con `nube: "drive"` → «Por clasificar» dice «Los documentos por clasificar solo se ven en el instituto.» (sin error ni aviso en Problemas). Se señala en Ajustes → Mantenimiento (`js/entrada-ajustes.js`). Su permiso se pide como el de las demás carpetas (`js/permisos-carpetas.js`, fila `entrada` de `js/comprobacion-entrada.js`). Clasificar, separar/unir, mandar a la papelera y devolver un suelto usan `Entrada.dir()`; `js/carpetas.js` mueve entre nubes distintas copiando y borrando. `App.E.sueltos` y `App.E.entradaNoEsta` los rellena `App.verAbiertos`. Demostración: `?entrada=1` o `?entrada=falta` (`js/demo/entrada.js`).
