@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 23-oct-2026 (fila 450 en curso)
+Última puesta al día: 24-oct-2026 (filas 455 a 459 nuevas, conversación de diseño del tema 447)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -20,3 +20,8 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 434 | 120 | cuatro arreglos del hito: quitar la ventana de hito completo, casilla del correo del tutor en el aviso, plantillas del tipo en Generar y la del hito 2 de matrícula, quitar Registrar y marcar la tarea al unir el sellado; pruebas y revisor |
 | 441 | 60 | contestar con el asunto del cuadro: decidir hilo o correo nuevo en el script, SCRIPT_ESPERADO, pruebas y revisor |
 | 450 | 150 | partir etiquetas-pantalla.js, guardado del trabajo por pestaña, orden de etiquetas, tres tarjetas encima de la hoja, «Empezar de cero», adaptar las pruebas de Etiquetas, prueba nueva, revisor |
+| 455 | 100 | handle `entrada` nuevo, tres casos al entrar, Ajustes, disco de demostración para la entrada, pruebas y revisor |
+| 456 | 120 | raíz de nube en Ruta y topes, `rutas.json` con nube, textos sin «Dropbox», ignorar ficheros de Google, pruebas y revisor |
+| 457 | 90 | copias `(N)` solo en `_GESTOR`, quién en las diferencias, repaso de guardados frescos, pruebas y revisor |
+| 458 | 240 | botón con cerrojo, copia reanudable con comprobación, fechas originales, cambio de handles, marca y «NO USAR», disco de Drive de demostración, pruebas y revisor |
+| 459 | 150 | franja del otro ordenador con identificador, casa sin entrada, copia sin internet en Drive y copia vieja, documentos, pruebas y revisor |
