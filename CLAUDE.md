@@ -1,5 +1,19 @@
 # Gestor de asuntos del IES
 
+## Método con ficha del cambio (25-oct-2026, norma de Francisco para todos sus proyectos)
+
+**Lee `docs/METODO-FICHA.md` antes de coger cualquier fila.** Lo esencial:
+
+1. Se programa solo lo que dice la «Ficha del cambio» de la instrucción. Nada de mejoras de paso.
+2. Si aparece algo que la ficha no cubre y cambia lo que ve o hace la usuaria, o el cambio sale
+   más del doble de grande de lo estimado: **la sesión se para y pregunta**. Con Francisco
+   presente, se le pregunta en lenguaje llano. Si la sesión va sola, la fila pasa a BLOQUEADA
+   con «PREGUNTA PARA FRANCISCO: …» y `main` no se toca. En estos dos casos esto manda sobre
+   cualquier regla de este fichero que diga que no se pregunta a Francisco.
+3. Pruebas: las de «Cómo se comprueba» de la ficha, más la comprobación general del repositorio.
+4. Antes de publicar, repasar la ficha punto por punto y dejarlo escrito (cumplido / no
+   cumplido). Un punto no cumplido no se publica.
+
 Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la cola.
 
 **Una sola sesión a la vez, una fila tras otra** (27-sep-2026, cambiado el 1-oct-2026): nunca
