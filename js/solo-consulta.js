@@ -25,6 +25,7 @@ window.SoloConsulta = (function () {
   var TEXTO_ERROR = 'Solo consulta: no se ha guardado nada.';
   var marcado = leer();
   var pausado = false;
+  var cerrojoDe = null;   /* fila 458: { texto, boton, alPulsar } mientras otro ordenador pasa las carpetas a Drive */
   var RAW = typeof Symbol === 'function' ? Symbol('crudo') : '__crudo';
 
   function leer() {
@@ -32,12 +33,18 @@ window.SoloConsulta = (function () {
   }
 
   /* ¿Está puesta ahora? (`pausar` la apaga un momento: solo lo usa la copia de pruebas para montar sus datos.) */
-  function activo() { return (marcado && !pausado) || directivo(); }
+  function activo() { return (marcado && !pausado) || directivo() || !!cerrojoDe; }
   /* Fila 287 (docs/PERFIL-DIRECTIVO.md): quien entra con un perfil de directivo va protegido igual. */
   function directivo() { return !!(window.Perfil && Perfil.esDirectivo()); }
   /* Solo la marca de este ordenador (el permiso de las carpetas, que para un directivo es de escritura). */
   function soloPorMarca() { return marcado && !pausado; }
-  function textoError() { return (!marcado && directivo()) ? 'Con tu perfil no se puede cambiar esto.' : TEXTO_ERROR; }
+  function textoError() {
+    if (cerrojoDe) return cerrojoDe.texto;
+    return (!marcado && directivo()) ? 'Con tu perfil no se puede cambiar esto.' : TEXTO_ERROR;
+  }
+  /* Fila 458 (docs/PASAR-A-DRIVE.md): un traslado a Drive en marcha cierra la escritura en todos los demás
+     ordenadores. Solo dura esta sesión: nada se guarda en el navegador. */
+  function cerrojo(c) { cerrojoDe = c || null; }
   function pausar(si) { pausado = !!si; }
 
   function guardar(valor) {
@@ -148,6 +155,25 @@ window.SoloConsulta = (function () {
     if (!activo()) return;
     document.body.classList.add('solo-consulta');
     /* Fila 287: un directivo no ve la franja de «solo consultar» sino una línea fija, discreta. */
+    if (cerrojoDe) {
+      if (!document.getElementById('franja-solo-consulta')) {
+        var fc = document.createElement('div');
+        fc.id = 'franja-solo-consulta';
+        fc.setAttribute('role', 'status');
+        fc.innerHTML = '<span></span>' + (cerrojoDe.boton ? '<button type="button" class="boton" id="franja-solo-consulta-quitar"></button>' : '');
+        fc.firstChild.textContent = cerrojoDe.texto;
+        document.body.insertBefore(fc, document.body.firstChild);
+        if (cerrojoDe.boton) {
+          var bc = document.getElementById('franja-solo-consulta-quitar');
+          bc.textContent = cerrojoDe.boton;
+          bc.onclick = cerrojoDe.alPulsar;
+        }
+        window.addEventListener('resize', medirFranja, { passive: true });
+      }
+      medirFranja();
+      vigilarControles();
+      return;
+    }
     if (!marcado && directivo()) {
       document.body.classList.add('perfil-directivo');
       if (!document.getElementById('franja-perfil')) {
@@ -236,7 +262,7 @@ window.SoloConsulta = (function () {
 
   return {
     activo: activo, pausar: pausar, poner: poner, guardar: guardar, proteger: proteger, error: error, esError: esError,
-    alEntrar: alEntrar, enganchar: enganchar, apagarControles: apagarControles, TEXTO_ERROR: TEXTO_ERROR,
+    alEntrar: alEntrar, cerrojo: cerrojo, enganchar: enganchar, apagarControles: apagarControles, TEXTO_ERROR: TEXTO_ERROR,
     textoError: textoError, soloPorMarca: soloPorMarca, crudo: crudo
   };
 })();

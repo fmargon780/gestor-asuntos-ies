@@ -32,6 +32,7 @@ var Entrada = (function () {
   var noEsta = false;       /* la última lectura no pudo abrir la carpeta de entrada */
 
   async function esLaMisma(a, b) {
+    if (window.FechasOrigen) { a = FechasOrigen.crudo(a); b = FechasOrigen.crudo(b); }   /* fila 458: sin la envoltura de las fechas */
     try { return !!(a && b && a.isSameEntry && await a.isSameEntry(b)); } catch (e) { return false; }
   }
 

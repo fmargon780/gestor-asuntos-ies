@@ -216,12 +216,25 @@ $('btn-entrar').onclick = async function () {
     }
     if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
     if (window.ActualizarCopia && ActualizarCopia.alEntrar && await ActualizarCopia.alEntrar()) return;   /* fila 325 */
+    /* Fila 458 (docs/PASAR-A-DRIVE.md): si otro ordenador está pasando las carpetas a Drive, aquí solo se consulta. */
+    if (window.PasarADrive && await PasarADrive.alEntrar(App.E.abiertos) && window.SoloConsulta) {
+      App.E.abiertos = SoloConsulta.proteger(App.E.abiertos);
+      App.E.archivo = SoloConsulta.proteger(App.E.archivo);
+    }
     var finTotal = M('entrar.total');   /* después de los permisos y de la actualización (ahí espera a una persona) */
     App.E.usuario = $('campo-usuario').value.trim();
     await Almacen.guardar('usuario', App.E.usuario);
 
     App.E.gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR);
     App.E.datos = await Carpetas.crear(App.E.gestor, 'datos');
+
+    /* Fila 458: tras «Pasar a Drive», las fechas de modificación de antes de la copia (js/fechas-de-origen.js). */
+    if (window.FechasOrigen && await FechasOrigen.cargar(App.E.gestor)) {
+      App.E.abiertos = FechasOrigen.envolver(App.E.abiertos, 'abiertos/');
+      App.E.archivo = FechasOrigen.envolver(App.E.archivo, 'archivo/');
+      App.E.gestor = FechasOrigen.envolver(App.E.gestor, 'abiertos/' + App.CARPETA_GESTOR + '/');
+      App.E.datos = FechasOrigen.envolver(App.E.datos, 'abiertos/' + App.CARPETA_GESTOR + '/datos/');
+    }
 
     /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): se lee
        `_GESTOR/rutas.json` ya de entrada, sin esperar a que alguien

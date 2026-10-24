@@ -439,6 +439,9 @@ de `App` va después del fichero que lo define.
 | `pruebas/permisos-carpetas.mjs` | «Dar permiso» en las tres filas, `niega`, «Entrar» pide los tres permisos, carpeta omitida, peticiones seguidas y la demostración de siempre (fila 318) |
 | `js/entrada.js` | La carpeta de entrada de documentos sueltos (handle `entrada`, fila 455): `leer`, `dir`, `elegir`, `quitar`. Sin señalar es la raíz de abiertos; señalada, otra carpeta; si no se encuentra (o sin señalar con `nube: "drive"` en `rutas.json`), «Por clasificar» dice «Los documentos por clasificar solo se ven en el instituto.» |
 | `js/entrada-ajustes.js` | «Carpeta de entrada de documentos sueltos» en Ajustes → Mantenimiento, con «Señalar» y «Usar la de asuntos vivos» (fila 455) |
+| `js/fechas-de-origen.js` | Las fechas de modificación de antes de «Pasar a Drive» (fila 458): `cargar`, `envolver`, `crudo`. Envuelve las carpetas señaladas para que `getFile()` devuelva la fecha original de los ficheros apuntados en `_GESTOR/fechas-de-dropbox.json`, si el tamaño no ha cambiado y la fecha sigue siendo la de la copia |
+| `js/pasar-a-drive.js` | El traslado de las carpetas de Dropbox a Google Drive (fila 458): cerrojo `traslado-en-marcha.json`, copia con avance (`traslado-avance.json`), comprobación (tamaños y `_GESTOR` byte a byte), cambio de los manejadores, marca `PASADO-A-DRIVE.json` y carpeta «NO USAR – pasado a Drive el <fecha>» |
+| `js/pasar-a-drive-ajustes.js` | «Pasar las carpetas a Google Drive» en Ajustes → Mantenimiento (fila 458): botón «Pasar a Drive», progreso, «Seguir», «Cancelar el traslado» y la lista de carpetas viejas que arrastrar |
 | `js/demo/entrada.js` | Demostración: `?entrada=1` (carpeta señalada con dos documentos) y `?entrada=falta` (señalada, sin encontrarla) (fila 455) |
 | `pruebas/entrada-documentos-sueltos.mjs` | Sin señalar, señalada (clasificar mueve entre carpetas), sin encontrar y `nube: "drive"` (fila 455) |
 | `css/comprobacion-entrada.css` | El aspecto de la marca y de las filas del panel |
@@ -480,6 +483,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/hitos-vuelven-a-su-asunto.mjs` | Prueba (fila 292, demostración): pasar, unir y deshacer los hitos de un nombre viejo |
 | `pruebas/conflictos-que-cambia.mjs` | Prueba (fila 292, demostración): «Qué cambia», «Las dos dicen lo mismo.», sin detalle, solo se lee |
 | `pruebas/conflictos-drive.mjs` | Prueba (fila 457, demostración): las copias «(N)» de Google Drive en `_GESTOR` se juntan; «Acta (2).pdf» no se toca; la de Dropbox sigue igual |
+| `pruebas/pasar-a-drive.mjs` | Prueba (fila 458, demostración con el disco de Google Drive de mentira): presencia, carpeta equivocada, cuenta previa, traslado entero con fechas y «NO USAR», corte a la mitad y «Seguir», cerrojo de otro ordenador |
 | `pruebas/avisos-de-inicio-que-explican.mjs` | Prueba (fila 292, demostración): «asuntos que se repiten» pregunta, la línea de los aspirantes, «Borrados que se fusionan» |
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |

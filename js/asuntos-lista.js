@@ -84,7 +84,7 @@ App.verAbiertosPorTurno = async function (yaLeido) {
 
 /* Windows y Dropbox dejan por ahí ficheros suyos que no son trabajo
    de nadie, y Word deja los temporales que empiezan por ~$. */
-App.FICHEROS_DEL_SISTEMA = ['desktop.ini', 'thumbs.db', '.ds_store', 'icon\r'];
+App.FICHEROS_DEL_SISTEMA = ['desktop.ini', 'thumbs.db', '.ds_store', 'icon\r', 'pasado-a-drive.json'];   /* fila 458: la marca del traslado a Drive */
 
 App.esDocumentoDeTrabajo = function (nombre) {
   var n = String(nombre || '');

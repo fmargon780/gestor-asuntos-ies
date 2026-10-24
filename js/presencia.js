@@ -128,6 +128,17 @@ var Presencia = (function () {
     return combinado;
   }
 
+  /* Fila 458: los nombres de las otras personas con una señal vigente (3 minutos) en algún asunto, es decir,
+     que están dentro de la app. Los usa «Pasar a Drive» antes de empezar. */
+  async function quienesDentro() {
+    var mapa = await leerTodos(), yo = usuario(), vistos = {};
+    Object.keys(mapa).forEach(function (clave) {
+      var q = mapa[clave] && mapa[clave].usuario;
+      if (q && q !== yo) vistos[q] = true;
+    });
+    return Object.keys(vistos).sort();
+  }
+
   /* Pone (o pisa) la propia señal en 'clave' y guarda solo el fichero
      propio. */
   async function anunciar(clave) {
@@ -322,7 +333,7 @@ var Presencia = (function () {
   return {
     CARPETA: CARPETA,
     vigilar: vigilar, dejarDeVigilar: dejarDeVigilar, tomarElMando: tomarElMando,
-    ocupantePor: ocupantePor, quienEstabaCerca: quienEstabaCerca, refrescarCache: refrescarCache, huella: huella,
+    ocupantePor: ocupantePor, quienesDentro: quienesDentro, quienEstabaCerca: quienEstabaCerca, refrescarCache: refrescarCache, huella: huella,
     mover: mover, borrarClave: borrarClave, borrarFicheroViejo: borrarFicheroViejo
   };
 })();

@@ -480,6 +480,16 @@
     });
     await marcarPrimerHito(eleccionesClave, 'hecho', 'Elecciones convocadas.');
 
+    /* Fila 458 (docs/PASAR-A-DRIVE.md): el asunto con más documentos de la demostración, para comprobar que tras «Pasar a Drive»
+       se abre con todo: diez documentos y una carpeta de versiones previas. */
+    var carpetaElecciones = await App.E.abiertos.getDirectoryHandle(eleccionesClave);
+    for (var ne = 1; ne <= 10; ne++) {
+      await Carpetas.escribirBytes(carpetaElecciones, 'Candidatura ' + (ne < 10 ? '0' : '') + ne + '.pdf', 'candidatura ' + ne, 'application/pdf');
+    }
+    var previasElecciones = await Carpetas.crear(carpetaElecciones, 'Versiones previas');
+    await Carpetas.escribirBytes(previasElecciones, 'Convocatoria (versión 1).pdf', 'convocatoria v1', 'application/pdf');
+    await Carpetas.escribirBytes(previasElecciones, 'Convocatoria (versión 2).pdf', 'convocatoria v2', 'application/pdf');
+
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */
     await crearAsunto(tipos.FACTURA, 'EMPRESAS', dobla, hace(60), {

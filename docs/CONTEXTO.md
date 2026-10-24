@@ -344,6 +344,40 @@ que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo
 
 Se comprueba con `pruebas/copias.mjs`.
 
+### Pasar a Drive (fila 458, `docs/PASAR-A-DRIVE.md`)
+
+Ajustes → Mantenimiento → «Carpetas de este ordenador» → «Pasar las carpetas a Google Drive»
+(`js/pasar-a-drive-ajustes.js`; el traslado, en `js/pasar-a-drive.js`). Solo Administración y nunca en
+«solo consultar». Orden: nadie más dentro (`Presencia.quienesDentro`, señal de 3 minutos; «Seguir de todas
+formas»), cerrojo `_GESTOR/traslado-en-marcha.json` en Dropbox (no se copia; otro ordenador que entre queda en
+solo consulta con la franja «Se están pasando las carpetas…», `PasarADrive.alEntrar` + `SoloConsulta.cerrojo`;
+con más de 12 horas sin moverse, «Quitar el cerrojo»), señalar «Mi unidad» o «My Drive» (solo se comprueba el
+nombre), cuenta («Vas a copiar N documentos (X GB)…»), copia, comprobación, cambio y carpeta «NO USAR».
+
+- **Qué se copia:** cada carpeta de asunto de «asuntos vivos», el ARCHIVO, `_GESTOR` (menos `presencia/`, que
+  caduca sola, y los ficheros del propio traslado) y la carpeta de la copia sin internet (`copiaCarpeta`). Los
+  sueltos de la raíz de «asuntos vivos» se quedan: son la entrada (handle `entrada`, fila 455).
+- **Se puede cortar:** `_GESTOR/traslado-avance.json` de Drive apunta las unidades terminadas y
+  `fechas-de-dropbox.json` cada fichero copiado (`{f: fecha original, t: tamaño, c: fecha de la copia}`); al
+  volver a pulsar, el ordenador que puso el cerrojo (su identificador está en `localStorage`,
+  `gestor.traslado.id`) ve «Hay un traslado a medias. Seguir» y no repite lo que está bien.
+- **Fechas:** `js/fechas-de-origen.js` envuelve (Proxy) `App.E.abiertos`, `archivo`, `gestor` y `datos` al entrar
+  si existe `fechas-de-dropbox.json`: `getFile()` devuelve la fecha original si el tamaño no ha cambiado y la
+  fecha sigue siendo la de la copia (±2 s). Claves: `abiertos/<ruta>` (incluye `abiertos/_GESTOR/…`) y `archivo/<ruta>`.
+- **Cambio:** `abiertos` y `archivo` recordados pasan a Drive, `entrada` a la «asuntos vivos» de Dropbox,
+  `copiaCarpeta` a la copia de Drive; `rutas.json` (el de Drive) dice `nube: "drive"`; `PASADO-A-DRIVE.json`
+  (mismo identificador) en la raíz de Dropbox y en el `_GESTOR` de Drive (la fila 459 lo usa). Esa marca no sale
+  en «Por clasificar» (`App.FICHEROS_DEL_SISTEMA`). La sesión sigue en la misma página, ya sobre Drive: no recarga.
+- **Carpetas viejas:** la app crea «NO USAR – pasado a Drive el <dd-mm-aaaa>» y lista qué arrastrar; «Ya las he
+  arrastrado» mira la raíz de Dropbox y que el ARCHIVO y la copia viejos ya no se abran (guardados como
+  `traslado-archivo-viejo` y `traslado-copia-vieja`). No borra nada. En la demostración hay un botón
+  «(Demostración) Arrastrar las carpetas viejas».
+- **Demostración:** segundo disco de mentira, `Mi unidad` (`Demo.disco().drive`, selector `gestor-drive`);
+  `?traslado=corta` corta la copia a la mitad una vez. El asunto de las Elecciones tiene diez documentos y
+  «Versiones previas».
+- **Sin comprobar en ordenadores reales:** que `showDirectoryPicker` sobre «Mi unidad» deje crear y escribir
+  en Drive para ordenadores en modo «duplicar archivos», y qué fecha de modificación pone Drive a lo copiado.
+
 ### Copias en conflicto de Dropbox, y releer siempre
 
 Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte un fichero como

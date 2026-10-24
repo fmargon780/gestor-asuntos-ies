@@ -79,6 +79,7 @@ App.pintarCarpetasDeEsteOrdenador = function () {
   carp.appendChild(App.filaEstado('Asuntos abiertos', App.E.abiertos.name));
   carp.appendChild(App.filaEstado('Archivo', App.E.archivo.name));
   if (window.EntradaAjustes) EntradaAjustes.pintar($('entrada-ajustes'));   /* fila 455 */
+  if (window.PasarADriveAjustes) PasarADriveAjustes.pintar($('pasar-a-drive-ajustes'));   /* fila 458 */
 };
 
 $('btn-olvidar').onclick = async function () {
