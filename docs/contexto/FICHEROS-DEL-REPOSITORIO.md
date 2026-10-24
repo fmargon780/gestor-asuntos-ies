@@ -479,6 +479,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/parecido-de-carpetas.mjs` | Prueba (fila 292) de los cinco criterios de parecido, el empate y sin candidatas |
 | `pruebas/hitos-vuelven-a-su-asunto.mjs` | Prueba (fila 292, demostración): pasar, unir y deshacer los hitos de un nombre viejo |
 | `pruebas/conflictos-que-cambia.mjs` | Prueba (fila 292, demostración): «Qué cambia», «Las dos dicen lo mismo.», sin detalle, solo se lee |
+| `pruebas/conflictos-drive.mjs` | Prueba (fila 457, demostración): las copias «(N)» de Google Drive en `_GESTOR` se juntan; «Acta (2).pdf» no se toca; la de Dropbox sigue igual |
 | `pruebas/avisos-de-inicio-que-explican.mjs` | Prueba (fila 292, demostración): «asuntos que se repiten» pregunta, la línea de los aspirantes, «Borrados que se fusionan» |
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |

@@ -13,7 +13,9 @@
    mira: el cambio del otro ordenador se pierde en la práctica.
 
    Al entrar, y cada cinco minutos, se busca en _GESTOR algún fichero
-   con "conflicto" o "conflicted" en el nombre.
+   con "conflicto" o "conflicted" en el nombre. Fila 457: y, con Google
+   Drive, el que se llama "<nombre> (N).json" teniendo también
+   "<nombre>.json" (ver realDeDrive).
 
    - `asuntos.json`, `tablon.json` y `hitos.json` se fusionan solos: son
      los ficheros en los que los dos ordenadores escriben todo el rato,
@@ -59,10 +61,31 @@
 
   /* "asuntos (copia en conflicto de PC2 2026-09-11).json"  ->  "asuntos.json"
      "asuntos (PC2's conflicted copy 2026-09-11).json"      ->  "asuntos.json" */
-  function ficheroReal(nombreConflicto) {
+  function ficheroReal(nombreConflicto, existentes) {
     var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.json$/i);
-    return m ? m[1].trim() + '.json' : '';
+    if (m) return m[1].trim() + '.json';
+    return realDeDrive(nombreConflicto, existentes, '.json');
   }
+
+  /* Fila 457 (docs/PASAR-A-DRIVE.md): Google Drive para ordenadores no usa "conflicted copy". Lo más
+     probable (NO está comprobado en los ordenadores reales) es que deje la otra versión como
+     "asuntos (1).json" junto a "asuntos.json". Solo cuenta si 'existentes' (los nombres de esa misma
+     carpeta de _GESTOR) tiene también "asuntos.json": sin él, "Acta (2).pdf" o cualquier "(N)" que
+     ponga la propia app no se toca. Quien llama solo la usa para carpetas de _GESTOR. */
+  function realDeDrive(nombre, existentes, extension) {
+    if (!existentes) return '';
+    var m = String(nombre).match(/^(.+?) \((\d+)\)(\.[a-z0-9]+)$/i);
+    if (!m || m[3].toLowerCase() !== extension) return '';
+    var real = m[1] + m[3];
+    return existentes[real] ? real : '';
+  }
+  I.realDeDrive = realDeDrive;
+  function nombresDe(ficheros) {
+    var set = {};
+    ficheros.forEach(function (f) { set[f.nombre] = true; });
+    return set;
+  }
+  I.nombresDe = nombresDe;
 
   /* ---------- fusionar una ficha de asuntos.json ----------
 
@@ -391,9 +414,10 @@
     var ficheros;
     try { ficheros = await Carpetas.ficheros(g); } catch (e) { return; }
 
+    var existentes = nombresDe(ficheros);
     for (var i = 0; i < ficheros.length; i++) {
       var nombre = ficheros[i].nombre;
-      var real = ficheroReal(nombre);
+      var real = ficheroReal(nombre, existentes);
       /* Fila 176, punto 5: antes solo se miraban los conflictos de los
          ficheros de Copias.FICHEROS; plantillas.json, envios.json,
          rutas.json, margenes-pdf.json y cualquier otro de _GESTOR se
@@ -458,8 +482,9 @@
     try { carpeta = await Carpetas.crear(g, 'presencia'); } catch (e) { return; }
     var lista;
     try { lista = await Carpetas.ficheros(carpeta); } catch (e) { return; }
+    var existentes = nombresDe(lista);
     for (var i = 0; i < lista.length; i++) {
-      if (!ficheroReal(lista[i].nombre)) continue;
+      if (!ficheroReal(lista[i].nombre, existentes)) continue;
       try { await carpeta.removeEntry(lista[i].nombre); } catch (e) { /* se intenta la próxima vez */ }
     }
   }
@@ -473,6 +498,7 @@
      revisarFechasDatos, y rellena I.revisarCsv/I.revisarFechasDatos. */
   window.Conflictos = {
     revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId,
+    ficheroReal: ficheroReal,   /* fila 457: para las pruebas */
     _interno: I
   };
 

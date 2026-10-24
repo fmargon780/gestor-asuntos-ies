@@ -297,6 +297,18 @@ var Presencia = (function () {
     return e.usuario;
   }
 
+  /* Fila 457: quién estaba dentro de la app (según la caché) más cerca de 'ms', sin contar a quien está
+     mirando; '' si no se sabe. Sirve a «Qué cambia» cuando el nombre de la copia no dice quién fue. */
+  function quienEstabaCerca(ms) {
+    var mejor = '', dist = 15 * 60 * 1000;
+    Object.keys(cache).forEach(function (clave) {
+      var e = cache[clave], t = new Date(e && e.ultima).getTime();
+      if (!e || !e.usuario || e.usuario === usuario() || isNaN(t)) return;
+      if (Math.abs(t - ms) < dist) { dist = Math.abs(t - ms); mejor = e.usuario; }
+    });
+    return mejor;
+  }
+
   /* Una huella de quién está dentro de qué, ahora mismo, en la caché.
      Sirve para saber si de verdad ha cambiado algo entre una lectura y
      la siguiente (fila 33, 17-sep-2026): si nadie ha entrado ni salido
@@ -310,7 +322,7 @@ var Presencia = (function () {
   return {
     CARPETA: CARPETA,
     vigilar: vigilar, dejarDeVigilar: dejarDeVigilar, tomarElMando: tomarElMando,
-    ocupantePor: ocupantePor, refrescarCache: refrescarCache, huella: huella,
+    ocupantePor: ocupantePor, quienEstabaCerca: quienEstabaCerca, refrescarCache: refrescarCache, huella: huella,
     mover: mover, borrarClave: borrarClave, borrarFicheroViejo: borrarFicheroViejo
   };
 })();

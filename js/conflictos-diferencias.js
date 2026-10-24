@@ -130,8 +130,13 @@ var ConflictosDiferencias = (function () {
   async function describir(g, p) {
     var salida = { cuando: [], lineas: [], mas: 0, igual: false, sinDetalle: false };
     var quien = quienEs(p.nombreConflicto);
+    var cuandoOtro = await fecha(g, p.nombreConflicto);
+    /* Fila 457: Google Drive no pone quién en el nombre. Se mira quién estaba dentro de la app cuando
+       se guardó; si no se sabe, «el otro ordenador». */
+    var deDrive = !quien && !/conflic/i.test(p.nombreConflicto);
+    if (deDrive && window.Presencia && Presencia.quienEstabaCerca) quien = Presencia.quienEstabaCerca(cuandoOtro);
     salida.cuando.push('La de este ordenador: ' + cuandoEs(await fecha(g, p.real)));
-    salida.cuando.push('La del otro' + (quien ? ' (' + quien + ')' : '') + ': ' + cuandoEs(await fecha(g, p.nombreConflicto)));
+    salida.cuando.push('La del otro' + (quien ? ' (' + quien + ')' : (deDrive ? ' ordenador' : '')) + ': ' + cuandoEs(cuandoOtro));
     var mio, otro;
     try {
       mio = await Carpetas.leerJson(g, p.real);

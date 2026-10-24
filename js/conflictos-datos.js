@@ -23,9 +23,9 @@
   var CSV_DE_TERCEROS = ['solicitantes.csv', 'personal.csv', 'empresas.csv', 'otros.csv',
                          'tutores.csv'];   /* fila 166: los tutores legales ya terceros */
 
-  function ficheroRealCsv(nombreConflicto) {
+  function ficheroRealCsv(nombreConflicto, existentes) {
     var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.csv$/i);
-    return m ? m[1].trim() + '.csv' : '';
+    return m ? m[1].trim() + '.csv' : I.realDeDrive(nombreConflicto, existentes, '.csv');   /* fila 457 */
   }
 
   /* Función pura. `real` y `otro`: el texto de los dos CSV. Devuelve
@@ -175,15 +175,17 @@
     if (!dirDatos || !window.Datos) return;
     var lista;
     try { lista = await Carpetas.ficheros(dirDatos); } catch (e) { return; }
+    var existentes = I.nombresDe(lista);
     for (var i = 0; i < lista.length; i++) {
       var nombre = lista[i].nombre;
-      /* Fila 167: administraciones.json, unido por id (Administraciones.unirDatos). */
-      if (/^administraciones\s*\([^)]*conflic[^)]*\)\.json$/i.test(nombre) && window.Administraciones) {
+      /* Fila 167: administraciones.json, unido por id (Administraciones.unirDatos). Fila 457: y la de Drive. */
+      if ((/^administraciones\s*\([^)]*conflic[^)]*\)\.json$/i.test(nombre) ||
+           I.realDeDrive(nombre, existentes, '.json') === 'administraciones.json') && window.Administraciones) {
         try { if (await fusionarAdministraciones(g, dirDatos, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en administraciones.json.'); }
         catch (e) { /* a la siguiente pasada */ }
         continue;
       }
-      var real = ficheroRealCsv(nombre);
+      var real = ficheroRealCsv(nombre, existentes);
       if (!real || CSV_DE_TERCEROS.indexOf(real) === -1) continue;
       var r = null;
       try { r = await fusionarCsv(g, dirDatos, nombre, real); } catch (e) { r = null; }

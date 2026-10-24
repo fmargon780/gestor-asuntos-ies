@@ -350,6 +350,16 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
 `asuntos (copia en conflicto de PC2 2026-09-11).json`.
 
 - `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
+- **Con Google Drive** (fila 457, `docs/PASAR-A-DRIVE.md`): Drive para ordenadores no hace «conflicted copy».
+  Lo más probable es que deje la otra versión como `asuntos (1).json` junto a `asuntos.json`. Cuenta
+  como copia en conflicto un `<nombre> (N).json` (`.csv` en `_GESTOR/datos`) **solo en la propia carpeta de
+  `_GESTOR` y solo si existe también `<nombre>.json`** (`realDeDrive` en `js/conflictos.js`); nunca en
+  carpetas de asuntos, donde la app pone ` (2)` a documentos a propósito. Se juntan con las mismas reglas
+  y la copia va a `_GESTOR/copias`. «Qué cambia» pone «el otro ordenador» (o quien estaba dentro según
+  `Presencia.quienEstabaCerca`). **La forma de Drive NO está comprobada en los ordenadores reales**: si en
+  Ajustes → Problemas aparecen ficheros de `_GESTOR` con otro nombre raro, hay que añadir esa forma en
+  `realDeDrive`. Todos los guardados de `_GESTOR` releen el fichero antes de escribir (revisado en la
+  fila 457); si Drive se queda con el último cambio sin dejar copia, lo cubren eso y `presencia`.
 - Los CSV de terceros dados de alta a mano (`solicitantes.csv`, `personal.csv`, `empresas.csv`,
   `otros.csv`, en `_GESTOR/datos`; fila 130) también se fusionan solos: unión de filas, dos iguales
   se quedan en una; con el mismo nombre y datos distintos se queda la del fichero real y la otra
