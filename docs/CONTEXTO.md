@@ -378,6 +378,34 @@ nombre), cuenta («Vas a copiar N documentos (X GB)…»), copia, comprobación,
 - **Sin comprobar en ordenadores reales:** que `showDirectoryPicker` sobre «Mi unidad» deje crear y escribir
   en Drive para ordenadores en modo «duplicar archivos», y qué fecha de modificación pone Drive a lo copiado.
 
+### El otro ordenador, casa y la copia sin internet tras pasar a Drive (fila 459, `docs/PASAR-A-DRIVE.md`)
+
+Dónde vive todo después del traslado: «asuntos vivos» (menos los sueltos de su raíz), el ARCHIVO, `_GESTOR` y la
+carpeta de la copia sin internet, en la «Mi unidad» de la cuenta común (Drive para ordenadores, «duplicar archivos»,
+`C:\Google Drive` en los dos ordenadores del instituto). En Dropbox se queda la raíz de «asuntos vivos» como entrada
+de documentos sueltos, con `PASADO-A-DRIVE.json` y «NO USAR – pasado a Drive el <fecha>».
+
+`js/carpetas-en-drive.js` (`CarpetasEnDrive.alEntrar`, llamado desde `js/nucleo.js` al pulsar «Entrar», después de los
+permisos y **antes de crear nada**):
+- **Otro ordenador del instituto:** si la raíz de «asuntos vivos» guardada lleva `PASADO-A-DRIVE.json`, aún apunta a
+  Dropbox: no se crea `_GESTOR` ni nada allí y sale la franja «Las carpetas están ahora en Google Drive. Señálalas para
+  seguir.» con un botón que pide, de uno en uno, la «asuntos vivos» de Drive (vale solo si su `_GESTOR/PASADO-A-DRIVE.json`
+  lleva el mismo identificador), el ARCHIVO (mismo nombre que el de la marca y no el viejo) y, si la página es la copia sin
+  internet (`file://`), la carpeta de la copia (`copiaCarpeta`). Si no, «Esa no es la carpeta que se pasó a Drive…».
+  Guarda `abiertos`, `archivo` y `entrada` (la raíz de Dropbox) y entra. `RutaCarpetas.olvidarRutaDeOtraNube('drive')`
+  borra la raíz de Dropbox apuntada en ese navegador (si no, «Ruta» seguiría dando rutas de Dropbox).
+- **Casa** (Chromebook, versión web, usuario con la cuenta común): se señalan las carpetas de Drive como en cualquier
+  instalación nueva; como `rutas.json` dice `nube: "drive"` y no hay `entrada`, «Por clasificar» dice «Los documentos por
+  clasificar solo se ven en el instituto.» (fila 455). «Solo consultar», si estaba puesto, no se quita solo.
+- **Copia sin internet vieja:** su dirección dice «NO USAR», o dice «Dropbox» y las carpetas ya están en Drive (marca en
+  la raíz o `rutas.json` con `nube: "drive"`): «Esta copia es la vieja. Abre la que está en Google Drive.», con la ruta nueva
+  (la raíz de Drive apuntada + el nombre de la copia de la marca) y un botón «Copiar la ruta». No deja entrar.
+- `App.pintarListaUsuarios` ya no crea `_GESTOR` al arrancar (antes, con permiso ya concedido, lo habría creado en la
+  Dropbox del otro ordenador).
+- Para las pruebas, `window.__DIRECCION_COPIA__ = { protocolo, ruta }` hace pasar la página por una copia `file://`.
+- **Sin comprobar en ordenadores reales:** la apertura de `showDirectoryPicker` sobre carpetas de Drive en ChromeOS (Archivos
+  → Google Drive → Mi unidad) y que Chrome conserve los handles de la copia vieja al abrir la nueva desde Drive.
+
 ### Copias en conflicto de Dropbox, y releer siempre
 
 Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte un fichero como

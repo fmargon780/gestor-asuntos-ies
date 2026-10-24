@@ -660,3 +660,10 @@ body.solo-consulta #lector { height: calc(100vh - var(--franja-demo-alto, 0px) -
 #pasar-a-drive-ajustes .traslado-error { color: var(--rojo-linea); }
 #pasar-a-drive-ajustes .traslado-aviso { background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: 6px; padding: 6px 10px; }
 #pasar-a-drive-ajustes .traslado-titulo, #pasar-a-drive-ajustes .traslado-final { font-weight: 600; }
+
+/* Fila 459: la franja de la entrada tras «Pasar a Drive» (js/carpetas-en-drive.js). */
+.franja-drive-nuevas { background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: 6px; padding: 8px 12px; margin: 10px 0; }
+.franja-drive-nuevas p { margin: 0 0 6px; }
+.franja-drive-nuevas .franja-drive-texto { font-weight: 600; }
+.franja-drive-nuevas .franja-drive-error { color: var(--rojo-linea); }
+.franja-drive-nuevas .franja-drive-ruta code { word-break: break-all; }

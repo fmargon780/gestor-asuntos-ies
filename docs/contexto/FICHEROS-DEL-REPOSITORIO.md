@@ -442,6 +442,7 @@ de `App` va después del fichero que lo define.
 | `js/fechas-de-origen.js` | Las fechas de modificación de antes de «Pasar a Drive» (fila 458): `cargar`, `envolver`, `crudo`. Envuelve las carpetas señaladas para que `getFile()` devuelva la fecha original de los ficheros apuntados en `_GESTOR/fechas-de-dropbox.json`, si el tamaño no ha cambiado y la fecha sigue siendo la de la copia |
 | `js/pasar-a-drive.js` | El traslado de las carpetas de Dropbox a Google Drive (fila 458): cerrojo `traslado-en-marcha.json`, copia con avance (`traslado-avance.json`), comprobación (tamaños y `_GESTOR` byte a byte), cambio de los manejadores, marca `PASADO-A-DRIVE.json` y carpeta «NO USAR – pasado a Drive el <fecha>» |
 | `js/pasar-a-drive-ajustes.js` | «Pasar las carpetas a Google Drive» en Ajustes → Mantenimiento (fila 458): botón «Pasar a Drive», progreso, «Seguir», «Cancelar el traslado» y la lista de carpetas viejas que arrastrar |
+| `js/carpetas-en-drive.js` | El otro ordenador, casa y la copia sin internet tras pasar a Drive (fila 459): franja «Las carpetas están ahora en Google Drive. Señálalas para seguir.» (valida el identificador de `PASADO-A-DRIVE.json`), y aviso «Esta copia es la vieja» |
 | `js/demo/entrada.js` | Demostración: `?entrada=1` (carpeta señalada con dos documentos) y `?entrada=falta` (señalada, sin encontrarla) (fila 455) |
 | `pruebas/entrada-documentos-sueltos.mjs` | Sin señalar, señalada (clasificar mueve entre carpetas), sin encontrar y `nube: "drive"` (fila 455) |
 | `css/comprobacion-entrada.css` | El aspecto de la marca y de las filas del panel |
@@ -484,6 +485,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/conflictos-que-cambia.mjs` | Prueba (fila 292, demostración): «Qué cambia», «Las dos dicen lo mismo.», sin detalle, solo se lee |
 | `pruebas/conflictos-drive.mjs` | Prueba (fila 457, demostración): las copias «(N)» de Google Drive en `_GESTOR` se juntan; «Acta (2).pdf» no se toca; la de Dropbox sigue igual |
 | `pruebas/pasar-a-drive.mjs` | Prueba (fila 458, demostración con el disco de Google Drive de mentira): presencia, carpeta equivocada, cuenta previa, traslado entero con fechas y «NO USAR», corte a la mitad y «Seguir», cerrojo de otro ordenador |
+| `pruebas/carpetas-en-drive.mjs` | Prueba (fila 459): el otro ordenador señala las carpetas de Drive (y rechaza las equivocadas), casa, copia sin internet vieja y «Ruta» de Drive |
 | `pruebas/avisos-de-inicio-que-explican.mjs` | Prueba (fila 292, demostración): «asuntos que se repiten» pregunta, la línea de los aspirantes, «Borrados que se fusionan» |
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |

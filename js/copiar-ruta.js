@@ -196,6 +196,18 @@ window.RutaCarpetas = (function () {
     return { valor: '', deducido: false };
   }
 
+  /* Fila 459 (docs/PASAR-A-DRIVE.md): al pasar este ordenador de Dropbox a Drive, la ruta apuntada de la otra nube
+     (la raíz de Dropbox de este ordenador) ya no vale: se olvida, y la de Drive se deduce de la dirección de la copia
+     sin internet o se pide la primera vez que haga falta. */
+  function olvidarRutaDeOtraNube(nube) {
+    var apuntadas = [leerLocal(CLAVE_NUBE), leerLocal(CLAVE_DROPBOX), leer('abiertos'), leer('archivo')];
+    var sobra = apuntadas.some(function (r) { var n = nubeDeRuta(r); return !!n && n !== nube; });
+    if (!sobra) return;
+    try {
+      [CLAVE_NUBE, CLAVE_DROPBOX, CLAVES.abiertos, CLAVES.archivo].forEach(function (c) { window.localStorage.removeItem(c); });
+    } catch (e) { /* sin memoria: nada */ }
+  }
+
   /* ---------- la parte de dentro de Dropbox, para todo el centro ---------- */
 
   var comun = {};   /* lo último leído de _GESTOR/rutas.json */
@@ -545,6 +557,6 @@ window.RutaCarpetas = (function () {
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
     pintarBloque: pintarBloque, comunConocido: comunConocido,
     nubeEnUso: nubeEnUso, nombreNube: nombreNube, nubeDeRuta: nubeDeRuta,
-    raizDeLaNube: dropboxDeEsteOrdenador
+    raizDeLaNube: dropboxDeEsteOrdenador, olvidarRutaDeOtraNube: olvidarRutaDeOtraNube
   };
 })();

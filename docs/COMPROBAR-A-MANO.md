@@ -357,3 +357,7 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] (fila 441) Si en el cuadro escribes el mismo asunto que puso el remitente, la respuesta sale dentro de su conversación.
 - [ ] [SOLO FRANCISCO] (fila 449) Guardas un documento de «Ver todo» en el asunto A26-0464 (Nicolás Amortegui) en el ordenador del centro: el aviso «Ir al asunto» se queda hasta cerrarlo, abre «Trabajo» en el hito y «← Volver a Ver todo» te devuelve; lo mismo con un correo de Gmail.
 - [ ] [SOLO FRANCISCO] (fila 451) En el ordenador del centro, En Administración + En espera + Por liquidar suman lo mismo que «Todos los abiertos» (26 el 21-oct), y el asunto que faltaba sale en «En Administración», al final, con «Añade un hito o archívalo».
+
+## Fila 459 — el otro ordenador, casa y la copia sin internet en Drive (24-oct-2026)
+
+- [ ] [SOLO FRANCISCO] Después de pasar a Drive, abrir el asunto de las Elecciones al Consejo Escolar desde el ordenador de Diego y desde casa, y comprobar que el marcador de la copia sin internet es el mismo en los dos ordenadores del instituto.

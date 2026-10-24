@@ -185,3 +185,17 @@ versión), `index.html` (añadir `js/cargar-fichero.js` antes de quien lo use), 
   añadiendo) y una entrada en `docs/HISTORIA.md`.
 - Mensaje final a Francisco: dos o tres frases, y los enlaces a `docs/INSTALAR-COPIA.md` y, si
   hace falta, a `docs/CLAVE-COPIA-PUBLICA.md`.
+
+## Después de pasar a Drive (fila 459, `docs/PASAR-A-DRIVE.md`)
+
+Tras el traslado a Google Drive, la copia vive en la carpeta de Drive (por ejemplo
+`C:\Google Drive\Mi unidad\Gestor de Asuntos - aplicación`, la misma ruta en los dos ordenadores, así que basta un
+marcador). `ABRIR EL GESTOR.html` y `js/actualizar-copia.js` funcionan igual allí: no dependen de Dropbox, solo de la
+carpeta señalada (`copiaCarpeta`).
+
+- La copia **vieja** (la que sigue en Dropbox o en «NO USAR – pasado a Drive…») se reconoce por su dirección y dice «Esta
+  copia es la vieja. Abre la que está en Google Drive.» con la ruta nueva; no deja trabajar (`js/carpetas-en-drive.js`).
+- En el **otro ordenador**, al abrir la copia nueva por primera vez, sale una franja que pide señalar las carpetas de Drive
+  (asuntos abiertos, ARCHIVO y la carpeta de esta copia). Chrome comparte el almacenamiento de todas las páginas `file://`,
+  así que la copia nueva hereda los handles de la vieja y la franja es lo que los cambia.
+- Desde casa (Chromebook) se usa la versión web, no la copia.

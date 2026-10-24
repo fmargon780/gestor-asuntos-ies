@@ -103,8 +103,10 @@ App.pintarListaUsuarios = async function () {
   var tienePermiso = await Carpetas.permiso(App.E.abiertos, false);
   if (!tienePermiso) return;
 
+  /* Fila 459: sin crear `_GESTOR`. Si las carpetas se pasaron a Drive desde otro ordenador, aquí (Dropbox) ya no
+     debe aparecer nada; en una carpeta recién señalada, sin `_GESTOR` no hay usuarios que enseñar. */
   var gestor;
-  try { gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR); }
+  try { gestor = await App.E.abiertos.getDirectoryHandle(App.CARPETA_GESTOR); }
   catch (e) { return; }
   var nombres = await Usuarios.cargar(gestor);
   if (!nombres.length) return;
@@ -214,6 +216,9 @@ $('btn-entrar').onclick = async function () {
       U.aviso('Sin permiso sobre alguna de las dos carpetas. Vuelve a elegirla.', 'malo');
       return;
     }
+    /* Fila 459 (docs/PASAR-A-DRIVE.md): antes de crear nada, ¿las carpetas se pasaron a Drive desde otro ordenador, o esta
+       es la copia sin internet vieja? Sale una franja y la entrada se para hasta señalar las de Drive. */
+    if (window.CarpetasEnDrive && await CarpetasEnDrive.alEntrar(App.E.abiertos)) return;
     if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
     if (window.ActualizarCopia && ActualizarCopia.alEntrar && await ActualizarCopia.alEntrar()) return;   /* fila 325 */
     /* Fila 458 (docs/PASAR-A-DRIVE.md): si otro ordenador está pasando las carpetas a Drive, aquí solo se consulta. */
