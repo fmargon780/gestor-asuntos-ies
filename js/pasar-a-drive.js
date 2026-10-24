@@ -518,7 +518,7 @@ var PasarADrive = (function () {
 
   /* El texto del paso 6. */
   function textoFinal(info) {
-    var ruta = info.rutaCopia || ('la carpeta «' + info.copiaNueva + '» dentro de «Mi unidad» de Google Drive');
+    var ruta = info.rutaCopia || (info.copiaNueva ? 'la carpeta «' + info.copiaNueva + '» dentro de «Mi unidad» de Google Drive' : 'la carpeta de la copia sin internet, dentro de «Mi unidad» de Google Drive (si la tenías)');
     return 'Las carpetas ya están en Google Drive. Antes de usar la app desde el otro ordenador o desde casa, espera a que ' +
       'Google Drive termine de subirlo todo (el icono de Drive deja de girar). Diego tendrá que señalarlas la próxima vez que entre. ' +
       'Abre a partir de ahora la copia de la app que está en Google Drive: ' + ruta + '. Las carpetas viejas de Dropbox, en «' +
