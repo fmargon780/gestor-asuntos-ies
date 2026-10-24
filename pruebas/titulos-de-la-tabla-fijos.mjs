@@ -90,11 +90,11 @@ await comprobar('5. pestañas y títulos con fondo opaco',
 
 console.log('--- 3. cambiar de pestaña, bajado ---');
 await pagina.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-await pagina.click('.inicio-pestana[data-pestana="dorm"]');
+await pagina.click('.inicio-pestana[data-pestana="esp"]');
 await pagina.waitForTimeout(400);
 c = await cajas();
 await comprobar('3. cambia la pestaña activa, y pestañas y títulos no se solapan',
-  pagina.evaluate(() => document.querySelector('.inicio-pestana.activa').dataset.pestana).then((p) => [p, c.th.top >= c.pest.bottom - 1]), ['dorm', true]);
+  pagina.evaluate(() => document.querySelector('.inicio-pestana.activa').dataset.pestana).then((p) => [p, c.th.top >= c.pest.bottom - 1]), ['esp', true]);
 await pagina.click('.inicio-pestana[data-pestana="todos"]');
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => window.scrollTo(0, 500));

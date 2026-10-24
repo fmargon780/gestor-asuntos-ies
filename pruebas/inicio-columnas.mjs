@@ -135,7 +135,7 @@ await comprobar('3. la primera celda es la fecha de inicio, la segunda el tipo',
 await comprobar('3. ordenar y arrastrar: tras arrastrar no se ordena por esa columna', p.evaluate(() => InicioOrden._estado()), { col: null, dir: 1 });
 await p.click('#inicio-thead-normal th[data-col="tercero"]');
 await comprobar('3. pulsar un título sin arrastrar sigue ordenando', p.evaluate(() => InicioOrden._estado()), { col: 'tercero', dir: 1 });
-for (const pestana of ['adm', 'esp', 'dorm', 'todos']) {
+for (const pestana of ['adm', 'esp', 'todos']) {
   await p.click('.inicio-pestana[data-pestana="' + pestana + '"]');
   await p.waitForSelector('.inicio-pestana.activa[data-pestana="' + pestana + '"]');
   await p.waitForTimeout(400);

@@ -201,34 +201,34 @@ await comprobar('al quitar Responsable, vuelven las cinco', filasYcuenta('todos'
 
 console.log('--- 2. "En Administración": los cinco filtros valen aquí también ---');
 await irA('adm');
-await comprobar('de partida, dos filas (ADM1, ADM2)', filasYcuenta('adm'), [2, 2]);
+await comprobar('de partida, tres filas (ADM1, ADM2 y DORM1, que no tiene hitos)', filasYcuenta('adm'), [3, 3]);
 
 await conFiltro('#inicio-me-toca-responsable', 'administracion', async () => {
   await comprobar('Responsable "Administración": solo ADM1 (ADM2 es de Diego)', filasYcuenta('adm'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('adm'), [2, 2]);
+await comprobar('vuelven las tres', filasYcuenta('adm'), [3, 3]);
 
 await conFiltro('#filtro-tipo-asunto', 'BAJA', async () => {
   await comprobar('Tipo "BAJA": solo ADM2', filasYcuenta('adm'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('adm'), [2, 2]);
+await comprobar('vuelven las tres', filasYcuenta('adm'), [3, 3]);
 
 await conFiltro('#filtro-plazo', 'sinplazo', async () => {
   await comprobar('Plazo "sin plazo": solo ADM2', filasYcuenta('adm'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('adm'), [2, 2]);
+await comprobar('vuelven las tres', filasYcuenta('adm'), [3, 3]);
 
 await conFiltro('#filtro-organo', 'JEFATURA', async () => {
   await comprobar('Lo encarga "Jefatura de Estudios": solo ADM2', filasYcuenta('adm'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('adm'), [2, 2]);
+await comprobar('vuelven las tres', filasYcuenta('adm'), [3, 3]);
 
 await conFiltro('#filtro-estado', 'terceros', async () => {
   await comprobar('Situación "Esperan a terceros" no tiene sentido aquí: tabla vacía, no se esconde la opción', filasYcuenta('adm'), [0, 0]);
   await comprobar('con el texto de vacío de "En Administración"',
     pagina.locator('#inicio-tabla-cuerpo').textContent().then(t => t.indexOf('Nada pendiente de Administración por ahora.') !== -1), true);
 });
-await comprobar('vuelven las dos', filasYcuenta('adm'), [2, 2]);
+await comprobar('vuelven las tres', filasYcuenta('adm'), [3, 3]);
 
 /* ================= 3. "EN ESPERA": LOS CINCO FILTROS ================= */
 
@@ -263,36 +263,35 @@ await conFiltro('#filtro-estado', 'sinhitos', async () => {
 });
 await comprobar('vuelven las dos', filasYcuenta('esp'), [2, 2]);
 
-/* ================= 4. "DORMIDOS": LOS CINCO FILTROS ================= */
+/* ================= 4. «SOLO DORMIDOS» (fila 451: ya no hay pestaña) ================= */
 
-console.log('--- 4. "Dormidos": los cinco filtros valen aquí también ---');
-await irA('dorm');
-await comprobar('de partida, dos filas (ADM2 y DORM1, dormidos los dos)', filasYcuenta('dorm'), [2, 2]);
+console.log('--- 4. «Solo dormidos»: cada pestaña enseña solo sus dormidos, y los demás filtros valen igual ---');
+await irA('todos');
+await pagina.selectOption('#filtro-estado', 'dormidos');
+await pagina.waitForTimeout(250);
+await comprobar('«Todos los abiertos»: ADM2 y DORM1, dormidos los dos', filasYcuenta('todos'), [2, 2]);
+await irA('adm');
+await comprobar('«En Administración»: los mismos dos (DORM1 no tiene hitos)', filasYcuenta('adm'), [2, 2]);
+await irA('esp');
+await comprobar('«En espera»: ninguno', filasYcuenta('esp'), [0, 0]);
+await irA('todos');
 
 await conFiltro('#inicio-me-toca-responsable', 'diego', async () => {
-  await comprobar('Responsable "Diego": solo ADM2 (DORM1 no tiene hito actual)', filasYcuenta('dorm'), [1, 1]);
+  await comprobar('Responsable "Diego": solo ADM2 (DORM1 no tiene hito actual)', filasYcuenta('todos'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('dorm'), [2, 2]);
-
-await conFiltro('#filtro-estado', 'sinhitos', async () => {
-  await comprobar('Situación "Sin hitos": solo DORM1', filasYcuenta('dorm'), [1, 1]);
-});
-await comprobar('vuelven las dos', filasYcuenta('dorm'), [2, 2]);
-
 await conFiltro('#filtro-organo', 'JEFATURA', async () => {
-  await comprobar('Lo encarga "Jefatura de Estudios": solo ADM2', filasYcuenta('dorm'), [1, 1]);
+  await comprobar('Lo encarga "Jefatura de Estudios": solo ADM2', filasYcuenta('todos'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('dorm'), [2, 2]);
-
 await conFiltro('#filtro-plazo', 'sinplazo', async () => {
-  await comprobar('Plazo "sin plazo": solo ADM2 (DORM1 está vencido)', filasYcuenta('dorm'), [1, 1]);
+  await comprobar('Plazo "sin plazo": solo ADM2 (DORM1 está vencido)', filasYcuenta('todos'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('dorm'), [2, 2]);
-
 await conFiltro('#filtro-tipo-asunto', 'TRASLADO', async () => {
-  await comprobar('Tipo "TRASLADO": solo DORM1', filasYcuenta('dorm'), [1, 1]);
+  await comprobar('Tipo "TRASLADO": solo DORM1', filasYcuenta('todos'), [1, 1]);
 });
-await comprobar('vuelven las dos', filasYcuenta('dorm'), [2, 2]);
+await comprobar('vuelven las dos', filasYcuenta('todos'), [2, 2]);
+await pagina.selectOption('#filtro-estado', '');
+await pagina.waitForTimeout(250);
+await comprobar('sin el filtro, vuelven las cinco', filasYcuenta('todos'), [5, 5]);
 
 /* ================= 5. "FILTROS (N)" CUENTA LOS CINCO, RESPONSABLE INCLUIDO ================= */
 
@@ -314,7 +313,8 @@ await pagina.click('#filtros-puestos .boton-limpiar');
 await pagina.waitForTimeout(300);
 await comprobar('Responsable queda limpio', pagina.locator('#inicio-me-toca-responsable').inputValue(), '');
 await comprobar('Plazo también', pagina.locator('#filtro-plazo').inputValue(), '');
-await comprobar('vuelven las dos filas de "Dormidos"', filasYcuenta('dorm'), [2, 2]);
+await irA('todos');
+await comprobar('vuelven las cinco filas de «Todos los abiertos»', filasYcuenta('todos'), [5, 5]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

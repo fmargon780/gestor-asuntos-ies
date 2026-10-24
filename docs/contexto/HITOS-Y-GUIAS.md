@@ -648,17 +648,16 @@ cruza por la clave del asunto.
 
 Se comprueba con `pruebas/que-me-toca.mjs`.
 
-**El bloque "Dormidos"** (19-sep-2026, fila 68, `docs/AVISOS-QUE-FALTAN.md`, 2): a diferencia de
-los otros tres, no cruza hitos, sino **asuntos abiertos** enteros sin novedades desde hace
+**Dormidos** (19-sep-2026, fila 68; desde la fila 451 ya no es un bloque ni una pestaña, sino una marca
+«Dormido · N días» en la fila y el filtro «Solo dormidos»): asuntos abiertos sin novedades desde hace
 `App.diasDormido()` días (60 por defecto; campo "Asuntos dormidos" en Ajustes → El centro,
-`registro.ajustesAvisos.diasDormido`, compartido entre los dos ordenadores). "Sin novedades" es,
-a propósito, barato: la fecha más reciente de `ficha.notaEl`, `ficha.situacionEl` y
-`ficha.editadoEl` (o `ficha.abiertoEl` si no hay ninguna de las tres). **No** mira el documento
-más nuevo de la carpeta: costaría un recorrido del disco por asunto solo para pintar esta
-pantalla. Cada línea lleva un botón **Abrir** y uno **Ocultar por 30 días**, que guarda
-`ficha.dormidoOcultoHasta` (vía `App.anotar`) y lo saca de la lista hasta esa fecha. Vive en
-`js/que-me-toca.js` junto a los demás bloques (`reunirDormidos`, `bloqueDormidos`,
-`App.diasDormido`/`App.guardarDiasDormido`/`App.pintarDiasDormido`), no en un fichero aparte.
+`registro.ajustesAvisos.diasDormido`). "Sin novedades" es, a propósito, barato: la fecha más reciente de
+`ficha.notaEl`, `ficha.situacionEl`, `ficha.editadoEl`, `ficha.abiertoEl` y, de hitos.json, `actividadEl` de
+la entrada del asunto (lo escribe `Hitos.marcar` al marcar o desmarcar y `situarEn`) y el `hechoEl` de sus
+hitos. **No** mira el documento más nuevo de la carpeta. `QueMeToca.diasDormidoDe(a)` da los días o `null`
+(también `null` si `ficha.dormidoOcultoHasta` está en el futuro o el asunto está en «Por liquidar»);
+`reunirDormidos()` los junta. «Dejar de avisar 30 días» (`QueMeToca.ocultarDormido`) está en el ⋮ de la fila.
+Todo vive en `js/que-me-toca.js`, no en un fichero aparte.
 
 ### La pantalla "Cuentas"
 

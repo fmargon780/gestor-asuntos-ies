@@ -163,8 +163,8 @@ await comprobar('con las cuatro filas', pagina.locator('#inicio-tabla-cuerpo .in
 console.log('--- 3. "En Administración": el vencido primero, el sin fecha con "Sin plazo" ---');
 await pagina.click('.inicio-pestana[data-pestana="adm"]');
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-hito="a1"]');
-await comprobar('dos filas en "En Administración" (A y D)',
-  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
+await comprobar('tres filas en "En Administración" (A, D y C, que no tiene hitos: fila 451)',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 3);
 await comprobar('el badge rojo de la pestaña dice "1" (solo A está vencido)',
   pagina.locator('.inicio-pestana[data-pestana="adm"] .cuenta-roja').textContent(), '1');
 await comprobar('la primera fila es la de A (vencida)',
@@ -176,6 +176,8 @@ await comprobar('D, sin fecha, sale detrás con "Sin plazo"',
   pagina.locator('#inicio-tabla-cuerpo tr[data-hito="d1"] .marca-plazo').textContent(), 'Sin plazo');
 await comprobar('D es la segunda fila (el vencido va primero)',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').nth(1).getAttribute('data-hito'), 'd1');
+await comprobar('C, sin ningún hito, va la última con «Añade un hito o archívalo»',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').nth(2).locator('.inicio-sin-hito').textContent(), 'Añade un hito o archívalo');
 
 console.log('--- 3b. pulsar la fila abre la mesa del hito, no la ficha a secas ---');
 await pagina.click('#inicio-tabla-cuerpo tr[data-hito="a1"]');
@@ -211,15 +213,14 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(300);
 
-/* ================= 5. "DORMIDOS" ================= */
+/* ================= 5. «DORMIDO», UNA MARCA EN LA FILA (fila 451) ================= */
 
-console.log('--- 5. "Dormidos": C, sin novedades desde hace 75 días ---');
-await pagina.click('.inicio-pestana[data-pestana="dorm"]');
+console.log('--- 5. «Dormido»: ya no es pestaña; C lleva la marca «Dormido · 75 días» ---');
+await comprobar('no hay pestaña «Dormidos»', pagina.locator('.inicio-pestana[data-pestana="dorm"]').count(), 0);
+await pagina.click('.inicio-pestana[data-pestana="todos"]');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .inicio-tabla-fila[data-asunto="' + CLAVE_C + '"]');
-await comprobar('una fila en "Dormidos"', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
-await comprobar('es C', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().getAttribute('data-asunto'), CLAVE_C);
-await comprobar('el número junto al nombre de la pestaña',
-  pagina.locator('.inicio-pestana[data-pestana="dorm"] .cuenta-lista').textContent(), '1');
+await comprobar('la fila de C lleva la marca',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila[data-asunto="' + CLAVE_C + '"] .marca-dormido').textContent(), 'Dormido · 75 días');
 
 /* ================= 6. PULSAR EL AVISO DE VENCIDOS FILTRA LA TABLA ================= */
 

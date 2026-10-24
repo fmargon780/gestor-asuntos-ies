@@ -228,6 +228,7 @@
       var entrada = d.porAsunto[clave];
       if (!entrada) return d;
       n = situarLista(entrada.hitos, idHito, nota, quien);
+      entrada.actividadEl = U.ahora();   /* fila 451 */
       return d;
     });
     var entrada = datos.porAsunto[clave];
