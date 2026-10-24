@@ -61,7 +61,11 @@ App.verAbiertosPorTurno = async function (yaLeido) {
   /* Fila 287: un directivo ve solo los asuntos de su órgano (Perfil.veAsunto; Administración, todos). */
   if (window.Perfil) App.E.listaAbiertos = App.E.listaAbiertos.filter(Perfil.veAsunto);
 
-  App.E.sueltos = hay.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
+  /* Fila 455: los sueltos salen de la carpeta de entrada (js/entrada.js), que sin señalar es esta misma raíz. */
+  var entrada = window.Entrada ? await Entrada.leer(hay) : { ficheros: hay.ficheros, noEsta: false };
+  if (turno !== App.turnoVerAbiertos) return App.promesaVerAbiertos;
+  App.E.entradaNoEsta = !!entrada.noEsta;
+  App.E.sueltos = entrada.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
 
   /* Un documento que ya se ha metido en su carpeta deja de estar recién
      llegado: se quita del contador de la pestaña del navegador. */

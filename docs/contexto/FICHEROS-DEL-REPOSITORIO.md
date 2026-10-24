@@ -437,6 +437,10 @@ de `App` va después del fichero que lo define.
 | `js/permisos-carpetas.js` | El permiso de las carpetas recordadas (alumnado, bandeja, Centro de datos): `estado`, `pedir` y `pedirAlEntrar` (lo llama «Entrar»); sus filas del panel llevan «Dar permiso» (fila 318) |
 | `js/demo/permisos.js` | Copia de pruebas: `sinpermiso=` (carpetas que empiezan sin permiso) y `niega=` (las que lo niegan) (fila 318) |
 | `pruebas/permisos-carpetas.mjs` | «Dar permiso» en las tres filas, `niega`, «Entrar» pide los tres permisos, carpeta omitida, peticiones seguidas y la demostración de siempre (fila 318) |
+| `js/entrada.js` | La carpeta de entrada de documentos sueltos (handle `entrada`, fila 455): `leer`, `dir`, `elegir`, `quitar`. Sin señalar es la raíz de abiertos; señalada, otra carpeta; si no se encuentra (o sin señalar con `nube: "drive"` en `rutas.json`), «Por clasificar» dice «Los documentos por clasificar solo se ven en el instituto.» |
+| `js/entrada-ajustes.js` | «Carpeta de entrada de documentos sueltos» en Ajustes → Mantenimiento, con «Señalar» y «Usar la de asuntos vivos» (fila 455) |
+| `js/demo/entrada.js` | Demostración: `?entrada=1` (carpeta señalada con dos documentos) y `?entrada=falta` (señalada, sin encontrarla) (fila 455) |
+| `pruebas/entrada-documentos-sueltos.mjs` | Sin señalar, señalada (clasificar mueve entre carpetas), sin encontrar y `nube: "drive"` (fila 455) |
 | `css/comprobacion-entrada.css` | El aspecto de la marca y de las filas del panel |
 | `pruebas/comprobacion-entrada.mjs` | Falta casi todo (panel solo, «Arreglarlo» lleva al bloque), «No lo uso en este ordenador», todo bien (marca verde) y una comprobación imposible (gris con motivo) |
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |

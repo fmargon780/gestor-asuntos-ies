@@ -244,7 +244,7 @@ var Papelera = (function () {
   }
 
   async function mandarSuelto(s) {
-    await mandarFichero(App.E.abiertos, s.nombre, 'suelto', null);
+    await mandarFichero(((window.Entrada && Entrada.dir()) || App.E.abiertos), s.nombre, 'suelto', null);
   }
 
   /* ---------- buscar la carpeta de un asunto por su nombre ----------

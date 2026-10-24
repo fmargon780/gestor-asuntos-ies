@@ -252,6 +252,20 @@
     return resultado('bandeja', T, 'bien', 'Señalada y se lee.');
   }
 
+  /* Fila 455: la carpeta de entrada de documentos sueltos (js/entrada.js). Sin señalar es lo de siempre
+     (la raíz de asuntos vivos); señalada y sin encontrar no es un error: «Por clasificar» lo dice. */
+  async function entrada() {
+    var T = 'Carpeta de entrada de documentos sueltos';
+    var arreglar = llevarA('#entrada-ajustes');
+    var h = window.Entrada ? Entrada.carpetaSenalada() : null;
+    if (!h) return resultado('entrada', T, 'bien', 'Sin señalar: se usa la de asuntos vivos.');
+    if (enDemo() && !(Demo.permisosSimulados && Demo.permisosSimulados())) return resultado('entrada', T, 'bien', 'Señalada.');
+    if (!(await Carpetas.permiso(h, false))) {
+      return pedirPermiso('entrada', T, 'la carpeta de entrada de documentos sueltos', arreglar);
+    }
+    return resultado('entrada', T, 'bien', Entrada.noSeVe() ? Entrada.FRASE_NO_ESTA : 'Señalada.');
+  }
+
   async function envio() {
     var T = 'Envío de correo';
     var arreglar = llevarA('#envio-correo-url');
@@ -398,6 +412,7 @@
     ['alumnado', 'Base de datos de alumnado', alumnado],
     ['centro-de-datos', 'Carpeta del Centro de datos', centroDeDatos],
     ['bandeja', 'Bandeja de Gmail', bandeja],
+    ['entrada', 'Carpeta de entrada de documentos sueltos', entrada],
     ['envio', 'Envío de correo', envio],
     ['ruta', 'Ruta de Dropbox en este ordenador', ruta],
     ['centro-datos', 'Datos del centro', datosDelCentro],

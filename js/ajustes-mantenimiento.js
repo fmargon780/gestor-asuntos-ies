@@ -78,6 +78,7 @@ App.pintarCarpetasDeEsteOrdenador = function () {
   carp.innerHTML = '';
   carp.appendChild(App.filaEstado('Asuntos abiertos', App.E.abiertos.name));
   carp.appendChild(App.filaEstado('Archivo', App.E.archivo.name));
+  if (window.EntradaAjustes) EntradaAjustes.pintar($('entrada-ajustes'));   /* fila 455 */
 };
 
 $('btn-olvidar').onclick = async function () {

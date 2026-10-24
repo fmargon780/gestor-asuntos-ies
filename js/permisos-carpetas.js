@@ -31,6 +31,9 @@
       /* En «solo consultar» el Centro de datos no se lee (js/centro-de-datos.js): no se pide. */
       noSePide: function () { return !!(window.SoloConsulta && SoloConsulta.activo()); } },
     { id: 'bandeja', carpeta: function () { return Almacen.leer('bandeja'); },
+      permiso: function (d, p) { return Carpetas.permiso(d, p); } },
+    /* Fila 455: la carpeta de entrada de documentos sueltos, si está señalada. */
+    { id: 'entrada', carpeta: function () { return window.Entrada ? Entrada.carpetaSenalada() : null; },
       permiso: function (d, p) { return Carpetas.permiso(d, p); } }
   ];
 
