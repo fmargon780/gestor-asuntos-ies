@@ -35,7 +35,7 @@
       var nombre = div.querySelector('.tarjeta-nombre');
       if (nombre) {
         nombre.classList.add('nombre-pulsable');
-        nombre.title = 'Abrir la ficha de este asunto';
+        nombre.setAttribute('data-ayuda-clave', 'abrir-la-ficha-de-este-asunto');
         nombre.onclick = async function (ev) {
           ev.stopPropagation();
           /* Fila 64: la tarjeta del ARCHIVO solo trae lo poco que
@@ -55,7 +55,7 @@
           if (BOTONES_DE_LA_TARJETA.indexOf(texto) === -1) { acciones.removeChild(h); return; }
           if (NOMBRES_NUEVOS[texto]) {
             h.textContent = NOMBRES_NUEVOS[texto];
-            h.title = 'Llevar la carpeta al ARCHIVO';
+            h.setAttribute('data-ayuda-clave', 'llevar-la-carpeta-al-archivo');
           }
         });
       }

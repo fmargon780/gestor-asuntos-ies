@@ -138,13 +138,13 @@ var Documentos = (function () {
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +
                  (pendiente ? '<span class="marca-sin-registrar">Sin registrar</span>' : '') +
                  '<button type="button" class="boton" data-copiar="' + i + '" ' +
-                   'title="Copiar el nombre del documento, sin la extensión">Copiar nombre</button>' +
+                   'data-ayuda-clave="copiar-nombre-documento">Copiar nombre</button>' +
                  '<button type="button" class="boton" data-renombrar="' + i + '">Cambiar el nombre</button>' +
                  (sinRegistro ? '<button type="button" class="boton' + (pendiente ? ' boton-ambar' : '') +
-                   '" data-registrar="' + i + '" title="Dar registro de entrada o salida a este documento">' +
+                   '" data-registrar="' + i + '" data-ayuda-clave="dar-registro">' +
                    'Registrar</button>' : '') +
                  '<button type="button" class="boton boton-peligro" data-borrar="' + i +
-                   '" style="margin-left:auto" title="Va a la papelera">Borrar</button>' +
+                   '" style="margin-left:auto" data-ayuda-clave="va-a-la-papelera">Borrar</button>' +
                '</div>';
       }).join('') + '</div>';
     }
@@ -176,7 +176,7 @@ var Documentos = (function () {
        86). Los botones de la propia fila siguen haciendo lo suyo. */
     Array.prototype.forEach.call(caja.querySelectorAll('.fila-documento'), function (fila, i) {
       fila.style.cursor = 'pointer';
-      fila.title = 'Pulsa para verlo';
+      fila.setAttribute('data-ayuda-clave', 'pulsa-para-verlo');
       fila.onclick = function (ev) {
         if (ev.target.closest('button, a, input, select, textarea, label')) return;
         N.pintarFormulario({ modo: 'renombrar', nombreActual: lista[i].nombre });

@@ -225,7 +225,7 @@
     }
     linea.id = 'avisos-linea-pliega';
     linea.className = 'avisos-linea-plegado avisos-linea-pliega';
-    linea.title = 'Plegar los avisos';
+    linea.setAttribute('data-ayuda-clave', 'plegar-los-avisos');
     linea.setAttribute('aria-label', 'Plegar los avisos');
     linea.setAttribute('aria-expanded', 'true');
     linea.textContent = etiqueta + ' ▾';
@@ -256,7 +256,7 @@
     ocultar.type = 'button';
     ocultar.id = 'avisos-linea-ocultar';
     ocultar.className = 'avisos-linea-ocultar';
-    ocultar.title = 'Ocultar por hoy';
+    ocultar.setAttribute('data-ayuda-clave', 'ocultar-por-hoy');
     ocultar.setAttribute('aria-label', 'Ocultar por hoy');
     ocultar.textContent = '✕';
     ocultar.onclick = ocultarPorHoy;

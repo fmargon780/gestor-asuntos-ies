@@ -122,14 +122,14 @@ var PlantillasPantalla = (function () {
     var deLaApp = esDeLaApp(p);
     var menu = (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="sustituir"' + off + '>Sustituir el fichero…</button>' : '') +
       (enUso(p)
-        ? '<button type="button" class="boton" data-accion="fuera"' + (deLaApp ? ' disabled title="La aplicación la necesita para avisar a quien lo pide."' : off) + '>Dejar fuera de uso…</button>'
+        ? '<button type="button" class="boton" data-accion="fuera"' + (deLaApp ? ' disabled data-motivo-clave="plantilla-de-la-app-fuera"' : off) + '>Dejar fuera de uso…</button>'
         : '<button type="button" class="boton" data-accion="activar"' + off + '>Volver a activar</button>') +
-      '<button type="button" class="boton boton-peligro" data-accion="borrar"' + (deLaApp ? ' disabled title="La aplicación la vuelve a crear sola."' : off) + '>Borrar</button>';
+      '<button type="button" class="boton boton-peligro" data-accion="borrar"' + (deLaApp ? ' disabled data-motivo-clave="plantilla-de-la-app-borrar"' : off) + '>Borrar</button>';
     return '<td class="pt-acciones"><button type="button" class="boton" data-accion="ver" data-solo-lectura>Ver</button> ' +
       (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="retocar"' +
         (E.falta[p.id] ? ' disabled title="El fichero «' + esc(p.fichero) + '» no está en la carpeta de plantillas."' : off) + '>Retocar</button> ' : '') +
       '<button type="button" class="boton" data-accion="cambiar"' + off + '>Cambiar</button> ' +
-      '<details class="pt-mas-menu"><summary title="Más" data-solo-lectura>⋮</summary><div class="pt-menu">' + menu + '</div></details></td>';
+      '<details class="pt-mas-menu"><summary data-ayuda-clave="mas" data-solo-lectura>⋮</summary><div class="pt-menu">' + menu + '</div></details></td>';
   }
 
   function cabecera() {

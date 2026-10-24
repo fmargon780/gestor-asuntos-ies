@@ -135,7 +135,7 @@ var FichaDatosAMano = (function () {
     if (asuntoClave !== a.nombre) { asuntoClave = a.nombre; abierta = false; datos = null; }
     caja.innerHTML =
       '<section class="ficha-bloque datos-mano" id="datos-mano">' +
-        '<div class="datos-mano-cabeza" id="datos-mano-cabeza" role="button" tabindex="0" aria-expanded="false" title="Datos del asunto: pulsa para desplegar o plegar">' +
+        '<div class="datos-mano-cabeza" id="datos-mano-cabeza" role="button" tabindex="0" aria-expanded="false" data-ayuda-clave="datos-del-asunto-plegar">' +
           '<span class="datos-mano-flecha" aria-hidden="true">▸</span>' +
           '<span class="datos-mano-titulo">Datos del asunto</span>' +
           '<span class="datos-mano-linea" id="datos-mano-linea"></span>' +

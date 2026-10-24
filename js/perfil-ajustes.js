@@ -56,7 +56,7 @@ var PerfilAjustes = (function () {
       f.className = 'fila-tipo perfil-fila';
       f.dataset.nombre = n;
       f.innerHTML = '<span class="nombre-tipo">' + U.escapar(n) + '</span>' +
-        '<select class="campo perfil-elegir" title="Perfil">' + Perfil.PERFILES.map(function (p) {
+        '<select class="campo perfil-elegir" data-ayuda-clave="perfil">' + Perfil.PERFILES.map(function (p) {
           return '<option value="' + p.valor + '"' + (Perfil.perfilDe(n) === p.valor ? ' selected' : '') + '>' + U.escapar(p.texto) + '</option>';
         }).join('') + '</select>' +
         '<input class="campo perfil-correo" placeholder="Correo (opcional)" value="' + U.escapar(Perfil.correoDe(n)) + '">';

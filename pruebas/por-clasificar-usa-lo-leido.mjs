@@ -91,10 +91,10 @@ await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 
 console.log('--- lo leído deja el botón listo para crear de un tirón ---');
-await pagina.waitForSelector('#lista-sueltos [data-accion-suelto="crear"][title]', { timeout: 15000 });
+await pagina.waitForSelector('#lista-sueltos [data-accion-suelto="crear"][data-ayuda-clave]', { timeout: 15000 });
 await comprobar('el título dice que crea con lo leído',
-  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').getAttribute('title'),
-  'Crea el asunto con lo leído y mete el documento dentro');
+  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').evaluate((b) => AyudaRaton.ayuda(b).ayuda),
+  'Crea el asunto con lo leído y guarda el documento dentro.');
 await comprobar('sigue siendo el botón principal (sin sugerencias)',
   pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').evaluate((b) => b.classList.contains('boton-principal')), true);
 

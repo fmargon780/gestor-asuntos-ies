@@ -63,7 +63,7 @@
     h.type = 'time';
     h.id = idHora;
     h.className = 'campo tablon-hora';
-    h.title = 'A qué hora es, si tiene hora (hace falta poner el día)';
+    h.setAttribute('data-ayuda-clave', 'a-que-hora-es-si-tiene');
     h.value = hora || '';
     caja.appendChild(h);
 

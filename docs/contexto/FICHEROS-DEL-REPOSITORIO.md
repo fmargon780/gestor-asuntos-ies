@@ -622,6 +622,10 @@ de `App` va después del fichero que lo define.
 | `docs/CLAVE-COPIA-PUBLICA.md` | Pasos para Francisco (fila 89): crear el repositorio público, el token de grano fino y el secreto `COPIA_TOKEN` |
 | `docs/INSTALAR-COPIA.md` | Pasos para Francisco (filas 89 y 91): guardar `ABRIR EL GESTOR.html` en el Dropbox del centro y abrirlo; y lo mismo si la copia se ha quedado vieja |
 | `README.md` | — |
+| `js/ayuda-raton.js` | Fila 462: el recuadro de ayuda al dejar el ratón quieto (400 ms) sobre pestañas y botones; pasa todo `title` a `data-ayuda` y enseña el motivo de un botón apagado (`docs/AYUDA-AL-PASAR-EL-RATON.md`) |
+| `js/ayudas.js` | Fila 462: todos los textos fijos del recuadro de ayuda, uno por línea (por clave, identificador, pestaña o rótulo), los botones obvios sin recuadro y los motivos de un botón apagado |
+| `css/ayuda-raton.css` | Fila 462: el aspecto del recuadro de ayuda |
+| `pruebas/ayuda-al-pasar-el-raton.mjs` | Fila 462: el recuadro sale y se va, «Liquidar» apagado dice por qué, «Guardar» no lo lleva, el tabulador, el borde de la pantalla, ningún `title`, pantalla táctil |
 | `js/solo-consulta.js` | Fila 260: «En este ordenador, solo consultar»: la marca (`localStorage`), `proteger` (carpetas que rechazan escribir con error `SoloConsulta`), el aviso fijo con «Quitar» y el apagado de los controles que cambian algo |
 | `pruebas/solo-consulta.mjs` | Prueba de la fila 260: cero escrituras en el disco de demostración, el cierre aguanta, aviso fijo, controles apagados, «Quitar» |
 | `js/control-registro.js` | Fila 259: control del registro de entrada y de salida, sin pantalla: leer los CSV de Séneca (`leerCsv`), guardar apuntes y decisiones en `_GESTOR` (`control-registro.json`, `control-registro/<año>.json`), emparejar con los asuntos (`clasificar`), huecos de numeración y avisos |

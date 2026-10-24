@@ -305,10 +305,10 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
       '<div class="marcados-lista">' + lista.map(function (m) {
         var clave = m.categoria + '|' + m.nombre;
         return '<span class="marcado-chip' + (m.perdido ? ' marcado-chip-perdido' : '') + '"' +
-          (m.perdido ? ' title="Ya no está en las listas: se conserva igual, hasta que lo quites tú"' : '') + '>' +
+          (m.perdido ? ' data-ayuda-clave="ya-no-esta-en-las-listas"' : '') + '>' +
           U.escapar(m.nombre) +
           '<button type="button" class="marcado-quitar" data-clave="' + U.escapar(clave) + '" ' +
-          'title="Quitarlo de lo señalado">×</button></span>';
+          'data-ayuda-clave="quitar-de-lo-senalado">×</button></span>';
       }).join('') + '</div>' +
       (sitioBarra ? '<div class="marcados-acciones"><button type="button" class="boton" id="rel-cancelar">Cancelar</button>' + botonPrincipal + '</div>' : '');
 

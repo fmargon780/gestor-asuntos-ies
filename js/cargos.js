@@ -288,9 +288,9 @@ window.Cargos = Cargos;
     desde.type = 'date'; desde.className = 'campo campo-plazo'; desde.value = o.desde;
     var hasta = document.createElement('input');
     hasta.type = 'date'; hasta.className = 'campo campo-plazo'; hasta.value = o.hasta;
-    hasta.title = 'Vacío: sigue en el cargo';
+    hasta.setAttribute('data-ayuda-clave', 'vacio-sigue-en-el-cargo');
     var sexo = document.createElement('select');   /* fila 111: para «El/La Director/a» */
-    sexo.className = 'campo'; sexo.title = 'Sexo, para las plantillas';
+    sexo.className = 'campo'; sexo.setAttribute('data-ayuda-clave', 'sexo-para-las-plantillas');
     sexo.innerHTML = '<option value="">Sexo…</option><option value="H">Hombre</option><option value="M">Mujer</option>';
     sexo.value = o.sexo || '';
 

@@ -49,7 +49,7 @@ console.log('--- 1. la entrada y la pantalla ---');
 await abrirFicha('Aguilar Ponce, Pablo');
 const antes = await nombresDeCarpeta('Aguilar Ponce, Pablo');
 const e1 = await entrada('JUSTIFICANTE');
-await comprobar('1. en el PDF «JUSTIFICANTE» (sin Word) la entrada está encendida', [await e1.isDisabled(), await e1.getAttribute('title')], [false, null]);
+await comprobar('1. en el PDF «JUSTIFICANTE» (sin Word) la entrada está encendida', [await e1.isDisabled(), await e1.getAttribute('data-ayuda')], [false, null]);
 await e1.click();
 await pagina.waitForSelector('#convertir-plantilla .cep-linea', { timeout: 30000 });
 await pagina.waitForTimeout(2500);

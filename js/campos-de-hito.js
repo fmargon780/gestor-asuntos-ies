@@ -89,7 +89,7 @@ window.CamposDeHito = (function () {
           (f.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') + '</label>' +
         control +
         (editable ? '<button type="button" class="campo-hito-menu" data-clave="' + U.escapar(f.clave) +
-          '" data-nombre="' + U.escapar(f.nombre) + '" title="Más opciones">⋮</button>' : '') +
+          '" data-nombre="' + U.escapar(f.nombre) + '" data-ayuda-clave="mas-opciones">⋮</button>' : '') +
         '</div>';
     }).join('');
     return '<section class="mesa-bloque mesa-campos-hito' + (campos.length ? '' : ' mesa-campos-hito-vacia') + '">' +

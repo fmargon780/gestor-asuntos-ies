@@ -230,7 +230,7 @@ var U = (function () {
       var x = document.createElement('button');
       x.type = 'button';
       x.className = 'mensaje-cerrar';
-      x.title = 'Cerrar este aviso';
+      x.setAttribute('data-ayuda-clave', 'cerrar-este-aviso');
       x.setAttribute('aria-label', 'Cerrar este aviso');
       x.textContent = '✕';
       x.onclick = function () { d.remove(); };

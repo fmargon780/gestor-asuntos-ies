@@ -40,7 +40,7 @@ var VariosCuadro = (function () {
     x.type = 'button';
     x.id = 'varios-cerrar';
     x.className = 'cuadro-cerrar-x';
-    x.title = 'Cancelar';
+    x.setAttribute('data-ayuda-clave', 'cancelar');
     x.setAttribute('aria-label', 'Cancelar');
     x.textContent = '✕';
     x.onclick = function () { $('cuadro-cancelar').click(); };

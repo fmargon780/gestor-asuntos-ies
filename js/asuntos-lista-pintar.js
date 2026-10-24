@@ -225,7 +225,7 @@ App.tarjetaAsunto = function (a, modo) {
                         U.escapar(Nombres.tipoParaVer(a.leido.tipo, App.E.tipos)) + '</span>' : '') +
         (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
         (lado && lado.lado === 'terceros' && lado.quien && !lado.esperando
-          ? '<span class="marca-quien" title="Lo tiene ahora">' + U.escapar(lado.quien) + '</span>' : '') +
+          ? '<span class="marca-quien" data-ayuda-clave="lo-tiene-ahora">' + U.escapar(lado.quien) + '</span>' : '') +
         U.escapar(a.nombre) +
       '</div>' +
       /* Fila 129: el estado es el hito actual (js/estado-hito.js), en su
@@ -262,7 +262,7 @@ App.tarjetaAsunto = function (a, modo) {
     var editar = document.createElement('button');
     editar.className = 'boton';
     editar.textContent = 'Cambiar';
-    editar.title = 'Cambiar la fecha, el tipo, la descripción o el tercero';
+    editar.setAttribute('data-ayuda-clave', 'cambiar-la-fecha-el-tipo-la');
     editar.onclick = function () { App.editarAsunto(a); };
     acciones.appendChild(editar);
   }
@@ -270,7 +270,7 @@ App.tarjetaAsunto = function (a, modo) {
   var copiar = document.createElement('button');
   copiar.className = 'boton';
   copiar.textContent = 'Copiar nombre';
-  copiar.title = 'Para pegarlo como asunto del correo';
+  copiar.setAttribute('data-ayuda-clave', 'para-pegarlo-como-asunto-del-correo');
   copiar.onclick = function () {
     U.copiar(a.nombre).then(function (ok) {
       if (ok) U.aviso('Nombre copiado.', 'bueno');
@@ -461,7 +461,7 @@ App.filaTablaAsunto = function (a, opciones) {
   }
   /* Fila 239: el número del asunto, junto al tipo. */
   var numeroDeAsunto = (a.ficha && a.ficha.numero) || (a.leido && a.leido.numero) || '';
-  if (numeroDeAsunto) tdTipo.innerHTML += '<span class="marca-numero" title="Número del asunto">' + U.escapar(numeroDeAsunto) + '</span>';
+  if (numeroDeAsunto) tdTipo.innerHTML += '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(numeroDeAsunto) + '</span>';
   celdas.tipo = tdTipo;
 
   /* ---------- Hito actual ---------- */

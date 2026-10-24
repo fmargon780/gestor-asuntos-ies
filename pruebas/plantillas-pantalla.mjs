@@ -146,7 +146,7 @@ await p.waitForSelector('#capa:not(.oculto) .pt-texto');
 await comprobar('16. «Ver» de correo enseña su texto, solo para leer', p.evaluate(() => [document.querySelector('#cuadro-cuerpo .pt-texto').textContent.indexOf('Hemos recibido su parte de baja') !== -1, document.getElementById('cuadro-cancelar').classList.contains('oculto'), document.querySelectorAll('#cuadro-cuerpo textarea').length]), [true, true, 0]);
 await p.click('#cuadro-aceptar');
 await fila(p, 'Aviso de avance').locator('summary').click();
-await comprobar('17. «Borrar» está apagado en «Aviso de avance»', p.evaluate(() => { const b = [...document.querySelectorAll('.pt-tabla tbody tr')].filter((x) => x.children[0].textContent.indexOf('Aviso de avance') === 0)[0].querySelector('[data-accion="borrar"]'); return [b.disabled, b.title]; }), [true, 'La aplicación la vuelve a crear sola.']);
+await comprobar('17. «Borrar» está apagado en «Aviso de avance»', p.evaluate(() => { const b = [...document.querySelectorAll('.pt-tabla tbody tr')].filter((x) => x.children[0].textContent.indexOf('Aviso de avance') === 0)[0].querySelector('[data-accion="borrar"]'); return [b.disabled, AyudaRaton.ayuda(b).motivo]; }), [true, 'La aplicación vuelve a crear esta plantilla sola: no se puede borrar.']);
 await fila(p, 'Aviso de avance').locator('summary').click();
 await fila(p, 'Confirmación de matrícula').locator('summary').click();
 await fila(p, 'Confirmación de matrícula').locator('[data-accion="borrar"]').click();

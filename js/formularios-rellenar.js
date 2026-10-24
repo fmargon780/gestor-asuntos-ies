@@ -287,7 +287,7 @@ var FormulariosRellenar = (function () {
       boton.type = 'button';
       boton.className = 'boton boton-preparar-formulario';
       boton.textContent = 'Preparar para el tercero';
-      boton.title = 'Rellena los datos del centro y del curso, y lo guarda en la carpeta del asunto';
+      boton.setAttribute('data-ayuda-clave', 'rellena-los-datos-del-centro-y');
       boton.onclick = function () {
         boton.disabled = true;
         prepararParaElTercero(asuntoDeEsteMomento, clave).finally(function () { boton.disabled = false; });

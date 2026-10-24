@@ -180,14 +180,14 @@ var PersonasDelGrupo = (function () {
   function celdaGenerado(f) {
     if (!f.generado) return '';
     return '<button type="button" class="enlace pg-abrir" data-solo-lectura data-fichero="' + U.escapar(f.generado.fichero) +
-      '" title="Abrir su documento">' + U.escapar(fechaLarga(f.generado.fecha)) + '</button>';
+      '" data-ayuda-clave="abrir-su-documento">' + U.escapar(fechaLarga(f.generado.fecha)) + '</button>';
   }
 
   /* Fila 295: la celda «Enviado»: fecha y dirección (abre el PDF de su tanda), «No ha salido: …» o «Pendiente de enviar». */
   function celdaEnviado(f, extra) {
     if (f.enviado) {
       var texto = U.escapar(fechaLarga(f.enviado.fecha) + (f.enviado.correo ? ' · ' + f.enviado.correo : ''));
-      return f.enviado.pdf ? '<button type="button" class="enlace pg-abrir" data-solo-lectura data-fichero="' + U.escapar(f.enviado.pdf) + '" title="Abrir el correo enviado">' + texto + '</button>' : texto;
+      return f.enviado.pdf ? '<button type="button" class="enlace pg-abrir" data-solo-lectura data-fichero="' + U.escapar(f.enviado.pdf) + '" data-ayuda-clave="abrir-correo-enviado">' + texto + '</button>' : texto;
     }
     if (extra && extra.pendiente && (extra.esAviso || f.generado)) return '<span class="suave">Pendiente de enviar</span>';
     var fallo = extra && extra.fallos && extra.fallos[f.persona.categoria + '|' + f.persona.nombre];
@@ -206,7 +206,7 @@ var PersonasDelGrupo = (function () {
         (esAviso ? '' : '<td class="pg-generado">' + celdaGenerado(f) + '</td>') +
         (conRegistro && !esAviso ? '<td class="pg-registrado">' + (f.registrado.length ? U.escapar(f.registrado.join(', ')) : (f.generado ? '<span class="suave">Pendiente</span>' : '')) + '</td>' : '') +
         '<td class="pg-enviado">' + celdaEnviado(f, extra) + '</td>' +
-        '<td><button type="button" class="boton boton-chico pg-mas" data-solo-lectura title="Más acciones">⋯</button></td></tr>';
+        '<td><button type="button" class="boton boton-chico pg-mas" data-solo-lectura data-ayuda-clave="mas-acciones">⋯</button></td></tr>';
     }).join('');
     return '<table class="pg-tabla"><thead>' + cab + '</thead><tbody>' + cuerpo + '</tbody></table>' +
       (vista.length ? '' : '<p class="explica">Nadie con eso.</p>');

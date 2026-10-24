@@ -60,7 +60,7 @@
                '<span class="marca-tipo">' + U.escapar(r.categoria) + '</span>' +
                '<span>' + U.escapar(r.nombre) + '</span>' +
                '<button type="button" class="boton rel-copiar" data-i="' + i + '" ' +
-                 'title="Copiar el nombre en orden normal, para pegarlo en un documento">Copiar</button>' +
+                 'data-ayuda-clave="copiar-nombre-normal">Copiar</button>' +
                (abierto
                  ? '<button type="button" class="boton rel-quitar" data-i="' + i + '">Quitar</button>'
                  : '') +

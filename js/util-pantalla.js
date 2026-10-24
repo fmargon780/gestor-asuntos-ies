@@ -159,7 +159,7 @@
     var boton = document.createElement('button');
     boton.type = 'button';
     boton.className = 'fila-menu-btn';
-    boton.title = 'Más acciones';
+    boton.setAttribute('data-ayuda-clave', 'mas-acciones');
     boton.setAttribute('aria-haspopup', 'true');
     boton.setAttribute('aria-expanded', 'false');
     boton.textContent = '⋮';

@@ -137,7 +137,7 @@ var Esperas = (function () {
     if (!e || e.id !== h.id) return '';
     if (!(h.fecha && h.fecha < U.hoyIso())) return '';
     return '<button type="button" class="boton mesa-sin-respuesta"' +
-      (soloConsulta() ? ' disabled title="En este ordenador solo se puede consultar"' : '') + '>No ha llegado nada</button>';
+      (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>No ha llegado nada</button>';
   }
 
   function abrirElSiguiente(a) {

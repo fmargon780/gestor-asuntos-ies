@@ -95,8 +95,8 @@ var RegistroAsunto = (function () {
       '<div class="nota-cabeza">' +
         '<span class="nota-cuando">' + U.escapar(window.Notas ? Notas.cuando(l.cuando) : l.cuando) + '</span>' +
         (l.quien ? '<span class="nota-quien">' + U.escapar(l.quien) + '</span>' : '') + hito +
-        (l.delAsunto ? '<span class="registro-del-asunto" title="Nota del asunto, no unida a ningún hito">del asunto</span>' : '') +
-        (editable ? '<span class="registro-menu"><button type="button" class="registro-mas" title="Cambiar o borrar" aria-label="Cambiar o borrar esta línea">⋮</button>' +
+        (l.delAsunto ? '<span class="registro-del-asunto" data-ayuda-clave="nota-del-asunto">del asunto</span>' : '') +
+        (editable ? '<span class="registro-menu"><button type="button" class="registro-mas" data-ayuda-clave="cambiar-o-borrar" aria-label="Cambiar o borrar esta línea">⋮</button>' +
           '<span class="registro-acciones oculto"><button type="button" class="boton registro-cambiar">Cambiar</button>' +
           '<button type="button" class="boton registro-borrar">Borrar</button></span></span>' : '') +
       '</div>' +

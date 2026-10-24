@@ -116,7 +116,7 @@ window.NovedadesVentana = (function () {
     var s = document.createElement('span');
     s.className = 'version-pulsable';
     s.textContent = v;
-    s.title = 'Ver qué hay de nuevo';
+    s.setAttribute('data-ayuda-clave', 'ver-que-hay-de-nuevo');
     s.setAttribute('role', 'button');
     s.tabIndex = 0;
     s.onclick = function () { ver(); };

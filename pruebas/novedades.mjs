@@ -85,8 +85,8 @@ await comprobar('y cuenta como vista', pagina.evaluate(() => localStorage.getIte
 
 console.log('--- 4. el número de versión, pulsable ---');
 await comprobar('la versión es pulsable, con su título',
-  pagina.evaluate(() => { const s = document.querySelector('#usuario-pie .version-pulsable'); return s ? [s.title, s.textContent === App.textoVersion()] : null; }),
-  ['Ver qué hay de nuevo', true]);
+  pagina.evaluate(() => { const s = document.querySelector('#usuario-pie .version-pulsable'); return s ? [AyudaRaton.ayuda(s).ayuda, s.textContent === App.textoVersion()] : null; }),
+  ['Enseña las novedades de la aplicación.', true]);
 await pagina.click('#usuario-pie .version-pulsable');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('salen las 10 últimas, vistas o no', pagina.locator('.novedades-lista:not(.oculto) li').count(), 10);

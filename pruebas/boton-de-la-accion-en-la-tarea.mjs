@@ -98,8 +98,8 @@ console.log('--- 4. solo consultar ---');
 const consulta = await paginaNueva(true);
 await abrirMesa(consulta, 'Vidal Soto');
 await comprobar('4. los botones salen apagados, con su título',
-  consulta.$$eval('.hito-en-mesa .guion-accion-tarea', (l) => l.map((b) => [b.disabled, b.title])),
-  [[true, 'En este ordenador solo se puede consultar'], [true, 'En este ordenador solo se puede consultar']]);
+  consulta.$$eval('.hito-en-mesa .guion-accion-tarea', (l) => l.map((b) => [b.disabled, AyudaRaton.ayuda(b).motivo])),
+  [[true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.'], [true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.']]);
 await consulta.close();
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);

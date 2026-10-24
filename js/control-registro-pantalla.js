@@ -98,7 +98,7 @@ var ControlRegistroPantalla = (function () {
       return filaBase(x, '<td class="cr-acciones">' +
         '<button type="button" class="boton" data-accion="crear"' + off + '>Crear asunto</button> ' +
         '<button type="button" class="boton" data-accion="no-necesita"' + off + '>No necesita asunto</button> ' +
-        '<details class="cr-mas"><summary title="Más">⋮</summary><div class="cr-menu">' +
+        '<details class="cr-mas"><summary data-ayuda-clave="mas">⋮</summary><div class="cr-menu">' +
         '<button type="button" class="boton" data-accion="es-de"' + off + '>Es de este asunto…</button>' +
         (x.apunte.clase ? '<button type="button" class="boton" data-accion="clase"' + off + '>Esta clase nunca lleva asunto</button>' : '') +
         '</div></details></td>');

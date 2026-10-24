@@ -36,7 +36,7 @@ var CandidaturasFicha = (function () {
     var docs = (c.documentos || []).map(function (d) {
       return ficheros[d]
         ? '<button type="button" class="enlace cand-doc" data-doc="' + esc(d) + '">' + esc(d) + '</button>'
-        : '<span class="suave cand-doc-falta" title="Ese documento ya no está en la carpeta">' + esc(d) + ' (ya no está)</span>';
+        : '<span class="suave cand-doc-falta" data-ayuda-clave="documento-ya-no-esta">' + esc(d) + ' (ya no está)</span>';
     }).join(' ');
     var off = soloConsulta() ? ' disabled' : '';
     return '<li class="cand-fila" data-id="' + esc(c.id) + '">' +
@@ -226,7 +226,7 @@ var CandidaturasFicha = (function () {
     boton.type = 'button';
     boton.className = 'boton cand-lista-btn';
     boton.textContent = 'Lista de candidaturas ▾';
-    boton.title = 'Sacar la lista en PDF para el tablón';
+    boton.setAttribute('data-ayuda-clave', 'sacar-la-lista-en-pdf-para');
     boton.setAttribute('aria-haspopup', 'true');
     var menu = document.createElement('div');
     menu.className = 'fila-menu oculto';

@@ -73,7 +73,7 @@ const contenedorDeMentira = {
    (enlace + párrafo): se sustituye por uno mínimo que basta para que
    `insertarEnlace` no reviente. */
 contexto.document.createElement = function (etiqueta) {
-  return { tagName: etiqueta, style: {}, appendChild: function () {}, addEventListener: function () {} };
+  return { tagName: etiqueta, style: {}, appendChild: function () {}, addEventListener: function () {}, setAttribute: function () {} };
 };
 SenecaAyudante.insertarEnlace(contenedorDeMentira);
 comprobar('17. insertarEnlace mete algo en el contenedor', contenedorDeMentira.hijos.length >= 2, true);

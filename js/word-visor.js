@@ -70,7 +70,7 @@ var WordVisor = (function () {
     capa.className = 'word-visor oculto';
     capa.innerHTML =
       '<div class="word-visor-barra">' +
-        '<button type="button" class="boton word-visor-volver" title="Volver a la lista de documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
+        '<button type="button" class="boton word-visor-volver" data-ayuda-clave="volver-lista-documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
         '<span class="word-visor-nombre"></span>' +
         '<span class="word-visor-ruta"></span>' +
         '<span class="word-visor-botones">' +

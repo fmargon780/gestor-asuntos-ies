@@ -223,7 +223,6 @@ window.SoloConsulta = (function () {
     if (el.disabled || el.dataset.guardando || el.matches(DEJAR) || el.closest('#capa, #franja-solo-consulta')) return;
     el.disabled = true;
     el.dataset.apagadoPorSoloConsulta = '1';
-    el.title = 'Solo consulta';
   }
 
   function apagarControles() {

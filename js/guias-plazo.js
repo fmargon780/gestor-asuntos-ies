@@ -22,7 +22,7 @@ var GuiasPlazo = (function () {
      guía, para poder leer el valor con un simple getElementById. */
   function htmlConId(p, id) {
     var actual = Plazos.cuentaValida(p && p.plazo && p.plazo.cuenta);
-    return '<select' + (id ? ' id="' + id + '"' : '') + ' class="campo paso-plazo-cuenta" title="Cómo se cuentan los días">' +
+    return '<select' + (id ? ' id="' + id + '"' : '') + ' class="campo paso-plazo-cuenta" data-ayuda-clave="como-se-cuentan-dias">' +
       Plazos.CUENTAS.map(function (c) {
         return '<option value="' + c.valor + '"' + (c.valor === actual ? ' selected' : '') + '>' +
           U.escapar(c.texto) + '</option>';

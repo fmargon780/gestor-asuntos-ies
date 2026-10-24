@@ -42,7 +42,7 @@ window.HitosDocumentoMenu = (function () {
 
   function botonHTML(nombre) {
     return '<button type="button" class="hito-doc-menu-boton" data-doc="' +
-      U.escapar(nombre) + '" title="Más opciones">⋯</button>';
+      U.escapar(nombre) + '" data-ayuda-clave="mas-opciones">⋯</button>';
   }
 
   /* Tras cualquier herramienta, o tras quitarlo: el hito se queda

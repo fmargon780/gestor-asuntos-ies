@@ -82,7 +82,7 @@ var CuentasTiempos = (function () {
       var a = x.a;
       var nombre = window.Reservados ? Reservados.candadoHtml(a) + U.escapar(Reservados.nombreParaVer(a)) : U.escapar(a.nombre);
       var hito = window.EstadoHito && EstadoHito.textoDeNombre ? EstadoHito.textoDeNombre(a.nombre) : '';
-      return '<tr class="cuentas-antiguo" data-i="' + i + '" title="Abrir su ficha"><td>' + nombre + '</td><td>' +
+      return '<tr class="cuentas-antiguo" data-i="' + i + '" data-ayuda-clave="abrir-su-ficha"><td>' + nombre + '</td><td>' +
         U.escapar(tipoParaVer(a)) + '</td><td>' + x.dias + '</td><td>' + U.escapar(hito || '—') + '</td></tr>';
     }).join('');
     return '<h3 class="cuentas-subtitulo">Los que más tiempo llevan abiertos</h3>' +

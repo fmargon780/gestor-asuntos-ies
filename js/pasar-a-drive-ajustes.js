@@ -330,7 +330,7 @@ var PasarADriveAjustes = (function () {
     zona.appendChild(parrafo('Copia a Google Drive las carpetas de cada asunto, el ARCHIVO, _GESTOR y la copia sin internet, comprueba que no falta ' +
       'nada y, desde entonces, la aplicación trabaja allí. Hazlo en el instituto, una tarde sin trabajo. Se puede cortar y seguir.'));
     var inicio = boton('Pasar a Drive', function () { pasoComenzar(false); }, 'traslado-pasar');
-    if (enSolo) { inicio.disabled = true; inicio.title = 'No se puede en solo consultar'; }
+    if (enSolo) { inicio.disabled = true; inicio.setAttribute('data-motivo-clave', 'en-solo-consultar'); }
     zona.appendChild(filaDeBotones([inicio]));
   }
 

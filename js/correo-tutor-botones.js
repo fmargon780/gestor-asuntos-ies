@@ -35,7 +35,7 @@ var CorreoTutorBotones = (function () {
     if (!d) return '';
     var sin = !d.correos.length;
     return '<button type="button" class="boton boton-chico correo-tutor-anadir" data-zona="' + zona + '"' +
-      (sin ? ' disabled title="Ninguno de los tutores tiene correo apuntado"' : '') + '>' + esc(textoDelBoton(d)) + '</button>';
+      (sin ? ' disabled data-motivo-clave="sin-correo-de-tutores"' : '') + '>' + esc(textoDelBoton(d)) + '</button>';
   }
 
   /* Un renglón: el nombre del campo y, a su lado, el botón. */
@@ -100,7 +100,7 @@ var CorreoTutorBotones = (function () {
     var cajaNueva = $('correo-tutor-faltas');
     if (cajaNueva) engancharAvisos(cajaNueva);
     /* Los botones «+ Tutor/a de…» (apagados si no había ningún correo) se vuelven a pintar. */
-    Array.prototype.forEach.call(document.querySelectorAll('.correo-tutor-anadir'), function (b) { if (d && d.correos.length) { b.disabled = false; b.removeAttribute('title'); } });
+    Array.prototype.forEach.call(document.querySelectorAll('.correo-tutor-anadir'), function (b) { if (d && d.correos.length) { b.disabled = false; b.removeAttribute('data-ayuda'); } });
   }
 
   function engancharAvisos(caja) {

@@ -78,7 +78,7 @@ var GuiasMasAjustes = (function () {
     var boton = document.createElement('button');
     boton.type = 'button';
     boton.className = 'boton paso-mas-ajustes-boton';
-    boton.title = 'Explicación, a quién le toca, normativa y otros ajustes de este hito';
+    boton.setAttribute('data-ayuda-clave', 'explicacion-a-quien-le-toca-normativa');
     var abierto = !!abiertos[p.id];
     boton.textContent = textoBoton(abierto);
     boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');

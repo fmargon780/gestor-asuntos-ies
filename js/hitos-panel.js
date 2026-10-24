@@ -292,7 +292,7 @@
     b.type = 'button';
     b.className = 'boton boton-chico hitos-ver-mapa';
     b.textContent = 'Ver mapa';
-    b.title = 'La guía entera de un vistazo, con el camino de este asunto';
+    b.setAttribute('data-ayuda-clave', 'la-guia-entera-de-un-vistazo');
     b.onclick = function () { GuiasMapa.abrirDeAsunto(a); };
     linea.appendChild(b);
   }

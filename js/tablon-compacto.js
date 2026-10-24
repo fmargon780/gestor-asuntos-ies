@@ -295,7 +295,7 @@
     if (n.privada) {
       var candado = document.createElement('span');
       candado.className = 'tablon-fila-compacta-privada';
-      candado.title = 'Solo para mí';
+      candado.setAttribute('data-ayuda-clave', 'solo-para-mi');
       candado.textContent = '🔒';
       fila.appendChild(candado);
     }
@@ -337,7 +337,7 @@
     var cerrar = document.createElement('button');
     cerrar.type = 'button';
     cerrar.className = 'tablon-overlay-cerrar';
-    cerrar.title = 'Cerrar';
+    cerrar.setAttribute('data-ayuda-clave', 'cerrar');
     cerrar.setAttribute('aria-label', 'Cerrar');
     cerrar.textContent = '✕';
     cerrar.onclick = alternarTodas;
@@ -376,7 +376,7 @@
     b.type = 'button';
     b.id = 'tablon-pliega';
     b.className = 'tablon-pliega';
-    b.title = 'Plegar el tablón';
+    b.setAttribute('data-ayuda-clave', 'plegar-el-tablon');
     b.setAttribute('aria-expanded', 'true');
     b.innerHTML = '<span class="tablon-titulo">Tablón</span>' +
                   '<span class="cuenta-lista">' + cuantas + '</span><span>▾</span>';
@@ -419,7 +419,7 @@
   function casillaSoloParaMi(id, marcada, alCambiar) {
     var etiqueta = document.createElement('label');
     etiqueta.className = 'tablon-solo-mia';
-    etiqueta.title = 'La verás solo tú, en este tablón';
+    etiqueta.setAttribute('data-ayuda-clave', 'la-veras-solo-tu-en-este');
 
     var casilla = document.createElement('input');
     casilla.type = 'checkbox';
@@ -488,7 +488,7 @@
     para.type = 'date';
     para.id = 'tablon-para';
     para.className = 'campo tablon-fecha';
-    para.title = 'Para qué día es, si tiene día';
+    para.setAttribute('data-ayuda-clave', 'para-que-dia-es-si-tiene');
     para.value = fechaPuesta;
     fila.appendChild(para);
 
@@ -611,7 +611,7 @@
       cambiaDia.type = 'date';
       cambiaDia.id = 'papel-para';
       cambiaDia.className = 'campo tablon-fecha';
-      cambiaDia.title = 'Para qué día es, si tiene día';
+      cambiaDia.setAttribute('data-ayuda-clave', 'para-que-dia-es-si-tiene');
       cambiaDia.value = n.para;
       d.appendChild(cambiaDia);
       var cambiaHora = TablonHora.controles('papel-hora', 'papel-antes', n.hora, n.hora ? n.antes : null);

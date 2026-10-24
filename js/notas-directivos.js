@@ -321,7 +321,7 @@ var NotasDirectivos = (function () {
     if (activa() || !sinVer(a).length) return null;
     var s = document.createElement('span');
     s.className = 'marca-nota-directivo';
-    s.title = 'Nota de un directivo sin ver';
+    s.setAttribute('data-ayuda-clave', 'nota-de-un-directivo-sin-ver');
     s.setAttribute('aria-label', 'Nota de un directivo sin ver');
     s.textContent = '✎';
     return s;

@@ -254,7 +254,7 @@
     enlace.href = textoDelMarcador();
     enlace.draggable = true;
     enlace.textContent = 'Instalar el ayudante de Séneca';
-    enlace.title = 'Arrástralo a la barra de marcadores. No se pulsa.';
+    enlace.setAttribute('data-ayuda-clave', 'arrastralo-a-la-barra-de-marcadores');
     enlace.onclick = function (ev) {
       ev.preventDefault();
       if (window.U) U.aviso('Este enlace se arrastra a la barra de marcadores: no se pulsa.', 'malo');

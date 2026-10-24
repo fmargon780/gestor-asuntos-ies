@@ -51,7 +51,7 @@ var NotasHito = (function () {
 
   function etiquetaHtml(n) {
     if (!n || !n.hito) return '';
-    return '<button type="button" class="nota-hito" data-hito="' + U.escapar(n.hito) + '" title="Abrir la mesa de este hito">⚑ ' +
+    return '<button type="button" class="nota-hito" data-hito="' + U.escapar(n.hito) + '" data-ayuda-clave="abrir-mesa-del-hito">⚑ ' +
       U.escapar(n.hitoTitulo || 'Hito') + '</button>';
   }
 

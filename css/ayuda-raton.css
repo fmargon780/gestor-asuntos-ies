@@ -1,0 +1,15 @@
+/* El recuadro de ayuda al dejar el ratón quieto (fila 462, js/ayuda-raton.js). Los colores y la letra son los de la
+   aplicación. Por encima de todo (cuadros, mensajes, la franja), y sin cogerse a sí mismo con el ratón. */
+.ayuda-raton {
+  position: fixed; left: 0; top: 0; z-index: 2000;
+  box-sizing: border-box; max-width: 340px; padding: 7px 10px;
+  background: var(--tinta, #1b2430); color: var(--papel, #fff);
+  border: 1px solid var(--tinta, #1b2430); border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(20, 30, 45, .28);
+  font: inherit; font-size: 0.86rem; line-height: 1.35; text-align: left;
+  pointer-events: none;
+}
+.ayuda-raton[hidden] { display: none; }
+.ayuda-raton p { margin: 0; }
+.ayuda-raton p + p { margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, .28); }
+.ayuda-raton .ayuda-raton-motivo { color: var(--ambar, #fff4d6); font-weight: 600; }

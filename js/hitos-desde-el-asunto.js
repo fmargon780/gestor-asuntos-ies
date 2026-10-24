@@ -290,7 +290,7 @@ window.HitosDesdeElAsunto = (function () {
 
   function marcaSoloAquiHTML(a, h) {
     return esSoloAqui(a, h)
-      ? ' <span class="marca-solo-aqui" title="Solo existe en este asunto: no está en la guía">solo aquí</span>' : '';
+      ? ' <span class="marca-solo-aqui" data-ayuda-clave="solo-aqui-hito">solo aquí</span>' : '';
   }
 
   function pasoEsDeNivelSuperior(pasos, idPaso) {

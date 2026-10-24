@@ -106,7 +106,7 @@ var AdministracionesFicha = (function () {
       var datos = [dep.contacto, dep.correo, dep.telefono, dep.dir3 ? 'DIR3 ' + dep.dir3 : ''].filter(Boolean).join('  ·  ');
       return '<li><div class="adm-dep" data-dep="' + esc(dep.id) + '"><strong>' + esc(dep.nombre) + '</strong>' +
         (datos ? ' <span class="suave">' + esc(datos) + '</span>' : '') +
-        ' <button type="button" class="enlace" data-dep-anadir="' + esc(dep.id) + '" title="Añadir un subdepartamento">+ dentro</button>' +
+        ' <button type="button" class="enlace" data-dep-anadir="' + esc(dep.id) + '" data-ayuda-clave="anadir-subdepartamento">+ dentro</button>' +
         ' <button type="button" class="enlace" data-dep-cambiar="' + esc(dep.id) + '">Cambiar</button>' +
         ' <button type="button" class="enlace" data-dep-quitar="' + esc(dep.id) + '">Quitar</button></div>' +
         arbolHtml(dep.hijos) + '</li>';

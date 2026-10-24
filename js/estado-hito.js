@@ -85,7 +85,7 @@ var EstadoHito = (function () {
     if (l.listo && window.PorLiquidar && PorLiquidar.estaPorLiquidar(a)) texto = 'Por liquidar';
     var html = l.hito
       ? '<button type="button" class="marca-hito' + clase + '" data-hito="' + esc(l.hito) +
-        '" title="Abrir este hito">' + esc(texto) + '</button>'
+        '" data-ayuda-clave="abrir-este-hito">' + esc(texto) + '</button>'
       : '<span class="marca-hito' + clase + '">' + esc(texto) + '</span>';
     if (l.esperando) {
       html += '<span class="marca-esperando' + (l.esperando.auto ? ' marca-esperando-auto' : '') + '" title="' +
@@ -347,7 +347,7 @@ var EstadoHito = (function () {
      se leía como una marca de estado); el hito actual lleva en su lugar
      la etiqueta fija «Hito actual». */
   function botonSituarHTML(clase) {
-    return '<button type="button" class="boton ' + clase + '" title="Dar por hechos los hitos anteriores que sigan sin terminar">' +
+    return '<button type="button" class="boton ' + clase + '" data-ayuda-clave="dar-por-hechos-anteriores">' +
       'Saltar a este hito</button>';
   }
 

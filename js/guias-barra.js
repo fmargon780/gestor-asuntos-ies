@@ -26,10 +26,10 @@ var GuiasBarra = (function () {
 
   function html() {
     return '<div class="guia-barra">' +
-      '<button type="button" class="boton" id="guia-negrita" title="Negrita"><strong>N</strong></button>' +
-      '<button type="button" class="boton" id="guia-vinetas" title="Lista con viñetas">Viñetas</button>' +
-      '<button type="button" class="boton" id="guia-enlace" title="Poner un enlace">Enlace</button>' +
-      '<button type="button" class="boton" id="guia-quitar" title="Quitar el formato">Quitar formato</button>' +
+      '<button type="button" class="boton" id="guia-negrita" data-ayuda-clave="negrita"><strong>N</strong></button>' +
+      '<button type="button" class="boton" id="guia-vinetas" data-ayuda-clave="lista-con-vinetas">Viñetas</button>' +
+      '<button type="button" class="boton" id="guia-enlace" data-ayuda-clave="poner-enlace">Enlace</button>' +
+      '<button type="button" class="boton" id="guia-quitar" data-ayuda-clave="quitar-formato">Quitar formato</button>' +
       '</div>' +
       '<div class="guia-enlace-fila oculto" id="guia-enlace-fila">' +
       '<input id="guia-enlace-url" class="campo" placeholder="https://…  o  correo@centro.es">' +

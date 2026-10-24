@@ -308,7 +308,7 @@
     var cerrar = document.createElement('button');
     cerrar.type = 'button';
     cerrar.id = 'franja-copia-cerrar';
-    cerrar.title = 'Cerrar';
+    cerrar.setAttribute('data-ayuda-clave', 'cerrar');
     cerrar.setAttribute('aria-label', 'Cerrar');
     cerrar.textContent = '✕';
     cerrar.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;color:#5d6b7a';

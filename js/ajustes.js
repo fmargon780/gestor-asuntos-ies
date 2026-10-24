@@ -120,7 +120,7 @@ App.botonMenuTarjeta = function (opciones) {
   var boton = document.createElement('button');
   boton.type = 'button';
   boton.className = 'tarjeta-tipo-menu-btn';
-  boton.title = 'Más opciones';
+  boton.setAttribute('data-ayuda-clave', 'mas-opciones');
   boton.setAttribute('aria-haspopup', 'true');
   boton.textContent = '⋮';
   envoltorio.appendChild(boton);

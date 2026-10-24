@@ -55,7 +55,7 @@ await comprobar('3. el aviso sigue arriba en la ficha', pagina.locator('#franja-
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(800);
 await comprobar('4. «+ Nuevo asunto» apagado, con motivo',
-  pagina.evaluate(() => { const b = document.getElementById('btn-nuevo-asunto'); return b ? [b.disabled, b.title] : null; }), [true, 'Solo consulta']);
+  pagina.evaluate(() => { const b = document.getElementById('btn-nuevo-asunto'); return b ? [b.disabled, AyudaRaton.ayuda(b).motivo] : null; }), [true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.']);
 await comprobar('4. la caja del tablón apagada',
   pagina.evaluate(() => { const t = document.getElementById('tablon-texto'); return t ? t.disabled : 'sin tablón'; }).then((x) => x === 'sin tablón' || x), true);
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), abiertos[0]);
@@ -66,7 +66,7 @@ await comprobar('4. la ficha está en modo consulta (sin «Tomar el mando» ni a
 await comprobar('4. «Ver todo» solo mira: sigue encendido',
   pagina.evaluate(() => { const b = document.getElementById('tercero-ver-todo'); return b ? !b.disabled : 'sin botón'; }).then((x) => x === 'sin botón' || x), true);
 await comprobar('4. los apagados de la ficha dicen «Solo consulta»',
-  pagina.evaluate(() => { const b = Array.prototype.filter.call(document.querySelectorAll('#ficha-asunto-cuerpo button[disabled]'), (x) => x.dataset.apagadoPorConsulta); return b.length > 0 && b.every((x) => x.title === 'Solo consulta'); }), true);
+  pagina.evaluate(() => { const b = Array.prototype.filter.call(document.querySelectorAll('#ficha-asunto-cuerpo button[disabled]'), (x) => x.dataset.apagadoPorConsulta); return b.length > 0 && b.every((x) => AyudaRaton.ayuda(x).motivo === 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.'); }), true);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(400);
 if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa').count())) await pagina.locator('#ficha-guia .hito .hito-titulo').first().click();

@@ -103,7 +103,7 @@ var EtiquetasHoja = (function () {
         var x = (g.x0 + col * g.px) * mm, y = (g.y0 + fila * g.py) * mm, w = g.ancho * mm, h = g.alto * mm;
         var estilo = 'left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + w.toFixed(1) + 'px;height:' + h.toFixed(1) + 'px';
         if (c.gastada) {
-          return '<div class="et-casilla et-gastada" data-casilla="' + c.i + '" style="' + estilo + '" title="Gastada: pulsa para volver a usarla"></div>';
+          return '<div class="et-casilla et-gastada" data-casilla="' + c.i + '" style="' + estilo + '" data-ayuda-clave="casilla-gastada"></div>';
         }
         var p = c.item ? preparadas.get(c.item) : null;
         var clases = 'et-casilla' + (c.item ? '' : ' et-libre') + (c.item && c.item.sinDireccion ? ' et-sin-direccion' : '') + (p && p.corto ? ' et-corta' : '');

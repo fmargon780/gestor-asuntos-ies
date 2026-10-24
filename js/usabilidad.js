@@ -47,7 +47,7 @@
       volver.type = 'button';
       volver.className = 'boton boton-volver';
       volver.textContent = '← Volver';
-      volver.title = 'Volver a la pantalla anterior';
+      volver.setAttribute('data-ayuda-clave', 'volver-a-la-pantalla-anterior');
       /* Nuevo asunto ya tiene su propio Cancelar (deja el formulario
          limpio, devuelve el documento suelto pendiente…): el Volver de
          su cabecera hace lo mismo, no un volver a pelo. */
@@ -85,7 +85,7 @@
   cancelarArriba.type = 'button';
   cancelarArriba.className = 'boton';
   cancelarArriba.textContent = 'Cancelar';
-  cancelarArriba.title = 'Dejar este asunto sin crear y volver';
+  cancelarArriba.setAttribute('data-ayuda-clave', 'dejar-este-asunto-sin-crear-y');
   cancelarArriba.onclick = cancelarNuevo;
   var cabNuevo = $('pantalla-nuevo') && $('pantalla-nuevo').querySelector('.cabecera');
   if (cabNuevo) {
@@ -191,7 +191,7 @@
     x.type = 'button';
     x.className = 'chip-x';
     x.textContent = '×';
-    x.title = 'Quitar este filtro';
+    x.setAttribute('data-ayuda-clave', 'quitar-este-filtro');
     x.onclick = alQuitar;
     s.appendChild(x);
     return s;
@@ -295,7 +295,7 @@
     limpiar.type = 'button';
     limpiar.className = 'boton boton-limpiar';
     limpiar.textContent = 'Limpiar todo';
-    limpiar.title = 'Quitar la búsqueda y los filtros';
+    limpiar.setAttribute('data-ayuda-clave', 'quitar-la-busqueda-y-los-filtros');
     limpiar.onclick = limpiarFiltros;
     barraFiltros.appendChild(limpiar);
   }

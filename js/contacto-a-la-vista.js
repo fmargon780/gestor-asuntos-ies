@@ -14,7 +14,7 @@ var ContactoALaVista = (function () {
     return '<span class="contacto-vista" title="' + U.escapar(av.titulo || av.texto) + '">' +
       (av.clase === 'telefono' ? 'Tel. ' : '') + U.escapar(av.texto) + '</span>' +
       '<button type="button" class="contacto-copiar" data-copia="' + U.escapar(av.copia) +
-      '" title="Copiar" aria-label="Copiar el contacto">⧉</button>';
+      '" data-ayuda-clave="copiar-contacto" aria-label="Copiar el contacto">⧉</button>';
   }
 
   /* La marca entera para el asunto `a`: «Lo pide: María (madre) · Tel. 600 111 222 ⧉»,

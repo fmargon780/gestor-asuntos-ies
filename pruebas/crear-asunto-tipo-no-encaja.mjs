@@ -84,10 +84,10 @@ await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 
 console.log('--- tipo y persona de categorías distintas: no se crea nada ---');
-await pagina.waitForSelector('#lista-sueltos [data-accion-suelto="crear"][title]', { timeout: 15000 });
+await pagina.waitForSelector('#lista-sueltos [data-accion-suelto="crear"][data-ayuda-clave]', { timeout: 15000 });
 await comprobar('el título es el de «tercero sin tipo»',
-  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').getAttribute('title'),
-  'Deja el tercero elegido, a la espera de que se elija el tipo de asunto');
+  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').evaluate((b) => AyudaRaton.ayuda(b).ayuda),
+  'Deja elegido el tercero y espera a que elijas el tipo de asunto.');
 await comprobar('la línea de lo leído no enseña el tipo',
   pagina.locator('#lista-sueltos .tarjeta-propuesta').first().textContent().then(t => t.indexOf('SOLICITUD') === -1 && t.indexOf('26EM0368') !== -1 && t.indexOf('Con Dni, Ana') !== -1), true);
 const carpetas = () => pagina.evaluate(async () => {

@@ -71,7 +71,7 @@ await comprobar('cada opción sigue siendo de su tipo de verdad',
   opciones.evaluateAll(os => os.map(o => o.value).sort()),
   ['', 'MATRICULA', LARGO2, LARGO].sort());
 await comprobar('el nombre largo sale al pasar el ratón por la opción',
-  pagina.locator(`#filtro-tipo-asunto option[value="${LARGO}"]`).getAttribute('title'),
+  pagina.locator(`#filtro-tipo-asunto option[value="${LARGO}"]`).getAttribute('data-ayuda'),
   LARGO);
 
 await pagina.selectOption('#filtro-tipo-asunto', LARGO);
@@ -83,7 +83,7 @@ await pagina.waitForTimeout(300);
 
 const marca = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Aguilar") .marca-tipo');
 await comprobar('la etiqueta de la fila enseña el corto', marca.textContent(), 'TRASLEXP');
-await comprobar('y el largo al pasar el ratón', marca.getAttribute('title'), LARGO);
+await comprobar('y el largo al pasar el ratón', marca.getAttribute('data-ayuda'), LARGO);
 const marca2 = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Bermúdez") .marca-tipo');
 await comprobar('una carpeta vieja con el nombre largo también enseña el corto', marca2.textContent(), 'TRASLEXP');
 const marca3 = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Trujillo") .marca-tipo');

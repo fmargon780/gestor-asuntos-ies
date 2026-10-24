@@ -87,13 +87,13 @@ var Reservados = (function () {
   function nombreParaVer(a) { return tapar(a) ? nombreTapado(a) : a.nombre; }
 
   function candadoHtml(a) {
-    return es(a) ? '<span class="marca-reservado" title="Asunto reservado">' + CANDADO + '</span>' : '';
+    return es(a) ? '<span class="marca-reservado" data-ayuda-clave="asunto-reservado">' + CANDADO + '</span>' : '';
   }
 
   function candado() {
     var s = document.createElement('span');
     s.className = 'marca-reservado';
-    s.title = 'Asunto reservado';
+    s.setAttribute('data-ayuda-clave', 'asunto-reservado');
     s.textContent = CANDADO;
     return s;
   }
