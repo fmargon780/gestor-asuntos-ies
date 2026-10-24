@@ -86,3 +86,27 @@ Los dos deben llevar un texto que explique lo que hacen de verdad, sacado del c�
   modo táctil no sale. Foto con Playwright del recuadro sobre «Liquidar» y sobre el botón con ayuda
   que quede más a la derecha en Inicio (por ejemplo, el ⋮ de una fila), para ver que no se corta.
 - Antes de cerrar, revisa que cada pestaña tiene su texto y que ningún texto pasa de 20 palabras.
+
+## Cómo está hecho (fila 462, 24-oct-2026)
+
+- `js/ayuda-raton.js` (`AyudaRaton`) pinta el recuadro (`#ayuda-raton`, `css/ayuda-raton.css`). Escucha en el
+  documento entero (`mouseover` con 400 ms de espera, `mouseout`, `focusin` con el tabulador), así que sirve
+  también para lo que se pinta después. Sin ratón (`(any-hover: hover)` falso, o un toque reciente) no sale.
+- **Ningún `title` queda en la página.** Lo que el código escriba en `title` (con `el.title = …` o dentro de un
+  texto HTML) se pasa solo a `data-ayuda` (un observador de la página y una propiedad `title` que habla con
+  `data-ayuda`). Un botón o `<select>` que era solo un símbolo conserva su nombre en `aria-label`. Excepción: los
+  `<iframe title>` y el `<title>` de la pestaña del navegador, que el navegador exige y no sacan ayuda gris;
+  y el `title` de un `<option>`, que no se puede seguir con el ratón dentro de una lista desplegable (se quita).
+- **Los textos fijos, en `js/ayudas.js`**, uno por línea, enlazados por `data-ayuda-clave="clave"`
+  (`TEXTOS`), por identificador (`POR_ID`), por pestaña (`POR_PESTANA`: `data-pantalla`, `data-pestana`,
+  `data-ajustes-pestana`, `data-tarjeta`) o por el rótulo del botón (`POR_ROTULO`, sin números ni flechas). Las
+  pestañas de categoría de tipos (`#pestanas-tipos`) llevan el texto común `TEXTO_CATEGORIA`. Los botones obvios
+  (`OBVIOS`: Guardar, Cancelar, Aceptar, Entrar, Abrir, Cerrar, Volver) no llevan recuadro aunque tengan ayuda.
+  Un `data-ayuda` puesto por el código (un nombre cortado, un aviso ámbar) se enseña tal cual.
+- **Botones apagados:** el recuadro enseña lo que hace y, debajo, en ámbar, el motivo: `data-ayuda-apagado`
+  (dato del momento), `data-motivo-clave` (`MOTIVOS`), `MOTIVO_POR_ID` / `MOTIVO_POR_ROTULO`, el aviso de
+  «solo consulta» o «espera, se está haciendo»; si no hay otro, el aviso general `TEXTO_GENERAL`. Para que un botón
+  nuevo diga por qué está apagado, basta añadir su identificador a `MOTIVO_POR_ID`.
+- Para añadir ayuda a un botón nuevo: ponerle `data-ayuda-clave="…"` y una línea en `TEXTOS`, o (si es una pestaña
+  o su rótulo ya sirve) una línea en `POR_ROTULO`. Máximo 20 palabras; la prueba lo comprueba.
+- Prueba: `pruebas/ayuda-al-pasar-el-raton.mjs`.

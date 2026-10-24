@@ -126,7 +126,7 @@
     p.id = 'lector';
     p.className = 'oculto';
     p.innerHTML =
-      '<div class="lector-tirador" id="lector-tirador" title="Arrastra para hacerlo más ancho o más estrecho"></div>' +
+      '<div class="lector-tirador" id="lector-tirador" data-ayuda-clave="tirador-lector"></div>' +
       '<div class="lector-cabecera">' +
         '<div class="lector-texto">' +
           '<div class="lector-titulo" id="lector-titulo"></div>' +
@@ -134,7 +134,7 @@
         '</div>' +
         '<div class="lector-botones" id="lector-botones"></div>' +
         '<button type="button" class="lector-cerrar" id="lector-cerrar" ' +
-          'title="Cerrar el panel">✕</button>' +
+          'data-ayuda-clave="cerrar-panel">✕</button>' +
       '</div>' +
       '<div class="lector-cuerpo"><iframe id="lector-marco" title="Lo que se está leyendo"></iframe></div>';
     document.body.appendChild(p);

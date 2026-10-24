@@ -56,10 +56,10 @@ var HitoMesaTareaMenu = (function () {
   function botonesHTML(g, a) {
     var notas = notasDe(a, g);
     var boton = notas.length
-      ? '<button type="button" class="guion-tarea-notas-boton" title="Ver las notas de esta tarea">💬' +
+      ? '<button type="button" class="guion-tarea-notas-boton" data-ayuda-clave="ver-notas-tarea">💬' +
         (notas.length > 1 ? ' ' + notas.length : '') + '</button>'
       : '';
-    return boton + '<button type="button" class="guion-tarea-menu-boton" title="Más opciones">⋮</button>';
+    return boton + '<button type="button" class="guion-tarea-menu-boton" data-ayuda-clave="mas-opciones">⋮</button>';
   }
 
   /* Lo que va debajo de la tarea: la edición en línea, la caja de

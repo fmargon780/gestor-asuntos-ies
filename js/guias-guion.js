@@ -182,9 +182,9 @@ var GuiasGuion = (function () {
             U.escapar(a.texto) + '</option>';
         }).join('') + '</select>') +
         '<span class="requisito-mandos">' +
-          (dentro ? '' : '<button type="button" class="boton guion-subir" title="Subir">↑</button>' +
-            '<button type="button" class="boton guion-bajar" title="Bajar">↓</button>') +
-          '<button type="button" class="boton boton-peligro guion-quitar" title="Quitar">✕</button>' +
+          (dentro ? '' : '<button type="button" class="boton guion-subir" data-ayuda-clave="subir">↑</button>' +
+            '<button type="button" class="boton guion-bajar" data-ayuda-clave="bajar">↓</button>') +
+          '<button type="button" class="boton boton-peligro guion-quitar" data-ayuda-clave="quitar">✕</button>' +
         '</span>' +
       '</div>' +
       (pregunta ? '' : recetaHTML(g)) +
@@ -211,7 +211,7 @@ var GuiasGuion = (function () {
         return '<div class="guion-opcion" data-id="' + U.escapar(o.id) + '">' +
           '<div class="guion-fila-linea guion-opcion-cabecera"><input class="campo guion-opcion-texto" value="' +
             U.escapar(o.texto || '') + '" placeholder="Respuesta (Sí, No…)">' +
-            '<button type="button" class="boton boton-peligro guion-opcion-quitar" title="Quitar la respuesta">✕</button></div>' +
+            '<button type="button" class="boton boton-peligro guion-opcion-quitar" data-ayuda-clave="quitar-respuesta">✕</button></div>' +
           '<div class="guion-opcion-lineas">' + (o.lineas || []).map(function (x) { return filaHTML(x, true); }).join('') + '</div>' +
           '<button type="button" class="enlace guion-linea-anadir">+ Añadir línea</button>' +
         '</div>';

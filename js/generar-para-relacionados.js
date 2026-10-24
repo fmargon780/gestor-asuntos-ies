@@ -39,7 +39,7 @@ var GenerarParaRelacionados = (function () {
     /* Fila 306: en un asunto de actividad los relacionados son el alumnado; la plantilla de los profesores no se ofrece. */
     if (window.Actividades && Actividades.tieneActividad(a) && Actividades.esPlantillaVieja(plantilla)) return '';
     return '<button type="button" class="boton boton-chico mesa-plantilla-cada" ' +
-      'title="Un documento para cada relacionado del asunto, con sus datos">… para cada relacionado (' + n + ')</button>';
+      'data-ayuda-clave="documento-por-relacionado">… para cada relacionado (' + n + ')</button>';
   }
 
   function enganchar(caja, a, h, plantillas) {

@@ -113,8 +113,8 @@ await p.waitForTimeout(200);
 await abrirMenu(p, 'Aviso de avance');
 await comprobar('8. «Aviso de avance»: «Dejar fuera de uso…» apagado', p.evaluate(() => {
   const b = [...document.querySelectorAll('.pt-tabla tbody tr')].filter((r) => r.children[0].textContent.indexOf('Aviso de avance') === 0)[0].querySelector('[data-accion="fuera"]');
-  return [b.disabled, b.title];
-}), [true, 'La aplicación la necesita para avisar a quien lo pide.']);
+  return [b.disabled, AyudaRaton.ayuda(b).motivo];
+}), [true, 'La aplicación necesita esta plantilla para avisar a quien lo pide: no se puede dejar fuera.']);
 await abrirMenu(p, 'Aviso de avance');
 await dejarFuera(p, 'Confirmación de matrícula');
 await fila(p, 'Confirmación de matrícula').locator('[data-accion="cambiar"]').click();

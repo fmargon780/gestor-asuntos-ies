@@ -45,9 +45,9 @@ var GuiasRequisitos = (function () {
         '<span>Obligatorio</span>' +
       '</label>' +
       '<span class="requisito-mandos">' +
-        '<button type="button" class="boton requisito-subir" title="Subir">↑</button>' +
-        '<button type="button" class="boton requisito-bajar" title="Bajar">↓</button>' +
-        '<button type="button" class="boton boton-peligro requisito-quitar" title="Quitar la fila">✕</button>' +
+        '<button type="button" class="boton requisito-subir" data-ayuda-clave="subir">↑</button>' +
+        '<button type="button" class="boton requisito-bajar" data-ayuda-clave="bajar">↓</button>' +
+        '<button type="button" class="boton boton-peligro requisito-quitar" data-ayuda-clave="quitar-la-fila">✕</button>' +
       '</span></div>';
   }
 

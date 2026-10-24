@@ -70,8 +70,8 @@ var HitoMesaGuion = (function () {
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
       (g.valor ? ' · ' + g.valor : '') + (g.documento ? ' · ' + g.documento : '') : '';
     var claveAccion = accionDe(g);
-    var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
-      : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
+    var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" data-ayuda-clave="reunir-documento">📎</span>'
+      : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" data-ayuda-clave="reunir-dato">✎</span>' : '');
     /* Fila 154: las acciones viven en la cabecera del hito; fila 410: y cada
        tarea pendiente de comunicar o de generar lleva su botón, delante del
        💬 y del «⋮». Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
@@ -80,7 +80,7 @@ var HitoMesaGuion = (function () {
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
        la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
-    var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" title="Solo existe en este asunto">solo aquí</span>' : '';
+    var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" data-ayuda-clave="solo-aqui-tarea">solo aquí</span>' : '';
     var botonesTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
     var debajoTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
     return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
@@ -88,7 +88,7 @@ var HitoMesaGuion = (function () {
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
-        (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" title="Vuelve a activarla en Herramientas → Plantillas, o pon otra en la tarea">plantilla fuera de uso</span>' : '') +
+        (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" data-ayuda-clave="plantilla-fuera-de-uso">plantilla fuera de uso</span>' : '') +
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +

@@ -373,7 +373,7 @@ var ExportarInforme = (function () {
     ['.exportar-guardar-pdf', '.exportar-imprimir'].forEach(function (q) {
       var b = capa.querySelector(q);
       b.disabled = !r.completo;
-      if (r.completo) b.removeAttribute('title'); else b.title = texto;
+      b.title = r.completo ? '' : texto;
     });
     return r;
   }

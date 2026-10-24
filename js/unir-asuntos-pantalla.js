@@ -75,7 +75,7 @@
     nombre.type = 'button';
     nombre.className = 'columna-nombre';
     nombre.textContent = a.nombre;
-    nombre.title = 'Abrir la ficha de este asunto';
+    nombre.setAttribute('data-ayuda-clave', 'abrir-la-ficha-de-este-asunto');
     nombre.onclick = function () { App.abrirFicha(a, 'abierto'); };
     col.appendChild(nombre);
 
@@ -164,7 +164,7 @@
     noSon.type = 'button';
     noSon.className = 'boton';
     noSon.textContent = 'No son el mismo';
-    noSon.title = 'No volver a avisar de este grupo';
+    noSon.setAttribute('data-ayuda-clave', 'no-volver-a-avisar-de-este');
     noSon.onclick = async function () {
       noSon.disabled = true;
       try {

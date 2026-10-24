@@ -241,7 +241,7 @@ var ActividadesFormulario = (function () {
           '<select class="campo act-papel" aria-label="Papel de ' + esc(p.nombre) + '">' +
             '<option value="acompana"' + (p.papel === 'organiza' ? '' : ' selected') + '>Acompaña</option>' +
             '<option value="organiza"' + (p.papel === 'organiza' ? ' selected' : '') + '>Organiza</option></select>' +
-          '<button type="button" class="act-profe-quitar" title="Quitar" aria-label="Quitar a ' + esc(p.nombre) + '">×</button></div>';
+          '<button type="button" class="act-profe-quitar" data-ayuda-clave="quitar" aria-label="Quitar a ' + esc(p.nombre) + '">×</button></div>';
       }).join('') : '<p class="nota">Nadie todavía.</p>';
       Array.prototype.forEach.call($('act-profes').querySelectorAll('.act-profe'), function (f) {
         var i = +f.dataset.i;

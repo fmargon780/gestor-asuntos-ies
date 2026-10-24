@@ -381,7 +381,7 @@
       b.type = 'button';
       b.className = 'boton boton-generar-documento';
       b.textContent = 'Generar documento';
-      b.title = 'Sacar una copia de una plantilla de Word con los huecos ya rellenos';
+      b.setAttribute('data-ayuda-clave', 'sacar-una-copia-de-una-plantilla');
       b.onclick = function () {
         b.disabled = true;
         elegirYGenerar(asunto, modoActual, lista).finally(function () { b.disabled = false; });

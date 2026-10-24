@@ -93,7 +93,7 @@ window.TipoEnLinea = (function () {
           '<input id="' + o.prefijo + '-buscar" class="campo" autocomplete="off" ' +
             'placeholder="Escribe para buscar un tipo" aria-label="Buscar un tipo de asunto">' +
           '<button type="button" class="boton" id="' + o.prefijo + '-dejar" ' +
-            'title="Dejar el tipo que había" aria-label="Dejar el tipo que había">✕</button>' +
+            'data-ayuda-clave="dejar-el-tipo" aria-label="Dejar el tipo que había">✕</button>' +
         '</div>' +
         '<div class="resultados tipo-buscar-resultados" id="' + o.prefijo + '-resultados"></div>' +
         '<div id="' + o.prefijo + '-crear"></div>';

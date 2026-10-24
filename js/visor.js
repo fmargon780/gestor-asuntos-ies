@@ -70,18 +70,18 @@
     panel.id = 'visor-lateral';
     panel.className = 'oculto';
     panel.innerHTML =
-      '<div class="visor-tirador" id="visor-tirador" title="Arrastra para ensanchar o estrechar"></div>' +
+      '<div class="visor-tirador" id="visor-tirador" data-ayuda-clave="tirador-visor"></div>' +
       '<div class="visor-cabecera">' +
-        '<button type="button" class="boton visor-volver" id="visor-volver" title="Volver a la lista de documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
+        '<button type="button" class="boton visor-volver" id="visor-volver" data-ayuda-clave="volver-lista-documentos">← Carpeta</button>' +   /* fila 425: solo dentro de «Trabajo» */
         '<div class="visor-nombre" id="visor-nombre"></div>' +
         '<span class="visor-ruta" id="visor-ruta"></span>' +
         '<div class="visor-botones">' +
-          '<button type="button" class="boton" id="visor-menos" title="Reducir">−</button>' +
+          '<button type="button" class="boton" id="visor-menos" data-ayuda-clave="reducir">−</button>' +
           '<span class="visor-zoom" id="visor-zoom"></span>' +
-          '<button type="button" class="boton" id="visor-mas" title="Ampliar">+</button>' +
-          '<button type="button" class="boton" id="visor-ancho" title="Al ancho de la columna">Ancho</button>' +
-          '<button type="button" class="boton" id="visor-fuera" title="Abrirlo en otra pestaña">Fuera</button>' +
-          '<button type="button" class="boton" id="visor-cerrar" title="Cerrar el visor">✕</button>' +
+          '<button type="button" class="boton" id="visor-mas" data-ayuda-clave="ampliar">+</button>' +
+          '<button type="button" class="boton" id="visor-ancho" data-ayuda-clave="al-ancho">Ancho</button>' +
+          '<button type="button" class="boton" id="visor-fuera" data-ayuda-clave="abrir-en-otra-pestana">Fuera</button>' +
+          '<button type="button" class="boton" id="visor-cerrar" data-ayuda-clave="cerrar-visor">✕</button>' +
         '</div>' +
       '</div>' +
       '<div class="visor-acciones oculto" id="visor-acciones"></div>' +

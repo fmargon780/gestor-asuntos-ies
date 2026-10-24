@@ -414,7 +414,7 @@ window.RutaCarpetas = (function () {
     b.type = 'button';
     b.className = 'boton boton-chico boton-copiar-fila ruta-documento';
     b.textContent = 'Ruta';
-    b.title = 'Copiar la ruta de este documento, para pegarla al adjuntarlo';
+    b.setAttribute('data-ayuda-clave', 'copiar-la-ruta-de-este-documento');
     b.onclick = async function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
@@ -459,7 +459,7 @@ window.RutaCarpetas = (function () {
     b.type = 'button';
     b.className = 'boton boton-copiar-fila';
     b.textContent = 'Ruta';
-    b.title = 'Copiar la ruta de la carpeta, para pegarla en el navegador o en el explorador de archivos';
+    b.setAttribute('data-ayuda-clave', 'copiar-la-ruta-de-la-carpeta');
     b.onclick = async function (ev) {
       ev.stopPropagation();
       ev.preventDefault();

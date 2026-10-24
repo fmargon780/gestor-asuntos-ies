@@ -85,7 +85,7 @@ var CorreoCuadro = (function () {
         '<div class="marcados-lista">' + direcciones.map(function (d) {
           return '<span class="marcado-chip">' + U.escapar(d) +
             '<button type="button" class="cco-quitar" data-dir="' + U.escapar(d) + '" ' +
-            'title="Quitarlo de la copia oculta">×</button></span>';
+            'data-ayuda-clave="quitar-de-copia-oculta">×</button></span>';
         }).join('') + '</div>'
       : '') +
       (ccoSinCorreo.length

@@ -268,8 +268,8 @@ window.DocCampos = (function () {
               }).join(' ') + '</div>' : '') +
             '<label class="interruptor"><input type="checkbox" class="doccampos-obligatorio"' +
               (c.obligatorio ? ' checked' : '') + '><span>Obligatorio</span></label>' +
-            '<button type="button" class="boton" data-subir="' + i + '" title="Subir"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
-            '<button type="button" class="boton" data-bajar="' + i + '" title="Bajar"' + (i === lista.length - 1 ? ' disabled' : '') + '>↓</button>' +
+            '<button type="button" class="boton" data-subir="' + i + '" data-ayuda-clave="subir"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+            '<button type="button" class="boton" data-bajar="' + i + '" data-ayuda-clave="bajar"' + (i === lista.length - 1 ? ' disabled' : '') + '>↓</button>' +
             '<button type="button" class="boton" data-quitar="' + i + '">Quitar</button>' +
             '</div>';
         }).join('');

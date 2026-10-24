@@ -71,9 +71,9 @@ var SenecaDestinatarios = (function () {
         '<div class="marcados-lista">' + destinatarios.map(function (u) {
           var yaCopiado = !!copiados[u.toLowerCase()];
           return '<span class="marcado-chip' + (yaCopiado ? ' marcado-chip-copiado' : '') + '"' +
-            (yaCopiado ? ' title="Ya copiado"' : '') + '>@' + U.escapar(u) +
+            (yaCopiado ? ' data-ayuda-clave="ya-copiado"' : '') + '>@' + U.escapar(u) +
             '<button type="button" class="seneca-dest-quitar" data-usuario="' + U.escapar(u) + '" ' +
-            'title="Quitarlo de la lista">×</button></span>';
+            'data-ayuda-clave="quitar-de-la-lista">×</button></span>';
         }).join('') + '</div>'
       : '') +
       (sinUsuario.length

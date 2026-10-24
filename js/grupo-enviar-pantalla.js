@@ -72,8 +72,8 @@ var GrupoEnviarPantalla = (function () {
           '<label class="ge-campo">Plantilla <select class="campo ge-plantilla"></select></label>' +
           '<label class="ge-campo">Asunto del correo' + (S.esAviso ? ' (obligatorio)' : '') + ' <input class="campo ge-asunto" type="text"></label>' +
           '<label class="ge-campo">Texto, igual para todos <textarea class="campo ge-texto" rows="6"></textarea></label>' +
-          '<div class="ge-nav"><button type="button" class="boton boton-chico ge-ant" title="El correo de la anterior">◀</button>' +
-            '<span class="ge-nav-texto"></span><button type="button" class="boton boton-chico ge-sig" title="El correo de la siguiente">▶</button></div>' +
+          '<div class="ge-nav"><button type="button" class="boton boton-chico ge-ant" data-ayuda-clave="correo-anterior">◀</button>' +
+            '<span class="ge-nav-texto"></span><button type="button" class="boton boton-chico ge-sig" data-ayuda-clave="correo-siguiente">▶</button></div>' +
           '<div class="ge-muestra"></div>' +
         '</section>' +
         '<section class="ge-der"><div class="ge-resultado"></div><div class="ge-quien"></div></section>' +

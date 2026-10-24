@@ -129,7 +129,7 @@ var FichaDocumentos = (function () {
       var casilla = document.createElement('input');
       casilla.type = 'checkbox';
       casilla.className = 'ficha-documento-marca';
-      casilla.title = 'Adjuntar al correo del hito';
+      casilla.setAttribute('data-ayuda-clave', 'adjuntar-al-correo-del-hito');
       casilla.checked = !!marcadosCarpeta[f.nombre];
       casilla.onchange = function () {
         if (casilla.checked) marcadosCarpeta[f.nombre] = true; else delete marcadosCarpeta[f.nombre];
@@ -332,7 +332,7 @@ var FichaDocumentos = (function () {
     b.type = 'button';
     b.className = 'boton boton-principal ficha-documentos-anadir';
     b.textContent = '+ Añadir documento';
-    b.title = 'Traer un documento del ordenador a esta carpeta, ya con su nombre';
+    b.setAttribute('data-ayuda-clave', 'traer-un-documento-del-ordenador-a');
     b.onclick = alPulsar;
     titulo.appendChild(b);
     if (window.FichaGenerarDocumento) FichaGenerarDocumento.poner(titulo, a);
@@ -354,7 +354,7 @@ var FichaDocumentos = (function () {
     b.type = 'button';
     b.className = 'boton ficha-documentos-repartir';
     b.textContent = 'Repartir ficheros entre terceros';
-    b.title = 'Un fichero por persona: crea el asunto de cada una, ya archivado, con su fichero';
+    b.setAttribute('data-ayuda-clave', 'un-fichero-por-persona-crea-el');
     b.onclick = function () { RepartirFicheros.abrir({ asunto: a, alTerminar: function () { pintar(a); } }); };
     if (!viejo) titulo.appendChild(b);
   }
@@ -455,7 +455,7 @@ var FichaDocumentos = (function () {
       var fila = document.createElement('div');
       fila.className = 'ficha-previa-fila';
       var abrir = document.createElement('button');
-      abrir.type = 'button'; abrir.className = 'ficha-previa-abrir'; abrir.textContent = f.nombre; abrir.title = 'Verlo al lado del programa';
+      abrir.type = 'button'; abrir.className = 'ficha-previa-abrir'; abrir.textContent = f.nombre; abrir.setAttribute('data-ayuda-clave', 'verlo-al-lado-del-programa');
       abrir.onclick = function () { if (window.Visor) Visor.abrir(f.handle, f.nombre, { asunto: a, carpeta: a.handle, modo: modo, subcarpeta: f.carpeta }); };
       var sacar = document.createElement('button');
       sacar.type = 'button'; sacar.textContent = 'Sacar de versiones previas';

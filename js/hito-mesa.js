@@ -225,7 +225,7 @@ var HitoMesa = (function () {
            tira (sin fila propia, para no bajar «QUÉ HAY QUE HACER»,
            fila 145: la cabecera se midió a propósito para que quepa en
            250 px). No estira como los botones de hito (flex: 0 0 auto). */
-        '<button type="button" class="mesa-tira-volver" id="mesa-volver-hitos" title="← Volver a los hitos">← Hitos</button>' +
+        '<button type="button" class="mesa-tira-volver" id="mesa-volver-hitos" data-ayuda-clave="volver-a-los-hitos">← Hitos</button>' +
         visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
@@ -237,7 +237,7 @@ var HitoMesa = (function () {
         (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +
         '<div class="mesa-etiquetas">' +
           /* Fila 239: el número del asunto, si lo tiene. */
-          (a && a.ficha && a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +
+          (a && a.ficha && a.ficha.numero ? '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +
           (window.ContactoALaVista ? ContactoALaVista.html(a) : '') +   /* fila 305 */
           /* Fila 162: «Paso actual», el mismo que en la lista y en la cabecera. */
           (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML() : '') +
@@ -257,7 +257,7 @@ var HitoMesa = (function () {
           (abierto && !decision
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
-          (abierto ? '<button type="button" class="boton mesa-mas" title="Crear, cambiar o borrar el hito">Hito ▾</button>' : '') +
+          (abierto ? '<button type="button" class="boton mesa-mas" data-ayuda-clave="menu-del-hito">Hito ▾</button>' : '') +
         '</div>' +
       '</div>' +
       (abierto && window.HacerEsteHito ? HacerEsteHito.lineaHTML(a, h) : '') +

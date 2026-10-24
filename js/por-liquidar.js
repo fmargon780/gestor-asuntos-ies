@@ -342,7 +342,7 @@ window.PorLiquidar = (function () {
     var caja = document.createElement('input');
     caja.type = 'checkbox';
     caja.className = 'liq-marca';
-    caja.title = 'Marcar para liquidar';
+    caja.setAttribute('data-ayuda-clave', 'marcar-para-liquidar');
     caja.checked = !!marcados[a.nombre];
     caja.onchange = function () {
       if (caja.checked) marcados[a.nombre] = true; else delete marcados[a.nombre];
@@ -355,7 +355,7 @@ window.PorLiquidar = (function () {
     tdTercero.className = 'inicio-tabla-tercero';
     var span = document.createElement('span');
     span.className = 'nombre-pulsable tarjeta-nombre';
-    span.title = 'Abrir la ficha de este asunto';
+    span.setAttribute('data-ayuda-clave', 'abrir-la-ficha-de-este-asunto');
     var candado = window.Reservados ? Reservados.candadoHtml(a) : '';
     span.innerHTML = candado + '<b>' + (tapado ? 'Reservado' : U.escapar(QueMeToca.terceroDe(a) || a.nombre)) + '</b>';
     tdTercero.appendChild(span);
@@ -365,7 +365,7 @@ window.PorLiquidar = (function () {
     if (tipo) tdTipo.innerHTML = '<span class="marca-tipo" title="' + U.escapar(tipo) + '">' +
       U.escapar(Nombres.tipoParaVer(tipo, App.E.tipos)) + '</span>';
     var numero = (a.ficha && a.ficha.numero) || (a.leido && a.leido.numero) || '';
-    if (numero) tdTipo.innerHTML += '<span class="marca-numero" title="Número del asunto">' + U.escapar(numero) + '</span>';
+    if (numero) tdTipo.innerHTML += '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(numero) + '</span>';
 
     ordenTerceroTipo().forEach(function (c) { tr.appendChild(c === 'tipo' ? tdTipo : tdTercero); });
 
@@ -396,7 +396,7 @@ window.PorLiquidar = (function () {
   function ordenTerceroTipo() { return window.InicioColumnas ? InicioColumnas.ordenLiquidar() : ['tercero', 'tipo']; }
 
   function cabecera(conImporte) {
-    return '<tr><th class="liq-casilla"><input type="checkbox" id="liq-todos" title="Marcar todos los que se ven"></th>' +
+    return '<tr><th class="liq-casilla"><input type="checkbox" id="liq-todos" data-ayuda-clave="marcar-todos-los-que-se-ven"></th>' +
       ordenTerceroTipo().map(function (c) { return '<th data-col="' + c + '">' + TITULOS[c] + '</th>'; }).join('') +
       '<th data-col="desde">Por liquidar desde</th>' + (conImporte ? '<th data-col="importe">Importe</th>' : '') + '</tr>';
   }

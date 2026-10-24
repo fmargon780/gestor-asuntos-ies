@@ -85,7 +85,7 @@
      LA-CABECERA.md): es el único sitio de la cabecera donde sale. */
   function marcasDeFicha(a, tipo) {
     return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
-      (a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +   /* fila 239 */
+      (a.ficha.numero ? '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +   /* fila 239 */
       ContactoALaVista.html(a);   /* fila 305: «Lo pide: …» con su contacto, o «Contacto: …» */
   }
 
@@ -161,7 +161,7 @@
           ' <span class="marca-solo-aqui">solo aquí</span></span><span>' +
           (f.valor ? (f.ambar ? '<span class="ficha-valor-ambar" title="' + U.escapar(f.ayuda || '') + '">' + U.escapar(f.valor) + '</span>' : U.escapar(f.valor)) : '<span class="suave">sin valor</span>') +
           ' <button type="button" class="campo-aqui-menu" data-clave="' + U.escapar(f.clave || '') +
-          '" data-nombre="' + U.escapar(f.titulo) + '" title="Más opciones">⋮</button></span></div>';
+          '" data-nombre="' + U.escapar(f.titulo) + '" data-ayuda-clave="mas-opciones">⋮</button></span></div>';
       }
       return '<div class="ficha-dato' + (f.ambar ? ' ficha-dato-ambar' : '') + '"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span' + (f.ambar ? ' title="' + U.escapar(f.ayuda || '') + '"' : '') + '>' + U.escapar(f.valor) + '</span></div>';
@@ -302,7 +302,7 @@
       bplazo.type = 'button';
       bplazo.className = 'boton-vencimiento' + (et.clase ? ' ' + et.clase : '');
       bplazo.textContent = et.texto;
-      bplazo.title = 'Poner o cambiar la fecha límite';
+      bplazo.setAttribute('data-ayuda-clave', 'poner-o-cambiar-la-fecha-limite');
       bplazo.onclick = async function (ev) {
         try { await App.editarPlazo(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
       };

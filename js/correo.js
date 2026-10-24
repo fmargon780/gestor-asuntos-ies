@@ -449,7 +449,7 @@
       b.type = 'button';
       b.className = 'boton boton-comunicar';
       b.textContent = 'Comunicar';
-      b.title = 'Escribir un correo o un mensaje de Séneca de este asunto';
+      b.setAttribute('data-ayuda-clave', 'escribir-un-correo-o-un-mensaje');
 
       var principal = caja.querySelector('.boton-principal');
       if (principal) caja.insertBefore(b, principal); else caja.appendChild(b);

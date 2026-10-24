@@ -41,7 +41,7 @@ var GuiasOpcionesEditor = (function () {
       quitar.type = 'button';
       quitar.className = 'boton boton-peligro';
       quitar.textContent = 'Quitar la opción';
-      quitar.title = 'Quitar esta opción y sus hitos';
+      quitar.setAttribute('data-ayuda-clave', 'quitar-esta-opcion-y-sus-hitos');
       quitar.onclick = function () {
         recoger();
         nivel[i].opciones.splice(j, 1);
@@ -75,7 +75,7 @@ var GuiasOpcionesEditor = (function () {
           entrarB.type = 'button';
           entrarB.className = 'boton boton-principal subpaso-entrar';
           entrarB.textContent = 'Entrar';
-          entrarB.title = 'Ver y escribir las opciones de esta pregunta';
+          entrarB.setAttribute('data-ayuda-clave', 'ver-y-escribir-las-opciones-de');
           entrarB.onclick = function () {
             recoger();
             /* Se entra en el nivel donde está la pregunta (los hitos de

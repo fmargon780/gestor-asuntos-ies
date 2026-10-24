@@ -115,7 +115,7 @@ var HitoMesaDocumentos = (function () {
     return '<details class="mesa-previas"><summary>' + suyas.length + (suyas.length === 1 ? ' versión previa' : ' versiones previas') +
       ' · ver</summary>' + suyas.map(function (n) {
         /* Fila 439: una sola línea: el nombre (se abre al pulsarlo), «Ruta» y ⋮ con «Sacar de versiones previas». */
-        return '<div class="mesa-previa-fila"><button type="button" class="mesa-previa-abrir" data-doc="' + U.escapar(n) + '" title="Verlo al lado del programa">' +
+        return '<div class="mesa-previa-fila"><button type="button" class="mesa-previa-abrir" data-doc="' + U.escapar(n) + '" data-ayuda-clave="verlo-al-lado">' +
           U.escapar(n) + '</button>' + ruta(n, (carpetas || {})[n]) +
           '<span class="mesa-previa-menu" data-doc="' + U.escapar(n) + '"></span></div>';
       }).join('') + '</details>';
@@ -145,7 +145,7 @@ var HitoMesaDocumentos = (function () {
          documento (tipo y el nombre entero), fecha, registro, estado y
          acciones; los gemelos, debajo, sangrados, cada uno con su «Abrir». */
       return '<div class="hito-documento mesa-doc" data-doc="' + U.escapar(g.nombre) + '">' +
-        '<input type="checkbox" class="mesa-doc-marca" title="Seleccionar"' + (falta ? ' disabled' : '') + '>' +
+        '<input type="checkbox" class="mesa-doc-marca" data-ayuda-clave="seleccionar"' + (falta ? ' disabled' : '') + '>' +
         '<div class="mesa-doc-nombre"><span class="mesa-doc-tipo">' + U.escapar(tipoDe(g.nombre)) + '</span>' +
           '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '" title="' + U.escapar(g.nombre) + '">' +
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +

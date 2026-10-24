@@ -65,7 +65,7 @@ var ActividadesFicha = (function () {
       avisoDe(act) +
       '<div class="act-ficha-botones">' +
         '<button type="button" class="boton" id="act-cambiar">Cambiar</button>' +
-        '<button type="button" class="boton' + (estadoAviso.ambar ? ' boton-principal' : '') + '" id="act-avisar"' + (act.anulada ? ' disabled title="La actividad está anulada."' : '') + '>' + esc(estadoAviso.boton) + '</button>' +
+        '<button type="button" class="boton' + (estadoAviso.ambar ? ' boton-principal' : '') + '" id="act-avisar"' + (act.anulada ? ' disabled data-motivo-clave="actividad-anulada"' : '') + '>' + esc(estadoAviso.boton) + '</button>' +
         (act.anulada
           ? '<button type="button" class="boton" id="act-deshacer-anulacion">Deshacer la anulación</button>'
           : '<button type="button" class="boton" id="act-anular">Anular la actividad</button>') +

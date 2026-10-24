@@ -105,7 +105,7 @@
     boton.type = 'button';
     boton.className = 'boton boton-principal boton-dar-de-alta';
     boton.textContent = 'Dar de alta: ' + td.nombre + (td.documento ? ' — ' + td.documento : '');
-    boton.title = 'Abre el alta con estos datos ya escritos. No se da de alta sola: hay que revisar y guardar.';
+    boton.setAttribute('data-ayuda-clave', 'abre-el-alta-con-estos-datos');
     boton.onclick = async function (ev) {
       if (ev) ev.stopPropagation();
       var valores = {};
@@ -208,9 +208,9 @@
       (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
     var sugerencias = (propuesta && propuesta.sugerencias) || [];
     if (tipoObj && tipoEncaja(propuesta)) {
-      boton.title = 'Crea el asunto con lo leído y mete el documento dentro';
+      boton.setAttribute('data-ayuda-clave', 'crea-el-asunto-con-lo-leido');
     } else if (propuesta && propuesta.tercero) {
-      boton.title = 'Deja el tercero elegido, a la espera de que se elija el tipo de asunto';
+      boton.setAttribute('data-ayuda-clave', 'deja-el-tercero-elegido-a-la');
     } else {
       boton.title = '';
     }

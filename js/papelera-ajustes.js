@@ -224,7 +224,7 @@
 
     if (CLASES_CON_FICHERO[ficha.clase] && ficha.carpeta && window.Visor) {
       f.classList.add('fila-papelera-pulsable');
-      f.title = 'Pulsa para verlo sin sacarlo de la papelera';
+      f.setAttribute('data-ayuda-clave', 'pulsa-para-verlo-sin-sacarlo-de');
       f.onclick = function (ev) {
         if (ev.target.closest('button, a, input, select, textarea, label')) return;
         abrirDesdeLaPapelera(ficha);

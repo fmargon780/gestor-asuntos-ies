@@ -31,7 +31,7 @@
     b.type = 'button';
     b.className = 'boton ficha-documentos-generar';
     b.textContent = 'Generar documento';
-    b.title = 'Abre el hito actual, con sus plantillas para generar';
+    b.setAttribute('data-ayuda-clave', 'abre-el-hito-actual-con-sus');
     b.onclick = function () { ir(a); };
     titulo.appendChild(b);
     /* El título pasa a ocupar más: la tarjeta cerrada vuelve a contar cuántos renglones le caben. */

@@ -319,7 +319,7 @@ var BandejaPantalla = (function () {
          fila 86): el PDF del hilo ya está en disco, así que se puede
          enseñar sin pasar por el botón. */
       div.classList.add('tarjeta-correo-pulsable');
-      div.title = 'Pulsa para leer el correo al lado del programa';
+      div.setAttribute('data-ayuda-clave', 'pulsa-para-leer-el-correo-al');
       div.onclick = function (ev) {
         if (ev.target.closest('button, a, input, select, textarea, label, .acciones')) return;
         window.Bandeja.leerElCorreo(d);

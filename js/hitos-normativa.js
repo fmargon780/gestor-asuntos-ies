@@ -82,7 +82,7 @@ var HitosNormativa = (function () {
       '<input class="campo normativa-clave" value="' + U.escapar(r.clave) + '" placeholder="Clave: ROC-40">' +
       '<input class="campo normativa-url" value="' + U.escapar(r.url) +
         '" placeholder="O un enlace directo, si no está en el sistema de normativa">' +
-      '<button type="button" class="boton boton-peligro normativa-quitar" title="Quitar la referencia">✕</button>' +
+      '<button type="button" class="boton boton-peligro normativa-quitar" data-ayuda-clave="quitar-referencia">✕</button>' +
       '<span class="normativa-aviso-clave"' + (claveConApartado(r.clave) ? '' : ' hidden') + '>' +
         'Las claves son de artículo entero: prueba con <code>ROC-40</code>.</span>' +
       '</div>';

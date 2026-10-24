@@ -64,7 +64,7 @@ console.log('--- abrir el primero ---');
 await pulsarDelMenu(tarjetaDe('260901 uno.pdf'), 'Abrir');
 await pagina.waitForSelector('#visor-lateral:not(.oculto)');
 await comprobar('el visor dice el nombre completo',
-  pagina.locator('#visor-nombre').getAttribute('title'), '260901 uno.pdf');
+  pagina.locator('#visor-nombre').getAttribute('data-ayuda'), '260901 uno.pdf');
 await comprobar('solo su tarjeta queda marcada',
   pagina.locator('#lista-sueltos .tarjeta-abierta').count(), 1);
 await comprobar('es la del primero',

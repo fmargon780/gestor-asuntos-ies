@@ -83,7 +83,7 @@ var GuiasMapa = (function () {
       '<span class="mapa-titulo">' + esc(p.titulo || (pregunta ? 'Pregunta sin título' : 'Hito sin título')) +
         /* Fila 116: el guion de este hito tiene una pregunta (el mapa no dibuja el guion). */
         ((p.guion || []).some(function (g) { return g && g.pregunta; })
-          ? ' <span class="mapa-guion-pregunta" title="El guion tiene una pregunta">¿</span>' : '') + '</span>' +
+          ? ' <span class="mapa-guion-pregunta" data-ayuda-clave="guion-con-pregunta">¿</span>' : '') + '</span>' +
       lineaPequena(p, op) + estado + '</div>';
     if (!pregunta) return '<div class="mapa-nodo">' + caja + '</div>';
     var elegida = h && h.elegida;

@@ -146,7 +146,7 @@ var PlantillaRetocarPantalla = (function () {
       (d.despues ? ' → <span class="cep-despues">' + esc(d.despues) + '</span> · <span class="cep-veces">' + textoVeces(sesion.veces(l)) + '</span>' : '');
     texto.onclick = function () { irADocumento(l); };
     var x = document.createElement('button');
-    x.type = 'button'; x.className = 'cer-x'; x.textContent = '✕'; x.title = 'Deshacer este cambio';
+    x.type = 'button'; x.className = 'cer-x'; x.textContent = '✕'; x.setAttribute('data-ayuda-clave', 'deshacer-este-cambio');
     x.onclick = async function () { await sesion.quitar(l.id); await refrescar(); };
     fila.appendChild(texto);
     fila.appendChild(x);

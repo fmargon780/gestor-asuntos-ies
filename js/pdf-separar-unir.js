@@ -123,7 +123,7 @@ var PdfSepararUnir = (function () {
         var tijera = document.createElement('button');
         tijera.type = 'button';
         tijera.className = 'pdf-tijera';
-        tijera.title = 'Cortar aquí';
+        tijera.setAttribute('data-ayuda-clave', 'cortar-aqui');
         tijera.textContent = '✂';
         tijera.dataset.despuesDe = i;
         tijera.onclick = function (ev) {
@@ -264,9 +264,9 @@ var PdfSepararUnir = (function () {
           '</span></label>' +
         '<span class="unir-orden">' + (pos !== -1 ? (pos + 2) + 'º' : '') + '</span>' +
         '<button type="button" class="boton unir-subir" data-indice="' + i + '"' +
-          (pos <= 0 ? ' disabled' : '') + ' title="Antes">▲</button>' +
+          (pos <= 0 ? ' disabled' : '') + ' data-ayuda-clave="pasar-antes">▲</button>' +
         '<button type="button" class="boton unir-bajar" data-indice="' + i + '"' +
-          (pos === -1 || pos === elegidos.length - 1 ? ' disabled' : '') + ' title="Después">▼</button>' +
+          (pos === -1 || pos === elegidos.length - 1 ? ' disabled' : '') + ' data-ayuda-clave="pasar-despues">▼</button>' +
       '</div>';
     }).join('');
 

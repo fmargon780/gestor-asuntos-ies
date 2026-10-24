@@ -242,11 +242,11 @@
       '" data-id="' + U.escapar(r.id) + '">' +
       '<input type="checkbox" class="hito-requisito-casilla"' + (marcada ? ' checked' : '') + '>' +
       '<span class="hito-requisito-texto' + (r.obligatorio ? ' hito-requisito-obligatorio' : '') + '">' +
-        (r.obligatorio && !marcada ? '<span class="hito-requisito-punto" title="Obligatorio"></span>' : '') +
+        (r.obligatorio && !marcada ? '<span class="hito-requisito-punto" data-ayuda-clave="obligatorio"></span>' : '') +
         U.escapar(r.texto) +
       '</span>' +
       extra +
-      '<button type="button" class="hito-requisito-menu-boton" title="Más opciones">⋯</button>' +
+      '<button type="button" class="hito-requisito-menu-boton" data-ayuda-clave="mas-opciones">⋯</button>' +
       '</div>';
   }
 

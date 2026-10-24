@@ -108,7 +108,7 @@ await comprobar('se ve en la lista de la ficha', pagina.locator('#ficha-document
 await comprobar('pero la cuenta dice 3', pagina.locator('#ficha-cuenta-docs').textContent(), '3');
 await comprobar('y su fila no trae «Registrar»',
   pagina.evaluate(() => !!document.querySelector('#ficha-documentos .ficha-documento-indice').closest('.ficha-documento-fila')
-    .querySelector('button[title^="Dar registro"]')), false);
+    .querySelector('button[data-ayuda-clave="dar-registro"]')), false);
 await comprobar('ni sale en los documentos del resumen', pagina.evaluate(() =>
   Array.prototype.some.call(document.querySelectorAll('.ficha-resumen-doc'), x => x.textContent.indexOf('ÍNDICE') !== -1)), false);
 

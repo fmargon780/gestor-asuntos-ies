@@ -93,7 +93,7 @@
         var boton = document.createElement('button');
         boton.type = 'button';
         boton.className = 'ficha-nombre-menu-boton';
-        boton.title = 'Más acciones sobre el asunto';
+        boton.setAttribute('data-ayuda-clave', 'mas-acciones-sobre-el-asunto');
         boton.textContent = '⋯';
         h2.appendChild(boton);
         FichaMenus.montar(boton, opciones);

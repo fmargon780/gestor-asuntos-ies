@@ -90,7 +90,7 @@ await pagina.waitForTimeout(5000);
 await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota */
 await comprobar('2. el cuadro de avisos dice «2 notas de directivos» (la de la demostración y la enviada)', sinVer(pagina), '2 notas de directivos');
 await comprobar('2. la fila del asunto lleva la marca de nota sin ver; la del asunto con nota vista, no',
-  pagina.evaluate(() => { const f = (t) => [...document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]')].find((r) => r.textContent.indexOf(t) !== -1); return [f('Aguilar Ponce, Marina').querySelectorAll('.marca-nota-directivo').length, f('Aguilar Ponce, Marina').querySelector('.marca-nota-directivo').title, f('Aguilar Ponce, Pablo').querySelectorAll('.marca-nota-directivo').length]; }), [1, 'Nota de un directivo sin ver', 0]);
+  pagina.evaluate(() => { const f = (t) => [...document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]')].find((r) => r.textContent.indexOf(t) !== -1); return [f('Aguilar Ponce, Marina').querySelectorAll('.marca-nota-directivo').length, f('Aguilar Ponce, Marina').querySelector('.marca-nota-directivo').getAttribute('data-ayuda-clave') && AyudaRaton.ayuda(f('Aguilar Ponce, Marina').querySelector('.marca-nota-directivo')).ayuda, f('Aguilar Ponce, Pablo').querySelectorAll('.marca-nota-directivo').length]; }), [1, 'Hay una nota de un directivo que aún no has visto.', 0]);
 await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); });   /* fila 368: el cuadro de avisos abierto flota y se pliega al pulsar fuera */
 await pagina.click('#avisos-linea [data-aviso="notas-directivos"]');
 await pagina.waitForTimeout(800);

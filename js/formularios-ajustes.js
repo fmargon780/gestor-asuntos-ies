@@ -62,7 +62,7 @@ var FormulariosAjustes = (function () {
 
   function filaHTML(g, i, hueco) {
     return '<div class="fila-tipo impreso-casilla" data-grupo="' + i + '" title="' + U.escapar(g.nombres.join('\n')) + '">' +
-      '<span class="impreso-mini" title="Pulsa para verla en grande"></span>' +
+      '<span class="impreso-mini" data-ayuda-clave="ver-miniatura-en-grande"></span>' +
       '<span class="nombre-tipo impreso-casilla-nombre">' + U.escapar(g.etiqueta) + '</span>' +
       '<select class="campo campo-hueco-impreso">' + opcionesHuecos(hueco || '') + '</select>' +
     '</div>';

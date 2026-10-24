@@ -185,7 +185,7 @@ var HitosPanelLista = (function () {
         /* Fila 162: el hito actual lleva «Paso actual»; los de después, «Saltar a este paso». */
         (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(raiz, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML()
           : (abierto && window.EstadoHito && EstadoHito.puedeSituar(raiz, h.id) ? EstadoHito.botonSituarHTML('hito-situar') : '')) +
-        '<button type="button" class="hito-desplegar" title="Ver más">▾</button>' +
+        '<button type="button" class="hito-desplegar" data-ayuda-clave="ver-mas">▾</button>' +
       '</div>' +
       '<div class="hito-cuerpo oculto">' + cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta, raiz) + '</div>';
 

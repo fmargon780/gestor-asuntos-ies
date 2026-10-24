@@ -105,7 +105,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo, compacta) {
   div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '') +
                    (abierta ? ' tarjeta-abierta' : '');
   div.dataset.suelto = s.nombre;
-  div.title = 'Pulsa para verlo al lado del programa';
+  div.setAttribute('data-ayuda-clave', 'pulsa-para-verlo-al-lado-del');
   div.onclick = function (ev) {
     if (ev.target.closest('button, a, input, select, textarea, label, .acciones')) return;
     App.abrirSuelto(s);
@@ -134,7 +134,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo, compacta) {
   var ver = document.createElement('button');
   ver.className = 'boton';
   ver.textContent = 'Abrir';
-  ver.title = 'Lo abre en otra pestaña para verlo';
+  ver.setAttribute('data-ayuda-clave', 'lo-abre-en-otra-pestana-para');
   ver.onclick = function () { App.abrirSuelto(s); };
   enMenu.push(ver);
 
@@ -150,7 +150,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo, compacta) {
   var meter = document.createElement('button');
   meter.className = 'boton';
   meter.textContent = 'Guardar en un asunto';
-  meter.title = 'Lo lleva a la carpeta de un asunto que ya existe';
+  meter.setAttribute('data-ayuda-clave', 'lo-lleva-a-la-carpeta-de');
   /* Apagado mientras dura todo (fila 100: se podía pulsar dos veces). */
   meter.onclick = async function () {
     if (meter.disabled) return;

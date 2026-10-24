@@ -83,7 +83,7 @@
       m.textContent = '⚠ ' + faltan + ' por configurar';
       m.classList.add(hayRoja ? 'comprobacion-roja' : 'comprobacion-ambar');
     }
-    m.title = 'Comprobación al entrar: pulsa para ver el detalle';
+    m.setAttribute('data-ayuda-clave', 'comprobacion-al-entrar-pulsa-para-ver');
     registrarProblema(faltan);
   }
 

@@ -208,7 +208,7 @@ window.ElegirAsunto = (function () {
       equis.type = 'button';
       equis.className = 'elegir-cerrar';
       equis.id = 'elegir-cerrar';
-      equis.title = 'Cerrar';
+      equis.setAttribute('data-ayuda-clave', 'cerrar');
       equis.setAttribute('aria-label', 'Cerrar');
       equis.textContent = '✕';
       if (cuadro) cuadro.appendChild(equis);
@@ -327,7 +327,7 @@ window.ElegirAsunto = (function () {
       equis.type = 'button';
       equis.className = 'elegir-cerrar';
       equis.id = 'elegir-cerrar';
-      equis.title = 'Cerrar';
+      equis.setAttribute('data-ayuda-clave', 'cerrar');
       equis.setAttribute('aria-label', 'Cerrar');
       equis.textContent = '✕';
       if (cuadro2) { cuadro2.classList.add('cuadro-elegir'); cuadro2.appendChild(equis); }

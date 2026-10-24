@@ -268,7 +268,7 @@ async function construirSeccionCampos(tipo) {
       if (pasosGuia.length) {
         var selH = document.createElement('select');
         selH.className = 'campo campo-hito-select';
-        selH.title = 'Hito de este campo';
+        selH.setAttribute('data-ayuda-clave', 'hito-de-este-campo');
         selH.innerHTML = '<option value="">Ninguno (del asunto)</option>' + pasosGuia.map(function (p) {
           return '<option value="' + U.escapar(p.id) + '"' + (c.hito === p.id ? ' selected' : '') + '>' + U.escapar(p.titulo) + '</option>';
         }).join('');
@@ -294,13 +294,13 @@ async function construirSeccionCampos(tipo) {
 
       var subir = document.createElement('button');
       subir.type = 'button'; subir.className = 'boton'; subir.textContent = '▲';
-      subir.title = 'Subirlo un puesto'; subir.disabled = (i === 0);
+      subir.setAttribute('data-ayuda-clave', 'subirlo-un-puesto'); subir.disabled = (i === 0);
       subir.onclick = function () { mover(i, -1); };
       f.appendChild(subir);
 
       var bajar = document.createElement('button');
       bajar.type = 'button'; bajar.className = 'boton'; bajar.textContent = '▼';
-      bajar.title = 'Bajarlo un puesto'; bajar.disabled = (i === lista.length - 1);
+      bajar.setAttribute('data-ayuda-clave', 'bajarlo-un-puesto'); bajar.disabled = (i === lista.length - 1);
       bajar.onclick = function () { mover(i, 1); };
       f.appendChild(bajar);
 

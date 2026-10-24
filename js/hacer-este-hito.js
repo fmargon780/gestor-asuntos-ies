@@ -57,12 +57,12 @@ var HacerEsteHito = (function () {
     }
     if (c && c.estado === 'listo-para-enviar') {
       return '<button type="button" class="boton mesa-hacer-hito mesa-hacer-enviar"' +
-        (soloConsulta() ? ' disabled title="En este ordenador solo se puede consultar"' : '') + '>Enviar</button>';
+        (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>Enviar</button>';
     }
     var t = tareasDe(a, h);
     if (!t.some(function (g) { return g.accion === 'generar' || g.accion === 'comunicar'; })) return '';
     return '<button type="button" class="boton boton-principal mesa-hacer-hito"' +
-      (soloConsulta() ? ' disabled title="En este ordenador solo se puede consultar"' : '') + '>Hacer este hito</button>';
+      (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>Hacer este hito</button>';
   }
 
   function nombreDePlantilla(g) {

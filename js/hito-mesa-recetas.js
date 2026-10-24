@@ -141,7 +141,7 @@ var HitoMesaRecetas = (function () {
     if (!texto) return '';
     var consulta = window.SoloConsulta && SoloConsulta.activo();
     return '<button type="button" class="boton boton-chico guion-accion-tarea" data-accion="' + g.accion + '"' +
-      (consulta ? ' disabled title="En este ordenador solo se puede consultar"' : '') + '>' + texto + '</button>';
+      (consulta ? ' disabled data-motivo-clave="consulta"' : '') + '>' + texto + '</button>';
   }
 
   /* Lo mismo que elegir esa tarea en el menú de la cabecera. */

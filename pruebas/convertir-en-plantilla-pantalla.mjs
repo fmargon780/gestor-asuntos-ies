@@ -64,7 +64,7 @@ const entradaWord = await menuDe('CERTIFICADO D26');
 await comprobar('1. en el Word hay «Convertir en plantilla» y está encendida', entradaWord.isDisabled(), false);
 await pagina.keyboard.press('Escape');
 const entradaPdf = await menuDe('Fuente Lucena');
-await comprobar('1. en un PDF sin su Word, desde la fila 281, la entrada está encendida (copia el texto)', [await entradaPdf.isDisabled(), await entradaPdf.getAttribute('title')], [false, null]);
+await comprobar('1. en un PDF sin su Word, desde la fila 281, la entrada está encendida (copia el texto)', [await entradaPdf.isDisabled(), await entradaPdf.getAttribute('data-ayuda')], [false, null]);
 await pagina.keyboard.press('Escape');
 
 console.log('--- 2. la pantalla y lo que propone ---');
@@ -264,7 +264,7 @@ await pagina.click('.cep-pie-botones >> text=Cancelar');
 await pagina.waitForSelector('#convertir-plantilla', { state: 'detached' });
 await comprobar('10. cancelar sin haber cambiado nada: sale sin preguntar y no hay plantillas nuevas', [await pagina.locator('#capa:not(.oculto)').count(), await pagina.evaluate(async () => (await Plantillas.cargar(App.E.gestor)).documentos.length)], [0, 8]);   /* fila 311: y la del certificado de actividades. Fila 322: y una más, «Aviso de revisión». Fila 320: la copia de pruebas lleva tres más de Word para la pantalla «Plantillas». Antes: la plantilla de la copia de pruebas de la fila 285 y la de la fila 280 */
 const entradaDoc = await menuDe('notas antiguas.doc');
-await comprobar('10. un .doc viejo: apagada, con su motivo', [await entradaDoc.isDisabled(), await entradaDoc.getAttribute('title')], [true, 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.']);
+await comprobar('10. un .doc viejo: apagada, con su motivo', [await entradaDoc.isDisabled(), await entradaDoc.getAttribute('data-ayuda')], [true, 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.']);
 await pagina.keyboard.press('Escape');
 await abrirFicha('Aguilar Ponce, Pablo');
 const entradaPablo = await menuDe('SOLICITUD');

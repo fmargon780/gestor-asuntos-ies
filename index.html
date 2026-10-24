@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gestor de Asuntos</title>
 <link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/ayuda-raton.css">   <!-- fila 462 -->
 <link rel="stylesheet" href="css/plazos.css">
 <link rel="stylesheet" href="css/ajustes.css">
 <link rel="stylesheet" href="css/campos.css">
@@ -222,7 +223,7 @@
                       aria-controls="filtros-abiertos">Filtros</button>
               <span class="exportar-envoltorio" id="exportar-envoltorio">
                 <button type="button" id="btn-exportar" class="boton" aria-haspopup="true"
-                        aria-expanded="false" title="Sacar a una hoja de cálculo o a un informe lo que se ve">Exportar ▾</button>
+                        aria-expanded="false">Exportar ▾</button>
                 <span id="exportar-menu" class="exportar-menu oculto">
                   <button type="button" id="btn-exportar-hoja">Hoja de cálculo</button>
                   <button type="button" id="btn-exportar-pdf">Informe en PDF</button>
@@ -440,7 +441,7 @@
                selector elige cuál se lee (o todos a la vez). Las
                opciones las rellena js/archivo-personas.js con los
                cursos que de verdad hay en el resumen guardado. -->
-          <select id="selector-curso-archivo" class="campo" style="width:auto" title="Curso"></select>
+          <select id="selector-curso-archivo" class="campo" style="width:auto" aria-label="Curso"></select>
         </div>
       </header>
       <p class="explica" id="explica-archivo">Leyendo el archivo…</p>
@@ -849,7 +850,7 @@
       <label class="etiqueta" style="margin-top:10px">Logo del centro <span class="suave">(opcional; cada plantilla dice si lo lleva)</span></label>
       <div id="membrete-logo-estado" class="suave" style="margin-bottom:6px"></div>
       <button type="button" class="boton" id="membrete-elegir-logo">Subir el logo (PNG o JPG)</button>
-      <button type="button" class="boton boton-peligro oculto" id="membrete-quitar-logo" title="Va a la papelera">Borrar el logo</button>
+      <button type="button" class="boton boton-peligro oculto" id="membrete-quitar-logo">Borrar el logo</button>
       <div><button type="button" class="boton" id="membrete-guardar" style="margin-top:10px">Guardar</button></div>
       <p class="nota">Vista previa (cambia mientras escribes; se guarda con «Guardar»):</p>
       <div id="membrete-vista-previa"></div>
@@ -1030,6 +1031,8 @@
 
 <!-- Piezas sueltas: cada una hace su trabajo y no sabe de las demás. -->
 <script src="js/util.js"></script>
+<script src="js/ayudas.js"></script>   <!-- fila 462: los textos del recuadro de ayuda -->
+<script src="js/ayuda-raton.js"></script>   <!-- fila 462: el recuadro (ya no hay ayudas grises del navegador) -->
 <script src="js/solo-consulta.js"></script>
 <script src="js/util-parecidos.js"></script>
 <script src="js/buscar-o-crear.js"></script>

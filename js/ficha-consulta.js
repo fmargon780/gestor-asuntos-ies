@@ -101,7 +101,6 @@
       if (enConsulta && !esControlDeSoloLectura(el)) {
         if (!el.disabled) {
           el.disabled = true; el.dataset.apagadoPorConsulta = '1';
-          if (window.SoloConsulta && SoloConsulta.activo()) el.title = 'Solo consulta';   /* fila 260: el motivo */
         }
       } else if (el.dataset.apagadoPorConsulta) {
         el.disabled = false;

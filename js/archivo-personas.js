@@ -223,7 +223,7 @@ $('selector-curso-archivo').onchange = function () {
   reconstruir.type = 'button';
   reconstruir.id = 'btn-reconstruir-indice';
   reconstruir.className = 'boton accion-de-administracion';   /* fila 287: un directivo no la ve */
-  reconstruir.title = 'Recorre el archivo entero una vez y guarda el índice de búsqueda';
+  reconstruir.setAttribute('data-ayuda-clave', 'recorre-el-archivo-entero-una-vez');
   reconstruir.textContent = 'Reconstruir el índice';
   reconstruir.onclick = function () { App.reconstruirIndiceArchivo(reconstruir); };
 

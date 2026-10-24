@@ -120,7 +120,7 @@ var ActividadesPantalla = (function () {
     var s = Actividades.situacion(a, h);
     var off = soloConsulta() ? ' disabled' : '';
     var menu = a.antigua
-      ? '<details class="pt-mas-menu"><summary title="Más" data-solo-lectura>⋯</summary><div class="pt-menu">' +
+      ? '<details class="pt-mas-menu"><summary data-ayuda-clave="mas" data-solo-lectura>⋯</summary><div class="pt-menu">' +
         '<button type="button" class="boton" data-accion="cambiar"' + off + '>Cambiar</button>' +
         '<button type="button" class="boton boton-peligro" data-accion="borrar"' + off + '>Borrar</button></div></details>'
       : '';
@@ -159,7 +159,7 @@ var ActividadesPantalla = (function () {
       cuerpo.innerHTML = '<div class="vacio">Ninguna actividad encaja con eso.</div>';
     } else {
       cuerpo.innerHTML = '<table class="pt-tabla ap-tabla"><thead><tr>' +
-        '<th><button type="button" class="enlace pt-ordenar activa" data-solo-lectura id="ap-orden" title="Cambiar el orden">Fecha ' + (E.orden === 'desc' ? '▼' : '▲') + '</button></th>' +
+        '<th><button type="button" class="enlace pt-ordenar activa" data-solo-lectura id="ap-orden" data-ayuda-clave="cambiar-el-orden">Fecha ' + (E.orden === 'desc' ? '▼' : '▲') + '</button></th>' +
         '<th>Actividad</th><th>Departamento</th><th>Lugar</th><th>Unidades</th><th>Alumnado</th><th>Profesorado</th><th>Situación</th><th></th></tr></thead><tbody>' +
         l.map(function (a) { return fila(a, h); }).join('') + '</tbody></table>';
       $('ap-orden').onclick = function () { E.orden = E.orden === 'desc' ? 'asc' : 'desc'; pintarCuerpo(); };

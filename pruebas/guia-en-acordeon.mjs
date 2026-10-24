@@ -113,13 +113,13 @@ await pagina.keyboard.type('Pagar');
 /* ================= 4 ================= */
 console.log('--- 4. las flechas ---');
 await linea(0);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] .paso-mandos button[title="Bajar este hito"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] .paso-mandos button[data-ayuda="Bajar este hito"]');
 await comprobar('bajado, sigue abierto (ahora en el sitio 2)',
   pagina.evaluate(() => !document.querySelector('#guia-pasos > .paso-editor[data-pos="1"]').classList.contains('paso-plegado')), true);
 await comprobar('y es el único abierto', abiertos(), ['Registrar la entrada']);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] .paso-mandos button[title="Subir este hito"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] .paso-mandos button[data-ayuda="Subir este hito"]');
 await comprobar('subido, sigue abierto', abiertos(), ['Registrar la entrada']);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="3"] .paso-mandos button[title="Subir este hito"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="3"] .paso-mandos button[data-ayuda="Subir este hito"]');
 await comprobar('mover uno cerrado no lo abre', abiertos(), ['Registrar la entrada']);
 
 /* ================= 5 ================= */

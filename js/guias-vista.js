@@ -49,7 +49,7 @@
        preguntaba. */
     var verlo = (conCasillas && conCuerpo && !pregunta)
       ? '<button type="button" class="paso-ver" ' +
-        'title="Ver o esconder la explicación de este hito">ver</button>'
+        'data-ayuda-clave="ver-explicacion-del-hito">ver</button>'
       : '';
 
     var titulo = '<span class="paso-titulo-texto">' +
