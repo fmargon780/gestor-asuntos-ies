@@ -176,7 +176,7 @@ var GuiasMapa = (function () {
   function panelHTML() {
     return '<div id="guia-mapa-panel" class="guia-mapa-panel oculto">' +
       '<div class="guia-mapa-panel-cabecera"><strong>Mapa de la guía</strong>' +
-      '<button type="button" class="boton" id="guia-mapa-cerrar">Cerrar el mapa</button></div>' +
+      '<button type="button" class="boton" id="guia-mapa-cerrar">← Volver al hito</button></div>' +
       '<div class="guia-mapa-panel-cuerpo"></div></div>';
   }
 

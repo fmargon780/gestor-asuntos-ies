@@ -1,0 +1,159 @@
+/* ============================================================
+   El editor de la guía a todo lo ancho y en dos columnas
+   (25-oct-2026, fila 463, docs/EDITOR-DE-LA-GUIA-CLARO.md, parte A).
+   Hitos a la izquierda, el hito elegido a la derecha. Cada columna se
+   desplaza por su cuenta; la ventana no.
+   ============================================================ */
+
+.cuadro.cuadro-guia {
+  max-width: none;
+  width: 100%;
+  height: calc(100vh - 40px);
+  height: calc(100dvh - 40px);
+}
+.capa > .cuadro.cuadro-guia > h3 { display: none; }   /* el título visible va en .guia-cab, con los botones a su derecha */
+.capa > .cuadro.cuadro-guia > #cuadro-cuerpo {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.guia-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; flex: 0 0 auto; }
+.guia-cab-titulo { margin: 0; }
+.guia-cab-herr { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.guia-dos-col {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(240px, 30%) minmax(0, 1fr);
+  gap: 18px;
+}
+.guia-col-izq, .guia-col-der { min-height: 0; overflow-y: auto; padding-right: 4px; }
+.guia-col-izq { display: flex; flex-direction: column; gap: 8px; }
+.guia-col-izq > .boton-ancho { flex: 0 0 auto; }
+.guia-col-izq .guia-camino { margin: 0; }
+
+/* La lista de hitos de la izquierda. */
+.guia-lista { display: flex; flex-direction: column; gap: 8px; }
+.guia-lista-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 4px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.guia-lista-item:hover { background: var(--fondo); }
+.guia-lista-item.elegido { background: var(--azul-claro); border-color: var(--azul); border-left-color: var(--azul); }
+.guia-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.guia-lista-titulo { font-weight: 600; overflow-wrap: anywhere; }
+.guia-lista-gris { font-size: 12px; overflow-wrap: anywhere; }
+.guia-lista-gris:empty { display: none; }
+
+/* «Ver mapa» enseña el mapa en lugar del hito. */
+.guia-col-der:has(#guia-mapa-panel:not(.oculto)) > #guia-pasos { display: none; }
+
+/* El hito elegido: «Datos del hito» en una fila (baja a dos si no cabe). */
+.cuadro-guia .paso-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+}
+.cuadro-guia .paso-editor.paso-plegado { display: none; }
+.cuadro-guia .paso-editor > * { flex: 1 0 100%; margin-top: 0; margin-bottom: 0; }
+.cuadro-guia .paso-editor > .paso-cabecera,
+.cuadro-guia .paso-editor > .paso-extra,
+.cuadro-guia .paso-editor > .paso-extra > .paso-extra-cuerpo,
+.cuadro-guia .paso-editor > .paso-extra .paso-plazo-fila { display: contents; }
+.cuadro-guia .paso-editor > .paso-extra { border: 0; padding: 0; background: none; }
+
+.paso-apartado-fijo { font-weight: 700; }
+.paso-datos-titulo { font-size: 13px; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .4px; }
+
+.dato { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dato > .etiqueta, .dato .etiqueta { margin: 0; font-size: 12px; font-weight: 600; color: var(--tinta-suave); }
+.dato .campo { width: 100%; }
+.cuadro-guia .dato-titulo { flex: 2 1 240px; }
+.cuadro-guia .dato-responsable { flex: 1 1 170px; }
+.cuadro-guia .paso-toca-bloque { flex: 1 1 200px; }
+.cuadro-guia .paso-toca-bloque .paso-toca-fila { display: flex; gap: 6px; }
+.cuadro-guia .dato-plazo-dias { flex: 0 0 90px; }
+.cuadro-guia .dato-cuenta { flex: 1 1 140px; }
+.cuadro-guia .dato-desde { flex: 2 1 260px; }   /* lo bastante ancho para leer el hito elegido */
+.cuadro-guia .paso-plazo-desde-fijo { flex: 2 1 260px; }
+.cuadro-guia .paso-numero { align-self: center; }
+.cuadro-guia .paso-mandos { margin-left: auto; align-self: flex-end; }
+
+/* «Tareas de este hito (N)»: siempre a la vista, no se pliega. */
+.cuadro-guia .paso-guion > summary {
+  list-style: none;
+  pointer-events: none;
+  cursor: default;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tinta);
+}
+.cuadro-guia .paso-guion > summary::-webkit-details-marker { display: none; }
+
+/* Los apartados plegados, cada uno con su título y un resumen en gris. */
+.paso-apartado-cab {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--fondo);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.paso-apartado-cab .ap-titulo { font-weight: 600; }
+.paso-apartado-cab .ap-resumen { font-size: 12px; }
+.paso-apartado-cab .ap-flecha::before { content: '▸'; }
+.paso-apartado-cab[aria-expanded="true"] .ap-flecha::before { content: '▾'; }
+
+.paso-editor:not(.abre-explicacion) > .ap-explicacion,
+.subpaso-editor:not(.abre-explicacion) > .ap-explicacion,
+.paso-editor:not(.abre-aviso) > .ap-aviso,
+.subpaso-editor:not(.abre-aviso) > .ap-aviso,
+.paso-editor:not(.abre-documentos) > .ap-documentos,
+.subpaso-editor:not(.abre-documentos) > .ap-documentos,
+.paso-editor:not(.abre-normativa) > .ap-normativa,
+.subpaso-editor:not(.abre-normativa) > .ap-normativa,
+.paso-editor:not(.abre-otros) > .ap-otros,
+.subpaso-editor:not(.abre-otros) > .ap-otros { display: none !important; }
+
+.cuadro-guia .paso-normativa > summary { display: none; }
+.cuadro-guia .paso-aviso-frase { margin: 4px 0 0; font-size: 13px; }
+
+/* La barra de formato, justo encima de la explicación (ya no pegada arriba del todo). */
+.guia-barra-caja .guia-barra { position: static; border-bottom: 0; padding-bottom: 6px; margin-bottom: 0; }
+.guia-barra-caja .guia-enlace-fila { margin-bottom: 6px; }
+
+/* Los hitos de dentro de cada respuesta: el mismo aspecto, siempre a la vista. */
+.cuadro-guia .subpaso-editor { display: flex; flex-direction: column; gap: 8px; }
+.cuadro-guia .subpaso-editor > * { margin: 0; }
+.cuadro-guia .subpaso-editor > .paso-cabecera { align-items: flex-end; }
+.cuadro-guia .subpaso-editor .dato-titulo { flex: 1 1 200px; }
+.cuadro-guia .paso-cabecera { cursor: default; }
+
+@media (max-width: 800px) {
+  .capa > .cuadro.cuadro-guia > #cuadro-cuerpo { overflow-y: auto; display: block; }
+  .guia-dos-col { display: flex; flex-direction: column; }
+  .guia-col-izq, .guia-col-der { overflow: visible; }
+}

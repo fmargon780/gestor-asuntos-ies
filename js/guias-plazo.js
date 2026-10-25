@@ -41,7 +41,8 @@ var GuiasPlazo = (function () {
   document.addEventListener('change', function (ev) {
     var sel = ev.target;
     if (!sel || !sel.classList || !sel.classList.contains('paso-plazo-cuenta') || !sel.parentNode) return;
-    var dias = sel.parentNode.querySelector('input[type="number"]');
+    var fila = sel.closest('.paso-plazo-fila') || sel.parentNode;   /* fila 463: los días y «Cómo se cuentan» van en etiquetas distintas */
+    var dias = fila.querySelector('input[type="number"]');
     if (dias) dias.placeholder = sel.value === 'meses' ? 'meses' : 'días';
   });
 

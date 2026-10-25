@@ -74,7 +74,7 @@ console.log('--- 2. elegir uno: copia suelta ---');
 await pagina.click('#biblioteca-panel-lista .biblioteca-panel-item');
 await pagina.waitForSelector('#guia-pasos > .paso-editor[data-pos="1"]');
 await comprobar('entra como hito nuevo, con su título',
-  pagina.inputValue('#guia-pasos > .paso-editor[data-pos="1"] > .paso-cabecera > .paso-titulo'), 'Registrar de salida en Séneca');
+  pagina.inputValue('#guia-pasos > .paso-editor[data-pos="1"] > .paso-cabecera .paso-titulo'), 'Registrar de salida en Séneca');
 await comprobar('dice que el plazo contaba desde un hito de otro tipo',
   pagina.textContent('#guia-pasos > .paso-editor[data-pos="1"] > .paso-aviso-plazo'), 'El plazo contaba desde un hito de otro tipo: revísalo.');
 await comprobar('no hay etiqueta de origen', pagina.$$eval('.chip-origen', (e) => e.length), 0);
@@ -83,17 +83,17 @@ await comprobar('no hay «Guardar en la biblioteca»', pagina.$$eval('.paso-guar
 console.log('--- 3. «Usarlo» al escribir un título parecido ---');
 await pagina.click('#guia-anadir');
 await pagina.waitForSelector('#guia-pasos > .paso-editor[data-pos="2"]');
-await pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera > .paso-titulo').fill('Abrir el exped');
+await pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera .paso-titulo').fill('Abrir el exped');
 await pagina.waitForSelector('#guia-pasos > .paso-editor[data-pos="2"] .paso-titulo-usarlo');
 await comprobar('dice en qué tipo está',
-  pagina.textContent('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera > .paso-titulo-parecido'),
+  pagina.textContent('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera .paso-titulo-parecido'),
   'En «Matrícula» hay «Abrir el expediente» · Usarlo');
 await pagina.click('#guia-pasos > .paso-editor[data-pos="2"] .paso-titulo-usarlo');
 await comprobar('«Usarlo» trae el hito',
-  pagina.inputValue('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera > .paso-titulo'), 'Abrir el expediente');
+  pagina.inputValue('#guia-pasos > .paso-editor[data-pos="2"] > .paso-cabecera .paso-titulo'), 'Abrir el expediente');
 
 console.log('--- 4. Guardar no pregunta nada y la copia queda suelta ---');
-await pagina.evaluate(() => { document.querySelector('#guia-pasos > .paso-editor[data-pos="1"] > .paso-cabecera > .paso-titulo').value = 'Registrar de salida (Certificado)'; });   /* el hito está plegado */
+await pagina.evaluate(() => { document.querySelector('#guia-pasos > .paso-editor[data-pos="1"] > .paso-cabecera .paso-titulo').value = 'Registrar de salida (Certificado)'; });   /* el hito está plegado */
 await pagina.click('#cuadro-aceptar');
 const guardada = await pagina.evaluate(() => window.__guardada);
 await comprobar('el cuadro se cierra sin ninguna pregunta de la biblioteca',

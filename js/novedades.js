@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '463', fecha: '2026-10-25', texto: 'La ventana para escribir la guía de un tipo de asunto ocupa toda la pantalla: a la izquierda, la lista de hitos; a la derecha, el hito elegido, con sus datos rotulados (responsable, a quién le toca, plazo y «desde» legible) y sus tareas siempre a la vista. Lo demás del hito está en apartados con título: explicación, «Al terminar este hito», documentos, normativa y otros.' },
   { id: '450', fecha: '2026-10-23', texto: 'Etiquetas recuerda sola lo que dejaste a medias en cada ordenador (personas, hoja, diseño, orden, copias y huecos), con «Empezar de cero». Hay un orden nuevo para las etiquetas y tres tarjetas encima de la hoja: Hoja, Diseño y Orden.' },
   { id: '449', fecha: '2026-10-23', texto: 'Al guardar un documento o un correo de «Ver todo» en un asunto que ya existe, el aviso con «Ir al asunto» se queda hasta que lo cierres con la ✕. «Ir al asunto» abre «Trabajo» en el hito, y su «← Volver a Ver todo» te devuelve a donde estabas.' },
   { id: '441', fecha: '2026-10-23', texto: 'Al contestar un correo desde la aplicación, sale con el asunto que escribas en el cuadro de Correo. Si no lo cambias, sigue dentro de la conversación; si pones otro, sale como correo nuevo con ese asunto.' },
