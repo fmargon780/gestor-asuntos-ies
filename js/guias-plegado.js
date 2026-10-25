@@ -153,6 +153,9 @@ var GuiasPlegado = (function () {
         /* «Tareas de este hito» siempre a la vista: no se pliega. */
         var g = el.querySelector(':scope > .paso-guion');
         if (g && !g.open) g.open = true;
+        /* Lo mismo con «Normativa e impresos»: el apartado ya lo pliega; el desplegable de dentro, no. */
+        var nm = el.querySelector(':scope > .paso-normativa');
+        if (nm && !nm.open) nm.open = true;
       });
       var vacio = document.getElementById('guia-vacio-der');
       if (vacio) vacio.classList.toggle('oculto', !!sel);
@@ -194,7 +197,7 @@ var GuiasPlegado = (function () {
       /* «Tareas de este hito» no se pliega: si se cierra con el teclado, se reabre. */
       c.addEventListener('toggle', function (ev) {
         var t = ev.target;
-        if (t && t.classList && t.classList.contains('paso-guion') && !t.open) t.open = true;
+        if (t && t.classList && (t.classList.contains('paso-guion') || t.classList.contains('paso-normativa')) && !t.open) t.open = true;
       }, true);
     }
 

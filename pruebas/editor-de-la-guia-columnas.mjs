@@ -205,6 +205,14 @@ await comprobar('lo escrito en un hito escondido también se guarda, y el resto 
     return JSON.stringify(s) === JSON.stringify(e);
   }, GUIA), true);
 
+console.log('--- 5b. «Normativa e impresos» abierto enseña su contenido ---');
+await abrir();
+await pagina.click(D(0) + ' > .paso-apartado-cab[data-ap="normativa"]');
+await comprobar('se ve «+ Añadir referencia» y la referencia escrita',
+  pagina.evaluate(() => { const d = document.querySelector('#guia-pasos > .paso-editor[data-pos="0"] > .paso-normativa');
+    return [d.querySelector('.normativa-anadir').offsetParent !== null, d.querySelector('.normativa-fila') !== null && d.querySelector('.normativa-fila').offsetParent !== null]; }), [true, true]);
+await pagina.click('#cuadro-cancelar');
+
 /* ================= 6 ================= */
 console.log('--- 6. «Ver mapa» ---');
 await abrir();

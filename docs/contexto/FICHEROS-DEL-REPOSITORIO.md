@@ -241,6 +241,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
+| `js/guias-convertir.js` | Pasar «Documentos» y «Comunicación» de un hito a tareas al abrir el editor de la guía (sacado de `guias-editor.js`, fila 463) |
 | `js/guias-columnas.js`, `css/guias-columnas.css` | El editor de la guía a dos columnas: apartados con título y resumen (`GuiasColumnas`), la lista de hitos de la izquierda y el diseño de la ventana (fila 463) |
 | `js/guias-plegado.js` | Qué hito se ve en el editor de la guía: el elegido en la lista de la izquierda, la lista y su línea gris (`GuiasPlegado`, filas 122 y 463) |
 | `js/guias-plazo.js` | El desplegable «Días hábiles / lectivos / naturales» del plazo de cada paso de la guía (`GuiasPlazo`, fila 131). Antes de `js/guias.js` |
