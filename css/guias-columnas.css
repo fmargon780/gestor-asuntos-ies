@@ -215,3 +215,15 @@
 .cuadro-guia .guia-aviso { flex: 0 0 auto; margin: 0 0 8px; }
 .guion-fila.guion-fila-resaltada:not(.guion-subfila) { background: #fff8e6; border-color: #e6c377; }
 .guion-fila.guion-fila-resaltada:not(.guion-subfila) > .guion-resumen { background: transparent; }
+
+/* Fila 465, parte C: el editor de plantillas dentro de la columna derecha («Ver y cambiar el texto»).
+   Mientras está abierto no se ve la guía (sigue en su sitio, con lo escrito), ni los paneles de mapa y de
+   traer un hito, y la lista de hitos y los botones de arriba no responden (no se cambia de hito a medias). */
+.guia-col-der:has(#guia-plantilla-panel:not(.oculto)) > #guia-pasos,
+.guia-col-der:has(#guia-plantilla-panel:not(.oculto)) > .guia-mapa-panel,
+.guia-col-der:has(#guia-plantilla-panel:not(.oculto)) > .biblioteca-panel { display: none; }
+.guia-dos-col:has(#guia-plantilla-panel:not(.oculto)) > .guia-col-izq,
+.cuadro-guia:has(#guia-plantilla-panel:not(.oculto)) .guia-cab-herr { pointer-events: none; opacity: .5; }
+.guia-plantilla-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.guia-plantilla-pie { margin-top: 14px; }
+.guion-receta .guia-plantilla-ver, .paso-avisar-lopide-plantilla .guia-plantilla-ver { align-self: flex-end; }

@@ -74,6 +74,7 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   explicación del hito elegido o del recuadro donde se escribe. «Ver mapa» enseña el mapa en la
   derecha en lugar del hito (`← Volver al hito`). Pruebas: `pruebas/editor-de-la-guia-columnas.mjs`
   y `pruebas/guia-en-acordeon.mjs` (adaptada).
+  **Plantilla desde la guía (fila 465, `js/guias-plantilla.js`)**: junto a «Plantilla de correo» de una tarea «Comunicar» (y de sus líneas dentro de una respuesta) y junto a «Con la plantilla:» de «Al terminar este hito», el botón «Ver y cambiar el texto» (`.guia-plantilla-ver`, solo con plantilla elegida) pinta en `#guia-plantilla-panel` (columna derecha) el editor de `PlantillasAjustes` (`cuerpoDelCuadroHTML`, `engancharCuadro`, `guardarCuadro`: el mismo que el cuadro de Ajustes → «Cambiar»). Mientras está abierto, `#guia-pasos` sigue en el DOM, escondido por CSS (lo escrito no se pierde), y la lista de hitos y los botones de arriba no responden. «Guardar la plantilla» guarda al momento y repinta la guía (`recoger(); pintar()`), en el mismo hito y con la misma tarea abierta; «← Volver a la guía» vuelve sin guardar. «Normativa e impresos» enseña solo los impresos marcados más los que encuentra el buscador (`Formularios.engancharEmbebido`, todas las filas siguen en el DOM; `leerEditor` lee lo mismo que siempre).
 
 - **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
   `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de

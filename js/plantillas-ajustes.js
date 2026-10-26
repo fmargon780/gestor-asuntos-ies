@@ -290,20 +290,21 @@
     HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]) });
   }
 
-  function abrirCuadroDePlantilla(existente, tipoPreset, alGuardar) {
+  function opcionesTiposDe(categoria, existente, tipoPreset) {
+    return opcionesDeCategoria(categoria).map(function (t) {
+      var elegido = existente ? existente.tipo === t.tipo : (tipoPreset && tipoPreset.tipo === t.tipo);
+      return '<option value="' + U.escapar(t.tipo) + '"' + (elegido ? ' selected' : '') + '>' +
+        U.escapar(t.tipo) + '</option>';
+    }).join('');
+  }
+
+  /* El cuerpo del editor (los campos de siempre). Lo usan el cuadro de Ajustes
+     (`abrirCuadroDePlantilla`) y, desde la fila 465, la columna derecha del
+     editor de la guía (js/guias-plantilla.js): un solo editor para los dos. */
+  function cuerpoDelCuadroHTML(existente, tipoPreset) {
     var categorias = Nombres.CATEGORIAS;
     var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
-
-    function opcionesTipos(categoria) {
-      return opcionesDeCategoria(categoria).map(function (t) {
-        var elegido = existente ? existente.tipo === t.tipo : (tipoPreset && tipoPreset.tipo === t.tipo);
-        return '<option value="' + U.escapar(t.tipo) + '"' + (elegido ? ' selected' : '') + '>' +
-          U.escapar(t.tipo) + '</option>';
-      }).join('');
-    }
-
-    var cuerpo =
-      '<div class="dos-columnas">' +
+    return '<div class="dos-columnas">' +
         '<div><label class="etiqueta">Categoría</label>' +
           '<select id="pl-categoria" class="campo">' +
             categorias.map(function (c) {
@@ -311,7 +312,7 @@
             }).join('') +
           '</select></div>' +
         '<div><label class="etiqueta">Tipo de asunto</label>' +
-          '<select id="pl-tipo" class="campo">' + opcionesTipos(categoriaInicial) + '</select></div>' +
+          '<select id="pl-tipo" class="campo">' + opcionesTiposDe(categoriaInicial, existente, tipoPreset) + '</select></div>' +
       '</div>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
@@ -321,17 +322,16 @@
       (window.PlantillaVaA ? PlantillaVaA.selectHTML('pl-va-a', existente ? existente.vaA : 'familia') : '') +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
+  }
 
-    var promesa = U.preguntar(existente ? 'Cambiar plantilla' : 'Nueva plantilla', cuerpo,
-      existente ? 'Guardar' : 'Crear');
-
-    /* El catálogo de huecos ya no se pinta entero encima del texto:
-       un solo botón abre el buscador de js/huecos-buscador.js
-       (17-sep-2026, docs/HUECOS-INSERTAR.md). `campos` va en el orden
-       del formulario, y el hueco entra en el que tuviera el foco por
-       última vez; sin foco previo, al final del último, que es el
-       cuadro de texto. La vista previa se repinta sola, porque al
-       insertar se lanza un evento `input`. */
+  /* El catálogo de huecos ya no se pinta entero encima del texto:
+     un solo botón abre el buscador de js/huecos-buscador.js
+     (17-sep-2026, docs/HUECOS-INSERTAR.md). `campos` va en el orden
+     del formulario, y el hueco entra en el que tuviera el foco por
+     última vez; sin foco previo, al final del último, que es el
+     cuadro de texto. La vista previa se repinta sola, porque al
+     insertar se lanza un evento `input`. */
+  function engancharCuadro(existente, tipoPreset) {
     engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', []);
     engancharCampoDeTexto('pl-texto-seneca', 'pl-insertar-hueco-seneca', []);
 
@@ -342,42 +342,54 @@
     }
 
     $('pl-categoria').onchange = function () {
-      $('pl-tipo').innerHTML = opcionesTipos($('pl-categoria').value);
+      $('pl-tipo').innerHTML = opcionesTiposDe($('pl-categoria').value, existente, tipoPreset);
       pintarPrevia();
     };
     $('pl-tipo').onchange = pintarPrevia;
     $('pl-texto').oninput = pintarPrevia;
     pintarPrevia();
+  }
 
-    promesa.then(async function (ok) {
+  /* Lee los campos y guarda. Devuelve true si ha guardado (si falta algo o falla, avisa y devuelve false). */
+  async function guardarCuadro(existente, alGuardar) {
+    var nombre = $('pl-nombre').value.trim();
+    var tipo = $('pl-tipo').value;
+    var categoria = $('pl-categoria').value;
+    var texto = $('pl-texto').value;
+    var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
+    var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
+    var vaA = window.PlantillaVaA ? PlantillaVaA.leer('pl-va-a') : '';
+    if (!nombre || !tipo || !texto.trim()) {
+      U.aviso('Hace falta el nombre, el tipo y el texto.', 'malo');
+      return false;
+    }
+    try {
+      await Plantillas.guardar(App.E.gestor, function (actual) {
+        if (existente) {
+          var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
+          if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], vaA);
+        } else {
+          actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, vaA));
+        }
+        return actual;
+      });
+      U.aviso(existente ? 'Plantilla guardada.' : 'Plantilla creada.', 'bueno');
+      await cargar();
+      if (typeof alGuardar === 'function') alGuardar();
+      return true;
+    } catch (e) {
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
+      return false;
+    }
+  }
+
+  function abrirCuadroDePlantilla(existente, tipoPreset, alGuardar) {
+    var promesa = U.preguntar(existente ? 'Cambiar plantilla' : 'Nueva plantilla', cuerpoDelCuadroHTML(existente, tipoPreset),
+      existente ? 'Guardar' : 'Crear');
+    engancharCuadro(existente, tipoPreset);
+    promesa.then(function (ok) {
       if (!ok) return;
-      var nombre = $('pl-nombre').value.trim();
-      var tipo = $('pl-tipo').value;
-      var categoria = $('pl-categoria').value;
-      var texto = $('pl-texto').value;
-      var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
-      var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
-      var vaA = window.PlantillaVaA ? PlantillaVaA.leer('pl-va-a') : '';
-      if (!nombre || !tipo || !texto.trim()) {
-        U.aviso('Hace falta el nombre, el tipo y el texto.', 'malo');
-        return;
-      }
-      try {
-        await Plantillas.guardar(App.E.gestor, function (actual) {
-          if (existente) {
-            var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-            if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], vaA);
-          } else {
-            actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, vaA));
-          }
-          return actual;
-        });
-        U.aviso(existente ? 'Plantilla guardada.' : 'Plantilla creada.', 'bueno');
-        await cargar();
-        if (typeof alGuardar === 'function') alGuardar();
-      } catch (e) {
-        U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-      }
+      return guardarCuadro(existente, alGuardar);
     });
   }
 
@@ -553,6 +565,10 @@
     cargar: cargar,
     pintarDeTipo: pintarDeTipo,
     abrirCuadroDePlantilla: abrirCuadroDePlantilla,
+    /* Fila 465: el mismo editor, para pintarlo en otro sitio (js/guias-plantilla.js). */
+    cuerpoDelCuadroHTML: cuerpoDelCuadroHTML,
+    engancharCuadro: engancharCuadro,
+    guardarCuadro: guardarCuadro,
     campoDeTextoHTML: campoDeTextoHTML,
     engancharCampoDeTexto: engancharCampoDeTexto,
     /* Fila 151: el editor de plantilla dentro del cuadro de Correo o de

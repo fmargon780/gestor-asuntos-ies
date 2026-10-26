@@ -87,6 +87,7 @@
         '<div class="guia-col-der" id="guia-col-der">' +
           (window.GuiasBiblioteca ? GuiasBiblioteca.panelTraerHTML() : '') +
           (window.GuiasMapa ? GuiasMapa.panelHTML() : '') +
+          (window.GuiasPlantilla ? GuiasPlantilla.panelHTML() : '') +   /* fila 465 */
           '<div id="guia-vacio-der" class="vacio oculto">Añade el primer hito</div>' +
           '<div id="guia-pasos"></div>' +
         '</div>' +
@@ -447,6 +448,9 @@
 
     plegado.enganchar();
     pintar();
+    /* Fila 465, C2: «Ver y cambiar el texto» de una plantilla; al guardarla se repinta la guía con lo escrito. */
+    if (window.GuiasPlantilla) GuiasPlantilla.enganchar({ col: $('guia-col-der'), pasos: $('guia-pasos'),
+      alGuardar: function () { recoger(); pintar(); } });
     /* El mapa (fila 113): panel dentro del mismo cuadro, dibujado con lo
        que hay en pantalla; pulsar un hito lleva a él. */
     if (window.GuiasMapa && $('guia-ver-mapa')) {
