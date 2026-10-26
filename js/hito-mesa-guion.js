@@ -316,56 +316,21 @@ var HitoMesaGuion = (function () {
 
   function puedeAnadirALaGuia(a, h) { return !!pasoDeLaGuia(a, h); }
 
-  /* Fila 150: el editor de tareas de siempre, en la propia mesa, sin
-     salir a Ajustes. Reutiliza js/guias-guion.js (el mismo editor de
-     Ajustes), aquí solo para la lista `guion` de este hito: `leer()` para
-     recoger lo escrito, `enganchar()` para subir/bajar/quitar/preguntas,
-     igual que hace js/guias-paso-bloques.js con `ctx.recoger()`/`ctx.pintar()`.
-     Fila 224: se abre desde el «⋮» de una tarea de la guía («Cambiar en
-     la guía»), con `idResaltar` a la vista y resaltada. */
+  /* Fila 150 y fila 224: «Abrir en la guía» desde el «⋮» de una tarea de la guía.
+     Fila 464 (docs/EDITOR-DE-LA-GUIA-CLARO.md, B6): ya no monta una ventana
+     pequeña; abre el editor completo de la guía del tipo, con el hito de la
+     tarea elegido y la tarea abierta y resaltada. «Guardar» guarda la guía
+     (lo mismo que en Ajustes) y deja el asunto como estaba, repintado. */
   async function cambiarGuionDelPaso(a, h, idResaltar) {
     var p = pasoDeLaGuia(a, h);
-    if (!p || !window.GuiasGuion) return;
+    if (!p || !window.GuiasDelCentro) return;
     var tipo = tipoDe(a);
-    var lista = GuiasGuion.normalizar(p.guion || []);
-    var caja = document.createElement('div');
-    function pintarLocal() {
-      caja.innerHTML = GuiasGuion.bloqueHTML(lista);
-      var det = caja.querySelector('.paso-guion');
-      if (det) det.open = true;
-      GuiasGuion.enganchar(caja, function (mutador) {
-        lista = GuiasGuion.leer(caja);
-        mutador(lista);
-        pintarLocal();
-      });
-      if (idResaltar) {
-        var fila = caja.querySelector('.guion-fila[data-id="' + idResaltar + '"]');
-        if (fila) { fila.classList.add('guion-fila-resaltada'); fila.scrollIntoView({ block: 'center' }); }
-      }
-    }
-    pintarLocal();
-    var esperar = U.preguntar('Cambiar en la guía de ' + U.escapar(tipo),
-      '<p class="nota">Vale para todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
-      'Las tareas ya marcadas en un asunto no se desmarcan.</p><div id="mesa-guion-editor"></div>', 'Guardar');
-    var sitio = document.getElementById('mesa-guion-editor');
-    if (sitio) sitio.appendChild(caja);
-    var ok = await esperar;
-    if (!ok) return;
-    try {
-      var normalizado = GuiasGuion.normalizar(GuiasGuion.leer(caja));
-      var hecho = await GuiasDelCentro.cambiarPasos(tipo, function (pasos) {
-        var pp = buscarPaso(pasos, h.origenGuia);
-        if (!pp || (pp.opciones && pp.opciones.length)) return false;
-        pp.guion = normalizado;
-        return true;
-      });
-      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return; }
-    } catch (e) {
-      U.fallo('No he podido guardar las tareas', e);
-      return;
-    }
-    U.aviso('Tareas actualizadas.', 'bueno');
-    if (window.HitosPanel) HitosPanel.programarRepintado();
+    var guardada = await GuiasDelCentro.escribir(tipo, {
+      irA: h.origenGuia, tarea: idResaltar,
+      aviso: 'Vale para todos los asuntos de ' + tipo + ', abiertos y nuevos. ' +
+        'Las tareas ya marcadas en un asunto no se desmarcan.'
+    });
+    if (guardada && window.HitosPanel) HitosPanel.programarRepintado();
   }
 
   return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia,

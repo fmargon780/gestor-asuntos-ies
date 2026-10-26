@@ -157,3 +157,61 @@
   .guia-dos-col { display: flex; flex-direction: column; }
   .guia-col-izq, .guia-col-der { overflow: visible; }
 }
+
+/* ---------- Parte B (fila 464): cada tarea en una línea, que se abre al pulsarla ---------- */
+.cuadro-guia .guion-lista { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; }
+.guion-fila:not(.guion-subfila) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--papel);
+  padding: 0;
+}
+.guion-fila:not(.guion-subfila) > :not(.guion-resumen) { margin: 0 12px; }
+.guion-fila.guion-abierta:not(.guion-subfila) { padding-bottom: 10px; }
+.guion-resumen {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.guion-resumen:hover { background: var(--fondo); }
+.guion-resumen-texto { flex: 1 1 auto; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.guion-resumen-que { flex: 0 1 auto; font-size: 12px; text-align: right; }
+.guion-resumen-flecha::before { content: '▸'; }
+.guion-abierta > .guion-resumen .guion-resumen-flecha::before { content: '▾'; }
+.guion-fila:not(.guion-subfila):not(.guion-abierta) > :not(.guion-resumen) { display: none; }
+
+.guion-linea-texto { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.guion-linea-texto .guion-dato-texto { flex: 1 1 260px; }
+.guion-linea-texto .requisito-mandos { display: flex; gap: 6px; }
+.guion-linea-accion .dato { flex: 0 1 320px; }
+.guion-fila:not(.guion-subfila) .guion-receta { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.guion-fila:not(.guion-subfila) .guion-receta .dato { flex: 1 1 200px; }
+
+/* «Más de esta tarea», plegado dentro de la tarea abierta. */
+.guion-mas-cab { align-self: flex-start; }
+.guion-mas-flecha::before { content: '▸'; }
+.guion-mas-abierto > .guion-mas-cab .guion-mas-flecha::before { content: '▾'; }
+.guion-fila:not(.guion-subfila) > .guion-mas { display: none; flex-direction: column; gap: 8px; }
+.guion-fila.guion-abierta.guion-mas-abierto > .guion-mas { display: flex; }
+.guion-fila:not(.guion-subfila) .guion-mas .guion-norma { display: flex; gap: 8px; flex-wrap: wrap; }
+.guion-fila:not(.guion-subfila) .guion-mas .guion-norma .campo { flex: 1 1 220px; }
+
+/* «Obligatorio» y «Un documento / Un dato» solo con «Hay que reunirlo» marcado. */
+.guion-reunir-fila:not(.con-reunir) > .guion-reunir-clase,
+.guion-reunir-fila:not(.con-reunir) > .guion-obligatorio-etiqueta { display: none; }
+
+.cuadro-guia .guia-aviso { flex: 0 0 auto; margin: 0 0 8px; }
+.guion-fila.guion-fila-resaltada:not(.guion-subfila) { background: #fff8e6; border-color: #e6c377; }
+.guion-fila.guion-fila-resaltada:not(.guion-subfila) > .guion-resumen { background: transparent; }

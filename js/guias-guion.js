@@ -32,8 +32,9 @@
    receta, sin detalles: no hace falta convertir nada. Sale arriba en el
    menú del hito (js/hito-mesa-recetas.js).
 
-   Pinta, lee y engancha una lista dentro de un contenedor. Se carga
-   después de js/guias.js.
+   Aquí, el dato (normalizar, la receta). Pintar, leer y enganchar la lista de
+   tareas dentro de un contenedor, en js/guias-guion-editor.js (fila 464). Se
+   carga después de js/guias.js.
    ============================================================ */
 var GuiasGuion = (function () {
 
@@ -98,21 +99,29 @@ var GuiasGuion = (function () {
     return (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g)) ? ' <span class="guion-fuera-de-uso">plantilla fuera de uso</span>' : '';
   }
 
-  function recetaHTML(g) {
+  /* Fila 464, B2: en una tarea, cada desplegable con su rótulo; las líneas de dentro de una respuesta (`dentro`) siguen con «Detalles:». */
+  function conRotulo(rotulo, selectHTML, dentro) {
+    return dentro ? selectHTML : '<label class="dato"><span class="etiqueta">' + rotulo + '</span>' + selectHTML + '</label>';
+  }
+
+  function recetaHTML(g, dentro) {
     var r = g.receta || {};
+    var titulo = dentro ? '<span class="guion-receta-titulo">Detalles:</span>' : '';
     if (g.accion === 'comunicar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
-        '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>' +
-        '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>' +
-        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>' + marcaFueraDeUso(g) + '</div>';
+      return '<div class="guion-fila-linea guion-receta">' + titulo +
+        conRotulo('A quién', '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>', dentro) +
+        conRotulo('Por dónde', '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>', dentro) +
+        conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>', dentro) +
+        marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'generar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
-        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select>' + marcaFueraDeUso(g) + '</div>';
+      return '<div class="guion-fila-linea guion-receta">' + titulo +
+        conRotulo('Plantilla de documento', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select>', dentro) +
+        marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'registrar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
-        '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select></div>';
+      return '<div class="guion-fila-linea guion-receta">' + titulo +
+        conRotulo('Entrada o salida', '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select>', dentro) + '</div>';
     }
     return '';
   }
@@ -169,168 +178,7 @@ var GuiasGuion = (function () {
     }).join('; ');
   }
 
-  function filaHTML(g, dentro) {
-    var n = g.normativa || {};
-    var pregunta = !dentro && !!g.pregunta;
-    return '<div class="guion-fila' + (dentro ? ' guion-subfila' : '') + (pregunta ? ' guion-fila-pregunta' : '') +
-        '" data-id="' + U.escapar(g.id) + '">' +
-      '<div class="guion-fila-linea">' +
-        '<input class="campo guion-texto" value="' + U.escapar(g.texto || '') + '" placeholder="' +
-          (pregunta ? 'La pregunta (¿Viene con toda la documentación?)' : 'Texto de la tarea') + '">' +
-        (pregunta ? '' : '<select class="campo guion-accion">' + ACCIONES.map(function (a) {
-          return '<option value="' + a.valor + '"' + (a.valor === (g.accion || '') ? ' selected' : '') + '>' +
-            U.escapar(a.texto) + '</option>';
-        }).join('') + '</select>') +
-        '<span class="requisito-mandos">' +
-          (dentro ? '' : '<button type="button" class="boton guion-subir" data-ayuda-clave="subir">↑</button>' +
-            '<button type="button" class="boton guion-bajar" data-ayuda-clave="bajar">↓</button>') +
-          '<button type="button" class="boton boton-peligro guion-quitar" data-ayuda-clave="quitar">✕</button>' +
-        '</span>' +
-      '</div>' +
-      (pregunta ? '' : recetaHTML(g)) +
-      '<input class="campo guion-explicacion" value="' + U.escapar(g.explicacion || '') + '" placeholder="Explicación corta (opcional)">' +
-      (pregunta ? '' :
-        '<div class="guion-fila-linea guion-norma">' +
-          '<input class="campo guion-cita" value="' + U.escapar(n.cita || '') + '" placeholder="Normativa: la cita (opcional)">' +
-          '<input class="campo guion-url" value="' + U.escapar(n.url || '') + '" placeholder="Enlace al BOE o al BOJA (opcional)">' +
-        '</div>') +
-      (pregunta ? '' :
-        '<div class="guion-fila-linea guion-reunir-fila">' +
-          '<label class="interruptor"><input type="checkbox" class="guion-reunir"' + (g.reunir ? ' checked' : '') +
-            '><span>Hay que reunirlo</span></label>' +
-          '<select class="campo guion-reunir-clase">' +
-            '<option value="documento"' + (g.reunir !== 'dato' ? ' selected' : '') + '>📎 Un documento</option>' +
-            '<option value="dato"' + (g.reunir === 'dato' ? ' selected' : '') + '>✎ Un dato</option>' +
-          '</select>' +
-          '<label class="interruptor"><input type="checkbox" class="guion-obligatorio"' + (g.obligatorio ? ' checked' : '') +
-            '><span>Obligatorio</span></label>' +
-        '</div>') +
-      (dentro ? '' : '<label class="interruptor guion-pregunta-fila"><input type="checkbox" class="guion-es-pregunta"' +
-        (pregunta ? ' checked' : '') + '><span>Es una pregunta: lo que hay que hacer depende de la respuesta</span></label>') +
-      (pregunta ? '<div class="guion-opciones">' + (g.opciones || []).map(function (o) {
-        return '<div class="guion-opcion" data-id="' + U.escapar(o.id) + '">' +
-          '<div class="guion-fila-linea guion-opcion-cabecera"><input class="campo guion-opcion-texto" value="' +
-            U.escapar(o.texto || '') + '" placeholder="Respuesta (Sí, No…)">' +
-            '<button type="button" class="boton boton-peligro guion-opcion-quitar" data-ayuda-clave="quitar-respuesta">✕</button></div>' +
-          '<div class="guion-opcion-lineas">' + (o.lineas || []).map(function (x) { return filaHTML(x, true); }).join('') + '</div>' +
-          '<button type="button" class="enlace guion-linea-anadir">+ Añadir línea</button>' +
-        '</div>';
-      }).join('') + '<button type="button" class="enlace guion-opcion-anadir">+ Añadir respuesta</button></div>' : '') +
-    '</div>';
-  }
-
-  function bloqueHTML(guion) {
-    var lista = guion || [];
-    return '<details class="paso-guion">' +
-      '<summary>Tareas de este hito' + (lista.length ? ' (' + lista.length + ')' : '') + '</summary>' +
-      '<p class="nota">Lo que hay que hacer dentro del hito. Las tareas con acción se marcan solas cuando ' +
-      'la aplicación la ve desde el hito; los demás, a mano.</p>' +
-      '<div class="guion-lista">' + lista.map(function (g) { return filaHTML(g, false); }).join('') + '</div>' +
-      '<button type="button" class="boton boton-ancho guion-anadir">+ Añadir una tarea</button>' +
-      '</details>';
-  }
-
-  /* Lee las filas tal cual (sin descartar las vacías: el índice tiene que
-     casar con el de la lista para subir/bajar/quitar). */
-  function leerFila(f, dentro) {
-    function q(sel) { return f.querySelector(':scope > ' + sel); }
-    var marca = q('.guion-pregunta-fila > .guion-es-pregunta');
-    var base = { id: f.dataset.id || nuevoId(), texto: q('.guion-fila-linea > .guion-texto').value.trim(),
-                 explicacion: q('.guion-explicacion').value.trim() };
-    if (!dentro && marca && marca.checked) {
-      base.pregunta = true;
-      base.opciones = Array.prototype.map.call(f.querySelectorAll(':scope > .guion-opciones > .guion-opcion'), function (o) {
-        return { id: o.dataset.id || nuevoId(),
-                 texto: o.querySelector(':scope > .guion-opcion-cabecera > .guion-opcion-texto').value.trim(),
-                 lineas: Array.prototype.map.call(o.querySelectorAll(':scope > .guion-opcion-lineas > .guion-fila'),
-                   function (x) { return leerFila(x, true); }) };
-      });
-      return base;
-    }
-    var sel = q('.guion-fila-linea > .guion-accion');
-    var cita = q('.guion-norma > .guion-cita');
-    base.accion = sel ? sel.value : '';
-    var receta = q('.guion-receta');
-    if (receta) {
-      var leida = {};
-      [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido']]
-        .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
-      var limpia = normalizarReceta(base.accion, leida);
-      if (limpia) base.receta = limpia;
-    }
-    base.normativa = (cita && cita.value.trim())
-      ? { cita: cita.value.trim(), bloque: '', clave: '', url: q('.guion-norma > .guion-url').value.trim() } : null;
-    var reunir = q('.guion-reunir-fila .guion-reunir');
-    if (reunir && reunir.checked) {
-      base.reunir = q('.guion-reunir-fila > .guion-reunir-clase').value === 'dato' ? 'dato' : 'documento';
-      base.obligatorio = !!q('.guion-reunir-fila .guion-obligatorio').checked;
-    }
-    return base;
-  }
-
-  function leer(raiz) {
-    var filas = raiz.querySelectorAll(':scope > .paso-guion > .guion-lista > .guion-fila');
-    return Array.prototype.map.call(filas, function (f) { return leerFila(f, false); });
-  }
-
-  function lineaNueva() { return { id: nuevoId(), texto: '', explicacion: '', accion: '', normativa: null }; }
-
-  function enganchar(raiz, alCambiar) {
-    var det = raiz.querySelector(':scope > .paso-guion');
-    if (!det) return;
-    var anadir = det.querySelector(':scope > .guion-anadir');
-    if (anadir) anadir.onclick = function () {
-      alCambiar(function (lista) { lista.push({ id: nuevoId(), texto: '', explicacion: '', accion: '', normativa: null }); });
-    };
-    Array.prototype.forEach.call(det.querySelectorAll(':scope > .guion-lista > .guion-fila'), function (fila, idx) {
-      function boton(sel) { return fila.querySelector(':scope > .guion-fila-linea ' + sel); }
-      boton('.guion-subir').onclick = function () {
-        alCambiar(function (l) { if (idx > 0) { var t = l[idx - 1]; l[idx - 1] = l[idx]; l[idx] = t; } });
-      };
-      boton('.guion-bajar').onclick = function () {
-        alCambiar(function (l) { if (idx < l.length - 1) { var t = l[idx + 1]; l[idx + 1] = l[idx]; l[idx] = t; } });
-      };
-      boton('.guion-quitar').onclick = function () {
-        alCambiar(function (l) { l.splice(idx, 1); });
-      };
-      /* Fila 164: al cambiar la acción, sale (o se va) su receta. */
-      var accionSel = fila.querySelector(':scope > .guion-fila-linea > .guion-accion');
-      if (accionSel) accionSel.onchange = function () { alCambiar(function () { /* solo repintar con lo leído */ }); };
-      /* Fila 116: la casilla «Es una pregunta» y sus respuestas. */
-      var marca = fila.querySelector(':scope > .guion-pregunta-fila > .guion-es-pregunta');
-      if (marca) marca.onchange = function () {
-        alCambiar(function (l) {
-          var g = l[idx];
-          if (!g) return;
-          if (marca.checked) {
-            g.pregunta = true;
-            if (!g.opciones || !g.opciones.length) {
-              g.opciones = [{ id: nuevoId(), texto: 'Sí', lineas: [] }, { id: nuevoId(), texto: 'No', lineas: [lineaNueva()] }];
-            }
-          } else { delete g.pregunta; delete g.opciones; }
-        });
-      };
-      var anadirOpcion = fila.querySelector(':scope > .guion-opciones > .guion-opcion-anadir');
-      if (anadirOpcion) anadirOpcion.onclick = function () {
-        alCambiar(function (l) { l[idx].opciones.push({ id: nuevoId(), texto: '', lineas: [lineaNueva()] }); });
-      };
-      Array.prototype.forEach.call(fila.querySelectorAll(':scope > .guion-opciones > .guion-opcion'), function (op, j) {
-        op.querySelector(':scope > .guion-opcion-cabecera > .guion-opcion-quitar').onclick = function () {
-          alCambiar(function (l) { l[idx].opciones.splice(j, 1); });
-        };
-        op.querySelector(':scope > .guion-linea-anadir').onclick = function () {
-          alCambiar(function (l) { l[idx].opciones[j].lineas.push(lineaNueva()); });
-        };
-        Array.prototype.forEach.call(op.querySelectorAll(':scope > .guion-opcion-lineas > .guion-fila'), function (sub, k) {
-          sub.querySelector(':scope > .guion-fila-linea .guion-quitar').onclick = function () {
-            alCambiar(function (l) { l[idx].opciones[j].lineas.splice(k, 1); });
-          };
-        });
-      });
-    });
-  }
-
-  return { normalizar: normalizar, textoLegible: textoLegible, bloqueHTML: bloqueHTML, leer: leer, enganchar: enganchar, ACCIONES: ACCIONES,
-           normalizarReceta: normalizarReceta, A_QUIEN: A_QUIEN };
+  return { normalizar: normalizar, textoLegible: textoLegible, ACCIONES: ACCIONES,
+           normalizarReceta: normalizarReceta, A_QUIEN: A_QUIEN, VIAS: VIAS, recetaHTML: recetaHTML, nuevoId: nuevoId };
 })();
 window.GuiasGuion = GuiasGuion;

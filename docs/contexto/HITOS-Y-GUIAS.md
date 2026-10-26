@@ -64,7 +64,7 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   perdería). «Datos del hito» es la cabecera + `.paso-extra` (ya un `div`, no un `details`), con
   `display: contents` para que título, responsable, «A quién le toca», «Plazo (días)», «Cómo se
   cuentan», «Desde» y ↑ ↓ «Quitar» vayan en una fila con rótulos (`.dato`). «Tareas de este hito
-  (N)» (`.paso-guion`) siempre abierta. `js/guias-columnas.js` (`GuiasColumnas.montar`) ordena los
+  (N)» (`.paso-guion`) siempre abierta; desde la fila 464 cada tarea es una línea (`.guion-resumen`: texto, lo que hace en gris, «▸») que se abre al pulsarla, de una en una (`js/guias-guion-editor.js`; abiertas y «Más de esta tarea» se recuerdan por id de tarea), con «Texto de la tarea», ↑ ↓ «Quitar», «Qué se hace» y los desplegables de la receta rotulados; «Obligatorio» y «Un documento / Un dato» solo con «Hay que reunirlo» marcado (clase `con-reunir`). `js/guias-columnas.js` (`GuiasColumnas.montar`) ordena los
   hijos del recuadro y pone un botón de apartado plegado, con resumen gris, delante de los campos
   de cada uno (clases `ap-campo ap-<clave>`; el recuadro lleva `abre-<clave>` si está abierto, y se
   recuerda por id de hito): Explicación del hito, Al terminar este hito (con la frase gris de qué

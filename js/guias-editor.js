@@ -51,6 +51,7 @@
        `GuiasOpcionesEditor.caja()` (fila 60, ver la nota junto a detallesAbiertos). */
     var abiertos = {};
     if (window.GuiasColumnas) GuiasColumnas.reiniciar();   /* fila 463 */
+    if (window.GuiasGuion) GuiasGuion.reiniciar();   /* fila 464: ninguna tarea abierta al empezar */
     /* El hito elegido (fila 122, js/guias-plegado.js; desde la fila 463, la lista de la izquierda). */
     var plegado = GuiasPlegado.crear({ nivel: function () { return nivel; }, recoger: recoger, responsables: opcionesResp,
       alElegir: function () { colocarBarra(); } });
@@ -68,6 +69,8 @@
        hitos del nivel que se ve (y el camino, si se ha entrado en una pregunta);
        a la derecha, el hito elegido. Cada columna se desplaza por su cuenta. */
     var esperar = U.preguntar('Guía de ' + nombreTipo,
+      /* Fila 464, B6: desde «Abrir en la guía» de una tarea, el aviso de siempre arriba del editor. */
+      (opciones && opciones.aviso ? '<p class="nota guia-aviso">' + U.escapar(opciones.aviso) + '</p>' : '') +
       '<div class="guia-cab">' +
         '<h3 class="guia-cab-titulo">Guía de ' + U.escapar(nombreTipo) + '</h3>' +
         '<div class="guia-cab-herr">' +
@@ -460,6 +463,16 @@
       return ok;
     }
     if (opciones && opciones.irA) irAPaso(opciones.irA);
+    /* Fila 464, B6: la tarea que se pide sale abierta, resaltada y a la vista. */
+    if (opciones && opciones.tarea && window.GuiasGuion) {
+      GuiasGuion.abrirTarea(opciones.tarea);
+      pintar();
+      var fTarea = document.querySelector('#guia-pasos .guion-fila[data-id="' + opciones.tarea + '"]');
+      if (fTarea) {
+        fTarea.classList.add('guion-fila-resaltada');
+        if (fTarea.scrollIntoView) fTarea.scrollIntoView({ block: 'center' });
+      }
+    }
 
     return esperar.then(async function (ok) {
       if (ok) recoger();
