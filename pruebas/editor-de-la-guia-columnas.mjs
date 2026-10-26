@@ -287,7 +287,7 @@ await pagina.evaluate(async (GUIA) => {
   await w.close();
 }, GUIA);
 await pagina.evaluate(() => { window.__escrita = GuiasDelCentro.escribir('FACTURA', { irA: 'p3' }); });
-await pagina.waitForSelector('#guia-pasos .paso-editor', { state: 'attached' });
+await pagina.waitForFunction(() => { const e = document.querySelector('#guia-lista .guia-lista-item.elegido .guia-lista-titulo'); return e && e.textContent.indexOf('Esperar el parte') === 0; });
 await comprobar('GuiasDelCentro.escribir abre el editor nuevo con el hito pedido elegido',
   pagina.evaluate(() => [document.querySelector('#capa .cuadro').classList.contains('cuadro-guia'),
     document.querySelector('#guia-lista .guia-lista-item.elegido .guia-lista-titulo').textContent]),
