@@ -361,3 +361,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 ## Fila 459 — el otro ordenador, casa y la copia sin internet en Drive (24-oct-2026)
 
 - [ ] [SOLO FRANCISCO] Después de pasar a Drive, abrir el asunto de las Elecciones al Consejo Escolar desde el ordenador de Diego y desde casa, y comprobar que el marcador de la copia sin internet es el mismo en los dos ordenadores del instituto.
+
+- Fila 463 (editor de la guía a dos columnas), [SOLO FRANCISCO]: abre la guía real de EXPULSIÓN DEL CENTRO (Ajustes → su tarjeta → «Cambiar la guía») y mira que se ve a todo lo ancho, con los hitos a la izquierda, el elegido a la derecha, los datos rotulados y las tareas a la vista, y que el hito de la comunicación a la familia y el tutor se ve bien.
