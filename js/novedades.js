@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '464', fecha: '2026-10-26', texto: 'En la guía de un tipo de asunto, cada tarea de un hito ocupa una línea (su texto y lo que hace); al pulsarla se abre con «Qué se hace», «A quién», «Por dónde» y «Plantilla de correo» rotulados, y lo demás en «Más de esta tarea». «Obligatorio» solo sale si «Hay que reunirlo» está marcado. Desde un asunto, «Abrir en la guía» abre ahora este editor con esa tarea abierta.' },
   { id: '463', fecha: '2026-10-25', texto: 'La ventana para escribir la guía de un tipo de asunto ocupa toda la pantalla: a la izquierda, la lista de hitos; a la derecha, el hito elegido, con sus datos rotulados (responsable, a quién le toca, plazo y «desde» legible) y sus tareas siempre a la vista. Lo demás del hito está en apartados con título: explicación, «Al terminar este hito», documentos, normativa y otros.' },
   { id: '450', fecha: '2026-10-23', texto: 'Etiquetas recuerda sola lo que dejaste a medias en cada ordenador (personas, hoja, diseño, orden, copias y huecos), con «Empezar de cero». Hay un orden nuevo para las etiquetas y tres tarjetas encima de la hoja: Hoja, Diseño y Orden.' },
   { id: '449', fecha: '2026-10-23', texto: 'Al guardar un documento o un correo de «Ver todo» en un asunto que ya existe, el aviso con «Ir al asunto» se queda hasta que lo cierres con la ✕. «Ir al asunto» abre «Trabajo» en el hito, y su «← Volver a Ver todo» te devuelve a donde estabas.' },

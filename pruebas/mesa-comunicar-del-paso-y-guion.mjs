@@ -122,6 +122,9 @@ for (let intento = 0; intento < 6 && !editorAbierto; intento++) {
   }
 }
 await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila');
+await comprobar('3. es el editor completo de la guía, con la tarea abierta',
+  pagina.evaluate(() => [!!document.querySelector('#capa .guia-dos-col'), !!document.querySelector('#capa .guion-fila[data-id="g1"].guion-abierta'),
+    !!document.querySelector('#capa .guia-aviso')]), [true, true, true]);
 await comprobar('3. la tarea sale resaltada en el editor',
   pagina.evaluate(() => !!document.querySelector('#capa .paso-guion .guion-fila[data-id="g1"].guion-fila-resaltada')), true);
 await pagina.fill('#capa .paso-guion .guion-fila[data-id="g1"] .guion-texto', 'Avisar a la tutoría (por iPasen)');

@@ -238,7 +238,8 @@ de `App` va después del fichero que lo define.
 | `js/generar-para-relacionados.js` | «… para cada relacionado (N)» en «Generar documento ▾» de la mesa (fila 171): un documento por relacionado, lo del asunto preguntado una vez, resumen con lo que falta a cada persona y «Enviar a cada uno» (un correo por persona, nunca dos veces el mismo documento) |
 | `js/hito-mesa-comunicar.js` | Los destinatarios de «Comunicar» en la mesa, como chips, dentro del desplegable «Comunicar ▾» (filas 109 y 145) |
 | `js/hitos-guion.js` | El guion de un hito: `Hitos.guionDe`, `marcarGuion`, `marcarGuionPorAccion`, `anadirGuionPropio` (fila 109) |
-| `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
+| `js/guias-guion.js` | `GuiasGuion`: el dato de las tareas de un hito (`normalizar`, la receta) (fila 109) |
+| `js/guias-guion-editor.js` | El editor de la lista de tareas de un hito: cada tarea en una línea que se abre al pulsarla, «Más de esta tarea», `bloqueHTML`/`leer`/`enganchar` (fila 464) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
 | `js/guias-convertir.js` | Pasar «Documentos» y «Comunicación» de un hito a tareas al abrir el editor de la guía (sacado de `guias-editor.js`, fila 463) |

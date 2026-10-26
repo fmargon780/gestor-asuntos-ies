@@ -295,8 +295,10 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
     asunto (`Hitos.cambiarGuionAqui(clave, idHito, original, texto)` esconde el id original en `guionOcultos` y
     pone una propia con `enLugarDe` en su mismo sitio, con su marca de hecha).
   - **Abrir en la guía** (tarea de la guía; antes «Cambiar en la guía»): `HitoMesaGuion.cambiarGuionDelPaso(a, h, idResaltar)`,
-    el mismo editor de siempre (`js/guias-guion.js`) con esa tarea a la vista y resaltada
-    (`.guion-fila-resaltada`); el título de la ventana dice «Cambiar en la guía de <tipo>».
+    Desde la fila 464 abre el editor completo de la guía del tipo (`GuiasDelCentro.escribir(tipo, { irA, tarea, aviso })`,
+    `js/guias-editor.js`) con el hito de la tarea elegido y la tarea abierta y resaltada (`.guion-fila-resaltada`); el aviso
+    «Vale para todos los asuntos de <tipo>…» sale arriba. «Guardar» guarda la guía entera y repinta el asunto. La ventana pequeña
+    «Cambiar en la guía de…» ya no existe.
   - **Pasar a la guía** (tarea «solo aquí»; sin pregunta desde la fila 416, `DondeSeGuardaTareas.pasar`): la tarea (texto,
     explicación, acción, normativa, reunir/obligatorio) se añade al final del `guion` del paso de
     la guía con `GuiasDelCentro.cambiarPasos` (id nuevo de `GuiasGuion.normalizar`, como antes),
