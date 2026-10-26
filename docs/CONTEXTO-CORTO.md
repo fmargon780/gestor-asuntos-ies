@@ -38,7 +38,7 @@ Claude Code.
 
 - Pocas frases, una idea por frase, sin jerga.
 - Una sola pregunta o decisión por mensaje. Esperar su respuesta.
-- Si hay que elegir, opciones numeradas con la recomendada marcada.
+- Si hay que elegir, opciones numeradas con sus pros y contras, sin recomendación.
 - No pedirle permiso para cambiar código: aplicarlo. Verificar el propio trabajo.
 - Guiarlo por la interfaz paso a paso, diciendo dónde está cada botón.
 - Nada de tareas manuales suyas: si se puede hacer desde la app, se hace desde la app.
