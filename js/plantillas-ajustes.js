@@ -290,7 +290,12 @@
     HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]) });
   }
 
+  /* Fila 465: una plantilla general (sin tipo ni categoría, como «Aviso de avance») se puede ver y cambiar
+     desde la guía sin que el cuadro le ponga un tipo que no tenía. */
+  function esGeneral(existente) { return !!existente && !existente.tipo && !existente.categoria; }
+
   function opcionesTiposDe(categoria, existente, tipoPreset) {
+    if (esGeneral(existente) && !categoria) return '<option value="" selected>(vale para cualquier tipo)</option>';
     return opcionesDeCategoria(categoria).map(function (t) {
       var elegido = existente ? existente.tipo === t.tipo : (tipoPreset && tipoPreset.tipo === t.tipo);
       return '<option value="' + U.escapar(t.tipo) + '"' + (elegido ? ' selected' : '') + '>' +
@@ -303,10 +308,11 @@
      editor de la guía (js/guias-plantilla.js): un solo editor para los dos. */
   function cuerpoDelCuadroHTML(existente, tipoPreset) {
     var categorias = Nombres.CATEGORIAS;
-    var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
+    var categoriaInicial = esGeneral(existente) ? '' : ((existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0]);
     return '<div class="dos-columnas">' +
         '<div><label class="etiqueta">Categoría</label>' +
           '<select id="pl-categoria" class="campo">' +
+            (esGeneral(existente) ? '<option value="" selected>(todas)</option>' : '') +
             categorias.map(function (c) {
               return '<option value="' + c + '"' + (c === categoriaInicial ? ' selected' : '') + '>' + c + '</option>';
             }).join('') +
@@ -359,7 +365,7 @@
     var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
     var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
     var vaA = window.PlantillaVaA ? PlantillaVaA.leer('pl-va-a') : '';
-    if (!nombre || !tipo || !texto.trim()) {
+    if (!nombre || (!tipo && !esGeneral(existente)) || !texto.trim()) {
       U.aviso('Hace falta el nombre, el tipo y el texto.', 'malo');
       return false;
     }

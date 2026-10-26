@@ -162,6 +162,27 @@ await comprobar('guardada, y la guía vuelve con el apartado abierto y la misma 
   }), ['Otro texto, cambiado.', 'pl-otra', true]);
 await pagina.click('#cuadro-cancelar');
 
+/* ================= 4b ================= */
+console.log('--- 4b. una plantilla general (sin tipo) no pierde su sitio al guardarse ---');
+await pagina.evaluate(async () => {
+  await Plantillas.guardar(App.E.gestor, (a) => { a.lista.push({ id: 'pl-gen', tipo: '', categoria: '', nombre: 'Aviso general', texto: 'Texto general.' }); return a; });
+  await PlantillasAjustes.cargar();
+  window.__guardada = Guias.editar('BAJA', [{ id: 'p1', titulo: 'Uno', avisarLoPide: true, avisarLoPidePlantilla: 'pl-gen' }], [], []);
+});
+await pagina.waitForSelector('#guia-pasos .paso-editor', { state: 'attached' });
+await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] > .paso-apartado-cab[data-ap="aviso"]');
+await pagina.waitForFunction(() => document.querySelector('#guia-pasos .paso-avisar-lopide-select').value === 'pl-gen');
+await pagina.click('#guia-pasos .paso-avisar-lopide-plantilla .guia-plantilla-ver');
+await pagina.waitForSelector('#guia-plantilla-guardar');
+await pagina.fill('#pl-texto', 'Texto general, cambiado.');
+await pagina.click('#guia-plantilla-guardar');
+await pagina.waitForFunction(() => document.querySelector('#guia-plantilla-panel').classList.contains('oculto'));
+await comprobar('guardada sin tipo ni categoría, y sigue elegida en el aviso',
+  pagina.evaluate(async () => { await new Promise(r => setTimeout(r, 300)); const p = Plantillas.enMemoria().lista.filter(x => x.id === 'pl-gen')[0];
+    return [p.tipo, p.categoria, p.texto, document.querySelector('#guia-pasos .paso-avisar-lopide-select').value]; }),
+  ['', '', 'Texto general, cambiado.', 'pl-gen']);
+await pagina.click('#cuadro-cancelar');
+
 /* ================= 5 ================= */
 console.log('--- 5. «Normativa e impresos»: solo los marcados y el buscador ---');
 await abrir();
