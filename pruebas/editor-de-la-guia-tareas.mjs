@@ -217,6 +217,8 @@ await comprobar('el hito elegido, la tarea abierta y resaltada, y el aviso arrib
     document.querySelector('.guia-aviso').textContent,
     !!document.querySelector('.guia-dos-col')]),
   ['Recibir el parte de baja', ['g2'], true, 'Vale para todos los asuntos de FACTURA, abiertos y nuevos.', true]);
+await comprobar('la tarea resaltada se ve con fondo resaltado',
+  pagina.evaluate(() => getComputedStyle(document.querySelector('#guia-pasos .guion-fila[data-id="g2"].guion-fila-resaltada')).backgroundColor), 'rgb(255, 248, 230)');
 await pagina.click('#cuadro-cancelar');
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);

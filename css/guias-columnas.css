@@ -213,3 +213,5 @@
 .guion-reunir-fila:not(.con-reunir) > .guion-obligatorio-etiqueta { display: none; }
 
 .cuadro-guia .guia-aviso { flex: 0 0 auto; margin: 0 0 8px; }
+.guion-fila.guion-fila-resaltada:not(.guion-subfila) { background: #fff8e6; border-color: #e6c377; }
+.guion-fila.guion-fila-resaltada:not(.guion-subfila) > .guion-resumen { background: transparent; }
