@@ -124,9 +124,9 @@ await comprobar('un paso sin nada, los dos vacíos',
   pagina.locator('.paso-texto-documentos').nth(1).inputValue(), '');
 /* El acordeón (fila 122) nace con todo cerrado: hay que abrir el
    segundo paso antes de poder escribir en sus campos. */
-await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] > .paso-cabecera > .paso-numero');
-/* Fila 418: el texto para los documentos va en «Más ajustes». */
-await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] > .paso-mas-ajustes-boton');
+await pagina.click('#guia-lista .guia-lista-item:nth-child(2)');
+/* Fila 463: el texto para los documentos va en el apartado «Documentos de este hito». */
+await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] > .paso-apartado-cab[data-ap="documentos"]');
 await pagina.locator('.paso-texto-documentos').nth(1).fill('Nuevo texto');
 await pagina.locator('.paso-tipo-documento').nth(1).selectOption('FACTURA');
 await pagina.click('#cuadro-aceptar');

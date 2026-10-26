@@ -51,33 +51,29 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   pura). Desde la fila 122 salieron también de `js/guias.js` la barra de formato
   (`js/guias-barra.js`) y la caja de opciones de un paso-pregunta con sus pasos
   (`js/guias-opciones-editor.js`, `GuiasOpcionesEditor.caja(ctx, p, i)`).
-- **«Más ajustes» en el hito de la guía** (fila 418, `docs/HITOS-UN-SOLO-SITIO.md` parte C,
-  `js/guias-mas-ajustes.js`). Al abrir un hito solo se ven título, responsable, plazo y tareas. La
-  explicación, «A quién le toca», normativa y formularios, solo informativo, avisar a quien lo
-  pide, recibe varios documentos, texto/tipo de documento y «es una pregunta» llevan la clase
-  `paso-ajuste` (siguen siendo hijos directos del recuadro: `recoger()` los lee igual) y el CSS los
-  esconde hasta que el recuadro lleva `mas-abierto` (botón «Más ajustes», cerrado al abrir; se
-  recuerda por id mientras el editor sigue abierto). Debajo del título, la línea gris
-  (`GuiasMasAjustes.linea`): «Solo informativo · Avisa a quien lo pide · Recibe varios documentos ·
-  Normativa (N) · Documentos (N) · Campos (N) · Texto para documentos · A quién le toca: …»; con el
-  hito cerrado no repite lo que ya sale en sus marcas. Un hito-pregunta se queda como estaba. No
-  cambia ningún dato guardado.
-- **El editor, en acordeón** (fila 122, `docs/GUIA-EN-ACORDEON.md`, `js/guias-plegado.js`). Cada
-  paso cerrado es una línea: número, título y marcas (`GuiasPlegado.marcas`: Pregunta, Solo
-  informativo, Normativa (N), Documentos (N), Guion (N), el responsable), con ↑ ↓ y «Quitar».
-  Pulsar la línea (fuera de botones y campos) lo abre o lo cierra. **Un solo paso abierto** en
-  todo el editor (`abierto`, un id); si es un paso de una opción, su paso-pregunta sigue abierto.
-  No se quita nada del DOM: la clase `paso-plegado` y el CSS esconden todo menos la cabecera, así
-  que `recoger()` lee igual y lo guardado no cambia. Cada `.paso-editor`/`.subpaso-editor` lleva
-  `data-paso-id`. `pintar()` acaba en `plegado.aplicar()` (el abierto sigue abierto tras
-  repintar); al entrar o cambiar de nivel, todo cerrado, salvo el paso de `irA` (mapa, y el
-  editor de un modelo de la biblioteca, que pasa `{ irA: m.id }`). Un paso nuevo («Añadir un
-  paso», «+ Añadir un paso a esta opción», «+ Traer de la biblioteca») sale abierto con el cursor
-  en su título; las flechas no abren ni cierran y la pantalla sigue al paso. No hay error al
-  guardar que abrir (el punto 9 de la fila no tiene hoy a qué aplicarse: un paso vacío se descarta
-  sin avisar). «Guion de este paso» toma la caja gris de los demás apartados (`css/guias.css`;
-  desde la fila 199, «Documentos de este paso» y «Comunicación de este paso» ya no tienen sección
-  propia, ver más abajo). Prueba: `pruebas/guia-en-acordeon.mjs`.
+- **El editor de la guía, a dos columnas** (fila 463, 25-oct-2026, `docs/EDITOR-DE-LA-GUIA-CLARO.md`
+  parte A; sustituye al acordeón de la fila 122 y a «Más ajustes» de la fila 418). La ventana lleva
+  la clase `cuadro-guia` (todo el ancho; `css/guias-columnas.css`). **Izquierda**: `#guia-lista`, un
+  botón por hito del nivel que se ve (número, título y línea gris «Responsable · N tareas · marcas»,
+  `GuiasPlegado.lineaDeLista`), el camino de las preguntas de dentro (`#guia-camino`) encima y
+  «+ Añadir un hito» debajo. **Derecha**: el hito elegido. `js/guias-plegado.js` guarda cuál es
+  (`abierto`, un id; por defecto el primero; un hito de dentro de una respuesta elige su pregunta):
+  los demás `.paso-editor` llevan `paso-plegado` y el CSS los esconde **enteros**, así que
+  `recoger()` de `js/guias-editor.js` los lee todos igual y lo guardado no cambia. Los botones de
+  la lista se reutilizan (no se recrean si no cambian: un clic justo tras escribir en un campo se
+  perdería). «Datos del hito» es la cabecera + `.paso-extra` (ya un `div`, no un `details`), con
+  `display: contents` para que título, responsable, «A quién le toca», «Plazo (días)», «Cómo se
+  cuentan», «Desde» y ↑ ↓ «Quitar» vayan en una fila con rótulos (`.dato`). «Tareas de este hito
+  (N)» (`.paso-guion`) siempre abierta. `js/guias-columnas.js` (`GuiasColumnas.montar`) ordena los
+  hijos del recuadro y pone un botón de apartado plegado, con resumen gris, delante de los campos
+  de cada uno (clases `ap-campo ap-<clave>`; el recuadro lleva `abre-<clave>` si está abierto, y se
+  recuerda por id de hito): Explicación del hito, Al terminar este hito (con la frase gris de qué
+  aviso es), Documentos de este hito, Normativa e impresos y Otros. Los hitos de dentro de una
+  respuesta (`.subpaso-editor`) llevan lo mismo (sin «Datos del hito») y se ven siempre. La barra
+  de formato es un solo nodo (`#guia-barra-caja`) que se coloca encima del recuadro de la
+  explicación del hito elegido o del recuadro donde se escribe. «Ver mapa» enseña el mapa en la
+  derecha en lugar del hito (`← Volver al hito`). Pruebas: `pruebas/editor-de-la-guia-columnas.mjs`
+  y `pruebas/guia-en-acordeon.mjs` (adaptada).
 
 - **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
   `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de

@@ -241,8 +241,9 @@ de `App` va después del fichero que lo define.
 | `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
-| `js/guias-mas-ajustes.js` | «Más ajustes» en el hito de la guía: esconde explicación, a quién le toca, normativa y demás tras un botón, y calcula la línea gris con lo activado (`GuiasMasAjustes`, fila 418) |
-| `js/guias-plegado.js` | El editor de la guía en acordeón: un solo paso abierto, la línea resumida con sus marcas (`GuiasPlegado`, fila 122) |
+| `js/guias-convertir.js` | Pasar «Documentos» y «Comunicación» de un hito a tareas al abrir el editor de la guía (sacado de `guias-editor.js`, fila 463) |
+| `js/guias-columnas.js`, `css/guias-columnas.css` | El editor de la guía a dos columnas: apartados con título y resumen (`GuiasColumnas`), la lista de hitos de la izquierda y el diseño de la ventana (fila 463) |
+| `js/guias-plegado.js` | Qué hito se ve en el editor de la guía: el elegido en la lista de la izquierda, la lista y su línea gris (`GuiasPlegado`, filas 122 y 463) |
 | `js/guias-plazo.js` | El desplegable «Días hábiles / lectivos / naturales» del plazo de cada paso de la guía (`GuiasPlazo`, fila 131). Antes de `js/guias.js` |
 | `js/guias-toca.js` | «Nos toca» / «Esperamos a…» de cada paso de la guía, en el editor y en la fila cerrada (`GuiasToca`, fila 129). Antes de `js/guias.js` |
 | `js/guias-barra.js` | La barra de formato del editor de la guía (negrita, viñetas, enlace; `GuiasBarra`, fila 122, sacada de `js/guias.js`) |
@@ -497,7 +498,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/dni.mjs` | Prueba del DNI, del aviso y de las tres mejoras del buscador |
 | `pruebas/empresas.mjs` | Prueba del nombre comercial y de cambiar los datos de un tercero |
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
-| `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
+| `pruebas/guia-en-acordeon.mjs` | Prueba del hito elegido del editor de la guía (fila 122, adaptada en la 463) |
+| `pruebas/editor-de-la-guia-columnas.mjs` | Prueba del editor de la guía a dos columnas (fila 463, parte A) |
 | `pruebas/documentos-comunicacion-a-tareas.mjs` | Prueba de lógica (jsdom, fila 199, 27-sep-2026): `Guias._convertirDocumentosYComunicacion` convierte `plantillasDocumento`/`comunicacion` de un paso a tareas del guion (generar, comunicar con los dos canales distintos/iguales/uno solo, con el `via` correcto en cada caso y el asunto escrito a mano como primera línea del cuerpo), a cualquier profundidad de pregunta, sin duplicar en una segunda conversión |
 | `pruebas/problemas.mjs` | Prueba (navegador de verdad, fila 291): «N problemas por resolver» en Inicio y el menú, cada tarjeta con sus cuatro partes y sin palabras prohibidas, buscar su carpeta, los hitos que no salen dos veces, dos ordenadores a la vez, alumnado, Soporte, solo consulta y «Todo en orden» |
 | `pruebas/herramientas.mjs` | Prueba (navegador de verdad, fila 200, 28-sep-2026): la pestaña "Herramientas" en el menú, en su orden; los cuatro bloques (Papelera, Traer el alumnado, Tablas de datos, Restaurar una copia de seguridad) al entrar, y que Mantenimiento ya no los tiene; "Días de aviso" y "Copias de seguridad", una sola sección cada una en El centro; los avisos de papelera vieja y alumnado desfasado llevan a Herramientas |

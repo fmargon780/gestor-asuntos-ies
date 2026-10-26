@@ -63,8 +63,9 @@ var GuiasOpcionesEditor = (function () {
         var subPregunta = Guias.esPregunta(sp);
         sc.innerHTML =
           '<div class="paso-cabecera">' +
+            '<label class="dato dato-titulo"><span class="etiqueta">' + (subPregunta ? 'La pregunta' : 'Título del hito') + '</span>' +
             '<input class="campo subpaso-titulo" value="' + U.escapar(sp.titulo) + '" ' +
-            'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del hito') + '">' +
+            'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del hito') + '"></label>' +
             (subPregunta ? '<span class="marca-pregunta">pregunta</span>' : '') +
           '</div>' +
           (subPregunta ? '' : '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
@@ -116,7 +117,7 @@ var GuiasOpcionesEditor = (function () {
         var filaPreg = document.createElement('label');
         filaPreg.className = 'interruptor paso-es-pregunta-fila';
         filaPreg.innerHTML = '<input type="checkbox" class="subpaso-es-pregunta"' +
-          (subPregunta ? ' checked' : '') + '><span>Este hito es una pregunta</span>';
+          (subPregunta ? ' checked' : '') + '><span>Este hito es una pregunta: el trámite sigue por un camino o por otro</span>';
         sc.appendChild(filaPreg);
         filaPreg.querySelector('.subpaso-es-pregunta').onchange = function () {
           recoger();
@@ -130,8 +131,8 @@ var GuiasOpcionesEditor = (function () {
           pintar();
         };
 
-        /* Fila 418: la explicación y «es una pregunta», tras «Más ajustes». */
-        if (window.GuiasMasAjustes) GuiasMasAjustes.montar(sc, sp);
+        /* Fila 463: el mismo aspecto que los hitos de arriba: tareas a la vista y apartados con título. */
+        if (window.GuiasColumnas) GuiasColumnas.montar(sc, sp, { sub: true });
 
         dentro.appendChild(sc);
       });
@@ -144,7 +145,7 @@ var GuiasOpcionesEditor = (function () {
         recoger();
         var nuevo = { id: Guias.nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [], comunicacion: null };
         nivel[i].opciones[j].pasos.push(nuevo);
-        /* Fila 122: el hito nuevo, ya abierto y con el cursor en su título. */
+        /* Fila 122: el hito nuevo, con el cursor en su título (fila 463: se ve entero, dentro de su pregunta). */
         if (c.plegado) c.plegado.abrir(nuevo.id);
         pintar();
         if (c.plegado) c.plegado.alTitulo(nuevo.id);

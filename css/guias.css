@@ -401,37 +401,11 @@
 .guion-opcion-cabecera { display: flex; gap: 6px; align-items: center; }
 .guion-opcion-cabecera .guion-opcion-texto { flex: 1; font-weight: 600; }
 
-/* ---------- el editor de la guía, en acordeón (24-sep-2026, fila 122) ----------
-   Un paso cerrado enseña solo su cabecera, con el título y las marcas
-   en vez del campo de escribir (js/guias-plegado.js). */
+/* ---------- qué hito se ve en el editor de la guía (fila 122; desde la fila 463, columnas) ----------
+   Un hito que no es el elegido se esconde entero (js/guias-plegado.js);
+   el aspecto del editor a dos columnas, en css/guias-columnas.css. */
 
-.paso-editor > .paso-cabecera,
-.subpaso-editor > .paso-cabecera { cursor: pointer; }
-.paso-plegado > :not(.paso-cabecera) { display: none !important; }
-.paso-plegado > .paso-cabecera > .paso-titulo,
-.paso-plegado > .paso-cabecera > .subpaso-titulo,
-.paso-plegado > .paso-cabecera > .marca-pregunta { display: none; }
-.paso-editor:not(.paso-plegado) > .paso-cabecera > .paso-resumen,
-.subpaso-editor:not(.paso-plegado) > .paso-cabecera > .paso-resumen { display: none; }
-.paso-editor.paso-plegado { padding-top: 7px; padding-bottom: 7px; }
-.paso-resumen {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.paso-resumen-titulo { font-weight: 600; }
-.paso-marca {
-  font-size: 11px;
-  color: var(--tinta-suave);
-  background: var(--fondo);
-  border: 1px solid var(--linea);
-  border-radius: 999px;
-  padding: 1px 8px;
-  white-space: nowrap;
-}
+.paso-editor.paso-plegado { display: none; }
 
 /* «Guion de este paso», la misma caja gris y la misma letra que los
    demás apartados del paso (hasta la fila 199, también «Documentos de
@@ -452,13 +426,3 @@
 /* Fila 224: la tarea a la vista al abrir «Cambiar en la guía» desde el
    «⋮» de una tarea, dentro de este mismo editor. */
 .guion-fila-resaltada { background: #fff8e6; border: 1px solid #e6c377; border-radius: 8px; }
-
-/* ---------- fila 418: «Más ajustes» en el hito de la guía ---------- */
-.paso-editor:not(.mas-abierto) > .paso-ajuste,
-.subpaso-editor:not(.mas-abierto) > .paso-ajuste,
-.paso-editor:not(.mas-abierto) > .paso-extra > .paso-extra-cuerpo > .paso-ajuste { display: none !important; }
-.paso-extra[open] > summary { display: none; }
-.paso-extra[open] > .paso-extra-cuerpo { margin-top: 0; }
-.paso-mas-ajustes-boton { align-self: flex-start; margin: 8px 0 4px; }
-.paso-ajustes-linea { font-size: 12px; margin: 2px 0 0 0; }
-.paso-plegado > .paso-ajustes-linea { display: block !important; margin-left: 30px; }

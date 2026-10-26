@@ -111,6 +111,8 @@ await pagina.fill('#guia-pasos .paso-titulo', 'Registrar entrada');
 await pagina.click('#guia-anadir');
 await pagina.waitForTimeout(200);
 await pagina.locator('#guia-pasos .paso-titulo').nth(1).fill('¿Cómo hemos recibido la factura?');
+/* Fila 463: la casilla de pregunta está en el apartado «Otros» del hito elegido (el nuevo). */
+await pagina.click('#guia-pasos > .paso-editor:not(.paso-plegado) > .paso-apartado-cab[data-ap="otros"]');
 await pagina.locator('#guia-pasos .paso-es-pregunta').nth(1).check();
 await pagina.waitForTimeout(300);
 

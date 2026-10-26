@@ -56,7 +56,7 @@ const win = dom.window;
 win.TextDecoder = TextDecoder;
 win.Blob = Blob;
 
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'guias.js', 'guias-guion.js', 'guias-editor.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'guias.js', 'guias-guion.js', 'guias-convertir.js', 'guias-editor.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { Guias } = win;

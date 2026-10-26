@@ -1,29 +1,26 @@
 /* ============================================================
-   guias-plegado.js — el cuadro de escribir la guía, en acordeón
-   (24-sep-2026, fila 122, docs/GUIA-EN-ACORDEON.md).
+   guias-plegado.js — qué hito se ve en el editor de la guía.
 
-   Cada hito cerrado ocupa una línea: número, título y unas marcas con
-   lo que lleva dentro (Normativa, Documentos, Tareas, Pregunta, Solo
-   informativo y el responsable). Pulsar la línea (fuera de los
-   botones) lo abre o lo cierra. Solo hay UN hito abierto en todo el
-   editor; si es un hito de una opción, el hito-pregunta que lo contiene
-   sigue abierto, para que se vea dónde está.
+   Fila 122 (24-sep-2026) lo hizo acordeón; desde la fila 463 (25-oct-2026,
+   docs/EDITOR-DE-LA-GUIA-CLARO.md, parte A) es la lista de la columna
+   izquierda: un hito elegido a la vez, y es el que se ve en la derecha.
 
-   No se quita nada del DOM: un hito cerrado lleva la clase
-   `paso-plegado` y el CSS esconde todo lo que no sea su cabecera. Así
-   recoger() de js/guias.js sigue leyendo todos los campos, abiertos o
-   no, y lo que se guarda no cambia.
+   No se quita nada del DOM: un hito no elegido lleva la clase
+   `paso-plegado` y el CSS lo esconde entero. Así recoger() de
+   js/guias-editor.js sigue leyendo todos los campos, se vean o no, y lo
+   que se guarda no cambia. Los hitos de dentro de una respuesta no se
+   pliegan: se ven siempre, dentro de la pregunta que los contiene.
 
-   `GuiasPlegado.crear(o)` con o = { nivel(), recoger, responsables }
-   devuelve el acordeón de un editor:
-   - `abrir(id)`: ese hito queda como el abierto (sin repintar).
-   - `abrirAlLlegar(id)` / `alCambiarDeNivel()`: al cambiar de nivel
-     todo nace cerrado, salvo el hito al que se va desde el mapa.
-   - `aplicar()`: clases y líneas resumidas de lo que hay en pantalla;
-     se llama al final de cada pintar().
-   - `enganchar()`: el clic en la línea, una sola vez por cuadro.
+   `GuiasPlegado.crear(o)` con o = { nivel(), recoger, responsables,
+   alElegir(editor) } devuelve el selector de un editor:
+   - `abrir(id)`: ese hito queda como el elegido (sin repintar).
+   - `abrirAlLlegar(id)` / `alCambiarDeNivel()`: al cambiar de nivel se
+     elige el hito al que se va desde el mapa, o el primero.
+   - `aplicar()`: clases, lista de la izquierda y resúmenes; se llama al
+     final de cada pintar().
+   - `enganchar()`: la lista y los avisos de cambio, una sola vez por cuadro.
    - `alTitulo(id)`: el cursor en el título de ese hito.
-   - `seguir(id)`: que la pantalla siga a ese hito (al subirlo/bajarlo).
+   - `seguir(id)`: ese hito queda elegido y a la vista (al subirlo/bajarlo).
    `GuiasPlegado.marcas(p, responsables)` es la parte pura: la lista de
    marcas de un hito.
    ============================================================ */
@@ -63,8 +60,29 @@ var GuiasPlegado = (function () {
     return null;
   }
 
+  /* La línea gris de un hito en la columna de la izquierda (fila 463, A2):
+     responsable y número de tareas, y detrás las marcas de siempre
+     (pregunta, solo informativo, espera…). */
+  function lineaDeLista(p, responsables) {
+    var m = marcas(p, responsables);
+    var partes = [];
+    var resp = '';
+    if (p && p.responsable) {
+      var r = (responsables || []).filter(function (x) { return x.id === p.responsable; })[0];
+      resp = r ? r.nombre : (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(p.responsable) ? ResponsableOrganismo.nombreDe(p.responsable, p.responsableNombre) : p.responsable);
+    }
+    if (resp) partes.push(resp);
+    var t = cuantos(p && p.guion);
+    if (t) partes.push(t + (t === 1 ? ' tarea' : ' tareas'));
+    m.forEach(function (x) {
+      if (x === resp || /^Tareas \(/.test(x)) return;
+      partes.push(x);
+    });
+    return partes.join(' · ');
+  }
+
   function crear(o) {
-    var abierto = null;
+    var abierto = null;     /* el hito elegido (columna derecha) */
     var pendiente = null;
 
     function caja() { return document.getElementById('guia-pasos'); }
@@ -74,96 +92,127 @@ var GuiasPlegado = (function () {
       return c ? Array.prototype.slice.call(c.querySelectorAll('.paso-editor, .subpaso-editor')) : [];
     }
 
+    function altos() {
+      var c = caja();
+      return c ? Array.prototype.slice.call(c.querySelectorAll(':scope > .paso-editor')) : [];
+    }
+
     function editorDe(id) {
       if (!id) return null;
       return editores().filter(function (el) { return el.dataset.pasoId === id; })[0] || null;
     }
 
-    /* Abierto: el hito elegido y, si es de una opción, el hito-pregunta
-       de arriba que lo contiene. */
-    function estaAbierto(el) {
-      if (!abierto) return false;
-      if (el.dataset.pasoId === abierto) return true;
-      if (!el.classList.contains('paso-editor')) return false;
-      return !!editores().filter(function (x) {
-        return x.dataset.pasoId === abierto && x.classList.contains('subpaso-editor') && el.contains(x);
-      }).length;
+    /* El hito elegido: el de `abierto`; si ese es un hito de dentro de una
+       respuesta, el hito pregunta que lo contiene; si no hay, el primero. */
+    function elegido() {
+      var lista = altos();
+      if (!lista.length) return null;
+      var el = abierto ? editorDe(abierto) : null;
+      if (el) {
+        var arriba = el.classList.contains('paso-editor') ? el : el.closest('.paso-editor');
+        if (arriba) return arriba;
+      }
+      return lista[0];
     }
 
-    function resumen(el) {
-      var cab = el.querySelector(':scope > .paso-cabecera');
-      if (!cab) return;
-      var r = cab.querySelector(':scope > .paso-resumen');
-      if (!r) {
-        r = document.createElement('span');
-        r.className = 'paso-resumen';
-        var titulo = cab.querySelector(':scope > .paso-titulo, :scope > .subpaso-titulo');
-        if (titulo && titulo.nextSibling) cab.insertBefore(r, titulo.nextSibling);
-        else cab.appendChild(r);
-      }
-      var p = buscar(o.nivel(), el.dataset.pasoId);
-      /* Fila 418: lo activado dentro de «Más ajustes», en una línea gris bajo el título. */
-      var gris = el.querySelector(':scope > .paso-ajustes-linea');
-      var textoGris = window.GuiasMasAjustes ? GuiasMasAjustes.linea(p, o.responsables, el.classList.contains('paso-plegado')) : '';
-      if (textoGris) {
-        if (!gris) {
-          gris = document.createElement('div');
-          gris.className = 'paso-ajustes-linea suave';
-          cab.insertAdjacentElement('afterend', gris);
+    /* Los botones de la lista se reutilizan y su contenido solo se toca si ha
+       cambiado: si no, un clic que empieza en la lista justo después de escribir
+       en un campo (el cambio repinta) se perdería, porque el botón ya no existe. */
+    function pintarLista(sel) {
+      var cont = document.getElementById('guia-lista');
+      if (!cont) return;
+      var nivel = o.nivel();
+      while (cont.children.length > nivel.length) cont.removeChild(cont.lastChild);
+      nivel.forEach(function (p, i) {
+        var b = cont.children[i];
+        if (!b) {
+          b = document.createElement('button');
+          b.type = 'button';
+          cont.appendChild(b);
         }
-        gris.textContent = textoGris;
-      } else if (gris) gris.remove();
-      var t = p && p.titulo ? p.titulo : 'Hito sin título';
-      var html = '<span class="paso-resumen-titulo' + (p && p.titulo ? '' : ' suave') + '">' + U.escapar(t) + '</span>' +
-        marcas(p, o.responsables).map(function (m) {
-          return '<span class="paso-marca">' + U.escapar(m) + '</span>';
-        }).join('');
-      /* Fila 418: sin tocar el DOM si no ha cambiado (un clic que empieza en la línea no se pierde). */
-      if (r.dataset.html !== html) { r.innerHTML = html; r.dataset.html = html; }
+        var elegidoAhora = !!(sel && sel.dataset.pasoId === p.id);
+        b.className = 'guia-lista-item' + (elegidoAhora ? ' elegido' : '');
+        b.dataset.pasoId = p.id;
+        if (elegidoAhora) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+        var html = '<span class="paso-numero">' + (i + 1) + '</span>' +
+          '<span class="guia-lista-texto">' +
+            '<span class="guia-lista-titulo' + (p.titulo ? '' : ' suave') + '">' + U.escapar(p.titulo || 'Hito sin título') + '</span>' +
+            '<span class="guia-lista-gris suave">' + U.escapar(lineaDeLista(p, o.responsables)) + '</span>' +
+          '</span>';
+        if (b.dataset.html !== html) { b.innerHTML = html; b.dataset.html = html; }
+      });
     }
 
     function aplicar() {
+      var sel = elegido();
+      if (sel) abierto = sel.dataset.pasoId;
+      altos().forEach(function (el) { el.classList.toggle('paso-plegado', el !== sel); });
       editores().forEach(function (el) {
-        el.classList.toggle('paso-plegado', !estaAbierto(el));
-        resumen(el);
+        var p = buscar(o.nivel(), el.dataset.pasoId);
+        if (window.GuiasColumnas) GuiasColumnas.actualizar(el, p, o.responsables);
+        /* «Tareas de este hito» siempre a la vista: no se pliega. */
+        var g = el.querySelector(':scope > .paso-guion');
+        if (g && !g.open) g.open = true;
+        /* Lo mismo con «Normativa e impresos»: el apartado ya lo pliega; el desplegable de dentro, no. */
+        var nm = el.querySelector(':scope > .paso-normativa');
+        if (nm && !nm.open) nm.open = true;
       });
+      var vacio = document.getElementById('guia-vacio-der');
+      if (vacio) vacio.classList.toggle('oculto', !!sel);
+      pintarLista(sel);
+      if (o.alElegir) o.alElegir(sel);
     }
 
     function abrir(id) { abierto = id || null; }
 
-    function alternar(el) {
+    function elegirPorLista(id) {
       o.recoger();
-      abierto = el.classList.contains('paso-plegado') ? el.dataset.pasoId : null;
+      abierto = id;
       aplicar();
-      if (abierto && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+      var der = document.getElementById('guia-col-der');
+      if (der) der.scrollTop = 0;
     }
 
     function enganchar() {
       var c = caja();
       if (!c) return;
-      /* Fila 418: la línea gris sigue a lo que se marca dentro de «Más ajustes». */
+      /* La línea gris y los resúmenes siguen a lo que se marca. */
       c.addEventListener('change', function () { o.recoger(); aplicar(); });
-      c.addEventListener('click', function (ev) {
+      /* El título, en la lista de la izquierda, al escribirlo. */
+      c.addEventListener('input', function (ev) {
         var t = ev.target;
-        if (!t || !t.closest) return;
-        if (t.closest('button, input, select, textarea, a, label, [contenteditable="true"]')) return;
-        var cab = t.closest('.paso-cabecera');
-        if (!cab || !cab.parentElement) return;
-        var el = cab.parentElement;
-        if (!el.classList.contains('paso-editor') && !el.classList.contains('subpaso-editor')) return;
-        alternar(el);
+        if (!t || !t.classList || !t.classList.contains('paso-titulo')) return;
+        var el = t.closest('.paso-editor');
+        var item = el && document.querySelector('#guia-lista .guia-lista-item[data-paso-id="' + el.dataset.pasoId + '"] .guia-lista-titulo');
+        if (!item) return;
+        item.textContent = t.value.trim() || 'Hito sin título';
+        item.classList.toggle('suave', !t.value.trim());
+        item.closest('.guia-lista-item').dataset.html = '';   /* que el próximo aplicar() lo vuelva a escribir entero */
       });
+      var lista = document.getElementById('guia-lista');
+      if (lista) lista.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest && ev.target.closest('.guia-lista-item');
+        if (b) elegirPorLista(b.dataset.pasoId);
+      });
+      /* «Tareas de este hito» no se pliega: si se cierra con el teclado, se reabre. */
+      c.addEventListener('toggle', function (ev) {
+        var t = ev.target;
+        if (t && t.classList && (t.classList.contains('paso-guion') || t.classList.contains('paso-normativa')) && !t.open) t.open = true;
+      }, true);
     }
 
     function alTitulo(id) {
       var el = editorDe(id);
       if (!el) return;
-      var t = el.querySelector(':scope > .paso-cabecera > .paso-titulo, :scope > .paso-cabecera > .subpaso-titulo');
+      aplicar();
+      var t = el.querySelector(':scope > .paso-cabecera .paso-titulo, :scope > .paso-cabecera .subpaso-titulo');
       if (el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
       if (t) t.focus();
     }
 
     function seguir(id) {
+      abierto = id;
+      aplicar();
       var el = editorDe(id);
       if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
     }
@@ -171,11 +220,12 @@ var GuiasPlegado = (function () {
     return {
       abrir: abrir, aplicar: aplicar, enganchar: enganchar, alTitulo: alTitulo, seguir: seguir,
       abierto: function () { return abierto; },
+      elegido: elegido,
       abrirAlLlegar: function (id) { pendiente = id || null; },
       alCambiarDeNivel: function () { abierto = pendiente; pendiente = null; }
     };
   }
 
-  return { crear: crear, marcas: marcas };
+  return { crear: crear, marcas: marcas, lineaDeLista: lineaDeLista };
 })();
 window.GuiasPlegado = GuiasPlegado;

@@ -12,129 +12,6 @@
   function $(id) { return document.getElementById(id); }
 
   /* ==========================================================
-     DOCUMENTOS Y COMUNICACIÓN DE UN HITO PASAN A TAREAS
-
-     27-sep-2026, fila 199, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
-     apartado 4. «Documentos de este paso» y «Comunicación de este
-     paso» ya no se editan aparte (fuera de js/guias-paso-bloques.js):
-     su contenido pasa a tareas del guion, la primera vez que se abre
-     el editor de un tipo que todavía las tuviera.
-
-     `convertirDocumentosYComunicacionPuro` es la parte sin E/S (fácil
-     de probar): recorre `pasos` (y sus subpasos, a cualquier
-     profundidad) y, en cada uno:
-       - cada `id` de `plantillasDocumento` se convierte en una tarea
-         «Generar un documento → nombre», con `receta: { plantilla:
-         id }`, y `plantillasDocumento` se vacía;
-       - si `comunicacion` tiene texto (correo o Séneca), se convierte
-         en una o dos tareas «Comunicar» con una plantilla NUEVA (nunca
-         había una: el texto vivía suelto en el paso), y `comunicacion`
-         se vacía. Un asunto escrito a mano pasa como primera línea del
-         cuerpo (27-sep-2026, corrección de fila 199, decidido con
-         Francisco: nada se pierde sin decirlo). Con los dos canales
-         iguales, una tarea con `via:''` (vale para cualquiera). Con
-         los dos DISTINTOS, una sola plantilla (`texto`+`textoSeneca`,
-         igual que ya hace `js/plantillas-ajustes.js`) pero DOS tareas,
-         una `via:'correo'` y otra `via:'seneca'` — decidido con
-         Francisco: "los dos, como dos avisos", nunca uno solo. Con un
-         solo canal, una tarea con ESE `via` exacto: dejarlo en `''`
-         haría que `js/hito-mesa-recetas.js` la disparase por correo
-         por defecto aunque el texto fuera solo de Séneca (un fallo
-         real, corregido de paso).
-     Repetirlo no duplica nada: sin `plantillasDocumento` ni texto de
-     comunicación que convertir, no toca el paso. Devuelve las filas
-     de plantilla nuevas que hay que guardar en `plantillas.json`.
-     ========================================================== */
-  function textoDelCanal(asunto, cuerpo) {
-    var a = String(asunto || '').trim();
-    return a ? (a + '\n\n' + cuerpo) : cuerpo;
-  }
-
-  function tareaComunicar(idPlantilla, via, nombrePlantilla) {
-    return { id: G.nuevoId(), texto: 'Comunicar → ' + nombrePlantilla, explicacion: '',
-             accion: 'comunicar', receta: { a: '', via: via, plantilla: idPlantilla }, normativa: null };
-  }
-  function convertirDocumentosYComunicacionPuro(pasos, nombreTipo, categoria, opciones) {
-    opciones = opciones || {};
-    var idPlantilla = opciones.idPlantilla || function () { return G.nuevoId(); };
-    var nombreDocumento = opciones.nombreDocumento || function (id) { return id; };
-    var nuevasPlantillas = [];
-
-    function convertirUno(p) {
-      if (!p) return;
-      if (G.esPregunta(p)) {
-        (p.opciones || []).forEach(function (o) { (o && o.pasos || []).forEach(convertirUno); });
-        return;
-      }
-      if (Array.isArray(p.plantillasDocumento) && p.plantillasDocumento.length) {
-        p.guion = Array.isArray(p.guion) ? p.guion : [];
-        p.plantillasDocumento.forEach(function (id) {
-          p.guion.push({
-            id: G.nuevoId(), texto: 'Generar un documento → ' + nombreDocumento(id),
-            explicacion: '', accion: 'generar', receta: { plantilla: id }, normativa: null
-          });
-        });
-        p.plantillasDocumento = [];
-      }
-      var c = p.comunicacion;
-      var tieneCorreo = !!(c && c.correo && String(c.correo.cuerpo || '').trim());
-      var tieneSeneca = !!(c && c.seneca && String(c.seneca.cuerpo || '').trim());
-      if (tieneCorreo || tieneSeneca) {
-        var textoCorreo = tieneCorreo ? textoDelCanal(c.correo.asunto, c.correo.cuerpo) : '';
-        var textoSeneca = tieneSeneca ? textoDelCanal(c.seneca.asunto, c.seneca.cuerpo) : '';
-        var idNuevo = idPlantilla();
-        var nombrePlantilla = p.titulo || 'Comunicación sin título';
-        var fila = { id: idNuevo, tipo: nombreTipo, categoria: categoria || '', nombre: nombrePlantilla,
-                     texto: tieneCorreo ? textoCorreo : textoSeneca };
-        p.guion = Array.isArray(p.guion) ? p.guion : [];
-        if (tieneCorreo && tieneSeneca && textoCorreo.trim() !== textoSeneca.trim()) {
-          fila.textoSeneca = textoSeneca;
-          p.guion.push(tareaComunicar(idNuevo, 'correo', nombrePlantilla));
-          p.guion.push(tareaComunicar(idNuevo, 'seneca', nombrePlantilla));
-        } else {
-          p.guion.push(tareaComunicar(idNuevo, tieneCorreo && tieneSeneca ? '' : (tieneCorreo ? 'correo' : 'seneca'), nombrePlantilla));
-        }
-        nuevasPlantillas.push(fila);
-        p.comunicacion = { correo: { asunto: '', cuerpo: '' }, seneca: { asunto: '', cuerpo: '' } };
-      }
-    }
-
-    (pasos || []).forEach(convertirUno);
-    return nuevasPlantillas;
-  }
-
-  /* La parte con E/S: guarda en `plantillas.json` las que haga falta.
-     Sin `App.E.gestor` (sin carpeta señalada, por ejemplo en una
-     prueba) no se convierte nada: se deja para la próxima vez que se
-     abra el editor con la carpeta a mano. `Plantillas.documentoPorId`
-     trabaja con lo último leído (`GuiasDocumentos.precargar`, ya
-     llamado por `js/guias-enganche.js` justo antes de abrir el
-     editor); sin nada leído, se usa el propio id como nombre. */
-  async function convertirDocumentosYComunicacion(pasos, nombreTipo, categoria) {
-    if (!window.Plantillas || !window.App || !App.E || !App.E.gestor) return;
-    var nuevas;
-    try {
-      nuevas = convertirDocumentosYComunicacionPuro(pasos, nombreTipo, categoria, {
-        idPlantilla: Plantillas.idNuevo,
-        nombreDocumento: function (id) {
-          var d = Plantillas.documentoPorId(id);
-          return (d && (d.nombre || d.fichero)) || id;
-        }
-      });
-    } catch (e) { return; }
-    if (!nuevas.length) return;
-    try {
-      await Plantillas.guardar(App.E.gestor, function (actual) {
-        nuevas.forEach(function (f) { actual.lista.push(f); });
-        return actual;
-      });
-    } catch (e) {
-      U.accesorio('He convertido documentos y comunicación de este hito a tareas, pero no he ' +
-        'podido guardar su plantilla de comunicación', e);
-    }
-  }
-
-  /* ==========================================================
      ESCRIBIR LA GUÍA
 
      Un recuadro por hito, y una sola barra de formato arriba que
@@ -152,7 +29,7 @@
   function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
     var pasos = G.normalizar(lista);
     var tipoInfo = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === nombreTipo; })[0];
-    return convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')
+    return G.convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')
       .catch(function () { /* sin poder convertir ahora, se abre el editor igual */ })
       .then(function () { return abrirCuadro(); });
 
@@ -167,15 +44,16 @@
     var nivel = pasos;
     var opcionesResp = listaResponsables || [];
     var cuadro = document.querySelector('#capa .cuadro');
-    cuadro.classList.add('cuadro-medio');
+    cuadro.classList.add('cuadro-guia');   /* fila 463: a todo lo ancho, en dos columnas */
     GuiasBarra.reiniciar();
     /* Qué `<details>` estaban abiertos antes del último pintar(): lo lee
        `restaurarAbierto`, más abajo, y lo usan tanto `pintar()` como
        `GuiasOpcionesEditor.caja()` (fila 60, ver la nota junto a detallesAbiertos). */
     var abiertos = {};
-    if (window.GuiasMasAjustes) GuiasMasAjustes.reiniciar();   /* fila 418 */
-    /* El acordeón (fila 122, js/guias-plegado.js): un solo hito abierto. */
-    var plegado = GuiasPlegado.crear({ nivel: function () { return nivel; }, recoger: recoger, responsables: opcionesResp });
+    if (window.GuiasColumnas) GuiasColumnas.reiniciar();   /* fila 463 */
+    /* El hito elegido (fila 122, js/guias-plegado.js; desde la fila 463, la lista de la izquierda). */
+    var plegado = GuiasPlegado.crear({ nivel: function () { return nivel; }, recoger: recoger, responsables: opcionesResp,
+      alElegir: function () { colocarBarra(); } });
     /* Lo que la caja de opciones (js/guias-opciones-editor.js) toma prestado. */
     var opcionesCtx = {
       nivel: function () { return nivel; }, recoger: recoger, pintar: pintar,
@@ -186,21 +64,43 @@
       nombreTipo: nombreTipo
     };
 
+    /* Fila 463: a todo lo ancho, en dos columnas. A la izquierda, la lista de
+       hitos del nivel que se ve (y el camino, si se ha entrado en una pregunta);
+       a la derecha, el hito elegido. Cada columna se desplaza por su cuenta. */
     var esperar = U.preguntar('Guía de ' + nombreTipo,
-      '<p class="explica">Cada hito de la guía es un hito del asunto, con sus tareas.</p>' +
-      '<div id="guia-camino" class="guia-camino"></div>' +
-      GuiasBarra.html() +
-      '<div id="guia-pasos"></div>' +
-      '<div class="guia-anadir-fila">' +
-        '<button type="button" class="boton boton-ancho" id="guia-anadir">Añadir un hito</button>' +
-        (window.GuiasMapa ? '<button type="button" class="boton boton-ancho" id="guia-ver-mapa">Ver mapa</button>' : '') +
-        (window.GuiasBiblioteca
-          ? '<button type="button" class="boton boton-ancho" id="guia-traer-biblioteca">+ Traer un hito de otro tipo</button>' +
-            GuiasBiblioteca.panelTraerHTML()
-          : '') +
+      '<div class="guia-cab">' +
+        '<h3 class="guia-cab-titulo">Guía de ' + U.escapar(nombreTipo) + '</h3>' +
+        '<div class="guia-cab-herr">' +
+          (window.GuiasMapa ? '<button type="button" class="boton" id="guia-ver-mapa">Ver mapa</button>' : '') +
+          (window.GuiasBiblioteca ? '<button type="button" class="boton" id="guia-traer-biblioteca">+ Traer un hito de otro tipo</button>' : '') +
+        '</div>' +
       '</div>' +
-      (window.GuiasMapa ? GuiasMapa.panelHTML() : ''),
+      '<div class="guia-dos-col">' +
+        '<div class="guia-col-izq" id="guia-col-izq">' +
+          '<div id="guia-camino" class="guia-camino"></div>' +
+          '<div id="guia-lista" class="guia-lista"></div>' +
+          '<button type="button" class="boton boton-ancho" id="guia-anadir">+ Añadir un hito</button>' +
+        '</div>' +
+        '<div class="guia-col-der" id="guia-col-der">' +
+          (window.GuiasBiblioteca ? GuiasBiblioteca.panelTraerHTML() : '') +
+          (window.GuiasMapa ? GuiasMapa.panelHTML() : '') +
+          '<div id="guia-vacio-der" class="vacio oculto">Añade el primer hito</div>' +
+          '<div id="guia-pasos"></div>' +
+        '</div>' +
+      '</div>',
       'Guardar');
+
+    /* La barra de formato es un solo nodo: vive junto a la explicación del
+       hito elegido (colocarBarra) y se va al recuadro donde se escribe. */
+    var barraCaja = window.GuiasColumnas ? GuiasColumnas.cajaDeBarra(GuiasBarra.html()) : null;
+    if (barraCaja) barraCaja.classList.add('ap-campo', 'ap-explicacion');
+    function colocarBarra() {
+      if (!barraCaja) return;
+      var sel = plegado.elegido();
+      var cuerpo = sel && sel.querySelector(':scope > .paso-cuerpo');
+      if (cuerpo) cuerpo.insertAdjacentElement('beforebegin', barraCaja);
+      else if (barraCaja.parentNode) barraCaja.parentNode.removeChild(barraCaja);
+    }
 
     /* Fila 175, punto 7: si algún hito tiene días de plazo escritos
        pero ningún «desde» elegido, «Guardar» no cierra el cuadro (los
@@ -216,8 +116,6 @@
           'Elige "desde" o borra los días.', 'malo');
         plegado.abrir(falta.caja.dataset.pasoId);
         plegado.aplicar();
-        var detalles = falta.caja.querySelector(':scope > .paso-extra');
-        if (detalles) detalles.open = true;
         if (falta.caja.scrollIntoView) falta.caja.scrollIntoView({ block: 'nearest' });
         falta.desdeSel.focus();
       };
@@ -234,6 +132,7 @@
       }, nombreTipo);
     }
 
+    if (barraCaja) $('guia-col-der').insertBefore(barraCaja, $('guia-pasos'));   /* para que enganchar() encuentre sus botones */
     GuiasBarra.enganchar();
 
     /* ---------- responsable, estado y plazo por defecto (sección 11) ----------
@@ -244,36 +143,36 @@
        como están en ese momento. */
     function pasoExtraHTML(p, i) {
       var otros = nivel.filter(function (x, k) { return k !== i; });
-      return '<details class="paso-extra" open>' +
-        '<summary>Responsable, a quién le toca y plazo <span class="suave">(opcional)</span></summary>' +
+      /* Fila 463, A4: todo en una fila (baja a dos si no cabe), cada cosa con su rótulo. */
+      return '<div class="paso-extra">' +
         '<div class="paso-extra-cuerpo">' +
-          '<label class="etiqueta">Responsable por defecto</label>' +
+          '<label class="dato dato-responsable"><span class="etiqueta">Responsable</span>' +
           '<select class="campo paso-responsable"><option value="">(sin responsable)</option>' +
           opcionesResp.map(function (r) {
             return '<option value="' + U.escapar(r.id) + '"' + (r.id === p.responsable ? ' selected' : '') +
               '>' + U.escapar(r.nombre) + '</option>';
-          }).join('') + (window.ResponsableOrganismo ? ResponsableOrganismo.opcionesExtra(p) : '') + '</select>' +
-          /* Fila 129: a quién le toca este hito (js/guias-toca.js). */
-          (window.GuiasToca ? '<div class="paso-toca-bloque">' + GuiasToca.html(p, opcionesResp) + '</div>' : '') +
-          '<label class="etiqueta">Plazo</label>' +
+          }).join('') + (window.ResponsableOrganismo ? ResponsableOrganismo.opcionesExtra(p) : '') + '</select></label>' +
+          /* Fila 129: a quién le toca este hito (js/guias-toca.js); siempre a la vista (fila 463). */
+          (window.GuiasToca ? '<div class="dato paso-toca-bloque">' + GuiasToca.html(p, opcionesResp) + '</div>' : '') +
           '<div class="paso-plazo-fila">' +
+            '<label class="dato dato-plazo-dias"><span class="etiqueta">Plazo (días)</span>' +
             '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="' +
             (p.plazo && p.plazo.cuenta === 'meses' ? 'meses' : 'días') + '" value="' +
-            (p.plazo ? p.plazo.dias : '') + '">' +
-            (window.GuiasPlazo ? GuiasPlazo.html(p) : '<span class="suave">días</span>') +   /* fila 131 */
+            (p.plazo ? p.plazo.dias : '') + '"></label>' +
+            (window.GuiasPlazo ? '<label class="dato dato-cuenta"><span class="etiqueta">Cómo se cuentan</span>' + GuiasPlazo.html(p) + '</label>' : '') +   /* fila 131 */
             (opciones && opciones.esModelo
               /* Fila 284: un modelo de la biblioteca no dice desde qué hito; cada guía lo decide al traerlo. */
               ? '<span class="suave paso-plazo-desde-fijo">desde que se termine el hito de arriba, en cada guía</span>'
-              : '<span class="suave">desde</span>' +
+              : '<label class="dato dato-desde"><span class="etiqueta">Desde</span>' +
                 '<select class="campo paso-plazo-desde"><option value="">(sin plazo)</option>' +
                 otros.map(function (o) {
                   return '<option value="' + U.escapar(o.id) + '"' +
                     (p.plazo && p.plazo.desde === o.id ? ' selected' : '') + '>' +
                     U.escapar(o.titulo || 'Hito sin título') + '</option>';
-                }).join('') + '</select>') +
+                }).join('') + '</select></label>') +
           '</div>' +
         '</div>' +
-      '</details>';
+      '</div>';
     }
 
     /* ---------- la lista de hitos ---------- */
@@ -387,7 +286,7 @@
             oc.querySelectorAll(':scope > .opcion-pasos > .subpaso-editor')
           ).map(function (sc) {
             var sp = viejos.filter(function (x) { return x.id === sc.dataset.id; })[0] || subpasoNuevo(sc.dataset.id);
-            sp.titulo = sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim();
+            sp.titulo = sc.querySelector(':scope > .paso-cabecera .subpaso-titulo').value.trim();
             var cuerpoEl = sc.querySelector(':scope > .subpaso-cuerpo');
             if (cuerpoEl) sp.cuerpo = G.limpiar(cuerpoEl.innerHTML);
             if (window.GuiasRequisitos && sc.querySelector(':scope > .paso-requisitos')) sp.requisitos = GuiasRequisitos.leer(sc);
@@ -419,12 +318,12 @@
     function pintar() {
       var caja = $('guia-pasos');
       abiertos = detallesAbiertos(caja);
+      if (barraCaja && barraCaja.parentNode) barraCaja.parentNode.removeChild(barraCaja);   /* que no se vaya con el repintado */
       caja.innerHTML = '';
       GuiasBarra.reiniciar();
       pintarCamino();
       if (!nivel.length) {
-        caja.innerHTML = '<div class="vacio">Todavía no hay ningún hito. ' +
-                         'Añade el primero aquí abajo.</div>';
+        plegado.aplicar();   /* fila 463: la columna derecha dice «Añade el primer hito» */
         return;
       }
       nivel.forEach(function (p, i) {
@@ -435,8 +334,9 @@
         d.innerHTML =
           '<div class="paso-cabecera">' +
             '<span class="paso-numero">' + (i + 1) + '</span>' +
+            '<label class="dato dato-titulo"><span class="etiqueta">Título del hito</span>' +
             '<input class="campo paso-titulo" value="' + U.escapar(p.titulo) + '" ' +
-            'placeholder="Título corto del hito">' +
+            'placeholder="Título corto del hito"></label>' +
           '</div>' +
           '<div class="paso-cuerpo" contenteditable="true" ' +
           'data-vacio="Explicación del hito">' + G.limpiar(p.cuerpo) + '</div>';
@@ -483,7 +383,6 @@
         prepararRecuadro(cuerpo);
 
         d.insertAdjacentHTML('beforeend', pasoExtraHTML(p, i));
-        restaurarAbierto(d.querySelector(':scope > .paso-extra'), abiertos, i, '');
 
         var pregunta = G.esPregunta(p);
         /* Los bloques de dentro de un hito que no es pregunta (fila 133:
@@ -511,18 +410,22 @@
 
         if (pregunta) d.appendChild(GuiasOpcionesEditor.caja(opcionesCtx, p, i));
 
-        /* Fila 418: lo que no es título, responsable, plazo ni tareas, tras «Más ajustes». */
-        if (window.GuiasMasAjustes) GuiasMasAjustes.montar(d, p);
+        /* Fila 463: datos, tareas y apartados con título, en su orden. */
+        if (window.GuiasColumnas) GuiasColumnas.montar(d, p, { sub: false });
 
         caja.appendChild(d);
       });
-      plegado.aplicar();   /* fila 122: el hito abierto sigue abierto tras repintar */
+      plegado.aplicar();   /* fila 122: el hito elegido sigue elegido tras repintar */
     }
 
     /* Al pegar desde Word o desde una web, solo el texto: así no se
        cuela el formato de fuera. */
     function prepararRecuadro(cuerpo) {
-      cuerpo.onfocus = function () { GuiasBarra.escribiendoEn(cuerpo); };
+      cuerpo.onfocus = function () {
+        GuiasBarra.escribiendoEn(cuerpo);
+        /* Fila 463: la barra, justo encima del recuadro donde se escribe. */
+        if (barraCaja && barraCaja.nextElementSibling !== cuerpo) cuerpo.insertAdjacentElement('beforebegin', barraCaja);
+      };
       cuerpo.onpaste = function (ev) {
         ev.preventDefault();
         var t = (ev.clipboardData || window.clipboardData).getData('text/plain');
@@ -560,7 +463,7 @@
 
     return esperar.then(async function (ok) {
       if (ok) recoger();
-      cuadro.classList.remove('cuadro-medio');
+      cuadro.classList.remove('cuadro-guia');
       GuiasBarra.reiniciar();
       if (!ok) return null;
       return G.normalizar(pasos);
@@ -569,8 +472,6 @@
   }
 
   Object.assign(G, {
-    editar: editar,
-    /* Para las pruebas (pruebas/documentos-comunicacion-a-tareas.mjs). */
-    _convertirDocumentosYComunicacion: convertirDocumentosYComunicacionPuro
+    editar: editar
   });
 })();

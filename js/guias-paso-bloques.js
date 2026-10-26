@@ -62,7 +62,7 @@ var GuiasPasoBloques = (function () {
        Si no se pulsa, el hito sigue siendo el que era. */
     if (window.GuiasBiblioteca && window.HitosBiblioteca && !pregunta) {
       (function (indice) {
-        var tituloInput = d.querySelector(':scope > .paso-cabecera > .paso-titulo');
+        var tituloInput = d.querySelector(':scope > .paso-cabecera .paso-titulo');
         if (!tituloInput) return;
         var aviso = document.createElement('div');
         aviso.className = 'paso-titulo-parecido oculto';
