@@ -363,3 +363,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - [ ] [SOLO FRANCISCO] Después de pasar a Drive, abrir el asunto de las Elecciones al Consejo Escolar desde el ordenador de Diego y desde casa, y comprobar que el marcador de la copia sin internet es el mismo en los dos ordenadores del instituto.
 
 - Fila 463 (editor de la guía a dos columnas), [SOLO FRANCISCO]: abre la guía real de EXPULSIÓN DEL CENTRO (Ajustes → su tarjeta → «Cambiar la guía») y mira que se ve a todo lo ancho, con los hitos a la izquierda, el elegido a la derecha, los datos rotulados y las tareas a la vista, y que el hito de la comunicación a la familia y el tutor se ve bien.
+
+- Fila 464 (tareas en una línea), [SOLO FRANCISCO]: en la guía real de EXPULSIÓN DEL CENTRO, abre el hito «Comunicación a la familia y tutor» (o el de título parecido) y mira que la tarea «Se envía comunicación por mail al tutor de la unidad…» sale en una línea, que al pulsarla se abre con «A quién», «Por dónde» y «Plantilla de correo» («Notificación Sanción Tutor/a y Familia»), y que desde un asunto real de expulsión, «⋮ → Abrir en la guía» abre el editor con esa tarea abierta y resaltada.
