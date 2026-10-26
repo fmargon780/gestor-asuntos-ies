@@ -570,6 +570,8 @@
   window.PlantillasAjustes = {
     cargar: cargar,
     pintarDeTipo: pintarDeTipo,
+    /* Fila 465: repinta la lista de plantillas de la ficha del tipo, si hay una abierta (tras guardar una desde la guía). */
+    refrescarSeccion: function () { refrescarSeccionActual(); },
     abrirCuadroDePlantilla: abrirCuadroDePlantilla,
     /* Fila 465: el mismo editor, para pintarlo en otro sitio (js/guias-plantilla.js). */
     cuerpoDelCuadroHTML: cuerpoDelCuadroHTML,

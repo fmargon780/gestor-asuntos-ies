@@ -183,6 +183,30 @@ await comprobar('guardada sin tipo ni categoría, y sigue elegida en el aviso',
   ['', '', 'Texto general, cambiado.', 'pl-gen']);
 await pagina.click('#cuadro-cancelar');
 
+/* ================= 4c ================= */
+console.log('--- 4c. la ficha del tipo en Ajustes enseña el texto nuevo ---');
+await comprobar('tras guardar desde la guía, «Cambiar» en Ajustes abre la plantilla con el texto guardado',
+  pagina.evaluate(async () => {
+    const caja = document.createElement('div'); document.body.appendChild(caja);
+    await PlantillasAjustes.pintarDeTipo(caja, { tipo: 'BAJA', categoria: 'ALUMNADO' });
+    window.__guardada = Guias.editar('BAJA', [{ id: 'p1', titulo: 'Uno', guion: [{ id: 'g1', texto: 'T', accion: 'comunicar', receta: { a: '', via: '', plantilla: 'pl-otra' } }] }], [], []);
+    await new Promise(r => setTimeout(r, 400));
+    document.querySelector('#guia-pasos .guion-resumen').click();
+    document.querySelector('#guia-pasos .guia-plantilla-ver').click();
+    await new Promise(r => setTimeout(r, 500));
+    document.querySelector('#pl-texto').value = 'Texto desde la guía.';
+    document.querySelector('#guia-plantilla-guardar').click();
+    await new Promise(r => setTimeout(r, 800));
+    const tarjeta = Array.from(caja.querySelectorAll('.tarjeta-tipo')).filter(t => t.textContent.indexOf('Otra plantilla') !== -1)[0];
+    document.querySelector('#cuadro-cancelar').click();
+    await new Promise(r => setTimeout(r, 200));
+    tarjeta.querySelector('button').click();
+    await new Promise(r => setTimeout(r, 400));
+    const v = document.querySelector('#pl-texto').value;
+    document.querySelector('#cuadro-cancelar').click();
+    return v;
+  }), 'Texto desde la guía.');
+
 /* ================= 5 ================= */
 console.log('--- 5. «Normativa e impresos»: solo los marcados y el buscador ---');
 await abrir();

@@ -72,6 +72,7 @@ var GuiasPlantilla = (function () {
       document.getElementById('guia-plantilla-guardar').onclick = async function () {
         if (!(await PlantillasAjustes.guardarCuadro(existente, null))) return;
         cerrar();
+        PlantillasAjustes.refrescarSeccion();   /* la tarjeta de la ficha del tipo, con el texto nuevo */
         if (typeof o.alGuardar === 'function') o.alGuardar();
         col.scrollTop = scroll;
       };
