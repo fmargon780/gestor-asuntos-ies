@@ -25,3 +25,14 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (27-oct-2026, tema 469) El enlace al proyecto de Google es la **lista de proyectos** de
   script.google.com (con la cuenta de Administración); no se guarda en Ajustes la dirección exacta
   del proyecto.
+
+## Registro de Séneca
+
+- (27-oct-2026, tema 477) El registrado se guarda **con el «Ruta» de siempre** del documento, sin
+  botón nuevo: la copia del original se hace por dentro al pulsarlo.
+- (27-oct-2026, tema 477) Cuando llega el registrado encima, la app **lo resuelve sola y avisa**, sin
+  preguntar.
+- (27-oct-2026, tema 477) Si lo que llega encima **no trae sello, se deja** y el original pasa a
+  versiones previas: la app nunca deshace lo que se guardó (por ejemplo, un firmado).
+- (27-oct-2026, tema 477) Lo que llega **ya registrado por la bandeja electrónica** sigue entrando
+  por la carpeta y «Es un documento nuevo».
