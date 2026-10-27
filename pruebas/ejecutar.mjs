@@ -2,7 +2,8 @@
    27-sep-2026, docs/PRUEBAS-MAS-RAPIDAS.md).
 
    Levanta un solo servidor local con la aplicación (python3 -m
-   http.server) para las pruebas que necesitan un navegador de
+   http.server, en el primer puerto libre desde el 8123: pueden correr
+   dos tandas a la vez) para las pruebas que necesitan un navegador de
    verdad, compartido por todas, y lo para al terminar, tanto si todo
    ha ido bien como si no.
 
@@ -25,14 +26,17 @@
    Se usa con `npm test`. Falla (código de salida distinto de 0) si
    falla cualquiera de las pruebas (después del segundo intento). */
 import { spawn } from 'node:child_process';
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync, realpathSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright';
 import { aRepetir, decidir, lineasDelResumen, tituloSegundoIntento } from './apoyo/segundo-intento.mjs';
 
 const CARPETA = fileURLToPath(new URL('.', import.meta.url));
-const PUERTO = 8123;
-const DIRECCION = `http://localhost:${PUERTO}/index.html`;
+const PUERTO_INICIAL = 8123;
+const INTENTOS_DE_PUERTO = 20;
+let PUERTO = PUERTO_INICIAL;
+let DIRECCION = '';
 
 const PALABRAS = process.argv.slice(2);
 
@@ -133,8 +137,9 @@ function tope() {
 
 function esperar(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-async function servidorListo() {
+async function servidorListo(hijo) {
   for (let i = 0; i < 50; i++) {
+    if (hijo.salio) return false;
     try {
       const r = await fetch(DIRECCION);
       if (r.ok) return true;
@@ -181,19 +186,76 @@ async function ejecutarEnParalelo(lista, cuantosALaVez) {
   return resultados;
 }
 
-const servidor = spawn('python3', ['-m', 'http.server', String(PUERTO)], {
-  cwd: fileURLToPath(new URL('..', import.meta.url)),
-  stdio: 'ignore'
-});
+/* Chromium de reserva (fila 466): si el que espera Playwright no está instalado pero hay uno en
+   /opt/pw-browsers, se usa ese; si no hay ninguno, se para con un solo mensaje claro. */
+function chromiumDeReserva() {
+  const raiz = '/opt/pw-browsers';
+  try {
+    const enlace = raiz + '/chromium';
+    if (existsSync(enlace)) return realpathSync(enlace);
+    const carpetas = readdirSync(raiz).filter((c) => /^chromium-\d+$/.test(c))
+      .sort((a, b) => parseInt(b.slice(9), 10) - parseInt(a.slice(9), 10));
+    for (const c of carpetas) {
+      const exe = raiz + '/' + c + '/chrome-linux64/chrome';
+      if (existsSync(exe)) return exe;
+    }
+  } catch (e) { /* no hay /opt/pw-browsers */ }
+  return null;
+}
+
+function comprobarChromium() {
+  if (process.env.CHROMIUM_PATH) return true;
+  let esperado = '';
+  try { esperado = chromium.executablePath(); } catch (e) { /* sin ruta conocida */ }
+  if (esperado && existsSync(esperado)) return true;
+  const reserva = chromiumDeReserva();
+  if (reserva) {
+    process.env.CHROMIUM_PATH = reserva;
+    console.log('Chromium de reserva: ' + reserva);
+    return true;
+  }
+  console.log('No hay ningún Chromium para las pruebas. Instálalo con: npx playwright install chromium');
+  return false;
+}
+
+/* Arranca el servidor en el primer puerto libre desde el 8123. Si el proceso sale enseguida, el puerto
+   estaba ocupado y se prueba el siguiente. */
+async function arrancarServidor() {
+  for (let i = 0; i < INTENTOS_DE_PUERTO; i++) {
+    const puerto = PUERTO_INICIAL + i;
+    const hijo = spawn('python3', ['-m', 'http.server', String(puerto), '--bind', '127.0.0.1'], {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      stdio: 'ignore'
+    });
+    hijo.on('exit', () => { hijo.salio = true; });
+    await esperar(1000);
+    if (hijo.salio) continue;
+    PUERTO = puerto;
+    DIRECCION = `http://127.0.0.1:${PUERTO}/index.html`;
+    if (await servidorListo(hijo)) return hijo;
+    hijo.kill();
+  }
+  return null;
+}
+
+/* Toda salida con error para antes el servidor. */
+let servidor = null;
+function salir(codigo) {
+  if (servidor) servidor.kill();
+  process.exit(codigo);
+}
 
 const empiezan = Date.now();
 let resultados = [];
 const segundosIntentos = [];
 try {
-  if (!(await servidorListo())) {
-    console.log('El servidor local no ha arrancado.');
-    process.exit(1);
+  servidor = await arrancarServidor();
+  if (!servidor) {
+    console.log('No hay ningún puerto libre entre el ' + PUERTO_INICIAL + ' y el ' + (PUERTO_INICIAL + INTENTOS_DE_PUERTO - 1) + ' para el servidor local.');
+    salir(1);
   }
+  console.log('Servidor local en el puerto ' + PUERTO + '.');
+  if (!comprobarChromium()) salir(1);
 
   const cuantosALaVez = tope();
   const enParalelo = pruebas.filter((f) => !EN_SOLITARIO.includes(f));
@@ -221,7 +283,7 @@ try {
     segundosIntentos.push(r);
   }
 } finally {
-  servidor.kill();
+  if (servidor) servidor.kill();
 }
 
 const decision = decidir(resultados, segundosIntentos);
