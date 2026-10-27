@@ -189,3 +189,4 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 
 
 | 472 | Paso de Francisco (de la fila 471): poner al día el script de Gmail «Gestor - Correos» en script.google.com (https://script.google.com/home, con la cuenta de Administración): la propia tarjeta «El envío de correo está anticuado» de Ajustes → Problemas trae los pasos y el enlace del código (`apps-script/gestor-correos.gs`, versión `27-oct-2026 · fila 471`). Hasta que lo haga, la tarjeta sale (ahora es verdad). | IDEA (27-oct-2026) · paso de Francisco |
+| 473 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (27-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1payvZB97ADcJ2gadvMfkcWmeCrA3ndJX/view?usp=drivesdk |
