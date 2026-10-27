@@ -167,6 +167,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 460 | Paso de Francisco (de la fila 458, `docs/PASAR-A-DRIVE.md`): en los dos ordenadores del instituto, instalar Google Drive para ordenadores (https://www.google.com/drive/download/) con la cuenta común, modo «Duplicar archivos», carpeta `C:\Google Drive` en los dos; esperar a que sincronice. Después, cuando las filas 455 a 459 estén HECHAS, un viernes por la tarde en el instituto, pulsar «Pasar a Drive» en Ajustes con Diego fuera de la app. | IDEA (24-oct-2026) |
 | 461 | Paso de Francisco (de la fila 459): en casa, usuario de la cuenta común en el Chromebook. | HECHA (24-oct-2026): usuario creado; lo demás, en COMPROBAR-A-MANO (fila 459) |
 | 467 | Centro de mando: campo «copia de prueba» por app. Decidido el 26-oct-2026 en el método (`fmargon780/metodo-apps`, `METODO.md`, apartado 7): se decide app por app; marcarlo crea una tarea en la cola de esa app para montar la copia, que existe cuando esa tarea está hecha; por defecto, sin copia. Falta diseñarlo con Francisco. | IDEA (26-oct-2026) |
+| 468 | Aviso de usuario: mejora en «Ajustes» | IDEA (27-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1aMo0W_-KGoeYkdNKSyKwr_y4EKGtHWd0/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
