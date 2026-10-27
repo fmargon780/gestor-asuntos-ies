@@ -22,4 +22,4 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
 - Libros de texto, en un mismo tema: el documento de entrega de cada alumno y ayudar a la secretaria a controlar la entrega, la devolución y el estado de los libros.
 
-Última reflexión: 24-oct-2026
+Última reflexión: 27-oct-2026
