@@ -451,8 +451,8 @@ Se comprueba con `pruebas/conflictos.mjs`.
 
 ### Pruebas automáticas en cada subida
 
-`package.json` trae `playwright` y `jsdom`; `npm test` (ejecuta `pruebas/ejecutar.mjs`) levanta
-el servidor local y corre las pruebas de `pruebas/` varias a la vez (fila 208, `PRUEBAS_A_LA_VEZ`
+`package.json` trae `playwright` (versión exacta, la que casa con el Chromium de `/opt/pw-browsers`; fila 466) y `jsdom`; `npm test` (ejecuta `pruebas/ejecutar.mjs`) levanta
+el servidor local (en el primer puerto libre desde el 8123, así que pueden correr dos tandas a la vez; si el Chromium de Playwright no está, usa el de `/opt/pw-browsers` poniendo `CHROMIUM_PATH`) y corre las pruebas de `pruebas/` varias a la vez (fila 208, `PRUEBAS_A_LA_VEZ`
 o `os.availableParallelism() - 1`, entre 2 y 6), fallando si falla cualquiera; con palabras en la
 línea de comandos (`node pruebas/ejecutar.mjs hito mesa`) solo corren las que coinciden en el
 nombre, para probar rápido lo que se está tocando mientras se trabaja una fila. Las que necesitan
@@ -599,7 +599,7 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
 ### Cómo probar
 
 - **La aplicación entera se puede probar en local**, y es lo único que caza los fallos de
-  verdad: `python3 -m http.server 8123` y las pruebas de `pruebas/`, que traen su disco de
+  verdad: `python3 -m http.server <puerto libre>` (el 8123 vale si está libre) y las pruebas de `pruebas/`, que traen su disco de
   mentira. En Ajustes los bloques son `<details>` cerrados; hay que abrirlos antes de escribir.
   Para el portapapeles, dar `permissions: ['clipboard-read','clipboard-write']`.
 - Para un módulo suelto sale más barato `jsdom` cargando el `index.html` de verdad, con dobles de

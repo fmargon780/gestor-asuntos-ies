@@ -93,6 +93,11 @@ Manda sobre cualquier otra regla de `docs/COLA.md` o de `docs/` que diga lo cont
 5. Si una pasada completa (la diaria o una corta) tarda más o menos de lo apuntado, se actualiza el
    dato: la frontera de 10 minutos se mira siempre con la última medida.
 
+**Terminal de la sesión** (fila 466, 27-oct-2026): **nunca `pkill -f` ni `pgrep -f`**: buscan en la línea de órdenes de todos los
+procesos, también en la de la terminal de la sesión, y la cierran. Para parar un proceso, guarda su
+número (PID) al lanzarlo y usa `kill <PID>`. `npm test` elige solo un puerto libre desde el 8123, así
+que pueden correr dos tandas a la vez.
+
 **Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
 EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una
 línea por cada fila que queda (la EN CURSO y todas las PENDIENTE), con los minutos que calculas

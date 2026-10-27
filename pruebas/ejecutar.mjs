@@ -244,6 +244,8 @@ function salir(codigo) {
   if (servidor) servidor.kill();
   process.exit(codigo);
 }
+process.on('SIGINT', () => salir(130));
+process.on('SIGTERM', () => salir(143));
 
 const empiezan = Date.now();
 let resultados = [];
