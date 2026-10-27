@@ -59,9 +59,9 @@ console.log('--- 2 y 5. señal vieja ---');
     titulo: document.getElementById('cuadro-titulo').textContent,
     enlaces: Array.from(document.querySelectorAll('#cuadro-cuerpo a')).map((a) => a.href)
   }));
-  comprobar('2. el cuadro lleva los tres enlaces', cuadro.enlaces, [
-    'https://script.google.com/home', 'https://script.google.com/home/trash',
-    'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-ies/main/apps-script/gestor-correos.gs']);
+  comprobar('2. el cuadro lleva los dos enlaces que se abren (el del código se copia, fila 471)', cuadro.enlaces.filter((h) => h.indexOf('https:') === 0), [
+    'https://script.google.com/home', 'https://script.google.com/home/trash']);
+  comprobar('2. y el del código, para copiar', await pagina.locator('#cuadro-cuerpo [data-copiar-codigo]').count(), 1);
   await pagina.click('#cuadro-aceptar');
   /* 5. la señal vuelve */
   await pagina.evaluate(async () => {
@@ -109,7 +109,7 @@ console.log('--- 6. la regla de la hora ---');
 console.log('--- 7. el script de Gmail ---');
 {
   const gs = fs.readFileSync(new URL('../apps-script/gestor-correos.gs', import.meta.url), 'utf8');
-  comprobar('7. versión de la fila 441', /var VERSION_SCRIPT = '23-oct-2026 · fila 441';/.test(gs), true);
+  comprobar('7. versión de la fila 471', /var VERSION_SCRIPT = '27-oct-2026 · fila 471';/.test(gs), true);
   comprobar('7. escribe latido.json al final de recogerCorreos', /finally \{\s*escribirLatido\(carpeta\);/.test(gs) && /FICHERO_LATIDO = 'latido\.json'/.test(gs), true);
   comprobar('7. cada 10 minutos', /MINUTOS_ENTRE_LATIDOS = 10/.test(gs), true);
 }

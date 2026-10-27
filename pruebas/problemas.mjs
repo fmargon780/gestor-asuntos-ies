@@ -61,6 +61,8 @@ await comprobar('2. y no sale «Todo en orden»', pagina.locator('#problemas-tod
 /* ================= 3. LAS CUATRO PARTES Y LAS PALABRAS ================= */
 
 console.log('--- 3. cada tarjeta, con sus cuatro partes ---');
+/* Fila 471: la tarjeta del script de Gmail escribe, a propósito, la dirección del código (termina en .gs). */
+const ENLACE_CODIGO = 'https://github.com/fmargon780/gestor-asuntos-ies/blob/main/apps-script/gestor-correos.gs';
 const PROHIBIDAS = /hu[eé]rfan|ficha sin carpeta|fichas sin carpeta|envoltura|json|\.(js|md|gs|csv)\b|docs\//i;
 await comprobar('3. título, «Qué pasa:», «Por qué:» y «Qué hacer:» a la vista, sin abrir nada', pagina.evaluate(() =>
   [...document.querySelectorAll('#ajustes-tab-problemas .problema')].map((t) => {
@@ -75,7 +77,7 @@ const textoVisible = (pg) => pg.evaluate(() => [...document.querySelectorAll('#a
   c.querySelectorAll('.problema-detalle').forEach((d) => d.remove());
   return c.textContent;
 }).join('\n'));
-await comprobar('3. ni «huérfano», «ficha sin carpeta», «envoltura», «json» ni nombres de fichero', PROHIBIDAS.test(await textoVisible(pagina)), false);
+await comprobar('3. ni «huérfano», «ficha sin carpeta», «envoltura», «json» ni nombres de fichero', PROHIBIDAS.test((await textoVisible(pagina)).split(ENLACE_CODIGO).join('')), false);
 await comprobar('3. cada acción lleva a su lado una frase que dice qué pasa al pulsarla', pagina.evaluate(() =>
   [...document.querySelectorAll('#ajustes-tab-problemas .problema-accion')].every((a) => a.querySelector('button') && a.querySelector('.problema-explica') && a.querySelector('.problema-explica').textContent.length > 10)), true);
 await comprobar('3. la acción normal va la primera y lleva «(lo normal)»', pagina.evaluate(() =>
@@ -93,11 +95,11 @@ await pagina.evaluate(() => {
   Problemas.registrar('contacto', ProblemasTextos.contacto(3));
 });
 await pagina.waitForTimeout(300);
-await comprobar('3. las demás tarjetas, igual: sin palabras prohibidas en lo que se ve', PROHIBIDAS.test(await textoVisible(pagina)), false);
+await comprobar('3. las demás tarjetas, igual: sin palabras prohibidas en lo que se ve', PROHIBIDAS.test((await textoVisible(pagina)).split(ENLACE_CODIGO).join('')), false);
 await comprobar('3. el detalle técnico de «una parte no se ha cargado bien» está plegado',
   pagina.evaluate(() => { const d = document.querySelector('[data-problema="envolturas"] .problema-detalle'); return [!!d, d.open]; }), [true, false]);
 await comprobar('3. (la demostración trae un script de Gmail anticuado) los pasos de «El envío de correo está anticuado» van numerados, con «Esto lo hace quien montó la aplicación.»',
-  pagina.evaluate(() => { const t = document.querySelector('[data-problema="script"]'); return [t.querySelectorAll('ol.problema-pasos li').length, t.textContent.includes('Esto lo hace quien montó la aplicación.')]; }), [3, true]);
+  pagina.evaluate(() => { const t = document.querySelector('[data-problema="script"]'); return [t.querySelectorAll('ol.problema-pasos li').length, t.textContent.includes('Esto lo hace quien montó la aplicación.')]; }), [4, true]);   /* fila 471: cuatro pasos */
 await comprobar('3. los pasos de «No llegan correos a la bandeja» van numerados y el título no lleva ruido',
   pagina.evaluate(() => { const t = document.querySelector('[data-problema="bandeja"]'); return [t.querySelectorAll('ol.problema-pasos li').length, t.querySelector('.problema-titulo').textContent]; }), [4, 'No llegan correos a la bandeja']);
 await comprobar('3. orden de las tarjetas: el de la lista',

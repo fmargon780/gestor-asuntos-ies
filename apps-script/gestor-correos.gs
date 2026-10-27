@@ -589,8 +589,27 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '23-oct-2026 · fila 441';
+var VERSION_SCRIPT = '27-oct-2026 · fila 471';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
+
+/* Fila 471: la app pregunta la versión sin enviar nada. Con `?k=<clave>` correcta contesta
+   { ok: true, soloVersion: true, version, cuenta }; con clave mala o sin ella, { ok: false, motivo }
+   sin `version`. No llama a ninguna función de envío. */
+function doGet(e) {
+  var resultado;
+  try {
+    var claveRecibida = (e && e.parameter && e.parameter.k) || '';
+    var claveGuardada = PropertiesService.getScriptProperties().getProperty(PROPIEDAD_CLAVE);
+    if (!claveGuardada || claveRecibida !== claveGuardada) {
+      resultado = { ok: false, motivo: 'La clave no es correcta.' };
+    } else {
+      resultado = conVersion({ ok: true, soloVersion: true });
+    }
+  } catch (err) {
+    resultado = { ok: false, motivo: 'No he podido leer la versión: ' + (err && err.message ? err.message : err) };
+  }
+  return ContentService.createTextOutput(JSON.stringify(resultado)).setMimeType(ContentService.MimeType.JSON);
+}
 
 function doPost(e) {
   var resultado;

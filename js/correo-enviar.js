@@ -44,7 +44,7 @@ window.CorreoEnviar = (function () {
 
   /* La versión de este mismo cambio (ha de coincidir con VERSION_SCRIPT
      de apps-script/gestor-correos.gs). */
-  var SCRIPT_ESPERADO = '23-oct-2026 · fila 441';
+  var SCRIPT_ESPERADO = '27-oct-2026 · fila 471';
   var CLAVE_VERSION_CONOCIDA = 'gestor-envio-script-version';
 
   /* El número de fila de una versión ('24-sep-2026 · fila 130' -> 130):
@@ -102,7 +102,11 @@ window.CorreoEnviar = (function () {
     if (!window.Problemas || !window.ProblemasTextos) return;
     if (!scriptDesactualizado()) { Problemas.registrar('script', null); return; }
     var d = ProblemasTextos.script();
-    d.acciones[0].alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    d.acciones.forEach(function (a) {
+      if (a.id === 'problema-script-codigo') a.alPulsar = function () { CorreoVersion.copiarEnlaceDelCodigo(); };
+      else if (a.id === 'problema-script-proyectos') a.alPulsar = function () { CorreoVersion.abrirProyectos(); };
+      else if (a.id === 'problema-script-ver') a.alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    });
     Problemas.registrar('script', d);
   }
   if (window.Problemas) Problemas.calculador('script', calcularProblema);
@@ -182,7 +186,11 @@ window.CorreoEnviar = (function () {
     var fuera = (envia && !mismaCuenta(envia, admin)) || (recoge && !mismaCuenta(recoge, admin));
     if (esDeDirectivo() || !fuera) { Problemas.registrar('cuenta', null); return; }
     var d = ProblemasTextos.cuenta(admin, envia, recoge);
-    d.acciones[0].alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    d.acciones.forEach(function (a) {
+      if (a.id === 'problema-script-codigo') a.alPulsar = function () { CorreoVersion.copiarEnlaceDelCodigo(); };
+      else if (a.id === 'problema-script-proyectos') a.alPulsar = function () { CorreoVersion.abrirProyectos(); };
+      else if (a.id === 'problema-script-ver') a.alPulsar = function () { if (!App.irASeccionDeAjustes('#bloque-envio-correo')) irAAjustes(); };
+    });
     Problemas.registrar('cuenta', d);
   }
   if (window.Problemas) Problemas.calculador('cuenta', calcularProblemaCuenta);
@@ -580,6 +588,7 @@ window.CorreoEnviar = (function () {
     cuentaConocida: leerCuentaConocida, cuentaDeAdministracion: cuentaDeAdministracion, nombreDelRemitente: nombreDelRemitente,
     mismaCuenta: mismaCuenta, lineaDeCuenta: lineaDeCuenta, estadoDeCuenta: estadoDeCuenta, repintarCuenta: repintarCuenta,
     versionConocida: leerVersionConocida,
+    registrarVersionScript: registrarVersionScript,   /* fila 471: la usa js/correo-version.js */
     /* solo para las pruebas */
     _numeroDeFila: numeroDeFila,
     _registrarVersionScript: registrarVersionScript,

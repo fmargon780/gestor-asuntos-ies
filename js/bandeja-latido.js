@@ -32,7 +32,7 @@ window.BandejaLatido = (function () {
   var ID = 'recogida-correos';
   var ENLACE_SCRIPT = 'https://script.google.com/home';
   var ENLACE_PAPELERA = 'https://script.google.com/home/trash';
-  var ENLACE_CODIGO = 'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-ies/main/apps-script/gestor-correos.gs';
+  var ENLACE_CODIGO = 'https://github.com/fmargon780/gestor-asuntos-ies/blob/main/apps-script/gestor-correos.gs';   /* fila 471: se copia, no se abre (el repositorio es de otra cuenta) */
 
   var cuentaDelLatido = '';   /* fila 411: la cuenta con la que el script recoge, de la última señal leída */
   var abierta = Date.now();
@@ -65,11 +65,21 @@ window.BandejaLatido = (function () {
       '<li>Abre <a href="' + ENLACE_SCRIPT + '" target="_blank" rel="noopener">script.google.com</a> con la cuenta de Administración ' +
       'y busca «Gestor - Correos». Si no está, mira la <a href="' + ENLACE_PAPELERA + '" target="_blank" rel="noopener">papelera</a> y pulsa «Restaurar».</li>' +
       '<li>Ábrelo, elige <code>prepararTodo</code> en el desplegable de arriba y pulsa «Ejecutar».</li>' +
-      '<li>Si la aplicación avisa de que el script es viejo, pega antes <a href="' + ENLACE_CODIGO + '" target="_blank" rel="noopener">el código nuevo</a> ' +
-      'en lugar del que hay.</li>' +
+      '<li>Si la aplicación avisa de que el script es viejo, pega antes el código nuevo en lugar del que hay: <a href="#" data-copiar-codigo>copiar el enlace del código</a> ' +
+      '(pégalo en el Chrome de tu cuenta personal).</li>' +
       '</ol>' +
       '<p class="nota">Cuando vuelva la señal, este aviso se quita solo.</p>';
   }
+
+  /* El enlace del código no se abre: se copia (la app va en cuentas del centro y el repositorio es de otra). */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest && ev.target.closest('[data-copiar-codigo]');
+    if (!a) return;
+    ev.preventDefault();
+    U.copiar(ENLACE_CODIGO, null, { avisoFallo: 'No he podido copiarlo.' }).then(function (ok) {
+      if (ok) U.aviso('Enlace copiado. Pégalo en el Chrome de tu cuenta personal.', 'bueno');
+    });
+  });
 
   function abrirPasos() {
     U.preguntar('La recogida de correos', pasos(), 'Entendido', true);

@@ -166,6 +166,7 @@
     if (window.Datos && Datos.anadirALista) await Datos.anadirALista(App.E.datos, 'ALUMNADO', { 'Nombre': 'Quintana Vega, Elena' });
     if (window.Frescura) await Frescura.repasar();
     if (window.CorreoEnviar) CorreoEnviar._registrarVersionScript('20-sep-2026 · fila 180');
+    if (window.CorreoVersion) CorreoVersion.preguntar(true);   /* fila 471: el script de mentira contesta tras montar los datos; con `gestor-demo-script-al-dia` = '1' está al día */
     await construirPerdidas();   /* fila 303: antes de rellenar el contacto, para que sus asuntos también lo lleven */
     try {
       if (window.ContactoMigracion) await ContactoMigracion._rellenarTodos();

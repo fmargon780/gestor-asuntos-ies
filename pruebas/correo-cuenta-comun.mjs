@@ -4,7 +4,7 @@
    Script (apps-script/gestor-correos.gs):
      1. Con `nombreRemitente`, el correo (nuevo o dentro de un hilo) sale con la opción `name`.
      2. Sin `nombreRemitente` (app vieja), sale como siempre: sin `name`.
-     3. Cada respuesta dice con qué cuenta trabaja el script (`cuenta`) y la versión de la fila 441.
+     3. Cada respuesta dice con qué cuenta trabaja el script (`cuenta`) y la versión de la fila 471.
      4. Un hilo guardado desde otro buzón (no existe por id) se busca por `rfc822msgid:` con las
         `matriculas`, de la última a la primera, y se responde dentro de él.
      5. Si tampoco se encuentra, o no hay matrículas, correo nuevo, sin ruido.
@@ -91,7 +91,7 @@ console.log('--- 1-3. nombre del remitente y cuenta ---');
   const r = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x', nombreRemitente: REMITENTE });
   comprobar('1. correo nuevo con el nombre del remitente', [r.ok, c.enviados[0].opciones.name], [true, REMITENTE]);
   comprobar('3. la respuesta dice la cuenta del script', r.cuenta, ADMIN);
-  comprobar('3. y la versión de la fila 441', r.version, '23-oct-2026 · fila 441');
+  comprobar('3. y la versión de la fila 471', r.version, '27-oct-2026 · fila 471');
   const r2 = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x' });
   comprobar('2. sin nombre (app vieja): sin opción name', [r2.ok, 'name' in c.enviados[1].opciones], [true, false]);
   const r3 = enviar(c, { prueba: true, nombreRemitente: REMITENTE });
