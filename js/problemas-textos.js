@@ -172,13 +172,18 @@ var ProblemasTextos = (function () {
       porque: 'El script de Gmail que está puesto en Google es más antiguo que la aplicación.',
       quien: QUIEN,
       pasos: [
-        'Copia el código nuevo del script de Gmail en el proyecto «Gestor - Correos» de script.google.com, en lugar del que hay, y guarda.',
+        'Pulsa «Copiar el enlace del código» y pégalo en el Chrome de tu cuenta personal (la que tiene el repositorio): ' +
+          'https://github.com/fmargon780/gestor-asuntos-ies/blob/main/apps-script/gestor-correos.gs . ' +
+          'Allí copia el archivo con su botón de copiar (arriba a la derecha del código).',
+        'Pulsa «Abrir mis proyectos de Google», entra en «Gestor - Correos», borra el código que hay, pega el nuevo y guarda.',
         'Pulsa «Implementar» → «Gestionar implementaciones» → el lápiz → «Versión: Nueva versión» → «Implementar». Así la dirección no cambia.',
-        'Vuelve aquí, a Este ordenador → «Enviar correo», y pulsa «Probar». No hay que pegar ninguna dirección nueva.'
+        'Vuelve aquí y recarga la página: si todo ha ido bien, esta tarjeta desaparece sola. No hace falta pulsar «Probar» ni pegar ninguna dirección.'
       ],
       soporte: 'Para que lo haga quien montó la aplicación.',
       acciones: [
-        { texto: 'Ver «Enviar correo»', cambia: false, id: 'problema-script-ver', explica: 'Abre «Enviar correo», para probar el envío.' }
+        { texto: 'Copiar el enlace del código', normal: true, cambia: false, id: 'problema-script-codigo', explica: 'Copia la dirección del código en GitHub, para pegarla en el Chrome de tu cuenta personal.' },
+        { texto: 'Abrir mis proyectos de Google', cambia: false, id: 'problema-script-proyectos', explica: 'Abre script.google.com con la cuenta de Administración.' },
+        { texto: 'Ver «Enviar correo»', cambia: false, id: 'problema-script-ver', explica: 'Abre «Enviar correo».' }
       ]
     };
   }
