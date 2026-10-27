@@ -14,3 +14,14 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   lo pide» (a quien encargó el asunto, al marcar el hito hecho). No se juntan.
 - (25-oct-2026, tema 448) Los hitos y tareas que dividen el trámite en caminos según una respuesta se
   siguen llamando **«pregunta»**. Cambiar el nombre sería una idea aparte.
+
+## Correo
+
+- (27-oct-2026, tema 469) La actualización del script de Gmail la hace **solo Francisco**: los
+  avisos sobre el script pueden ser cortos.
+- (27-oct-2026, tema 469) El enlace al código del script en GitHub **se copia, no se abre**: la app
+  se usa con cuentas g.educaand.es y el repositorio es de su cuenta personal de gmail.com; él lo
+  pega en el Chrome de esa cuenta.
+- (27-oct-2026, tema 469) El enlace al proyecto de Google es la **lista de proyectos** de
+  script.google.com (con la cuenta de Administración); no se guarda en Ajustes la dirección exacta
+  del proyecto.
