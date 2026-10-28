@@ -198,3 +198,4 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 479 | Aviso de usuario: mejora en «Inicio» | IDEA (27-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1nfT3TOoqbUBUICsNWPxXsCHXAxM0lpPu/view?usp=drivesdk |
 | 480 | Aviso de usuario: error en «Inicio» | IDEA (27-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/167WWDwWHc5H0LUu_HENAKFckIs8ET1U1/view?usp=drivesdk |
 | 481 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (28-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1Vd82D5B3hV4-VZ4PuqD6EdSkL_MpuOuW/view?usp=drivesdk |
+| 482 | Aviso de usuario: mejora en «Nuevo asunto» | IDEA (28-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1flu1-m_8EmHJ7hMCNDIMiHOR0pOOZIjd/view?usp=drivesdk |
