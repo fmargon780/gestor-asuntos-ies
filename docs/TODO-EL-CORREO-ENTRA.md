@@ -1,5 +1,8 @@
 # Todo el correo de la cuenta común entra en la app (fila 440)
 
+> Cambiado por la fila 480 (`docs/CORREO-SE-QUEDA-EN-RECIBIDOS.md`): el script ya no archiva lo que recoge; la
+> etiqueta `GESTOR/Hecho` pasa a llamarse `En la app`.
+
 Diseñado con Francisco el 23-oct-2026 (tema 431, idea 420). Una sola sesión.
 
 ## Qué pasa hoy

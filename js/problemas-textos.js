@@ -188,6 +188,26 @@ var ProblemasTextos = (function () {
     };
   }
 
+  /* h1) Hay cambios de Gmail sin hacer (fila 480): la app apunta qué correos marcar como leídos, archivar o devolver a
+     recibidos y se lo manda al script; con más de un día sin salir, aviso. */
+  function gmailPendiente(n) {
+    return {
+      titulo: 'Hay ' + n + ' cambio' + (n === 1 ? '' : 's') + ' de Gmail sin hacer',
+      que: 'Algunos correos no se han marcado como leídos, archivado o devuelto a recibidos en Gmail desde hace más de un día.',
+      porque: 'El script de Gmail no ha contestado desde este ordenador (sin conexión, o todavía es una versión anterior).',
+      quien: QUIEN,
+      pasos: [
+        'Mira que este ordenador tenga conexión a internet.',
+        'Abre «Enviar correo» y pulsa «Probar». Si dice que el script está anticuado, sigue los pasos de la tarjeta «El envío de correo está anticuado».',
+        'Cuando el script conteste, esto se hace solo y la tarjeta desaparece.'
+      ],
+      soporte: 'Si después de esto no se arregla.',
+      acciones: [
+        { texto: 'Ver «Enviar correo»', cambia: false, id: 'problema-gmail-ver', explica: 'Abre «Enviar correo».' }
+      ]
+    };
+  }
+
   /* h2) Este ordenador no trabaja con la cuenta de Administración (fila 411). `envia` y `recoge`: las cuentas conocidas ('' si no se sabe). */
   function cuenta(admin, envia, recoge) {
     var cuales = [];
@@ -313,7 +333,7 @@ var ProblemasTextos = (function () {
     personalSinDni: personalSinDni, personalDosListados: personalDosListados, personalListado: personalListado,
     NO_SE_SABE: NO_SE_SABE, QUIEN: QUIEN, plural: plural,
     alumnado: alumnado, carpetas: carpetas, hitos: hitos, conflictos: conflictos, conservacion: conservacion,
-    envolturas: envolturas, bandeja: bandeja, script: script, cuenta: cuenta, rutas: rutas, configurar: configurar,
+    envolturas: envolturas, bandeja: bandeja, script: script, gmailPendiente: gmailPendiente, cuenta: cuenta, rutas: rutas, configurar: configurar,
     fichasArchivo: fichasArchivo, contacto: contacto
   };
 })();

@@ -80,6 +80,16 @@
    la papelera y lo que envía la propia cuenta. La etiqueta GESTOR sigue
    sirviendo para traer un correo antiguo. Si esta fecha no está en la
    copia pegada en script.google.com, está vieja.
+
+   28-oct-2026, fila 480, docs/CORREO-SE-QUEDA-EN-RECIBIDOS.md: el script
+   ya NO archiva lo que recoge. El correo se queda en recibidos, sin leer,
+   con la etiqueta «En la app» (antes «GESTOR/Hecho»). Lo leído / archivado
+   lo decide la app con órdenes a `doPost` (`accion: 'gmail'`): leído al
+   meterlo en un asunto, leído y archivado al descartarlo, archivado al
+   archivar su asunto y de vuelta a recibidos al reabrirlo. La consulta de
+   recibidos mira solo lo posterior a la última vuelta buena (menos una
+   hora) para no leer cada minuto los hilos ya recogidos. Si esta fecha no
+   está en la copia pegada en script.google.com, está vieja.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -102,10 +112,10 @@
    2. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
       Drive: remitente, fecha, asunto, texto y direcciones.
    3. Guarda también el hilo en PDF y sus documentos adjuntos.
-   4. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
-      volver a recogerlo, y lo archiva en Gmail (sale de la bandeja de
-      entrada; si llega una respuesta, Gmail lo devuelve y se vuelve a
-      recoger y archivar).
+   4. Le quita la etiqueta GESTOR y le pone «En la app», para no volver
+      a recogerlo. NO lo archiva (fila 480): se queda en recibidos; la
+      app lo marca leído / lo archiva / lo devuelve a recibidos con sus
+      órdenes (doPost, `accion: 'gmail'`).
    5. Después lee seguidos.json, que escribe el Gestor de Asuntos con
       los hilos que ya están enganchados a un asunto. De esos hilos ya
       no hay etiqueta que valga: se miran uno por uno y, si han crecido,
@@ -121,7 +131,8 @@
    ============================================================ */
 
 var ETIQUETA = 'GESTOR';
-var ETIQUETA_HECHO = 'GESTOR/Hecho';
+var ETIQUETA_HECHO = 'En la app';
+var ETIQUETA_VIEJA = 'GESTOR/Hecho';   /* fila 480: se migra a «En la app» y se borra */
 var CARPETA = 'GESTOR-BANDEJA';
 var FICHERO_SEGUIDOS = 'seguidos.json';
 var MAX_POR_VUELTA = 20;
@@ -138,6 +149,17 @@ var PROPIEDAD_ARRANQUE = 'arranque-bandeja';
 var PREFIJO_RECOGIDO = 'recogido:';
 var DIAS_RECORDAR_RECOGIDO = 90;
 
+/* Fila 480: cuándo terminó la última vuelta buena (milisegundos), el
+   hecho de que la app ya puso al día lo archivado desde el 23-oct, y desde
+   cuándo se espera esa puesta al día antes de migrar la etiqueta vieja. */
+var PROPIEDAD_ULTIMA_VUELTA = 'ultima-vuelta-buena';
+var PROPIEDAD_PUESTA_AL_DIA = 'puesta-al-dia-hecha';
+var PROPIEDAD_ESPERA_MIGRAR = 'migracion-etiqueta-desde';
+var PROPIEDAD_MIGRADA = 'migracion-etiqueta-hecha';
+var DIAS_ESPERAR_PUESTA_AL_DIA = 7;
+var MAX_MIGRADOS_POR_VUELTA = 100;
+var MAX_ORDENES_POR_LLAMADA = 40;
+
 /* Fila 178: memoria permanente de los `idEnvio` ya mandados, agrupados
    por día de envío ('enviados-AAMMDD' -> JSON con la lista de ids),
    en PropertiesService (no caduca como CacheService, que solo aguanta
@@ -153,6 +175,7 @@ function prepararTodo() {
   etiqueta(ETIQUETA);
   etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
+  apuntarEsperaDeMigracion();
 
   var puestos = ScriptApp.getProjectTriggers();
   for (var i = 0; i < puestos.length; i++) {
@@ -197,10 +220,12 @@ function prepararEnvio() {
 function recogerCorreos() {
   try { limpiarEnviosViejos(); } catch (e) { Logger.log('No he podido limpiar enviados-*: ' + e.message); }
   var arranque = fechaDeArranque();
+  var inicioVuelta = new Date().getTime();
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
   try {
+    apuntarEsperaDeMigracion();
     var hilos = pendiente.getThreads(0, MAX_POR_VUELTA);
 
     for (var i = 0; i < hilos.length; i++) {
@@ -209,8 +234,7 @@ function recogerCorreos() {
         guardarHilo(hilo, carpeta, null, 0);
         apuntarRecogido(hilo, hilo.getMessages());
         hilo.removeLabel(pendiente);
-        hilo.addLabel(hecho);
-        hilo.moveToArchive();
+        hilo.addLabel(hecho);   /* fila 480: se queda en recibidos, sin tocar lo leído */
       } catch (e) {
         Logger.log('No he podido guardar "' + hilo.getFirstMessageSubject() + '": ' + e.message);
       }
@@ -221,6 +245,8 @@ function recogerCorreos() {
     try { recogerLoQueLlega(carpeta, arranque, seguidos, MAX_POR_VUELTA - hilos.length); }
     catch (e) { Logger.log('No he podido recoger lo que llega: ' + e.message); }
     try { limpiarRecogidosViejos(); } catch (e) { Logger.log('No he podido limpiar recogido:*: ' + e.message); }
+    try { migrarEtiquetaVieja(); } catch (e) { Logger.log('No he podido migrar la etiqueta vieja: ' + e.message); }
+    PropertiesService.getScriptProperties().setProperty(PROPIEDAD_ULTIMA_VUELTA, String(inicioVuelta));   /* fila 480: solo si la vuelta ha llegado hasta aquí sin error */
   } finally {
     escribirLatido(carpeta);   /* fila 336: la señal de que esta vuelta se ha hecho, haya habido correos o no */
   }
@@ -293,11 +319,18 @@ function recogerLoQueLlega(carpeta, arranque, seguidos, hueco) {
   if (hueco <= 0) return 0;
   var hecho = etiqueta(ETIQUETA_HECHO);
   var desde = Math.floor(arranque / 1000);
+  /* Fila 480: los hilos recogidos se quedan en recibidos semanas, así que
+     la consulta de recibidos solo mira lo posterior a la última vuelta
+     buena (menos una hora, por si Gmail tarda), nunca antes del arranque.
+     `after:` encuentra los hilos con algún mensaje posterior: una
+     respuesta nueva entra, lo quieto no se vuelve a leer. */
+  var desdeBandeja = Math.max(desde, Math.floor(ultimaVueltaBuena() / 1000) - 3600);
+  var sinEtiqueta = '-label:' + nombreEnBusqueda(ETIQUETA_HECHO) + ' -label:' + nombreEnBusqueda(ETIQUETA_VIEJA);
   var consultas = [
     /* En la bandeja de entrada: lo nuevo y las respuestas a lo ya recogido. */
-    'in:inbox -from:me after:' + desde,
+    'in:inbox -from:me after:' + desdeBandeja,
     /* Fuera de ella (alguien lo archivó antes de que pasara el script) y sin recoger todavía. */
-    '-in:inbox -in:spam -in:trash -label:' + ETIQUETA_HECHO.replace(/\//g, '-') + ' -from:me after:' + desde
+    '-in:inbox -in:spam -in:trash ' + sinEtiqueta + ' -from:me after:' + desde
   ];
   var vistos = {};
   var recogidos = 0;
@@ -310,19 +343,129 @@ function recogerLoQueLlega(carpeta, arranque, seguidos, hueco) {
       vistos[id] = true;
       try {
         var mensajes = hilo.getMessages();
-        if (!hayRecibidoNuevo(mensajes, Math.max(arranque, ultimoRecogido(id)))) continue;
+        var corte = Math.max(arranque, ultimoRecogido(id));
+        /* Un hilo que ya lleva «En la app» pero cuyo 'recogido:<id>' se olvidó (a los 90 días) no
+           entra otra vez sin un mensaje recibido reciente. */
+        if (!ultimoRecogido(id) && llevaEtiqueta(hilo, ETIQUETA_HECHO)) {
+          corte = Math.max(corte, new Date().getTime() - DIAS_RECORDAR_RECOGIDO * 86400000);
+        }
+        if (!hayRecibidoNuevo(mensajes, corte)) continue;
         if (hiloYaSeguido(hilo, mensajes, seguidos)) continue;
         guardarHilo(hilo, carpeta, null, 0);
         apuntarRecogido(hilo, mensajes);
         recogidos++;
-        hilo.addLabel(hecho);
-        hilo.moveToArchive();
+        hilo.addLabel(hecho);   /* fila 480: se queda en recibidos, sin leer */
       } catch (e) {
         Logger.log('No he podido recoger "' + hilo.getFirstMessageSubject() + '": ' + e.message);
       }
     }
   }
   return recogidos;
+}
+
+function ultimaVueltaBuena() {
+  return parseInt(PropertiesService.getScriptProperties().getProperty(PROPIEDAD_ULTIMA_VUELTA) || '0', 10) || 0;
+}
+
+/* Gmail busca una etiqueta con espacios o barras poniendo guiones: «En la app» -> En-la-app. */
+function nombreEnBusqueda(nombre) {
+  return String(nombre).replace(/[\/\s]/g, '-');
+}
+
+function llevaEtiqueta(hilo, nombre) {
+  var etiquetas = hilo.getLabels();
+  for (var i = 0; i < etiquetas.length; i++) if (etiquetas[i].getName() === nombre) return true;
+  return false;
+}
+
+/* ---------- de GESTOR/Hecho a «En la app» (fila 480) ----------
+
+   Apps Script no renombra una etiqueta: se crea «En la app», se pone a cada
+   hilo que lleva GESTOR/Hecho (por tandas) y, al quedar vacía, se borra la
+   vieja. Espera a que la app haya puesto al día lo archivado desde el 23-oct
+   (necesita GESTOR/Hecho para saber qué devolver a recibidos) o, si en
+   DIAS_ESPERAR_PUESTA_AL_DIA días no llega, lo hace igual. */
+
+function apuntarEsperaDeMigracion() {
+  var propiedades = PropertiesService.getScriptProperties();
+  if (!propiedades.getProperty(PROPIEDAD_ESPERA_MIGRAR)) propiedades.setProperty(PROPIEDAD_ESPERA_MIGRAR, String(new Date().getTime()));
+}
+
+function migrarEtiquetaVieja() {
+  var propiedades = PropertiesService.getScriptProperties();
+  if (propiedades.getProperty(PROPIEDAD_MIGRADA)) return;
+  var desde = parseInt(propiedades.getProperty(PROPIEDAD_ESPERA_MIGRAR) || '0', 10) || 0;
+  var puestaAlDia = !!propiedades.getProperty(PROPIEDAD_PUESTA_AL_DIA);
+  var vencida = desde && new Date().getTime() - desde > DIAS_ESPERAR_PUESTA_AL_DIA * 86400000;
+  if (!puestaAlDia && !vencida) return;
+  var vieja = GmailApp.getUserLabelByName(ETIQUETA_VIEJA);
+  if (!vieja) { propiedades.setProperty(PROPIEDAD_MIGRADA, '1'); return; }
+  var nueva = etiqueta(ETIQUETA_HECHO);
+  var hilos = vieja.getThreads(0, MAX_MIGRADOS_POR_VUELTA);
+  for (var i = 0; i < hilos.length; i++) {
+    hilos[i].addLabel(nueva);
+    hilos[i].removeLabel(vieja);
+  }
+  if (hilos.length < MAX_MIGRADOS_POR_VUELTA) {
+    vieja.deleteLabel();
+    propiedades.setProperty(PROPIEDAD_MIGRADA, '1');
+  }
+}
+
+/* ---------- órdenes de la app sobre Gmail (fila 480) ----------
+
+   doPost con accion: 'gmail' y la misma clave que el envío:
+
+     { accion: 'gmail',
+       ordenes: [ { id, matriculas, leido: true, bandeja: 'archivar' | 'recibidos' } ],
+       ponerAlDia: [ { id, matriculas } ], ultima: true }
+
+   Contesta { ok: true, resultados: { <id>: 'hecho' | 'noEsta' | 'error' }, ponerAlDia: <cuántos movidos> }.
+   `noEsta`: el hilo no aparece ni por id ni por matrícula (no tiene arreglo: la app lo da por hecho).
+   `recibidos` solo mueve un hilo con algún mensaje recibido (no escrito por la propia cuenta).
+   No pasa por enviarUnaVez ni por su candado: no envía nada. */
+
+function tieneMensajeRecibido(mensajes) {
+  var mia = String(miCorreo() || '').toLowerCase();
+  for (var i = 0; i < mensajes.length; i++) {
+    var m = mensajes[i];
+    if (typeof m.isDraft === 'function' && m.isDraft()) continue;
+    if (mia && quien(m.getFrom()).correo === mia) continue;
+    return true;
+  }
+  return false;
+}
+
+function ordenesGmail(cuerpo) {
+  var resultados = {};
+  var ordenes = cuerpo.ordenes || [];
+  for (var i = 0; i < ordenes.length && i < MAX_ORDENES_POR_LLAMADA; i++) {
+    var o = ordenes[i] || {};
+    if (!o.id) continue;
+    try {
+      var hilo = hiloDeSeguido(o);
+      if (!hilo) { resultados[o.id] = 'noEsta'; continue; }
+      if (o.leido) hilo.markRead();
+      if (o.bandeja === 'archivar') hilo.moveToArchive();
+      else if (o.bandeja === 'recibidos' && tieneMensajeRecibido(hilo.getMessages())) hilo.moveToInbox();
+      resultados[o.id] = 'hecho';
+    } catch (e) {
+      Logger.log('Orden de Gmail sobre ' + o.id + ': ' + e.message);
+      resultados[o.id] = 'error';
+    }
+  }
+  var movidos = 0;
+  var alDia = cuerpo.ponerAlDia || [];
+  for (var j = 0; j < alDia.length && j < MAX_ORDENES_POR_LLAMADA; j++) {
+    try {
+      var h = hiloDeSeguido(alDia[j] || {});
+      if (h && llevaEtiqueta(h, ETIQUETA_VIEJA)) { h.moveToInbox(); movidos++; }
+    } catch (e) {
+      Logger.log('Puesta al día de ' + (alDia[j] && alDia[j].id) + ': ' + e.message);
+    }
+  }
+  if (cuerpo.ultima) PropertiesService.getScriptProperties().setProperty(PROPIEDAD_PUESTA_AL_DIA, String(new Date().getTime()));
+  return conVersion({ ok: true, resultados: resultados, ponerAlDia: movidos });
 }
 
 /* Una vez al día: olvida los 'recogido:<id>' de hilos de más de
@@ -589,7 +732,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '27-oct-2026 · fila 471';
+var VERSION_SCRIPT = '28-oct-2026 · fila 480';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 /* Fila 471: la app pregunta la versión sin enviar nada. Con `?k=<clave>` correcta contesta
@@ -624,6 +767,8 @@ function doPost(e) {
       resultado = { ok: false, motivo: 'Esta aplicación todavía no tiene clave. Ejecuta prepararEnvio() una vez.' };
     } else if (claveRecibida !== claveGuardada) {
       resultado = { ok: false, motivo: 'La clave no es correcta.' };
+    } else if (cuerpo.accion === 'gmail') {
+      resultado = ordenesGmail(cuerpo);   /* fila 480: leído / archivar / recibidos; no envía nada */
     } else {
       resultado = enviarUnaVez(cuerpo);
     }

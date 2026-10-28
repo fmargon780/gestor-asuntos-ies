@@ -29,8 +29,11 @@ esta versión y no cambia); quedan fuera el spam, la papelera y lo que envía la
 envíos a grupos en copia oculta, borradores); los hilos que ya están en `seguidos.json` (por id o
 por matrícula) entran por su asunto y no en «Ha llegado»; lo ya recogido se apunta por hilo
 (`recogido:<id>` = fecha del mensaje más nuevo) y solo vuelve a entrar si llega un mensaje recibido
-más nuevo (la respuesta a un correo descartado). Al recogerlo el hilo se archiva en Gmail y lleva
-`GESTOR/Hecho`. La etiqueta `GESTOR` queda solo para traer a mano un correo antiguo. Descartar
+más nuevo (la respuesta a un correo descartado). Al recogerlo el hilo lleva la etiqueta «En la app»
+(antes `GESTOR/Hecho`) y SE QUEDA en recibidos, sin leer (fila 480, `docs/CORREO-SE-QUEDA-EN-RECIBIDOS.md`);
+la app lo marca leído al meterlo en un asunto, leído y archivado al descartarlo, y archiva/devuelve a recibidos
+los hilos del asunto al archivarlo/reabrirlo (`js/correo-gmail.js`, órdenes `doPost` con `accion: 'gmail'`,
+pendientes en `_GESTOR/gmail-pendiente/<ordenador>.json`). La etiqueta `GESTOR` queda solo para traer a mano un correo antiguo. Descartar
 borra la ficha de la bandeja; el correo sigue en Gmail. Prueba: `pruebas/todo-el-correo-entra.mjs`.
 El script lo pega Francisco a mano (`docs/TE-TOCA.md`). La aplicación lee esa carpeta y propone tercero, tipo y fecha.
 "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro

@@ -90,6 +90,10 @@ App.cerrarAsunto = async function (a) {
   if (window.NotasDirectivos && !App.E.archivarSinPreguntar && !(await NotasDirectivos.antesDeArchivar(a))) return;
   var categoria = a.ficha.categoria || a.leido.categoria || '';
   var tercero = a.ficha.tercero || '';
+  /* Fila 480: los hilos de correo del asunto, copiados antes de que la ficha baje a la carpeta. En Gmail se
+     archivan cuando el archivado ya ha salido bien. */
+  var hilosGmail = window.CorreoGmail ? CorreoGmail.hilosDeFicha(a.ficha) : [];
+  var lineaGmail = hilosGmail.length ? '<p class="nota">Sus correos también se archivan en Gmail.</p>' : '';
 
   if (!categoria || !tercero) {
     var opciones = Nombres.CATEGORIAS.map(function (c) {
@@ -140,7 +144,7 @@ App.cerrarAsunto = async function (a) {
     if (!ArchivarCabe.sinProblema(medida)) {
       /* Archivar varios de golpe: este se queda donde estaba y el lote avisa al acabar. */
       if (App.E.archivarSinPreguntar) { ArchivarCabe.anotarNoCabe(a.nombre); return; }
-      var decision = await ArchivarCabe.cuadro(medida, avisoFusion);
+      var decision = await ArchivarCabe.cuadro(medida, avisoFusion + lineaGmail);
       if (decision.accion === 'cambiar') { await App.editarAsunto(a); return; }
       if (decision.accion !== 'acortar') return;
       if (!(await ArchivarCabe.acortar(a, medida, decision.nuevos))) return;
@@ -161,7 +165,7 @@ App.cerrarAsunto = async function (a) {
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +
     '</div></div>' +
-    avisoFusion +
+    avisoFusion + lineaGmail +
     '<p class="nota">Se copia primero y se comprueba que ha llegado todo. ' +
     'Si algo falla, la carpeta se queda donde está.</p>', 'Archivar el asunto');
   if (!confirmar) return;
@@ -231,6 +235,7 @@ App.cerrarAsunto = async function (a) {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros, archivandose: undefined
     });
+    if (window.CorreoGmail && hilosGmail.length) CorreoGmail.asuntoArchivado(hilosGmail);   /* fila 480 */
     /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');
     if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'archivar');   /* fila 289: sus encargos pasan a «Terminado» */
@@ -332,6 +337,7 @@ App.reabrirAsunto = async function (a) {
       : { conSufijo: [] };
     if (!haciendoFusion) await Carpetas.mover(padreUsar, a.nombre, App.E.abiertos);
     await App.anotar(a.nombre, { estado: 'abierto', reabiertoEl: U.ahora(), reabiertoPor: App.E.usuario });
+    if (window.CorreoGmail) CorreoGmail.asuntoReabierto(CorreoGmail.hilosDeFicha(ficha));   /* fila 480: sus correos vuelven a recibidos */
     if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'reabrir', ficha);   /* fila 289: sus encargos vuelven a «En marcha» */
     var mensaje = 'Asunto reabierto.';
     if (haciendoFusion) {

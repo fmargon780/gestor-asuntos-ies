@@ -91,7 +91,7 @@ console.log('--- 1-3. nombre del remitente y cuenta ---');
   const r = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x', nombreRemitente: REMITENTE });
   comprobar('1. correo nuevo con el nombre del remitente', [r.ok, c.enviados[0].opciones.name], [true, REMITENTE]);
   comprobar('3. la respuesta dice la cuenta del script', r.cuenta, ADMIN);
-  comprobar('3. y la versión de la fila 471', r.version, '27-oct-2026 · fila 471');
+  comprobar('3. y la versión de la fila 480', r.version, '28-oct-2026 · fila 480');
   const r2 = enviar(c, { para: 'ana@correo.es', asunto: 'Hola', cuerpo: 'x' });
   comprobar('2. sin nombre (app vieja): sin opción name', [r2.ok, 'name' in c.enviados[1].opciones], [true, false]);
   const r3 = enviar(c, { prueba: true, nombreRemitente: REMITENTE });

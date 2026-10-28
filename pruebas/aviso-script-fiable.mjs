@@ -47,7 +47,7 @@ const URL_GUARDADA = 'https://script.google.com/macros/s/X/exec?k=abc';
   await ejecutar(c, 'CorreoEnviar.guardarUrl("' + URL_GUARDADA + '")');
   await ejecutar(c, 'CorreoEnviar._registrarVersionScript("23-oct-2026 · fila 441")');
   comprobar('1. con la versión vieja guardada, está anticuado', await ejecutar(c, 'CorreoEnviar.scriptDesactualizado()'), true);
-  c.responder({ status: 200, texto: JSON.stringify({ ok: true, soloVersion: true, version: '27-oct-2026 · fila 471', cuenta: 'admin@x.es' }) });
+  c.responder({ status: 200, texto: JSON.stringify({ ok: true, soloVersion: true, version: '28-oct-2026 · fila 480', cuenta: 'admin@x.es' }) });
   await ejecutar(c, 'CorreoVersion.preguntar(true)');
   comprobar('1. la consulta que contesta la versión actual lo quita', await ejecutar(c, 'CorreoEnviar.scriptDesactualizado()'), false);
   comprobar('1. es un GET a la dirección guardada, tal cual', [c.peticiones[0].url, c.peticiones[0].op.method, c.peticiones[0].op.body], [URL_GUARDADA, 'GET', undefined]);
