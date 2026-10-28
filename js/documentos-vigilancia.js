@@ -19,6 +19,11 @@ App.mirando = false;
 App.vigilarLaCarpeta = function () {
   setInterval(App.mirarLaCarpeta, App.SEGUNDOS_ENTRE_MIRADAS * 1000);
   window.addEventListener('focus', App.mirarLaCarpeta);
+  /* Fila 478: las copias de la «Ruta» de un documento (js/ruta-copia.js), con el mismo temporizador y el mismo foco;
+     aparte de mirarLaCarpeta, que sale pronto cuando no cambia nada arriba. */
+  function mirarCopiasDeRuta() { if (window.RutaCopia) RutaCopia.mirar(); }
+  setInterval(mirarCopiasDeRuta, App.SEGUNDOS_ENTRE_MIRADAS * 1000);
+  window.addEventListener('focus', mirarCopiasDeRuta);
 };
 
 App.mirarLaCarpeta = async function () {

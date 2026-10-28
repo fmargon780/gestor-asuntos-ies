@@ -233,7 +233,7 @@ var VersionesPrevias = (function () {
   else enganchar();
 
   return { CARPETA: CARPETA, CARPETA_NUEVA: CARPETA_NUEVA, CARPETA_ANTIGUA: CARPETA_ANTIGUA, nombreDeCarpeta: nombreDeCarpeta,
-           esCarpetaDePrevias: esCarpetaDePrevias, listar: listar, bloque: bloque, mover: mover, sacar: sacar, queMover: queMover,
+           esCarpetaDePrevias: esCarpetaDePrevias, carpeta: carpeta, listar: listar, bloque: bloque, mover: mover, sacar: sacar, queMover: queMover,
            ordenarAsunto: ordenarAsunto, ordenarTrasCambio: ordenarTrasCambio, abrir: abrir,
            ordenarTodo: ordenarTodo, claveGemelo: claveGemelo, esSinSellar: esSinSellar };
 })();

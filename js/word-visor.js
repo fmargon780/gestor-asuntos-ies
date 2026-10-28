@@ -218,6 +218,7 @@ var WordVisor = (function () {
         var w = await h.createWritable();
         await w.write(blob);
         await w.close();
+        if (window.RutaCopia) await RutaCopia.alEscribir(mismo.carpeta, nombre);   /* fila 478 */
       });
     } catch (e) { U.fallo('No he podido guardar el PDF', e); return false; }
     U.aviso('PDF guardado en la carpeta del asunto: ' + nombre, 'bueno');

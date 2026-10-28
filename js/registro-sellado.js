@@ -179,7 +179,7 @@ var RegistroSellado = (function () {
      sellado son el mismo documento (mismo número, mismo nombre): el
      original pasa a «SIN SELLAR» en la subcarpeta de previas y el
      sellado ocupa su sitio. El registro se apunta en la ficha. */
-  async function asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previo) {
+  async function asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previo, opciones) {
     var codigo = Nombres.codigoRegistro({ ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero });
     if (!codigo) {
       U.aviso('No he podido leer el número de registro del sello.', 'malo');
@@ -210,8 +210,8 @@ var RegistroSellado = (function () {
         'registroDeDocumento', nombreDocumentoOriginal);
       var carpetaPrevias = window.VersionesPrevias && VersionesPrevias.nombreDeCarpeta
         ? await VersionesPrevias.nombreDeCarpeta(asunto.handle) : '_Previas';
-      U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «' + carpetaPrevias + '».'
-        : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
+      U.aviso(aPrevias ? 'Documento registrado' + avisoCodigo(opciones, codigo) + '. El original sin sellar se conserva en «' + carpetaPrevias + '».'
+        : 'Documento registrado' + avisoCodigo(opciones, codigo) + '. El original sin sellar se conserva en la carpeta.', 'bueno');
       return nombreFinal;   /* fila 285: el nombre con el que queda el sellado */
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');
@@ -219,11 +219,14 @@ var RegistroSellado = (function () {
     }
   }
 
+  /* Fila 478: quien registra por la «Ruta» del documento (js/ruta-copia.js) quiere el código en el aviso. */
+  function avisoCodigo(opciones, codigo) { return opciones && opciones.conCodigo && codigo ? ' (' + codigo + ')' : ''; }
+
   /* Fila 434 (docs/ARREGLOS-DEL-HITO-EN-TRABAJO.md, punto 5): al unir el PDF sellado a un documento
      que es de un hito, se marca sola la primera tarea de registrar que ese hito tenga pendiente.
      `opciones.noMarcar` lo usa quien marca la tarea por su cuenta (el registro por personas). */
   async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello, opciones) {
-    var nuevo = await asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello);
+    var nuevo = await asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello, opciones);
     if (nuevo && !(opciones && opciones.noMarcar)) await marcarRegistrarDelHito(asunto, nombreDocumentoOriginal, nuevo);
     return nuevo;
   }
@@ -239,10 +242,10 @@ var RegistroSellado = (function () {
     } catch (e) { /* no crítico: el documento ya está registrado */ }
   }
 
-  async function asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
+  async function asociarSinMarcar(asunto, nombrePdf, nombreDocumentoOriginal, sello, opciones) {
     var previoNumerado = Documentos.leerNombre(nombreDocumentoOriginal, asunto && asunto.ficha);
     if (previoNumerado.numero && previoNumerado.fecha && previoNumerado.tipo) {
-      return asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previoNumerado);
+      return asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previoNumerado, opciones);
     }
     var nombreNuevo = nombreParaSello(nombreDocumentoOriginal, sello);
     if (!nombreNuevo) {
@@ -279,8 +282,10 @@ var RegistroSellado = (function () {
         '. Se conserva el original sin sellar.',
         'registroDeDocumento', nombreDocumentoOriginal, { auto: true });
 
-      U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «Versiones previas».'
-        : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
+      var carpetaPrevias2 = aPrevias && opciones && opciones.conCodigo && window.VersionesPrevias && VersionesPrevias.nombreDeCarpeta
+        ? await VersionesPrevias.nombreDeCarpeta(asunto.handle) : 'Versiones previas';
+      U.aviso(aPrevias ? 'Documento registrado' + avisoCodigo(opciones, codigo) + '. El original sin sellar se conserva en «' + carpetaPrevias2 + '».'
+        : 'Documento registrado' + avisoCodigo(opciones, codigo) + '. El original sin sellar se conserva en la carpeta.', 'bueno');
       return nombreNuevo;   /* fila 285 */
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');

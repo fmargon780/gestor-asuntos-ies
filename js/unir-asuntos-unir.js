@@ -124,6 +124,7 @@
           else await Carpetas.mover(seVa.handle, sub, seQueda.handle);
         }
         await fusionarFicha(seQueda, seVa, fechaTexto);
+        if (window.RutaCopia) await RutaCopia.quitarCarpeta(seVa.handle);   /* fila 478: su copia de la «Ruta» no se lleva */
         try { await App.E.abiertos.removeEntry(seVa.nombre); }
         catch (eQuitar) { restos.push(seVa.nombre); }
       }

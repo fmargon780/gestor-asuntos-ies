@@ -362,7 +362,7 @@ window.RutaCarpetas = (function () {
       guardar(cual, valor);
     }
     var r = de(a, modo, doc);
-    if (r.completa) copiarConAviso(r.texto, boton);
+    if (r.completa) copiarConAviso(r.texto, boton).then(function () { return copiaDelDocumento(a, modo, doc); });
     if (paraElCentro) {
       guardarComun(paraElCentro, true).catch(function (e) {
         U.accesorio('Copiado, pero no he podido guardar la ruta para todo el centro', e);
@@ -403,6 +403,12 @@ window.RutaCarpetas = (function () {
     };
   }
 
+  /* Fila 478 (docs/REGISTRADO-DESDE-LA-RUTA-DEL-DOCUMENTO.md): tras copiar la ruta de un PDF, la app guarda por
+     dentro una copia, para reconocer el registrado de Séneca si se guarda encima (js/ruta-copia.js). */
+  function copiaDelDocumento(a, modo, doc) {
+    return window.RutaCopia ? RutaCopia.alCopiarRuta(a, modo, doc) : Promise.resolve();
+  }
+
   /* Fila 423: el botón «Ruta» de un documento (ficha, mesa del hito, versiones
      previas y visor). Copia la ruta del documento con su extensión; si falta la
      ruta de Dropbox o la del centro, la pide con el mismo cuadro de siempre
@@ -421,7 +427,8 @@ window.RutaCarpetas = (function () {
       await cargarComun();
       var r = de(a, modo, doc);
       if (!r.completa) { pedirRutaConPreguntar(a, modo, b, doc); return; }
-      copiarConAviso(r.texto, b);
+      await copiarConAviso(r.texto, b);
+      await copiaDelDocumento(a, modo, doc);
     };
     return b;
   }
