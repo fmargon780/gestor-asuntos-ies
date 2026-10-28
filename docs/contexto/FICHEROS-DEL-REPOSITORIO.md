@@ -424,6 +424,7 @@ de `App` va después del fichero que lo define.
 | `js/bandeja-correos.js` | La lógica de la bandeja de correos: leer, adivinar, guardar, la huella del hilo, lo que deja un correo dentro del asunto (`window.Bandeja`). Desde la fila 115 ya no vigila ningún "Borrador en camino"; solo `limpiarEnviosViejos()`, que borra al arrancar los restos que pudieran quedar de antes de esa fila |
 | `js/bandeja-ajustes.js` | El bloque «Bandeja de correos» de Ajustes, el último correo recogido y la limpieza de los encargos viejos (fila 133, sacado de `js/bandeja-correos.js`) |
 | `js/bandeja-guardar.js` | Leer el correo, guardarlo en un asunto (o reabrirlo) y lo que pasa después de crear el asunto (fila 133, sacado de `js/bandeja-correos.js`) |
+| `js/correo-gmail.js` | Lo que la app le pide a Gmail tras tocar un correo (fila 480): leído, archivar, recibidos; pendientes por ordenador en `_GESTOR/gmail-pendiente/` y puesta al día única |
 | `js/correo-version.js` | Pregunta al script de Gmail su versión sin enviar nada (`doGet`) y lleva los botones de la tarjeta «El envío de correo está anticuado» (fila 471) |
 | `pruebas/aviso-script-fiable.mjs` | Prueba (vm y Chromium, fila 471): la consulta de versión, `doGet` del script y la tarjeta con sus tres botones |
 | `js/bandeja-latido.js` | El aviso «La recogida de correos está parada» (fila 336): lee `latido.json` de la carpeta de la bandeja, cada 5 minutos, y avisa en Inicio si tiene más de una hora o no existe |

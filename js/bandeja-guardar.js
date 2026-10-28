@@ -47,6 +47,9 @@
 
   /* La carpeta de un asunto que ya existe. Si está archivado, hay que
      bajar por ARCHIVO / CATEGORÍA / TERCERO. */
+  /* Fila 480: Gmail refleja lo que pasa en la app (js/correo-gmail.js). Nunca frena nada. */
+  function enGmail(que, d) { if (window.CorreoGmail) CorreoGmail[que](d); }
+
   async function carpetaDelAsunto(nombre, ficha) {
     if (!N.estaArchivado(ficha)) return App.E.abiertos.getDirectoryHandle(nombre);
     if (!App.E.archivo) throw new Error('No hay carpeta de ARCHIVO señalada.');
@@ -74,6 +77,7 @@
       /* La huella sí se refresca: puede que el hilo traiga mensajes
          nuevos aunque el correo ya estuviera apuntado. */
       await N.apuntarHuella(elAsunto.nombre, d);
+      enGmail('metidoEnUnAsunto', d);
       await borrarDeLaBandeja(item);
       U.aviso('Ese correo ya estaba en ' + elAsunto.nombre + '. No lo he repetido.', 'bueno');
       if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
@@ -88,6 +92,7 @@
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
     await N.apuntarHuella(elAsunto.nombre, d);
+    enGmail('metidoEnUnAsunto', d);
     var sinQuitar = await borrarDeLaBandeja(item);
     /* Fila 449: ya está en el asunto; que siga en la bandeja no es un fallo de guardar. */
     if (sinQuitar && sinQuitar.length) U.accesorio('El correo ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo');
@@ -339,6 +344,7 @@
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 
     await N.apuntarHuella(nombreAsunto, d);
+    enGmail('metidoEnUnAsunto', d);
     await borrarDeLaBandeja(item);
     U.aviso(resultado.metidos
       ? 'Asunto creado con el correo dentro.'
@@ -371,10 +377,11 @@
     var ok = await U.preguntar('Descartar este correo',
       '<p>Se quita de la bandeja sin crear ningún asunto.</p>' +
       '<p class="nota">' + U.escapar(d.asunto || '') + '</p>' +
-      '<p class="nota">El correo sigue en Gmail. ' +
+      '<p class="nota">En Gmail se marca como leído y se archiva. ' +
       'Si contestan en esta conversación, o si le pones la etiqueta GESTOR, volverá a la bandeja.</p>',
       'Descartar');
     if (!ok) return;
+    enGmail('descartado', d);
     await borrarDeLaBandeja(item);
     U.aviso('Correo descartado.', 'bueno');
   }
