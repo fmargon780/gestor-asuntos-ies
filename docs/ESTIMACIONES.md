@@ -5,13 +5,14 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 27-oct-2026 (fila 478 nueva, conversación de diseño del tema 477)
+Última puesta al día: 28-oct-2026 (fila 480 nueva, conversación de diseño de la idea 480)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
+| 480 | 150 | script sin archivar, consulta por última vuelta, órdenes `doPost` nuevas, pendientes por ordenador, enganches en guardar/descartar/archivar/reabrir, puesta al día única, renombrar etiqueta, pruebas y revisor |
 | 478 | 150 | copia al pulsar «Ruta» y lista en `_GESTOR`, mirada propia, resolver con y sin sello reutilizando registro-sellado, cerrojo entre ordenadores, ignorar `_copia-ruta` en todo lo que recorre el asunto, escrituras de la app que borran la copia, demo de «guardar encima», pruebas y revisor |
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |

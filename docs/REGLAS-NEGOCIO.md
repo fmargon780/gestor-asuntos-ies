@@ -26,6 +26,18 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   script.google.com (con la cuenta de Administración); no se guarda en Ajustes la dirección exacta
   del proyecto.
 
+- (28-oct-2026, idea 480) Gmail refleja lo que pasa en la app: el correo que llega se queda en
+  recibidos **sin leer** y sale en «Ha llegado»; al meterlo en un asunto se marca **leído** y sigue en
+  recibidos; al **archivar el asunto** se archivan en Gmail sus correos. Vale para correos nuevos y
+  respuestas.
+- (28-oct-2026, idea 480) Las respuestas a un correo que ya está en un asunto también pasan por
+  «Ha llegado» hasta que alguien las mete en su asunto.
+- (28-oct-2026, idea 480) Descartar un correo lo marca **leído y lo archiva** en Gmail.
+- (28-oct-2026, idea 480) Meter una respuesta en un asunto archivado **lo reabre**, y sus correos
+  vuelven a recibidos.
+- (28-oct-2026, idea 480) La etiqueta de Gmail de lo recogido se llama **«En la app»** (antes
+  `GESTOR/Hecho`).
+
 ## Registro de Séneca
 
 - (27-oct-2026, tema 477) El registrado se guarda **con el «Ruta» de siempre** del documento, sin
