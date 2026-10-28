@@ -67,6 +67,7 @@
     if (window.Navegacion) Navegacion.apuntar();   /* fila 119: de dónde se viene */
     App.ir('asunto');
     pintar();
+    if (window.RutaCopia) RutaCopia.mirar();   /* fila 478: ¿ha llegado el registrado de Séneca encima de un documento? */
 
     /* Solo se vigila la presencia en un asunto abierto: en el ARCHIVO
        no hay nada que tramitar, así que nadie puede "pisarse". */

@@ -59,7 +59,7 @@ window.Ayudas = (function () {
     'como-se-cuentan-dias': 'Elige si los días del plazo son naturales o hábiles.',
     'comprobacion-al-entrar-pulsa-para-ver': 'Comprobación hecha al entrar: púlsalo para ver el detalle.',
     'copiar-contacto': 'Copia el dato para pegarlo en otro sitio.',
-    'copiar-la-ruta-de-este-documento': 'Copia la ruta de este documento para pegarla al adjuntarlo.',
+    'copiar-la-ruta-de-este-documento': 'Copia la ruta de este documento para pegarla al adjuntarlo. Si guardas aquí el registrado de Séneca, la app conserva el original y apunta el registro sola.',
     'copiar-la-ruta-de-la-carpeta': 'Copia la ruta de la carpeta para pegarla en el navegador o en el explorador de archivos.',
     'copiar-nombre-documento': 'Copia el nombre del documento, sin la extensión.',
     'copiar-nombre-normal': 'Copia el nombre en orden normal, nombre y apellidos, para pegarlo en un documento.',

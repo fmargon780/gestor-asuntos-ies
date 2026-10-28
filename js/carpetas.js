@@ -84,6 +84,7 @@ var Carpetas = (function () {
   function esCarpetaTemporalDeSincronizacion(nombre) {
     var n = String(nombre || '');
     if (!n) return true;
+    if (n === '_copia-ruta') return true;   /* fila 478: la copia de seguridad de la «Ruta» (js/ruta-copia.js) */
     var c = n.charAt(0);
     if (c === '.' || c === '~') return true;
     var min = n.toLowerCase();
@@ -411,6 +412,7 @@ var Carpetas = (function () {
     if (typeof h.move === 'function') {
       try {
         await h.move(nombreNuevo);
+        await avisarEscritura(dir, nombre, nombreNuevo);
         return true;
       } catch (e) { /* no se puede aquí: se copia y se borra */ }
     }
@@ -428,7 +430,15 @@ var Carpetas = (function () {
     }
 
     await dir.removeEntry(nombre);
+    await avisarEscritura(dir, nombre, nombreNuevo);
     return true;
+  }
+
+  /* Fila 478: si la app escribe, renombra o mueve un PDF, la copia de seguridad de su «Ruta»
+     (js/ruta-copia.js) ya no vale y se borra. */
+  async function avisarEscritura(dir) {
+    if (!window.RutaCopia) return;
+    for (var i = 1; i < arguments.length; i++) await window.RutaCopia.alEscribir(dir, arguments[i]);
   }
 
   /* Lleva un fichero suelto dentro de otra carpeta.
@@ -445,6 +455,8 @@ var Carpetas = (function () {
     if (typeof h.move === 'function') {
       try {
         await h.move(dirDestino, destino);
+        await avisarEscritura(dirOrigen, nombre);
+        await avisarEscritura(dirDestino, destino);
         return true;
       } catch (e) { /* no se puede aquí: se copia y se borra */ }
     }
@@ -469,6 +481,8 @@ var Carpetas = (function () {
         throw e4;
       }
     }
+    await avisarEscritura(dirOrigen, nombre);
+    await avisarEscritura(dirDestino, destino);
     return true;
   }
 
@@ -498,6 +512,7 @@ var Carpetas = (function () {
     var w = await salida.createWritable();
     await w.write(f);
     await w.close();
+    await avisarEscritura(dir, nombreNuevo);
     return f.name;
   }
 
@@ -561,6 +576,7 @@ var Carpetas = (function () {
       var w = await h.createWritable();
       await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
       await w.close();
+      await avisarEscritura(dir, nombre);
       return true;
     }, dir, nombre);
   }
