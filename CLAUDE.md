@@ -1,10 +1,10 @@
 # Gestor de asuntos del IES
 
-## Reglas comunes (método de trabajo, 26-oct-2026)
+## Reglas comunes (método de trabajo, 29-oct-2026)
 
 **Lee y sigue `docs/METODO-COMUN.md` antes de coger cualquier fila.** Son las reglas comunes a
-todas las apps: qué leer al empezar (incluido `docs/LECCIONES.md`), la ficha manda, cuándo parar
-y preguntar, atascos, lecciones, ahorro, comprobar y publicar. Es una copia del método
+todas las apps: qué leer al empezar (incluido `docs/LECCIONES.md`), la instrucción manda, cuándo parar
+y preguntar, atascos, lecciones, ahorro, segundo revisor y publicar. Es una copia del método
 (`fmargon780/metodo-apps`): no se edita aquí. Lo que sigue en este fichero son reglas propias de
 esta app; mandan solo en lo propio (cómo se publica, ramas, revisor, pruebas).
 
