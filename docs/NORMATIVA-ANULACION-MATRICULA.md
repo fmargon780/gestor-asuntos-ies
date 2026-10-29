@@ -10,6 +10,10 @@ precepto de donde sale.
 - **O-FP**: Orden de 18 de septiembre de 2025 (evaluación de FP, grados D y E).
 - **O-ABS**: Orden de 19 de septiembre de 2005 (Plan Integral de absentismo escolar).
 
+**Dos conceptos distintos**
+- **Anulación**: la matrícula queda sin efecto, como si no se hubiera hecho; ese curso no cuenta. Solo la regulan Bachillerato y FP.
+- **Baja**: el alumno deja de serlo desde una fecha; lo cursado hasta entonces cuenta. En ESO no hay norma que la regule (apartado 5).
+
 ---
 
 ## 1. Bachillerato · Anulación a petición
@@ -42,7 +46,16 @@ precepto de donde sale.
 - Hay absentismo en ESO cuando las faltas sin justificar en un mes llegan a 25 horas de clase, o al 25 % de los días u horas lectivas. [O-ABS]
 - El absentismo se trata con el protocolo del centro y, si persiste, con derivación a los Servicios Sociales. [O-ABS y plan provincial de absentismo]
 
-## 5. FP · Renuncia a matrícula (a petición)
+## 5. ESO · Baja (no es anulación)
+
+Ninguna norma andaluza regula la baja en ESO ordinaria. Lo que sigue sale de los principios generales.
+
+- **Menor de 16 años: no cabe baja**, ni de oficio ni a petición: está en edad obligatoria. [LOE, art. 4.2]
+- **De 16 años en adelante, de oficio: no cabe.** El alumno tiene derecho a seguir en ESO hasta los 18 [LOE, art. 4.2] y ninguna norma habilita a la dirección para quitárselo por faltar. Un acto que limita un derecho necesita una norma que lo permita y motivación [LPAC, art. 35.1.a]. Lo que procede: mantenerlo matriculado, registrar las faltas, avisar a la familia si es menor, y evaluarlo a final de curso.
+- **De 16 años en adelante, a petición: sí.** El interesado puede renunciar a sus derechos cuando la ley no lo prohíbe [LPAC, art. 94.1]. La solicitud la firma el alumno; si es menor de 18, también su familia. La dirección la acepta por escrito y la baja se graba en Séneca.
+- **Efecto de la baja:** lo cursado hasta la fecha de la baja queda en su expediente. Si quiere volver, pide plaza de nuevo, dentro de la edad máxima.
+
+## 6. FP · Renuncia a matrícula (a petición)
 
 - Se puede renunciar a la matrícula una sola vez; no en el grado básico, por ser enseñanza básica. [O-FP, art. 8.1]
 - Se dirige a la dirección, por Secretaría Virtual o en la secretaría del centro. [O-FP, art. 8.2]
@@ -63,7 +76,7 @@ precepto de donde sale.
 - No gasta convocatorias, pero pierde la reserva de plaza. [O-FP, art. 8.6]
 - No se devuelven los precios públicos. [O-FP, art. 8.7]
 
-## 6. FP · Anulación de oficio
+## 7. FP · Anulación de oficio
 
 - Se inicia si, pasados 5 días hábiles desde el comienzo de las clases, el alumno no se incorpora o falta de forma injustificada y reiterada. [O-FP, art. 9.1]
 - Puede iniciarse hasta el 15 de noviembre (anexo VIII); la plaza pasa a la lista de espera. [O-FP, art. 9.1]
@@ -75,12 +88,12 @@ precepto de donde sale.
 - Efectos: pierde las convocatorias de esa matrícula y la reserva de plaza; en el expediente, «Anulación de Oficio». [O-FP, art. 9.6]
 - No se devuelven los precios públicos, salvo error de la Administración. [O-FP, art. 9.7]
 
-## 7. FP · Recursos
+## 8. FP · Recursos
 
 - Contra la resolución de renuncia o de anulación de oficio: recurso de alzada ante la Delegación Territorial, en un mes; pone fin a la vía administrativa. [O-FP, art. 10.1]
 - La Delegación tiene tres meses para resolver. [O-FP, art. 10.3]
 
-## 8. Traslado de matrícula
+## 9. Traslado de matrícula
 
 - Bachillerato, 1.er trimestre: lo autoriza la dirección del centro y lo comunica a la Delegación. [O-ADM, DA 3.ª, 1]
 - Bachillerato, 2.º trimestre: lo autoriza la Delegación (misma provincia) o la Dirección General (otra provincia), con informe de Inspección. [O-ADM, DA 3.ª, 1]
@@ -93,10 +106,12 @@ precepto de donde sale.
 
 ## Conclusiones
 
-1. **Solo hay tres caminos de verdad**: Bachillerato a petición, Bachillerato de oficio y FP (renuncia y anulación de oficio). En ESO no se anula: se tramita absentismo.
-2. **Bachillerato de oficio tiene una fecha fija**: pedir los motivos antes del 31 de octubre. Todo lo demás (cuántas faltas, cuánto esperar la respuesta) no lo dice la norma.
-3. **Para esos huecos, el modelo es FP**: notificar, dar 10 días hábiles lectivos para volver o justificar, resolver y notificar en 10 días hábiles, con recurso de alzada en un mes. Así se cumplen también las garantías de la LPAC.
-4. **Bachillerato no tiene modelos oficiales**: solicitud, petición de motivos y resolución hay que crearlas como plantillas propias. FP sí los tiene (anexos V, VII y VIII).
-5. **Las fechas clave del curso**: 31 de octubre (Bachillerato de oficio), 15 de noviembre (FP de oficio y renuncia sin motivo), fin de abril (Bachillerato a petición).
-6. **El traslado es otro trámite**: no anula nada y tiene su propia regla por trimestres. Conviene que sea un tipo de asunto aparte.
-7. **Pendiente**: precisar el artículo exacto de la O-ABS que define el absentismo, y la regulación del traslado en FP, si el centro tiene FP.
+1. **Anulación y baja son cosas distintas.** Anular borra el curso a efectos de permanencia; la baja solo cierra la matrícula desde una fecha.
+2. **Caminos que regula la norma**: Bachillerato a petición, Bachillerato de oficio y FP (renuncia y anulación de oficio).
+3. **ESO**: no hay anulación. Hasta los 16, solo absentismo. Desde los 16, baja solo a petición del alumno (y de su familia si es menor); nunca de oficio.
+4. **Bachillerato de oficio tiene una fecha fija**: pedir los motivos antes del 31 de octubre. Cuántas faltas y cuánto esperar la respuesta no lo dice la norma.
+5. **Para esos huecos, el modelo es FP**: notificar, dar 10 días hábiles lectivos para volver o justificar, resolver y notificar en 10 días hábiles, con recurso de alzada en un mes. Así se cumplen también las garantías de la LPAC.
+6. **Bachillerato y ESO no tienen modelos oficiales**: las solicitudes, la petición de motivos y las resoluciones serán plantillas propias. FP sí los tiene (anexos V, VII y VIII).
+7. **Fechas clave del curso**: 31 de octubre (Bachillerato de oficio), 15 de noviembre (FP de oficio y renuncia sin motivo), fin de abril (Bachillerato a petición).
+8. **El traslado es otro trámite**: no anula nada y tiene su propia regla por trimestres.
+9. **Pendiente**: el artículo exacto de la O-ABS que define el absentismo, y el traslado en FP si el centro tiene FP.
