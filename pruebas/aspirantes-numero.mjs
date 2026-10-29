@@ -60,7 +60,7 @@ await pagina.fill('#buscar-tercero', 'Pendiente De Numero, Nora');
 await pagina.waitForTimeout(300);
 await pagina.click('#resultados-tercero button');
 await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Pendiente De Numero, Nora');
+await pagina.fill('#alta-apellidos', 'Pendiente De Numero, Nora');
 await pagina.fill('.alta-campo[data-campo="Fecha de nacimiento"]', '02/02/2013');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);

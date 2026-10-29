@@ -392,7 +392,7 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro explica para qué es',
   pagina.locator('#cuadro-cuerpo').textContent()
     .then(t => t.indexOf('todavía no está matriculado') !== -1), true);
-await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Nuevo Aspirante, Lucas');
+await pagina.fill('#alta-apellidos', 'Nuevo Aspirante, Lucas');
 await pagina.fill('.alta-campo[data-campo="Fecha de nacimiento"]', '10/04/2012');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);

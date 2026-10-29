@@ -156,6 +156,7 @@
   function usarExistente(tipo) {
     cerrar();
     App.marcarTipoElegido(tipo);
+    App.irAlSiguienteHueco();   /* fila 489 */
     U.aviso('Ya existía. Elegido: ' + tipo.tipo + '.', 'bueno');
   }
 
@@ -191,6 +192,7 @@
       }
       cerrar();
       App.marcarTipoElegido(tipo);
+      App.irAlSiguienteHueco();   /* fila 489 */
       U.aviso('Tipo creado. Su guía, campos y plantillas se añaden en Ajustes.', 'bueno');
     });
   }

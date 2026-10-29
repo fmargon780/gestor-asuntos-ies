@@ -106,8 +106,8 @@ await pagina.fill('#buscar-tercero', 'Gómez Prado, Iván');
 await pagina.waitForTimeout(300);
 await pagina.getByRole('button', { name: '+ Dar de alta uno nuevo' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('el nombre llega ya escrito en el cuadro de alta',
-  pagina.locator('.alta-campo[data-campo="Nombre"]').inputValue(), 'Gómez Prado, Iván');
+await comprobar('el nombre llega ya escrito en el cuadro de alta, repartido en Apellidos y Nombre (fila 489)',
+  Promise.all([pagina.locator('#alta-apellidos').inputValue(), pagina.locator('#alta-nombre-pila').inputValue()]), ['Gómez Prado', 'Iván']);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 await pagina.waitForTimeout(300);

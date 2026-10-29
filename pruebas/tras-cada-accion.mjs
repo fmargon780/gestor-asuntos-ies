@@ -56,7 +56,7 @@ await pagina.fill('#buscar-tercero', 'Llegada');
 await pagina.waitForTimeout(300);
 await pagina.getByRole('button', { name: '+ Dar de alta un solicitante' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Llegada Prueba, Eva');
+await pagina.fill('#alta-apellidos', 'Llegada Prueba, Eva');
 await pagina.fill('.alta-campo[data-campo="Nº Id. Escolar"]', '4441119');
 await pagina.click('#cuadro-aceptar');
 /* Fila 173, punto 3: dar de alta deja el tercero elegido, sin pulsar

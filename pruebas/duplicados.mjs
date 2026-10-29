@@ -74,7 +74,7 @@ function nombresDeAbiertos() {
 async function darDeAltaAlumno(nombre, id) {
   await pagina.getByRole('button', { name: '+ Dar de alta un solicitante' }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
-  await pagina.fill('.alta-campo[data-campo="Nombre"]', nombre);
+  await pagina.fill('#alta-apellidos', nombre);
   await pagina.fill('.alta-campo[data-campo="Nº Id. Escolar"]', id);
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForSelector('#tercero-elegido:not(.oculto)');

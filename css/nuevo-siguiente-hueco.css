@@ -1,0 +1,3 @@
+/* Fila 489: el sitio al que salta el cursor en «Nuevo asunto» se ilumina un instante. */
+@keyframes salto-cursor { from { box-shadow: 0 0 0 4px var(--azul-claro); } to { box-shadow: 0 0 0 4px transparent; } }
+.salto-cursor { animation: salto-cursor 1s ease-out; }

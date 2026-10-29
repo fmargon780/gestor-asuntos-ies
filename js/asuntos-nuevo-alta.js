@@ -19,33 +19,8 @@ App.ACLARA_ALTA = {
             'dos, y en el nombre de la carpeta seguirá yendo la razón social.'
 };
 
-/* El cuadro de los datos de un tercero. Lo usan el alta y también el
-   botón de cambiarlos de js/archivo-personas.js: los campos son los
-   mismos, y así no hay dos cuadros que se puedan quedar distintos.
-
-   `valores` trae lo que ya se sabe; con el cuadro vacío es un alta.
-   Devuelve lo escrito, o null si se cancela. */
-App.cuadroDeTercero = async function (categoria, valores, titulo, botonar) {
-  var def = Datos.LISTAS[categoria];
-  if (!def) return null;
-  valores = valores || {};
-  var campos = def.cabecera.map(function (c) {
-    return '<label class="etiqueta">' + U.escapar(c) + '</label>' +
-           '<input class="campo alta-campo" data-campo="' + U.escapar(c) + '" value="' +
-           U.escapar(valores[c] || '') + '">';
-  }).join('');
-  var aclara = App.ACLARA_ALTA[categoria]
-    ? '<p class="explica">' + U.escapar(App.ACLARA_ALTA[categoria]) + '</p>'
-    : '';
-  var ok = await U.preguntar(titulo, aclara + campos, botonar || 'Guardar');
-  if (!ok) return null;
-  var puestos = {};
-  Array.prototype.forEach.call(document.querySelectorAll('.alta-campo'), function (i) {
-    puestos[i.dataset.campo] = i.value.trim();
-  });
-  if (!puestos[def.cabecera[0]]) { U.aviso('Hace falta al menos el nombre.', 'malo'); return null; }
-  return puestos;
-};
+/* El cuadro de los datos de un tercero (App.cuadroDeTercero) vive en
+   js/tercero-cuadro.js (fila 489). */
 
 /* Altas con cuadro propio (fila 167: Administraciones): `fn(sugerencia)`
    abre su cuadro, guarda, y devuelve la persona nueva o null. */
@@ -133,7 +108,7 @@ App.avisoPersonaEnOtraLista = async function (texto, caja, alOtra) {
     si.className = 'boton boton-esa-persona';
     si.style.marginRight = '6px';
     si.textContent = App.E.nuevo.tipo ? 'Es esa persona: elegir otro tipo' : 'Es esa persona: cambiar';
-    si.onclick = function () { App.E.nuevo.tipoEnLinea = false; App.fijarTercero(p); };
+    si.onclick = function () { App.E.nuevo.tipoEnLinea = false; App.fijarTercero(p); App.irAlSiguienteHueco(); };   /* fila 489 */
     var no = document.createElement('button');
     no.className = 'boton boton-otra-persona';
     no.textContent = 'Es otra persona';
@@ -165,7 +140,7 @@ App.altaTercero = async function (categoria, sugerencia, alDarDeAlta) {
     if (!nueva) return;
     U.aviso('Dado de alta.', 'bueno');
     if (alDarDeAlta) { alDarDeAlta(nueva); return; }
-    if (App.E.nuevo.categoria === categoria) { App.fijarTercero(nueva); return; }
+    if (App.E.nuevo.categoria === categoria) { App.fijarTercero(nueva); App.irAlSiguienteHueco(); return; }
     return;
   }
   var def = Datos.LISTAS[categoria];
@@ -182,7 +157,7 @@ App.altaTercero = async function (categoria, sugerencia, alDarDeAlta) {
   var nombreNuevo = valores[def.cabecera[0]];
   var creado = fuente && fuente.lista && fuente.lista.filter(function (p) { return p.nombre === nombreNuevo; })[0];
   if (alDarDeAlta) { alDarDeAlta(creado || null); return; }
-  if (App.E.nuevo.categoria === categoria && creado) { App.fijarTercero(creado); return; }
+  if (App.E.nuevo.categoria === categoria && creado) { App.fijarTercero(creado); App.irAlSiguienteHueco(); return; }
   $('buscar-tercero').value = nombreNuevo;
   App.buscarTercero();
 };

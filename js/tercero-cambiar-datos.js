@@ -41,7 +41,7 @@ App.cambiarDatosDelTercero = async function (p, boton) {
   valores[def.cabecera[0]] = nombreAntes;
 
   var puestos = await App.cuadroDeTercero(
-    p.categoria, valores, 'Cambiar los datos de ' + nombreAntes, 'Guardar los cambios');
+    p.categoria, valores, 'Cambiar los datos de ' + nombreAntes, 'Guardar los cambios', { avisarSinComa: true });
   if (!puestos) return null;
 
   var info = {

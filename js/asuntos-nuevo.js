@@ -259,7 +259,7 @@ App.pintarTipos = function () {
     b.dataset.tipo = t.tipo;
     b.innerHTML = U.escapar(t.tipo) +
       (categoriaPersona ? '' : ' <small aria-hidden="true">' + U.escapar(t.categoria) + '</small>');
-    b.onclick = function () { App.elegirTipo(t); };
+    b.onclick = function () { App.elegirTipo(t); App.irAlSiguienteHueco(); };   /* fila 489 */
     caja.appendChild(b);
   });
 };
@@ -419,7 +419,7 @@ App.buscarTercero = async function () {
     d.innerHTML = '<div>' + U.escapar(p.nombre) +
                   '<span class="resultado-categoria">' + U.escapar(Nombres.textoCategoria(p.categoria, 'lista')) + '</span></div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
-    d.onclick = function () { App.fijarTercero(p); };
+    d.onclick = function () { App.fijarTercero(p); App.irAlSiguienteHueco(); };   /* fila 489 */
     return d;
   }
 

@@ -221,7 +221,7 @@ window.TipoEnLinea = (function () {
     controlNuevo = montar(caja, {
       prefijo: 'nuevo-tipo', rotulo: 'Tipo de asunto:', tipo: App.E.nuevo.tipo,
       categoria: function () { return App.categoriaDeLaParrilla ? App.categoriaDeLaParrilla() : null; },
-      alElegir: function (t) { App.elegirTipo(t); }
+      alElegir: function (t) { App.elegirTipo(t); App.irAlSiguienteHueco(); }   /* fila 489 */
     });
   };
 
