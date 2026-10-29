@@ -3,8 +3,10 @@
 > Copia exacta de `METODO-COMUN.md` del repositorio `fmargon780/metodo-apps`.
 > **No se edita aquí.** Cuando el método cambia, Claude sustituye este fichero entero en todas las
 > apps. Si una regla de este fichero choca con `CLAUDE.md` de la app, manda `CLAUDE.md` solo en lo
-> propio de la app (cómo se publica, ramas, revisor, pruebas propias); en todo lo demás manda
-> este fichero.
+> propio de la app (cómo se publica, ramas, revisores técnicos propios, pruebas propias); en todo
+> lo demás manda este fichero. El segundo revisor (apartado 6) se hace siempre, también en las
+> apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro revisor es técnico y
+> se suma, no lo sustituye.
 
 ## 1. Al empezar cada sesión (y nada más)
 
@@ -27,8 +29,10 @@ salvo que la instrucción lo pida.
    hace la usuaria y eso no está en el texto ni en la pantalla de prueba, no se programa: se
    pregunta (apartado 3.A).
 3. Lo de «Qué NO se hace en esta tarea» no se programa.
-4. Instrucciones antiguas con «Ficha del cambio»: se programa lo de la ficha, y lo que esté en
-   «Pendiente» no.
+4. Instrucciones antiguas con «Ficha del cambio»: mientras Francisco no decida otra cosa
+   (`PENDIENTE.md` del método), se programa lo de la ficha, y lo que esté en «Pendiente» no.
+   Si la instrucción trae una lista «Cómo sabemos que está bien» o la app pide escribirla, sirve
+   de guía al segundo revisor; nunca se le pide a Francisco.
 5. Las filas IDEA y EN DISEÑO no son trabajo: nunca se cogen, ni se marcan, ni se estiman, ni se
    mueven. «La primera PENDIENTE» se cuenta saltándolas.
 
@@ -37,6 +41,9 @@ salvo que la instrucción lo pida.
 **A. Pregunta para la persona** (Francisco u otra), solo en dos casos:
 - aparece algo que la instrucción no cubre y que **cambia lo que ve o hace la usuaria**;
 - el cambio sale **más del doble** de lo estimado.
+
+Una frase de lanzamiento o una regla de la app que diga «sin preguntarme nada» significa que la
+sesión va sola: en estos dos casos no decide ella, deja la fila BLOQUEADA como se explica abajo.
 
 Cómo se pregunta: en lenguaje llano, una sola pregunta, con las opciones numeradas y sus pros y
 contras, **sin marcar ninguna como recomendada**. Si la persona está en la conversación, se le
