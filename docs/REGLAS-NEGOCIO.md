@@ -48,3 +48,12 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   versiones previas: la app nunca deshace lo que se guardó (por ejemplo, un firmado).
 - (27-oct-2026, tema 477) Lo que llega **ya registrado por la bandeja electrónica** sigue entrando
   por la carpeta y «Es un documento nuevo».
+
+## Nuevo asunto y altas de personas
+
+- (29-oct-2026, tema 486) En «Nuevo asunto», al elegir un tipo o una persona, el cursor salta solo al
+  **siguiente hueco que falte** (persona, tipo, datos del asunto, «Crear el asunto»), en los dos
+  caminos, y ese hueco se ilumina un instante. Nunca se mueve mientras se escribe.
+- (29-oct-2026, tema 486) Las personas de **Alumnado y Personal** se dan de alta y se cambian con dos
+  casillas, **«Apellidos» y «Nombre»**; la app pone la coma. Lo guardado sigue siendo
+  «Apellidos, Nombre» en una sola línea. Empresas, Otros y Administraciones siguen con su casilla.
