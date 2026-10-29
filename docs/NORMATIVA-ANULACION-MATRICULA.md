@@ -1,172 +1,102 @@
-# Normativa: anulación, baja de oficio y traslado de matrícula — Andalucía
+# Anulación, baja de oficio y traslado de matrícula
 
-Estudio normativo cerrado el 29-oct-2026. Material de partida para diseñar el tipo (o los tipos)
-de asunto. No es una ficha: lo que se decida irá a `docs/REGLAS-NEGOCIO.md` y a la ficha.
-**El diseño está suspendido hasta que Francisco dé el estudio por bueno.**
+Normativa vigente a 29-oct-2026, ordenada por materias. Detrás de cada frase, la norma y el
+precepto de donde sale.
 
-Resumen por etapas:
-
-| Etapa | A petición del alumno o la familia | De oficio | Traslado |
-|---|---|---|---|
-| ESO | No existe | No existe (va por absentismo) | Sí, por Séneca |
-| Bachillerato | Sí, antes de fin de abril | Sí, pedir motivos antes del 31 de octubre | Sí, con autorización según trimestre |
-| FP (grados D y E) | Sí, «renuncia a matrícula» | Sí, con plazos y días fijados | Por la orden de admisión de FP |
+**Normas citadas**
+- **LOE**: Ley Orgánica 2/2006, de 3 de mayo, de Educación.
+- **LPAC**: Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común.
+- **O-ADM**: Orden de 20 de febrero de 2020 (admisión del alumnado, Infantil a Bachillerato).
+- **O-FP**: Orden de 18 de septiembre de 2025 (evaluación de FP, grados D y E).
+- **O-ABS**: Orden de 19 de septiembre de 2005 (Plan Integral de absentismo escolar).
 
 ---
 
-## 1. Bachillerato
+## 1. Bachillerato · Anulación a petición
 
-Norma: **Orden de 20 de febrero de 2020** (admisión, Infantil a Bachillerato), disposición
-adicional cuarta. Comprobado el 29-oct-2026: la **Orden de 31 de agosto de 2026** solo toca de
-esa orden los artículos 26 (solicitudes fuera de plazo) y 27 (plazo de matrícula y certificación);
-**la disposición adicional cuarta sigue igual**. (Las «anulaciones de matrícula» que cambia la
-orden de 2026 son las de música y danza, artes plásticas y enseñanzas artísticas superiores.)
+- La dirección del centro puede dejar sin efecto la matrícula de Bachillerato. [O-ADM, DA 4.ª, 1]
+- Lo pide el alumno o, si es menor, su padre, madre, tutor o guardador, mediante petición razonada. [O-ADM, DA 4.ª, 1]
+- Plazo: antes de que termine el mes de abril del curso. [O-ADM, DA 4.ª, 1]
+- Requisito: que las causas alegadas impidan al alumno asistir a clase. [O-ADM, DA 4.ª, 1]
+- Efecto: esa matrícula no cuenta para el número máximo de años de permanencia en Bachillerato. [O-ADM, DA 4.ª, 1]
 
-Texto de la disposición adicional cuarta (las normas no tienen derechos de autor):
+## 2. Bachillerato · Anulación de oficio
 
-> 1. La dirección de los centros docentes, a petición razonada del alumno o alumna o, si es menor
-> de edad, de su padre, madre, tutor o guardador, antes de finalizar el mes de abril de cada curso
-> y cuando las causas alegadas imposibiliten la asistencia del alumno o alumna a clase, podrá dejar
-> sin efecto su matrícula en bachillerato. En este caso, la matrícula no será computada a los
-> efectos del número máximo de años de permanencia en esta enseñanza.
->
-> 2. Asimismo, la dirección de los centros docentes, antes del 31 de octubre de cada año, deberá
-> recabar del alumnado que no se haya incorporado o que no asista a las actividades lectivas la
-> información precisa sobre los motivos que provocan tal circunstancia con objeto de dejar sin
-> efecto la matrícula en la citada enseñanza, en los casos que proceda, y poder matricular a otras
-> personas solicitantes. En el caso del alumnado menor de edad, la referida información se
-> recabará de sus representantes legales.
->
-> 3. Se considerará como causa justificada y, en consecuencia, no se dejará sin efecto la
-> matrícula, la ausencia del alumno o alumna por estar realizando estudios en el extranjero,
-> siempre que la fecha prevista de reincorporación sea dentro del año académico en curso o en el
-> siguiente.
+- Antes del 31 de octubre, la dirección **debe** pedir los motivos al alumnado que no se ha incorporado o no asiste a clase. [O-ADM, DA 4.ª, 2]
+- Si el alumno es menor, los motivos se piden a sus representantes legales. [O-ADM, DA 4.ª, 2]
+- Finalidad: dejar sin efecto la matrícula cuando proceda y poder matricular a otros solicitantes. [O-ADM, DA 4.ª, 2]
+- No se anula si la ausencia se debe a estudios en el extranjero con vuelta prevista este curso o el siguiente: es causa justificada. [O-ADM, DA 4.ª, 3]
 
-### 1.1 A petición
-- Pide: el alumno; si es menor, padre, madre, tutor o guardador. Petición razonada.
-- Plazo: antes de que acabe abril.
-- Requisito: causas que impidan asistir a clase. La norma no las enumera ni fija documentos: queda
-  a criterio de la dirección (en la práctica: enfermedad, trabajo, obligaciones familiares).
-- No hay modelo oficial de solicitud ni de resolución para Bachillerato en Andalucía.
-- Resuelve: la dirección.
-- Efecto: ese curso no cuenta para el máximo de años de permanencia.
+## 3. Garantías de cualquier anulación de oficio
 
-### 1.2 De oficio
-- Supuesto: no se ha incorporado o no asiste a clase.
-- Obligación de la dirección: antes del 31 de octubre, pedir los motivos (al alumno; si es menor,
-  a sus representantes legales).
-- Finalidad: dejar sin efecto la matrícula «en los casos que proceda» y liberar la plaza.
-- Excepción: estudios en el extranjero con vuelta este curso o el siguiente → no se anula.
-- La norma no fija número de faltas, plazo de respuesta, ni fecha tope para resolver. El 31 de
-  octubre es el tope para **pedir los motivos**.
+- La notificación lleva el texto íntegro de la resolución, si pone fin o no a la vía administrativa, los recursos, el órgano y el plazo. [LPAC, art. 40.2]
+- Se motivan los actos que limitan derechos de los interesados. [LPAC, art. 35.1.a]
+- Antes de resolver se da audiencia al interesado, por un plazo de 10 a 15 días hábiles. [LPAC, art. 82.1 y 82.2]
+- Contra la resolución de un órgano que no pone fin a la vía administrativa cabe recurso de alzada ante su superior. [LPAC, art. 121.1]
+- El recurso de alzada se interpone en un mes; la Administración tiene tres meses para resolverlo. [LPAC, art. 122.1 y 122.2]
 
-### 1.3 Garantías del procedimiento de oficio (Ley 39/2015)
-La norma de Bachillerato no las detalla; se aplican las generales. Como guía, la regulación de
-FP (apartado 3) es el procedimiento más parecido y completo de la propia Consejería:
-- Notificar al interesado (o a sus representantes) con constancia de la recepción (arts. 40-44).
-- Darle un plazo para incorporarse o justificar (en FP, hasta 10 días hábiles lectivos), que
-  hace de trámite de audiencia (art. 82: entre 10 y 15 días hábiles).
-- Resolución motivada de la dirección, notificada con pie de recursos.
-- Recurso de alzada ante la Delegación Territorial, en un mes (arts. 121-122); la Delegación
-  tiene tres meses para resolver. Es lo que fija FP expresamente y lo habitual para resoluciones
-  de la dirección; la disposición de Bachillerato no lo dice.
-- Después: anotarlo en Séneca y, si hay lista de espera, ofrecer la plaza.
+## 4. ESO · Faltas de asistencia
 
-## 2. ESO
+- La ESO no tiene anulación de matrícula: la DA 4.ª de la orden de admisión solo se refiere a Bachillerato. [O-ADM, DA 4.ª]
+- La enseñanza básica es obligatoria hasta los 16 años; se puede seguir en ESO en régimen ordinario hasta los 18, cumplidos en el año en que termina el curso. [LOE, art. 4.2]
+- Hay absentismo en ESO cuando las faltas sin justificar en un mes llegan a 25 horas de clase, o al 25 % de los días u horas lectivas. [O-ABS]
+- El absentismo se trata con el protocolo del centro y, si persiste, con derivación a los Servicios Sociales. [O-ABS y plan provincial de absentismo]
 
-- **No hay anulación de matrícula**, ni a petición ni de oficio. Es enseñanza básica y
-  obligatoria; la disposición adicional cuarta solo habla de Bachillerato.
-- **Faltas de asistencia → protocolo de absentismo.** Norma: Orden de 19 de septiembre de 2005
-  (Plan Integral de absentismo; modificada el 19-12-2005) y el plan provincial. Hay absentismo
-  cuando las faltas sin justificar en un mes llegan a 25 horas en ESO, o al 25 % de días u horas
-  lectivas. Pasos: tutoría y familia → jefatura de estudios / dirección → derivación a Servicios
-  Sociales (documento de derivación del plan provincial) → equipo técnico municipal o provincial.
-  El asunto no termina con una baja, sino con la reincorporación o la derivación.
-- **Mayores de 16:** la obligatoriedad acaba a los 16, pero se puede seguir en ESO en régimen
-  ordinario hasta los 18 cumplidos en el año en que acaba el curso (Ley Orgánica de Educación,
-  art. 4.2). No se ha encontrado norma andaluza que regule una «baja voluntaria» en ESO: en la
-  práctica se hace la baja en Séneca a petición del alumno o la familia. Si se quiere en la app,
-  se trata como petición documentada, sin plazo legal.
+## 5. FP · Renuncia a matrícula (a petición)
 
-## 3. FP de grados D y E (ciclos de grado básico, medio y superior)
+- Se puede renunciar a la matrícula una sola vez; no en el grado básico, por ser enseñanza básica. [O-FP, art. 8.1]
+- Se dirige a la dirección, por Secretaría Virtual o en la secretaría del centro. [O-FP, art. 8.2]
+- Plazo: al menos dos meses antes de la sesión de evaluación final de la primera convocatoria. [O-FP, art. 8.2]
+- Modelo de solicitud: anexo V. [O-FP, art. 8.2]
+- Antes del 15 de noviembre se puede renunciar sin dar motivos. [O-FP, art. 8.3]
+- Después, hace falta una de estas causas, con su documento: [O-FP, art. 8.3 y art. 7.3 y 7.6]
+  - a) enfermedad prolongada o accidente;
+  - b) trabajo en horario incompatible;
+  - c) cuidado de hijo menor de 9 años, o enfermedad grave u hospitalización de cónyuge o familiar hasta 2.º grado;
+  - d) cuidado de personas dependientes hasta 2.º grado;
+  - e) necesidades específicas de apoyo educativo;
+  - f) otras causas documentadas.
+- La dirección dicta propuesta de resolución en 10 días hábiles (anexo VII), publicada en el tablón y en Secretaría Virtual. [O-FP, art. 8.4]
+- 5 días hábiles de alegaciones; resolución definitiva en 5 días hábiles; notificación en 5 días hábiles. [O-FP, art. 8.4]
+- Se graba en Séneca como «Favorable» o «Desfavorable» y en los documentos como «Renuncia». [O-FP, art. 8.4]
+- Desde la resolución favorable, el alumno no se evalúa. [O-FP, art. 8.5]
+- No gasta convocatorias, pero pierde la reserva de plaza. [O-FP, art. 8.6]
+- No se devuelven los precios públicos. [O-FP, art. 8.7]
 
-Norma: **Orden de 18 de septiembre de 2025** (evaluación de FP grados D y E), arts. 8, 9 y 10,
-que desarrolla el art. 26 del Decreto 147/2025. Modificada el 11-02-2026 (art. 8.1) y sus anexos
-el 29-03-2026.
+## 6. FP · Anulación de oficio
 
-### 3.1 Renuncia a matrícula (a petición) — art. 8
-- Una sola vez. **No en grado básico** (es enseñanza básica).
-- Pide: el alumno o sus representantes. Dirigida a la dirección; por Secretaría Virtual o en el
-  centro.
-- Plazo: al menos dos meses antes de la sesión de evaluación final de la primera convocatoria.
-- Causas (las de la convocatoria extraordinaria, art. 7.3) con su documento: enfermedad o
-  accidente; trabajo incompatible; cuidado de hijo menor de 9 años o de familiares; cuidado de
-  dependientes; necesidades específicas de apoyo; otras documentadas. **Antes del 15 de
-  noviembre se puede renunciar sin motivo.**
-- Trámite: propuesta de resolución en 10 días hábiles (modelo del anexo VII), publicada en el
-  tablón y en Secretaría Virtual → 5 días hábiles de alegaciones → resolución definitiva en 5
-  días hábiles → notificación en 5 días hábiles. Se graba en Séneca como «Favorable» o
-  «Desfavorable»; en los documentos, «Renuncia».
-- Efectos: no gasta convocatorias; pierde la reserva de plaza; no se devuelven precios públicos.
-- Modelos oficiales: solicitud anexo V; resolución anexo VII.
+- Se inicia si, pasados 5 días hábiles desde el comienzo de las clases, el alumno no se incorpora o falta de forma injustificada y reiterada. [O-FP, art. 9.1]
+- Puede iniciarse hasta el 15 de noviembre (anexo VIII); la plaza pasa a la lista de espera. [O-FP, art. 9.1]
+- Después del 15 de noviembre, con al menos 45 días hábiles de faltas injustificadas en el conjunto de módulos. [O-FP, art. 9.1]
+- Grado básico: solo si consta aplicado el protocolo de absentismo (con aviso a servicios municipales e Inspección) y el intento fallido de comunicar con la familia. [O-FP, art. 9.2]
+- Virtual y semipresencial: más de 15 días naturales sin actividad en la plataforma (y, en semipresencial, 5 jornadas presenciales sin asistir). [O-FP, art. 9.3]
+- En 5 días hábiles, la dirección notifica la situación y da un plazo para incorporarse de 10 días hábiles lectivos como máximo. [O-FP, art. 9.4]
+- Si no se incorpora ni justifica con las causas del art. 7.3, la dirección resuelve la anulación y la notifica en 10 días hábiles. [O-FP, art. 9.5]
+- Efectos: pierde las convocatorias de esa matrícula y la reserva de plaza; en el expediente, «Anulación de Oficio». [O-FP, art. 9.6]
+- No se devuelven los precios públicos, salvo error de la Administración. [O-FP, art. 9.7]
 
-### 3.2 Anulación de oficio — art. 9
-- Inicio: pasados 5 días hábiles desde el comienzo de las clases, si no se incorpora o falta de
-  forma injustificada y reiterada. Se puede iniciar hasta el 15 de noviembre (modelo anexo VIII)
-  y la plaza pasa a la lista de espera.
-- Después del 15 de noviembre: con al menos 45 días hábiles de faltas injustificadas en el
-  conjunto de módulos.
-- Virtual y semipresencial: más de 15 días naturales sin entrar en la plataforma ni hacer tareas
-  (y, en semipresencial, 5 jornadas presenciales sin asistir).
-- **Grado básico:** solo si constan aplicado el protocolo de absentismo (con comunicación a
-  servicios municipales e Inspección) y el intento fallido de comunicar con la familia.
-- Trámite: en 5 días hábiles, la dirección notifica al alumno o representantes y da un plazo
-  para incorporarse de **10 días hábiles lectivos** como máximo → si no se incorpora ni justifica
-  (causas del art. 7.3), resolución de anulación → notificación en 10 días hábiles.
-- Efectos: pierde las convocatorias de esa matrícula y la reserva de plaza; observación
-  «Anulación de Oficio» en el expediente; sin devolución de precios (salvo error de la
-  Administración).
-- También se anula la matrícula duplicada (mismo módulo en dos ofertas o modalidades).
+## 7. FP · Recursos
 
-### 3.3 Recursos — art. 10
-Contra la resolución de la dirección de un centro público: recurso de alzada ante la Delegación
-Territorial en un mes; tres meses para resolver; pone fin a la vía administrativa.
+- Contra la resolución de renuncia o de anulación de oficio: recurso de alzada ante la Delegación Territorial, en un mes; pone fin a la vía administrativa. [O-FP, art. 10.1]
+- La Delegación tiene tres meses para resolver. [O-FP, art. 10.3]
 
-## 4. Traslado de matrícula a otro centro
+## 8. Traslado de matrícula
 
-### 4.1 Todas las etapas: cómo se hace en Séneca
-El **centro de destino** matricula al alumno; queda «pendiente de confirmación de traslado»; el
-**centro de origen** confirma el traslado y el alumno pasa a «trasladado a otro centro». El
-expediente viaja por Séneca. En ESO y Bachillerato se remite el historial académico y, si el
-curso ya ha empezado, el **informe personal por traslado**.
+- Bachillerato, 1.er trimestre: lo autoriza la dirección del centro y lo comunica a la Delegación. [O-ADM, DA 3.ª, 1]
+- Bachillerato, 2.º trimestre: lo autoriza la Delegación (misma provincia) o la Dirección General (otra provincia), con informe de Inspección. [O-ADM, DA 3.ª, 1]
+- Bachillerato, desde otra comunidad autónoma: lo autoriza la Dirección General. [O-ADM, DA 3.ª, 2]
+- Bachillerato, 3.er trimestre: no se autoriza, salvo los cambios de centro excepcionales del Decreto 21/2020. [O-ADM, DA 3.ª, 3]
+- ESO: no hay autorización previa; el alumno se matricula en el centro de destino.
+- Cómo se hace en Séneca (práctica, no norma): el centro de destino matricula; el de origen confirma el traslado; el expediente viaja por Séneca.
 
-### 4.2 Bachillerato — Orden de 20 de febrero de 2020, disposición adicional tercera
-- 1.er trimestre: lo autoriza la dirección del centro y lo comunica a la Delegación.
-- 2.º trimestre: lo autoriza la Delegación (misma provincia) o la Dirección General (otra
-  provincia), con informe de Inspección.
-- Desde otra comunidad: lo autoriza la Dirección General.
-- 3.er trimestre: no se autoriza, salvo los cambios de centro excepcionales del Decreto 21/2020
-  (disposición adicional quinta: violencia de género, acoso, etc.).
+---
 
-### 4.3 ESO
-Sin autorización previa: el traslado se produce al matricularse en el centro de destino (plaza
-por el procedimiento extraordinario de admisión si es a mitad de curso) y confirmarlo el de
-origen en Séneca.
+## Conclusiones
 
-### 4.4 FP
-Se rige por la Orden de 10 de julio de 2024 (admisión y matrícula en FP grados D y E). No se ha
-detallado aquí: si el centro tiene FP y se quiere un tipo de traslado de FP, se estudia aparte.
-
-## 5. Lo que no da la normativa (lo decide el centro o la app)
-- Modelos de solicitud y resolución para Bachillerato y ESO (solo FP tiene anexos oficiales).
-- Número de faltas que dispara la vía de oficio en Bachillerato.
-- Plazo de respuesta de la familia en Bachillerato (se puede tomar el de FP: 10 días hábiles
-  lectivos).
-
-## 6. Fuentes
-- Orden de 20 de febrero de 2020 (admisión): https://www.juntadeandalucia.es/boja/2020/503/1
-- Orden de 31 de agosto de 2026 (medidas de mejora; capítulo IV, admisión): https://www.juntadeandalucia.es/boja/2026/168/c03/2
-- Orden de 18 de septiembre de 2025 (FP grados D y E), texto consolidado: https://noticias.juridicas.com/base_datos/CCAA/972434-orden-desarrollo-educativo-y-formacion-profesional-18-sep-2025-ca-andalucia.html
-- Orden de 19-12-2005, que modifica la de 19-09-2005 (absentismo): https://www.juntadeandalucia.es/boja/2006/7/3
-- Normativa de escolarización FP (Junta): https://www.juntadeandalucia.es/educacion/portales/web/escolarizacion/formacion-profesional/normativa
-- Traslado de expedientes en Séneca (CEP): https://blogsaverroes.juntadeandalucia.es/cepercehel2/files/2022/12/2-Traslado_de_expedientes.pdf
+1. **Solo hay tres caminos de verdad**: Bachillerato a petición, Bachillerato de oficio y FP (renuncia y anulación de oficio). En ESO no se anula: se tramita absentismo.
+2. **Bachillerato de oficio tiene una fecha fija**: pedir los motivos antes del 31 de octubre. Todo lo demás (cuántas faltas, cuánto esperar la respuesta) no lo dice la norma.
+3. **Para esos huecos, el modelo es FP**: notificar, dar 10 días hábiles lectivos para volver o justificar, resolver y notificar en 10 días hábiles, con recurso de alzada en un mes. Así se cumplen también las garantías de la LPAC.
+4. **Bachillerato no tiene modelos oficiales**: solicitud, petición de motivos y resolución hay que crearlas como plantillas propias. FP sí los tiene (anexos V, VII y VIII).
+5. **Las fechas clave del curso**: 31 de octubre (Bachillerato de oficio), 15 de noviembre (FP de oficio y renuncia sin motivo), fin de abril (Bachillerato a petición).
+6. **El traslado es otro trámite**: no anula nada y tiene su propia regla por trimestres. Conviene que sea un tipo de asunto aparte.
+7. **Pendiente**: precisar el artículo exacto de la O-ABS que define el absentismo, y la regulación del traslado en FP, si el centro tiene FP.
