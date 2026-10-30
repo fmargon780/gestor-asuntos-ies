@@ -90,6 +90,9 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
   primer hito. El formulario se prepara desde cero cada vez que se entra, sin excepción, desde
   cualquiera de sus seis entradas (fila 220, `App.prepararNuevo`): nunca queda nada de la vez
   anterior, y la pastilla de categoría manda siempre sobre un tercero o tipo que ya no encaje.
+- Un tipo admite una o varias clases de tercero (fila 493, `categorias` en `tipos.json`; `categoria` = la primera;
+  se marcan en Ajustes → el tipo → «Clases de tercero»). En Nuevo asunto, un tipo elegido limita pastillas y buscador a
+  sus clases («TIPO admite: …»; sin pastilla «Todas»); el asunto guarda la clase del tercero elegido.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración» y «Secretaría con V.º B.º de Dirección» (fija, id `secretaria-vb-direccion`, fila 234; cuenta también al filtrar por Secretaría o Dirección), no personas. El responsable también puede ser «Una Administración…» dada de alta (`adm:<id>[:<dep>]` + `responsableNombre`; `js/responsable-organismo.js`, fila 205): nunca de Administración, el asunto espera a ese organismo. Vía y fecha límite.

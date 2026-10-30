@@ -588,7 +588,31 @@ var Nombres = (function () {
     return 'OTROS';
   }
 
+  /* Fila 493: las clases de tercero que admite un tipo, en el orden de CATEGORIAS. Un tipo sin
+     `categorias` (guardado antes de esta fila, o por otro ordenador) admite solo su `categoria`. */
+  function categoriasDe(t) {
+    var l = t && Array.isArray(t.categorias) ? t.categorias.filter(function (c) { return CATEGORIAS.indexOf(c) !== -1; }) : [];
+    if (!l.length) return [t && t.categoria ? t.categoria : 'OTROS'];
+    return CATEGORIAS.filter(function (c) { return l.indexOf(c) !== -1; });
+  }
+
+  function categoriasDeTipo(tipos, tipo) {
+    for (var i = 0; i < tipos.length; i++) {
+      if (U.normalizar(tipos[i].tipo) === U.normalizar(tipo)) return categoriasDe(tipos[i]);
+    }
+    return ['OTROS'];
+  }
+
+  /* Deja `categorias` puesta y `categoria` igual a la primera (lo que lee todo lo demás). */
+  function fijarCategorias(t, lista) {
+    t.categorias = CATEGORIAS.filter(function (c) { return lista.indexOf(c) !== -1; });
+    if (!t.categorias.length) t.categorias = [t.categoria || 'OTROS'];
+    t.categoria = t.categorias[0];
+    return t;
+  }
+
   return {
+    categoriasDe: categoriasDe, categoriasDeTipo: categoriasDeTipo, fijarCategorias: fijarCategorias,
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS, TEXTOS_CATEGORIA: TEXTOS_CATEGORIA,
     textoCategoria: textoCategoria, opcionesCategorias: opcionesCategorias, terceroTutor: terceroTutor,
     terceroAdministracion: terceroAdministracion,

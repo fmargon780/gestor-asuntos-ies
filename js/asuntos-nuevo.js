@@ -140,11 +140,29 @@ App.prepararNuevo = function () {
    buscador, la pastilla filtra también la parrilla de tipos
    (categoriaDeLaParrilla), así que aquí se repinta y se deja el
    cursor en el buscador de personas, justo debajo. */
+/* Fila 493: con un tipo elegido, solo salen las pastillas de las clases que ese tipo admite, y una línea
+   dice cuáles son. Sin tipo, todas. No hay pastilla «Todas»: ninguna pulsada ya busca en todas las
+   permitidas. */
+App.clasesPermitidasNuevo = function () {
+  var t = App.E.nuevo.tipo && App.E.tipos.filter(function (x) { return x.tipo === App.E.nuevo.tipo; })[0];
+  return t ? Nombres.categoriasDe(t) : Nombres.CATEGORIAS.slice();
+};
+
 App.pintarCategorias = function () {
   var caja = $('categorias-lista');
   caja.innerHTML = '';
+  var permitidas = App.clasesPermitidasNuevo();
+  var linea = $('categorias-admite');
+  if (linea) {
+    var hayTipo = !!App.E.nuevo.tipo;
+    linea.classList.toggle('oculto', !hayTipo);
+    linea.textContent = hayTipo
+      ? App.E.nuevo.tipo + ' admite: ' + permitidas.map(function (c) { return Nombres.textoCategoria(c, 'lista'); }).join(' · ') + '.'
+      : '';
+  }
   Nombres.CATEGORIAS.forEach(function (cat) {
-    var cuantos = App.tiposParaElegir().filter(function (t) { return t.categoria === cat; }).length;
+    if (permitidas.indexOf(cat) === -1) return;
+    var cuantos = App.tiposParaElegir().filter(function (t) { return Nombres.categoriasDe(t).indexOf(cat) !== -1; }).length;
     var b = document.createElement('button');
     b.className = 'categoria-boton' + (App.E.nuevo.categoria === cat ? ' elegido' : '');
     b.setAttribute('data-categoria', cat);
@@ -153,6 +171,16 @@ App.pintarCategorias = function () {
     b.onclick = function () { App.pulsarCategoriaNuevo(cat); };
     caja.appendChild(b);
   });
+};
+
+/* Fila 493: la clase que deja puesta un tipo recién elegido. Con persona elegida, la de la persona; con un
+   tipo de una sola clase, esa (como hasta ahora); con varias, la pastilla que ya hubiera si el tipo la
+   admite, o ninguna (se busca en todas las permitidas). */
+App.claseAlElegirTipo = function (t) {
+  if (App.E.nuevo.tercero) return App.E.nuevo.tercero.categoria;
+  var clases = Nombres.categoriasDe(t);
+  if (clases.length === 1) return clases[0];
+  return clases.indexOf(App.E.nuevo.categoria) !== -1 ? App.E.nuevo.categoria : null;
 };
 
 /* Pulsar una pastilla es una decisión explícita de categoría: manda
@@ -176,7 +204,7 @@ App.pulsarCategoriaNuevo = function (cat) {
     }
     if (App.E.nuevo.tipo) {
       var t = App.E.tipos.filter(function (x) { return x.tipo === App.E.nuevo.tipo; })[0];
-      if (!t || t.categoria !== nueva) App.E.nuevo.tipo = null;
+      if (!t || Nombres.categoriasDe(t).indexOf(nueva) === -1) App.E.nuevo.tipo = null;
     }
   }
   App.elegirCategoria(nueva);
@@ -237,7 +265,7 @@ App.pintarTipos = function () {
   caja.innerHTML = '';
   var categoriaPersona = categoriaDeLaParrilla();
   var deEsta = categoriaPersona
-    ? App.tiposParaElegir().filter(function (t) { return t.categoria === categoriaPersona; })
+    ? App.tiposParaElegir().filter(function (t) { return Nombres.categoriasDe(t).indexOf(categoriaPersona) !== -1; })
     : App.tiposParaElegir();   /* fila 422: sin los desactivados */
   caja.classList.toggle('tipos-todas-categorias', !categoriaPersona);
   if (!deEsta.length) {
@@ -250,6 +278,7 @@ App.pintarTipos = function () {
     var b = document.createElement('button');
     b.className = 'tipo-boton' + (App.E.nuevo.tipo === t.tipo ? ' elegido' : '');
     b.setAttribute('data-categoria', t.categoria);
+    var clasesDelTipo = Nombres.categoriasDe(t);
     /* `data-tipo`: el nombre de verdad, sin la categoría, para quien lo
        lea del DOM en vez del estado (js/tipos-buscador.js,
        js/tipos-organo.js, js/guias-enganche.js). `aria-hidden` en la
@@ -258,7 +287,7 @@ App.pintarTipos = function () {
        aunque se vea también la categoría. */
     b.dataset.tipo = t.tipo;
     b.innerHTML = U.escapar(t.tipo) +
-      (categoriaPersona ? '' : ' <small aria-hidden="true">' + U.escapar(t.categoria) + '</small>');
+      (categoriaPersona && clasesDelTipo.length === 1 ? '' : ' <small aria-hidden="true">' + U.escapar(clasesDelTipo.join(' · ')) + '</small>');   /* fila 493: cada tipo con sus clases */
     b.onclick = function () { App.elegirTipo(t); App.irAlSiguienteHueco(); };   /* fila 489 */
     caja.appendChild(b);
   });
@@ -274,9 +303,9 @@ App.pintarTipos = function () {
 App.elegirTipo = function (t) {
   var terceroActual = App.E.nuevo.tercero;
   var propuesto = App.E.nuevo.terceroPropuesto;
-  var seAplicaPropuesto = !terceroActual && propuesto && propuesto.categoria === t.categoria;
+  var seAplicaPropuesto = !terceroActual && propuesto && Nombres.categoriasDe(t).indexOf(propuesto.categoria) !== -1;
   App.E.nuevo.tipo = t.tipo;
-  App.elegirCategoria(t.categoria);
+  App.elegirCategoria(App.claseAlElegirTipo(t));
   App.E.nuevo.terceroPropuesto = null;
   App.pintarTipos();
   App.loPideNuevoControles = null;
@@ -311,7 +340,7 @@ App.nuevoAsuntoCon = function (opciones) {
   var tipoObj = opciones.tipo
     ? App.E.tipos.filter(function (t) { return t.tipo === opciones.tipo; })[0] || null
     : null;
-  var categoria = tercero ? tercero.categoria : (tipoObj ? tipoObj.categoria : null);
+  var categoria = tercero ? tercero.categoria : (tipoObj && Nombres.categoriasDe(tipoObj).length === 1 ? tipoObj.categoria : null);
 
   App.ir('nuevo');
   App.E.nuevo.viaInicial = opciones.viaInicial || null;
@@ -346,7 +375,8 @@ App.nuevoAsuntoCon = function (opciones) {
    App.elegirTipo; si ya estaba a la vista, se deja tal cual. */
 App.marcarTipoElegido = function (t) {
   App.E.nuevo.tipo = t.tipo;
-  if (!App.E.nuevo.tercero) App.elegirCategoria(t.categoria);
+  if (!App.E.nuevo.tercero) App.elegirCategoria(App.claseAlElegirTipo(t));
+  App.pintarCategorias();
   App.pintarTipos();
   App.actualizarLimiteNuevo();
   App.refrescarVista();
@@ -375,7 +405,8 @@ App.buscarTercero = async function () {
   caja.innerHTML = '<div class="explica">Buscando…</div>';
 
   var filtro = App.E.nuevo.categoria;
-  var categorias = filtro ? [filtro] : Nombres.CATEGORIAS.slice();
+  /* Fila 493: sin pastilla pulsada, se busca en las clases que admite el tipo elegido (todas si no hay tipo). */
+  var categorias = filtro ? [filtro] : App.clasesPermitidasNuevo();
   var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8);
   caja.innerHTML = '';
 

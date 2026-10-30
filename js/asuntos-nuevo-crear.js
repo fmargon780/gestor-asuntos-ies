@@ -131,7 +131,7 @@ App.faltaTipoOTercero = function () {
 /* ¿El tipo y la persona son de la misma categoría? Solo entonces se
    crea de un clic (fila 385). `tipo` es el objeto del tipo. */
 App.tipoEncajaConTercero = function (tipo, tercero) {
-  return !!(tipo && tercero && tipo.categoria === tercero.categoria);
+  return !!(tipo && tercero && Nombres.categoriasDe(tipo).indexOf(tercero.categoria) !== -1);
 };
 
 App.crearAsuntoDelFormulario = async function () {
@@ -320,7 +320,7 @@ App.crearAsuntoConPropuesta = async function (tipo, tercero, documentoSuelto) {
     return;
   }
   App.ir('nuevo');
-  App.elegirCategoria(tipo.categoria);
+  App.elegirCategoria(tercero.categoria);
   App.elegirTipo(tipo);
   App.fijarTercero(tercero);
   if (!App.E.nuevo.tipo) return;   /* fila 385: el tipo se descartó por el camino */

@@ -411,6 +411,10 @@ async function abrirCuadroDeEdicion(a, p, base) {
      de contacto (fila 66) y el departamento (fila 167, del organismo
      recién elegido, o se limpia si ya no es de Administraciones). */
   var elegido = controlesTercero.terceroElegido();
+  /* Fila 493: la clase guardada es la del tercero (elegido ahora, o el que ya tenía) si el tipo la admite; si no, la primera del tipo. */
+  var clasesDelTipo = Nombres.categoriasDeTipo(App.E.tipos, d.tipo);
+  var claseDelTercero = elegido ? elegido.categoria : (a.ficha && a.ficha.categoria);
+  if (claseDelTercero && clasesDelTipo.indexOf(claseDelTercero) !== -1) datos.categoria = claseDelTercero;
   if (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) datos.grupo = AsuntoDeGrupo.grupoRenombrado(a, elegido);   /* fila 293: sigue siendo un objeto */
   else if (elegido) datos.contacto = Datos.fotoDeContacto(elegido, elegido.categoria);
   var organismoNuevo = (elegido !== null && window.AdministracionesFicha)

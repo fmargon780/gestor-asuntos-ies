@@ -58,7 +58,7 @@ function construirSeccionDatos(tipo) {
   var lista = document.createElement('div');
   lista.className = 'lista';
   lista.appendChild(App.filaEstado('Nombre', tipo.tipo));
-  lista.appendChild(App.filaEstado('Categoría', tipo.categoria));
+  lista.appendChild(window.AjustesTipoClases ? AjustesTipoClases.filaDeTipo(tipo) : App.filaEstado('Categoría', tipo.categoria));   /* fila 493 */
   if (tipo.alias && tipo.alias.length) {
     lista.appendChild(App.filaEstado('Antes se llamó', tipo.alias.join(', ')));
   }
@@ -429,7 +429,7 @@ App.pintarTipoDeAsunto = async function () {
 
   var nombre = $('tipo-asunto-nombre'), categoria = $('tipo-asunto-categoria');
   if (nombre) nombre.textContent = tipo.tipo;
-  if (categoria) categoria.textContent = tipo.categoria;
+  if (categoria) categoria.textContent = Nombres.categoriasDe(tipo).join(' · ');   /* fila 493 */
 
   var col1 = $('tipo-asunto-col-1'), col2 = $('tipo-asunto-col-2');
   if (!col1 || !col2) return;
