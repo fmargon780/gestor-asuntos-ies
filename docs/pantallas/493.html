@@ -1,0 +1,176 @@
+<title>Prueba tema 492</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: barra lateral de la app + zona de trabajo a todo el ancho; dos pantallas (Ajustes de un tipo, Nuevo asunto) que comparten los datos. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-tinta:#1e7a46;
+  --barra:#1f4e79;--barra-tinta:#e8f0f8;--hover:#f0f3f7;
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --barra:#0f2235;--barra-tinta:#cfdcea;--hover:#222c37;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --barra:#0f2235;--barra-tinta:#cfdcea;--hover:#222c37;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.app{display:flex;min-height:100vh}
+nav{background:var(--barra);color:var(--barra-tinta);width:200px;flex:none;padding-block:16px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:12px;display:flex;flex-direction:column;gap:4px}
+nav .marca{font-weight:700;margin:0 8px 12px}
+nav button{font:inherit;text-align:left;background:none;border:0;color:inherit;padding:9px 10px;border-radius:8px;cursor:pointer;opacity:.85}
+nav button.activo{background:rgba(255,255,255,.14);opacity:1;font-weight:600}
+nav .prueba{margin-top:auto;font-size:12px;opacity:.7;padding:0 8px}
+main{flex:1;min-width:0;padding-block:18px;padding-left:20px;padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:21px;margin:0;text-wrap:balance}
+.cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.marca-categoria{font-size:12px;background:var(--azul-claro);color:var(--azul);border-radius:999px;padding:3px 10px;font-weight:600;letter-spacing:.02em}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:8px 14px;cursor:pointer}
+.boton:hover{background:var(--hover)}
+.boton-principal{background:var(--azul);color:#fff;border-color:var(--azul)}
+.boton-principal:disabled{opacity:.45;cursor:default}
+.boton:focus-visible,.pastilla:focus-visible,.tipo:focus-visible,.res:focus-visible,input:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.columnas{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.seccion{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px}
+.seccion h2{font-size:15px;margin:0 0 10px}
+.fila{display:grid;grid-template-columns:170px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--linea);align-items:start}
+.fila:first-of-type{border-top:0}
+.fila .r{color:var(--tinta-suave)}
+.clases{display:flex;flex-wrap:wrap;gap:6px 16px}
+.clases label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.clases input:disabled+span{color:var(--tinta)}
+.plegada{color:var(--tinta-suave);font-size:14px}
+.plegada div{padding:10px 0;border-top:1px solid var(--linea)}
+.plegada div:first-child{border-top:0}
+.bloque{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.bloque h2{font-size:15px;margin:0 0 10px}
+.pastillas{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pastilla{font:inherit;font-size:13px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:5px 12px;cursor:pointer}
+.pastilla.on{background:var(--azul);color:#fff;border-color:var(--azul)}
+input.campo{font:inherit;width:100%;border:1px solid var(--linea);border-radius:8px;padding:9px 12px;background:var(--papel);color:var(--tinta)}
+.resultados{margin-top:6px;display:flex;flex-direction:column}
+.res{font:inherit;text-align:left;background:none;border:0;border-top:1px solid var(--linea);padding:8px 4px;color:var(--tinta);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.res:hover{background:var(--hover)}
+.res small{color:var(--tinta-suave)}
+.elegido{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--azul-claro);border-radius:8px;padding:8px 12px}
+.parrilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.tipo{font:inherit;font-size:14px;text-align:left;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:8px;padding:10px 12px;cursor:pointer}
+.tipo small{display:block;color:var(--tinta-suave);font-size:12px;margin-top:2px}
+.tipo.on{border-color:var(--azul);box-shadow:0 0 0 1px var(--azul) inset;background:var(--azul-claro)}
+.nota{color:var(--tinta-suave);font-size:13px;margin:0 0 8px}
+.aviso-verde{background:var(--verde);color:var(--verde-tinta);border-radius:8px;padding:10px 12px;margin-top:10px}
+.pie{display:flex;justify-content:flex-end;gap:8px}
+@media (max-width:760px){.app{flex-direction:column}nav{width:auto;flex-direction:row;flex-wrap:wrap;padding-right:max(12px,env(safe-area-inset-right,0px))}nav .prueba{margin:0;width:100%}.columnas{grid-template-columns:1fr}.fila{grid-template-columns:1fr}main{padding-left:max(16px,env(safe-area-inset-left,0px))}}
+</style>
+
+<div class="app">
+  <nav>
+    <div class="marca">Gestor de asuntos</div>
+    <button id="ir-inicio" disabled style="opacity:.5">Inicio</button>
+    <button id="ir-nuevo">Nuevo asunto</button>
+    <button id="ir-ajustes" class="activo">Ajustes</button>
+    <div class="prueba">Pantalla de prueba · datos inventados · no se guarda nada</div>
+  </nav>
+  <main>
+    <section id="v-ajustes"></section>
+    <section id="v-nuevo" hidden></section>
+  </main>
+</div>
+
+<script>
+var CLASES=['ALUMNADO','TUTORES LEGALES','PERSONAL','EMPRESAS','OTROS','ADMINISTRACIONES'];
+var TXT={'ALUMNADO':'Alumnado','TUTORES LEGALES':'Tutores legales','PERSONAL':'Personal','EMPRESAS':'Empresas','OTROS':'Otros','ADMINISTRACIONES':'Administraciones'};
+var TIPOS=[
+ {tipo:'COMUNICACION RECIBIDA',clases:['OTROS'],quien:'Secretaría'},
+ {tipo:'SOLICITUD DE INFORME',clases:['ADMINISTRACIONES'],quien:'Dirección'},
+ {tipo:'MATRICULA',clases:['ALUMNADO'],quien:'Secretaría'},
+ {tipo:'EXPULSION DEL CENTRO',clases:['ALUMNADO'],quien:'Dirección'},
+ {tipo:'BAJA MEDICA',clases:['PERSONAL'],quien:'Secretaría'},
+ {tipo:'FACTURA',clases:['EMPRESAS'],quien:'Secretaría'},
+ {tipo:'CITA CON LA FAMILIA',clases:['TUTORES LEGALES'],quien:'Jefatura'}
+];
+var TERCEROS=[
+ {n:'Asociación Vecinal El Chorro',c:'OTROS'},{n:'Club Deportivo Alhaurín',c:'OTROS'},{n:'Parroquia de San Sebastián',c:'OTROS'},
+ {n:'Delegación Territorial de Desarrollo Educativo de Málaga',c:'ADMINISTRACIONES'},{n:'Ayuntamiento de Alhaurín el Grande',c:'ADMINISTRACIONES'},{n:'CEIP Los Llanos 29000123',c:'ADMINISTRACIONES'},
+ {n:'García Pérez, Lucía 1234567',c:'ALUMNADO'},{n:'Alcaide Ruiz, Mario 7654321',c:'ALUMNADO'},
+ {n:'Pérez Gil, María 4X7Z',c:'TUTORES LEGALES'},{n:'Moreno Ruiz, Antonio 8K2L',c:'PERSONAL'},
+ {n:'Papelería del Sur, S.L. B29123456',c:'EMPRESAS'}
+];
+var tipoAjustes=0;
+var N={clase:null,tipo:null,tercero:null,texto:'',creado:false};
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function lista(cl){return cl.map(function(c){return TXT[c]}).join(' · ')}
+function tipoDe(n){return TIPOS.filter(function(t){return t.tipo===n})[0]}
+
+function ir(v){
+  $('v-ajustes').hidden=v!=='ajustes';$('v-nuevo').hidden=v!=='nuevo';
+  $('ir-ajustes').classList.toggle('activo',v==='ajustes');$('ir-nuevo').classList.toggle('activo',v==='nuevo');
+  if(v==='nuevo'){N={clase:null,tipo:null,tercero:null,texto:'',creado:false};pintarNuevo()}else pintarAjustes();
+}
+$('ir-ajustes').onclick=function(){ir('ajustes')};$('ir-nuevo').onclick=function(){ir('nuevo')};
+
+function pintarAjustes(){
+  var t=TIPOS[tipoAjustes];
+  var opciones=TIPOS.map(function(x,i){return '<option value="'+i+'"'+(i===tipoAjustes?' selected':'')+'>'+esc(x.tipo)+'</option>'}).join('');
+  var casillas=CLASES.map(function(c){
+    var on=t.clases.indexOf(c)>=0, ultima=on&&t.clases.length===1;
+    return '<label title="'+(ultima?'Un tipo tiene siempre al menos una clase':'')+'"><input type="checkbox" id="cl-'+c.replace(' ','-')+'" data-c="'+c+'"'+(on?' checked':'')+(ultima?' disabled':'')+'><span>'+TXT[c]+'</span></label>'}).join('');
+  $('v-ajustes').innerHTML=
+   '<div class="cab"><button class="boton" id="volver">← Ajustes</button><h1>'+esc(t.tipo)+'</h1>'+
+   t.clases.map(function(c){return '<span class="marca-categoria">'+TXT[c]+'</span>'}).join('')+
+   '<span style="margin-left:auto" class="r"><label for="otro-tipo" class="nota" style="margin:0 6px 0 0">Ver otro tipo</label><select id="otro-tipo" class="boton">'+opciones+'</select></span></div>'+
+   '<div class="columnas"><div class="seccion"><h2>Datos del tipo</h2>'+
+     '<div class="fila"><span class="r">Nombre</span><span>'+esc(t.tipo)+'</span></div>'+
+     '<div class="fila"><span class="r">Clases de tercero</span><div class="clases">'+casillas+'</div></div>'+
+     '<div class="fila"><span class="r">Quién lo encarga</span><span>'+esc(t.quien)+'</span></div>'+
+     '<div class="fila"><span class="r">Reservado</span><span>No</span></div>'+
+   '</div><div class="seccion plegada"><div>▸ Campos del asunto</div><div>▸ Guía del procedimiento</div><div>▸ Al terminar el asunto</div><div>▸ Plazo</div><div>▸ Palabras clave</div><div>▸ Plazo de conservación</div></div></div>';
+  $('volver').onclick=function(){};
+  $('otro-tipo').onchange=function(e){tipoAjustes=+e.target.value;pintarAjustes()};
+  Array.prototype.forEach.call(document.querySelectorAll('.clases input'),function(i){
+    i.onchange=function(){var c=i.dataset.c;
+      if(i.checked){if(t.clases.indexOf(c)<0)t.clases.push(c)}else t.clases=t.clases.filter(function(x){return x!==c});
+      t.clases.sort(function(a,b){return CLASES.indexOf(a)-CLASES.indexOf(b)});pintarAjustes()}
+  });
+}
+
+function clasesPosibles(){ return N.tipo?tipoDe(N.tipo).clases:CLASES }
+function pintarNuevo(){
+  var v=$('v-nuevo');
+  if(N.creado){
+    v.innerHTML='<div class="cab"><h1>Nuevo asunto</h1></div><div class="aviso-verde">Asunto creado: '+esc(N.tipo)+' · '+esc(N.tercero.n)+' ('+TXT[N.tercero.c]+'). En la prueba no se guarda nada.</div><p><button class="boton" id="otro">Crear otro</button></p>';
+    $('otro').onclick=function(){ir('nuevo')};return;
+  }
+  var posibles=clasesPosibles();
+  if(N.clase&&posibles.indexOf(N.clase)<0)N.clase=null;
+  var pastillas=posibles.map(function(c){return '<button class="pastilla'+((N.clase===c||posibles.length===1)?' on':'')+'" data-c="'+c+'">'+TXT[c]+'</button>'}).join('');
+  var tercero;
+  if(N.tercero){
+    tercero='<div class="elegido"><span>'+esc(N.tercero.n)+' <small class="nota">· '+TXT[N.tercero.c]+'</small></span><button class="boton" id="quitar-t">Cambiar</button></div>';
+  } else {
+    var dentro=N.clase?[N.clase]:posibles, txt=N.texto.trim().toLowerCase();
+    var res=TERCEROS.filter(function(p){return dentro.indexOf(p.c)>=0&&(!txt||p.n.toLowerCase().indexOf(txt)>=0)});
+    tercero='<input class="campo" id="buscar" placeholder="Buscar persona, empresa u organismo…" value="'+esc(N.texto)+'">'+
+     '<div class="resultados">'+(res.length?res.map(function(p){var i=TERCEROS.indexOf(p);return '<button class="res" data-i="'+i+'"><span>'+esc(p.n)+'</span><small>'+TXT[p.c]+'</small></button>'}).join(''):'<p class="nota" style="margin-top:8px">Nadie con ese nombre en '+lista(dentro)+'.</p>')+'</div>';
+  }
+  var tiposVer=N.tercero?TIPOS.filter(function(t){return t.clases.indexOf(N.tercero.c)>=0}):
+               (N.clase?TIPOS.filter(function(t){return t.clases.indexOf(N.clase)>=0}):TIPOS);
+  var parrilla=tiposVer.map(function(t){return '<button class="tipo'+(N.tipo===t.tipo?' on':'')+'" data-t="'+esc(t.tipo)+'">'+esc(t.tipo)+'<small>'+lista(t.clases)+'</small></button>'}).join('');
+  v.innerHTML='<div class="cab"><h1>Nuevo asunto</h1></div>'+
+   '<div class="bloque"><h2>¿Para quién?</h2>'+(N.tipo?'<p class="nota">'+esc(N.tipo)+' admite: '+lista(posibles)+'.</p>':'')+
+     '<div class="pastillas">'+pastillas+'</div>'+tercero+'</div>'+
+   '<div class="bloque"><h2>Tipo de asunto</h2>'+(N.tipo&&!N.tercero?'':'')+'<div class="parrilla">'+parrilla+'</div></div>'+
+   '<div class="pie"><button class="boton boton-principal" id="crear"'+(N.tipo&&N.tercero?'':' disabled')+'>Crear el asunto</button></div>';
+  Array.prototype.forEach.call(v.querySelectorAll('.pastilla'),function(b){b.onclick=function(){if(posibles.length===1)return;N.clase=(N.clase===b.dataset.c)?null:b.dataset.c;if(N.tercero&&N.clase&&N.tercero.c!==N.clase)N.tercero=null;pintarNuevo()}});
+  Array.prototype.forEach.call(v.querySelectorAll('.res'),function(b){b.onclick=function(){N.tercero=TERCEROS[+b.dataset.i];pintarNuevo()}});
+  Array.prototype.forEach.call(v.querySelectorAll('.tipo'),function(b){b.onclick=function(){N.tipo=(N.tipo===b.dataset.t)?null:b.dataset.t;pintarNuevo()}});
+  var q=$('buscar');if(q){q.oninput=function(){N.texto=q.value;var p=q.selectionStart;pintarNuevo();var n=$('buscar');n.focus();n.setSelectionRange(p,p)}}
+  var qt=$('quitar-t');if(qt)qt.onclick=function(){N.tercero=null;pintarNuevo()};
+  $('crear').onclick=function(){N.creado=true;pintarNuevo()};
+}
+pintarAjustes();
+</script>

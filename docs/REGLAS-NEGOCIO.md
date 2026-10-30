@@ -57,3 +57,11 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (29-oct-2026, tema 486) Las personas de **Alumnado y Personal** se dan de alta y se cambian con dos
   casillas, **«Apellidos» y «Nombre»**; la app pone la coma. Lo guardado sigue siendo
   «Apellidos, Nombre» en una sola línea. Empresas, Otros y Administraciones siguen con su casilla.
+
+## Tipos de asunto y clases de tercero
+
+- (30-oct-2026, tema 492) Un tipo de asunto admite **una o varias clases de tercero**, marcadas en
+  sus Ajustes («Yo prefiero la 2»: no se duplica el tipo por clase). Al crear un asunto, el tercero
+  se elige **solo entre las clases permitidas** del tipo.
+- (30-oct-2026, tema 492) En «Nuevo asunto» **no hay pastilla «Todas»**: sin ninguna pulsada salen
+  las clases permitidas; una pastilla se fija pulsándola y se suelta pulsándola otra vez.
