@@ -40,7 +40,9 @@ App.admiteAlta = function (categoria) {
    botón por cada una que admita alta (App.botonAlta, con una sola
    categoría ya fijada, sigue igual que siempre). */
 App.botonesAlta = function (texto) {
-  return Nombres.CATEGORIAS.filter(App.admiteAlta).map(function (cat) {
+  /* Fila 493: solo las clases que admite el tipo elegido (todas si no hay tipo). */
+  var permitidas = App.clasesPermitidasNuevo();
+  return Nombres.CATEGORIAS.filter(function (c) { return App.admiteAlta(c) && permitidas.indexOf(c) !== -1; }).map(function (cat) {
     var b = document.createElement('button');
     b.className = 'boton';
     b.style.marginTop = '6px';

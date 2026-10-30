@@ -25,7 +25,7 @@ window.TipoEnLinea = (function () {
      `categoria`, si viene, limita la búsqueda a esa categoría. */
   function buscar(texto, categoria) {
     /* Fila 422: un tipo desactivado no se ofrece. */
-    var tipos = App.tiposParaElegir().filter(function (t) { return !categoria || t.categoria === categoria; });
+    var tipos = App.tiposParaElegir().filter(function (t) { return !categoria || Nombres.categoriasDe(t).indexOf(categoria) !== -1; });
     var deNombre = {};   /* nombre (o corto, o alias) -> tipos que lo llevan */
     tipos.forEach(function (t) {
       [t.tipo, t.nombreCorto].concat(t.alias || []).forEach(function (n) {
@@ -66,7 +66,7 @@ window.TipoEnLinea = (function () {
       estado.buscando = false;
       var t = objeto(estado.tipo);
       var marca = t
-        ? '<span class="resultado-categoria">' + U.escapar(t.categoria) + '</span>' +
+        ? '<span class="resultado-categoria">' + U.escapar(Nombres.categoriasDe(t).join(' · ')) + '</span>' +
           (t.desactivado ? ' <span class="suave tipo-marca-desactivado">Desactivado</span>' : '')
         : (estado.tipo ? ' <span class="suave">(no está en la lista)</span>' : '');
       caja.innerHTML = '<div class="elegido"><div class="elegido-caja">' +
@@ -121,7 +121,7 @@ window.TipoEnLinea = (function () {
           var d = document.createElement('div');
           d.className = 'resultado tipo-resultado';
           d.dataset.tipo = t.tipo;
-          d.innerHTML = U.escapar(t.tipo) + '<span class="resultado-categoria">' + U.escapar(t.categoria) + '</span>';
+          d.innerHTML = U.escapar(t.tipo) + '<span class="resultado-categoria">' + U.escapar(Nombres.categoriasDe(t).join(' · ')) + '</span>';
           d.onclick = function () { elegir(t); };
           lista.appendChild(d);
         });

@@ -203,7 +203,9 @@ var TiposUnir = (function () {
         }
         if (nombreNuevo !== a.nombre) await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreNuevo);
         var datosExtra = {
-          tipo: seQueda.tipo, categoria: seQueda.categoria,
+          tipo: seQueda.tipo,
+          /* fila 493: la clase del asunto es la de su tercero; solo cambia si el tipo que se queda no la admite */
+          categoria: (a.ficha && Nombres.categoriasDe(seQueda).indexOf(a.ficha.categoria) !== -1) ? a.ficha.categoria : seQueda.categoria,
           /* Fila 207: para que no se le ofrezca la guía nueva ni le
              lleguen sus pasos nuevos (js/hitos-sincronizar.js). */
           tipoUnidoDe: viejo

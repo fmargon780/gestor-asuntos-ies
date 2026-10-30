@@ -234,7 +234,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 
 | Fichero | Qué es |
 |---|---|
-| `tipos.json` | Tipos de asunto y su categoría. `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
+| `tipos.json` | Tipos de asunto y sus clases de tercero (fila 493: `categorias`, lista en el orden de `Nombres.CATEGORIAS`; `categoria` = la primera; sin `categorias` vale `[categoria]`: `Nombres.categoriasDe`). `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación de antes de la fila 129: ya no se enseñan, ni se editan, ni se cargan al entrar (fila 132: fuera su código); solo los lee una vez el paso único (`js/estado-migracion.js`). No se borra del Dropbox |
 | `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |

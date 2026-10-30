@@ -147,9 +147,10 @@ App.fijarTercero = function (p) {
      camino) deja de valer para esta persona: se olvida, en vez de
      dejar un asunto a medio montar con tipo y categoría distintos. */
   var tipoActual = App.E.tipos.filter(function (t) { return t.tipo === App.E.nuevo.tipo; })[0];
-  if (App.E.nuevo.tipo && (!tipoActual || tipoActual.categoria !== p.categoria)) {
+  if (App.E.nuevo.tipo && (!tipoActual || Nombres.categoriasDe(tipoActual).indexOf(p.categoria) === -1)) {   /* fila 493: un tipo se olvida solo si no admite su clase */
     App.E.nuevo.tipo = null;
   }
+  App.pintarCategorias();
   App.pintarTipos();
   var texto = App.textoTercero(p);
   $('resultados-tercero').innerHTML = '';

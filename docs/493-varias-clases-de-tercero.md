@@ -96,4 +96,11 @@ ha llegado un comunicado de una Administración.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (30-oct-2026, otro ayudante sin ver el código; app de demostración en Chromium):
+  - 1 Ajustes, seis casillas, solo Otros marcada y apagada: coincide.
+  - 2 Marcar Administraciones, cabecera «OTROS · ADMINISTRACIONES»: coincide. «Sigue marcada al recargar»: no lo ha podido ver (la demo no guarda); lo cubre la prueba `pruebas/varias-clases-de-tercero.mjs` (se relee de tipos.json y al reabrir el tipo).
+  - 3 Nuevo asunto con el tipo: solo pastillas Otros y Administraciones y la línea «admite»: coincide. Terceros de Otros en la demo: no los ha visto (no hay ninguno con esas letras); la prueba sí, con un Ayuntamiento. Un alumno no sale: coincide.
+  - 4 Pulsar/soltar Administraciones, sin «Todas»: coincide. 5 Persona primero, parrilla con clases debajo: coincide. 6 Crear: la ficha dice ADMINISTRACIONES: coincide. 7 Tipo de una clase como hoy: coincide.
+  - No coincidía y se corrigió: (a) el orden de las casillas (ahora el de la pantalla de prueba); (b) la marca del título de «Datos del tipo» no se ponía al día al marcar; (c) «Dar de alta» ofrecía clases que el tipo no admite (ahora solo las del tipo).
+  - La app hace sin que el texto lo pida: el aviso verde al guardar las casillas (igual que «Reservado»); se deja. Sin tocar, por idea aparte: los contadores por clase de la lista de Ajustes cuentan el tipo solo en su primera clase.
+  - No visto por el revisor: la persistencia al recargar (cubierta por la prueba) y los nombres exactos de Francisco (Delegación Territorial, Ayuntamiento).

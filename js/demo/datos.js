@@ -251,6 +251,11 @@
     elecciones.candidaturas = true;
     await App.guardarTipos();
 
+    /* Fila 493: un tipo de una sola clase (Otros) al que se le pueden marcar más en Ajustes. */
+    await crearTipoConGuia('COMUNICACION RECIBIDA', 'OTROS', [
+      { titulo: 'Registrar y archivar la comunicación', cuerpo: '<p>Dejar la copia en la carpeta.</p>', responsable: 'yo' }
+    ], null);
+
     var notas = null;
     if (window.Demo.hacer) {
       var idPlantilla = await Demo.hacer.crearPlantilla();

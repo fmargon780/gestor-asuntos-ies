@@ -245,7 +245,7 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
   var linea1 = document.createElement('div');
   linea1.className = 'tarjeta-tipo-linea';
   linea1.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(tipo.tipo) + '</span>' +
-    (mostrarCategoria ? '<span class="marca-categoria">' + U.escapar(tipo.categoria) + '</span>' : '') +
+    (mostrarCategoria ? '<span class="marca-categoria">' + U.escapar(Nombres.categoriasDe(tipo).join(' · ')) + '</span>' : '') +
     ((tipo.alias && tipo.alias.length)
       ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '') +
     (tipo.desactivado ? '<span class="marca-desactivado">Desactivado</span>' : '');
@@ -449,7 +449,7 @@ $('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
    nuevo" de Nuevo asunto (fila 128, js/tipo-al-vuelo.js): una sola
    forma de guardar un tipo, no dos. */
 App.crearTipo = async function (datos) {
-  var tipo = { tipo: datos.nombre, categoria: datos.categoria };
+  var tipo = { tipo: datos.nombre, categoria: datos.categoria, categorias: [datos.categoria] };   /* fila 493 */
   if (datos.nombreCorto) tipo.nombreCorto = datos.nombreCorto;
   if (datos.organo) tipo.organo = datos.organo;   /* fila 134 */
   await Borrados.revivir(App.E.gestor, 'tipos', datos.nombre);
