@@ -29,10 +29,11 @@ salvo que la instrucción lo pida.
    hace la usuaria y eso no está en el texto ni en la pantalla de prueba, no se programa: se
    pregunta (apartado 3.A).
 3. Lo de «Qué NO se hace en esta tarea» no se programa.
-4. Instrucciones antiguas con «Ficha del cambio»: mientras Francisco no decida otra cosa
-   (`PENDIENTE.md` del método), se programa lo de la ficha, y lo que esté en «Pendiente» no.
-   Si la instrucción trae una lista «Cómo sabemos que está bien» o la app pide escribirla, sirve
-   de guía al segundo revisor; nunca se le pide a Francisco.
+4. Instrucciones antiguas con «Ficha del cambio» (antes del 29-oct-2026): si la tarea no se ha
+   empezado y cambia lo que ve o hace la usuaria, no se programa; vuelve a IDEA para pasar por el
+   recorrido nuevo (decidido por Francisco el 30-oct-2026). Si ya estaba programada (DEVUELTA o a
+   medias), se termina con su ficha, y lo que esté en «Pendiente» no se programa. Una lista «Cómo
+   sabemos que está bien» sirve de guía al segundo revisor; nunca se le pide a Francisco.
 5. Las filas IDEA y EN DISEÑO no son trabajo: nunca se cogen, ni se marcan, ni se estiman, ni se
    mueven. «La primera PENDIENTE» se cuenta saltándolas.
 
