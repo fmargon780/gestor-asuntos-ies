@@ -79,7 +79,7 @@ await pagina.click('#tipo-al-vuelo-crear');
 await pagina.waitForSelector('#tipo-al-vuelo-panel.oculto', { state: 'attached' });
 
 await comprobar('el tipo se ha guardado, con su nombre corto',
-  tiposEnDisco('EVACUACION'), [{ tipo: 'EVACUACION', categoria: 'ALUMNADO', nombreCorto: 'EVAC' }]);
+  tiposEnDisco('EVACUACION'), [{ tipo: 'EVACUACION', categoria: 'ALUMNADO', categorias: ['ALUMNADO'], nombreCorto: 'EVAC' }]);
 await comprobar('queda elegido en Nuevo asunto',
   pagina.evaluate(() => App.E.nuevo.tipo), 'EVACUACION');
 await comprobar('su botón sale marcado en la parrilla',
