@@ -30,7 +30,8 @@ var AjustesTipoClases = (function () {
       });
     }
 
-    Nombres.CATEGORIAS.forEach(function (clase) {
+    /* El orden de la pantalla de prueba; lo guardado va siempre en el de Nombres.CATEGORIAS. */
+    ['ALUMNADO', 'TUTORES LEGALES', 'PERSONAL', 'EMPRESAS', 'OTROS', 'ADMINISTRACIONES'].forEach(function (clase) {
       var l = document.createElement('label');
       l.className = 'tipo-clases-casilla';
       var i = document.createElement('input');
@@ -70,6 +71,7 @@ var AjustesTipoClases = (function () {
   function marcar(tipo) {
     var m = document.getElementById('tipo-asunto-categoria');
     if (m) m.textContent = Nombres.categoriasDe(tipo).join(' · ');
+    if (window.AjustesPlegado && AjustesPlegado.resumirTipo) AjustesPlegado.resumirTipo();
   }
 
   return { filaDeTipo: filaDeTipo, marcar: marcar };

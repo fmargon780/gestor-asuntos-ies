@@ -168,7 +168,7 @@ var AjustesPlegado = (function () {
     if (window.ListaComprobacionTipo) ListaComprobacionTipo.pintar(tipo);
 
     ponerResumen(seccionDelTipo('datos'),
-      tipo.categoria + (tipo.nombreCorto ? ' · ' + tipo.nombreCorto : ''));
+      Nombres.categoriasDe(tipo).join(' · ') + (tipo.nombreCorto ? ' · ' + tipo.nombreCorto : ''));
 
     var campos = ((App.E.campos && App.E.campos.porTipo) || {})[tipo.tipo] || [];
     ponerResumen(seccionDelTipo('campos'), campos.length ? plural(campos.length, 'campo', 'campos') : 'ninguno');

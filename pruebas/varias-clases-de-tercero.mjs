@@ -61,7 +61,7 @@ await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
 await pagina.evaluate(() => document.querySelectorAll('#pantalla-tipo-asunto details').forEach((d) => { d.open = true; }));
 const casillas = () => pagina.locator('.tipo-clases-casilla input').evaluateAll((is) => is.map((i) => [i.getAttribute('data-clase'), i.checked, i.disabled]));
 await comprobar('1. seis casillas, solo OTROS marcada, y apagada', casillas(),
-  [['ALUMNADO', false, false], ['PERSONAL', false, false], ['EMPRESAS', false, false], ['OTROS', true, true], ['TUTORES LEGALES', false, false], ['ADMINISTRACIONES', false, false]]);
+  [['ALUMNADO', false, false], ['TUTORES LEGALES', false, false], ['PERSONAL', false, false], ['EMPRESAS', false, false], ['OTROS', true, true], ['ADMINISTRACIONES', false, false]]);
 await comprobar('1. la fila se llama «Clases de tercero»', pagina.locator('#pantalla-tipo-asunto .tipo-clases-fila .nombre-tipo').textContent(), 'Clases de tercero');
 await pagina.locator('.tipo-clases-casilla input[data-clase="ADMINISTRACIONES"]').check();
 await pagina.waitForTimeout(400);
@@ -95,6 +95,9 @@ await comprobar('2. solo las pastillas Otros y Administraciones', pastillas(), [
 await comprobar('2. la línea «admite»', pagina.locator('#categorias-admite').textContent(), 'COMUNICACION RECIBIDA admite: Otros · Administraciones.');
 await comprobar('2. sin pastilla «Todas»', pagina.locator('#categorias-lista').textContent().then((t) => /Todas/.test(t)), false);
 await comprobar('2. ninguna pastilla pulsada', pagina.locator('#categorias-lista .categoria-boton.elegido').count(), 0);
+await pagina.fill('#buscar-tercero', 'zzzz');
+await pagina.waitForSelector('#resultados-tercero .vacio');
+await comprobar('2. sin resultados, solo se ofrece dar de alta en las clases del tipo', pagina.locator('#resultados-tercero button').allTextContents(), ['+ Dar de alta en Otros', '+ Dar de alta en Administraciones']);
 await pagina.fill('#buscar-tercero', 'de');
 await pagina.waitForFunction(() => document.querySelectorAll('#resultados-tercero .resultado').length >= 2);
 await comprobar('2. el buscador busca solo en las dos clases', pagina.evaluate(() => window.__cats[window.__cats.length - 1]), ['OTROS', 'ADMINISTRACIONES']);
