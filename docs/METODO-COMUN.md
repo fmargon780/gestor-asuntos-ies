@@ -6,7 +6,8 @@
 > propio de la app (cómo se publica, ramas, revisores técnicos propios, pruebas propias); en todo
 > lo demás manda este fichero. El segundo revisor (apartado 6) se hace siempre, también en las
 > apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro revisor es técnico y
-> se suma, no lo sustituye.
+> se suma, no lo sustituye. Tampoco puede el `CLAUDE.md` de la app permitir pruebas que toquen los
+> datos reales (apartado 6.4).
 
 ## 1. Al empezar cada sesión (y nada más)
 
@@ -99,6 +100,13 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    BLOQUEADA con «ATASCO PARA CLAUDE».
 4. Pruebas: las que se necesiten para lo tocado, más una comprobación general de que lo que ya
    funcionaba sigue funcionando.
+   **Las pruebas nunca tocan los datos reales**: no se crea, cambia ni borra nada en los datos de
+   verdad para probar. Si la app tiene copia de prueba, se prueba allí; su copia de los datos se
+   saca de nuevo antes de probar, con los datos personales (nombres, teléfonos, correos,
+   direcciones, documentos de identidad) cambiados por otros inventados, y cifras, fechas,
+   productos e importes como están. Si no la tiene y algo solo se puede comprobar cambiando
+   datos, no se cambia: el revisor lo deja como «no lo he podido ver» y por qué. Esto manda
+   también sobre el `CLAUDE.md` de la app (decidido por Francisco el 30-oct-2026).
 5. **Una fila solo es HECHA cuando está en `main`, publicada y comprobada** en la dirección real.
    Después de publicar, el revisor mira la app publicada si puede entrar; si no puede, lo deja
    escrito. Si no se puede comprobar la publicación por una causa ajena, queda SIN PUBLICACIÓN
