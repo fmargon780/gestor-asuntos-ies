@@ -80,8 +80,20 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    misma vaya por ahí.
 3. Como mucho tres subidas por fila (EN CURSO, el cambio, HECHA), nunca fichero a fichero.
 4. Ningún fichero de código pasa de 400 líneas: el que haya que tocar y las pase, se parte antes.
-5. `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas; `docs/COLA.md`, de 40 KB. Lo cerrado va a
-   `docs/HISTORIA.md`. Se actualizan sustituyendo la línea vieja, no añadiendo otra debajo.
+5. **Tamaño de la cola y del resumen.** `docs/COLA.md` no pasa de 40 KB (40.000 bytes según
+   `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas. Se actualizan sustituyendo la línea
+   vieja, no añadiendo otra debajo.
+   **Al marcar una fila HECHA**, en esa misma subida, la sesión los mide (`wc -c docs/COLA.md`,
+   `wc -l docs/CONTEXTO-CORTO.md`) y, si alguno se pasa, lo reduce:
+   - **Cola:** las filas HECHA, SUSTITUIDA y DESCARTADA salen de la cola y pasan, con su texto
+     completo, a `docs/HISTORIA.md`. Las HECHA de hoy y de ayer se quedan un día más, porque el
+     Centro de mando saca de la cola su «Terminado hoy». Las notas largas de las filas que siguen
+     vivas se dejan en una línea; el detalle va a la instrucción de la fila. El formato de la cola
+     (columnas, estados al principio, enlaces a sesiones) no cambia: el Centro de mando la lee así.
+   - **Resumen:** lo que ya es pasado va a `docs/HISTORIA.md`; el detalle largo que sigue vigente
+     va a `docs/CONTEXTO.md`, y en el resumen queda una línea que remite a él.
+   - No se pierde ningún texto. Si `docs/HISTORIA.md` o `docs/CONTEXTO.md` no existen, se crean.
+   - Si no se puede bajar del límite sin quitar algo vigente, se dice en la nota de la fila.
 6. Estimación: en la subida que marca EN CURSO se pone al día `docs/ESTIMACIONES.md` (minutos de
    cada fila que queda). Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`.
 

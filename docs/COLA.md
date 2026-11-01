@@ -166,6 +166,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 468 | Aviso de usuario: mejora en «Ajustes» | SUSTITUIDA (27-oct-2026): diseñada en el tema 469 · enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1aMo0W_-KGoeYkdNKSyKwr_y4EKGtHWd0/view?usp=drivesdk |
 | 469 | Tema: aviso del script de correo fiable y con enlaces. Junta la idea 468: que el aviso «El envío de correo está anticuado» de Problemas salga solo cuando sea verdad (el 27-oct-2026 salió con el script ya al día, porque la app recordaba una versión vieja y no volvía a preguntar; se fue al pulsar «Probar»), y que, cuando sea verdad, traiga el enlace al código que hay que copiar, el enlace al proyecto de Google donde se pega y el paso de «Nueva versión». | SUSTITUIDA (27-oct-2026): diseñada; instrucción en la fila 471 (`docs/AVISO-SCRIPT-CORREO-FIABLE.md`) |
 | 470 | Tema: copia de prueba en el Centro de mando. Junta la idea 467: una casilla «copia de prueba» por app en el Centro de mando que, al marcarla, crea en la cola de esa app la tarea de montar su copia; por defecto, sin copia. Va en esta cola como las demás partes del Centro de mando. [toca a: metodo-apps] | DECIDIDA (27-oct-2026) · tema |
+| 498 | `docs/498-LIMPIAR-COLA-Y-RESUMEN.md` — tarea pequeña del método: la cola por debajo de 40 KB y el resumen por debajo de 160 líneas, sin perder texto | PENDIENTE (1-nov-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
