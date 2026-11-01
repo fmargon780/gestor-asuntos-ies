@@ -107,15 +107,8 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     COMPROBADA con estas mismas dos condiciones: **«la web sirve una versión posterior» solo vale
     si además el commit de la fila está en `main`.**
 
-20. **`docs/COLA.md` por debajo de 40 KB, siempre** (fila 226, `docs/COLA-POR-DEBAJO-DE-40-KB.md`).
-    Las filas **HECHA** (salvo las de hoy y las de ayer, que se quedan hasta el día siguiente para
-    el «Terminado hoy» del Centro de mando), **DESCARTADA** y **SUSTITUIDA** salen de la tabla; su
-    texto completo va a `docs/HISTORIA.md` (o a `docs/COLA-CERRADAS.md` si aquel se hace
-    inmanejable). Las notas largas de debajo de la tabla, igual: lo ya resuelto a
-    `docs/HISTORIA.md`, lo que sigue abierto, resumido en una o dos líneas aquí o en un documento
-    propio de `docs/` enlazado desde aquí. **Toda sesión que deje este documento por encima de
-    40 KB (`wc -c`) lo reduce en esa misma subida**, con estos mismos criterios; es una subida solo
-    de `docs/`, va directa a `main` (no publica nada).
+20. **Tamaño de esta cola y del resumen:** lo manda `docs/METODO-COMUN.md` 5.5 (se miden al marcar
+    cada fila HECHA). Es una subida solo de `docs/`, va directa a `main` (no publica nada).
 
 21. **Novedades visibles** (fila 248, `docs/NOVEDADES-AL-RECARGAR.md`). Al terminar una fila que
     cambia algo que se ve en pantalla, añade su línea al principio de `js/novedades.js` en el mismo
