@@ -51,4 +51,12 @@ acumulado del año actual y un acumulada desde el mes x al mes y?»
 - Las horas de una app coinciden con sus subidas de `docs/COLA.md`.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Programada desde la conversación del método, confirmado por Francisco el 2-nov-2026 («Lo vas a
+  programar aquí»). Publicada como versión 75 del Centro de mando.
+- Cambio sobre las notas de arriba: las pausas se descuentan con la línea «Tiempo activo: N min» en
+  la subida de cierre. Lo anterior cuenta como máximo 90 minutos por diseño; las reflexiones
+  anteriores no cuentan.
+- Coincide en pruebas con GitHub simulado: meses, año, tramo, flechas, avisos, fallos por app y 390 px.
+- Cálculo probado con mensajes reales: tema 94, 25 min; tema 65, 46 min; tema 86, 90 min.
+- No lo he podido ver: la página publicada con datos reales y la escritura real de
+  `docs/IMPORTANCIA-APPS.md`.
