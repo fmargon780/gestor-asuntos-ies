@@ -1,0 +1,136 @@
+<title>Tiempo por app</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Mismo aspecto que el Centro de mando: una sola tabla a todo el ancho */
+:root{
+  --ground:#f2f4f2; --panel:#ffffff; --ink:#1b2621; --muted:#5d6b64; --line:#d9e0dc;
+  --accent:#0b6b3a; --accent-soft:#e3f1e8;
+  --warn:#9a5b00; --warn-soft:#fdf0d9; --bad:#b3261e; --bad-soft:#fbe4e2;
+  --sans:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#121815; --panel:#1a221e; --ink:#e4ebe7; --muted:#9aa8a1; --line:#2c3732;
+    --accent:#5cc28a; --accent-soft:#1d3327;
+    --warn:#f0b35a; --warn-soft:#3a2c14; --bad:#f28b82; --bad-soft:#3d1f1d;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#121815; --panel:#1a221e; --ink:#e4ebe7; --muted:#9aa8a1; --line:#2c3732;
+  --accent:#5cc28a; --accent-soft:#1d3327;
+  --warn:#f0b35a; --warn-soft:#3a2c14; --bad:#f28b82; --bad-soft:#3d1f1d;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 20px;display:flex;flex-direction:column;gap:10px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
+h1{font-size:21px;margin:0;text-wrap:balance}
+.meta{color:var(--muted);font-size:13px}
+.lista{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:2px 14px}
+.fila{display:grid;grid-template-columns:2em minmax(130px,190px) minmax(0,1fr) 4.5em minmax(170px,1fr) auto;gap:4px 12px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.fila:first-child{border-top:0}
+.fila.cab{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:7px 0}
+.pos{font-family:var(--mono);font-weight:600;color:var(--accent)}
+.nom{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.barra{height:12px;background:var(--line);border-radius:3px;overflow:hidden;min-width:40px}
+.barra i{display:block;height:100%;background:var(--accent)}
+.fila.mal .barra i{background:var(--warn)}
+.horas{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.aviso{font-size:14px;min-width:0}
+.aviso span{display:inline-block;border-radius:6px;padding:1px 8px;background:var(--warn-soft);color:var(--warn);margin:1px 4px 1px 0}
+.aviso span.olvido{background:var(--bad-soft);color:var(--bad)}
+.flechas{display:flex;gap:4px}
+button{font:inherit;font-size:14px;line-height:1.3;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:2px 9px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.35;cursor:default}
+.periodo{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.grupo{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.chip{font-size:13px;padding:3px 9px}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.sel{font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+select{font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+@media (max-width:760px){
+  .fila.cab{display:none}
+  .fila{grid-template-columns:2em minmax(0,1fr) auto}
+  .barra{grid-column:2}
+  .horas{grid-column:3;grid-row:2}
+  .aviso{grid-column:2 / 4}
+  .flechas{grid-column:3;grid-row:1}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="titulo">Tus apps</h1>
+    <span class="meta" id="nota"></span>
+  </header>
+  <div class="periodo" id="periodo"></div>
+  <div class="lista" id="lista"></div>
+</div>
+
+<script>
+const MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre"];
+const H={
+ "NeXo":[8,10,7,12,6,5,4,9,11,8,6],
+ "Ausencias y Guardias":[0,0,2,3,4,6,2,3,9,7,4.5],
+ "Centro de datos":[0,0,0,0,2,3,1,6,8,5,3],
+ "Dieta familiar":[0,0,0,0,0,1,3,4,2,14,9],
+ "Gestor de asuntos":[3,5,6,4,7,9,2,8,12,4,1.5],
+ "Rúbricas de Inma":[0,0,0,0,0,0,0,2,3,6,.5],
+ "BD Alumnado":[4,3,2,5,6,8,3,5,4,1,0]
+};
+const BASE=Object.keys(H);
+const orden=MESES.map((_,i)=>i===9?["Dieta familiar",...BASE.filter(n=>n!=="Dieta familiar")]:BASE.slice());
+let vista={t:"mes",m:10}, desde=8, hasta=10;
+const el=(t,c,x)=>{ const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e; };
+const horas=h=>String(Math.round(h*10)/10).replace(".",",")+" h";
+const suma=(n,a,b)=>H[n].slice(a,b+1).reduce((x,y)=>x+y,0);
+function chip(txt,on,fn){ const b=el("button","chip",txt); b.type="button"; b.setAttribute("aria-pressed",on?"true":"false"); b.addEventListener("click",fn); return b; }
+function selector(id,val,lab){ const w=el("label","sel"); w.htmlFor=id; w.append(lab+" "); const s=el("select"); s.id=id; MESES.forEach((m,i)=>{ const o=el("option",null,m); o.value=i; s.append(o); }); s.value=val; s.addEventListener("change",()=>{ if(id==="desde") desde=+s.value; else hasta=+s.value; vista={t:"rango"}; pintar(); }); w.append(s); return w; }
+function pintarPeriodo(){
+  const p=document.getElementById("periodo"); const f=[];
+  const fm=el("div","grupo"); MESES.forEach((m,i)=>fm.append(chip(m.slice(0,3),vista.t==="mes"&&vista.m===i,()=>{ vista={t:"mes",m:i}; pintar(); })));
+  const fa=el("div","grupo"); fa.append(chip("Año 2026",vista.t==="ano",()=>{ vista={t:"ano"}; pintar(); }),selector("desde",desde,"Desde"),selector("hasta",hasta,"hasta"),chip("Ver",vista.t==="rango",()=>{ vista={t:"rango"}; pintar(); }));
+  f.push(fm,fa); p.replaceChildren(...f);
+}
+function pintar(){
+  pintarPeriodo();
+  const m=document.getElementById("lista"), t=document.getElementById("titulo"), nota=document.getElementById("nota");
+  const esMes=vista.t==="mes";
+  let a,b,nombre;
+  if(esMes){ a=b=vista.m; nombre=MESES[a]; }
+  else if(vista.t==="ano"){ a=0; b=10; nombre="Año 2026, hasta noviembre"; }
+  else { a=Math.min(desde,hasta); b=Math.max(desde,hasta); nombre="De "+MESES[a].toLowerCase()+" a "+MESES[b].toLowerCase(); }
+  t.textContent="Tus apps: "+nombre;
+  nota.textContent=esMes?"Simulación con números inventados. Cada mes guarda su propio orden. Arriba, la más importante.":"Simulación con números inventados. En un acumulado no hay orden de importancia: van de más a menos tiempo.";
+  if(vista.t==="rango"&&desde>hasta) nota.textContent="«Desde» iba después de «hasta»: se han cambiado de sitio. "+nota.textContent;
+  const lista=(esMes?orden[a]:BASE.slice().sort((x,y)=>suma(y,a,b)-suma(x,a,b))).map(n=>({n,h:suma(n,a,b)}));
+  const max=Math.max(...lista.map(x=>x.h),1);
+  const cab=el("div","fila cab");
+  ["","App","Tiempo en reflexión y diseño","","Qué pasa",""].forEach(x=>cab.append(el("div",null,x)));
+  const filas=[cab];
+  lista.forEach((x,i)=>{
+    const antes=esMes?lista.slice(0,i).find(y=>y.h<x.h):null;
+    const f=el("div","fila"+(antes?" mal":""));
+    f.append(el("span","pos",esMes?String(i+1):""),el("span","nom",x.n));
+    const br=el("div","barra"), r=el("i"); r.style.width=(100*x.h/max)+"%"; br.append(r); f.append(br);
+    f.append(el("span","horas",horas(x.h)));
+    const av=el("div","aviso");
+    if(antes) av.append(el("span",null,"Más tiempo que "+antes.n+", que es más importante"));
+    if(!x.h) av.append(el("span","olvido",(esMes&&a===10)?"Sin tocar desde hace 23 días":"Sin tocar en este periodo"));
+    f.append(av);
+    const fl=el("div","flechas");
+    if(esMes) [["▲",-1,"Subir "],["▼",1,"Bajar "]].forEach(([s,d,tt])=>{ const p=el("button",null,s); p.type="button"; p.setAttribute("aria-label",tt+x.n); p.disabled=i+d<0||i+d>=lista.length; p.addEventListener("click",()=>{ const o=orden[a]; [o[i],o[i+d]]=[o[i+d],o[i]]; pintar(); }); fl.append(p); });
+    f.append(fl);
+    filas.push(f);
+  });
+  m.replaceChildren(...filas);
+}
+pintar();
+</script>
