@@ -4,6 +4,6 @@ Lo escribe el «Centro de mando», vista «Tiempo por app». En cada mes, las ap
 
 ```json
 {
-  "2026-11":["ERP-Nutricion","ausencias-guardias-ies","gestor-asuntos-ies","centro-de-datos-ies","dieta-familiar","Focus_Lingo","Partituras-de-Caja-Clara","bd-alumnado-ies","club-tolox-corre","rubricas-inma","Cancionero-Parroquia","normativa-escolarizacion","comparador-listas","Disciplina-IES","migracion-dropbox-drive","erp-entidad-deportiva-gas","soporte-apps","actas-ciclo-inma"]
+  "2026-11":["ERP-Nutricion","ausencias-guardias-ies","gestor-asuntos-ies","centro-de-datos-ies","dieta-familiar","Focus_Lingo","Partituras-de-Caja-Clara","bd-alumnado-ies","club-tolox-corre","rubricas-inma","Cancionero-Parroquia","normativa-escolarizacion","comparador-listas","Disciplina-IES","actas-ciclo-inma","migracion-dropbox-drive","erp-entidad-deportiva-gas","soporte-apps"]
 }
 ```
