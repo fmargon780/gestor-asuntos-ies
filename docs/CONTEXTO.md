@@ -32,6 +32,7 @@ que cambie algo general).
 | `docs/contexto/CAMPOS-Y-TIPOS.md` | Los campos propios y calculados de cada tipo de asunto, y Ajustes de un tipo |
 | `docs/contexto/PANTALLA.md` | La cabecera fija, el refresco, la barra lateral, el tablón, el panel de lectura, la presencia |
 | `docs/contexto/FICHEROS-DEL-REPOSITORIO.md` | La tabla de todos los ficheros del repositorio, uno por uno |
+| `docs/contexto/QUE-ESTA-HECHO.md` | La lista completa de lo que ya está hecho, una línea por cosa (pasada del resumen en la fila 498) |
 
 **Por qué está partido así** (antes de la fila 65 esto era un único documento de 244 KB): tres
 averías de fichero (`docs/HISTORIA.md`) salieron de reescribir ficheros demasiado grandes para

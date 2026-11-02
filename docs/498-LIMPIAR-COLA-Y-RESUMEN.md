@@ -39,4 +39,5 @@ tratar la cola y el resumen juntos («1») y dijo que se hiciera («Adelante»).
 - Solo cambian ficheros de `docs/`: no se toca el código ni se publica la app.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (2-nov-2026, ayudante sin haber visto el trabajo): coincide todo: cola 26.696 bytes (<40.000); resumen 158 líneas (<=160); las 19 filas cerradas y las 2 notas largas (478 y 480) están idénticas en HISTORIA.md; ninguna fila viva cambia ni cambia el orden; la 499 (HECHA de hoy) se queda; lo quitado del resumen está en QUE-ESTA-HECHO.md (sección 5 entera, pasada tal cual) y el resumen remite a él; solo cambia docs/. No coincide: nada. No pudo ver: el reparto exacto entre los tres ficheros destino, ni ejecutar el lector del Centro de mando (el formato de la cola no cambia).
+- Decisión de Claude: las reglas propias del principio de la cola no se resumieron (no hacía falta para bajar del límite).
