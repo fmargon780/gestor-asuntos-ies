@@ -12,7 +12,11 @@ fuente: Times New Roman
 
 {{TABLA LIBROS DUPLICADO}}
 
+~
+
 {{TABLA LIBROS ALUMNO}}
+
+~
 
 {{TABLA LIBROS}}
 
