@@ -47,6 +47,14 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .docs{list-style:none;margin:0;padding:0;font-size:14px}
 .docs li{padding:7px 0;border-top:1px solid var(--linea);overflow-wrap:anywhere}
 .docs button{font:inherit;background:none;border:0;padding:0;color:var(--azul);cursor:pointer;text-align:left;text-decoration:underline}
+.elegido{background:var(--azul-claro);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-weight:600}
+.busca{display:grid;grid-template-columns:minmax(0,1fr) 124px;gap:6px}
+.busca input{font:inherit;width:100%;border:1px solid var(--linea);border-radius:8px;padding:8px 10px;background:var(--papel);color:var(--tinta)}
+.resultados{display:flex;flex-direction:column;max-height:260px;overflow-y:auto}
+.res{font:inherit;text-align:left;background:none;border:0;border-top:1px solid var(--linea);padding:7px 4px;color:var(--tinta);cursor:pointer}
+.res:hover{background:var(--hover)}
+.res small{color:var(--tinta-suave);display:block}
+.res-pie{font-size:13px;color:var(--tinta-suave);padding:6px 4px;border-top:1px solid var(--linea)}
 .vacio{color:var(--tinta-suave);font-size:14px;margin:0}
 .zona-hoja{min-width:0;overflow-x:auto}
 .hoja{background:var(--hoja);color:var(--hoja-tinta);font-family:var(--fuente-hoja);font-size:16px;line-height:1.35;width:100%;min-width:320px;max-width:760px;margin:0 auto;padding:30px 44px;border:1px solid var(--linea);box-shadow:0 2px 10px rgba(20,30,45,.1)}
@@ -83,8 +91,13 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
         </div>
       </div>
       <div id="caja-alumno">
-        <label class="r" for="alumno">Alumno</label>
-        <select id="alumno"></select>
+        <label class="r" for="buscar">Alumno</label>
+        <div class="elegido" id="elegido"></div>
+        <div class="busca">
+          <input id="buscar" type="search" autocomplete="off" placeholder="Nombre, apellidos, DNI o NIE">
+          <select id="unidad" aria-label="Unidad"></select>
+        </div>
+        <div class="resultados" id="resultados"></div>
       </div>
       <div id="caja-grupo" hidden>
         <label class="r" for="grupo">Grupo</label>
@@ -120,17 +133,41 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
    {id:'a4',nom:'Ortega Luque, Izan',pila:'Izan Ortega Luque',uni:'2º ESO B',nivel:'2º ESO',tut:'Juan Ortega Gil',dni:'',lib:['Física y Química','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas','Música'],sin:[]},
    {id:'a5',nom:'Romero Gil, Marta',pila:'Marta Romero Gil',uni:'1º BACH A',nivel:'1º Bachillerato',tut:'Elena Gil Ramos',dni:'45678901G',lib:[],sin:[]}
   ];
+  /* 600 alumnos inventados, para probar la búsqueda de verdad. */
+  var LIBROS={'1º ESO':L1.concat(['Religión Católica','Francés 2º Idioma']),'2º ESO':['Física y Química','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas','Música'],'3º ESO':['Biología y Geología','Física y Química','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas'],'4º ESO':['Geografía e Historia','Lengua Castellana','Inglés','Matemáticas'],'1º Bachillerato':[]};
+  var UNI=[];[['1º ESO','1º ESO'],['2º ESO','2º ESO'],['3º ESO','3º ESO'],['4º ESO','4º ESO']].forEach(function(n){'ABCD'.split('').forEach(function(l){UNI.push([n[0]+' '+l,n[1]])})});UNI.push(['1º BACH A','1º Bachillerato']);UNI.push(['1º BACH B','1º Bachillerato']);
+  var AP=['García','Martín','López','Sánchez','Pérez','Gómez','Ruiz','Díaz','Moreno','Muñoz','Álvarez','Romero','Navarro','Torres','Domínguez','Vázquez','Ramos','Gil','Serrano','Molina','Morales','Suárez','Ortega','Delgado','Castro'];
+  var NO=['Ana','Pablo','Lucía','Mario','Sara','Adrián','Julia','Daniel','Carmen','Álvaro','Paula','Diego','Irene','Javier','Marta','Rubén','Elena','Iván','Nerea','Sergio'];
+  var LETRA='TRWAGMYFPDXBNJZSQVHLCKE';
+  function dniDe(n){var c=10000000+n*137;return c+LETRA[c%23]}
+  A.forEach(function(a,i){a.doc=dniDe(i+1);a.nie=String(2100000+i*3)});
+  for(var n=0;n<594;n++){var u=UNI[n%UNI.length],ap1=AP[n%25],ap2=AP[(n*7+3)%25],no=NO[(n*3)%20];
+    A.push({id:'x'+n,nom:ap1+' '+ap2+', '+no,pila:no+' '+ap1+' '+ap2,uni:u[0],nivel:u[1],tut:'',dni:'',lib:LIBROS[u[1]].slice(),sin:[],doc:dniDe(n+10),nie:String(2101000+n*3)})}
   var $=function(i){return document.getElementById(i)};
-  var S={modo:'uno',ver:null,docs:[],num:1234};
+  var S={modo:'uno',ver:null,docs:[],num:1234,sel:null};S.sel=A[0];
   var HOY='3 de noviembre de 2026';
   var MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
   function fechaLarga(v){if(!v)return '';var p=v.split('-');return (+p[2])+' de '+MES[+p[1]-1]+' de '+p[0]}
-  function alu(){for(var i=0;i<A.length;i++)if(A[i].id===$('alumno').value)return A[i]}
+  function alu(){return S.sel}
+  function norm(t){return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
   function delGrupo(){return A.filter(function(a){return a.uni===$('grupo').value})}
 
-  A.forEach(function(a){var o=document.createElement('option');o.value=a.id;o.textContent=a.nom+' · '+a.uni;$('alumno').appendChild(o)});
-  ['1º ESO D','2º ESO B','3º ESO A'].forEach(function(g){var o=document.createElement('option');o.textContent=g;$('grupo').appendChild(o)});
+  var o0=document.createElement('option');o0.value='';o0.textContent='Todas';$('unidad').appendChild(o0);
+  UNI.forEach(function(u){var o=document.createElement('option');o.textContent=u[0];$('unidad').appendChild(o);var g=document.createElement('option');g.textContent=u[0];$('grupo').appendChild(g)});
+  $('grupo').value='3º ESO A';
+  function buscar(){
+    var t=norm($('buscar').value.trim()),u=$('unidad').value,c=$('resultados');
+    if(t.length<2&&!u){c.innerHTML='';return}
+    var pal=t?t.split(/\s+/):[];
+    var r=A.filter(function(a){if(u&&a.uni!==u)return false;var h=norm(a.nom+' '+a.doc+' '+a.nie);return pal.every(function(p){return h.indexOf(p)>=0})});
+    r.sort(function(x,y){return x.nom.localeCompare(y.nom,'es')});
+    var tope=u?r.length:30;
+    c.innerHTML=r.slice(0,tope).map(function(a){return '<button type="button" class="res" data-id="'+a.id+'">'+esc(a.nom)+'<small>'+esc(a.uni)+' · DNI '+a.doc+' · NIE '+a.nie+'</small></button>'}).join('')+
+      (!r.length?'<div class="res-pie">Ningún alumno coincide.</div>':r.length>tope?'<div class="res-pie">Hay '+r.length+'. Salen los 30 primeros: escribe más letras o elige la unidad.</div>':'');
+  }
+  $('buscar').oninput=buscar;$('unidad').onchange=buscar;
+  $('resultados').addEventListener('click',function(e){var b=e.target.closest('.res');if(!b)return;for(var i=0;i<A.length;i++)if(A[i].id===b.getAttribute('data-id'))S.sel=A[i];$('buscar').value='';$('unidad').value='';$('resultados').innerHTML='';S.ver=null;refrescar()});
 
   function pintarHoja(a,dup,fEntrega,fFirma){
     var filas=a.lib.map(function(l){return '<tr><td>'+esc(l)+'</td><td></td></tr>'}).join('');
@@ -160,6 +197,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 
   function refrescar(){
     var uno=S.modo==='uno';
+    $('elegido').textContent=S.sel.nom+' · '+S.sel.uni;
     $('modo-uno').classList.toggle('on',uno);$('modo-grupo').classList.toggle('on',!uno);
     $('caja-alumno').hidden=!uno;$('caja-grupo').hidden=uno;
     $('caja-dup').style.display=uno?'flex':'none';
@@ -188,7 +226,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   function cambio(){S.ver=null;refrescar()}
   $('modo-uno').onclick=function(){S.modo='uno';cambio()};
   $('modo-grupo').onclick=function(){S.modo='grupo';$('dup').checked=false;cambio()};
-  $('alumno').onchange=$('grupo').onchange=$('dup').onchange=$('fecha').oninput=cambio;
+  $('grupo').onchange=$('dup').onchange=$('fecha').oninput=cambio;
   $('generar').onclick=function(){
     var uno=S.modo==='uno',dup=uno&&$('dup').checked;
     var lista=(uno?[alu()]:delGrupo()).filter(function(a){return a.lib.length&&!a.sin.length});

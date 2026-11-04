@@ -9,6 +9,8 @@ Al diseñarlo (3-nov-2026): «Nos tenemos que centrar en el modelo de documento 
 - Esta tarea es **solo el documento**. El control de entrega, devolución y estado no entra (idea 366).
 - El Gestor lee los listados de libros de texto del Centro de datos.
 - Tipo de asunto nuevo, **FICHA ENTREGA LIBROS**, con la ficha como plantilla de Word. Sale para **un alumno** o para **un grupo** (el asunto de grupo que ya existe).
+- El alumno se elige en «Nuevo asunto» con el buscador de siempre: varias letras del nombre o los apellidos, o el DNI, o el NIE, y salen las coincidencias.
+- **Nuevo en ese buscador:** al buscar alumnado, un desplegable de unidad al lado, en todo «Nuevo asunto», no solo en este tipo. Con una unidad elegida salen sus alumnos **enteros**, sin tope y sin escribir nada; escribiendo, se acotan dentro de ella.
 - La ficha reproduce el modelo del centro:
   - Título «FICHA ENTREGA LIBROS 1º DE ESO» (con su nivel) y «CURSO 2026/27».
   - Recuadro con «Apellidos, Nombre» y la unidad.
@@ -44,11 +46,13 @@ Al diseñarlo (3-nov-2026): «Nos tenemos que centrar en el modelo de documento 
 - «Asignatura que no está en el listado» es la que no casa con ninguna fila del nivel, tenga o no libro. Una fila del listado sin libro casa y no sale en la ficha.
 - Las materias del alumno vienen del campo `materias` de `ALUMNADO-BD.json`, que ya pinta la ficha de la persona. Comprobar con el fichero de la demo; si no llegan, parar y preguntar.
 - Tabla de libros: `Docx.ponerTabla` (`js/docx-tabla.js`) pone cabecera y filas en un hueco nuevo. Hoy no hay otro hueco que haga falta para el tutor: no se añade ninguno de DNI.
+- Unidad en el buscador: `App.buscarTercero` y `Datos.buscar` (`js/asuntos-nuevo*.js`) tienen tope por categoría; con unidad elegida no se aplica. La pantalla de prueba enseña el buscador junto a la ficha solo para probarlo: en la app va en «Nuevo asunto».
 - Plantilla nueva en `plantillas/` (`.docx` y `.md`, como las demás) y su alta en «Cargar plantillas». Letra Times, como el modelo.
 - En `.md` de esa plantilla, dejar los dos textos (original y duplicado).
 - Sin datos reales en el repositorio: los modelos escaneados llevan nombres y DNI de alumnos y familias, y no se copian. Todo su texto está arriba.
 
 ## Cómo lo comprueba el segundo revisor
+- Buscador de «Nuevo asunto»: por letras, por DNI y por NIE salen las coincidencias; con la unidad elegida y sin escribir sale la unidad entera, también si pasa de 30.
 - Un alumno con Religión y Francés: su ficha sale con esas filas; otro sin ellas, sin esas filas.
 - Duplicado marcado: sale el recuadro, «recibió el <fecha>», la frase de la original extraviada y la fecha de hoy al pie.
 - Duplicado sin fecha: el botón no deja generar.
