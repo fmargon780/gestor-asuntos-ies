@@ -110,17 +110,27 @@ var Formularios = (function () {
     return Array.prototype.map.call(casillas, function (c) { return c.dataset.clave; });
   }
 
-  function engancharBuscador(editor) {
+  /* `soloMarcados` (fila 465, C4, el editor de un hito de guía): se ven los impresos marcados y,
+     al escribir en el buscador, los que coinciden; con el buscador vacío no sale la lista larga.
+     Marcar uno de los encontrados lo deja en los de este hito; quitar la marca a uno de los
+     marcados no lo esconde hasta la siguiente búsqueda (para poder deshacerlo). Todas las filas
+     siguen en el documento, marcadas o no, así que `leerEditor` lee lo mismo que siempre. */
+  function engancharBuscador(editor, soloMarcados) {
     if (!editor) return;
     var buscarInput = editor.querySelector('.formularios-buscar');
     var filas = editor.querySelectorAll('.formularios-fila');
     if (!buscarInput) return;
-    buscarInput.oninput = function () {
+    function filtrar() {
       var q = U.normalizar(buscarInput.value);
       Array.prototype.forEach.call(filas, function (fila) {
-        fila.classList.toggle('oculto', !!q && U.normalizar(fila.textContent).indexOf(q) === -1);
+        var coincide = !q || U.normalizar(fila.textContent).indexOf(q) !== -1;
+        if (!soloMarcados) { fila.classList.toggle('oculto', !coincide); return; }
+        var marcada = fila.querySelector('.formularios-casilla').checked;
+        fila.classList.toggle('oculto', !marcada && (!q || !coincide));
       });
-    };
+    }
+    buscarInput.oninput = filtrar;
+    if (soloMarcados) filtrar();
   }
 
   /* Para el editor de un hito de guía (js/guias.js, síncrono: nunca se
@@ -148,7 +158,7 @@ var Formularios = (function () {
      `.formularios-editor` (el `d` del hito, en js/guias.js). */
   function engancharEmbebido(raiz) {
     if (!raiz) return;
-    engancharBuscador(raiz.querySelector('.formularios-editor'));
+    engancharBuscador(raiz.querySelector('.formularios-editor'), true);   /* fila 465, C4 */
   }
 
   /* Para "Datos del tipo" (js/ajustes-tipo.js): async de verdad (no

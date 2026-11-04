@@ -112,6 +112,8 @@ var GuiasGuion = (function () {
         conRotulo('A quién', '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>', dentro) +
         conRotulo('Por dónde', '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>', dentro) +
         conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>', dentro) +
+        /* Fila 465, C1: «Ver y cambiar el texto» solo con una plantilla elegida (js/guias-plantilla.js). */
+        (window.GuiasPlantilla ? GuiasPlantilla.botonHTML(!r.plantilla) : '') +
         marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'generar') {
