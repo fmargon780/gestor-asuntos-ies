@@ -9,6 +9,8 @@ Al diseñarlo (3-nov-2026): «Nos tenemos que centrar en el modelo de documento 
 - Esta tarea es **solo el documento**. El control de entrega, devolución y estado no entra (idea 366).
 - El Gestor lee los listados de libros de texto del Centro de datos.
 - Tipo de asunto nuevo, **FICHA ENTREGA LIBROS**, con la ficha como plantilla de Word. Sale para **un alumno** o para **un grupo** (el asunto de grupo que ya existe).
+- Cómo se usa: por cada extravío, un asunto de ese alumno con su duplicado. En septiembre, asuntos de grupo: unidad o nivel, se elige cada vez, como ya permite el asunto de grupo (Francisco, 4-nov-2026: opción «se deja libre»). No se programa nada para esto.
+- La guía del tipo lleva un solo hito, «Generar la ficha».
 - El alumno se elige en «Nuevo asunto» con el buscador de siempre: varias letras del nombre o los apellidos, o el DNI, o el NIE, y salen las coincidencias.
 - **Nuevo en ese buscador:** al buscar alumnado, un desplegable de unidad al lado, en todo «Nuevo asunto», no solo en este tipo. Con una unidad elegida salen sus alumnos **enteros**, sin tope y sin escribir nada; escribiendo, se acotan dentro de ella.
 - La ficha reproduce el modelo del centro:
