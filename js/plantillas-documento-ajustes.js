@@ -89,7 +89,7 @@
       '<button type="button" class="boton boton-principal" id="tipo-pd-nueva" ' +
       'style="margin-top:10px">+ Nueva plantilla</button>' +
       '<hr>' +
-      '<label class="etiqueta">Huecos que se pueden usar en el Word</label>' +
+      '<label class="etiqueta">Campos variables que se pueden usar en el Word</label>' +
       '<p class="nota">Cópialos y pégalos donde haga falta, escritos igual, entre llaves.</p>' +
       '<div id="tipo-pd-huecos" class="rejilla-huecos"></div>';
 

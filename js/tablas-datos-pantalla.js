@@ -29,7 +29,7 @@
       '<div class="bloque-cuerpo">' +
         '<p class="explica" id="tablas-datos-tutorias-linea">Las tutorías se suben al Centro de datos.</p>' +
         '<p class="explica">Además, cualquier CSV o Excel de ' +
-        '<code>_GESTOR/datos/Tablas</code>. Se unen a cada persona por su DNI y sirven para los huecos ' +
+        '<code>_GESTOR/datos/Tablas</code>. Se unen a cada persona por su DNI y sirven para los campos variables ' +
         '<code>{{ESPECIALIDAD}}</code>, <code>{{TABLA TUTORIAS}}</code>, <code>{{DATO …}}</code> y <code>{{TABLA …}}</code>.</p>' +
         '<div id="tablas-datos-lista" class="lista"></div>' +
         '<button type="button" class="boton" id="tablas-datos-releer" style="margin-top:8px">Volver a leer</button> ' +

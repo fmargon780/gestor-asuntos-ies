@@ -98,14 +98,14 @@ await comprobar('3. marcar otra vez: vuelve el hueco', [/2100006/.test(await tex
 
 console.log('--- 4. lo marcado a mano ---');
 await seleccionar('la solicitud de beca');
-await comprobar('4. sale el menú con cuatro opciones', pagina.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un dato…', 'Cambiar por otro texto…', 'Esto se pregunta cada vez', 'Quitar del documento']);
+await comprobar('4. sale el menú con cuatro opciones', pagina.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un campo variable…', 'Cambiar por otro texto…', 'Esto se pregunta cada vez', 'Quitar del documento']);
 await pagina.locator('.cep-menu-sel button', { hasText: 'Esto se pregunta cada vez' }).click();
 await pagina.waitForSelector('#cep-nombre-dato');
 await comprobar('4. pide el nombre del dato', pagina.locator('#cuadro-titulo').textContent(), '¿Cómo se llama este dato?');
 await pagina.fill('#cep-nombre-dato', 'Nombre del tercero');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
-await comprobar('4. un nombre que ya es un dato no se crea', [(await avisos()).some((a) => /Ya hay un dato con ese nombre\. Elígelo en «Cambiar por un dato…»\.\|ambar/.test(a)), (await lineas()).some((l) => /Se pregunta cada vez/.test(l))], [true, false]);
+await comprobar('4. un nombre que ya es un dato no se crea', [(await avisos()).some((a) => /Ya hay un dato con ese nombre\. Elígelo en «Cambiar por un campo variable…»\.\|ambar/.test(a)), (await lineas()).some((l) => /Se pregunta cada vez/.test(l))], [true, false]);
 await seleccionar('la solicitud de beca');
 await pagina.locator('.cep-menu-sel button', { hasText: 'Esto se pregunta cada vez' }).click();
 await pagina.waitForSelector('#cep-nombre-dato');
@@ -118,12 +118,12 @@ await comprobar('4. aparece «Lo que has marcado tú» con esa línea y el hueco
   /\{campo:Para qué se presenta\}/.test(await textoDoc())], [1, true, true]);
 
 await seleccionar('el presente certificado');
-await pagina.locator('.cep-menu-sel button', { hasText: 'Cambiar por un dato…' }).click();
+await pagina.locator('.cep-menu-sel button', { hasText: 'Cambiar por un campo variable…' }).click();
 await pagina.waitForSelector('#huecos-buscar');
 await pagina.fill('#huecos-buscar', 'grupo');
 await pagina.keyboard.press('Enter');
 await pagina.waitForTimeout(2000);
-await comprobar('4. «Cambiar por un dato…» abre el buscador de huecos y cambia el trozo por el elegido', [
+await comprobar('4. «Cambiar por un campo variable…» abre el buscador de huecos y cambia el trozo por el elegido', [
   (await lineas()).some((l) => /el presente certificado → /.test(l)), /\{grupo\}/.test(await textoDoc())], [true, true]);
 
 /* Fila 322: «Cambiar por otro texto…» también aquí. */

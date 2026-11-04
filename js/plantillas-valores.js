@@ -260,7 +260,9 @@
       'correo del centro': delCentro.correo,
       cargo: datosCentro.cargo || '',
       consejeria: datosCentro.consejeria || I.POR_DEFECTO_CONSEJERIA || '',
-      campos: camposDelAsuntoDe(a)
+      campos: camposDelAsuntoDe(a),
+      /* Fila 510: los campos de lista del tipo y sus opciones, para los textos condicionales. */
+      camposLista: window.TextoCondicional ? TextoCondicional.listasPorNombre(tipoDelAsunto(a), a.ficha) : undefined
     };
     /* Fila 238: sin documento en el tercero, el campo «DNI para el certificado». */
     if (!valores.dni) {

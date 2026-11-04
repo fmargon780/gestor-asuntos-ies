@@ -228,7 +228,7 @@
        le faltan datos (fila 100). */
     U.aviso(
       resultado.faltan.length
-        ? 'Documento generado, con huecos sin dato: ' + resultado.faltan.join(', ') + '.'
+        ? 'Documento generado, con campos variables sin dato: ' + resultado.faltan.join(', ') + '.'
         : 'Documento generado: ' + nombreDoc,
       resultado.faltan.length ? 'ambar' : 'bueno');
 

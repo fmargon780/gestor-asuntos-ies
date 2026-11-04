@@ -24,10 +24,11 @@ var PlantillaSeleccion = (function () {
       while ((m = re.exec(texto))) {
         if (m.index > ultimo) frag.appendChild(document.createTextNode(texto.slice(ultimo, m.index)));
         var marca = document.createElement('mark');
-        marca.className = 'cep-hueco';
+        var condicion = /^\{si:/i.test(m[0]);   /* fila 510: la marca de un texto condicional, en morado y sin clic */
+        marca.className = condicion ? 'cep-condicion' : 'cep-hueco';
         marca.dataset.hueco = m[0];
         marca.textContent = m[0];
-        marca.onclick = function (ev) { ev.stopPropagation(); if (alClic) alClic(this.dataset.hueco); };
+        if (!condicion) marca.onclick = function (ev) { ev.stopPropagation(); if (alClic) alClic(this.dataset.hueco); };
         frag.appendChild(marca);
         ultimo = m.index + m[0].length;
       }
@@ -77,7 +78,7 @@ var PlantillaSeleccion = (function () {
   }
 
   /* El menú sobre la selección. `opc`: { documento: () => el documento pintado, activo: () => bool, conHuecos: bool,
-     opciones: (s) => [[texto, acción]] }. Devuelve { ocultar, hayMenu, destruir }. */
+     opciones: (s) => [[texto, acción, clase opcional]] }. Devuelve { ocultar, hayMenu, destruir }. */
   function montar(opc) {
     var menu = null;
 
@@ -96,6 +97,7 @@ var PlantillaSeleccion = (function () {
       opc.opciones(s).forEach(function (o) {
         var b = document.createElement('button');
         b.type = 'button'; b.textContent = o[0];
+        if (o[2]) b.className = o[2];
         b.onclick = function () { menu.style.visibility = 'hidden'; o[1](); window.getSelection().removeAllRanges(); };
         menu.appendChild(b);
       });
@@ -130,7 +132,7 @@ var PlantillaSeleccion = (function () {
 
   /* ---------- los cuadros pequeños ---------- */
 
-  /* «Cambiar por un dato…»: el buscador de huecos de siempre. `alElegir(hueco)`. */
+  /* «Cambiar por un campo variable…»: el buscador de huecos de siempre. `alElegir(hueco)`. */
   function cambiarPorUnDato(s, alElegir) {
     var viejo = document.getElementById('cep-hueco-temporal');
     if (viejo) viejo.remove();

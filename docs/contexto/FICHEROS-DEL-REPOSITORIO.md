@@ -301,6 +301,7 @@ de `App` va después del fichero que lo define.
 | `js/documentos-datos.js` | `DocumentosDatos` (fila 239): registro, campos y texto de cada documento con número, en `ficha.documentos`; `linea`/`lineaHTML` (fila 436) pintan la línea de datos de todas las listas de documentos |
 | `js/largo-de-rutas.js` | `LargoDeRutas` (fila 239): el bloque «Largo de las rutas» de Ajustes → El centro |
 | `js/word-faltan.js` | `WordFaltan` (fila 155): «Faltan datos para este documento», antes de guardar el Word |
+| `js/texto-condicional.js`, `js/texto-condicional-cuadro.js` | `TextoCondicional` y `TextoCondicionalCuadro` (fila 510): la marca `{si:Campo=Valor}` de las plantillas (qué párrafo sale, «[falta: Campo]», poner/cambiar la marca) y el cuadro «Texto condicional» |
 | `js/lib/docx-preview.min.js`, `js/lib/jszip.min.js`, `js/lib/html2canvas.min.js` | Librerías del visor de Word (fila 155): docx-preview 0.4.1 (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0), html2canvas 1.4.1 (MIT); se cargan al abrir el primer Word |
 | `js/tipos-organo.js` | Quién encarga cada tipo (`TiposOrgano`, fila 134): el dato `organo` de `tipos.json`, su desplegable en la pantalla de un tipo, el bloque de Ajustes «Quién encarga cada tipo», la parrilla agrupada de Nuevo asunto, el filtro «Lo encarga» y lo que usa Cuentas. Antes de `js/tipos-buscador.js` |
 | `js/reservados.js` | Los asuntos reservados (`Reservados`, fila 135): la única regla (`es`), la tarjeta tapada, lo que se deja buscar, «Mostrar reservados» (solo en la sesión), el candado y el menú de la ficha, la casilla del tipo |

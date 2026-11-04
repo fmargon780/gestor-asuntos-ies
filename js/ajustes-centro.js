@@ -107,11 +107,11 @@ App.editarTextoPorDefectoDocumento = async function (nombre) {
   var promesa = U.preguntar('Texto por defecto: ' + nombre,
     '<p class="explica">Se propone en el cuadro de "Cambiar el nombre" cuando el hito desde el que se ' +
     'añade el documento no trae ya el suyo propio (o al añadirlo sin ningún hito de por medio). ' +
-    'Admite los mismos huecos que una plantilla: {nombre} (el tercero), {curso}, {grupo}, {tipo}, ' +
+    'Admite los mismos campos variables que una plantilla: {nombre} (el tercero), {curso}, {grupo}, {tipo}, ' +
     '{campo:Nombre del campo}…</p>' +
     '<div class="etiqueta-con-boton">' +
       '<label class="etiqueta">Texto por defecto</label>' +
-      '<button type="button" class="boton boton-hueco" id="tdoc-insertar-hueco">Insertar hueco</button>' +
+      HuecosBuscador.recuadroInsertarHTML('tdoc-insertar-hueco') +
     '</div>' +
     '<input id="tdoc-texto-defecto" class="campo" value="' + U.escapar(textoActual) + '">' +
     '<div id="tdoc-texto-defecto-parecido" class="nota oculto"></div>',

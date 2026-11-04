@@ -453,7 +453,7 @@ App.pintarTipoDeAsunto = async function () {
   }
 
   var secCorreo = seccionDeTipo('correo', 'Plantillas de correo y de Séneca',
-    'Las plantillas pegadas a este tipo, con su editor de huecos.');
+    'Las plantillas pegadas a este tipo, con su editor de campos variables.');
   col2.appendChild(secCorreo.sec);
   var secWord = seccionDeTipo('word', 'Plantilla de documento de Word',
     'El .docx colgado de este tipo y su tipo de documento.');

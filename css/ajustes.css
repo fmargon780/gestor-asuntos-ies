@@ -466,3 +466,18 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
   color: #5f6b7a; background: #dfe3e8; border-radius: 4px; padding: 1px 6px;
 }
 .tipo-marca-desactivado { font-weight: 600; }
+
+/* Fila 510: el recuadro «Insertar» (Campo variable, Texto condicional) y el cuadro «Texto condicional». */
+.insertar-caja {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0; min-width: 0;
+  border: 1px solid var(--azul, #1f4e79); background: var(--azul-claro, #e8f0f8); border-radius: 10px; padding: 2px 10px 8px;
+}
+.insertar-caja legend {
+  font-size: 12px; font-weight: 700; color: var(--azul, #1f4e79); text-transform: uppercase; letter-spacing: .06em; padding: 0 4px;
+}
+.insertar-caja .boton { border-color: var(--azul, #1f4e79); color: var(--azul, #1f4e79); font-weight: 600; background: var(--papel, #fff); }
+.texto-cond-cuadro { z-index: 56; gap: 10px; padding: 12px; }
+.texto-cond-cuadro .texto-cond-fila .etiqueta { display: block; margin: 0 0 4px; }
+.texto-cond-cuadro select { width: 100%; }
+.texto-cond-botones { display: flex; gap: 8px; justify-content: flex-end; }
+.texto-cond-aviso:empty { display: none; }

@@ -108,6 +108,23 @@ var DocxSustituir = (function () {
     return salida;
   }
 
+  /* Fila 510 (textos condicionales): pone la marca `{si:Campo=Valor}` al principio del párrafo; si ya tenía una, la cambia. */
+  function ponerMarca(parrafo, marca) {
+    var segs = I.extraerTextos(parrafo);
+    if (!segs.length) return parrafo;
+    var originales = segs.map(function (s) { return I.decodificarEntidades(s.texto); });
+    var textos = originales.slice();
+    var previa = window.TextoCondicional && TextoCondicional.leerMarca(textos.join(''));
+    if (previa) ponerEnTramo(textos, 0, previa.largo, '');
+    textos[0] = marca + ' ' + textos[0];
+    var salida = parrafo;
+    for (var j = segs.length - 1; j >= 0; j--) {
+      if (textos[j] === originales[j]) continue;
+      salida = salida.slice(0, segs[j].inicio) + '<w:t xml:space="preserve">' + I.escaparXml(textos[j]) + '</w:t>' + salida.slice(segs[j].fin);
+    }
+    return salida;
+  }
+
   /* El texto de cada párrafo de un trozo de xml, en orden (es el índice que usa `quitarParrafos`). */
   function textosDeParrafos(xml) {
     var lista = [];
@@ -125,6 +142,7 @@ var DocxSustituir = (function () {
       indice++;
       if (quitar[indice]) return '';
       var nuevo = cambiarParrafo(p, op.cambios || [], veces);
+      if (esCuerpo && nuevo !== '' && op.condiciones && op.condiciones[indice]) nuevo = ponerMarca(nuevo, op.condiciones[indice]);
       /* Fila 322: el índice, en el original, de cada párrafo del cuerpo que sobrevive (para «Retocar»). */
       if (esCuerpo && op.sobrevivientes && nuevo !== '') op.sobrevivientes.push(indice);
       return nuevo;
@@ -140,7 +158,7 @@ var DocxSustituir = (function () {
 
   /* ---------- el .docx ---------- */
 
-  /* op: { cambios: [{ id, buscar, poner }], quitarParrafos: [índices del cuerpo], sinCabecera, membrete,
+  /* op: { cambios: [{ id, buscar, poner }], quitarParrafos: [índices del cuerpo], condiciones: { índice del cuerpo: '{si:Campo=Valor}' }, sinCabecera, membrete,
      sobrevivientes: [] (opcional: se llena con el índice original de cada párrafo del cuerpo que queda) }.
      Devuelve { bytes, blob, veces: { id: n } }. */
   async function aplicar(buffer, op) {

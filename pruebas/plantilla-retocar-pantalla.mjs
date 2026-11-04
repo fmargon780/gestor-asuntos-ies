@@ -88,7 +88,7 @@ await comprobar('1. ni propuestas del asistente ni datos de la plantilla', p.eva
 /* ---------- 2: cambiar ---------- */
 console.log('--- 2. cambiar por otro texto y deshacer ---');
 await seleccionar(p, 'el alunmo');
-await comprobar('2. el menú tiene las cinco opciones', p.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un dato…', 'Cambiar por otro texto…', 'Esto se pregunta cada vez', 'Quitar del documento', 'Quitar el párrafo entero']);
+await comprobar('2. el menú tiene las seis opciones', p.locator('.cep-menu-sel button').allTextContents(), ['Cambiar por un campo variable…', 'Cambiar por otro texto…', 'Esto se pregunta cada vez', 'Quitar del documento', 'Quitar el párrafo entero', 'Texto condicional…']);
 await opcion(p, 'Cambiar por otro texto…');
 await p.waitForSelector('#cep-texto-nuevo');
 await comprobar('2. el cuadro lleva el trozo escrito y «Antes»', p.evaluate(() => [document.getElementById('cuadro-titulo').textContent, document.getElementById('cep-texto-nuevo').value, document.getElementById('cuadro-cuerpo').textContent.indexOf('Antes: el alunmo') !== -1, document.getElementById('cuadro-aceptar').textContent]), ['Cambiar este texto', 'el alunmo', true, 'Cambiar']);
@@ -113,12 +113,12 @@ await opcion(p, 'Quitar del documento');
 await p.waitForTimeout(1500);
 await comprobar('3. «Quitar del documento» quita solo esa palabra', [/documentación/.test(await textoDoc(p)), /presentar su antes del 30/.test(await textoDoc(p)), /Se informa de que/.test(await textoDoc(p))], [false, true, true]);
 await seleccionar(p, 'Localidad de pruebas');
-await opcion(p, 'Cambiar por un dato…');
+await opcion(p, 'Cambiar por un campo variable…');
 await p.waitForSelector('#huecos-buscar');
 await p.fill('#huecos-buscar', 'grupo');
 await p.keyboard.press('Enter');
 await p.waitForTimeout(1800);
-await comprobar('3. «Cambiar por un dato…»: queda su hueco resaltado', p.evaluate(() => [...document.querySelectorAll('#retocar-plantilla mark.cep-hueco')].map((m) => m.textContent).filter((t) => /grupo/.test(t)).length), 1);
+await comprobar('3. «Cambiar por un campo variable…»: queda su hueco resaltado', p.evaluate(() => [...document.querySelectorAll('#retocar-plantilla mark.cep-hueco')].map((m) => m.textContent).filter((t) => /grupo/.test(t)).length), 1);
 await seleccionar(p, 'Se informa de que');
 await opcion(p, 'Esto se pregunta cada vez');
 await p.waitForSelector('#cep-nombre-dato');
@@ -127,7 +127,7 @@ await p.click('#cuadro-aceptar');
 await p.waitForTimeout(1500);
 await comprobar('3. «Esto se pregunta cada vez» deja su campo', [(await lineas(p)).some((l) => /Se pregunta cada vez: Quién informa/.test(l)), /\{campo:Quién informa\}/.test(await textoDoc(p))], [true, true]);
 await seleccionar(p, '{{NOMBRE NATURAL}}');
-await comprobar('3. un hueco entero también se puede seleccionar', p.locator('.cep-menu-sel button').count(), 5);
+await comprobar('3. un hueco entero también se puede seleccionar', p.locator('.cep-menu-sel button').count(), 6);
 await p.keyboard.press('Escape');
 
 console.log('--- 4. cancelar ---');

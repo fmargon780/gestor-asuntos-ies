@@ -78,3 +78,7 @@ body.con-cep { overflow: hidden; }
 .cer-x { flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: #667; font: inherit; padding: 0 4px; border-radius: 4px; }
 .cer-x:hover { background: #fde6e6; color: #a33; }
 .cer-pie-nota { margin-top: 18px; color: #667; }
+
+/* Fila 510 (textos condicionales): la marca {si:…} en morado y la opción nueva del menú en azul. */
+.cep-condicion { background: #e9e3f7; color: #4b2f8a; border-radius: 3px; padding: 0 3px; font-family: ui-monospace, Consolas, monospace; font-size: .9em; }
+.cep-menu-sel button.cep-menu-nuevo { color: #1f4e79; font-weight: 700; border-top: 1px solid #c9d2dd; border-radius: 0 0 4px 4px; margin-top: 2px; }
