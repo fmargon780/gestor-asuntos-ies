@@ -88,3 +88,18 @@ tenga tutorías en dos cursos distintos.
 
 Cuenta en `docs/CONTEXTO-CORTO.md`, en una línea, que el tutor y las tutorías vienen
 solo del Centro de datos. Marca la fila 376 HECHA como siempre.
+
+## Revisión y respuestas durante el trabajo
+
+Segundo revisor (4-nov-2026, ayudante nuevo, solo con la pantalla de prueba `?demo=1`): APROBADA, sin ningún MAL.
+
+- Correo de 4º A: «+ Tutor/a de 4º A» pone el correo de Otero Campos, Marta — coincide.
+- Correo de 2º B: pone los dos tutores — coincide.
+- Correo de 1º C (sin tutor): botón apagado y aviso «No sé quién es el tutor o tutora de 1º C. Las tutorías se suben al Centro de datos.» — coincide.
+- «Tablas de datos»: fila «Tutorías: 7 filas · cursos 2025/2026, 2026/2027 · vienen del Centro de datos» — coincide.
+- «Tablas de datos»: sin subida del PDF de tutorías, sale «Las tutorías se suben al Centro de datos.»; las demás tablas siguen igual — coincide.
+- Consola sin errores; Inicio, Nuevo asunto, Archivo, Personas y empresas, Ajustes y Herramientas abren; crear, abrir y archivar un asunto funciona — coincide.
+- Certificado de función tutorial con dos cursos: no lo he podido ver en la pantalla de prueba (no hay plantilla de ese certificado en la copia de pruebas). Lo cubre `pruebas/tutor-desde-el-centro-de-datos.mjs`, que pasa en verde.
+- Plegable «Datos de las tablas» en la ficha de Personas y empresas: no aparece en las fichas de Personal (Otero Campos, Reyes Palma, Uceda Molina, Cabello Ruiz). No lo pide esta instrucción (el plegable es de la fila 110 y se pinta en la ficha del tercero, `ficha-tercero.js`); no lo he podido ver y queda sin tocar.
+- PDF suelto de un curso que falta (aviso ámbar): [SOLO FRANCISCO], no comprobado.
+- Extras que la app hace sin que el texto lo pida: ninguno nuevo de este cambio.
