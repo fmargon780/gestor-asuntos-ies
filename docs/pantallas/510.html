@@ -1,0 +1,231 @@
+<title>Párrafos según el asunto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: cabecera del asunto; a la izquierda los datos del asunto, a la derecha lo que sale (Word, correo) o la plantilla con sus marcas. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --hover:#f0f3f7;--sobre-azul:#fff;--marca-fondo:#e9e3f7;--marca-tinta:#4b2f8a;
+  --hoja:#fff;--hoja-tinta:#111;--falta:#ffe9a8;
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --fuente-hoja:"Times New Roman",Times,"Liberation Serif",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --hover:#222c37;--sobre-azul:#10202f;--marca-fondo:#2c2442;--marca-tinta:#c9b6f2;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --hover:#222c37;--sobre-azul:#10202f;--marca-fondo:#2c2442;--marca-tinta:#c9b6f2;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0 0 10px}
+.cab{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:12px}
+h1{font-size:21px;margin:0;text-wrap:balance}
+.etq{font-size:12px;background:var(--azul-claro);color:var(--azul);border-radius:999px;padding:3px 10px;font-weight:600;letter-spacing:.02em}
+.columnas{display:grid;grid-template-columns:minmax(290px,380px) minmax(0,1fr);gap:14px;align-items:start}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font-size:15px;margin:0}
+.dato label{display:block;font-size:13px;color:var(--tinta-suave);margin-bottom:4px}
+.dato .lista{font-size:11px;color:var(--tinta-suave);margin-left:6px;text-transform:uppercase;letter-spacing:.05em}
+select,input{font:inherit;width:100%;border:1px solid var(--linea);border-radius:8px;padding:8px 10px;background:var(--papel);color:var(--tinta)}
+.dato.vacio select{border-color:var(--ambar-linea);background:var(--ambar)}
+.separa{border-top:1px solid var(--linea);padding-top:10px;font-size:12px;color:var(--tinta-suave);text-transform:uppercase;letter-spacing:.06em}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.pestanas{display:flex;flex-wrap:wrap;gap:6px}
+.pestana{font:inherit;font-size:14px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:8px;padding:7px 12px;cursor:pointer}
+.pestana:hover{background:var(--hover)}
+.pestana[aria-selected="true"]{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul);font-weight:600}
+.aviso{border-radius:8px;padding:9px 12px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.zona{min-width:0;overflow-x:auto}
+.hoja{background:var(--hoja);color:var(--hoja-tinta);font-family:var(--fuente-hoja);font-size:15.5px;line-height:1.4;max-width:780px;min-width:300px;margin:0 auto;padding:28px 36px;border:1px solid var(--linea);border-radius:4px}
+.hoja h3{font-size:16px;text-align:center;margin:0 0 12px;letter-spacing:.02em}
+.hoja h4{font-size:14px;margin:16px 0 4px;letter-spacing:.04em}
+.hoja p{margin:6px 0;text-align:justify}
+.falta{background:var(--falta)}
+.correo{background:var(--hoja);color:var(--hoja-tinta);font-family:var(--fuente);font-size:14.5px;line-height:1.5;max-width:780px;margin:0 auto;padding:18px 22px;border:1px solid var(--linea);border-radius:8px}
+.correo .asunto{font-weight:600;border-bottom:1px solid #ccd;padding-bottom:8px;margin-bottom:10px}
+.correo p{margin:8px 0}
+.plantilla p{position:relative}
+.m{font-family:ui-monospace,Consolas,"Liberation Mono",monospace;font-size:12.5px;background:var(--marca-fondo);color:var(--marca-tinta);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.hoja .m{background:#e9e3f7;color:#4b2f8a}
+.leyenda{font-size:13.5px;color:var(--tinta-suave);margin:0;line-height:1.45}
+.editor{display:flex;flex-direction:column;gap:8px;max-width:780px}
+.editor .fila-b{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.editor .fila-b label{font-size:13px;color:var(--tinta-suave)}
+.editor textarea{font:inherit;font-size:14px;line-height:1.5;width:100%;min-height:260px;border:1px solid var(--linea);border-radius:8px;padding:10px;background:var(--papel);color:var(--tinta);resize:vertical}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:7px 12px;cursor:pointer}
+.boton:hover{background:var(--hover)}
+.boton-principal,.boton-principal:hover{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul);font-weight:600}
+[hidden]{display:none!important}
+.cuadro-cond{border:1px solid var(--linea);background:var(--papel);border-radius:10px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;box-shadow:0 4px 12px rgba(20,30,45,.08)}
+.cuadro-cond .ancho{grid-column:1/-1}
+.cuadro-cond label{display:block;font-size:13px;color:var(--tinta-suave);margin-bottom:4px}
+.botones{display:flex;gap:8px;justify-content:flex-end}
+@media (max-width:560px){.cuadro-cond{grid-template-columns:1fr}}
+@media (max-width:820px){.columnas{grid-template-columns:minmax(0,1fr)}.hoja{padding:20px 18px}}
+@media (prefers-reduced-motion:no-preference){.hoja p,.correo p{transition:background .2s}}
+</style>
+
+<div class="marco">
+  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada.</p>
+  <div class="cab">
+    <h1>Baja en ESO por traslado al extranjero · Ana Ruiz Vega</h1>
+    <span class="etq">BAJA ESO EXTRANJERO</span>
+  </div>
+
+  <div class="columnas">
+    <section class="panel" aria-label="Datos del asunto">
+      <h2>Datos del asunto</h2>
+      <div class="dato"><label for="d-curso">Curso</label><input id="d-curso" value="2.º ESO B"></div>
+      <div class="dato"><label for="d-pais">País de destino</label><input id="d-pais" value="Hungría"></div>
+      <div class="dato"><label for="d-fecha">Fecha de efectos de la baja</label><input id="d-fecha" type="date" value="2026-11-04"></div>
+      <div class="separa">Datos que deciden qué párrafos salen</div>
+      <div class="dato" id="w-prot"><label for="d-prot">Protocolo de absentismo iniciado<span class="lista">lista</span></label>
+        <select id="d-prot"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+      <div class="dato" id="w-acr"><label for="d-acr">Cómo se acredita el traslado<span class="lista">lista</span></label>
+        <select id="d-acr"><option value="">—</option><option>Declaración de la familia</option><option>Diligencia de la Dirección</option></select></div>
+      <div class="dato" id="w-doc"><label for="d-doc">Aporta matrícula del país de destino<span class="lista">lista</span></label>
+        <select id="d-doc"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+      <div id="estado" class="aviso aviso-ambar" role="status"></div>
+    </section>
+
+    <section class="panel" aria-label="Lo que sale">
+      <div class="pestanas" role="tablist">
+        <button class="pestana" role="tab" id="t-word" aria-selected="true">Resolución (Word)</button>
+        <button class="pestana" role="tab" id="t-correo" aria-selected="false">Correo de envío</button>
+        <button class="pestana" role="tab" id="t-plant" aria-selected="false">Así está escrita la plantilla</button>
+        <button class="pestana" role="tab" id="t-editor" aria-selected="false">Editor de la plantilla de correo</button>
+      </div>
+      <div class="zona" id="vista"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var vistaActual='word';
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function fechaLarga(v){if(!v)return '<span class="falta">[falta: Fecha de efectos de la baja]</span>';var m=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];var p=v.split('-');return (+p[2])+' de '+m[+p[1]-1]+' de '+p[0]}
+  function d(){return {curso:$('d-curso').value||'',pais:$('d-pais').value||'',fecha:$('d-fecha').value,prot:$('d-prot').value,acr:$('d-acr').value,doc:$('d-doc').value}}
+  function h(v,n){return v?esc(v):'<span class="falta">[falta: '+n+']</span>'}
+
+  /* La plantilla: cada párrafo es [condición o null, texto]. La condición es [campo, valor]. */
+  var CAMPO={prot:'Protocolo de absentismo iniciado',acr:'Cómo se acredita el traslado',doc:'Aporta matrícula del país de destino'};
+  function resolucion(x){
+    return [
+      ['h3',null,'RESOLUCIÓN DE LA DIRECCIÓN DEL IES FUENTE LUCENA POR LA QUE SE DA DE BAJA LA MATRÍCULA DE ANA RUIZ VEGA'],
+      ['h4',null,'ANTECEDENTES'],
+      ['p',null,'<b>Primero.</b> La alumna está matriculada en '+h(x.curso,'Curso')+' en el curso 2026/2027 y no ha asistido a clase desde el inicio del curso.'],
+      ['p',null,'<b>Segundo.</b> La Dirección del centro contactó con la familia, que comunicó su traslado de residencia a '+h(x.pais,'País de destino')+' con carácter definitivo.'],
+      ['p',['prot','Sí'],'<b>Tercero.</b> Ante las faltas de asistencia se inició el protocolo de absentismo escolar y se informó a los Servicios Sociales comunitarios.'],
+      ['p',['prot','No'],'<b>Tercero.</b> No llegó a iniciarse el protocolo de absentismo escolar, porque la familia comunicó el traslado antes de que se dieran sus requisitos.'],
+      ['p',['acr','Declaración de la familia'],'<b>Cuarto.</b> La familia ha firmado una declaración en la que comunica el traslado y solicita la baja (anexo I).'],
+      ['p',['acr','Diligencia de la Dirección'],'<b>Cuarto.</b> La Dirección ha extendido diligencia de la comunicación verbal de la familia sobre el traslado (anexo II).'],
+      ['p',['doc','Sí'],'La familia aporta además el certificado de matrícula en un centro educativo del país de destino.'],
+      ['h4',null,'RESUELVE'],
+      ['p',null,'<b>Primero.</b> Dar de baja la matrícula de la alumna en este centro con efectos desde el '+fechaLarga(x.fecha)+', por traslado de residencia a '+h(x.pais,'País de destino')+'.'],
+      ['p',null,'<b>Segundo.</b> Anotar la baja en Séneca y en el expediente académico de la alumna.']
+    ];
+  }
+  function correo(x){
+    return [
+      ['asunto',null,'Resolución de baja de matrícula · Ana Ruiz Vega'],
+      ['p',null,'Estimada familia:'],
+      ['p',null,'Les enviamos firmada la resolución de la Dirección por la que se da de baja la matrícula de Ana en el IES Fuente Lucena, con efectos desde el '+fechaLarga(x.fecha)+'.'],
+      ['p',['prot','Sí'],'Como se había iniciado el protocolo de absentismo, enviamos también copia a los Servicios Sociales comunitarios para su cierre.'],
+      ['p',['doc','No'],'Si disponen del certificado de matrícula en el nuevo centro, les agradecemos que nos lo hagan llegar para completar el expediente.'],
+      ['p',null,'Atentamente,<br>Administración del IES Fuente Lucena']
+    ];
+  }
+
+  function pintar(lista,x,clase){
+    var faltan={};
+    var html=lista.map(function(e){
+      var tag=e[0],cond=e[1],txt=e[2];
+      var abre=tag==='asunto'?'<div class="asunto">':'<'+tag+'>';var cierra=tag==='asunto'?'</div>':'</'+tag+'>';
+      if(cond){
+        var v=x[cond[0]];
+        if(!v){faltan[cond[0]]=1;return '<'+tag+' class="falta">[falta: '+CAMPO[cond[0]]+'] '+txt+cierra}
+        if(v!==cond[1])return '';
+      }
+      return abre+txt+cierra;
+    }).join('');
+    return {html:'<div class="'+clase+'">'+html+'</div>',faltan:faltan};
+  }
+  function plantilla(lista,clase){
+    return '<div class="'+clase+' plantilla">'+lista.map(function(e){
+      var tag=e[0]==='asunto'?'div':e[0],cond=e[1],txt=e[2]
+        .replace(/<span class="falta">\[falta: ([^\]]+)\]<\/span>/g,function(t,n){return '{'+n+'}'});
+      var marca=cond?'<span class="m">{si:'+esc(CAMPO[cond[0]])+'='+esc(cond[1])+'}</span> ':'';
+      return '<'+tag+(e[0]==='asunto'?' class="asunto"':'')+'>'+marca+txt+'</'+tag+'>';
+    }).join('')+'</div>';
+  }
+  function plantillaFija(){
+    var vacio={curso:'',pais:'',fecha:'',prot:'',acr:'',doc:''};
+    return '<p class="leyenda">La marca morada va al principio del párrafo. Al generar el documento, la marca desaparece y el párrafo sale solo si el dato del asunto tiene ese valor. Los demás huecos, como hoy.</p>'+
+      '<p class="separa" style="margin:12px 0 6px">Resolución (Word)</p>'+plantilla(resolucion(vacio),'hoja')+
+      '<p class="separa" style="margin:14px 0 6px">Correo de envío</p>'+plantilla(correo(vacio),'correo');
+  }
+
+  var TEXTO_CORREO='Estimada familia:\n\nLes enviamos firmada la resolución de la Dirección por la que se da de baja la matrícula de {nombreNatural} en el IES Fuente Lucena, con efectos desde el {campo:Fecha de efectos de la baja}.\n\nComo se había iniciado el protocolo de absentismo, enviamos también copia a los Servicios Sociales comunitarios para su cierre.\n\nAtentamente,\nAdministración del IES Fuente Lucena';
+  var LISTAS={'Protocolo de absentismo iniciado':['Sí','No'],'Cómo se acredita el traslado':['Declaración de la familia','Diligencia de la Dirección'],'Aporta matrícula del país de destino':['Sí','No']};
+  var textoEditor=TEXTO_CORREO,cursor=null;
+  function editor(){
+    var ops=Object.keys(LISTAS).map(function(k){return '<option>'+esc(k)+'</option>'}).join('');
+    return '<div class="editor">'+
+      '<p class="leyenda">Pon el cursor en el párrafo «Como se había iniciado…» y pulsa «Párrafo que sale si…».</p>'+
+      '<div class="fila-b"><label for="ed-texto">Texto</label><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="boton" id="ed-hueco">Insertar hueco</button><button type="button" class="boton" id="ed-cond">Párrafo que sale si…</button></span></div>'+
+      '<div class="cuadro-cond" id="ed-cuadro" hidden>'+
+        '<div><label for="ed-dato">Dato del asunto</label><select id="ed-dato">'+ops+'</select></div>'+
+        '<div><label for="ed-valor">Valor</label><select id="ed-valor"></select></div>'+
+        '<p class="leyenda ancho">Salen solo los datos de lista de este tipo de asunto. La marca se pone al principio del párrafo donde está el cursor.</p>'+
+        '<div class="botones ancho"><button type="button" class="boton" id="ed-cancelar">Cancelar</button><button type="button" class="boton boton-principal" id="ed-poner">Poner la marca</button></div>'+
+      '</div>'+
+      '<textarea id="ed-texto">'+esc(textoEditor)+'</textarea>'+
+      '<p class="leyenda" id="ed-aviso"></p></div>';
+  }
+  function engancharEditor(){
+    var ta=$('ed-texto');if(!ta)return;
+    function valores(){$('ed-valor').innerHTML=LISTAS[$('ed-dato').value].map(function(v){return '<option>'+esc(v)+'</option>'}).join('')}
+    valores();
+    ta.addEventListener('input',function(){textoEditor=ta.value});
+    ['keyup','click','select'].forEach(function(ev){ta.addEventListener(ev,function(){cursor=ta.selectionStart})});
+    $('ed-dato').addEventListener('change',valores);
+    $('ed-hueco').addEventListener('click',function(){$('ed-aviso').textContent='«Insertar hueco» funciona como hoy.'});
+    $('ed-cond').addEventListener('click',function(){$('ed-cuadro').hidden=false});
+    $('ed-cancelar').addEventListener('click',function(){$('ed-cuadro').hidden=true});
+    $('ed-poner').addEventListener('click',function(){
+      var t=ta.value,pos=cursor==null?t.length:cursor;
+      while(pos>0&&t[pos-1]==='\n'&&(pos>=t.length||t[pos]==='\n'))pos--;var ini=t.lastIndexOf('\n\n',pos-1);ini=ini<0?0:ini+2;
+      var resto=t.slice(ini).replace(/^\{si:[^}]*\}\s*/,'');
+      var marca='{si:'+$('ed-dato').value+'='+$('ed-valor').value+'} ';
+      ta.value=t.slice(0,ini)+marca+resto;textoEditor=ta.value;
+      $('ed-cuadro').hidden=true;
+      $('ed-aviso').textContent='Marca puesta: el párrafo solo saldrá si «'+$('ed-dato').value+'» es «'+$('ed-valor').value+'». Si el párrafo ya tenía una marca, se cambia por la nueva.';
+      ta.focus();ta.setSelectionRange(ini+marca.length,ini+marca.length);cursor=ini+marca.length;
+    });
+  }
+  function refrescar(){
+    var x=d();
+    ['prot','acr','doc'].forEach(function(k){$('w-'+k).classList.toggle('vacio',!x[k])});
+    var r1=pintar(resolucion(x),x,'hoja'),r2=pintar(correo(x),x,'correo');
+    var falta=Object.keys(Object.assign({},r1.faltan,r2.faltan)).map(function(k){return CAMPO[k]});
+    var est=$('estado');
+    if(falta.length){est.className='aviso aviso-ambar';est.innerHTML='<b>Faltan datos:</b> '+falta.map(esc).join(' · ')+'. Los párrafos que dependen de ellos salen en amarillo.'}
+    else{est.className='aviso aviso-verde';est.textContent='Todos los datos puestos: el documento sale solo con los párrafos que tocan.'}
+    if(vistaActual==='editor'){if(!$('ed-texto')){$('vista').innerHTML=editor();engancharEditor()}return}
+    $('vista').innerHTML=vistaActual==='word'?r1.html:vistaActual==='correo'?r2.html:plantillaFija();
+  }
+  ['d-curso','d-pais','d-fecha','d-prot','d-acr','d-doc'].forEach(function(id){$(id).addEventListener('input',refrescar);$(id).addEventListener('change',refrescar)});
+  [['t-word','word'],['t-correo','correo'],['t-plant','plant'],['t-editor','editor']].forEach(function(p){
+    $(p[0]).addEventListener('click',function(){vistaActual=p[1];$('vista').innerHTML='';['t-word','t-correo','t-plant','t-editor'].forEach(function(t){$(t).setAttribute('aria-selected',String(t===p[0]))});refrescar()});
+  });
+  refrescar();
+})();
+</script>
