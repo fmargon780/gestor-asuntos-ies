@@ -190,5 +190,6 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 504 | Tema: Filas devueltas a la vista. Junta la idea 497: que las filas DEVUELTA salgan en «En cola» del Centro de mando, en la tabla de entrada y en la pestaña Trabajo, y que «Abrir Claude Code» las ofrezca primero. Va en esta cola como las demás partes del Centro de mando. [toca a: metodo-apps] | SUSTITUIDA (4-nov-2026): diseñado en la fila 507 |
 | 506 | Método: quitar la regla «la DEVUELTA va siempre delante» (skill `disenar-idea`, «Ordenar la cola», y lo que la repita): desde la fila 507 Francisco decide el orden completo; una devuelta llega arriba, pero se puede mover. Se trata en el proyecto «Método de desarrollo de apps». [toca a: metodo-apps] | IDEA (4-nov-2026) |
 | 508 | Aviso de usuario: mejora en «Inicio» | IDEA (4-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1Us9xiE754zYWXN3DWDyTMvE-TE8YVZnf/view?usp=drivesdk |
+| 509 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (4-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16Yr1XkPcc3k0TQoPG9-ZnUy1dNT7db_M/view?usp=drivesdk |
 
 
