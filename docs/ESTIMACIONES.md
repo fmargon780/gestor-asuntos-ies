@@ -29,4 +29,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 463 | 200 | ventana a todo lo ancho en dos columnas, hito elegido en vez de acordeón, rótulos y «desde» ancho, apartados con título en lugar de «Más ajustes», hitos de dentro de las respuestas, mapa y traer en la columna derecha, partir guias-editor.js, adaptar unas 12 pruebas, prueba nueva y revisor |
 | 465 | 120 | editor de plantillas dentro de la columna derecha sin perder la guía, botones en la tarea y en el aviso, impresos solo marcados con buscador, prueba nueva y revisor |
 | 493 | 150 | clases de tercero por tipo (lista con la primera como hoy), casillas en Ajustes, pastillas, buscador y parrilla de «Nuevo asunto», clase del asunto según el tercero, demostración, prueba nueva, revisor |
-| 501 | 240 | leer libros del Centro de datos, cruce con la matrícula, plantilla con tabla variable, duplicado, unidad en el buscador, pruebas y revisor |
