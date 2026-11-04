@@ -1,0 +1,201 @@
+<title>Ficha de entrega de libros</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: cabecera de asunto a todo el ancho; a la izquierda los datos y a la derecha la ficha tal como saldrá en papel. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --rojo:#fdecec;--rojo-linea:#c0392b;--hover:#f0f3f7;--sobre-azul:#fff;
+  --hoja:#fff;--hoja-tinta:#111;--hoja-linea:#333;
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --fuente-hoja:"Times New Roman",Times,"Liberation Serif",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1a;--rojo-linea:#e0796c;--hover:#222c37;--sobre-azul:#10202f;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1a;--rojo-linea:#e0796c;--hover:#222c37;--sobre-azul:#10202f;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0 0 10px}
+.cab{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:12px}
+h1{font-size:21px;margin:0;text-wrap:balance}
+.marca{font-size:12px;background:var(--azul-claro);color:var(--azul);border-radius:999px;padding:3px 10px;font-weight:600;letter-spacing:.02em}
+.columnas{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:14px;align-items:start}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font-size:15px;margin:0}
+label.r,.r{display:block;font-size:13px;color:var(--tinta-suave);margin-bottom:4px}
+select,input[type=date]{font:inherit;width:100%;border:1px solid var(--linea);border-radius:8px;padding:8px 10px;background:var(--papel);color:var(--tinta)}
+.pastillas{display:flex;gap:6px}
+.pastilla{font:inherit;font-size:13px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:5px 12px;cursor:pointer}
+.pastilla.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.casilla{display:flex;gap:8px;align-items:center;cursor:pointer}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:9px 14px;cursor:pointer}
+.boton:hover{background:var(--hover)}
+.boton-principal{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul);font-weight:600}
+.boton-principal:hover{background:var(--azul)}
+.boton-principal:disabled{opacity:.45;cursor:default}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.aviso{border-radius:8px;padding:9px 12px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-rojo{background:var(--rojo);border-color:var(--rojo-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.docs{list-style:none;margin:0;padding:0;font-size:14px}
+.docs li{padding:7px 0;border-top:1px solid var(--linea);overflow-wrap:anywhere}
+.docs button{font:inherit;background:none;border:0;padding:0;color:var(--azul);cursor:pointer;text-align:left;text-decoration:underline}
+.vacio{color:var(--tinta-suave);font-size:14px;margin:0}
+.zona-hoja{min-width:0;overflow-x:auto}
+.hoja{background:var(--hoja);color:var(--hoja-tinta);font-family:var(--fuente-hoja);font-size:16px;line-height:1.35;width:100%;min-width:320px;max-width:760px;margin:0 auto;padding:30px 44px;border:1px solid var(--linea);box-shadow:0 2px 10px rgba(20,30,45,.1)}
+.hoja h3{font-size:22px;text-align:center;margin:0;letter-spacing:.01em}
+.hoja .sub{text-align:center;font-weight:700;font-size:13px;margin:0 0 6px}
+.hoja .dup{text-align:center;font-weight:700;font-size:15px;border:2px solid var(--hoja-tinta);padding:3px;margin:6px auto 10px;max-width:300px;letter-spacing:.04em}
+.hoja table{border-collapse:collapse;width:100%}
+.hoja td,.hoja th{border:1px solid var(--hoja-linea);padding:5px 8px;text-align:left}
+.t-alumno{margin:10px 0 14px}.t-alumno td{font-size:18px}.t-alumno td+td{width:24%}
+.t-libros th{width:45%}.t-libros th+th{width:55%}
+.t-libros td{height:32px}
+.hoja p{margin:14px 0 0}
+.falta{background:#ffe9a8}
+.firmas{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-top:20px}
+.firmas div{min-height:82px;display:flex;flex-direction:column;justify-content:space-between}
+.t-firma{margin-top:12px}.t-firma th{font-size:14px;width:30%}.t-firma th:first-child{width:45%}.t-firma td{height:46px}
+.nota{font-size:14px;margin-top:24px!important}
+@media (max-width:820px){.columnas{grid-template-columns:minmax(0,1fr)}.hoja{padding:20px 18px}}
+</style>
+
+<div class="marco">
+  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada.</p>
+  <div class="cab">
+    <h1 id="titulo"></h1>
+    <span class="marca">FICHA ENTREGA LIBROS</span>
+  </div>
+  <div class="columnas">
+    <section class="panel" aria-label="Datos de la ficha">
+      <div>
+        <span class="r">Para quién</span>
+        <div class="pastillas">
+          <button class="pastilla on" id="modo-uno" type="button">Un alumno</button>
+          <button class="pastilla" id="modo-grupo" type="button">Un grupo</button>
+        </div>
+      </div>
+      <div id="caja-alumno">
+        <label class="r" for="alumno">Alumno</label>
+        <select id="alumno"></select>
+      </div>
+      <div id="caja-grupo" hidden>
+        <label class="r" for="grupo">Grupo</label>
+        <select id="grupo"></select>
+      </div>
+      <div id="caja-dup" style="display:flex;flex-direction:column;gap:10px">
+        <label class="casilla"><input type="checkbox" id="dup" checked> <span>Duplicado por extravío</span></label>
+        <div id="caja-fecha">
+          <label class="r" for="fecha">Fecha de la entrega original</label>
+          <input type="date" id="fecha" value="2026-09-15">
+        </div>
+      </div>
+      <div id="avisos" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="boton boton-principal" id="generar" type="button">Generar</button>
+      <div>
+        <h2>Documentos del asunto</h2>
+        <p class="vacio" id="sin-docs" style="margin-top:6px">Todavía no hay ninguno.</p>
+        <ul class="docs" id="docs"></ul>
+      </div>
+    </section>
+    <div class="zona-hoja"><div class="hoja" id="hoja"></div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var L1=['Biología y Geología','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas','Música'];
+  var A=[
+   {id:'a1',nom:'Marín Soto, Lucía',pila:'Lucía Marín Soto',uni:'1º ESO D',nivel:'1º ESO',tut:'Rosa Soto Vega',dni:'12345678Z',lib:L1.concat(['Religión Católica','Francés 2º Idioma']),sin:[]},
+   {id:'a2',nom:'Benítez Ruiz, Hugo',pila:'Hugo Benítez Ruiz',uni:'1º ESO D',nivel:'1º ESO',tut:'Antonio Benítez Mora',dni:'23456789D',lib:L1.slice(),sin:[]},
+   {id:'a3',nom:'Cano Díaz, Noa',pila:'Noa Cano Díaz',uni:'3º ESO A',nivel:'3º ESO',tut:'Pilar Díaz León',dni:'34567890V',lib:['Biología y Geología','Física y Química','Lengua Castellana','Inglés','Matemáticas'],sin:['Geografía e Historia Bilingüe']},
+   {id:'a6',nom:'Vega Ramos, Aitor',pila:'Aitor Vega Ramos',uni:'3º ESO A',nivel:'3º ESO',tut:'Lola Ramos Cruz',dni:'56789012B',lib:['Biología y Geología','Física y Química','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas'],sin:[]},
+   {id:'a4',nom:'Ortega Luque, Izan',pila:'Izan Ortega Luque',uni:'2º ESO B',nivel:'2º ESO',tut:'Juan Ortega Gil',dni:'',lib:['Física y Química','Geografía e Historia','Lengua Castellana','Inglés','Matemáticas','Música'],sin:[]},
+   {id:'a5',nom:'Romero Gil, Marta',pila:'Marta Romero Gil',uni:'1º BACH A',nivel:'1º Bachillerato',tut:'Elena Gil Ramos',dni:'45678901G',lib:[],sin:[]}
+  ];
+  var $=function(i){return document.getElementById(i)};
+  var S={modo:'uno',ver:null,docs:[],num:1234};
+  var HOY='3 de noviembre de 2026';
+  var MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function fechaLarga(v){if(!v)return '';var p=v.split('-');return (+p[2])+' de '+MES[+p[1]-1]+' de '+p[0]}
+  function alu(){for(var i=0;i<A.length;i++)if(A[i].id===$('alumno').value)return A[i]}
+  function delGrupo(){return A.filter(function(a){return a.uni===$('grupo').value})}
+
+  A.forEach(function(a){var o=document.createElement('option');o.value=a.id;o.textContent=a.nom+' · '+a.uni;$('alumno').appendChild(o)});
+  ['1º ESO D','2º ESO B','3º ESO A'].forEach(function(g){var o=document.createElement('option');o.textContent=g;$('grupo').appendChild(o)});
+
+  function pintarHoja(a,dup,fEntrega,fFirma){
+    var filas=a.lib.map(function(l){return '<tr><td>'+esc(l)+'</td><td></td></tr>'}).join('');
+    var trozo=dup
+      ?'recibió el '+(fEntrega?esc(fEntrega):'<span class="falta">(falta la fecha)</span>')+' TODOS los libros correspondientes a su matrícula y se compromete a devolverlos en buen estado cuando finalice el curso académico 2026-27. Esta ficha sustituye a la original, extraviada.'
+      :'ha recibido TODOS los libros correspondientes a su matrícula y se compromete a devolverlos en buen estado cuando finalice el curso académico 2026-27.';
+    $('hoja').innerHTML=
+      '<h3>FICHA ENTREGA LIBROS '+esc(a.nivel.toUpperCase().replace('ª','º').replace(' ESO',' DE ESO'))+'</h3>'+
+      '<div class="sub">CURSO 2026/27</div>'+
+      (dup?'<div class="dup">DUPLICADO POR EXTRAVÍO</div>':'')+
+      '<table class="t-alumno"><tr><td>'+esc(a.nom)+'</td><td>'+esc(a.uni)+'</td></tr></table>'+
+      '<table class="t-libros"><tr><th>LIBROS</th><th>Estado de conservación</th></tr>'+filas+'</table>'+
+      '<p>Quien firma abajo como padre, madre o tutor/a legal del alumno: '+esc(a.pila)+', matriculado/a en este centro en el curso de '+esc(a.nivel)+', '+trozo+'</p>'+
+      '<p style="padding-left:40px">En Alhaurín el Grande, a '+esc(fFirma)+'</p>'+
+      '<div class="firmas"><div><span>El alumno</span><span>Fdo.: '+esc(a.pila)+'</span></div></div>'+
+      '<table class="t-firma"><tr><th>Padre, madre o tutor/a legal</th><th>DNI</th><th>Firma</th></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>'+
+      '<p style="margin-top:6px;font-size:14px">Basta con la firma de uno de ellos.</p>'+
+      '<p class="nota">Nota: Este documento será devuelto por el alumno/a a su tutor/a una vez firmado por su padre/madre</p>';
+  }
+
+  function avisosDe(a){
+    var h=[];
+    if(!a.lib.length)h.push(['rojo',a.nom+': el listado de libros no tiene libros de '+a.nivel+'. No se puede generar la ficha.']);
+    a.sin.forEach(function(m){h.push(['rojo',a.nom+': la asignatura «'+m+'» no está en el listado de libros. No se puede generar la ficha hasta arreglarlo en el Centro de datos.'])});
+    return h;
+  }
+
+  function refrescar(){
+    var uno=S.modo==='uno';
+    $('modo-uno').classList.toggle('on',uno);$('modo-grupo').classList.toggle('on',!uno);
+    $('caja-alumno').hidden=!uno;$('caja-grupo').hidden=uno;
+    $('caja-dup').style.display=uno?'flex':'none';
+    $('caja-fecha').hidden=!$('dup').checked;
+    var lista=uno?[alu()]:delGrupo();
+    var av=[];lista.forEach(function(a){av=av.concat(avisosDe(a))});
+    $('titulo').textContent=uno?'A26-0512 · '+alu().nom:'A26-0513 · '+$('grupo').value+' ('+lista.length+' alumnos)';
+    $('avisos').innerHTML=av.map(function(v){return '<div class="aviso aviso-'+v[0]+'">'+esc(v[1])+'</div>'}).join('');
+    var dup=uno&&$('dup').checked, faltaFecha=dup&&!$('fecha').value;
+    if(faltaFecha)$('avisos').innerHTML+='<div class="aviso aviso-ambar">Escribe la fecha de la entrega original.</div>';
+    var hay=lista.filter(function(a){return a.lib.length&&!a.sin.length}).length;
+    var g=$('generar');g.disabled=!hay||faltaFecha;
+    g.textContent=uno?(dup?'Generar el duplicado':'Generar la ficha'):(hay<lista.length?'Generar para '+hay+' de '+lista.length:'Generar para todos ('+hay+')');
+    var v=S.ver;
+    if(v)pintarHoja(v.a,v.dup,v.fE,v.fF);
+    else pintarHoja(lista[0],dup,fechaLarga($('fecha').value),HOY);
+  }
+
+  function fichero(a,dup){S.num++;return '261103 '+(dup?'FICHA ENTREGA LIBROS DUPLICADO':'FICHA ENTREGA LIBROS')+' D26-0'+S.num+'.docx'}
+  function pintarDocs(){
+    $('sin-docs').hidden=S.docs.length>0;
+    $('docs').innerHTML=S.docs.map(function(d,i){return '<li><button type="button" data-i="'+i+'">'+esc(d.nom)+'</button> <span style="color:var(--tinta-suave)">· '+esc(d.a.nom)+'</span></li>'}).join('');
+  }
+
+  $('docs').addEventListener('click',function(e){var i=e.target.getAttribute('data-i');if(i===null)return;S.ver=S.docs[+i];refrescar()});
+  function cambio(){S.ver=null;refrescar()}
+  $('modo-uno').onclick=function(){S.modo='uno';cambio()};
+  $('modo-grupo').onclick=function(){S.modo='grupo';$('dup').checked=false;cambio()};
+  $('alumno').onchange=$('grupo').onchange=$('dup').onchange=$('fecha').oninput=cambio;
+  $('generar').onclick=function(){
+    var uno=S.modo==='uno',dup=uno&&$('dup').checked;
+    var lista=(uno?[alu()]:delGrupo()).filter(function(a){return a.lib.length&&!a.sin.length});
+    lista.forEach(function(a){S.docs.push({nom:fichero(a,dup),a:a,dup:dup,fE:fechaLarga($('fecha').value),fF:HOY})});
+    S.ver=S.docs[S.docs.length-lista.length];
+    pintarDocs();refrescar();
+  };
+  refrescar();
+})();
+</script>
