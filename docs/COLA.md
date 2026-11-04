@@ -193,3 +193,5 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 509 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (4-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16Yr1XkPcc3k0TQoPG9-ZnUy1dNT7db_M/view?usp=drivesdk |
 
 
+| 510 | Plantillas de documento con párrafos que salen o no según un dato del asunto (por ejemplo, «Protocolo de absentismo: Sí»). Sale del diseño del tipo de baja por traslado al extranjero (fila 511); vale para cualquier plantilla del centro. | EN DISEÑO (4-nov-2026) |
+| 511 | Tipo de asunto para la baja en ESO por traslado al extranjero (parte de Administración: recibir el encargo de Dirección, elaborar la resolución, firma, registro de salida, baja en Séneca y comunicar si procede), con resolución, anexo I, anexo II y correo. Necesita la 510 HECHA. | IDEA (4-nov-2026) |
