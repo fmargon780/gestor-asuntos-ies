@@ -254,6 +254,7 @@ Además: el botón también junto a «Con la plantilla:» del aviso (C3); sin pl
 
 ### Respuestas de Francisco durante el trabajo
 - (las apunta Claude Code si tiene que preguntarle algo)
+- (4-nov-2026, fila 463, segundo revisor, ayudante aparte, 1400 px, demo BAJA MEDICA) A1-A8 y los 4 puntos de «Cómo se comprueba»: COINCIDE. Consola sin errores. «Ver mapa», «Entrar»/«← Volver», no perder lo escrito al cambiar de hito y «Guardar»: COINCIDE. NO COINCIDÍA: el desplegable «Esperamos a…» salía cortado («Esperamo»); corregido (ancho mínimo en `css/guias-columnas.css`) y pruebas de la parte A en verde. NO LO HE PODIDO VER: cursor en el título tras «+ Añadir un hito», enlace de la pantalla de plantillas, «Abrir en la guía», B y C (aún no hechas), guía real de EXPULSIÓN [SOLO FRANCISCO]. Observado, ya existía antes de esta fila (`guias-toca.js` sin tocar): un hito con «Esperamos a… Interesado» se muestra como «Tercero» al abrirlo porque ese desplegable no ofrece «Interesado»; puede cambiar el dato al guardar. Añadido por la app que el texto no pide: al marcar pregunta se ocultan también «Al terminar», «Documentos» y «Normativa e impresos».
 
 ## Para Claude Code
 

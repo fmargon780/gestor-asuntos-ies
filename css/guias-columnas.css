@@ -88,8 +88,9 @@
 .dato .campo { width: 100%; }
 .cuadro-guia .dato-titulo { flex: 2 1 240px; }
 .cuadro-guia .dato-responsable { flex: 1 1 170px; }
-.cuadro-guia .paso-toca-bloque { flex: 1 1 200px; }
+.cuadro-guia .paso-toca-bloque { flex: 1 1 300px; }
 .cuadro-guia .paso-toca-bloque .paso-toca-fila { display: flex; gap: 6px; }
+.cuadro-guia .paso-toca-bloque .paso-toca-fila .campo { flex: 1 1 140px; min-width: 130px; width: auto; }   /* «Esperamos a…» se lee entero */
 .cuadro-guia .dato-plazo-dias { flex: 0 0 90px; }
 .cuadro-guia .dato-cuenta { flex: 1 1 140px; }
 .cuadro-guia .dato-desde { flex: 2 1 260px; }   /* lo bastante ancho para leer el hito elegido */
