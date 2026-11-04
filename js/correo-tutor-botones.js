@@ -52,7 +52,7 @@ var CorreoTutorBotones = (function () {
     if (!d || !d.faltan.length) return '';
     var lineas = [];
     d.unidades.forEach(function (u) {
-      if (!u.tutores.length) { lineas.push('<p class="aviso aviso-ambar correo-tutor-falta">Falta el correo del tutor/a de ' + esc(u.unidad) + '</p>'); return; }
+      if (!u.tutores.length) { lineas.push('<p class="aviso aviso-ambar correo-tutor-falta">No sé quién es el tutor o tutora de ' + esc(u.unidad) + '. Las tutorías se suben al Centro de datos.</p>'); return; }   /* fila 376 */
       u.tutores.forEach(function (t) {
         if ((t.correos || []).length) return;
         if (!t.clave) { lineas.push('<p class="aviso aviso-ambar correo-tutor-falta">Falta el correo de ' + esc(t.nombre) + ' (tutor/a de ' + esc(u.unidad) + ')</p>'); return; }
