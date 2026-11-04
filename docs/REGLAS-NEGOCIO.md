@@ -74,3 +74,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (4-nov-2026, tema 363) Si una asignatura de la matrícula no está en el listado, la ficha de ese alumno **no se genera** («Debería impedirlo»). En un grupo salen las demás.
 - (4-nov-2026, tema 363) **En Bachillerato no hay ficha:** «el centro no entrega los libros, los compra el alumnado directamente».
 - (4-nov-2026, tema 363) La entrega de septiembre va en asuntos de grupo, por unidad o por nivel, según se elija cada vez.
+
+## Centro de mando
+
+- (4-nov-2026, tema 504) Las filas DEVUELTA cuentan en «En cola». Llegan arriba, pero llevan flechas: Francisco decide el orden completo y puede poner una PENDIENTE delante («siempre podemos cambiar el orden de las filas en la cola con los botones»).
+- (4-nov-2026, tema 504) En la tabla de entrada, el número de devueltas va «en rojo y entre paréntesis» junto al de «En cola», con una leyenda abajo que lo explica.

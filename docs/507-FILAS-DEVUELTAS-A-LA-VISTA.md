@@ -1,4 +1,4 @@
-# 504 — Filas devueltas a la vista
+# 507 — Filas devueltas a la vista
 
 ## Lo que escribió Francisco
 Centro de mando: que las filas DEVUELTA salgan en «En cola» (en la tabla de entrada y en la pestaña
@@ -26,7 +26,7 @@ dentro de la app, y la fila 59 de Dieta familiar no se veía (31-oct-2026).
   demás». «Ver todas» no cuenta dos veces las devueltas.
 
 ## Pantalla de prueba (aprobada el 4-nov-2026)
-- `docs/pantallas/504.html` · https://claude.ai/artifact/A5bQ7cdyUNdLaVPkVbJ1bp
+- `docs/pantallas/507.html` · https://claude.ai/artifact/A5bQ7cdyUNdLaVPkVbJ1bp
 - El botón «Simular…» y la franja verde de arriba son solo de la prueba: no van a la app.
 
 ## Qué NO se hace en esta tarea

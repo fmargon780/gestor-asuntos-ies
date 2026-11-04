@@ -5,13 +5,14 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 30-oct-2026 (fila 493 PENDIENTE)
+Última puesta al día: 4-nov-2026 (fila 507 PENDIENTE)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
+| 507 | 60 | Centro de mando: devueltas en «En cola», tabla con paréntesis y leyenda, flechas, frase del botón, reglas de este repositorio, publicar el artefacto y revisor |
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
