@@ -57,8 +57,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .editor{display:flex;flex-direction:column;gap:8px;max-width:780px}
 .editor .fila-b{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
 .editor .fila-b label{font-size:13px;color:var(--tinta-suave)}
-.insertar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:4px 10px 8px;margin:0}
-.insertar legend{font-size:12px;color:var(--tinta-suave);text-transform:uppercase;letter-spacing:.06em;padding:0 4px}
+.insertar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border:1px solid var(--azul);background:var(--azul-claro);border-radius:10px;padding:4px 10px 8px;margin:0}
+.insertar .boton{border-color:var(--azul);color:var(--azul);font-weight:600}
+.insertar legend{font-size:12px;color:var(--azul);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:0 4px}
 .editor textarea{font:inherit;font-size:14px;line-height:1.5;width:100%;min-height:260px;border:1px solid var(--linea);border-radius:8px;padding:10px;background:var(--papel);color:var(--tinta);resize:vertical}
 .boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:7px 12px;cursor:pointer}
 .boton:hover{background:var(--hover)}
@@ -68,6 +69,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .cuadro-cond .ancho{grid-column:1/-1}
 .cuadro-cond label{display:block;font-size:13px;color:var(--tinta-suave);margin-bottom:4px}
 .botones{display:flex;gap:8px;justify-content:flex-end}
+.ret p.sel{outline:2px solid #1f4e79;outline-offset:2px}
+.menu-sel{position:absolute;z-index:5;background:var(--papel);border:1px solid var(--linea);border-radius:10px;box-shadow:0 6px 18px rgba(20,30,45,.18);padding:4px;display:flex;flex-direction:column;min-width:240px}
+.menu-sel button{font:inherit;font-size:14px;text-align:left;background:none;border:0;border-radius:6px;padding:7px 10px;color:var(--tinta);cursor:pointer}
+.menu-sel button:hover{background:var(--hover)}
+.menu-sel .nuevo{color:var(--azul);font-weight:700;border-top:1px solid var(--linea);border-radius:0 0 6px 6px}
+.zona-ret{position:relative}
 @media (max-width:560px){.cuadro-cond{grid-template-columns:1fr}}
 @media (max-width:820px){.columnas{grid-template-columns:minmax(0,1fr)}.hoja{padding:20px 18px}}
 @media (prefers-reduced-motion:no-preference){.hoja p,.correo p{transition:background .2s}}
@@ -82,11 +89,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 
   <div class="columnas">
     <section class="panel" aria-label="Datos del asunto">
-      <h2>Datos del asunto</h2>
+      <h2>Campos del asunto</h2>
       <div class="dato"><label for="d-curso">Curso</label><input id="d-curso" value="2.º ESO B"></div>
       <div class="dato"><label for="d-pais">País de destino</label><input id="d-pais" value="Hungría"></div>
       <div class="dato"><label for="d-fecha">Fecha de efectos de la baja</label><input id="d-fecha" type="date" value="2026-11-04"></div>
-      <div class="separa">Datos que deciden qué párrafos salen</div>
+      <div class="separa">Campos que deciden qué textos condicionales salen</div>
       <div class="dato" id="w-prot"><label for="d-prot">Protocolo de absentismo iniciado<span class="lista">lista</span></label>
         <select id="d-prot"><option value="">—</option><option>Sí</option><option>No</option></select></div>
       <div class="dato" id="w-acr"><label for="d-acr">Cómo se acredita el traslado<span class="lista">lista</span></label>
@@ -102,6 +109,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
         <button class="pestana" role="tab" id="t-correo" aria-selected="false">Correo de envío</button>
         <button class="pestana" role="tab" id="t-plant" aria-selected="false">Así está escrita la plantilla</button>
         <button class="pestana" role="tab" id="t-editor" aria-selected="false">Editor de la plantilla de correo</button>
+        <button class="pestana" role="tab" id="t-retocar" aria-selected="false">Retocar la plantilla de Word</button>
       </div>
       <div class="zona" id="vista"></div>
     </section>
@@ -170,7 +178,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   }
   function plantillaFija(){
     var vacio={curso:'',pais:'',fecha:'',prot:'',acr:'',doc:''};
-    return '<p class="leyenda">La marca morada va al principio del párrafo. Al generar el documento, la marca desaparece y el párrafo sale solo si el dato del asunto tiene ese valor. Los demás huecos, como hoy.</p>'+
+    return '<p class="leyenda">La marca morada va al principio del párrafo. Al generar el documento, la marca desaparece y el párrafo sale solo si el campo del asunto tiene ese valor. Los campos variables, como hoy.</p>'+
       '<p class="separa" style="margin:12px 0 6px">Resolución (Word)</p>'+plantilla(resolucion(vacio),'hoja')+
       '<p class="separa" style="margin:14px 0 6px">Correo de envío</p>'+plantilla(correo(vacio),'correo');
   }
@@ -184,9 +192,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       '<p class="leyenda">Pon el cursor en el párrafo «Como se había iniciado…» y pulsa «Texto condicional».</p>'+
       '<div class="fila-b"><label for="ed-texto">Texto</label><fieldset class="insertar"><legend>Insertar</legend><button type="button" class="boton" id="ed-hueco">Campo variable</button><button type="button" class="boton" id="ed-cond">Texto condicional</button></fieldset></div>'+
       '<div class="cuadro-cond" id="ed-cuadro" hidden>'+
-        '<div><label for="ed-dato">Dato del asunto</label><select id="ed-dato">'+ops+'</select></div>'+
+        '<div><label for="ed-dato">Campo del asunto</label><select id="ed-dato">'+ops+'</select></div>'+
         '<div><label for="ed-valor">Valor</label><select id="ed-valor"></select></div>'+
-        '<p class="leyenda ancho">Salen solo los datos de lista de este tipo de asunto. La marca se pone al principio del párrafo donde está el cursor.</p>'+
+        '<p class="leyenda ancho">Salen solo los campos de lista de este tipo de asunto. La marca se pone al principio del párrafo donde está el cursor.</p>'+
         '<div class="botones ancho"><button type="button" class="boton" id="ed-cancelar">Cancelar</button><button type="button" class="boton boton-principal" id="ed-poner">Poner la marca</button></div>'+
       '</div>'+
       '<textarea id="ed-texto">'+esc(textoEditor)+'</textarea>'+
@@ -199,7 +207,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     ta.addEventListener('input',function(){textoEditor=ta.value});
     ['keyup','click','select'].forEach(function(ev){ta.addEventListener(ev,function(){cursor=ta.selectionStart})});
     $('ed-dato').addEventListener('change',valores);
-    $('ed-hueco').addEventListener('click',function(){$('ed-aviso').textContent='«Campo variable» es el antiguo «Insertar hueco»: funciona como hoy.'});
+    $('ed-hueco').addEventListener('click',function(){$('ed-aviso').textContent='«Campo variable» es el antiguo «Insertar hueco»: hace lo mismo que hoy.'});
     $('ed-cond').addEventListener('click',function(){$('ed-cuadro').hidden=false});
     $('ed-cancelar').addEventListener('click',function(){$('ed-cuadro').hidden=true});
     $('ed-poner').addEventListener('click',function(){
@@ -213,20 +221,76 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       ta.focus();ta.setSelectionRange(ini+marca.length,ini+marca.length);cursor=ini+marca.length;
     });
   }
+  /* Retocar: la resolución sin marca en el «No llegó a iniciarse…». */
+  var retParrafos=null,retElegido=null;
+  function retInicio(){
+    var vacio={curso:'',pais:'',fecha:'',prot:'',acr:'',doc:''};
+    retParrafos=resolucion(vacio).map(function(e){
+      var txt=e[2].replace(/<span class="falta">\[falta: ([^\]]+)\]<\/span>/g,function(t,n){return '{'+n+'}'});
+      var c=e[1];if(c&&c[0]==='prot'&&c[1]==='No')c=null;
+      return {tag:e[0],cond:c?[CAMPO[c[0]],c[1]]:null,txt:txt};
+    });
+  }
+  function retPintar(){
+    if(!retParrafos)retInicio();
+    var ops=Object.keys(LISTAS).map(function(k){return '<option>'+esc(k)+'</option>'}).join('');
+    return '<p class="leyenda">Selecciona con el ratón un trozo del párrafo «No llegó a iniciarse…» y elige «Texto condicional…» en el menú.</p>'+
+      '<div class="cuadro-cond" id="rt-cuadro" hidden style="margin:8px 0">'+
+        '<div><label for="rt-dato">Campo del asunto</label><select id="rt-dato">'+ops+'</select></div>'+
+        '<div><label for="rt-valor">Valor</label><select id="rt-valor"></select></div>'+
+        '<p class="leyenda ancho">Salen solo los campos de lista de este tipo de asunto. La marca se pone al principio del párrafo seleccionado.</p>'+
+        '<div class="botones ancho"><button type="button" class="boton" id="rt-cancelar">Cancelar</button><button type="button" class="boton boton-principal" id="rt-poner">Poner la marca</button></div>'+
+      '</div>'+
+      '<p class="leyenda" id="rt-aviso"></p>'+
+      '<div class="zona-ret"><div class="hoja ret" id="rt-hoja">'+retParrafos.map(function(q,i){
+        var marca=q.cond?'<span class="m">{si:'+esc(q.cond[0])+'='+esc(q.cond[1])+'}</span> ':'';
+        return '<'+q.tag+' data-i="'+i+'"'+(i===retElegido?' class="sel"':'')+'>'+marca+q.txt+'</'+q.tag+'>';
+      }).join('')+'</div><div class="menu-sel" id="rt-menu" hidden>'+
+        '<button type="button" data-hoy="1">Cambiar por un campo variable…</button>'+
+        '<button type="button" data-hoy="1">Cambiar por otro texto…</button>'+
+        '<button type="button" data-hoy="1">Esto se pregunta cada vez</button>'+
+        '<button type="button" data-hoy="1">Quitar del documento</button>'+
+        '<button type="button" data-hoy="1">Quitar el párrafo entero</button>'+
+        '<button type="button" class="nuevo" id="rt-cond">Texto condicional…</button></div></div>';
+  }
+  function retEnganchar(){
+    var hoja=$('rt-hoja');if(!hoja)return;
+    function valores(){$('rt-valor').innerHTML=LISTAS[$('rt-dato').value].map(function(v){return '<option>'+esc(v)+'</option>'}).join('')}
+    valores();$('rt-dato').addEventListener('change',valores);
+    hoja.addEventListener('mouseup',function(ev){
+      var selx=window.getSelection();var n=selx&&selx.anchorNode;if(!n)return;
+      var el=(n.nodeType===3?n.parentNode:n).closest('[data-i]');if(!el||!hoja.contains(el))return;
+      if(!selx.toString().trim())return;
+      retElegido=+el.getAttribute('data-i');
+      Array.prototype.forEach.call(hoja.querySelectorAll('.sel'),function(x){x.classList.remove('sel')});el.classList.add('sel');
+      var m=$('rt-menu'),zona=hoja.parentNode.getBoundingClientRect();
+      m.style.left=Math.max(0,Math.min(ev.clientX-zona.left,zona.width-250))+'px';m.style.top=(ev.clientY-zona.top+10)+'px';m.hidden=false;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#rt-menu [data-hoy]'),function(b){b.addEventListener('click',function(){$('rt-menu').hidden=true;$('rt-aviso').textContent='«'+b.textContent+'» hace lo mismo que hoy.'})});
+    $('rt-cond').addEventListener('click',function(){$('rt-menu').hidden=true;$('rt-cuadro').hidden=false});
+    $('rt-cancelar').addEventListener('click',function(){$('rt-cuadro').hidden=true});
+    $('rt-poner').addEventListener('click',function(){
+      if(retElegido==null)return;
+      retParrafos[retElegido].cond=[$('rt-dato').value,$('rt-valor').value];
+      var aviso='Marca puesta: el párrafo solo saldrá si «'+$('rt-dato').value+'» es «'+$('rt-valor').value+'». Si el párrafo ya tenía una marca, se cambia por la nueva.';
+      $('vista').innerHTML=retPintar();retEnganchar();$('rt-aviso').textContent=aviso;
+    });
+  }
   function refrescar(){
     var x=d();
     ['prot','acr','doc'].forEach(function(k){$('w-'+k).classList.toggle('vacio',!x[k])});
     var r1=pintar(resolucion(x),x,'hoja'),r2=pintar(correo(x),x,'correo');
     var falta=Object.keys(Object.assign({},r1.faltan,r2.faltan)).map(function(k){return CAMPO[k]});
     var est=$('estado');
-    if(falta.length){est.className='aviso aviso-ambar';est.innerHTML='<b>Faltan datos:</b> '+falta.map(esc).join(' · ')+'. Los párrafos que dependen de ellos salen en amarillo.'}
-    else{est.className='aviso aviso-verde';est.textContent='Todos los datos puestos: el documento sale solo con los párrafos que tocan.'}
+    if(falta.length){est.className='aviso aviso-ambar';est.innerHTML='<b>Faltan campos:</b> '+falta.map(esc).join(' · ')+'. Los textos condicionales que dependen de ellos salen en amarillo.'}
+    else{est.className='aviso aviso-verde';est.textContent='Todos los campos rellenos: el documento sale solo con los textos condicionales que tocan.'}
+    if(vistaActual==='retocar'){if(!$('rt-hoja')){$('vista').innerHTML=retPintar();retEnganchar()}return}
     if(vistaActual==='editor'){if(!$('ed-texto')){$('vista').innerHTML=editor();engancharEditor()}return}
     $('vista').innerHTML=vistaActual==='word'?r1.html:vistaActual==='correo'?r2.html:plantillaFija();
   }
   ['d-curso','d-pais','d-fecha','d-prot','d-acr','d-doc'].forEach(function(id){$(id).addEventListener('input',refrescar);$(id).addEventListener('change',refrescar)});
-  [['t-word','word'],['t-correo','correo'],['t-plant','plant'],['t-editor','editor']].forEach(function(p){
-    $(p[0]).addEventListener('click',function(){vistaActual=p[1];$('vista').innerHTML='';['t-word','t-correo','t-plant','t-editor'].forEach(function(t){$(t).setAttribute('aria-selected',String(t===p[0]))});refrescar()});
+  [['t-word','word'],['t-correo','correo'],['t-plant','plant'],['t-editor','editor'],['t-retocar','retocar']].forEach(function(p){
+    $(p[0]).addEventListener('click',function(){vistaActual=p[1];$('vista').innerHTML='';['t-word','t-correo','t-plant','t-editor','t-retocar'].forEach(function(t){$(t).setAttribute('aria-selected',String(t===p[0]))});refrescar()});
   });
   refrescar();
 })();
