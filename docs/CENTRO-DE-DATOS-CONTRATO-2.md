@@ -216,3 +216,34 @@ siempre la lista entera).
 - Ocho campos, con `dueno: "gestor-asuntos-ies"`: `cargo` (el id), `cargoNombre`, `tratamiento`, `orden` (numero), `persona`, `sexo` (`H` o `M`), `desde` y `hasta` (fecha, `AAAA-MM-DD`).
   Un dato vacío no se escribe; la `persona` no se limpia; no se corrige nada (fechas que se pisan o al revés se entregan como están).
 - Si `cargos.json` no existe no se entrega (no valen los seis cargos de fábrica); de tener ocupantes a no tener ninguno no se entrega sola.
+
+## Lo que el Gestor toma: el conjunto `libros` (fila 501, 4-nov-2026)
+
+Copia de `docs/CONTRATO.md` del Centro de datos (la versión buena es la suya). El Gestor lo toma con `js/centro-de-datos-libros.js`
+(copia byte a byte, con comprobación de huella, a `_GESTOR/datos/LIBROS-HECHO <curso>.json`) y lo lee `js/libros-hecho.js`.
+
+### El conjunto `libros`
+
+Desde CD v38 el Centro de datos guarda el listado de **libros de texto** de cada nivel y deja **una lista de libros por curso escolar**, con todos los niveles juntos. Es solo añadir: el contrato sigue en **2** y `acuerdoHecho` en **1**. No tiene entregas ni ficha completa, no lleva datos de personas y **todavía no lo usa ninguna aplicación** (el Gestor de asuntos lo usará para los documentos de préstamo y devolución; al diseñarlos, copiar esta sección). El cruce de los libros con cada alumno no está hecho.
+
+**Los listados.** Clave `libros`, uno por nivel (`RegAsiLibMat1_ESO.csv`: el nombre dice el nivel y no dice el curso, que sale del nombre si lo trae o del curso elegido en la página). Variante `<curso>/<nivel>`, `ambito` = el nivel. Se queda viejo a los 365 días.
+
+**Las partes.** Una por cada curso con algún listado `libros`: `parte: "curso"`, ruta `hecho/libros/<curso>/curso.json`. Sus `fuentes` son las entradas `libros` del curso. En `hechos`: `conjunto: "libros"`. Clave de más de la parte: `columnasLibros` (por nivel, los títulos de columna tal como vienen).
+
+**Los registros.** `{ id, datos }`, sin `matriculado`, uno por fila con asignatura. El `id` es `<nivel>~<asignatura sin tildes ni espacios dobles, en minúsculas>~<ISBN sin espacios ni guiones>` (el ISBN vacío si no hay libro). Dos filas con el mismo `id` en un fichero dan un registro (el de la última fila) y un aviso. Las asignaturas sin libro también salen (`conLibro: false`).
+
+| Clave | Etiqueta | Tipo | De dónde sale |
+|---|---|---|---|
+| `nivel` | Nivel | texto | La variante (`eso1`…) |
+| `nivelTexto` | Nivel (para leer) | texto | «1º ESO»… |
+| `materia` | Asignatura | texto | `Materia` |
+| `conLibro` | Tiene libro | si-no | Sí si trae `ISBN/EAN` o `Título` (siempre está) |
+| `isbn`, `editorial`, `titulo` | ISBN/EAN, Editorial, Título | texto | sus columnas |
+| `anioImplantacion` | Año de implantación | numero | `Año de Impl.` |
+| `importe` | Importe estimado (€) | numero | `Importe estimado` (punto o coma decimal) |
+| `digital`, `chequeLibro`, `otroMaterial` | Digital, Incluido en el cheque libro, Otro material curricular | si-no | `Digital`, `Incluir en cheque libro`, `Otro material curricular` |
+| `celdas` | Casillas del listado | tabla | Todas las casillas no vacías: `columna` y `valor` |
+
+Todos con `dueno: "centro-de-datos-ies"` y `fuente: "libros"`. Una clave solo está si la casilla no está vacía y se entiende; si no se entiende, su texto sigue en `celdas` y sale un aviso.
+
+**Los avisos** (lista cerrada): `libros-fichero` (el listado está vacío, no se lee, le falta una de las columnas `Materia`, `ISBN/EAN`, `Editorial` o `Título`, o trae filas sin asignatura; `datos`: `nivel` y `detalle`, una frase llana), `libros-repetido` (`datos`: `materia`, `nivel`) y `libros-dato` (`datos`: `materia`, `nivel`, `columna`). En `hecho/estado.json` se cuentan con tres contadores nuevos: `librosFichero`, `librosRepetido` y `librosDato`.

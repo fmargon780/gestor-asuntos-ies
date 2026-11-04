@@ -171,6 +171,7 @@ App.pintarCategorias = function () {
     b.onclick = function () { App.pulsarCategoriaNuevo(cat); };
     caja.appendChild(b);
   });
+  if (window.NuevoUnidad) NuevoUnidad.actualizar();   /* fila 501: el desplegable «Unidad» */
 };
 
 /* Fila 493: la clase que deja puesta un tipo recién elegido. Con persona elegida, la de la persona; con un
@@ -401,17 +402,26 @@ $('buscar-tercero').oninput = function () {
 App.buscarTercero = async function () {
   var texto = $('buscar-tercero').value;
   var caja = $('resultados-tercero');
-  if (U.normalizar(texto).length < 2) { caja.innerHTML = ''; return; }
+  var unidad = window.NuevoUnidad ? NuevoUnidad.unidad() : '';   /* fila 501 */
+  if (U.normalizar(texto).length < 2 && !unidad) { caja.innerHTML = ''; return; }
   caja.innerHTML = '<div class="explica">Buscando…</div>';
 
   var filtro = App.E.nuevo.categoria;
   /* Fila 493: sin pastilla pulsada, se busca en las clases que admite el tipo elegido (todas si no hay tipo). */
-  var categorias = filtro ? [filtro] : App.clasesPermitidasNuevo();
-  var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8);
+  var categorias = unidad ? ['ALUMNADO'] : (filtro ? [filtro] : App.clasesPermitidasNuevo());
+  var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8, unidad);
   caja.innerHTML = '';
 
   var total = 0;
   porCategoria.forEach(function (p) { total += p.resultados.length; });
+
+  if (!total && unidad) {
+    var sinNadie = document.createElement('div');
+    sinNadie.className = 'vacio';
+    sinNadie.textContent = 'Nadie coincide en ' + unidad + '.';
+    caja.appendChild(sinNadie);
+    return;
+  }
 
   if (!total && filtro && await App.avisoPersonaEnOtraLista(texto, caja, App.buscarTercero)) return;   /* fila 386 */
 

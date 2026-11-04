@@ -161,6 +161,8 @@
       try { tablas = await TablasDatos.prepararDocumento(buffer, asunto, valores); buffer = tablas.buffer; }
       catch (e) { tablas = null; }
     }
+    /* Fila 501: la ficha de entrega de libros que no se puede hacer (falta una asignatura en el listado…). */
+    if (tablas && tablas.bloqueo) { U.aviso(tablas.bloqueo, 'malo'); return; }
     var resultado;
     async function rellenarCon(v) {
       var r = await Docx.rellenar(buffer, v);

@@ -43,6 +43,8 @@ var GenerarParaRelacionados = (function () {
   }
 
   function enganchar(caja, a, h, plantillas) {
+    /* Fila 501: la ficha de entrega de libros avisa de quien no puede tenerla y cuenta «Generar para N de M». */
+    if (window.LibrosFicha) LibrosFicha.alPintarMesa(caja, a, plantillas).catch(function () { /* solo avisos */ });
     Array.prototype.forEach.call(caja.querySelectorAll('.mesa-plantilla-cada'), function (b) {
       b.onclick = async function () {
         var id = b.closest('.mesa-plantilla').dataset.id;
@@ -143,7 +145,7 @@ var GenerarParaRelacionados = (function () {
 
     var fecha = U.hoyIso();
     var etiquetas = etiquetasDeLaPersona();
-    var todos = [];
+    var todos = [], sinFicha = [];
     for (var i = 0; i < personas.length; i++) {
       var rel = personas[i];
       var copia = Plantillas.asuntoParaPersona(a, rel);
@@ -154,9 +156,12 @@ var GenerarParaRelacionados = (function () {
         try { tablas = await TablasDatos.prepararDocumento(base, copia, valores); buffer = tablas.buffer; }
         catch (e) { tablas = null; }
       }
+      /* Fila 501: la ficha de entrega de libros de quien no se puede hacer se deja fuera, con su aviso. */
+      if (tablas && tablas.bloqueo) { sinFicha.push({ rel: rel, motivo: tablas.bloqueo.split((soloElNombre(rel.nombre) || rel.nombre) + ': ').join('') }); continue; }
       var r = await Docx.rellenar(buffer, valores);
       todos.push({ rel: rel, valores: valores, buffer: buffer, tablas: tablas, resultado: r });
     }
+    if (!todos.length && sinFicha.length) { U.aviso(sinFicha.map(function (x) { return x.motivo; }).join(' '), 'malo'); return; }
 
     /* Lo del asunto que falta, una sola vez para todos. */
     var delAsunto = [];
@@ -188,7 +193,7 @@ var GenerarParaRelacionados = (function () {
       if (!sigue) { U.aviso('No se ha generado nada.', 'ambar'); return; }
     }
 
-    var hechos = [], yaEstaban = [], fallidos = [], faltasPorPersona = [], parado = false;
+    var hechos = [], yaEstaban = [], fallidos = sinFicha.slice(), faltasPorPersona = [], parado = false;
     var barra = window.GrupoGenerar ? GrupoGenerar.barra(todos.length) : null;
     for (var j = 0; j < todos.length; j++) {
       var x = todos[j];

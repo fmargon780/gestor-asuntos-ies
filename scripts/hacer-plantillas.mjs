@@ -209,6 +209,13 @@ function parrafosDeBloque(bloque) {
   const lineas = bloque.split('\n').map((l) => l.trim()).filter(Boolean);
   if (!lineas.length) return '';
 
+  /* Fila 501: `:: texto` párrafo centrado; `::: texto`, centrado, en negrita y grande (el título de una ficha). */
+  if (lineas[0].startsWith('::: ')) {
+    return parrafo([lineas[0].replace(/^:::\s+/, '')].concat(lineas.slice(1)), { negrita: true, tamano: 32, centro: true });
+  }
+  if (lineas[0].startsWith(':: ')) {
+    return parrafo([lineas[0].replace(/^::\s+/, '')].concat(lineas.slice(1)), { centro: true });
+  }
   if (lineas[0].startsWith('# ')) {
     return parrafo([lineas[0].replace(/^#\s+/, '')].concat(lineas.slice(1)), { negrita: true, tamano: 32 });
   }
@@ -258,11 +265,15 @@ const RELS_PAQUETE = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
   '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
   '</Relationships>';
 
-const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-  '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
-  '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/><w:sz w:val="22"/></w:rPr></w:rPrDefault></w:docDefaults>' +
-  '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
-  '</w:styles>';
+/* Fila 501: la letra puede cambiar por plantilla (`fuente:` en el frontmatter); por defecto, Calibri. */
+function stylesXmlDe(fuente) {
+  const f = escaparXml(fuente || 'Calibri');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+    '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="' + f + '" w:hAnsi="' + f + '"/><w:sz w:val="22"/></w:rPr></w:rPrDefault></w:docDefaults>' +
+    '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
+    '</w:styles>';
+}
 
 /* Vacío de relaciones a propósito: `Docx.ponerImagen` (fila 81) crea
    la que haga falta la primera vez que un documento con esta
@@ -270,12 +281,12 @@ const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 const RELS_DOCUMENTO_VACIO = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
 
-function construirDocx(cuerpoMd) {
+function construirDocx(cuerpoMd, fuente) {
   return construirZip([
     { nombre: '[Content_Types].xml', texto: CONTENT_TYPES },
     { nombre: '_rels/.rels', texto: RELS_PAQUETE },
     { nombre: 'word/document.xml', texto: documentoXmlDe(cuerpoMd) },
-    { nombre: 'word/styles.xml', texto: STYLES_XML },
+    { nombre: 'word/styles.xml', texto: stylesXmlDe(fuente) },
     { nombre: 'word/_rels/document.xml.rels', texto: RELS_DOCUMENTO_VACIO }
   ]);
 }
@@ -314,7 +325,7 @@ async function main() {
 
     if (esDocumento) {
       const nombreDocx = fichero.replace(/\.md$/, '.docx');
-      const zip = construirDocx(cuerpo);
+      const zip = construirDocx(cuerpo, datos.fuente);
       fs.writeFileSync(path.join(CARPETA_PLANTILLAS, nombreDocx), zip);
       /* Fila 124: un `id` fijo en el frontmatter viaja al índice, para que
          un paso de la biblioteca del centro pueda citar la plantilla
