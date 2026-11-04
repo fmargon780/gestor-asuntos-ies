@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 507 | 60 | Centro de mando: devueltas en «En cola», tabla con paréntesis y leyenda, flechas, frase del botón, reglas de este repositorio, publicar el artefacto y revisor |
 | 375 | 100 | Dos huecos nuevos, pie común en el Word con membrete (footer y relaciones del ZIP), datos de prueba, pruebas y revisor |
 | 408 | 90 | averiguar por qué no renombra al cambiar el tipo, arreglarlo, puesta al día de los asuntos ya mal, pruebas, revisor |
 | 411 | 120 | Nombre del remitente y cuenta de Administración en Ajustes, la cuenta en la respuesta del script y el latido, aviso ámbar y tarjeta de Problemas, buscar hilos antiguos por rfc822msgid, textos de Ajustes, pruebas, revisor |
