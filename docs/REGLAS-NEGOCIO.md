@@ -65,3 +65,12 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   se elige **solo entre las clases permitidas** del tipo.
 - (30-oct-2026, tema 492) En «Nuevo asunto» **no hay pastilla «Todas»**: sin ninguna pulsada salen
   las clases permitidas; una pastilla se fija pulsándola y se suelta pulsándola otra vez.
+
+## Libros de texto
+
+- (4-nov-2026, tema 363) La ficha de entrega lleva **las asignaturas de la matrícula de cada alumno**, cruzadas con el listado de libros, no una lista fija por nivel.
+- (4-nov-2026, tema 363) **Ningún tutor sale impreso** en la ficha: «no sabemos quien de los dos tutores va a firmarlo». Lleva una tabla en blanco de dos líneas y «Basta con la firma de uno de ellos.»
+- (4-nov-2026, tema 363) Si se pierde la ficha se genera un **duplicado por extravío**: dice la fecha de la entrega original y se firma con la de hoy.
+- (4-nov-2026, tema 363) Si una asignatura de la matrícula no está en el listado, la ficha de ese alumno **no se genera** («Debería impedirlo»). En un grupo salen las demás.
+- (4-nov-2026, tema 363) **En Bachillerato no hay ficha:** «el centro no entrega los libros, los compra el alumnado directamente».
+- (4-nov-2026, tema 363) La entrega de septiembre va en asuntos de grupo, por unidad o por nivel, según se elija cada vez.

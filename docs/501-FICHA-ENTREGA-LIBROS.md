@@ -32,7 +32,7 @@ Al diseñarlo (3-nov-2026): «Nos tenemos que centrar en el modelo de documento 
 - **Bachillerato no lleva ficha:** el centro no entrega libros allí, los compra el alumnado. Si el listado no tiene libros de su nivel, aviso rojo y no se genera.
 - El cheque libro no cambia nada en la ficha.
 
-## Pantalla de prueba (aprobada el <fecha>)
+## Pantalla de prueba (aprobada el 4-nov-2026)
 - `docs/pantallas/501.html` · https://claude.ai/artifact/3QX6MFvMDyyKCdj7xa4zts
 
 ## Qué NO se hace en esta tarea
