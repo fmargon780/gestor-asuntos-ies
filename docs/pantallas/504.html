@@ -1,0 +1,419 @@
+<title>Filas devueltas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#f2f4f2; --panel:#ffffff; --ink:#1b2621; --muted:#5d6b64; --line:#d9e0dc;
+  --accent:#0b6b3a; --accent-soft:#e3f1e8;
+  --ok:#1f7a45; --ok-soft:#e2f3e8; --warn:#9a5b00; --warn-soft:#fdf0d9; --bad:#b3261e; --bad-soft:#fbe4e2;
+  --sans:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#121815; --panel:#1a221e; --ink:#e4ebe7; --muted:#9aa8a1; --line:#2c3732;
+    --accent:#5cc28a; --accent-soft:#1d3327;
+    --ok:#6fd198; --ok-soft:#1b3326; --warn:#f0b35a; --warn-soft:#3a2c14; --bad:#f28b82; --bad-soft:#3d1f1d;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#121815; --panel:#1a221e; --ink:#e4ebe7; --muted:#9aa8a1; --line:#2c3732;
+  --accent:#5cc28a; --accent-soft:#1d3327;
+  --ok:#6fd198; --ok-soft:#1b3326; --warn:#f0b35a; --warn-soft:#3a2c14; --bad:#f28b82; --bad-soft:#3d1f1d;
+}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+.wrap{padding-inline:16px;padding-block:12px 20px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+h1{font-size:21px;margin:0;text-wrap:balance}
+.meta{color:var(--muted);font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+a.abre{display:inline-block;font:inherit;font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--accent);background:var(--accent);color:var(--panel);border-radius:6px;padding:5px 10px;cursor:pointer}
+a.abre.grande{font-size:14px;padding:6px 14px}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+
+/* Dos columnas */
+.app{display:block}
+/* Versión 66: sin panel izquierdo; dentro de una app, «← Tus apps» y un desplegable para saltar a otra */
+aside,select#movil{display:none!important}
+.navapp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+/* El botón «Abrir Claude Code» va dentro del recuadro de estado: no hereda el color del título grande */
+.estado a.abre,.estado a.abre.grande{color:var(--panel);font-size:14px}
+.navapp select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);max-width:100%}
+aside{position:sticky;top:env(safe-area-inset-top,0px);max-height:calc(100vh - 70px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:2px}
+.grupo{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 8px 2px}
+details.reposo>summary{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 8px 2px;cursor:pointer;list-style-position:inside}
+.item{display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:4px 8px;text-align:left;width:100%;border:1px solid transparent;background:transparent;border-radius:6px;padding:6px 8px}
+.item:hover{border-color:var(--line)}
+.item[aria-current="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.item .nom{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .cnt{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.item .dsc{grid-column:2 / 4;font-size:12px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.punto{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.punto.ok{background:var(--ok)} .punto.warn{background:var(--warn)} .punto.bad{background:var(--bad)} .punto.info{background:var(--muted)}
+.item .webmal{color:var(--bad);font-weight:700}
+select#movil{display:none;font:inherit;padding:8px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);width:100%}
+
+main{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cab{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.cab h2{font-size:20px;margin:0}
+.cab h2.nom-edit{border:1px solid transparent;border-radius:6px;padding:1px 6px;margin-left:-7px;cursor:text;outline:none}
+.cab h2.nom-edit:hover{border-color:var(--line);background:var(--panel)}
+.cab h2.nom-edit:focus{border-color:var(--accent);background:var(--panel)}
+.cab .gh{font-size:13px}
+.chip{font-size:13px;border-radius:999px;padding:2px 10px;background:var(--panel);border:1px solid var(--line)}
+.chip.ok{color:var(--ok)} .chip.warn{color:var(--warn);background:var(--warn-soft);border-color:transparent} .chip.bad{color:var(--bad);background:var(--bad-soft);border-color:transparent} .chip.info{color:var(--muted)}
+.lanzar{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-lanzar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700;font-size:14px;padding:6px 14px}
+.btn-lanzar.sec{background:transparent;color:var(--muted);border-color:var(--line);font-weight:400;font-size:12px;padding:3px 8px}
+.btn-lanzar:disabled{background:var(--panel);color:var(--muted);border-color:var(--line);cursor:default;font-weight:400}
+.nota{font-size:13px;color:var(--muted)} .nota.bad{color:var(--bad)}
+.frase{font:inherit;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:min(340px,100%);min-width:0;text-overflow:ellipsis}
+
+.estado{border-radius:8px;padding:10px 14px;border:1px solid var(--line);background:var(--panel);display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.estado .grande{font-size:18px;font-weight:700}
+.estado .sub{color:var(--ink);font-size:14px}
+.estado.ok{background:var(--ok-soft);border-color:transparent} .estado.ok .grande{color:var(--ok)}
+.estado.warn{background:var(--warn-soft);border-color:transparent} .estado.warn .grande{color:var(--warn)}
+.estado.bad{background:var(--bad-soft);border-color:transparent} .estado.bad .grande{color:var(--bad)}
+.estado.info .grande{color:var(--accent)}
+.enlaces{display:flex;flex-wrap:wrap;gap:4px 14px;width:100%}
+.enlaces a{font-weight:700}
+.estado .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.avisos{display:flex;flex-direction:column;gap:6px}
+.aviso{border-left:4px solid var(--warn);background:var(--warn-soft);padding:6px 12px;border-radius:0 6px 6px 0;font-size:14px}
+.aviso.bad{border-left-color:var(--bad);background:var(--bad-soft)}
+.cuentas{display:flex;flex-wrap:wrap;gap:6px}
+.cuenta{display:flex;align-items:baseline;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px}
+button.cuenta{cursor:pointer;font-size:13px} button.cuenta[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+.cuenta b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.pestanas{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.pestanas button{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;font-size:14px;padding:6px 12px;color:var(--muted)}
+.pestanas button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;align-items:start}
+section{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+section h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0;display:flex;justify-content:space-between;gap:8px}
+ol,ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+li{display:grid;grid-template-columns:3.2em 1fr;gap:8px;padding:5px 0;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+ol.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));column-gap:24px}
+ol.cols li:nth-child(-n+2){border-top:0}
+.n{font-family:var(--mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.t{min-width:0;overflow-wrap:anywhere}
+.sub{display:block;color:var(--muted);font-size:13px}
+.vacio{color:var(--muted);font-style:italic;padding:2px 0}
+.commit{grid-template-columns:4.2em 1fr}
+.hora{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fallo{color:var(--bad);font-size:14px}
+.fila-p{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.fila-p:first-child{border-top:0}
+.fila-p .nom{font-weight:700}
+.fila-p .sub{grid-column:2 / 4}
+.pie{color:var(--muted);font-size:12px;margin:0}
+li.mov{grid-template-columns:3.2em 1fr auto}
+.flechas{display:flex;gap:4px;align-self:start}
+.flechas button{padding:2px 8px;font-size:14px;line-height:1.2}
+.flechas button:disabled{opacity:.35;cursor:default}
+li.movido .n{color:var(--warn)}
+.barra-orden{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--warn-soft);border-radius:6px;padding:8px 12px;font-size:14px}
+.acciones-idea{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-items:center;font-size:13px}
+.acciones-idea select{font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+.acciones-idea .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.resumen{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.resumen .qui{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.resumen .txt{font-size:15px;white-space:pre-line}
+.resumen .txt.pensando{color:var(--muted);font-style:italic}
+.recortes{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.recorte{border:1px solid var(--line);border-radius:6px;padding:0;background:var(--panel);cursor:zoom-in;line-height:0;max-width:100%}
+.recorte img{display:block;height:72px;width:auto;max-width:220px;object-fit:cover;border-radius:5px}
+.recorte.grande{cursor:zoom-out;flex-basis:100%}
+.recorte.grande img{height:auto;max-width:100%;max-height:none}
+.borrador-img{display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap}
+.borrador-img img{height:56px;border-radius:5px;border:1px solid var(--line)}
+/* Versión 70: archivos adjuntos (PDF, Word, Excel, texto) en las ideas */
+a.archivo,span.archivo{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:5px 10px;background:var(--panel);color:var(--ink);font-size:13px;text-decoration:none;max-width:100%;overflow-wrap:anywhere}
+a.archivo:hover{border-color:var(--accent)}
+.aviso-texto.plegado{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.aviso-texto.desplegable{cursor:pointer}
+.t a.tit-diseno{color:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.t a.tit-diseno:hover{text-decoration-color:var(--accent)}
+.aviso-texto{margin-top:4px;padding:6px 10px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;white-space:pre-line;font-size:14px;color:var(--ink)}
+.barra-orden .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.idea-texto{width:100%;box-sizing:border-box;font:inherit;font-size:15px;line-height:1.55;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);min-height:7.5em;resize:vertical;overflow-y:auto}
+.idea-texto:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.idea-pie{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;width:100%}
+.idea-pie .borrador-img{flex:1;width:auto;min-width:200px}
+.idea-pie .palabras{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* Nota de Francisco en un aviso de soporte, y motivo cuando la captura no se puede traer */
+.nota-fr{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.nota-fr label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.nota-fr .idea-texto{min-height:3.4em;font-size:14px;line-height:1.45}
+.nota-fr .pie-nota{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.nota-fr .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.cap-fallo{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:4px;font-size:13px;color:var(--muted)}
+.cap-fallo button{padding:2px 8px}
+/* Editar una idea propia que sigue sin diseñar: la misma caja grande de «Nueva idea» */
+.edita-idea{display:flex;flex-direction:column;gap:6px;min-width:0}
+.edita-idea label{font-weight:700}
+.edita-idea .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.edita-idea .guardar:disabled{background:var(--panel);color:var(--muted);border-color:var(--line);cursor:default;font-weight:400}
+.edita-idea .nota{width:100%}
+.edita-idea .idea-pie .borrador-img{flex:1 1 100%}
+.edita-idea .idea-pie .palabras{margin-left:auto}
+/* Mientras se edita una idea, su lista se queda con dos tercios del ancho */
+@media (min-width:1000px){ .grid.editando{grid-template-columns:minmax(0,1fr) minmax(0,2fr)} }
+
+/* Enlace a la app, avisos de copias y panel general */
+a.abre.hueca{background:transparent;color:var(--accent)}
+a.abre.mini{font-size:12px;font-weight:400;padding:3px 8px;background:transparent;color:var(--muted);border-color:var(--line)}
+.lanzar .nota.ancha{width:100%}
+.cab .tambien{font-size:12px;color:var(--muted)}
+.aviso.info{border-left-color:var(--muted);background:var(--panel);border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tabla-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0}
+table.panel{border-collapse:collapse;width:100%;font-size:14px}
+table.panel th,table.panel td{padding:6px 10px;border-top:1px solid var(--line);text-align:left;vertical-align:top;font-weight:400}
+table.panel thead th{border-top:0;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);vertical-align:bottom}
+table.panel .num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.panel thead th.num{font-family:var(--sans)}
+table.panel tr.total th,table.panel tr.total td{background:var(--accent-soft);font-weight:700}
+/* Versión 67: la tabla de entrada se desplaza por dentro; la cabecera arriba y la fila «Todas» abajo siempre a la vista */
+.tabla-wrap.panelw{max-height:calc(100vh - 120px);overflow:auto}
+.tabla-wrap.panelw thead th{position:sticky;background:var(--panel);z-index:2}
+.tabla-wrap.panelw thead tr.grupos th{top:0}
+.tabla-wrap.panelw thead tr:not(.grupos) th{top:var(--alto-grupos,30px);box-shadow:inset 0 -1px 0 var(--line)}
+.tabla-wrap.panelw tfoot tr.total th,.tabla-wrap.panelw tfoot tr.total td{position:sticky;bottom:0;z-index:2;box-shadow:inset 0 1px 0 var(--line)}
+table.panel thead th.ordena{cursor:pointer;user-select:none}
+table.panel thead th.ordena:hover{color:var(--ink)}
+table.panel thead th.ordena[aria-sort]:not([aria-sort="none"]){color:var(--ink);font-weight:700}
+table.panel tr.reposo th button.lnk{color:var(--muted)}
+table.panel th[scope="row"]{min-width:150px}
+table.panel td.est{min-width:170px}
+table.panel td:last-child,table.panel th:last-child{white-space:nowrap}
+table.panel td.apl{min-width:190px;overflow-wrap:anywhere}
+table.panel .est .punto{display:inline-block;margin-right:6px}
+button.lnk{border:0;background:none;padding:0;text-align:left;border-radius:2px;color:var(--accent);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+button.lnk[aria-pressed="true"]{background:var(--accent);color:var(--panel);text-decoration:none;padding:0 6px}
+.cero{color:var(--muted)}
+table.panel.suelta td:last-child,table.panel.suelta th:last-child{white-space:normal;min-width:240px}
+table.panel td.cod{font-family:var(--mono);font-weight:600;color:var(--accent);white-space:nowrap}
+.dos-tablas{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sop-ok{color:var(--ok);font-weight:700} .sop-warn{color:var(--warn);font-weight:700} .sop-info{color:var(--muted)}
+
+/* Te toca a ti: pasos que solo puede dar Francisco */
+.pestanas button.con:not([aria-selected="true"]){color:var(--warn);font-weight:700}
+.grid.toca{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.grid.tocas{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.caja-toca{display:flex;flex-direction:column;gap:6px;min-width:0}
+li.paso{grid-template-columns:3.2em minmax(0,1fr) auto;align-items:start}
+li.paso>button{white-space:nowrap}
+li.paso .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+li.paso.hecho .txt{color:var(--muted);text-decoration:line-through}
+li.paso code{font-family:var(--mono);font-size:13px;background:var(--ground);border-radius:4px;padding:0 4px;overflow-wrap:anywhere}
+/* Hecho por ti (9-oct-2026): cada paso en un renglón; «Ampliar» lo enseña entero, con su botón «Deshacer» */
+li.paso.corto{align-items:baseline;padding:3px 0}
+li.paso.corto .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+li.paso.corto .sub{display:none}
+li.paso .conv{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:4px}
+li.paso .conv input{font:inherit;font-size:13px;flex:1 1 260px;min-width:0;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+li.paso .conv .nota{width:100%}
+li.paso .conv button{padding:3px 8px;font-size:12px}
+li.paso .conv a.abre.mini.seguir{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+li.paso button.mas{border:0;background:none;padding:0;color:var(--accent);font-size:13px;text-decoration:underline;border-radius:2px}
+li.paso .t button.mas{display:block;margin-top:2px}
+.duda{color:var(--warn);font-weight:700}
+/* Proyecto de Claude de cada app: una línea en «Ideas y diseño» */
+.barra-orden.proy{background:var(--panel);border:1px solid var(--line)}
+.barra-orden.proy input{flex:1;min-width:220px;font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+.barra-orden.proy .guardar{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.barra-orden.proy .ok{color:var(--ok);font-weight:700}
+section h3 button.lnk{text-transform:none;letter-spacing:0;font-size:14px}
+
+/* Versión 65: mapa de la app, reflexión, números que piden algo, tabla de entrada por bloques */
+.mapa{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 20px}
+.mapa .bloque{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mapa h4{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.mapa p{margin:0;font-size:14px}
+.mapa ul{list-style:disc;padding-left:18px;display:block}
+.mapa ul li{display:list-item;border:0;padding:1px 0;font-size:14px}
+li.marcable{grid-template-columns:5em 1fr}
+li.fuera .t{color:var(--muted)}
+label.casilla{display:flex;align-items:flex-start;gap:6px;cursor:pointer}
+label.casilla input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+a.abre[aria-disabled="true"]{background:var(--panel);color:var(--muted);border-color:var(--line);font-weight:400;cursor:default}
+.reflex{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.resalta{background:var(--warn-soft);color:var(--warn)!important;border-radius:4px;padding:0 6px}
+button.lnk.resalta{text-decoration:none;padding:0 6px}
+button.cuenta.alerta:not([aria-pressed="true"]){border-color:var(--warn);color:var(--warn);font-weight:700}
+table.panel thead tr.grupos th{text-align:center;color:var(--ink);font-weight:700;border-bottom:1px solid var(--line)}
+table.panel .sep{border-left:2px solid var(--line)}
+table.panel thead th.num{white-space:normal;min-width:72px}
+.tema-ideas{margin-top:4px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:1px}
+.tipo{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--warn)}
+
+@media (max-width:760px){
+  .grid.toca,.grid.tocas{grid-template-columns:1fr}
+  li.paso{grid-template-columns:3.2em minmax(0,1fr)}
+  li.paso>button{grid-column:2;justify-self:start}
+  li.paso.corto{grid-template-columns:3.2em minmax(0,1fr) auto}
+  li.paso.corto>button{grid-column:auto}
+  .app{grid-template-columns:1fr}
+  aside{display:none}
+  select#movil{display:block}
+  ol.cols{grid-template-columns:1fr}
+  ol.cols li:nth-child(2){border-top:1px solid var(--line)}
+  .lanzar{margin-left:0}
+}
+/* Versión 75: vista «Tiempo por app» */
+.tiempo,.tiempo *{box-sizing:border-box}
+.tiempo{display:flex;flex-direction:column;gap:10px;min-width:0}
+.t-periodo{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.t-grupo{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.t-chip{font-size:13px;padding:3px 9px}
+.t-chip[aria-pressed="true"]{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.t-sel{font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+.t-sel select{font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+.t-lista{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:2px 14px}
+.t-fila{display:grid;grid-template-columns:2em minmax(130px,190px) minmax(0,1fr) 4.5em minmax(170px,1fr) auto;gap:4px 12px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.t-fila:first-child{border-top:0}
+.t-fila.t-cab{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:7px 0}
+.t-pos{font-family:var(--mono);font-weight:600;color:var(--accent)}
+.t-nom{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.t-barra{height:12px;background:var(--line);border-radius:3px;overflow:hidden;min-width:40px}
+.t-barra i{display:block;height:100%;background:var(--accent)}
+.t-fila.mal .t-barra i{background:var(--warn)}
+.t-horas{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.t-aviso{font-size:14px;min-width:0}
+.t-aviso span{display:inline-block;max-width:100%;border-radius:6px;padding:1px 8px;background:var(--warn-soft);color:var(--warn);margin:1px 4px 1px 0}
+.t-aviso span.olvido{background:var(--bad-soft);color:var(--bad)}
+.t-aviso span.t-carga{background:transparent;color:var(--muted);padding-left:0}
+.t-fila .flechas{align-self:center}
+@media (max-width:760px){
+  .t-fila.t-cab{display:none}
+  .t-fila{grid-template-columns:2em minmax(0,1fr) auto}
+  .t-barra{grid-column:2}
+  .t-horas{grid-column:3;grid-row:2}
+  .t-aviso{grid-column:2 / 4}
+  .t-aviso:empty{display:none}
+  .t-fila .flechas{grid-column:3;grid-row:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.prueba{background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;padding:6px 12px;font-size:14px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.prueba button{background:var(--panel)}
+.texto-dev{display:inline-block;width:4.5ch;margin-left:.5ch;text-align:left;color:var(--bad);font-weight:700}
+.t .chip{display:inline-block;font-size:12px;font-weight:700;padding:0 8px;margin-right:6px}
+</style>
+<div class="wrap">
+  <header><h1>Centro de mando</h1><div class="meta"><span>Actualizado a las 10:00</span></div></header>
+  <div class="prueba"><span><b>Pantalla de prueba.</b> Datos inventados; no guarda nada.</span>
+    <button id="sim" type="button">Simular que Claude Code termina la primera fila de esta app</button>
+    <button id="ini" type="button">Volver al principio</button></div>
+  <main id="principal"></main>
+</div>
+<script>
+(function(){
+const INI=()=>({
+ biblioteca:{nom:"Biblioteca escolar",ap:3,dec:1,fal:0,hechas:[],filas:[
+  {n:31,t:"Ficha de préstamo con foto del alumno",e:"D",min:30,nota:"Lo que no coincide: la foto sale cortada al imprimir."},
+  {n:34,t:"Aviso de libros sin devolver",e:"D",min:20,nota:"El revisor la rechazó dos veces: el aviso salía dos veces."},
+  {n:36,t:"Buscar por autor",e:"P",min:40,nota:""},
+  {n:37,t:"Lista de lecturas por curso",e:"P",min:60,nota:""},
+  {n:39,t:"Etiquetas con código de barras",e:"P",min:90,nota:""}]},
+ reservas:{nom:"Reservas de aulas",ap:0,dec:2,fal:1,hechas:[],filas:[
+  {n:12,t:"Reservar una semana entera de una vez",e:"D",min:40,nota:"Lo que no coincide: el viernes no se reserva."}]},
+ comedor:{nom:"Comedor",ap:5,dec:0,fal:0,hechas:[{n:8,t:"Menú del mes en PDF",h:"09:12"}],filas:[
+  {n:9,t:"Alergias en la lista del día",e:"P",min:30,nota:""},
+  {n:10,t:"Altas y bajas por trimestre",e:"P",min:50,nota:""}]},
+ ajedrez:{nom:"Club de ajedrez",ap:1,dec:0,fal:0,hechas:[],filas:[]}
+});
+let A=INI(),sel="panel",pest="trabajo",fil={},ordenP="app",filtroP=null,orden={},abierta={},msg={},detalles=new Set();
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const bot=(c,x,f)=>{const b=el("button",c,x);b.type="button";b.addEventListener("click",f);return b;};
+const pendDe=(k)=>{const a=A[k];return orden[k]?orden[k].map(n=>a.filas.find(f=>f.n===n)):a.filas.slice();};
+const COLS=[["apuntadas","Ideas","Apuntadas",a=>a.ap,a=>a.ap>=5],["decididas","Ideas","Decididas",a=>a.dec,()=>0],
+ ["encola","Trabajo","En cola",a=>a.filas.length,()=>0],["trabajando","Trabajo","Trabajando",()=>0,()=>0],
+ ["necesitan","Trabajo","Te necesitan",()=>0,()=>0],["aprobar","Trabajo","Por aprobar",()=>0,()=>0],
+ ["fallos","Fallos","Fallos avisados",a=>a.fal,a=>a.fal>0]];
+const textoDev=n=>el("span","texto-dev",n?"("+n+")":"");
+const sep=i=>i===0||i===2||i===6?" sep":"";
+function abrirEn(k,col){sel=k;pest=col==="apuntadas"||col==="decididas"?"ideas":col==="fallos"?"fallos":"trabajo";
+ if(col==="encola")fil[k]="pend";if(col==="trabajando")fil[k]="encurso";if(col==="necesitan")fil[k]="necesitan";if(col==="aprobar")fil[k]="paquete";pintar();}
+function panel(){
+ const m=$("principal"),nom=(a,b)=>A[a].nom.localeCompare(A[b].nom,"es");
+ const col=COLS.find(c=>c[0]===ordenP),colF=COLS.find(c=>c[0]===filtroP);
+ const ks=Object.keys(A).filter(k=>!colF||colF[3](A[k])>0).sort((a,b)=>col?(col[3](A[b])-col[3](A[a]))||nom(a,b):nom(a,b));
+ const cab=el("div","cab");cab.append(el("h2",null,"Tus apps"),el("span","nota",colF?"Solo las apps con «"+colF[2]+"». Pulsa otra vez el total de abajo para verlas todas.":"Pulsa un número para ir a esa lista dentro de la app. Pulsa el título de una columna para ordenar (el mayor arriba); «App» vuelve al orden alfabético. Los totales de la última fila filtran la tabla."));
+ const t=el("table","panel"),th=el("thead"),tg=el("tr","grupos");tg.append(el("th"));
+ [["Ideas",2],["Trabajo",4],["",1]].forEach(([x,n])=>{const h=el("th","sep",x);h.colSpan=n;tg.append(h);});
+ const marca=(h,id,x)=>{const on=ordenP===id;h.textContent=x+(on?(id==="app"?" ▲":" ▼"):"");h.addEventListener("click",()=>{ordenP=id;pintar();});};
+ const tr=el("tr"),hp=el("th","ordena");marca(hp,"app","App");tr.append(hp);
+ COLS.forEach((c,i)=>{const h=el("th","num ordena"+sep(i));marca(h,c[0],c[2]);tr.append(h);});th.append(tg,tr);t.append(th);
+ const tb=el("tbody");
+ ks.forEach(k=>{const a=A[k],r=el("tr"),h=el("th");h.scope="row";h.append(bot("lnk",a.nom,()=>abrirEn(k,null)));r.append(h);
+  COLS.forEach(([id,g,x,fn,pide],i)=>{const v=fn(a),td=el("td","num"+sep(i));
+   if(v)td.append(bot("lnk"+(pide(a)?" resalta":""),String(v),()=>abrirEn(k,id)));else td.append(el("span","cero","0"));const nd=id==="encola"?a.filas.filter(f=>f.e==="D").length:0;if(id==="encola")td.append(textoDev(nd));r.append(td);});tb.append(r);});
+ const tf=el("tfoot"),to=el("tr","total"),h0=el("th",null,"Todas ("+Object.keys(A).length+")");to.append(h0);
+ COLS.forEach(([id,g,x,fn],i)=>{const v=Object.values(A).reduce((n,a)=>n+fn(a),0),td=el("td","num"+sep(i));
+  if(v){const b=bot("lnk",String(v),()=>{filtroP=filtroP===id?null:id;pintar();});b.setAttribute("aria-pressed",filtroP===id?"true":"false");td.append(b);}else td.append(el("span","cero","0"));const nd=id==="encola"?Object.values(A).reduce((n,a)=>n+a.filas.filter(f=>f.e==="D").length,0):0;if(id==="encola")td.append(textoDev(nd));to.append(td);});
+ tf.append(to);t.append(tb,tf);const w=el("div","tabla-wrap");w.append(t);m.replaceChildren(cab,w,el("p","pie","En rojo y entre paréntesis, junto al número de «En cola»: cuántas de esas filas están devueltas."));
+}
+const hhmm=min=>{const x=600+min;return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");};
+const dur=m=>(Math.floor(m/60)?Math.floor(m/60)+" h ":"")+(m%60?(m%60)+" min":"");
+function frase(k){const f=pendDe(k)[0],b="Repositorio fmargon780/"+k+". Lee su CLAUDE.md y cúmplelo. ";
+ const otra=f.e==="P"&&pendDe(k).some(x=>x.e==="D");return b+"Coge la primera fila DEVUELTA o PENDIENTE de docs/COLA.md, en el orden de la cola: debe ser la fila "+f.n+"."+(f.e==="D"?" Está DEVUELTA: lee su nota y retómala desde lo que quedó hecho.":"")+(otra?" Hazla aunque haya una DEVUELTA detrás: Francisco ha puesto este orden.":"")+" Lo primero de todo, márcala EN CURSO y sube ese cambio a main.";}
+function trabajo(k){
+ const a=A[k],lista=pendDe(k),est=el("div","estado"),g=el("span","grande"),s=el("span","sub");est.append(g,s);
+ if(lista.length){est.classList.add("info");g.textContent=lista.length+(lista.length===1?" fila en cola":" filas en cola");s.textContent="La siguiente es la fila "+lista[0].n+".";}
+ else{est.classList.add("ok");g.textContent="Nada en cola";s.textContent="Claude Code no tiene nada que hacer en esta app.";}
+ const lz=el("div","lanzar");lz.style.marginLeft="0";
+ if(lista.length){const inp=el("input","frase");inp.type="text";inp.readOnly=true;inp.value=frase(k);inp.id="frase-"+k;inp.setAttribute("aria-label","Encargo para Claude Code");
+  const b=el("a","abre grande",abierta[k]?"Abierta ✓":"Abrir Claude Code: fila "+lista[0].n);b.href="#";b.addEventListener("click",e=>{e.preventDefault();abierta[k]=1;pintar();});lz.append(inp,b);
+  if(abierta[k])lz.append(el("span","nota ancha","En la app se abriría Claude Code con esta frase escrita: «"+frase(k)+"»"));
+ }else lz.append(el("span","nota","Nada en cola."));
+ est.append(lz);
+ const cu=el("div","cuentas");let f=fil[k]||"pend";
+ const T=[["pend","En cola",lista.length],["encurso","Trabajando",0],["necesitan","Te necesitan",0],["paquete","Por aprobar",0],["hechas","Hechas hoy",a.hechas.length],["todas","Ver todas",lista.length+a.hechas.length]];
+ T.forEach(([id,x,v])=>{const c=bot("cuenta",x+" ",()=>{fil[k]=id;pintar();});c.setAttribute("aria-pressed",f===id?"true":"false");c.append(el("b",null,String(v)));cu.append(c);});
+ const ol=el("ol","cols");let reloj=0;
+ const verDet=(e,txt,key)=>{const d=el("details");d.open=detalles.has(key);d.addEventListener("toggle",()=>{d.open?detalles.add(key):detalles.delete(key);});d.style.cssText="font-size:12px;color:var(--muted)";d.append(el("summary",null,"ver detalle"),el("div",null,txt));e.append(d);};
+ if(f==="pend"||f==="todas"){
+  const ps=lista;
+  lista.forEach(x=>{reloj+=x.min;const li=el("li","mov"),t=el("div","t");t.append(el("div",null,x.t));
+   const sb=el("span","sub");if(x.e==="D"){sb.append(el("span","chip warn","Devuelta"),document.createTextNode("≈ "+dur(x.min)+" · acabará hacia las "+hhmm(reloj)));}
+   else sb.textContent="En cola · ≈ "+dur(x.min)+" · acabará hacia las "+hhmm(reloj);
+   t.append(sb);verDet(t,x.t+(x.nota?" · "+x.nota:""),k+x.n);
+   const nn=el("span","n",String(x.n));if(orden[k]&&a.filas[ps.indexOf(x)]!==x)li.classList.add("movido");li.append(nn,t);
+   if(ps.length>1){const i=ps.indexOf(x),fl=el("div","flechas");
+    const mv=(dest)=>{const o=ps.map(y=>y.n);o.splice(i,1);o.splice(dest,0,x.n);orden[k]=o;msg[k]=null;pintar();};
+    const mk=(s,tt,dis,fn)=>{const b=bot(null,s,fn);b.title=tt;b.disabled=dis;fl.append(b);};
+    mk("⤒","Llevar al principio",i===0,()=>mv(0));mk("↑","Adelantar",i===0,()=>mv(i-1));mk("↓","Retrasar",i===ps.length-1,()=>mv(i+1));mk("⤓","Llevar al final",i===ps.length-1,()=>mv(ps.length-1));li.append(fl);}
+   ol.append(li);});
+ }
+ if(f==="hechas"||f==="todas")a.hechas.forEach(x=>{const li=el("li"),t=el("div","t");t.append(el("div",null,x.t),el("span","sub","Terminada a las "+x.h));li.append(el("span","n",String(x.n)),t);ol.append(li);});
+ if(!ol.children.length){const v=el("li");v.style.display="block";v.append(el("span","vacio",f==="necesitan"?"Nada te necesita en esta app.":"No hay ninguna."));ol.append(v);}
+ const TIT={pend:"En cola",encurso:"Trabajando",necesitan:"Te necesitan",paquete:"Por aprobar",hechas:"Hechas hoy",todas:"Todas"};
+ const sec=el("section"),h3=el("h3");h3.append(el("span",null,TIT[f]));if(f==="pend"&&lista.length)h3.append(el("span",null,lista.length+" · fin de la cola ≈ "+hhmm(reloj)));sec.append(h3,ol);
+ const out=[est,cu];
+ if(orden[k]||msg[k]){const b=el("div","barra-orden");
+  if(orden[k]){b.append(el("span",null,"Has cambiado el orden. No se aplica hasta que lo guardes."),bot("guardar","Guardar el nuevo orden",()=>{a.filas=pendDe(k);delete orden[k];msg[k]="Orden guardado (en esta prueba no se guarda de verdad).";pintar();}),bot(null,"Deshacer",()=>{delete orden[k];pintar();}));}
+  else b.append(el("span",null,msg[k]));out.push(b);}
+ out.push(sec);return out;
+}
+function proyecto(k){
+ const nav=el("div","navapp");nav.append(bot("lnk","← Tus apps",()=>{sel="panel";pintar();}));
+ const s=el("select");s.id="saltar";s.setAttribute("aria-label","Saltar a otra app");Object.keys(A).forEach(x=>{const o=el("option",null,A[x].nom);o.value=x;o.selected=x===k;s.append(o);});s.addEventListener("change",()=>{sel=s.value;pintar();});nav.append(s);
+ const cab=el("div","cab");cab.append(el("h2",null,A[k].nom));
+ const p=el("div","pestanas");[["ideas","Ideas y diseño"],["trabajo","Trabajo"],["fallos","Fallos avisados"]].forEach(([id,x])=>{const b=bot(null,x,()=>{pest=id;pintar();});b.setAttribute("aria-selected",pest===id?"true":"false");p.append(b);});
+ const c=pest==="trabajo"?trabajo(k):[(()=>{const v=el("section");v.append(el("span","vacio","Esta pestaña queda igual que hoy."));return v;})()];
+ $("principal").replaceChildren(nav,cab,p,...c);
+}
+function pintar(){$("sim").hidden=sel==="panel"||pest!=="trabajo"||!A[sel].filas.length;if(sel==="panel")panel();else proyecto(sel);}
+$("sim").addEventListener("click",()=>{const a=A[sel],f=pendDe(sel)[0];if(orden[sel]){a.filas=pendDe(sel);delete orden[sel];}a.filas=a.filas.filter(x=>x!==f);a.hechas.unshift({n:f.n,t:f.t,h:"10:00"});delete abierta[sel];msg[sel]=null;pintar();});
+$("ini").addEventListener("click",()=>{A=INI();orden={};abierta={};msg={};fil={};detalles.clear();sel="panel";pest="trabajo";filtroP=null;ordenP="app";pintar();});
+pintar();
+})();
+
+</script>
