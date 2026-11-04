@@ -305,18 +305,22 @@ var Docx = (function () {
     var segmentos = extraerTextos(xmlParrafo);
     if (!segmentos.length) return xmlParrafo;
     repararHuecosPartidos(segmentos);
+    /* Fila 510 (js/texto-condicional.js): la marca {si:Campo=Valor} del principio del párrafo nunca sale. */
+    var condicional = window.TextoCondicional
+      ? TextoCondicional.aplicarASegmentos(segmentos, valores, faltanTotal, decodificarEntidades, escaparXml) : null;
+    if (condicional === 'quita') return '';
 
     var salida = xmlParrafo;
     for (var j = segmentos.length - 1; j >= 0; j--) {
       var seg = segmentos[j];
       var plano = decodificarEntidades(seg.texto);
-      var r = Plantillas.rellenar(plano, valores);
+      var r = Plantillas.rellenar(plano, valores, { sinCondicionales: true });
       if (r.faltan.length) faltanTotal.push.apply(faltanTotal, r.faltan);
       var escapado = escaparXml(r.texto).split('\n').join('</w:t><w:br/><w:t xml:space="preserve">');
       var nuevo = '<w:t xml:space="preserve">' + escapado + '</w:t>';
       salida = salida.slice(0, seg.inicio) + nuevo + salida.slice(seg.fin);
     }
-    return salida;
+    return condicional === 'falta' ? TextoCondicional.resaltarParrafoXml(salida) : salida;
   }
 
   /* Un párrafo que tenía texto de verdad (un hueco, casi siempre) y se

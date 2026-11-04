@@ -88,10 +88,10 @@ await pagina.waitForSelector('#pl-texto');
 
 await comprobar('el formulario ya no pinta el muro de huecos',
   pagina.locator('#pl-huecos').count(), 0);
-await comprobar('y sí pinta un solo botón "Insertar hueco"',
+await comprobar('y sí pinta un solo botón "Campo variable"',
   pagina.locator('#pl-insertar-hueco').count(), 1);
 await comprobar('el texto del botón es el acordado',
-  pagina.locator('#pl-insertar-hueco').textContent(), 'Insertar hueco');
+  pagina.locator('#pl-insertar-hueco').textContent(), 'Campo variable');
 await comprobar('el cuadro de huecos nace cerrado',
   pagina.locator('#huecos-cuadro').count(), 0);
 

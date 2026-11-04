@@ -146,7 +146,7 @@
       caja.id = 'huecos-cuadro';
       caja.innerHTML =
         '<input type="search" class="campo huecos-buscar" id="huecos-buscar" ' +
-          'placeholder="Buscar un hueco: escribe unas letras" autocomplete="off">' +
+          'placeholder="Buscar un campo variable: escribe unas letras" autocomplete="off">' +
         '<div class="huecos-lista" id="huecos-lista"></div>' +
         '<p class="huecos-pie">Flechas y Enter para elegir. Escape para cerrar.</p>';
       document.body.appendChild(caja);
@@ -165,7 +165,7 @@
         elegido = 0;
         cajaLista.innerHTML = '';
         if (!visibles.length) {
-          cajaLista.innerHTML = '<div class="huecos-vacio">Ningún hueco se llama así.</div>';
+          cajaLista.innerHTML = '<div class="huecos-vacio">Ningún campo variable se llama así.</div>';
           return;
         }
         visibles.forEach(function (h, i) {
@@ -255,10 +255,20 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'boton boton-hueco';
-    b.textContent = texto || 'Insertar hueco';
+    b.textContent = texto || 'Campo variable';
     return b;
   }
 
-  window.HuecosBuscador = { montar: montar, boton: boton, cerrar: cerrar };
+  /* Fila 510: el recuadro azul «Insertar» que sustituye al botón suelto. Siempre lleva «Campo variable» (el antiguo
+     «Insertar hueco»); «Texto condicional» solo si se da `idCondicional` (donde se escribe una plantilla de correo).
+     `claseCampo`: una clase más para el botón «Campo variable». */
+  function recuadroInsertarHTML(idCampoVariable, idCondicional, claseCampo) {
+    return '<fieldset class="insertar-caja"><legend>Insertar</legend>' +
+      '<button type="button" class="boton boton-hueco' + (claseCampo ? ' ' + claseCampo : '') + '"' + (idCampoVariable ? ' id="' + idCampoVariable + '"' : '') + '>Campo variable</button>' +
+      (idCondicional ? '<button type="button" class="boton boton-hueco" id="' + idCondicional + '">Texto condicional</button>' : '') +
+      '</fieldset>';
+  }
+
+  window.HuecosBuscador = { montar: montar, boton: boton, cerrar: cerrar, recuadroInsertarHTML: recuadroInsertarHTML };
 
 })();

@@ -183,7 +183,7 @@
 
     contenedor.innerHTML =
       '<p class="explica">Cada plantilla es solo el cuerpo del medio: el saludo y la firma se ' +
-      'ponen solos. Sirve igual para el correo y para el mensaje de Séneca. Los huecos entre ' +
+      'ponen solos. Sirve igual para el correo y para el mensaje de Séneca. Los campos variables entre ' +
       'llaves, como <code>{nombre}</code>, se rellenan solos al abrir el cuadro.</p>' +
       '<div id="tipo-plantillas-lista" class="rejilla-tipos"></div>' +
       '<button type="button" class="boton boton-principal" id="tipo-plantillas-nueva" ' +
@@ -258,9 +258,11 @@
   function campoDeTextoHTML(idTexto, idBoton, etiqueta, valor, filas) {
     return '<div class="etiqueta-con-boton">' +
       '<label class="etiqueta">' + U.escapar(etiqueta) + '</label>' +
-      '<button type="button" class="boton boton-hueco" id="' + idBoton + '">Insertar hueco</button>' +
+      /* Fila 510: el recuadro «Insertar», con «Campo variable» y «Texto condicional». */
+      HuecosBuscador.recuadroInsertarHTML(idBoton, idTexto + '-condicional') +
       '</div>' +
-      '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(valor || '') + '</textarea>';
+      '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(valor || '') + '</textarea>' +
+      '<p class="nota texto-cond-aviso" id="' + idTexto + '-cond-aviso" aria-live="polite"></p>';
   }
 
   /* Fila 170 (docs/PLANTILLAS-DEL-COMPANERO.md, parte 2): un segundo
@@ -284,10 +286,14 @@
     return fila;
   }
 
-  function engancharCampoDeTexto(idTexto, idBoton, otrosCampos) {
+  function engancharCampoDeTexto(idTexto, idBoton, otrosCampos, tipoDeLaPlantilla) {
     var boton = $(idBoton), campo = $(idTexto);
     if (!boton || !campo) return;
     HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]) });
+    /* Fila 510: «Texto condicional» pone {si:Campo=Valor} al principio del párrafo del cursor. */
+    if (window.TextoCondicionalCuadro) {
+      TextoCondicionalCuadro.montarBoton({ boton: $(idTexto + '-condicional'), campo: campo, tipo: tipoDeLaPlantilla, aviso: $(idTexto + '-cond-aviso') });
+    }
   }
 
   /* Fila 465: una plantilla general (sin tipo ni categoría, como «Aviso de avance») se puede ver y cambiar
@@ -338,8 +344,9 @@
      cuadro de texto. La vista previa se repinta sola, porque al
      insertar se lanza un evento `input`. */
   function engancharCuadro(existente, tipoPreset) {
-    engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', []);
-    engancharCampoDeTexto('pl-texto-seneca', 'pl-insertar-hueco-seneca', []);
+    function tipoElegido() { return ($('pl-tipo') || {}).value || ''; }
+    engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', [], tipoElegido);
+    engancharCampoDeTexto('pl-texto-seneca', 'pl-insertar-hueco-seneca', [], tipoElegido);
 
     function pintarPrevia() {
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);
@@ -447,7 +454,7 @@
     function pintar() {
       if (!caja) return;
       if (!vivos.length) { caja.innerHTML = ''; return; }
-      caja.innerHTML = '<p class="nota">He cambiado estos datos por su hueco. Revísalos:</p>';
+      caja.innerHTML = '<p class="nota">He cambiado estos datos por su campo variable. Revísalos:</p>';
       vivos.forEach(function (c) {
         var fila = document.createElement('div');
         fila.className = 'pl2-cambio';
@@ -487,11 +494,11 @@
 
   function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar, inicial) {
     contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente, inicial);
-    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', []);
-    engancharCampoDeTexto('pl2-texto-seneca', 'pl2-insertar-hueco-seneca', []);
-
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+    function tipoDelAsunto() { return tipo; }
+    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', [], tipoDelAsunto);
+    engancharCampoDeTexto('pl2-texto-seneca', 'pl2-insertar-hueco-seneca', [], tipoDelAsunto);
 
     /* Con el cuadro abierto desde un hito, la vista previa lleva también el hito (fila 270). */
     var hitoDelCuadro = (window.CorreoNucleo && CorreoNucleo._interno && CorreoNucleo._interno.hitoActual) || undefined;

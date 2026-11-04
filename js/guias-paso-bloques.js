@@ -177,7 +177,7 @@ var GuiasPasoBloques = (function () {
         '<div class="etiqueta-con-boton">' +
           '<label class="etiqueta">Texto para los documentos de este hito ' +
             '<span class="suave">(opcional)</span></label>' +
-          '<button type="button" class="boton boton-hueco paso-texto-documentos-boton">Insertar hueco</button>' +
+          HuecosBuscador.recuadroInsertarHTML('', '', 'paso-texto-documentos-boton') +
         '</div>' +
         '<input class="campo paso-texto-documentos" value="' + U.escapar(p.textoDocumentos || '') + '">' +
         '<label class="etiqueta">Tipo de documento que suele salir de aquí ' +

@@ -33,10 +33,15 @@ var WordFaltan = (function () {
     var igual = false;
     var esperar = U.preguntar('Faltan datos para este documento',
       '<p class="explica">Escribe lo que falte. Vale solo para este documento: no se guarda en ninguna ficha. ' +
-      'Lo que dejes vacío se queda como hueco en el Word.</p>' +
+      'Lo que dejes vacío se queda sin rellenar en el Word.</p>' +
       lista.map(function (f, i) {
-        return '<label class="etiqueta" for="word-falta-' + i + '">' + U.escapar(legible(f)) + '</label>' +
-          '<input class="campo word-falta" id="word-falta-' + i + '" data-hueco="' + U.escapar(f) + '">';
+        /* Fila 510: un campo de lista que decide un texto condicional se elige en un desplegable con sus opciones. */
+        var opciones = window.TextoCondicional ? TextoCondicional.opcionesDeFalta(f) : null;
+        var control = opciones
+          ? '<select class="campo word-falta" id="word-falta-' + i + '" data-hueco="' + U.escapar(f) + '"><option value="">—</option>' +
+            opciones.map(function (o) { return '<option>' + U.escapar(o) + '</option>'; }).join('') + '</select>'
+          : '<input class="campo word-falta" id="word-falta-' + i + '" data-hueco="' + U.escapar(f) + '">';
+        return '<label class="etiqueta" for="word-falta-' + i + '">' + U.escapar(legible(f)) + '</label>' + control;
       }).join('') +
       '<p style="margin-top:10px"><button type="button" class="boton" id="word-falta-igual">Generar igualmente</button></p>',
       'Generar');

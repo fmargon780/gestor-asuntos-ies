@@ -703,3 +703,20 @@ Prueba: `pruebas/correo-tutor-botones.mjs`.
 `enviarCorreo` (Apps Script) ya no ignora el asunto del cuadro de Correo al responder: si el asunto es el del primer mensaje del hilo (`mismoAsunto`: sin `Re:`/`RV:`/`Fw:`/`Fwd:` repetidos, mayúsculas ni espacios de más) y los destinatarios ya estaban en él, responde dentro (`createDraftReply`); si no, correo nuevo con ese asunto, cuyo hilo devuelve y la app engancha al asunto como cualquier envío. Una app vieja sin asunto responde dentro, como antes. La app no cambia: decide el script. `VERSION_SCRIPT` y `SCRIPT_ESPERADO`: `23-oct-2026 · fila 441` (hace falta pegar el script y «Nueva versión»).
 
 **La versión del script, preguntada sin enviar nada (fila 471, `docs/AVISO-SCRIPT-CORREO-FIABLE.md`).** `apps-script/gestor-correos.gs` tiene `doGet(e)`: con `?k=<clave>` buena contesta `{ ok: true, soloVersion: true, version, cuenta }` y no envía; con clave mala, `{ ok: false, motivo }` sin `version`. `js/correo-version.js` (`CorreoVersion`) hace ese GET a la dirección guardada al abrir la app (una vez por carga) y al entrar en Ajustes → Mantenimiento (como mucho una vez por minuto), y llama a `CorreoEnviar.registrarVersionScript`. Red caída, tiempo agotado (15 s), respuesta que no es JSON (script viejo sin `doGet`) o clave mala: no tocan lo guardado ni la dirección. La tarjeta «El envío de correo está anticuado» trae «Copiar el enlace del código» (copia `https://github.com/fmargon780/gestor-asuntos-ies/blob/main/apps-script/gestor-correos.gs`; no abre nada), «Abrir mis proyectos de Google» (`script.google.com/home?authuser=<cuenta de Administración>`) y «Ver «Enviar correo»», con cuatro pasos. El enlace al código de `js/bandeja-latido.js` es el mismo y también se copia. Demo: la consulta contesta una versión vieja salvo `localStorage` `gestor-demo-script-al-dia` = `'1'`.
+
+## Textos condicionales (fila 510, `docs/510-PARRAFOS-SEGUN-EL-ASUNTO.md`)
+
+Un párrafo de una plantilla de correo (y de Word) puede empezar por `{si:Campo=Valor}`: «Campo» es un
+campo de lista del tipo de asunto y «Valor» una de sus opciones. `Plantillas.rellenar` (correos: párrafo =
+texto entre dos líneas en blanco) y `Docx.rellenar` (Word: un `<w:p>`, aunque la marca venga partida en
+varios `<w:t>`) llaman a `TextoCondicional` (`js/texto-condicional.js`) antes de resolver los campos
+variables: la marca nunca sale; el párrafo sale si el campo del asunto (`valores.campos`) tiene ese
+valor y desaparece si no. Campo vacío, o campo/valor que el tipo no tiene (`valores.camposLista`, que
+pone `valoresDeAsunto`): sale con «[falta: Campo]» delante (amarillo en el Word) y el campo entra en
+`faltan`; `WordFaltan` lo pide con un desplegable (las opciones se las anota `TextoCondicional`). El
+recuadro «Insertar» (`HuecosBuscador.recuadroInsertarHTML`) lleva «Campo variable» (el antiguo «Insertar
+hueco») y, solo en plantillas de correo (también el texto para Séneca), «Texto condicional»
+(`js/texto-condicional-cuadro.js`: cuadro flotante con «Campo del asunto» y «Valor», solo campos de lista
+del tipo; «Poner la marca» la escribe, o la cambia, al principio del párrafo del cursor). En «Retocar» una
+plantilla de Word, «Texto condicional…» es un cambio de tipo `condicion` (`PlantillaRetocar`,
+`DocxSustituir.aplicar` con `op.condiciones`) y la marca se enseña en morado (`.cep-condicion`).

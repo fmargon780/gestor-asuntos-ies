@@ -787,7 +787,7 @@
       <details class="bloque-ajustes" id="bloque-datos-centro">
         <summary>
           <span class="bloque-titulo">Datos del centro y firma</span>
-          <span class="bloque-pie">Lo que rellena los huecos de correos y documentos</span>
+          <span class="bloque-pie">Lo que rellena los campos variables de correos y documentos</span>
         </summary>
         <div class="bloque-cuerpo" id="centro-firma-cuerpo">
       <label class="etiqueta">Firma</label>
@@ -1433,11 +1433,14 @@
 <!-- js/plantillas.js va antes que js/correo.js: el cuadro de Correo usa
      Plantillas.cargar/deTipo/rellenar/valoresDeAsunto para su desplegable
      "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3). -->
+<!-- Fila 510: los textos condicionales {si:Campo=Valor}; antes de js/plantillas.js y js/docx.js, que los resuelven. -->
+<script src="js/texto-condicional.js"></script>
 <script src="js/plantillas.js"></script>
 <script src="js/plantillas-valores.js"></script>
 <!-- js/huecos-buscador.js va antes que quien lo use: el botón "Insertar
      hueco" del editor de plantillas (docs/HUECOS-INSERTAR.md, fila 35). -->
 <script src="js/huecos-buscador.js"></script>
+<script src="js/texto-condicional-cuadro.js"></script>
 <script src="js/plantillas-ajustes.js"></script>
 <!-- Fila 270: «Guardar como plantilla nueva» (lo usan los cuadros de Correo y de Séneca). -->
 <script src="js/plantilla-de-lo-escrito.js"></script>

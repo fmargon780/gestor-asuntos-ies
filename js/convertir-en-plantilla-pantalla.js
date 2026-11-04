@@ -49,7 +49,7 @@ var ConvertirEnPlantillaPantalla = (function () {
       activo: function () { return !!capa && paso === 1; },
       opciones: function (s) {
         return [
-          ['Cambiar por un dato…', function () { cambiarPorUnDato(s); }],
+          ['Cambiar por un campo variable…', function () { cambiarPorUnDato(s); }],
           ['Cambiar por otro texto…', function () { cambiarPorOtroTexto(s); }],
           ['Esto se pregunta cada vez', function () { sePreguntaCadaVez(s); }],
           ['Quitar del documento', function () { quitarDelDocumento(s); }]
@@ -352,7 +352,7 @@ var ConvertirEnPlantillaPantalla = (function () {
     var nombre = ((document.getElementById('cep-nombre-dato') || {}).value || '').trim();
     if (!nombre) return;
     if (api.nombreDeDatoOcupado(nombre)) {
-      U.aviso('Ya hay un dato con ese nombre. Elígelo en «Cambiar por un dato…».', 'ambar');
+      U.aviso('Ya hay un dato con ese nombre. Elígelo en «Cambiar por un campo variable…».', 'ambar');
       return;
     }
     await marcarManual({ tipo: 'cadavez', buscar: s.texto, poner: '{campo:' + nombre + '}', nombreDato: nombre, etiqueta: nombre });

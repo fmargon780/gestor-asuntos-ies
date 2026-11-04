@@ -18,6 +18,7 @@ var PlantillaRetocar = (function () {
   /* Lo que enseña una línea de la lista: { antes, despues }. `despues` vacío en «Quitar el párrafo». */
   function descripcion(l) {
     if (l.tipo === 'parrafo') return { antes: 'Quitar el párrafo: «' + l.resumen + '»', despues: '' };
+    if (l.tipo === 'condicion') return { antes: 'Texto condicional: «' + l.resumen + '» solo sale si «' + l.campo + '» es «' + l.valor + '»', despues: '' };
     if (l.tipo === 'quitar') return { antes: l.buscar, despues: 'se quita' };
     if (l.tipo === 'cadavez') return { antes: l.buscar, despues: 'Se pregunta cada vez: ' + l.nombreDato };
     return { antes: l.buscar, despues: l.poner };
@@ -53,10 +54,12 @@ var PlantillaRetocar = (function () {
     var s = { lineas: [], trabajo: null, cuenta: 0 };
 
     function opciones() {
-      var cambios = s.lineas.filter(function (l) { return l.tipo !== 'parrafo'; })
+      var cambios = s.lineas.filter(function (l) { return l.tipo !== 'parrafo' && l.tipo !== 'condicion'; })
         .map(function (l) { return { id: l.id, buscar: l.buscar, poner: l.poner }; }).sort(porLargo);
+      var condiciones = {};
+      s.lineas.forEach(function (l) { if (l.tipo === 'condicion') condiciones[l.indice] = TextoCondicional.marcaEscrita(l.campo, l.valor); });
       return {
-        cambios: cambios, sobrevivientes: [],
+        cambios: cambios, sobrevivientes: [], condiciones: condiciones,
         quitarParrafos: s.lineas.filter(function (l) { return l.tipo === 'parrafo'; }).map(function (l) { return l.indice; })
       };
     }
@@ -71,16 +74,23 @@ var PlantillaRetocar = (function () {
       return r;
     };
 
-    s.veces = function (l) { return l.tipo === 'parrafo' ? 1 : ((s.trabajo && s.trabajo.veces[l.id]) || 0); };
+    s.veces = function (l) { return (l.tipo === 'parrafo' || l.tipo === 'condicion') ? 1 : ((s.trabajo && s.trabajo.veces[l.id]) || 0); };
     s.tocado = function () { return s.lineas.length > 0; };
 
-    /* Añade un cambio: { tipo: 'texto'|'dato'|'cadavez'|'quitar', buscar, poner, nombreDato? } o
-       { tipo: 'parrafo', indice, resumen }. Devuelve { linea } o { aviso } si no se puede. */
+    /* Añade un cambio: { tipo: 'texto'|'dato'|'cadavez'|'quitar', buscar, poner, nombreDato? }, o
+       { tipo: 'parrafo', indice, resumen }, o { tipo: 'condicion', indice, resumen, campo, valor } (fila 510). Devuelve { linea } o { aviso } si no se puede. */
     s.anadir = async function (m) {
       s.cuenta++;
       var linea = Object.assign({ id: 'ret' + s.cuenta }, m);
       if (linea.tipo === 'parrafo') {
         if (s.lineas.some(function (l) { return l.tipo === 'parrafo' && l.indice === linea.indice; })) return { aviso: 'Ese párrafo ya está quitado.' };
+        s.lineas.push(linea);
+        await s.aplicar();
+        return { linea: linea };
+      }
+      if (linea.tipo === 'condicion') {
+        /* Fila 510: un párrafo lleva una sola marca; la nueva sustituye a la que hubiera puesto antes. */
+        s.lineas = s.lineas.filter(function (l) { return !(l.tipo === 'condicion' && l.indice === linea.indice); });
         s.lineas.push(linea);
         await s.aplicar();
         return { linea: linea };

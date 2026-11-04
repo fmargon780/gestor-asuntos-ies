@@ -106,7 +106,7 @@ async function recorrido(p, nombreNueva, tipo) {
   await comprobar(p + ' · tres líneas con «Deshacer» y la nota del saludo y la firma', pagina.evaluate((p) => [
     document.querySelectorAll('#pl2-cambios .pl2-cambio').length,
     Array.from(document.querySelectorAll('#pl2-cambios .pl2-cambio button')).every(b => b.textContent === 'Deshacer'),
-    /He cambiado estos datos por su hueco\. Revísalos:/.test(document.getElementById('pl2-cambios').textContent),
+    /He cambiado estos datos por su campo variable\. Revísalos:/.test(document.getElementById('pl2-cambios').textContent),
     /El saludo y la firma no van en la plantilla: la app los pone sola en cada mensaje\./.test(document.getElementById(p + '-plantilla-editor').textContent)
   ], p), [3, true, true, true]);
   await comprobar(p + ' · la vista previa lee lo que se había escrito', pagina.locator('#pl2-previa').textContent(), FRASE);

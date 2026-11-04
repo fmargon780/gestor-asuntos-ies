@@ -430,12 +430,15 @@ var Plantillas = (function () {
     });
   }
 
-  function rellenar(texto, valores) {
+  /* `opciones.sinCondicionales`: js/docx.js ya ha resuelto las marcas {si:…} de cada párrafo del Word. */
+  function rellenar(texto, valores, opciones) {
     valores = valores || {};
     var conLoQueFalta = String(texto || '').replace(reLoQueFalta(true), function () {
       return valores.loQueFalta || '';
     });
     var faltan = [];
+    /* Fila 510: los párrafos con {si:Campo=Valor} salen o no ANTES de resolver los campos variables. */
+    if (window.TextoCondicional && !(opciones && opciones.sinCondicionales)) conLoQueFalta = TextoCondicional.procesarCorreo(conLoQueFalta, valores, faltan);
     /* Fila 111 (js/genero.js): con los sexos del asunto, «alumno/a» se
        queda en la forma que toca; sin el dato, tal cual y en `faltan`. */
     if (valores.sexos && window.Genero) {

@@ -49,11 +49,12 @@ var PlantillaRetocarPantalla = (function () {
       conHuecos: true,
       opciones: function (s) {
         return [
-          ['Cambiar por un dato…', function () { cambiarPorUnDato(s); }],
+          ['Cambiar por un campo variable…', function () { cambiarPorUnDato(s); }],
           ['Cambiar por otro texto…', function () { cambiarPorOtroTexto(s); }],
           ['Esto se pregunta cada vez', function () { sePreguntaCadaVez(s); }],
           ['Quitar del documento', function () { anadir({ tipo: 'quitar', buscar: s.texto, poner: '' }); }],
-          ['Quitar el párrafo entero', function () { quitarElParrafo(s); }]
+          ['Quitar el párrafo entero', function () { quitarElParrafo(s); }],
+          ['Texto condicional…', function () { textoCondicional(s); }, 'cep-menu-nuevo']
         ];
       }
     });
@@ -69,7 +70,7 @@ var PlantillaRetocarPantalla = (function () {
   }
 
   function alEscape(ev) {
-    if (ev.key !== 'Escape' || !capa || document.querySelector('#capa:not(.oculto)') || document.getElementById('huecos-cuadro')) return;
+    if (ev.key !== 'Escape' || !capa || document.querySelector('#capa:not(.oculto)') || document.getElementById('huecos-cuadro') || document.getElementById('texto-cond-cuadro')) return;
     ev.stopPropagation();
     ev.preventDefault();
     if (sel && sel.hayMenu()) { sel.ocultar(); return; }
@@ -127,6 +128,11 @@ var PlantillaRetocarPantalla = (function () {
   function irADocumento(l) {
     var c = caja();
     if (!c || l.tipo === 'parrafo') return;
+    if (l.tipo === 'condicion') {
+      var marca = Array.prototype.filter.call(c.querySelectorAll('mark.cep-condicion'), function (m) { return m.dataset.hueco === TextoCondicional.marcaEscrita(l.campo, l.valor); })[0];
+      if (marca) marca.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
     var destino = c.querySelector('mark.cep-cambio[data-linea="' + l.id + '"]') ||
       (l.poner && Array.prototype.filter.call(c.querySelectorAll('mark.cep-hueco'), function (m) { return l.poner.indexOf(m.dataset.hueco) !== -1; })[0]) ||
       PlantillaSeleccion.primerSitioDeTexto(c, l.buscar);
@@ -219,15 +225,39 @@ var PlantillaRetocarPantalla = (function () {
     if (!ok) return;
     var nombre = ((document.getElementById('cep-nombre-dato') || {}).value || '').trim();
     if (!nombre) return;
-    if (nombreOcupado(nombre)) { U.aviso('Ya hay un dato con ese nombre. Elígelo en «Cambiar por un dato…».', 'ambar'); return; }
+    if (nombreOcupado(nombre)) { U.aviso('Ya hay un dato con ese nombre. Elígelo en «Cambiar por un campo variable…».', 'ambar'); return; }
     await anadir({ tipo: 'cadavez', buscar: s.texto, poner: '{campo:' + nombre + '}', nombreDato: nombre });
   }
 
-  async function quitarElParrafo(s) {
+  /* El índice, en el Word original, del párrafo donde está lo seleccionado (null si no se sabe cuál es). */
+  function indiceDelParrafo(s) {
     var c = caja();
     var parrafos = Array.prototype.filter.call(c.querySelectorAll('p'), function (p) { return !p.closest('header, footer'); });
     var pos = parrafos.indexOf(s.parrafo);
-    var indice = sesion.parrafoOriginal(parrafos.map(function (p) { return p.textContent; }), pos);
+    return sesion.parrafoOriginal(parrafos.map(function (p) { return p.textContent; }), pos);
+  }
+
+  /* Fila 510, «Texto condicional…»: la marca {si:Campo=Valor} al principio del párrafo de lo seleccionado. */
+  function textoCondicional(s) {
+    var indice = indiceDelParrafo(s);
+    var resumen = PlantillaRetocar.principio(s.parrafo.textContent.replace(/^\s*\{si:[^}]*\}\s*/i, ''));
+    sel.ocultar();
+    if (indice === null) {
+      U.aviso('No sé cuál de los párrafos iguales quieres cambiar. Ponle la marca en Word y usa «Sustituir el fichero».', 'ambar');
+      return;
+    }
+    TextoCondicionalCuadro.abrir({
+      ancla: document.querySelector('.cep-barra') || document.body,
+      tipo: plantilla.tipo, dondeVa: 'seleccionado',
+      alPoner: async function (campo, valor) {
+        await anadir({ tipo: 'condicion', indice: indice, resumen: resumen, campo: campo, valor: valor });
+        U.aviso(TextoCondicional.avisoDeMarca(campo, valor), 'bueno');
+      }
+    });
+  }
+
+  async function quitarElParrafo(s) {
+    var indice = indiceDelParrafo(s);
     sel.ocultar();
     if (indice === null) {
       U.aviso('No sé cuál de los párrafos iguales quieres quitar. Quítalo en Word y usa «Sustituir el fichero».', 'ambar');
