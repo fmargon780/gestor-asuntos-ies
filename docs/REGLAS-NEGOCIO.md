@@ -15,6 +15,17 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (25-oct-2026, tema 448) Los hitos y tareas que dividen el trámite en caminos según una respuesta se
   siguen llamando **«pregunta»**. Cambiar el nombre sería una idea aparte.
 
+## Plantillas
+
+- (4-nov-2026, fila 510) Las variantes de un documento se resuelven con **textos condicionales**
+  (párrafos que salen o no según un campo de lista del asunto), no con campos cuyas opciones son
+  frases enteras. Valen para Word y para correo.
+- (4-nov-2026, fila 510) Con el campo vacío salen **todos** los textos condicionales que dependen
+  de él, en amarillo, para que nadie firme sin elegir.
+- (4-nov-2026, fila 510) Nombres en toda la app («cuida la coherencia en la nomenclatura»):
+  **campo variable** (antes «hueco»), **texto condicional** y **campo del asunto**. Los botones van
+  en un recuadro **«Insertar»** con «Campo variable» y «Texto condicional».
+
 ## Correo
 
 - (27-oct-2026, tema 469) La actualización del script de Gmail la hace **solo Francisco**: los
