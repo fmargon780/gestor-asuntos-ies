@@ -454,7 +454,7 @@
     function pintar() {
       if (!caja) return;
       if (!vivos.length) { caja.innerHTML = ''; return; }
-      caja.innerHTML = '<p class="nota">He cambiado estos datos por su hueco. Revísalos:</p>';
+      caja.innerHTML = '<p class="nota">He cambiado estos datos por su campo variable. Revísalos:</p>';
       vivos.forEach(function (c) {
         var fila = document.createElement('div');
         fila.className = 'pl2-cambio';

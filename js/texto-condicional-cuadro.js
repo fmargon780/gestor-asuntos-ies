@@ -58,7 +58,7 @@ var TextoCondicionalCuadro = (function () {
             return '<option value="' + i + '">' + U.escapar(c.nombre) + '</option>';
           }).join('') + '</select></div>' +
         '<div class="texto-cond-fila"><label class="etiqueta" for="tc-valor">Valor</label><select id="tc-valor" class="campo"></select></div>' +
-        '<p class="huecos-pie">Salen solo los campos de lista de este tipo de asunto. La marca se pone al principio del párrafo donde está el cursor.</p>' +
+        '<p class="huecos-pie">Salen solo los campos de lista de este tipo de asunto. La marca se pone al principio del párrafo ' + (o.dondeVa ? 'donde está lo ' + o.dondeVa : 'donde está el cursor') + '.</p>' +
         '<div class="texto-cond-botones"><button type="button" class="boton" id="tc-cancelar">Cancelar</button>' +
         '<button type="button" class="boton boton-principal" id="tc-poner">Poner la marca</button></div>';
     }

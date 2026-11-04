@@ -248,7 +248,7 @@ var PlantillaRetocarPantalla = (function () {
     }
     TextoCondicionalCuadro.abrir({
       ancla: document.querySelector('.cep-barra') || document.body,
-      tipo: plantilla.tipo,
+      tipo: plantilla.tipo, dondeVa: 'seleccionado',
       alPoner: async function (campo, valor) {
         await anadir({ tipo: 'condicion', indice: indice, resumen: resumen, campo: campo, valor: valor });
         U.aviso(TextoCondicional.avisoDeMarca(campo, valor), 'bueno');
