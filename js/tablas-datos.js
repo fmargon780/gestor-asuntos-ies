@@ -225,10 +225,22 @@ var TablasDatos = (function () {
 
     var persona = await personaDelAsunto(asunto);
     var faltan = [];
+    var bloqueo = '', libros = null;
     valores.datosTablas = valores.datosTablas || {};
 
     for (var i = 0; i < huecos.length; i++) {
       var h = huecos[i];
+      /* Fila 501 (js/libros-ficha.js): la ficha de entrega de libros. Si no se puede hacer, `bloqueo` lo dice y no se genera. */
+      if (window.LibrosFicha && /^(tabla|dato)\s+libros\b/i.test(h)) {
+        libros = libros || await LibrosFicha.contexto(persona || await LibrosFicha.personaDeAsunto(asunto), valores, LibrosFicha.esGrupoDe(asunto));
+        delete valores.sexos;   /* «matriculado/a», «tutor/a» y «padre/madre» de la ficha se quedan tal cual: no son del sexo del alumno */
+        if (libros.avisos.length) { bloqueo = libros.avisos.join(' '); continue; }
+        var delLibro = LibrosFicha.hueco(h, libros);
+        if (!delLibro) continue;
+        if (delLibro.tabla) buffer = (await Docx.ponerTabla(buffer, h, delLibro.tabla.cabecera, delLibro.tabla.filas)).bytes;
+        else valores.datosTablas[U.normalizar(h)] = delLibro.texto;
+        continue;
+      }
       if (/^especialidad$/i.test(h)) {
         var esp = await especialidadDe(persona);
         if (!esp) { faltan.push('Especialidad'); esp = Docx.MARCA_FALTA('Especialidad'); }
@@ -278,7 +290,7 @@ var TablasDatos = (function () {
         valores.datosTablas[U.normalizar(h)] = v;
       }
     }
-    return { buffer: buffer, faltan: faltan };
+    return { buffer: buffer, faltan: faltan, bloqueo: bloqueo };
   }
 
   /* La especialidad es el puesto de la persona en los RelPerCen (curso más reciente). */

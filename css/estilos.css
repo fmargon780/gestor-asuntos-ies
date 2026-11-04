@@ -81,6 +81,8 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
   padding: 9px 12px; width: 100%; background: var(--papel); color: var(--tinta);
 }
 .campo:focus { outline: 2px solid var(--azul-claro); border-color: var(--azul); }
+.buscar-fila { display: flex; gap: 8px; align-items: stretch; }
+.buscar-fila select { width: auto; min-width: 120px; flex: 0 0 auto; }
 .etiqueta { display: block; font-weight: 600; margin: 18px 0 7px; }
 
 /* ---------- estructura ---------- */

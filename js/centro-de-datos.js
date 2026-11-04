@@ -32,7 +32,7 @@ var CentroDeDatos = (function () {
   var TITULOS = {
     'alumnado': 'Alumnado', 'personal': 'Personal', 'alumnado-bd': 'Alumnado de la base de datos',
     'tutorias': 'Función tutorial', 'consejo-escolar': 'Consejo Escolar',
-    'registro-entrada': 'Registro de entrada', 'registro-salida': 'Registro de salida'
+    'registro-entrada': 'Registro de entrada', 'registro-salida': 'Registro de salida', 'libros': 'Libros de texto'
   };
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
@@ -367,6 +367,17 @@ var CentroDeDatos = (function () {
         delPersonal.fallos.forEach(function (f) { salida.fallos.push(f); });
         if (delPersonal.cursos.length) salida.tomados.push('personal');
       }
+      /* Fila 501: la lista de libros de texto ya preparada. */
+      var delosLibros = null;
+      if (window.CentroDeDatosLibros) {
+        try { delosLibros = await CentroDeDatosLibros.tomar(dir, r.indice, apuntes, op); }
+        catch (x) { salida.fallos.push('Libros de texto: ' + U.mensajeDeError(x)); }
+      }
+      if (delosLibros) {
+        Object.keys(delosLibros.nuevos).forEach(function (k) { nuevos[k] = delosLibros.nuevos[k]; });
+        delosLibros.fallos.forEach(function (f) { salida.fallos.push(f); });
+        if (delosLibros.cursos.length) salida.tomados.push('libros');
+      }
       await R.terminar(ctx);
       await apuntar(nuevos);
       if (delPersonal && delPersonal.cursos.length && window.Problemas) Problemas.recalcular('personal');   /* fila 327: sus avisos */
@@ -382,6 +393,7 @@ var CentroDeDatos = (function () {
           }
         });
         if (delPersonal && delPersonal.cursos.length && !vistos.personal) partes.push(TITULOS.personal + ' (' + fechaCorta(delPersonal.subido, false) + ')');
+        if (delosLibros && delosLibros.cursos.length) partes.push(TITULOS.libros + ' (' + fechaCorta(delosLibros.subido, false) + ')');
         avisarTraido(partes, config);
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');

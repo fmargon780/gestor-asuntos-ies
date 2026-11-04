@@ -83,6 +83,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478).
 - Correo (Gmail por script, se queda en recibidos, fila 480), Séneca, Centro de datos y control del registro.
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
+- Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
 - Medidas, «Qué hay de nuevo» y el botón «Soporte» común.
 
 ## 6. Reglas de código que no se pueden olvidar
