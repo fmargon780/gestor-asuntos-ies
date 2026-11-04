@@ -26,6 +26,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 458 | 240 | botón con cerrojo, copia reanudable con comprobación, fechas originales, cambio de handles, marca y «NO USAR», disco de Drive de demostración, pruebas y revisor |
 | 459 | 150 | franja del otro ordenador con identificador, casa sin entrada, copia sin internet en Drive y copia vieja, documentos, pruebas y revisor |
 | 462 | 150 | recuadro de ayuda común, fichero de textos, recorrer pestañas y botones escribiendo cada texto, quitar las ~125 ayudas grises conservando el nombre para lectores de pantalla, motivo en los botones apagados, pruebas y revisor |
-| 465 | 120 | editor de plantillas dentro de la columna derecha sin perder la guía, botones en la tarea y en el aviso, impresos solo marcados con buscador, prueba nueva y revisor |
 | 493 | 150 | clases de tercero por tipo (lista con la primera como hoy), casillas en Ajustes, pastillas, buscador y parrilla de «Nuevo asunto», clase del asunto según el tercero, demostración, prueba nueva, revisor |
 | 510 | 210 | marcas en correos y en Word (párrafo partido en tramos), amarillo y «Faltan datos» con desplegable, recuadro «Insertar» en todos los sitios de «Insertar hueco», cuadro «Texto condicional», opción nueva y nombre nuevo en «Retocar», quitar «hueco» de botones y avisos, pruebas y revisor |
