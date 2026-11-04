@@ -75,7 +75,7 @@ Ver `CLAUDE.md`, apartado «Trabajar en la rama de la fila; a `main` solo con el
   una línea cada uno>**. `main` no se toca. La sesión para, con un mensaje final que empieza por
   «DEVUELTA:» y dice qué falla en palabras de usuario. Nada de un tercer intento en la misma
   sesión: es la forma de que un fallo que la sesión no sabe arreglar no se coma la cuota.
-- **El siguiente lanzamiento coge primero las filas DEVUELTA** (antes que cualquier PENDIENTE):
+- **El siguiente lanzamiento coge la primera fila DEVUELTA o PENDIENTE en el orden de la cola** (quien marca DEVUELTA la deja encima de las PENDIENTE; Francisco puede moverla):
   parte de su rama `fila-<nº>` tal como quedó, arregla lo apuntado, y sigue el mismo camino
   (revisor, dos intentos). Una fila DEVUELTA dos lanzamientos seguidos pasa a **BLOQUEADA** con
   el informe, y se queda para que Francisco la lleve a una conversación de diseño.

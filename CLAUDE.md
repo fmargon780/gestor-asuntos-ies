@@ -12,8 +12,8 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 
 **Una sola sesión a la vez, una fila tras otra** (27-sep-2026, cambiado el 1-oct-2026): nunca
 trabajan dos sesiones de Claude Code a la vez en este repositorio ni dos filas a la vez. Por
-defecto, cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA** (si la
-hay) o si no la primera **PENDIENTE** de `docs/COLA.md`, la lleva hasta el final (revisor incluido)
+defecto, cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA o PENDIENTE**, en el orden
+de la cola, de `docs/COLA.md`, la lleva hasta el final (revisor incluido)
 y para. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o «todas»), la
 misma conversación las hace de una en una, en el orden de la cola, cada una completa (EN CURSO,
 revisor, publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila
@@ -133,7 +133,7 @@ EN EL PAQUETE). **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
 con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El
-siguiente lanzamiento coge primero las filas DEVUELTA, antes que cualquier PENDIENTE; DEVUELTA dos
+siguiente lanzamiento coge la primera DEVUELTA o PENDIENTE en el orden de la cola (Francisco decide el orden completo); DEVUELTA dos
 lanzamientos seguidos pasa a BLOQUEADA. Nada de esto se para a pedir permiso ni a preguntarle nada
 a Francisco: las decisiones a mitad camino las toma la sesión y las deja escritas en la nota de la
 fila. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.

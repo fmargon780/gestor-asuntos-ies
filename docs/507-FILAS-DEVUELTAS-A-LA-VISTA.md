@@ -62,3 +62,9 @@ dentro de la app, y la fila 59 de Dieta familiar no se veía (31-oct-2026).
 - Lo que no pueda ver en las colas reales lo dice en vez de darlo por bueno.
 
 ## Revisión y respuestas durante el trabajo
+
+### Segundo revisor (4-nov-2026, ayudante que no vio cómo se programó; prueba con datos inventados)
+**Coincide:** tabla con «4(2)», «1(1)» y sin paréntesis donde no hay devueltas, en rojo; fila de totales «7(3)»; números alineados en vertical con hueco fijo; leyenda exacta bajo la tabla; recuadro «4 filas en cola · La siguiente es la fila 10»; pestaña Trabajo con marca «Devuelta», sin pastilla «Devueltas» ni el texto antiguo, «Ver todas» sin duplicar; app con solo devueltas con botón «Abrir Claude Code: fila 59»; frases correctas (primera devuelta, y PENDIENTE delante de una DEVUELTA con «Hazla aunque haya una DEVUELTA detrás»); flechas en las devueltas y orden guardado con la PENDIENTE delante.
+**No coincide:** nada. (Observación: las devueltas no llevan «Aplazar hasta…», porque una devuelta no se aplaza; no estaba pedido.)
+**No ha podido ver:** las colas reales de GitHub ni un guardado real en docs/COLA.md; el aspecto en el artefacto publicado (tema oscuro, móvil); la estimación de tiempo de las devueltas (el arnés no tenía ESTIMACIONES.md; el código la trata igual que a las demás); que la fila 59 de Dieta familiar salga ya (solo se vio una fila 59 inventada).
+**Hecho:** Centro de mando versión 78 publicado (https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E, versión 91). Reglas cambiadas a «la primera DEVUELTA o PENDIENTE en el orden de la cola» en CLAUDE.md, docs/COLA.md (cabecera y reglas 0 y 2) y docs/REVISOR-ANTES-DE-PUBLICAR.md.
