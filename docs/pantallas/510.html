@@ -57,6 +57,8 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .editor{display:flex;flex-direction:column;gap:8px;max-width:780px}
 .editor .fila-b{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
 .editor .fila-b label{font-size:13px;color:var(--tinta-suave)}
+.insertar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:4px 10px 8px;margin:0}
+.insertar legend{font-size:12px;color:var(--tinta-suave);text-transform:uppercase;letter-spacing:.06em;padding:0 4px}
 .editor textarea{font:inherit;font-size:14px;line-height:1.5;width:100%;min-height:260px;border:1px solid var(--linea);border-radius:8px;padding:10px;background:var(--papel);color:var(--tinta);resize:vertical}
 .boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:7px 12px;cursor:pointer}
 .boton:hover{background:var(--hover)}
@@ -179,8 +181,8 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   function editor(){
     var ops=Object.keys(LISTAS).map(function(k){return '<option>'+esc(k)+'</option>'}).join('');
     return '<div class="editor">'+
-      '<p class="leyenda">Pon el cursor en el párrafo «Como se había iniciado…» y pulsa «Párrafo que sale si…».</p>'+
-      '<div class="fila-b"><label for="ed-texto">Texto</label><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="boton" id="ed-hueco">Insertar hueco</button><button type="button" class="boton" id="ed-cond">Párrafo que sale si…</button></span></div>'+
+      '<p class="leyenda">Pon el cursor en el párrafo «Como se había iniciado…» y pulsa «Texto condicional».</p>'+
+      '<div class="fila-b"><label for="ed-texto">Texto</label><fieldset class="insertar"><legend>Insertar</legend><button type="button" class="boton" id="ed-hueco">Campo variable</button><button type="button" class="boton" id="ed-cond">Texto condicional</button></fieldset></div>'+
       '<div class="cuadro-cond" id="ed-cuadro" hidden>'+
         '<div><label for="ed-dato">Dato del asunto</label><select id="ed-dato">'+ops+'</select></div>'+
         '<div><label for="ed-valor">Valor</label><select id="ed-valor"></select></div>'+
@@ -197,7 +199,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     ta.addEventListener('input',function(){textoEditor=ta.value});
     ['keyup','click','select'].forEach(function(ev){ta.addEventListener(ev,function(){cursor=ta.selectionStart})});
     $('ed-dato').addEventListener('change',valores);
-    $('ed-hueco').addEventListener('click',function(){$('ed-aviso').textContent='«Insertar hueco» funciona como hoy.'});
+    $('ed-hueco').addEventListener('click',function(){$('ed-aviso').textContent='«Campo variable» es el antiguo «Insertar hueco»: funciona como hoy.'});
     $('ed-cond').addEventListener('click',function(){$('ed-cuadro').hidden=false});
     $('ed-cancelar').addEventListener('click',function(){$('ed-cuadro').hidden=true});
     $('ed-poner').addEventListener('click',function(){
