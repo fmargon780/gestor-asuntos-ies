@@ -146,7 +146,9 @@ var GuiasPasoBloques = (function () {
         var cajaAviso = document.createElement('div');
         cajaAviso.className = 'paso-avisar-lopide-plantilla' + (p.avisarLoPide ? '' : ' oculto');
         cajaAviso.innerHTML = '<label class="etiqueta-en-linea">Con la plantilla:</label>' +
-          '<select class="campo paso-avisar-lopide-select"><option value="">Cargando…</option></select>';
+          '<select class="campo paso-avisar-lopide-select"><option value="">Cargando…</option></select>' +
+          /* Fila 465, C3: «Ver y cambiar el texto», cuando ya hay plantilla elegida. */
+          (window.GuiasPlantilla ? GuiasPlantilla.botonHTML(true) : '');
         d.appendChild(cajaAviso);
 
         filaAviso.querySelector('.paso-avisar-lopide').onchange = function () {
@@ -156,7 +158,9 @@ var GuiasPasoBloques = (function () {
         AvisosLoPide.opcionesPlantillaHTML(ctx.nombreTipo, p.avisarLoPidePlantilla, AvisosLoPide.NOMBRE_AVANCE)
           .then(function (html) {
             if (!cajaAviso.isConnected) return;
-            cajaAviso.querySelector('.paso-avisar-lopide-select').innerHTML = html;
+            var selAviso = cajaAviso.querySelector('.paso-avisar-lopide-select');
+            selAviso.innerHTML = html;
+            if (window.GuiasPlantilla) GuiasPlantilla.actualizarBoton(selAviso);
           });
       }
 
