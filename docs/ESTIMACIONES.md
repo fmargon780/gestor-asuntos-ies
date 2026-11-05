@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 5-nov-2026 (fila 515 PENDIENTE)
+Última puesta al día: 5-nov-2026 (fila 515 HECHA)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -27,4 +27,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 459 | 150 | franja del otro ordenador con identificador, casa sin entrada, copia sin internet en Drive y copia vieja, documentos, pruebas y revisor |
 | 462 | 150 | recuadro de ayuda común, fichero de textos, recorrer pestañas y botones escribiendo cada texto, quitar las ~125 ayudas grises conservando el nombre para lectores de pantalla, motivo en los botones apagados, pruebas y revisor |
 | 493 | 150 | clases de tercero por tipo (lista con la primera como hoy), casillas en Ajustes, pastillas, buscador y parrilla de «Nuevo asunto», clase del asunto según el tercero, demostración, prueba nueva, revisor |
-| 515 | 180 | contar firmas, casos nuevos en `queHaLlegado`, pregunta guardada en la lista compartida, aviso del firmado con otro nombre, marca en la línea de datos, demostración, prueba nueva y revisor |
