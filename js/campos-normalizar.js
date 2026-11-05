@@ -29,7 +29,7 @@ var CamposNucleo = CamposNucleo || {};
      primera: protege el alta del "curso" de fábrica contra una
      carrera de dos sesiones leyendo a la vez, ver `leer()`). */
   function normalizarCalculado(c) {
-    return {
+    var salida = {
       id: String((c && c.id) || ''),
       nombre: String((c && c.nombre) || ''),
       categorias: (c && Array.isArray(c.categorias)) ? c.categorias.filter(Boolean) : [],
@@ -37,6 +37,10 @@ var CamposNucleo = CamposNucleo || {};
       operacion: String((c && c.operacion) || ''),
       parametros: (c && c.parametros && typeof c.parametros === 'object') ? c.parametros : {}
     };
+    /* Fila 529: un campo creado por pasos lleva su lista de pasos y el grupo en el que sale. */
+    if (salida.operacion === 'pasos') salida.pasos = (c && Array.isArray(c.pasos)) ? c.pasos.filter(function (x) { return x && typeof x === 'object' && x.op; }) : [];
+    if (c && ['Persona', 'Tutores', 'Asunto', 'Centro', 'Firmantes'].indexOf(c.grupo) !== -1) salida.grupo = c.grupo;
+    return salida;
   }
 
   function normalizarListaCalculados(lista) {

@@ -97,3 +97,21 @@
 .campos-fila-campo:hover, .campos-fila-campo:focus-visible, .campos-fila-campo.elegido { background: var(--azul-claro); }
 .campos-elegir-pie { border-top: 1px solid var(--linea); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; flex: 0 0 auto; }
 @media (max-width: 640px) { .campos-elegir-cuerpo { grid-template-columns: minmax(0, 1fr); } .campos-elegir-grupos { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--linea); } .campos-fila-campo { grid-template-columns: minmax(0, 1fr); } }
+
+/* Fila 529 (docs/529-CREAR-CAMPOS-POR-PASOS.md): crear un campo a partir de otros, por pasos. */
+.cp-dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; align-items: start; }
+.cp-panel { border: 1px solid var(--borde, #d9d9d9); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cp-mitad { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.cp-pasos { display: flex; flex-direction: column; gap: 8px; }
+.cp-paso { border: 1px solid var(--borde, #d9d9d9); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.cp-paso-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cp-botones { display: flex; gap: 6px; align-items: center; }
+.cp-paso-datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.cp-ancho { grid-column: 1 / -1; }
+.cp-equiv { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 6px; align-items: center; }
+.cp-flecha { color: var(--suave, #666); }
+.cp-sale { font-size: 0.9em; padding: 4px 6px; border-radius: 4px; background: var(--fondo-suave, #f3f3f3); }
+.cp-tit { color: var(--suave, #666); }
+.cp-anadir { display: flex; flex-direction: column; gap: 4px; }
+.cp-tabla table { width: 100%; border-collapse: collapse; }
+.cp-tabla th, .cp-tabla td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--borde, #d9d9d9); }

@@ -112,20 +112,19 @@ console.log('--- 3. crear un campo calculado, con vista previa ---');
 await pagina.click('#campos-calc-crear');
 await pagina.waitForSelector('#calc-nombre');
 await pagina.fill('#calc-nombre', 'Nivel');
-await pagina.click('[data-cat="ALUMNADO"]');
-/* Origen "El grupo" ya viene elegido de partida; operación por
-   defecto "Quitar los últimos caracteres" también: se cambia a
-   "Quitar los primeros caracteres", con n=1, para sacar del "1ºA"
-   compacto algo distinto de "Curso" (que ya quita del final). */
-await pagina.selectOption('#calc-operacion', 'quitarInicio');
-await pagina.waitForSelector('#p-n');
-await pagina.fill('#p-n', '1');
+/* Fila 529: se parte del grupo y se le añade un paso, «Quitar los primeros caracteres», con n=1, para
+   sacar del «1ºA» compacto algo distinto de «Curso» (que ya quita del final). */
+await pagina.waitForSelector('#calc-desde option[value="g"]', { state: 'attached' });
+await pagina.selectOption('#calc-desde', 'g');
+await pagina.selectOption('#calc-op', 'quitarIni');
+await pagina.waitForSelector('#s0-n');
+await pagina.fill('#s0-n', '1');
 await pagina.waitForTimeout(200);
 
-await comprobarQue('la vista previa dice con quién se prueba',
-  pagina.locator('#calc-preview').textContent().then((t) => t.indexOf('Probando con:') !== -1));
-await comprobarQue('y enseña algún resultado (puede estar vacío para esa persona, pero no revienta)',
-  pagina.locator('#calc-preview').textContent().then((t) => t.indexOf('Resultado:') !== -1));
+await comprobarQue('la tabla de resultados enseña personas',
+  pagina.locator('#calc-res tr').count().then((n) => n >= 1));
+await comprobarQue('y dice a quién vale',
+  pagina.locator('#calc-vale').textContent().then((t) => t.indexOf('Vale para') !== -1));
 
 await pagina.click('#calc-guardar');
 await pagina.waitForSelector('#calc-nombre', { state: 'detached' });
@@ -136,7 +135,7 @@ await comprobarQue('el nuevo calculado se ha guardado en campos.json',
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
     const h = await g.getFileHandle('campos.json');
     const j = JSON.parse(await (await h.getFile()).text());
-    return (j.calculados || []).some((c) => c.nombre === 'Nivel');
+    return (j.calculados || []).some((c) => c.nombre === 'Nivel' && c.operacion === 'pasos' && c.pasos.length === 1);
   }));
 
 /* ============================================================
