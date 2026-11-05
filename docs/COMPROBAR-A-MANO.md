@@ -373,3 +373,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - Fila 515 (documentos firmados, 5-nov-2026) [SOLO FRANCISCO]: con un PDF real firmado con AutoFirma y otro firmado dentro de Séneca, guárdalos encima de un documento tras pulsar «Ruta» y mira que la app los reconoce («Firmado» en la línea gris) y cuenta bien las firmas («Firmado (2)» si lleva dos). Claude no ha visto ninguno real. Si lo firmado en Séneca no lleva firma interna en el PDF, no se reconocerá.
 
 - Fila 523 (tarea «Firmar un documento», 5-nov-2026) [SOLO FRANCISCO]: con un PDF real firmado con AutoFirma y otro firmado dentro de Séneca, guárdalos encima del documento de una tarea «Firmar un documento» tras pulsar «Ruta» y mira que la tarea se marca sola (con 2 firmas necesarias, que la primera no la marca y avisa, y la segunda sí). Lo automático solo cuenta firmas de un PDF de prueba inventado.
+
+- [ ] 530. [SOLO FRANCISCO] Generar un Word real de una tarea de «Generar» con un dato escrito en la propia tarea (por ejemplo «País de destino» en una baja por traslado), abrirlo en Word y mirar que el dato sale en su sitio, y que otro documento que usa el mismo dato ya lo tiene.
