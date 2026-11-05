@@ -46,6 +46,7 @@
     if (g.accion === 'firmar') return 'Firmar un documento' + (GG.firmasNecesarias(g) > 1 ? ' · ' + GG.firmasNecesarias(g) + ' firmas' : '');
     if (g.accion === 'registrar') return 'Registrar un documento';
     if (g.accion === 'anadir') return 'Añadir un documento';
+    if (g.accion === 'pedir') return 'Pedir datos' + (r.campos && r.campos.length ? ' · ' + r.campos.length + (r.campos.length === 1 ? ' campo' : ' campos') : '');   /* fila 530 */
     return 'Sin acción';
   }
 
@@ -116,7 +117,7 @@
       cabeza +
       '<div class="guion-fila-linea guion-linea-texto">' + lineaTexto + mandos + '</div>' +
       queSeHace +
-      (pregunta ? '' : recetaHTML(g, false)) +
+      (pregunta ? '' : recetaHTML(Object.assign({ editorGuia: true }, g), false)) +   /* fila 530: «Pedir datos» se edita aquí */
       opcionesHTML2 +
       '<button type="button" class="enlace guion-mas-cab" aria-expanded="' + (masAbierto ? 'true' : 'false') + '"><span class="guion-mas-flecha"></span> Más de esta tarea</button>' +
       '<div class="guion-mas">' + explicacionHTML + normaHTML + reunirHTML + preguntaFilaHTML + '</div>' +
@@ -168,6 +169,7 @@
       var leida = {};
       [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
         .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
+      if (receta.dataset.campos) { try { leida.campos = JSON.parse(receta.dataset.campos); } catch (e) { /* sin campos */ } }   /* fila 530 */
       var limpia = normalizarReceta(base.accion, leida);
       if (limpia) base.receta = limpia;
     }
@@ -251,6 +253,22 @@
       if (reunirMarca) reunirMarca.addEventListener('change', function () {
         reunirMarca.closest('.guion-reunir-fila').classList.toggle('con-reunir', reunirMarca.checked);
       });
+      /* Fila 530: los campos de una tarea «Pedir datos»: quitar y «+ Añadir campo» (la ventana de elegir). */
+      Array.prototype.forEach.call(fila.querySelectorAll(':scope > .guion-receta-pedir .guion-pedir-quitar'), function (q) {
+        q.onclick = function () { alCambiar(function (l) { l[idx].receta.campos.splice(+q.dataset.i, 1); }); };
+      });
+      var anadirCampo = fila.querySelector(':scope > .guion-receta-pedir .guion-pedir-anadir');
+      if (anadirCampo) anadirCampo.onclick = function () {
+        CamposElegir.abrir({ tipo: '', soloGuardables: true, alElegir: async function (campo) {
+          try {
+            var entrada = await DatosDelAsunto.entradaDeCampoDeLista(campo, null);
+            alCambiar(function (l) {
+              var r = l[idx].receta = l[idx].receta || {};
+              r.campos = GG.normalizarCampos((r.campos || []).concat([entrada]));
+            });
+          } catch (e) { U.fallo('No he podido añadir el campo', e); }
+        } });
+      };
       /* Fila 164: al cambiar la acción, sale (o se va) su receta. */
       var accionSel = fila.querySelector(':scope > .guion-fila-linea .guion-accion');
       if (accionSel) accionSel.onchange = function () { alCambiar(function () { /* solo repintar con lo leído */ }); };

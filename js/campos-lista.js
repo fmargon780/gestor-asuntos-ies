@@ -126,6 +126,24 @@ var CamposLista = (function () {
     return usos;
   }
 
+  /* [{ tipo, donde: 'crear' | 'general' | 'hito', hito: marca }]: una línea por tipo que usa el campo. */
+  function detalleDeDonde(config, campo) {
+    var salida = [];
+    Object.keys(config.porTipo || {}).forEach(function (tipo) {
+      (config.porTipo[tipo] || []).forEach(function (x) {
+        var es = (campo.propioId && x.origen === 'propio' && x.id === campo.propioId) || (campo.calculadoId && x.origen === 'calculado' && x.id === campo.calculadoId);
+        if (es) salida.push({ tipo: tipo, donde: x.hito ? 'hito' : (x.sinPedirAlCrear ? 'general' : 'crear'), hito: x.hito || '' });
+      });
+    });
+    return salida;
+  }
+
+  /* La frase de una línea de `dondeDetalle`; `tituloDeHito`: el título del hito, si se sabe. */
+  function textoDonde(d, tituloDeHito) {
+    if (d.donde === 'hito') return d.tipo + ': hito «' + (tituloDeHito || 'del tipo') + '»';
+    return d.tipo + ': ' + (d.donde === 'general' ? 'en la parte general, sin pedirlo al crear' : 'al crear el asunto');
+  }
+
   function reunir(e) {
     e = e || {};
     var config = e.config || {};
@@ -171,6 +189,8 @@ var CamposLista = (function () {
       c.usos = usosDe(c, e.textos, lista);
       c.dondeSePide = c.propioId && window.Campos ? Campos.tiposQueUsanPropio(config, c.propioId) : [];
       if (c.calculadoId && window.Campos) c.dondeSePide = Campos.tiposQueUsanCalculado(config, c.calculadoId);
+      /* Fila 530: lo que hace cada tipo con el campo (al crear, en la parte general sin pedirlo al crear, o un hito). */
+      c.dondeDetalle = detalleDeDonde(config, c);
       c.enTipos = c.dondeSePide.length;
       c.dondeSePide.forEach(function (t) { c.usos.push('Tipo de asunto «' + t + '»'); });
     });
@@ -223,7 +243,7 @@ var CamposLista = (function () {
 
   return {
     GRUPOS: GRUPOS, ORIGENES: ORIGENES, CLASES_PERSONA: CLASES_PERSONA,
-    reunir: reunir, sePuedeQuitar: sePuedeQuitar, dondeSePide: dondeSePide, camino: camino, rutaCorta: rutaCorta,
+    reunir: reunir, textoDonde: textoDonde, sePuedeQuitar: sePuedeQuitar, dondeSePide: dondeSePide, camino: camino, rutaCorta: rutaCorta,
     sirveParaClase: sirveParaClase, buscar: buscar, marcaDeCampo: marcaDeCampo
   };
 })();

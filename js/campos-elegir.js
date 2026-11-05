@@ -12,7 +12,13 @@
    «+ Campo manual nuevo» y «+ Crear a partir de otros»: el campo se
    crea sin salir de la plantilla y queda insertado.
 
-   CamposElegir.abrir({ tipo: 'nombre del tipo' | función, alElegir(campo) })
+   CamposElegir.abrir({ tipo: 'nombre del tipo' | función, alElegir(campo, para) })
+
+   Fila 530 (desde un asunto, js/campo-elegir-en-asunto.js): `soloGuardables`
+   deja solo los campos que se pueden guardar en un asunto (de un fichero,
+   calculados, propios y los {campo:…} escritos a mano) y `para`
+   ([{ valor, texto }]) pone abajo el desplegable «Para»: su valor llega a
+   `alElegir` como segundo argumento.
    ============================================================ */
 var CamposElegir = (function () {
 
@@ -51,10 +57,11 @@ var CamposElegir = (function () {
     var categoria = categoriaDelTipo(tipo);
     var entrada = await CamposListaDatos.entrada();
     var lista = CamposLista.reunir(entrada);
+    if (ctx.soloGuardables) lista = lista.filter(function (c) { return c.propioId || c.calculadoId || c.escritoAMano || c.id.indexOf('f:') === 0; });
     var personas = await CamposListaDatos.personas(categoria === 'PERSONAL' ? 'PERSONAL' : 'ALUMNADO');
     var persona = personas[0];
     var usados = masUsados(lista, entrada.textos, tipo);
-    var st = { q: '', g: 'Persona', verOtros: false, modo: 'lista', sel: 0 };
+    var st = { q: '', g: 'Persona', verOtros: false, modo: 'lista', sel: 0, para: ctx.para && ctx.para.length ? ctx.para[0].valor : '' };
 
     var capa = document.createElement('div');
     capa.className = 'capa capa-campos';
@@ -71,7 +78,7 @@ var CamposElegir = (function () {
     abierto = { capa: capa, tecla: tecla };
     capa.addEventListener('mousedown', function (ev) { if (ev.target === capa) cerrar(); });
 
-    function elegir(campo) { cerrar(); ctx.alElegir(campo); }
+    function elegir(campo) { cerrar(); ctx.alElegir(campo, st.para); }
     function porId(id) { return lista.filter(function (c) { return c.id === id; })[0]; }
 
     /* Los ejemplos se calculan una vez, al abrir: así filtrar al escribir es inmediato y Enter elige siempre lo que se ve. */
@@ -109,7 +116,10 @@ var CamposElegir = (function () {
           var n = lista.filter(function (c) { return c.grupo === g && CamposLista.sirveParaClase(c, categoria); }).length;
           return '<button type="button" class="campos-grupo' + (!q && st.g === g && st.modo === 'lista' ? ' on' : '') + '" data-g="' + esc(g) + '"><span>' + esc(g) + '</span><span>' + n + '</span></button>';
         }).join('') + '</div><div class="campos-elegir-centro" id="ce-centro">' + centro + '</div></div>' +
-        '<div class="campos-elegir-pie"><span class="suave pequeno">' + (persona ? 'Ejemplos con ' + esc(persona.nombre) : '') + '</span>' +
+        '<div class="campos-elegir-pie">' +
+        (ctx.para && ctx.para.length > 1 ? '<span class="campos-elegir-para"><label class="suave pequeno" for="ce-para">Para</label> <select id="ce-para" class="campo">' +
+          ctx.para.map(function (o) { return '<option value="' + esc(o.valor) + '"' + (o.valor === st.para ? ' selected' : '') + '>' + esc(o.texto) + '</option>'; }).join('') + '</select></span>' : '') +
+        '<span class="suave pequeno">' + (persona ? 'Ejemplos con ' + esc(persona.nombre) : '') + '</span>' +
         '<span><button type="button" class="boton" id="ce-nuevo-manual">+ Campo manual nuevo</button> <button type="button" class="boton" id="ce-nuevo-calculado">+ Crear a partir de otros</button></span></div>';
 
       var b = cuadro.querySelector('#ce-buscar');
@@ -129,6 +139,8 @@ var CamposElegir = (function () {
         else if (ev.key === 'Enter') { ev.preventDefault(); if (ordenVisible[st.sel]) elegir(ordenVisible[st.sel]); }
       };
       cuadro.querySelector('#ce-cerrar').onclick = cerrar;
+      var paraSel = cuadro.querySelector('#ce-para');
+      if (paraSel) paraSel.onchange = function () { st.para = paraSel.value; };
       Array.prototype.forEach.call(cuadro.querySelectorAll('[data-id]'), function (x) { x.onclick = function () { elegir(porId(x.getAttribute('data-id'))); }; });
       Array.prototype.forEach.call(cuadro.querySelectorAll('.campos-grupo'), function (x) { x.onclick = function () { st.g = x.getAttribute('data-g'); st.q = ''; st.modo = 'lista'; st.verOtros = false; st.sel = 0; pintar(); }; });
       var vo = cuadro.querySelector('#ce-ver-otros');
@@ -139,14 +151,14 @@ var CamposElegir = (function () {
         CamposManualNuevo.pintar(cuadro.querySelector('#ce-manual'), {
           textoCrear: 'Crear e insertar',
           existentes: function () { return lista; },
-          alCrear: function (p) { cerrar(); ctx.alElegir({ nombre: p.nombre, marca: CamposLista.marcaDeCampo(p.nombre), id: 'p:' + p.id }); },
+          alCrear: function (p) { cerrar(); ctx.alElegir({ nombre: p.nombre, marca: CamposLista.marcaDeCampo(p.nombre), id: 'p:' + p.id, propioId: p.id }, st.para); },
           alCancelar: function () { st.modo = 'lista'; pintar(); }
         });
       } else if (st.modo === 'calculado') {
         /* Hasta la fila 529, el editor de siempre. */
         CamposCalculadosEditor.abrir(cuadro.querySelector('#ce-calculado'), {
           existente: null,
-          alGuardar: function (cal) { cerrar(); ctx.alElegir({ nombre: cal.nombre, marca: CamposLista.marcaDeCampo(cal.nombre), id: 'c:' + cal.id }); },
+          alGuardar: function (cal) { cerrar(); ctx.alElegir({ nombre: cal.nombre, marca: CamposLista.marcaDeCampo(cal.nombre), id: 'c:' + cal.id, calculadoId: cal.id }, st.para); },
           alCancelar: function () { st.modo = 'lista'; pintar(); }
         });
       } else {

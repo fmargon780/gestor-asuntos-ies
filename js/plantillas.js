@@ -412,6 +412,8 @@ var Plantillas = (function () {
     var valor = valores[real] || '';
     /* Fila 155: sin dato, lo escrito a mano con el nombre con el que salió en `faltan`. */
     if (!valor) { var aMano = escritoAMano(nombreDeHueco(real), valores); if (aMano !== null) valor = aMano; }
+    /* Fila 530: un dato que se escribió en el asunto (js/datos-del-asunto.js) con el nombre de este hueco. */
+    if (!valor) valor = buscarCampo(valores.campos, nombreDeHueco(real));
     if (!valor && SIN_FALTA.indexOf(real) === -1) faltan.push(nombreDeHueco(real));
     return { encontrado: true, valor: valor };
   }

@@ -44,7 +44,8 @@ var GuiasGuion = (function () {
     { valor: 'firmar', texto: 'Firmar un documento' },
     { valor: 'registrar', texto: 'Registrar un documento' },
     { valor: 'comunicar', texto: 'Comunicar' },
-    { valor: 'anadir', texto: 'Añadir un documento' }
+    { valor: 'anadir', texto: 'Añadir un documento' },
+    { valor: 'pedir', texto: 'Pedir datos' }   /* fila 530 */
   ];
 
   var A_QUIEN = [
@@ -56,6 +57,21 @@ var GuiasGuion = (function () {
   /* Fila 523: las firmas que necesita la tarea de firmar (1 por defecto). */
   var FIRMAS = [{ valor: '1', texto: '1' }, { valor: '2', texto: '2' }, { valor: '3', texto: '3' }];
   var SENTIDOS = [{ valor: '', texto: 'Entrada o salida' }, { valor: 'entrada', texto: 'Entrada' }, { valor: 'salida', texto: 'Salida' }];
+
+  /* Fila 530: los campos que pide una tarea «Pedir datos»: { origen, id | columna }, sin repetir. */
+  function normalizarCampos(lista) {
+    var vistos = {}, salida = [];
+    (Array.isArray(lista) ? lista : []).forEach(function (c) {
+      var o = String((c && c.origen) || '');
+      if (['fichero', 'calculado', 'propio'].indexOf(o) === -1) return;
+      var e = o === 'fichero' ? { origen: o, columna: String(c.columna || '') } : { origen: o, id: String(c.id || '') };
+      var k = o + ':' + (e.columna || e.id);
+      if (!(e.columna || e.id) || vistos[k]) return;
+      vistos[k] = true;
+      salida.push(e);
+    });
+    return salida;
+  }
 
   function valido(lista, v) { return lista.some(function (x) { return x.valor === v; }) ? v : ''; }
 
@@ -72,6 +88,9 @@ var GuiasGuion = (function () {
     } else if (accion === 'firmar') {
       var f = valido(FIRMAS, String(r.firmas || ''));
       out = { firmas: f === '1' ? '' : f };   /* 1 es lo normal: no se guarda */
+    } else if (accion === 'pedir') {
+      var campos = normalizarCampos(r.campos);
+      out = { campos: campos.length ? campos : '' };   /* fila 530 */
     }
     if (!out) return null;
     return Object.keys(out).some(function (k) { return out[k]; }) ? out : null;
@@ -116,6 +135,20 @@ var GuiasGuion = (function () {
     return dentro ? selectHTML : '<label class="dato"><span class="etiqueta">' + rotulo + '</span>' + selectHTML + '</label>';
   }
 
+  /* Fila 530: los campos de una tarea «Pedir datos». En el editor de la guía (`g.editorGuia`) se quitan y se añaden aquí;
+     en «Nueva tarea» se añaden después, desde la propia tarea. */
+  function pedirHTML(g) {
+    var campos = (g.receta && g.receta.campos) || [];
+    if (!g.editorGuia) return '<div class="guion-fila-linea guion-receta"><span class="suave pequeno">Los campos que pide se añaden después, en la propia tarea.</span></div>';
+    return '<div class="guion-fila-linea guion-receta guion-receta-pedir" data-campos="' + U.escapar(JSON.stringify(campos)) + '">' +
+      '<span class="etiqueta">Datos que pide</span>' +
+      (campos.length ? campos.map(function (c, i) {
+        return '<span class="guion-pedir-campo">' + U.escapar(window.Campos ? Campos.nombreDeCampo(c, window.App && App.E && App.E.campos) : (c.columna || c.id)) +
+          ' <button type="button" class="enlace guion-pedir-quitar" data-i="' + i + '" aria-label="Quitar este campo">✕</button></span>';
+      }).join('') : '<span class="suave pequeno">Ninguno todavía.</span>') +
+      '<button type="button" class="boton boton-chico guion-pedir-anadir">+ Añadir campo</button></div>';
+  }
+
   function recetaHTML(g, dentro) {
     var r = g.receta || {};
     var titulo = dentro ? '<span class="guion-receta-titulo">Detalles:</span>' : '';
@@ -137,6 +170,7 @@ var GuiasGuion = (function () {
       return '<div class="guion-fila-linea guion-receta">' + titulo +
         conRotulo('Entrada o salida', '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select>', dentro) + '</div>';
     }
+    if (g.accion === 'pedir') return pedirHTML(g);
     if (g.accion === 'firmar') {
       return '<div class="guion-fila-linea guion-receta">' + titulo +
         conRotulo('Firmas necesarias', '<select class="campo guion-receta-firmas">' + opcionesHTML(FIRMAS, String(firmasNecesarias(g))) + '</select>', dentro) + '</div>';
@@ -197,6 +231,6 @@ var GuiasGuion = (function () {
   }
 
   return { normalizar: normalizar, textoLegible: textoLegible, ACCIONES: ACCIONES,
-           normalizarReceta: normalizarReceta, firmasNecesarias: firmasNecesarias, A_QUIEN: A_QUIEN, VIAS: VIAS, recetaHTML: recetaHTML, nuevoId: nuevoId };
+           normalizarReceta: normalizarReceta, normalizarCampos: normalizarCampos, firmasNecesarias: firmasNecesarias, A_QUIEN: A_QUIEN, VIAS: VIAS, recetaHTML: recetaHTML, nuevoId: nuevoId };
 })();
 window.GuiasGuion = GuiasGuion;

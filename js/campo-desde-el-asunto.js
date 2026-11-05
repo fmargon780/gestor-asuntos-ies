@@ -31,7 +31,7 @@
 window.CampoDesdeElAsunto = (function () {
 
   function $(id) { return document.getElementById(id); }
-  function copia(x) { return JSON.parse(JSON.stringify(x)); }
+  var copia = CampoDesdeElAsuntoEscribir.copia;
 
   function tipoDe(a) { return DondeSeGuarda.tipoDe(a); }
 
@@ -190,64 +190,11 @@ window.CampoDesdeElAsunto = (function () {
     return { valor: leido.valor, donde: donde };
   }
 
-  /* ---------- lo que se escribe ---------- */
+  /* ---------- lo que se escribe (js/campo-desde-el-asunto-escribir.js) ---------- */
 
-  /* El campo entra en la configuración del tipo (al final, sin
-     «Obligatorio» ni «Añadir al nombre»). Si ya estaba y ahora se le pone hito
-     (fila 255), se le pone la marca, sin duplicarlo. Devuelve cómo estaba la
-     lista del tipo antes y cómo queda, para «Deshacer». */
-  function anadirAlTipo(tipo, entrada) {
-    var clave = Campos.claveDeCampo(entrada);
-    var res = null;
-    return App.enFila('campos.json', async function () {
-      var actual = await Campos.leer(App.E.gestor);
-      var lista = (actual.porTipo && actual.porTipo[tipo]) || [];
-      var antes = copia(lista);
-      var i = -1;
-      lista.forEach(function (c, k) { if (Campos.claveDeCampo(c) === clave) i = k; });
-      var nueva;
-      if (i === -1) nueva = lista.concat([entrada]);
-      else if (entrada.hito && !lista[i].hito) {
-        nueva = lista.map(function (c, k) { return k === i ? Object.assign({}, c, { hito: entrada.hito, obligatorio: false }) : c; });
-      } else { res = { antes: antes, despues: antes }; return actual; }
-      var config = await Campos.guardarConfigDeTipo(App.E.gestor, tipo, nueva);
-      res = { antes: antes, despues: copia((config.porTipo && config.porTipo[tipo]) || []) };
-      return config;
-    }).then(function (config) { App.E.campos = config; return res; });
-  }
-
-  /* Fila 255: a un campo del tipo se le quita la marca de hito (pasa a ser del asunto). */
-  function quitarHitoEnElTipo(tipo, clave) {
-    return App.enFila('campos.json', async function () {
-      var actual = await Campos.leer(App.E.gestor);
-      var lista = ((actual.porTipo && actual.porTipo[tipo]) || []).map(function (c) {
-        if (Campos.claveDeCampo(c) !== clave) return c;
-        var n = Object.assign({}, c); delete n.hito; return n;
-      });
-      return Campos.guardarConfigDeTipo(App.E.gestor, tipo, lista);
-    }).then(function (config) { App.E.campos = config; });
-  }
-
-  /* Una sola escritura de la ficha del asunto, releída del disco justo
-     antes. `o`: valor (si no viene, se deja el que tenía), anadir (una
-     entrada para `camposPropiosDelAsunto`), quitar (true: sale de la lista
-     «solo aquí»; con `borrarValor`, también su valor). */
-  function escribirEnAsunto(a, clave, o) {
-    return App.guardarRegistroFresco(async function (registro) {
-      await App.comprobarNoCerrado(a.nombre);
-      var ficha = registro.asuntos[a.nombre] || (registro.asuntos[a.nombre] = {});
-      var campos = (ficha.campos && !Array.isArray(ficha.campos)) ? Object.assign({}, ficha.campos) : {};
-      if (o.borrarValor) delete campos[clave];
-      else if (o.valor !== undefined) campos[clave] = { valor: o.valor, enNombre: false };
-      ficha.campos = campos;
-      /* Fila 255: guardar solo un valor no toca la lista de «solo aquí». */
-      if (o.anadir || o.quitar) {
-        var lista = (ficha.camposPropiosDelAsunto || []).filter(function (c) { return Campos.claveDeCampo(c) !== clave; });
-        if (o.anadir) lista.push(o.anadir);
-        if (lista.length) ficha.camposPropiosDelAsunto = lista; else delete ficha.camposPropiosDelAsunto;
-      }
-    });
-  }
+  var anadirAlTipo = CampoDesdeElAsuntoEscribir.anadirAlTipo;
+  var quitarHitoEnElTipo = CampoDesdeElAsuntoEscribir.quitarHitoEnElTipo;
+  var escribirEnAsunto = CampoDesdeElAsuntoEscribir.escribirEnAsunto;
 
   /* Fila 254: nada de lo que tarde se queda en silencio. Si `promesa` no ha
      acabado en `ms`, sale un aviso ámbar; al acabar (bien o mal) ya no. */
@@ -400,7 +347,8 @@ window.CampoDesdeElAsunto = (function () {
   /* Tras pintar la ficha: engancha el botón y los «⋮». */
   function alPintar(caja, a) {
     var b = caja.querySelector('#ficha-campo-anadir');
-    if (b) b.onclick = function () { abrir(a); };
+    /* Fila 530: «+ Añadir campo» abre la ventana de elegir (js/campo-elegir-en-asunto.js). */
+    if (b) b.onclick = function () { if (window.CampoElegirEnAsunto) CampoElegirEnAsunto.abrir(a); else abrir(a); };
     Array.prototype.forEach.call(caja.querySelectorAll('.campo-aqui-menu'), function (boton) {
       var clave = boton.dataset.clave;
       var nombre = boton.dataset.nombre || clave;

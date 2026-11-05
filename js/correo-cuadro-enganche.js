@@ -93,6 +93,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     var desplegable = $('correo-plantilla');
     if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
     PlantillaDeLoEscrito.engancharBotones(cfgPlantilla, a, function () { return I.S.plantillaElegida; });   /* fila 270 */
+    if (window.DatosDelAsuntoCuadro) DatosDelAsuntoCuadro.enganchar('correo', a, function () { elegirPlantilla(a, I.S.plantillaElegida); });   /* fila 530 */
   }
 
   /* Cambiar de plantilla, con la confirmación en línea de siempre si el

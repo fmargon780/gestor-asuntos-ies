@@ -102,7 +102,10 @@ var CamposListaPantalla = (function () {
     if (campo.propioId) {
       h += '<p class="pequeno">Clase de dato: ' + esc(CamposClases.nombreDe(campo.clase)) + (campo.clase === 'lista' ? ' · ' + esc((campo.opciones || []).join(', ')) : '') + '</p>' +
         '<div><strong class="pequeno">Dónde se pide</strong>' +
-        (campo.dondeSePide.length ? '<ul class="campos-usos" id="cl-donde-pide">' + campo.dondeSePide.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>'
+        (campo.dondeSePide.length ? '<ul class="campos-usos" id="cl-donde-pide">' + (campo.dondeDetalle || []).map(function (d) {
+          var paso = d.donde === 'hito' && window.CamposDeHito ? CamposDeHito.pasosDeLaGuia(d.tipo).filter(function (x) { return x.id === d.hito; })[0] : null;
+          return '<li>' + esc(CamposLista.textoDonde(d, paso && paso.titulo)) + '</li>';   /* fila 530: lo que hace cada tipo */
+        }).join('') + '</ul>'
           : '<p class="suave pequeno" id="cl-donde-pide">Se pide al usarlo, en la tarea que lo necesite.</p>') +
         '<p class="suave pequeno">No se decide aquí: se decide en cada tipo de asunto.</p></div>';
     }
