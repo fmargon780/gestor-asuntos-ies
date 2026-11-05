@@ -8,10 +8,11 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, window: {} };
 vm.createContext(contexto);
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'campos-normalizar.js', 'campos-guardar.js', 'campos-valores.js', 'campos.js', 'campos-pasos.js', 'campos-calculo.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'campos-normalizar.js', 'campos-guardar.js', 'campos-valores.js', 'campos.js', 'campos-datos-cache.js', 'campos-pasos.js', 'campos-calculo.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 contexto.window.CamposPasos = contexto.CamposPasos;
+contexto.window.CamposDatosCache = contexto.CamposDatosCache;
 contexto.window.Calculo = contexto.Calculo;
 const { Calculo, CamposPasos, Campos } = contexto;
 
@@ -134,6 +135,15 @@ viejas.forEach(([parte, valor], i) => {
   const nueva = Object.assign({}, vieja, { operacion: 'pasos', parametros: {}, pasos: CamposPasos.deLegado(vieja) });
   comprobar('la vieja ' + (i + 1) + ' (' + parte.operacion + ') da lo mismo como pasos', Calculo.evaluar(nueva, p, {}), Calculo.evaluar(vieja, p, {}));
 });
+
+console.log('--- 7b. partir de un dato que no está en la ficha ---');
+const ana = { nombre: 'Ana Pons', campos: {} };
+const nie = { clase: 'dato', id: 'h:nie', nombre: 'Nº de identificación escolar' };
+comprobar('sin leer el dato, sale vacío', por(nie, [{ op: 'texto', txt: 'Id. ', lado: 'principio' }], ana), '');
+contexto.CamposDatosCache.poner('h:nie', ana, '1140233');
+comprobar('leído el dato, el campo lo usa', por(nie, [{ op: 'texto', txt: 'Id. ', lado: 'principio' }], ana), 'Id. 1140233');
+comprobar('un paso puede usar el dato de otra parte', uno({ op: 'juntar', campo: nie, sep: '-', lado: 'final' }, 'Ana', {}) , 'Ana');
+comprobar('los datos de otra parte de una receta', contexto.CamposDatosCache.idsDe({ origen: nie, operacion: 'pasos', pasos: [] }, {}), ['h:nie']);
 
 console.log('--- 8. lo que se guarda en campos.json ---');
 const leido = Campos.normalizar({ calculados: [{ id: 'c9', nombre: 'Por pasos', categorias: ['ALUMNADO'], grupo: 'Asunto', origen: col('X'), operacion: 'pasos', pasos: [{ op: 'letras', modo: 'mayus' }, { sinOp: 1 }] }] });

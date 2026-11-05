@@ -17,9 +17,11 @@
    pasos de cada operación están en js/campos-pasos.js; sus casillas,
    en js/campos-calculados-pasos.js.
 
-   Solo se ofrecen los campos que se pueden sacar de la ficha de la
-   persona al crear un asunto: las columnas de sus ficheros, el grupo y
-   otros campos calculados.
+   Se puede partir de cualquier campo de la lista que tenga valor para
+   una persona (columnas de sus ficheros, grupo, otros calculados, los
+   datos del Centro de datos, tutores y tablas de datos; no los campos
+   manuales del asunto). Los que no vienen de su ficha se leen antes
+   con js/campos-datos-cache.js, porque el cálculo es síncrono.
    ============================================================ */
 var CamposCalculadosEditor = (function () {
 
@@ -31,12 +33,13 @@ var CamposCalculadosEditor = (function () {
 
   function clave(o) {
     if (!o) return '';
-    return o.clase === 'columna' ? 'f|' + o.columna : o.clase === 'calculado' ? 'c|' + o.id : 'g';
+    return o.clase === 'columna' ? 'f|' + o.columna : o.clase === 'calculado' ? 'c|' + o.id : o.clase === 'dato' ? 'd|' + o.id : 'g';
   }
   function origenDeEntrada(e) {
     if (e.id && e.id.indexOf('f:') === 0 && e.columna) return { clase: 'columna', columna: e.columna };
     if (e.id === 'h:grupo') return { clase: 'grupo' };
     if (e.calculadoId) return { clase: 'calculado', id: e.calculadoId };
+    if (e.id && (e.id.indexOf('h:') === 0 || e.id.indexOf('d:') === 0)) return { clase: 'dato', id: e.id, nombre: e.nombre };   /* nº escolar, tutores, tablas de datos… */
     return null;
   }
   function nombreCategoria(c) { return c.charAt(0) + c.slice(1).toLowerCase(); }
@@ -50,6 +53,7 @@ var CamposCalculadosEditor = (function () {
       pasos: existente && window.CamposPasos ? CamposPasos.deLegado(existente) : []
     };
     var entradas = [];       /* los campos que se pueden elegir: { clave, origen, nombre, grupo, clases } */
+    var listaCampos = [];    /* la lista completa de campos, para leer los datos de otra parte */
     var personas = [];
     var persona = 0;         /* la de ejemplo */
 
@@ -73,6 +77,7 @@ var CamposCalculadosEditor = (function () {
     async function cargar() {
       var lista = [];
       try { lista = await CamposListaDatos.lista(); } catch (e) { lista = []; }
+      listaCampos = lista;
       var vistos = {};
       lista.forEach(function (e) {
         var o = origenDeEntrada(e);
@@ -98,6 +103,12 @@ var CamposCalculadosEditor = (function () {
       }
       personas = salida;
       if (persona >= personas.length) persona = 0;
+      /* Los datos de otra parte se leen antes (el cálculo es síncrono): de las personas que se ven. */
+      var ids = window.CamposDatosCache ? CamposDatosCache.idsDe(receta(), App.E.campos) : [];
+      if (ids.length) {
+        var vistas = personas.slice(0, 6).concat(personas[persona] ? [personas[persona]] : []);
+        for (var j = 0; j < vistas.length; j++) await CamposDatosCache.precargar(ids, vistas[j], listaCampos);
+      }
     }
 
     function opciones(elegida, vacio) {

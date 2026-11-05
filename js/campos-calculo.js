@@ -52,6 +52,9 @@ var Calculo = (function () {
       return limpiar((typeof Nombres !== 'undefined' && Nombres.grupoCompacto)
         ? Nombres.grupoCompacto(persona.unidad, persona.curso) : '');
     }
+    if (origen.clase === 'dato') {   /* fila 529: un dato de otra parte, ya leído (js/campos-datos-cache.js) */
+      return limpiar(window.CamposDatosCache ? CamposDatosCache.valor(origen.id, persona) : '');
+    }
     if (origen.clase === 'calculado') {
       if ((profundidad || 0) >= PROFUNDIDAD_MAXIMA) return '';
       var receta = calculadoPorId(config, origen.id);
@@ -66,6 +69,7 @@ var Calculo = (function () {
     if (a.clase !== b.clase) return false;
     if (a.clase === 'columna') return a.columna === b.columna;
     if (a.clase === 'calculado') return a.id === b.id;
+    if (a.clase === 'dato') return a.id === b.id;
     return true; /* "grupo" no lleva más datos */
   }
 
@@ -202,6 +206,7 @@ var Calculo = (function () {
     if (!origen) return '';
     if (origen.clase === 'columna') return origen.columna || '';
     if (origen.clase === 'grupo') return 'El grupo';
+    if (origen.clase === 'dato') return origen.nombre || 'Otro campo';
     if (origen.clase === 'calculado') {
       var r = calculadoPorId(config, origen.id);
       return r ? r.nombre : '';
@@ -353,6 +358,7 @@ var Calculo = (function () {
        necesita sueltas, sin montar una receta completa */
     origenesIguales: origenesIguales,
     trazar: trazar,
+    origenesDe: origenesDe,
     dependeDe: function (idCalculado, idBuscado, config) { return sigueLaCadena({ clase: 'calculado', id: idCalculado }, idBuscado, config, {}); },
     valorDeOrigen: function (origen, persona, config) { return valorDeOrigen(origen, persona, config, 0); }
   };
