@@ -22,6 +22,7 @@ var DatosDeLaTarea = (function () {
 
   var abiertas = {};
   var turnos = {};
+  var pintadas = {};   /* clave → función que vuelve a pintar esa lista */
 
   function plantillaDe(g) { return (g.receta && g.receta.plantilla) || ''; }
 
@@ -71,6 +72,7 @@ var DatosDeLaTarea = (function () {
   async function pintarUno(el, a, h, g, siguiente, abierto, alRepintar) {
     var clave = a.nombre + '|' + h.id + '|' + g.id;
     var turno = turnos[clave] = (turnos[clave] || 0) + 1;
+    pintadas[clave] = { el: el, de: function () { pintarUno(el, a, h, g, siguiente, abierto, alRepintar); } };
     var open = clave in abiertas ? abiertas[clave] : !!(siguiente && siguiente.id === g.id);
     function conmutar() { abiertas[clave] = !open; pintarUno(el, a, h, g, siguiente, abierto, alRepintar); }
     if (!open) { el.innerHTML = cabeza(false, 'Ver los datos'); el.querySelector('.dat-cabeza').onclick = conmutar; return; }
@@ -126,6 +128,15 @@ var DatosDeLaTarea = (function () {
     });
   }
 
+  /* Todas las listas de datos que están a la vista se vuelven a pintar (tras guardar un dato en cualquier sitio). */
+  function repintarTodas() {
+    Object.keys(pintadas).forEach(function (k) {
+      var x = pintadas[k];
+      if (!x.el.isConnected) { delete pintadas[k]; return; }
+      x.de();
+    });
+  }
+
   /* Rellena los huecos de `caja` (la lista de tareas de un hito). `guion`: Hitos.guionDe; `siguiente`: la primera sin hacer. */
   function pintar(caja, a, h, guion, siguiente, abierto, alRepintar) {
     var porId = {};
@@ -136,6 +147,6 @@ var DatosDeLaTarea = (function () {
     });
   }
 
-  return { marcoHTML: marcoHTML, pintar: pintar, esDePlantilla: esDePlantilla, esDePedir: esDePedir, datosDePedir: datosDePedir };
+  return { repintarTodas: repintarTodas, marcoHTML: marcoHTML, pintar: pintar, esDePlantilla: esDePlantilla, esDePedir: esDePedir, datosDePedir: datosDePedir };
 })();
 window.DatosDeLaTarea = DatosDeLaTarea;

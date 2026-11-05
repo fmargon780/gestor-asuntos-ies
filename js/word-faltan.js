@@ -50,12 +50,19 @@ var WordFaltan = (function () {
     (faltan || []).forEach(function (f) { if (f && lista.indexOf(f) === -1) lista.push(f); });
     if (!lista.length) return { accion: 'igual', aMano: {} };
     var igual = false;
+    /* Fila 530: el mismo control que en la lista de la tarea (desplegable para un campo de lista y para el tutor con custodia). */
+    var infos = {};
+    if (asunto && window.DatosDelAsunto) {
+      var valores = null;
+      try { valores = await Plantillas.valoresDeAsunto(asunto); } catch (e) { valores = null; }
+      lista.forEach(function (f) { try { infos[f] = DatosDelAsunto.infoDe(f, asunto, valores); } catch (e2) { /* sin info: caja de texto */ } });
+    }
     var esperar = U.preguntar('Faltan datos para este documento',
       '<p class="explica">Escribe lo que falte.' + (asunto ? ' Se guarda en el asunto: ninguna otra plantilla lo vuelve a pedir. ' : ' Vale solo para este documento. ') +
       'Lo que dejes vacío se queda sin rellenar en el Word.</p>' +
       lista.map(function (f, i) {
         /* Fila 510: un campo de lista que decide un texto condicional se elige en un desplegable con sus opciones. */
-        var opciones = window.TextoCondicional ? TextoCondicional.opcionesDeFalta(f) : null;
+        var opciones = (infos[f] && infos[f].clase === 'lista' && infos[f].valores && infos[f].valores.length) ? infos[f].valores : (window.TextoCondicional ? TextoCondicional.opcionesDeFalta(f) : null);
         var control = opciones
           ? '<select class="campo word-falta" id="word-falta-' + i + '" data-hueco="' + U.escapar(f) + '"><option value="">—</option>' +
             opciones.map(function (o) { return '<option>' + U.escapar(o) + '</option>'; }).join('') + '</select>'

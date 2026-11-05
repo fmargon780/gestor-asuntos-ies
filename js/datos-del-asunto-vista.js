@@ -54,7 +54,7 @@ var DatosDelAsuntoVista = (function () {
   function resumenHtml(datos, titulo) {
     var f = datos.filter(function (d) { return d.falta; }).length;
     return (titulo ? esc(titulo) + '. ' : '') + (f
-      ? 'Falta' + (f > 1 ? 'n ' : ' ') + f + ' de ' + datos.length + ' datos' + (f < datos.length ? '; el resto ya está.' : '.')
+      ? 'Falta' + (f > 1 ? 'n ' : ' ') + f + ' de ' + datos.length + (datos.length > 1 ? ' datos' : ' dato') + (f < datos.length ? '; el resto ya está.' : '.')
       : (datos.length ? 'Ya están todos los datos.' : 'No usa ningún dato.'));
   }
 
@@ -108,6 +108,12 @@ var DatosDelAsuntoVista = (function () {
 
   /* ---------- guardar lo escrito ---------- */
 
+  /* Tras guardar un dato, las demás listas de datos ya pintadas y «Campos del asunto» se ponen al día (fila 530). */
+  function alGuardarAlgo(a) {
+    try { if (window.DatosDeLaTarea) DatosDeLaTarea.repintarTodas(); } catch (e) { U.accesorio('Guardado, pero no he podido poner al día las otras listas', e); }
+    try { if (window.CampoDesdeElAsunto) CampoDesdeElAsunto._i.repintar(a); } catch (e2) { /* repintar ya avisa */ }
+  }
+
   /* Engancha las cajas y los botones de la lista pintada con `html`. `o.alCambiar(nombre)` se llama tras guardar. */
   function enganchar(raiz, a, datos, o) {
     o = o || {};
@@ -126,6 +132,7 @@ var DatosDelAsuntoVista = (function () {
           el.classList.remove('campo-ambar');
           if (r.sinCambio) return;
           U.aviso(r.valor ? '«' + d.nombre + '» guardado en el asunto.' : '«' + d.nombre + '» quitado del asunto.', 'bueno');
+          alGuardarAlgo(a);
           if (o.alCambiar) o.alCambiar(d.nombre, r);
         } catch (e) { U.fallo('No he podido guardar «' + d.nombre + '»', e); }
         finally { delete el.dataset.guardando; }
@@ -139,6 +146,6 @@ var DatosDelAsuntoVista = (function () {
     });
   }
 
-  return { html: html, enganchar: enganchar, resumenHtml: resumenHtml, filaHtml: filaHtml };
+  return { alGuardarAlgo: alGuardarAlgo, html: html, enganchar: enganchar, resumenHtml: resumenHtml, filaHtml: filaHtml };
 })();
 window.DatosDelAsuntoVista = DatosDelAsuntoVista;

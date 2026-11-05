@@ -116,6 +116,42 @@ await comprobar('12. «Faltan datos» fuera de una tarea guarda en el asunto', p
   return [r.accion, v.campos['Dato nuevo W']];
 }), ['generar', 'escrito']);
 
+await comprobar('13. el resumen concuerda: «Falta 1 de 1 dato», «Faltan 2 de 2 datos»', p.evaluate(() => [
+  DatosDelAsuntoVista.resumenHtml([{ falta: true }], ''), DatosDelAsuntoVista.resumenHtml([{ falta: true }, { falta: true }], '')]),
+  ['Falta 1 de 1 dato.', 'Faltan 2 de 2 datos.']);
+
+await comprobar('14. «Faltan datos» usa desplegable para un campo de lista y para el tutor con custodia', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  App.E.campos.propios = (App.E.campos.propios || []).filter((x) => x.id !== 'pq').concat([{ id: 'pq', nombre: 'Protocolo Q', clase: 'lista', valores: ['Sí', 'No'] }]);
+  const v0 = Plantillas.valoresDeAsunto;
+  Plantillas.valoresDeAsunto = async (x, o) => Object.assign(await v0(x, o), { tutor1: 'Ana', tutor2: 'Luis' });
+  const resp = WordFaltan.preguntar(['Protocolo Q', 'Tutor con custodia', 'Otro dato'], { asunto: a });
+  await new Promise((r) => setTimeout(r, 400));
+  const r = [0, 1, 2].map((i) => { const c = document.getElementById('word-falta-' + i); return [c.tagName, c.tagName === 'SELECT' ? [...c.options].map((o) => o.textContent).join('|') : '']; });
+  document.getElementById('cuadro-cancelar').click();
+  await resp;
+  Plantillas.valoresDeAsunto = v0;
+  return r;
+}), [['SELECT', '—|Sí|No'], ['SELECT', '—|Ana|Luis'], ['INPUT', '']]);
+
+await comprobar('15. tras guardar un dato se repintan las otras listas y «Campos del asunto»', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const llamadas = [];
+  const t0 = DatosDeLaTarea.repintarTodas, r0 = CampoDesdeElAsunto._i.repintar;
+  DatosDeLaTarea.repintarTodas = () => llamadas.push('tareas');
+  CampoDesdeElAsunto._i.repintar = () => llamadas.push('ficha');
+  const caja = document.createElement('div');
+  const d = [{ nombre: 'Dato repintar', valor: '', falta: true, info: { clase: 'texto' } }];
+  caja.innerHTML = DatosDelAsuntoVista.html(a, d, {});
+  document.body.appendChild(caja);
+  DatosDelAsuntoVista.enganchar(caja.querySelector('.dap'), a, d, {});
+  const c = caja.querySelector('.dap-control');
+  c.value = 'x'; c.dispatchEvent(new Event('change'));
+  await new Promise((r) => setTimeout(r, 800));
+  DatosDeLaTarea.repintarTodas = t0; CampoDesdeElAsunto._i.repintar = r0; caja.remove();
+  return llamadas.sort();
+}), ['ficha', 'tareas']);
+
 await comprobar('sin errores de consola', errores, []);
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' fallos' : '\ntodo bien');
