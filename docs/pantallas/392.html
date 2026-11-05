@@ -1,0 +1,203 @@
+<title>Prueba tema 392</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: ficha de un asunto a todo el ancho; arriba, lo que pasa fuera de la app; debajo, documentos a la izquierda y notas a la derecha. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-tinta:#1e7a46;
+  --hover:#f0f3f7;--fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --hover:#222c37;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --hover:#222c37;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+main{padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+h1{font-size:20px;margin:0;text-wrap:balance}
+h2{font-size:15px;margin:0 0 8px}
+.cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{font-size:12px;background:var(--azul-claro);color:var(--azul);border-radius:999px;padding:3px 10px;font-weight:600}
+.bloque{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;min-width:0}
+.fuera{border-style:dashed}
+.fuera p{margin:0 0 8px;color:var(--tinta-suave);font-size:13px}
+.simula{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:7px 12px;cursor:pointer;text-align:left}
+.boton:hover:not(:disabled){background:var(--hover)}
+.boton:disabled{opacity:.45;cursor:default}
+.boton-principal{background:var(--azul);color:#fff;border-color:var(--azul)}
+.boton-principal:hover:not(:disabled){background:var(--azul)}
+.boton:focus-visible,select:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.mini{font-size:12px;padding:2px 8px}
+.pie{display:flex;justify-content:flex-end;margin-top:8px}
+.aviso{border-radius:8px;padding:10px 12px}
+.aviso p{margin:4px 0 8px}
+.aviso-ambar{background:var(--ambar);border:1px solid var(--ambar-linea)}
+.aviso-verde{background:var(--verde);color:var(--verde-tinta)}
+.sello-fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:7px 10px;background:var(--papel);color:var(--tinta);max-width:100%}
+.suave{color:var(--tinta-suave)}
+.columnas{display:grid;grid-template-columns:2fr 1fr;gap:12px;align-items:start}
+.pila{display:flex;flex-direction:column;gap:12px;min-width:0}
+.doc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--linea)}
+.doc:first-of-type{border-top:0}
+.ext{font-size:11px;font-weight:700;color:var(--azul);background:var(--azul-claro);border-radius:4px;padding:1px 5px}
+.nombre{overflow-wrap:anywhere;min-width:0}
+.datos{color:var(--tinta-suave);font-size:13px}
+.sin-reg{font-size:12px;background:var(--ambar);border:1px solid var(--ambar-linea);border-radius:999px;padding:1px 8px}
+.nota{padding:7px 0;border-top:1px solid var(--linea);font-size:14px}
+.nota:first-of-type{border-top:0}
+.nota small{display:block;color:var(--tinta-suave)}
+.vacio{color:var(--tinta-suave);font-size:14px;margin:0}
+@media (max-width:760px){.simula,.columnas{grid-template-columns:1fr}}
+</style>
+
+<main>
+  <div class="cab"><h1>261103 A26-0412 CERTIFICADO Reyes Palma, Lucía</h1><span class="chip">Pantalla de prueba · datos inventados</span></div>
+
+  <section class="bloque fuera">
+    <h2>Lo que pasa fuera de la app</h2>
+    <p id="pista">Para los tres primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.</p>
+    <div class="simula">
+      <button id="s-firmado" class="boton" disabled>Guardar encima el PDF firmado</button>
+      <button id="s-ambos" class="boton" disabled>Guardar encima el PDF registrado en Séneca</button>
+      <button id="s-nada" class="boton" disabled>Guardar encima un PDF sin firma ni sello</button>
+      <button id="s-suelto" class="boton">Llega a la carpeta un firmado con otro nombre</button>
+    </div>
+    <div class="pie"><button id="s-reinicio" class="boton mini">Empezar de nuevo</button></div>
+  </section>
+
+  <div id="avisos" class="pila" aria-live="polite"></div>
+
+  <div class="columnas">
+    <div class="pila">
+      <section class="bloque"><h2>Documentos</h2><div id="docs"></div></section>
+      <section class="bloque"><h2>Versiones previas</h2><div id="previas"></div></section>
+    </div>
+    <section class="bloque"><h2>Notas</h2><div id="notas"></div></section>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var HOY = '5-nov-2026';
+  var e;
+
+  function inicial() {
+    e = {
+      docs: [
+        { nombre: '261105 CERTIFICADO D26-01234.pdf', firmado: false, registro: '', pideRegistro: true },
+        { nombre: '261105 JUSTIFICANTE D26-01235.pdf', firmado: false, registro: '', pideRegistro: false },
+        { nombre: '261103 SOLICITUD D26-01230.pdf', firmado: false, registro: '26EM0187', pideRegistro: false }
+      ],
+      previas: [],
+      notas: [{ t: 'Registrado 26EM0187 el 3-nov-2026 · 261103 SOLICITUD D26-01230.pdf', q: 'Automática' }],
+      elegido: null, suelto: false, verde: '', ambar: '', nuevos: 0
+    };
+  }
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function base(n) { return n.replace(/\.pdf$/, ''); }
+
+  function linea(d) {
+    var p = [];
+    if (d.firmado) p.push('Firmado');
+    if (d.registro) p.push('Registro ' + d.registro);
+    return p.join(' · ');
+  }
+
+  function pintar() {
+    $('docs').innerHTML = e.docs.map(function (d, i) {
+      var l = linea(d);
+      return '<div class="doc"><span class="ext">PDF</span><span class="nombre">' + esc(d.nombre) + '</span>' +
+        '<button class="boton mini" data-ruta="' + i + '">Ruta</button>' +
+        (l ? '<span class="datos">' + esc(l) + '</span>' : '') +
+        (!d.registro && d.pideRegistro ? '<span class="sin-reg">Sin registrar</span>' : '') + '</div>';
+    }).join('');
+    $('previas').innerHTML = e.previas.length
+      ? e.previas.map(function (n) { return '<div class="doc"><span class="ext">PDF</span><span class="nombre">' + esc(n) + '</span></div>'; }).join('')
+      : '<p class="vacio">Sin versiones previas.</p>';
+    $('notas').innerHTML = e.notas.map(function (n) {
+      return '<div class="nota">' + esc(n.t) + '<small>' + esc(n.q) + '</small></div>';
+    }).join('');
+
+    var av = '';
+    if (e.verde) av += '<div class="aviso aviso-verde">' + esc(e.verde) + '</div>';
+    if (e.ambar) av += '<div class="aviso aviso-ambar">' + esc(e.ambar) + '</div>';
+    if (e.suelto) {
+      av += '<div class="aviso aviso-ambar"><strong>Este papel lleva firma digital.</strong>' +
+        '<p>¿De qué documento es? <span class="suave">(certificado_signed.pdf)</span></p><div class="sello-fila">' +
+        '<button id="f-nuevo" class="boton boton-principal">Es un documento nuevo</button>' +
+        '<select id="f-elegir" aria-label="Elige un documento"><option value="">Elige un documento…</option>' +
+        e.docs.map(function (d, i) { return '<option value="' + i + '">' + esc(d.nombre) + '</option>'; }).join('') +
+        '</select><button id="f-no" class="boton">No es de este asunto</button></div></div>';
+    }
+    $('avisos').innerHTML = av;
+    if (e.suelto) {
+      $('f-nuevo').onclick = function () {
+        e.nuevos++;
+        var n = '261105 DOCUMENTO D26-0124' + e.nuevos + '.pdf';
+        e.docs.unshift({ nombre: n, firmado: true, registro: '', pideRegistro: false });
+        e.notas.unshift({ t: 'Firmado el ' + HOY + ' · ' + n, q: 'Automática' });
+        e.suelto = false; e.verde = 'Documento firmado guardado como ' + n + '.'; e.ambar = ''; pintar();
+      };
+      $('f-elegir').onchange = function () {
+        if (this.value !== '') { firmar(e.docs[Number(this.value)]); e.suelto = false; pintar(); }
+      };
+      $('f-no').onclick = function () { e.suelto = false; e.verde = ''; e.ambar = ''; pintar(); };
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ruta]'), function (b) {
+      b.onclick = function () {
+        e.elegido = Number(b.getAttribute('data-ruta'));
+        e.verde = 'Ruta copiada: ' + e.docs[e.elegido].nombre; e.ambar = ''; pintar();
+      };
+    });
+    var hay = e.elegido !== null && !!e.docs[e.elegido];
+    ['s-firmado', 's-ambos', 's-nada'].forEach(function (id) { $(id).disabled = !hay; });
+    $('s-suelto').disabled = e.suelto;
+    $('pista').textContent = hay ? 'Guardarás encima de ' + e.docs[e.elegido].nombre + '.'
+      : 'Para los tres primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
+  }
+
+  function firmar(d) {
+    var ya = d.firmado;
+    d.firmado = true;
+    e.ambar = '';
+    if (ya) { e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf'); e.verde = 'Este documento ya estaba firmado. Lo nuevo se queda; el anterior se conserva en «_Previas».'; return; }
+    e.previas.unshift(base(d.nombre) + ' SIN FIRMAR.pdf');
+    e.notas.unshift({ t: 'Firmado el ' + HOY + ' · ' + d.nombre, q: 'Automática' });
+    e.verde = 'Documento firmado. El original sin firmar se conserva en «_Previas».';
+  }
+
+  $('s-firmado').onclick = function () { firmar(e.docs[e.elegido]); e.elegido = null; pintar(); };
+  $('s-ambos').onclick = function () {
+    var d = e.docs[e.elegido];
+    if (d.registro) { e.verde = ''; e.ambar = 'Este documento ya tiene registro ' + d.registro + '. Lo he dejado; el anterior se conserva en «_Previas».'; e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf'); }
+    else {
+      d.registro = '26SM0123';
+      e.previas.unshift(base(d.nombre) + ' SIN SELLAR.pdf');
+      e.notas.unshift({ t: 'Registrado 26SM0123 el ' + HOY + ' · ' + d.nombre + '. Se conserva el original sin sellar.', q: 'Automática' });
+      e.verde = 'Documento registrado (26SM0123). El original sin sellar se conserva en «_Previas».'; e.ambar = '';
+    }
+    e.elegido = null; pintar();
+  };
+  $('s-nada').onclick = function () {
+    var d = e.docs[e.elegido];
+    e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf');
+    d.firmado = false;
+    e.verde = '';
+    e.ambar = 'Lo que has guardado encima de ' + d.nombre + ' no trae firma ni sello de registro. Lo he dejado; el anterior se conserva en «_Previas».';
+    e.elegido = null; pintar();
+  };
+  $('s-suelto').onclick = function () { e.suelto = true; e.verde = ''; e.ambar = ''; pintar(); };
+  $('s-reinicio').onclick = function () { inicial(); pintar(); };
+
+  inicial(); pintar();
+})();
+</script>
