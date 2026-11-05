@@ -32,6 +32,9 @@ var HitosPanelLista = (function () {
        apunta una nota automática. */
     var faltan = (nuevoEstado === 'hecho' && window.Hitos.faltanObligatorios)
       ? Hitos.faltanObligatorios(h, a) : [];
+    /* Fila 524: lo que falta por firmar o registrar en este hito; se avisa, no se impide. Un solo cuadro a la vez:
+       si ya hay el de las casillas obligatorias, ese va después y no se repite. */
+    if (nuevoEstado === 'hecho' && window.AvisosFalta && !(await AvisosFalta.alMarcarHito(a, h))) { casillaEl.checked = false; return false; }
     if (faltan.length) {
       var ok = await U.preguntar('Dar este hito por hecho',
         '<p class="explica">Faltan ' + faltan.length + (faltan.length === 1 ? ' cosa' : ' cosas') +

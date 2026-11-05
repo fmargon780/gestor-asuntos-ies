@@ -255,7 +255,7 @@ var U = (function () {
      antes su espera se quedaba colgada para siempre. */
   var cuadroEsperando = null;
 
-  function preguntar(titulo, cuerpoHtml, textoAceptar, sinCancelar) {
+  function preguntar(titulo, cuerpoHtml, textoAceptar, sinCancelar, textoCancelar) {
     if (cuadroEsperando) { var anterior = cuadroEsperando; cuadroEsperando = null; anterior(false); }
     return new Promise(function (resolver) {
       var capa = document.getElementById('capa');
@@ -264,6 +264,7 @@ var U = (function () {
       var aceptar = document.getElementById('cuadro-aceptar');
       var cancelar = document.getElementById('cuadro-cancelar');
       aceptar.textContent = textoAceptar || 'Aceptar';
+      cancelar.textContent = textoCancelar || 'Cancelar';   /* fila 524: «Volver» en el cuadro de lo que falta */
       cancelar.classList.toggle('oculto', !!sinCancelar);
       capa.classList.remove('oculto');
 

@@ -88,6 +88,10 @@ function mensajeDeFallo(verbo, e, sigueEn, dondeCopia) {
 App.cerrarAsunto = async function (a) {
   /* Fila 290: con notas de directivos sin ver, se pregunta antes. */
   if (window.NotasDirectivos && !App.E.archivarSinPreguntar && !(await NotasDirectivos.antesDeArchivar(a))) return;
+  /* Fila 524: lo que falta por firmar o registrar en todo el asunto, antes de preguntar el archivado; se avisa, no se impide.
+     Con el cuadro de aviso ya contestado, el de «Archivar el asunto» no se repite (`yaPreguntado`). Archivar varios de golpe, como hoy. */
+  var avisoFalta = (window.AvisosFalta && !App.E.archivarSinPreguntar) ? await AvisosFalta.alArchivar(a) : { sigue: true, hayAviso: false };
+  if (!avisoFalta.sigue) return;
   var categoria = a.ficha.categoria || a.leido.categoria || '';
   var tercero = a.ficha.tercero || '';
   /* Fila 480: los hilos de correo del asunto, copiados antes de que la ficha baje a la carpeta. En Gmail se
@@ -137,7 +141,7 @@ App.cerrarAsunto = async function (a) {
   /* Fila 265: antes de preguntar nada, se mide la ruta que tendrá cada
      documento en el archivo. Si la carpeta ya no está en Asuntos abiertos,
      no hay nada que medir y siguen los avisos de más abajo, como siempre. */
-  var yaPreguntado = false;
+  var yaPreguntado = avisoFalta.hayAviso;
   if (window.ArchivarCabe) {
     var medida = null;
     try { medida = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero); } catch (eM) { medida = null; }

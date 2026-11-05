@@ -70,9 +70,12 @@ var HitoMesaDocumentos = (function () {
   }
 
   /* Fila 147: el código de registro va en su columna; aquí, solo el estado. */
-  function estadoDe(n, falta) {
+  /* Fila 524: «Sin registrar» solo en los documentos con la casilla «Pendiente de registro» y en los que cuelgan de una
+     tarea de registrar sin hacer (`sinRegistrar`); los demás, sin marca. «Registrado» sigue igual. */
+  function estadoDe(n, falta, sinRegistrar) {
     if (falta) return { texto: '(ya no está)', clase: 'mesa-doc-gris' };
-    return codigoDe(n) ? { texto: 'Registrado', clase: 'mesa-doc-verde' } : { texto: 'Sin registrar', clase: 'mesa-doc-ambar' };
+    if (codigoDe(n)) return { texto: 'Registrado', clase: 'mesa-doc-verde' };
+    return sinRegistrar ? { texto: 'Sin registrar', clase: 'mesa-doc-ambar' } : { texto: '', clase: 'mesa-doc-gris' };
   }
 
   function fechaDe(n) {
@@ -140,7 +143,7 @@ var HitoMesaDocumentos = (function () {
     if (!docs.length) return (abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '') + plegadas;
     return agrupar(docs, nombresDeLaCarpeta).map(function (g) {
       var falta = !!(nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(g.nombre) === -1);
-      var estado = estadoDe(g.nombre, falta);
+      var estado = estadoDe(g.nombre, falta, window.AvisosFalta ? AvisosFalta.sinRegistrar(a, hitos, g.nombre) : false);
       var origen = origenDe(g.nombre, h, hitos);
       /* Fila 147: la tabla con sitio (en la tarjeta grande): casilla,
          documento (tipo y el nombre entero), fecha, registro, estado y
@@ -375,6 +378,6 @@ var HitoMesaDocumentos = (function () {
 
   return { filasHTML: filasHTML, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
            moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar,
-           datosDeLaLinea: datosDeLaLinea, abrirEnVisor: abrirEnVisor };   /* fila 522 */
+           datosDeLaLinea: datosDeLaLinea, abrirEnVisor: abrirEnVisor, codigoDe: codigoDe };   /* fila 522 */
 })();
 window.HitoMesaDocumentos = HitoMesaDocumentos;

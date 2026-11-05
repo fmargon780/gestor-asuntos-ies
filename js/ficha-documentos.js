@@ -164,7 +164,7 @@ var FichaDocumentos = (function () {
     enMenu.push(copiar);
 
     if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre, a)) {
-      var pendiente = Registro.pendiente(a, f.nombre);
+      var pendiente = window.AvisosFalta ? AvisosFalta.sinRegistrar(a, hitosVisibles || [], f.nombre) : Registro.pendiente(a, f.nombre);   /* fila 524: también si cuelga de una tarea de registrar sin hacer */
       if (pendiente) {
         var marca = document.createElement('span');
         marca.className = 'marca-sin-registrar';

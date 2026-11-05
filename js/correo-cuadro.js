@@ -519,7 +519,7 @@ var CorreoCuadro = (function () {
     boton.onclick = function () { alPulsarEnviar(a); };
   }
 
-  function alPulsarEnviar(a) {
+  async function alPulsarEnviar(a) {
     var para = paraDelCuadro();
     var ccoTexto = ccoDelCuadro();
     if (!para && !ccoTexto) { U.aviso('Elige a quién se lo mandas.', 'malo'); return; }
@@ -532,12 +532,17 @@ var CorreoCuadro = (function () {
       return;
     }
 
+    /* Fila 524: lo que falta por firmar o registrar de los documentos que adjuntas; se avisa, no se impide. */
+    var falta = [];
+    if (window.AvisosFalta && marcadas.length) { try { falta = await AvisosFalta.deLosAdjuntos(a, marcadas); } catch (e) { falta = []; } }
+
     pintarResumen(a, {
       para: para,
       cco: ccoTexto,
       asunto: $('correo-asunto') ? $('correo-asunto').value : '',
       cuerpo: $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '',
-      adjuntos: marcadas
+      adjuntos: marcadas,
+      falta: falta
     });
   }
 
@@ -554,6 +559,7 @@ var CorreoCuadro = (function () {
     var porNombre = {};
     listaTam.forEach(function (f) { porNombre[f.nombre] = f.tam; });
     var tl = window.CorreoAdjuntos ? CorreoAdjuntos.tamanoLegible : function (b) { return b + ' B'; };
+    var etiquetaConfirmar = (datos.falta && datos.falta.length) ? 'Enviar igualmente' : 'Confirmar y enviar';
 
     resumen.innerHTML =
       '<h3 style="margin-top:0">Vas a mandar este correo</h3>' +
@@ -568,9 +574,14 @@ var CorreoCuadro = (function () {
             return '<li>' + U.escapar(nombre) + (porNombre[nombre] !== undefined ? ' · ' + tl(porNombre[nombre]) : '') + '</li>';
           }).join('') + '</ul>'
         : '<p class="nota">Sin documentos adjuntos.</p>') +
+      /* Fila 524: el cuadro «Falta por hacer en lo que vas a enviar», dentro de este mismo cuadro (un solo cuadro a la vez). */
+      (datos.falta && datos.falta.length
+        ? '<div class="aviso aviso-ambar" id="correo-falta"><p><strong>Falta por hacer en lo que vas a enviar</strong></p>' +
+          (window.AvisosFalta ? AvisosFalta.listaHtml(datos.falta) : '') + '</div>'
+        : '') +
       '<div id="correo-resumen-aviso"></div>' +
       '<div class="correo-botones" style="margin-top:14px">' +
-        '<button type="button" class="boton boton-principal" id="correo-confirmar-envio">Confirmar y enviar</button>' +
+        '<button type="button" class="boton boton-principal" id="correo-confirmar-envio">' + etiquetaConfirmar + '</button>' +
         '<button type="button" class="boton" id="correo-resumen-volver">Volver</button>' +
       '</div>';
 
@@ -645,7 +656,7 @@ var CorreoCuadro = (function () {
           ? '<p class="aviso aviso-ambar">' + U.escapar(e.message) + '</p>'
           : '<p class="aviso aviso-rojo">No he podido enviarlo: ' + U.escapar(U.mensajeDeError(e)) + '</p>';
       }
-      if (boton) { boton.disabled = false; boton.textContent = 'Confirmar y enviar'; }
+      if (boton) { boton.disabled = false; boton.textContent = (datos.falta && datos.falta.length) ? 'Enviar igualmente' : 'Confirmar y enviar'; }
       if (volver) volver.disabled = false;
     }
   }
@@ -673,6 +684,7 @@ var CorreoCuadro = (function () {
   return {
     cuerpoHtml: cuerpoHtml,
     enganchar: enganchar,
+    pintarResumen: pintarResumen,   /* fila 524: la prueba pinta el resumen */
     paraDelCuadro: paraDelCuadro,
     ccoDirecciones: function () { return Object.keys(cco); },
     documentosAdjuntados: function () { return documentosAdjuntados; }
