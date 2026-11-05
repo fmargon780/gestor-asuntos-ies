@@ -27,7 +27,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 459 | 150 | franja del otro ordenador con identificador, casa sin entrada, copia sin internet en Drive y copia vieja, documentos, pruebas y revisor |
 | 462 | 150 | recuadro de ayuda común, fichero de textos, recorrer pestañas y botones escribiendo cada texto, quitar las ~125 ayudas grises conservando el nombre para lectores de pantalla, motivo en los botones apagados, pruebas y revisor |
 | 493 | 150 | clases de tercero por tipo (lista con la primera como hoy), casillas en Ajustes, pastillas, buscador y parrilla de «Nuevo asunto», clase del asunto según el tercero, demostración, prueba nueva, revisor |
-| 528 | 150 | Pantalla nueva, reúne cuatro fuentes de datos y sustituye el buscador de campos |
 | 529 | 120 | Editor por pasos y cálculo con pruebas, respetando los calculados de antes |
 | 530 | 180 | Toca Word, correo, Séneca, tareas y alta; acción nueva |
 | 531 | 240 | Ficheros nuevos, guías por referencia y propuesta de paso; la de más riesgo |

@@ -74,4 +74,15 @@ El tema 518 se parte en cuatro, en este orden: 528, 529, 530 y 531. Esta es la p
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Segundo revisor, 5-nov-2026 (primera vuelta; comparó con el texto, lo entendido y `docs/pantallas/518.html`):**
+  - Puntos 1, 2, 3, 5, 6, 8 y 9: COINCIDE (lista con las seis columnas y cinco grupos; origen con tabla › columna; filtros y buscador; manual sin ajuste de «cuándo se pide»; ventana con grupos, buscador en todos, «Ver N de otra clase de persona», ejemplo y tabla; crear desde la ventana lo inserta).
+  - Punto 4 NO COINCIDÍA: faltaba la fecha del fichero, y «Grupo» y «Curso» salían «sin dato». Corregido.
+  - Punto 7 NO COINCIDÍA: «Se usa en: todavía no se usa» junto a «No se puede quitar». Corregido (los tipos que lo piden cuentan como uso).
+  - Punto 10 NO COINCIDÍA: elegir la columna «Nº Id. Escolar» dejaba un campo manual fantasma duplicado. Corregido (una columna que ya sale con otro nombre no se repite).
+  - Móvil (390 px): la sección ensanchaba la página. Corregido.
+  - Escape, flechas y Enter, consola sin errores, plantilla antigua con `{campo:Nombre}`: COINCIDE.
+  - NO LO HE PODIDO VER (solo Francisco): tablas y columnas con los listados reales.
+- **Segunda vuelta del revisor (comprobó solo lo corregido):** fecha del fichero («Fichero copiado aquí el …» en la demo, sin apunte de Séneca), ejemplos de Grupo y Curso, «Ejemplos con» sin repetidos, sin duplicado, 390 px sin desbordar y «Se usa en» con el tipo: todo COINCIDE.
+- **Lo que hace la app y el texto no pide** (se deja): en el detalle, la marca que se escribe en la plantilla; confirmación antes de quitar un campo.
+- **Aviso de Claude:** una columna de fichero sin equivalente (p. ej. otra columna del RegAlum) se inserta como `{campo:Columna}` y solo sale rellena si el tipo de asunto la lleva como campo; es como funcionaba ya, y lo resolverá la fila 530.
+- **Pruebas:** la nueva `pruebas/lista-de-campos.mjs` y las cinco antiguas adaptadas pasan. `npm test` entero no arranca en esta sesión (fallo de `undici` al arrancar, ya conocido); se pasaron 93 pruebas de las áreas tocadas con un servidor propio: 85 verdes; de las 8 que fallan, 3 pasan a solas (carga) y las otras 5 fallan igual en `main` sin este cambio (`cambiar-tipo-y-guia`, `campo-desde-el-asunto`, `campos`, `convertir-en-plantilla-pdf-pantalla`, `nuevo-asunto-categoria-guia`, `tipo-en-linea-al-cambiar`).
