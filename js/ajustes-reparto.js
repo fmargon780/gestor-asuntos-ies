@@ -60,6 +60,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-copias', donde: 'centro', otras: 'copia, restaurar, recuperar, caducidad' },
     { id: 'bloque-impresos', donde: 'centro', otras: 'casillas, PDF, anexo, catálogo, formularios' },
     { id: 'bloque-alumnado-personal', donde: 'centro', otras: 'RegAlum, RelPerCen, Séneca, CSV, fichero viejo, épocas, grupos, unidades, alumnado, personal' },
+    { id: 'bloque-lista-campos', donde: 'centro', otras: 'campos, campos variables, datos, plantillas, tablas, columnas, RegAlum, calculados, manuales' },
     /* Este ordenador */
     { id: 'bloque-carpetas', donde: 'ordenador', otras: 'Dropbox, Drive, nube, abiertos, ARCHIVO, señalar carpetas, solo consultar' },
     { id: 'bloque-rutas', donde: 'ordenador', otras: 'ruta, copiar ruta, dónde está Dropbox, dónde está la nube, Google Drive' },

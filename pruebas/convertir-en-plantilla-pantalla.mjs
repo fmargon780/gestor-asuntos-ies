@@ -119,11 +119,11 @@ await comprobar('4. aparece «Lo que has marcado tú» con esa línea y el hueco
 
 await seleccionar('el presente certificado');
 await pagina.locator('.cep-menu-sel button', { hasText: 'Cambiar por un campo variable…' }).click();
-await pagina.waitForSelector('#huecos-buscar');
-await pagina.fill('#huecos-buscar', 'grupo');
+await pagina.waitForSelector('#ce-buscar');   /* fila 528: la ventana de elegir un campo */
+await pagina.fill('#ce-buscar', 'grupo');
 await pagina.keyboard.press('Enter');
 await pagina.waitForTimeout(2000);
-await comprobar('4. «Cambiar por un campo variable…» abre el buscador de huecos y cambia el trozo por el elegido', [
+await comprobar('4. «Cambiar por un campo variable…» abre la ventana de elegir un campo y cambia el trozo por el elegido', [
   (await lineas()).some((l) => /el presente certificado → /.test(l)), /\{grupo\}/.test(await textoDoc())], [true, true]);
 
 /* Fila 322: «Cambiar por otro texto…» también aquí. */

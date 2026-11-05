@@ -114,8 +114,8 @@ await p.waitForTimeout(1500);
 await comprobar('3. «Quitar del documento» quita solo esa palabra', [/documentación/.test(await textoDoc(p)), /presentar su antes del 30/.test(await textoDoc(p)), /Se informa de que/.test(await textoDoc(p))], [false, true, true]);
 await seleccionar(p, 'Localidad de pruebas');
 await opcion(p, 'Cambiar por un campo variable…');
-await p.waitForSelector('#huecos-buscar');
-await p.fill('#huecos-buscar', 'grupo');
+await p.waitForSelector('#ce-buscar');   /* fila 528 */
+await p.fill('#ce-buscar', 'grupo');
 await p.keyboard.press('Enter');
 await p.waitForTimeout(1800);
 await comprobar('3. «Cambiar por un campo variable…»: queda su hueco resaltado', p.evaluate(() => [...document.querySelectorAll('#retocar-plantilla mark.cep-hueco')].map((m) => m.textContent).filter((t) => /grupo/.test(t)).length), 1);

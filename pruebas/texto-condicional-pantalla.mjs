@@ -87,11 +87,11 @@ await p.waitForSelector('#texto-cond-cuadro');
 await p.selectOption('#tc-valor', 'Sí');
 await p.click('#tc-poner');
 await comprobar('A. una segunda vez cambia la marca, no añade otra', p.inputValue('#pl-texto'), 'Hola.\n\n{si:' + PROT + '=Sí} Primer párrafo.\n\nSegundo párrafo.');
-await comprobar('A. «Campo variable» sigue abriendo el buscador de siempre', (async () => {
-  await p.click('#pl-insertar-hueco'); await p.waitForSelector('#huecos-cuadro');
-  const r = await p.evaluate(() => document.getElementById('huecos-buscar').placeholder);
+await comprobar('A. «Campo variable» abre la ventana de elegir un campo (fila 528)', (async () => {
+  await p.click('#pl-insertar-hueco'); await p.waitForSelector('.capa-campos #ce-buscar');
+  const r = await p.evaluate(() => document.getElementById('ce-buscar').placeholder);
   await p.keyboard.press('Escape'); return r;
-})(), 'Buscar un campo variable: escribe unas letras');
+})(), 'Buscar por campo, tabla o columna');
 
 /* ---------- B ---------- */
 console.log('--- B. un tipo sin campos de lista ---');

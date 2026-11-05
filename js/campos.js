@@ -104,7 +104,8 @@ var Campos = (function () {
       id: String((p && p.id) || ''),
       nombre: String((p && p.nombre) || ''),
       clase: (p && window.CamposClases && CamposClases.esValida(p.clase)) ? p.clase : ((p && p.clase === 'lista') ? 'lista' : 'texto'),   /* fila 244: cinco clases */
-      valores: (p && Array.isArray(p.valores)) ? p.valores.map(String).filter(Boolean) : []
+      valores: (p && Array.isArray(p.valores)) ? p.valores.map(String).filter(Boolean) : [],
+      grupo: (p && ['Persona', 'Tutores', 'Asunto', 'Centro', 'Firmantes'].indexOf(p.grupo) !== -1) ? p.grupo : 'Asunto'   /* fila 528: el grupo de la lista de campos */
     };
   }
 

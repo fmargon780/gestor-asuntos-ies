@@ -50,3 +50,50 @@
 .campo-aviso-ambar { font-size: 12px; color: #8a6100; margin: 2px 0 6px; }
 .ficha-valor-ambar,
 .ficha-dato-ambar > span:last-child { background: #fff7e0; color: #8a6100; border-radius: 4px; padding: 0 4px; cursor: help; }
+
+/* ============================================================
+   Fila 528 (docs/528-LISTA-DE-CAMPOS.md): la lista única de campos (Ajustes → El centro → Campos)
+   y la ventana de «Campo variable».
+   ============================================================ */
+.campos-lista-dos { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .campos-lista-dos { grid-template-columns: minmax(0, 1fr); } }
+.campos-lista-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.campos-lista-barra input[type="search"] { flex: 1; min-width: 170px; width: auto; }
+.campos-lista-barra select { width: auto; }
+.campos-lista-grupos { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.campos-lista-persona { margin-bottom: 8px; }
+.campos-lista-persona select { width: auto; max-width: 100%; }
+.campos-lista-izq, .campos-lista-der { min-width: 0; }
+.campos-lista-barra select { max-width: 100%; }
+.campos-grupo { gap: 10px; }
+.campos-pastilla { font: inherit; font-size: 13px; background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: 3px 11px; cursor: pointer; color: var(--tinta); }
+.campos-pastilla.on { background: var(--azul-claro); border-color: var(--azul); font-weight: 600; }
+.campos-lista-tabla { max-height: 62vh; overflow: auto; border: 1px solid var(--linea); border-radius: 8px; }
+.campos-lista-tabla table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.campos-lista-tabla th { position: sticky; top: 0; background: var(--papel); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--linea); font-size: 12px; }
+.campos-lista-tabla td { padding: 6px 8px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.campos-lista-tabla tbody tr { cursor: pointer; }
+.campos-lista-tabla tbody tr:hover, .campos-lista-tabla tbody tr.sel { background: var(--azul-claro); }
+.campos-lista-tabla .num { text-align: right; }
+.campos-lista-der { border: 1px solid var(--linea); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.campos-lista-der h3 { margin: 0; }
+.campos-etq { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--azul-claro); }
+.campos-etq.etq-manual { background: var(--ambar); }
+.campos-etq.etq-calculado { background: #e8f3e6; }
+.campos-usos { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; }
+.campo-manual-nuevo { display: flex; flex-direction: column; gap: 6px; }
+.campo-manual-nuevo .fila-botones { display: flex; gap: 8px; margin-top: 6px; }
+.cuadro.cuadro-campos { max-width: 920px; width: 100%; height: min(680px, calc(100dvh - 40px)); padding: 0; overflow: hidden; }
+.campos-elegir-cab { padding: 14px 18px 10px; border-bottom: 1px solid var(--linea); display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; }
+.campos-elegir-titulo { display: flex; align-items: baseline; gap: 10px; }
+.campos-elegir-titulo h3 { margin: 0; }
+.campos-elegir-usados { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.campos-elegir-cuerpo { display: grid; grid-template-columns: 170px minmax(0, 1fr); flex: 1 1 auto; min-height: 0; }
+.campos-elegir-grupos { border-right: 1px solid var(--linea); padding: 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.campos-grupo { font: inherit; display: flex; justify-content: space-between; background: none; border: 0; border-radius: 6px; padding: 7px 10px; cursor: pointer; color: var(--tinta); }
+.campos-grupo.on { background: var(--azul-claro); font-weight: 600; }
+.campos-elegir-centro { padding: 8px 12px; overflow-y: auto; }
+.campos-fila-campo { font: inherit; width: 100%; text-align: left; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; background: none; border: 0; border-bottom: 1px solid var(--linea); padding: 8px 6px; cursor: pointer; color: var(--tinta); }
+.campos-fila-campo:hover, .campos-fila-campo:focus-visible, .campos-fila-campo.elegido { background: var(--azul-claro); }
+.campos-elegir-pie { border-top: 1px solid var(--linea); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; flex: 0 0 auto; }
+@media (max-width: 640px) { .campos-elegir-cuerpo { grid-template-columns: minmax(0, 1fr); } .campos-elegir-grupos { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--linea); } .campos-fila-campo { grid-template-columns: minmax(0, 1fr); } }
