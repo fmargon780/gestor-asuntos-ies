@@ -1,0 +1,17 @@
+import { abrir } from './_rev_lib.mjs';
+const vp = process.argv[2] === 'm' ? { width: 390, height: 800 } : { width: 1500, height: 1000 };
+const { browser, page, errores } = await abrir(vp);
+const out = '/tmp/claude-0/revisor528/';
+await page.getByText('El centro', { exact: true }).first().click();
+await page.waitForTimeout(800);
+const sum = page.locator('summary', { hasText: /^\s*Campos/ }).last();
+await sum.scrollIntoViewIfNeeded();
+await sum.click();
+await page.waitForTimeout(1000);
+const det = sum.locator('xpath=..');
+await det.screenshot({ path: out + 'campos-' + (process.argv[2] || 'g') + '.png' });
+const txt = await det.innerText();
+const rows = await det.locator("tr").allInnerTexts(); console.log(rows.slice(55).map(r=>r.replace(/\s+/g," ")).join("\n"));
+console.log('HTMLLEN', (await det.innerHTML()).length);
+console.log('ERR', JSON.stringify(errores));
+await browser.close();

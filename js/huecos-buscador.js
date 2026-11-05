@@ -29,6 +29,7 @@
        boton: <button>,            // el que abre el cuadro
        campos: [asunto, texto],    // dónde puede entrar el hueco
        huecos: [{clave, etiqueta}] // opcional; por defecto Plantillas.HUECOS
+       tipo: 'nombre' | función   // opcional (fila 528): el tipo de asunto, para los «más usados» y la clase de persona
      });
 
    `campos` va en el orden en que están en el formulario. Se recuerda
@@ -49,6 +50,7 @@
   /* ---------- el cuadro flotante ---------- */
 
   function cerrar() {
+    if (window.CamposElegir) CamposElegir.cerrar();
     if (!abierto) return;
     var c = abierto;
     abierto = null;
@@ -128,8 +130,24 @@
       ev.preventDefault();
       ev.stopPropagation();
       if (abierto) { cerrar(); return; }
+      /* Fila 528: la ventana de elegir un campo (js/campos-elegir.js). El cuadro pequeño de abajo queda para quien pase `huecos` a mano. */
+      if (window.CamposElegir && !opciones.huecos) {
+        CamposElegir.abrir({ tipo: opciones.tipo, alElegir: function (c) { ponerTexto(c.marca); } })
+          .catch(function (e) { if (window.U && U.fallo) U.fallo('No he podido abrir la lista de campos', e); });
+        return;
+      }
       abrir();
     });
+
+    function ponerTexto(texto) {
+      var campo = estado.ultimo || porDefecto;
+      var inicio = (estado.ultimo === campo) ? estado.inicio : null;
+      var fin = (estado.ultimo === campo) ? estado.fin : null;
+      insertarEn(campo, inicio, fin, texto);
+      /* El cursor queda detrás de lo insertado, apuntado por si se pide otro seguido. */
+      estado.ultimo = campo;
+      estado.inicio = estado.fin = campo.selectionStart;
+    }
 
     /* El botón no se puede llevar el foco del campo: si lo hiciera,
        `estado` apuntaría al propio botón y se perdería el cursor. */
@@ -201,16 +219,8 @@
       }
 
       function elegir(h) {
-        var campo = estado.ultimo || porDefecto;
-        var inicio = (estado.ultimo === campo) ? estado.inicio : null;
-        var fin = (estado.ultimo === campo) ? estado.fin : null;
         cerrar();
-        insertarEn(campo, inicio, fin, '{' + h.clave + '}');
-        /* El campo se queda con el cursor detrás de lo insertado, y
-           lo apuntamos ya, por si se pide otro hueco seguido sin
-           volver a tocar el texto. */
-        estado.ultimo = campo;
-        estado.inicio = estado.fin = campo.selectionStart;
+        ponerTexto('{' + h.clave + '}');
       }
 
       campoBuscar.addEventListener('input', pintar);

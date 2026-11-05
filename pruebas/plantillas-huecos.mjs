@@ -92,43 +92,45 @@ await comprobar('y sí pinta un solo botón "Campo variable"',
   pagina.locator('#pl-insertar-hueco').count(), 1);
 await comprobar('el texto del botón es el acordado',
   pagina.locator('#pl-insertar-hueco').textContent(), 'Campo variable');
-await comprobar('el cuadro de huecos nace cerrado',
-  pagina.locator('#huecos-cuadro').count(), 0);
+await comprobar('la ventana de elegir un campo nace cerrada',
+  pagina.locator('.capa-campos').count(), 0);
 
 /* ========================================================
    2 · se abre y el buscador filtra
    ======================================================== */
 console.log('--- 2. el buscador ---');
 await pagina.click('#pl-insertar-hueco');
-await pagina.waitForSelector('#huecos-cuadro');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
 
-await comprobar('al abrirlo salen todos los huecos del catálogo',
-  pagina.evaluate(() => document.querySelectorAll('#huecos-cuadro .huecos-opcion').length ===
-    window.Plantillas.HUECOS.length), true);
+/* Fila 528: la ventana nueva (js/campos-elegir.js) sustituye al cuadro pequeño; los datos de una tabla de datos ya no salen como modelo para escribir a mano. */
+await pagina.fill('#ce-buscar', ' ');
+await pagina.waitForTimeout(300);
+await comprobar('buscando en todos los grupos salen los huecos del catálogo (menos los dos modelos de escribir a mano)',
+  pagina.evaluate(() => CamposLista.buscar(CamposLista.reunir({ huecos: Plantillas.HUECOS }), '', '', '').length === Plantillas.HUECOS.length - 2), true);
 await comprobar('el cursor arranca dentro del buscador',
-  pagina.evaluate(() => document.activeElement && document.activeElement.id), 'huecos-buscar');
-await comprobar('cada hueco enseña su nombre en claro y su código',
-  pagina.locator('#huecos-cuadro .huecos-opcion').first().textContent()
-    .then(t => t.indexOf('Nombre del tercero') !== -1 && t.indexOf('{nombre}') !== -1), true);
+  pagina.evaluate(() => document.activeElement && document.activeElement.id), 'ce-buscar');
+await pagina.fill('#ce-buscar', 'nombre del tercero');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:nombre"]');
+await comprobar('cada campo enseña su nombre en claro y su tabla',
+  pagina.locator('.campos-fila-campo[data-id="h:nombre"]').textContent()
+    .then(t => t.indexOf('Nombre del tercero') !== -1 && t.indexOf('RegAlum o RelPerCen') !== -1), true);
 
-await pagina.fill('#huecos-buscar', 'tutor');
-await comprobar('buscando "tutor" quedan solo los huecos de los tutores',
-  pagina.evaluate(() => Array.prototype.map.call(
-    document.querySelectorAll('#huecos-cuadro .huecos-opcion'),
-    (b) => b.getAttribute('data-clave')).join(',')),
-  'tutor1,tutor1telefono,tutor1correo,tutor2,tutor2telefono,tutor2correo,{TABLA TUTORIAS}');   /* fila 110: la tabla de tutorías también dice «tutor» */
+await pagina.fill('#ce-buscar', 'tutor');
+await pagina.waitForTimeout(400);
+await comprobar('buscando "tutor" salen los campos de los tutores',
+  pagina.evaluate(() => ['h:tutor1', 'h:tutor1telefono', 'h:tutor1correo', 'h:tutor2', 'h:tutor2telefono', 'h:tutor2correo'].every((id) => !!document.querySelector('.campos-fila-campo[data-id="' + id + '"]'))), true);
 await comprobar('y "Grupo" se queda fuera',
-  pagina.locator('#huecos-cuadro .huecos-opcion[data-clave="grupo"]').count(), 0);
+  pagina.locator('.campos-fila-campo[data-id="h:grupo"]').count(), 0);
 
-await pagina.fill('#huecos-buscar', 'TELEFONO');
+await pagina.fill('#ce-buscar', 'TELEFONO');
+await pagina.waitForTimeout(400);
 await comprobar('la búsqueda ignora mayúsculas y tildes',
-  pagina.evaluate(() => Array.prototype.slice.call(
-    document.querySelectorAll('#huecos-cuadro .huecos-opcion'))
-    .some((b) => b.getAttribute('data-clave') === 'tutor1telefono')), true);
+  pagina.locator('.campos-fila-campo[data-id="h:tutor1telefono"]').count(), 1);
 
-await pagina.fill('#huecos-buscar', 'zzz');
+await pagina.fill('#ce-buscar', 'zzz');
+await pagina.waitForTimeout(400);
 await comprobar('sin resultados lo dice, y no deja ninguno puesto',
-  pagina.locator('#huecos-cuadro .huecos-vacio').count(), 1);
+  pagina.evaluate(() => [document.querySelectorAll('.campos-fila-campo').length, /Ningún campo con ese nombre/.test(document.getElementById('ce-centro').textContent)]), [0, true]);
 
 /* ========================================================
    5 · Escape cierra el cuadro de huecos y solo ese
@@ -137,11 +139,11 @@ console.log('--- 5. Escape ---');
 await pagina.fill('#pl-texto', 'Buenos días.');
 await pagina.press('#pl-insertar-hueco', 'Escape').catch(() => {});
 await pagina.click('#pl-insertar-hueco');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.press('#huecos-buscar', 'Escape');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.press('#ce-buscar', 'Escape');
 await pagina.waitForTimeout(150);
-await comprobar('Escape cierra el cuadro de huecos',
-  pagina.locator('#huecos-cuadro').count(), 0);
+await comprobar('Escape cierra la ventana de elegir un campo',
+  pagina.locator('.capa-campos').count(), 0);
 await comprobar('y el cuadro de la plantilla sigue abierto',
   pagina.locator('#capa').evaluate(e => e.classList.contains('oculto')), false);
 await comprobar('y no ha insertado nada',
@@ -160,15 +162,16 @@ await pagina.evaluate(() => {
   c.dispatchEvent(new Event('keyup', { bubbles: true }));
 });
 await pagina.click('#pl-insertar-hueco');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.fill('#huecos-buscar', 'nombre del tercero');
-await pagina.click('#huecos-cuadro .huecos-opcion[data-clave="nombre"]');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.fill('#ce-buscar', 'nombre del tercero');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:nombre"]');
+await pagina.click('.campos-fila-campo[data-id="h:nombre"]');
 await pagina.waitForTimeout(150);
 
 await comprobar('el hueco entra donde estaba el cursor',
   pagina.locator('#pl-texto').inputValue(), 'Hola {nombre}, buenos días.');
-await comprobar('el cuadro se cierra al elegir',
-  pagina.locator('#huecos-cuadro').count(), 0);
+await comprobar('la ventana se cierra al elegir',
+  pagina.locator('.capa-campos').count(), 0);
 await comprobar('el cursor vuelve al texto, detrás de lo insertado',
   pagina.evaluate(() => {
     const c = document.getElementById('pl-texto');
@@ -187,9 +190,10 @@ await pagina.evaluate(() => {
   c.dispatchEvent(new Event('keyup', { bubbles: true }));
 });
 await pagina.click('#pl-insertar-hueco');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.fill('#huecos-buscar', 'grupo');
-await pagina.press('#huecos-buscar', 'Enter');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.fill('#ce-buscar', 'grupo');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:grupo"]');
+await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('con texto seleccionado, el hueco lo sustituye',
   pagina.locator('#pl-texto').inputValue(), 'Hola {grupo}, buenos días.');
@@ -202,10 +206,11 @@ await pagina.evaluate(() => {
   c.dispatchEvent(new Event('keyup', { bubbles: true }));
 });
 await pagina.click('#pl-insertar-hueco');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.fill('#huecos-buscar', 'tutor');
-await pagina.press('#huecos-buscar', 'ArrowDown');
-await pagina.press('#huecos-buscar', 'Enter');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.fill('#ce-buscar', 'tutor');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:tutor1telefono"]');
+await pagina.press('#ce-buscar', 'ArrowDown');
+await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('las flechas bajan por la lista y Enter elige',
   pagina.locator('#pl-texto').inputValue(), '{tutor1telefono}');
@@ -247,9 +252,10 @@ await pagina.evaluate(() => {
 /* sin haber tocado ninguno: al final del último, el cuadro de texto */
 await pagina.evaluate(() => { document.getElementById('prueba-texto').value = 'Ya escrito.'; });
 await pagina.click('#prueba-boton');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.fill('#huecos-buscar', 'grupo');
-await pagina.press('#huecos-buscar', 'Enter');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.fill('#ce-buscar', 'grupo');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:grupo"]');
+await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('sin foco previo, el hueco va al final del cuadro de texto',
   pagina.evaluate(() => [document.getElementById('prueba-asunto').value,
@@ -265,9 +271,10 @@ await pagina.evaluate(() => {
   a.dispatchEvent(new Event('keyup', { bubbles: true }));
 });
 await pagina.click('#prueba-boton');
-await pagina.waitForSelector('#huecos-cuadro');
-await pagina.fill('#huecos-buscar', 'tipo de asunto');
-await pagina.press('#huecos-buscar', 'Enter');
+await pagina.waitForSelector('.capa-campos #ce-buscar');
+await pagina.fill('#ce-buscar', 'tipo de asunto');
+await pagina.waitForSelector('.campos-fila-campo[data-id="h:tipo"]');
+await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('con el foco puesto antes en el asunto, el hueco entra en el asunto',
   pagina.evaluate(() => [document.getElementById('prueba-asunto').value,

@@ -86,8 +86,8 @@ await comprobarQue('2. el editor sale DENTRO del cuadro (el formulario se escond
 await pagina.fill('#pl2-nombre', 'Aviso de convalidación');
 await pagina.fill('#pl2-texto', 'Le informamos sobre ');
 await pagina.click('#pl2-insertar-hueco');
-await pagina.waitForSelector('.huecos-cuadro', { state: 'visible' });
-await pagina.fill('.huecos-buscar', 'nombre');
+await pagina.waitForSelector('.capa-campos #ce-buscar', { state: 'visible' });   /* fila 528 */
+await pagina.fill('#ce-buscar', 'nombre');
 await pagina.waitForTimeout(150);
 await pagina.keyboard.press('Enter');
 await pagina.waitForTimeout(150);

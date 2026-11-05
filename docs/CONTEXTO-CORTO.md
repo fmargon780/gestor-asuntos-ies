@@ -107,7 +107,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - **Una fila es HECHA solo con las dos cosas** (fila 242): su commit está en `main` (`git merge-base --is-ancestor`) y Vercel lo ha publicado (`curl` a `js/version.js`, estado «Vercel» del commit o `list_deployments`).
 - Vercel: 100 publicaciones/día para toda la cuenta; `vercel.json` lleva `git.deploymentEnabled: false` y nunca `ignoreCommand` (las canceladas también cuentan); una sola publicación por fila con código, a propósito, tras fusionar en `main`. Los proyectos `gestor-soporte`, `parroquia-conteo-colectas-ais-dev` y `diplomator` no tienen trabajo desde julio: si vuelven a tener cola, lo primero es ponerles esta misma regla.
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
-- Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
+- Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV. Todos los campos de las plantillas se reúnen en `CamposLista.reunir` (fila 528: Ajustes → El centro → «Campos» y la ventana de «Campo variable», `js/campos-elegir.js`); las marcas no cambian.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
 - Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar
   si falla algo de después (`U.accesorio`); siempre `U.mensajeDeError`. `U.mientrasGuarda` solo

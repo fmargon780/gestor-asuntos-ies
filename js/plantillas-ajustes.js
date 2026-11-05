@@ -289,7 +289,7 @@
   function engancharCampoDeTexto(idTexto, idBoton, otrosCampos, tipoDeLaPlantilla) {
     var boton = $(idBoton), campo = $(idTexto);
     if (!boton || !campo) return;
-    HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]) });
+    HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]), tipo: tipoDeLaPlantilla });
     /* Fila 510: «Texto condicional» pone {si:Campo=Valor} al principio del párrafo del cursor. */
     if (window.TextoCondicionalCuadro) {
       TextoCondicionalCuadro.montarBoton({ boton: $(idTexto + '-condicional'), campo: campo, tipo: tipoDeLaPlantilla, aviso: $(idTexto + '-cond-aviso') });
