@@ -55,6 +55,7 @@ async function cargarCarpetas(conReintentar) {
   ctx.window = ctx;
   vm.createContext(ctx);
   if (conReintentar) vm.runInContext(fs.readFileSync(new URL('js/reintentar-escritura.js', RAIZ), 'utf8'), ctx);
+  for (const f of ['carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js']) vm.runInContext(fs.readFileSync(new URL('js/' + f, RAIZ), 'utf8'), ctx);
   vm.runInContext(fs.readFileSync(new URL('js/carpetas.js', RAIZ), 'utf8') + '\nwindow.Carpetas = Carpetas;', ctx);
   return ctx;
 }

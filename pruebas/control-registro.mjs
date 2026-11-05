@@ -20,7 +20,7 @@ const contexto = {
 contexto.window = contexto;
 contexto.addEventListener = function () {};
 vm.createContext(contexto);
-for (const f of ['util.js', 'util-parecidos.js', 'reintentar-escritura.js', 'carpetas.js', 'cola-guardado.js',
+for (const f of ['util.js', 'util-parecidos.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'cola-guardado.js',
                  'nombres.js', 'datos.js', 'control-registro.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }

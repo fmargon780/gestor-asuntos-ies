@@ -9,7 +9,9 @@ const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, TextDecoder, Blob, window: {} };
 vm.createContext(contexto);
 vm.runInContext(fs.readFileSync(raiz + 'reintentar-escritura.js', 'utf8'), contexto, { filename: 'reintentar-escritura.js' });
-vm.runInContext(fs.readFileSync(raiz + 'carpetas.js', 'utf8'), contexto, { filename: 'carpetas.js' });
+for (const f of ['carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js']) {
+  vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
+}
 const { Carpetas } = contexto;
 
 /* ---------- disco de mentira ---------- */

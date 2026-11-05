@@ -64,7 +64,7 @@ function montar() {
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'hitos.js', 'hitos-sincronizar.js', 'guias-enganche.js']) {
+  for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'hitos-normalizar.js', 'hitos-fichero.js', 'hitos-arbol.js', 'hitos.js', 'hitos-sincronizar.js', 'guias-enganche.js']) {
     vm.runInContext(leerFuente(f), ctx, { filename: f });
   }
   ctx.U.aviso = (m) => { disco.avisos.push(String(m)); };

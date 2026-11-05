@@ -47,8 +47,8 @@ const contexto = {
 vm.createContext(contexto);
 contexto.App = contexto.window.App = { E: { usuario: 'Francisco', datos: {} } };
 for (const f of [
-  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'guias.js',
-  'hitos.js', 'hitos-archivo.js', 'hitos-a-quien.js', 'hitos-biblioteca.js'
+  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'guias.js',
+  'hitos-normalizar.js', 'hitos-fichero.js', 'hitos-arbol.js', 'hitos.js', 'hitos-archivo.js', 'hitos-a-quien.js', 'hitos-biblioteca.js'
 ]) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
