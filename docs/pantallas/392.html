@@ -97,7 +97,7 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
       ],
       previas: [],
       notas: [{ t: 'Registrado 26EM0187 el 3-nov-2026 · 261103 SOLICITUD D26-01230.pdf', q: 'Automática' }],
-      elegido: null, suelto: false, verde: '', ambar: '', nuevos: 0
+      elegido: null, suelto: false, duda: null, verde: '', ambar: '', nuevos: 0
     };
   }
 
@@ -129,6 +129,12 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
     var av = '';
     if (e.verde) av += '<div class="aviso aviso-verde">' + esc(e.verde) + '</div>';
     if (e.ambar) av += '<div class="aviso aviso-ambar">' + esc(e.ambar) + '</div>';
+    if (e.duda) {
+      av += '<div class="aviso aviso-ambar"><strong>Lo que has guardado encima de ' + esc(e.docs[e.duda.i].nombre) + ' no trae firma, y el documento anterior estaba firmado.</strong>' +
+        '<p>El firmado se conserva. ¿Con cuál te quedas?</p><div class="sello-fila">' +
+        '<button id="d-firmado" class="boton boton-principal">Quedarme con el firmado</button>' +
+        '<button id="d-nuevo" class="boton">Usar el nuevo</button></div></div>';
+    }
     if (e.suelto) {
       av += '<div class="aviso aviso-ambar"><strong>Este papel lleva firma digital.</strong>' +
         '<p>¿De qué documento es? <span class="suave">(certificado_signed.pdf)</span></p><div class="sello-fila">' +
@@ -138,6 +144,22 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
         '</select><button id="f-no" class="boton">No es de este asunto</button></div></div>';
     }
     $('avisos').innerHTML = av;
+    if (e.duda) {
+      $('d-firmado').onclick = function () {
+        var d = e.docs[e.duda.i];
+        d.firmas = e.duda.firmas;
+        e.previas.unshift(base(d.nombre) + ' DESCARTADO.pdf');
+        e.verde = 'He vuelto a poner el firmado. Lo que guardaste encima se conserva en «_Previas».';
+        e.ambar = ''; e.duda = null; pintar();
+      };
+      $('d-nuevo').onclick = function () {
+        var d = e.docs[e.duda.i];
+        e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf');
+        e.notas.unshift({ t: 'Sustituido el firmado por una versión sin firma el ' + HOY + ' · ' + d.nombre, q: 'Automática' });
+        e.verde = 'Se queda el nuevo, sin firma. El firmado se conserva en «_Previas».';
+        e.ambar = ''; e.duda = null; pintar();
+      };
+    }
     if (e.suelto) {
       $('f-nuevo').onclick = function () {
         e.nuevos++;
@@ -158,9 +180,9 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
         e.verde = 'Ruta copiada: ' + e.docs[e.elegido].nombre; e.ambar = ''; pintar();
       };
     });
-    var hay = e.elegido !== null && !!e.docs[e.elegido];
+    var hay = e.elegido !== null && !!e.docs[e.elegido] && !e.duda;
     ['s-firmado', 's-ambos', 's-nada'].forEach(function (id) { $(id).disabled = !hay; });
-    $('s-suelto').disabled = e.suelto;
+    $('s-suelto').disabled = e.suelto || !!e.duda;
     $('pista').textContent = hay ? 'Guardarás encima de ' + e.docs[e.elegido].nombre + '.'
       : 'Para los tres primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
   }
@@ -194,8 +216,12 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
   };
   $('s-nada').onclick = function () {
     var d = e.docs[e.elegido];
+    if (d.firmas) {
+      e.duda = { i: e.elegido, firmas: d.firmas };
+      d.firmas = 0; e.verde = ''; e.ambar = ''; e.elegido = null; pintar();
+      return;
+    }
     e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf');
-    d.firmas = 0;
     e.verde = '';
     e.ambar = 'Lo que has guardado encima de ' + d.nombre + ' no trae firma ni sello de registro. Lo he dejado; el anterior se conserva en «_Previas».';
     e.elegido = null; pintar();
