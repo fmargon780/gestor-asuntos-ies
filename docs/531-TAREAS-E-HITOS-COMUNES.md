@@ -73,4 +73,15 @@ Cuarta parte del tema 518. Necesita la 530 HECHA. Si algo cambia el texto de arr
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- (las apunta Claude Code) Decisiones de la sesión de programación (5-nov-2026), lo que la instrucción no cubría:
+  1. **Las guías de hoy no se tocan.** «+ Añadir un hito» y «+ Añadir una tarea» en blanco de la guía se quedan, y junto a ellos salen «+ Añadir un hito de la lista» y «+ Añadir una tarea de la lista». Que desaparezca escribir tareas libres lo hará la fila 532 al pasar las guías; quitarlo ahora rompía las guías de antes y 8 pruebas.
+  2. **La guía guarda `comun` más el retrato** (no solo la referencia): así asuntos, editor y sincronizar no cambian. El plazo y el lugar siguen siendo del hito de la guía.
+  3. **«Traer un hito de otro tipo»** (fila 417) sigue como estaba; el botón de la lista común va al lado. Quitarlo es cosa de la fila 532.
+  4. **En el asunto**, «+ Añadir tarea», «+ Añadir hito» y «Cambiar el hito» salen debajo de las tareas del hito abierto (no en la tira de hitos de la pantalla, cuyo fichero pasa de 400 líneas); «Cambiar la tarea» es una opción del ⋮ de la tarea común (sustituye a «Cambiar», que solo cambiaba la línea de una guía).
+  5. **Una tarea «solo este asunto» es una copia suelta** (sin la marca de común): «Cambiar la tarea» no la toca. Lo mismo un hito «solo este asunto».
+  6. **Cambiar el texto o la plantilla de una tarea común a mano en el editor de la guía** la suelta de la lista (pierde la marca); lo dice la propia línea.
+  7. **«Los otros asuntos abiertos siguen como están»** se hace con la «solo aquí» que ya existía (`cambiarGuionAqui`): su línea vieja se les queda como tarea suya, con lo marcado. Solo para tareas de hitos de primer nivel de la guía; no para las de dentro de una pregunta. Al cambiar un hito, los otros asuntos abiertos conservan su nombre de antes (el título del hito es copia del asunto).
+  8. **Plantilla nueva desde la ventana:** se abre el editor de plantillas de siempre; la ventana se cierra mientras tanto y vuelve con lo escrito y la plantilla ya elegida. Si se cancela el editor, la ventana no vuelve (hay que abrirla otra vez).
+  9. **La copia de `_GESTOR`** es la de `Copias.guardar` (copia del día antes del primer guardado de cada fichero); los dos ficheros nuevos están en `Copias.FICHEROS`. La propuesta (punto 9) no escribe nada.
+  10. **Propuesta:** solo mira los hitos de primer nivel que no son pregunta; las preguntas dentro de las tareas y los hitos con ramas «se quedan como están» (se cuentan). Se pueden copiar como texto.
+  11. **Pendiente para la 532:** aplicar la propuesta, quitar las tareas libres y «Traer un hito de otro tipo», y pasar las tareas de dentro de las ramas. El segundo revisor (con Playwright) aún no ha pasado esta fila.
