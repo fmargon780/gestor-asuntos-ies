@@ -195,3 +195,4 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 
 | 511 | Tipo de asunto para la baja en ESO por traslado al extranjero (parte de Administración: recibir el encargo de Dirección, elaborar la resolución, firma, registro de salida, baja en Séneca y comunicar si procede), con resolución, anexo I, anexo II y correo. Necesita la 510 HECHA. | IDEA (4-nov-2026) |
 | 512 | Tema: cómo se meten en un asunto los campos que luego usan las plantillas (campos variables y los datos de los textos condicionales) para que se rellenen; Francisco quiere profundizar en ello. Sale del diseño de la fila 510. | IDEA (4-nov-2026) |
+| 513 | Guías: una tarea de tipo «firmar» que se marque sola cuando llega el documento firmado, para que el hito avance sin tocarlo; segunda parte del tema 392, acordada con Francisco el 5-nov-2026 | IDEA (5-nov-2026) |
