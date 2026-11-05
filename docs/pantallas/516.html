@@ -1,0 +1,328 @@
+<title>Prueba tema 516</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: ficha de un asunto a todo el ancho; arriba, lo que pasa fuera de la app; debajo, la mesa del hito a la izquierda y documentos y notas a la derecha. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-tinta:#1e7a46;
+  --hover:#f0f3f7;--fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --hover:#222c37;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#5b9bd5;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-tinta:#7fd19c;
+  --hover:#222c37;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+main{padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+h1{font-size:20px;margin:0;text-wrap:balance}
+h2{font-size:15px;margin:0 0 8px}
+.cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{font-size:12px;background:var(--azul-claro);color:var(--azul);border-radius:999px;padding:3px 10px;font-weight:600}
+.bloque{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;min-width:0}
+.fuera{border-style:dashed}
+.fuera p{margin:0 0 8px;color:var(--tinta-suave);font-size:13px}
+.simula{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:7px 12px;cursor:pointer;text-align:left}
+.boton:hover:not(:disabled){background:var(--hover)}
+.boton:disabled{opacity:.45;cursor:default}
+.boton-principal{background:var(--azul);color:#fff;border-color:var(--azul)}
+.boton-principal:hover:not(:disabled){background:var(--azul)}
+.boton:focus-visible,select:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.mini{font-size:12px;padding:2px 8px}
+.pie{display:flex;justify-content:flex-end;margin-top:8px}
+.aviso{border-radius:8px;padding:10px 12px}
+.aviso p{margin:4px 0 8px}
+.aviso-ambar{background:var(--ambar);border:1px solid var(--ambar-linea)}
+.aviso-verde{background:var(--verde);color:var(--verde-tinta)}
+.sello-fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:7px 10px;background:var(--papel);color:var(--tinta);max-width:100%}
+.suave{color:var(--tinta-suave)}
+.columnas{display:grid;grid-template-columns:2fr 1fr;gap:12px;align-items:start}
+.pila{display:flex;flex-direction:column;gap:12px;min-width:0}
+.doc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--linea)}
+.doc:first-of-type{border-top:0}
+.ext{font-size:11px;font-weight:700;color:var(--azul);background:var(--azul-claro);border-radius:4px;padding:1px 5px}
+.nombre{overflow-wrap:anywhere;min-width:0}
+.datos{color:var(--tinta-suave);font-size:13px}
+.sin-reg{font-size:12px;background:var(--ambar);border:1px solid var(--ambar-linea);border-radius:999px;padding:1px 8px}
+.nota{padding:7px 0;border-top:1px solid var(--linea);font-size:14px}
+.nota:first-of-type{border-top:0}
+.nota small{display:block;color:var(--tinta-suave)}
+.vacio{color:var(--tinta-suave);font-size:14px;margin:0}
+@media (max-width:760px){.simula,.columnas{grid-template-columns:1fr}}
+
+.tira{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tira span{font-size:13px;border:1px solid var(--linea);border-radius:999px;padding:3px 10px;color:var(--tinta-suave)}
+.tira span.actual{background:var(--azul-claro);color:var(--azul);border-color:var(--azul);font-weight:600}
+.mesa-cab{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-bottom:6px}
+.mesa-cab h2{margin:0;font-size:16px}
+.mesa-botones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.linea-hacer{font-size:13px;color:var(--tinta-suave);margin:0 0 8px}
+.resaltado{box-shadow:0 0 0 3px var(--verde-tinta)}
+.tarea{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--linea)}
+.tarea label{display:flex;gap:8px;align-items:center;flex:1;min-width:0;cursor:pointer}
+.tarea.hecha .tt{color:var(--tinta-suave);text-decoration:line-through}
+.tarea.na .tt{color:var(--tinta-suave);font-style:italic}
+.clase{font-size:11px;font-weight:600;color:var(--azul);background:var(--azul-claro);border-radius:4px;padding:1px 6px}
+.enlace{font:inherit;font-size:13px;background:none;border:0;color:var(--azul);cursor:pointer;padding:2px;text-decoration:underline}
+.editor{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.editor label{font-size:13px;color:var(--tinta-suave);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.capa{position:fixed;inset:0;background:rgba(20,30,45,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.cuadro{background:var(--papel);border-radius:10px;padding:16px;width:min(640px,100%);display:flex;flex-direction:column;gap:10px}
+.cuadro h3{margin:0;font-size:17px}
+.cuadro ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.cuadro .pie{gap:8px;margin:0}
+.archivado{background:var(--verde);color:var(--verde-tinta);border-radius:8px;padding:10px 12px}
+</style>
+<main>
+  <div class="cab"><h1>261103 A26-0412 RECLAMACIÓN NOTAS Reyes Palma, Lucía</h1><span class="chip">Pantalla de prueba · datos inventados</span>
+    <span style="flex:1"></span><button id="archivar" class="boton">Archivar el asunto</button></div>
+
+  <section class="bloque fuera">
+    <h2>Lo que pasa fuera de la app</h2>
+    <p id="pista">Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.</p>
+    <div class="simula">
+      <button id="s-firmado" class="boton" disabled>Guardar encima el PDF firmado</button>
+      <button id="s-sellado" class="boton" disabled>Guardar encima el PDF registrado en Séneca</button>
+      <button id="s-sinruta" class="boton">Guardar el firmado sin haber pulsado «Ruta»</button>
+    </div>
+    <div class="pie"><button id="s-reinicio" class="boton mini">Empezar de nuevo</button></div>
+  </section>
+
+  <div id="avisos" class="pila" aria-live="polite"></div>
+
+  <div class="columnas">
+    <div class="pila">
+      <section class="bloque" id="mesa"></section>
+      <section class="bloque">
+        <h2>En la guía de este tipo de asunto</h2>
+        <div class="editor"><label for="accion">Tarea «Firmar la resolución» · Qué se hace
+          <select id="accion">
+            <option value="">Sin acción (se marca a mano)</option>
+            <option value="generar" disabled>Generar un documento</option>
+            <option value="firmar" selected>Firmar un documento</option>
+            <option value="registrar" disabled>Registrar un documento</option>
+            <option value="comunicar" disabled>Comunicar</option>
+            <option value="anadir" disabled>Añadir un documento</option>
+          </select></label>
+          <span id="accion-ayuda" class="datos"></span></div>
+      </section>
+    </div>
+    <div class="pila">
+      <section class="bloque"><h2>Documentos</h2><div id="docs"></div></section>
+      <section class="bloque"><h2>Notas</h2><div id="notas"></div></section>
+    </div>
+  </div>
+  <div id="capa"></div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var HOY = '05/11/2026';
+  var RES = '261105 RESOLUCION D26-01240.pdf';
+  var e;
+
+  function inicial() {
+    e = {
+      tareas: [
+        { id: 'g', texto: 'Generar la resolución', accion: 'generar' },
+        { id: 'f', texto: 'Firmar la resolución', accion: 'firmar' },
+        { id: 'r', texto: 'Registrar de salida la resolución', accion: 'registrar' },
+        { id: 'c', texto: 'Comunicar la resolución a la familia', accion: 'comunicar' }
+      ],
+      docs: [
+        { nombre: '261103 ALEGACIONES D26-01231.pdf', hito: 1, firmas: 0, registro: '', pendiente: true },
+        { nombre: '261104 INFORME DEPARTAMENTO D26-01236.pdf', hito: 2, firmas: 0, registro: '', pendiente: false }
+      ],
+      notas: [], elegido: null, cadena: null, hitoHecho: false, verde: '', ambar: '', cuadro: null, archivado: false
+    };
+    if ($('accion')) $('accion').value = 'firmar';
+  }
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function tarea(id) { return e.tareas.filter(function (t) { return t.id === id; })[0]; }
+  function abierta(t) { return !t.hecha && !t.na; }
+  function resolucion() { return e.docs.filter(function (d) { return d.nombre === RES; })[0]; }
+  var CLASE = { generar: 'Generar', firmar: 'Firmar', registrar: 'Registrar', comunicar: 'Comunicar' };
+
+  /* La siguiente parada de «Hacer este hito». */
+  function avanzar() {
+    if (!e.cadena) return;
+    var t = e.tareas.filter(function (x) { return abierta(x) && (x.accion === 'firmar' || x.accion === 'registrar' || x.accion === 'comunicar'); })[0];
+    e.cadena = !t ? null : t.accion === 'firmar' ? 'firma' : t.accion === 'registrar' ? 'sello' : 'enviar';
+  }
+
+  function faltaHito() {
+    var l = e.tareas.filter(function (t) { return abierta(t) && (t.accion === 'firmar' || t.accion === 'registrar'); }).map(function (t) {
+      var r = resolucion();
+      return r ? CLASE[t.accion] + ': ' + r.nombre : t.texto + ' (el documento aún no existe)';
+    });
+    e.docs.forEach(function (d) { if (d.hito === 2 && d.pendiente && !d.registro) l.push('Registrar: ' + d.nombre); });
+    return l;
+  }
+  function faltaAsunto() {
+    var l = faltaHito();
+    e.docs.forEach(function (d) { if (d.hito !== 2 && d.pendiente && !d.registro) l.push('Registrar: ' + d.nombre); });
+    return l;
+  }
+
+  function pintarMesa() {
+    var cuenta = e.tareas.filter(function (t) { return !t.na; });
+    var completo = cuenta.every(function (t) { return t.hecha; }) && !e.hitoHecho;
+    var bot = '';
+    if (e.hitoHecho) bot = '';
+    else if (e.cadena === 'firma') bot = '<button class="boton" disabled>Esperando el PDF firmado</button><button id="dejar" class="enlace">Dejar de esperar</button>';
+    else if (e.cadena === 'sello') bot = '<button class="boton" disabled>Esperando el PDF sellado</button><button id="dejar" class="enlace">Dejar de esperar</button>';
+    else if (e.cadena === 'enviar') bot = '<button id="enviar" class="boton boton-principal">Enviar</button>';
+    else if (e.tareas.some(function (t) { return abierta(t) && (t.accion === 'generar' || t.accion === 'comunicar'); })) bot = '<button id="hacer" class="boton boton-principal">Hacer este hito</button>';
+    if (!e.hitoHecho && e.cadena !== 'enviar' && resolucion() && abierta(tarea('c'))) bot += '<button id="comunicar" class="boton">Comunicar con la resolución adjunta</button>';
+    var partes = e.tareas.filter(abierta).map(function (t) {
+      return t.accion === 'generar' ? 'Genera «Resolución»' : t.accion === 'firmar' ? 'espera la firma' : t.accion === 'registrar' ? 'espera el registro en Séneca' : t.accion === 'comunicar' ? 'correo a la familia' : '';
+    }).filter(Boolean);
+    var html = '<div class="tira"><span>✓ 1. Recibir la reclamación</span><span class="' + (e.hitoHecho ? '' : 'actual') + '">' + (e.hitoHecho ? '✓ ' : '') + '2. Resolver</span><span class="' + (e.hitoHecho ? 'actual' : '') + '">3. Cerrar</span></div>';
+    html += '<div class="mesa-cab"><h2>2. Resolver</h2><div class="mesa-botones">' + bot +
+      '<button id="marcar" class="boton' + (e.hitoHecho ? '' : ' boton-principal') + (completo ? ' resaltado' : '') + '">' + (e.hitoHecho ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button></div></div>';
+    if (!e.cadena && !e.hitoHecho && partes.length) html += '<p class="linea-hacer">' + esc(partes.join(' → ')) + '</p>';
+    html += e.tareas.map(function (t) {
+      return '<div class="tarea' + (t.hecha ? ' hecha' : '') + (t.na ? ' na' : '') + '"><label><input type="checkbox" data-t="' + t.id + '"' + (t.hecha ? ' checked' : '') + (t.na ? ' disabled' : '') + '>' +
+        '<span class="tt">' + esc(t.texto) + '</span></label>' +
+        (t.accion ? '<span class="clase">' + CLASE[t.accion] + '</span>' : '') +
+        '<button class="enlace" data-na="' + t.id + '">' + (t.na ? 'Sí aplica' : 'No aplica') + '</button></div>';
+    }).join('');
+    $('mesa').innerHTML = html;
+  }
+
+  function linea(d) {
+    var p = [];
+    if (d.firmas) p.push('Firmado');
+    if (d.registro) p.push('Registro ' + d.registro);
+    return p.join(' · ');
+  }
+
+  function pintar() {
+    pintarMesa();
+    $('docs').innerHTML = e.docs.map(function (d, i) {
+      var l = linea(d);
+      return '<div class="doc"><span class="ext">PDF</span><span class="nombre">' + esc(d.nombre) + '</span>' +
+        '<span class="datos">Hito ' + d.hito + '</span>' +
+        '<button class="boton mini" data-ruta="' + i + '">' + (e.elegido === i ? 'Ruta ✓' : 'Ruta') + '</button>' +
+        (l ? '<span class="datos">' + esc(l) + '</span>' : '') +
+        (!d.registro && d.pendiente ? '<span class="sin-reg">Sin registrar</span>' : '') + '</div>';
+    }).join('');
+    $('notas').innerHTML = e.notas.length ? e.notas.map(function (n) { return '<div class="nota">' + esc(n) + '</div>'; }).join('') : '<p class="vacio">Sin notas.</p>';
+    var av = '';
+    if (e.archivado) av += '<div class="archivado">Asunto archivado. En la prueba no se mueve nada: pulsa «Empezar de nuevo».</div>';
+    if (e.verde) av += '<div class="aviso aviso-verde">' + esc(e.verde) + '</div>';
+    if (e.ambar) av += '<div class="aviso aviso-ambar">' + esc(e.ambar) + '</div>';
+    $('avisos').innerHTML = av;
+    var c = '';
+    if (e.cuadro) {
+      c = '<div class="capa"><div class="cuadro" role="dialog" aria-modal="true"><h3>' + esc(e.cuadro.titulo) + '</h3><ul>' +
+        e.cuadro.lista.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+        '<div class="pie"><button id="c-volver" class="boton">Volver</button><button id="c-seguir" class="boton boton-principal">' + esc(e.cuadro.boton) + '</button></div></div></div>';
+    }
+    $('capa').innerHTML = c;
+    $('accion-ayuda').textContent = tarea('f').accion === 'firmar' ? 'Se marca sola al llegar el firmado de un documento de este hito.' : 'Se marca a mano y no cuenta en los avisos.';
+    var hay = e.elegido !== null && !e.archivado;
+    $('s-firmado').disabled = !hay; $('s-sellado').disabled = !hay;
+    $('pista').textContent = hay ? 'Guardarás encima de ' + e.docs[e.elegido].nombre + '.' : 'Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
+    enganchar();
+  }
+
+  function limpiar() { e.verde = ''; e.ambar = ''; }
+
+  function enganchar() {
+    var g = function (id, fn) { var b = $(id); if (b) b.onclick = fn; };
+    g('hacer', function () {
+      limpiar();
+      var t = tarea('g');
+      if (abierta(t)) {
+        t.hecha = true;
+        e.docs.push({ nombre: RES, hito: 2, firmas: 0, registro: '', pendiente: false });
+        e.verde = 'Documento generado: ' + RES;
+      }
+      e.cadena = 'x'; avanzar(); pintar();
+    });
+    g('dejar', function () { limpiar(); e.cadena = null; pintar(); });
+    var alEnviar = function () {
+      limpiar();
+      var f = faltaHito().filter(function (x) { return x.indexOf(RES) !== -1; });
+      if (f.length) { e.cuadro = { titulo: 'Falta por hacer en lo que vas a enviar', lista: f, boton: 'Enviar igualmente', fn: enviarCorreo }; pintar(); return; }
+      enviarCorreo();
+    };
+    g('enviar', alEnviar);
+    g('comunicar', alEnviar);
+    g('marcar', function () {
+      limpiar();
+      if (e.hitoHecho) { e.hitoHecho = false; pintar(); return; }
+      var f = faltaHito();
+      if (f.length) { e.cuadro = { titulo: 'Falta por hacer en este hito', lista: f, boton: 'Marcar como hecho igualmente', fn: marcarHecho }; pintar(); return; }
+      marcarHecho();
+    });
+    g('c-volver', function () { e.cuadro = null; pintar(); });
+    g('c-seguir', function () { var fn = e.cuadro.fn; e.cuadro = null; fn(); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (b) {
+      b.onchange = function () {
+        limpiar(); var t = tarea(b.dataset.t); t.hecha = b.checked;
+        if (t.id === 'g' && t.hecha && !resolucion()) e.docs.push({ nombre: RES, hito: 2, firmas: 0, registro: '', pendiente: false });
+        avanzar(); pintar();
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-na]'), function (b) {
+      b.onclick = function () { limpiar(); var t = tarea(b.dataset.na); t.na = !t.na; t.hecha = false; avanzar(); pintar(); };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ruta]'), function (b) {
+      b.onclick = function () { limpiar(); var i = +b.dataset.ruta; e.elegido = e.elegido === i ? null : i; pintar(); };
+    });
+  }
+
+  function enviarCorreo() {
+    tarea('c').hecha = true; e.verde = 'Correo enviado a la familia con ' + RES + '. En la prueba no se envía nada.';
+    e.notas.unshift('Enviado a la familia el ' + HOY + ' · ' + RES); e.cadena = null; pintar();
+  }
+
+  function marcarHecho() { e.hitoHecho = true; e.cadena = null; e.verde = 'Hito marcado como hecho. Pasas al hito 3.'; pintar(); }
+
+  function archivar() { limpiar(); e.archivado = true; e.elegido = null; pintar(); }
+
+  $('archivar').onclick = function () {
+    limpiar();
+    if (e.archivado) return;
+    var f = faltaAsunto();
+    e.cuadro = f.length
+      ? { titulo: 'Falta por hacer en este asunto', lista: f, boton: 'Archivar igualmente', fn: archivar }
+      : { titulo: 'Archivar el asunto', lista: ['Se llevará la carpeta al archivo.'], boton: 'Archivar el asunto', fn: archivar };
+    pintar();
+  };
+
+  $('s-firmado').onclick = function () {
+    limpiar(); var d = e.docs[e.elegido]; e.elegido = null;
+    d.firmas = 1; e.verde = 'Documento firmado. El original sin firmar se conserva en «_Previas».';
+    e.notas.unshift('Firmado el ' + HOY + ' · ' + d.nombre);
+    var t = tarea('f');
+    if (d.hito === 2 && t.accion === 'firmar' && abierta(t)) { t.hecha = true; e.verde += ' Marcado: ' + t.texto + '.'; avanzar(); }
+    pintar();
+  };
+  $('s-sellado').onclick = function () {
+    limpiar(); var d = e.docs[e.elegido]; e.elegido = null;
+    d.registro = '26SM0' + (412 + e.notas.length); d.pendiente = false;
+    e.verde = 'Documento registrado.';
+    e.notas.unshift('Registrado ' + d.registro + ' el ' + HOY + ' · ' + d.nombre);
+    var t = tarea('r');
+    if (d.hito === 2 && d.nombre === RES && abierta(t)) { t.hecha = true; e.verde += ' Marcado: ' + t.texto + '.'; avanzar(); }
+    pintar();
+  };
+  $('s-sinruta').onclick = function () {
+    limpiar(); e.ambar = 'La app no se ha enterado: no cambia nada. Hay que marcar la tarea a mano.'; pintar();
+  };
+  $('s-reinicio').onclick = function () { inicial(); pintar(); };
+  $('accion').onchange = function () { limpiar(); tarea('f').accion = this.value; avanzar(); pintar(); };
+
+  inicial(); pintar();
+})();
+</script>
