@@ -18,6 +18,11 @@ Lee solo esto, en este orden:
 3. `docs/CONTEXTO-CORTO.md` (o `docs/CONTEXTO.md` si la app no tiene el corto).
 4. La fila de `docs/COLA.md` que vas a trabajar, su instrucción y su pantalla de prueba (`docs/pantallas/<nº>.html`), si la tiene.
 
+**Una sola tarea a la vez.** Antes de coger una fila, baja `main` y mira la cola. Si hay una fila EN
+CURSO que no es la que te han encargado retomar, no cojas ninguna: no toques nada y dile a la
+persona qué fila está en curso y que vuelva a lanzar la suya cuando acabe. Su tarea sigue en la cola.
+Manda sobre cualquier regla de `docs/COLA.md` que diga otra cosa, como «sáltala».
+
 Lee código solo cuando lo necesites para la tarea. No leas la historia ni documentos antiguos
 salvo que la instrucción lo pida.
 
@@ -94,7 +99,10 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
      va a `docs/CONTEXTO.md`, y en el resumen queda una línea que remite a él.
    - No se pierde ningún texto. Si `docs/HISTORIA.md` o `docs/CONTEXTO.md` no existen, se crean.
    - Si no se puede bajar del límite sin quitar algo vigente, se dice en la nota de la fila.
-6. Estimación: en la subida que marca EN CURSO se pone al día `docs/ESTIMACIONES.md` (minutos de
+6. **La cola no pierde filas.** Antes de escribir en `docs/COLA.md`, baja `main`. Después de
+   subir, comprueba que siguen todas las filas que había. Si falta alguna, la recuperas antes de
+   seguir.
+7. Estimación: en la subida que marca EN CURSO se pone al día `docs/ESTIMACIONES.md` (minutos de
    cada fila que queda). Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`.
 
 ## 6. Segundo revisor, comprobar y publicar
