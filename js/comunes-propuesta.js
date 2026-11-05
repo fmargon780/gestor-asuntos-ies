@@ -94,7 +94,8 @@ var ComunesPropuesta = (function () {
   function enganchar() {
     if (!window.Gestor) return;
     window.Gestor.alRefrescar.push(function () {
-      if (App.pantallaALaVista && !App.pantallaALaVista('ajustes')) return;
+      /* Sale al llegar a Herramientas o a Ajustes, en cualquier orden. */
+      if (App.pantallaALaVista && !App.pantallaALaVista('ajustes') && !App.pantallaALaVista('herramientas')) return;
       if (window.Gestor.carpetaGestor()) bloque();
     });
   }

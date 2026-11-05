@@ -237,6 +237,17 @@ await comprobar('10a. dice que es solo una propuesta y enseña lo que se uniría
 await comprobar('10b. no cambia ninguna guía ni ninguna lista, y no hay botón de aplicar', p.evaluate(async (antes) => [JSON.stringify([GuiasDelCentro.todas(), await ComunesGuardado.leer()]) === antes,
   [...document.querySelectorAll('#bloque-comunes-propuesta button')].map((b) => b.textContent)], antesTodo), [true, ['Preparar la propuesta', 'Copiar la propuesta como texto']]);
 
+await comprobar('10c. yendo directo a Herramientas, sin pasar por Ajustes, el bloque sale y está en Herramientas', p.evaluate(async () => {
+  document.getElementById('bloque-comunes-propuesta')?.remove();
+  document.querySelectorAll('.pantalla').forEach((x) => x.classList.add('oculto'));
+  document.getElementById('pantalla-herramientas').classList.remove('oculto');
+  App.pantallaALaVista = (c) => c === 'herramientas';
+  Gestor.alRefrescar.forEach((f) => { try { f(); } catch (e) { /* solo pintar */ } });
+  await new Promise((r) => setTimeout(r, 800));
+  const b = document.getElementById('bloque-comunes-propuesta');
+  return [!!b, !!(b && b.closest('#pantalla-herramientas'))];
+}), [true, true]);
+
 /* ------------------------------------------------------------------ */
 console.log('--- 6. en el editor de la guía ---');
 await p.evaluate(() => { window.__fin = GuiasDelCentro.escribir(window.__a.tipo); });
