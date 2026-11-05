@@ -34,7 +34,7 @@ Cuarta parte del tema 518. Necesita la 530 HECHA. Si algo cambia el texto de arr
 6. **«Para»:** este asunto y los siguientes (en la guía), o solo este asunto.
 7. **Cambiar:** «Cambiar la tarea» y «Cambiar el hito» avisan antes de guardar de en qué tipos se usa. Cambia en todas las guías. **Los otros asuntos abiertos siguen como están.**
 8. **Algo distinto en un trámite:** una tarea «solo este asunto», o crear otro hito o tarea.
-9. **Pasar las guías actuales:** una acción una sola vez lleva sus tareas e hitos a las listas y une los que sean iguales. Lo que dude, lo enseña para decidir; nada se pierde.
+9. **Pasar las guías actuales:** Francisco no lo hace solo (5-nov-2026: «preferiría hacer esto ayudado por tí»). La app prepara una propuesta en pantalla (Mantenimiento): qué tareas e hitos pasarían a las listas y cuáles se unirían, sin cambiar nada. La revisa con Claude en una conversación, y solo al confirmarla se aplica. Nada se pierde. Esa conversación es la fila 532, no esta.
 
 **Lo que desaparece o se sustituye:** escribir tareas libres en las guías (queda «Otra cosa» dentro de la lista); «Traer un hito de otro tipo» como copia independiente (fila 417) se sustituye por la lista común.
 
@@ -54,7 +54,7 @@ Cuarta parte del tema 518. Necesita la 530 HECHA. Si algo cambia el texto de arr
 - Hoy: `_GESTOR/hitos-biblioteca.json`, `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`, copia suelta `HitosBiblioteca.copiaSuelta`; tareas en `js/guias-guion.js` y `js/guias-guion-editor.js`, en el asunto `js/hitos-guion.js` y `js/hito-mesa-guion.js`.
 - Dos ficheros compartidos nuevos en `_GESTOR` por `ColaGuardado`. La guía guarda referencias más plazo y lugar.
 - Los asuntos abiertos guardan su propia copia de lo que tenían al crearse o al pasar (`origenGuia` no debe romperse; `js/hitos-sincronizar.js`).
-- Es la parte con más riesgo: antes de pasar, copia de `_GESTOR`. La acción de pasar la pulsa Francisco desde Mantenimiento, no se hace sola.
+- Es la parte con más riesgo: antes de aplicar, copia de `_GESTOR`. La propuesta se puede leer en pantalla como texto, y aplicarla es otra acción aparte; nunca se hace sola. Las guías viven en el Dropbox del centro, que Claude no alcanza desde su espacio de trabajo: lee la propuesta en la app, con Claude in Chrome.
 - Si se ve que es más del doble de lo previsto, parar y preguntar.
 - Las guías con preguntas y ramas siguen funcionando igual. Línea en `js/novedades.js`.
 
@@ -68,8 +68,8 @@ Cuarta parte del tema 518. Necesita la 530 HECHA. Si algo cambia el texto de arr
 - Añadir un hito trae sus tareas; el plazo sigue siendo de cada guía.
 - «Solo este asunto» no toca la guía.
 - Una guía con preguntas sigue igual tras pasar.
-- Pasar las guías une las iguales y no pierde ninguna tarea.
-- [SOLO FRANCISCO] Revisar las dudas de la unión con las guías reales.
+- La propuesta de pasar las guías une las iguales, no pierde ninguna tarea y no cambia nada hasta aplicarla.
+- Aplicarla con la demostración deja las guías como proponía.
 
 ## Revisión y respuestas durante el trabajo
 
