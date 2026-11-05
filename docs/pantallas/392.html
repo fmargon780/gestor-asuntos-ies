@@ -91,9 +91,9 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
   function inicial() {
     e = {
       docs: [
-        { nombre: '261105 CERTIFICADO D26-01234.pdf', firmado: false, registro: '', pideRegistro: true },
-        { nombre: '261105 JUSTIFICANTE D26-01235.pdf', firmado: false, registro: '', pideRegistro: false },
-        { nombre: '261103 SOLICITUD D26-01230.pdf', firmado: false, registro: '26EM0187', pideRegistro: false }
+        { nombre: '261105 CERTIFICADO D26-01234.pdf', firmas: 0, registro: '', pideRegistro: true },
+        { nombre: '261105 JUSTIFICANTE D26-01235.pdf', firmas: 0, registro: '', pideRegistro: false },
+        { nombre: '261103 SOLICITUD D26-01230.pdf', firmas: 0, registro: '26EM0187', pideRegistro: false }
       ],
       previas: [],
       notas: [{ t: 'Registrado 26EM0187 el 3-nov-2026 · 261103 SOLICITUD D26-01230.pdf', q: 'Automática' }],
@@ -106,7 +106,7 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
 
   function linea(d) {
     var p = [];
-    if (d.firmado) p.push('Firmado');
+    if (d.firmas) p.push(d.firmas > 1 ? 'Firmado (' + d.firmas + ')' : 'Firmado');
     if (d.registro) p.push('Registro ' + d.registro);
     return p.join(' · ');
   }
@@ -142,7 +142,7 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
       $('f-nuevo').onclick = function () {
         e.nuevos++;
         var n = '261105 DOCUMENTO D26-0124' + e.nuevos + '.pdf';
-        e.docs.unshift({ nombre: n, firmado: true, registro: '', pideRegistro: false });
+        e.docs.unshift({ nombre: n, firmas: 1, registro: '', pideRegistro: false });
         e.notas.unshift({ t: 'Firmado el ' + HOY + ' · ' + n, q: 'Automática' });
         e.suelto = false; e.verde = 'Documento firmado guardado como ' + n + '.'; e.ambar = ''; pintar();
       };
@@ -166,10 +166,15 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
   }
 
   function firmar(d) {
-    var ya = d.firmado;
-    d.firmado = true;
+    var ya = d.firmas;
+    d.firmas = ya + 1;
     e.ambar = '';
-    if (ya) { e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf'); e.verde = 'Este documento ya estaba firmado. Lo nuevo se queda; el anterior se conserva en «_Previas».'; return; }
+    if (ya) {
+      e.previas.unshift(base(d.nombre) + ' CON ' + ya + (ya === 1 ? ' FIRMA' : ' FIRMAS') + '.pdf');
+      e.notas.unshift({ t: 'Firmado (' + d.firmas + ' firmas) el ' + HOY + ' · ' + d.nombre, q: 'Automática' });
+      e.verde = 'Documento con ' + d.firmas + ' firmas. El anterior se conserva en «_Previas».';
+      return;
+    }
     e.previas.unshift(base(d.nombre) + ' SIN FIRMAR.pdf');
     e.notas.unshift({ t: 'Firmado el ' + HOY + ' · ' + d.nombre, q: 'Automática' });
     e.verde = 'Documento firmado. El original sin firmar se conserva en «_Previas».';
@@ -190,7 +195,7 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
   $('s-nada').onclick = function () {
     var d = e.docs[e.elegido];
     e.previas.unshift(base(d.nombre) + ' ANTERIOR.pdf');
-    d.firmado = false;
+    d.firmas = 0;
     e.verde = '';
     e.ambar = 'Lo que has guardado encima de ' + d.nombre + ' no trae firma ni sello de registro. Lo he dejado; el anterior se conserva en «_Previas».';
     e.elegido = null; pintar();
