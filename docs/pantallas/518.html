@@ -1,0 +1,565 @@
+<title>Campos del Gestor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: los colores y botones de la app; tres pestañas a todo lo ancho: lista con detalle, plantilla con ventana de elegir, y recetas por pasos. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --rojo:#fdecec;--rojo-linea:#c0392b;--hover:#f0f3f7;--sobre-azul:#fff;--velo:rgba(15,25,40,.45);
+  --hoja:#fff;--hoja-tinta:#111;--falta:#ffe9a8;
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --fuente-hoja:"Times New Roman",Times,"Liberation Serif",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1d1d;--rojo-linea:#d9776b;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1d1d;--rojo-linea:#d9776b;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0 0 8px}
+.cab{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:12px}
+h1{font-size:21px;margin:0;text-wrap:balance}
+h2{font-size:15px;margin:0}
+.empuja{margin-left:auto}
+.en-linea{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pestanas{display:flex;flex-wrap:wrap;gap:6px}
+.pestana{font:inherit;font-size:14px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:8px;padding:8px 14px;cursor:pointer}
+.pestana:hover{background:var(--hover)}
+.pestana[aria-selected="true"]{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul);font-weight:600}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.boton:hover{background:var(--hover)}
+.boton:disabled{opacity:.5;cursor:default}
+.principal{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.principal:hover{background:var(--azul);opacity:.9}
+.mini{padding:4px 9px;font-size:13px}
+select,input,textarea{font:inherit;width:100%;border:1px solid var(--linea);border-radius:8px;padding:7px 9px;background:var(--papel);color:var(--tinta)}
+textarea{resize:vertical;line-height:1.45}
+label.et{display:block;font-size:13px;color:var(--tinta-suave);margin-bottom:3px}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,tr:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:12px;align-items:start}
+.mitad{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+.filtros{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pastilla{font:inherit;font-size:13px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:4px 11px;cursor:pointer}
+.pastilla:hover{background:var(--hover)}
+.pastilla.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.tabla-caja{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--tinta-suave);font-weight:600;padding:5px 8px;border-bottom:1px solid var(--linea);white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid var(--linea);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--hover)}
+tbody tr.sel{background:var(--azul-claro)}
+.sin-puntero tr{cursor:default}
+.sin-puntero tr:hover{background:none}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.etq{font-size:12px;border-radius:999px;padding:2px 8px;background:var(--azul-claro);color:var(--azul);font-weight:600;white-space:nowrap}
+.etq.manual{background:var(--ambar);color:var(--tinta)}
+.etq.calc{background:var(--verde);color:var(--tinta)}
+.suave{color:var(--tinta-suave)}
+.pequeno{font-size:13px}
+.vacio{color:var(--tinta-suave);font-style:italic}
+.lista-usos{margin:0;padding-left:18px;font-size:14px}
+.aviso{border-radius:8px;padding:8px 11px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.insertar{border:2px solid var(--azul);border-radius:10px;padding:8px 10px;background:var(--azul-claro);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.insertar strong{color:var(--azul)}
+.hoja{background:var(--hoja);color:var(--hoja-tinta);font-family:var(--fuente-hoja);font-size:15.5px;line-height:1.45;padding:14px 18px;border:1px solid var(--linea);border-radius:6px;white-space:pre-wrap;min-height:230px}
+.falta{background:var(--falta)}
+.capa{position:fixed;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.cuadro{background:var(--papel);border-radius:12px;width:min(1180px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--linea)}
+.cuadro-cab{padding:12px 14px;border-bottom:1px solid var(--linea);display:flex;flex-direction:column;gap:8px}
+.cuadro-cuerpo{display:grid;grid-template-columns:190px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+.cuadro-pie{padding:10px 14px;border-top:1px solid var(--linea);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.grupos{border-right:1px solid var(--linea);overflow:auto;padding:8px;display:flex;flex-direction:column;gap:2px}
+.grupo{font:inherit;font-size:14px;text-align:left;border:0;background:none;color:var(--tinta);border-radius:6px;padding:6px 9px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.grupo:hover{background:var(--hover)}
+.grupo.on{background:var(--azul);color:var(--sobre-azul);font-weight:600}
+.resultados{overflow:auto;padding:8px 10px;min-height:280px}
+.fila-campo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:10px;align-items:center;width:100%;font:inherit;text-align:left;background:none;border:0;border-bottom:1px solid var(--linea);color:var(--tinta);padding:7px 6px;cursor:pointer}
+.fila-campo:hover{background:var(--hover)}
+.flecha{color:var(--tinta-suave)}
+.paso{border:1px solid var(--linea);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,240px);gap:10px;align-items:start}
+.paso-cab{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
+.paso-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;min-width:0}
+.sale{background:var(--azul-claro);border-radius:6px;padding:6px 9px;font-size:14px;overflow-wrap:anywhere;min-height:34px}
+.sale .tit{display:block;font-size:12px;color:var(--tinta-suave)}
+.equiv{display:grid;grid-template-columns:1fr auto 1fr auto;gap:5px;align-items:center}
+.ancho{grid-column:1/-1}
+.aviso-flot{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--verde);border:1px solid var(--verde-linea);color:var(--tinta);border-radius:8px;padding:9px 14px;font-size:14px;max-width:calc(100% - 32px)}
+
+.cab-asunto{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:10px}
+.asunto{display:grid;grid-template-columns:minmax(240px,310px) minmax(0,1fr);gap:12px;align-items:start}
+.dato-a{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--linea);font-size:14px}
+.dato-a.ancho-a{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto}
+.hitos{display:flex;flex-wrap:wrap;gap:6px}
+.tarea{border:1px solid var(--linea);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.tarea-cab{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:inherit;background:none;border:0;color:var(--tinta);padding:0;text-align:left;cursor:pointer;width:100%}
+.hecha{color:var(--tinta-suave);text-decoration:line-through}
+.antes{background:var(--azul-claro);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;align-items:end}
+@media (max-width:860px){
+  .asunto{grid-template-columns:minmax(0,1fr)}
+  .dos,.mitad{grid-template-columns:minmax(0,1fr)}
+  .cuadro-cuerpo{grid-template-columns:minmax(0,1fr);overflow:auto}
+  .grupos{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--linea);overflow:visible}
+  .resultados{overflow:visible}
+  .paso{grid-template-columns:minmax(0,1fr)}
+  .fila-campo{grid-template-columns:minmax(0,1fr) auto}
+  .fila-campo .ej{grid-column:1;grid-row:2}
+}
+</style>
+
+<div class="marco">
+  <p class="prueba">Pantalla de prueba. Datos inventados: no se guarda nada.</p>
+  <div class="cab">
+    <h1>Campos</h1>
+    <div class="pestanas" role="tablist">
+      <button class="pestana" role="tab" data-tab="lista" id="tab-lista">Lista de campos</button>
+      <button class="pestana" role="tab" data-tab="plantilla" id="tab-plantilla">Elegir un campo en una plantilla</button>
+      <button class="pestana" role="tab" data-tab="receta" id="tab-receta">Crear a partir de otros</button>
+      <button class="pestana" role="tab" data-tab="asunto" id="tab-asunto">En un asunto</button>
+    </div>
+    <div class="en-linea empuja">
+      <label class="pequeno suave" for="persona">Ejemplos con</label>
+      <select id="persona" style="width:auto"></select>
+    </div>
+  </div>
+  <div id="vista"></div>
+</div>
+<div id="capa-sitio"></div>
+<div id="flot" class="aviso-flot" hidden role="status"></div>
+
+<script>
+(function(){
+const PERSONAS={
+  marta:{t:'Marta Otero Campos',n:'Marta',a1:'Otero',a2:'Campos',u:'3º B',nac:'14/03/2011',sexo:'Mujer',nie:'2145678',dni:'12345678Z',t1:'Carmen Campos Vera',t1c:'carmen.campos@correo.es',t1t:'600 111 222',t2:'Luis Otero Gil',nota:'7,5',pais:'Francia',prot:'No',faltas:'4'},
+  hugo:{t:'Hugo Ruiz Lara',n:'Hugo',a1:'Ruiz',a2:'Lara',u:'1º Bach A',nac:'02/11/2008',sexo:'Hombre',nie:'2098765',dni:'',t1:'Ana Lara Mena',t1c:'',t1t:'600 333 444',t2:'',nota:'6,25',pais:'',prot:'Sí',faltas:'31'},
+  lucia:{t:'Lucía Vera Soto',n:'Lucía',a1:'Vera',a2:'Soto',u:'2º ESO A',nac:'30/06/2012',sexo:'Mujer',nie:'2211334',dni:'',t1:'',t1c:'',t1t:'',t2:'',nota:'9',pais:'Alemania',prot:'',faltas:'0'}
+};
+const TIPOS={
+  baja:{n:'Baja por traslado al extranjero',clase:'Alumnado'},
+  aut:{n:'Autorización de actividad',clase:'Alumnado'},
+  cert:{n:'Certificado de tutoría',clase:'Personal'}
+};
+const GRUPOS=['Persona','Tutores','Asunto','Centro','Firmantes'];
+const hoy='05/11/2026';
+let sig=1;
+function campo(nombre,grupo,origen,val,extra){return Object.assign({id:'c'+(sig++),nombre,grupo,origen,val,clases:['Todas'],usos:[],tipos:[]},extra||{})}
+const A={clases:['Alumnado']},pc=(o)=>Object.assign({},A,o);
+const C=[
+ campo('Nombre completo','Persona','Centro de datos',p=>p.t,{usos:['Resolución de baja','Correo a la familia','Autorización'],tipos:['baja','aut','cert']}),
+ campo('Nombre de pila','Persona','Centro de datos',p=>p.n,pc({usos:['Correo a la familia'],tipos:['aut']})),
+ campo('Primer apellido','Persona','Centro de datos',p=>p.a1,pc()),
+ campo('Segundo apellido','Persona','Centro de datos',p=>p.a2,pc()),
+ campo('Sexo','Persona','Centro de datos',p=>p.sexo,pc()),
+ campo('Unidad','Persona','Centro de datos',p=>p.u,pc({usos:['Resolución de baja','Anexo I'],tipos:['baja','aut']})),
+ campo('Fecha de nacimiento','Persona','Centro de datos',p=>p.nac,pc({usos:['Anexo I'],tipos:['baja']})),
+ campo('Nº de identificación escolar','Persona','Centro de datos',p=>p.nie,pc({usos:['Anexo II'],tipos:['baja']})),
+ campo('DNI','Persona','Centro de datos',p=>p.dni,{usos:['Certificado']}),
+ campo('Nota media','Persona','Centro de datos',p=>p.nota,pc()),
+ campo('Faltas sin justificar','Persona','Centro de datos',p=>p.faltas,pc()),
+ campo('Puesto','Persona','Centro de datos',()=>'Profesora de secundaria',{clases:['Personal'],usos:['Certificado'],tipos:['cert']}),
+ campo('Especialidad','Persona','Centro de datos',()=>'Inglés',{clases:['Personal'],usos:['Certificado'],tipos:['cert']}),
+ campo('Primer tutor','Tutores','Centro de datos',p=>p.t1,pc({usos:['Correo a la familia','Resolución de baja'],tipos:['baja','aut']})),
+ campo('Correo del primer tutor','Tutores','Centro de datos',p=>p.t1c,pc({usos:['Correo a la familia'],tipos:['baja','aut']})),
+ campo('Teléfono del primer tutor','Tutores','Centro de datos',p=>p.t1t,pc()),
+ campo('Segundo tutor','Tutores','Centro de datos',p=>p.t2,pc()),
+ campo('Tutor con custodia','Tutores','Manual',()=>'',pc({clase:'Lista',usos:['Resolución de baja'],tipos:['baja']})),
+ campo('Número de asunto','Asunto','El asunto',()=>'A26-0137',{usos:['Resolución de baja']}),
+ campo('Tipo de asunto','Asunto','El asunto',()=>'Baja por traslado',{}),
+ campo('Fecha del asunto','Asunto','El asunto',()=>'27/10/2026',{usos:['Resolución de baja'],tipos:['baja']}),
+ campo('Registro de entrada','Asunto','El asunto',()=>'26EM1234',{}),
+ campo('Nombre del centro','Centro','Ajustes del centro',()=>'IES Fuente Lucena',{usos:['Resolución de baja','Autorización','Certificado'],tipos:['baja','aut','cert']}),
+ campo('Localidad','Centro','Ajustes del centro',()=>'Alhaurín el Grande',{usos:['Resolución de baja'],tipos:['baja','cert']}),
+ campo('Código del centro','Centro','Ajustes del centro',()=>'29700692',{}),
+ campo('Consejería','Centro','Ajustes del centro',()=>'Consejería de Educación',{}),
+ campo('Quien firma','Firmantes','Ajustes del centro',()=>'Elena Prados Ruiz',{usos:['Resolución de baja','Certificado'],tipos:['baja','cert']}),
+ campo('Cargo de quien firma','Firmantes','Ajustes del centro',()=>'Directora',{usos:['Resolución de baja','Certificado'],tipos:['baja','cert']}),
+ campo('Quien da el visto bueno','Firmantes','Ajustes del centro',()=>'Pablo Mena Soler',{}),
+ campo('Tutoría más reciente','Persona','Tabla de datos',()=>'2º ESO C, 2025-26',{clases:['Personal'],usos:['Certificado'],tipos:['cert']}),
+ campo('Tabla de periodos de tutoría','Persona','Tabla de datos',()=>'(una tabla con cargo, curso y fechas)',{clases:['Personal']}),
+ campo('País de destino','Asunto','Manual',p=>p.pais,pc({clase:'Texto',pide:'En un hito',hito:'Recibir la solicitud',usos:['Resolución de baja','Anexo I'],tipos:['baja']})),
+ campo('Protocolo de absentismo iniciado','Asunto','Manual',p=>p.prot,pc({clase:'Lista',opciones:'Sí, No',pide:'En un hito',hito:'Recibir la solicitud',usos:['Resolución de baja'],tipos:['baja']})),
+ campo('Fecha de la sesión','Asunto','Manual',()=>'',{clase:'Fecha',pide:'Al generar el documento',usos:['Acuerdo del Consejo Escolar']}),
+ campo('Horas','Asunto','Manual',()=>'',{clase:'Número',pide:'Al crear el asunto',usos:['Certificado de actividad'],tipos:['aut']})
+];
+const TAB={'Nombre completo':['RegAlum','Alumno/a'],'Nombre de pila':['RegAlum','Nombre'],'Primer apellido':['RegAlum','Primer apellido'],'Segundo apellido':['RegAlum','Segundo apellido'],'Sexo':['RegAlum','Sexo'],'Unidad':['RegAlum','Unidad'],'Fecha de nacimiento':['RegAlum','Fecha de nacimiento'],'Nº de identificación escolar':['RegAlum','Nº Id. Escolar'],'DNI':['RegAlum','DNI/Pasaporte'],'Nota media':['Calificaciones','Nota media'],'Faltas sin justificar':['Faltas de asistencia','Injustificadas'],'Puesto':['RelPerCen','Puesto'],'Especialidad':['RelPerCen','Puesto'],'Primer tutor':['RegAlum','Primer tutor'],'Correo del primer tutor':['RegAlum','Correo Primer tutor'],'Teléfono del primer tutor':['RegAlum','Teléfono Primer tutor'],'Segundo tutor':['RegAlum','Segundo tutor'],'Tutoría más reciente':['Tutorías','Curso'],'Tabla de periodos de tutoría':['Tutorías','Cargo, curso y fechas']};
+function tablaDe(f){
+ if(TAB[f.nombre])return{t:TAB[f.nombre][0],c:TAB[f.nombre][1]};
+ if(f.origen==='El asunto')return{t:'Ficha del asunto',c:f.nombre};
+ if(f.origen==='Ajustes del centro')return{t:'Ajustes del centro',c:f.nombre};
+ if(f.receta){const b=por(f.receta.desde);return{t:'Se calcula',c:'de '+(b?b.nombre:'?')}}
+ return{t:'Se escribe a mano',c:''}}
+const rutaT=f=>{const x=tablaDe(f);if(f.receta)return 'Se calcula '+x.c;if(f.origen==='El asunto'||f.origen==='Ajustes del centro'||!x.c)return x.t;return x.t+' › '+x.c};
+const OPCION_PIDE=['Al crear el asunto','En un hito','Al generar el documento'];
+const HITOS=['Recibir la solicitud','Elaborar la resolución','Firma','Registro de salida'];
+
+/* ---------- operaciones de una receta ---------- */
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function leeF(t){const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(t).trim());return m?new Date(+m[3],+m[2]-1,+m[1]):null}
+function dd(n){return String(n).padStart(2,'0')}
+function escF(d){return dd(d.getDate())+'/'+dd(d.getMonth()+1)+'/'+d.getFullYear()}
+function leeN(t){const s=String(t).trim().replace(/\./g,'').replace(',','.');return s!==''&&!isNaN(+s)?+s:null}
+function escN(n){return String(Math.round(n*100)/100).replace('.',',')}
+const UNI=['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve','veinte','veintiuno','veintidós','veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete','veintiocho','veintinueve'];
+const DEC=['','','','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+const CEN=['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+function entero(n){if(n<30)return UNI[n];if(n<100){const u=n%10;return DEC[Math.floor(n/10)]+(u?' y '+UNI[u]:'')}if(n===100)return 'cien';if(n<1000){const r=n%100;return CEN[Math.floor(n/100)]+(r?' '+entero(r):'')}if(n<10000){const m=Math.floor(n/1000),r=n%1000;return (m===1?'mil':entero(m)+' mil')+(r?' '+entero(r):'')}return String(n)}
+function enLetra(t){const n=leeN(t);if(n===null||n<0)return t;const e=Math.floor(n),s=String(t).trim().split(',')[1];return s?entero(e)+' con '+entero(+s):entero(e)}
+function otro(id,p){const f=por(id);return f?valor(f,p):''}
+const OPS={
+ juntar:{n:'Juntar con otro campo',d:{campo:'',sep:' ',lado:'final'},
+  run:(s,v,p)=>{const o=otro(s.campo,p);if(!o)return v;if(!v)return o;return s.lado==='final'?v+s.sep+o:o+s.sep+v}},
+ texto:{n:'Añadir un texto fijo',d:{txt:'',lado:'principio'},run:(s,v)=>!v?v:(s.lado==='principio'?s.txt+v:v+s.txt)},
+ si:{n:'Si… entonces… si no…',d:{campo:'',cond:'igual',val:'',ent:'',sino:''},
+  run:(s,v,p)=>{const o=s.campo?otro(s.campo,p):v,a=String(o).toLowerCase(),b=String(s.val).toLowerCase();
+   const ok={igual:a===b,distinto:a!==b,contiene:b!==''&&a.includes(b),empieza:b!==''&&a.startsWith(b),vacio:!a,lleno:!!a}[s.cond];
+   const r=ok?s.ent:s.sino;return r===''?v:r}},
+ vacio:{n:'Si está vacío, usar otro campo',d:{campo:''},run:(s,v,p)=>v||otro(s.campo,p)},
+ equiv:{n:'Tabla de equivalencias',d:{filas:[{de:'',a:''}]},run:(s,v)=>{const f=s.filas.find(x=>x.de!==''&&x.de.toLowerCase()===String(v).toLowerCase());return f?f.a:v}},
+ quitarFin:{n:'Quitar los últimos caracteres',d:{n:1},run:(s,v)=>String(v).slice(0,Math.max(0,String(v).length-(+s.n||0))).trim()},
+ quitarIni:{n:'Quitar los primeros caracteres',d:{n:1},run:(s,v)=>String(v).slice(+s.n||0).trim()},
+ partir:{n:'Partir por un signo',d:{signo:' ',parte:'1'},run:(s,v)=>{if(!s.signo)return v;const t=String(v).split(s.signo);return (s.parte==='u'?t[t.length-1]:t[+s.parte-1])||''}},
+ letras:{n:'Mayúsculas o minúsculas',d:{modo:'mayus'},run:(s,v)=>{const t=String(v);return s.modo==='mayus'?t.toUpperCase():s.modo==='minus'?t.toLowerCase():t.toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase())}},
+ fechaSuma:{n:'Sumar a una fecha',d:{cant:10,uni:'habiles'},run:(s,v)=>{const d=leeF(v);if(!d)return v;let c=+s.cant||0;
+   if(s.uni==='dias')d.setDate(d.getDate()+c);else if(s.uni==='meses')d.setMonth(d.getMonth()+c);else{const i=c<0?-1:1;c=Math.abs(c);while(c>0){d.setDate(d.getDate()+i);if(d.getDay()!==0&&d.getDay()!==6)c--}}return escF(d)}},
+ fechaFormato:{n:'Escribir una fecha de otra forma',d:{f:'larga'},run:(s,v)=>{const d=leeF(v);if(!d)return v;return {larga:d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear(),dia:DIAS[d.getDay()],mes:MESES[d.getMonth()],anio:String(d.getFullYear()),edad:String(edad(d))}[s.f]}},
+ cuenta:{n:'Hacer una cuenta',d:{oper:'+',modo:'num',num:1,campo:''},run:(s,v,p)=>{const a=leeN(v),b=s.modo==='num'?leeN(s.num):leeN(otro(s.campo,p));if(a===null||b===null)return v;if(s.oper==='/'&&b===0)return v;return escN({'+':a+b,'-':a-b,'*':a*b,'/':a/b}[s.oper])}},
+ enLetra:{n:'Escribir un número en letra',d:{},run:(s,v)=>enLetra(v)}
+};
+function edad(d){const h=leeF(hoy);let e=h.getFullYear()-d.getFullYear();if(h.getMonth()<d.getMonth()||(h.getMonth()===d.getMonth()&&h.getDate()<d.getDate()))e--;return e}
+function por(id){return C.find(f=>f.id===id)}
+function porN(n){return C.find(f=>f.nombre===n)}
+function valor(f,p){if(f.receta)return aplicar(f.receta,p).fin;return f.val(p)||''}
+function aplicar(r,p){const b=por(r.desde);let v=b?valor(b,p):'';const pasos=[v];r.pasos.forEach(s=>{v=OPS[s.op].run(s,v,p);pasos.push(v)});return{fin:v,pasos}}
+function nuevoPaso(op){return Object.assign({op},JSON.parse(JSON.stringify(OPS[op].d)))}
+/* calculados de partida */
+function calc(nombre,desde,pasos,extra){const f=campo(nombre,'Persona','Calculado',()=>'',Object.assign({receta:{desde:porN(desde).id,pasos:pasos.map(s=>{const o=Object.assign(nuevoPaso(s.op),s);if(o.campoN){o.campo=porN(o.campoN).id;delete o.campoN}return o})}},extra||{}));C.push(f);return f}
+calc('Curso','Unidad',[{op:'quitarFin',n:1}],pc({grupo:'Persona',usos:['Anexo I'],tipos:['baja']}));
+calc('Don o doña','Sexo',[{op:'equiv',filas:[{de:'Mujer',a:'doña'},{de:'Hombre',a:'don'}]}],pc({usos:['Resolución de baja'],tipos:['baja']}));
+calc('Nombre con tratamiento','Don o doña',[{op:'juntar',campoN:'Nombre completo',sep:' ',lado:'final'}],pc({usos:['Resolución de baja'],tipos:['baja','aut']}));
+calc('Fecha de alegaciones','Fecha del asunto',[{op:'fechaSuma',cant:10,uni:'habiles'},{op:'fechaFormato',f:'larga'}],{grupo:'Asunto',usos:['Resolución de baja'],tipos:['baja']});
+calc('Edad','Fecha de nacimiento',[{op:'fechaFormato',f:'edad'}],pc({usos:['Anexo I'],tipos:['baja']}));
+
+/* ---------- estado ---------- */
+const E={tab:'lista',persona:'marta',g:'',o:'',q:'',sel:null,nuevoManual:null,
+ tipo:'baja',texto:'{{Localidad}}, a {{Fecha de alegaciones}}\n\nEn relación con el alumno o alumna {{Nombre con tratamiento}}, de {{Curso}}, que se traslada a {{País de destino}}, se resuelve conceder la baja.\n\nFdo.: {{Quien firma}}\n{{Cargo de quien firma}}',
+ ed:null,trasGuardar:null,pk:null};
+function nuevoEd(){return{id:null,nombre:'',grupo:'Asunto',desde:porN('Nombre completo').id,pasos:[]}}
+function edDe(f){return{id:f.id,nombre:f.nombre,grupo:f.grupo,desde:f.receta.desde,pasos:JSON.parse(JSON.stringify(f.receta.pasos))}}
+E.ed={id:null,nombre:'',grupo:'Persona',desde:porN('Nombre de pila').id,pasos:[nuevoPaso('letras')]};
+E.ed=Object.assign(E.ed,{nombre:'Nombre en mayúsculas'});
+const P=()=>PERSONAS[E.persona];
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function etq(f){const c=f.origen==='Manual'?' manual':f.origen==='Calculado'?' calc':'';return '<span class="etq'+c+'">'+esc(f.origen)+'</span>'}
+function usosDe(f){const u=f.usos.slice();C.forEach(o=>{if(o.receta&&o!==f&&depende(o,f.id))u.push('Campo «'+o.nombre+'»')});return u}
+function depende(o,id){const r=o.receta;if(r.desde===id)return true;return r.pasos.some(s=>s.campo===id)}
+function ej(f,p){const v=valor(f,p||P());return v?esc(v):'<span class="vacio">sin dato</span>'}
+let tFlot;function aviso(t){const n=$('flot');n.textContent=t;n.hidden=false;clearTimeout(tFlot);tFlot=setTimeout(()=>{n.hidden=true},3200)}
+
+/* ---------- pintar ---------- */
+function pintar(){
+ document.querySelectorAll('.pestana').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===E.tab)));
+ ({lista:pintarLista,plantilla:pintarPlantilla,receta:pintarReceta,asunto:pintarAsunto})[E.tab]();
+ pintarCapa();
+}
+function filtrados(){const q=E.q.trim().toLowerCase();return C.filter(f=>(!E.g||f.grupo===E.g)&&(!E.o||f.origen===E.o||tablaDe(f).t===E.o)&&(!q||busca(f,q)))}
+function busca(f,q){return (f.nombre+' '+rutaT(f)).toLowerCase().includes(q)}
+function pintarLista(){
+ const origenes=[...new Set(C.map(f=>f.origen))],tablas=[...new Set(C.map(f=>tablaDe(f).t))].filter(t=>!origenes.includes(t)&&t!=='Se calcula'&&t!=='Se escribe a mano');
+ const fs=filtrados();
+ $('vista').innerHTML='<div class="dos"><div class="panel">'+
+  '<div class="en-linea"><input id="l-buscar" placeholder="Buscar por campo, tabla o columna" value="'+esc(E.q)+'" style="flex:1;min-width:170px;width:auto" aria-label="Buscar un campo">'+
+  '<select id="l-origen" style="width:auto" aria-label="De dónde sale"><option value="">De cualquier origen</option><optgroup label="Origen">'+origenes.map(o=>'<option'+(o===E.o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</optgroup><optgroup label="Tabla">'+tablas.map(o=>'<option'+(o===E.o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</optgroup></select>'+
+  '<button class="boton" data-acc="nuevo-manual">+ Campo manual</button><button class="boton principal" data-acc="nueva-receta">+ Crear a partir de otros</button></div>'+
+  '<div class="filtros"><button class="pastilla'+(E.g?'':' on')+'" data-g="">Todos ('+C.length+')</button>'+GRUPOS.map(g=>'<button class="pastilla'+(E.g===g?' on':'')+'" data-g="'+g+'">'+g+' ('+C.filter(f=>f.grupo===g).length+')</button>').join('')+'</div>'+
+  '<div class="tabla-caja"><table><thead><tr><th>Campo</th><th>Grupo</th><th>De dónde sale</th><th>Ejemplo</th><th>Dónde se pide</th><th class="num">Se usa en</th></tr></thead><tbody id="l-filas">'+
+  (fs.length?fs.map(f=>'<tr tabindex="0" data-f="'+f.id+'" class="'+(E.sel===f.id?'sel':'')+'"><td>'+esc(f.nombre)+'</td><td class="suave">'+esc(f.grupo)+'</td><td>'+etq(f)+'<div class="pequeno suave" style="margin-top:3px">'+esc(rutaT(f))+'</div></td><td>'+ej(f)+'</td><td class="suave pequeno">'+esc(dondeCorto(f))+'</td><td class="num">'+usosDe(f).length+'</td></tr>').join(''):'<tr><td colspan="6" class="vacio">Ningún campo con ese nombre.</td></tr>')+
+  '</tbody></table></div></div><div class="panel" id="detalle"></div></div>';
+ pintarDetalle();
+}
+function selectHtml(id,ops,val,lab){return (lab?'<label class="et" for="'+id+'">'+lab+'</label>':'')+'<select id="'+id+'">'+ops.map(o=>'<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>'}
+function dondeLista(f){const l=[];if(f.hito)l.push('Baja por traslado al extranjero: hito «'+f.hito+'»');(f.dondeExtra||[]).forEach(x=>l.push(x));return l}
+function dondeCorto(f){if(f.origen!=='Manual')return 'Sale solo';const n=dondeLista(f).length;return n?(n===1?'En 1 tipo':'En '+n+' tipos'):'Al usarlo'}
+function formManual(f){
+ return '<div>'+selectHtml('d-grupo',GRUPOS,f.grupo||'Asunto','Grupo')+'</div><div>'+selectHtml('d-clase',['Texto','Lista','Fecha','Importe','Número'],f.clase||'Texto','Clase de dato')+'</div>'+
+ ((f.clase==='Lista')?'<div><label class="et" for="d-opciones">Opciones, separadas por comas</label><input id="d-opciones" value="'+esc(f.opciones||'')+'"></div>':'')+
+ '<div><strong class="pequeno">Dónde se pide</strong>'+(dondeLista(f).length?'<ul class="lista-usos">'+dondeLista(f).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="pequeno suave" style="margin:4px 0 0">Se pide al usarlo, en la tarea que lo necesite.</p>')+'<p class="pequeno suave" style="margin:4px 0 0">No se decide aquí: se decide en cada tipo de asunto, desde el propio asunto o su guía.</p></div>';
+}
+function pintarDetalle(){
+ const c=$('detalle');if(!c)return;
+ if(E.nuevoManual){const f=E.nuevoManual;
+  c.innerHTML='<h2>Campo manual nuevo</h2><div><label class="et" for="d-nombre">Nombre</label><input id="d-nombre" value="'+esc(f.nombre)+'"></div>'+formManual(f)+
+  '<div id="d-error"></div><div class="en-linea"><button class="boton principal" data-acc="guardar-manual">Crear el campo</button><button class="boton" data-acc="cancelar-manual">Cancelar</button></div>';return}
+ const f=por(E.sel);
+ if(!f){c.innerHTML='<h2>Pulsa un campo de la lista</h2><p class="suave pequeno" style="margin:0">Aquí verás de dónde sale, cómo se rellena y qué plantillas lo usan.</p>';return}
+ const u=usosDe(f);
+ let h='<h2>'+esc(f.nombre)+'</h2><div class="en-linea">'+etq(f)+'<span class="suave pequeno">Grupo '+esc(f.grupo)+' · '+(f.clases[0]==='Todas'?'vale para todos':'vale para '+esc(f.clases.join(', ')))+'</span></div>';
+ h+=rutaHtml(f);
+ h+='<div class="sale"><span class="tit">Ejemplo con '+esc(P().t)+'</span>'+ej(f)+'</div>';
+ if(f.origen==='Manual')h+=formManual(f);
+ else if(f.receta)h+='<p class="pequeno" style="margin:0">'+esc(textoReceta(f))+'</p><div><button class="boton" data-acc="cambiar-receta">Cambiar cómo se calcula</button></div>';
+ else h+='<p class="pequeno suave" style="margin:0">'+({'Centro de datos':'Se actualiza solo al recibir el fichero.','El asunto':'Lo pone la app en cada asunto.','Ajustes del centro':'Se cambia en Ajustes, en «El centro».','Tabla de datos':'Viene de una tabla de datos.'}[f.origen])+'</p>';
+ h+='<div><strong class="pequeno">Se usa en</strong>'+(u.length?'<ul class="lista-usos">'+u.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="vacio pequeno" style="margin:4px 0 0">Todavía no se usa.</p>')+'</div>';
+ if(f.origen==='Manual'||f.origen==='Calculado')h+=u.length?'<p class="suave pequeno" style="margin:0">No se puede quitar mientras se use.</p>':'<div><button class="boton" data-acc="quitar">Quitar el campo</button></div>';
+ c.innerHTML=h;
+}
+function rutaHtml(f){const x=tablaDe(f);
+ if(f.origen==='Centro de datos'||f.origen==='Tabla de datos')return '<div class="pequeno"><strong>Origen:</strong> '+f.origen+' <span class="flecha">→</span> '+esc(x.t)+' <span class="flecha">→</span> columna «'+esc(x.c)+'»'+(f.origen==='Centro de datos'?'<div class="suave">Fichero recibido el 03/11/2026.</div>':'')+'</div>';
+ return ''}
+function textoReceta(f){const r=f.receta,b=por(r.desde);return 'Sale de «'+(b?b.nombre:'?')+'»'+(r.pasos.length?', con estos pasos: '+r.pasos.map(s=>OPS[s.op].n.toLowerCase()).join(', ')+'.':'.')}
+function pintarPlantilla(){
+ $('vista').innerHTML='<div class="mitad"><div class="panel"><h2>Plantilla de documento</h2>'+
+ '<div>'+'<label class="et" for="p-tipo">Tipo de asunto</label><select id="p-tipo">'+Object.keys(TIPOS).map(k=>'<option value="'+k+'"'+(k===E.tipo?' selected':'')+'>'+esc(TIPOS[k].n)+'</option>').join('')+'</select></div>'+
+ '<div class="insertar"><strong>Insertar</strong><button class="boton" data-acc="abrir-picker" id="b-campo">Campo variable</button><span class="pequeno suave">Se pone donde esté el cursor.</span></div>'+
+ '<textarea id="p-texto" rows="12" aria-label="Texto de la plantilla">'+esc(E.texto)+'</textarea></div>'+
+ '<div class="panel"><h2>Cómo saldría con '+esc(P().t)+'</h2><div class="hoja" id="p-hoja"></div></div></div>';
+ pintarHoja();
+}
+function pintarHoja(){
+ const h=$('p-hoja');if(!h)return;
+ h.innerHTML=esc(E.texto).replace(/\{\{(.+?)\}\}/g,(m,n)=>{const f=porN(n.replace(/&amp;/g,'&'));if(!f)return '<span class="falta">[no existe: '+n+']</span>';const v=valor(f,P());return v?esc(v):'<span class="falta">[falta: '+n+']</span>'});
+}
+function opcionesCampos(val,incluirVacio,txtVacio){
+ const ed=E.ed;let h=incluirVacio?'<option value="">'+esc(txtVacio)+'</option>':'';
+ GRUPOS.forEach(g=>{const fs=C.filter(f=>f.grupo===g&&f.id!==ed.id&&!(ed.id&&f.receta&&dependeRec(f,ed.id)));if(fs.length)h+='<optgroup label="'+g+'">'+fs.map(f=>'<option value="'+f.id+'"'+(f.id===val?' selected':'')+'>'+esc(f.nombre)+'</option>').join('')+'</optgroup>'});
+ return h}
+function dependeRec(f,id,visto){visto=visto||{};if(visto[f.id])return false;visto[f.id]=1;if(f.id===id)return true;if(!f.receta)return false;const ids=[f.receta.desde].concat(f.receta.pasos.map(s=>s.campo).filter(Boolean));return ids.some(i=>{const o=por(i);return o&&dependeRec(o,id,visto)})}
+function inp(i,k,v,lab,tipo){return '<div><label class="et" for="s'+i+'-'+k+'">'+lab+'</label><input id="s'+i+'-'+k+'" data-paso="'+i+'" data-k="'+k+'" type="'+(tipo||'text')+'" value="'+esc(v)+'"></div>'}
+function sel(i,k,v,lab,ops){return '<div><label class="et" for="s'+i+'-'+k+'">'+lab+'</label><select id="s'+i+'-'+k+'" data-paso="'+i+'" data-k="'+k+'" data-re="1">'+ops.map(o=>'<option value="'+o[0]+'"'+(o[0]===String(v)?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select></div>'}
+function selC(i,k,v,lab,vac){return '<div class="ancho"><label class="et" for="s'+i+'-'+k+'">'+lab+'</label><select id="s'+i+'-'+k+'" data-paso="'+i+'" data-k="'+k+'">'+opcionesCampos(v,true,vac||'Elige un campo')+'</select></div>'}
+function formPaso(s,i){switch(s.op){
+ case'juntar':return selC(i,'campo',s.campo,'Con qué campo')+inp(i,'sep',s.sep,'Entre los dos')+sel(i,'lado',s.lado,'Dónde va',[['final','Detrás'],['principio','Delante']]);
+ case'texto':return inp(i,'txt',s.txt,'Texto')+sel(i,'lado',s.lado,'Dónde va',[['principio','Delante'],['final','Detrás']]);
+ case'si':{const sinV=s.cond==='vacio'||s.cond==='lleno';return selC(i,'campo',s.campo,'Mirar el campo','El valor de arriba')+sel(i,'cond',s.cond,'Condición',[['igual','es igual a'],['distinto','es distinto de'],['contiene','contiene'],['empieza','empieza por'],['vacio','está vacío'],['lleno','tiene dato']])+(sinV?'':inp(i,'val',s.val,'Valor'))+inp(i,'ent',s.ent,'Entonces pone')+inp(i,'sino',s.sino,'Si no, pone')+'<p class="ancho pequeno suave" style="margin:0">Si dejas una casilla vacía, sigue el valor de arriba.</p>'}
+ case'vacio':return selC(i,'campo',s.campo,'Campo de reserva');
+ case'equiv':return '<div class="ancho equiv">'+s.filas.map((f,j)=>'<input aria-label="Si vale" placeholder="Si vale" data-paso="'+i+'" data-fila="'+j+'" data-c="de" value="'+esc(f.de)+'"><span class="flecha">→</span><input aria-label="Pone" placeholder="Pone" data-paso="'+i+'" data-fila="'+j+'" data-c="a" value="'+esc(f.a)+'"><button class="boton mini" data-acc="quitar-fila" data-paso="'+i+'" data-fila="'+j+'" aria-label="Quitar esta línea">×</button>').join('')+'</div><div class="ancho"><button class="boton mini" data-acc="anadir-fila" data-paso="'+i+'">+ Otra línea</button></div>';
+ case'quitarFin':case'quitarIni':return inp(i,'n',s.n,'Cuántos','number');
+ case'partir':return inp(i,'signo',s.signo,'Signo')+sel(i,'parte',s.parte,'Me quedo con',[['1','La primera parte'],['2','La segunda parte'],['3','La tercera parte'],['u','La última parte']]);
+ case'letras':return sel(i,'modo',s.modo,'Forma',[['mayus','TODO EN MAYÚSCULAS'],['minus','todo en minúsculas'],['cada','Cada Palabra Con Mayúscula']]);
+ case'fechaSuma':return inp(i,'cant',s.cant,'Cuánto','number')+sel(i,'uni',s.uni,'De qué',[['habiles','Días hábiles'],['dias','Días naturales'],['meses','Meses']]);
+ case'fechaFormato':return sel(i,'f',s.f,'Forma',[['larga','5 de noviembre de 2026'],['dia','Día de la semana'],['mes','Mes en letra'],['anio','Solo el año'],['edad','Edad a día de hoy']]);
+ case'cuenta':return sel(i,'oper',s.oper,'Cuenta',[['+','Sumar'],['-','Restar'],['*','Multiplicar por'],['/','Dividir entre']])+sel(i,'modo',s.modo,'Con',[['num','Una cifra'],['campo','Otro campo']])+(s.modo==='num'?inp(i,'num',s.num,'Cifra'):selC(i,'campo',s.campo,'Campo'));
+ default:return '<p class="pequeno suave" style="margin:0">Sin nada que rellenar.</p>'}}
+function salidaHtml(v,tit){return '<span class="tit">'+tit+'</span>'+(v===''?'<span class="vacio">vacío</span>':esc(v))}
+function pintarReceta(){
+ const ed=E.ed,grupos=[['Texto',['juntar','texto','quitarFin','quitarIni','partir','letras']],['Decidir',['si','vacio','equiv']],['Fechas',['fechaSuma','fechaFormato']],['Números',['cuenta','enLetra']]];
+ $('vista').innerHTML='<div class="dos"><div class="panel"><h2>'+(ed.id?'Cambiar el campo':'Campo nuevo a partir de otros')+'</h2>'+
+ '<div class="mitad"><div><label class="et" for="r-nombre">Nombre del campo</label><input id="r-nombre" value="'+esc(ed.nombre)+'"></div>'+
+ '<div><label class="et" for="r-desde">Parte de</label><select id="r-desde">'+opcionesCampos(ed.desde)+'</select></div></div>'+
+ '<div>'+selectHtml('r-grupo',GRUPOS,ed.grupo,'Grupo en el que sale')+'</div>'+
+ '<div id="r-pasos" style="display:flex;flex-direction:column;gap:8px">'+ed.pasos.map((s,i)=>'<div class="paso"><div class="paso-cab"><strong class="pequeno">Paso '+(i+1)+'. '+esc(OPS[s.op].n)+'</strong><span class="en-linea"><button class="boton mini" data-acc="subir" data-paso="'+i+'"'+(i?'':' disabled')+' aria-label="Subir el paso '+(i+1)+'">↑</button><button class="boton mini" data-acc="bajar" data-paso="'+i+'"'+(i<ed.pasos.length-1?'':' disabled')+' aria-label="Bajar el paso '+(i+1)+'">↓</button><button class="boton mini" data-acc="quitar-paso" data-paso="'+i+'">Quitar</button></span></div><div class="paso-datos">'+formPaso(s,i)+'</div><div class="sale" id="sale-'+i+'"></div></div>').join('')+'</div>'+
+ '<div class="en-linea"><label class="pequeno suave" for="r-op">Añadir un paso</label><select id="r-op" style="width:auto;flex:1;min-width:190px"><option value="">Elige qué hacer</option>'+grupos.map(g=>'<optgroup label="'+g[0]+'">'+g[1].map(k=>'<option value="'+k+'">'+esc(OPS[k].n)+'</option>').join('')+'</optgroup>').join('')+'</select></div>'+
+ '<div id="r-error"></div>'+
+ '<div class="en-linea"><button class="boton principal" data-acc="guardar-receta">'+(ed.id?'Guardar los cambios':'Crear el campo')+'</button><button class="boton" data-acc="limpiar-receta">Empezar otro</button></div></div>'+
+ '<div class="panel"><h2>Resultado</h2><div class="tabla-caja"><table class="sin-puntero"><thead><tr><th>Persona</th><th>Sale</th></tr></thead><tbody id="r-res"></tbody></table></div>'+
+ '<div id="r-vale"></div><strong class="pequeno">Probar con uno ya hecho</strong><div class="en-linea" id="r-muestras">'+C.filter(f=>f.receta).slice(0,6).map(f=>'<button class="pastilla" data-muestra="'+f.id+'">'+esc(f.nombre)+'</button>').join('')+'</div>'+
+ '<p class="pequeno suave" style="margin:0">Un campo creado aquí sale en la lista y se puede usar para crear otros.</p></div></div>';
+ actualizar();
+}
+function clasesDe(ed){const ids=[ed.desde].concat(ed.pasos.map(s=>s.campo).filter(Boolean));const out=new Set();ids.forEach(i=>{const f=por(i);if(f&&f.clases[0]!=='Todas')f.clases.forEach(c=>out.add(c))});return out.size?[...out]:['Todas']}
+function actualizar(){
+ const ed=E.ed,r=aplicar(ed,P());
+ ed.pasos.forEach((s,i)=>{const n=$('sale-'+i);if(n)n.innerHTML=salidaHtml(r.pasos[i+1],'Tras este paso, con '+esc(P().n))});
+ const t=$('r-res');if(t)t.innerHTML=Object.keys(PERSONAS).map(k=>{const v=aplicar(ed,PERSONAS[k]).fin;return '<tr><td>'+esc(PERSONAS[k].t)+'</td><td>'+(v?esc(v):'<span class="vacio">vacío</span>')+'</td></tr>'}).join('');
+ const c=$('r-vale');if(c){const cl=clasesDe(ed);c.innerHTML='<span class="pequeno suave">'+(cl[0]==='Todas'?'Vale para todos los tipos de persona.':'Vale para '+esc(cl.join(' y '))+', porque sale de sus datos.')+'</span>'}
+}
+/* ---------- en un asunto ---------- */
+const TT={generar:'Generar documento',firmar:'Firmar',registrar:'Registrar',comunicar:'Comunicar',anadir:'Añadir documento',pedir:'Pedir datos',libre:'Otra cosa'};
+const PL={res:{n:'Resolución de baja',c:['Nombre con tratamiento','Curso','País de destino','Protocolo de absentismo iniciado','Tutor con custodia','Fecha de alegaciones','Quien firma']},
+ an1:{n:'Anexo I',c:['Nombre completo','Fecha de nacimiento','Edad','Curso','País de destino']},
+ cor:{n:'Correo a la familia',c:['Primer tutor','Correo del primer tutor','Nombre completo','Nombre del centro']}};
+const ids=(...n)=>n.map(x=>porN(x).id);
+const AS={v:{},sel:1,abierta:'t2',antes:null,nueva:null,general:ids('Nombre completo','Unidad','Primer tutor'),sig:10,
+ hitos:[{t:'Recibir la solicitud',campos:[],tareas:[{id:'t1',tipo:'anadir',t:'Añadir la solicitud de la familia'}]},
+  {t:'Elaborar la resolución',campos:[],tareas:[{id:'t2',tipo:'generar',pl:'res',t:'Generar la resolución'},{id:'t3',tipo:'generar',pl:'an1',t:'Generar el Anexo I'}]},
+  {t:'Firma',campos:[],tareas:[{id:'t4',tipo:'firmar',t:'Firmar la resolución'}]},
+  {t:'Comunicar',campos:[],tareas:[{id:'t5',tipo:'registrar',t:'Registrar de salida'},{id:'t6',tipo:'comunicar',pl:'cor',t:'Enviar el correo a la familia'}]}]};
+function valA(f){const g=AS.v[f.id];if(g)return g;
+ if(f.nombre==='Tutor con custodia'){const p=P(),t=[p.t1,p.t2].filter(Boolean);return t.length===1?t[0]:''}
+ if(f.origen==='Manual')return '';return valor(f,P())}
+function opcionesDe(f){if(f.nombre==='Tutor con custodia'){return [P().t1,P().t2].filter(Boolean)}return f.clase==='Lista'&&f.opciones?f.opciones.split(',').map(x=>x.trim()):null}
+function controlA(f){const o=opcionesDe(f),v=AS.v[f.id]||'',l='aria-label="'+esc(f.nombre)+'" data-valor="'+f.id+'"';
+ if(o&&o.length)return '<select '+l+'><option value="">Elige</option>'+o.map(x=>'<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>';
+ return '<input '+l+' value="'+esc(v)+'" placeholder="Escríbelo aquí">'}
+function filaDato(f,conAntes){const v=valA(f);
+ if(v&&!AS.v[f.id])return '<div class="dato-a"><span>'+esc(f.nombre)+'</span><span>'+esc(v)+'</span></div>';
+ if(v)return '<div class="dato-a"><span>'+esc(f.nombre)+'</span><span>'+controlA(f)+'</span></div>';
+ return '<div class="dato-a ancho-a"><span>'+esc(f.nombre)+'</span><span>'+controlA(f)+'</span>'+(conAntes?'<button class="boton mini" data-acc="a-antes" data-c="'+f.id+'">Pedirlo antes</button>':'<span></span>')+'</div>'}
+function nombreSitio(d){return d.k==='general'?'la parte general':d.k==='tarea'?'la tarea':'el hito «'+AS.hitos[d.i].t+'»'}
+function ponerCampo(f,d){const l=d.k==='general'?AS.general:d.k==='tarea'?AS.hitos.flatMap(h=>h.tareas).find(x=>x.id===d.t).campos:AS.hitos[d.i].campos;if(!l.includes(f.id))l.push(f.id)}
+function etqT(t){return '<span class="etq'+(t.tipo==='pedir'?' manual':'')+'">'+esc(TT[t.tipo])+'</span>'}
+function htmlTarea(t){
+ const ab=AS.abierta===t.id;let c='';
+ if(ab&&t.pl){const p=PL[t.pl],fs=p.c.map(porN),falta=fs.filter(f=>!valA(f));
+  c='<div class="pequeno suave">Plantilla «'+esc(p.n)+'». '+(falta.length?'Falta'+(falta.length>1?'n ':' ')+falta.length+' de '+fs.length+' datos; el resto ya está.':'Ya están todos los datos.')+'</div>'+fs.map(f=>filaDato(f,true)).join('');
+  if(AS.antes&&AS.antes.t===t.id){const hs=AS.hitos.map((h,i)=>'<option value="'+i+'"'+(String(i)===AS.antes.donde?' selected':'')+'>Hito «'+esc(h.t)+'»</option>').join('');
+   c+='<div class="antes"><div><label class="et" for="a-donde">Pedir «'+esc(por(AS.antes.c).nombre)+'» en</label><select id="a-donde"><option value="general"'+(AS.antes.donde==='general'?' selected':'')+'>La parte general</option>'+hs+'</select></div><div><label class="et" for="a-alcance">Para</label><select id="a-alcance"><option value="guia">Este asunto y los siguientes (en la guía)</option><option value="aqui">Solo este asunto</option></select></div><div class="en-linea"><button class="boton principal mini" data-acc="a-aplicar">Aplicar</button><button class="boton mini" data-acc="a-cancelar">Cancelar</button></div></div>'}
+  c+='<div class="en-linea"><button class="boton principal" data-acc="a-hacer" data-t="'+t.id+'">'+(t.hecha?'Volver a ':'')+(t.tipo==='comunicar'?'Preparar el correo':'Generar')+'</button>'+(falta.length?'<span class="pequeno suave">Si sigues, lo que falta sale en amarillo.</span>':'')+'</div>'}
+ else if(ab&&t.tipo==='pedir'){c=(t.campos||[]).map(i=>filaDato(por(i),false)).join('')||'<p class="vacio pequeno" style="margin:0">Sin campos todavía.</p>';c+='<div><button class="boton mini" data-acc="a-campo-tarea" data-t="'+t.id+'">+ Añadir campo</button></div>'}
+ else if(ab)c='<div class="en-linea"><button class="boton" data-acc="a-hacer" data-t="'+t.id+'">'+(t.hecha?'Desmarcar':'Marcar como hecha')+'</button></div>';
+ return '<div class="tarea"><button class="tarea-cab" data-acc="a-abrir" data-t="'+t.id+'" aria-expanded="'+ab+'">'+etqT(t)+'<span class="'+(t.hecha?'hecha':'')+'">'+esc(t.t)+'</span>'+(t.solo?'<span class="suave pequeno">solo este asunto</span>':'')+(t.guia?'<span class="suave pequeno">también en la guía</span>':'')+'</button>'+c+'</div>'}
+function pintarAsunto(){
+ const h=AS.hitos[AS.sel],n=AS.nueva;
+ $('vista').innerHTML='<div class="cab-asunto"><h2>A26-0137 · Baja por traslado al extranjero</h2><span class="suave">'+esc(P().t)+', '+esc(P().u)+'</span></div>'+
+ '<div class="asunto"><div class="panel"><h2>Campos del asunto</h2><div>'+AS.general.map(i=>filaDato(por(i),false)).join('')+'</div><div><button class="boton mini" data-acc="a-campo-general">+ Añadir campo</button></div><p class="pequeno suave" style="margin:0">Aquí también van los datos que solo quieres tener a la vista.</p></div>'+
+ '<div class="panel"><div class="hitos">'+AS.hitos.map((x,i)=>'<button class="pastilla'+(i===AS.sel?' on':'')+'" data-hito="'+i+'">'+(i+1)+'. '+esc(x.t)+'</button>').join('')+'</div>'+
+ (h.campos.length?'<div><strong class="pequeno">Campos de este hito</strong>'+h.campos.map(i=>filaDato(por(i),false)).join('')+'</div>':'')+
+ h.tareas.map(htmlTarea).join('')+
+ (n?'<div class="antes"><div><label class="et" for="a-ntipo">Tipo de tarea</label><select id="a-ntipo">'+Object.keys(TT).map(k=>'<option value="'+k+'"'+(k===n.tipo?' selected':'')+'>'+esc(TT[k])+'</option>').join('')+'</select></div>'+
+  ((n.tipo==='generar'||n.tipo==='comunicar')?'<div><label class="et" for="a-nplant">Plantilla</label><select id="a-nplant">'+Object.keys(PL).map(k=>'<option value="'+k+'"'+(k===n.pl?' selected':'')+'>'+esc(PL[k].n)+'</option>').join('')+'</select></div>':'')+
+  '<div><label class="et" for="a-ntexto">Texto de la tarea</label><input id="a-ntexto" value="'+esc(n.t)+'"></div><div><label class="et" for="a-nalc">Para</label><select id="a-nalc"><option value="guia"'+(n.alcance==='guia'?' selected':'')+'>Este asunto y los siguientes (en la guía)</option><option value="aqui"'+(n.alcance==='aqui'?' selected':'')+'>Solo este asunto</option></select></div><div class="en-linea"><button class="boton principal mini" data-acc="a-ntarea-ok">Añadir</button><button class="boton mini" data-acc="a-ntarea-no">Cancelar</button></div><div id="a-nerr" class="ancho"></div></div>':
+  '<div class="en-linea"><button class="boton" data-acc="a-ntarea">+ Nueva tarea</button><button class="boton" data-acc="a-campo-hito">+ Añadir campo a este hito</button></div>')+'</div></div>';
+}
+function abrirPickerA(d){E.tipo='baja';E.dest=d;E.pk={g:'Asunto',q:'',modo:'lista',verOtros:false,foco:true};pintarCapa()}
+function accionAsunto(a,b){const d=b.dataset;
+ if(a==='a-abrir'){AS.abierta=AS.abierta===d.t?null:d.t;AS.antes=null;pintarAsunto();return true}
+ if(a==='a-campo-general'){abrirPickerA({k:'general'});return true}
+ if(a==='a-campo-hito'){abrirPickerA({k:'hito',i:AS.sel});return true}
+ if(a==='a-campo-tarea'){abrirPickerA({k:'tarea',t:d.t});return true}
+ if(a==='a-antes'){AS.antes={t:AS.abierta,c:d.c,donde:'general',alcance:'guia'};pintarAsunto();return true}
+ if(a==='a-cancelar'){AS.antes=null;pintarAsunto();return true}
+ if(a==='a-aplicar'){const x=AS.antes,f=por(x.c),dst=x.donde==='general'?{k:'general'}:{k:'hito',i:+x.donde};ponerCampo(f,dst);
+  if(x.alcance==='guia')(f.dondeExtra=f.dondeExtra||[]).push('Baja por traslado al extranjero: '+nombreSitio(dst));
+  AS.antes=null;pintarAsunto();aviso('«'+f.nombre+'» se pedirá en '+nombreSitio(dst)+(x.alcance==='guia'?', también en los siguientes asuntos.':', solo en este asunto.'));return true}
+ if(a==='a-hacer'){const t=AS.hitos.flatMap(h=>h.tareas).find(x=>x.id===d.t);if(t.pl){t.hecha=true;aviso((t.tipo==='comunicar'?'Correo preparado':'Documento generado')+' con los datos del asunto.')}else t.hecha=!t.hecha;pintarAsunto();return true}
+ if(a==='a-ntarea'){AS.nueva={tipo:'pedir',pl:'res',t:'',alcance:'guia'};pintarAsunto();return true}
+ if(a==='a-ntarea-no'){AS.nueva=null;pintarAsunto();return true}
+ if(a==='a-ntarea-ok'){const n=AS.nueva;if(!n.t.trim()){$('a-nerr').innerHTML='<div class="aviso aviso-ambar">Escribe el texto de la tarea.</div>';return true}
+  const t={id:'t'+(AS.sig++),tipo:n.tipo,t:n.t.trim()};if(n.tipo==='generar'||n.tipo==='comunicar')t.pl=n.pl;if(n.tipo==='pedir')t.campos=[];if(n.alcance==='guia')t.guia=true;else t.solo=true;
+  AS.hitos[AS.sel].tareas.push(t);AS.abierta=t.id;AS.nueva=null;pintarAsunto();return true}
+ return false}
+
+/* ---------- ventana de elegir ---------- */
+function clase(){return TIPOS[E.tipo].clase}
+function sirve(f){return f.clases[0]==='Todas'||f.clases.includes(clase())}
+function pintarCapa(){
+ const s=$('capa-sitio');
+ if(!E.pk){s.innerHTML='';return}
+ const pk=E.pk,q=pk.q.trim().toLowerCase();
+ const mas=C.filter(f=>f.tipos.includes(E.tipo)).sort((a,b)=>usosDe(b).length-usosDe(a).length).slice(0,6);
+ let centro='';
+ if(pk.modo==='nuevo'){
+  const f=pk.nuevo;
+  centro='<div class="panel" style="border:0;padding:4px"><h2>Campo manual nuevo</h2><div><label class="et" for="d-nombre">Nombre</label><input id="d-nombre" value="'+esc(f.nombre)+'"></div>'+formManual(f)+'<div id="d-error"></div><div class="en-linea"><button class="boton principal" data-acc="pk-crear-manual">Crear e insertar</button><button class="boton" data-acc="pk-volver">Volver</button></div></div>';
+ }else{
+  let lista=C.filter(f=>q?busca(f,q):f.grupo===pk.g);
+  const buenos=lista.filter(sirve),otros=lista.filter(f=>!sirve(f));
+  const fila=f=>'<button class="fila-campo" data-ins="'+f.id+'"><span>'+esc(f.nombre)+(q?' <span class="suave pequeno">· '+esc(f.grupo)+'</span>':'')+'</span><span class="ej suave pequeno">→ '+ej(f)+'</span><span class="etq'+(f.origen==='Manual'?' manual':f.receta?' calc':'')+'">'+esc(tablaDe(f).t)+'</span></button>';
+  centro=(buenos.map(fila).join('')||(otros.length?'':'<p class="vacio" style="margin:6px">'+(q?'Ningún campo con ese nombre. Puedes crearlo abajo.':'Este grupo no tiene campos.')+'</p>'))+
+   (otros.length?(pk.verOtros?'<p class="pequeno suave" style="margin:10px 6px 2px">Son de otra clase de persona: en este tipo pueden salir vacíos.</p>'+otros.map(fila).join(''):'<button class="boton mini" style="margin-top:8px" data-acc="pk-otros">Ver '+otros.length+' de otra clase de persona</button>'):'');
+ }
+ s.innerHTML='<div class="capa" id="capa"><div class="cuadro" role="dialog" aria-modal="true" aria-label="Elegir un campo"><div class="cuadro-cab">'+
+  '<div class="en-linea"><h2>Elegir un campo</h2><span class="suave pequeno">para '+esc(TIPOS[E.tipo].n)+'</span><button class="boton mini empuja" data-acc="pk-cerrar">Cerrar</button></div>'+
+  (pk.modo==='nuevo'?'':'<input id="pk-q" placeholder="Buscar por campo, tabla o columna" value="'+esc(pk.q)+'" aria-label="Buscar por campo, tabla o columna">'+
+  '<div class="en-linea"><span class="pequeno suave">Los más usados en este tipo:</span>'+(mas.map(f=>'<button class="pastilla" data-ins="'+f.id+'">'+esc(f.nombre)+'</button>').join('')||'<span class="vacio pequeno">todavía ninguno</span>')+'</div>')+
+  '</div><div class="cuadro-cuerpo"><div class="grupos">'+GRUPOS.map(g=>{const n=C.filter(f=>f.grupo===g&&sirve(f)).length;return '<button class="grupo'+(!q&&pk.g===g&&pk.modo!=='nuevo'?' on':'')+'" data-pkg="'+g+'"><span>'+g+'</span><span>'+n+'</span></button>'}).join('')+'</div>'+
+  '<div class="resultados">'+centro+'</div></div>'+
+  '<div class="cuadro-pie"><span class="pequeno suave">Ejemplos con '+esc(P().t)+'</span><span class="en-linea"><button class="boton" data-acc="pk-nuevo-manual">+ Campo manual nuevo</button><button class="boton" data-acc="pk-nueva-receta">+ Crear a partir de otros</button></span></div></div></div>';
+ const q2=$('pk-q');if(q2&&pk.foco){q2.focus();q2.setSelectionRange(q2.value.length,q2.value.length)}
+}
+function insertar(nombre){
+ if(E.dest){const f=porN(nombre),d=E.dest;E.dest=null;E.pk=null;E.tab='asunto';ponerCampo(f,d);pintar();aviso('«'+nombre+'» añadido a '+nombreSitio(d)+'.');return}
+ const t='{{'+nombre+'}}',c=E.cursor==null?E.texto.length:E.cursor;
+ E.texto=E.texto.slice(0,c)+t+E.texto.slice(c);E.cursor=c+t.length;E.pk=null;E.tab='plantilla';pintar();
+ const a=$('p-texto');if(a){a.focus();a.setSelectionRange(E.cursor,E.cursor)}
+ aviso('Insertado «'+nombre+'».');
+}
+function validarNombre(n,idActual){n=n.trim();if(!n)return 'Ponle un nombre.';if(C.some(f=>f.nombre.toLowerCase()===n.toLowerCase()&&f.id!==idActual))return 'Ya hay un campo con ese nombre.';return ''}
+function error(id,t){const n=$(id);if(n)n.innerHTML=t?'<div class="aviso aviso-ambar">'+esc(t)+'</div>':''}
+function campoManual(d){return campo(d.nombre.trim(),d.grupo||'Asunto','Manual',()=>'',{clase:d.clase,opciones:d.opciones,pide:d.pide,hito:d.pide==='En un hito'?(d.hito||HITOS[0]):''})}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('button,tr[data-f]');
+ if(ev.target.id==='capa'){E.pk=null;E.dest=null;pintarCapa();return}
+ if(!b)return;
+ const d=b.dataset;
+ if(d.tab){E.tab=d.tab;E.pk=null;E.dest=null;pintar();return}
+ if(d.hito!==undefined){AS.sel=+d.hito;AS.nueva=null;AS.antes=null;pintarAsunto();return}
+ if(d.f){E.sel=d.f;E.nuevoManual=null;pintarLista();return}
+ if(d.g!==undefined){E.g=d.g;pintarLista();return}
+ if(d.ins){insertar(por(d.ins).nombre);return}
+ if(d.pkg){E.pk.g=d.pkg;E.pk.q='';E.pk.modo='lista';E.pk.verOtros=false;E.pk.foco=false;pintarCapa();return}
+ if(d.muestra){const f=por(d.muestra);E.ed=edDe(f);pintarReceta();return}
+ const a=d.acc,i=d.paso===undefined?-1:+d.paso,ed=E.ed;
+ if(!a)return;
+ if(accionAsunto(a,b))return;
+ if(a==='nuevo-manual'){E.nuevoManual={nombre:'',grupo:'Asunto',clase:'Texto',opciones:'',pide:'Al generar el documento'};E.sel=null;pintarLista();$('d-nombre').focus()}
+ else if(a==='cancelar-manual'){E.nuevoManual=null;pintarLista()}
+ else if(a==='guardar-manual'){const e=validarNombre(E.nuevoManual.nombre);if(e)return error('d-error',e);const f=campoManual(E.nuevoManual);C.push(f);E.nuevoManual=null;E.sel=f.id;E.g='';pintarLista();aviso('Campo «'+f.nombre+'» creado.')}
+ else if(a==='nueva-receta'){E.ed=nuevoEd();E.trasGuardar=null;E.tab='receta';pintar()}
+ else if(a==='cambiar-receta'){const f=por(E.sel);E.ed=edDe(f);E.trasGuardar=null;E.tab='receta';pintar()}
+ else if(a==='quitar'){const f=por(E.sel);C.splice(C.indexOf(f),1);E.sel=null;pintarLista();aviso('Campo «'+f.nombre+'» quitado.')}
+ else if(a==='abrir-picker'){E.dest=null;E.pk={g:'Persona',q:'',modo:'lista',verOtros:false,foco:true};pintarCapa()}
+ else if(a==='pk-cerrar'){E.pk=null;E.dest=null;pintarCapa()}
+ else if(a==='pk-otros'){E.pk.verOtros=true;E.pk.foco=false;pintarCapa()}
+ else if(a==='pk-nuevo-manual'){E.pk.modo='nuevo';E.pk.nuevo={nombre:E.pk.q,grupo:'Asunto',clase:'Texto',opciones:'',pide:'Al generar el documento'};E.pk.foco=false;pintarCapa();$('d-nombre').focus()}
+ else if(a==='pk-volver'){E.pk.modo='lista';E.pk.foco=true;pintarCapa()}
+ else if(a==='pk-crear-manual'){const e=validarNombre(E.pk.nuevo.nombre);if(e)return error('d-error',e);const f=campoManual(E.pk.nuevo);f.tipos=[E.tipo];C.push(f);insertar(f.nombre)}
+ else if(a==='pk-nueva-receta'){E.ed=nuevoEd();E.ed.nombre=E.pk.q;E.trasGuardar='insertar';E.pk=null;E.tab='receta';pintar()}
+ else if(a==='subir'||a==='bajar'){const j=a==='subir'?i-1:i+1,s=ed.pasos;[s[i],s[j]]=[s[j],s[i]];pintarReceta()}
+ else if(a==='quitar-paso'){ed.pasos.splice(i,1);pintarReceta()}
+ else if(a==='anadir-fila'){ed.pasos[i].filas.push({de:'',a:''});pintarReceta()}
+ else if(a==='quitar-fila'){const fl=ed.pasos[i].filas;fl.splice(+d.fila,1);if(!fl.length)fl.push({de:'',a:''});pintarReceta()}
+ else if(a==='limpiar-receta'){E.ed=nuevoEd();E.trasGuardar=null;pintarReceta();$('r-nombre').focus()}
+ else if(a==='guardar-receta'){
+  const e=validarNombre(ed.nombre,ed.id);if(e)return error('r-error',e);
+  const falta=ed.pasos.find(s=>('campo' in s)&&!s.campo&&s.op!=='si'&&!(s.op==='cuenta'&&s.modo==='num'));
+  if(falta)return error('r-error','Falta elegir el campo en «'+OPS[falta.op].n+'».');
+  const rec={desde:ed.desde,pasos:JSON.parse(JSON.stringify(ed.pasos))};
+  let f;if(ed.id){f=por(ed.id);f.nombre=ed.nombre.trim();f.grupo=ed.grupo;f.receta=rec;f.clases=clasesDe(ed)}
+  else{f=campo(ed.nombre.trim(),ed.grupo,'Calculado',()=>'',{receta:rec,clases:clasesDe(ed),tipos:E.trasGuardar?[E.tipo]:[]});C.push(f)}
+  if(E.trasGuardar==='insertar'){E.trasGuardar=null;E.ed=edDe(f);insertar(f.nombre);return}
+  E.ed=edDe(f);E.sel=f.id;pintarReceta();aviso('Campo «'+f.nombre+'» guardado. Ya sale en la lista.');
+ }
+});
+document.addEventListener('input',ev=>{
+ const t=ev.target,d=t.dataset,ed=E.ed;
+ if(t.id==='a-ntexto'){AS.nueva.t=t.value;return}
+ if(t.id==='l-buscar'){E.q=t.value;const c=t.selectionStart;pintarLista();const n=$('l-buscar');n.focus();n.setSelectionRange(c,c)}
+ else if(t.id==='d-nombre'){(E.pk&&E.pk.modo==='nuevo'?E.pk.nuevo:E.nuevoManual).nombre=t.value}
+ else if(t.id==='d-opciones'){obj().opciones=t.value}
+ else if(t.id==='pk-q'){E.pk.q=t.value;E.pk.foco=true;pintarCapa()}
+ else if(t.id==='p-texto'){E.texto=t.value;E.cursor=t.selectionStart;pintarHoja()}
+ else if(t.id==='r-nombre'){ed.nombre=t.value}
+ else if(d.fila!==undefined&&t.tagName==='INPUT'){ed.pasos[+d.paso].filas[+d.fila][d.c]=t.value;actualizar()}
+ else if(d.k&&t.tagName==='INPUT'){ed.pasos[+d.paso][d.k]=t.value;actualizar()}
+});
+function obj(){if(E.pk&&E.pk.modo==='nuevo')return E.pk.nuevo;return E.nuevoManual||por(E.sel)}
+document.addEventListener('change',ev=>{
+ const t=ev.target,d=t.dataset,ed=E.ed;
+ if(d.valor){AS.v[d.valor]=t.value;pintarAsunto();return}
+ if(t.id==='a-donde'){AS.antes.donde=t.value;return}
+ if(t.id==='a-alcance'){AS.antes.alcance=t.value;return}
+ if(t.id==='a-ntipo'){AS.nueva.tipo=t.value;pintarAsunto();return}
+ if(t.id==='a-nplant'){AS.nueva.pl=t.value;return}
+ if(t.id==='a-nalc'){AS.nueva.alcance=t.value;return}
+ if(t.id==='persona'){E.persona=t.value;pintar()}
+ else if(t.id==='l-origen'){E.o=t.value;pintarLista()}
+ else if(t.id==='p-tipo'){E.tipo=t.value;pintarPlantilla()}
+ else if(t.id==='r-desde'){ed.desde=t.value;actualizar()}
+ else if(t.id==='r-grupo'){ed.grupo=t.value}
+ else if(t.id==='r-op'){if(t.value){ed.pasos.push(nuevoPaso(t.value));pintarReceta()}}
+ else if(t.id==='d-grupo'||t.id==='d-clase'||t.id==='d-pide'||t.id==='d-hito'){const o=obj();o[{'d-grupo':'grupo','d-clase':'clase','d-pide':'pide','d-hito':'hito'}[t.id]]=t.value;if(t.id==='d-pide'&&t.value==='En un hito'&&!o.hito)o.hito=HITOS[0];if(E.pk)pintarCapa();else pintarLista()}
+ else if(d.k&&t.tagName==='SELECT'){ed.pasos[+d.paso][d.k]=t.value;if(d.re)pintarReceta();else actualizar()}
+});
+document.addEventListener('keydown',ev=>{
+ if(ev.key==='Escape'&&E.pk){E.pk=null;E.dest=null;pintarCapa();return}
+ if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches&&ev.target.matches('tr[data-f]')){ev.preventDefault();ev.target.click()}
+});
+document.addEventListener('select',ev=>{if(ev.target.id==='p-texto')E.cursor=ev.target.selectionStart},true);
+document.addEventListener('click',ev=>{if(ev.target.id==='p-texto')E.cursor=ev.target.selectionStart});
+document.addEventListener('keyup',ev=>{if(ev.target.id==='p-texto')E.cursor=ev.target.selectionStart});
+$('persona').innerHTML=Object.keys(PERSONAS).map(k=>'<option value="'+k+'">'+esc(PERSONAS[k].t)+'</option>').join('');
+pintar();
+})();
+</script>
