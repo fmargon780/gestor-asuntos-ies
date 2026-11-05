@@ -73,6 +73,7 @@ var AjustesReparto = (function () {
     /* Herramientas → Puesta a punto y reparaciones */
     { id: 'bloque-plantillas-centro', donde: 'herramientas', otras: 'plantillas, Word, correo, preparar' },
     { id: 'bloque-cargar-biblioteca', donde: 'herramientas', otras: 'biblioteca, tipos, guías, tareas, cargar, instituto' },
+    { id: 'bloque-comunes-propuesta', donde: 'herramientas', otras: 'guías, tareas, hitos, listas comunes, propuesta, pasar' },   /* fila 531 */
     { id: 'bloque-fichas-archivo', donde: 'herramientas', otras: 'fichas, ARCHIVO, poner en orden' },
     { id: 'bloque-contacto-migracion', donde: 'herramientas', otras: 'contacto, teléfono, correo, abiertos' },
     { id: 'bloque-versiones-previas', donde: 'herramientas', otras: 'versiones, previas, Word, antiguas' },
