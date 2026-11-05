@@ -208,6 +208,7 @@ var GuiasGuion = (function () {
       base.normativa = normalizarNormativa(g && g.normativa);
       var receta = normalizarReceta(base.accion, g && g.receta);
       if (receta) base.receta = receta;
+      if (g && g.comun) base.comun = String(g.comun);   /* fila 531: viene de la lista común de tareas (js/comunes.js) */
       /* Fila 138: algo que hay que reunir. */
       if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {
         base.reunir = g.reunir;

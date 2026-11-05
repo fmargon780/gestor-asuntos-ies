@@ -1,0 +1,9 @@
+/* Fila 531: las ventanas de la lista común de tareas y de hitos (js/comunes-ventana*.js). Usan el aspecto de la ventana de elegir un campo. */
+.capa-campos .et { display: block; font-size: 13px; margin: 8px 0 2px; color: var(--suave, #5d6b7a); }
+.capa-campos .mitad { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.capa-campos .lista-usos { margin: 4px 0; padding-left: 18px; }
+.capa-campos .en-linea { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.comunes-propuesta h4 { margin: 12px 0 4px; }
+.comunes-propuesta ul { margin: 4px 0; padding-left: 18px; }
+.comunes-aviso-usos { margin: 6px 0; }
+@media (max-width: 640px) { .capa-campos .mitad { grid-template-columns: minmax(0, 1fr); } }

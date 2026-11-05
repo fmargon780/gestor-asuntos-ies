@@ -253,6 +253,19 @@ de `App` va después del fichero que lo define.
 | `js/campo-desde-el-asunto-escribir.js` | Fila 530: trozo de `campo-desde-el-asunto.js` (escribir en el asunto y en el tipo) |
 | `js/plantillas-documento-elegir.js` | Fila 530: trozo de `plantillas-documento.js` (elegir entre varias plantillas) |
 | `css/datos-del-asunto.css` | Fila 530: estilos de las listas de datos |
+| `js/comunes.js` | Fila 531: `Comunes`, la lógica de las listas comunes de tareas y de hitos (normalizar, parecidas, dónde se usa, línea o hito de la guía desde la lista, «Cambiar» en las guías, la propuesta de pasar las guías) |
+| `js/comunes-guardado.js` | Fila 531: `ComunesGuardado`, leer y guardar `_GESTOR/tareas-comunes.json` y `hitos-comunes.json` por `ColaGuardado`/`Copias.guardar`; dejar los otros asuntos abiertos como estaban y reescribir las guías sin repartir |
+| `js/comunes-ventana.js` | Fila 531: `ComunesVentana`, la ventana «Elegir una tarea / un hito» con buscador, grupos, «Para» y usos |
+| `js/comunes-ventana-nuevo.js` | Fila 531: el formulario de crear una tarea o un hito nuevos dentro de esa ventana (parecidas, plantilla nueva con el editor de siempre) |
+| `js/comunes-cambiar.js` | Fila 531: `ComunesCambiar`, «Cambiar la tarea» y «Cambiar el hito» con el aviso de en qué tipos se usa |
+| `js/comunes-asunto.js` | Fila 531: `ComunesAsunto`, «+ Añadir tarea» y «+ Añadir hito» desde un asunto (para la guía o solo este asunto) |
+| `js/comunes-guia.js` | Fila 531: `ComunesGuia`, las listas comunes dentro del editor de la guía |
+| `js/comunes-propuesta.js` | Fila 531: Ajustes → Mantenimiento → «Pasar las guías a las listas comunes» (solo la propuesta; aplicarla es la fila 532) |
+| `js/guias-editor-plazo.js` | Fila 531: trozo de `js/guias-editor.js` (responsable, a quién le toca y plazo de cada hito; aviso de «Guardar» con días sin «desde») |
+| `js/guias-editor-abrir.js` | Fila 531: trozo de `js/guias-editor.js` (mapa, ir a un hito, abrir una tarea y las listas comunes al abrir el editor) |
+| `css/comunes.css` | Fila 531: estilos de las ventanas de las listas comunes |
+| `pruebas/comunes.mjs` | Prueba fila 531 (lógica, con `vm`) |
+| `pruebas/comunes-ventanas.mjs` | Prueba fila 531 (navegador, copia de pruebas) |
 | `pruebas/datos-del-asunto.mjs` | Prueba fila 530 (navegador, copia de pruebas) |
 | `pruebas/campo-desde-el-asunto.mjs` | Prueba (navegador de verdad, fila 245): los 10 puntos de «Cómo sabemos que está bien» |
 | `js/donde-se-guarda-tareas.js` | Nueva, cambiar, pasar y borrar una tarea desde la mesa (`DondeSeGuardaTareas`, fila 235; sin pregunta desde la fila 416): «Nueva tarea…» solo en este asunto, «Cambiar»/«Borrar» de la guía a la guía, «Pasar a la guía» (o el hito propio entero), con «Deshacer» |

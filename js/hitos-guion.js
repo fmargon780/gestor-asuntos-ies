@@ -108,7 +108,7 @@
 
     function linea(g, propio, deOpcion) {
       var x = Object.assign({}, g, estado[g.id] || {});
-      return { id: g.id, texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
+      var salida = { id: g.id, texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
                normativa: x.normativa || null, propio: !!propio, hecho: !!x.hecho,
                noaplica: !!x.noaplica, quien: x.quien || '', cuando: x.cuando || '',
                pregunta: false, deOpcion: deOpcion || null,
@@ -117,6 +117,8 @@
                obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '',
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
                receta: g.receta || null };
+      if (g.comun && !propio) salida.comun = g.comun;   /* fila 531: viene de la lista común de tareas */
+      return salida;
     }
     /* La línea de la guía en su sitio: la propia (si «Cambiar aquí» la
        sustituyó), o la de siempre; null si un «Borrar» la escondió sin
