@@ -1,4 +1,4 @@
-# 514 — Detectar documentos firmados
+# 515 — Detectar documentos firmados
 
 ## Lo que escribió Francisco
 
@@ -62,7 +62,7 @@ y su texto en el punto 6.
 
 ## Pantalla de prueba (aprobada el 5-nov-2026)
 
-- `docs/pantallas/514.html` · https://claude.ai/artifact/4bc5QBXDRCaZqZTqK216eT
+- `docs/pantallas/515.html` · https://claude.ai/artifact/4bc5QBXDRCaZqZTqK216eT
 
 ## Qué NO se hace en esta tarea
 
@@ -107,7 +107,7 @@ y su texto en el punto 6.
 7. Punto 7: sale la pregunta; los dos botones hacen lo descrito; recargar con la pregunta sin
    contestar la deja en la ficha, sin marca.
 8. Sin cambios en: registrar a mano, «Ajustar tamaño» y comprimir con un PDF firmado, asuntos de grupo.
-9. La pantalla coincide con `docs/pantallas/514.html`.
+9. La pantalla coincide con `docs/pantallas/515.html`.
 10. **[SOLO FRANCISCO]** Con un PDF real firmado con AutoFirma, y otro firmado dentro de Séneca:
     que la app los reconozca y cuente bien las firmas. Claude no ha visto ninguno. Si lo firmado en
     Séneca no lleva firma interna, no se reconocerá; se copia a `docs/COMPROBAR-A-MANO.md`.
