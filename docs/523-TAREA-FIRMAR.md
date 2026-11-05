@@ -59,4 +59,16 @@ Segunda parte del tema. Necesita la fila 522 HECHA. Si algo cambia el texto de a
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Segundo revisor (5-nov-2026), una línea por punto:**
+  1. Coincide («Firmar un documento» y «Firmas necesarias» 1/2/3 en la guía y en «Nueva tarea…»).
+  2. Coincide (tarea marcada y « Marcado: …» en el aviso).
+  3. Coincide (firmado de otro documento: no se marca nada).
+  4. Coincide («Aún no se marca la tarea: falta 1 de 2 firmas.»; la segunda marca; etiqueta «Firmar · 2 firmas»).
+  5. Coincide hasta el sello («Esperando el PDF firmado», luego «Esperando el PDF sellado»); no ha visto «Enviar» (lo hace el flujo del sello, que no cambia).
+  6. Coincide (sin documento no se espera, queda pendiente).
+  7. Coincide en que no se cierra solo; no ha visto el resalte de «Marcar como hecho» (código de antes, no tocado).
+  8. Coincide.
+  9. Coincide con `516.html` en lo de esta fila; diferencia menor: la 516 enseña «(falta 1 de 2 firmas)» en la línea gris; la app lo dice en el aviso al llegar.
+  10. No lo ha podido ver ([SOLO FRANCISCO], copiado a `docs/COMPROBAR-A-MANO.md`).
+  - **Lo que hacía de más y se quitó**: la franja del visor «Documento listo. Ahora toca firmarlo…» con «Ruta» al generar antes de firmar. Se deja: la etiqueta «Firmar» también con 1 firma (como la 516), la coletilla «· esperando la firma» en Inicio y la ayuda del botón.
+- **Notas de Claude Code**: `hacer-este-hito.mjs` («1 listos para enviar») y `nuevo-asunto-categoria-guia.mjs` fallan igual en `main` sin este cambio. `editor-de-la-guia-tareas.mjs` se adaptó (ahora son seis opciones en «Qué se hace»). Pasada completa no repetida (ya hecha hoy). Un firmado con sello y firma a la vez no marca la tarea de firmar (el texto solo habla del firmado encima de su documento).

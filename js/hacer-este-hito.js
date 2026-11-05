@@ -141,7 +141,7 @@ var HacerEsteHito = (function () {
     if (!p) return { sigue: false };
     if (p.fueraDeUso) { Plantillas.avisoFueraDeUso(p.fueraDeUso); return { sigue: false }; }
     var guardado = false;
-    var paraRegistrar = !!(siguiente && (siguiente.accion === 'registrar' || siguiente.accion === 'firmar'));   /* fila 523: también antes de firmar */
+    var paraRegistrar = !!(siguiente && siguiente.accion === 'registrar');
     var res = await PlantillasDocumento.generar(a, p, 'abierto', {
       hito: h, idPasoGuion: g.id,
       alAbrirVisor: async function (nombre, abierto) {
@@ -157,14 +157,6 @@ var HacerEsteHito = (function () {
   async function pasoFirmar(a, h, g, documento) {
     var doc = documentoDe(h, g, documento);
     await guardarCadena(a, h, { estado: 'esperando-firma', tarea: g.id, documento: doc, quien: App.E.usuario || '', cuando: U.ahora() });
-    if (window.WordVisor && WordVisor.abierto()) {
-      var f = WordVisor.franja('Documento listo. Ahora toca firmarlo. Cuando guardes el PDF firmado en la carpeta del asunto (con «Ruta» pulsado), la aplicación sigue sola. ');
-      if (f && window.RutaCarpetas) {
-        var sitio = document.createElement('span');
-        f.appendChild(RutaCarpetas.boton(a, 'abierto', { enLinea: true, contenedor: sitio }));
-        f.appendChild(sitio);
-      }
-    }
     repintar();
     return { sigue: false };
   }
