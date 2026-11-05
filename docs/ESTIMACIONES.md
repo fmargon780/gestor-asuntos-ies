@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 5-nov-2026 (filas 528 a 531 PENDIENTES)
+Última puesta al día: 5-nov-2026 (filas 528 a 531 y 525 PENDIENTES)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -31,3 +31,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 529 | 120 | Editor por pasos y cálculo con pruebas, respetando los calculados de antes |
 | 530 | 180 | Toca Word, correo, Séneca, tareas y alta; acción nueva |
 | 531 | 240 | Ficheros nuevos, guías por referencia y propuesta de paso; la de más riesgo |
+| 525 | 40 | Un cambio en `valoresDeAsunto`, novedades, prueba y revisor |

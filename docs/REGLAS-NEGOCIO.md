@@ -40,6 +40,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (5-nov-2026, tema 518) **El grupo dice de qué trata el dato; el origen, cómo llega.** No hay grupos de calculados ni de manuales.
 - (5-nov-2026, tema 518) **Cuándo se pide un dato no se decide en el campo:** se decide «en ese momento y lugar donde tenemos la necesidad del campo», desde el asunto, para este asunto o para los siguientes.
 - (5-nov-2026, tema 518) **Un asunto es un solo hecho:** «Se hace un asunto por cada expulsión. Y esta es la norma general». Cada dato tiene un valor por asunto; lo escrito al generar se guarda en el asunto.
+- (5-nov-2026, idea 525) **El campo Grupo sale de la unidad del alumno** si el asunto no trae grupo propio; de baja, su última unidad. Aceptado por Francisco: «Adelante».
 - (5-nov-2026, tema 518) Un campo de la parte general para los siguientes asuntos **se elige si se pide al crear** o no (opción 2).
 - (5-nov-2026, tema 518) Las **tareas** salen de una lista común, o se crean ahí mismo con su plantilla. Una tarea es **una sola y cada guía la usa**: si se cambia, cambia en todas («1, claramente»), avisando antes.
 - (5-nov-2026, tema 518) Los **hitos** se comparten **enteros**, con sus tareas (opción 1). El plazo y el lugar en la guía son de cada guía. Los otros asuntos abiertos no cambian.
