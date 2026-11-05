@@ -424,7 +424,7 @@ function htmlTarea(t){
  else if(ab&&cat.pl){const p=PL[cat.pl],fs=p.c.map(porN),falta=fs.filter(f=>!valA(f));
   c='<div class="pequeno suave">Plantilla «'+esc(p.n)+'». '+(falta.length?'Falta'+(falta.length>1?'n ':' ')+falta.length+' de '+fs.length+' datos; el resto ya está.':'Ya están todos los datos.')+'</div>'+fs.map(f=>filaDato(f,true)).join('');
   if(AS.antes&&AS.antes.t===t.id){const hs=AS.hitos.map((h,i)=>'<option value="'+i+'"'+(String(i)===AS.antes.donde?' selected':'')+'>Hito «'+esc(ch(h.cat).n)+'»</option>').join('');
-   c+='<div class="antes"><div><label class="et" for="a-donde">Pedir «'+esc(por(AS.antes.c).nombre)+'» en</label><select id="a-donde"><option value="general"'+(AS.antes.donde==='general'?' selected':'')+'>La parte general</option>'+hs+'</select></div><div><label class="et" for="a-alcance">Para</label><select id="a-alcance"><option value="guia">Este asunto y los siguientes (en la guía)</option><option value="aqui">Solo este asunto</option></select></div><div class="en-linea"><button class="boton principal mini" data-acc="a-aplicar">Aplicar</button><button class="boton mini" data-acc="a-cancelar">Cancelar</button></div></div>'}
+   c+='<div class="antes"><div><label class="et" for="a-donde">Pedir «'+esc(por(AS.antes.c).nombre)+'» en</label><select id="a-donde"><option value="crear"'+(AS.antes.donde==='crear'?' selected':'')+'>Al crear el asunto</option><option value="general"'+(AS.antes.donde==='general'?' selected':'')+'>En la parte general, sin pedirlo al crear</option>'+hs+'</select></div><div><label class="et" for="a-alcance">Para</label><select id="a-alcance"><option value="guia">Este asunto y los siguientes (en la guía)</option><option value="aqui">Solo este asunto</option></select></div><div class="en-linea"><button class="boton principal mini" data-acc="a-aplicar">Aplicar</button><button class="boton mini" data-acc="a-cancelar">Cancelar</button></div></div>'}
   c+='<div class="en-linea"><button class="boton principal" data-acc="a-hacer" data-t="'+t.id+'">'+(t.hecha?'Volver a ':'')+(cat.tipo==='comunicar'?'Preparar el correo':'Generar')+'</button><button class="boton" data-acc="m-tarea" data-c="'+t.cat+'">Cambiar la tarea</button>'+(falta.length?'<span class="pequeno suave">Si sigues, lo que falta sale en amarillo.</span>':'')+'</div>'}
  else if(ab&&cat.tipo==='pedir'){t.campos=t.campos||[];c=(t.campos||[]).map(i=>filaDato(por(i),false)).join('')||'<p class="vacio pequeno" style="margin:0">Sin campos todavía.</p>';c+='<div><button class="boton mini" data-acc="a-campo-tarea" data-t="'+t.id+'">+ Añadir campo</button> <button class="boton mini" data-acc="m-tarea" data-c="'+t.cat+'">Cambiar la tarea</button></div>'}
  else if(ab)c='<div class="en-linea"><button class="boton" data-acc="a-hacer" data-t="'+t.id+'">'+(t.hecha?'Desmarcar':'Marcar como hecha')+'</button><button class="boton" data-acc="m-tarea" data-c="'+t.cat+'">Cambiar la tarea</button></div>';
@@ -440,7 +440,7 @@ function pintarAsunto(){
  h.tareas.map(htmlTarea).join('')+
  ('<div class="en-linea"><button class="boton" data-acc="a-ntarea">+ Añadir tarea</button><button class="boton" data-acc="a-campo-hito">+ Añadir campo a este hito</button></div>')+'</div></div>';
 }
-function abrirPickerA(d){E.tipo='baja';E.dest=d;E.pk={g:'Asunto',q:'',modo:'lista',verOtros:false,foco:true};pintarCapa()}
+function abrirPickerA(d){E.tipo='baja';E.dest=d;E.destAlc='aqui';E.pk={g:'Asunto',q:'',modo:'lista',verOtros:false,foco:true};pintarCapa()}
 function usadoPor(c){return c.tipos.length?(c.tipos.length===1?'1 tipo':c.tipos.length+' tipos'):'sin usar'}
 function pintarCat(s){const c=E.cat,tarea=c.k==='tarea',lista=tarea?CT:CH,q=norm(c.q);
  const fila=x=>'<button class="fila-campo" data-cat="'+x.id+'"><span>'+esc(x.n)+'</span><span class="ej suave pequeno">'+(tarea?(x.pl?'Plantilla «'+esc(PL[x.pl].n)+'»':''):esc(x.tareas.map(i=>ct(i).n).join(' · ')))+'</span><span class="suave pequeno">'+usadoPor(x)+'</span></button>';
@@ -481,11 +481,12 @@ function accionAsunto(a,b){const d=b.dataset;
  if(a==='a-campo-general'){abrirPickerA({k:'general'});return true}
  if(a==='a-campo-hito'){abrirPickerA({k:'hito',i:AS.sel});return true}
  if(a==='a-campo-tarea'){abrirPickerA({k:'tarea',t:d.t});return true}
- if(a==='a-antes'){AS.antes={t:AS.abierta,c:d.c,donde:'general',alcance:'guia'};pintarAsunto();return true}
+ if(a==='a-antes'){AS.antes={t:AS.abierta,c:d.c,donde:'crear',alcance:'guia'};pintarAsunto();return true}
  if(a==='a-cancelar'){AS.antes=null;pintarAsunto();return true}
- if(a==='a-aplicar'){const x=AS.antes,f=por(x.c),dst=x.donde==='general'?{k:'general'}:{k:'hito',i:+x.donde};ponerCampo(f,dst);
-  if(x.alcance==='guia')(f.dondeExtra=f.dondeExtra||[]).push('Baja por traslado al extranjero: '+nombreSitio(dst));
-  AS.antes=null;pintarAsunto();aviso('«'+f.nombre+'» se pedirá en '+nombreSitio(dst)+(x.alcance==='guia'?', también en los siguientes asuntos.':', solo en este asunto.'));return true}
+ if(a==='a-aplicar'){const x=AS.antes,f=por(x.c),gen=x.donde==='crear'||x.donde==='general',dst=gen?{k:'general'}:{k:'hito',i:+x.donde};ponerCampo(f,dst);
+  const sitio=x.donde==='crear'?'al crear el asunto':x.donde==='general'?'la parte general, sin pedirlo al crear':nombreSitio(dst);
+  if(x.alcance==='guia')(f.dondeExtra=f.dondeExtra||[]).push('Baja por traslado al extranjero: '+sitio);
+  AS.antes=null;pintarAsunto();aviso(x.alcance==='guia'?'«'+f.nombre+'»: '+sitio+', también en los siguientes asuntos.':'«'+f.nombre+'» sale en '+nombreSitio(dst)+', solo en este asunto.');return true}
  if(a==='m-tarea'){const c=ct(d.c);AS.cam={k:'tarea',cat:c.id,n:c.n,pl:c.pl};pintarAsunto();return true}
  if(a==='m-hito'){const c=ch(AS.hitos[AS.sel].cat);AS.cam={k:'hito',cat:c.id,n:c.n,exp:c.exp};pintarAsunto();return true}
  if(a==='m-cancelar'){AS.cam=null;pintarAsunto();return true}
@@ -521,11 +522,13 @@ function pintarCapa(){
   '<div class="en-linea"><span class="pequeno suave">Los más usados en este tipo:</span>'+(mas.map(f=>'<button class="pastilla" data-ins="'+f.id+'">'+esc(f.nombre)+'</button>').join('')||'<span class="vacio pequeno">todavía ninguno</span>')+'</div>')+
   '</div><div class="cuadro-cuerpo"><div class="grupos">'+GRUPOS.map(g=>{const n=C.filter(f=>f.grupo===g&&sirve(f)).length;return '<button class="grupo'+(!q&&pk.g===g&&pk.modo!=='nuevo'?' on':'')+'" data-pkg="'+g+'"><span>'+g+'</span><span>'+n+'</span></button>'}).join('')+'</div>'+
   '<div class="resultados">'+centro+'</div></div>'+
-  '<div class="cuadro-pie"><span class="pequeno suave">Ejemplos con '+esc(P().t)+'</span><span class="en-linea"><button class="boton" data-acc="pk-nuevo-manual">+ Campo manual nuevo</button><button class="boton" data-acc="pk-nueva-receta">+ Crear a partir de otros</button></span></div></div></div>';
+  '<div class="cuadro-pie">'+(E.dest&&E.dest.k!=='tarea'?'<span class="en-linea" style="flex:1;min-width:220px"><label class="pequeno suave" for="pk-alc">Para</label><select id="pk-alc" style="width:auto;flex:1"><option value="aqui"'+(E.destAlc==='aqui'?' selected':'')+'>Solo este asunto</option>'+(E.dest.k==='general'?'<option value="crear"'+(E.destAlc==='crear'?' selected':'')+'>Los siguientes: pedirlo al crear el asunto</option><option value="general"'+(E.destAlc==='general'?' selected':'')+'>Los siguientes: en la parte general, sin pedirlo al crear</option>':'<option value="guia"'+(E.destAlc==='guia'?' selected':'')+'>Los siguientes: pedirlo en este hito</option>')+'</select></span>':'<span class="pequeno suave">Ejemplos con '+esc(P().t)+'</span>')+'<span class="en-linea"><button class="boton" data-acc="pk-nuevo-manual">+ Campo manual nuevo</button><button class="boton" data-acc="pk-nueva-receta">+ Crear a partir de otros</button></span></div></div></div>';
  const q2=$('pk-q');if(q2&&pk.foco){q2.focus();q2.setSelectionRange(q2.value.length,q2.value.length)}
 }
 function insertar(nombre){
- if(E.dest){const f=porN(nombre),d=E.dest;E.dest=null;E.pk=null;E.tab='asunto';ponerCampo(f,d);pintar();aviso('«'+nombre+'» añadido a '+nombreSitio(d)+'.');return}
+ if(E.dest){const f=porN(nombre),d=E.dest,al=E.destAlc;E.dest=null;E.pk=null;E.tab='asunto';ponerCampo(f,d);
+  if(al&&al!=='aqui'){const si=al==='crear'?'al crear el asunto':al==='general'?'la parte general, sin pedirlo al crear':nombreSitio(d);(f.dondeExtra=f.dondeExtra||[]).push('Baja por traslado al extranjero: '+si)}
+  pintar();aviso('«'+nombre+'» añadido a '+nombreSitio(d)+(al&&al!=='aqui'?', también en los siguientes asuntos.':'.'));return}
  const t='{{'+nombre+'}}',c=E.cursor==null?E.texto.length:E.cursor;
  E.texto=E.texto.slice(0,c)+t+E.texto.slice(c);E.cursor=c+t.length;E.pk=null;E.tab='plantilla';pintar();
  const a=$('p-texto');if(a){a.focus();a.setSelectionRange(E.cursor,E.cursor)}
@@ -606,6 +609,7 @@ document.addEventListener('change',ev=>{
  if(t.id==='a-donde'){AS.antes.donde=t.value;return}
  if(t.id==='a-alcance'){AS.antes.alcance=t.value;return}
  if(t.id==='c-alc'){E.cat.alc=t.value;return}
+ if(t.id==='pk-alc'){E.destAlc=t.value;return}
  if(t.id==='n-tipo'){E.cat.nuevo.tipo=t.value;pintarCapa();return}
  if(t.id==='n-pl'){E.cat.nuevo.pl=t.value;pintarCapa();return}
  if(t.id==='n-at'){if(t.value){E.cat.nuevo.tareas.push(t.value);pintarCapa()}return}
