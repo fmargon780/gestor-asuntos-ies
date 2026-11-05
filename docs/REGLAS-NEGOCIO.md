@@ -118,3 +118,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 
 - (4-nov-2026, tema 504) Las filas DEVUELTA cuentan en «En cola». Llegan arriba, pero llevan flechas: Francisco decide el orden completo y puede poner una PENDIENTE delante («siempre podemos cambiar el orden de las filas en la cola con los botones»).
 - (4-nov-2026, tema 504) En la tabla de entrada, el número de devueltas va «en rojo y entre paréntesis» junto al de «En cola», con una leyenda abajo que lo explica.
+
+## Tamaño de los ficheros
+
+- (5-nov-2026, tema 534) No se parten todos los ficheros largos a la vez: se parten los 10 de más de 600 líneas y `js/hitos-guion.js`, en dos tareas; los demás de más de 400, cuando se toquen («Hagámoslo como tú propones»). Si al empezar la 536 hay otro de más de 600, se parte también («Añádela»).

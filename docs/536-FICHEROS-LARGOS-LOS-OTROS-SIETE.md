@@ -10,6 +10,7 @@ Tema 534: «Ficheros largos. Junta la idea 526: partir por temas todos los fiche
 - Nada cambia para quien usa la app: mismas pantallas, mismos textos, mismos datos, mismo comportamiento.
 - Esta segunda tarea parte `js/nucleo.js` (745 líneas), `js/tablon-compacto.js` (739), `js/etiquetas-pantalla.js` (716), `js/correo-cuadro.js` (693), `js/ayudas.js` (643), `js/nombres.js` (633) y `js/campos.js` (609).
 - Se hace después de la 535.
+- Si al empezar hay otro fichero de `js/` de más de 600 líneas, se parte también en esta tarea.
 
 ## Pantalla de prueba
 - Sin pantalla: no cambia nada de lo que se ve.
