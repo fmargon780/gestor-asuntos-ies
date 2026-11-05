@@ -200,6 +200,7 @@ var RegistroSellado = (function () {
       }
       if (nombreFinal !== nombrePdf) await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreFinal);
       if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
+      if (aPrevias && window.TareasConDocumento) await TareasConDocumento.versionConservada(asunto, nombreDocumentoOriginal, nombreConservado, nombreFinal);   /* fila 522 */
       await DocumentosDatos.anotar(asunto.nombre, previo.numero, {
         tipo: previo.tipo, fecha: previo.fecha,
         anadirRegistro: { ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero, codigo: codigo }
@@ -238,7 +239,7 @@ var RegistroSellado = (function () {
       var h = (hitos || []).filter(function (x) {
         return (x.documentos || []).some(function (n) { return n === original || n === nuevo; });
       })[0];
-      if (h) await Hitos.marcarGuionPorAccion(asunto, h.id, 'registrar');
+      if (h) await Hitos.marcarGuionPorAccion(asunto, h.id, 'registrar', nuevo);   /* fila 522: la tarea de ese documento */
     } catch (e) { /* no crítico: el documento ya está registrado */ }
   }
 
@@ -274,6 +275,7 @@ var RegistroSellado = (function () {
         try { await VersionesPrevias.mover(asunto.handle, nombreConservado); aPrevias = true; } catch (e3) { aPrevias = false; }
         await VersionesPrevias.ordenarTrasCambio(asunto.handle);
       }
+      if (aPrevias && window.TareasConDocumento) await TareasConDocumento.versionConservada(asunto, nombreDocumentoOriginal, nombreConservado, nombreNuevo);   /* fila 522 */
 
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
       var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';

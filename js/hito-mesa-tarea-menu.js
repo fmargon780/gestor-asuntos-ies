@@ -70,6 +70,10 @@ var HitoMesaTareaMenu = (function () {
       return '<div class="guion-tarea-editar">' +
         '<input class="campo guion-tarea-editar-texto" data-clave="tarea-editar-' + U.escapar(g.id) +
         '" value="' + U.escapar(g.texto) + '">' +
+        /* Fila 522: «Qué se hace» y su dato, como en la guía (una pregunta no los lleva). */
+        (!g.pregunta && window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML({ accion: g.accion, receta: g.receta }) +
+          '<div class="tcd-botones"><button type="button" class="boton boton-chico guion-tarea-editar-guardar">Guardar</button>' +
+          '<button type="button" class="enlace guion-tarea-editar-cancelar">Cancelar</button></div>' : '') +
         '<p class="nota">Intro guarda, Escape cancela.</p></div>';
     }
     if (st.anotando) {
@@ -112,8 +116,8 @@ var HitoMesaTareaMenu = (function () {
 
   /* Intro en la línea editada: abre «¿Dónde se guarda?». Si se cancela,
      la línea sigue en edición con lo escrito. */
-  function guardarTexto(a, h, g, texto) {
-    return DondeSeGuardaTareas.cambiar(a, h, g, texto).then(function (ok) {
+  function guardarTexto(a, h, g, texto, extras) {
+    return DondeSeGuardaTareas.cambiar(a, h, g, texto, extras).then(function (ok) {
       if (ok) delete estado[g.id];
     });
   }
@@ -164,11 +168,21 @@ var HitoMesaTareaMenu = (function () {
 
     var editar = el.querySelector('.guion-tarea-editar-texto');
     if (editar) {
+      var caja = el.querySelector('.guion-tarea-editar');
+      var conForma = !g.pregunta && window.TareasConDocumentoVista && caja.querySelector('.tcd-accion');
+      if (conForma) TareasConDocumentoVista.engancharFormulario(caja);
+      var guardarEditado = function () {
+        var texto = editar.value.trim();
+        if (texto) guardarTexto(a, h, g, texto, conForma ? TareasConDocumentoVista.leerFormulario(caja) : undefined);
+      };
+      var botonGuardar = caja.querySelector('.guion-tarea-editar-guardar');
+      if (botonGuardar) botonGuardar.onclick = guardarEditado;
+      var botonCancelar = caja.querySelector('.guion-tarea-editar-cancelar');
+      if (botonCancelar) botonCancelar.onclick = function () { e(g.id).editando = false; repintar(); };
       editar.onkeydown = function (ev) {
         if (ev.key === 'Enter') {
           ev.preventDefault();
-          var texto = editar.value.trim();
-          if (texto) guardarTexto(a, h, g, texto);
+          guardarEditado();
         } else if (ev.key === 'Escape') {
           ev.preventDefault();
           e(g.id).editando = false;

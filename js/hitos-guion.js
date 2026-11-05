@@ -198,7 +198,9 @@
      primer paso del guion sin marcar con esa `accion`. No crítico: si
      falla, la acción ya está hecha (ámbar). Devuelve el paso marcado, o
      null si no había ninguno. */
-  async function marcarGuionPorAccion(a, idHito, accion) {
+  /* Fila 522: `documento`, si se da, es el documento con el que ha pasado la acción: la tarea de registrar (o de firmar)
+     que se marca es la de ese documento (TareasConDocumento.elegirPaso). */
+  async function marcarGuionPorAccion(a, idHito, accion, documento) {
     /* `a` puede ser el asunto o solo su clave (el nombre de la carpeta). */
     if (typeof a === 'string') {
       var clave = a;
@@ -211,9 +213,11 @@
       var entrada = datos.porAsunto[a.nombre];
       var h = entrada && Hitos.buscar(entrada.hitos, idHito);
       if (!h) return null;
-      var paso = guionDe(a, h).filter(function (g) { return g.accion === accion && !g.hecho && !g.noaplica; })[0];
+      var candidatos = guionDe(a, h).filter(function (g) { return g.accion === accion && !g.hecho && !g.noaplica; });
+      var paso = window.TareasConDocumento ? TareasConDocumento.elegirPaso(h, candidatos, accion, documento) : candidatos[0];
       if (!paso) return null;
       await marcarGuion(a.nombre, idHito, paso.id, { hecho: true });
+      if (window.TareasConDocumento) await TareasConDocumento.alMarcar(a, h, paso, documento);
       if (window.HitosPanel) HitosPanel.programarRepintado();
       return paso;
     } catch (e) {
@@ -231,11 +235,29 @@
     });
   }
 
-  function anadirGuionPropio(clave, idHito, texto) {
+  /* Fila 522: «Qué se hace» de una tarea «solo aquí», limpio: { accion, receta } o null si no se ha dicho nada. */
+  function extrasDeTarea(extras) {
+    if (!extras || typeof extras !== 'object' || !('accion' in extras)) return null;
+    var accion = ACCIONES.indexOf(extras.accion) !== -1 ? extras.accion : '';
+    return { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, extras.receta) : null };
+  }
+
+  function ponerExtras(g, x) {
+    var e = extrasDeTarea(x);
+    if (!e) return g;
+    g.accion = e.accion;
+    if (e.receta) g.receta = e.receta; else delete g.receta;
+    return g;
+  }
+
+  /* `extras` (fila 522): { accion, receta } de «Qué se hace». Sin elegir, la tarea sale como siempre. */
+  function anadirGuionPropio(clave, idHito, texto, extras) {
     texto = String(texto || '').trim();
     if (!texto) return Promise.resolve(null);
     return editarHito(clave, idHito, function (h) {
-      h.guionPropio = (h.guionPropio || []).concat([{ id: U.nuevoId('gp'), texto: texto }]);
+      var g = ponerExtras({ id: U.nuevoId('gp'), texto: texto }, extras);
+      if (!g.accion) delete g.accion;
+      h.guionPropio = (h.guionPropio || []).concat([g]);
     });
   }
 
@@ -243,7 +265,7 @@
      línea tal como la da `guionDe` (con su hecho/noaplica/valor de
      antes): la sustituta nace ya con esa marca, y el original se
      esconde. */
-  function cambiarGuionAqui(clave, idHito, original, nuevoTexto) {
+  function cambiarGuionAqui(clave, idHito, original, nuevoTexto, extras) {
     var texto = String(nuevoTexto || '').trim();
     if (!texto || !original || !original.id) return Promise.resolve(null);
     return editarHito(clave, idHito, function (h) {
@@ -251,12 +273,13 @@
       if (ocultos.indexOf(original.id) === -1) ocultos = ocultos.concat([original.id]);
       h.guionOcultos = ocultos;
       var nuevoId = U.nuevoId('gp');
-      h.guionPropio = (h.guionPropio || []).concat([{
+      h.guionPropio = (h.guionPropio || []).concat([ponerExtras({
         id: nuevoId, texto: texto, enLugarDe: original.id,
         explicacion: original.explicacion || '', accion: original.accion || '',
         normativa: original.normativa || null, reunir: original.reunir || '',
         obligatorio: !!original.obligatorio, receta: original.receta || null
-      }]);
+      }, extras)]);
+      if (window.TareasConDocumento) TareasConDocumento.mover(h, original.id, nuevoId);   /* fila 522: el documento sigue a la tarea */
       h.guionHecho = h.guionHecho || {};
       if (original.hecho || original.noaplica || original.valor || original.documento) {
         h.guionHecho[nuevoId] = { hecho: original.hecho, noaplica: original.noaplica, quien: original.quien,
@@ -279,12 +302,12 @@
   }
 
   /* «Cambiar» de una tarea «solo aquí» (sustituta o no): solo el texto. */
-  function cambiarGuionPropioTexto(clave, idHito, idPropio, nuevoTexto) {
+  function cambiarGuionPropioTexto(clave, idHito, idPropio, nuevoTexto, extras) {
     var texto = String(nuevoTexto || '').trim();
     if (!texto) return Promise.resolve(null);
     return editarHito(clave, idHito, function (h) {
       h.guionPropio = (h.guionPropio || []).map(function (g) {
-        return g.id === idPropio ? Object.assign({}, g, { texto: texto }) : g;
+        return g.id === idPropio ? ponerExtras(Object.assign({}, g, { texto: texto }), extras) : g;
       });
     });
   }
@@ -296,6 +319,7 @@
     return editarHito(clave, idHito, function (h) {
       h.guionPropio = (h.guionPropio || []).filter(function (g) { return g.id !== idPropio; });
       if (h.guionHecho) delete h.guionHecho[idPropio];
+      if (window.TareasConDocumento) TareasConDocumento.mover(h, idPropio, '');   /* fila 522 */
     });
   }
 
@@ -318,6 +342,7 @@
       var estadoAntes = (h.guionHecho && h.guionHecho[idPropio]) || null;
       h.guionPropio = (h.guionPropio || []).filter(function (g) { return g.id !== idPropio; });
       if (h.guionHecho) delete h.guionHecho[idPropio];
+      if (window.TareasConDocumento) TareasConDocumento.mover(h, idPropio, idNuevo);   /* fila 522: el documento se queda en el asunto */
       if (estadoAntes && (estadoAntes.hecho || estadoAntes.noaplica || estadoAntes.valor || estadoAntes.documento)) {
         h.guionHecho = h.guionHecho || {};
         h.guionHecho[idNuevo] = estadoAntes;

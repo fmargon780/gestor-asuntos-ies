@@ -1,0 +1,18 @@
+/* Fila 522 (docs/522-TAREAS-CON-DOCUMENTO.md): el documento colgado de cada tarea y «Qué se hace» en la mesa del hito. */
+.tcd { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 2px 0 6px 26px; font-size: 14px; }
+.tcd-apagado { opacity: .65; }
+.tcd-ext { font-size: 11px; font-weight: 600; color: var(--tinta-suave); border: 1px solid var(--linea); border-radius: 4px; padding: 0 5px; }
+.tcd .tcd-abrir, .tcd .tcd-abrir-version { text-align: left; overflow-wrap: anywhere; font-size: 14px; }
+.tcd .tcd-falta { color: var(--tinta-suave); text-decoration: none; cursor: default; }
+.tcd .mesa-doc-datos { flex: 0 1 auto; margin: 0; }
+.tcd-saldra { font-size: 13px; color: var(--tinta-suave); }
+.tcd-selector { font-size: 13px; padding: 3px 6px; max-width: 100%; }
+.tcd-nueva { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.tcd-nueva .guion-nueva-tarea { flex: 1 1 100%; width: auto; min-width: 0; margin-top: 0; }
+.tcd-form { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; font-size: 13px; margin-top: 6px; }
+.tcd-form .dato { flex-direction: column; }
+.tcd-form .campo { width: auto; max-width: 100%; }
+.tcd-receta { display: contents; }
+.tcd-receta .guion-fila-linea { display: contents; }
+.tcd-botones { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+.guion-tarea-editar { max-width: none; }
