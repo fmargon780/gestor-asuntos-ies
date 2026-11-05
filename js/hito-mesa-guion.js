@@ -83,6 +83,8 @@ var HitoMesaGuion = (function () {
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
        la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
+    var etiquetaFirmar = (g.accion === 'firmar' && window.GuiasGuion)
+      ? '<span class="guion-tarea-clase">' + (GuiasGuion.firmasNecesarias(g) > 1 ? 'Firmar · ' + GuiasGuion.firmasNecesarias(g) + ' firmas' : 'Firmar') + '</span>' : '';   /* fila 523 */
     var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" data-ayuda-clave="solo-aqui-tarea">solo aquí</span>' : '';
     var botonesTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
     var debajoTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
@@ -92,7 +94,7 @@ var HitoMesaGuion = (function () {
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
         (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" data-ayuda-clave="plantilla-fuera-de-uso">plantilla fuera de uso</span>' : '') +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar + etiquetaPropia + '</label>' +
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +
       /* Fila 522: su documento colgado (js/tareas-con-documento-vista.js). */

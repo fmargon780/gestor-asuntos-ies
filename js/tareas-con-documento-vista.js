@@ -172,7 +172,7 @@ window.TareasConDocumentoVista = (function () {
     var sel = raiz && raiz.querySelector('.tcd-accion');
     var accion = sel ? sel.value : '';
     var leida = {};
-    [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido']]
+    [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
       .forEach(function (x) { var c = raiz && raiz.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
     return { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, leida) : null };
   }

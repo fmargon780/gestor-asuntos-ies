@@ -43,6 +43,7 @@
       return ['Comunicar', r.a ? textoDe(A_QUIEN, r.a) : '', r.via ? textoDe(VIAS, r.via).toLowerCase() : ''].filter(Boolean).join(' · ');
     }
     if (g.accion === 'generar') return 'Generar un documento';
+    if (g.accion === 'firmar') return 'Firmar un documento' + (GG.firmasNecesarias(g) > 1 ? ' · ' + GG.firmasNecesarias(g) + ' firmas' : '');
     if (g.accion === 'registrar') return 'Registrar un documento';
     if (g.accion === 'anadir') return 'Añadir un documento';
     return 'Sin acción';
@@ -165,7 +166,7 @@
     var receta = q('.guion-receta');
     if (receta) {
       var leida = {};
-      [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido']]
+      [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
         .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
       var limpia = normalizarReceta(base.accion, leida);
       if (limpia) base.receta = limpia;

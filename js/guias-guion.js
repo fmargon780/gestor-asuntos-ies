@@ -4,7 +4,7 @@
 
    El guion es lo que hay que hacer dentro del hito, paso a paso:
    `guion: [{ id, texto, explicacion, accion, normativa }]`. `accion` es
-   'generar' | 'registrar' | 'comunicar' | 'anadir' | '' (con ella, la
+   'generar' | 'firmar' | 'registrar' | 'comunicar' | 'anadir' | '' (con ella, la
    tarea se marca sola cuando la aplicación ve esa acción desde el hito,
    js/hitos-guion.js). `normativa`, la misma forma que la de un hito
    (`{ cita, bloque, clave, url }`), o null. Nunca en un hito-pregunta.
@@ -41,6 +41,7 @@ var GuiasGuion = (function () {
   var ACCIONES = [
     { valor: '', texto: 'Sin acción (se marca a mano)' },
     { valor: 'generar', texto: 'Generar un documento' },
+    { valor: 'firmar', texto: 'Firmar un documento' },
     { valor: 'registrar', texto: 'Registrar un documento' },
     { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir un documento' }
@@ -52,6 +53,8 @@ var GuiasGuion = (function () {
     { valor: 'relacionados', texto: 'Los relacionados' }, { valor: 'otro', texto: 'Otro' }
   ];
   var VIAS = [{ valor: '', texto: 'Correo o Séneca' }, { valor: 'correo', texto: 'Por correo' }, { valor: 'seneca', texto: 'Por Séneca' }];
+  /* Fila 523: las firmas que necesita la tarea de firmar (1 por defecto). */
+  var FIRMAS = [{ valor: '1', texto: '1' }, { valor: '2', texto: '2' }, { valor: '3', texto: '3' }];
   var SENTIDOS = [{ valor: '', texto: 'Entrada o salida' }, { valor: 'entrada', texto: 'Entrada' }, { valor: 'salida', texto: 'Salida' }];
 
   function valido(lista, v) { return lista.some(function (x) { return x.valor === v; }) ? v : ''; }
@@ -66,9 +69,18 @@ var GuiasGuion = (function () {
       out = { plantilla: String(r.plantilla || '') };
     } else if (accion === 'registrar') {
       out = { sentido: valido(SENTIDOS, String(r.sentido || '')) };
+    } else if (accion === 'firmar') {
+      var f = valido(FIRMAS, String(r.firmas || ''));
+      out = { firmas: f === '1' ? '' : f };   /* 1 es lo normal: no se guarda */
     }
     if (!out) return null;
     return Object.keys(out).some(function (k) { return out[k]; }) ? out : null;
+  }
+
+  /* Fila 523: cuántas firmas necesita una tarea de firmar (1, 2 o 3). */
+  function firmasNecesarias(g) {
+    var n = parseInt(g && g.receta && g.receta.firmas, 10);
+    return n >= 2 && n <= 3 ? n : 1;
   }
 
   function opcionesHTML(lista, actual) {
@@ -124,6 +136,10 @@ var GuiasGuion = (function () {
     if (g.accion === 'registrar') {
       return '<div class="guion-fila-linea guion-receta">' + titulo +
         conRotulo('Entrada o salida', '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select>', dentro) + '</div>';
+    }
+    if (g.accion === 'firmar') {
+      return '<div class="guion-fila-linea guion-receta">' + titulo +
+        conRotulo('Firmas necesarias', '<select class="campo guion-receta-firmas">' + opcionesHTML(FIRMAS, String(firmasNecesarias(g))) + '</select>', dentro) + '</div>';
     }
     return '';
   }
@@ -181,6 +197,6 @@ var GuiasGuion = (function () {
   }
 
   return { normalizar: normalizar, textoLegible: textoLegible, ACCIONES: ACCIONES,
-           normalizarReceta: normalizarReceta, A_QUIEN: A_QUIEN, VIAS: VIAS, recetaHTML: recetaHTML, nuevoId: nuevoId };
+           normalizarReceta: normalizarReceta, firmasNecesarias: firmasNecesarias, A_QUIEN: A_QUIEN, VIAS: VIAS, recetaHTML: recetaHTML, nuevoId: nuevoId };
 })();
 window.GuiasGuion = GuiasGuion;

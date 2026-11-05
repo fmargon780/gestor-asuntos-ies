@@ -62,7 +62,7 @@
 (function () {
   if (typeof window.Hitos === 'undefined') return;
 
-  var ACCIONES = ['generar', 'registrar', 'comunicar', 'anadir'];
+  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir'];   /* fila 523: firmar */
 
   function tipoDe(a) {
     return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
