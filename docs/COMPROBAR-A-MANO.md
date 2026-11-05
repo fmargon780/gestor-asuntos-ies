@@ -369,3 +369,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - Fila 501 (ficha de entrega de libros), [SOLO FRANCISCO]: con el listado de libros real ya en el Centro de datos, crea un asunto FICHA ENTREGA LIBROS de un alumno de 1º ESO, genera la ficha y compárala con el modelo del centro (título, tabla de libros, texto, firmas). Mira también el aspecto del Word en Word de verdad.
 
 - Fila 465 (parte C, 4-nov-2026) [SOLO FRANCISCO]: en la guía real de EXPULSIÓN DEL CENTRO, hito de comunicación a la familia y tutor, abre la tarea del correo, pulsa «Ver y cambiar el texto» y comprueba que sale «Notificación Sanción Tutor/a y Familia»; cambia una palabra, guarda y comprueba que vuelves a la misma tarea.
+
+- Fila 515 (documentos firmados, 5-nov-2026) [SOLO FRANCISCO]: con un PDF real firmado con AutoFirma y otro firmado dentro de Séneca, guárdalos encima de un documento tras pulsar «Ruta» y mira que la app los reconoce («Firmado» en la línea gris) y cuenta bien las firmas («Firmado (2)» si lleva dos). Claude no ha visto ninguno real. Si lo firmado en Séneca no lleva firma interna en el PDF, no se reconocerá.

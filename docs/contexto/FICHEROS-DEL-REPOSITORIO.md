@@ -213,6 +213,8 @@ de `App` va después del fichero que lo define.
 | `js/ficha-en-la-lista.js` | El nombre del asunto, en la tarjeta de la lista, abre la ficha; y la tarjeta se queda con lo justo (fila 133, sacado de `js/ficha-asunto.js`) |
 | `js/ficha-huella.js` | La ficha se repinta solo si algo ha cambiado (la huella), y se reengancha al releer la carpeta (fila 133, sacado de `js/ficha-asunto.js`) |
 | `js/ficha-sellos.js` | Un papel que ya trae el sello del registro, avisado arriba de la ficha (fila 133, sacado de `js/ficha-asunto.js`) |
+| `js/ficha-firmas.js` | Un firmado que llega con otro nombre y la pregunta «¿con cuál te quedas?», arriba de la ficha (fila 515) |
+| `js/documentos-firmados.js` | Contar firmas de un PDF, apuntarlas, nota y aviso verde (fila 515) |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
 | `js/novedades.js` | Fila 248: la lista `window.NOVEDADES` de «Qué hay de nuevo», solo datos. |
