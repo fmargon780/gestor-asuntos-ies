@@ -145,7 +145,7 @@ await comprobar('2. la línea del documento dice «Firmado»', linea(D1), 'Firma
 await pagina.evaluate((a) => FichaNucleo.pintarDocumentos(App.E.listaAbiertos.filter((x) => x.nombre === a)[0]), ASUNTO);
 await pagina.waitForFunction((d) => Array.from(document.querySelectorAll('.ficha-documento-fila')).some((f) => f.dataset.doc === d && f.querySelector('.doc-datos')), D1, { timeout: 5000 }).catch(() => {});
 await comprobar('2. se ve en la fila de la ficha', pagina.evaluate((d) => Array.from(document.querySelectorAll('.ficha-documento-fila')).filter((f) => f.dataset.doc === d).map((f) => (f.querySelector('.doc-datos') || {}).textContent)[0], D1), 'Firmado');
-await comprobar('2. la línea con la opción de la mesa del hito también la lleva', pagina.evaluate(([a, d]) => DocumentosDatos.linea(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], d, { soloCampos: true }), [ASUNTO, D1]), 'Firmado');
+await comprobar('2. la mesa del hito la pone entre la fecha y el registro', pagina.evaluate(([a, d]) => DocumentosDatos.marcaDe(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], d), [ASUNTO, D1]), 'Firmado');
 
 console.log('--- 3. una firma más ---');
 await pulsarRuta(D1);

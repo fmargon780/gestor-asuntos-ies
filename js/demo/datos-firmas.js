@@ -115,7 +115,7 @@
   }
 
   function poner() {
-    if (document.getElementById('demo-firmas')) return;
+    if (document.getElementById('demo-firmas') || !/(^|[?&])firmas=1(&|$)/.test(location.search)) return;   /* solo con `&firmas=1`: no tapa nada a las demás pruebas */
     var caja = document.createElement('div');
     caja.id = 'demo-firmas';
     var t = document.createElement('strong');

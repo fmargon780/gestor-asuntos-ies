@@ -124,9 +124,10 @@ var HitoMesaDocumentos = (function () {
   function datosDeLaLinea(a, nombre, falta) {
     var fecha = fechaDe(nombre);
     var campos = !falta && window.DocumentosDatos ? DocumentosDatos.linea(a, nombre, { soloCampos: true }) : '';
-    var texto = [fecha, codigoDe(nombre) || '—', campos].filter(Boolean).join(' · ');
+    var marca = !falta && window.DocumentosDatos ? DocumentosDatos.marcaDe(a, nombre) : '';   /* fila 515: «Firmado» delante del registro */
+    var texto = [fecha, marca, codigoDe(nombre) || '—', campos].filter(Boolean).join(' · ');
     return '<div class="doc-datos mesa-doc-datos" title="' + U.escapar(texto) + '"><span class="mesa-doc-fecha">' + U.escapar(fecha) + '</span>' +
-      (fecha ? ' · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
+      (fecha ? ' · ' : '') + (marca ? '<span class="mesa-doc-firmado">' + U.escapar(marca) + '</span> · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
       (campos ? ' · ' + U.escapar(campos) : '') + '</div>';
   }
 

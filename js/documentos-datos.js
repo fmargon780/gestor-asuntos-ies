@@ -143,13 +143,20 @@ var DocumentosDatos = (function () {
     return partes;
   }
 
+  /* Fila 515: la marca de un documento por su nombre de fichero (la mesa del hito la pone entre la fecha y el registro). */
+  function marcaDe(a, nombreFichero) {
+    var d = deFichero(a && a.ficha, nombreFichero);
+    if (!d && window.Numeros) d = porNumero(Numeros.delNombreDeDocumento(nombreFichero));
+    return marcaFirmado(d);
+  }
+
   function linea(a, nombreFichero, opciones) {
     var ficha = a && a.ficha;
     var d = deFichero(ficha, nombreFichero);
     if (!d && window.Numeros) d = porNumero(Numeros.delNombreDeDocumento(nombreFichero));
     var solo = !!(opciones && opciones.soloCampos);
     var partes = [];
-    if (d && marcaFirmado(d)) partes.push(marcaFirmado(d));   /* fila 515: también en la mesa del hito */
+    if (d && !solo && marcaFirmado(d)) partes.push(marcaFirmado(d));   /* fila 515 */
     if (d && !solo) (d.registros || []).forEach(function (r) { if (r.codigo) partes.push('Registro ' + r.codigo); });
     if (window.Candidaturas && Candidaturas.lista) {
       var cand = Candidaturas.lista(a).filter(function (c) { return (c.documentos || []).indexOf(nombreFichero) !== -1; })[0];
@@ -166,6 +173,6 @@ var DocumentosDatos = (function () {
     return t ? '<div class="doc-datos ' + (claseExtra || '') + '" title="' + U.escapar(t) + '">' + U.escapar(t) + '</div>' : '';
   }
 
-  return { de: de, anotar: anotar, registroDe: registroDe, enriquecer: enriquecer, deFichero: deFichero, resumen: resumen, marcaFirmado: marcaFirmado, linea: linea, lineaHTML: lineaHTML };
+  return { de: de, anotar: anotar, registroDe: registroDe, enriquecer: enriquecer, deFichero: deFichero, resumen: resumen, marcaFirmado: marcaFirmado, marcaDe: marcaDe, linea: linea, lineaHTML: lineaHTML };
 })();
 window.DocumentosDatos = DocumentosDatos;
