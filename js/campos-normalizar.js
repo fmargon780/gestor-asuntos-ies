@@ -63,7 +63,10 @@ var CamposNucleo = CamposNucleo || {};
     /* Fila 255: `hito` (opcional) es el `id` del paso de la guía al que pertenece el campo. */
     var hito = String((c && c.hito) || '');
     if (hito) salida.hito = hito;
-    salida.obligatorio = !!(c && c.obligatorio) && !hito;   /* un campo de un hito no se pide al crear */
+    /* Fila 530: `sinPedirAlCrear` (opcional): de la parte general, pero no se pide al crear el asunto. */
+    var sinPedir = !!(c && c.sinPedirAlCrear) && !hito;
+    if (sinPedir) salida.sinPedirAlCrear = true;
+    salida.obligatorio = !!(c && c.obligatorio) && !hito && !sinPedir;   /* un campo de un hito, o sin pedirlo al crear, no se pide al crear */
     salida.enNombre = !!(c && c.enNombre);
     return salida;
   }

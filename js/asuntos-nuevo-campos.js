@@ -69,8 +69,9 @@ App.pintarCamposDelTipo = function () {
   }
   /* Fila 255: los campos de un hito no se piden al crear (se rellenan cuando llega su
      hito); solo se guarda su valor de partida, si lo tiene (de fichero o calculado). */
-  var lista = todos.filter(function (c) { return !c.hito; });
-  App.E.nuevo.camposDeHito = todos.filter(function (c) { return c.hito; }).map(function (cfg) {
+  /* Fila 530: lo mismo con «sin pedirlo al crear» (`sinPedirAlCrear`): el campo es del asunto, pero no se pide aquí. */
+  var lista = todos.filter(function (c) { return !c.hito && !c.sinPedirAlCrear; });
+  App.E.nuevo.camposDeHito = todos.filter(function (c) { return c.hito || c.sinPedirAlCrear; }).map(function (cfg) {
     return { clave: Campos.claveDeCampo(cfg), nombre: Campos.nombreDeCampo(cfg, App.E.campos),
              valor: String(Campos.valorInicial(cfg, persona, App.E.campos) || '') };
   });

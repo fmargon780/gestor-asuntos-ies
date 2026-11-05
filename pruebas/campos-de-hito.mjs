@@ -27,6 +27,8 @@ const errores = [];
 pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
+/* Fila 530: «+ Añadir campo» abre ahora la ventana de elegir (pruebas/datos-del-asunto.mjs); esta prueba sigue con el panel de siempre. */
+await pagina.addInitScript(() => { Object.defineProperty(window, 'CampoElegirEnAsunto', { get() { return undefined; }, set() {}, configurable: true }); });
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 30000 });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto], #inicio-tabla-cuerpo .fila', { timeout: 20000 });

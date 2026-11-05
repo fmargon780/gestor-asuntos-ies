@@ -130,10 +130,9 @@ var SenecaCuadro = (function () {
 
     return desplegable +
       '<label class="etiqueta">Texto del mensaje</label>' +
-      (cuerpo.faltan.length
-        ? '<p class="aviso aviso-ambar" id="seneca-faltan-datos">Faltan datos: ' +
-          U.escapar(cuerpo.faltan.join(', ')) + '</p>'
-        : '') +
+      /* Fila 530: lo que falta se escribe aquí y se guarda en el asunto (js/datos-del-asunto-cuadro.js). */
+      (window.DatosDelAsuntoCuadro ? DatosDelAsuntoCuadro.html('seneca', a, cuerpo.faltan)
+        : (cuerpo.faltan.length ? '<p class="aviso aviso-ambar" id="seneca-faltan-datos">Faltan datos: ' + U.escapar(cuerpo.faltan.join(', ')) + '</p>' : '')) +
       '<textarea id="seneca-cuerpo-texto" class="campo" rows="14">' + U.escapar(cuerpo.texto) + '</textarea>';
   }
 
@@ -198,6 +197,7 @@ var SenecaCuadro = (function () {
     var desplegable = $('seneca-plantilla');
     if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
     PlantillaDeLoEscrito.engancharBotones(cfgPlantilla, a, function () { return plantillaElegida; });   /* fila 270 */
+    if (window.DatosDelAsuntoCuadro) DatosDelAsuntoCuadro.enganchar('seneca', a, function () { elegirPlantilla(a, plantillaElegida); });   /* fila 530 */
   }
 
   /* Igual que en js/correo-cuadro.js: la misma confirmación en línea si

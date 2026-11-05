@@ -151,7 +151,8 @@ window.CamposDeHito = (function () {
     if (!caja || !abierto || enConsulta()) return;
     var campos = camposDe(a, h);
     var anadir = caja.querySelector('.mesa-campo-hito-anadir');
-    if (anadir) anadir.onclick = function () { CampoDesdeElAsunto.abrir(a, hitoDestino(a, h)); };
+    /* Fila 530: la ventana de elegir un campo (js/campo-elegir-en-asunto.js). */
+    if (anadir) anadir.onclick = function () { if (window.CampoElegirEnAsunto) CampoElegirEnAsunto.abrir(a, hitoDestino(a, h)); else CampoDesdeElAsunto.abrir(a, hitoDestino(a, h)); };
     Array.prototype.forEach.call(caja.querySelectorAll('.mesa-campo-hito'), function (fila) {
       var f = campos.filter(function (x) { return x.clave === fila.dataset.clave; })[0];
       if (!f) return;

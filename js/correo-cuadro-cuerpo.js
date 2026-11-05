@@ -163,10 +163,9 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
 
     return desplegable +
       '<label class="etiqueta"' + (opciones.length ? '' : ' style="margin-top:0"') + '>Cuerpo</label>' +
-      (cuerpo.faltan.length
-        ? '<p class="aviso aviso-ambar" id="correo-faltan-datos">Faltan datos: ' +
-          U.escapar(cuerpo.faltan.join(', ')) + '</p>'
-        : '') +
+      /* Fila 530: lo que falta se escribe aquí y se guarda en el asunto (js/datos-del-asunto-cuadro.js). */
+      (window.DatosDelAsuntoCuadro ? DatosDelAsuntoCuadro.html('correo', a, cuerpo.faltan)
+        : (cuerpo.faltan.length ? '<p class="aviso aviso-ambar" id="correo-faltan-datos">Faltan datos: ' + U.escapar(cuerpo.faltan.join(', ')) + '</p>' : '')) +
       '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' + U.escapar(cuerpo.texto) + '</textarea>';
   }
 

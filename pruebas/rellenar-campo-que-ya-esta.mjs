@@ -39,6 +39,8 @@ await pagina.addInitScript(() => {
     FichaTarjetas.alEntrar = function (a) { FichaTarjetas.abrirAlEntrar('tramite'); return alEntrar(a); };
   });
 });
+/* Fila 530: «+ Añadir campo» abre ahora la ventana de elegir (pruebas/datos-del-asunto.mjs); esta prueba sigue con el panel de siempre. */
+await pagina.addInitScript(() => { Object.defineProperty(window, 'CampoElegirEnAsunto', { get() { return undefined; }, set() {}, configurable: true }); });
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');

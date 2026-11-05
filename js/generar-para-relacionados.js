@@ -174,7 +174,7 @@ var GenerarParaRelacionados = (function () {
     });
     var aMano = null;
     if (delAsunto.length && window.WordFaltan) {
-      var resp = await WordFaltan.preguntar(delAsunto);
+      var resp = await WordFaltan.preguntar(delAsunto, { asunto: a });   /* fila 530: lo escrito se guarda en el asunto */
       if (resp.accion === 'cancelar') { U.aviso('No se ha generado nada.', 'ambar'); return; }
       if (resp.accion === 'generar' && Object.keys(resp.aMano).length) aMano = resp.aMano;
     }

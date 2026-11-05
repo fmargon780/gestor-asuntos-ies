@@ -97,6 +97,8 @@ var HitoMesaGuion = (function () {
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar + etiquetaPropia + '</label>' +
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +
+      /* Fila 530: los datos de su plantilla (o los campos de «Pedir datos»), para escribir lo que falte (js/datos-de-la-tarea.js). */
+      (window.DatosDeLaTarea ? DatosDeLaTarea.marcoHTML(g) : '') +
       /* Fila 522: su documento colgado (js/tareas-con-documento-vista.js). */
       (window.TareasConDocumentoVista && ctx ? TareasConDocumentoVista.colgadoHTML(a, h, g, ctx) : '') +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
@@ -265,6 +267,8 @@ var HitoMesaGuion = (function () {
         HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto, hitos); });
       }
     });
+    /* Fila 530: los datos de cada tarea de generar, comunicar o «Pedir datos». */
+    if (window.DatosDeLaTarea) DatosDeLaTarea.pintar(caja, a, h, guion, siguiente, abierto, function () { pintar(fila, a, h, abierto, hitos); });
     /* Fila 522: lo colgado de cada tarea (abrir, «Ruta», «Elegir documento», «Cambiar»). */
     if (window.TareasConDocumentoVista) {
       TareasConDocumentoVista.enganchar(caja, a, h, hitos || [], abierto, function () { pintar(fila, a, h, abierto, hitos); });
