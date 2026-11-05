@@ -60,6 +60,13 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (27-oct-2026, tema 477) Lo que llega **ya registrado por la bandeja electrónica** sigue entrando
   por la carpeta y «Es un documento nuevo».
 
+## Documentos firmados
+
+- (5-nov-2026, tema 392) La app **reconoce la firma y cuenta las firmas**, sin comprobar si es válida ni quién firma. Un documento con dos pone «Firmado (2)» (Francisco eligió tratarlo en esta idea).
+- (5-nov-2026, tema 392) Un firmado guardado encima se reconoce **solo y avisa**, igual que un registrado; un firmado con otro nombre pregunta de qué documento es.
+- (5-nov-2026, tema 392) Si llega algo sin firma encima de un firmado, **la app pregunta** con qué se queda («No me convence este comportamiento»; eligió la opción 2): nunca se cambia un firmado sin que alguien lo diga.
+- (5-nov-2026, tema 392) Se hace en dos partes: primero reconocer la firma; la tarea «firmar» en las guías va aparte (idea 513).
+
 ## Nuevo asunto y altas de personas
 
 - (29-oct-2026, tema 486) En «Nuevo asunto», al elegir un tipo o una persona, el cursor salta solo al
