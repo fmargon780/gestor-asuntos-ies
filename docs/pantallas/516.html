@@ -1,7 +1,7 @@
 <title>Prueba tema 516</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: ficha de un asunto a todo el ancho; arriba, lo que pasa fuera de la app; debajo, la mesa del hito a la izquierda y documentos y notas a la derecha. */
+/* Layout: ficha de un asunto a todo el ancho; arriba, lo que pasa fuera de la app; debajo, el hito a la izquierda y la carpeta (o el documento abierto) a la derecha, como en la pestaña Trabajo. */
 :root{
   --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
   --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-tinta:#1e7a46;
@@ -41,7 +41,7 @@ h2{font-size:15px;margin:0 0 8px}
 .sello-fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:7px 10px;background:var(--papel);color:var(--tinta);max-width:100%}
 .suave{color:var(--tinta-suave)}
-.columnas{display:grid;grid-template-columns:2fr 1fr;gap:12px;align-items:start}
+.columnas{display:grid;grid-template-columns:3fr 2fr;gap:12px;align-items:start}
 .pila{display:flex;flex-direction:column;gap:12px;min-width:0}
 .doc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--linea)}
 .doc:first-of-type{border-top:0}
@@ -77,6 +77,20 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
 .cuadro ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
 .cuadro .pie{gap:8px;margin:0}
 .archivado{background:var(--verde);color:var(--verde-tinta);border-radius:8px;padding:10px 12px}
+
+.tarea-bloque{border-top:1px solid var(--linea);padding:3px 0}
+.tarea-bloque .tarea{border-top:0}
+.colgado{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:2px 0 6px 26px;font-size:14px}
+.colgado.apagado{opacity:.65}
+.abrir{font:inherit;font-size:14px;background:none;border:0;color:var(--azul);cursor:pointer;padding:0;text-align:left;overflow-wrap:anywhere}
+.abrir:hover{text-decoration:underline}
+.sin-doc{font-size:13px;color:var(--tinta-suave)}
+.colgado select{font-size:13px;padding:3px 6px}
+.visor-cab{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.folio{background:#fff;color:#1b2430;border:1px solid var(--linea);border-radius:4px;padding:20px 24px;min-height:300px;font-size:14px;line-height:1.5}
+.folio h3{margin:0 0 10px;font-size:15px;text-align:center}
+.folio .marca{margin-top:30px;border:1px dashed #8a97a5;border-radius:6px;padding:8px;color:#5d6b7a;font-size:13px}
+h2.sub{margin-top:10px}
 </style>
 <main>
   <div class="cab"><h1>261103 A26-0412 RECLAMACIÓN NOTAS Reyes Palma, Lucía</h1><span class="chip">Pantalla de prueba · datos inventados</span>
@@ -84,7 +98,7 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
 
   <section class="bloque fuera">
     <h2>Lo que pasa fuera de la app</h2>
-    <p id="pista">Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.</p>
+    <p id="pista"></p>
     <div class="simula">
       <button id="s-firmado" class="boton" disabled>Guardar encima el PDF firmado</button>
       <button id="s-sellado" class="boton" disabled>Guardar encima el PDF registrado en Séneca</button>
@@ -103,17 +117,13 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
         <div class="editor"><label for="accion">Tarea «Firmar la resolución» · Qué se hace
           <select id="accion">
             <option value="">Sin acción (se marca a mano)</option>
-            <option value="generar" disabled>Generar un documento</option>
             <option value="firmar" selected>Firmar un documento</option>
-            <option value="registrar" disabled>Registrar un documento</option>
-            <option value="comunicar" disabled>Comunicar</option>
-            <option value="anadir" disabled>Añadir un documento</option>
           </select></label>
           <span id="accion-ayuda" class="datos"></span></div>
       </section>
     </div>
     <div class="pila">
-      <section class="bloque"><h2>Documentos</h2><div id="docs"></div></section>
+      <section class="bloque" id="derecha"></section>
       <section class="bloque"><h2>Notas</h2><div id="notas"></div></section>
     </div>
   </div>
@@ -124,51 +134,93 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var HOY = '05/11/2026';
-  var RES = '261105 RESOLUCION D26-01240.pdf';
   var e;
+  var CLASE = { generar: 'Generar', firmar: 'Firmar', registrar: 'Registrar', comunicar: 'Comunicar' };
 
   function inicial() {
     e = {
       tareas: [
-        { id: 'g', texto: 'Generar la resolución', accion: 'generar' },
-        { id: 'f', texto: 'Firmar la resolución', accion: 'firmar' },
-        { id: 'r', texto: 'Registrar de salida la resolución', accion: 'registrar' },
-        { id: 'c', texto: 'Comunicar la resolución a la familia', accion: 'comunicar' }
+        { id: 'g', texto: 'Generar la resolución', accion: 'generar', doc: null },
+        { id: 'f', texto: 'Firmar la resolución', accion: 'firmar', doc: null },
+        { id: 'r', texto: 'Registrar de salida la resolución', accion: 'registrar', doc: null },
+        { id: 'c', texto: 'Comunicar la resolución a la familia', accion: 'comunicar', doc: null },
+        { id: 'i', texto: 'Firmar el informe del departamento', accion: 'firmar', doc: null }
       ],
       docs: [
-        { nombre: '261103 ALEGACIONES D26-01231.pdf', hito: 1, firmas: 0, registro: '', pendiente: true },
-        { nombre: '261104 INFORME DEPARTAMENTO D26-01236.pdf', hito: 2, firmas: 0, registro: '', pendiente: false }
+        { id: 'a', nombre: '261103 ALEGACIONES D26-01231.pdf', hito: 1, firmas: 0, registro: '', pendiente: true },
+        { id: 'n', nombre: '261104 INFORME DEPARTAMENTO D26-01236.pdf', hito: 2, firmas: 0, registro: '', pendiente: false }
       ],
-      notas: [], elegido: null, cadena: null, hitoHecho: false, verde: '', ambar: '', cuadro: null, archivado: false
+      notas: [], elegido: null, cadena: null, hitoHecho: false, verde: '', ambar: '', cuadro: null, archivado: false,
+      abierto: null, abiertaVersion: null, eligiendo: null
     };
     if ($('accion')) $('accion').value = 'firmar';
   }
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function tarea(id) { return e.tareas.filter(function (t) { return t.id === id; })[0]; }
+  function doc(id) { return e.docs.filter(function (d) { return d.id === id; })[0]; }
   function abierta(t) { return !t.hecha && !t.na; }
-  function resolucion() { return e.docs.filter(function (d) { return d.nombre === RES; })[0]; }
-  var CLASE = { generar: 'Generar', firmar: 'Firmar', registrar: 'Registrar', comunicar: 'Comunicar' };
+  function conDoc(t) { return t.accion === 'generar' || t.accion === 'firmar' || t.accion === 'registrar'; }
 
-  /* La siguiente parada de «Hacer este hito». */
   function avanzar() {
     if (!e.cadena) return;
-    var t = e.tareas.filter(function (x) { return abierta(x) && (x.accion === 'firmar' || x.accion === 'registrar' || x.accion === 'comunicar'); })[0];
+    var t = e.tareas.filter(function (x) {
+      return abierta(x) && (x.accion === 'comunicar' || ((x.accion === 'firmar' || x.accion === 'registrar') && x.doc));
+    })[0];
     e.cadena = !t ? null : t.accion === 'firmar' ? 'firma' : t.accion === 'registrar' ? 'sello' : 'enviar';
   }
 
   function faltaHito() {
-    var l = e.tareas.filter(function (t) { return abierta(t) && (t.accion === 'firmar' || t.accion === 'registrar'); }).map(function (t) {
-      var r = resolucion();
-      return r ? CLASE[t.accion] + ': ' + r.nombre : t.texto + ' (el documento aún no existe)';
+    var l = [], vistos = {};
+    e.tareas.forEach(function (t) {
+      if (!abierta(t) || (t.accion !== 'firmar' && t.accion !== 'registrar')) return;
+      if (t.doc) { l.push(CLASE[t.accion] + ': ' + doc(t.doc).nombre); if (t.accion === 'registrar') vistos[t.doc] = 1; }
+      else l.push(t.texto + ' (sin documento)');
     });
-    e.docs.forEach(function (d) { if (d.hito === 2 && d.pendiente && !d.registro) l.push('Registrar: ' + d.nombre); });
+    e.docs.forEach(function (d) { if (d.hito === 2 && d.pendiente && !d.registro && !vistos[d.id]) l.push('Registrar: ' + d.nombre); });
     return l;
   }
   function faltaAsunto() {
     var l = faltaHito();
     e.docs.forEach(function (d) { if (d.hito !== 2 && d.pendiente && !d.registro) l.push('Registrar: ' + d.nombre); });
     return l;
+  }
+
+  function datos(d) {
+    var p = [];
+    if (d.firmas) p.push('Firmado');
+    if (d.registro) p.push('Registro ' + d.registro);
+    return p.join(' · ');
+  }
+  function botonRuta(d) { return '<button class="boton mini" data-ruta="' + d.id + '">' + (e.elegido === d.id ? 'Ruta ✓' : 'Ruta') + '</button>'; }
+  function lineaDoc(d, conHito) {
+    var l = datos(d);
+    return '<span class="ext">PDF</span><button class="abrir" data-abrir="' + d.id + '">' + esc(d.nombre) + '</button>' +
+      (conHito ? '<span class="datos">Hito ' + d.hito + '</span>' : '') + botonRuta(d) +
+      (l ? '<span class="datos">' + esc(l) + '</span>' : '') +
+      (!d.registro && d.pendiente ? '<span class="sin-reg">Sin registrar</span>' : '');
+  }
+  function selector(t) {
+    return '<select data-sel="' + t.id + '" aria-label="Documento de la tarea"><option value="">Elige un documento…</option>' +
+      e.docs.map(function (d) { return '<option value="' + d.id + '"' + (t.doc === d.id ? ' selected' : '') + '>' + esc(d.nombre) + '</option>'; }).join('') + '</select>';
+  }
+  function colgado(t) {
+    if (!conDoc(t) || t.na) return '';
+    if (e.eligiendo === t.id) return '<div class="colgado">' + selector(t) + '<button class="enlace" data-cerrar="1">Cancelar</button></div>';
+    if (t.hecha && t.verNombre) {
+      return '<div class="colgado apagado"><span class="ext">PDF</span><button class="abrir" data-version="' + t.id + '">' + esc(t.verNombre) + '</button>' +
+        (t.verDatos ? '<span class="datos">' + esc(t.verDatos) + '</span>' : '') + '</div>';
+    }
+    if (t.doc) {
+      return '<div class="colgado' + (t.hecha ? ' apagado' : '') + '">' + lineaDoc(doc(t.doc), false) +
+        (t.hecha || t.accion === 'generar' ? '' : '<button class="enlace" data-elegir="' + t.id + '">Cambiar</button>') + '</div>';
+    }
+    if (t.accion === 'generar') return '';
+    if (t.hecha) return '';
+    if (t.id === 'f' || t.id === 'r') {
+      if (abierta(tarea('g'))) return '<div class="colgado"><span class="sin-doc">Saldrá aquí al generar la resolución.</span></div>';
+    }
+    return '<div class="colgado"><button class="enlace" data-elegir="' + t.id + '">Elegir documento</button></div>';
   }
 
   function pintarMesa() {
@@ -179,41 +231,49 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
     else if (e.cadena === 'firma') bot = '<button class="boton" disabled>Esperando el PDF firmado</button><button id="dejar" class="enlace">Dejar de esperar</button>';
     else if (e.cadena === 'sello') bot = '<button class="boton" disabled>Esperando el PDF sellado</button><button id="dejar" class="enlace">Dejar de esperar</button>';
     else if (e.cadena === 'enviar') bot = '<button id="enviar" class="boton boton-principal">Enviar</button>';
-    else if (e.tareas.some(function (t) { return abierta(t) && (t.accion === 'generar' || t.accion === 'comunicar'); })) bot = '<button id="hacer" class="boton boton-principal">Hacer este hito</button>';
-    if (!e.hitoHecho && e.cadena !== 'enviar' && resolucion() && abierta(tarea('c'))) bot += '<button id="comunicar" class="boton">Comunicar con la resolución adjunta</button>';
+    else if (abierta(tarea('g')) || abierta(tarea('c'))) bot = '<button id="hacer" class="boton boton-principal">Hacer este hito</button>';
+    var res = tarea('g').doc;
+    if (!e.hitoHecho && e.cadena !== 'enviar' && res && abierta(tarea('c'))) bot += '<button id="comunicar" class="boton">Comunicar con la resolución adjunta</button>';
     var partes = e.tareas.filter(abierta).map(function (t) {
-      return t.accion === 'generar' ? 'Genera «Resolución»' : t.accion === 'firmar' ? 'espera la firma' : t.accion === 'registrar' ? 'espera el registro en Séneca' : t.accion === 'comunicar' ? 'correo a la familia' : '';
+      return t.accion === 'generar' ? 'Genera «Resolución»' : t.id === 'f' && t.accion === 'firmar' ? 'espera la firma' : t.accion === 'registrar' ? 'espera el registro en Séneca' : t.accion === 'comunicar' ? 'correo a la familia' : '';
     }).filter(Boolean);
     var html = '<div class="tira"><span>✓ 1. Recibir la reclamación</span><span class="' + (e.hitoHecho ? '' : 'actual') + '">' + (e.hitoHecho ? '✓ ' : '') + '2. Resolver</span><span class="' + (e.hitoHecho ? 'actual' : '') + '">3. Cerrar</span></div>';
     html += '<div class="mesa-cab"><h2>2. Resolver</h2><div class="mesa-botones">' + bot +
       '<button id="marcar" class="boton' + (e.hitoHecho ? '' : ' boton-principal') + (completo ? ' resaltado' : '') + '">' + (e.hitoHecho ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button></div></div>';
     if (!e.cadena && !e.hitoHecho && partes.length) html += '<p class="linea-hacer">' + esc(partes.join(' → ')) + '</p>';
+    html += '<h2 class="sub">Tareas</h2>';
     html += e.tareas.map(function (t) {
-      return '<div class="tarea' + (t.hecha ? ' hecha' : '') + (t.na ? ' na' : '') + '"><label><input type="checkbox" data-t="' + t.id + '"' + (t.hecha ? ' checked' : '') + (t.na ? ' disabled' : '') + '>' +
+      return '<div class="tarea-bloque"><div class="tarea' + (t.hecha ? ' hecha' : '') + (t.na ? ' na' : '') + '"><label><input type="checkbox" data-t="' + t.id + '"' + (t.hecha ? ' checked' : '') + (t.na ? ' disabled' : '') + '>' +
         '<span class="tt">' + esc(t.texto) + '</span></label>' +
         (t.accion ? '<span class="clase">' + CLASE[t.accion] + '</span>' : '') +
-        '<button class="enlace" data-na="' + t.id + '">' + (t.na ? 'Sí aplica' : 'No aplica') + '</button></div>';
+        '<button class="enlace" data-na="' + t.id + '">' + (t.na ? 'Sí aplica' : 'No aplica') + '</button></div>' + colgado(t) + '</div>';
+    }).join('');
+    html += '<h2 class="sub">Documentos de este hito</h2>' + e.docs.filter(function (d) { return d.hito === 2; }).map(function (d) {
+      return '<div class="doc">' + lineaDoc(d, false) + '</div>';
     }).join('');
     $('mesa').innerHTML = html;
   }
 
-  function linea(d) {
-    var p = [];
-    if (d.firmas) p.push('Firmado');
-    if (d.registro) p.push('Registro ' + d.registro);
-    return p.join(' · ');
+  function pintarDerecha() {
+    var v = e.abiertaVersion && tarea(e.abiertaVersion);
+    if (v) {
+      $('derecha').innerHTML = '<div class="visor-cab"><button id="a-carpeta" class="boton mini">← Carpeta</button><span class="datos" style="overflow-wrap:anywhere">' + esc(v.verNombre) + '</span></div>' +
+        '<div class="folio"><h3>Versión anterior</h3><p>Así estaba el documento al terminar la tarea «' + esc(v.texto) + '». Se conserva en «_Previas».</p>' +
+        (v.verDatos ? '<div class="marca">' + esc(v.verDatos) + '</div>' : '') + '</div>';
+      return;
+    }
+    var d = e.abierto && doc(e.abierto);
+    if (d) {
+      $('derecha').innerHTML = '<div class="visor-cab"><button id="a-carpeta" class="boton mini">← Carpeta</button><span class="datos" style="overflow-wrap:anywhere">' + esc(d.nombre) + '</span>' + botonRuta(d) + '</div>' +
+        '<div class="folio"><h3>' + esc(d.nombre.replace(/^\d+ /, '').replace(/ D26.*$/, '')) + '</h3><p>Documento inventado para la prueba. Aquí se ve el PDF abierto, ocupando la columna de la carpeta; el hito sigue a la izquierda.</p>' +
+        (datos(d) ? '<div class="marca">' + esc(datos(d)) + '</div>' : '') + '</div>';
+    } else {
+      $('derecha').innerHTML = '<h2>Carpeta del asunto</h2>' + e.docs.map(function (x) { return '<div class="doc">' + lineaDoc(x, true) + '</div>'; }).join('');
+    }
   }
 
   function pintar() {
-    pintarMesa();
-    $('docs').innerHTML = e.docs.map(function (d, i) {
-      var l = linea(d);
-      return '<div class="doc"><span class="ext">PDF</span><span class="nombre">' + esc(d.nombre) + '</span>' +
-        '<span class="datos">Hito ' + d.hito + '</span>' +
-        '<button class="boton mini" data-ruta="' + i + '">' + (e.elegido === i ? 'Ruta ✓' : 'Ruta') + '</button>' +
-        (l ? '<span class="datos">' + esc(l) + '</span>' : '') +
-        (!d.registro && d.pendiente ? '<span class="sin-reg">Sin registrar</span>' : '') + '</div>';
-    }).join('');
+    pintarMesa(); pintarDerecha();
     $('notas').innerHTML = e.notas.length ? e.notas.map(function (n) { return '<div class="nota">' + esc(n) + '</div>'; }).join('') : '<p class="vacio">Sin notas.</p>';
     var av = '';
     if (e.archivado) av += '<div class="archivado">Asunto archivado. En la prueba no se mueve nada: pulsa «Empezar de nuevo».</div>';
@@ -227,36 +287,54 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
         '<div class="pie"><button id="c-volver" class="boton">Volver</button><button id="c-seguir" class="boton boton-principal">' + esc(e.cuadro.boton) + '</button></div></div></div>';
     }
     $('capa').innerHTML = c;
-    $('accion-ayuda').textContent = tarea('f').accion === 'firmar' ? 'Se marca sola al llegar el firmado de un documento de este hito.' : 'Se marca a mano y no cuenta en los avisos.';
+    $('accion-ayuda').textContent = tarea('f').accion === 'firmar' ? 'Se marca sola al llegar firmado su documento.' : 'Se marca a mano, sin documento, y no cuenta en los avisos.';
     var hay = e.elegido !== null && !e.archivado;
     $('s-firmado').disabled = !hay; $('s-sellado').disabled = !hay;
-    $('pista').textContent = hay ? 'Guardarás encima de ' + e.docs[e.elegido].nombre + '.' : 'Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
+    $('pista').textContent = hay ? 'Guardarás encima de ' + doc(e.elegido).nombre + '.' : 'Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
     enganchar();
   }
 
   function limpiar() { e.verde = ''; e.ambar = ''; }
 
+  /* Llega una versión nueva: la tarea que dejó la anterior se queda con ella, con el nombre que recibe en «_Previas». */
+  function pasarAPrevias(d, sufijo) {
+    var t = d.ultima && tarea(d.ultima);
+    if (t) { t.verNombre = d.nombre.replace(/\.pdf$/, ' ' + sufijo + '.pdf'); t.verDatos = datos(d); }
+    d.ultima = null;
+  }
+
+  function generar() {
+    var t = tarea('g');
+    if (!abierta(t)) return;
+    t.hecha = true;
+    e.docs.push({ id: 'res', nombre: '261105 RESOLUCION D26-01240.pdf', hito: 2, firmas: 0, registro: '', pendiente: false });
+    t.doc = 'res'; doc('res').ultima = 'g';
+    ['f', 'r'].forEach(function (id) { var x = tarea(id); if (!x.doc && conDoc(x)) x.doc = 'res'; });
+    e.verde = 'Documento generado: 261105 RESOLUCION D26-01240.pdf';
+  }
+
+  function enviarCorreo() {
+    tarea('c').hecha = true;
+    var n = doc('res').nombre;
+    e.verde = 'Correo enviado a la familia con ' + n + '. En la prueba no se envía nada.';
+    e.notas.unshift('Enviado a la familia el ' + HOY + ' · ' + n); e.cadena = null; pintar();
+  }
+  function marcarHecho() { e.hitoHecho = true; e.cadena = null; e.verde = 'Hito marcado como hecho. Pasas al hito 3.'; pintar(); }
+  function archivar() { limpiar(); e.archivado = true; e.elegido = null; pintar(); }
+
   function enganchar() {
     var g = function (id, fn) { var b = $(id); if (b) b.onclick = fn; };
-    g('hacer', function () {
-      limpiar();
-      var t = tarea('g');
-      if (abierta(t)) {
-        t.hecha = true;
-        e.docs.push({ nombre: RES, hito: 2, firmas: 0, registro: '', pendiente: false });
-        e.verde = 'Documento generado: ' + RES;
-      }
-      e.cadena = 'x'; avanzar(); pintar();
-    });
+    var todos = function (sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); };
+    g('hacer', function () { limpiar(); generar(); e.cadena = 'x'; avanzar(); pintar(); });
     g('dejar', function () { limpiar(); e.cadena = null; pintar(); });
     var alEnviar = function () {
       limpiar();
-      var f = faltaHito().filter(function (x) { return x.indexOf(RES) !== -1; });
+      var n = doc('res').nombre;
+      var f = faltaHito().filter(function (x) { return x.indexOf(n) !== -1; });
       if (f.length) { e.cuadro = { titulo: 'Falta por hacer en lo que vas a enviar', lista: f, boton: 'Enviar igualmente', fn: enviarCorreo }; pintar(); return; }
       enviarCorreo();
     };
-    g('enviar', alEnviar);
-    g('comunicar', alEnviar);
+    g('enviar', alEnviar); g('comunicar', alEnviar);
     g('marcar', function () {
       limpiar();
       if (e.hitoHecho) { e.hitoHecho = false; pintar(); return; }
@@ -266,29 +344,22 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
     });
     g('c-volver', function () { e.cuadro = null; pintar(); });
     g('c-seguir', function () { var fn = e.cuadro.fn; e.cuadro = null; fn(); });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (b) {
+    g('a-carpeta', function () { e.abierto = null; e.abiertaVersion = null; pintar(); });
+    todos('[data-t]', function (b) {
       b.onchange = function () {
-        limpiar(); var t = tarea(b.dataset.t); t.hecha = b.checked;
-        if (t.id === 'g' && t.hecha && !resolucion()) e.docs.push({ nombre: RES, hito: 2, firmas: 0, registro: '', pendiente: false });
+        limpiar(); var t = tarea(b.dataset.t);
+        if (t.id === 'g' && b.checked) generar(); else t.hecha = b.checked;
         avanzar(); pintar();
       };
     });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-na]'), function (b) {
-      b.onclick = function () { limpiar(); var t = tarea(b.dataset.na); t.na = !t.na; t.hecha = false; avanzar(); pintar(); };
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-ruta]'), function (b) {
-      b.onclick = function () { limpiar(); var i = +b.dataset.ruta; e.elegido = e.elegido === i ? null : i; pintar(); };
-    });
+    todos('[data-na]', function (b) { b.onclick = function () { limpiar(); var t = tarea(b.dataset.na); t.na = !t.na; t.hecha = false; avanzar(); pintar(); }; });
+    todos('[data-ruta]', function (b) { b.onclick = function () { limpiar(); var i = b.dataset.ruta; e.elegido = e.elegido === i ? null : i; pintar(); }; });
+    todos('[data-abrir]', function (b) { b.onclick = function () { limpiar(); e.abiertaVersion = null; e.abierto = b.dataset.abrir; pintar(); }; });
+    todos('[data-version]', function (b) { b.onclick = function () { limpiar(); e.abierto = null; e.abiertaVersion = b.dataset.version; pintar(); }; });
+    todos('[data-elegir]', function (b) { b.onclick = function () { limpiar(); e.eligiendo = b.dataset.elegir; pintar(); }; });
+    todos('[data-cerrar]', function (b) { b.onclick = function () { e.eligiendo = null; pintar(); }; });
+    todos('[data-sel]', function (b) { b.onchange = function () { limpiar(); var t = tarea(b.dataset.sel); t.doc = b.value || null; e.eligiendo = null; avanzar(); pintar(); }; });
   }
-
-  function enviarCorreo() {
-    tarea('c').hecha = true; e.verde = 'Correo enviado a la familia con ' + RES + '. En la prueba no se envía nada.';
-    e.notas.unshift('Enviado a la familia el ' + HOY + ' · ' + RES); e.cadena = null; pintar();
-  }
-
-  function marcarHecho() { e.hitoHecho = true; e.cadena = null; e.verde = 'Hito marcado como hecho. Pasas al hito 3.'; pintar(); }
-
-  function archivar() { limpiar(); e.archivado = true; e.elegido = null; pintar(); }
 
   $('archivar').onclick = function () {
     limpiar();
@@ -301,27 +372,33 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
   };
 
   $('s-firmado').onclick = function () {
-    limpiar(); var d = e.docs[e.elegido]; e.elegido = null;
+    limpiar(); var d = doc(e.elegido); e.elegido = null;
+    pasarAPrevias(d, 'SIN FIRMAR');
     d.firmas = 1; e.verde = 'Documento firmado. El original sin firmar se conserva en «_Previas».';
     e.notas.unshift('Firmado el ' + HOY + ' · ' + d.nombre);
-    var t = tarea('f');
-    if (d.hito === 2 && t.accion === 'firmar' && abierta(t)) { t.hecha = true; e.verde += ' Marcado: ' + t.texto + '.'; avanzar(); }
-    pintar();
+    e.tareas.forEach(function (t) {
+      if (t.accion === 'firmar' && t.doc === d.id && abierta(t)) { t.hecha = true; d.ultima = t.id; e.verde += ' Marcado: ' + t.texto + '.'; }
+    });
+    avanzar(); pintar();
   };
   $('s-sellado').onclick = function () {
-    limpiar(); var d = e.docs[e.elegido]; e.elegido = null;
+    limpiar(); var d = doc(e.elegido); e.elegido = null;
+    pasarAPrevias(d, 'SIN SELLAR');
     d.registro = '26SM0' + (412 + e.notas.length); d.pendiente = false;
     e.verde = 'Documento registrado.';
     e.notas.unshift('Registrado ' + d.registro + ' el ' + HOY + ' · ' + d.nombre);
-    var t = tarea('r');
-    if (d.hito === 2 && d.nombre === RES && abierta(t)) { t.hecha = true; e.verde += ' Marcado: ' + t.texto + '.'; avanzar(); }
-    pintar();
+    e.tareas.forEach(function (t) {
+      if (t.accion === 'registrar' && t.doc === d.id && abierta(t)) { t.hecha = true; d.ultima = t.id; e.verde += ' Marcado: ' + t.texto + '.'; }
+    });
+    avanzar(); pintar();
   };
-  $('s-sinruta').onclick = function () {
-    limpiar(); e.ambar = 'La app no se ha enterado: no cambia nada. Hay que marcar la tarea a mano.'; pintar();
-  };
+  $('s-sinruta').onclick = function () { limpiar(); e.ambar = 'La app no se ha enterado: no cambia nada. Hay que marcar la tarea a mano.'; pintar(); };
   $('s-reinicio').onclick = function () { inicial(); pintar(); };
-  $('accion').onchange = function () { limpiar(); tarea('f').accion = this.value; avanzar(); pintar(); };
+  $('accion').onchange = function () {
+    limpiar(); var t = tarea('f'); t.accion = this.value;
+    if (!t.accion) t.doc = null; else if (tarea('g').doc) t.doc = 'res';
+    avanzar(); pintar();
+  };
 
   inicial(); pintar();
 })();
