@@ -86,6 +86,10 @@ select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8
 .abrir:hover{text-decoration:underline}
 .sin-doc{font-size:13px;color:var(--tinta-suave)}
 .colgado select{font-size:13px;padding:3px 6px}
+.solo{font-size:11px;color:var(--tinta-suave);border:1px solid var(--linea);border-radius:4px;padding:0 5px}
+.form-tarea{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--linea)}
+.form-tarea input[type=text]{font:inherit;font-size:14px;flex:1 1 220px;min-width:0;border:1px solid var(--linea);border-radius:8px;padding:7px 10px;background:var(--papel);color:var(--tinta)}
+.form-tarea label{font-size:13px;color:var(--tinta-suave);display:flex;gap:6px;align-items:center}
 .visor-cab{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .folio{background:#fff;color:#1b2430;border:1px solid var(--linea);border-radius:4px;padding:20px 24px;min-height:300px;font-size:14px;line-height:1.5}
 .folio h3{margin:0 0 10px;font-size:15px;text-align:center}
@@ -112,15 +116,6 @@ h2.sub{margin-top:10px}
   <div class="columnas">
     <div class="pila">
       <section class="bloque" id="mesa"></section>
-      <section class="bloque">
-        <h2>En la guía de este tipo de asunto</h2>
-        <div class="editor"><label for="accion">Tarea «Firmar la resolución» · Qué se hace
-          <select id="accion">
-            <option value="">Sin acción (se marca a mano)</option>
-            <option value="firmar" selected>Firmar un documento</option>
-          </select></label>
-          <span id="accion-ayuda" class="datos"></span></div>
-      </section>
     </div>
     <div class="pila">
       <section class="bloque" id="derecha"></section>
@@ -135,7 +130,7 @@ h2.sub{margin-top:10px}
   var $ = function (id) { return document.getElementById(id); };
   var HOY = '05/11/2026';
   var e;
-  var CLASE = { generar: 'Generar', firmar: 'Firmar', registrar: 'Registrar', comunicar: 'Comunicar' };
+  var CLASE = { generar: 'Generar', firmar: 'Firmar', registrar: 'Registrar', comunicar: 'Comunicar', anadir: 'Añadir' };
 
   function inicial() {
     e = {
@@ -151,9 +146,8 @@ h2.sub{margin-top:10px}
         { id: 'n', nombre: '261104 INFORME DEPARTAMENTO D26-01236.pdf', hito: 2, firmas: 0, registro: '', pendiente: false }
       ],
       notas: [], elegido: null, cadena: null, hitoHecho: false, verde: '', ambar: '', cuadro: null, archivado: false,
-      abierto: null, abiertaVersion: null, eligiendo: null
+      abierto: null, abiertaVersion: null, eligiendo: null, cambiando: null, nueva: { texto: '', accion: '', extra: '' }, cuenta: 0
     };
-    if ($('accion')) $('accion').value = 'firmar';
   }
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -165,7 +159,7 @@ h2.sub{margin-top:10px}
   function avanzar() {
     if (!e.cadena) return;
     var t = e.tareas.filter(function (x) {
-      return abierta(x) && (x.accion === 'comunicar' || ((x.accion === 'firmar' || x.accion === 'registrar') && x.doc));
+      return abierta(x) && (x.id === 'c' || ((x.accion === 'firmar' || x.accion === 'registrar') && x.doc));
     })[0];
     e.cadena = !t ? null : t.accion === 'firmar' ? 'firma' : t.accion === 'registrar' ? 'sello' : 'enviar';
   }
@@ -223,6 +217,26 @@ h2.sub{margin-top:10px}
     return '<div class="colgado"><button class="enlace" data-elegir="' + t.id + '">Elegir documento</button></div>';
   }
 
+  var ACCIONES = [['', 'Sin acción (se marca a mano)'], ['generar', 'Generar un documento'], ['firmar', 'Firmar un documento'], ['registrar', 'Registrar un documento'], ['comunicar', 'Comunicar'], ['anadir', 'Añadir un documento']];
+  var EXTRAS = {
+    generar: ['Plantilla', ['Certificado', 'Requerimiento']],
+    registrar: ['Sentido', ['Entrada o salida', 'Entrada', 'Salida']],
+    comunicar: ['A quién', ['A quien toque', 'La familia', 'Tutor/a del grupo', 'Otro']]
+  };
+  function camposHTML(f, pre) {
+    var h = '<label>Qué se hace <select id="' + pre + '-accion">' + ACCIONES.map(function (a) {
+      return '<option value="' + a[0] + '"' + (a[0] === f.accion ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select></label>';
+    var x = EXTRAS[f.accion];
+    if (x) h += '<label>' + x[0] + ' <select id="' + pre + '-extra">' + x[1].map(function (o) {
+      return '<option' + (o === f.extra ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label>';
+    return h;
+  }
+  function formCambiar(t) {
+    var f = e.cambiando;
+    return '<div class="form-tarea"><input type="text" id="cam-texto" aria-label="Texto de la tarea" value="' + esc(f.texto) + '">' + camposHTML(f, 'cam') +
+      '<button id="cam-ok" class="boton mini">Guardar</button><button id="cam-no" class="enlace">Cancelar</button></div>';
+  }
+
   function pintarMesa() {
     var cuenta = e.tareas.filter(function (t) { return !t.na; });
     var completo = cuenta.every(function (t) { return t.hecha; }) && !e.hitoHecho;
@@ -246,8 +260,14 @@ h2.sub{margin-top:10px}
       return '<div class="tarea-bloque"><div class="tarea' + (t.hecha ? ' hecha' : '') + (t.na ? ' na' : '') + '"><label><input type="checkbox" data-t="' + t.id + '"' + (t.hecha ? ' checked' : '') + (t.na ? ' disabled' : '') + '>' +
         '<span class="tt">' + esc(t.texto) + '</span></label>' +
         (t.accion ? '<span class="clase">' + CLASE[t.accion] + '</span>' : '') +
-        '<button class="enlace" data-na="' + t.id + '">' + (t.na ? 'Sí aplica' : 'No aplica') + '</button></div>' + colgado(t) + '</div>';
+        (t.solo ? '<span class="solo">solo aquí</span>' : '') +
+        '<button class="enlace" data-cam="' + t.id + '">Cambiar</button>' +
+        (t.solo ? '<button class="enlace" data-guia="' + t.id + '">Pasar a la guía</button>' : '') +
+        '<button class="enlace" data-na="' + t.id + '">' + (t.na ? 'Sí aplica' : 'No aplica') + '</button></div>' +
+        (e.cambiando && e.cambiando.id === t.id ? formCambiar(t) : '') + colgado(t) + '</div>';
     }).join('');
+    html += '<div class="form-tarea"><input type="text" id="nue-texto" aria-label="Nueva tarea" placeholder="Nueva tarea…" value="' + esc(e.nueva.texto) + '">' + camposHTML(e.nueva, 'nue') +
+      '<button id="nue-ok" class="boton mini">Añadir</button></div>';
     html += '<h2 class="sub">Documentos de este hito</h2>' + e.docs.filter(function (d) { return d.hito === 2; }).map(function (d) {
       return '<div class="doc">' + lineaDoc(d, false) + '</div>';
     }).join('');
@@ -287,7 +307,6 @@ h2.sub{margin-top:10px}
         '<div class="pie"><button id="c-volver" class="boton">Volver</button><button id="c-seguir" class="boton boton-principal">' + esc(e.cuadro.boton) + '</button></div></div></div>';
     }
     $('capa').innerHTML = c;
-    $('accion-ayuda').textContent = tarea('f').accion === 'firmar' ? 'Se marca sola al llegar firmado su documento.' : 'Se marca a mano, sin documento, y no cuenta en los avisos.';
     var hay = e.elegido !== null && !e.archivado;
     $('s-firmado').disabled = !hay; $('s-sellado').disabled = !hay;
     $('pista').textContent = hay ? 'Guardarás encima de ' + doc(e.elegido).nombre + '.' : 'Para los dos primeros, pulsa antes «Ruta» en un documento. Eso marca el documento sobre el que guardas.';
@@ -301,6 +320,13 @@ h2.sub{margin-top:10px}
     var t = d.ultima && tarea(d.ultima);
     if (t) { t.verNombre = d.nombre.replace(/\.pdf$/, ' ' + sufijo + '.pdf'); t.verDatos = datos(d); }
     d.ultima = null;
+  }
+
+  function generarOtra(t) {
+    t.hecha = true; e.cuenta++;
+    var id = 'nuevo' + e.cuenta, n = '261105 ' + (t.extra || 'Certificado').toUpperCase() + ' D26-0124' + e.cuenta + '.pdf';
+    e.docs.push({ id: id, nombre: n, hito: 2, firmas: 0, registro: '', pendiente: false, ultima: t.id });
+    t.doc = id; e.verde = 'Documento generado: ' + n;
   }
 
   function generar() {
@@ -348,10 +374,42 @@ h2.sub{margin-top:10px}
     todos('[data-t]', function (b) {
       b.onchange = function () {
         limpiar(); var t = tarea(b.dataset.t);
-        if (t.id === 'g' && b.checked) generar(); else t.hecha = b.checked;
+        if (t.id === 'g' && b.checked) generar(); else if (t.accion === 'generar' && b.checked && !t.doc) generarOtra(t); else t.hecha = b.checked;
         avanzar(); pintar();
       };
     });
+    var leer = function (pre, f) {
+      var a = $(pre + '-accion'), x = $(pre + '-extra'), tx = $(pre + '-texto');
+      if (tx) tx.oninput = function () { f.texto = tx.value; };
+      if (a) a.onchange = function () { f.accion = a.value; f.extra = EXTRAS[f.accion] ? EXTRAS[f.accion][1][0] : ''; pintar(); };
+      if (x) x.onchange = function () { f.extra = x.value; };
+    };
+    leer('nue', e.nueva);
+    if (e.cambiando) leer('cam', e.cambiando);
+    g('nue-ok', function () {
+      limpiar(); var f = e.nueva;
+      if (!f.texto.trim()) { e.ambar = 'Escribe primero qué hay que hacer.'; pintar(); return; }
+      e.cuenta++;
+      e.tareas.push({ id: 'p' + e.cuenta, texto: f.texto.trim(), accion: f.accion === 'anadir' ? 'anadir' : f.accion, extra: f.extra, doc: null, solo: true });
+      e.nueva = { texto: '', accion: '', extra: '' };
+      e.verde = 'Guardado solo en este asunto.'; avanzar(); pintar();
+    });
+    g('cam-no', function () { e.cambiando = null; pintar(); });
+    g('cam-ok', function () {
+      limpiar(); var f = e.cambiando, t = tarea(f.id);
+      t.texto = f.texto.trim() || t.texto; t.accion = f.accion; t.extra = f.extra;
+      if (!conDoc(t)) t.doc = null;
+      else if (!t.doc && (t.id === 'f' || t.id === 'r') && tarea('g').doc) t.doc = tarea('g').doc;
+      e.cambiando = null;
+      e.verde = t.solo ? 'Guardado solo en este asunto.' : 'Guardado en la guía: vale para todos los asuntos de este tipo.';
+      avanzar(); pintar();
+    });
+    todos('[data-cam]', function (b) { b.onclick = function () {
+      limpiar(); var t = tarea(b.dataset.cam);
+      e.cambiando = { id: t.id, texto: t.texto, accion: t.accion, extra: t.extra || (EXTRAS[t.accion] ? EXTRAS[t.accion][1][0] : '') }; pintar(); }; });
+    todos('[data-guia]', function (b) { b.onclick = function () {
+      limpiar(); var t = tarea(b.dataset.guia); t.solo = false;
+      e.verde = 'Pasada a la guía con su «Qué se hace». Su documento se queda en este asunto.'; pintar(); }; });
     todos('[data-na]', function (b) { b.onclick = function () { limpiar(); var t = tarea(b.dataset.na); t.na = !t.na; t.hecha = false; avanzar(); pintar(); }; });
     todos('[data-ruta]', function (b) { b.onclick = function () { limpiar(); var i = b.dataset.ruta; e.elegido = e.elegido === i ? null : i; pintar(); }; });
     todos('[data-abrir]', function (b) { b.onclick = function () { limpiar(); e.abiertaVersion = null; e.abierto = b.dataset.abrir; pintar(); }; });
@@ -394,11 +452,6 @@ h2.sub{margin-top:10px}
   };
   $('s-sinruta').onclick = function () { limpiar(); e.ambar = 'La app no se ha enterado: no cambia nada. Hay que marcar la tarea a mano.'; pintar(); };
   $('s-reinicio').onclick = function () { inicial(); pintar(); };
-  $('accion').onchange = function () {
-    limpiar(); var t = tarea('f'); t.accion = this.value;
-    if (!t.accion) t.doc = null; else if (tarea('g').doc) t.doc = 'res';
-    avanzar(); pintar();
-  };
 
   inicial(); pintar();
 })();
