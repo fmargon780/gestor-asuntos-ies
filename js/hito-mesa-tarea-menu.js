@@ -139,7 +139,15 @@ var HitoMesaTareaMenu = (function () {
     var lista = [
       { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
     ];
-    lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
+    if (g.comun && window.ComunesCambiar) {   /* fila 531: una tarea de la lista común se cambia en todas las guías */
+      lista.push({ texto: 'Cambiar la tarea', clase: 'mesa-comun-cambiar', alPulsar: async function () {
+        try {
+          var t = Comunes.buscar((await ComunesGuardado.leer()).tareas, g.comun);
+          if (!t) { U.aviso('Esta tarea ya no está en la lista de tareas.', 'ambar'); return; }
+          ComunesCambiar.tarea(t, { claveActual: a.nombre });
+        } catch (err) { U.fallo('No he podido leer la lista', err); }
+      } });
+    } else lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
     if (g.propio) {
       lista.push({ texto: 'Pasar a la guía', alPulsar: function () { pasarALaGuia(a, h, g); } });
     }

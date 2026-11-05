@@ -190,7 +190,8 @@ var HitoMesaGuion = (function () {
       (abierto ? '<div class="tcd-nueva"><input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' +
         /* Fila 522: «Qué se hace» y su dato, como en la guía; sin elegir, como siempre. */
         (window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML(nuevaForma[h.id]) +
-          '<button type="button" class="boton boton-chico tcd-anadir">Añadir</button>' : '') + '</div>' : '');
+          '<button type="button" class="boton boton-chico tcd-anadir">Añadir</button>' : '') + '</div>' : '') +
+      (abierto && window.ComunesAsunto ? ComunesAsunto.botonesHTML(a, h) : '');   /* fila 531: la lista común de tareas y de hitos */
 
     /* La normativa de las tareas del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
@@ -320,6 +321,7 @@ var HitoMesaGuion = (function () {
     };
     var botonAnadir = caja.querySelector('.tcd-anadir');
     if (botonAnadir) botonAnadir.onclick = anadirNueva;
+    if (window.ComunesAsunto) ComunesAsunto.enganchar(caja, a, h);
   }
 
   function tipoDe(a) {

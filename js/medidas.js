@@ -39,7 +39,7 @@ var Medidas = (function () {
     'indice-archivo.json', '_ficha.json', 'HISTORIAL DE TRAMITACION.txt', 'rutas.json',
     'control-registro.json', 'RegAlum.csv', 'ALUMNADO-BD.json', 'solicitantes.csv', 'personal.csv',
     'empresas.csv', 'otros.csv', 'tutores.csv', 'administraciones.json', 'plantillas.json', 'envios.json',
-    'informes.json', 'margenes-pdf.json', 'responsable-migrado.json', 'estado-migrado.json'];
+    'informes.json', 'margenes-pdf.json', 'responsable-migrado.json', 'estado-migrado.json', 'tareas-comunes.json', 'hitos-comunes.json'];
 
   /* Carpetas conocidas por su nombre exacto: sus ficheros llevan nombres de personas o de cursos. */
   var CARPETAS = { 'indice-archivo': 'indice-por-curso', 'presencia': 'presencia', 'copias': 'copia', 'medidas': 'medidas',
