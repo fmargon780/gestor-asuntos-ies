@@ -88,9 +88,12 @@
         if (!sel.value) return;
         var original = sel.value;
         try {
-          await U.mientrasGuarda(sel, function () {
+          /* Fila 515: un PDF con sello y firma entra por el sello y además se anota la firma. */
+          var firmas = window.DocumentosFirmados ? await DocumentosFirmados.contarEn(a.handle, d.nombre) : 0;
+          var colocado = await U.mientrasGuarda(sel, function () {
             return RegistroSellado.asociar(a, d.nombre, original, d.sello);
           });
+          if (colocado && firmas) await DocumentosFirmados.anotarJuntoAlSello(a, typeof colocado === 'string' ? colocado : original, firmas);
         } catch (e) {
           U.fallo('No he podido asociar el sello', e);
         }
@@ -127,6 +130,7 @@
       await Hitos.leer();
       hito = Hitos.hitoActualDeAsunto ? Hitos.hitoActualDeAsunto(a) : null;
     } catch (e1) { hito = null; }
+    var firmas = window.DocumentosFirmados ? await DocumentosFirmados.contarEn(a.handle, d.nombre) : 0;   /* fila 515 */
     boton.disabled = true;
     try {
       await App.verDocumentos(a, { ponerNombre: d.nombre, propuesta: { fecha: d.sello.fecha, registro: d.sello }, hito: hito });
@@ -137,6 +141,7 @@
     var nombreNuevo = despues.filter(function (n) { return antes.indexOf(n) === -1; })[0];
     if (nombreNuevo && despues.indexOf(d.nombre) === -1) {
       await alGuardarComoNuevo(a, d, nombreNuevo, hito);
+      if (firmas) await DocumentosFirmados.anotarJuntoAlSello(a, nombreNuevo, firmas);
     }
     N.pintarDocumentos(a);
     pintarSellos(a);

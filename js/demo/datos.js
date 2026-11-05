@@ -403,6 +403,7 @@
     });
     await marcarPrimerHito(pabloClave, 'hecho', 'Documentación recibida y comprobada.');
     await crearDocumentosDeDemostracion(pabloClave);
+    if (window.Demo.firmas) await Demo.firmas.construir(pabloClave, hace);   /* fila 515 */
     /* Fila 281: un PDF con texto de dos páginas y uno con una tabla (js/demo/datos-plantilla.js). */
     if (window.Demo.plantilla) await Demo.plantilla.construirPdf({ pabloClave: pabloClave, hace: hace });
     /* Fila 229: un registro con líneas de los dos tipos (escritas a mano y automáticas)

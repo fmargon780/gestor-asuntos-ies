@@ -233,6 +233,7 @@
       '</header>' +
       '<div id="ficha-presencia"></div>' +
       '<div id="ficha-sellos"></div>' +
+      '<div id="ficha-firmas"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
       /* Tarjetas (24-sep-2026, fila 107, docs/FICHA-EN-TARJETAS.md): la
          cuadrícula, abrir una en grande y la franja de documentos viven
@@ -266,6 +267,7 @@
     if (window.CandidaturasFicha) CandidaturasFicha.pintar(a);   /* fila 347: la tarjeta «Candidaturas» */
     N.pintarPresencia();
     N.pintarSellos(a);
+    if (N.pintarFirmas) N.pintarFirmas(a);   /* fila 515: firmado con otro nombre y pregunta del firmado */
     if (window.OtrosDelTercero) OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a);
     N.asegurarObservadorConsulta();
     N.aplicarModoConsulta();

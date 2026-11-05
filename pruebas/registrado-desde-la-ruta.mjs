@@ -171,8 +171,8 @@ const notasAntes5 = await pagina.evaluate((a) => (App.E.registro.asuntos[a].nota
 await escribirEncima(DOC2, pdfConTexto('firmado con AutoFirma, sin sello de registro'));
 await mirar();
 await comprobar('5. el aviso ámbar',
-  avisos().then((l) => l.filter((x) => x.indexOf('no trae sello de registro') !== -1)),
-  ['ambar|Lo que has guardado encima de ' + DOC2 + ' no trae sello de registro. Lo he dejado; el anterior se conserva en «_Previas».']);
+  avisos().then((l) => l.filter((x) => x.indexOf('no trae firma ni sello de registro') !== -1)),
+  ['ambar|Lo que has guardado encima de ' + DOC2 + ' no trae firma ni sello de registro. Lo he dejado; el anterior se conserva en «_Previas».']);
 await comprobar('5. el documento conserva lo llegado',
   pagina.evaluate(async ([a, n]) => (await (await (await window.__disco.abiertos.getDirectoryHandle(a)).getFileHandle(n)).getFile()).text().then((t) => t.indexOf('AutoFirma') !== -1), [ASUNTO, DOC2]), true);
 await comprobar('5. el original está en previas con « ANTERIOR»', dentro(['_Previas']).then((l) => l.filter((n) => / ANTERIOR\.pdf$/.test(n))), ['260912 SOLICITUD Otro escrito ANTERIOR.pdf']);

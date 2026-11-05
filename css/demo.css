@@ -44,3 +44,9 @@ body.demo-activo .arranque {
 
 /* Fila 260: con «solo consultar», los datos se montan antes y la pantalla no se enseña hasta estar protegida (unos 6 s). */
 body.demo-montando #aplicacion { visibility: hidden; }
+
+/* Fila 515: la cajita de «Prueba tema 392 (fuera de la app)» (js/demo/datos-firmas.js). */
+#demo-firmas { position: fixed; right: 12px; bottom: 12px; z-index: 50; max-width: 300px; padding: 10px 12px;
+  background: var(--fondo-tarjeta, #fff); border: 1px dashed #888; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.2); font-size: 13px; }
+#demo-firmas p { margin: 4px 0 8px; }
+#demo-firmas .boton { display: block; width: 100%; margin-top: 6px; text-align: left; white-space: normal; height: auto; }

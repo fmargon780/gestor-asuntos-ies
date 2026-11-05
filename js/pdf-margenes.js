@@ -236,20 +236,36 @@ var PdfMargenes = (function () {
   /* Si el PDF ya trae una firma digital: buscando en los propios bytes
      las marcas /ByteRange y /Type /Sig (con o sin espacio), sin
      necesidad de interpretar la estructura entera del fichero. */
-  function pareceFirmado(bytes) {
+  function textoDeBytes(bytes) {
     var trozo = 65536;
     var texto = '';
     for (var i = 0; i < bytes.length; i += trozo) {
       var fin = Math.min(bytes.length, i + trozo);
       texto += String.fromCharCode.apply(null, bytes.slice(i, fin));
     }
+    return texto;
+  }
+
+  function pareceFirmado(bytes) {
+    var texto = textoDeBytes(bytes);
     return /\/ByteRange/.test(texto) || /\/Type\s*\/Sig\b/.test(texto);
+  }
+
+  /* Fila 515 (tema 392): cuántas firmas digitales trae el PDF. Cada firma lleva su
+     /ByteRange; si no hay ninguno y sí un /Type /Sig, cuenta una. Solo cuenta: no
+     comprueba que la firma sea válida ni quién firma. */
+  function contarFirmas(bytes) {
+    var texto = textoDeBytes(bytes);
+    var rangos = texto.match(/\/ByteRange/g);
+    if (rangos && rangos.length) return rangos.length;
+    return /\/Type\s*\/Sig\b/.test(texto) ? 1 : 0;
   }
 
   return {
     calcularEncaje: calcularEncaje,
     conHueco: conHueco,
     pareceFirmado: pareceFirmado,
+    contarFirmas: contarFirmas,
     posicionCruda: posicionCruda,
     TAMANOS: TAMANOS,
     ORDEN_TAMANOS: ORDEN_TAMANOS,

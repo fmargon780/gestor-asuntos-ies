@@ -17,11 +17,18 @@
    `App.SEGUNDOS_ENTRE_MIRADAS` (js/documentos-vigilancia.js) y al abrir la
    ficha del asunto (js/ficha-asunto.js).
 
-   Si el documento ha cambiado, `queHaLlegado` decide qué es (una sola
-   función, para que el tema 392 añada «trae firma» sin rehacer nada):
+   Si el documento ha cambiado, `queHaLlegado` decide qué es (una sola función):
      - 'registrado': trae sello de registro. Se hace lo mismo que
        `RegistroSellado.asociar` (el original pasa a previas como «SIN
-       SELLAR», se anota el registro y la nota, se marca la tarea).
+       SELLAR», se anota el registro y la nota, se marca la tarea). Si
+       además trae firma, se anota la firma (fila 515).
+     - 'firmado' / 'masFirmas' (fila 515, tema 392): trae firma digital y
+       ninguna o menos firmas había antes. El original va a previas como
+       «SIN FIRMAR» / «CON 1 FIRMA», se anota la marca «Firmado» y la nota.
+     - 'sinFirmaSobreFirmado': llega algo sin firma ni sello encima de un
+       firmado. No se decide: se guarda la duda en el propio elemento de la
+       lista (`duda`), la copia sigue en `_copia-ruta` y la ficha pregunta
+       (js/ficha-firmas.js → `contestar`).
      - 'sinSello': lo llegado se queda; el original va a previas como
        «<nombre> ANTERIOR». No se anota nada.
 
@@ -141,9 +148,17 @@ window.RutaCopia = (function () {
     } catch (e) { /* accesorio: la mirada lo arreglará */ }
   }
 
-  /* ---------- qué ha llegado (una sola función; el tema 392 añadirá «firmado») ---------- */
+  /* ---------- qué ha llegado (una sola función) ----------
+     `firmas`: las que trae lo llegado; `previas`: las que tenía el documento antes. */
 
-  function queHaLlegado(sello) { return sello ? 'registrado' : 'sinSello'; }
+  function queHaLlegado(sello, firmas, previas) {
+    if (sello) return 'registrado';
+    if (firmas > 0) {
+      if (!(previas > 0)) return 'firmado';
+      return firmas > previas ? 'masFirmas' : 'mismasFirmas';
+    }
+    return previas > 0 ? 'sinFirmaSobreFirmado' : 'sinSello';
+  }
 
   /* ---------- la mirada ---------- */
 
@@ -198,6 +213,7 @@ window.RutaCopia = (function () {
     if (!N || !N.actual || N.actual.nombre !== a.nombre) return;
     try {
       N.pintarDocumentos(N.actual);
+      if (N.pintarFirmas) N.pintarFirmas(N.actual);   /* fila 515: la pregunta del firmado */
       if (window.Notas) { N.actual.ficha.notas = await Notas.frescas(N.actual); N.pintarNotas(N.actual, N.modoActual === 'abierto'); }
     } catch (e) { /* solo pintar */ }
   }
@@ -214,11 +230,20 @@ window.RutaCopia = (function () {
     }
   }
 
+  /* Las firmas que tenía el documento antes: la copia que se hizo al pulsar «Ruta» y lo apuntado en la ficha. */
+  async function firmasDeAntes(a, sub, claim, doc) {
+    var n = await DocumentosFirmados.contarEn(sub, claim);
+    var d = window.DocumentosDatos ? DocumentosDatos.deFichero(a.ficha, doc) : null;
+    return Math.max(n, d ? Number(d.firmas) || 0 : 0);
+  }
+
   async function resolverReclamada(a, sub, item, f, claim) {
     var doc = item.doc;
     var sello = null;
     try { sello = window.RegistroLector ? await RegistroLector.leerSello(f) : null; } catch (e) { sello = null; }
-    var caso = queHaLlegado(sello);
+    var firmas = await DocumentosFirmados.contar(f);
+    var previas = await firmasDeAntes(a, sub, claim, doc);
+    var caso = queHaLlegado(sello, firmas, previas);
     var codigo = '';
     if (caso === 'registrado') {
       var tmp = RegistroSellado.nombreLibreEntre(
@@ -228,18 +253,92 @@ window.RutaCopia = (function () {
         await Carpetas.renombrarFichero(a.handle, doc, tmp);
         await Carpetas.moverFichero(sub, claim, a.handle, doc);
         var nuevo = await RegistroSellado.asociar(a, tmp, doc, sello, { conCodigo: true });
+        await DocumentosFirmados.anotarJuntoAlSello(a, doc, firmas);   /* fila 515: sello y firma */
         await quitarDeLista(a.nombre, doc);
         await borrarSiVacia(a.handle, sub);
         await repintar(a);
         return !!nuevo;
       }
     }
+    if (caso === 'firmado' || caso === 'masFirmas') {
+      var carpeta = await aPrevias(a, sub, claim, doc, DocumentosFirmados.sufijoDelAnterior(caso, previas));
+      await quitarDeLista(a.nombre, doc);
+      await borrarSiVacia(a.handle, sub);
+      await DocumentosFirmados.alLlegar(a, doc, caso, firmas, carpeta);
+      await repintar(a);
+      return true;
+    }
+    if (caso === 'sinFirmaSobreFirmado') return preguntar(a, sub, item, claim, doc, previas);
     var carpetaPrevias = await aPrevias(a, sub, claim, doc, ' ANTERIOR');
     await quitarDeLista(a.nombre, doc);
     await borrarSiVacia(a.handle, sub);
+    if (caso === 'mismasFirmas') {
+      try { await DocumentosFirmados.anotarFirmas(a, doc, firmas, false); } catch (e3) { /* accesorio */ }
+    }
     U.aviso(caso === 'registrado'
       ? 'Lo que has guardado encima de ' + doc + ' trae sello de registro, pero el nombre del documento no permite anotarlo. Lo he dejado; el anterior se conserva en «' + carpetaPrevias + '».'
-      : 'Lo que has guardado encima de ' + doc + ' no trae sello de registro. Lo he dejado; el anterior se conserva en «' + carpetaPrevias + '».', 'ambar');
+      : caso === 'mismasFirmas'
+        ? 'Lo que has guardado encima de ' + doc + ' trae firma, pero no más firmas que el anterior. Lo he dejado; el anterior se conserva en «' + carpetaPrevias + '».'
+        : 'Lo que has guardado encima de ' + doc + ' no trae firma ni sello de registro. Lo he dejado; el anterior se conserva en «' + carpetaPrevias + '».', 'ambar');
+    await repintar(a);
+    return true;
+  }
+
+  /* ---------- la pregunta: algo sin firma encima de un firmado (fila 515, punto 7) ----------
+     No se decide. La copia (el firmado) sigue en `_copia-ruta`; la duda queda en el elemento de la
+     lista compartida, con las firmas que tenía, para que la vean los dos ordenadores y sobreviva a
+     recargar. Hasta contestar, el documento sale sin marca. */
+  async function preguntar(a, sub, item, claim, doc, previas) {
+    try { await Carpetas.renombrarFichero(sub, claim, doc); } catch (e) { /* ya se verá */ }
+    await cambiarLista(function (items) {
+      var x = items.filter(function (i) { return i.asunto === a.nombre && i.doc === doc; })[0];
+      if (!x || x.duda) return false;
+      x.duda = { firmas: previas, desde: Date.now() };
+      return true;
+    });
+    try { await DocumentosFirmados.anotarFirmas(a, doc, 0, false); } catch (e2) { /* accesorio */ }
+    await repintar(a);
+    return true;
+  }
+
+  /* Las dudas sin contestar de un asunto (para la ficha). */
+  async function dudas(a) {
+    var items = (await leerLista()) || [];
+    return items.filter(function (i) { return i.asunto === a.nombre && i.duda; });
+  }
+
+  /* La respuesta. `quedarse`: true = «Quedarme con el firmado»; false = «Usar el nuevo». */
+  async function contestar(a, doc, quedarse) {
+    var sub = await subcarpeta(a.handle);
+    var item = ((await leerLista()) || []).filter(function (i) { return i.asunto === a.nombre && i.doc === doc && i.duda; })[0];
+    if (!sub || !item) { await quitarDeLista(a.nombre, doc); return false; }
+    var claim = await reclamar(sub, doc);
+    if (!claim) return false;
+    var carpeta;
+    try {
+      if (quedarse) {
+        var tmp = RegistroSellado.nombreLibreEntre(
+          (await Carpetas.ficheros(a.handle)).map(function (x) { return x.nombre; }), sinExtension(doc) + ' (llegado)' + extensionCon(doc));
+        await Carpetas.renombrarFichero(a.handle, doc, tmp);
+        try { await Carpetas.moverFichero(sub, claim, a.handle, doc); }
+        catch (e1) { await Carpetas.renombrarFichero(a.handle, tmp, doc); throw e1; }
+        carpeta = await aPrevias(a, a.handle, tmp, doc, ' DESCARTADO');
+      } else {
+        carpeta = await aPrevias(a, sub, claim, doc, ' ANTERIOR');
+      }
+    } catch (e) {
+      try { if (await Carpetas.existeFichero(sub, claim)) await Carpetas.renombrarFichero(sub, claim, doc); } catch (e2) { /* ya se verá */ }
+      throw e;
+    }
+    await quitarDeLista(a.nombre, doc);
+    await borrarSiVacia(a.handle, sub);
+    if (quedarse) {
+      try { await DocumentosFirmados.anotarFirmas(a, doc, item.duda.firmas, false); } catch (e3) { U.accesorio('He vuelto a poner el firmado, pero no he podido recuperar su marca', e3); }
+      U.aviso('He vuelto a poner el firmado. Lo que guardaste encima se conserva en «' + carpeta + '».', 'bueno');
+    } else {
+      try { await DocumentosFirmados.notaDeSustituido(a, doc); } catch (e4) { U.accesorio('Documento sustituido, pero no he podido apuntarlo en las notas', e4); }
+      U.aviso('Se queda el nuevo, sin firma. El firmado se conserva en «' + carpeta + '».', 'bueno');
+    }
     await repintar(a);
     return true;
   }
@@ -256,6 +355,7 @@ window.RutaCopia = (function () {
       await quitarDeLista(item.asunto, item.doc);
       return;
     }
+    if (item.duda) return;   /* fila 515: esperando respuesta en la ficha */
     var f = await fh.getFile();
     if (f.size === item.tamano && (f.lastModified || 0) === item.fecha) return;
     var copia;
@@ -296,6 +396,6 @@ window.RutaCopia = (function () {
 
   return {
     CARPETA: CARPETA, FICHERO: FICHERO, alCopiarRuta: alCopiarRuta, alEscribir: alEscribir, quitarCarpeta: quitarCarpeta,
-    mirar: mirar, queHaLlegado: queHaLlegado, toca: toca
+    mirar: mirar, queHaLlegado: queHaLlegado, toca: toca, dudas: dudas, contestar: contestar
   };
 })();

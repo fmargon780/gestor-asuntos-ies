@@ -62,6 +62,10 @@ var DocumentosDatos = (function () {
         if (!lista.some(function (r) { return r.codigo === codigo; })) lista.push(datos.anadirRegistro);
         nuevo.registros = lista;
       }
+      /* Fila 515: `firmas` fija el número (0 lo quita); `firmasMinimo` nunca lo baja. */
+      if (datos && datos.firmasMinimo) nuevo.firmas = Math.max(Number(actual.firmas) || 0, Number(datos.firmasMinimo) || 0);
+      delete nuevo.firmasMinimo;
+      if (!(Number(nuevo.firmas) > 0)) delete nuevo.firmas;
       todos[numero] = nuevo;
     });
   }
@@ -97,9 +101,16 @@ var DocumentosDatos = (function () {
   }
 
   /* Una línea para la fila del documento: «Registro 26EM0123 · campos · texto». */
+  /* Fila 515 (tema 392): «Firmado» o «Firmado (2)», delante del registro. */
+  function marcaFirmado(d) {
+    var n = d ? Number(d.firmas) || 0 : 0;
+    return n > 1 ? 'Firmado (' + n + ')' : (n === 1 ? 'Firmado' : '');
+  }
+
   function resumen(d) {
     if (!d) return '';
     var partes = [];
+    if (marcaFirmado(d)) partes.push(marcaFirmado(d));
     (d.registros || []).forEach(function (r) { if (r.codigo) partes.push('Registro ' + r.codigo); });
     (d.campos || []).forEach(function (c) { if (c) partes.push(c); });
     if (d.texto) partes.push(d.texto);
@@ -138,6 +149,7 @@ var DocumentosDatos = (function () {
     if (!d && window.Numeros) d = porNumero(Numeros.delNombreDeDocumento(nombreFichero));
     var solo = !!(opciones && opciones.soloCampos);
     var partes = [];
+    if (d && marcaFirmado(d)) partes.push(marcaFirmado(d));   /* fila 515: también en la mesa del hito */
     if (d && !solo) (d.registros || []).forEach(function (r) { if (r.codigo) partes.push('Registro ' + r.codigo); });
     if (window.Candidaturas && Candidaturas.lista) {
       var cand = Candidaturas.lista(a).filter(function (c) { return (c.documentos || []).indexOf(nombreFichero) !== -1; })[0];
@@ -154,6 +166,6 @@ var DocumentosDatos = (function () {
     return t ? '<div class="doc-datos ' + (claseExtra || '') + '" title="' + U.escapar(t) + '">' + U.escapar(t) + '</div>' : '';
   }
 
-  return { de: de, anotar: anotar, registroDe: registroDe, enriquecer: enriquecer, deFichero: deFichero, resumen: resumen, linea: linea, lineaHTML: lineaHTML };
+  return { de: de, anotar: anotar, registroDe: registroDe, enriquecer: enriquecer, deFichero: deFichero, resumen: resumen, marcaFirmado: marcaFirmado, linea: linea, lineaHTML: lineaHTML };
 })();
 window.DocumentosDatos = DocumentosDatos;
