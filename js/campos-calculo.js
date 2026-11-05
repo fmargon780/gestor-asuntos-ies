@@ -52,6 +52,9 @@ var Calculo = (function () {
       return limpiar((typeof Nombres !== 'undefined' && Nombres.grupoCompacto)
         ? Nombres.grupoCompacto(persona.unidad, persona.curso) : '');
     }
+    if (origen.clase === 'dato') {   /* fila 529: un dato de otra parte, ya leído (js/campos-datos-cache.js) */
+      return limpiar(window.CamposDatosCache ? CamposDatosCache.valor(origen.id, persona) : '');
+    }
     if (origen.clase === 'calculado') {
       if ((profundidad || 0) >= PROFUNDIDAD_MAXIMA) return '';
       var receta = calculadoPorId(config, origen.id);
@@ -66,6 +69,7 @@ var Calculo = (function () {
     if (a.clase !== b.clase) return false;
     if (a.clase === 'columna') return a.columna === b.columna;
     if (a.clase === 'calculado') return a.id === b.id;
+    if (a.clase === 'dato') return a.id === b.id;
     return true; /* "grupo" no lleva más datos */
   }
 
@@ -149,14 +153,39 @@ var Calculo = (function () {
     partir: { etiqueta: 'Partir por un signo' },
     equivalencias: { etiqueta: 'Tabla de equivalencias' },
     juntar: { etiqueta: 'Juntar dos campos' },
-    deFecha: { etiqueta: 'Sacar un dato de una fecha' }
+    deFecha: { etiqueta: 'Sacar un dato de una fecha' },
+    pasos: { etiqueta: 'Una lista de pasos' }   /* fila 529: js/campos-pasos.js */
   };
 
   /* ---------- evaluar ---------- */
 
+  /* Fila 529: los festivos de Ajustes › Hitos, los últimos leídos (nunca se va al disco desde aquí). */
+  function contextoDePasos(persona, config, profundidad) {
+    var h = (window.Hitos && window.Hitos.ultimosLeidos) ? window.Hitos.ultimosLeidos() : null;
+    return {
+      festivos: (h && h.ajustes && h.ajustes.festivos) || [],
+      otro: function (origen) { return valorDeOrigen(origen, persona, config, profundidad || 0); }
+    };
+  }
+
+  /* Los valores que va tomando un campo por pasos: el de partida y el de después de cada paso. */
+  function trazar(receta, persona, config) {
+    var v = limpiar(valorDeOrigen(receta && receta.origen, persona, config, 0));
+    var salida = [v];
+    var ctx = contextoDePasos(persona, config, 0);
+    var pasos = window.CamposPasos ? CamposPasos.deLegado(receta) : [];
+    pasos.forEach(function (paso) { v = CamposPasos.aplicar(paso, v, ctx); salida.push(v); });
+    return salida;
+  }
+
   function evaluar(receta, persona, config, profundidad) {
     if (!receta || !persona) return '';
     var origenValor = valorDeOrigen(receta.origen, persona, config, profundidad || 0);
+    if (receta.operacion === 'pasos') {
+      if (!window.CamposPasos) return '';
+      var ctx = contextoDePasos(persona, config, profundidad || 0);
+      return limpiar(CamposPasos.deLegado(receta).reduce(function (v, paso) { return CamposPasos.aplicar(paso, v, ctx); }, limpiar(origenValor)));
+    }
     var p = receta.parametros || {};
     switch (receta.operacion) {
       case 'quitarFinal': return quitarFinal(origenValor, p);
@@ -177,6 +206,7 @@ var Calculo = (function () {
     if (!origen) return '';
     if (origen.clase === 'columna') return origen.columna || '';
     if (origen.clase === 'grupo') return 'El grupo';
+    if (origen.clase === 'dato') return origen.nombre || 'Otro campo';
     if (origen.clase === 'calculado') {
       var r = calculadoPorId(config, origen.id);
       return r ? r.nombre : '';
@@ -226,6 +256,10 @@ var Calculo = (function () {
         var origen2 = nombreDeOrigen(p.origen2, config) || 'otro campo';
         return origen + ' y ' + origen2 + ', unidos por ' + signoConArticulo(String(p.separador || ''));
       }
+      case 'pasos': {
+        var nombrar = function (o) { return nombreDeOrigen(o, config); };
+        return origen + (receta.pasos || []).map(function (x) { return ' → ' + CamposPasos.describirPaso(x, nombrar); }).join('');
+      }
       case 'deFecha': {
         var modo = p.que === 'edad' ? 'la edad de hoy' : (p.que === 'anio' ? 'el año' : 'el curso académico');
         return 'De ' + origen + ', ' + modo;
@@ -241,6 +275,16 @@ var Calculo = (function () {
      parecido, como con los campos propios, solo avisa: eso lo pinta
      el editor con `U.parecidos`, no esto. */
 
+  /* Los campos de los que sale una receta: el de partida y los que usan sus pasos. */
+  function origenesDe(receta) {
+    var o = [receta.origen];
+    if (receta.operacion === 'juntar' && receta.parametros) o.push(receta.parametros.origen2);
+    if (receta.operacion === 'pasos' && window.CamposPasos) {
+      (receta.pasos || []).forEach(function (paso) { o = o.concat(CamposPasos.camposDelPaso(paso)); });
+    }
+    return o;
+  }
+
   function sigueLaCadena(origen, idBuscado, config, vistos) {
     if (!origen || origen.clase !== 'calculado') return false;
     if (origen.id === idBuscado) return true;
@@ -248,20 +292,12 @@ var Calculo = (function () {
     vistos[origen.id] = true;
     var receta = calculadoPorId(config, origen.id);
     if (!receta) return false;
-    if (sigueLaCadena(receta.origen, idBuscado, config, vistos)) return true;
-    if (receta.operacion === 'juntar' && receta.parametros) {
-      return sigueLaCadena(receta.parametros.origen2, idBuscado, config, vistos);
-    }
-    return false;
+    return origenesDe(receta).some(function (x) { return sigueLaCadena(x, idBuscado, config, vistos); });
   }
 
   function haceCiclo(calculado, config) {
     if (!calculado || !calculado.id) return false;
-    if (sigueLaCadena(calculado.origen, calculado.id, config, {})) return true;
-    if (calculado.operacion === 'juntar' && calculado.parametros) {
-      if (sigueLaCadena(calculado.parametros.origen2, calculado.id, config, {})) return true;
-    }
-    return false;
+    return origenesDe(calculado).some(function (x) { return sigueLaCadena(x, calculado.id, config, {}); });
   }
 
   function validar(calculado, config) {
@@ -286,6 +322,11 @@ var Calculo = (function () {
       motivos.push('Elige qué operación se le aplica.');
     }
     var p = calculado.parametros || {};
+    if (calculado.operacion === 'pasos') {
+      var pasos = Array.isArray(calculado.pasos) ? calculado.pasos : [];
+      if (!pasos.length) motivos.push('Añade al menos un paso.');
+      pasos.forEach(function (paso, i) { motivos = motivos.concat(CamposPasos.validarPaso(paso, i)); });
+    }
     if (calculado.operacion === 'quitarFinal' || calculado.operacion === 'quitarInicio') {
       var n = parseInt(p.n, 10);
       if (!(n >= 1 && n <= 20)) motivos.push('El número de caracteres tiene que estar entre 1 y 20.');
@@ -316,6 +357,9 @@ var Calculo = (function () {
     /* expuestas por si el editor (js/campos-calculados-editor.js) las
        necesita sueltas, sin montar una receta completa */
     origenesIguales: origenesIguales,
+    trazar: trazar,
+    origenesDe: origenesDe,
+    dependeDe: function (idCalculado, idBuscado, config) { return sigueLaCadena({ clase: 'calculado', id: idCalculado }, idBuscado, config, {}); },
     valorDeOrigen: function (origen, persona, config) { return valorDeOrigen(origen, persona, config, 0); }
   };
 })();

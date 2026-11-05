@@ -54,6 +54,19 @@ App.pintarCamposDelTipo = function () {
   var tipo = App.E.nuevo.tipo;
   var persona = App.E.nuevo.tercero;
   var todos = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  /* Fila 529: un campo creado a partir de datos de otra parte (nº escolar, tutores…) necesita leerlos antes; se leen y se vuelve a pintar. */
+  if (persona && window.CamposDatosCache) {
+    var faltan = [];
+    todos.forEach(function (cfg) {
+      var r = cfg.origen === 'calculado' ? ((App.E.campos.calculados || []).filter(function (x) { return x.id === cfg.id; })[0]) : null;
+      if (r) CamposDatosCache.idsDe(r, App.E.campos).forEach(function (id) { if (!CamposDatosCache.tiene(id, persona)) faltan.push(id); });
+    });
+    if (faltan.length) {
+      CamposDatosCache.precargar(faltan, { categoria: persona.categoria, nombre: persona.nombre, persona: persona }).then(function () {
+        if (App.E.nuevo.tercero === persona && App.E.nuevo.tipo === tipo) App.pintarCamposDelTipo();
+      });
+    }
+  }
   /* Fila 255: los campos de un hito no se piden al crear (se rellenan cuando llega su
      hito); solo se guarda su valor de partida, si lo tiene (de fichero o calculado). */
   var lista = todos.filter(function (c) { return !c.hito; });

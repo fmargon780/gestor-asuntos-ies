@@ -99,6 +99,7 @@ var CamposLista = (function () {
   }
 
   function grupoDeCalculado(c) {
+    if (c.grupo && GRUPOS.indexOf(c.grupo) !== -1) return c.grupo;   /* fila 529: el que se eligió al crearlo */
     return (c.categorias || []).some(function (x) { return x === 'ALUMNADO' || x === 'PERSONAL'; }) ? 'Persona' : 'Asunto';
   }
 

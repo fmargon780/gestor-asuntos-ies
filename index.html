@@ -1770,6 +1770,9 @@
      js/ajustes-tipo.js, que los llama al pintar la sección Campos.
      js/campos-calculo.js no depende de nada de aquí abajo (solo de
      U y Nombres, ya cargados); los otros dos sí llaman a App.E. -->
+<!-- Fila 529: los pasos de un campo creado a partir de otros. Antes de js/campos-calculo.js, que los usa. -->
+<script src="js/campos-datos-cache.js"></script>
+<script src="js/campos-pasos.js"></script>
 <script src="js/campos-calculo.js"></script>
 <script src="js/campos-catalogo.js"></script>
 <!-- Fila 528 (docs/528-LISTA-DE-CAMPOS.md): la lista única de campos y la ventana de elegir; después de campos-catalogo.js y de campos-calculados-editor.js. -->
@@ -1780,6 +1783,7 @@
 <script src="js/campos-lista-pantalla.js"></script>
 <script src="js/campos-de-hito.js"></script>
 <script src="js/campo-desde-el-asunto.js"></script>
+<script src="js/campos-calculados-pasos.js"></script>
 <script src="js/campos-calculados-editor.js"></script>
 <!-- Fila 274: el apartado «Al terminar el asunto»; antes de js/ajustes-tipo.js, que lo cuelga. -->
 <script src="js/ajustes-tipo-al-terminar.js"></script>

@@ -1,284 +1,202 @@
 /* ============================================================
-   campos-calculados-editor.js — crear y cambiar un campo calculado
-   (fila 56, 18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md, 6).
+   campos-calculados-editor.js — crear y cambiar un campo a partir de
+   otros, por pasos (fila 529, docs/529-CREAR-CAMPOS-POR-PASOS.md;
+   sustituye al editor de una sola operación de la fila 56).
 
-   Vive dentro del panel de js/campos-catalogo.js (pestaña
-   Calculados), no en un cuadro aparte: solo hay un `U.preguntar` y ya
-   está ocupado por la pantalla del tipo si acaso, así que este
-   formulario se pinta directo en el hueco que le pasan.
+   Un campo lleva: nombre, grupo en el que sale, el campo del que parte
+   y una lista de pasos que se añaden, quitan y ordenan con flechas.
+   Cada paso enseña lo que sale con la persona de ejemplo; al lado, una
+   tabla con el resultado final para varias personas. Qué personas lo
+   usan (`categorias`) se saca de los campos de los que sale.
 
-   La vista previa se prueba con una persona de verdad de la primera
-   categoría marcada (`Datos.cargar`); "Probar con otro" pasa a la
-   siguiente que traiga algo en el origen elegido.
+   Se pinta directo en el hueco que le pasan (`abrir(caja, ctx)`, con
+   `ctx.existente`, `ctx.alGuardar(calculado, esNuevo)` y
+   `ctx.alCancelar()`), como el de antes: lo llaman la lista de campos
+   (js/campos-lista-pantalla.js), la ventana de elegir campo
+   (js/campos-elegir.js) y el catálogo (js/campos-catalogo.js). Los
+   pasos de cada operación están en js/campos-pasos.js; sus casillas,
+   en js/campos-calculados-pasos.js.
+
+   Se puede partir de cualquier campo de la lista que tenga valor para
+   una persona (columnas de sus ficheros, grupo, otros calculados, los
+   datos del Centro de datos, tutores y tablas de datos; no los campos
+   manuales del asunto). Los que no vienen de su ficha se leen antes
+   con js/campos-datos-cache.js, porque el cálculo es síncrono.
    ============================================================ */
 var CamposCalculadosEditor = (function () {
 
-  var CATEGORIAS = Nombres.CATEGORIAS;   /* fila 166: la lista única */
-  var ETIQUETA_OPERACION = {
-    quitarFinal: 'Quitar los últimos caracteres', quitarInicio: 'Quitar los primeros caracteres',
-    partir: 'Partir por un signo', equivalencias: 'Tabla de equivalencias',
-    juntar: 'Juntar dos campos', deFecha: 'Sacar un dato de una fecha'
-  };
+  var GRUPOS = ['Persona', 'Tutores', 'Asunto', 'Centro', 'Firmantes'];
+  var TODAS = ['ALUMNADO', 'PERSONAL'];
 
+  function esc(t) { return U.escapar(String(t == null ? '' : t)); }
   function $(raiz, id) { return raiz.querySelector('#' + id); }
+
+  function clave(o) {
+    if (!o) return '';
+    return o.clase === 'columna' ? 'f|' + o.columna : o.clase === 'calculado' ? 'c|' + o.id : o.clase === 'dato' ? 'd|' + o.id : 'g';
+  }
+  function origenDeEntrada(e) {
+    if (e.id && e.id.indexOf('f:') === 0 && e.columna) return { clase: 'columna', columna: e.columna };
+    if (e.id === 'h:grupo') return { clase: 'grupo' };
+    if (e.calculadoId) return { clase: 'calculado', id: e.calculadoId };
+    if (e.id && (e.id.indexOf('h:') === 0 || e.id.indexOf('d:') === 0)) return { clase: 'dato', id: e.id, nombre: e.nombre };   /* nº escolar, tutores, tablas de datos… */
+    return null;
+  }
+  function nombreCategoria(c) { return c.charAt(0) + c.slice(1).toLowerCase(); }
 
   function abrir(caja, ctx) {
     var existente = ctx.existente;
-    /* Estado del formulario, siempre en memoria hasta que se guarda. */
-    var estado = existente
-      ? {
-          nombre: existente.nombre || '', categorias: (existente.categorias || []).slice(),
-          origen: existente.origen || { clase: 'grupo' },
-          operacion: existente.operacion || 'quitarFinal',
-          parametros: Object.assign({}, existente.parametros || {})
-        }
-      : {
-          nombre: '', categorias: [], origen: { clase: 'grupo' },
-          operacion: 'quitarFinal', parametros: { n: 1, soloSiEsLetra: true }
-        };
-    var personaPrueba = null;
-    var candidatosProbados = 0;
+    var estado = {
+      nombre: existente ? existente.nombre || '' : '',
+      grupo: existente && existente.grupo ? existente.grupo : 'Persona',
+      desde: existente ? existente.origen : null,
+      pasos: existente && window.CamposPasos ? CamposPasos.deLegado(existente) : []
+    };
+    var entradas = [];       /* los campos que se pueden elegir: { clave, origen, nombre, grupo, clases } */
+    var listaCampos = [];    /* la lista completa de campos, para leer los datos de otra parte */
+    var personas = [];
+    var persona = 0;         /* la de ejemplo */
 
-    function categoriaPrincipal() { return estado.categorias[0] || CATEGORIAS[0]; }
+    function receta() {
+      return { id: existente && existente.id ? existente.id : 'nuevo', nombre: estado.nombre.trim(), origen: estado.desde, operacion: 'pasos', parametros: {}, pasos: estado.pasos };
+    }
+    function entradaDe(o) { var k = clave(o); return entradas.filter(function (e) { return e.clave === k; })[0] || null; }
 
-    async function columnasDeCategoria(categoria) {
-      try {
-        var r = App.E.datos ? await Datos.cargar(App.E.datos, categoria) : null;
-        return (r && r.cabecera) || (window.Datos && Datos.LISTAS[categoria] && Datos.LISTAS[categoria].cabecera) || [];
-      } catch (e) { return []; }
+    /* A qué personas vale: la unión de lo que dicen los campos de los que sale. */
+    function categorias() {
+      var out = [];
+      var origenes = [estado.desde];
+      estado.pasos.forEach(function (p) { origenes = origenes.concat(CamposPasos.camposDelPaso(p)); });
+      origenes.forEach(function (o) {
+        var e = entradaDe(o);
+        ((e && e.clases) || []).forEach(function (c) { if (TODAS.indexOf(c) !== -1 && out.indexOf(c) === -1) out.push(c); });
+      });
+      return out.length ? out : TODAS.slice();
     }
 
-    function calculadosDisponibles() {
-      return (App.E.campos.calculados || []).filter(function (c) { return !existente || c.id !== existente.id; });
+    async function cargar() {
+      var lista = [];
+      try { lista = await CamposListaDatos.lista(); } catch (e) { lista = []; }
+      listaCampos = lista;
+      var vistos = {};
+      lista.forEach(function (e) {
+        var o = origenDeEntrada(e);
+        if (!o) return;
+        if (o.clase === 'calculado' && existente && (o.id === existente.id || Calculo.dependeDe(o.id, existente.id, App.E.campos))) return;
+        var k = clave(o);
+        if (vistos[k]) { vistos[k].clases = vistos[k].clases.concat(e.clases || []); return; }
+        vistos[k] = { clave: k, origen: o, nombre: e.nombre, grupo: e.grupo, clases: (e.clases || []).slice() };
+        entradas.push(vistos[k]);
+      });
+      /* Una receta de antes puede partir de algo que la lista no trae: se deja elegible. */
+      var faltan = [estado.desde].concat(estado.pasos.reduce(function (a, p) { return a.concat(CamposPasos.camposDelPaso(p)); }, []));
+      faltan.forEach(function (o) {
+        if (o && !entradaDe(o)) entradas.push({ clave: clave(o), origen: o, nombre: o.clase === 'columna' ? o.columna : (o.clase === 'grupo' ? 'El grupo' : 'Campo calculado'), grupo: 'Persona', clases: [] });
+      });
+      await cargarPersonas();
     }
 
-    async function pintar() {
-      var columnas = await columnasDeCategoria(categoriaPrincipal());
+    async function cargarPersonas() {
+      var cats = categorias(), salida = [];
+      for (var i = 0; i < cats.length; i++) {
+        try { salida = salida.concat(await CamposListaDatos.personas(cats[i])); } catch (e) { /* sin ejemplos de esa categoría */ }
+      }
+      personas = salida;
+      if (persona >= personas.length) persona = 0;
+      /* Los datos de otra parte se leen antes (el cálculo es síncrono): de las personas que se ven. */
+      var ids = window.CamposDatosCache ? CamposDatosCache.idsDe(receta(), App.E.campos) : [];
+      if (ids.length) {
+        var vistas = personas.slice(0, 6).concat(personas[persona] ? [personas[persona]] : []);
+        for (var j = 0; j < vistas.length; j++) await CamposDatosCache.precargar(ids, vistas[j], listaCampos);
+      }
+    }
+
+    function opciones(elegida, vacio) {
+      var k = clave(elegida), h = vacio === undefined ? '' : '<option value="">' + esc(vacio) + '</option>';
+      if (vacio === undefined) h = '<option value="">Elige un campo</option>';
+      GRUPOS.forEach(function (g) {
+        var fs = entradas.filter(function (e) { return e.grupo === g; });
+        if (fs.length) h += '<optgroup label="' + g + '">' + fs.map(function (e) {
+          return '<option value="' + esc(e.clave) + '"' + (e.clave === k ? ' selected' : '') + '>' + esc(e.nombre) + '</option>';
+        }).join('') + '</optgroup>';
+      });
+      return h;
+    }
+
+    function pintar() {
+      var gruposPasos = CamposPasos.GRUPOS_DE_PASOS;
       caja.innerHTML =
-        '<div class="campos-calc-form">' +
-          '<label class="etiqueta" style="margin-top:0">Nombre del campo</label>' +
-          '<input id="calc-nombre" class="campo" value="' + U.escapar(estado.nombre) + '">' +
-          '<div id="calc-nombre-aviso" class="nota"></div>' +
-
-          '<label class="etiqueta">Vale para</label>' +
-          '<div class="campos-calc-categorias">' + CATEGORIAS.map(function (cat) {
-            return '<label class="interruptor interruptor-fila"><input type="checkbox" data-cat="' + cat + '"' +
-              (estado.categorias.indexOf(cat) !== -1 ? ' checked' : '') + '><span>' + cat + '</span></label>';
-          }).join('') + '</div>' +
-
-          '<label class="etiqueta">De dónde sale</label>' +
-          '<select id="calc-origen-clase" class="campo">' +
-            '<option value="grupo"' + (estado.origen.clase === 'grupo' ? ' selected' : '') + '>El grupo (forma compacta)</option>' +
-            '<option value="columna"' + (estado.origen.clase === 'columna' ? ' selected' : '') + '>Una columna de la ficha</option>' +
-            '<option value="calculado"' + (estado.origen.clase === 'calculado' ? ' selected' : '') + '>Otro campo calculado</option>' +
-          '</select>' +
-          (estado.origen.clase === 'columna'
-            ? '<select id="calc-origen-columna" class="campo">' + columnas.map(function (col) {
-                return '<option value="' + U.escapar(col) + '"' + (estado.origen.columna === col ? ' selected' : '') + '>' + U.escapar(col) + '</option>';
-              }).join('') + '</select>'
-            : '') +
-          (estado.origen.clase === 'calculado'
-            ? '<select id="calc-origen-calculado" class="campo">' + calculadosDisponibles().map(function (c) {
-                return '<option value="' + c.id + '"' + (estado.origen.id === c.id ? ' selected' : '') + '>' + U.escapar(c.nombre) + '</option>';
-              }).join('') + '</select>'
-            : '') +
-
-          '<label class="etiqueta">Qué le hago</label>' +
-          '<select id="calc-operacion" class="campo">' + Object.keys(ETIQUETA_OPERACION).map(function (op) {
-            return '<option value="' + op + '"' + (estado.operacion === op ? ' selected' : '') + '>' + ETIQUETA_OPERACION[op] + '</option>';
-          }).join('') + '</select>' +
-          '<div id="calc-parametros"></div>' +
-
-          '<div class="vista-previa" id="calc-preview" style="margin-top:14px"></div>' +
-
-          '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
-            '<button type="button" class="boton" id="calc-cancelar">Cancelar</button>' +
-            '<button type="button" class="boton boton-principal" id="calc-guardar">' +
-              (existente && existente.id ? 'Guardar los cambios' : 'Crear y añadir') + '</button>' +
+        '<div class="campos-calc-form cp-dos">' +
+          '<div class="cp-panel">' +
+            '<h3 style="margin-top:0">' + (existente && existente.id ? 'Cambiar el campo' : 'Campo nuevo a partir de otros') + '</h3>' +
+            '<div class="cp-mitad">' +
+              '<div><label class="etiqueta" for="calc-nombre">Nombre del campo</label><input id="calc-nombre" class="campo" value="' + esc(estado.nombre) + '"><div id="calc-nombre-aviso" class="nota"></div></div>' +
+              '<div><label class="etiqueta" for="calc-desde">Parte de</label><select id="calc-desde" class="campo">' + opciones(estado.desde) + '</select></div>' +
+            '</div>' +
+            '<label class="etiqueta" for="calc-grupo">Grupo en el que sale</label>' +
+            '<select id="calc-grupo" class="campo">' + GRUPOS.map(function (g) { return '<option' + (g === estado.grupo ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select>' +
+            '<div id="calc-pasos" class="cp-pasos">' + estado.pasos.map(function (s, i) {
+              return '<div class="cp-paso"><div class="cp-paso-cab"><strong>Paso ' + (i + 1) + '. ' + esc(CamposPasos.OPS[s.op].n) + '</strong><span class="cp-botones">' +
+                '<button type="button" class="boton boton-chico" data-acc="subir" data-paso="' + i + '"' + (i ? '' : ' disabled') + ' aria-label="Subir el paso ' + (i + 1) + '">↑</button>' +
+                '<button type="button" class="boton boton-chico" data-acc="bajar" data-paso="' + i + '"' + (i < estado.pasos.length - 1 ? '' : ' disabled') + ' aria-label="Bajar el paso ' + (i + 1) + '">↓</button>' +
+                '<button type="button" class="boton boton-chico" data-acc="quitar-paso" data-paso="' + i + '">Quitar</button></span></div>' +
+                '<div class="cp-paso-datos">' + CamposCalculadosPasos.formulario(s, i, opciones) + '</div><div class="cp-sale" id="sale-' + i + '"></div></div>';
+            }).join('') + '</div>' +
+            '<div class="cp-anadir"><label class="nota" for="calc-op">Añadir un paso</label><select id="calc-op" class="campo"><option value="">Elige qué hacer</option>' +
+              gruposPasos.map(function (g) { return '<optgroup label="' + g[0] + '">' + g[1].map(function (k) { return '<option value="' + k + '">' + esc(CamposPasos.OPS[k].n) + '</option>'; }).join('') + '</optgroup>'; }).join('') + '</select></div>' +
+            '<div id="calc-error" class="nota" role="alert"></div>' +
+            '<div class="cp-botones" style="justify-content:flex-end;margin-top:10px">' +
+              '<button type="button" class="boton" id="calc-cancelar">Cancelar</button>' +
+              '<button type="button" class="boton boton-principal" id="calc-guardar">' + (existente && existente.id ? 'Guardar los cambios' : 'Crear y añadir') + '</button></div>' +
+          '</div>' +
+          '<div class="cp-panel"><h3 style="margin-top:0">Resultado</h3>' +
+            '<label class="etiqueta" for="calc-persona">Persona de ejemplo</label><select id="calc-persona" class="campo"></select>' +
+            '<div class="cp-tabla"><table><thead><tr><th>Persona</th><th>Sale</th></tr></thead><tbody id="calc-res"></tbody></table></div>' +
+            '<div id="calc-vale" class="nota"></div>' +
+            '<strong class="nota" style="display:block;margin-top:8px">Probar con uno ya hecho</strong><div id="calc-muestras" class="cp-botones" style="flex-wrap:wrap"></div>' +
+            '<p class="nota" style="margin:8px 0 0">Un campo creado aquí sale en la lista y se puede usar para crear otros.</p>' +
           '</div>' +
         '</div>';
-
-      pintarParametros();
       enganchar();
-      await actualizarPreview();
+      actualizar();
     }
 
-    /* ---------- los parámetros, según la operación elegida ---------- */
-
-    function pintarParametros() {
-      var c = $(caja, 'calc-parametros');
-      var p = estado.parametros;
-      if (estado.operacion === 'quitarFinal') {
-        c.innerHTML =
-          '<label class="etiqueta">Cuántos caracteres</label>' +
-          '<input id="p-n" class="campo" type="number" min="1" max="20" value="' + (p.n || 1) + '">' +
-          '<label class="interruptor interruptor-fila" style="margin-top:6px">' +
-          '<input type="checkbox" id="p-solo-letra"' + (p.soloSiEsLetra ? ' checked' : '') + '>' +
-          '<span>Solo si es una letra</span></label>';
-      } else if (estado.operacion === 'quitarInicio') {
-        c.innerHTML = '<label class="etiqueta">Cuántos caracteres</label>' +
-          '<input id="p-n" class="campo" type="number" min="1" max="20" value="' + (p.n || 1) + '">';
-      } else if (estado.operacion === 'partir') {
-        c.innerHTML =
-          '<label class="etiqueta">El signo</label>' +
-          '<input id="p-signo" class="campo" maxlength="1" style="width:60px" value="' + U.escapar(p.signo || '') + '">' +
-          '<label class="etiqueta">Qué parte</label>' +
-          '<select id="p-lado" class="campo">' +
-            '<option value="antes"' + (p.lado !== 'despues' ? ' selected' : '') + '>Lo de antes</option>' +
-            '<option value="despues"' + (p.lado === 'despues' ? ' selected' : '') + '>Lo de después</option>' +
-          '</select>' +
-          '<label class="etiqueta">De cuál</label>' +
-          '<select id="p-ocurrencia" class="campo">' +
-            '<option value="primera"' + (p.ocurrencia !== 'ultima' ? ' selected' : '') + '>La primera vez que sale</option>' +
-            '<option value="ultima"' + (p.ocurrencia === 'ultima' ? ' selected' : '') + '>La última vez que sale</option>' +
-          '</select>';
-      } else if (estado.operacion === 'equivalencias') {
-        var textoPares = (p.pares || []).map(function (x) { return (x.de || '') + ' -> ' + (x.a || ''); }).join('\n');
-        c.innerHTML =
-          '<label class="etiqueta">Tabla, una equivalencia por línea, así: <code>ALU -&gt; Alumnado</code></label>' +
-          '<textarea id="p-pares" class="campo" rows="4">' + U.escapar(textoPares) + '</textarea>' +
-          '<label class="interruptor interruptor-fila" style="margin-top:6px">' +
-          '<input type="checkbox" id="p-ignorar-mayus"' + (p.ignorarMayusculas ? ' checked' : '') + '>' +
-          '<span>No distinguir mayúsculas ni acentos</span></label>' +
-          '<label class="etiqueta">Si no está en la tabla</label>' +
-          '<select id="p-si-no-esta" class="campo">' +
-            '<option value="dejar"' + (p.siNoEsta !== 'vaciar' ? ' selected' : '') + '>Dejar el valor tal cual</option>' +
-            '<option value="vaciar"' + (p.siNoEsta === 'vaciar' ? ' selected' : '') + '>Dejarlo vacío</option>' +
-          '</select>';
-      } else if (estado.operacion === 'juntar') {
-        var origen2 = p.origen2 || { clase: 'columna' };
-        c.innerHTML =
-          '<label class="etiqueta">Con qué otro campo</label>' +
-          '<select id="p-origen2-clase" class="campo">' +
-            '<option value="columna"' + (origen2.clase === 'columna' ? ' selected' : '') + '>Una columna de la ficha</option>' +
-            '<option value="grupo"' + (origen2.clase === 'grupo' ? ' selected' : '') + '>El grupo (forma compacta)</option>' +
-            '<option value="calculado"' + (origen2.clase === 'calculado' ? ' selected' : '') + '>Otro campo calculado</option>' +
-          '</select>' +
-          '<div id="p-origen2-detalle"></div>' +
-          '<label class="etiqueta">Separador</label>' +
-          '<input id="p-separador" class="campo" style="width:100px" value="' + U.escapar(p.separador || '') + '">';
-      } else if (estado.operacion === 'deFecha') {
-        c.innerHTML =
-          '<label class="etiqueta">Qué dato</label>' +
-          '<select id="p-que" class="campo">' +
-            '<option value="edad"' + (p.que === 'edad' || !p.que ? ' selected' : '') + '>La edad de hoy</option>' +
-            '<option value="anio"' + (p.que === 'anio' ? ' selected' : '') + '>El año</option>' +
-            '<option value="anioAcademico"' + (p.que === 'anioAcademico' ? ' selected' : '') + '>El curso académico</option>' +
-          '</select>';
+    /* Lo que cambia con cada tecla: los resultados, no las casillas. */
+    function actualizar() {
+      var sel = $(caja, 'calc-persona');
+      if (sel) {
+        sel.innerHTML = personas.length ? personas.map(function (p, i) { return '<option value="' + i + '"' + (i === persona ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') : '<option>No hay con quién probarlo todavía</option>';
       }
-    }
-
-    async function pintarOrigen2Detalle() {
-      var cont = $(caja, 'p-origen2-detalle');
-      if (!cont) return;
-      var p = estado.parametros;
-      var origen2 = p.origen2 || { clase: 'columna' };
-      if (origen2.clase === 'columna') {
-        var columnas = await columnasDeCategoria(categoriaPrincipal());
-        cont.innerHTML = '<select id="p-origen2-columna" class="campo">' + columnas.map(function (col) {
-          return '<option value="' + U.escapar(col) + '"' + (origen2.columna === col ? ' selected' : '') + '>' + U.escapar(col) + '</option>';
-        }).join('') + '</select>';
-        var sel = $(caja, 'p-origen2-columna');
-        if (sel) sel.onchange = function () { estado.parametros.origen2 = { clase: 'columna', columna: sel.value }; actualizarPreview(); };
-        if (columnas.length && !origen2.columna) estado.parametros.origen2 = { clase: 'columna', columna: columnas[0] };
-      } else if (origen2.clase === 'calculado') {
-        var opciones = calculadosDisponibles();
-        cont.innerHTML = '<select id="p-origen2-calculado" class="campo">' + opciones.map(function (c) {
-          return '<option value="' + c.id + '"' + (origen2.id === c.id ? ' selected' : '') + '>' + U.escapar(c.nombre) + '</option>';
-        }).join('') + '</select>';
-        var sel2 = $(caja, 'p-origen2-calculado');
-        if (sel2) sel2.onchange = function () { estado.parametros.origen2 = { clase: 'calculado', id: sel2.value }; actualizarPreview(); };
-        if (opciones.length && !origen2.id) estado.parametros.origen2 = { clase: 'calculado', id: opciones[0].id };
-      } else {
-        cont.innerHTML = '';
-        estado.parametros.origen2 = { clase: 'grupo' };
-      }
-    }
-
-    /* ---------- enganchar cada campo del formulario ---------- */
-
-    function enganchar() {
-      $(caja, 'calc-nombre').oninput = function () { estado.nombre = this.value; avisoNombre(); };
-      Array.prototype.forEach.call(caja.querySelectorAll('[data-cat]'), function (c) {
-        c.onchange = function () {
-          estado.categorias = CATEGORIAS.filter(function (cat) {
-            var caja2 = caja.querySelector('[data-cat="' + cat + '"]');
-            return caja2 && caja2.checked;
-          });
-          repintarConservando();
-        };
+      var r = receta(), ej = personas[persona];
+      var traza = ej ? Calculo.trazar(r, ej.persona, App.E.campos) : null;
+      estado.pasos.forEach(function (s, i) {
+        var n = $(caja, 'sale-' + i);
+        if (!n) return;
+        n.innerHTML = traza ? '<span class="cp-tit">Tras este paso, con ' + esc(ej.nombre) + '</span> ' + (traza[i + 1] === '' ? '<span class="nota">vacío</span>' : esc(traza[i + 1])) : '';
       });
-
-      $(caja, 'calc-origen-clase').onchange = function () {
-        var clase = this.value;
-        estado.origen = clase === 'grupo' ? { clase: 'grupo' }
-          : clase === 'columna' ? { clase: 'columna', columna: '' }
-          : { clase: 'calculado', id: '' };
-        repintarConservando();
-      };
-      var selCol = $(caja, 'calc-origen-columna');
-      if (selCol) { if (!estado.origen.columna) estado.origen.columna = selCol.value; selCol.onchange = function () { estado.origen.columna = this.value; actualizarPreview(); }; }
-      var selCal = $(caja, 'calc-origen-calculado');
-      if (selCal) { if (!estado.origen.id) estado.origen.id = selCal.value; selCal.onchange = function () { estado.origen.id = this.value; actualizarPreview(); }; }
-
-      $(caja, 'calc-operacion').onchange = function () {
-        estado.operacion = this.value;
-        estado.parametros = valoresPorDefecto(estado.operacion);
-        pintarParametros();
-        engancharParametros();
-        actualizarPreview();
-      };
-      engancharParametros();
-
-      $(caja, 'calc-cancelar').onclick = function () { ctx.alCancelar(); };
-      $(caja, 'calc-guardar').onclick = guardar;
-      avisoNombre();
-    }
-
-    function valoresPorDefecto(op) {
-      if (op === 'quitarFinal') return { n: 1, soloSiEsLetra: true };
-      if (op === 'quitarInicio') return { n: 1 };
-      if (op === 'partir') return { signo: ' ', lado: 'antes', ocurrencia: 'primera' };
-      if (op === 'equivalencias') return { pares: [], ignorarMayusculas: false, siNoEsta: 'dejar' };
-      if (op === 'juntar') return { origen2: { clase: 'columna', columna: '' }, separador: '-' };
-      if (op === 'deFecha') return { que: 'edad' };
-      return {};
-    }
-
-    function engancharParametros() {
-      var p = estado.parametros;
-      var campoN = $(caja, 'p-n');
-      if (campoN) campoN.oninput = function () { p.n = parseInt(this.value, 10) || 1; actualizarPreview(); };
-      var soloLetra = $(caja, 'p-solo-letra');
-      if (soloLetra) soloLetra.onchange = function () { p.soloSiEsLetra = this.checked; actualizarPreview(); };
-      var signo = $(caja, 'p-signo');
-      if (signo) signo.oninput = function () { p.signo = this.value.charAt(0) || ''; actualizarPreview(); };
-      var lado = $(caja, 'p-lado');
-      if (lado) lado.onchange = function () { p.lado = this.value; actualizarPreview(); };
-      var ocurrencia = $(caja, 'p-ocurrencia');
-      if (ocurrencia) ocurrencia.onchange = function () { p.ocurrencia = this.value; actualizarPreview(); };
-      var pares = $(caja, 'p-pares');
-      if (pares) pares.oninput = function () {
-        p.pares = this.value.split('\n').map(function (linea) {
-          var partes = linea.split('->');
-          return { de: (partes[0] || '').trim(), a: (partes[1] || '').trim() };
-        }).filter(function (x) { return x.de; });
-        actualizarPreview();
-      };
-      var ignorarMayus = $(caja, 'p-ignorar-mayus');
-      if (ignorarMayus) ignorarMayus.onchange = function () { p.ignorarMayusculas = this.checked; actualizarPreview(); };
-      var siNoEsta = $(caja, 'p-si-no-esta');
-      if (siNoEsta) siNoEsta.onchange = function () { p.siNoEsta = this.value; actualizarPreview(); };
-      var origen2Clase = $(caja, 'p-origen2-clase');
-      if (origen2Clase) origen2Clase.onchange = function () {
-        p.origen2 = this.value === 'grupo' ? { clase: 'grupo' } : this.value === 'calculado' ? { clase: 'calculado', id: '' } : { clase: 'columna', columna: '' };
-        pintarOrigen2Detalle().then(actualizarPreview);
-      };
-      if (origen2Clase) pintarOrigen2Detalle();
-      var separador = $(caja, 'p-separador');
-      if (separador) separador.oninput = function () { p.separador = this.value; actualizarPreview(); };
-      var que = $(caja, 'p-que');
-      if (que) que.onchange = function () { p.que = this.value; actualizarPreview(); };
+      var t = $(caja, 'calc-res');
+      if (t) {
+        t.innerHTML = personas.slice(0, 6).map(function (p) {
+          var v = estado.desde ? Calculo.evaluar(r, p.persona, App.E.campos) : '';
+          return '<tr><td>' + esc(p.nombre) + '</td><td>' + (v ? esc(v) : '<span class="nota">vacío</span>') + '</td></tr>';
+        }).join('') || '<tr><td colspan="2" class="nota">No hay con quién probarlo todavía.</td></tr>';
+      }
+      var cats = categorias();
+      var vale = $(caja, 'calc-vale');
+      if (vale) vale.textContent = cats.length === TODAS.length ? 'Vale para todos los tipos de persona.' : 'Vale para ' + cats.map(nombreCategoria).join(' y ') + ', porque sale de sus datos.';
+      var m = $(caja, 'calc-muestras');
+      if (m && !m.dataset.listo) {
+        m.dataset.listo = '1';
+        (App.E.campos.calculados || []).filter(function (c) { return !existente || c.id !== existente.id; }).slice(0, 6).forEach(function (c) {
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'boton boton-chico'; b.textContent = c.nombre;
+          b.onclick = function () {
+            estado.desde = c.origen; estado.pasos = CamposPasos.deLegado(c);
+            cargarPersonas().then(pintar);
+          };
+          m.appendChild(b);
+        });
+      }
     }
 
     function avisoNombre() {
@@ -286,65 +204,66 @@ var CamposCalculadosEditor = (function () {
       if (!aviso) return;
       var nombre = estado.nombre.trim();
       if (!nombre) { aviso.textContent = 'Escribe el nombre del campo.'; return; }
-      var otros = (App.E.campos.calculados || [])
-        .filter(function (c) { return !existente || c.id !== existente.id; })
-        .map(function (c) { return c.nombre; });
+      var otros = (App.E.campos.calculados || []).filter(function (c) { return !existente || c.id !== existente.id; }).map(function (c) { return c.nombre; });
       var cerca = U.parecidos(nombre, otros);
       var mismo = cerca.filter(function (c) { return c.igual; })[0];
-      aviso.textContent = mismo
-        ? 'Ya hay un campo calculado así, escrito: ' + mismo.nombre + '.'
+      aviso.textContent = mismo ? 'Ya hay un campo calculado así, escrito: ' + mismo.nombre + '.'
         : (cerca.length ? 'Ojo, se parece a: ' + cerca.slice(0, 3).map(function (c) { return c.nombre; }).join(', ') + '.' : '');
     }
 
-    function repintarConservando() { pintar(); }
+    function origenDeClave(k) { var e = entradas.filter(function (x) { return x.clave === k; })[0]; return e ? e.origen : null; }
 
-    /* ---------- la vista previa ---------- */
-
-    async function buscarPersonaDePrueba(receta) {
-      var categoria = categoriaPrincipal();
-      var fuente;
-      try { fuente = App.E.datos ? await Datos.cargar(App.E.datos, categoria) : null; } catch (e) { fuente = null; }
-      var lista = (fuente && fuente.lista) || [];
-      if (!lista.length) return null;
-      for (var i = candidatosProbados; i < lista.length; i++) {
-        var valorOrigen = Calculo.valorDeOrigen(receta.origen, lista[i], App.E.campos);
-        if (valorOrigen) { candidatosProbados = i + 1; return lista[i]; }
-      }
-      return null;
+    function enganchar() {
+      $(caja, 'calc-nombre').oninput = function () { estado.nombre = this.value; avisoNombre(); };
+      avisoNombre();
+      $(caja, 'calc-desde').onchange = function () { estado.desde = origenDeClave(this.value); cargarPersonas().then(actualizar); };
+      $(caja, 'calc-grupo').onchange = function () { estado.grupo = this.value; };
+      $(caja, 'calc-persona').onchange = function () { persona = parseInt(this.value, 10) || 0; actualizar(); };
+      $(caja, 'calc-op').onchange = function () { if (!this.value) return; estado.pasos.push(CamposPasos.nuevoPaso(this.value)); pintar(); };
+      $(caja, 'calc-cancelar').onclick = function () { ctx.alCancelar(); };
+      $(caja, 'calc-guardar').onclick = guardar;
+      var pasos = $(caja, 'calc-pasos');
+      pasos.oninput = function (ev) { cambio(ev.target, false); };
+      pasos.onchange = function (ev) { cambio(ev.target, true); };
+      pasos.onclick = function (ev) {
+        var b = ev.target.closest && ev.target.closest('button[data-acc]');
+        if (!b) return;
+        var i = parseInt(b.dataset.paso, 10), j = parseInt(b.dataset.fila, 10), a = b.dataset.acc;
+        if (a === 'subir' && i > 0) estado.pasos.splice(i - 1, 0, estado.pasos.splice(i, 1)[0]);
+        else if (a === 'bajar' && i < estado.pasos.length - 1) estado.pasos.splice(i + 1, 0, estado.pasos.splice(i, 1)[0]);
+        else if (a === 'quitar-paso') estado.pasos.splice(i, 1);
+        else if (a === 'anadir-fila') estado.pasos[i].filas.push({ de: '', a: '' });
+        else if (a === 'quitar-fila') { estado.pasos[i].filas.splice(j, 1); if (!estado.pasos[i].filas.length) estado.pasos[i].filas.push({ de: '', a: '' }); }
+        else return;
+        cargarPersonas().then(pintar);
+      };
     }
 
-    async function actualizarPreview(probarOtro) {
-      var caja2 = $(caja, 'calc-preview');
-      if (!caja2 || !window.Calculo) return;
-      var receta = { origen: estado.origen, operacion: estado.operacion, parametros: estado.parametros };
-      if (!probarOtro) candidatosProbados = 0;
-      personaPrueba = await buscarPersonaDePrueba(receta);
-      if (!personaPrueba) {
-        caja2.innerHTML = '<p class="nota">No hay con quién probarlo todavía.</p>';
-        return;
-      }
-      var valorOrigen = Calculo.valorDeOrigen(receta.origen, personaPrueba, App.E.campos);
-      var resultado = Calculo.evaluar(receta, personaPrueba, App.E.campos);
-      var nombrePersona = (window.App && App.textoTercero) ? App.textoTercero(personaPrueba) : (personaPrueba.nombre || '(sin nombre)');
-      caja2.innerHTML =
-        '<p><strong>Probando con:</strong> ' + U.escapar(nombrePersona) + ' ' +
-        '<button type="button" class="boton boton-chico" id="calc-probar-otro">Probar con otro</button></p>' +
-        '<p><strong>Valor de partida:</strong> ' + (U.escapar(valorOrigen) || '<span class="suave">(vacío)</span>') + '</p>' +
-        '<p><strong>Cálculo:</strong> ' + U.escapar(Calculo.describir(receta, App.E.campos)) + '</p>' +
-        '<p><strong>Resultado:</strong> ' + (U.escapar(resultado) || '<span class="suave">(vacío)</span>') + '</p>';
-      $(caja2, 'calc-probar-otro').onclick = function () { actualizarPreview(true); };
+    /* Una casilla de un paso ha cambiado. `terminado`: se ha soltado (change) y no solo tecleado (input). */
+    function cambio(el, terminado) {
+      if (el.dataset.paso === undefined) return;
+      var s = estado.pasos[parseInt(el.dataset.paso, 10)];
+      if (!s) return;
+      if (el.dataset.fila !== undefined) { s.filas[parseInt(el.dataset.fila, 10)][el.dataset.c] = el.value; actualizar(); return; }
+      var k = el.dataset.k;
+      if (el.type === 'checkbox') s[k] = el.checked;
+      else if (el.dataset.campo) s[k] = el.value ? origenDeClave(el.value) : null;
+      else s[k] = el.value;
+      if (terminado && el.dataset.re) { cargarPersonas().then(pintar); return; }
+      if (terminado && el.dataset.campo) { cargarPersonas().then(actualizar); return; }
+      actualizar();
     }
-
-    /* ---------- guardar ---------- */
 
     async function guardar() {
       var calculado = {
         id: existente && existente.id ? existente.id : ('c' + Date.now() + Math.floor(Math.random() * 1000)),
-        nombre: estado.nombre.trim(), categorias: estado.categorias,
-        origen: estado.origen, operacion: estado.operacion, parametros: estado.parametros
+        nombre: estado.nombre.trim(), categorias: categorias(), grupo: estado.grupo,
+        origen: estado.desde, operacion: 'pasos', parametros: {},
+        pasos: JSON.parse(JSON.stringify(estado.pasos))
       };
       var motivos = Calculo.validar(calculado, App.E.campos);
-      if (motivos.length) { U.aviso(motivos[0], 'malo'); return; }
+      var error = $(caja, 'calc-error');
+      if (motivos.length) { if (error) error.textContent = motivos[0]; U.aviso(motivos[0], 'malo'); return; }
       U.mientrasGuarda($(caja, 'calc-guardar'), async function () {
         try {
           var esNuevo = !(existente && existente.id);
@@ -353,13 +272,13 @@ var CamposCalculadosEditor = (function () {
             if (i === -1) calculados.push(calculado); else calculados[i] = calculado;
             return calculados;
           });
-          U.aviso('Campo calculado ' + calculado.nombre + ' guardado.', 'bueno');
+          U.aviso('Campo ' + calculado.nombre + ' guardado.', 'bueno');
           ctx.alGuardar(calculado, esNuevo);
         } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
       });
     }
 
-    pintar();
+    cargar().then(pintar);
   }
 
   return { abrir: abrir };
