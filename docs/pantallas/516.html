@@ -136,10 +136,10 @@ h2.sub{margin-top:10px}
     e = {
       tareas: [
         { id: 'g', texto: 'Generar la resolución', accion: 'generar', doc: null },
-        { id: 'f', texto: 'Firmar la resolución', accion: 'firmar', doc: null },
+        { id: 'f', texto: 'Firmar la resolución', accion: 'firmar', extra: '2', doc: null },
         { id: 'r', texto: 'Registrar de salida la resolución', accion: 'registrar', doc: null },
         { id: 'c', texto: 'Comunicar la resolución a la familia', accion: 'comunicar', doc: null },
-        { id: 'i', texto: 'Firmar el informe del departamento', accion: 'firmar', doc: null }
+        { id: 'i', texto: 'Firmar el informe del departamento', accion: 'firmar', extra: '1', doc: null }
       ],
       docs: [
         { id: 'a', nombre: '261103 ALEGACIONES D26-01231.pdf', hito: 1, firmas: 0, registro: '', pendiente: true },
@@ -164,11 +164,17 @@ h2.sub{margin-top:10px}
     e.cadena = !t ? null : t.accion === 'firmar' ? 'firma' : t.accion === 'registrar' ? 'sello' : 'enviar';
   }
 
+  function necesarias(t) { return +t.extra || 1; }
+  function faltanFirmas(t) {
+    if (t.accion !== 'firmar' || necesarias(t) < 2) return '';
+    return ' (' + (necesarias(t) - doc(t.doc).firmas === 1 ? 'falta 1' : 'faltan ' + (necesarias(t) - doc(t.doc).firmas)) + ' de ' + necesarias(t) + ' firmas)';
+  }
+
   function faltaHito() {
     var l = [], vistos = {};
     e.tareas.forEach(function (t) {
       if (!abierta(t) || (t.accion !== 'firmar' && t.accion !== 'registrar')) return;
-      if (t.doc) { l.push(CLASE[t.accion] + ': ' + doc(t.doc).nombre); if (t.accion === 'registrar') vistos[t.doc] = 1; }
+      if (t.doc) { l.push(CLASE[t.accion] + ': ' + doc(t.doc).nombre + faltanFirmas(t)); if (t.accion === 'registrar') vistos[t.doc] = 1; }
       else l.push(t.texto + ' (sin documento)');
     });
     e.docs.forEach(function (d) { if (d.hito === 2 && d.pendiente && !d.registro && !vistos[d.id]) l.push('Registrar: ' + d.nombre); });
@@ -182,7 +188,7 @@ h2.sub{margin-top:10px}
 
   function datos(d) {
     var p = [];
-    if (d.firmas) p.push('Firmado');
+    if (d.firmas) p.push(d.firmas > 1 ? 'Firmado (' + d.firmas + ')' : 'Firmado');
     if (d.registro) p.push('Registro ' + d.registro);
     return p.join(' · ');
   }
@@ -220,6 +226,7 @@ h2.sub{margin-top:10px}
   var ACCIONES = [['', 'Sin acción (se marca a mano)'], ['generar', 'Generar un documento'], ['firmar', 'Firmar un documento'], ['registrar', 'Registrar un documento'], ['comunicar', 'Comunicar'], ['anadir', 'Añadir un documento']];
   var EXTRAS = {
     generar: ['Plantilla', ['Certificado', 'Requerimiento']],
+    firmar: ['Firmas necesarias', ['1', '2', '3']],
     registrar: ['Sentido', ['Entrada o salida', 'Entrada', 'Salida']],
     comunicar: ['A quién', ['A quien toque', 'La familia', 'Tutor/a del grupo', 'Otro']]
   };
@@ -259,7 +266,7 @@ h2.sub{margin-top:10px}
     html += e.tareas.map(function (t) {
       return '<div class="tarea-bloque"><div class="tarea' + (t.hecha ? ' hecha' : '') + (t.na ? ' na' : '') + '"><label><input type="checkbox" data-t="' + t.id + '"' + (t.hecha ? ' checked' : '') + (t.na ? ' disabled' : '') + '>' +
         '<span class="tt">' + esc(t.texto) + '</span></label>' +
-        (t.accion ? '<span class="clase">' + CLASE[t.accion] + '</span>' : '') +
+        (t.accion ? '<span class="clase">' + CLASE[t.accion] + (t.accion === 'firmar' && necesarias(t) > 1 ? ' · ' + necesarias(t) + ' firmas' : '') + '</span>' : '') +
         (t.solo ? '<span class="solo">solo aquí</span>' : '') +
         '<button class="enlace" data-cam="' + t.id + '">Cambiar</button>' +
         (t.solo ? '<button class="enlace" data-guia="' + t.id + '">Pasar a la guía</button>' : '') +
@@ -431,11 +438,14 @@ h2.sub{margin-top:10px}
 
   $('s-firmado').onclick = function () {
     limpiar(); var d = doc(e.elegido); e.elegido = null;
-    pasarAPrevias(d, 'SIN FIRMAR');
-    d.firmas = 1; e.verde = 'Documento firmado. El original sin firmar se conserva en «_Previas».';
-    e.notas.unshift('Firmado el ' + HOY + ' · ' + d.nombre);
+    pasarAPrevias(d, d.firmas === 0 ? 'SIN FIRMAR' : d.firmas === 1 ? 'CON 1 FIRMA' : 'CON ' + d.firmas + ' FIRMAS');
+    d.firmas++;
+    e.verde = d.firmas === 1 ? 'Documento firmado. El original sin firmar se conserva en «_Previas».' : 'Documento con ' + d.firmas + ' firmas. El anterior se conserva en «_Previas».';
+    e.notas.unshift((d.firmas === 1 ? 'Firmado' : 'Firmado (' + d.firmas + ' firmas)') + ' el ' + HOY + ' · ' + d.nombre);
     e.tareas.forEach(function (t) {
-      if (t.accion === 'firmar' && t.doc === d.id && abierta(t)) { t.hecha = true; d.ultima = t.id; e.verde += ' Marcado: ' + t.texto + '.'; }
+      if (t.accion !== 'firmar' || t.doc !== d.id || !abierta(t)) return;
+      if (d.firmas >= necesarias(t)) { t.hecha = true; d.ultima = t.id; e.verde += ' Marcado: ' + t.texto + '.'; }
+      else e.verde += ' Aún no se marca la tarea:' + faltanFirmas(t).replace(' (', ' ').replace(')', '') + '.';
     });
     avanzar(); pintar();
   };
