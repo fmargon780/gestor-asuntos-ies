@@ -243,6 +243,17 @@ de `App` va después del fichero que lo define.
 | `js/hito-mesa-guion.js` | «Qué hay que hacer»: el guion de la mesa (el siguiente paso resaltado, fila 145), la pregunta de un hito-pregunta (fila 109) y la caja «Nueva tarea…» (fila 224) |
 | `js/donde-se-guarda.js` | El bloque «¿Dónde se guarda?» (`DondeSeGuarda`, fila 235), que desde la fila 416 solo usan los campos de un hito o del asunto (filas 245 y 255): «En el tipo X» / «Solo en este asunto», con cuántos asuntos abiertos llegan, teclado y el emergente pequeño; más los ayudantes `tipoDe`, `nombreCortoDe` y `otrosAbiertos` que usan los hitos y las tareas. Carga antes que `js/donde-se-guarda-tareas.js` |
 | `js/campo-desde-el-asunto.js` | «+ Añadir campo» en la ficha del asunto (`CampoDesdeElAsunto`, fila 245): panel de `js/campos-catalogo.js`, valor, «¿Dónde se guarda?» (en el tipo / solo aquí), «⋮» de un campo «solo aquí», «Deshacer». Carga después de `js/campos-catalogo.js` |
+| `js/datos-del-asunto.js` | Fila 530: `DatosDelAsunto`, escribir un dato en el asunto (`ficha.campos`), clase y opciones de un dato, «Tutor con custodia» |
+| `js/datos-de-plantilla.js` | Fila 530: `DatosDePlantilla`, la lista de datos de una plantilla con su valor o «falta» |
+| `js/datos-del-asunto-vista.js` | Fila 530: `DatosDelAsuntoVista`, filas de datos para escribir y «Pedirlo antes» |
+| `js/datos-del-asunto-cuadro.js` | Fila 530: `DatosDelAsuntoCuadro`, lo que falta en Correo y Séneca, para escribir |
+| `js/datos-de-la-tarea.js` | Fila 530: `DatosDeLaTarea`, datos bajo una tarea de la mesa del hito y tarea «Pedir datos» |
+| `js/campo-colocar.js` | Fila 530: `CampoColocar`, poner un campo en la parte general o en un hito, para este asunto o los siguientes |
+| `js/campo-elegir-en-asunto.js` | Fila 530: `CampoElegirEnAsunto`, «+ Añadir campo» con la ventana de elegir |
+| `js/campo-desde-el-asunto-escribir.js` | Fila 530: trozo de `campo-desde-el-asunto.js` (escribir en el asunto y en el tipo) |
+| `js/plantillas-documento-elegir.js` | Fila 530: trozo de `plantillas-documento.js` (elegir entre varias plantillas) |
+| `css/datos-del-asunto.css` | Fila 530: estilos de las listas de datos |
+| `pruebas/datos-del-asunto.mjs` | Prueba fila 530 (navegador, copia de pruebas) |
 | `pruebas/campo-desde-el-asunto.mjs` | Prueba (navegador de verdad, fila 245): los 10 puntos de «Cómo sabemos que está bien» |
 | `js/donde-se-guarda-tareas.js` | Nueva, cambiar, pasar y borrar una tarea desde la mesa (`DondeSeGuardaTareas`, fila 235; sin pregunta desde la fila 416): «Nueva tarea…» solo en este asunto, «Cambiar»/«Borrar» de la guía a la guía, «Pasar a la guía» (o el hito propio entero), con «Deshacer» |
 | `js/hitos-desde-el-asunto-guia.js` | Lo de detrás de «A la guía» (`HitosDesdeElAsuntoGuia`, fila 235): llevar un hito propio entero a la guía, instantáneas y «Deshacer». Después de `js/hitos-desde-el-asunto.js` |
