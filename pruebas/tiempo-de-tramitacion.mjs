@@ -16,7 +16,7 @@ const contexto = { console, App: { PANTALLAS: [], E: { tipos: [{ tipo: 'MATRICUL
 contexto.window = contexto;
 contexto.document = { getElementById() { return null; }, addEventListener() {}, readyState: 'complete' };
 vm.createContext(contexto);
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'cuentas.js', 'reservados.js', 'cuentas-tiempos.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'cuentas.js', 'reservados.js', 'cuentas-tiempos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Cuentas, CuentasTiempos } = contexto;

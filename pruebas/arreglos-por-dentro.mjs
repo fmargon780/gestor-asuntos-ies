@@ -38,7 +38,7 @@ function carpeta(nombre) {
 const contexto = { console, TextDecoder, Blob, window: {}, indexedDB: null, setTimeout, clearTimeout,
   document: { readyState: 'loading', addEventListener() {} } };
 vm.createContext(contexto);
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'conflictos.js', 'conflictos-datos.js', 'destinatarios.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'conflictos.js', 'conflictos-datos.js', 'destinatarios.js']) {
   vm.runInContext(leer('js/' + f), contexto, { filename: f });
   Object.keys(contexto.window).forEach(function (k) { if (!(k in contexto)) contexto[k] = contexto.window[k]; });
 }
@@ -107,7 +107,7 @@ comprobar('5. «Comunicar» a un relacionado da las mismas direcciones que el gr
   Destinatarios.delGrupo(miembros).direcciones.join(', '));
 comprobar('5. sin responsable de fuera: el tercero', Destinatarios.deHito('yo', { nombreTercero: 'Ana' }), { nombre: 'Ana', correoPreferente: '' });
 const usan = {
-  correo: leer('js/correo-cuadro.js'), hito: leer('js/hitos-comunicar.js'), seneca: leer('js/seneca-destinatarios.js')
+  correo: ['js/correo-cuadro-destinatarios.js', 'js/correo-cuadro-cuerpo.js', 'js/correo-cuadro-enganche.js', 'js/correo-cuadro.js'].map(leer).join('\n'), hito: leer('js/hitos-comunicar.js'), seneca: leer('js/seneca-destinatarios.js')
 };
 comprobar('5. los tres usan la regla común',
   [/Destinatarios\.(correosDe|posibles|delGrupo|miembrosDeOpcion)/.test(usan.correo),
