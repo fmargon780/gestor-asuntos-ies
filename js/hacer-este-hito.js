@@ -10,7 +10,9 @@
    ninguno de los tres menús.
 
    El apunte `cadena` del hito (hitos.json) dice dónde está parada:
-   { estado: 'esperando-sello' | 'listo-para-enviar', tarea, documento, quien, cuando }.
+   { estado: 'esperando-firma' | 'esperando-sello' | 'listo-para-enviar', tarea, documento, quien, cuando }
+   (fila 523: «esperando-firma» se para en una tarea de firmar; la quita la llegada del firmado,
+   js/tarea-firmar.js).
    Lo borra terminar la cadena, dar el hito por hecho y «Dejar de esperar».
    El reconocimiento del PDF sellado, y el aviso de Inicio, viven en
    js/hacer-este-hito-sello.js.
@@ -20,7 +22,7 @@
    ============================================================ */
 var HacerEsteHito = (function () {
 
-  var ACCIONES = ['generar', 'registrar', 'comunicar'];
+  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar'];
   var activos = {};   /* «asunto|hito» -> true, mientras la cadena corre */
 
   var PARA_QUIEN = { tercero: 'al tercero', tutores: 'a la familia', relacionados: 'a los relacionados', tutoria: 'al tutor o tutora del grupo', otro: 'a otra persona' };
@@ -51,8 +53,9 @@ var HacerEsteHito = (function () {
   function botonHTML(a, h) {
     if (!puede(h) || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return '';   /* fila 293: en un asunto de grupo, los botones de la lista */
     var c = h.cadena;
-    if (c && c.estado === 'esperando-sello') {
-      return '<button type="button" class="boton mesa-hacer-hito mesa-hacer-espera" disabled>Esperando el PDF sellado</button>' +
+    if (c && (c.estado === 'esperando-sello' || c.estado === 'esperando-firma')) {
+      return '<button type="button" class="boton mesa-hacer-hito mesa-hacer-espera" disabled>' +
+        (c.estado === 'esperando-firma' ? 'Esperando el PDF firmado' : 'Esperando el PDF sellado') + '</button>' +
         '<button type="button" class="enlace mesa-hacer-dejar">Dejar de esperar</button>';
     }
     if (c && c.estado === 'listo-para-enviar') {
@@ -63,6 +66,21 @@ var HacerEsteHito = (function () {
     if (!t.some(function (g) { return g.accion === 'generar' || g.accion === 'comunicar'; })) return '';
     return '<button type="button" class="boton boton-principal mesa-hacer-hito"' +
       (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>Hacer este hito</button>';
+  }
+
+  /* Fila 523: el documento con el que trabaja una tarea de firmar o de registrar: el suyo (colgado, js/tareas-con-documento.js)
+     o el que la cadena trae de generar. '' si no tiene. */
+  function documentoDe(h, g, documento) {
+    var e = window.TareasConDocumento ? TareasConDocumento.de(h, g.id) : null;
+    var propio = e && e.doc;
+    if (propio) return (documento && TareasConDocumento.mismo(propio, documento)) ? documento : propio;
+    return documento || '';
+  }
+
+  /* ¿Tendrá documento la tarea `i` de la lista? Lo tiene, o una tarea de generar pendiente va antes. */
+  function tendraDocumento(h, lista, i, documento) {
+    if (documentoDe(h, lista[i], documento)) return true;
+    return lista.slice(0, i).some(function (g) { return g.accion === 'generar'; });
   }
 
   function nombreDePlantilla(g) {
@@ -76,16 +94,19 @@ var HacerEsteHito = (function () {
     if (!puede(h) || (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a))) return '';   /* fila 293 */
     var c = h.cadena;
     if (c && c.estado === 'listo-para-enviar') return '<div class="mesa-hacer-linea">El documento ya está sellado.</div>';
-    if (c && c.estado === 'esperando-sello') return '';
+    if (c && (c.estado === 'esperando-sello' || c.estado === 'esperando-firma')) return '';
     var t = tareasDe(a, h);
     if (!t.some(function (g) { return g.accion === 'generar' || g.accion === 'comunicar'; })) return '';
-    var partes = t.map(function (g) {
+    var partes = t.map(function (g, i) {
       if (g.accion === 'generar') return 'Genera «' + nombreDePlantilla(g) + '»';
+      /* Fila 523: una tarea de firmar o de registrar sin documento no se espera. */
+      if ((g.accion === 'firmar' || g.accion === 'registrar') && !tendraDocumento(h, t, i, '')) return '';
+      if (g.accion === 'firmar') return 'espera la firma';
       if (g.accion === 'registrar') return 'espera el registro en Séneca';
       var r = g.receta || {};
       return (r.via === 'seneca' ? 'mensaje por Séneca' : 'correo') + (PARA_QUIEN[r.a] ? ' ' + PARA_QUIEN[r.a] : '');
     });
-    return '<div class="mesa-hacer-linea">' + U.escapar(partes.join(' → ')) + '</div>';
+    return '<div class="mesa-hacer-linea">' + U.escapar(partes.filter(Boolean).join(' → ')) + '</div>';
   }
 
   function enganchar(cab, a, h) {
@@ -130,6 +151,14 @@ var HacerEsteHito = (function () {
     });
     if (!res || !guardado) return { sigue: false };
     return { sigue: true, documento: WordVisor.nombrePdf(res.nombre) };
+  }
+
+  /* Fila 523: se para a esperar el PDF firmado; lo que lo marca es la llegada del firmado (js/tarea-firmar.js). */
+  async function pasoFirmar(a, h, g, documento) {
+    var doc = documentoDe(h, g, documento);
+    await guardarCadena(a, h, { estado: 'esperando-firma', tarea: g.id, documento: doc, quien: App.E.usuario || '', cuando: U.ahora() });
+    repintar();
+    return { sigue: false };
   }
 
   async function pasoRegistrar(a, h, g, documento) {
@@ -228,12 +257,13 @@ var HacerEsteHito = (function () {
     activos[k] = true;
     var documento = (hito0.cadena && hito0.cadena.documento) || '';
     var intentadas = {};
+    var saltadas = {};
     try {
       for (var vuelta = 0; vuelta < 30; vuelta++) {
         var h = await fresco(a, hito0.id);
         if (!h || h.estado === 'hecho') return;
         var guion = Hitos.guionDe(a, h);
-        var pendientes = guion.filter(function (g) { return !g.hecho && !g.noaplica && (g.pregunta || ACCIONES.indexOf(g.accion) !== -1); });
+        var pendientes = guion.filter(function (g) { return !g.hecho && !g.noaplica && (g.pregunta || ACCIONES.indexOf(g.accion) !== -1) && !saltadas[g.id]; });
         var sig = pendientes[0];
         if (!sig) break;
         if (sig.pregunta) { U.aviso('Antes hay que responder: «' + sig.texto + '».', 'ambar'); return; }
@@ -241,8 +271,11 @@ var HacerEsteHito = (function () {
         intentadas[sig.id] = true;
         var resto = pendientes.slice(1).filter(function (g) { return !g.pregunta; })[0];
         var r;
+        /* Fila 523: firmar o registrar sin documento no se espera: pasa a la siguiente y queda pendiente. */
+        if ((sig.accion === 'firmar' || sig.accion === 'registrar') && !documentoDe(h, sig, documento)) { saltadas[sig.id] = true; continue; }
         if (sig.accion === 'generar') r = await pasoGenerar(a, h, sig, resto);
-        else if (sig.accion === 'registrar') r = await pasoRegistrar(a, h, sig, documento);
+        else if (sig.accion === 'firmar') r = await pasoFirmar(a, h, sig, documento);
+        else if (sig.accion === 'registrar') r = await pasoRegistrar(a, h, sig, documentoDe(h, sig, documento));
         else r = await pasoComunicar(a, h, sig, documento);
         if (!r || !r.sigue) return;
         if (r.documento) documento = r.documento;
@@ -256,11 +289,29 @@ var HacerEsteHito = (function () {
     }
   }
 
+  /* Fila 523: lo que queda apuntado en el hito tras marcar una tarea (sin pasar por la cadena): según la siguiente tarea
+     pendiente, espera su firma, espera su sello, queda listo para enviar, o nada. Lo usa js/tarea-firmar.js. */
+  function cadenaTrasMarcar(a, h, documento) {
+    /* La siguiente que se espera: firmar o registrar solo si tiene su documento (si no, se salta, como en la cadena). */
+    var sig = tareasDe(a, h).filter(function (g) {
+      return (g.accion !== 'firmar' && g.accion !== 'registrar') || (window.TareasConDocumento && TareasConDocumento.de(h, g.id));
+    })[0];
+    if (!sig) return null;
+    var ahora = { quien: App.E.usuario || '', cuando: U.ahora() };
+    if (sig.accion === 'comunicar') return Object.assign({ estado: 'listo-para-enviar', tarea: sig.id, documento: documento }, ahora);
+    if (sig.accion === 'firmar' || sig.accion === 'registrar') {
+      var doc = documentoDe(h, sig, documento);
+      if (!doc) return null;
+      return Object.assign({ estado: sig.accion === 'firmar' ? 'esperando-firma' : 'esperando-sello', tarea: sig.id, documento: doc }, ahora);
+    }
+    return null;
+  }
+
   return {
     botonHTML: botonHTML, lineaHTML: lineaHTML, enganchar: enganchar, enCurso: enCurso,
     ejecutar: ejecutar, tareasDe: tareasDe,
     /* para js/hacer-este-hito-sello.js y las pruebas */
-    _fresco: fresco, _guardarCadena: guardarCadena
+    _fresco: fresco, _guardarCadena: guardarCadena, _cadenaTrasMarcar: cadenaTrasMarcar
   };
 })();
 window.HacerEsteHito = HacerEsteHito;

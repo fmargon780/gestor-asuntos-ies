@@ -127,6 +127,7 @@ var HacerEsteHitoSello = (function () {
     if (!e) return '';
     if (cadenasDe(e.hitos, 'listo-para-enviar').length) return ' <span class="suave marca-cadena">· listo para enviar</span>';
     if (cadenasDe(e.hitos, 'esperando-sello').length) return ' <span class="suave marca-cadena">· esperando el sello</span>';
+    if (cadenasDe(e.hitos, 'esperando-firma').length) return ' <span class="suave marca-cadena">· esperando la firma</span>';   /* fila 523 */
     return '';
   }
 

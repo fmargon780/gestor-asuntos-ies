@@ -331,6 +331,7 @@ window.Ayudas = (function () {
     'hacer este hito': 'Abre la mesa de trabajo del hito, con sus tareas y sus documentos.',
     'dejar de esperar': 'Quita la espera: el asunto vuelve a estar en nuestras manos.',
     'no ha llegado nada': 'Apunta que todavía no ha llegado lo que esperábamos y sigue esperando.',
+    'esperando el pdf firmado': 'Queda pendiente del PDF con la firma, guardado encima de este documento.',
     'esperando el pdf sellado': 'Queda pendiente del PDF con el sello de registro.',
     'cambiar': 'Cambia este dato.',
     'cambiar los datos': 'Cambia los datos de esta persona o entidad.',

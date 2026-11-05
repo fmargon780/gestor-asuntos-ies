@@ -16,3 +16,9 @@
 .tcd-receta .guion-fila-linea { display: contents; }
 .tcd-botones { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
 .guion-tarea-editar { max-width: none; }
+
+/* Fila 523: la clase de la tarea de firmar, «Firmar · 2 firmas». */
+.guion-tarea-clase {
+  font-size: 11px; color: var(--tinta-suave); background: var(--fondo); border-radius: 10px;
+  padding: 1px 7px; white-space: nowrap;
+}

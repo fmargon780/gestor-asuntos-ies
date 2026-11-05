@@ -8,6 +8,8 @@
    marca «Firmado» en la línea gris, js/documentos-datos.js), escribir la
    nota del asunto y poner el aviso verde.
 
+   (Fila 523: `alLlegar` también marca la tarea de firmar de ese documento, js/tarea-firmar.js.)
+
    Solo cuenta firmas: no comprueba que sean válidas ni quién firma.
 
    Quién lo usa:
@@ -80,10 +82,12 @@ window.DocumentosFirmados = (function () {
     if (!principal) return;
     try { await nota(a, doc, textoDeLaNota(caso, firmas, doc)); }
     catch (e2) { U.accesorio('Documento firmado, pero no he podido apuntarlo en las notas', e2); }
-    if (!carpetaPrevias) return;
-    U.aviso(caso === 'masFirmas'
+    /* Fila 523: la tarea de firmar de ese documento se marca sola (js/tarea-firmar.js) y el aviso lo dice. */
+    var tarea = window.TareaFirmar ? await TareaFirmar.alLlegar(a, doc, firmas) : '';
+    if (!carpetaPrevias) { if (tarea) U.aviso(tarea.trim(), 'bueno'); return; }
+    U.aviso((caso === 'masFirmas'
       ? 'Documento con ' + firmas + ' firmas. El anterior se conserva en «' + carpetaPrevias + '».'
-      : 'Documento firmado. El original sin firmar se conserva en «' + carpetaPrevias + '».', 'bueno');
+      : 'Documento firmado. El original sin firmar se conserva en «' + carpetaPrevias + '».') + tarea, 'bueno');
   }
 
   /* Se contesta «Usar el nuevo» a la pregunta: la nota dice qué pasó. */
