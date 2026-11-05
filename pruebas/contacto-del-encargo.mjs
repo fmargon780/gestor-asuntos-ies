@@ -16,7 +16,7 @@ function comprobar(titulo, real, esperado) {
 const dom = new JSDOM('<!doctype html><html><body><div id="caja"></div></body></html>', { runScripts: 'outside-only' });
 const win = dom.window;
 win.App = { E: { usuario: 'Francisco' } };
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'lo-pide.js', 'contacto-a-la-vista.js', 'plantillas.js', 'plantillas-valores.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'lo-pide.js', 'contacto-a-la-vista.js', 'plantillas.js', 'plantillas-valores.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { ContactoALaVista, Plantillas } = win;

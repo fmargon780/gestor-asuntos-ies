@@ -34,7 +34,7 @@ vm.createContext(contexto);
 contexto.App = contexto.window.App = { E: { datos: dirDatos, gestor, archivo, listaAbiertos: [] },
   FICHAS_DE_CATEGORIA: {}, trasPintarFicha: [] };
 contexto.Gestor = contexto.window.Gestor = { alCrearAsunto: [], alRefrescar: [] };
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'datos.js', 'datos-alumnado.js',
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'datos.js', 'datos-alumnado.js',
   'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'personas-familias.js', 'tutores-legales.js']) {
   vm.runInContext(fs.readFileSync(raiz + 'js/' + f, 'utf8'), contexto, { filename: f });
 }
@@ -128,7 +128,7 @@ comprobar('5. las cinco categorías (y, desde la fila 167, ADMINISTRACIONES)', N
 const aMano = [];
 for (const f of fs.readdirSync(raiz + 'js').filter((x) => x.endsWith('.js'))) {
   const texto = fs.readFileSync(raiz + 'js/' + f, 'utf8');
-  if (f !== 'nombres.js' && /\[\s*'ALUMNADO'\s*,\s*'PERSONAL'/.test(texto)) aMano.push(f);
+  if (f !== 'nombres.js' && f !== 'nombres-tipos.js' && /\[\s*'ALUMNADO'\s*,\s*'PERSONAL'/.test(texto)) aMano.push(f);
 }
 const html = fs.readFileSync(raiz + 'index.html', 'utf8');
 if (/<option value="(EMPRESAS|OTROS|PERSONAL)"/.test(html)) aMano.push('index.html');

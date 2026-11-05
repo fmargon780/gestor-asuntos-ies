@@ -55,7 +55,7 @@ contexto.addEventListener = function () {};
 vm.createContext(contexto);
 for (const f of [
   'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js',
-  'copias.js', 'cola-guardado.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'conflictos.js',
+  'copias.js', 'cola-guardado.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'nucleo.js', 'nucleo-tipos.js', 'nucleo-registro.js', 'borrados-fusion.js', 'conflictos.js',
   'guias.js', 'guias-enganche.js', 'presencia.js', 'vistazo-registro.js'
 ]) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });

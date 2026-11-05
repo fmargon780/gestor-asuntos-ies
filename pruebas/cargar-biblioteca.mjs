@@ -107,8 +107,8 @@ win.Blob = Blob;
 win.addEventListener = function () {};
 win.App = null;   /* lo crea nucleo.js */
 
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'nombres.js', 'guias.js', 'guias-requisitos.js',
-                  'campos.js', 'nucleo.js', 'borrados-fusion.js',
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'nombres-tipos.js', 'nombres-montar.js', 'nombres-terceros.js', 'nombres.js', 'guias.js', 'guias-requisitos.js',
+                  'campos-normalizar.js', 'campos-guardar.js', 'campos-valores.js', 'campos.js', 'nucleo.js', 'nucleo-tipos.js', 'nucleo-registro.js', 'borrados-fusion.js',
                   'hitos-biblioteca.js', 'guias-enganche.js', 'cargar-fichero.js', 'cargar-biblioteca.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
