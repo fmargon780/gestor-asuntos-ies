@@ -145,6 +145,9 @@ await pagina.evaluate(async () => {
   window.__doc = doc;
 });
 await lanzar();
+/* Fila 524: con un documento pendiente de registro sale antes «Falta por hacer en este asunto»; se sigue «igualmente». */
+await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent === 'Falta por hacer en este asunto');
+await pagina.click('#cuadro-aceptar');
 const nuevoStem = sinRelleno(largo90, 20);
 await pagina.fill('.ac-caja', nuevoStem);
 await pagina.click('#cuadro-aceptar');

@@ -8,7 +8,7 @@
      1. Al abrir el hito, el guion, los documentos del hito y el registro están a la vez,
         de arriba abajo, sin tarjetas de resumen.
      2. En los documentos, el nombre del fichero entero (sin «…») y el gemelo debajo,
-        con «26SM0617» y «Sin registrar».
+        con «26SM0617» y, sin la casilla de pendiente, sin marca (fila 524).
      3. Escape cierra la mesa (la lista de hitos) y no se vuelve a abrir sola.
      4. Escribir una nota sin guardar y forzar un repintado: el texto sigue en la caja.
         Intro guarda; la nota sale arriba del registro.
@@ -126,7 +126,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* 2. */
   await comprobar('2. «26SM0617» y «Sin registrar»',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-grande-docs .mesa-doc-estado, .hito-en-mesa .mesa-grande-docs .mesa-doc-registro')).map((e) => e.textContent).filter((t) => t !== '—').sort()),
-    ['26SM0617', 'Registrado', 'Sin registrar']);
+    ['', '26SM0617', 'Registrado']);   /* fila 524: «Sin registrar» solo con casilla o tarea de registrar; aquí sin marca */
   /* Fila 439: una sola línea; un nombre larguísimo puede cortarse con «…» y entonces se ve entero en el title. */
   await comprobar('2. el nombre del fichero, entero (o cortado con «…» y entero en el title)',
     pagina.evaluate((reg) => {
