@@ -15,6 +15,13 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (25-oct-2026, tema 448) Los hitos y tareas que dividen el trámite en caminos según una respuesta se
   siguen llamando **«pregunta»**. Cambiar el nombre sería una idea aparte.
 
+- (5-nov-2026, tema 516) Cada tarea de generar, firmar o registrar lleva **colgado su documento** («poder ver colgado de la tarea del hito el documento involucrado»), y solo se marca sola con él. El documento es del asunto, no de la guía.
+- (5-nov-2026, tema 516) Una tarea hecha muestra **la versión con la que quedó** el documento, porque «ya no es igual al de la tarea anterior».
+- (5-nov-2026, tema 516) Una tarea creada en el hito se configura **igual que en la guía** («Qué se hace»): «es fundamental poder crear desde un asunto concreto la guía de ese tipo de asuntos para el futuro, así como modificarlo».
+- (5-nov-2026, tema 516) **Se avisa, no se impide:** al marcar el hito, archivar o enviar, sale lo que falta por firmar o registrar y se puede seguir. Solo cuenta lo que hay que firmar o registrar.
+- (5-nov-2026, tema 516) **El hito no se cierra solo:** con todo hecho se resalta «Marcar como hecho».
+- (5-nov-2026, tema 516) Una tarea de firmar puede pedir **varias firmas**, y se marca al llegar a ese número.
+
 ## Plantillas
 
 - (4-nov-2026, fila 510) Las variantes de un documento se resuelven con **textos condicionales**
