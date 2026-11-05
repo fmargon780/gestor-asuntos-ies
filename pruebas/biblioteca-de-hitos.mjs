@@ -45,7 +45,7 @@ win.TextDecoder = TextDecoder;
 win.Blob = Blob;
 win.App = { E: { usuario: 'Francisco' } };
 
-for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'guias.js', 'guias-requisitos.js',
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'guias.js', 'guias-requisitos.js',
                   'hitos-biblioteca.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }

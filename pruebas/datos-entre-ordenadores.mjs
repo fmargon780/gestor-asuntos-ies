@@ -54,7 +54,7 @@ contexto.window = contexto;
 contexto.addEventListener = function () {};
 vm.createContext(contexto);
 for (const f of [
-  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js',
+  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js',
   'copias.js', 'cola-guardado.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'conflictos.js',
   'guias.js', 'guias-enganche.js', 'presencia.js', 'vistazo-registro.js'
 ]) {

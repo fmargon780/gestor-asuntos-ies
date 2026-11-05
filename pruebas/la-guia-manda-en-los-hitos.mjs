@@ -39,7 +39,7 @@ function nuevoContexto(opciones) {
   vm.createContext(ctx);
   vm.runInContext(leerFuente('util.js'), ctx, { filename: 'util.js' });
   for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(leerFuente(f), ctx, { filename: f });
-  for (const f of ['plazos.js', 'hitos.js', 'hitos-sincronizar.js', 'hitos-desde-el-asunto.js']) vm.runInContext(leerFuente(f), ctx, { filename: f });
+  for (const f of ['plazos.js', 'hitos-normalizar.js', 'hitos-fichero.js', 'hitos-arbol.js', 'hitos.js', 'hitos-sincronizar.js', 'hitos-desde-el-asunto-puras.js', 'hitos-desde-el-asunto-formulario.js', 'hitos-desde-el-asunto-propagar.js', 'hitos-desde-el-asunto-cambiar.js', 'hitos-desde-el-asunto.js']) vm.runInContext(leerFuente(f), ctx, { filename: f });
   return { ctx, disco, Hitos: ctx.Hitos, D: ctx.HitosDesdeElAsunto };
 }
 

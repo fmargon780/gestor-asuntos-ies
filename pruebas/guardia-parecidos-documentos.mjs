@@ -39,7 +39,7 @@ const win = dom.window;
 win.TextDecoder = TextDecoder;
 win.Blob = Blob;
 
-for (const f of ['util.js', 'util-parecidos.js', 'carpetas.js', 'copias.js', 'guias.js', 'guias-requisitos.js',
+for (const f of ['util.js', 'util-parecidos.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'guias.js', 'guias-requisitos.js',
                   'hitos-biblioteca.js', 'campos.js', 'guias-biblioteca.js', 'guias-biblioteca-guardias.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }

@@ -96,8 +96,8 @@ win.App = null;   /* lo crea nucleo.js */
 
 for (const f of [
   'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js',
-  'carpetas.js', 'copias.js', 'nombres.js', 'campos.js', 'nucleo.js', 'borrados-fusion.js',
-  'asuntos-editar.js', 'guias-enganche.js', 'hitos.js', 'hitos-sincronizar.js',
+  'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'nombres.js', 'campos.js', 'nucleo.js', 'borrados-fusion.js',
+  'asuntos-editar.js', 'guias-enganche.js', 'hitos-normalizar.js', 'hitos-fichero.js', 'hitos-arbol.js', 'hitos.js', 'hitos-sincronizar.js',
   'asunto-renombrar.js', 'plantillas.js', 'papelera.js', 'estado-hito.js',
   'tipos-nombre.js', 'tipos-unir.js'
 ]) {

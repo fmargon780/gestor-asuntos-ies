@@ -40,7 +40,7 @@ const App = { E: { usuario: 'Francisco', listaAbiertos: [] } };
 const window = { Hitos, U, GuiasDelCentro, App };
 const contexto = { console, window, Hitos, U, GuiasDelCentro, App };
 vm.createContext(contexto);
-for (const f of ['guias-guion.js', 'hitos-guion.js']) vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
+for (const f of ['guias-guion.js', 'hitos-guion.js', 'hitos-guion-marcar.js', 'hitos-guion-reunir.js']) vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 const GuiasGuion = window.GuiasGuion;
 
 let fallos = 0;

@@ -46,8 +46,8 @@ vm.createContext(contexto);
    sitios antes de cargar nada, y copiar en los dos sentidos después. */
 contexto.App = contexto.window.App = { E: { usuario: 'Francisco', datos: {} } };
 for (const f of [
-  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js', 'lo-pide.js', 'destinatarios.js',
-  'plantillas.js', 'plantillas-valores.js', 'guias.js', 'hitos.js', 'hitos-archivo.js', 'correo.js', 'correo-grupos.js', 'correo-rastro.js', 'correo-adjuntos.js',
+  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas-disco.js', 'carpetas-copiar.js', 'carpetas-ficheros.js', 'carpetas.js', 'copias.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js', 'lo-pide.js', 'destinatarios.js',
+  'plantillas.js', 'plantillas-valores.js', 'guias.js', 'hitos-normalizar.js', 'hitos-fichero.js', 'hitos-arbol.js', 'hitos.js', 'hitos-archivo.js', 'correo.js', 'correo-grupos.js', 'correo-rastro.js', 'correo-adjuntos.js',
   'hitos-comunicar.js', 'hitos-anadir.js', 'hitos-documento-menu.js'
 ]) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
