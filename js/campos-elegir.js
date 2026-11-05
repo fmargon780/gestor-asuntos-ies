@@ -88,7 +88,7 @@ var CamposElegir = (function () {
         return '<button type="button" class="campos-fila-campo" data-id="' + esc(c.id) + '"><span class="campos-fila-nombre">' + esc(c.nombre) +
           (q ? ' <span class="suave pequeno">· ' + esc(c.grupo) + '</span>' : '') + '</span>' +
           '<span class="campos-fila-ej suave pequeno">' + (ej ? '→ ' + esc(ej) : '<em>sin dato</em>') + '</span>' +
-          '<span class="campos-etq' + (c.origen === 'Manual' ? ' etq-manual' : c.origen === 'Calculado' ? ' etq-calculado' : '') + '">' + esc(CamposLista.rutaCorta(c)) + '</span></button>';
+          '<span class="campos-etq' + (c.origen === 'Manual' ? ' etq-manual' : c.origen === 'Calculado' ? ' etq-calculado' : '') + '">' + esc(CamposLista.rutaCorta(c) || c.origen) + '</span></button>';
       }
       var centro;
       if (st.modo === 'manual') centro = '<div id="ce-manual"></div>';

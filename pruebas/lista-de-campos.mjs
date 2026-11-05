@@ -133,6 +133,37 @@ await comprobar('5. la segunda vez se elige de la lista', pagina.$$eval('.campos
 await pagina.press('#ce-buscar', 'Escape');
 await pagina.evaluate(async () => { const c = (await CamposListaDatos.lista()).find((x) => x.nombre === 'Fecha de la visita'); await Campos.guardarPropios(App.E.gestor, (l) => l.filter((x) => x.id !== c.propioId)); });
 
+console.log('--- 5b. lo que vio el segundo revisor ---');
+await comprobar('5b. una columna de RegAlum que ya sale como otro campo no se repite ni deja un manual fantasma', pagina.evaluate(() => {
+  const l = CamposLista.reunir({ huecos: [{ clave: 'referencia', etiqueta: 'Nº escolar, documento o NIF del tercero' }], cabeceras: { ALUMNADO: ['Nº Id. Escolar'] }, textos: [{ donde: 'X', texto: '{campo:Nº Id. Escolar}' }] });
+  return [l.length, l[0].origen];
+}), [1, 'Centro de datos']);
+await comprobar('5b. un manual puesto en un tipo cuenta ese tipo en «Se usa en» (no dice «todavía no se usa» y a la vez «no se puede quitar»)', pagina.evaluate(() => {
+  const l = CamposLista.reunir({ config: { propios: [{ id: 'p1', nombre: 'Importe', clase: 'importe', valores: [] }], porTipo: { FACTURA: [{ origen: 'propio', id: 'p1' }] } } });
+  return [l[0].usos, CamposLista.sePuedeQuitar(l[0])];
+}), [['Tipo de asunto «FACTURA»'], false]);
+await comprobar('5b. el ejemplo del grupo sale con una persona del alumnado y «Ejemplos con» no repite nombres', pagina.evaluate(async () => {
+  const ps = await CamposListaDatos.personas('ALUMNADO');
+  const l = await CamposListaDatos.lista();
+  const g = l.find((c) => c.id === 'h:grupo');
+  return [ps.length === new Set(ps.map((p) => p.nombre)).size, !!(await CamposListaDatos.ejemplo(g, ps[0]))];
+}), [true, true]);
+await comprobar('5b. el detalle dice cuándo llegó o se copió el fichero', pagina.evaluate(async () => {
+  const l = await CamposListaDatos.lista(); const e = await CamposListaDatos.entrada();
+  const f = await CamposListaDatos.fechaDelFichero(l.find((c) => c.id === 'h:referencia'), e.ficheros);
+  return /^Fichero (recibido|copiado aquí) el /.test(f);
+}), true);
+await comprobar('5b. a 390 px la sección no ensancha la página', (async () => {
+  await pagina.click('#cuadro-cancelar'); await pagina.waitForSelector('#capa', { state: 'hidden' });
+  await pagina.setViewportSize({ width: 390, height: 800 });
+  await pagina.click('.pestana[data-pantalla="ajustes"]'); await pagina.click('.pestana-ajustes[data-ajustes-pestana="centro"]');
+  await pagina.evaluate(() => { document.getElementById('bloque-lista-campos').open = true; });
+  await pagina.waitForSelector('#lista-campos-cuerpo tbody tr[data-id]', { timeout: 20000 });
+  await pagina.waitForTimeout(500);
+  return pagina.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+})(), true);
+await pagina.setViewportSize({ width: 1500, height: 1000 });
+
 console.log('--- 6. una plantilla antigua con {campo:Nombre} a mano ---');
 await comprobar('6. un {campo:…} escrito a mano en una plantilla entra en la lista, sin dejar de funcionar', pagina.evaluate(() => {
   const l = CamposLista.reunir({ huecos: [], textos: [{ donde: 'Correo «X»', texto: 'Hola {campo:Escrito a mano}' }] });

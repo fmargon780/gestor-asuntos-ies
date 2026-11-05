@@ -65,7 +65,7 @@ var CamposListaPantalla = (function () {
       '<div class="campos-lista-tabla"><table><thead><tr><th>Campo</th><th>Grupo</th><th>De dónde sale</th><th>Ejemplo</th><th>Dónde se pide</th><th>Se usa en</th></tr></thead><tbody>' +
       (fs.length ? fs.map(function (c) {
         return '<tr tabindex="0" data-id="' + esc(c.id) + '" class="' + (estado.sel === c.id ? 'sel' : '') + '"><td>' + esc(c.nombre) + '</td><td>' + esc(c.grupo) + '</td>' +
-          '<td>' + etiqueta(c) + '<div class="suave pequeno">' + esc(CamposLista.rutaCorta(c)) + '</div></td><td>' + ejemploHtml(ejemplos[c.id]) + '</td>' +
+          '<td>' + etiqueta(c) + (CamposLista.rutaCorta(c) ? '<div class="suave pequeno">' + esc(CamposLista.rutaCorta(c)) + '</div>' : '') + '</td><td>' + ejemploHtml(ejemplos[c.id]) + '</td>' +
           '<td class="suave pequeno">' + esc(CamposLista.dondeSePide(c)) + '</td><td class="num">' + c.usos.length + '</td></tr>';
       }).join('') : '<tr><td colspan="6" class="suave">Ningún campo con ese nombre.</td></tr>') +
       '</tbody></table></div></div><div class="campos-lista-der" id="cl-detalle"></div></div>';
@@ -96,7 +96,7 @@ var CamposListaPantalla = (function () {
     var clases = campo.clases.length ? 'vale para ' + campo.clases.map(function (x) { return CamposLista.CLASES_PERSONA[x] || x; }).join(', ') : 'vale para todos';
     var h = '<h3>' + esc(campo.nombre) + '</h3><div>' + etiqueta(campo) + ' <span class="suave pequeno">Grupo ' + esc(campo.grupo) + ' · ' + esc(clases) + '</span></div>' +
       '<p class="campos-camino"><strong class="pequeno">De dónde sale</strong><br><span id="cl-camino">' + esc(CamposLista.camino(campo)) + '</span>' +
-      (fecha ? '<br><span class="suave pequeno" id="cl-fecha">Fichero recibido el ' + esc(fecha) + '</span>' : '') + '</p>' +
+      (fecha ? '<br><span class="suave pequeno" id="cl-fecha">' + esc(fecha) + '</span>' : '') + '</p>' +
       '<p><strong class="pequeno">Ejemplo con ' + esc(persona ? persona.nombre : 'nadie') + '</strong><br>' + ejemploHtml(ej) + '</p>' +
       '<p><strong class="pequeno">Se escribe así en una plantilla</strong><br><code>' + esc(campo.marca) + '</code></p>';
     if (campo.propioId) {

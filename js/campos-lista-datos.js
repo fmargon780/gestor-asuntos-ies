@@ -69,7 +69,8 @@ var CamposListaDatos = (function () {
     try {
       var r = await Datos.cargar(App.E.datos, categoria || 'ALUMNADO');
       return (r.lista || []).filter(function (p) { return categoria !== 'ALUMNADO' || p.matriculado !== false; }).slice(0, 30)
-        .map(function (p) { return { categoria: categoria || 'ALUMNADO', nombre: p.nombre, persona: p }; });
+        .map(function (p) { return { categoria: categoria || 'ALUMNADO', nombre: p.nombre, persona: p }; })
+        .filter(function (p, i, todas) { return todas.findIndex(function (x) { return x.nombre === p.nombre; }) === i; });
     } catch (e) { return []; }
   }
 
@@ -91,12 +92,15 @@ var CamposListaDatos = (function () {
     try {
       if (campo.id.indexOf('h:') === 0) {
         v = (await valoresDe(p))[campo.id.slice(2)];
+        if (!v && campo.id === 'h:grupo') v = (p.persona.campos || {}).Unidad || p.persona.unidad || '';   /* sin asunto, el grupo sale de la persona */
       } else if (campo.id.indexOf('f:') === 0) {
         v = (p.persona.campos || {})[campo.columna];
       } else if (campo.id.indexOf('d:') === 0 && window.TablasDatos && campo.columna) {
         var filas = await TablasDatos.filasDe(campo.tabla, p.persona);
         v = filas.length && filas[0].celdas ? filas[0].celdas[campo.columna] : '';
-      } else if (campo.origen === 'Manual' || campo.origen === 'Calculado') {
+      } else if (campo.calculadoId) {
+        v = Campos.valorInicial({ origen: 'calculado', id: campo.calculadoId }, p.persona, App.E.campos);
+      } else if (campo.origen === 'Manual') {
         v = ((await valoresDe(p)).campos || {})[campo.nombre];
       }
     } catch (e) { v = ''; }
@@ -110,7 +114,9 @@ var CamposListaDatos = (function () {
       var f = campo.fichero || (campo.tabla.indexOf('RegAlum') === 0 ? (ficheros || {}).ALUMNADO : campo.tabla === 'RelPerCen' ? (ficheros || {}).PERSONAL : '');
       if (!f || !window.DatosQueTengo) return '';
       var ms = await DatosQueTengo.fechaReal(f);
-      return ms ? DatosQueTengo.fechaHora(new Date(ms).toISOString()) : '';
+      if (ms) return 'Fichero recibido el ' + DatosQueTengo.fechaHora(new Date(ms).toISOString());
+      var copia = await Carpetas.fechaFichero(App.E.datos, f);   /* sin apunte de Séneca: la fecha de la copia */
+      return copia ? 'Fichero copiado aquí el ' + DatosQueTengo.fechaHora(new Date(copia).toISOString()) : '';
     } catch (e) { return ''; }
   }
 

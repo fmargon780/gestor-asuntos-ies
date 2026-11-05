@@ -62,7 +62,10 @@
 .campos-lista-barra select { width: auto; }
 .campos-lista-grupos { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .campos-lista-persona { margin-bottom: 8px; }
-.campos-lista-persona select { width: auto; }
+.campos-lista-persona select { width: auto; max-width: 100%; }
+.campos-lista-izq, .campos-lista-der { min-width: 0; }
+.campos-lista-barra select { max-width: 100%; }
+.campos-grupo { gap: 10px; }
 .campos-pastilla { font: inherit; font-size: 13px; background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: 3px 11px; cursor: pointer; color: var(--tinta); }
 .campos-pastilla.on { background: var(--azul-claro); border-color: var(--azul); font-weight: 600; }
 .campos-lista-tabla { max-height: 62vh; overflow: auto; border: 1px solid var(--linea); border-radius: 8px; }

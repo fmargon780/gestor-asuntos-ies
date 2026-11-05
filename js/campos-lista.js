@@ -88,7 +88,7 @@ var CamposLista = (function () {
     var m = /^\{?(DATO|TABLA)\s+(.+?)(?::\s*(.*))?\}?$/.exec(String(h.clave).replace(/^\{|\}$/g, ''));
     var tabla = m ? m[2] : '', columna = m && m[3] ? m[3] : '';
     var esTabla = m && m[1] === 'TABLA';
-    return { id: 'd:' + h.clave, nombre: h.etiqueta, grupo: 'Persona', origen: 'Tabla de datos', tabla: tabla, columna: columna || (esTabla ? 'tabla entera' : ''),
+    return { id: 'd:' + h.clave, nombre: h.etiqueta, grupo: 'Persona', origen: 'Tabla de datos', tabla: tabla, columna: columna || (esTabla ? '(tabla entera)' : ''),
       marca: marcaDeClave(h.clave), clases: AL };
   }
 
@@ -148,7 +148,12 @@ var CamposLista = (function () {
     });
     Object.keys(e.cabeceras || {}).forEach(function (cat) {
       (e.cabeceras[cat] || []).forEach(function (col) {
-        if (col) { var c = deColumna(cat, col, (e.ficheros || {})[cat]); lista.push(c); }
+        if (!col) return;
+        var c = deColumna(cat, col, (e.ficheros || {})[cat]);
+        /* Una columna que ya sale con otro nombre (Unidad = Grupo, Nº Id. Escolar = Nº escolar…) no se repite. */
+        var repetida = lista.some(function (x) { return x.origen === 'Centro de datos' && norm(x.columna) === norm(col) && x.tabla.indexOf(c.tabla) === 0; });
+        if (!repetida) lista.push(c);
+        conocidos[norm(col)] = true;
       });
     });
     ((config.calculados) || []).forEach(function (c) {
@@ -166,6 +171,7 @@ var CamposLista = (function () {
       c.dondeSePide = c.propioId && window.Campos ? Campos.tiposQueUsanPropio(config, c.propioId) : [];
       if (c.calculadoId && window.Campos) c.dondeSePide = Campos.tiposQueUsanCalculado(config, c.calculadoId);
       c.enTipos = c.dondeSePide.length;
+      c.dondeSePide.forEach(function (t) { c.usos.push('Tipo de asunto «' + t + '»'); });
     });
     /* Los calculados que dependen de otro campo cuentan como uso de ese campo. */
     ((config.calculados) || []).forEach(function (c) {
@@ -178,11 +184,11 @@ var CamposLista = (function () {
 
   /* Se puede quitar solo un campo manual o calculado que nadie usa. */
   function sePuedeQuitar(c) {
-    return !!(c.propioId || c.calculadoId) && !c.usos.length && !c.enTipos;
+    return !!(c.propioId || c.calculadoId) && !c.usos.length;
   }
 
   function dondeSePide(c) {
-    if (c.origen !== 'Manual' && c.origen !== 'Calculado') return 'Sale solo';
+    if (c.origen !== 'Manual') return 'Sale solo';
     if (!c.enTipos) return 'Al usarlo';
     return c.enTipos === 1 ? 'En 1 tipo' : 'En ' + c.enTipos + ' tipos';
   }
@@ -199,7 +205,8 @@ var CamposLista = (function () {
   function rutaCorta(c) {
     if (c.origen === 'Centro de datos' || c.origen === 'Tabla de datos') return c.tabla + (c.columna ? ' › ' + c.columna : '');
     if (c.origen === 'Calculado') return c.tabla + ' ' + c.columna;
-    return c.tabla;
+    if (c.origen === 'Manual') return c.tabla;
+    return '';
   }
 
   function sirveParaClase(c, categoria) { return !c.clases.length || !categoria || c.clases.indexOf(categoria) !== -1; }
