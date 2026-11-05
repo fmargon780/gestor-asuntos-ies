@@ -56,4 +56,14 @@ Tercera parte del tema. Necesita las filas 522 y 523 HECHAS. Si algo cambia el t
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Segundo revisor (5-nov-2026), una línea por punto:**
+  1. Marcar un hito con pendientes: coincide («Volver» no cambia nada; «igualmente» lo marca; solo lo de ese hito).
+  2. Sin pendientes y desmarcar: coincide, sin cuadro.
+  3. Archivar: coincide (lista también la casilla de otro hito; «Archivar igualmente» archiva; sin pendientes, el cuadro de siempre). Con su escenario de PDF falsos el asunto siguió en la lista tras archivar; en una prueba limpia desapareció (atribuido a los PDF falsos; la prueba `archivar-no-cabe.mjs` archiva bien).
+  4. Enviar: coincide. El aviso va dentro del resumen del correo con «Enviar igualmente» y «Volver», en vez de «Confirmar y enviar» (decisión de Claude: un solo cuadro a la vez). Sin pendiente, «Confirmar y enviar».
+  5. «No aplica», «Comunicar» y sin acción: coincide, no salen.
+  6. «falta 1 de 2 firmas»: coincide.
+  7. «Sin registrar»: coincide (mesa y ficha). No ha podido ver «Registrado» con sus PDF falsos (no cambia).
+  8. Pantalla 516: coincide en lo de esta fila.
+  - **Hacía de más y se quitó**: los textos «Todavía falta:» y «No se impide nada: tú decides.» de los cuadros (la pantalla no los lleva).
+- **Notas de Claude Code**: `hacer-este-hito.mjs` ya fallaba en `main`; `archivar-no-cabe.mjs` (prueba 14, `js/carpetas.js` de 624 líneas) también falla en `main` sin este cambio. Se adaptaron `mesa-tarjetas-que-se-abren.mjs` (sin marca donde no hay casilla) y `archivar-no-cabe.mjs` (pasa por el cuadro nuevo). Pasada completa no repetida (ya hecha hoy).

@@ -122,8 +122,7 @@ window.AvisosFalta = (function () {
   /* El cuadro. Devuelve true si se sigue (no faltaba nada, o «igualmente»). Nunca impide. */
   async function preguntar(titulo, lineas, botonSeguir) {
     if (!lineas || !lineas.length) return true;
-    return U.preguntar(titulo, '<p class="explica">Todavía falta:</p>' + listaHtml(lineas) +
-      '<p class="explica">No se impide nada: tú decides.</p>', botonSeguir, false, 'Volver');
+    return U.preguntar(titulo, listaHtml(lineas), botonSeguir, false, 'Volver');   /* como la pantalla 516: título, lista y dos botones */
   }
 
   async function hitosDe(a) {
