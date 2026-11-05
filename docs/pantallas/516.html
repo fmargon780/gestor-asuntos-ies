@@ -192,7 +192,7 @@ h2.sub{margin-top:10px}
     return '<span class="ext">PDF</span><button class="abrir" data-abrir="' + d.id + '">' + esc(d.nombre) + '</button>' +
       (conHito ? '<span class="datos">Hito ' + d.hito + '</span>' : '') + botonRuta(d) +
       (l ? '<span class="datos">' + esc(l) + '</span>' : '') +
-      (!d.registro && d.pendiente ? '<span class="sin-reg">Sin registrar</span>' : '');
+      (!d.registro && (d.pendiente || e.tareas.some(function (t) { return t.accion === 'registrar' && t.doc === d.id && abierta(t); })) ? '<span class="sin-reg">Sin registrar</span>' : '');
   }
   function selector(t) {
     return '<select data-sel="' + t.id + '" aria-label="Documento de la tarea"><option value="">Elige un documento…</option>' +
