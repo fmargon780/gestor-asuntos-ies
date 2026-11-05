@@ -153,6 +153,8 @@ var Hitos = (function () {
     /* El estado del guion (fila 109, js/hitos-guion.js): solo si lo hay. */
     if (h && h.guionHecho && typeof h.guionHecho === 'object') salida.guionHecho = h.guionHecho;
     if (h && Array.isArray(h.guionPropio) && h.guionPropio.length) salida.guionPropio = h.guionPropio;
+    /* Fila 522: el documento colgado de cada tarea (js/tareas-con-documento.js), solo si lo hay. */
+    if (h && h.guionDocumento && typeof h.guionDocumento === 'object' && Object.keys(h.guionDocumento).length) salida.guionDocumento = h.guionDocumento;
     /* Fila 224: las tareas de la guía escondidas en este asunto («Cambiar
        aquí» o «Borrar»), solo si hay alguna. */
     if (h && Array.isArray(h.guionOcultos) && h.guionOcultos.length) salida.guionOcultos = h.guionOcultos;

@@ -205,6 +205,8 @@ window.RutaCopia = (function () {
     var existentes = (await Carpetas.ficheros(prev)).map(function (f) { return f.nombre; });
     var destino = RegistroSellado.nombreLibreEntre(existentes, sinExtension(doc) + sufijo + extensionCon(doc));
     await Carpetas.moverFichero(sub, claim, prev, destino);
+    /* Fila 522: la versión que deja el documento es la de la última tarea hecha que trabajaba con él (no la descartada). */
+    if (window.TareasConDocumento && sufijo !== ' DESCARTADO') await TareasConDocumento.versionConservada(a, doc, destino);
     return VersionesPrevias.nombreDeCarpeta(a.handle);
   }
 

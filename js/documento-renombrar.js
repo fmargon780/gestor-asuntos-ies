@@ -51,6 +51,7 @@ var DocumentoRenombrar = (function () {
         (h.requisitos || []).forEach(function (r) { if (r.documento === viejo) r.documento = nuevo; });
         var guion = h.guionHecho || {};
         Object.keys(guion).forEach(function (id) { if (guion[id] && guion[id].documento === viejo) guion[id].documento = nuevo; });
+        if (window.TareasConDocumento) TareasConDocumento.alRenombrar(h, viejo, nuevo);   /* fila 522: el documento colgado de cada tarea */
       });
       return d;
     });

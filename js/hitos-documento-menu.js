@@ -78,7 +78,7 @@ window.HitosDocumentoMenu = (function () {
     var antesNombres = await ficherosDeLaCarpeta(a);
     await Registro.abrirCuadro(a, nombre, function () {
       trasElCambio(a, hito, antesNombres);
-      if (Hitos.marcarGuionPorAccion) Hitos.marcarGuionPorAccion(a, hito.id, 'registrar');   /* fila 109 */
+      if (Hitos.marcarGuionPorAccion) Hitos.marcarGuionPorAccion(a, hito.id, 'registrar', nombre);   /* fila 109; fila 522: la tarea de ese documento */
     });
   }
 

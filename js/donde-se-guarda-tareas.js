@@ -139,12 +139,12 @@ window.DondeSeGuardaTareas = (function () {
 
   /* Siempre solo en este asunto, con su marca «solo aquí». `alElegir()` se
      llama en cuanto se guarda (para vaciar la caja antes del repintado). */
-  async function nueva(a, h, texto, alElegir) {
+  async function nueva(a, h, texto, alElegir, extras) {
     texto = String(texto || '').trim();
     if (!texto) return false;
     try {
       if (alElegir) alElegir();
-      await Hitos.anadirGuionPropio(a.nombre, h.id, texto);
+      await Hitos.anadirGuionPropio(a.nombre, h.id, texto, extras);   /* fila 522: con «Qué se hace» y su dato, si se eligieron */
       if (DondeSeGuarda.tipoDe(a)) U.aviso(SOLO_AQUI, 'bueno');
       repintar();
       return true;
@@ -156,9 +156,18 @@ window.DondeSeGuardaTareas = (function () {
 
   /* ---------- Cambiar ---------- */
 
-  async function cambiar(a, h, g, texto) {
+  /* Fila 522: «Qué se hace» y su dato cambiados en una línea de la guía (o de un guion), tal como la guía los guarda. */
+  function aplicarExtras(linea, extras) {
+    if (!extras) return;
+    linea.accion = extras.accion || '';
+    if (extras.receta) linea.receta = extras.receta; else delete linea.receta;
+  }
+
+  /* `extras` (fila 522): { accion, receta } si «Cambiar» también ha tocado «Qué se hace». */
+  async function cambiar(a, h, g, texto, extras) {
     texto = String(texto || '').trim();
     if (!texto) return false;
+    var cambioExtras = !!extras && ((extras.accion || '') !== (g.accion || '') || JSON.stringify(extras.receta || null) !== JSON.stringify(g.receta || null));
     try {
       var ctx = await contexto(a, h);
       var propiaRaw = g.propio ? (h.guionPropio || []).filter(function (x) { return x.id === g.id; })[0] : null;
@@ -166,8 +175,8 @@ window.DondeSeGuardaTareas = (function () {
       /* Una tarea «solo aquí» de verdad, o un hito que no está en la guía: se queda en el asunto. */
       if ((g.propio && !idOriginal) || !ctx.tipo || ctx.apagada || !ctx.enGuia) {
         if (g.pregunta) { if (texto !== g.texto) await Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto); }
-        else if (g.propio) { if (texto !== g.texto) await Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto); }
-        else await Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto);
+        else if (g.propio) { if (texto !== g.texto || cambioExtras) await Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto, extras); }
+        else await Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto, extras);
         if (ctx.tipo) U.aviso(ctx.apagada || SOLO_AQUI, 'bueno');
         repintar();
         return true;
@@ -179,11 +188,12 @@ window.DondeSeGuardaTareas = (function () {
             var l = lineaEn(p.guion, g.id);
             if (!l) return false;
             l.lista[l.i].texto = texto;
+            aplicarExtras(l.lista[l.i], extras);
           },
           /* Fila 405: una pregunta con texto «solo aquí» vuelve a seguir a la guía. */
           despues: g.pregunta ? function () { return Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, ''); } : null,
           deshacerAqui: function () {
-            return g.pregunta ? Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto) : Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto);
+            return g.pregunta ? Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto) : Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto, extras);
           }
         });
       }
@@ -194,6 +204,7 @@ window.DondeSeGuardaTareas = (function () {
           var l = lineaEn(p.guion, idOriginal);
           if (!l) return false;
           l.lista[l.i].texto = texto;
+          aplicarExtras(l.lista[l.i], extras);
         },
         despues: function () {
           return editarAqui(a, h, function (x) {
@@ -202,10 +213,11 @@ window.DondeSeGuardaTareas = (function () {
             x.guionOcultos = (x.guionOcultos || []).filter(function (id) { return id !== idOriginal; });
             if (x.guionHecho) delete x.guionHecho[g.id];
             if (estado) { x.guionHecho = x.guionHecho || {}; x.guionHecho[idOriginal] = estado; }
+            if (window.TareasConDocumento) TareasConDocumento.mover(x, g.id, idOriginal);   /* fila 522 */
           });
         },
         deshacerAqui: function () {
-          return Hitos.cambiarGuionAqui(a.nombre, h.id, Object.assign({}, g, { id: idOriginal }), texto);
+          return Hitos.cambiarGuionAqui(a.nombre, h.id, Object.assign({}, g, { id: idOriginal }), texto, extras);
         }
       });
     } catch (err) {

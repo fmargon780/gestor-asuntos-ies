@@ -125,7 +125,7 @@ var HitoMesa = (function () {
     }
     var h = hitoPorId(hitos, abierta.idHito);
     pintarCabecera(fila, a, h, hitos, ajustes, abierto);
-    if (window.HitoMesaGuion) HitoMesaGuion.pintar(fila, a, h, abierto);
+    if (window.HitoMesaGuion) HitoMesaGuion.pintar(fila, a, h, abierto, hitos);
     if (window.HitoMesaDocumentos) HitoMesaDocumentos.enganchar(fila, a, h, hitos, abierto);
     if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
   }

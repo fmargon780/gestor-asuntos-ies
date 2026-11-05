@@ -80,7 +80,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 
 - Asuntos con guía de hitos, estado automático, «Qué me toca», «Cuentas», reservados y recurrentes.
 - Nuevo asunto por persona o por tipo, con tipos de una o varias clases de tercero (fila 493).
-- Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478) y reconocimiento de PDF firmados con su marca «Firmado» (fila 515).
+- Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478) y reconocimiento de PDF firmados con su marca «Firmado» (fila 515); cada tarea de generar o registrar del hito lleva su documento colgado (fila 522).
 - Correo (Gmail por script, se queda en recibidos, fila 480), Séneca, Centro de datos y control del registro.
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).

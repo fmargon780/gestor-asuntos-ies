@@ -38,6 +38,9 @@
    ============================================================ */
 var HitoMesaGuion = (function () {
 
+  /* Fila 522: lo elegido en «Qué se hace» de la caja «Nueva tarea…», por hito, para que un repintado no lo borre. */
+  var nuevaForma = {};
+
   /* Fila 229: marcar, desmarcar o «No aplica» de una tarea deja su línea
      en el registro del hito (accesorio: si falla, ámbar). */
   function apuntarTarea(a, h, tarea, que) {
@@ -64,7 +67,7 @@ var HitoMesaGuion = (function () {
     return parseInt(p[2], 10) + '-' + MESES[parseInt(p[1], 10) - 1];
   }
 
-  function pasoHTML(g, abierto, siguiente, a, h) {
+  function pasoHTML(g, abierto, siguiente, a, h, ctx) {
     var marcado = g.hecho || g.noaplica;
     var titulo = marcado ? (g.noaplica ? 'No aplica' : 'Hecho') + (g.quien ? ' por ' + g.quien : '') +
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
@@ -92,6 +95,8 @@ var HitoMesaGuion = (function () {
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +
+      /* Fila 522: su documento colgado (js/tareas-con-documento-vista.js). */
+      (window.TareasConDocumentoVista && ctx ? TareasConDocumentoVista.colgadoHTML(a, h, g, ctx) : '') +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
@@ -121,9 +126,9 @@ var HitoMesaGuion = (function () {
     '</div>';
   }
 
-  function lineaHTML(g, abierto, siguiente, a, h) {
+  function lineaHTML(g, abierto, siguiente, a, h, ctx) {
     if (g.pregunta) return preguntaGuionHTML(g, abierto, siguiente, a);
-    var html = pasoHTML(g, abierto, siguiente, a, h);
+    var html = pasoHTML(g, abierto, siguiente, a, h, ctx);
     return g.deOpcion ? html.replace('class="guion-paso', 'class="guion-paso guion-de-opcion') : html;
   }
 
@@ -147,7 +152,7 @@ var HitoMesaGuion = (function () {
       }).join('') + '</div></div>';
   }
 
-  function pintar(fila, a, h, abierto) {
+  function pintar(fila, a, h, abierto, hitos) {
     var caja = fila.querySelector('.mesa-guion');
     if (!caja || !h) return;
     if (h.clase === 'decision') {
@@ -162,22 +167,26 @@ var HitoMesaGuion = (function () {
     /* Fila 224: el repintado de esta tarjeta no puede tirar lo que se
        esté escribiendo (la caja «Nueva tarea…», o el texto o la nota de
        una tarea en edición), ni el foco ni el cursor. */
-    U.conservandoLoEscrito(caja, function () { pintarGuion(caja, fila, a, h, abierto); });
+    U.conservandoLoEscrito(caja, function () { pintarGuion(caja, fila, a, h, abierto, hitos); });
   }
 
-  function pintarGuion(caja, fila, a, h, abierto) {
+  function pintarGuion(caja, fila, a, h, abierto, hitos) {
     var guion = Hitos.guionDe(a, h);
     var c = Hitos.cuentaGuion(guion);
     var pct = c.total ? Math.round(100 * c.hechos / c.total) : 0;
     /* Fila 145: la siguiente tarea, la primera sin hacer y sin «No aplica»
        (con el hito ya hecho, ninguno). */
     var siguiente = h.estado === 'hecho' ? null : guion.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
+    var ctx = { guion: guion, hitos: hitos || [], abierto: abierto };
     caja.innerHTML =
       '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas del hito</span>' +
         '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
-      guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h); }).join('') + plegadasHTML(guion.plegadas) +
-      (abierto ? '<input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' : '');
+      guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h, ctx); }).join('') + plegadasHTML(guion.plegadas) +
+      (abierto ? '<div class="tcd-nueva"><input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' +
+        /* Fila 522: «Qué se hace» y su dato, como en la guía; sin elegir, como siempre. */
+        (window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML(nuevaForma[h.id]) +
+          '<button type="button" class="boton boton-chico tcd-anadir">Añadir</button>' : '') + '</div>' : '');
 
     /* La normativa de las tareas del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
@@ -214,7 +223,7 @@ var HitoMesaGuion = (function () {
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-pregunta'), function (el) {
       var g = porId[el.dataset.id];
       if (g && window.HitoMesaTareaMenu) {
-        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto); });
+        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto, hitos); });
       }
     });
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso:not(.guion-pregunta):not(.guion-paso-plegada)'), function (el) {
@@ -251,9 +260,13 @@ var HitoMesaGuion = (function () {
          💬 de esta tarea. */
       var g = porId[id];
       if (g && window.HitoMesaTareaMenu) {
-        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto); });
+        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto, hitos); });
       }
     });
+    /* Fila 522: lo colgado de cada tarea (abrir, «Ruta», «Elegir documento», «Cambiar»). */
+    if (window.TareasConDocumentoVista) {
+      TareasConDocumentoVista.enganchar(caja, a, h, hitos || [], abierto, function () { pintar(fila, a, h, abierto, hitos); });
+    }
     /* Fila 145: soltar un fichero en la siguiente tarea, como en la columna derecha. */
     var soltar = caja.querySelector('.guion-soltar');
     if (soltar) {
@@ -273,23 +286,34 @@ var HitoMesaGuion = (function () {
        (U.conservandoLoEscrito, más arriba, se encarga del foco tras el
        repintado). */
     var nueva = caja.querySelector('#guion-nueva-tarea');
-    if (nueva) nueva.onkeydown = function (ev) {
-      if (ev.key !== 'Enter' || ev.isComposing) return;
-      ev.preventDefault();
+    var contNueva = caja.querySelector('.tcd-nueva');
+    if (contNueva && window.TareasConDocumentoVista) {
+      TareasConDocumentoVista.engancharFormulario(contNueva, function (forma) { nuevaForma[h.id] = forma; });
+    }
+    function anadirNueva() {
       var texto = nueva.value.trim();
       if (!texto || nueva.dataset.preguntando) return;
       /* Fila 416: Intro guarda la tarea solo en este asunto, sin preguntar. La caja se
          vacía al guardar (antes del repintado, para que no vuelva el texto). */
       nueva.dataset.preguntando = '1';
+      var forma = (contNueva && window.TareasConDocumentoVista) ? TareasConDocumentoVista.leerFormulario(contNueva) : null;
+      delete nuevaForma[h.id];
       DondeSeGuardaTareas.nueva(a, h, texto, function () {
         var actual = document.getElementById('guion-nueva-tarea');
         if (actual && actual.value.trim() === texto) actual.value = '';
-      }).then(function () {
+      }, forma).then(function () {
         var actual = document.getElementById('guion-nueva-tarea');
         if (actual) { delete actual.dataset.preguntando; actual.focus(); }
         delete nueva.dataset.preguntando;
       });
+    }
+    if (nueva) nueva.onkeydown = function (ev) {
+      if (ev.key !== 'Enter' || ev.isComposing) return;
+      ev.preventDefault();
+      anadirNueva();
     };
+    var botonAnadir = caja.querySelector('.tcd-anadir');
+    if (botonAnadir) botonAnadir.onclick = anadirNueva;
   }
 
   function tipoDe(a) {

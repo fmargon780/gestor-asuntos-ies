@@ -65,4 +65,17 @@ El tema se parte en tres, en este orden: 522, 523 y 524. Esta es la primera. Si 
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Segundo revisor (5-nov-2026), una línea por punto:**
+  1. Generar desde el hito: coincide (documento, «Ruta» y datos en la tarea de generar y en la de registrar).
+  2. Antes de generar: coincide («Saldrá aquí al generar el certificado.»).
+  3. «Elegir documento» / «Cambiar»: coincide; no ha podido ver que liste documentos de otros hitos (el asunto tenía uno solo; lo comprueba la prueba automática con los de la carpeta).
+  4. Registrar: coincide con el sellado de su documento; con el de otro documento no lo ha podido ver desde la pantalla (sí lo comprueba `pruebas/tareas-con-documento.mjs`).
+  5. Tarea hecha: coincide (versión `SIN SELLAR` sin «Ruta», se abre a la derecha con «← Carpeta»; la última hecha, el actual). El visor del PDF falso de la copia de pruebas sale como texto: no es de esta fila.
+  6. Marcada a mano: no lo ha podido ver.
+  7. «Nueva tarea…» con «Qué se hace», «Cambiar» y «Pasar a la guía»: coincide (el documento se queda).
+  8. «Cambiar» de una tarea de la guía llega a la guía: coincide.
+  9. Asunto de antes (Hugo): coincide, sin errores de consola. La tarea de generar hecha de antes no muestra documento (no se sabe cuál es; el texto dice «o nada»).
+  10. Maqueta 516: coincide en lo de esta fila; difiere en que el «Cambiar» de una tarea de la guía y la etiqueta de la acción van en el «⋮» y no sueltos (como hoy en la app); «Firmar un documento» no está (fila 523).
+  - **No coincidía y se corrigió**: al abrir «Cambiar» desde el «⋮», las otras tareas pasaban a mostrar «….docx (ya no está)». Arreglado (el repintado local perdía la lista de hitos) y cubierto en la prueba.
+  - Lo que la app hace de más: nada nuevo; «No aplica» en una tarea «solo aquí» y la «Ruta» del visor de una versión son de antes. El desplegable de «Cambiar» no marca el documento actual (se deja así).
+- **Notas de Claude Code**: `donde-se-guarda.mjs` (paso 5, el menú lateral tapa «Crear») y `hacer-este-hito.mjs` («1 listos para enviar») fallan igual en `main` sin este cambio, en este entorno; no son de la fila. Pasada completa de pruebas no hecha (tarda mucho): se pasaron las 72 pruebas de lo tocado; 67 verdes y las 5 que fallaron, repetidas con el arreglo (3 pasan; 2 son las de arriba). `hitos-guion.js` ya pasaba de 400 líneas antes (444; ahora 469, bajo las 600 de CONTEXTO).

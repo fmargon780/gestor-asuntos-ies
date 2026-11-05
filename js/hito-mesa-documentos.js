@@ -374,6 +374,7 @@ var HitoMesaDocumentos = (function () {
   }
 
   return { filasHTML: filasHTML, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
-           moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar };
+           moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar,
+           datosDeLaLinea: datosDeLaLinea, abrirEnVisor: abrirEnVisor };   /* fila 522 */
 })();
 window.HitoMesaDocumentos = HitoMesaDocumentos;
