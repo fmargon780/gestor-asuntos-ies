@@ -45,4 +45,13 @@ Tarea pequeña: sin pantalla de prueba. Manda la de la fila 543 (`docs/pantallas
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (6-nov-2026, commit 9500c9d), aprobada:
+  - Archivados y último uso salen del ARCHIVO, no «Nunca»: coincide.
+  - No sale marcado de partida y cuenta en «Usados»: coincide.
+  - Tipo sin ningún asunto: marcado y «Nunca»: coincide.
+  - Nombre corto o nombre viejo del tipo cuenta: coincide.
+  - Marcas de partida iguales al cerrar y abrir: coincide.
+  - Cuerpo enviado con archivados y último uso, sin datos de asuntos ni personas: coincide.
+  - La pantalla no cambia en nada más; mayúsculas/minúsculas no influyen: coincide.
+  - Con el ARCHIVO real, los tipos en mayúsculas ya no salen marcados: NO COMPROBADO (solo Francisco; copiado a `docs/COMPROBAR-A-MANO.md`).
+  - No visto: que el índice falle (`ok:false`/excepción); el código cuenta lo que hay, como pide el texto.
