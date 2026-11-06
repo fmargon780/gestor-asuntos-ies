@@ -85,7 +85,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
 - Plan de las guías (fila 551): Herramientas → «Aplicar el plan de las guías» pasa las guías a las listas comunes de tareas y de hitos y, una vez aplicado, quita lo viejo (tareas e hitos libres en la guía, «Traer un hito de otro tipo», «Nueva tarea…», «Tipos y su uso»).
 - Tarea «Copiar a otra carpeta» (fila 552): al llegar el registrado a su hito copia el documento a una carpeta de fuera del asunto (recordada por ordenador), con nombre de campos, sin pisar nunca (« (2)») y con «Dar permiso» si falta el permiso (`js/tarea-copiar*.js`).
-- Medidas, «Qué hay de nuevo» y el botón «Soporte» común.
+- Medidas, «Qué hay de nuevo» y el botón «Soporte» común. El hito abierto lleva Tareas, Campos, Documentos y Registro en recuadros; «Subir»/«Bajar» tareas con su orden en el asunto y en la guía, y «+ Añadir hito» al final de la tira con «Va detrás de» (fila 553, `js/hitos-guion-orden.js`).
 - El tutor y las tutorías vienen solo de las fichas `hecho/tutorias` del Centro de datos, todos los cursos; el Gestor ya no lee el PDF de la función tutorial (fila 376).
 
 ## 6. Reglas de código que no se pueden olvidar
@@ -152,8 +152,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
 - Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer tareas». Ajustes › Hitos: festivos.
-- Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
-- Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
+- Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento). Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
