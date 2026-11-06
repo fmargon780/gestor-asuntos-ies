@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 6-nov-2026 (fila 555 PENDIENTE)
+Última puesta al día: 6-nov-2026 (fila 553 PENDIENTE)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -33,3 +33,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 530 | 180 | Toca Word, correo, Séneca, tareas y alta; acción nueva |
 | 531 | 240 | Ficheros nuevos, guías por referencia y propuesta de paso; la de más riesgo |
 | 555 | 300 | destinatarios que se buscan escribiendo con la lista cerrada del asunto, custodia, otro correo para un envío, plantilla con papeles en tres campos y saludo y firma, tarea sin «a quién», quitar «Va a», «Añadir un grupo», «+ Tutor/a» y las casillas de «Comunicar ▾», paso de las plantillas viejas, adaptar seis pruebas y una nueva, revisor |
+| 553 | 180 | recuadros de las cuatro partes del hito, menú ⋮ que no se corte, subir y bajar con orden en el asunto y en la guía y su franja, «Qué se hace» en «Cambiar la tarea» con sus datos, etiqueta de acción, «+ Añadir hito» en la tira con «Va detrás de», quitar «Crear» de «Hito ▾», pruebas y revisor |

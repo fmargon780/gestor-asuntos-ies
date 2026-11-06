@@ -56,6 +56,11 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, tema 550) **Al unir tareas no se pierde nada:** las explicaciones y normativas distintas se juntan; las de plantilla distinta quedan separadas. Las tareas de las preguntas y la guía de un tipo que se active después pasan a las listas con las mismas reglas («Adelante según tus propuestas»).
 - (6-nov-2026, tema 550) **La carpeta de destino es una tarea, no un ajuste del tipo:** «Copiar a otra carpeta» copia sola el registrado, con nombre de campos; sin permiso, avisa y pide permiso; nunca pisa un fichero, añade « (2)».
 
+- (6-nov-2026, idea 553) Las tareas de un asunto se pueden **subir y bajar**, «con la opción de guardar ese cambio en la guía». Guardarlo en la guía no cambia los asuntos abiertos.
+- (6-nov-2026, idea 553) «Cambiar la tarea» deja cambiar también **«Qué se hace»**, en todas las guías que la usan; los asuntos abiertos siguen como estaban.
+- (6-nov-2026, idea 553) **Los hitos se añaden desde la tira de hitos**, no desde las tareas, y la ventana pregunta dónde situarlo, «con al final por defecto». «Hito ▾» ya no tiene «Crear».
+- (6-nov-2026, idea 553) Tareas, Campos, Documentos y Registro del hito, «muy bien diferenciadas»: cada una en su recuadro.
+
 ## Correo
 
 - (27-oct-2026, tema 469) La actualización del script de Gmail la hace **solo Francisco**: los
