@@ -131,6 +131,49 @@ await p.waitForSelector('.aviso-malo, .aviso.malo, #avisos .malo, [class*="malo"
 await comprobar('6g. si el buzón no acepta, aviso con el motivo', p.evaluate(() => document.body.textContent.indexOf('buzón lleno') !== -1), true);
 await p.close();
 
+console.log('--- 8. fila 546: lo archivado cuenta (ARCHIVO, todos los cursos) ---');
+p = await abrir('');
+const cand = await p.evaluate(() => TiposYSuUso.recoger().filter((f) => f.uso === 0 && !f.desactivado).slice(0, 2).map((f) => f.tipo));
+const marcasAntes = await p.evaluate(() => [...document.querySelectorAll('#tu-filas input:checked')].map((i) => i.dataset.m).sort());
+await comprobar('8a. hay al menos dos tipos sin ningún asunto para probar', cand.length, 2);
+const [tA, tB] = cand;
+/* tA: dos archivados con el nombre completo; tB: uno solo, con un nombre sin tipo reconocible y e.tipo = tB. */
+await p.evaluate(([a, b]) => {
+  const falso = async () => ({ ok: true, datos: { asuntos: [
+    { nombre: '240115 Uno de ' + a, tipo: a, cerradoEl: '2024-03-02T10:00:00Z' },
+    { nombre: '250601 Dos de ' + a, tipo: a },
+    { nombre: '230910 Raro', tipo: b, fecha: '2023-12-01' } ] } });
+  IndiceArchivo.leerDisco = falso;
+  const d = document.getElementById('bloque-tipos-uso'); d.open = false; d.open = true;
+}, [tA, tB]);
+await p.waitForFunction(([a]) => TiposYSuUso.recoger().some((f) => f.tipo === a && f.archivados > 0), [tA]);
+const fa = await p.evaluate(([a, b]) => { const r = TiposYSuUso.recoger(); return [a, b].map((t) => { const f = r.find((x) => x.tipo === t); return [f.archivados, f.ultimo]; }); }, [tA, tB]);
+await comprobar('8b. archivados y último uso salen del índice (nombre y fechas más recientes)', fa, [[2, '2025-06-01'], [1, '2023-12-01']]);
+await comprobar('8c. la tabla enseña los archivados y la fecha, no «Nunca»', p.evaluate((t) => { const tr = document.querySelector('#tu-filas tr[data-t="' + t + '"]'); return [tr.cells[4].textContent, tr.cells[5].textContent]; }, tA), ['2', '01-jun-2025']);
+await comprobar('8d. cuentan en Usados y no en Sin usar; los filtros siguen cuadrando', p.evaluate((t) => {
+  const n = (f) => Number(document.querySelector('.tu-pastilla[data-f="' + f + '"]').textContent.match(/\((\d+)\)/)[1]);
+  const r = TiposYSuUso.recoger();
+  return [n('sin') === r.filter((f) => f.uso === 0 && !f.desactivado).length, n('usados') === r.filter((f) => f.uso > 0 && !f.desactivado).length, r.find((f) => f.tipo === t).uso > 0];
+}, tA), [true, true, true]);
+await comprobar('8e. las marcas de partida no cambian al cerrar y abrir', p.evaluate(() => { const d = document.getElementById('bloque-tipos-uso'); d.open = false; d.open = true; return new Promise((ok) => setTimeout(() => ok([...document.querySelectorAll('#tu-filas input:checked')].map((i) => i.dataset.m).sort()), 500)); }), marcasAntes);
+await p.close();
+/* Marcas de partida con el ARCHIVO ya leído desde el principio. */
+p = await navegador.newPage({ viewport: { width: 1600, height: 1000 } });
+await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}");
+await p.goto(BASE + '?demo=1&auto=1&guias=1');
+await p.waitForSelector('#franja-demo', { timeout: 30000 });
+await p.waitForTimeout(2500);
+await p.evaluate(() => App.ir('herramientas'));
+await p.waitForSelector('#bloque-tipos-uso', { state: 'attached' });
+const sinArch = await p.evaluate(() => TiposYSuUso.recoger().filter((f) => f.uso === 0 && !f.desactivado).slice(0, 1).map((f) => f.tipo)[0]);
+await p.evaluate((t) => { IndiceArchivo.leerDisco = async () => ({ ok: true, datos: { asuntos: [{ nombre: '240101 Algo', tipo: t }] } }); document.getElementById('bloque-tipos-uso').open = true; }, sinArch);
+await p.waitForSelector('#tu-filas tr[data-t]');
+await p.waitForFunction((t) => TiposYSuUso.recoger().find((f) => f.tipo === t).archivados === 1, sinArch);
+await comprobar('8f. un tipo con asuntos solo archivados no sale marcado de partida; uno sin ninguno, sí', p.evaluate((t) => [!document.querySelector('#tu-filas input[data-m="' + t + '"]').checked, [...document.querySelectorAll('#tu-filas input:checked')].length > 0], sinArch), [true, true]);
+await comprobar('8g. un tipo sin ningún asunto sale con «Nunca»', p.evaluate((t) => [...document.querySelectorAll('#tu-filas tr[data-t]')].some((tr) => tr.dataset.t !== t && tr.cells[5].textContent === 'Nunca'), sinArch), true);
+await comprobar('8h. el envío lleva los archivados y el último uso', p.evaluate(async (t) => { window.__c = null; window.fetch = async (u, op) => { window.__c = op.body; return { json: async () => ({ ok: true }) }; }; document.getElementById('tu-enviar').click(); await new Promise((r) => setTimeout(r, 300)); document.getElementById('cuadro-aceptar').click(); await new Promise((r) => setTimeout(r, 500)); const c = window.__c && JSON.parse(JSON.parse(window.__c).texto.split('\n').slice(1).join('\n')).tipos.find((x) => x.nombre === t); return c ? [c.archivados, c.ultimoUso] : null; }, sinArch), [1, '2024-01-01']);
+await p.close();
+
 console.log('--- 7. en la demostración no se envía ---');
 p = await abrir('');
 await p.evaluate(() => { window.__envios = 0; window.fetch = async () => { window.__envios++; return { json: async () => ({ ok: true }) }; }; });
