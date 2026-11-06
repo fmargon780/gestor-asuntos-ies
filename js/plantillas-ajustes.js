@@ -182,8 +182,8 @@
       .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
 
     contenedor.innerHTML =
-      '<p class="explica">Cada plantilla es solo el cuerpo del medio: el saludo y la firma se ' +
-      'ponen solos. Sirve igual para el correo y para el mensaje de Séneca. Los campos variables entre ' +
+      '<p class="explica">Cada plantilla lleva su texto y, si quieres, su saludo, su firma y a quién va (Para, Copia y Copia oculta); ' +
+      'vacíos, salen los de siempre. Sirve igual para el correo y para el mensaje de Séneca. Los campos variables entre ' +
       'llaves, como <code>{nombre}</code>, se rellenan solos al abrir el cuadro.</p>' +
       '<div id="tipo-plantillas-lista" class="rejilla-tipos"></div>' +
       '<button type="button" class="boton boton-principal" id="tipo-plantillas-nueva" ' +

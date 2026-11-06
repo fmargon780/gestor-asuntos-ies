@@ -77,8 +77,6 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     if (!window.CorreoPara) return;
     if (!I.S.plantillaElegida) { CorreoPara.vaciar(); CorreoPara.repintar(); return; }   /* «Sin plantilla»: el correo queda sin nadie puesto */
     if (!p) return;
-    var hay = ['para', 'copia', 'oculta'].some(function (c) { return (p[c] || []).length; });
-    if (!hay) return;
     CorreoPara.vaciar();
     CorreoPara.aplicarPapeles({ para: p.para, copia: p.copia, oculta: p.oculta });
     CorreoPara.repintar();

@@ -185,7 +185,7 @@ var CorreoPara = (function () {
     if (!item) return;
     if (item.familia && S.grupoDeFamilias) campo = 'oculta';
     quitar(item.id);
-    S.dest[campo].push({ id: item.id, nombre: item.nombre, dirs: (item.dirs || []).slice(), vez: '', familia: !!item.familia });
+    S.dest[campo].push({ id: item.id, nombre: item.nombre, dirs: (item.dirs || []).slice(), vez: '', familia: !!item.familia, custodia: !!item.custodia });
   }
 
   function ponerElegido(campo, id) { poner(campo, buscarCandidato(id)); }
@@ -266,7 +266,7 @@ var CorreoPara = (function () {
 
   function elegidosDe(campo) {
     return S.dest[campo].map(function (p) {
-      return { id: p.id, nombre: p.nombre, correo: p.vez || primerCorreo(p.dirs), vez: p.vez };
+      return { id: p.id, nombre: p.nombre + (p.custodia ? ' · custodia' : ''), correo: p.vez || primerCorreo(p.dirs), vez: p.vez };
     });
   }
 
