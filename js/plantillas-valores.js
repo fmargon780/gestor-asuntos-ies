@@ -233,7 +233,8 @@
     var valores = {
       nombre: soloElNombreDe(terceroTexto),
       nombreNatural: nombreNaturalDe(terceroTexto, categoria),
-      grupo: p.grupo,
+      /* Fila 525: sin grupo en la ficha ni en el nombre, el alumno aporta su unidad (la de este curso o la última). */
+      grupo: p.grupo || ((categoria === 'ALUMNADO' && persona && (persona.unidad || persona.unidadUltima)) || ''),
       curso: p.curso,
       tipo: tipoDelAsunto(a),
       referencia: referenciaDe(categoria, persona),
