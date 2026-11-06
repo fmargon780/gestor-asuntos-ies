@@ -53,6 +53,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, tema 540) **Las guías generales no sirven a Administración:** «casi todas esas guías no nos están sirviendo para nada más que confundirnos». Los tipos sin usar se desactivan con su guía, y solo se pasan a las listas las guías que quedan.
 - (6-nov-2026, tema 540) **La pantalla «Tipos y su uso» es temporal:** «Esto es solo para el proceso de "limpieza"». Se quita al terminar.
 - (6-nov-2026, tema 540) Al desactivar un tipo que se repite solo, **la app solo avisa** («Me parece bien»).
+- (6-nov-2026, tema 550) **Al unir tareas no se pierde nada:** las explicaciones y normativas distintas se juntan; las de plantilla distinta quedan separadas. Las tareas de las preguntas y la guía de un tipo que se active después pasan a las listas con las mismas reglas («Adelante según tus propuestas»).
+- (6-nov-2026, tema 550) **La carpeta de destino es una tarea, no un ajuste del tipo:** «Copiar a otra carpeta» copia sola el registrado, con nombre de campos; sin permiso, avisa y pide permiso; nunca pisa un fichero, añade « (2)».
 
 ## Correo
 
