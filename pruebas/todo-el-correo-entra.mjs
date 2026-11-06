@@ -304,7 +304,7 @@ console.log('--- fila 480. órdenes de la app (doPost, accion: gmail) ---');
   comprobar('6. y apunta que está hecha', m.propiedades['puesta-al-dia-hecha'] !== undefined, true);
   r = llamar({ accion: 'gmail', clave: 'mala', ordenes: [{ id: 'O-a', bandeja: 'archivar' }] });
   comprobar('8. con la clave mala no se toca nada', [r.ok, a.archivado], [false, false]);
-  comprobarQue('8. el script dice su versión de la fila 480', /fila 480/.test(llamar({ accion: 'gmail', ordenes: [] }).version || ''));
+  comprobarQue('8. el script dice su versión de la fila 555', /fila 555/.test(llamar({ accion: 'gmail', ordenes: [] }).version || ''));
 }
 
 /* ---------- 9. el tope ---------- */

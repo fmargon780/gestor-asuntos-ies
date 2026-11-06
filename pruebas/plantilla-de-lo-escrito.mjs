@@ -103,11 +103,11 @@ async function recorrido(p, nombreNueva, tipo) {
   const texto = await pagina.locator('#pl2-texto').inputValue();
   await comprobar(p + ' · sin saludo ni firma y con tres huecos', [/Estimados|Buenos días|Hola/.test(texto), texto],
     [false, 'Le informamos de que la solicitud de {nombreNatural}, del grupo {grupo}, está lista. Puede recogerla hasta el {limite}.']);
-  await comprobar(p + ' · tres líneas con «Deshacer» y la nota del saludo y la firma', pagina.evaluate((p) => [
+  await comprobar(p + ' · tres líneas con «Deshacer» y sin la nota del saludo y la firma (fila 555)', pagina.evaluate((p) => [
     document.querySelectorAll('#pl2-cambios .pl2-cambio').length,
     Array.from(document.querySelectorAll('#pl2-cambios .pl2-cambio button')).every(b => b.textContent === 'Deshacer'),
     /He cambiado estos datos por su campo variable\. Revísalos:/.test(document.getElementById('pl2-cambios').textContent),
-    /El saludo y la firma no van en la plantilla: la app los pone sola en cada mensaje\./.test(document.getElementById(p + '-plantilla-editor').textContent)
+    !/El saludo y la firma no van en la plantilla/.test(document.getElementById(p + '-plantilla-editor').textContent)
   ], p), [3, true, true, true]);
   await comprobar(p + ' · la vista previa lee lo que se había escrito', pagina.locator('#pl2-previa').textContent(), FRASE);
   await pagina.locator('#pl2-cambios .pl2-cambio', { hasText: '{grupo}' }).locator('button').click();

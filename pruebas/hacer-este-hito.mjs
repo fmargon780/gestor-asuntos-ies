@@ -102,6 +102,7 @@ console.log('--- 3. enviar de verdad ---');
 await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
 await pagina.waitForSelector('#capa:not(.oculto) #correo-caja');
 await pagina.waitForTimeout(1200);
+await pagina.evaluate(() => { CorreoPara.ponerDirecciones('para', ['familia@correo-demo.es']); CorreoPara.repintar(); });   /* fila 555: a quién va lo dice la plantilla */
 await pagina.locator('#correo-caja button:text-is("Enviar")').click();
 await pagina.waitForTimeout(600);
 await pagina.locator('#cuadro-cuerpo button:visible', { hasText: /^(Sí|Mandar|Enviar ahora|Enviar|Confirmar)/ }).last().click();
@@ -119,7 +120,7 @@ console.log('--- 4. Irene ---');
 await abrirMesa('Vidal Soto');
 await comprobar('4. «Hacer este hito»', botones(), ['Hacer este hito']);
 await comprobar('4. la línea de lo que hará', pagina.locator('.mesa-hacer-linea').allTextContents(),
-  ['Genera «Certificado de notas» → espera el registro en Séneca → correo al tercero']);
+  ['Genera «Certificado de notas» → espera el registro en Séneca → correo']);
 await comprobar('4. los tres menús de siempre siguen', pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), ['Generar documento ▾', 'Comunicar ▾']);
 /* 5. pregunta sin responder (se prueba antes de generar) */
 console.log('--- 5. pregunta sin responder ---');
