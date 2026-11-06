@@ -56,8 +56,8 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
    los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota; después
    sigue la regla 0 (para, o pasa a la siguiente solo si el lanzamiento pidió varias).
-4. Al terminar una, márcala **HECHA** con la fecha y **para**, salvo que el lanzamiento pida varias filas (regla 0). **La hora de `App.VERSION` sale del reloj de verdad**
-   (`TZ='Europe/Madrid' date`, receta exacta en `js/version.js`), nunca a ojo: el 17-sep-2026
+4. Al terminar una, márcala **HECHA** con la fecha y **para**, salvo que el lanzamiento pida varias filas (regla 0). **La hora de `App.VERSION` la pone el programa**
+   (`node scripts/poner-version.mjs`, fila 549), nunca a mano ni a ojo: el 17-sep-2026 y el 6-nov-2026
    salieron versiones con horas por delante de la real.
 5. Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
    para (regla 0). Nunca dejes el repositorio con las pruebas en rojo.

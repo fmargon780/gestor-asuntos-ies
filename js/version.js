@@ -21,13 +21,14 @@
    genera de este fichero y solo se actualiza si cambia) y quien abra
    index.html en local: por eso se sigue poniendo en cada subida.
 
-   OJO al escribir esta línea: coge la hora de verdad, nunca a ojo ni
-   sumando algo al valor de antes (17-sep-2026, aviso de Francisco: las
-   versiones estaban saliendo con horas por delante de la real). Antes
-   de cambiarla, en la terminal:
+   OJO al escribir esta línea: nunca a ojo ni sumando algo al valor de
+   antes (17-sep-2026 y 6-nov-2026, avisos de Francisco: salían horas por
+   delante de la real). DESDE LA FILA 549 se escribe con el programa, que
+   coge el reloj de España; en la terminal:
 
-       TZ='Europe/Madrid' date '+%d %m %Y %H:%M' | { read d m y hm; \
-         meses=(ene feb mar abr may jun jul ago sep oct nov dic); \
-         echo "$d-${meses[$((10#$m-1))]}-$y · $hm"; }
+       node scripts/poner-version.mjs
+
+   Una prueba (pruebas/hora-de-la-version.mjs) falla si la hora escrita
+   va más de 15 minutos por delante de la real.
    ============================================================ */
-App.VERSION = '6-nov-2026 · 12:30';
+App.VERSION = '6-nov-2026 · 10:04';

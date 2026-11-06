@@ -53,4 +53,10 @@ Tarea pequeña: sin pantalla de prueba.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (6-nov-2026, ayudante que no vio cómo se programó):
+  - Coincide: `node scripts/poner-version.mjs` deja la hora real de España con el formato de siempre.
+  - Coincide: con una hora a mano por delante (23:59) la prueba nueva falla; con la del programa pasa. `version-al-publicar.mjs` pasa entera.
+  - Coincide: `js/version.js` y la regla 4 de `docs/COLA.md` mandan usar el programa; `CLAUDE.md` no repetía la receta, no se toca. Quedan recetas viejas en docs de filas ya hechas (históricas).
+  - Hace la app y el texto no pide: la prueba `version-al-publicar.mjs` acepta el día con una cifra (`6-nov`), necesario porque fallaba ya en `main`.
+  - No lo he podido ver: la publicación (se comprueba después de publicar).
+- `npm test` se cae en este entorno con un error del ejecutor (undici), también en `main` sin el cambio; se pasaron las pruebas sueltas con node.
