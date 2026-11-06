@@ -79,6 +79,16 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (28-oct-2026, idea 480) La etiqueta de Gmail de lo recogido se llama **«En la app»** (antes
   `GESTOR/Hecho`).
 
+- (6-nov-2026, tema 487) **Un correo solo va a gente ligada al asunto:** el interesado, sus tutores legales, su tutor de grupo, sus profesores, quien lo pide, los relacionados y las listas del personal. «Si necesitara enviar la comunicación a Servicios Sociales, tendría que relacionar a ese tercero con el asunto, si no no debería dejarme.»
+- (6-nov-2026, tema 487) **Los destinatarios se buscan escribiendo** en Para, Copia y Copia oculta, no en una lista a la vista: «prefiero un sistema en el que el usuario toma la iniciativa de buscar lo que necesita».
+- (6-nov-2026, tema 487) Los dos tutores legales salen siempre, con **«tiene la custodia»** junto al que la tiene; quien escribe elige uno o los dos.
+- (6-nov-2026, tema 487) Se puede escribir **otro correo de una persona solo para un envío** (opción 2); el guardado no cambia.
+- (6-nov-2026, tema 487) **Los destinatarios propuestos van en la plantilla** (Para, Copia y Copia oculta, por papeles); la tarea de la guía solo elige plantilla (opción 1). Se pueden cambiar en cada envío.
+- (6-nov-2026, tema 487) Las listas del personal (Ajustes › Grupos) **pueden ir en Para, Copia o Copia oculta**, cada una por separado. Salen solo las que tienen solo personal del centro.
+- (6-nov-2026, tema 487) **En un asunto de grupo, las familias van siempre a Copia oculta** (opción 1).
+- (6-nov-2026, tema 487) La plantilla de correo lleva **su saludo y su firma**; vacíos, salen el de siempre y la firma de Ajustes.
+- (6-nov-2026, tema 487) Las plantillas viejas **se pasan solas**, sin lista de revisión (opción 1). «Comunicar ▾» del hito **pierde las casillas** de destinatarios (opción 1).
+
 ## Registro de Séneca
 
 - (27-oct-2026, tema 477) El registrado se guarda **con el «Ruta» de siempre** del documento, sin
