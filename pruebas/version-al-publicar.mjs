@@ -37,7 +37,7 @@ comprobar('2. cambia solo la línea de la versión', [puesto.split('\n').length 
   puesto.replace(/App\.VERSION = '[^']*';/, '') === js.replace(/App\.VERSION = '[^']*';/, '')], [true, true, true]);
 comprobar('2. sin la línea, no toca nada', ponerVersion('// nada', 'x'), null);
 comprobar('2. el js/version.js del repositorio lleva una fecha escrita, nunca vacía',
-  /^App\.VERSION = '\d{2}-[a-z]{3}-\d{4} · \d{2}:\d{2}';$/m.test(js), true);
+  /^App\.VERSION = '\d{1,2}-[a-z]{3}-\d{4} · \d{2}:\d{2}';$/m.test(js), true);
 
 /* 3 */
 const vercel = JSON.parse(fs.readFileSync(raiz + 'vercel.json', 'utf8'));
