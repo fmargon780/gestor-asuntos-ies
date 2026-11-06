@@ -6,6 +6,9 @@ para ir tachando.
 
 ---
 
+- [ ] **Envío de las guías a Claude (fila 543, `docs/543-TIPOS-Y-SU-USO.md`).**
+      En Herramientas → «Tipos y su uso» pulsa «Enviar las guías activas a Claude» y confirma. Debe salir «Enviadas N guías a Claude. Dile en la conversación que ya están.» y Claude, con el conector de Drive, encontrar el aviso GUIAS-PARA-CLAUDE en SOPORTE-AVISOS. (La prueba automática solo mira el cuerpo con el `fetch` sustituido.)
+
 - [ ] **Persona de las listas con el asunto real (fila 435, `docs/DOCUMENTOS-CON-PERSONA-Y-LINEA-DE-DATOS.md`, parte A).**
       En Ajustes → Tipos de documento → JUSTIFICANTE → Campos del nombre, añade el campo «Alumno» de clase
       «Persona de las listas» (Alumnado). En el asunto de transporte de Nicolás Amortegui (A26-0464), nombra un
