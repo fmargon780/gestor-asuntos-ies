@@ -121,7 +121,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <div class="col">
         <label class="campo"><span>Cuál</span><select id="ed-cual"></select></label>
         <label class="campo"><span>Nombre de la plantilla</span><input type="text" id="ed-nombre"></label>
-        <label class="campo"><span>Texto</span><textarea id="ed-texto" rows="6"></textarea></label>
+        <label class="campo"><span>Saludo</span><input type="text" id="ed-saludo" placeholder="Vacío: el de siempre, según la persona del asunto"></label>
+        <label class="campo"><span>Texto</span><textarea id="ed-texto" rows="5"></textarea></label>
+        <label class="campo"><span>Firma</span><textarea id="ed-firma" rows="3" placeholder="Vacía: la firma general de Ajustes"></textarea></label>
+        <div class="botones"><button class="boton" id="ed-insertar" type="button">Insertar campo variable: Nombre del alumno</button></div>
+        <p class="ayuda">El campo variable se pone donde esté el cursor, en el saludo, el texto o la firma.</p>
       </div>
       <div class="col">
         <div class="campo"><span class="etiqueta">Para</span><div class="dest" data-campo="para" data-modo="papel"></div></div>
@@ -197,11 +201,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   var FUERA=['moreno','garcia','lopez','perez','sanchez'];
 
   var plantillas=[
-    {id:'sin',nombre:'Sin plantilla',texto:'',para:[],copia:[],oculta:[]},
-    {id:'fam',nombre:'Notificación de la sanción a la familia',texto:'Estimados tutores legales de Lucía:\n\nLes comunicamos la sanción que consta en el documento adjunto, que deben firmar y devolver.\n\nUn saludo.',para:['legales'],copia:[],oculta:['tutor']},
-    {id:'tut',nombre:'Informar al tutor/a de la sanción',texto:'Buenas:\n\nJefatura de Estudios ha entregado a Lucía la notificación escrita para la familia. Esta comunicación es solo a efectos informativos.\n\nUn saludo.',para:['tutor'],copia:['g-je'],oculta:[]},
-    {id:'reg',nombre:'Comunicación recibida por el registro',texto:'Hola.\n\nAdjuntamos comunicación recibida por el Registro Electrónico.',para:['pide'],copia:[],oculta:[]}
+    {id:'sin',nombre:'Sin plantilla',saludo:'',firma:'',texto:'',para:[],copia:[],oculta:[]},
+    {id:'fam',nombre:'Notificación de la sanción a la familia',saludo:'Estimados tutores legales de {{Nombre del alumno}}:',firma:'',texto:'Les comunicamos la sanción que consta en el documento adjunto, que deben firmar y devolver.',para:['legales'],copia:[],oculta:['tutor']},
+    {id:'tut',nombre:'Informar al tutor/a de la sanción',saludo:'Buenas:',firma:'Un saludo.\n\nJefatura de Estudios\nIES Ejemplo',texto:'Jefatura de Estudios ha entregado a {{Nombre del alumno}} la notificación escrita para la familia. Esta comunicación es solo a efectos informativos.',para:['tutor'],copia:['g-je'],oculta:[]},
+    {id:'reg',nombre:'Comunicación recibida por el registro',saludo:'',firma:'',texto:'Adjuntamos comunicación recibida por el Registro Electrónico.',para:['pide'],copia:[],oculta:[]}
   ];
+  /* Lo de siempre, si la plantilla deja vacío el saludo o la firma */
+  var SALUDO_SIEMPRE='Estimados tutores legales de Lucía:';
+  var FIRMA_GENERAL='Un saludo.\n\nAdministración\nIES Ejemplo · Tel. 951 000 000';
+  function rellenar(t){ return String(t).replace(/\{\{Nombre del alumno\}\}/g,'Lucía').replace(/\{\{Unidad\}\}/g,'2º ESO B'); }
+  function cuerpoDe(p){
+    if(p.id==='sin') return SALUDO_SIEMPRE+'\n\n\n\n'+FIRMA_GENERAL;
+    return rellenar(p.saludo||SALUDO_SIEMPRE)+'\n\n'+rellenar(p.texto)+'\n\n'+rellenar(p.firma||FIRMA_GENERAL);
+  }
   function pl(id){return plantillas.filter(function(p){return p.id===id;})[0];}
   function papel(id){return PAPELES.filter(function(p){return p.id===id;})[0];}
 
@@ -221,7 +233,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         laGente().forEach(function(x){ if(x.papel===papelId && (x.lista||x.correo)) correo[k].push({id:x.id}); });
       });
     });
-    $('c-cuerpo').value=p.texto;
+    $('c-cuerpo').value=cuerpoDe(p);
   }
 
   /* ---------- el campo que se busca escribiendo ---------- */
@@ -366,14 +378,21 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   /* ---------- plantilla ---------- */
   function cargarEditor(){
     var id=$('ed-cual').value;
-    var p=id==='nueva'?{id:'nueva',nombre:'',texto:'',para:[],copia:[],oculta:[]}:pl(id);
+    var p=id==='nueva'?{id:'nueva',nombre:'',saludo:'',firma:'',texto:'',para:[],copia:[],oculta:[]}:pl(id);
     borrador=JSON.parse(JSON.stringify(p));
-    $('ed-nombre').value=borrador.nombre; $('ed-texto').value=borrador.texto; $('ed-guardado').hidden=true;
+    $('ed-nombre').value=borrador.nombre; $('ed-texto').value=borrador.texto; $('ed-saludo').value=borrador.saludo||''; $('ed-firma').value=borrador.firma||''; $('ed-guardado').hidden=true;
     pintarTodas();
   }
   $('ed-cual').onchange=cargarEditor;
+  var ultimoCampo='ed-texto';
+  ['ed-saludo','ed-texto','ed-firma'].forEach(function(id){ $(id).addEventListener('focus',function(){ultimoCampo=id;}); });
+  $('ed-insertar').addEventListener('mousedown',function(e){e.preventDefault();});
+  $('ed-insertar').onclick=function(){
+    var el=$(ultimoCampo), ini=el.selectionStart==null?el.value.length:el.selectionStart, fin=el.selectionEnd==null?ini:el.selectionEnd, t='{{Nombre del alumno}}';
+    el.value=el.value.slice(0,ini)+t+el.value.slice(fin); el.focus(); el.selectionStart=el.selectionEnd=ini+t.length; $('ed-guardado').hidden=true;
+  };
   $('ed-guardar').onclick=function(){
-    borrador.nombre=$('ed-nombre').value.trim()||'Plantilla sin nombre'; borrador.texto=$('ed-texto').value;
+    borrador.nombre=$('ed-nombre').value.trim()||'Plantilla sin nombre'; borrador.texto=$('ed-texto').value; borrador.saludo=$('ed-saludo').value; borrador.firma=$('ed-firma').value;
     if(borrador.id==='nueva'){ borrador.id='n'+Date.now(); plantillas.push(borrador); }
     else plantillas[plantillas.indexOf(pl(borrador.id))]=borrador;
     var id=borrador.id; borrador=JSON.parse(JSON.stringify(borrador));
