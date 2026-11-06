@@ -1,0 +1,379 @@
+<title>A quién va cada correo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: los colores y botones de la app (css/estilos.css); tres pestañas: el correo de un asunto, la plantilla y la tarea de la guía. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --rojo:#fdecec;--rojo-linea:#c0392b;--hover:#f0f3f7;--sobre-azul:#fff;--velo:rgba(15,25,40,.45);
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1c;--rojo-linea:#e07a6e;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1c;--rojo-linea:#e07a6e;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0}
+.cab{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+h1{font-size:21px;margin:0;text-wrap:balance}
+h2{font-size:16px;margin:0}
+h3{font-size:13px;margin:0;color:var(--tinta-suave);text-transform:uppercase;letter-spacing:.04em}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.boton:hover{background:var(--hover)}
+.principal{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.principal:hover{background:var(--azul);opacity:.9}
+.enlace{font:inherit;font-size:13px;background:none;border:0;color:var(--azul);cursor:pointer;padding:0;text-align:left}
+input[type=text],select,textarea{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:7px 9px;background:var(--papel);color:var(--tinta);width:100%;min-width:0}
+textarea{resize:vertical;line-height:1.45}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.pestanas{display:flex;flex-wrap:wrap;gap:6px}
+.pestana{font:inherit;font-size:14px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:6px 14px;cursor:pointer}
+.pestana.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dos{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:860px){.dos{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.suave{color:var(--tinta-suave)}
+.pequeno{font-size:13px}
+.etq{font-size:12px;border-radius:999px;padding:2px 9px;background:var(--azul-claro);color:var(--azul);font-weight:600;white-space:nowrap}
+.etq.ambar{background:var(--ambar);color:var(--tinta)}
+.etq.gris{background:var(--hover);color:var(--tinta-suave)}
+.aviso{border-radius:8px;padding:8px 11px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.aviso-azul{background:var(--azul-claro);border-color:var(--azul)}
+.campo{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.campo>span{color:var(--tinta-suave);font-weight:600}
+/* lista de destinatarios */
+.bloque{display:flex;flex-direction:column;gap:0}
+.persona{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--linea)}
+.bloque .persona:first-of-type{border-top:0}
+.quien{display:flex;flex-direction:column;gap:2px;min-width:0}
+.nombre{font-weight:600;font-size:14px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.correo{font-size:13px;color:var(--tinta-suave);word-break:break-all}
+.correo.cambiado{color:var(--tinta)}
+.sincorreo{font-size:13px;color:var(--rojo-linea)}
+.donde{display:inline-flex;border:1px solid var(--linea);border-radius:8px;overflow:hidden}
+.donde button{font:inherit;font-size:13px;border:0;border-left:1px solid var(--linea);background:var(--papel);color:var(--tinta);padding:5px 9px;cursor:pointer}
+.donde button:first-child{border-left:0}
+.donde button.on{background:var(--azul);color:var(--sobre-azul)}
+.donde button:disabled{opacity:.4;cursor:not-allowed}
+.otro{grid-column:1/-1;display:flex;gap:6px;align-items:center}
+.otro input{flex:1}
+.resumen{display:flex;flex-direction:column;gap:6px}
+.lin{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:14px;align-items:baseline}
+.lin>b{color:var(--tinta-suave);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:13px;background:var(--azul-claro);color:var(--tinta);border-radius:999px;padding:2px 9px;word-break:break-all}
+.vacio{font-size:13px;color:var(--tinta-suave)}
+.botones{display:flex;flex-wrap:wrap;gap:8px}
+/* plantilla */
+.roles{display:flex;flex-direction:column;gap:10px}
+.rol-fila{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;align-items:start}
+.rol-fila>b{font-size:13px;color:var(--tinta-suave);padding-top:5px}
+.pastillas{display:flex;flex-wrap:wrap;gap:6px}
+.pastilla{font:inherit;font-size:13px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:4px 11px;cursor:pointer}
+.pastilla.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.capa{position:fixed;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.cuadro{background:var(--papel);border-radius:12px;width:min(520px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--linea)}
+.cuadro-cab{padding:12px 14px;border-bottom:1px solid var(--linea)}
+.cuadro-cuerpo{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45}
+.cuadro-pie{padding:10px 14px;border-top:1px solid var(--linea);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.tarea{border:1px solid var(--linea);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+.fila2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+</style>
+
+<div class="marco">
+  <p class="prueba">Pantalla de prueba del tema 487 · datos inventados · no guarda nada</p>
+  <div class="cab">
+    <h1>A quién va cada correo</h1>
+    <div class="pestanas" role="tablist">
+      <button class="pestana on" data-p="correo" id="p-correo">Correo de un asunto</button>
+      <button class="pestana" data-p="plantilla" id="p-plantilla">Plantilla de correo</button>
+      <button class="pestana" data-p="tarea" id="p-tarea">Tarea de la guía</button>
+    </div>
+  </div>
+
+  <!-- ============ CORREO ============ -->
+  <section id="v-correo" class="dos">
+    <div class="col">
+      <div class="panel">
+        <div class="cab"><h2>Correo de este asunto</h2><span class="etq gris">261106 A26-0611 EXPULSIÓN DEL CENTRO · Ruiz Ortega, Lucía · 2º ESO B</span></div>
+        <label class="campo"><span>Plantilla</span>
+          <select id="sel-plantilla"></select>
+        </label>
+        <p class="pequeno suave" id="nota-plantilla"></p>
+        <h3>Personas de este asunto</h3>
+        <div id="lista"></div>
+        <button class="enlace" id="relacionar">+ Relacionar a alguien con el asunto (p. ej., Servicios Sociales)</button>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <h2>Así sale el correo</h2>
+        <div class="resumen" id="resumen"></div>
+        <label class="campo"><span>Asunto</span><input type="text" id="c-asunto" value="261106 A26-0611 EXPULSIÓN DEL CENTRO Ruiz Ortega, Lucía"></label>
+        <label class="campo"><span>Cuerpo</span><textarea id="c-cuerpo" rows="7"></textarea></label>
+        <div class="botones"><button class="boton principal" id="enviar">Enviar</button><button class="boton" id="copiar-para">Copiar Para</button></div>
+        <p class="pequeno suave">«Enviar» enseña antes el resumen; nada sale sin confirmarlo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLANTILLA ============ -->
+  <section id="v-plantilla" class="dos" hidden>
+    <div class="col">
+      <div class="panel">
+        <h2>Plantilla de correo</h2>
+        <label class="campo"><span>Cuál</span><select id="ed-cual"></select></label>
+        <label class="campo"><span>Nombre de la plantilla</span><input type="text" id="ed-nombre"></label>
+        <label class="campo"><span>Texto</span><textarea id="ed-texto" rows="5"></textarea></label>
+        <h3>Destinatarios propuestos</h3>
+        <p class="pequeno suave">Salen ya puestos al preparar el correo con esta plantilla. Se pueden cambiar en cada envío. Sin ninguno marcado, el correo sale sin destinatarios y se eligen al enviar.</p>
+        <div class="roles" id="roles"></div>
+        <div class="botones"><button class="boton principal" id="ed-guardar">Guardar</button></div>
+        <p class="aviso aviso-verde" id="ed-guardado" hidden>Guardada. Mira cómo sale en «Correo de un asunto».</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <h2>Qué es cada papel</h2>
+        <ul class="pequeno" style="margin:0;padding-left:18px;line-height:1.55">
+          <li><b>El interesado</b>: la persona del asunto (el alumno, el docente, la empresa…).</li>
+          <li><b>Tutores legales</b>: los dos, si los hay. En cada envío se puede quitar uno.</li>
+          <li><b>Tutor/a del grupo</b> y <b>Profesores del grupo</b>: los de la unidad del alumno.</li>
+          <li><b>Quien lo pide</b>: quien encargó el asunto.</li>
+          <li><b>Relacionados</b>: los terceros relacionados con ese asunto.</li>
+          <li><b>Listas del personal</b>: las guardadas en Ajustes (Equipo directivo…).</li>
+        </ul>
+        <p class="pequeno suave">El papel que el asunto no tiene (por ejemplo, tutores legales en un asunto de una empresa) no pone a nadie.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAREA ============ -->
+  <section id="v-tarea" class="dos" hidden>
+    <div class="col">
+      <div class="panel">
+        <h2>Guía de «Expulsión del centro» · Hito 3: Envío de la comunicación</h2>
+        <div class="tarea">
+          <div class="fila2">
+            <label class="campo"><span>Qué se hace</span><select id="t-que"><option>Comunicar</option></select></label>
+            <label class="campo"><span>Por</span><select id="t-por"><option>Correo</option><option>Mensaje de Séneca</option></select></label>
+            <label class="campo"><span>Plantilla</span><select id="t-plantilla"></select></label>
+          </div>
+          <div class="campo"><span>A quién va</span><div id="t-aquien" class="pequeno"></div></div>
+          <button class="enlace" id="t-ver">Ver y cambiar la plantilla</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <h2>Lo que cambia aquí</h2>
+        <p class="pequeno" style="margin:0">La tarea ya no tiene su propio «a quién». Solo elige la plantilla, y la plantilla dice a quién va.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="capa" id="capa" hidden>
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="capa-tit">
+    <div class="cuadro-cab"><h2 id="capa-tit">Antes de enviar</h2></div>
+    <div class="cuadro-cuerpo" id="capa-cuerpo"></div>
+    <div class="cuadro-pie"><button class="boton" id="capa-no">Volver</button><button class="boton principal" id="capa-si">Enviar de verdad</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id);};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  /* ---------- datos inventados ---------- */
+  var ROLES = [
+    {id:'interesado', t:'El interesado'},
+    {id:'legales', t:'Tutores legales'},
+    {id:'tutor', t:'Tutor/a del grupo'},
+    {id:'profes', t:'Profesores del grupo'},
+    {id:'pide', t:'Quien lo pide'},
+    {id:'relac', t:'Relacionados'},
+    {id:'g-dir', t:'Equipo directivo'},
+    {id:'g-ori', t:'Orientación'}
+  ];
+  var personas = [
+    {id:'alu', rol:'interesado', grupo:'El asunto', nombre:'Ruiz Ortega, Lucía', etq:'alumna', correo:'lucia.ruiz.o@g.educaand.es'},
+    {id:'madre', rol:'legales', grupo:'Tutores legales', nombre:'Ortega Lara, Marta', etq:'madre', custodia:true, correo:'marta.ortega.l@correo.es'},
+    {id:'padre', rol:'legales', grupo:'Tutores legales', nombre:'Ruiz Cano, Andrés', etq:'padre', correo:'aruizcano@correo.es'},
+    {id:'tutor', rol:'tutor', grupo:'Su grupo', nombre:'Navas Peña, Elena', etq:'tutora de 2º ESO B', correo:'enavpen@g.educaand.es'},
+    {id:'p1', rol:'profes', grupo:'Sus profesores (2º ESO B)', nombre:'Gil Moreno, Tomás', etq:'Matemáticas', correo:'tgilmor@g.educaand.es'},
+    {id:'p2', rol:'profes', grupo:'Sus profesores (2º ESO B)', nombre:'Prieto Sanz, Ana', etq:'Lengua', correo:'aprisan@g.educaand.es'},
+    {id:'p3', rol:'profes', grupo:'Sus profesores (2º ESO B)', nombre:'Vela Ruiz, Javier', etq:'Geografía e Historia', correo:''},
+    {id:'pide', rol:'pide', grupo:'Quien lo pide', nombre:'Campos Díaz, Rafael', etq:'Jefatura de Estudios', correo:'jefatura@iesejemplo.es'},
+    {id:'g-dir', rol:'g-dir', grupo:'Listas del personal', nombre:'Equipo directivo', etq:'4 personas', correo:'4 correos', lista:true},
+    {id:'g-ori', rol:'g-ori', grupo:'Listas del personal', nombre:'Orientación', etq:'2 personas', correo:'2 correos', lista:true}
+  ];
+  var SERV = {id:'ss', rol:'relac', grupo:'Relacionados con el asunto', nombre:'Servicios Sociales Comunitarios', etq:'Ayuntamiento', correo:'ssociales@ayto-ejemplo.es'};
+
+  var plantillas = [
+    {id:'sin', nombre:'Sin plantilla', texto:'', para:[], copia:[], oculta:[]},
+    {id:'fam', nombre:'Notificación de la sanción a la familia', texto:'Estimados tutores legales de Lucía:\n\nLes comunicamos la sanción que consta en el documento adjunto, que deben firmar y devolver.\n\nUn saludo.', para:['legales'], copia:[], oculta:['tutor']},
+    {id:'tut', nombre:'Informar al tutor/a de la sanción', texto:'Buenas:\n\nJefatura de Estudios ha entregado a Lucía la notificación escrita para la familia. Esta comunicación es solo a efectos informativos.\n\nUn saludo.', para:['tutor'], copia:['g-dir'], oculta:[]},
+    {id:'reg', nombre:'Comunicación recibida por el registro', texto:'Hola.\n\nAdjuntamos comunicación recibida por el Registro Electrónico.', para:['pide'], copia:[], oculta:[]}
+  ];
+
+  var estado = {};      /* id persona -> '' | 'para' | 'copia' | 'oculta' */
+  var otroCorreo = {};  /* id persona -> correo solo para este envío */
+  var abiertoOtro = {};
+  var relacionado = false;
+  var plantillaActual = 'fam';
+
+  function lasPersonas(){ return relacionado ? personas.slice(0,8).concat([SERV]).concat(personas.slice(8)) : personas; }
+  function pl(id){ return plantillas.filter(function(p){return p.id===id;})[0]; }
+
+  function aplicarPlantilla(){
+    var p = pl(plantillaActual); estado = {};
+    lasPersonas().forEach(function(x){
+      if (p.para.indexOf(x.rol)!==-1) estado[x.id]='para';
+      else if (p.copia.indexOf(x.rol)!==-1) estado[x.id]='copia';
+      else if (p.oculta.indexOf(x.rol)!==-1) estado[x.id]='oculta';
+      if (!x.lista && !x.correo && !otroCorreo[x.id]) estado[x.id]='';
+    });
+    $('c-cuerpo').value = p.texto;
+    var partes = [];
+    [['para','Para'],['copia','Copia'],['oculta','Copia oculta']].forEach(function(z){
+      var r = p[z[0]].map(function(id){return ROLES.filter(function(q){return q.id===id;})[0].t;});
+      if (r.length) partes.push(z[1]+': '+r.join(', '));
+    });
+    $('nota-plantilla').textContent = partes.length ? 'La plantilla propone — '+partes.join(' · ')+'. Puedes cambiarlo abajo.' : 'Sin destinatarios propuestos: elígelos abajo.';
+  }
+
+  function pintarLista(){
+    var html='', grupoAnt='';
+    lasPersonas().forEach(function(x){
+      if (x.grupo!==grupoAnt){ if(grupoAnt) html+='</div>'; html+='<div class="bloque"><h3 style="margin-top:8px">'+esc(x.grupo)+'</h3>'; grupoAnt=x.grupo; }
+      var correo = otroCorreo[x.id] || x.correo;
+      var sin = !x.lista && !correo;
+      html+='<div class="persona" data-id="'+x.id+'"><div class="quien"><div class="nombre">'+esc(x.nombre)+' <span class="etq gris">'+esc(x.etq)+'</span>'+
+        (x.custodia?'<span class="etq ambar">tiene la custodia</span>':'')+'</div>'+
+        (sin?'<span class="sincorreo">Sin correo</span>':'<span class="correo'+(otroCorreo[x.id]?' cambiado':'')+'">'+esc(correo)+(otroCorreo[x.id]?' · solo para este envío':'')+'</span>')+
+        (!x.lista?' <button class="enlace" data-otro="'+x.id+'">'+(otroCorreo[x.id]?'Volver al guardado':'Otro correo para este envío')+'</button>':'')+
+        '</div><div class="donde" role="group" aria-label="Dónde va '+esc(x.nombre)+'">'+
+        [['','—'],['para','Para'],['copia','Copia'],['oculta','Oculta']].map(function(o){
+          return '<button type="button" data-id="'+x.id+'" data-v="'+o[0]+'"'+((estado[x.id]||'')===o[0]?' class="on"':'')+(sin&&o[0]?' disabled':'')+'>'+o[1]+'</button>';
+        }).join('')+'</div>'+
+        (abiertoOtro[x.id]?'<div class="otro"><input type="text" id="otro-'+x.id+'" placeholder="correo@ejemplo.es"><button class="boton" data-guardar-otro="'+x.id+'">Usar</button></div>':'')+
+        '</div>';
+    });
+    html+='</div>';
+    $('lista').innerHTML=html;
+    $('relacionar').hidden = relacionado;
+  }
+
+  function direcciones(v){
+    var out=[];
+    lasPersonas().forEach(function(x){ if(estado[x.id]===v) out.push(x.lista? x.nombre+' ('+x.correo+')' : (otroCorreo[x.id]||x.correo)); });
+    return out;
+  }
+  function pintarResumen(){
+    $('resumen').innerHTML=[['para','Para'],['copia','Copia'],['oculta','Copia oculta']].map(function(z){
+      var d=direcciones(z[0]);
+      return '<div class="lin"><b>'+z[1]+'</b><div class="chips">'+(d.length?d.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join(''):'<span class="vacio">nadie</span>')+'</div></div>';
+    }).join('');
+  }
+  function todo(){ pintarLista(); pintarResumen(); }
+
+  function llenarSelects(){
+    $('sel-plantilla').innerHTML = plantillas.map(function(p){return '<option value="'+p.id+'"'+(p.id===plantillaActual?' selected':'')+'>'+esc(p.nombre)+'</option>';}).join('');
+    var sinSin = plantillas.filter(function(p){return p.id!=='sin';});
+    var edAct = $('ed-cual').value || 'fam';
+    $('ed-cual').innerHTML = sinSin.map(function(p){return '<option value="'+p.id+'"'+(p.id===edAct?' selected':'')+'>'+esc(p.nombre)+'</option>';}).join('') + '<option value="nueva">+ Plantilla nueva</option>';
+    var tAct = $('t-plantilla').value || 'fam';
+    $('t-plantilla').innerHTML = sinSin.map(function(p){return '<option value="'+p.id+'"'+(p.id===tAct?' selected':'')+'>'+esc(p.nombre)+'</option>';}).join('');
+  }
+
+  /* ---------- eventos del correo ---------- */
+  $('lista').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    if (b.dataset.v!==undefined && b.dataset.id){ estado[b.dataset.id]=b.dataset.v; todo(); return; }
+    if (b.dataset.otro){ var id=b.dataset.otro; if(otroCorreo[id]){ delete otroCorreo[id]; abiertoOtro[id]=false; } else abiertoOtro[id]=!abiertoOtro[id]; todo(); if(abiertoOtro[id]) $('otro-'+id).focus(); return; }
+    if (b.dataset.guardarOtro){ var i2=b.dataset.guardarOtro, v=$('otro-'+i2).value.trim(); if(/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v)){ otroCorreo[i2]=v; abiertoOtro[i2]=false; todo(); } else { $('otro-'+i2).style.borderColor='var(--rojo-linea)'; } }
+  });
+  $('sel-plantilla').onchange=function(){ plantillaActual=this.value; aplicarPlantilla(); todo(); };
+  $('relacionar').onclick=function(){ relacionado=true; todo(); };
+  $('copiar-para').onclick=function(){ var t=direcciones('para').join(', '); var b=this; try{ navigator.clipboard.writeText(t).then(function(){b.textContent='Copiado';},function(){b.textContent='No se pudo copiar';}); }catch(e){ b.textContent='No se pudo copiar'; } setTimeout(function(){b.textContent='Copiar Para';},1500); };
+  $('enviar').onclick=function(){
+    var p=direcciones('para'), c=direcciones('copia'), o=direcciones('oculta');
+    var h='';
+    if(!p.length) h+='<p class="aviso aviso-ambar">«Para» está vacío: elige al menos a una persona.</p>';
+    h+='<div class="lin"><b>Para</b><div>'+(p.map(esc).join(', ')||'<span class="vacio">nadie</span>')+'</div></div>'+
+       '<div class="lin"><b>Copia</b><div>'+(c.map(esc).join(', ')||'<span class="vacio">nadie</span>')+'</div></div>'+
+       '<div class="lin"><b>Copia oculta</b><div>'+(o.map(esc).join(', ')||'<span class="vacio">nadie</span>')+'</div></div>';
+    $('capa-cuerpo').innerHTML=h; $('capa-si').disabled=!p.length; $('capa').hidden=false; $('capa-no').focus();
+  };
+  $('capa-no').onclick=function(){ $('capa').hidden=true; };
+  $('capa-si').onclick=function(){ $('capa-cuerpo').innerHTML='<p class="aviso aviso-verde">Enviado (en la prueba no sale nada).</p>'; this.disabled=true; };
+
+  /* ---------- plantilla ---------- */
+  var borrador=null;
+  function cargarEditor(){
+    var id=$('ed-cual').value;
+    var p = id==='nueva' ? {id:'nueva',nombre:'',texto:'',para:[],copia:[],oculta:[]} : pl(id);
+    borrador = JSON.parse(JSON.stringify(p));
+    $('ed-nombre').value=borrador.nombre; $('ed-texto').value=borrador.texto; $('ed-guardado').hidden=true;
+    pintarRoles();
+  }
+  function pintarRoles(){
+    $('roles').innerHTML=[['para','Para'],['copia','Copia'],['oculta','Copia oculta']].map(function(z){
+      return '<div class="rol-fila"><b>'+z[1]+'</b><div class="pastillas">'+ROLES.map(function(r){
+        var on=borrador[z[0]].indexOf(r.id)!==-1;
+        return '<button type="button" class="pastilla'+(on?' on':'')+'" data-z="'+z[0]+'" data-r="'+r.id+'">'+esc(r.t)+'</button>';
+      }).join('')+'</div></div>';
+    }).join('');
+  }
+  $('roles').addEventListener('click',function(e){
+    var b=e.target.closest('.pastilla'); if(!b) return;
+    var z=b.dataset.z, r=b.dataset.r;
+    var ya=borrador[z].indexOf(r)!==-1;
+    ['para','copia','oculta'].forEach(function(k){ borrador[k]=borrador[k].filter(function(x){return x!==r;}); });
+    if(!ya) borrador[z].push(r);
+    pintarRoles(); $('ed-guardado').hidden=true;
+  });
+  $('ed-cual').onchange=cargarEditor;
+  $('ed-guardar').onclick=function(){
+    borrador.nombre=$('ed-nombre').value.trim()||'Plantilla sin nombre'; borrador.texto=$('ed-texto').value;
+    if(borrador.id==='nueva'){ borrador.id='n'+Date.now(); plantillas.push(borrador); }
+    else { var i=plantillas.indexOf(pl(borrador.id)); plantillas[i]=borrador; }
+    plantillaActual=borrador.id; llenarSelects(); $('ed-cual').value=borrador.id; $('sel-plantilla').value=borrador.id;
+    borrador=JSON.parse(JSON.stringify(borrador));
+    aplicarPlantilla(); todo(); pintarTarea(); $('ed-guardado').hidden=false;
+  };
+
+  /* ---------- tarea ---------- */
+  function pintarTarea(){
+    var p=pl($('t-plantilla').value)||plantillas[1];
+    var partes=[];
+    [['para','Para'],['copia','Copia'],['oculta','Copia oculta']].forEach(function(z){
+      var r=p[z[0]].map(function(id){return ROLES.filter(function(q){return q.id===id;})[0].t;});
+      if(r.length) partes.push('<b>'+z[1]+':</b> '+esc(r.join(', ')));
+    });
+    $('t-aquien').innerHTML = (partes.length?partes.join(' · '):'<span class="suave">La plantilla no propone a nadie: se elige al enviar.</span>') + '<br><span class="suave">Lo dice la plantilla.</span>';
+  }
+  $('t-plantilla').onchange=pintarTarea;
+  $('t-ver').onclick=function(){ $('ed-cual').value=$('t-plantilla').value; cargarEditor(); ir('plantilla'); };
+
+  /* ---------- pestañas ---------- */
+  function ir(p){
+    ['correo','plantilla','tarea'].forEach(function(k){ $('v-'+k).hidden=(k!==p); $('p-'+k).classList.toggle('on',k===p); });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.pestana'),function(b){ b.onclick=function(){ ir(b.dataset.p); }; });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('capa').hidden=true; });
+
+  llenarSelects(); aplicarPlantilla(); todo(); cargarEditor(); pintarTarea();
+})();
+</script>
