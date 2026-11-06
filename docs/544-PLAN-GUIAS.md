@@ -4,7 +4,7 @@ Decidido con Francisco el 6-nov-2026, a partir de las 62 guías activas que envi
 «Tipos y su uso» (aviso del buzón `2026-11-06 085356 mejora.txt`). Antes, ese mismo día,
 desactivó 84 tipos sin usar (ya había uno desactivado: 85 en total).
 
-**En curso.** Se va guía a guía; lo que no está aquí todavía no se ha decidido.
+**En curso.** Hecho: las guías de la biblioteca. Falta: unir las tareas repetidas.
 
 ## Grupos
 
@@ -50,3 +50,9 @@ Los desactiva Francisco todos juntos al final, en «Tipos y su uso».
    «Anotar en el expediente y en Séneca» y «Comunicar a la familia y a la tutoría».
 6. **Apertura de expediente académico de Bachillerato:** se desactiva (arriba).
 7. **Apertura de expediente académico de ESO:** se desactiva (arriba).
+8. **Baja del alumnado:** se queda como está. Francisco y Diego la matizarán más adelante.
+9. **Cambio en la situación familiar:** se quita «Archivar con acceso restringido». Se quedan
+   «Recoger la documentación», «Actualizar los datos en Séneca» y «Comunicar a la tutoría lo
+   que deba saber».
+10. **Alta y actualización de datos:** se quedan «Recoger los datos», «Grabar en Séneca» y
+    «Comprobar que la nómina los recoge»; «Archivar» se va por la regla general.
