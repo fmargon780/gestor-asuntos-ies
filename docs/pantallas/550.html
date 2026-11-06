@@ -1,0 +1,389 @@
+<title>Guías en las listas comunes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: los colores y botones de la app (css/estilos.css); dos pestañas, cada una a todo lo ancho con dos columnas. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --rojo:#fdecec;--rojo-linea:#c0392b;--hover:#f0f3f7;--sobre-azul:#fff;--velo:rgba(15,25,40,.45);
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1c;--rojo-linea:#e07a6e;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --rojo:#3a1c1c;--rojo-linea:#e07a6e;--hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0}
+.cab{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+h1{font-size:21px;margin:0;text-wrap:balance}
+h2{font-size:16px;margin:0}
+h3{font-size:14px;margin:0}
+.empuja{margin-left:auto}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.boton:hover{background:var(--hover)}
+.principal{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.principal:hover{background:var(--azul);opacity:.9}
+.mini{padding:3px 9px;font-size:13px}
+.enlace{font:inherit;font-size:14px;background:none;border:0;color:var(--azul);cursor:pointer;padding:2px 0;text-align:left}
+input[type=text],select{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:7px 9px;background:var(--papel);color:var(--tinta);width:100%;min-width:0}
+input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--azul)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.pestanas{display:flex;flex-wrap:wrap;gap:6px}
+.pestana{font:inherit;font-size:14px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:6px 14px;cursor:pointer}
+.pestana.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dos{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:12px;align-items:start}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.suave{color:var(--tinta-suave)}
+.pequeno{font-size:13px}
+.cifras{display:flex;flex-wrap:wrap;gap:6px}
+.etq{font-size:12px;border-radius:999px;padding:2px 9px;background:var(--azul-claro);color:var(--azul);font-weight:600;white-space:nowrap}
+.etq.gris{background:var(--hover);color:var(--tinta-suave)}
+.etq.verde{background:var(--verde);color:var(--tinta)}
+.etq.ambar{background:var(--ambar);color:var(--tinta)}
+.aviso{border-radius:8px;padding:8px 11px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.aviso-azul{background:var(--azul-claro);border-color:var(--azul)}
+details{border-top:1px solid var(--linea);padding-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+summary::marker{color:var(--tinta-suave)}
+.lista{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.lista li{display:flex;flex-direction:column;gap:2px}
+.antes{color:var(--tinta-suave);font-size:13px;line-height:1.45}
+.flecha{color:var(--tinta-suave)}
+.hito{border:1px solid var(--linea);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.hito-cab{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.tarea{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:4px 0;border-top:1px dashed var(--linea)}
+.tarea:first-of-type{border-top:0}
+.tarea .texto{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.marca{width:18px;height:18px;border:1.5px solid var(--linea);border-radius:4px;flex:0 0 18px;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.marca.hecha{background:var(--azul);border-color:var(--azul);color:var(--sobre-azul)}
+.doc{font-size:13px;color:var(--tinta-suave)}
+.anadir{display:flex;flex-wrap:wrap;gap:8px}
+.campo{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.campo>span{color:var(--tinta-suave);font-weight:600}
+.fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fila>input{flex:1}
+.ejemplo{font-size:13px;background:var(--hover);border-radius:6px;padding:6px 8px;word-break:break-word}
+.capa{position:fixed;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.cuadro{background:var(--papel);border-radius:12px;width:min(560px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--linea)}
+.cuadro-cab{padding:12px 14px;border-bottom:1px solid var(--linea)}
+.cuadro-cuerpo{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45}
+.cuadro-cuerpo ul{margin:0;padding-left:18px}
+.cuadro-pie{padding:10px 14px;border-top:1px solid var(--linea);display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.herr{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.herr li{display:flex;justify-content:space-between;gap:8px}
+.tachado{text-decoration:line-through;color:var(--tinta-suave)}
+@media (max-width:860px){.dos{grid-template-columns:minmax(0,1fr)}.empuja{margin-left:0}}
+</style>
+
+<div class="marco">
+  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada. Dos partes: aplicar el plan de las guías, y la tarea nueva «Copiar a otra carpeta».</p>
+  <div class="pestanas" role="tablist">
+    <button type="button" class="pestana on" id="p-plan" role="tab">1 · Aplicar el plan</button>
+    <button type="button" class="pestana" id="p-copiar" role="tab">2 · Copiar a otra carpeta</button>
+  </div>
+
+  <!-- ================= PARTE 1 ================= -->
+  <section id="v-plan">
+    <div class="dos">
+      <div class="col">
+        <div class="panel" id="plan-antes">
+          <div class="cab">
+            <h1>Aplicar el plan de las guías</h1>
+            <span class="suave pequeno">Herramientas · plan del 6-nov-2026</span>
+          </div>
+          <div class="cifras">
+            <span class="etq">62 guías</span><span class="etq">38 tareas → 9</span><span class="etq">24 hitos → 6</span>
+            <span class="etq gris">«Archivar» se quita de 31 guías</span><span class="etq gris">26 guías vacías no cambian</span>
+          </div>
+          <p class="pequeno suave" style="margin:0">Esto es lo que va a cambiar. Todavía no se ha cambiado nada.</p>
+
+          <details open>
+            <summary>Se unen en una sola <span class="etq">5 grupos</span></summary>
+            <ul class="lista">
+              <li><b>Hito «Registro de entrada»</b><span class="antes">antes: Dar Registro de Entrada · Registrar Entrada · Registrar de Entrada la Solicitud · Registro de Entrada de la Matrícula · Registro entrada · Regitra de entrada</span></li>
+              <li><b>Tarea «Registrar de entrada el documento»</b> <span class="etq gris">Registrar</span><span class="antes">antes: 8 nombres distintos, en 19 guías</span></li>
+              <li><b>Hito «Registro de salida»</b><span class="antes">antes: 7 nombres distintos, en 14 guías</span></li>
+              <li><b>Tarea «Registrar de salida el documento»</b> <span class="etq gris">Registrar</span><span class="antes">en CONVALIDACIÓN CURSO, «si se remite» pasa a su explicación</span></li>
+              <li><b>Tarea «Firmar un documento»</b> <span class="etq gris">Firmar</span><span class="antes">antes: Poner a la firma del Responsable · Enviar a bandeja de firma de Secretaría · 2 más</span></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Explicaciones distintas: se juntan <span class="etq">3 tareas</span></summary>
+            <ul class="lista">
+              <li><b>Registrar de entrada el documento</b>
+                <span class="antes">Queda con las dos explicaciones, una debajo de otra:<br>«Con su fecha, en el Libro de Entrada.»<br>«Si llega por la sede, el registro ya viene puesto.»</span></li>
+              <li><b>Firmar un documento</b><span class="antes">Queda con 2 explicaciones juntas.</span></li>
+              <li><b>Registrar de salida el documento</b><span class="antes">Queda con 3 explicaciones juntas.</span></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Plantillas distintas: quedan separadas <span class="etq ambar">3 tareas</span></summary>
+            <p class="pequeno suave" style="margin:6px 0 0">Mismo nombre, pero cada una con su plantilla. En la lista salen las tres, con su plantilla al lado.</p>
+            <ul class="lista">
+              <li><b>Enviar el documento al solicitante por la vía acordada</b><span class="antes">plantilla «Certificado de notas» · CERTIFICADO NOTAS, CERTIFICADO TÍTULO</span></li>
+              <li><b>Enviar el documento al solicitante por la vía acordada</b><span class="antes">plantilla «Certificado de matrícula» · CERTIFICADO MATRÍCULA</span></li>
+              <li><b>Enviar el documento al solicitante por la vía acordada</b><span class="antes">plantilla «Certificado de servicios» · CERTIFICADO PERSONAL</span></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Se quitan <span class="etq gris">hitos y tareas</span></summary>
+            <ul class="lista">
+              <li><b>Hito «Archivar»</b><span class="antes">de 31 guías</span></li>
+              <li><b>Guías de la biblioteca</b><span class="antes">lo que hacen Dirección, Jefatura, Orientación o la tutoría, en 6 guías (Evaluación psicopedagógica, Elecciones al Consejo Escolar, CAMBIO DE GRUPO…)</span></li>
+              <li><b>«Descargar el documento registrado a la carpeta del asunto»</b><span class="antes">en 4 guías: los documentos ya están en su carpeta</span></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>Dentro de las preguntas <span class="etq">pasan también</span></summary>
+            <p class="pequeno" style="margin:6px 0 0">Las tareas de cada camino de una pregunta pasan a las listas con las mismas reglas. <span class="suave">12 tareas en 4 guías.</span></p>
+          </details>
+
+          <details>
+            <summary>No encontrado: se salta <span class="etq ambar">1</span></summary>
+            <p class="pequeno" style="margin:6px 0 0">Hito «Envío Certificado» en CERTIFICADO TÍTULO: ya no está en la guía. No se cambia nada ahí.</p>
+          </details>
+
+          <details>
+            <summary>Desaparece de la app</summary>
+            <ul class="lista">
+              <li>Escribir tareas e hitos libres en la guía: solo se añaden de la lista.</li>
+              <li>«+ Traer un hito de otro tipo».</li>
+              <li>La caja «Nueva tarea…» del asunto: queda «+ Añadir tarea».</li>
+              <li>«Tipos y su uso», «Pasar las guías a las listas comunes» y «Cargar la biblioteca del centro».</li>
+            </ul>
+          </details>
+
+          <div class="cab">
+            <button type="button" class="boton principal" id="b-aplicar">Aplicar el plan</button>
+            <button type="button" class="boton" id="b-copiar-texto">Copiar como texto</button>
+            <span class="suave pequeno" id="copiado"></span>
+          </div>
+        </div>
+
+        <div class="panel" id="plan-despues" hidden>
+          <div class="aviso aviso-verde"><b>Plan aplicado.</b> 62 guías pasadas a las listas comunes: 9 tareas y 6 hitos en las listas. Copia de las guías guardada antes de empezar. 1 cosa saltada (no estaba en la guía).</div>
+          <div class="cab"><h2>Guía de CERTIFICADO NOTAS</h2><span class="suave pequeno">así queda en el editor de la guía</span></div>
+          <div class="hito">
+            <div class="hito-cab"><b>1 · Registro de entrada</b><span class="etq gris">de la lista</span></div>
+            <div class="tarea"><span class="marca"></span><div class="texto">Registrar de entrada el documento <span class="doc">Registrar</span></div></div>
+          </div>
+          <div class="hito">
+            <div class="hito-cab"><b>2 · Poner a la firma</b><span class="etq gris">de la lista</span><span class="suave pequeno">responsable: Secretaría</span></div>
+            <div class="tarea"><span class="marca"></span><div class="texto">Firmar un documento <span class="doc">Firmar</span></div></div>
+          </div>
+          <div class="hito">
+            <div class="hito-cab"><b>3 · Enviar el certificado</b><span class="etq gris">de la lista</span></div>
+            <div class="tarea"><span class="marca"></span><div class="texto">Enviar el documento al solicitante por la vía acordada <span class="doc">Comunicar · plantilla «Certificado de notas»</span></div></div>
+          </div>
+          <div class="anadir">
+            <button type="button" class="boton mini" id="b-anadir-hito">+ Añadir un hito de la lista</button>
+            <button type="button" class="boton mini" id="b-anadir-tarea">+ Añadir una tarea de la lista</button>
+          </div>
+          <p class="pequeno suave" style="margin:0" id="anadir-nota">Ya no hay «+ Añadir un hito» en blanco ni «+ Traer un hito de otro tipo».</p>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="panel">
+          <h2>Herramientas</h2>
+          <ul class="herr" id="herr">
+            <li><span>Poner en orden las fichas del ARCHIVO</span></li>
+            <li><span id="h1">Tipos y su uso</span></li>
+            <li><span id="h2">Pasar las guías a las listas comunes</span></li>
+            <li><span id="h3">Cargar la biblioteca del centro</span></li>
+            <li><span id="h4">Aplicar el plan de las guías</span></li>
+            <li><span>Traer tareas</span></li>
+          </ul>
+          <p class="pequeno suave" style="margin:0" id="herr-nota">Antes de aplicar el plan.</p>
+        </div>
+
+        <div class="panel" id="panel-activar" hidden>
+          <h2>Ajustes · Tipos de asunto</h2>
+          <p class="pequeno suave" style="margin:0">Un tipo desactivado que se vuelve a activar.</p>
+          <div class="cab">
+            <span>Apertura de expediente académico de ESO</span>
+            <span class="etq gris" id="estado-tipo">desactivado</span>
+            <button type="button" class="boton mini empuja" id="b-activar">Activar</button>
+          </div>
+          <div class="aviso aviso-azul" id="aviso-activar" hidden>Activado. Su guía pasa a las listas comunes: 2 tareas ya estaban en la lista y 1 se añade nueva («Comprobar el historial académico»).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PARTE 2 ================= -->
+  <section id="v-copiar" hidden>
+    <div class="dos">
+      <div class="col">
+        <div class="panel">
+          <div class="cab">
+            <h1>A 260304 A26-0211 AUSENCIA García López, Ana</h1>
+          </div>
+          <p class="pequeno suave" style="margin:0">Hito abierto del asunto.</p>
+          <div class="hito">
+            <div class="hito-cab"><b>3 · Registro de salida</b></div>
+            <div class="tarea">
+              <span class="marca" id="m-reg"></span>
+              <div class="texto">Registrar de salida el documento
+                <span class="doc">261104 RESOLUCION D26-01234.pdf · <span id="reg-estado">sin registrar</span></span></div>
+            </div>
+            <div class="tarea">
+              <span class="marca" id="m-cop"></span>
+              <div class="texto">Copiar el documento registrado a la carpeta Ausencias
+                <span class="doc" id="cop-estado">Se hará sola cuando llegue el registrado.</span></div>
+            </div>
+          </div>
+          <div class="aviso aviso-ambar" id="aviso-permiso" hidden>No se ha copiado: este ordenador no tiene permiso sobre la carpeta Ausencias. <button type="button" class="enlace" id="b-permiso">Dar permiso</button></div>
+          <div class="cab">
+            <button type="button" class="boton" id="b-llega">Simular: llega el registrado</button>
+            <label class="fila pequeno"><input type="checkbox" id="sin-permiso"> Este ordenador aún no tiene permiso sobre Ausencias</label>
+            <button type="button" class="boton mini empuja" id="b-reiniciar">Volver a empezar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="panel">
+          <h2>Nueva tarea</h2>
+          <label class="campo"><span>Nombre</span><input type="text" id="t-nombre" value="Copiar el documento registrado a la carpeta Ausencias"></label>
+          <label class="campo"><span>Qué hace</span>
+            <select id="t-hace">
+              <option>Generar documento</option><option>Firmar</option><option>Registrar</option><option>Comunicar</option>
+              <option>Añadir documento</option><option>Pedir datos</option><option selected>Copiar a otra carpeta</option><option>Otra cosa</option>
+            </select></label>
+          <div id="t-copiar" class="col" style="gap:10px">
+            <div class="campo"><span>Carpeta</span>
+              <div class="fila"><input type="text" id="t-carpeta" value="Dropbox › Jefatura › Ausencias" readonly><button type="button" class="boton mini" id="b-carpeta">Elegir carpeta</button></div></div>
+            <div class="campo"><span>Qué copia</span>
+              <div class="pequeno">El documento de la tarea de registrar de este hito, cuando llega registrado.</div></div>
+            <div class="campo"><span>Nombre del fichero copiado</span>
+              <div class="fila"><input type="text" id="t-patron" value="{Apellidos y nombre} {Fecha del registro} Justificante"><button type="button" class="boton mini" id="b-campo">Insertar campo</button></div>
+              <div class="fila" id="campos-lista" hidden></div>
+              <div class="ejemplo" id="t-ejemplo"></div></div>
+          </div>
+          <p class="pequeno suave" style="margin:0" id="t-otra" hidden>Las demás clases de tarea, igual que hoy.</p>
+          <div class="cab"><span class="suave pequeno">Para: este asunto y los siguientes</span><button type="button" class="boton principal empuja" id="b-crear">Crear y añadir</button></div>
+          <div class="aviso aviso-verde" id="creada" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="capa" id="capa" hidden>
+  <div class="cuadro" role="dialog" aria-labelledby="cuadro-titulo">
+    <div class="cuadro-cab"><h2 id="cuadro-titulo"></h2></div>
+    <div class="cuadro-cuerpo" id="cuadro-cuerpo"></div>
+    <div class="cuadro-pie" id="cuadro-pie"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+
+  /* ---- pestañas ---- */
+  function ver(cual){
+    $('v-plan').hidden=cual!=='plan'; $('v-copiar').hidden=cual!=='copiar';
+    $('p-plan').classList.toggle('on',cual==='plan'); $('p-copiar').classList.toggle('on',cual==='copiar');
+  }
+  $('p-plan').onclick=function(){ver('plan')}; $('p-copiar').onclick=function(){ver('copiar')};
+
+  /* ---- cuadro ---- */
+  function cuadro(titulo,html,botones){
+    $('cuadro-titulo').textContent=titulo; $('cuadro-cuerpo').innerHTML=html; var pie=$('cuadro-pie'); pie.innerHTML='';
+    botones.forEach(function(b){var e=document.createElement('button');e.type='button';e.className='boton'+(b.principal?' principal':'');e.textContent=b.texto;e.onclick=function(){$('capa').hidden=true;if(b.hacer)b.hacer()};pie.appendChild(e)});
+    $('capa').hidden=false;
+  }
+
+  /* ---- parte 1 ---- */
+  $('b-aplicar').onclick=function(){
+    cuadro('Aplicar el plan de las guías',
+      '<p style="margin:0">Se van a cambiar las guías de 36 tipos y llenar las listas comunes.</p><ul><li>Antes se guarda una copia de las guías.</li><li>Los asuntos abiertos siguen como están.</li><li>Después desaparecen las herramientas de la limpieza.</li></ul>',
+      [{texto:'Cancelar'},{texto:'Aplicar',principal:true,hacer:aplicar}]);
+  };
+  function aplicar(){
+    $('plan-antes').hidden=true; $('plan-despues').hidden=false; $('panel-activar').hidden=false;
+    ['h1','h2','h3','h4'].forEach(function(i){$(i).classList.add('tachado')});
+    $('herr-nota').textContent='Después: estas cuatro ya no salen.';
+  }
+  $('b-copiar-texto').onclick=function(){
+    var t='PLAN DE LAS GUÍAS (6-nov-2026) — 62 guías; 38 tareas → 9; 24 hitos → 6; «Archivar» se quita de 31 guías.';
+    var ok=function(){$('copiado').textContent='Copiado.'};
+    try{navigator.clipboard.writeText(t).then(ok,function(){$('copiado').textContent='No se ha podido copiar.'})}catch(e){$('copiado').textContent='No se ha podido copiar.'}
+  };
+  function ventanaLista(que){
+    var filas = que==='hito'
+      ? ['Registro de entrada · en 19 tipos','Registro de salida · en 14 tipos','Poner a la firma · en 11 tipos','Enviar el certificado · en 5 tipos']
+      : ['Registrar de entrada el documento · Registrar','Firmar un documento · Firmar','Enviar el documento al solicitante… · Comunicar · «Certificado de matrícula»','Copiar el documento registrado a la carpeta Ausencias · Otra cosa'];
+    cuadro(que==='hito'?'Añadir un hito de la lista':'Añadir una tarea de la lista',
+      '<ul>'+filas.map(function(f){return '<li>'+f+'</li>'}).join('')+'</ul><p class="pequeno suave" style="margin:0">Igual que hoy: buscador y «Crear» si no está.</p>',
+      [{texto:'Cerrar'}]);
+  }
+  $('b-anadir-hito').onclick=function(){ventanaLista('hito')};
+  $('b-anadir-tarea').onclick=function(){ventanaLista('tarea')};
+  $('b-activar').onclick=function(){
+    var on=$('estado-tipo').textContent==='activo';
+    $('estado-tipo').textContent=on?'desactivado':'activo';
+    $('estado-tipo').className='etq '+(on?'gris':'verde');
+    $('b-activar').textContent=on?'Activar':'Desactivar';
+    $('aviso-activar').hidden=on;
+  };
+
+  /* ---- parte 2 ---- */
+  var datos={'Apellidos y nombre':'García López, Ana','Fecha del registro':'2026-11-04','Número de registro':'26SA0412','Tipo':'AUSENCIA','Fecha del documento':'2026-11-04'};
+  function nombreCopiado(){
+    return $('t-patron').value.replace(/\{([^}]+)\}/g,function(m,c){return datos[c]!==undefined?datos[c]:m}).trim()+'.pdf';
+  }
+  function pintarEjemplo(){$('t-ejemplo').textContent='Saldrá así: '+nombreCopiado()}
+  $('t-patron').addEventListener('input',pintarEjemplo); pintarEjemplo();
+  $('b-campo').onclick=function(){
+    var l=$('campos-lista'); if(!l.hidden){l.hidden=true;return}
+    l.innerHTML=''; Object.keys(datos).forEach(function(c){var b=document.createElement('button');b.type='button';b.className='boton mini';b.textContent=c;b.onclick=function(){$('t-patron').value+=' {'+c+'}';l.hidden=true;pintarEjemplo()};l.appendChild(b)});
+    l.hidden=false;
+  };
+  $('b-carpeta').onclick=function(){
+    cuadro('Elegir carpeta','<p style="margin:0">Aquí se abre la ventana del ordenador para señalar la carpeta. En esta prueba se elige de esta lista.</p>',
+      [{texto:'Dropbox › Jefatura › Ausencias',hacer:function(){$('t-carpeta').value='Dropbox › Jefatura › Ausencias'}},
+       {texto:'Dropbox › Secretaría › Nóminas',hacer:function(){$('t-carpeta').value='Dropbox › Secretaría › Nóminas'}}]);
+  };
+  $('t-hace').onchange=function(){var c=this.value==='Copiar a otra carpeta';$('t-copiar').hidden=!c;$('t-otra').hidden=c};
+  $('b-crear').onclick=function(){
+    var c=$('t-hace').value==='Copiar a otra carpeta';
+    $('creada').hidden=false;
+    $('creada').textContent=c?'Tarea creada en la lista común y añadida al hito. Copiará a '+$('t-carpeta').value.split(' › ').pop()+' como «'+nombreCopiado()+'».':'Tarea creada y añadida al hito.';
+  };
+
+  var copiado=false;
+  function copiar(){
+    copiado=true; $('m-cop').classList.add('hecha'); $('m-cop').textContent='✓';
+    $('cop-estado').textContent='Copiado a '+$('t-carpeta').value.split(' › ').pop()+' como «'+nombreCopiado()+'».';
+    $('aviso-permiso').hidden=true;
+  }
+  $('b-llega').onclick=function(){
+    $('m-reg').classList.add('hecha'); $('m-reg').textContent='✓'; $('reg-estado').textContent='registrado 26SA0412';
+    if(copiado) return;
+    if($('sin-permiso').checked){$('aviso-permiso').hidden=false;$('cop-estado').textContent='Pendiente: falta permiso sobre la carpeta.'}
+    else copiar();
+  };
+  $('b-permiso').onclick=function(){$('sin-permiso').checked=false;copiar()};
+  $('b-reiniciar').onclick=function(){
+    copiado=false; ['m-reg','m-cop'].forEach(function(i){$(i).classList.remove('hecha');$(i).textContent=''});
+    $('reg-estado').textContent='sin registrar'; $('cop-estado').textContent='Se hará sola cuando llegue el registrado.'; $('aviso-permiso').hidden=true;
+  };
+})();
+</script>
