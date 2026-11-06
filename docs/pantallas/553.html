@@ -1,0 +1,413 @@
+<title>Gestor · hito 553</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Aspecto del Gestor (css/estilos.css, css/hito-mesa.css); el hito en una columna, cada parte en su recuadro. */
+:root{
+  --tinta:#1b2430; --tinta-suave:#5d6b7a; --linea:#dde3ea; --fondo:#f4f6f9; --papel:#ffffff;
+  --azul:#1f4e79; --azul-claro:#e8f0f8; --azul-tira:#e3eefb; --azul-tinta:#1d4f86;
+  --ambar:#fff4d6; --ambar-linea:#e0b34a; --ambar-tinta:#8a6100; --siguiente:#fff8e6; --siguiente-linea:#e6c377;
+  --verde:#e2f4e6; --verde-tinta:#1f6b33; --verde-barra:#2f8a55; --cabecera-bloque:#eef3f9;
+  --sombra:0 1px 2px rgba(20,30,45,.06),0 4px 12px rgba(20,30,45,.05);
+  --letra:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e3e8ee; --tinta-suave:#9aa8b6; --linea:#334150; --fondo:#141b23; --papel:#1c2530;
+  --azul:#5b93c9; --azul-claro:#1e3348; --azul-tira:#22384f; --azul-tinta:#a9cbef;
+  --ambar:#3a3018; --ambar-linea:#9c7a2a; --ambar-tinta:#f0cf7c; --siguiente:#2f2817; --siguiente-linea:#7d6630;
+  --verde:#1d3826; --verde-tinta:#9fd8af; --verde-barra:#4fae75; --cabecera-bloque:#223040; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e3e8ee; --tinta-suave:#9aa8b6; --linea:#334150; --fondo:#141b23; --papel:#1c2530;
+  --azul:#5b93c9; --azul-claro:#1e3348; --azul-tira:#22384f; --azul-tinta:#a9cbef;
+  --ambar:#3a3018; --ambar-linea:#9c7a2a; --ambar-tinta:#f0cf7c; --siguiente:#2f2817; --siguiente-linea:#7d6630;
+  --verde:#1d3826; --verde-tinta:#9fd8af; --verde-barra:#4fae75; --cabecera-bloque:#223040; color-scheme:dark}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--letra);font-size:14px;margin:0}
+.pagina{padding-block:16px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+.aviso-prueba{background:var(--ambar);border:1px solid var(--ambar-linea);color:var(--ambar-tinta);border-radius:8px;padding:8px 12px;font-size:13px}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:6px 14px;cursor:pointer;white-space:nowrap}
+.boton:hover{background:var(--azul-claro)}
+.boton:disabled{color:var(--tinta-suave);cursor:default;background:var(--papel)}
+.boton-chico{font-size:13px;padding:5px 10px}
+.boton-principal{background:var(--azul);color:#fff;border-color:var(--azul)}
+.boton:focus-visible,.menu button:focus-visible,.tira button:focus-visible{outline:2px solid var(--azul);outline-offset:1px}
+.campo{font:inherit;font-size:14px;border:1px solid var(--linea);border-radius:8px;padding:8px 10px;width:100%;box-sizing:border-box;background:var(--papel);color:var(--tinta)}
+.ficha{background:var(--papel);border:1px solid var(--linea);border-radius:10px;box-shadow:var(--sombra);padding:14px;display:flex;flex-direction:column;gap:12px}
+.ficha-titulo{margin:0;font-size:17px}
+.ficha-titulo .suave{color:var(--tinta-suave);font-weight:400;font-size:13px}
+/* La tira de hitos, con «+ Añadir hito» al final */
+.tira{display:flex;border:1px solid var(--linea);border-radius:8px;overflow:hidden}
+.tira button{flex:1 1 0;min-width:0;font:inherit;font-size:12px;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;border-right:1px solid var(--linea);border-bottom:3px solid transparent;padding:5px 10px;background:var(--papel);color:var(--tinta-suave)}
+.tira button.volver{flex:0 0 auto;background:var(--fondo)}
+.tira button.hecho{color:var(--verde-tinta);background:var(--verde)}
+.tira button.actual{background:var(--azul-tira);color:var(--azul-tinta);font-weight:600;border-bottom-color:var(--azul)}
+.tira button.anadir-hito{flex:0 0 auto;border-right:0;color:var(--azul);font-weight:600;background:var(--fondo)}
+.tira button.nuevo{animation:brillo 1.2s ease-out}
+@keyframes brillo{from{background:var(--ambar)}}
+@media (prefers-reduced-motion:reduce){.tira button.nuevo{animation:none}}
+.titulo-fila{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mesa-titulo{margin:0;font-size:21px}
+.meta{font-size:12.5px;color:var(--tinta-suave)}
+.acciones{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+/* Las cuatro partes del hito: cada una en su recuadro, con su título a la vista */
+.parte{border:1px solid var(--linea);border-radius:10px;background:var(--papel)}
+.parte-cabecera{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--cabecera-bloque);border-bottom:1px solid var(--linea);border-radius:10px 10px 0 0}
+.parte-titulo{font-size:15px;font-weight:700;margin:0;color:var(--tinta)}
+.parte-cuenta{font-size:12.5px;color:var(--tinta-suave)}
+.parte-cabecera .derecha{margin-left:auto;display:flex;gap:6px;align-items:center}
+.parte-cuerpo{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.barra{flex:1 1 auto;height:6px;background:var(--fondo);border-radius:4px;overflow:hidden;max-width:220px}
+.barra span{display:block;height:100%;background:var(--verde-barra)}
+/* Tareas */
+.tarea{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--linea);position:relative}
+.tarea:last-of-type{border-bottom:0}
+.tarea label{display:flex;gap:8px;align-items:center;flex:1 1 auto;min-width:0;cursor:pointer}
+.tarea.hecho .texto{color:var(--tinta-suave)}
+.tarea.siguiente{background:var(--siguiente);border:1px solid var(--siguiente-linea);border-radius:8px;padding:8px 10px}
+.tarea.siguiente .texto{font-weight:600;font-size:15px}
+.tarea.movida{animation:brillo 1s ease-out}
+@media (prefers-reduced-motion:reduce){.tarea.movida{animation:none}}
+.quien{font-size:12px;color:var(--tinta-suave);white-space:nowrap}
+.etq{font-size:11px;color:var(--tinta-suave);background:var(--fondo);border-radius:10px;padding:1px 7px;white-space:nowrap}
+.mas{border:0;background:none;cursor:pointer;color:var(--tinta-suave);font-size:16px;padding:2px 6px;border-radius:6px}
+.mas:hover{background:var(--fondo);color:var(--tinta)}
+.menu{position:absolute;right:0;top:100%;z-index:40;background:var(--papel);border:1px solid var(--linea);border-radius:8px;box-shadow:0 10px 28px rgba(10,25,45,.18);padding:4px;display:flex;flex-direction:column;min-width:170px}
+.menu button{font:inherit;font-size:13.5px;text-align:left;background:none;border:0;border-radius:6px;padding:7px 10px;cursor:pointer;color:var(--tinta)}
+.menu button:hover{background:var(--azul-claro)}
+.menu button:disabled{color:var(--tinta-suave);cursor:default;background:none}
+.menu .sep{height:1px;background:var(--linea);margin:4px 2px}
+.menu .peligro{color:#c0392b}
+.menu.arriba{top:auto;bottom:100%}
+.accion-etq{font-size:11px;font-weight:600;color:var(--azul-tinta);background:var(--azul-tira);border-radius:10px;padding:1px 8px;white-space:nowrap}
+.aviso-usos{background:var(--ambar);border:1px solid var(--ambar-linea);color:var(--ambar-tinta);border-radius:8px;padding:8px 10px;font-size:13px}
+.et{font-size:12.5px;font-weight:600;display:block;margin-bottom:4px}
+.casillas{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.parecidas{font-size:12.5px;color:var(--ambar-tinta)}
+.orden-cambiado{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--azul-claro);border:1px solid var(--azul);border-radius:8px;padding:8px 10px;font-size:13px}
+.orden-cambiado span{flex:1 1 220px;min-width:0}
+.pie-tareas{display:flex;gap:6px}
+/* Campos, documentos, registro */
+.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.dato label{display:block;font-size:12px;color:var(--tinta-suave);margin-bottom:4px}
+.doc{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--linea);font-size:13px}
+.doc:last-child{border-bottom:0}
+.doc .nombre{flex:1 1 220px;min-width:0;font-weight:700}
+.doc .nombre small{display:block;font-weight:400;color:var(--tinta-suave)}
+.estado{font-size:11px;font-weight:600;border-radius:10px;padding:1px 8px;background:var(--verde);color:var(--verde-tinta)}
+.soltar{border:1px dashed var(--linea);border-radius:8px;padding:12px;text-align:center;font-size:12px;color:var(--tinta-suave)}
+.nota-linea{font-size:13px;padding:4px 0;display:flex;gap:10px}
+.nota-linea .cuando{color:var(--tinta-suave);white-space:nowrap;font-variant-numeric:tabular-nums}
+.nota-linea.auto{color:var(--tinta-suave)}
+textarea.campo{resize:vertical;min-height:60px}
+/* Ventanas */
+.capa{position:fixed;inset:0;background:rgba(10,20,35,.45);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:50}
+.cuadro{background:var(--papel);border-radius:10px;box-shadow:0 18px 48px rgba(0,0,0,.3);width:520px;max-width:100%;display:flex;flex-direction:column;max-height:80vh}
+.cuadro h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--linea);font-size:16px}
+.cuadro-cuerpo{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.cuadro-pie{padding:10px 14px;border-top:1px solid var(--linea);display:flex;gap:8px;justify-content:flex-end}
+.opcion{font:inherit;text-align:left;cursor:pointer;padding:9px 12px;border:1px solid var(--linea);border-radius:8px;background:var(--papel);color:var(--tinta)}
+.opcion:hover,.opcion.elegida{background:var(--azul-claro);border-color:var(--azul)}
+.opcion small{display:block;color:var(--tinta-suave)}
+.para{display:flex;gap:12px;flex-wrap:wrap;font-size:13px}
+.tostada{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--tinta);color:var(--papel);padding:10px 16px;border-radius:8px;font-size:13.5px;z-index:60;max-width:90vw}
+</style>
+
+<div class="pagina">
+  <div class="aviso-prueba"><strong>Pantalla de prueba</strong> · datos inventados, no guarda nada. El hito sale como quedará después de «Aplicar el plan de las guías» (sin la caja «Nueva tarea…»).</div>
+
+  <div class="ficha">
+    <h2 class="ficha-titulo">251104 A26-0099 CERTIFICADO Ruiz Molina, Lucía 1234567 <span class="suave">· Solicitud de certificado</span></h2>
+
+    <div class="tira" id="tira"></div>
+
+    <div class="titulo-fila">
+      <h3 class="mesa-titulo" id="titulo-hito">2. Esperar respuesta</h3>
+      <span class="meta">En curso · Sin plazo · Sin responsable</span>
+      <div class="acciones">
+        <button class="boton igual" type="button">Generar documento ▾</button>
+        <button class="boton igual" type="button">Comunicar ▾</button>
+        <button class="boton igual" type="button">Marcar como hecho</button>
+        <span style="position:relative"><button class="boton" type="button" id="hito-menu">Hito ▾</button></span>
+      </div>
+    </div>
+
+    <section class="parte" aria-labelledby="t-tareas">
+      <div class="parte-cabecera">
+        <h4 class="parte-titulo" id="t-tareas">Tareas</h4>
+        <span class="parte-cuenta" id="cuenta-tareas"></span>
+        <div class="barra"><span id="barra"></span></div>
+      </div>
+      <div class="parte-cuerpo">
+        <div id="lista-tareas"></div>
+        <div class="orden-cambiado" id="orden-cambiado" hidden>
+          <span>Has cambiado el orden de las tareas en este asunto.</span>
+          <button class="boton boton-chico boton-principal" type="button" id="guardar-guia">Guardar también en la guía</button>
+          <button class="boton boton-chico" type="button" id="solo-aqui">Solo en este asunto</button>
+        </div>
+        <div class="pie-tareas"><button class="boton boton-chico" type="button" id="anadir-tarea">+ Añadir tarea</button></div>
+      </div>
+    </section>
+
+    <section class="parte" aria-labelledby="t-campos">
+      <div class="parte-cabecera"><h4 class="parte-titulo" id="t-campos">Campos</h4><span class="parte-cuenta">2</span></div>
+      <div class="parte-cuerpo campos">
+        <div class="dato"><label for="c1">Fecha de recepción de la respuesta</label><input class="campo" id="c1" type="date"></div>
+        <div class="dato"><label for="c2">Curso del certificado</label><input class="campo" id="c2" value="2024-2025"></div>
+      </div>
+    </section>
+
+    <section class="parte" aria-labelledby="t-docs">
+      <div class="parte-cabecera"><h4 class="parte-titulo" id="t-docs">Documentos</h4><span class="parte-cuenta">1</span>
+        <div class="derecha"><button class="boton boton-chico igual" type="button">Añadir documento</button></div></div>
+      <div class="parte-cuerpo">
+        <div class="doc"><span class="nombre">Solicitud de certificado<small>251104 SOLICITUD D26-01544.pdf</small></span><span class="meta">04-nov-2026</span><span class="meta">26EM0412</span><span class="estado">Registrado</span></div>
+        <div class="soltar">Suelta aquí un documento del ordenador</div>
+      </div>
+    </section>
+
+    <section class="parte" aria-labelledby="t-registro">
+      <div class="parte-cabecera"><h4 class="parte-titulo" id="t-registro">Registro</h4><span class="parte-cuenta" id="cuenta-registro"></span></div>
+      <div class="parte-cuerpo">
+        <textarea class="campo" id="nota" placeholder="Anotar algo que ha pasado… (Intro guarda)"></textarea>
+        <div id="notas"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  var HACE=[{v:'generar',t:'Generar documento'},{v:'firmar',t:'Firmar'},{v:'registrar',t:'Registrar'},{v:'comunicar',t:'Comunicar'},{v:'anadir',t:'Añadir documento'},{v:'pedir',t:'Pedir datos'},{v:'',t:'Otra cosa'}];
+  var PLANTILLAS={generar:['Certificado académico','Resolución de la dirección','Diligencia de entrega'],comunicar:['Correo a la familia: falta documentación','Correo de recordatorio','Correo al tutor del grupo']};
+  function textoHace(v){var h=HACE.filter(function(x){return x.v===(v||'')})[0];return h?h.t:'Otra cosa'}
+  var LISTA=[
+    {t:'Comprobar el expediente en Séneca',a:'',usos:9},
+    {t:'Enviar recordatorio por correo',a:'comunicar',p:'Correo de recordatorio',usos:14},
+    {t:'Generar el certificado',a:'generar',p:'Certificado académico',usos:6},
+    {t:'Firmar el certificado',a:'firmar',usos:6}
+  ];
+  var HITOS=[{t:'Pedir documentación que falta',d:'3 tareas',usos:12},{t:'Comunicar a la familia',d:'2 tareas',usos:20},{t:'Registrar de salida',d:'2 tareas',usos:31}];
+  var hitos=[{t:'Tramitar',e:'hecho'},{t:'Esperar respuesta',e:'actual'},{t:'Archivar',e:''}];
+  var tareas=[
+    {id:1,t:'Enviar la solicitud a la familia',a:'comunicar',p:'Correo a la familia: falta documentación',hecho:true,quien:'Diego · 04-nov',usos:5},
+    {id:2,t:'Llamar si no contesta en 5 días',a:'',usos:3},
+    {id:3,t:'Anotar la fecha de la respuesta',a:'pedir',usos:4},
+    {id:4,t:'Revisar que viene firmada',a:'',usos:7}
+  ];
+  var ordenGuia=[1,2,3,4];
+  var sigId=10, abierto=null;
+  var notas=[{c:'05-nov 09:12',t:'La familia dice que la manda esta semana.'},{c:'04-nov 11:30',t:'Hito «Tramitar» hecho.',auto:true}];
+
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function tostada(txt){var d=document.createElement('div');d.className='tostada';d.textContent=txt;document.body.appendChild(d);setTimeout(function(){d.remove()},3600)}
+
+  /* ---------- tira de hitos ---------- */
+  function pintarTira(nuevo){
+    var t=$('tira');
+    t.innerHTML='<button type="button" class="volver">← Hitos</button>'+hitos.map(function(h,i){
+      return '<button type="button" class="'+h.e+(i===nuevo?' nuevo':'')+'" title="'+esc((i+1)+'. '+h.t)+'">'+esc((i+1)+'. '+h.t)+'</button>'}).join('')+
+      '<button type="button" class="anadir-hito" id="anadir-hito">+ Añadir hito</button>';
+    t.querySelector('.volver').onclick=function(){tostada('«← Hitos»: igual que hoy.')};
+    Array.prototype.forEach.call(t.querySelectorAll('button:not(.volver):not(.anadir-hito)'),function(b){b.onclick=function(){tostada('Abrir otro hito: igual que hoy.')}});
+    $('anadir-hito').onclick=ventanaHito;
+    var pos=hitos.findIndex(function(h){return h.e==='actual'});
+    $('titulo-hito').textContent=(pos+1)+'. '+hitos[pos].t;
+  }
+
+  /* ---------- tareas ---------- */
+  function ordenCambiado(){
+    var actual=tareas.filter(function(x){return !x.propia}).map(function(x){return x.id});
+    var guia=ordenGuia.filter(function(id){return actual.indexOf(id)>=0});
+    return actual.join(',')!==guia.join(',');
+  }
+  function pintarTareas(movida){
+    var hechas=tareas.filter(function(x){return x.hecho}).length;
+    $('cuenta-tareas').textContent=hechas+' de '+tareas.length;
+    $('barra').style.width=(tareas.length?Math.round(100*hechas/tareas.length):0)+'%';
+    var sig=tareas.filter(function(x){return !x.hecho})[0];
+    $('lista-tareas').innerHTML=tareas.map(function(x,i){
+      return '<div class="tarea'+(x.hecho?' hecho':'')+(x===sig?' siguiente':'')+(x.id===movida?' movida':'')+'" data-i="'+i+'">'+
+        '<label><input type="checkbox"'+(x.hecho?' checked':'')+'><span class="texto">'+esc(x.t)+'</span>'+
+        (x.a?'<span class="accion-etq" title="'+esc(x.p?'Plantilla: '+x.p:'')+'">'+esc(textoHace(x.a))+'</span>':'')+
+        (x.propia?'<span class="etq">solo aquí</span>':'')+'</label>'+
+        (x.hecho&&x.quien?'<span class="quien">'+esc(x.quien)+'</span>':'')+
+        '<button type="button" class="mas" aria-label="Más opciones de la tarea">⋮</button></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.tarea'),function(fila){
+      var i=+fila.dataset.i;
+      fila.querySelector('input').onchange=function(e){tareas[i].hecho=e.target.checked;tareas[i].quien=e.target.checked?'Francisco · 06-nov':'';pintarTareas()};
+      fila.querySelector('.mas').onclick=function(e){e.stopPropagation();abrirMenu(fila,i)};
+    });
+    $('orden-cambiado').hidden=!ordenCambiado();
+  }
+
+  function cerrarMenu(){if(abierto){abierto.remove();abierto=null}}
+  document.addEventListener('click',cerrarMenu);
+
+  function abrirMenu(fila,i){
+    cerrarMenu();
+    var x=tareas[i];
+    var m=document.createElement('div');m.className='menu';
+    m.innerHTML='<button type="button" data-a="subir"'+(i===0?' disabled':'')+'>Subir</button>'+
+      '<button type="button" data-a="bajar"'+(i===tareas.length-1?' disabled':'')+'>Bajar</button>'+
+      '<div class="sep"></div>'+
+      '<button type="button" data-a="anotar">Anotar</button>'+
+      '<button type="button" data-a="cambiar">'+(x.propia?'Cambiar':'Cambiar la tarea')+'</button>'+
+      '<button type="button" data-a="borrar" class="peligro">Borrar</button>';
+    m.onclick=function(e){
+      e.stopPropagation();var a=e.target.dataset.a;if(!a||e.target.disabled)return;
+      cerrarMenu();
+      if(a==='anotar'||a==='borrar'){tostada('«'+e.target.textContent+'»: igual que hoy.');return}
+      if(a==='cambiar'){ventanaCambiar(x);return}
+      var j=a==='subir'?i-1:i+1, y=tareas[i];tareas[i]=tareas[j];tareas[j]=y;pintarTareas(y.id);
+    };
+    fila.appendChild(m);abierto=m;
+    /* Si no cabe por debajo, se abre hacia arriba */
+    var r=m.getBoundingClientRect();
+    if(r.bottom>window.innerHeight-8) m.classList.add('arriba');
+  }
+
+  $('guardar-guia').onclick=function(){
+    ordenGuia=tareas.filter(function(x){return !x.propia}).map(function(x){return x.id}).concat(ordenGuia.filter(function(id){return !tareas.some(function(x){return x.id===id})}));
+    pintarTareas();
+    tostada('Orden guardado en la guía de «Solicitud de certificado». Los asuntos nuevos de este tipo saldrán así; los abiertos siguen como están.');
+  };
+  $('solo-aqui').onclick=function(){
+    ordenGuia=tareas.filter(function(x){return !x.propia}).map(function(x){return x.id});
+    $('orden-cambiado').hidden=true;
+    tostada('El orden se queda solo en este asunto. La guía no cambia.');
+  };
+
+  /* ---------- ventanas ---------- */
+  function abrirCapa(titulo,cuerpo,pie){
+    var capa=document.createElement('div');capa.className='capa';
+    capa.innerHTML='<div class="cuadro" role="dialog" aria-label="'+esc(titulo)+'"><h3>'+esc(titulo)+'</h3><div class="cuadro-cuerpo">'+cuerpo+'</div><div class="cuadro-pie">'+pie+'</div></div>';
+    document.body.appendChild(capa);
+    capa.onclick=function(e){if(e.target===capa)capa.remove()};
+    var c=capa.querySelector('.cancelar');if(c)c.onclick=function(){capa.remove()};
+    return capa;
+  }
+  function paraHTML(){
+    return '<div class="para"><strong>Para</strong><label><input type="radio" name="para" checked> Este asunto y los siguientes (en la guía)</label><label><input type="radio" name="para" class="para-aqui"> Solo este asunto</label></div>';
+  }
+  function haceHTML(id,valor){
+    return '<label class="et" for="'+id+'">Qué se hace</label><select class="campo" id="'+id+'">'+HACE.map(function(h){return '<option value="'+h.v+'"'+(h.v===(valor||'')?' selected':'')+'>'+esc(h.t)+'</option>'}).join('')+'</select>';
+  }
+  function plantillaHTML(id,accion,valor){
+    var l=PLANTILLAS[accion];if(!l)return '';
+    return '<label class="et" for="'+id+'">Plantilla</label><select class="campo" id="'+id+'"><option value="">Sin plantilla fija</option>'+
+      l.map(function(p){return '<option'+(p===valor?' selected':'')+'>'+esc(p)+'</option>'}).join('')+'<option value="__nueva">+ Plantilla nueva…</option></select>';
+  }
+
+  /* «+ Añadir tarea»: elegir de la lista o crear una nueva */
+  $('anadir-tarea').onclick=function(){ventanaTarea()};
+  function ventanaTarea(){
+    var capa=abrirCapa('Elegir una tarea',
+      '<input class="campo" id="vt-buscar" placeholder="Buscar en la lista de tareas…"><div id="vt-lista" style="display:flex;flex-direction:column;gap:6px"></div>'+
+      '<button type="button" class="boton boton-chico" id="vt-crear" style="align-self:flex-start">+ Crear una tarea nueva</button>'+
+      '<div id="vt-nueva" hidden style="display:flex;flex-direction:column;gap:6px"></div>'+paraHTML(),
+      '<button class="boton cancelar" type="button">Cancelar</button><button class="boton boton-principal" type="button" id="vt-ok" hidden>Crear y añadir</button>');
+    function aqui(){return capa.querySelector('.para-aqui').checked}
+    function anadir(n){
+      n.id=++sigId;n.propia=aqui();n.usos=n.usos||1;tareas.push(n);
+      if(!n.propia)ordenGuia.push(n.id);
+      capa.remove();pintarTareas(n.id);
+      tostada('Tarea añadida al final'+(n.propia?', solo en este asunto.':', y en la guía.')+' Con ⋮ → Subir o Bajar la colocas donde quieras.');
+    }
+    function pintar(f){
+      var l=LISTA.filter(function(o){return o.t.toLowerCase().indexOf(f.toLowerCase())>=0});
+      $('vt-lista').innerHTML=l.map(function(o){return '<button type="button" class="opcion" data-k="'+LISTA.indexOf(o)+'">'+esc(o.t)+'<small>'+esc(textoHace(o.a))+(o.p?' · '+o.p:'')+' · en '+o.usos+' tipos</small></button>'}).join('')||'<p class="meta">Ninguna con ese texto. Puedes crearla.</p>';
+      Array.prototype.forEach.call(capa.querySelectorAll('.opcion'),function(b){b.onclick=function(){var o=LISTA[+b.dataset.k];anadir({t:o.t,a:o.a,p:o.p,usos:o.usos})}});
+    }
+    pintar('');
+    $('vt-buscar').oninput=function(e){pintar(e.target.value)};
+    var n={a:''};
+    function pintarNueva(){
+      $('vt-nueva').innerHTML='<label class="et" for="vt-nombre">Nombre</label><input class="campo" id="vt-nombre" value="'+esc(n.t||$('vt-buscar').value)+'">'+
+        '<div class="parecidas" id="vt-parecidas"></div>'+haceHTML('vt-hace',n.a)+plantillaHTML('vt-pl',n.a,n.p);
+      $('vt-hace').onchange=function(e){n.t=$('vt-nombre').value;n.a=e.target.value;n.p='';pintarNueva()};
+      if($('vt-pl'))$('vt-pl').onchange=function(e){if(e.target.value==='__nueva'){tostada('Abre el editor de plantillas de siempre: igual que hoy.');e.target.value=''}else n.p=e.target.value};
+      $('vt-nombre').oninput=function(e){
+        var par=LISTA.filter(function(o){return e.target.value.length>3&&o.t.toLowerCase().indexOf(e.target.value.toLowerCase().slice(0,6))>=0});
+        $('vt-parecidas').textContent=par.length?'¿Es alguna de estas? '+par.map(function(o){return o.t}).join(' · '):'';
+      };
+    }
+    $('vt-crear').onclick=function(){$('vt-nueva').hidden=false;$('vt-ok').hidden=false;$('vt-crear').hidden=true;pintarNueva();$('vt-nombre').focus()};
+    $('vt-ok').onclick=function(){var t=$('vt-nombre').value.trim();if(!t){$('vt-nombre').focus();return}LISTA.push({t:t,a:n.a,p:n.p,usos:1});anadir({t:t,a:n.a,p:n.p})};
+    $('vt-buscar').focus();
+  }
+
+  /* ⋮ → «Cambiar la tarea»: nombre, qué se hace y plantilla, en todas las guías */
+  function ventanaCambiar(x){
+    var st={a:x.a,p:x.p};
+    var capa=abrirCapa(x.propia?'Cambiar':'Cambiar la tarea','<div id="vc-cuerpo" style="display:flex;flex-direction:column;gap:6px"></div>',
+      '<button class="boton cancelar" type="button">Cancelar</button><button class="boton boton-principal" type="button" id="vc-ok">Guardar</button>');
+    function pintar(nombre){
+      $('vc-cuerpo').innerHTML=(x.propia?'<div class="meta">Tarea solo de este asunto: el cambio no sale de aquí.</div>':
+        '<div class="aviso-usos">Esta tarea se usa en '+x.usos+' tipos. Cambiará en todos. Los otros asuntos abiertos siguen como están.</div>')+
+        '<label class="et" for="vc-nombre">Nombre</label><input class="campo" id="vc-nombre" value="'+esc(nombre)+'">'+
+        haceHTML('vc-hace',st.a)+plantillaHTML('vc-pl',st.a,st.p);
+      $('vc-hace').onchange=function(e){st.a=e.target.value;st.p='';pintar($('vc-nombre').value)};
+      if($('vc-pl'))$('vc-pl').onchange=function(e){if(e.target.value==='__nueva'){tostada('Abre el editor de plantillas de siempre: igual que hoy.');e.target.value=''}else st.p=e.target.value};
+    }
+    pintar(x.t);
+    $('vc-ok').onclick=function(){
+      var t=$('vc-nombre').value.trim();if(!t)return;
+      var cambio=x.a!==st.a;
+      x.t=t;x.a=st.a;x.p=st.p;capa.remove();pintarTareas(x.id);
+      tostada(x.propia?'Tarea cambiada en este asunto.':'Tarea cambiada en las '+x.usos+' guías que la usan'+(cambio?'; ahora «'+textoHace(x.a)+'».':'.'));
+    };
+  }
+
+  /* «+ Añadir hito»: elegir de la lista o crear uno nuevo; entra detrás del hito abierto */
+  function ventanaHito(){
+    var capa=abrirCapa('Elegir un hito',
+      '<input class="campo" id="vh-buscar" placeholder="Buscar en la lista de hitos…"><div id="vh-lista" style="display:flex;flex-direction:column;gap:6px"></div>'+
+      '<button type="button" class="boton boton-chico" id="vh-crear" style="align-self:flex-start">+ Crear un hito nuevo</button>'+
+      '<div id="vh-nuevo" hidden style="display:flex;flex-direction:column;gap:6px">'+
+        '<label class="et" for="vh-nombre">Nombre</label><input class="campo" id="vh-nombre">'+
+        '<label class="et" for="vh-expl">Explicación</label><textarea class="campo" id="vh-expl" rows="2"></textarea>'+
+        '<span class="et">Tareas de la lista</span><div class="casillas">'+LISTA.map(function(o,k){return '<label><input type="checkbox" data-k="'+k+'"> '+esc(o.t)+'</label>'}).join('')+'</div>'+
+      '</div>'+'<label class="et" for="vh-donde">Va detrás de</label><select class="campo" id="vh-donde">'+hitos.map(function(h,k){return '<option value="'+k+'"'+(k===hitos.length-1?' selected':'')+'>'+esc((k+1)+'. '+h.t)+(k===hitos.length-1?' (al final)':'')+'</option>'}).join('')+'</select>'+paraHTML(),
+      '<button class="boton cancelar" type="button">Cancelar</button><button class="boton boton-principal" type="button" id="vh-ok" hidden>Crear y añadir</button>');
+    function poner(nombre){
+      var aqui=capa.querySelector('.para-aqui').checked;
+      var k=+$('vh-donde').value, pos=k+1, detras=hitos[k].t;
+      hitos.splice(pos,0,{t:nombre,e:''});
+      capa.remove();pintarTira(pos);
+      tostada('Hito «'+nombre+'» añadido detrás de «'+detras+'»'+(aqui?', solo en este asunto.':', en este asunto y en la guía.'));
+    }
+    function pintar(f){
+      $('vh-lista').innerHTML=HITOS.filter(function(o){return o.t.toLowerCase().indexOf(f.toLowerCase())>=0}).map(function(o){
+        return '<button type="button" class="opcion" data-k="'+HITOS.indexOf(o)+'">'+esc(o.t)+'<small>'+esc(o.d)+' · en '+o.usos+' tipos</small></button>'}).join('')||'<p class="meta">Ninguno con ese texto. Puedes crearlo.</p>';
+      Array.prototype.forEach.call(capa.querySelectorAll('.opcion'),function(b){b.onclick=function(){poner(HITOS[+b.dataset.k].t)}});
+    }
+    pintar('');
+    $('vh-buscar').oninput=function(e){pintar(e.target.value)};
+    $('vh-crear').onclick=function(){$('vh-nuevo').hidden=false;$('vh-ok').hidden=false;$('vh-crear').hidden=true;$('vh-nombre').value=$('vh-buscar').value;$('vh-nombre').focus()};
+    $('vh-ok').onclick=function(){var t=$('vh-nombre').value.trim();if(!t){$('vh-nombre').focus();return}HITOS.push({t:t,d:'nuevo',usos:1});poner(t)};
+    $('vh-buscar').focus();
+  }
+
+  /* ---------- registro ---------- */
+  function pintarNotas(){
+    $('cuenta-registro').textContent=notas.length+(notas.length===1?' línea':' líneas');
+    $('notas').innerHTML=notas.map(function(n){return '<div class="nota-linea'+(n.auto?' auto':'')+'"><span class="cuando">'+esc(n.c)+'</span><span>'+esc(n.t)+'</span></div>'}).join('');
+  }
+  $('nota').onkeydown=function(e){
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();var v=e.target.value.trim();if(!v)return;notas.unshift({c:'06-nov ahora',t:v});e.target.value='';pintarNotas()}
+  };
+
+  /* «Hito ▾»: ya sin «Crear»; lo demás, igual que hoy */
+  $('hito-menu').onclick=function(e){
+    e.stopPropagation();cerrarMenu();
+    var m=document.createElement('div');m.className='menu';
+    m.innerHTML=['Cambiar','Borrar'].map(function(t){return '<button type="button"'+(t==='Borrar'?' class="peligro"':'')+'>'+t+'</button>'}).join('')+'<div class="sep"></div>'+
+      ['Saltar a este hito…','Dejarlo solo informativo','Cambiar la guía…','Enviar estado'].map(function(t){return '<button type="button">'+t+'</button>'}).join('');
+    m.onclick=function(ev){ev.stopPropagation();if(ev.target.tagName!=='BUTTON')return;cerrarMenu();tostada('«'+ev.target.textContent+'»: igual que hoy.')};
+    this.parentNode.appendChild(m);abierto=m;
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('.igual'),function(b){b.onclick=function(){tostada('«'+b.textContent.replace(' ▾','')+'»: igual que hoy.')}});
+
+  pintarTira();pintarTareas();pintarNotas();
+})();
+</script>
