@@ -25,8 +25,8 @@ function comprobar(titulo, real, esperado) {
 }
 
 console.log('--- 1. la lista fija de lo que hace una tarea ---');
-comprobar('siete clases, la última «Otra cosa»', Comunes.HACE.map((h) => h.texto),
-  ['Generar documento', 'Firmar', 'Registrar', 'Comunicar', 'Añadir documento', 'Pedir datos', 'Otra cosa']);
+comprobar('ocho clases, la última «Otra cosa»', Comunes.HACE.map((h) => h.texto),
+  ['Generar documento', 'Firmar', 'Registrar', 'Comunicar', 'Añadir documento', 'Pedir datos', 'Copiar a otra carpeta', 'Otra cosa']);
 comprobar('una acción desconocida es «Otra cosa»', Comunes.normalizarTarea({ nombre: 'X', accion: 'inventada' }).accion, '');
 comprobar('una tarea de generar guarda su plantilla', Comunes.normalizarTarea({ nombre: 'G', accion: 'generar', receta: { plantilla: 'p1', basura: 1 } }).receta, { plantilla: 'p1' });
 comprobar('una tarea sin nombre se descarta del fichero', Comunes.normalizarFichero('tareas', { tareas: [{ nombre: ' ' }, { nombre: 'Vale' }] }).tareas.map((t) => t.nombre), ['Vale']);

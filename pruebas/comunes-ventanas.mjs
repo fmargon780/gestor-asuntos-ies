@@ -53,7 +53,7 @@ await p.waitForSelector('.capa-campos #cv-crear');
 await comprobar('la ventana trae «Para» con las dos opciones y la lista vacía', p.evaluate(() => [
   [...document.querySelectorAll('#cv-para option')].map((o) => o.value), document.querySelectorAll('.comunes-fila').length, document.querySelector('#cv-centro').textContent.indexOf('No hay ninguna tarea') !== -1]), [['guia', 'aqui'], 0, true]);
 await comprobar('los grupos son lo que hace cada tarea, con «Otra cosa» al final', p.evaluate(() => [...document.querySelectorAll('.campos-grupo > span:first-child')].map((s) => s.textContent)),
-  ['Todas', 'Generar documento', 'Firmar', 'Registrar', 'Comunicar', 'Añadir documento', 'Pedir datos', 'Otra cosa']);
+  ['Todas', 'Generar documento', 'Firmar', 'Registrar', 'Comunicar', 'Añadir documento', 'Pedir datos', 'Copiar a otra carpeta', 'Otra cosa']);
 await p.click('#cv-crear');
 await p.fill('#cn-nombre', 'Firmar por la Dirección');
 await p.selectOption('#cn-hace', 'firmar');
