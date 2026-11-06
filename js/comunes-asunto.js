@@ -54,6 +54,7 @@ var ComunesAsunto = (function () {
 
   /* ---------- hito ---------- */
 
+  /* `h`: el hito detrás del que entra el nuevo (fila 553: «Va detrás de»). */
   async function ponerHito(a, h, hc, para) {
     var tipo = tipoDe(a), listas = await ComunesGuardado.leer();
     if (para === 'guia' && tipo) {
@@ -88,11 +89,23 @@ var ComunesAsunto = (function () {
     repintar();
   }
 
-  function anadirHito(a, h) {
+  /* Fila 553: el botón «+ Añadir hito» está al final de la tira de hitos; la ventana pregunta «Va detrás de» (por defecto, el último). */
+  async function anadirHito(a) {
+    var hitos;
+    try { hitos = window.HitosDesdeElAsuntoNucleo.nivelSuperior(await Hitos.hitosDe(a.nombre)); } catch (e) { U.fallo('No he podido leer los hitos', e); return; }
+    if (!hitos.length) return;
+    var numerados = Hitos.numerados ? Hitos.numerados(hitos) : hitos;
+    var detras = hitos.map(function (x, i) {
+      var n = numerados.indexOf(x) + 1;
+      return { valor: x.id, texto: (n ? n + '. ' : '') + (x.titulo || 'Hito') + (i === hitos.length - 1 ? ' (al final)' : '') };
+    });
     var para = tipoDe(a) ? [{ valor: 'guia', texto: PARA_GUIA }, { valor: 'aqui', texto: PARA_AQUI }] : [{ valor: 'aqui', texto: PARA_AQUI }];
     return ComunesVentana.abrir({
-      clase: 'hito', titulo: 'Elegir un hito', tipo: tipoDe(a), para: para,
-      alElegir: function (hc, p) { ponerHito(a, h, hc, p).catch(function (e) { U.fallo('No he podido añadir el hito', e); }); }
+      clase: 'hito', titulo: 'Elegir un hito', tipo: tipoDe(a), para: para, detras: detras,
+      alElegir: function (hc, p, idDetras) {
+        var ancla = hitos.filter(function (x) { return x.id === idDetras; })[0] || hitos[hitos.length - 1];
+        ponerHito(a, ancla, hc, p).catch(function (e) { U.fallo('No he podido añadir el hito', e); });
+      }
     });
   }
 
@@ -105,14 +118,12 @@ var ComunesAsunto = (function () {
   /* Los botones de debajo de las tareas del hito, y su enganche (los llama js/hito-mesa-guion.js). */
   function botonesHTML(a, h) {
     return '<div class="guion-comunes en-linea"><button type="button" class="boton boton-chico comunes-anadir-tarea">+ Añadir tarea</button>' +
-      '<button type="button" class="boton boton-chico comunes-anadir-hito">+ Añadir hito</button>' +
       (hitoComunDe(a, h) ? '<button type="button" class="boton boton-chico comunes-cambiar-hito">Cambiar el hito</button>' : '') + '</div>';
   }
 
   function enganchar(caja, a, h) {
     function q(sel) { return caja.querySelector(sel); }
     if (q('.comunes-anadir-tarea')) q('.comunes-anadir-tarea').onclick = function () { anadirTarea(a, h); };
-    if (q('.comunes-anadir-hito')) q('.comunes-anadir-hito').onclick = function () { anadirHito(a, h); };
     if (q('.comunes-cambiar-hito')) q('.comunes-cambiar-hito').onclick = async function () {
       try {
         var listas = await ComunesGuardado.leer(), hc = Comunes.buscar(listas.hitos, hitoComunDe(a, h));

@@ -130,6 +130,17 @@ async function abrirMas() {
 /* La mesa se repinta sola de vez en cuando y, con la máquina cargada, el menú se desprendía a mitad de clic:
    se pulsa de una vez, dentro de la página, y si no se abre el cuadro se vuelve a abrir el menú. */
 async function elegirDelMenu(texto) {
+  /* Fila 553: «Crear» ya no está en «Hito ▾» (los hitos nuevos salen de «+ Añadir hito»); el cuadro de siempre se abre directamente. */
+  if (texto === 'Crear') {
+    await pagina.evaluate(async () => {
+      const id = document.querySelector('.hito-en-mesa').dataset.id;
+      for (const x of App.E.listaAbiertos) {
+        if ((await Hitos.hitosDe(x.nombre)).some((h) => h.id === id)) { HitosDesdeElAsunto.abrirCrear(x, id); return; }
+      }
+    });
+    await pagina.waitForSelector('#capa:not(.oculto)');
+    return;
+  }
   for (let intento = 0; intento < 5; intento++) {
     if (intento) { await pagina.keyboard.press('Escape'); await pagina.waitForTimeout(400); }
     try { await abrirMas(); } catch (e) { continue; }

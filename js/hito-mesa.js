@@ -231,7 +231,9 @@ var HitoMesa = (function () {
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
           (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') + '</button>';
-      }).join('') + '</div>' +
+      }).join('') +
+        /* Fila 553: «+ Añadir hito», al final de la tira (antes, bajo las tareas). */
+        (abierto && window.ComunesAsunto ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '') + '</div>' +
       '<div class="mesa-titulo-fila">' +
         '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
         (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +
@@ -272,6 +274,8 @@ var HitoMesa = (function () {
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });
+    var anadirHito = cab.querySelector('.mesa-tira-anadir');
+    if (anadirHito) anadirHito.onclick = function () { ComunesAsunto.anadirHito(a); };
     var volverHitos = cab.querySelector('#mesa-volver-hitos');
     if (volverHitos) volverHitos.onclick = cerrar;
     engancharPaneles(cab, a, h);
@@ -337,13 +341,12 @@ var HitoMesa = (function () {
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
     /* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): arriba, sin repetir la
-       palabra, Crear · Cambiar · Borrar (antes «+ Crear un hito»,
+       palabra, Cambiar · Borrar (fila 553: sin «Crear»; los hitos nuevos, con «+ Añadir hito» de la tira; antes «+ Crear un hito»,
        «Cambiar este hito» y «Borrar este hito», al final; fila 206).
        Nunca en un hito-pregunta (las preguntas se siguen escribiendo en
        Ajustes). Las demás opciones se quedan debajo de una raya, con su
        texto de siempre: esta fila no las mueve. */
     if (window.HitosDesdeElAsunto && !decision) {
-      opcionesMas.push({ texto: 'Crear', clase: 'mesa-hda-crear', alPulsar: function () { HitosDesdeElAsunto.abrirCrear(a, h.id); } });
       opcionesMas.push({ texto: 'Cambiar', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
       var puedeBorrar = HitosDesdeElAsunto.sinTrabajo(h, a);
       opcionesMas.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,

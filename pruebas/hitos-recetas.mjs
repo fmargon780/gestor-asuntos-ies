@@ -101,7 +101,7 @@ await comprobar('la carpeta enseña los tres; ninguno es de este hito, así que 
     [d.dataset.doc, (d.querySelector('.ficha-marca-hito') || {}).textContent || '', !!d.querySelector('.ficha-documento-traer') && !d.querySelector('.ficha-documento-traer').classList.contains('oculto')])),
   [['260905 SOLICITUD.pdf', '', true], ['260906 INFORME.pdf', '', true], ['260907 SUELTO.pdf', '', true]]);
 await comprobar('el título del hito cuenta solo los suyos',
-  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '· 0');
+  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '0');
 await comprobar('a la izquierda ya no hay filas «De otros hitos» ni «sin hito»',
   pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno, .hito-en-mesa .mesa-docs-apartado').length), 0);
 

@@ -127,6 +127,17 @@ async function abrirMas() {
 }
 
 async function elegirDelMenu(texto) {
+  /* Fila 553: «Crear» ya no está en «Hito ▾» (los hitos nuevos salen de «+ Añadir hito»); el cuadro de siempre se abre directamente. */
+  if (texto === 'Crear') {
+    await pagina.evaluate(async () => {
+      const id = document.querySelector('.hito-en-mesa').dataset.id;
+      for (const x of App.E.listaAbiertos) {
+        if ((await Hitos.hitosDe(x.nombre)).some((h) => h.id === id)) { HitosDesdeElAsunto.abrirCrear(x, id); return; }
+      }
+    });
+    await pagina.waitForSelector('#capa:not(.oculto)');
+    return;
+  }
   await abrirMas();
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click();
   await pagina.waitForSelector('#capa:not(.oculto)');

@@ -106,9 +106,9 @@
     var sustitutas = {};
     propios.forEach(function (g) { if (g.enLugarDe) sustitutas[g.enLugarDe] = g; });
 
-    function linea(g, propio, deOpcion) {
+    function linea(g, propio, deOpcion, clave) {
       var x = Object.assign({}, g, estado[g.id] || {});
-      var salida = { id: g.id, texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
+      var salida = { id: g.id, clave: clave || '', texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
                normativa: x.normativa || null, propio: !!propio, hecho: !!x.hecho,
                noaplica: !!x.noaplica, quien: x.quien || '', cuando: x.cuando || '',
                pregunta: false, deOpcion: deOpcion || null,
@@ -129,15 +129,23 @@
       var sust = sustitutas[g.id];
       return sust ? linea(Object.assign({ explicacion: '', accion: '', normativa: null }, sust), true, deOpcion) : null;
     }
-    var lista = [], plegadas = [];
+    /* Fila 553: cada tarea (o pregunta con sus respuestas) es un bloque que se mueve entero; su clave es el id
+       de la tarea de la guía (también si aquí la sustituye otra) o el de la «solo aquí». */
+    var bloques = [], plegadas = [];
     (guionDelPaso || []).forEach(function (g) {
-      if (!g.pregunta) { var l = lineaDeGuia(g); if (l) lista.push(l); return; }
+      if (!g.pregunta) {
+        var l = lineaDeGuia(g);
+        if (l) { l.clave = g.id; bloques.push({ clave: g.id, deGuia: true, lineas: [l] }); }
+        return;
+      }
       /* Fila 405: una pregunta escondida en este asunto se va con las líneas
          de todas sus respuestas (lo ya marcado queda guardado, sin verse). */
       if (ocultos[g.id]) return;
       var opciones = g.opciones || [];
       var op = opciones.filter(function (o) { return o.id === elegido[g.id]; })[0] || null;
-      lista.push({ id: g.id, texto: textos[g.id] || g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
+      var bloque = { clave: g.id, deGuia: true, lineas: [] };
+      bloques.push(bloque);
+      bloque.lineas.push({ id: g.id, clave: g.id, texto: textos[g.id] || g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
                    propio: false, hecho: !!op, noaplica: false, quien: '', cuando: '', pregunta: true,
                    elegida: op ? op.id : '', opciones: opciones.map(function (o) { return { id: o.id, texto: o.texto }; }),
                    deOpcion: null });
@@ -146,15 +154,27 @@
           var deOpcion = { pregunta: g.id, opcion: o.id, respuesta: o.texto || '' };
           var lx = lineaDeGuia(x, deOpcion);
           if (!lx) return;
-          if (op && o.id === op.id) lista.push(lx);
+          if (op && o.id === op.id) bloque.lineas.push(lx);
           else if (lx.hecho || lx.noaplica) plegadas.push(lx);
         });
       });
     });
     propios.filter(function (g) { return !g.enLugarDe; }).forEach(function (g) {
-      lista.push(linea(Object.assign({ explicacion: '', accion: '', normativa: null }, g), true));
+      bloques.push({ clave: g.id, deGuia: false, lineas: [linea(Object.assign({ explicacion: '', accion: '', normativa: null }, g), true, null, g.id)] });
     });
+    /* El orden de la guía es el de antes de mover nada; el de este asunto, `guionOrden` (lo que no esté en esa lista, al final). */
+    var ordenGuia = bloques.filter(function (b) { return b.deGuia; }).map(function (b) { return b.clave; });
+    var orden = (hito && hito.guionOrden) || [];
+    if (orden.length) {
+      var puesto = bloques.map(function (b, i) { var k = orden.indexOf(b.clave); return { b: b, k: k === -1 ? 1e9 : k, i: i }; });
+      puesto.sort(function (x, y) { return x.k - y.k || x.i - y.i; });
+      bloques = puesto.map(function (x) { return x.b; });
+    }
+    var lista = [];
+    bloques.forEach(function (b) { b.lineas.forEach(function (l) { lista.push(l); }); });
     lista.plegadas = plegadas;
+    lista.bloques = bloques.map(function (b) { return { clave: b.clave, deGuia: b.deGuia }; });
+    lista.ordenGuia = ordenGuia;
     return lista;
   }
 

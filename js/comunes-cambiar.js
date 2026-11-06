@@ -3,8 +3,9 @@
    docs/531-TAREAS-E-HITOS-COMUNES.md, punto 7).
 
    Una ventana propia (nunca un `U.preguntar`: también sale desde el editor de
-   la guía, que ya es uno) con el nombre (y la plantilla, en una tarea de
-   generar o comunicar; la explicación, en un hito) y un aviso, antes de
+   la guía, que ya es uno) con el nombre, «Qué se hace» (fila 553) y los datos que
+   pide esa acción (la plantilla, en una tarea de generar o comunicar, con
+   «+ Plantilla nueva…»; la carpeta, en copiar); la explicación, en un hito) y un aviso, antes de
    guardar, de en qué tipos se usa: «Cambiará en todos. Los otros asuntos
    abiertos siguen como están.»
 
@@ -63,31 +64,47 @@ var ComunesCambiar = (function () {
     } catch (e) { U.accesorio('Está cambiado en la lista, pero no he podido ponerlo al día en todas las guías', e); }
   }
 
+  /* Fila 553: lo que depende de «Qué se hace»: la plantilla (si genera o comunica) o la carpeta de «Copiar a otra carpeta». */
+  function datosDeLaTareaHTML(n, t) {
+    if (n.accion === 'generar' || n.accion === 'comunicar') {
+      var pls = window.Plantillas && Plantillas.enMemoria ? Plantillas.enMemoria() : null;
+      var plantillas = pls ? ((n.accion === 'comunicar' ? pls.lista : pls.documentos) || []).filter(function (p) { return Plantillas.enUso(p) || p.id === n.plantilla; }) : [];
+      return '<label class="et" for="cc-pl">Plantilla</label><select id="cc-pl" class="campo"><option value="">Sin plantilla fija</option>' +
+        plantillas.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === n.plantilla ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') +
+        '<option value="__nueva">+ Plantilla nueva…</option></select>';
+    }
+    if (n.accion === 'copiar' && window.TareaCopiarEditor) return TareaCopiarEditor.formularioHTML(t.accion === 'copiar' ? t.receta : null);   /* fila 552 */
+    return '';
+  }
+
   async function tarea(t, o) {
     o = o || {};
     var d;
     try { d = await datos(); } catch (e) { U.fallo('No he podido leer la lista', e); return; }
     var uso = Comunes.usos(d.guias).tareas[t.id] || [];
-    var conPlantilla = t.accion === 'generar' || t.accion === 'comunicar';
-    var pls = window.Plantillas && Plantillas.enMemoria ? Plantillas.enMemoria() : null;
-    var plantillas = pls ? ((t.accion === 'comunicar' ? pls.lista : pls.documentos) || []).filter(function (p) { return Plantillas.enUso(p) || p.id === (t.receta && t.receta.plantilla); }) : [];
-    var actual = (t.receta && t.receta.plantilla) || '';
+    /* Lo elegido en la ventana: «Qué se hace» y la plantilla (se conservan al cambiar de acción dentro de la misma familia). */
+    var n = { accion: t.accion || '', plantilla: (t.receta && t.receta.plantilla) || '' };
     var cuerpo = avisoUsos('Esta tarea', uso) +
       '<label class="et" for="cc-nombre">Nombre</label><input id="cc-nombre" class="campo" value="' + esc(t.nombre) + '">' +
-      (conPlantilla ? '<label class="et" for="cc-pl">Plantilla</label><select id="cc-pl" class="campo"><option value="">Sin plantilla fija</option>' +
-        plantillas.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === actual ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') + '</select>' : '') +
-      (t.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.formularioHTML(t.receta) : '');   /* fila 552 */
+      '<label class="et" for="cc-hace">Qué se hace</label><select id="cc-hace" class="campo">' +
+      Comunes.HACE.map(function (h) { return '<option value="' + esc(h.valor) + '"' + (h.valor === n.accion ? ' selected' : '') + '>' + esc(h.texto) + '</option>'; }).join('') + '</select>' +
+      '<div id="cc-datos">' + datosDeLaTareaHTML(n, t) + '</div>';
     var capa = ventana('Cambiar la tarea', cuerpo, async function (c) {
       var nombre = c.querySelector('#cc-nombre').value.trim();
       if (!nombre) return 'Ponle un nombre.';
       var pl = c.querySelector('#cc-pl'), nueva = JSON.parse(JSON.stringify(t));
       nueva.nombre = nombre;
-      if (t.accion === 'copiar' && window.TareaCopiarEditor) {   /* fila 552 */
+      nueva.accion = n.accion;
+      if (n.accion === 'copiar' && window.TareaCopiarEditor) {   /* fila 552 */
         var rc = TareaCopiarEditor.leer(c);
         if (!rc || !rc.carpeta) return 'Elige la carpeta de destino.';
         nueva.receta = rc;
-      }
-      if (pl) { var r0 = Object.assign({}, t.receta || {}); if (pl.value) r0.plantilla = pl.value; else delete r0.plantilla; nueva.receta = r0; }
+      } else if (pl) {
+        var r0 = n.accion === t.accion ? Object.assign({}, t.receta || {}) : {};
+        if (pl.value) r0.plantilla = pl.value; else delete r0.plantilla;
+        nueva.receta = Object.keys(r0).length ? r0 : null;
+      } else if (n.accion !== t.accion) nueva.receta = null;   /* la receta vieja no sirve a la acción nueva */
+      if (!nueva.receta) delete nueva.receta;
       if (Comunes.existeIgual('tareas', d.listas.tareas, nueva, t.id)) return 'Ya hay otra tarea con ese nombre.';
       try { nueva = await ComunesGuardado.reemplazar('tareas', nueva); } catch (e) { U.fallo('No he podido guardar el cambio', e); return 'No se ha guardado.'; }
       await repartir(Comunes.cambiarTareaEnGuias(d.guias, nueva), o);
@@ -96,8 +113,36 @@ var ComunesCambiar = (function () {
       if (window.HitosPanel) HitosPanel.programarRepintado();
       return '';
     });
-    if (t.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(capa);   /* fila 552 */
-    var n = capa.querySelector('#cc-nombre'); n.focus(); n.setSelectionRange(n.value.length, n.value.length);
+
+    /* «Plantilla nueva…»: la ventana se cierra mientras se escribe y vuelve con la plantilla ya elegida. */
+    function plantillaNueva() {
+      var familia = n.accion, antes = ((window.Plantillas && Plantillas.enMemoria()) ? (familia === 'comunicar' ? Plantillas.enMemoria().lista : Plantillas.enMemoria().documentos) || [] : []).map(function (p) { return p.id; });
+      var borrador = Object.assign({}, t, { nombre: capa.querySelector('#cc-nombre').value, accion: n.accion });
+      capa.parentNode.removeChild(capa);
+      async function alGuardar() {
+        try { await Plantillas.cargar(App.E.gestor); } catch (e) { /* se vuelve con lo que haya */ }
+        var pls = Plantillas.enMemoria(), lista = (familia === 'comunicar' ? pls.lista : pls.documentos) || [];
+        var nueva = lista.filter(function (p) { return antes.indexOf(p.id) === -1; })[0];
+        borrador.receta = nueva ? { plantilla: nueva.id } : (t.receta || null);
+        tarea(borrador, o);
+      }
+      if (familia === 'comunicar') PlantillasAjustes.abrirCuadroDePlantilla(null, null, alGuardar);
+      else PlantillasDocumento.abrirCuadroDePlantillaDoc(null, null, alGuardar);
+    }
+    function enganchaDatos() {
+      var pl = capa.querySelector('#cc-pl');
+      if (pl) pl.onchange = function () { if (pl.value === '__nueva') plantillaNueva(); else n.plantilla = pl.value; };
+      if (n.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(capa);   /* fila 552 */
+    }
+    capa.querySelector('#cc-hace').onchange = function (ev) {
+      n.accion = ev.target.value;
+      n.plantilla = '';   /* las plantillas de otra acción no valen */
+      capa.querySelector('#cc-datos').innerHTML = datosDeLaTareaHTML(n, t);
+      capa.querySelector('#cc-err').innerHTML = '';
+      enganchaDatos();
+    };
+    enganchaDatos();
+    var nm = capa.querySelector('#cc-nombre'); nm.focus(); nm.setSelectionRange(nm.value.length, nm.value.length);
   }
 
   async function hito(h, o) {

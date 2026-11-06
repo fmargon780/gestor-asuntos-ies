@@ -84,7 +84,9 @@ var HitoMesaGuion = (function () {
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
        la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
     var etiquetaFirmar = (g.accion === 'firmar' && window.GuiasGuion)
-      ? '<span class="guion-tarea-clase">' + (GuiasGuion.firmasNecesarias(g) > 1 ? 'Firmar · ' + GuiasGuion.firmasNecesarias(g) + ' firmas' : 'Firmar') + '</span>' : '';   /* fila 523 */
+      ? '<span class="guion-tarea-clase guion-tarea-accion">' + (GuiasGuion.firmasNecesarias(g) > 1 ? 'Firmar · ' + GuiasGuion.firmasNecesarias(g) + ' firmas' : 'Firmar') + '</span>'   /* fila 523 */
+      /* Fila 553: cada tarea con acción lleva su etiqueta, al lado del nombre. */
+      : ((g.accion && window.Comunes) ? '<span class="guion-tarea-accion" data-accion="' + U.escapar(g.accion) + '">' + U.escapar(Comunes.textoDeHace(g.accion)) + '</span>' : '');
     var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" data-ayuda-clave="solo-aqui-tarea">solo aquí</span>' : '';
     var botonesTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
     var debajoTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
@@ -175,6 +177,31 @@ var HitoMesaGuion = (function () {
     U.conservandoLoEscrito(caja, function () { pintarGuion(caja, fila, a, h, abierto, hitos); });
   }
 
+  /* Fila 553: si el orden de las tareas de la guía ha cambiado en este asunto, la franja con las dos salidas (js/hitos-guion-orden.js). */
+  function franjaDelOrdenHTML(a, h) {
+    if (!Hitos.ordenDeLaGuiaCambiado || !puedeAnadirALaGuia(a, h) || !Hitos.ordenDeLaGuiaCambiado(a, h)) return '';
+    return '<div class="guion-orden-cambiado"><span>Has cambiado el orden de las tareas en este asunto.</span>' +
+      '<button type="button" class="boton boton-chico boton-principal guion-orden-guia">Guardar también en la guía</button>' +
+      '<button type="button" class="boton boton-chico guion-orden-aqui">Solo en este asunto</button></div>';
+  }
+
+  function engancharFranjaDelOrden(caja, a, h) {
+    var guia = caja.querySelector('.guion-orden-guia'), aqui = caja.querySelector('.guion-orden-aqui');
+    function repintar() { if (window.HitosPanel) HitosPanel.programarRepintado(); }
+    if (guia) guia.onclick = function () {
+      U.mientrasGuarda(guia, async function () {
+        try {
+          if (await Hitos.guardarOrdenEnLaGuia(a, h)) U.aviso('Orden guardado también en la guía de ' + tipoDe(a) + '.', 'bueno');
+          else U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar');
+          repintar();
+        } catch (e) { U.fallo('No he podido guardar el orden en la guía', e); }
+      });
+    };
+    if (aqui) aqui.onclick = function () {
+      Hitos.dejarOrdenSoloAqui(a, h.id).then(repintar).catch(function (e) { U.fallo('No he podido guardar el cambio', e); });
+    };
+  }
+
   function pintarGuion(caja, fila, a, h, abierto, hitos) {
     var guion = Hitos.guionDe(a, h);
     var c = Hitos.cuentaGuion(guion);
@@ -184,10 +211,11 @@ var HitoMesaGuion = (function () {
     var siguiente = h.estado === 'hecho' ? null : guion.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
     var ctx = { guion: guion, hitos: hitos || [], abierto: abierto };
     caja.innerHTML =
-      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas del hito</span>' +
+      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas</span>' +
         '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
       guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h, ctx); }).join('') + plegadasHTML(guion.plegadas) +
+      (abierto ? franjaDelOrdenHTML(a, h) : '') +
       (abierto ? '<div class="tcd-nueva"><input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' +
         /* Fila 522: «Qué se hace» y su dato, como en la guía; sin elegir, como siempre. */
         (window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML(nuevaForma[h.id]) +
@@ -323,6 +351,7 @@ var HitoMesaGuion = (function () {
     var botonAnadir = caja.querySelector('.tcd-anadir');
     if (botonAnadir) botonAnadir.onclick = anadirNueva;
     if (window.ComunesAsunto) ComunesAsunto.enganchar(caja, a, h);
+    engancharFranjaDelOrden(caja, a, h);
   }
 
   function tipoDe(a) {
