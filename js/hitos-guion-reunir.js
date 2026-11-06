@@ -17,6 +17,7 @@
   function quien() { return I.quien.apply(this, arguments); }
   function marcarGuion() { return I.marcarGuion.apply(this, arguments); }
   function marcarGuionPorAccion() { return I.marcarGuionPorAccion.apply(this, arguments); }
+  function anotarCopia() { return I.anotarCopia.apply(this, arguments); }   /* fila 552 */
   function elegirEnGuion() { return I.elegirEnGuion.apply(this, arguments); }
   function anadirGuionPropio() { return I.anadirGuionPropio.apply(this, arguments); }
   function cambiarGuionAqui() { return I.cambiarGuionAqui.apply(this, arguments); }
@@ -130,6 +131,7 @@
   Hitos.cuentaGuion = cuentaGuion;
   Hitos.marcarGuion = marcarGuion;
   Hitos.marcarGuionPorAccion = marcarGuionPorAccion;
+  Hitos.anotarCopia = anotarCopia;
   Hitos.anadirGuionPropio = anadirGuionPropio;
   Hitos.cambiarGuionAqui = cambiarGuionAqui;
   Hitos.cambiarPreguntaAqui = cambiarPreguntaAqui;

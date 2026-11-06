@@ -52,12 +52,24 @@
       if (!paso) return null;
       await marcarGuion(a.nombre, idHito, paso.id, { hecho: true });
       if (window.TareasConDocumento) await TareasConDocumento.alMarcar(a, h, paso, documento);
+      if (accion === 'registrar' && window.TareaCopiar) await TareaCopiar.alRegistrar(a, h, paso, documento);   /* fila 552 */
       if (window.HitosPanel) HitosPanel.programarRepintado();
       return paso;
     } catch (e) {
       if (window.U && U.accesorio) U.accesorio('Hecho, pero no he podido marcar el paso del guion', e);
       return null;
     }
+  }
+
+  /* Fila 552: lo que dice la tarea «Copiar a otra carpeta» ({ texto } o { pendiente, permiso }); con `hecho`, se marca. */
+  function anotarCopia(clave, idHito, idPaso, copia, hecho) {
+    return editarHito(clave, idHito, function (h) {
+      h.guionHecho = h.guionHecho || {};
+      var e = h.guionHecho[idPaso] || {};
+      if (copia) e.copia = copia; else delete e.copia;
+      if (hecho) { e.hecho = true; e.noaplica = false; e.quien = quien(); e.cuando = U.ahora(); }
+      h.guionHecho[idPaso] = e;
+    });
   }
 
   /* Fila 116: la respuesta a una pregunta del guion. Cambiarla no borra lo
@@ -190,6 +202,7 @@
   I.quien = quien;
   I.marcarGuion = marcarGuion;
   I.marcarGuionPorAccion = marcarGuionPorAccion;
+  I.anotarCopia = anotarCopia;
   I.elegirEnGuion = elegirEnGuion;
   I.anadirGuionPropio = anadirGuionPropio;
   I.cambiarGuionAqui = cambiarGuionAqui;

@@ -162,7 +162,7 @@ window.TareasConDocumentoVista = (function () {
     if (!window.GuiasGuion) return '';
     var accion = (g && g.accion) || '';
     return '<div class="tcd-form"><label class="dato"><span class="etiqueta">Qué se hace</span>' +
-      '<select class="campo tcd-accion">' + GuiasGuion.ACCIONES.map(function (x) {
+      '<select class="campo tcd-accion">' + GuiasGuion.ACCIONES.filter(function (x) { return x.valor !== 'copiar'; }).map(function (x) {   /* fila 552: solo en la lista común */
         return '<option value="' + U.escapar(x.valor) + '"' + (x.valor === accion ? ' selected' : '') + '>' + U.escapar(x.texto) + '</option>';
       }).join('') + '</select></label><span class="tcd-receta">' + recetaHTML(accion, g && g.receta) + '</span></div>';
   }

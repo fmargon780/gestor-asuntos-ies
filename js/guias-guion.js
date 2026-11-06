@@ -45,7 +45,8 @@ var GuiasGuion = (function () {
     { valor: 'registrar', texto: 'Registrar un documento' },
     { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir un documento' },
-    { valor: 'pedir', texto: 'Pedir datos' }   /* fila 530 */
+    { valor: 'pedir', texto: 'Pedir datos' },   /* fila 530 */
+    { valor: 'copiar', texto: 'Copiar a otra carpeta' }   /* fila 552 */
   ];
 
   var A_QUIEN = [
@@ -91,6 +92,8 @@ var GuiasGuion = (function () {
     } else if (accion === 'pedir') {
       var campos = normalizarCampos(r.campos);
       out = { campos: campos.length ? campos : '' };   /* fila 530 */
+    } else if (accion === 'copiar') {   /* fila 552 (js/tarea-copiar.js) */
+      out = { carpeta: String(r.carpeta || '').trim(), carpetaId: r.carpeta ? String(r.carpetaId || '') : '', patron: String(r.patron || '').trim() };
     }
     if (!out) return null;
     return Object.keys(out).some(function (k) { return out[k]; }) ? out : null;
@@ -171,6 +174,10 @@ var GuiasGuion = (function () {
         conRotulo('Entrada o salida', '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select>', dentro) + '</div>';
     }
     if (g.accion === 'pedir') return pedirHTML(g);
+    if (g.accion === 'copiar') {   /* fila 552 */
+      return dentro || !window.TareaCopiarEditor ? '<div class="guion-fila-linea guion-receta"><span class="suave pequeno">«Copiar a otra carpeta» no va dentro de una pregunta.</span></div>'
+        : TareaCopiarEditor.bloqueGuiaHTML(r);
+    }
     if (g.accion === 'firmar') {
       return '<div class="guion-fila-linea guion-receta">' + titulo +
         conRotulo('Firmas necesarias', '<select class="campo guion-receta-firmas">' + opcionesHTML(FIRMAS, String(firmasNecesarias(g))) + '</select>', dentro) + '</div>';

@@ -99,6 +99,7 @@ var HitoMesaGuion = (function () {
       debajoTarea +
       /* Fila 530: los datos de su plantilla (o los campos de «Pedir datos»), para escribir lo que falte (js/datos-de-la-tarea.js). */
       (window.DatosDeLaTarea ? DatosDeLaTarea.marcoHTML(g) : '') +
+      (window.TareaCopiar ? TareaCopiar.vistaHTML(g, a, h) : '') +   /* fila 552: lo copiado, o el aviso de lo pendiente */
       /* Fila 522: su documento colgado (js/tareas-con-documento-vista.js). */
       (window.TareasConDocumentoVista && ctx ? TareasConDocumentoVista.colgadoHTML(a, h, g, ctx) : '') +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +

@@ -65,7 +65,7 @@
   var I = Hitos._guionInterno = Hitos._guionInterno || {};
   function quien() { return I.quien.apply(this, arguments); }
 
-  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir'];   /* fila 523: firmar; fila 530: pedir */
+  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir', 'copiar'];   /* fila 523: firmar; fila 530: pedir */
 
   function tipoDe(a) {
     return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
@@ -116,7 +116,8 @@
                reunir: (g.reunir === 'documento' || g.reunir === 'dato') ? g.reunir : '',
                obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '',
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
-               receta: g.receta || null };
+               receta: g.receta || null,
+               copia: x.copia || null };   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
       if (g.comun && !propio) salida.comun = g.comun;   /* fila 531: viene de la lista común de tareas */
       return salida;
     }
