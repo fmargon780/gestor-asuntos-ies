@@ -79,10 +79,10 @@ var ComunesCambiar = (function () {
     var capa = ventana('Cambiar la tarea', cuerpo, async function (c) {
       var nombre = c.querySelector('#cc-nombre').value.trim();
       if (!nombre) return 'Ponle un nombre.';
-      if (Comunes.existeNombre(d.listas.tareas, nombre, t.id)) return 'Ya hay otra tarea con ese nombre.';
       var pl = c.querySelector('#cc-pl'), nueva = JSON.parse(JSON.stringify(t));
       nueva.nombre = nombre;
       if (pl) { var r0 = Object.assign({}, t.receta || {}); if (pl.value) r0.plantilla = pl.value; else delete r0.plantilla; nueva.receta = r0; }
+      if (Comunes.existeIgual('tareas', d.listas.tareas, nueva, t.id)) return 'Ya hay otra tarea con ese nombre.';
       try { nueva = await ComunesGuardado.reemplazar('tareas', nueva); } catch (e) { U.fallo('No he podido guardar el cambio', e); return 'No se ha guardado.'; }
       await repartir(Comunes.cambiarTareaEnGuias(d.guias, nueva), o);
       if (o.alCambiar) o.alCambiar(nueva);
@@ -104,8 +104,8 @@ var ComunesCambiar = (function () {
     var capa = ventana('Cambiar el hito', cuerpo, async function (c) {
       var nombre = c.querySelector('#cc-nombre').value.trim();
       if (!nombre) return 'Ponle un nombre.';
-      if (Comunes.existeNombre(d.listas.hitos, nombre, h.id)) return 'Ya hay otro hito con ese nombre.';
       var nuevo = Object.assign({}, h, { nombre: nombre, explicacion: c.querySelector('#cc-exp').value.trim() });
+      if (Comunes.existeIgual('hitos', d.listas.hitos, nuevo, h.id)) return 'Ya hay otro hito con ese nombre.';
       try { nuevo = await ComunesGuardado.reemplazar('hitos', nuevo); } catch (e) { U.fallo('No he podido guardar el cambio', e); return 'No se ha guardado.'; }
       await repartir(Comunes.cambiarHitoEnGuias(d.guias, nuevo), o);
       /* En este asunto el cambio se ve siempre; en los demás abiertos, los hitos siguen con su nombre de antes. */

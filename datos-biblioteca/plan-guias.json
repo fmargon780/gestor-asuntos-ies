@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "fuente": "docs/544-PLAN-GUIAS.md (6-nov-2026). Los nombres van tal cual los escribió Francisco; se buscan sin distinguir mayúsculas, tildes ni espacios dobles. Un nombre que acaba en «…» casa con todo lo que empieza así.",
+  "quitarHitos": ["Archivar"],
+  "hitos": [
+    { "nombre": "Registro de entrada", "desde": ["Dar Registro de Entrada", "Registrar Entrada", "Registrar de Entrada la Solicitud", "Registro de Entrada de la Matrícula", "Registro entrada", "Regitra de entrada"] },
+    { "nombre": "Registro de salida", "desde": ["Dar registro de salida", "Registrar en Libro de Salida", "Registrar en el Libro de Salida", "Registro salida relación alumnado", "Registro de Salida", "Registro salida"] },
+    { "nombre": "Poner a la firma", "desde": ["Enviar a Firma", { "nombre": "Enviar a firma Dirección", "responsable": "Dirección" }, { "nombre": "Firma del director", "responsable": "Dirección" }, "Puesta a la firma"] },
+    { "nombre": "Copiar el documento registrado a la carpeta Ausencias", "desde": ["Desgcargar el pdf registrado en Ausencias"] },
+    { "nombre": "Enviar el certificado", "desde": ["Envío Certificado", "Envío del certificado", "Envío del certificado registrado", "Enviar al solicitande"] }
+  ],
+  "tareas": [
+    { "nombre": "Registrar de entrada el documento", "accion": "registrar", "receta": { "sentido": "entrada" },
+      "desde": ["Registrar en Libro de Entrada", "Registrar en Libro de entrada", "Registrar el documento en el Libro de Entrada", "Registrar de entrada el documento", "Registrar la entrada de la solicitud en Séneca…", "Registrar la entrada de la solicitud o la propuesta", "Registrar la entrada de cada candidatura"] },
+    { "nombre": "Registrar de salida el documento", "accion": "registrar", "receta": { "sentido": "salida" }, "condicion": true,
+      "desde": ["Enviar a Libro de salida relación de alumnado", "Enviar al Libro de Salida una vez firmado", "Dar registro de salida en Séneca al documento firmado", "Anotar la información en el Registro de Salida", "Registrar la salida en Séneca…", "Registrar de salida el documento"] },
+    { "nombre": "Firmar un documento", "accion": "firmar",
+      "desde": ["Poner a la firma del Responsable", "Poner el documento generado a la firma del director", "Enviar a bandeja de firma de Secretaría", "Comprobar el estado de la firma hasta que esté firmado"] },
+    { "nombre": "Copiar el documento registrado a la carpeta Ausencias", "accion": "",
+      "desde": ["Descargar documento registrado y poner en la Carpeta Ausencias", "Descargar el documento registrado y guardarlo en la Carpeta Ausencis"] }
+  ],
+  "quitarTareas": ["Descargar el documento registrado a la carpeta del asunto y anotar registro", "Descargar el documento firmado en la carpeta del asunto"],
+  "tareaEnHito": [
+    { "hito": "Enviar el certificado", "nombre": "Enviar el documento al solicitante por la vía acordada", "accion": "comunicar" }
+  ],
+  "guias": [
+    { "tipo": "Evaluación psicopedagógica y alumnado NEAE", "otrosNombres": ["NEAE"],
+      "sustituir": [
+        { "titulo": "Registrar la solicitud de la familia", "cuerpo": "", "tareas": [{ "nombre": "Registrar de entrada el documento", "accion": "registrar", "receta": { "sentido": "entrada" } }] },
+        { "titulo": "Registrar el recibí", "cuerpo": "<p>Cuando llegue.</p>", "tareas": [{ "nombre": "Registrar de entrada el documento", "accion": "registrar", "receta": { "sentido": "entrada" } }] }
+      ] },
+    { "tipo": "Elecciones al Consejo Escolar", "otrosNombres": ["ELECCIONES CONSEJO ESCOLAR", "Elecc. Consejo Escolar"],
+      "conservar": ["Constituir la Junta Electoral", "Publicar el censo", "Recoger candidaturas", "Proclamar candidaturas"],
+      "quitar": ["Votación por sectores", "Actas de escrutinio", "Constitución del nuevo Consejo Escolar", "Grabar el resultado en Séneca"] },
+    { "tipo": "CAMBIO DE GRUPO", "otrosNombres": ["Cambio de grupo"],
+      "conservar": ["Recoger la solicitud o la propuesta", "Modificar el grupo en Séneca", "Comunicar a la familia, a las dos tutorías y al equipo docente"],
+      "quitar": ["Valorar la petición", "Resolver"] },
+    { "tipo": "CONVALIDACIÓN CURSO", "otrosNombres": ["CONVALIDACION CURSO"],
+      "conservar": ["Recoger la solicitud", "Resolver o remitir, según el supuesto", "Anotar en el expediente y en Séneca", "Comunicar a la familia y a la tutoría"],
+      "mover": [{ "tarea": "Pasar la solicitud al departamento que corresponde", "de": "Informe del departamento", "a": "Recoger la solicitud" }],
+      "quitar": ["Informe del departamento"] },
+    { "tipo": "Cambio en la situación familiar", "otrosNombres": ["SITUACIÓN FAMILIAR", "SITUACION FAMILIAR"],
+      "conservar": ["Recoger la documentación", "Actualizar los datos en Séneca", "Comunicar a la tutoría lo que deba saber"],
+      "quitar": ["Archivar con acceso restringido"] },
+    { "tipo": "Alta y actualización de datos", "otrosNombres": ["DATOS PERSONAL INTERINO"],
+      "conservar": ["Recoger los datos", "Grabar en Séneca", "Comprobar que la nómina los recoge"],
+      "quitar": [] }
+  ]
+}

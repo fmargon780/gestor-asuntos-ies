@@ -72,6 +72,8 @@ window.TiposDesactivar = (function () {
     }
     repintar(tipo);
     U.aviso(tipo.tipo + ' activado.', 'bueno');
+    /* Fila 551: si el plan de las guías ya está aplicado, la guía del tipo pasa a las listas comunes (js/plan-guias-aplicar.js). */
+    if (window.PlanGuiasAplicar) await PlanGuiasAplicar.alActivarTipo(tipo);
     return true;
   }
 

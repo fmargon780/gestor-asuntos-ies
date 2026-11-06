@@ -7,3 +7,10 @@
 .comunes-propuesta ul { margin: 4px 0; padding-left: 18px; }
 .comunes-aviso-usos { margin: 6px 0; }
 @media (max-width: 640px) { .capa-campos .mitad { grid-template-columns: minmax(0, 1fr); } }
+/* Fila 551: con el plan de las guías aplicado (js/plan-guias-aplicar.js) desaparece lo viejo: escribir tareas e hitos libres en la guía,
+   «+ Traer un hito de otro tipo», la caja «Nueva tarea…» del asunto y los bloques temporales de Herramientas. Sin la marca, todo sigue como hoy. */
+.plan-guias-aplicado #guia-traer-biblioteca, .plan-guias-aplicado #guia-anadir, .plan-guias-aplicado .guion-anadir, .plan-guias-aplicado .tcd-nueva,
+.plan-guias-aplicado #bloque-plan-guias, .plan-guias-aplicado #bloque-tipos-uso, .plan-guias-aplicado #bloque-comunes-propuesta,
+.plan-guias-aplicado #bloque-cargar-biblioteca { display: none !important; }
+.plan-guias-informe h4 { margin: 12px 0 4px; }
+.plan-guias-informe ul { margin: 4px 0; padding-left: 18px; }
