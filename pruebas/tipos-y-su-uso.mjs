@@ -56,9 +56,9 @@ await comprobar('2a. al pulsar un tipo se ve su guía con hitos y tareas', p.eva
   const t = document.querySelector('#tu-filas tr.sel').dataset.t, g = document.getElementById('tu-guia');
   return [g.querySelector('h3').textContent === t, g.querySelectorAll('.tu-hito').length === GuiasDelCentro.pasosDe(t).length, !!g.querySelector('#tu-editar')];
 }), [true, true, true]);
-await p.evaluate(() => { window.__abierto = null; App.abrirTipoDeAsunto = (t) => { window.__abierto = t; }; });
+await p.evaluate(() => { window.__abierto = null; App.abrirTipoDeAsunto = (t) => { window.__abierto = t && t.tipo; }; });
 await p.click('#tu-editar');
-await comprobar('2b. «Abrir en el editor de la guía» abre el tipo', p.evaluate(() => window.__abierto === document.querySelector('#tu-filas tr.sel').dataset.t), true);
+await comprobar('2b. «Abrir en el editor de la guía» abre el tipo (su objeto, no el nombre)', p.evaluate(() => window.__abierto === document.querySelector('#tu-filas tr.sel').dataset.t), true);
 
 console.log('--- 3. las marcas ---');
 const sin = await num('.tu-pastilla[data-f="sin"]');
@@ -89,6 +89,16 @@ await comprobar('4c. tipos.json se escribe una sola vez', p.evaluate(() => windo
 await comprobar('4d. ya no salen al crear asuntos; guías y asuntos abiertos siguen igual', p.evaluate(async ([e, ant]) => [e.every((n) => App.tiposParaElegir().map((x) => x.tipo).indexOf(n) === -1), JSON.stringify([GuiasDelCentro.todas(), App.E.listaAbiertos.length]) === ant], [elegidos, antes]), [true, true]);
 await comprobar('4e. salen en «Desactivados» con su Activar', p.evaluate((e) => [document.querySelector('.tu-pastilla.on').textContent.startsWith('Desactivados'), [...document.querySelectorAll('#tu-filas tr[data-t]')].map((t) => t.dataset.t).sort().join('|') === [...e].sort().join('|'), document.querySelectorAll('#tu-filas [data-a]').length], elegidos), [true, true, 2]);
 
+console.log('--- 4b. «Activar» se ve entero, a 1300 y a 800 px ---');
+for (const ancho of [1300, 800]) {
+  await p.setViewportSize({ width: ancho, height: 900 });
+  await p.waitForTimeout(300);
+  await comprobar('4f. a ' + ancho + ' px el botón Activar cabe dentro de su caja', p.evaluate(() => {
+    const caja = document.querySelector('.tu-caja').getBoundingClientRect(), b = document.querySelector('#tu-filas [data-a]').getBoundingClientRect();
+    return b.right <= caja.right + 1 && b.left >= caja.left;
+  }), true);
+}
+await p.setViewportSize({ width: 1600, height: 1000 });
 console.log('--- 5. activar ---');
 await p.click('#tu-filas [data-a="' + elegidos[0] + '"]');
 await p.waitForFunction((n) => document.getElementById('tu-mensaje').textContent.indexOf(n + ' vuelve a estar activo') !== -1, elegidos[0]);

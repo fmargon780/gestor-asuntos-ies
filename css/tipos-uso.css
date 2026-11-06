@@ -10,7 +10,7 @@
 .tu-caja { overflow-x: auto; max-height: 560px; overflow-y: auto; }
 .tu-tabla { border-collapse: collapse; width: 100%; font-size: 14px; }
 .tu-tabla th { text-align: left; font-size: 12px; color: var(--tinta-suave, #5d6b7a); font-weight: 600; padding: 5px 8px; border-bottom: 1px solid var(--linea, #dde3ea); white-space: nowrap; }
-.tu-tabla td:last-child { white-space: nowrap; }
+.tu-tabla td:last-child { min-width: 150px; }
 .tu-tabla td { padding: 6px 8px; border-bottom: 1px solid var(--linea, #dde3ea); vertical-align: middle; }
 .tu-tabla .num { text-align: right; font-variant-numeric: tabular-nums; }
 .tu-tabla tbody tr { cursor: pointer; }
@@ -25,5 +25,8 @@
 .tu-hito li { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; align-items: baseline; }
 .tu-guia h3 { margin: 0; font-size: 16px; }
 .tu-suave { color: var(--tinta-suave, #5d6b7a); font-size: 13px; }
-@media (max-width: 1100px) { .tu-dos { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1500px) { .tu-dos { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 860px) { .tu-dos { grid-template-columns: minmax(0, 1fr); } .tu-cab .tu-enviar { margin-left: 0; } }
+@media (max-width: 900px) { .tu-cat { display: none; } .tu-tabla th, .tu-tabla td { padding: 5px 4px; } .tu-tabla td:last-child { min-width: 0; } }
+.tu-ult { white-space: nowrap; }
+@media (max-width: 900px) { .tu-ult { white-space: normal; } .tu-tabla td:last-child .tu-etq { display: inline-block; margin-bottom: 3px; } .tu-tabla { font-size: 13px; } }
