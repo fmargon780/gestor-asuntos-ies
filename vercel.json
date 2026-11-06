@@ -1,14 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
   "buildCommand": "node scripts/version-al-publicar.mjs",
   "outputDirectory": ".",
-  "git": {
-    "deploymentEnabled": {
-      "claude/**": false,
-      "avisos": false
-    }
-  },
+  "git": { "deploymentEnabled": false },
   "headers": [
     {
       "source": "/(.*)",
@@ -27,7 +21,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob:"
+          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob: https://script.google.com https://script.googleusercontent.com"
         }
       ]
     }
