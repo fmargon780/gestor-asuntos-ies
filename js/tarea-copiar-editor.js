@@ -75,7 +75,10 @@ window.TareaCopiarEditor = (function () {
     var f = raiz && raiz.querySelector('.tcp-form');
     if (!f) return;
     f.querySelector('.tcp-elegir').onclick = function () {
-      elegirCarpeta(f).then(function () { pintarEjemplo(f); }).catch(function (e) { U.fallo('No he podido elegir la carpeta', e); });
+      elegirCarpeta(f).then(function () {
+        Array.prototype.forEach.call(document.querySelectorAll('#cn-err, #cc-err'), function (e) { e.innerHTML = ''; });   /* el aviso de «Elige la carpeta» ya no vale */
+        pintarEjemplo(f);
+      }).catch(function (e) { U.fallo('No he podido elegir la carpeta', e); });
     };
     f.querySelector('.tcp-insertar').onclick = function () { insertarCampo(f); };
     f.querySelector('.tcp-patron').addEventListener('input', function () { pintarEjemplo(f); });

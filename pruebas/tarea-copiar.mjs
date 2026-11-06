@@ -149,11 +149,15 @@ await pagina.waitForTimeout(1000);
 await comprobar('5. sale el aviso ámbar con «Dar permiso»',
   pagina.evaluate((id) => { const p = document.querySelector('.hito-en-mesa .guion-paso[data-id="' + id + '"]'); const av = p && p.querySelector('.aviso-ambar'); return [!!av, av ? av.innerText : '', !!(p && p.querySelector('.tcp-dar-permiso'))]; }, idCopiar),
   [true, 'Pendiente: falta permiso sobre la carpeta. Dar permiso', true]);
+await comprobar('5. antes de que llegue el registrado se lee «Se hará sola cuando llegue el registrado.»',
+  pagina.evaluate(() => TareaCopiar.vistaHTML({ accion: 'copiar', hecho: false, copia: null }, null, null).indexOf('Se hará sola cuando llegue el registrado.') !== -1), true);
 await pagina.evaluate(() => { window.__sinPermiso = false; });
 await pagina.locator('.hito-en-mesa .guion-paso[data-id="' + idCopiar + '"] .tcp-dar-permiso').click();
 await pagina.waitForTimeout(1500);
 const e5b = await estado(idCopiar);
 await comprobar('5. al darlo se copia (3 ficheros) y se marca', [e5b.ficheros.length, e5b.hecha, /^Copiado a Ausencias como «/.test((e5b.copia || {}).texto || '')], [3, true, true]);
+await comprobar('5. la línea «Copiado a…» se ve en pantalla con la tarea hecha',
+  pagina.evaluate((id) => { const l = document.querySelector('.hito-en-mesa .guion-paso[data-id="' + id + '"] .tcp-linea'); return !!l && l.offsetHeight > 0 && /^Copiado a Ausencias/.test(l.innerText); }, idCopiar), true);
 await comprobar('5. el aviso ámbar se va',
   pagina.evaluate((id) => !document.querySelector('.hito-en-mesa .guion-paso[data-id="' + id + '"] .tcp-dar-permiso'), idCopiar), true);
 

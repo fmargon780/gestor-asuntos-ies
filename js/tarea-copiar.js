@@ -209,7 +209,8 @@ window.TareaCopiar = (function () {
   /* Bajo la tarea: la línea de lo copiado, o lo pendiente (con el aviso ámbar y «Dar permiso»). */
   function vistaHTML(g, a, h) {
     var c = g.copia;
-    if (g.accion !== 'copiar' || !c) return '';
+    if (g.accion !== 'copiar') return '';
+    if (!c) return g.hecho ? '' : '<div class="guion-paso-explicacion tcp-linea">Se hará sola cuando llegue el registrado.</div>';
     if (g.hecho) return c.texto ? '<div class="guion-paso-explicacion tcp-linea">' + esc(c.texto) + '</div>' : '';
     if (!c.pendiente) return '';
     return '<div class="aviso aviso-ambar tcp-pendiente">' + esc(c.pendiente) +

@@ -129,6 +129,7 @@ details.mesa-normativa > summary { cursor: pointer; }
 .guion-paso.hecho:not(.guion-pregunta) .guion-paso-explicacion,
 .guion-paso.hecho:not(.guion-pregunta) .guion-paso-botones,
 .guion-paso.hecho:not(.guion-pregunta) .guion-dato { display: none; }
+.guion-paso.hecho:not(.guion-pregunta) .guion-paso-explicacion.tcp-linea { display: block; }   /* fila 552: «Copiado a…» se ve con la tarea hecha */
 .guion-paso.hecho .guion-casilla { accent-color: #2f8a55; }
 .guion-paso.hecho { padding: 3px 0; }
 .guion-paso:not(.hecho):not(.guion-pregunta) .guion-paso-texto { font-weight: 400; }
