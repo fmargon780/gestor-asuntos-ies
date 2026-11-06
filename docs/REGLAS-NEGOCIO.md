@@ -50,6 +50,9 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, idea 538) **«Cambiar la tarea» va en el ⋮** de la tarea, no como botón visible, aunque la pantalla aprobada lo traía visible.
 - (6-nov-2026, idea 538) **Añadir no es cambiar:** un hito nuevo en la guía llega también a los asuntos abiertos de ese tipo; cambiar una tarea o un hito no les llega.
 - (6-nov-2026, idea 538) **Lo creado «solo este asunto» no entra en la lista común** («Lo cambiamos así», fila 539).
+- (6-nov-2026, tema 540) **Las guías generales no sirven a Administración:** «casi todas esas guías no nos están sirviendo para nada más que confundirnos». Los tipos sin usar se desactivan con su guía, y solo se pasan a las listas las guías que quedan.
+- (6-nov-2026, tema 540) **La pantalla «Tipos y su uso» es temporal:** «Esto es solo para el proceso de "limpieza"». Se quita al terminar.
+- (6-nov-2026, tema 540) Al desactivar un tipo que se repite solo, **la app solo avisa** («Me parece bien»).
 
 ## Correo
 
