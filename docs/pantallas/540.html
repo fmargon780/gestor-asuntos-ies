@@ -1,0 +1,183 @@
+<title>Tipos y su uso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: los colores y botones de la app; a todo lo ancho, tabla de tipos a la izquierda y su guía a la derecha. */
+:root{
+  --tinta:#1b2430;--tinta-suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;
+  --azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#7cc397;
+  --hover:#f0f3f7;--sobre-azul:#fff;--velo:rgba(15,25,40,.45);
+  --fuente:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --tinta:#e6ebf1;--tinta-suave:#9aa8b6;--linea:#2e3a47;--fondo:#121820;--papel:#1a222c;
+  --azul:#7db3e3;--azul-claro:#1d3044;--ambar:#3a3018;--ambar-linea:#b8902f;--verde:#16301f;--verde-linea:#3e8a5c;
+  --hover:#222c37;--sobre-azul:#10202f;--velo:rgba(0,0,0,.6);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--fuente);font-size:15px}
+.marco{padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.prueba{font-size:13px;color:var(--tinta-suave);margin:0}
+.cab{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+h1{font-size:21px;margin:0;text-wrap:balance}
+h2{font-size:16px;margin:0}
+h3{font-size:14px;margin:0}
+.empuja{margin-left:auto}
+.boton{font:inherit;font-size:14px;background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.boton:hover{background:var(--hover)}
+.boton:disabled{opacity:.5;cursor:default}
+.principal{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.principal:hover{background:var(--azul);opacity:.9}
+.mini{padding:3px 9px;font-size:13px}
+input[type=search]{font:inherit;border:1px solid var(--linea);border-radius:8px;padding:6px 9px;background:var(--papel);color:var(--tinta);width:min(240px,100%)}
+input[type=checkbox]{width:17px;height:17px;margin:0;accent-color:var(--azul);cursor:pointer}
+button:focus-visible,input:focus-visible,tr:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dos{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:12px;align-items:start}
+.filtros{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pastilla{font:inherit;font-size:13px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:999px;padding:4px 11px;cursor:pointer}
+.pastilla:hover{background:var(--hover)}
+.pastilla.on{background:var(--azul);color:var(--sobre-azul);border-color:var(--azul)}
+.tabla-caja{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--tinta-suave);font-weight:600;padding:5px 8px;border-bottom:1px solid var(--linea);white-space:nowrap}
+th.num{text-align:right}
+td{padding:6px 8px;border-bottom:1px solid var(--linea);vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--hover)}
+tbody tr.sel{background:var(--azul-claro)}
+tr.apagado td{color:var(--tinta-suave)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.etq{font-size:12px;border-radius:999px;padding:2px 8px;background:var(--azul-claro);color:var(--azul);font-weight:600;white-space:nowrap}
+.etq.gris{background:var(--hover);color:var(--tinta-suave)}
+.suave{color:var(--tinta-suave)}
+.pequeno{font-size:13px}
+.vacio{color:var(--tinta-suave);font-style:italic;padding:8px}
+.aviso{border-radius:8px;padding:8px 11px;font-size:14px;line-height:1.4;border:1px solid}
+.aviso-ambar{background:var(--ambar);border-color:var(--ambar-linea)}
+.aviso-verde{background:var(--verde);border-color:var(--verde-linea)}
+.hito{border-top:1px solid var(--linea);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+.hito ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.hito li{display:flex;justify-content:space-between;gap:8px;font-size:14px;align-items:baseline}
+.pie{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.capa{position:fixed;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}
+.cuadro{background:var(--papel);border-radius:12px;width:min(560px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--linea)}
+.cuadro-cab{padding:12px 14px;border-bottom:1px solid var(--linea)}
+.cuadro-cuerpo{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.cuadro-cuerpo ul{margin:0;padding-left:18px}
+.cuadro-pie{padding:10px 14px;border-top:1px solid var(--linea);display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+@media (max-width:860px){.dos{grid-template-columns:minmax(0,1fr)}.empuja{margin-left:0}}
+</style>
+<div class="marco">
+  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada. En la app está en Herramientas, junto a «Pasar las guías a las listas comunes», y se quitará al terminar la limpieza.</p>
+  <div class="cab">
+    <h1>Tipos y su uso</h1>
+    <span class="suave pequeno" id="resumen"></span>
+    <button type="button" class="boton empuja" id="b-enviar">Enviar las guías activas a Claude</button>
+  </div>
+  <div id="mensaje"></div>
+  <div class="dos">
+    <section class="panel">
+      <div class="filtros">
+        <input type="search" id="buscar" placeholder="Buscar un tipo" aria-label="Buscar un tipo">
+        <span id="pastillas" class="filtros"></span>
+      </div>
+      <div class="tabla-caja"><table>
+        <thead><tr><th>Desactivar</th><th>Tipo de asunto</th><th>Categoría</th><th class="num">Abiertos</th><th class="num">Archivados</th><th>Último uso</th><th></th></tr></thead>
+        <tbody id="filas"></tbody>
+      </table></div>
+      <div class="pie">
+        <button type="button" class="boton principal" id="b-desactivar">Desactivar</button>
+        <button type="button" class="boton" id="b-todos">Marcar los que se ven</button>
+        <button type="button" class="boton" id="b-ninguno">Quitar todas las marcas</button>
+        <span class="suave pequeno">Los tipos sin usar salen marcados. Desmarca los que sabes que llegarán.</span>
+      </div>
+    </section>
+    <section class="panel" id="guia"></section>
+  </div>
+</div>
+<div class="capa" id="capa" hidden><div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="c-titulo">
+  <div class="cuadro-cab"><h2 id="c-titulo"></h2></div>
+  <div class="cuadro-cuerpo" id="c-cuerpo"></div>
+  <div class="cuadro-pie"><button type="button" class="boton" id="c-no">Cancelar</button><button type="button" class="boton principal" id="c-si"></button></div>
+</div></div>
+<script>
+var G=function(n,t){return{n:n,t:t}},D='Generar documento',F='Firmar',R='Registrar',C='Comunicar',A='Añadir documento',O='Otra cosa';
+var tipos=[
+ {n:'Certificado de matrícula',c:'Alumnado',ab:3,ar:41,u:'05-nov-2026',g:[G('Solicitud',[['Añadir la solicitud al asunto',A]]),G('Certificado',[['Generar el certificado',D],['Recoger la firma de la dirección',F],['Registrar la salida en Séneca',R]]),G('Entrega',[['Enviar el certificado a quien lo pide',C]])]},
+ {n:'Traslado de expediente',c:'Alumnado',ab:2,ar:17,u:'04-nov-2026',g:[G('Petición del centro de destino',[['Añadir la petición al asunto',A]]),G('Envío',[['Generar el oficio de remisión',D],['Registrar la salida en Séneca',R],['Enviar el expediente',C]])]},
+ {n:'Convalidación de materias',c:'Alumnado',ab:1,ar:6,u:'22-oct-2026',g:[G('Solicitud',[['Registrar la entrada en Séneca',R]]),G('Reunión del departamento',[['Convocar al departamento',O],['Levantar acta de la reunión',O]]),G('Resolución',[['Generar la resolución',D],['Comunicarla a la familia',C]])]},
+ {n:'Expulsión al Aula de convivencia',c:'Alumnado',ab:1,ar:4,u:'30-oct-2026',g:[G('Parte',[['Añadir el parte al asunto',A]]),G('Citación',[['Generar la citación',D],['Enviarla por iPasen',C]])]},
+ {n:'Baja de personal',c:'Personal',ab:1,ar:9,u:'02-nov-2026',g:[G('Parte de baja',[['Añadir el parte de baja al asunto',A],['Grabar la baja en Séneca',O]])]},
+ {n:'Toma de posesión',c:'Personal',ab:0,ar:12,u:'15-sep-2026',g:[G('Documentación',[['Comprobar el nombramiento',O],['Generar el acta de toma de posesión',D],['Registrar la salida en Séneca',R]])]},
+ {n:'Certificado Miembro Consejo Escolar',c:'Personal',ab:0,ar:2,u:'08-oct-2026',g:[G('Certificado',[['Generar el certificado',D],['Recoger la firma de la dirección',F]])]},
+ {n:'Factura de proveedor',c:'Empresas y otros',ab:2,ar:23,u:'03-nov-2026',g:[G('Factura',[['Añadir la factura al asunto',A],['Grabar la factura en Séneca',O]])]},
+ {n:'Parte mensual de faltas',c:'Personal',ab:0,ar:0,u:'',rep:1,g:[G('Parte del mes',[['Descargar el parte de faltas en Séneca',O],['Recoger la firma de la dirección',F],['Enviar el parte a Inspección',C]])]},
+ {n:'Título de Bachillerato',c:'Alumnado',ab:0,ar:0,u:'',g:[G('Propuesta de título',[['Generar la propuesta',D],['Registrar la salida en Séneca',R]]),G('Pago de la tasa',[['Añadir el justificante de pago al asunto',A]])]},
+ {n:'Revisión de calificaciones finales',c:'Alumnado',ab:0,ar:0,u:'',g:[G('Reclamación',[['Registrar la entrada en Séneca',R]]),G('Decisión del departamento',[['Convocar al departamento',O],['Estudiar la reclamación',O],['Elaborar el informe',O]]),G('Resolución de Dirección',[['Dictar la resolución',O],['Comunicarla a la familia',C]])]},
+ {n:'Procedimiento de cambio de centro',c:'Alumnado',ab:0,ar:0,u:'',g:[G('Inicio por Dirección',[['Dictar el acuerdo de inicio',O],['Nombrar instructor',O]]),G('Instrucción',[['Tomar declaración al alumno',O],['Elevar la propuesta a la Delegación',O]])]},
+ {n:'Evaluación de la función directiva',c:'Personal',ab:0,ar:0,u:'',g:[G('Inspección',[['Visitar el centro',O],['Redactar el informe de evaluación',O]])]},
+ {n:'Reclamación de nómina',c:'Personal',ab:0,ar:0,u:'',g:[G('Reclamación',[['Comprobar la nómina',O],['Remitirla a la Delegación',C]])]},
+ {n:'Contrato menor de obras',c:'Empresas y otros',ab:0,ar:0,u:'',g:[G('Expediente',[['Pedir tres presupuestos',O],['Aprobar el gasto en el Consejo Escolar',O]])]},
+ {n:'Cesión de instalaciones',c:'Empresas y otros',ab:0,ar:0,u:'',g:[G('Solicitud',[['Registrar la entrada en Séneca',R]]),G('Acuerdo',[['Llevarla al Consejo Escolar',O],['Comunicar el acuerdo',C]])]}
+];
+tipos.forEach(function(t){t.uso=t.ab+t.ar;t.apagado=false;t.marca=t.uso===0;t.sinPasar=false});
+var filtro='todos',texto='',sel=tipos[0],pasadas=false;
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function pl(n,a,b){return n+' '+(n===1?a:b)}
+function norm(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+function visibles(){return tipos.filter(function(t){
+ if(texto&&norm(t.n).indexOf(norm(texto))<0)return false;
+ if(filtro==='sin')return t.uso===0&&!t.apagado;
+ if(filtro==='usados')return t.uso>0&&!t.apagado;
+ if(filtro==='apagados')return t.apagado;
+ return true})}
+function contar(f){return tipos.filter(f).length}
+function pintar(){
+ var act=contar(function(t){return!t.apagado});
+ $('resumen').textContent=pl(tipos.length,'tipo','tipos')+' · '+pl(act,'activo','activos')+' · '+pl(contar(function(t){return t.uso===0&&!t.apagado}),'sin usar','sin usar');
+ var ps=[['todos','Todos',tipos.length],['sin','Sin usar',contar(function(t){return t.uso===0&&!t.apagado})],['usados','Usados',contar(function(t){return t.uso>0&&!t.apagado})],['apagados','Desactivados',contar(function(t){return t.apagado})]];
+ $('pastillas').innerHTML=ps.map(function(p){return'<button type="button" class="pastilla'+(filtro===p[0]?' on':'')+'" data-f="'+p[0]+'">'+p[1]+' ('+p[2]+')</button>'}).join('');
+ var v=visibles();
+ $('filas').innerHTML=v.length?v.map(function(t){var i=tipos.indexOf(t);
+  return'<tr tabindex="0" data-i="'+i+'" class="'+(t===sel?'sel ':'')+(t.apagado?'apagado':'')+'"><td>'+(t.apagado?'':'<input type="checkbox" id="m'+i+'" data-m="'+i+'" aria-label="Marcar '+esc(t.n)+'"'+(t.marca?' checked':'')+'>')+'</td><td>'+esc(t.n)+'</td><td class="suave">'+esc(t.c)+'</td><td class="num">'+t.ab+'</td><td class="num">'+t.ar+'</td><td style="white-space:nowrap" class="'+(t.u?'':'suave')+'">'+(t.u||'Nunca')+'</td><td>'+(t.apagado?'<span class="etq gris">Desactivado</span> <button type="button" class="boton mini" data-a="'+i+'">Activar</button>':(t.sinPasar?'<span class="etq">Guía sin pasar</span>':''))+'</td></tr>'}).join(''):'<tr><td colspan="7" class="vacio">No hay ningún tipo así.</td></tr>';
+ var n=contar(function(t){return t.marca&&!t.apagado});
+ $('b-desactivar').textContent=n?'Desactivar '+pl(n,'tipo','tipos'):'Desactivar';
+ $('b-desactivar').disabled=!n;
+ pintarGuia()}
+function pintarGuia(){
+ var t=sel,ta=t.g.reduce(function(s,h){return s+h.t.length},0);
+ $('guia').innerHTML='<h2>'+esc(t.n)+'</h2><div class="suave pequeno">'+pl(t.g.length,'hito','hitos')+' · '+pl(ta,'tarea','tareas')+' · '+(t.apagado?'desactivado':t.uso?pl(t.uso,'asunto','asuntos'):'sin usar')+'</div>'+
+ t.g.map(function(h){return'<div class="hito"><h3>'+esc(h.n)+'</h3><ul>'+h.t.map(function(x){return'<li><span>'+esc(x[0])+'</span><span class="etq'+(x[1]===O?' gris':'')+'">'+x[1]+'</span></li>'}).join('')+'</ul></div>'}).join('')+
+ '<button type="button" class="boton" id="b-editar">Abrir en el editor de la guía</button><div id="nota-editar"></div>'}
+function cuadro(tit,html,si,fn){$('c-titulo').textContent=tit;$('c-cuerpo').innerHTML=html;$('c-si').textContent=si;$('capa').hidden=false;$('c-si').onclick=function(){$('capa').hidden=true;fn()};$('c-si').focus()}
+function msg(html,cl){$('mensaje').innerHTML='<div class="aviso '+cl+'">'+html+'</div>'}
+$('c-no').onclick=function(){$('capa').hidden=true};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')$('capa').hidden=true});
+$('buscar').oninput=function(){texto=this.value;pintar()};
+$('pastillas').onclick=function(e){var f=e.target.dataset.f;if(f){filtro=f;pintar()}};
+$('filas').onclick=function(e){var d=e.target.dataset;
+ if(d.m!==undefined){tipos[+d.m].marca=e.target.checked;pintar();return}
+ if(d.a!==undefined){var t=tipos[+d.a];t.apagado=false;t.marca=false;t.sinPasar=pasadas;pintar();
+  msg(esc(t.n)+' vuelve a estar activo. '+(pasadas?'Su guía sigue sin pasar a las listas comunes hasta que se revise.':'Entrará en lo que se envíe a Claude.'),pasadas?'aviso-ambar':'aviso-verde');return}
+ var tr=e.target.closest('tr[data-i]');if(tr){sel=tipos[+tr.dataset.i];pintar()}};
+$('filas').onkeydown=function(e){var tr=e.target.closest('tr[data-i]');if(tr&&e.target===tr&&e.key==='Enter'){sel=tipos[+tr.dataset.i];pintar()}};
+$('guia').onclick=function(e){if(e.target.id==='b-editar')$('nota-editar').innerHTML='<div class="aviso aviso-ambar">En la app se abre el editor de la guía de siempre, igual que hoy. Ahí se quita lo que no es de Administración.</div>'};
+$('b-todos').onclick=function(){visibles().forEach(function(t){if(!t.apagado)t.marca=true});pintar()};
+$('b-ninguno').onclick=function(){tipos.forEach(function(t){t.marca=false});pintar()};
+$('b-desactivar').onclick=function(){
+ var m=tipos.filter(function(t){return t.marca&&!t.apagado}),rep=m.filter(function(t){return t.rep}),ab=m.reduce(function(s,t){return s+t.ab},0);
+ cuadro('Desactivar '+pl(m.length,'tipo','tipos'),'<ul>'+m.map(function(t){return'<li>'+esc(t.n)+'</li>'}).join('')+'</ul><div>Dejarán de salir al crear asuntos. Sus guías y plantillas se conservan, y se pueden volver a activar.</div>'+
+ (ab?'<div class="aviso aviso-ambar">'+pl(ab,'asunto abierto sigue','asuntos abiertos siguen')+' igual.</div>':'')+
+ (rep.length?'<div class="aviso aviso-ambar">'+rep.map(function(t){return esc(t.n)}).join(', ')+' se repite solo. Dejará de crearse.</div>':''),'Desactivar',function(){
+  m.forEach(function(t){t.apagado=true;t.marca=false});filtro='apagados';pintar();msg(pl(m.length,'tipo desactivado','tipos desactivados')+'.','aviso-verde')})};
+$('b-enviar').onclick=function(){
+ var a=tipos.filter(function(t){return!t.apagado}),h=a.reduce(function(s,t){return s+t.g.length},0),ta=a.reduce(function(s,t){return s+t.g.reduce(function(x,y){return x+y.t.length},0)},0);
+ cuadro('Enviar las guías activas a Claude','<div>Se enviarán '+pl(a.length,'guía','guías')+', con '+pl(h,'hito','hitos')+' y '+pl(ta,'tarea','tareas')+'.</div><div>Van los nombres de tipos, hitos, tareas y plantillas, y cuántas veces se ha usado cada tipo. No va ningún dato de asuntos ni de personas.</div><div>Los tipos desactivados no se envían.</div>','Enviar',function(){
+  pasadas=true;msg('Enviadas '+pl(a.length,'guía','guías')+' a Claude. Dile en la conversación que ya están.','aviso-verde')})};
+pintar();
+</script>
