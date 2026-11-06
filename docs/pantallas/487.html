@@ -150,7 +150,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <li><b>Tutor/a del grupo</b> y <b>Profesores del grupo</b>: los de la unidad del alumno.</li>
           <li><b>Quien lo pide</b>: quien encargó el asunto.</li>
           <li><b>Relacionados</b>: los terceros relacionados con ese asunto.</li>
-          <li><b>Listas del personal</b>: las guardadas en Ajustes (Equipo directivo…).</li>
+          <li><b>Listas del personal</b>: las de Ajustes › Grupos que tienen solo personal del centro. Cada una por separado; se pueden marcar varias.</li>
         </ul>
         <p class="pequeno suave">El papel que el asunto no tiene (por ejemplo, tutores legales en un asunto de una empresa) no pone a nadie.</p>
       </div>
@@ -204,7 +204,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     {id:'pide', t:'Quien lo pide'},
     {id:'relac', t:'Relacionados'},
     {id:'g-dir', t:'Equipo directivo'},
-    {id:'g-ori', t:'Orientación'}
+    {id:'g-direc', t:'El director'},
+    {id:'g-sec', t:'La secretaría'},
+    {id:'g-je', t:'El jefe de estudios'}
   ];
   var personas = [
     {id:'alu', rol:'interesado', grupo:'El asunto', nombre:'Ruiz Ortega, Lucía', etq:'alumna', correo:'lucia.ruiz.o@g.educaand.es'},
@@ -215,8 +217,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     {id:'p2', rol:'profes', grupo:'Sus profesores (2º ESO B)', nombre:'Prieto Sanz, Ana', etq:'Lengua', correo:'aprisan@g.educaand.es'},
     {id:'p3', rol:'profes', grupo:'Sus profesores (2º ESO B)', nombre:'Vela Ruiz, Javier', etq:'Geografía e Historia', correo:''},
     {id:'pide', rol:'pide', grupo:'Quien lo pide', nombre:'Campos Díaz, Rafael', etq:'Jefatura de Estudios', correo:'jefatura@iesejemplo.es'},
-    {id:'g-dir', rol:'g-dir', grupo:'Listas del personal', nombre:'Equipo directivo', etq:'4 personas', correo:'4 correos', lista:true},
-    {id:'g-ori', rol:'g-ori', grupo:'Listas del personal', nombre:'Orientación', etq:'2 personas', correo:'2 correos', lista:true}
+    {id:'g-dir', rol:'g-dir', grupo:'Listas del personal', nombre:'El equipo directivo', etq:'4 personas', correo:'4 correos', lista:true},
+    {id:'g-direc', rol:'g-direc', grupo:'Listas del personal', nombre:'El director', etq:'1 persona', correo:'1 correo', lista:true},
+    {id:'g-sec', rol:'g-sec', grupo:'Listas del personal', nombre:'La secretaría', etq:'2 personas', correo:'2 correos', lista:true},
+    {id:'g-je', rol:'g-je', grupo:'Listas del personal', nombre:'El jefe de estudios', etq:'1 persona', correo:'1 correo', lista:true}
   ];
   var SERV = {id:'ss', rol:'relac', grupo:'Relacionados con el asunto', nombre:'Servicios Sociales Comunitarios', etq:'Ayuntamiento', correo:'ssociales@ayto-ejemplo.es'};
 
