@@ -10,7 +10,7 @@
 var TiposYSuUso = (function () {
 
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-  var st = { filtro: 'todos', texto: '', sel: '', marcas: {}, iniciado: false, mensaje: '' };
+  var st = { filtro: 'todos', texto: '', sel: '', marcas: {}, iniciado: false, mensaje: '', indice: [], leido: false };
 
   function $(id) { return document.getElementById(id); }
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
@@ -24,7 +24,7 @@ var TiposYSuUso = (function () {
 
   /* Una fila por tipo: { tipo, categoria, abiertos, archivados, uso, ultimo (ISO o ''), desactivado }. */
   function recoger() {
-    var ab = {}, ar = {}, ult = {}, abiertos = {};
+    var ab = {}, ar = {}, ult = {}, abiertos = {}, vistos = {};
     function ultimo(tipo, nombre, ficha) {
       var m = /^(\d{2})(\d{2})(\d{2})(\s|$)/.exec(nombre || '');
       var f = m ? '20' + m[1] + '-' + m[2] + '-' + m[3] : '';
@@ -45,8 +45,19 @@ var TiposYSuUso = (function () {
       var tipo = (reg[nombre] || {}).tipo;
       if (!tipo) { var l = window.Nombres && Nombres.leer(nombre, App.E.tipos); tipo = l && l.tipo; }
       if (!tipo) return;
+      vistos[nombre] = true;
       ar[tipo] = (ar[tipo] || 0) + 1;
       ultimo(tipo, nombre, reg[nombre]);
+    });
+    /* Fila 546: lo archivado vive en el índice del ARCHIVO (todos los cursos). */
+    st.indice.forEach(function (e) {
+      if (!e || !e.nombre || abiertos[e.nombre] || vistos[e.nombre]) return;
+      var l = window.Nombres && Nombres.leer(e.nombre, App.E.tipos), tipo = (l && l.tipo) || e.tipo;
+      if (!tipo) return;
+      vistos[e.nombre] = true;
+      ar[tipo] = (ar[tipo] || 0) + 1;
+      var f = e.cerradoEl || e.fecha;
+      ultimo(tipo, e.nombre, { cerradoEl: f });
     });
     return (App.E.tipos || []).map(function (t) {
       var a = ab[t.tipo] || 0, r = ar[t.tipo] || 0;
@@ -92,7 +103,7 @@ var TiposYSuUso = (function () {
   function pintar() {
     if (!$('tu-filas')) return;
     var filas = recoger();
-    if (!st.iniciado) {   /* de partida: marcados los activos sin usar */
+    if (!st.iniciado && st.leido) {   /* de partida: marcados los activos sin usar, ya leído el ARCHIVO */
       st.iniciado = true;
       filas.forEach(function (f) { if (f.uso === 0 && !f.desactivado) st.marcas[f.tipo] = true; });
     }
@@ -174,12 +185,23 @@ var TiposYSuUso = (function () {
     };
     $('tu-quitar').onclick = function () { st.marcas = {}; pintar(); };
     $('tu-desactivar').onclick = desactivar;
-    $('tu-enviar').onclick = function () { if (window.TiposYSuUsoEnviar) TiposYSuUsoEnviar.enviar(recoger(), guiaDe, mensaje); };
+    $('tu-enviar').onclick = async function () { if (!st.leido) await leerArchivo(); if (window.TiposYSuUsoEnviar) TiposYSuUsoEnviar.enviar(recoger(), guiaDe, mensaje); };
   }
 
   async function alAbrir() {
     try { if (window.GuiasDelCentro) await GuiasDelCentro.recargar(); } catch (e) { /* se sigue con las guías que hay */ }
+    await leerArchivo();
     pintar();
+  }
+
+  /* Fila 546: el índice del ARCHIVO, de todos los cursos, como App.contarAsuntosConTipo. */
+  async function leerArchivo() {
+    st.indice = [];
+    try {
+      var r = window.IndiceArchivo && await IndiceArchivo.leerDisco({ todos: true });
+      if (r && r.ok && r.datos && Array.isArray(r.datos.asuntos)) st.indice = r.datos.asuntos;
+    } catch (e) { /* sin índice usable, se cuenta lo que hay */ }
+    st.leido = true;
   }
 
   function bloque() {

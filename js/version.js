@@ -30,4 +30,4 @@
          meses=(ene feb mar abr may jun jul ago sep oct nov dic); \
          echo "$d-${meses[$((10#$m-1))]}-$y · $hm"; }
    ============================================================ */
-App.VERSION = '6-nov-2026 · 03:40';
+App.VERSION = '6-nov-2026 · 12:30';
