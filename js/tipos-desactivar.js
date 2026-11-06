@@ -75,6 +75,24 @@ window.TiposDesactivar = (function () {
     return true;
   }
 
+  /* Fila 543 (js/tipos-y-su-uso.js): apaga varios tipos de una vez y guarda
+     tipos.json UNA sola vez. Sin preguntar: quien llama ya ha enseñado la
+     lista. Si falla el guardado, todos vuelven a como estaban. true si salió. */
+  async function desactivarVarios(tipos) {
+    var a = (tipos || []).filter(function (t) { return t && !t.desactivado; });
+    if (!a.length) return false;
+    a.forEach(function (t) { t.desactivado = true; });
+    try {
+      await App.guardarTipos();
+    } catch (e) {
+      a.forEach(function (t) { delete t.desactivado; });
+      U.aviso('No he podido desactivarlos: ' + U.mensajeDeError(e), 'malo');
+      return false;
+    }
+    if (App.pintarTiposAjustes) App.pintarTiposAjustes();
+    return true;
+  }
+
   /* El botón «Desactivar» / «Activar» de la pantalla de un tipo. */
   function botonDe(tipo) {
     var b = document.createElement('button');
@@ -90,5 +108,5 @@ window.TiposDesactivar = (function () {
     return b;
   }
 
-  return { porNombre: porNombre, desactivar: desactivar, activar: activar, botonDe: botonDe, contarAbiertos: contarAbiertos };
+  return { porNombre: porNombre, desactivar: desactivar, activar: activar, desactivarVarios: desactivarVarios, botonDe: botonDe, contarAbiertos: contarAbiertos };
 })();
