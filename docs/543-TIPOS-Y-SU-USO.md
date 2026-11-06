@@ -108,3 +108,14 @@ Puntos de «Cómo lo comprueba el segundo revisor»:
 8. [SOLO FRANCISCO] envío real al buzón: no lo he podido ver.
 
 Otras diferencias con 540.html: cabecera con «Herramienta temporal de limpieza…» y resumen «17 tipos · 14 activos · 0 sin usar»; en la vista Desactivados aparece una frase suelta «3 tipos desactivados.» que 540.html no tiene; el botón «Desactivar» queda gris sin marcas, coherente.
+
+### Segundo revisor, vuelta 3 (6-nov-2026)
+
+1. Dónde: coincide (Herramientas sin pasar por Ajustes, bloque «Tipos y su uso»).
+2. Tabla: coincide (17 tipos; abiertos, archivados, último uso).
+3. Buscador y filtros: coincide en lo visto (resumen «17 tipos · 17 activos · 3 sin usar»; Desactivados pasa a 3 tras desactivar). No repasé uno a uno Todos/Sin usar/Usados esta vuelta.
+4. Ver la guía: coincide. Pulsar CERTIFICADO muestra «2 hitos · 0 tareas · 2 asuntos» con sus hitos; «Abrir en el editor de la guía» abre la pantalla de CERTIFICADO, con su nombre, «Guía (2 hitos)» y «Datos del tipo». Corregido el fallo de la vuelta 2.
+5. Desactivar: coincide. Cuadro «Dejarán de salir al crear asuntos. Sus guías y plantillas se conservan…», 3 desactivados («3 tipos desactivados.»), y en «Nuevo asunto» ya no salen. Avisos de abiertos/repetición, guías en disco y `tipos.json` escrito una vez: no lo he podido ver (disco de mentira).
+6. Activar: coincide. «Activar» en Parte de incidencia lo devuelve a «Nuevo asunto» (resumen 15 activos). El botón queda entero dentro de la tabla: a 1300 px termina en x=1195 (caja hasta 1236, sin desplazamiento); a 800 px en x=749 (caja hasta 752). A 800 px la tabla aún tiene 8 px de desplazamiento interno (480 frente a 472), no se corta el botón ni se desplaza la página.
+7. Enviar: no repasado esta vuelta (cuadro y cifras vistos en vueltas 1 y 2).
+8. [SOLO FRANCISCO] envío real al buzón: no lo he podido ver.
