@@ -732,7 +732,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '28-oct-2026 · fila 480';
+var VERSION_SCRIPT = '6-nov-2026 · fila 555';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 /* Fila 471: la app pregunta la versión sin enviar nada. Con `?k=<clave>` correcta contesta
@@ -887,6 +887,8 @@ function enviarCorreo(cuerpo) {
   var esPrueba = !!cuerpo.prueba;
   var para = esPrueba ? '' : String(cuerpo.para || '').trim();
   var cco = esPrueba ? '' : String(cuerpo.cco || '').trim();
+  /* Fila 555: «Copia» (cc). Una app vieja no lo manda: sale como hasta ahora. */
+  var cc = esPrueba ? '' : String(cuerpo.cc || '').trim();
   var asunto = String(cuerpo.asunto || '(sin asunto)');
   var texto = String(cuerpo.cuerpo || '');
 
@@ -916,13 +918,14 @@ function enviarCorreo(cuerpo) {
 
   var opciones = { attachments: attachments };
   if (cco) opciones.bcc = cco;
+  if (cc) opciones.cc = cc;
   /* Fila 411: el nombre que ve quien recibe el correo («Administración · IES Fuente Lucena»).
      Una app vieja no lo manda: se envía como hasta ahora. */
   var nombreRemitente = String(cuerpo.nombreRemitente || '').trim();
   if (nombreRemitente) opciones.name = nombreRemitente;
 
   var hiloId = String(cuerpo.hilo || '').trim();
-  var hilo = hiloId ? hiloParaResponder(hiloId, para, cco, cuerpo.matriculas) : null;
+  var hilo = hiloId ? hiloParaResponder(hiloId, para, (cc ? cc + ',' : '') + cco, cuerpo.matriculas) : null;
   /* Fila 441: el correo sale con el asunto escrito en el cuadro. Si no es el del hilo (sin «Re:»,
      mayúsculas ni espacios de más), correo nuevo con ese asunto; el hilo nuevo lo devuelve abajo. */
   if (hilo && String(cuerpo.asunto || '').trim() && !mismoAsunto(cuerpo.asunto, asuntoDelHilo(hilo))) hilo = null;
@@ -1039,6 +1042,7 @@ function mandarUnBorrador(fichero, carpeta) {
 
     var opciones = { attachments: adjuntos };
     if (encargo.cco) opciones.bcc = encargo.cco;
+    if (encargo.cc) opciones.cc = encargo.cc;
 
     var hilo = encargo.hilo ? GmailApp.getThreadById(encargo.hilo) : null;
     if (hilo) {

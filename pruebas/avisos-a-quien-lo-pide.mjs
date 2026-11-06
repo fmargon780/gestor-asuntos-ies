@@ -111,8 +111,8 @@ await comprobar('el título del cuadro es el de Correo',
   pagina.locator('#cuadro-titulo').textContent(), 'Correo de este asunto');
 await comprobar('el botón de cerrar dice "Esta vez no"',
   pagina.locator('#cuadro-aceptar').textContent(), 'Esta vez no');
-await comprobar('el correo de quien lo pide sale en "Otro correo" (sin correo de Séneca)',
-  pagina.inputValue('#correo-otro'), 'ana.pide@ejemplo.com');
+await comprobar('el correo de quien lo pide sale en «Para» (sin correo de Séneca)',
+  pagina.evaluate(() => CorreoPara.texto('para')), 'ana.pide@ejemplo.com');
 await comprobar('el cuerpo trae el título del hito',
   pagina.inputValue('#correo-cuerpo-texto').then(t => t.indexOf('Confirmar la plaza') !== -1), true);
 await comprobar('el cuerpo dice "el hito 2 de 2"',
@@ -163,7 +163,7 @@ await pagina.waitForSelector('#correo-formulario');
 await comprobar('el botón de cerrar es el normal, "Cerrar" (sin "Esta vez no")',
   pagina.locator('#cuadro-aceptar').textContent(), 'Cerrar');
 await comprobar('el correo de quien lo pide sigue saliendo',
-  pagina.inputValue('#correo-otro'), 'ana.pide@ejemplo.com');
+  pagina.evaluate(() => CorreoPara.texto('para')), 'ana.pide@ejemplo.com');
 
 /* ================= FIN ================= */
 

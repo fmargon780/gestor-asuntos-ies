@@ -120,12 +120,12 @@ await comprobar('3. el texto nombra la actividad, su fecha y su lugar, empieza p
   [cuerpo.indexOf('Visita a la Alhambra y al Albaicín') !== -1, /celebra .*\d{4} en Granada/.test(cuerpo), /^Buenas:/.test(cuerpo), /[{}]/.test(cuerpo)], [true, true, true, false]);
 await comprobar('3. el asunto del correo', pagina.inputValue('#correo-asunto').then((s) => /^Actividad extraescolar: Visita a la Alhambra y al Albaicín \(.*\d{4}\)$/.test(s)), true);
 await comprobar('3. «Para» vacío, y en la copia oculta el profesorado del centro con correo (tres)',
-  pagina.evaluate(() => [document.getElementById('correo-otro') ? document.getElementById('correo-otro').value : '', document.getElementById('correo-cco-caja').textContent]).then((r) => [r[0], /motero@correo-demo\.es/.test(r[1]), /freyes@correo-demo\.es/.test(r[1]), /puceda@correo-demo\.es/.test(r[1])]),
+  pagina.evaluate(() => [CorreoPara.texto('para'), CorreoPara.texto('oculta')]).then((r) => [r[0], /motero@correo-demo\.es/.test(r[1]), /freyes@correo-demo\.es/.test(r[1]), /puceda@correo-demo\.es/.test(r[1])]),
   ['', true, true, true]);
 await comprobar('3. el docente que ya se fue (Bonilla Cascado) y el no docente (Vidal Cano) no salen en la copia oculta',
-  pagina.evaluate(() => /mbonilla@|rvidal@/.test(document.getElementById('correo-cco-caja').textContent)), false);
+  pagina.evaluate(() => /mbonilla@|rvidal@/.test(CorreoPara.texto('oculta'))), false);
 await comprobar('3. el docente sin correo sale en una línea ámbar, con su nombre, y no hay otra línea aparte',
-  pagina.evaluate(() => { const l = document.querySelectorAll('#correo-cco-caja .aviso-ambar'); return [l.length, l[0] && l[0].textContent, document.querySelectorAll('#correo-cco-caja .aviso-en-linea').length]; }),
+  pagina.evaluate(() => { const l = document.querySelectorAll('#correo-cco-sin-correo .aviso-ambar'); return [l.length, l[0] && l[0].textContent, document.querySelectorAll('#correo-cco-sin-correo .aviso-en-linea').length]; }),
   [1, '1 docente del centro no tiene correo: Cabello Ruiz, Esperanza', 0]);
 await comprobar('3. enviar no se impide', pagina.evaluate(() => !document.getElementById('correo-enviar').disabled), true);
 await comprobar('3. no hay línea ámbar de «sin datos»', pagina.evaluate(() => /No hay datos del profesorado/.test(document.getElementById('correo-caja').textContent)), false);
@@ -149,6 +149,7 @@ await comprobar('4. la plantilla se ha creado una vez, colgada del tipo del asun
 
 /* ================= 5. ENVIAR ================= */
 console.log('--- 5. enviar ---');
+await pagina.evaluate(() => { CorreoPara.ponerDirecciones('para', ['secretaria@correo-demo.es'], 'Secretaría'); CorreoPara.repintar(); });   /* fila 555: sin nadie en «Para» no se envía */
 await pagina.click('#correo-enviar');
 await pagina.waitForSelector('#correo-resumen:not(.oculto)');
 await pagina.click('#correo-confirmar-envio');
@@ -191,7 +192,7 @@ await comprobar('6. el informe marcado es uno nuevo, sin la persona que ya no va
   Promise.all([pagina.evaluate((f) => [...document.querySelectorAll('#adjuntos-lista .correo-fila')].filter((r) => r.querySelector('.adjunto-marca').checked).map((r) => r.textContent.indexOf(f) !== -1), nuevoInforme[0]), nuevoInforme.length, textoPdf(pagina, asunto, nuevoInforme[0]).then((x) => x.indexOf('Alumnado que va: 7') !== -1)]),
   [[true], 1, true]);
 await comprobar('6. volver a avisar lleva los mismos destinatarios',
-  pagina.evaluate(() => { const t = document.getElementById('correo-cco-caja').textContent; return [/motero@/.test(t), /puceda@/.test(t), /mbonilla@|rvidal@/.test(t)]; }), [true, true, false]);
+  pagina.evaluate(() => { const t = CorreoPara.texto('oculta'); return [/motero@/.test(t), /puceda@/.test(t), /mbonilla@|rvidal@/.test(t)]; }), [true, true, false]);
 await cerrarCuadro(pagina);
 
 /* ================= 7. AJUSTES Y SIN GRUPO ================= */

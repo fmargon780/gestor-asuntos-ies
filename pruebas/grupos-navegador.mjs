@@ -202,20 +202,20 @@ await comprobar('los dos miembros del grupo quedan relacionados con el asunto', 
   return (j.asuntos[clave].relacionados || []).map(r => r.nombre).sort();
 }), ['Aguilar Ponce, Marina 1140233', 'Bermúdez Ortiz, Álvaro 1140501'].sort());
 
-console.log('--- "Añadir un grupo" en Correo mete los correos en Copia oculta ---');
+console.log('--- fila 555: un grupo con alumnado no sale en el correo ---');
 /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md). */
 /* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
 await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.waitForSelector('#correo-grupo');
-await pagina.selectOption('#correo-grupo', { label: 'Grupo de prueba' });
-await pagina.waitForTimeout(200);
-await comprobar('los dos correos del grupo entran en Copia oculta, sin repetidos',
-  pagina.locator('#correo-cco-caja .marcado-chip').allTextContents()
-    .then(ts => ts.map(t => t.replace('×', '').trim()).sort()),
-  ['tutor.alvaro@correo.es', 'tutor.marina@correo.es'].sort());
+await pagina.waitForSelector('#correo-oculta-escribir');
+await comprobar('fila 555: ya no hay «Añadir un grupo», y un grupo con alumnado no se puede poner en Copia oculta',
+  (async () => {
+    await pagina.fill('#correo-oculta-escribir', 'Grupo de prueba');
+    await pagina.waitForTimeout(200);
+    return pagina.evaluate(() => [!!document.getElementById('correo-grupo'), document.querySelectorAll('#correo-oculta .cdest-opcion').length]);
+  })(), [false, 0]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

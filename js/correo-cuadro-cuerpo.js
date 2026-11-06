@@ -9,39 +9,27 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   var I = CorreoCuadroNucleo;
   I.S = I.S || {};
   function n() { return I.n.apply(this, arguments); }
-  function correosDe() { return I.correosDe.apply(this, arguments); }
-  function contenidoCco() { return I.contenidoCco.apply(this, arguments); }
   function copiar() { return I.copiar.apply(this, arguments); }
   function plantillaInicial() { return I.plantillaInicial.apply(this, arguments); }
-  function destinoDe() { return I.destinoDe.apply(this, arguments); }
 
   function cuerpoHtml(a, persona, bloqueAdjuntos, opcionesGrupo) {
-    I.S.elegidos = {};
-    I.S.cco = {};
-    I.S.ccoSinCorreo = [];
     I.S.documentosAdjuntados = [];
     I.S.plantillaElegida = null; /* fila 271: null = sin decidir; '' = «Sin plantilla» */
+    I.S.ccoSinCorreo = [];
 
-    var correos = correosDe(persona);
-    /* Un hito con "Comunicar" (fila 60, docs/COMUNICAR-DESDE-EL-HITO.md,
-       5.1) puede proponer una dirección propia (o varias, separadas
-       por coma): gana a la de "Lo pide", y esta a la del departamento (fila 167). */
-    var correoLoPide = (n().destinatarioPreferente && n().destinatarioPreferente()) ||
-      (window.LoPide ? LoPide.correoDe(a.ficha) : '') || (window.Administraciones ? Administraciones.correoDelAsunto(a) : '');
-    /* Cuáles van marcados de partida: la regla común (fila 132). */
-    var posibles = Destinatarios.posibles(persona, correoLoPide, I.S.elegidos);
-    I.S.elegidos = posibles.elegidos;
-    var otroInicial = posibles.otro;
-    /* Fila 348: la plantilla con la que se abre dice a quién va, y «Para» lleva solo eso. */
-    I.S.destinoCtx = { persona: persona, correoLoPide: correoLoPide };
+    /* Fila 555: la plantilla con la que se abre propone Para, Copia y Copia oculta por papeles; sin plantilla, nadie. Lo que
+       pide la propia aplicación (un aviso a quien lo pidió, un hito…) entra además en «Para». */
     var plantillaDeEntrada = plantillaInicial(a);
-    var vaAInicial = plantillaDeEntrada && plantillaDeEntrada.vaA;
-    if (vaAInicial && !(n()._interno && n()._interno.tutorDelGrupo)) {
-      var d0 = destinoDe(vaAInicial);
-      I.S.elegidos = d0.elegidos; otroInicial = d0.otro;
+    if (window.CorreoPara) {
+      CorreoPara.vaciar();
+      var antes = (n()._interno || {}).restaurar;   /* el cuadro se cerró para relacionar a alguien y se vuelve a abrir */
+      if (antes) CorreoPara.restaurar(antes.dest);
+      else {
+        if (plantillaDeEntrada) CorreoPara.aplicarPapeles({ para: plantillaDeEntrada.para, copia: plantillaDeEntrada.copia, oculta: plantillaDeEntrada.oculta });
+        var preferente = (n().destinatarioPreferente && n().destinatarioPreferente()) || '';
+        if (preferente) CorreoPara.ponerDirecciones('para', String(preferente).match(Destinatarios.RE_CORREO) || []);
+      }
     }
-    /* Fila 299: al tutor o tutora del grupo no se le escribe a la familia: sin su correo, ninguna dirección marcada. */
-    if (n()._interno && n()._interno.tutorDelGrupo && !correoLoPide) Object.keys(I.S.elegidos).forEach(function (k) { I.S.elegidos[k] = false; });
 
     return '<div id="correo-formulario">' +
              '<div class="cuadro-cabecera-ruta"><span id="correo-ruta-lugar"></span></div>' +
@@ -49,7 +37,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
              '<div class="correo-grid">' +
                '<div class="correo-col-izq">' +
                  (window.CorreoTutor ? CorreoTutor.arribaHtml() : '') +   /* fila 299 */
-                 bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
+                 bloqueDestinatarios(a) +
                  bloqueAsunto(a) +
                  (bloqueAdjuntos || '') +
                  (window.CorreoAdjuntoPlantilla ? CorreoAdjuntoPlantilla.avisoHtml() : '') +   /* fila 299 */
@@ -67,6 +55,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
                '<button type="button" class="boton boton-principal" id="correo-enviar">Enviar</button>' +
                '<button type="button" class="boton" id="correo-gmail">Abrir en Gmail</button>' +
                '<button type="button" class="boton" id="correo-ordenador">Abrir en el correo del ordenador</button>' +
+               (window.CorreoRelacionar ? '<button type="button" class="boton" id="correo-relacionar">Relacionar a alguien con el asunto</button>' : '') +
              '</div>' +
              '<p class="nota">"Enviar" manda el correo de verdad, tras confirmar el resumen. ' +
              '"Abrir en Gmail" y "Abrir en el correo del ordenador" son para escribir allí, sin adjuntos.</p>' +
@@ -91,34 +80,11 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     return texto ? '<p class="nota" style="margin-top:0">' + U.escapar(texto) + '</p>' : '';
   }
 
-  function bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) {
+  function bloqueDestinatarios(a) {
     return avisoLoPideHtml(a) +
-      (window.CorreoTutorBotones && CorreoTutorBotones.cabeceraHtml('para', '', 'margin-top:0') || '<label class="etiqueta" style="margin-top:0">Para</label>') +
-      (correos.length
-        ? '<div id="correo-lista">' + correos.map(function (c) {
-            return '<label class="correo-fila">' +
-                     '<input type="checkbox" class="correo-marca" value="' + U.escapar(c.dir) + '"' +
-                       (I.S.elegidos[c.dir] ? ' checked' : '') + '>' +
-                     '<span><strong>' + U.escapar(c.dir) + '</strong>' +
-                     '<span class="suave"> · ' + U.escapar(c.titulo) + '</span></span>' +
-                   '</label>';
-          }).join('') + '</div>'
-        : '<p class="nota" style="margin-top:0">' +
-          (persona
-            ? 'En el fichero de Séneca no hay ningún correo de ' + U.escapar(n().terceroDe(a)) + '.'
-            : 'No he encontrado a ' + U.escapar(n().terceroDe(a)) + ' en los ficheros de datos.') +
-          ' Escríbelo aquí abajo.</p>') +
-      '<input id="correo-otro" class="campo" value="' + U.escapar(otroInicial || '') + '" ' +
-        'placeholder="Otro correo, si hace falta" style="margin-top:8px">' +
-      (window.CorreoTutor ? CorreoTutor.debajoDeOtroHtml() : '') +   /* fila 299 */
-      (window.CorreoTutorBotones ? CorreoTutorBotones.avisosHtml() : '') +   /* fila 348 */
-
-      (opcionesGrupo
-        ? '<label class="etiqueta">Añadir un grupo</label>' +
-          '<select id="correo-grupo" class="campo"><option value="">Elige…</option>' +
-            opcionesGrupo + '</select>'
-        : '') +
-      '<div id="correo-cco-caja">' + contenidoCco() + '</div>';
+      (window.CorreoPara ? CorreoPara.html() : '') +
+      (window.CorreoTutorBotones ? CorreoTutorBotones.avisosHtml() : '') +   /* fila 348, fila 434 */
+      '<div id="correo-cco-sin-correo"></div>';
   }
 
   /* El asunto del mensaje, siempre el nombre de la carpeta (fila 55,

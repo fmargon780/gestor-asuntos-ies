@@ -152,17 +152,25 @@ var GuiasGuion = (function () {
       '<button type="button" class="boton boton-chico guion-pedir-anadir">+ Añadir campo</button></div>';
   }
 
+  function aQuienVaHTML(idPlantilla) {
+    var p = idPlantilla && window.Plantillas && Plantillas.porId ? Plantillas.porId(idPlantilla) : null;
+    var t = p && window.PlantillaPapeles ? PlantillaPapeles.resumenDe(p) : '';
+    return '<span class="guion-a-quien-va"><span class="etiqueta">A quién va (lo dice la plantilla)</span> <span class="guion-a-quien-texto">' +
+      U.escapar(t || (idPlantilla ? 'Nadie propuesto: se elige al enviar' : 'Elige una plantilla')) + '</span></span>';
+  }
+
   function recetaHTML(g, dentro) {
     var r = g.receta || {};
     var titulo = dentro ? '<span class="guion-receta-titulo">Detalles:</span>' : '';
     if (g.accion === 'comunicar') {
-      return '<div class="guion-fila-linea guion-receta">' + titulo +
-        conRotulo('A quién', '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>', dentro) +
+      return '<div class="guion-fila-linea guion-receta"' + (r.a ? ' data-a="' + U.escapar(r.a) + '"' : '') + '>' + titulo +   /* fila 555: el «a quién» antiguo se conserva, aunque ya no manda */
         conRotulo('Por dónde', '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>', dentro) +
         conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>', dentro) +
         /* Fila 465, C1: «Ver y cambiar el texto» solo con una plantilla elegida (js/guias-plantilla.js). */
         (window.GuiasPlantilla ? GuiasPlantilla.botonHTML(!r.plantilla) : '') +
-        marcaFueraDeUso(g) + '</div>';
+        marcaFueraDeUso(g) +
+        /* Fila 555: a quién va lo dice la plantilla, con sus papeles por campo. */
+        aQuienVaHTML(r.plantilla) + '</div>';
     }
     if (g.accion === 'generar') {
       return '<div class="guion-fila-linea guion-receta">' + titulo +

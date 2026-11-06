@@ -178,7 +178,7 @@ await comprobar('el resumen del bloque pasa a "Conectado"',
 await abrirCorreoDe(CON_HILO);
 await comprobar('con conexión, el botón dice "Enviar"', pagina.locator('#correo-enviar').textContent(), 'Enviar');
 
-await pagina.fill('#correo-otro', 'proveedor@correo.es');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'proveedor@correo.es');
 await pagina.fill('#correo-cuerpo-texto', 'Le adjunto los documentos del contrato.\nUn saludo.');
 await pagina.check('.adjunto-marca >> nth=0');
 await pagina.check('.adjunto-marca >> nth=1');
@@ -199,7 +199,7 @@ await comprobarQue('el resumen dice el tamaño de cada documento',
 await pagina.click('#correo-resumen-volver');
 await pagina.waitForSelector('#correo-formulario:not(.oculto)');
 await comprobar('"Volver" conserva el correo escrito a mano',
-  pagina.locator('#correo-otro').inputValue(), 'proveedor@correo.es');
+  pagina.evaluate(() => CorreoPara.texto('para')), 'proveedor@correo.es');
 await comprobar('"Volver" conserva el cuerpo escrito a mano',
   pagina.locator('#correo-cuerpo-texto').inputValue(), 'Le adjunto los documentos del contrato.\nUn saludo.');
 await comprobar('"Volver" conserva los documentos marcados',
@@ -238,7 +238,7 @@ await cerrarCuadro();
    ======================================================== */
 llamadas = [];
 await abrirCorreoDe(GRANDE);
-await pagina.fill('#correo-otro', 'proveedor@correo.es');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'proveedor@correo.es');
 await pagina.check('.adjunto-marca >> nth=0');
 await pagina.click('#correo-enviar');
 await pagina.waitForSelector('.mensaje.malo:has-text("20 MB")');
@@ -253,7 +253,7 @@ await cerrarCuadro();
 llamadas = [];
 proximaRespuesta = { ok: false, motivo: 'La cuenta no ha podido mandarlo.' };
 await abrirCorreoDe(SIN_HILO);
-await pagina.fill('#correo-otro', 'compras@correo.es');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'compras@correo.es');
 await pagina.check('.adjunto-marca >> nth=0');
 await pagina.click('#correo-enviar');
 await pagina.waitForSelector('#correo-resumen:not(.oculto)');
@@ -266,7 +266,7 @@ await comprobarQue('"Confirmar y enviar" se puede volver a pulsar',
   pagina.evaluate(() => !document.getElementById('correo-confirmar-envio').disabled));
 await pagina.click('#correo-resumen-volver');
 await comprobar('el correo escrito a mano sigue ahí, listo para reintentar',
-  pagina.locator('#correo-otro').inputValue(), 'compras@correo.es');
+  pagina.evaluate(() => CorreoPara.texto('para')), 'compras@correo.es');
 await comprobar('nada se ha apuntado en las notas', notasDe(SIN_HILO).then(ns => ns.length), 0);
 await cerrarCuadro();
 

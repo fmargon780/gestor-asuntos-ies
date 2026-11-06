@@ -54,6 +54,12 @@
     return 'el tercero';
   }
 
+  /* Fila 555: a quién se comunicó = quien va en «Para» del cuadro; si no hay cuadro de Correo, lo que dijo el hito. */
+  function nombreDelDestinatario() {
+    var puestos = !I.porSeneca && window.CorreoPara ? CorreoPara.nombres('para') : [];
+    return puestos.length ? puestos.join(', ') : ((I.comunicarHitoActual && I.comunicarHitoActual.nombreDestinatario) || '');
+  }
+
   function textoDeLaNota() {
     if (I.comunicarHitoActual) {
       /* La constancia en el historial del hito incluye los documentos
@@ -65,10 +71,10 @@
          Correo (fila 115), la nota dice "enviado", igual que fuera de
          un hito. */
       if (!I.porSeneca && I.envioRealizado) {
-        return 'Correo enviado a ' + (I.comunicarHitoActual.nombreDestinatario || 'el tercero') +
+        return 'Correo enviado a ' + (nombreDelDestinatario() || 'el tercero') +
           sufijoDocumentos(documentosDelHito);
       }
-      return textoDeComunicarHito(I.comunicarHitoActual.nombreDestinatario, I.porSeneca) + sufijoDocumentos(documentosDelHito);
+      return textoDeComunicarHito(nombreDelDestinatario(), I.porSeneca) + sufijoDocumentos(documentosDelHito);
     }
 
     /* Un envío real (fila 115): "Correo enviado a X · con N documentos: …". */

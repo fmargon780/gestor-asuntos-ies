@@ -126,7 +126,7 @@ var InformarAlTutor = (function () {
       if (hay) { id = hay.id; return actual; }
       id = Plantillas.idNuevo();
       actual.lista.push({ id: id, tipo: tipo.tipo, categoria: tipo.categoria || 'ALUMNADO', nombre: NOMBRE_PLANTILLA,
-        texto: TEXTO_PLANTILLA, adjuntar: tipoDocumentoNotificacion() });
+        texto: TEXTO_PLANTILLA, adjuntar: tipoDocumentoNotificacion(), para: ['tutor'], saludo: 'Buenas:', migradaA555: true });   /* fila 555 */
       return actual;
     });
     return id;

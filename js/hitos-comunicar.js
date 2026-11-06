@@ -160,6 +160,7 @@
     var mensaje = c && c[canal];
     var destinatario = await resolverDestinatario(a, hito);
     if (opciones && opciones.correos && opciones.correos.length) destinatario.correoPreferente = opciones.correos.join(', ');
+    else destinatario.correoPreferente = '';   /* fila 555: a quién va lo dice la plantilla (sus papeles), no el responsable del hito */
     if (opciones && opciones.nombres && opciones.nombres.length) destinatario.nombre = opciones.nombres.join(', ');
 
     var extra = {

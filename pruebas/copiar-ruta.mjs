@@ -268,7 +268,7 @@ await comprobarQue('el botón «Ruta» sale en la cabecera del cuadro de Correo 
 
 /* Escribir algo a mano en "Otro correo" y en el cuerpo, para comprobar
    que pedir la ruta en línea no lo pierde. */
-await pagina.fill('#correo-otro', 'alguien@example.com');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'alguien@example.com');
 await pagina.evaluate(() => { const c = document.getElementById('correo-cuerpo-texto'); c.value = c.value + ' PRUEBA A MANO'; });
 await pagina.click('#correo-ruta-lugar .boton-copiar-fila');
 await pagina.waitForSelector('#correo-ruta-en-linea:not(.oculto) input');
@@ -288,7 +288,7 @@ await pagina.waitForFunction(() => document.getElementById('correo-ruta-en-linea
 await comprobar('guarda la parte de este ordenador',
   pagina.evaluate(() => localStorage.getItem('gestor-ruta-nube')), '/home/francisco/Dropbox');
 await comprobarQue('y no se pierde el "Otro correo" escrito a mano',
-  pagina.evaluate(() => document.getElementById('correo-otro').value === 'alguien@example.com'));
+  pagina.evaluate(() => CorreoPara.texto('para') === 'alguien@example.com'));
 await comprobarQue('ni lo escrito a mano en el cuerpo',
   pagina.evaluate(() => document.getElementById('correo-cuerpo-texto').value.indexOf('PRUEBA A MANO') > -1));
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());

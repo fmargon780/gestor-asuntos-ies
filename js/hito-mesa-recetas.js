@@ -47,32 +47,12 @@ var HitoMesaRecetas = (function () {
 
   /* ---------- comunicar ---------- */
 
-  /* Los destinatarios de la receta, de entre los de siempre de la mesa
-     (js/hito-mesa-comunicar.js). Sin «a quién», los premarcados de
-     siempre; «el tutor o tutora del grupo» (fila 299, js/tutor-del-grupo.js)
-     son las casillas «tutoria0»…; «otro» no se sabe: el cuadro sale sin
-     correo, para escribirlo. */
-  function elegidosPara(receta, h, lista) {
-    var a = (receta && receta.a) || '';
-    if (a === 'tercero') return lista.filter(function (c) { return c.id === 'tercero'; });
-    if (a === 'tutores') return lista.filter(function (c) { return /^tutor\d/.test(c.id); });
-    if (a === 'relacionados') return lista.filter(function (c) { return /^rel/.test(c.id); });
-    if (a === 'tutoria') return lista.filter(function (c) { return c.tutorDelGrupo; });
-    if (a === 'otro') return [];
-    var ids = window.HitoMesaComunicar ? HitoMesaComunicar.premarcados(h, lista) : ['tercero'];
-    return lista.filter(function (c) { return ids.indexOf(c.id) !== -1; });
-  }
-
   /* Lo que el cuadro de Correo o de Séneca necesita de una tarea de comunicar (fila 299: una sola regla para la mesa y para
-     «Hacer este hito»): quién (nombres, correos), con qué plantilla y, si es a la tutoría, el aviso para el cuadro. */
+     «Hacer este hito»): cuál es la tarea y con qué plantilla. Fila 555: a quién va lo dice la plantilla (sus papeles), no la tarea. */
   async function opcionesDePaso(a, h, g, lista, via) {
     var receta = g.receta || {};
-    var sel = elegidosPara(receta, h, lista || []);
-    var op = { idPasoGuion: g.id, nombres: sel.map(function (c) { return c.soloNombre || c.nombre; }) };
-    if (receta.a === 'tutoria' && !sel.length) op.nombres = ['la tutoría'];
-    if (receta.a === 'tutoria' || (sel.length && sel.every(function (c) { return c.tutorDelGrupo; }))) op.tutoria = true;
+    var op = { idPasoGuion: g.id };
     if (receta.plantilla) op.plantilla = receta.plantilla;
-    if (via === 'correo' && window.HitoMesaComunicar) op.correos = await HitoMesaComunicar.correosDe(sel);
     return op;
   }
 
@@ -98,7 +78,7 @@ var HitoMesaRecetas = (function () {
     if (fuera) { Plantillas.avisoFueraDeUso(fuera); return; }
     var via = canalDe(a, h, g);
     var op = await opcionesDePaso(a, h, g, lista, via);
-    if (via === 'correo' && window.HitoMesaComunicar) {
+    if (via === 'correo') {
       var marcados = window.HitoMesaDocumentos && HitoMesaDocumentos.marcados ? HitoMesaDocumentos.marcados(document) : [];
       if (marcados.length) op.adjuntos = marcados;
     }
@@ -147,8 +127,7 @@ var HitoMesaRecetas = (function () {
   /* Lo mismo que elegir esa tarea en el menú de la cabecera. */
   async function lanzarTarea(a, h, g, fila, boton) {
     if (g.accion === 'generar') return generarPaso(a, h, g, fila, boton);
-    var lista = window.HitoMesaComunicar ? await HitoMesaComunicar.candidatos(a, h) : [];
-    return comunicarPaso(a, h, g, lista);
+    return comunicarPaso(a, h, g, []);
   }
 
   /* `extra`: { lista } (los candidatos de Comunicar) o { fila } (la mesa). */
@@ -166,6 +145,6 @@ var HitoMesaRecetas = (function () {
     });
   }
 
-  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, elegidosPara: elegidosPara, botonDeTareaHTML: botonDeTareaHTML, lanzarTarea: lanzarTarea, opcionesDePaso: opcionesDePaso };
+  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, botonDeTareaHTML: botonDeTareaHTML, lanzarTarea: lanzarTarea, opcionesDePaso: opcionesDePaso };
 })();
 window.HitoMesaRecetas = HitoMesaRecetas;

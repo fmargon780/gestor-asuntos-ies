@@ -1,21 +1,16 @@
 /* ============================================================
-   correo-tutor-botones.js — «+ Tutor/a de 1º ESO G» en el cuadro de Correo
-   (15-oct-2026, fila 348, docs/CORREO-AL-TUTOR-DEL-GRUPO.md, apartados 1 a 3).
+   correo-tutor-botones.js — «Falta el correo de …» del tutor o tutora del grupo en el cuadro de Correo
+   (15-oct-2026, fila 348, docs/CORREO-AL-TUTOR-DEL-GRUPO.md; fila 434).
 
-   Si el tercero del asunto es alumnado matriculado este curso (o el asunto es de un grupo con alumnado matriculado),
-   junto a «Para» y a «Copia oculta» sale un botón pequeño que añade el correo del tutor o tutora de su unidad a ese
-   campo, sin quitar lo que hubiera y sin repetir una dirección. Con alumnado de varias unidades, un solo botón por campo:
-   «+ Tutores (3 grupos)». Si a alguna unidad le falta el correo, el botón añade los que hay y debajo sale un aviso en ámbar
-   por cada tutor sin correo, con una casilla y «Guardar» para escribirlo allí mismo (fila 434); si no hay ninguno, el
-   botón sale apagado. Quién es el tutor lo decide js/tutor-del-grupo.js (`paraElCuadro`, la tabla TUTORIAS de la fila 299);
-   el cuadro (js/correo-cuadro.js) pinta lo de aquí y le pasa `anadirCco`. El cuadro de Séneca no lleva nada de esto.
+   Desde la fila 555 (docs/555-A-QUIEN-VA-CADA-CORREO.md) ya no hay botones «+ Tutor/a de …»: el tutor o tutora se busca
+   escribiendo en Para, Copia o Copia oculta (js/correo-para.js). Queda aquí el aviso en ámbar por cada tutor sin correo, con
+   su casilla y «Guardar» para escribirlo allí mismo (fila 434): al guardarlo ya se puede elegir y se pone en «Para». Quién es el
+   tutor lo decide js/tutor-del-grupo.js (`paraElCuadro`, la tabla TUTORIAS de la fila 299).
    ============================================================ */
 var CorreoTutorBotones = (function () {
 
   function $(id) { return document.getElementById(id); }
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
-
-  var ZONAS = { para: 'Para', cco: 'Copia oculta' };
 
   function datos() {
     var d = window.CorreoNucleo && CorreoNucleo._interno && CorreoNucleo._interno.tutoresDelAlumno;
@@ -24,26 +19,6 @@ var CorreoTutorBotones = (function () {
 
   /* Los correos de los tutores, sin repetir. */
   function correos() { var d = datos(); return d ? d.correos.slice() : []; }
-
-  function textoDelBoton(d) {
-    return d.unidades.length === 1 ? '+ Tutor/a de ' + d.unidades[0].unidad : '+ Tutores (' + d.unidades.length + ' grupos)';
-  }
-
-  /* El botón de un campo ('para' o 'cco'), o ''. */
-  function botonHtml(zona) {
-    var d = datos();
-    if (!d) return '';
-    var sin = !d.correos.length;
-    return '<button type="button" class="boton boton-chico correo-tutor-anadir" data-zona="' + zona + '"' +
-      (sin ? ' disabled data-motivo-clave="sin-correo-de-tutores"' : '') + '>' + esc(textoDelBoton(d)) + '</button>';
-  }
-
-  /* Un renglón: el nombre del campo y, a su lado, el botón. */
-  function cabeceraHtml(zona, rotuloExtra, estilo) {
-    var boton = botonHtml(zona);
-    if (!boton) return '';
-    return '<div class="correo-campo-cabecera"><label class="etiqueta"' + (estilo ? ' style="' + estilo + '"' : '') + '>' + ZONAS[zona] + (rotuloExtra || '') + '</label>' + boton + '</div>';
-  }
 
   /* Debajo de los campos: una línea ámbar por cada tutor al que le falta el correo, con su casilla para escribirlo y «Guardar»
      (fila 434, docs/ARREGLOS-DEL-HITO-EN-TRABAJO.md, punto 2). Sin tutor en la tabla, solo el aviso; sin clave, tampoco se puede guardar. */
@@ -85,7 +60,7 @@ var CorreoTutorBotones = (function () {
     } catch (e) { U.fallo('No he podido guardar el correo', e); return false; }
     aplicarCorreo(d, clave, correo);
     if (window.CorreoTutor && CorreoTutor.apuntarAMano) CorreoTutor.apuntarAMano(clave, correo);
-    anadirAPara([correo]);
+    if (window.CorreoPara) { CorreoPara.actualizarCorreo('tutor:' + clave, correo); CorreoPara.repintar(); }
     repintar();
     return true;
   }
@@ -99,8 +74,6 @@ var CorreoTutorBotones = (function () {
     if (nuevo.firstChild) caja.replaceWith(nuevo.firstChild); else caja.remove();
     var cajaNueva = $('correo-tutor-faltas');
     if (cajaNueva) engancharAvisos(cajaNueva);
-    /* Los botones «+ Tutor/a de…» (apagados si no había ningún correo) se vuelven a pintar. */
-    Array.prototype.forEach.call(document.querySelectorAll('.correo-tutor-anadir'), function (b) { if (d && d.correos.length) { b.disabled = false; b.removeAttribute('data-ayuda'); } });
   }
 
   function engancharAvisos(caja) {
@@ -111,33 +84,12 @@ var CorreoTutorBotones = (function () {
     });
   }
 
-  /* Añade las direcciones al campo «Para» (en «Otro correo»), sin repetir ninguna de las que ya van. */
-  function anadirAPara(dirs) {
-    var otro = $('correo-otro');
-    if (!otro) return 0;
-    var yaVan = {};
-    Array.prototype.forEach.call(document.querySelectorAll('.correo-marca'), function (c) { if (c.checked) yaVan[c.value.toLowerCase()] = true; });
-    otro.value.split(/[,;]/).forEach(function (x) { if (x.trim()) yaVan[x.trim().toLowerCase()] = true; });
-    var nuevas = dirs.filter(function (d) { return !yaVan[d.toLowerCase()]; });
-    if (nuevas.length) otro.value = (otro.value.trim() ? otro.value.trim().replace(/[,;]\s*$/, '') + ', ' : '') + nuevas.join(', ');
-    return nuevas.length;
-  }
-
-  /* Engancha los botones que haya en el cuadro. `cb.anadirCco(dirs)`: lo pone el cuadro (la copia oculta es suya). */
-  function enganchar(cb) {
-    var caja = $('correo-caja');
-    if (!caja) return;
-    Array.prototype.forEach.call(caja.querySelectorAll('.correo-tutor-anadir'), function (b) {
-      b.onclick = function () {
-        var dirs = correos();
-        if (!dirs.length) return;
-        if (b.getAttribute('data-zona') === 'cco') cb.anadirCco(dirs); else anadirAPara(dirs);
-      };
-    });
+  /* Engancha los avisos que haya en el cuadro. */
+  function enganchar() {
     var faltas = $('correo-tutor-faltas');
     if (faltas) engancharAvisos(faltas);
   }
 
-  return { botonHtml: botonHtml, cabeceraHtml: cabeceraHtml, avisosHtml: avisosHtml, enganchar: enganchar, correos: correos, anadirAPara: anadirAPara, aplicarCorreo: aplicarCorreo };
+  return { avisosHtml: avisosHtml, enganchar: enganchar, correos: correos, aplicarCorreo: aplicarCorreo };
 })();
 window.CorreoTutorBotones = CorreoTutorBotones;

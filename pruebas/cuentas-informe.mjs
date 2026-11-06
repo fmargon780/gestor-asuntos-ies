@@ -100,7 +100,7 @@ await pagina.click('#btn-informe-direccion');
 await pagina.waitForSelector('#correo-formulario');
 
 await comprobar('sin destinatario de partida',
-  pagina.inputValue('#correo-otro'), '');
+  pagina.evaluate(() => CorreoPara.texto('para')), '');
 await comprobar('el asunto es "Informe de asuntos · <fecha>"',
   pagina.inputValue('#correo-asunto').then(t => t.indexOf('Informe de asuntos · ') === 0), true);
 
@@ -111,7 +111,7 @@ await comprobar('2. con el asunto vencido', cuerpo.indexOf('Uno Reves') !== -1, 
 await comprobar('3. esperando a otros', cuerpo.indexOf('Esperando a otros') !== -1, true);
 await comprobar('4. cerrados desde el último informe', cuerpo.indexOf('Cerrados desde el') !== -1, true);
 
-await pagina.fill('#correo-otro', 'direccion@ejemplo.com');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'direccion@ejemplo.com');
 await pagina.click('#correo-enviar');
 await pagina.waitForSelector('#correo-resumen:not(.oculto)');
 await pagina.click('#correo-confirmar-envio');

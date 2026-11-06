@@ -166,14 +166,14 @@ await comprobarQue('5. el correo sigue con el texto de siempre, no el de Séneca
   pagina.locator('#correo-cuerpo-texto').inputValue().then((v) => v.indexOf('de nuevo') !== -1 && v.indexOf('Solo para Séneca') === -1));
 await comprobarQue('5. con plantilla ya creada, «Editar plantilla» también en el cuadro de Correo',
   pagina.evaluate(() => !!document.getElementById('correo-plantilla-editar')));
-await pagina.fill('#correo-otro', 'alguien@example.com');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'alguien@example.com');
 await pagina.fill('#correo-asunto', 'Un asunto de prueba para no perderlo');
 await pagina.click('#correo-plantilla-editar');
 await pagina.waitForSelector('#correo-plantilla-editor:not(.oculto) #pl2-nombre');
 await pagina.click('#pl2-cancelar');
 await pagina.waitForSelector('#correo-formulario:not(.oculto)');
 await comprobar('5. «Para» sigue como se dejó',
-  pagina.locator('#correo-otro').inputValue(), 'alguien@example.com');
+  pagina.evaluate(() => CorreoPara.texto('para')), 'alguien@example.com');
 await comprobar('5. el asunto sigue como se dejó',
   pagina.locator('#correo-asunto').inputValue(), 'Un asunto de prueba para no perderlo');
 

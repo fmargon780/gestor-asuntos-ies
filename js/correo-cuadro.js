@@ -37,6 +37,7 @@ var CorreoCuadro = (function () {
   function $() { return I.$.apply(this, arguments); }
   function n() { return I.n.apply(this, arguments); }
   function paraDelCuadro() { return I.paraDelCuadro.apply(this, arguments); }
+  function ccDelCuadro() { return I.ccDelCuadro.apply(this, arguments); }
   function ccoDelCuadro() { return I.ccoDelCuadro.apply(this, arguments); }
   function cuerpoHtml() { return I.cuerpoHtml.apply(this, arguments); }
   function enganchar() { return I.enganchar.apply(this, arguments); }
@@ -60,8 +61,11 @@ var CorreoCuadro = (function () {
 
   async function alPulsarEnviar(a) {
     var para = paraDelCuadro();
+    var ccTexto = ccDelCuadro();
     var ccoTexto = ccoDelCuadro();
-    if (!para && !ccoTexto) { U.aviso('Elige a quién se lo mandas.', 'malo'); return; }
+    if (!para && !ccTexto && !ccoTexto) { U.aviso('Elige a quién se lo mandas.', 'malo'); return; }
+    /* Fila 555: sin nadie en «Para» no se envía (en un asunto de grupo, la Secretaría, por ejemplo). */
+    if (!para) { U.aviso('Pon a alguien en «Para» para poder enviarlo (en un grupo, por ejemplo, la Secretaría).', 'malo'); return; }
 
     var marcadas = marcasDeAdjuntos();
     var totalBytes = (window.CorreoAdjuntos && CorreoAdjuntos.totalBytesDe) ? CorreoAdjuntos.totalBytesDe(marcadas) : 0;
@@ -77,6 +81,7 @@ var CorreoCuadro = (function () {
 
     pintarResumen(a, {
       para: para,
+      cc: ccTexto,
       cco: ccoTexto,
       asunto: $('correo-asunto') ? $('correo-asunto').value : '',
       cuerpo: $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '',
@@ -90,6 +95,7 @@ var CorreoCuadro = (function () {
      son hermanos: se alterna cuál se ve, así que "Volver" no pierde
      nada de lo escrito a mano, sin tener que volver a montar nada. */
   function pintarResumen(a, datos) {
+    datos.cc = datos.cc || '';
     var formulario = $('correo-formulario');
     var resumen = $('correo-resumen');
     if (!formulario || !resumen) return;
@@ -103,9 +109,13 @@ var CorreoCuadro = (function () {
     resumen.innerHTML =
       '<h3 style="margin-top:0">Vas a mandar este correo</h3>' +
       '<p><strong>Para:</strong> ' +
-        (datos.para ? U.escapar(datos.para) : '<span class="suave">(nadie en Para; va en copia oculta)</span>') +
+        (datos.para ? U.escapar(datos.para) : '<span class="suave">(nadie en Para)</span>') +
       '</p>' +
+      (datos.cc ? '<p><strong>Copia:</strong> ' + U.escapar(datos.cc) + '</p>' : '') +
       (datos.cco ? '<p><strong>Copia oculta:</strong> ' + U.escapar(datos.cco) + '</p>' : '') +
+      /* Fila 555: un script anterior a la fila 555 no conoce «Copia»: esa gente no recibiría el correo. */
+      (datos.cc && window.CorreoEnviar && CorreoEnviar.scriptDesactualizado && CorreoEnviar.scriptDesactualizado()
+        ? '<p class="aviso aviso-ambar" id="correo-copia-script">El envío de correo está anticuado y no sabe mandar «Copia»: quien va en Copia no lo recibiría. Actualiza el script en Ajustes → Enviar correo antes de enviar.</p>' : '') +
       '<p><strong>Asunto:</strong> ' + U.escapar(datos.asunto) + '</p>' +
       '<p class="nota" style="white-space:pre-wrap">' + U.escapar(primerasLineas(datos.cuerpo)) + '</p>' +
       (datos.adjuntos.length
@@ -156,6 +166,7 @@ var CorreoCuadro = (function () {
 
       var respuesta = await CorreoEnviar.enviar({
         para: datos.para,
+        cc: datos.cc || '',
         cco: datos.cco,
         asunto: datos.asunto,
         cuerpo: datos.cuerpo,
@@ -227,7 +238,8 @@ var CorreoCuadro = (function () {
     enganchar: enganchar,
     pintarResumen: pintarResumen,   /* fila 524: la prueba pinta el resumen */
     paraDelCuadro: paraDelCuadro,
-    ccoDirecciones: function () { return Object.keys(I.S.cco); },
+    ccoDirecciones: function () { return window.CorreoPara ? CorreoPara.direcciones('oculta') : []; },
+    ccDirecciones: function () { return window.CorreoPara ? CorreoPara.direcciones('copia') : []; },
     documentosAdjuntados: function () { return I.S.documentosAdjuntados; }
   };
 })();

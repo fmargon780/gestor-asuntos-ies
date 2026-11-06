@@ -25,7 +25,6 @@ var HacerEsteHito = (function () {
   var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar'];
   var activos = {};   /* «asunto|hito» -> true, mientras la cadena corre */
 
-  var PARA_QUIEN = { tercero: 'al tercero', tutores: 'a la familia', relacionados: 'a los relacionados', tutoria: 'al tutor o tutora del grupo', otro: 'a otra persona' };
 
   function clave(a, h) { return a.nombre + '|' + h.id; }
   function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1; }
@@ -104,7 +103,7 @@ var HacerEsteHito = (function () {
       if (g.accion === 'firmar') return 'espera la firma';
       if (g.accion === 'registrar') return 'espera el registro en Séneca';
       var r = g.receta || {};
-      return (r.via === 'seneca' ? 'mensaje por Séneca' : 'correo') + (PARA_QUIEN[r.a] ? ' ' + PARA_QUIEN[r.a] : '');
+      return (r.via === 'seneca' ? 'mensaje por Séneca' : 'correo');
     });
     return '<div class="mesa-hacer-linea">' + U.escapar(partes.filter(Boolean).join(' → ')) + '</div>';
   }
@@ -190,8 +189,7 @@ var HacerEsteHito = (function () {
     if (fuera) { Plantillas.avisoFueraDeUso(fuera); return { sigue: false }; }
     var canales = HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
     var via = receta.via || canales[0] || 'correo';
-    var lista = await HitoMesaComunicar.candidatos(a, h);
-    var op = await HitoMesaRecetas.opcionesDePaso(a, h, g, lista, via);   /* fila 299: la misma regla que la mesa */
+    var op = await HitoMesaRecetas.opcionesDePaso(a, h, g, [], via);   /* fila 299: la misma regla que la mesa */
     op.cerrarTexto = 'Todavía no';
     if (via === 'correo') {
       if (documento) op.adjuntos = [documento];

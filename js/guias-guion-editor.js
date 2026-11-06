@@ -40,7 +40,7 @@
     }
     var r = g.receta || {};
     if (g.accion === 'comunicar') {
-      return ['Comunicar', r.a ? textoDe(A_QUIEN, r.a) : '', r.via ? textoDe(VIAS, r.via).toLowerCase() : ''].filter(Boolean).join(' · ');
+      return ['Comunicar', r.via ? textoDe(VIAS, r.via).toLowerCase() : ''].filter(Boolean).join(' · ');
     }
     if (g.accion === 'generar') return 'Generar un documento';
     if (g.accion === 'firmar') return 'Firmar un documento' + (GG.firmasNecesarias(g) > 1 ? ' · ' + GG.firmasNecesarias(g) + ' firmas' : '');
@@ -176,6 +176,7 @@
       var leida = {};
       [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
         .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
+      if (receta.dataset.a && leida.a === undefined) leida.a = receta.dataset.a;   /* fila 555 */
       if (receta.classList.contains('guion-receta-copiar') && window.TareaCopiarEditor) Object.assign(leida, TareaCopiarEditor.leerGuia(receta));   /* fila 552 */
       if (receta.dataset.campos) { try { leida.campos = JSON.parse(receta.dataset.campos); } catch (e) { /* sin campos */ } }   /* fila 530 */
       var limpia = normalizarReceta(base.accion, leida);

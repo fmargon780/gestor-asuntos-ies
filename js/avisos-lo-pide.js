@@ -56,10 +56,10 @@
     if (porNombre(datos, NOMBRE_AVANCE) && porNombre(datos, NOMBRE_CIERRE)) return datos;
     return Plantillas.guardar(gestor, function (actual) {
       if (!porNombre(actual, NOMBRE_AVANCE)) {
-        actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: NOMBRE_AVANCE, texto: TEXTO_AVANCE });
+        actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: NOMBRE_AVANCE, texto: TEXTO_AVANCE, para: ['pide'], migradaA555: true });   /* fila 555 */
       }
       if (!porNombre(actual, NOMBRE_CIERRE)) {
-        actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: NOMBRE_CIERRE, texto: TEXTO_CIERRE });
+        actual.lista.push({ id: Plantillas.idNuevo(), tipo: '', categoria: '', nombre: NOMBRE_CIERRE, texto: TEXTO_CIERRE, para: ['pide'], migradaA555: true });   /* fila 555 */
       }
       return actual;
     });

@@ -158,11 +158,11 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
 
   /* 5. */
   await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-  await pagina.waitForSelector('.hito-en-mesa .mesa-panel-comunicar .mesa-chip');
-  await comprobar('5. «Comunicar ▾» enseña los chips y «Preparar correo»',
+  await pagina.waitForSelector('.hito-en-mesa .mesa-panel-comunicar .mesa-preparar-correo');
+  await comprobar('5. «Comunicar ▾» ya no enseña chips (fila 555) y sí «Preparar correo»',
     pagina.evaluate(() => {
       const p = document.querySelector('.hito-en-mesa .mesa-panel-comunicar');
-      return [!!p.offsetParent, p.querySelectorAll('.mesa-chip').length > 0, !!(p.querySelector('.mesa-preparar-correo') || {}).offsetParent];
+      return [!!p.offsetParent, p.querySelectorAll('.mesa-chip').length === 0, !!(p.querySelector('.mesa-preparar-correo') || {}).offsetParent];
     }), [true, true, true]);
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(200);

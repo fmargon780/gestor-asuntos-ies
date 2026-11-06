@@ -52,7 +52,7 @@ await comprobar('2. se guarda al momento, sin enviar', pagina.evaluate(async () 
   return Object.keys(t).map((k) => [k, t[k].correo, t[k].nombre]);
 }), [['77889900', 'esperanza@correo-demo.es', 'Cabello Ruiz, Esperanza']]);
 await comprobar('2. el tutor queda como destinatario, el aviso desaparece y el cuadro sigue abierto', pagina.evaluate(() => ({
-  para: document.getElementById('correo-otro').value, avisos: document.querySelectorAll('.correo-tutor-falta').length,
+  para: CorreoPara.texto('para'), avisos: document.querySelectorAll('.correo-tutor-falta').length,
   abierto: !document.getElementById('capa').classList.contains('oculto') && !!document.getElementById('correo-formulario') })),
   { para: 'esperanza@correo-demo.es', avisos: 0, abierto: true });
 await pagina.click('#cuadro-aceptar');

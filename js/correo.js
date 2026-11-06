@@ -176,12 +176,34 @@
     return 'Buenos días:';
   }
 
+  function plantillaPorId(idPlantilla) {
+    return idPlantilla && plantillasDatos ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0] || null : null;
+  }
+
+  /* Fila 555: la plantilla de correo puede traer su propio saludo y su propia firma (con campos variables). Vacíos: los de siempre.
+     Los mensajes de Séneca no cambian. Devuelven { texto, faltan }. */
+  function saludoEfectivo(a, idPlantilla, paraSeneca) {
+    var p = plantillaPorId(idPlantilla);
+    if (!paraSeneca && p && String(p.saludo || '').trim() && !saludoPedido) {
+      var r = Plantillas.rellenar(p.saludo.trim(), valoresActuales || {});
+      return { texto: r.texto, faltan: r.faltan };
+    }
+    return { texto: saludoDe(a), faltan: [] };
+  }
+
+  function firmaEfectiva(idPlantilla, paraSeneca) {
+    var p = plantillaPorId(idPlantilla);
+    if (!paraSeneca && p && String(p.firma || '').trim()) {
+      var r = Plantillas.rellenar(p.firma, valoresActuales || {});
+      return { texto: r.texto, faltan: r.faltan };
+    }
+    return { texto: textoDeLaFirma(), faltan: [] };
+  }
+
   function cuerpoDelMedio(a, idPlantilla, paraSeneca) {
-    var saludo = saludoDe(a);
-    /* Fila 348: una plantilla que va al tutor o tutora saluda con «Buenas:», aunque su texto empiece con otro saludo. */
-    var deLaPlantilla = idPlantilla && plantillasDatos ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0] : null;
-    var alTutor = !!(deLaPlantilla && deLaPlantilla.vaA === 'tutor' && window.PlantillaVaA);
-    if (alTutor && !saludoPedido) saludo = PlantillaVaA.SALUDO;
+    var sal = saludoEfectivo(a, idPlantilla, paraSeneca);
+    var saludo = sal.texto;
+    var faltanSaludo = sal.faltan.slice();
 
     var medio = '', faltan = [];
 
@@ -198,7 +220,6 @@
       var textoPlantilla = plantilla
         ? ((paraSeneca && String(plantilla.textoSeneca || '').trim()) ? plantilla.textoSeneca : plantilla.texto)
         : '';
-      if (plantilla && alTutor) textoPlantilla = PlantillaVaA.sinSaludo(textoPlantilla);
       if (plantilla) {
         var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
         var r = Plantillas.rellenar(textoPlantilla, valoresConLoQueFalta);
@@ -216,7 +237,10 @@
       }
     }
 
-    var firma = textoDeLaFirma();
+    var fir = firmaEfectiva(idPlantilla, paraSeneca);
+    var firma = fir.texto;
+    faltanSaludo = faltanSaludo.concat(fir.faltan);
+    faltan = faltan.concat(faltanSaludo.filter(function (f) { return faltan.indexOf(f) === -1; }));
     var texto = medio ? (saludo + '\n\n' + medio + '\n\n' + firma) : (saludo + '\n\n\n\n' + firma);
     return { texto: texto, faltan: faltan };
   }
@@ -240,6 +264,7 @@
     documentoSenecaActual = (extra && extra.documentoSeneca) || '';
     saludoPedido = (extra && extra.saludo) || '';
     I.tutorDelGrupo = (extra && extra.tutorDelGrupo) || null;
+    I.restaurar = (extra && extra.restaurar) || null;   /* fila 555: el cuadro se reabre tras relacionar a alguien */
     /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
     I.plantillaPedida = (extra && extra.plantilla) || '';
     I.avisoActividad = (extra && extra.avisoActividad) || null;   /* fila 309: al enviarse, se apunta el aviso en el asunto */
@@ -324,6 +349,14 @@
     /* Fila 348: los tutores de las unidades del alumnado, para los botones «+ Tutor/a de …» del cuadro. */
     I.tutoresDelAlumno = null;
     if (window.TutorDelGrupo && TutorDelGrupo.paraElCuadro) { try { I.tutoresDelAlumno = await TutorDelGrupo.paraElCuadro(a); } catch (e) { I.tutoresDelAlumno = null; } }
+    /* Fila 555: la lista cerrada de a quién se puede escribir en este asunto (js/correo-para.js). */
+    if (window.CorreoPara) {
+      var contacto = window.LoPide ? (LoPide.contactoDe(a.ficha || {}) || {}) : {};
+      var pide = { correo: contacto.correo || (window.Administraciones ? Administraciones.correoDelAsunto(a) : '') || '',
+                   nombre: (a.ficha && a.ficha.loPide && a.ficha.loPide.nombre) || '' };
+      try { await CorreoPara.preparar(a, persona, { tercero: terceroDe(a), tutoresDelAlumno: I.tutoresDelAlumno, pide: pide }); }
+      catch (e) { U.accesorio('No he podido preparar a quién se puede escribir', e); }
+    }
     caja.innerHTML = window.CorreoCuadro ? CorreoCuadro.cuerpoHtml(a, persona, bloqueAdjuntos, opcionesGrupo) : '';
     if (window.CorreoCuadro) CorreoCuadro.enganchar(a);
   }
@@ -389,6 +422,8 @@
     /* Fila 270 (js/plantilla-de-lo-escrito.js): el saludo y la firma que
        pone la app, y los valores del asunto abierto (con su hito). */
     saludoDe: saludoDe,
+    saludoEfectivo: saludoEfectivo,
+    firmaEfectiva: firmaEfectiva,
     firmaDe: textoDeLaFirma,
     valoresDelCuadro: function () { return valoresActuales; },
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,

@@ -114,7 +114,11 @@ var PlantillaDeLoEscrito = (function () {
     var inicial = null;
     if (desdeEscrito && window.CorreoNucleo) {
       var N = window.CorreoNucleo;
-      inicial = preparar(escrito, N.saludoDe(a), N.firmaDe(), (N.valoresDelCuadro && N.valoresDelCuadro()) || {});
+      var idElegida = cfg.elegidaActual ? cfg.elegidaActual() : '';
+      var deSeneca = cfg.prefijo === 'seneca';
+      /* Fila 555: si la plantilla elegida lleva su propio saludo o firma, esos son los que hay que quitar. */
+      inicial = preparar(escrito, N.saludoEfectivo ? N.saludoEfectivo(a, idElegida, deSeneca).texto : N.saludoDe(a),
+        N.firmaEfectiva ? N.firmaEfectiva(idElegida, deSeneca).texto : N.firmaDe(), (N.valoresDelCuadro && N.valoresDelCuadro()) || {});
       /* Nada escrito entre el saludo y la firma: el editor en blanco, como siempre, y al guardar el mensaje se rellena con ella. */
       if (!inicial.texto) inicial = null;
     }
@@ -138,6 +142,7 @@ var PlantillaDeLoEscrito = (function () {
 
   /* Las dos llamadas de los cuadros, con su botón. */
   function engancharBotones(cfg, a, elegidaActual) {
+    cfg.elegidaActual = elegidaActual;   /* fila 555 */
     var editar = $(cfg.prefijo + '-plantilla-editar');
     var N = window.CorreoNucleo;
     if (editar) editar.onclick = function () {

@@ -87,3 +87,24 @@
 .correo-tutor-falta { margin: 6px 0 0; }
 .va-a-tabla select { width: auto; }
 .va-a-tabla td { overflow-wrap: normal; word-break: normal; }
+
+/* ---------- Fila 555: Para, Copia y Copia oculta que se rellenan escribiendo ---------- */
+.cdest { position: relative; margin-top: 10px; }
+.cdest-rotulo { display: block; margin: 0 0 4px; }
+.cdest-caja { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 4px 6px; min-height: 38px; cursor: text; }
+.cdest-pastillas { display: contents; }
+.cdest-pastilla { display: inline-flex; align-items: center; gap: 2px; background: #eef3fb; border: 1px solid #c4d3ec; border-radius: 14px; padding: 1px 4px 1px 8px; font-size: 0.92em; }
+.cdest-pastilla.cdest-vez { background: #fff4d6; border-color: #e5c767; }
+.cdest-texto { background: none; border: 0; padding: 2px 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.cdest-vez-rotulo { color: #8a6500; }
+.cdest-quitar { background: none; border: 0; cursor: pointer; font-size: 1.1em; line-height: 1; padding: 0 5px; color: var(--tinta-suave, #666); }
+.cdest-escribir { flex: 1 1 140px; min-width: 120px; border: 0; outline: 0; background: transparent; font: inherit; padding: 4px 2px; }
+.cdest-lista { position: absolute; left: 0; right: 0; z-index: 30; background: var(--fondo, #fff); border: 1px solid #c9c9c9; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.15); max-height: 260px; overflow: auto; }
+.cdest-opcion { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid #eee; padding: 7px 10px; font: inherit; cursor: pointer; }
+.cdest-opcion.cdest-activa, .cdest-opcion:hover { background: #eaf1ff; }
+.cdest-opcion.cdest-sin-correo { opacity: .65; cursor: not-allowed; }
+.cdest-aviso-sin { color: #8a6500; }
+.cdest-aviso { margin: 4px 0 0; }
+.cdest-edicion { margin-top: 6px; }
+.correo-para-ayuda { margin-top: 8px; }
+.guion-a-quien-va { display: inline-flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }

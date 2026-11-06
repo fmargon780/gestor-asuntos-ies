@@ -11,10 +11,6 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   function $() { return I.$.apply(this, arguments); }
   function n() { return I.n.apply(this, arguments); }
   function paraDelCuadro() { return I.paraDelCuadro.apply(this, arguments); }
-  function combinarCorreosDeGrupo() { return I.combinarCorreosDeGrupo.apply(this, arguments); }
-  function engancharCco() { return I.engancharCco.apply(this, arguments); }
-  function refrescarCco() { return I.refrescarCco.apply(this, arguments); }
-  function anadirCco() { return I.anadirCco.apply(this, arguments); }
   function copiar() { return I.copiar.apply(this, arguments); }
   function abrirGmail() { return I.abrirGmail.apply(this, arguments); }
   function abrirDelOrdenador() { return I.abrirDelOrdenador.apply(this, arguments); }
@@ -24,42 +20,40 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
 
   function enganchar(a) {
     var caja = $('correo-caja');
-    Array.prototype.forEach.call(caja.querySelectorAll('.correo-marca'), function (c) {
-      c.onchange = function () { I.S.elegidos[c.value] = c.checked; };
-    });
+    if (window.CorreoPara) CorreoPara.enganchar();   /* fila 555 */
 
     engancharPlantilla(a);
-    engancharCco();
-    if (window.CorreoTutorBotones) CorreoTutorBotones.enganchar({ anadirCco: anadirCco });   /* fila 348 */
+    if (window.CorreoTutorBotones) CorreoTutorBotones.enganchar();   /* fila 348, fila 434 */
     engancharRuta(a);
     if (window.CorreoTutor) CorreoTutor.enganchar();   /* fila 299 */
     if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.alAbrir(a, I.S.plantillaElegida);   /* fila 299 */
+    if (window.CorreoRelacionar) CorreoRelacionar.enganchar(a);   /* fila 555 */
 
-    /* Añadir un grupo a la copia oculta: el desplegable y, fila 309, `extra.grupoInicial` (el aviso al claustro). */
+    /* Lo que pone la propia aplicación en la copia oculta: un grupo propio (fila 309) o personas sueltas, como el profesorado (fila 352). */
     async function anadirGrupo(valor) {
       var resueltos = await Destinatarios.miembrosDeOpcion(valor);   /* fila 132 */
-      if (!resueltos.length) return;
-      var resultado = combinarCorreosDeGrupo(resueltos);
-      resultado.direcciones.forEach(function (d) { I.S.cco[d] = true; });
+      anadirACopiaOculta(resueltos);
+    }
+    function anadirACopiaOculta(miembros) {
+      var resultado = Destinatarios.delGrupo(miembros);
+      if (window.CorreoPara) CorreoPara.ponerDirecciones('oculta', resultado.direcciones);
       resultado.sinCorreo.forEach(function (nombre) {
         if (I.S.ccoSinCorreo.indexOf(nombre) === -1) I.S.ccoSinCorreo.push(nombre);
       });
-      refrescarCco();
-    }
-    var selectorGrupo = $('correo-grupo');
-    if (selectorGrupo) {
-      selectorGrupo.onchange = function () { var valor = selectorGrupo.value; selectorGrupo.value = ''; return anadirGrupo(valor); };
+      pintarSinCorreo();
+      if (window.CorreoPara) CorreoPara.repintar();
     }
     var grupoInicial = (n()._interno || {}).grupoInicial;
     if (grupoInicial) { n()._interno.grupoInicial = ''; anadirGrupo('grupo:' + grupoInicial); }
-    /* Fila 352: personas sueltas (el aviso al claustro: el profesorado del centro) en la copia oculta, como un grupo. */
     var personasCco = (n()._interno || {}).personasCopiaOculta;
-    if (personasCco) {
-      n()._interno.personasCopiaOculta = null;
-      var delGrupoCco = combinarCorreosDeGrupo(personasCco);
-      delGrupoCco.direcciones.forEach(function (d) { I.S.cco[d] = true; });
-      delGrupoCco.sinCorreo.forEach(function (nombre) { if (I.S.ccoSinCorreo.indexOf(nombre) === -1) I.S.ccoSinCorreo.push(nombre); });
-      refrescarCco();
+    if (personasCco) { n()._interno.personasCopiaOculta = null; anadirACopiaOculta(personasCco); }
+
+    /* El cuadro vuelve a abrirse tras relacionar a alguien: lo escrito a mano sigue ahí. */
+    var antes = (n()._interno || {}).restaurar;
+    if (antes) {
+      n()._interno.restaurar = null;
+      if ($('correo-asunto') && antes.asunto !== undefined) $('correo-asunto').value = antes.asunto;
+      if (antes.escrito && $('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = antes.cuerpo;
     }
 
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
@@ -83,6 +77,18 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   /* El botón «Ruta» en la cabecera del cuadro (fila 152,
      docs/RUTA-QUE-NO-VA-A-BING.md, punto 3): el modo (abierto/archivado)
      sale del propio asunto, igual que en js/ficha-nombre-acciones.js. */
+  /* Fila 352: la línea de «sin correo» de la copia oculta (en ámbar y hablando de docentes, si es el aviso al claustro). */
+  function pintarSinCorreo() {
+    var caja = $('correo-cco-sin-correo');
+    if (!caja) return;
+    var sin = I.S.ccoSinCorreo || [];
+    if (!sin.length) { caja.innerHTML = ''; return; }
+    caja.innerHTML = (n()._interno || {}).copiaOcultaDocentes
+      ? '<p class="aviso aviso-ambar" id="cco-sin-correo-docentes">' + sin.length +
+        (sin.length === 1 ? ' docente del centro no tiene correo: ' : ' docentes del centro no tienen correo: ') + U.escapar(sin.join(', ')) + '</p>'
+      : '<p class="nota aviso-en-linea">' + sin.length + (sin.length === 1 ? ' no tiene correo: ' : ' no tienen correo: ') + U.escapar(sin.join(', ')) + '</p>';
+  }
+
   function engancharRuta(a) {
     if (!window.RutaCarpetas) return;
     var interno = n()._interno || {};

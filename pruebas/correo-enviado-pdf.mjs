@@ -99,7 +99,7 @@ async function abrirCorreo() {
 }
 async function enviar(para, asunto, cuerpo, conAdjunto) {
   await abrirCorreo();
-  await pagina.fill('#correo-otro', para);
+  await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, para);
   await pagina.fill('#correo-asunto', asunto);
   await pagina.fill('#correo-cuerpo-texto', cuerpo);
   if (conAdjunto) await pagina.check('.adjunto-marca >> nth=0');
@@ -151,7 +151,7 @@ await cerrar();
 respuesta = { ok: true };
 await pagina.evaluate(() => { window.__escribirBytes = Carpetas.escribirBytes; Carpetas.escribirBytes = async () => { throw new Error('disco lleno de mentira'); }; });
 await abrirCorreo();
-await pagina.fill('#correo-otro', 'proveedor@correo.es');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'proveedor@correo.es');
 await pagina.fill('#correo-asunto', 'Se rompe el PDF');
 await pagina.fill('#correo-cuerpo-texto', 'Texto.');
 await pagina.click('#correo-enviar');
@@ -170,7 +170,7 @@ await pagina.evaluate(() => { Carpetas.escribirBytes = window.__escribirBytes; }
 const antes = (await ficherosDe()).length;
 respuesta = { ok: false, motivo: 'La cuenta no ha podido mandarlo.' };
 await abrirCorreo();
-await pagina.fill('#correo-otro', 'proveedor@correo.es');
+await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'proveedor@correo.es');
 await pagina.fill('#correo-asunto', 'No sale');
 await pagina.fill('#correo-cuerpo-texto', 'Texto.');
 await pagina.click('#correo-enviar');

@@ -67,10 +67,9 @@ async function esperarCuadro() {
   await pagina.waitForTimeout(900);
 }
 const cuadro = () => pagina.evaluate(() => {
-  const marcadas = [...document.querySelectorAll('#correo-formulario .correo-marca')].filter((c) => c.checked).map((c) => c.value);
   return {
-    otro: document.getElementById('correo-otro').value,
-    marcadas: marcadas,
+    otro: CorreoPara.texto('para'),
+    marcadas: [],
     saludo: document.getElementById('correo-cuerpo-texto').value.split('\n')[0],
     cuerpo: document.getElementById('correo-cuerpo-texto').value,
     arriba: (document.getElementById('correo-tutor-aviso') || {}).textContent || '',
@@ -102,9 +101,7 @@ await comprobar('1. y en los cuatro asuntos y en la guía, ninguno «Notificar a
   return t.concat(GuiasDelCentro.pasosDe('SANCION').map((p) => p.titulo));
 }), ['Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Entregar la notificación a la familia']);
 await abrirComunicar();
-await comprobar('2. «Comunicar ▾»: la casilla del tutor, con su unidad, y sin marcar',
-  pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.map((x) => [x.textContent, x.querySelector('input').checked])),
-  [['Jimenez Rubio, Mateo', true], ['Otero Campos, Marta (tutor/a de 4º A)', false]]);
+await comprobar('2. «Comunicar ▾»: ya no hay casillas de destinatarios (fila 555)', pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.length), 0);
 await comprobar('2. arriba, la tarea pendiente de comunicar', pagina.locator('.hito-en-mesa .mesa-receta').allTextContents(), ['Avisar al tutor/a']);
 
 /* ===== 8. Mateo: el cuadro con todo ===== */
@@ -112,7 +109,7 @@ console.log('--- 8. el cuadro del tutor con correo y NOTIFICACION ---');
 await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 let c = await cuadro();
-await comprobar('8. el correo del tutor ya puesto, el saludo «Buenas:» y su texto', [c.otro, c.marcadas, c.saludo, /^Jefatura de Estudios entregará al alumno la notificación escrita para la familia\./m.test(c.cuerpo),
+await comprobar('8. el correo del tutor ya puesto (lo dice la plantilla), el saludo «Buenas:» y su texto', [c.otro, c.marcadas, c.saludo, /^Jefatura de Estudios entregará al alumno la notificación escrita para la familia\./m.test(c.cuerpo),
   /Esta comunicación es solo a efectos informativos para el tutor o la tutora\./.test(c.cuerpo)], ['motero@correo-demo.es', [], 'Buenas:', true, true]);
 await comprobar('8. con la plantilla «Informar al tutor/a de la sanción»', c.plantilla, 'Informar al tutor/a de la sanción');
 await comprobar('8. el documento NOTIFICACION, marcado', c.docs.map((d) => [d[0].replace(/ D26-\d+/, ''), d[1]]), [['NOTIFICACION.pdf', true]]);
@@ -127,7 +124,7 @@ await comprobar('8. y la tarea queda hecha', t1.hechas, ['g-demo-tutor-avisar'])
 /* ===== 6. Delgado: dos tutores, desde «Hacer este hito» ===== */
 console.log('--- 6. dos tutores, «Hacer este hito» ---');
 await abrirMesa('SANCION Delgado Prieto');
-await comprobar('6. «Hacer este hito», con su línea', pagina.locator('.hito-en-mesa .mesa-hacer-linea').allTextContents(), ['correo al tutor o tutora del grupo']);
+await comprobar('6. «Hacer este hito», con su línea', pagina.locator('.hito-en-mesa .mesa-hacer-linea').allTextContents(), ['correo']);
 await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
 await esperarCuadro();
 c = await cuadro();
@@ -138,53 +135,43 @@ await pagina.waitForTimeout(1500);
 await pagina.evaluate(() => Hitos.guionDe && 0);
 
 /* ===== 9. Fuentes: tutora sin correo ===== */
-console.log('--- 9. sin correo: se escribe, se recuerda ---');
+console.log('--- 9. sin correo: no se puede elegir; se escribe en el aviso y entra en «Para» ---');
 await abrirMesa('SANCION Fuentes Calvo');
 await abrirComunicar();
 await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
-await comprobar('9. «Otro correo» vacío, sin la línea «No tengo el correo de…» (fila 434: la casilla es la del aviso ámbar)', [c.otro, c.marcadas, c.lineas],
-  ['', [], []]);
+await comprobar('9. «Para» vacío (la tutora no tiene correo) y el saludo «Buenas:»', [c.otro, c.saludo], ['', 'Buenas:']);
 await comprobar('9. sin NOTIFICACION: la línea ámbar de la plantilla', c.avisoDoc,
   'Esta plantilla adjunta el documento NOTIFICACION, y en este asunto todavía no hay ninguno.');
-await comprobar('9. el saludo «Buenas:»', c.saludo, 'Buenas:');
-await pagina.fill('#correo-otro', 'esperanza@correo-demo.es');
-await enviar();
-await cerrarCuadro();
-await comprobar('9. al enviar, se recuerda para esa profesora', pagina.evaluate(async () => {
+await pagina.fill('.correo-tutor-escribir', 'esperanza@correo-demo.es');
+await pagina.click('.correo-tutor-guardar');
+await pagina.waitForTimeout(1200);
+await comprobar('9. al guardarlo en el aviso, el correo entra en «Para»', pagina.evaluate(() => CorreoPara.texto('para')), 'esperanza@correo-demo.es');
+await comprobar('9. y se recuerda para esa profesora', pagina.evaluate(async () => {
   const t = await CorreosAMano.leerTodos();
   return Object.keys(t).map((k) => [k, t[k].correo, t[k].nombre, t[k].quien, /^\d{4}-\d{2}-\d{2}$/.test(t[k].cuando)]);
 }), [['77889900', 'esperanza@correo-demo.es', 'Cabello Ruiz, Esperanza', 'Revisor', true]]);
 await comprobar('9. y el fichero entra en las copias diarias', pagina.evaluate(() => Copias.FICHEROS.indexOf('correos-a-mano.json') !== -1), true);
-/* Otra vez: la casilla de la tutora, «Preparar correo» */
+await cerrarCuadro();
+/* Otra vez: ya viene su correo recordado */
 await abrirMesa('SANCION Fuentes Calvo');
 await abrirComunicar();
-await pagina.locator('.hito-en-mesa .mesa-chip', { hasText: 'Cabello Ruiz' }).locator('input').check();
-await pagina.locator('.hito-en-mesa .mesa-chip', { hasText: 'Fuentes Calvo' }).locator('input').uncheck();
-await pagina.click('.hito-en-mesa .mesa-preparar-correo');
+await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
-await comprobar('9. la dirección viene puesta, con «escrito a mano» y «Cambiar»', [c.otro, c.lineas.length, /^Correo de Cabello Ruiz, Esperanza, escrito a mano el \d{2}\/\d{2}\/\d{4} · Cambiar$/.test(c.lineas[0] || ''), c.saludo],
-  ['esperanza@correo-demo.es', 1, true, 'Buenas:']);
-await pagina.locator('.correo-tutor-cambiar').click();
-await comprobar('9. «Cambiar» vacía la caja', pagina.inputValue('#correo-otro'), '');
-await pagina.fill('#correo-otro', 'esperanza.nueva@correo-demo.es');
-await enviar();
+await comprobar('9. la segunda vez la dirección viene puesta por la plantilla', [c.otro, c.saludo], ['esperanza@correo-demo.es', 'Buenas:']);
 await cerrarCuadro();
-await comprobar('9. el nuevo sustituye al anterior', pagina.evaluate(async () => Object.values(await CorreosAMano.leerTodos()).map((t) => t.correo)), ['esperanza.nueva@correo-demo.es']);
 
 /* ===== 11. Klein: unidad sin tutor ===== */
 console.log('--- 11. unidad sin tutor ---');
 await abrirMesa('SANCION Klein Soto');
 await abrirComunicar();
-await comprobar('11. sin casilla de tutor', pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.map((x) => x.textContent.trim())), ['Klein Soto, Ana']);
 await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
-await comprobar('11. el cuadro se abre, con la línea ámbar y sin dirección', [c.arriba, c.otro, c.marcadas, c.saludo],
-  ['No sé quién es el tutor o tutora de 1º C. Las tutorías se suben al Centro de datos.', '', [], 'Buenas:']);
-await comprobar('11. sin «No tengo el correo de…» (no hay a quién)', c.lineas, []);
+await comprobar('11. el cuadro se abre, con la línea ámbar y sin dirección', pagina.evaluate(() => [[...document.querySelectorAll('#correo-formulario .correo-tutor-falta')].map((p) => p.textContent), CorreoPara.texto('para'), document.getElementById('correo-cuerpo-texto').value.split('\n')[0]]),
+  [['No sé quién es el tutor o tutora de 1º C. Las tutorías se suben al Centro de datos.'], '', 'Buenas:']);
 await cerrarCuadro();
 
 /* ===== 12. Adjuntar solo ===== */
@@ -227,8 +214,6 @@ await cerrarCuadro();
 console.log('--- 12b. plantilla de lo escrito y Séneca ---');
 await abrirMesa('SANCION Jimenez Rubio');
 await abrirComunicar();
-await pagina.locator('.hito-en-mesa .mesa-chip', { hasText: 'Otero Campos' }).locator('input').check();
-await pagina.locator('.hito-en-mesa .mesa-chip', { hasText: 'Jimenez Rubio' }).locator('input').uncheck();
 await pagina.click('.hito-en-mesa .mesa-preparar-correo');
 await esperarCuadro();
 await pagina.click('#correo-plantilla-desde-escrito');
@@ -250,13 +235,11 @@ await cerrarCuadro();
 console.log('--- 10. otro tipo de asunto ---');
 await abrirMesa('INCIDENCIA DE AULA Jimenez Rubio');
 await abrirComunicar();
-await comprobar('10. la tarea «Avisar a la tutoría» y la casilla del tutor de 4º A',
-  Promise.all([pagina.locator('.hito-en-mesa .mesa-receta').allTextContents(), pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.map((x) => x.textContent.trim()))]),
-  [['Avisar a la tutoría'], ['Jimenez Rubio, Mateo', 'Otero Campos, Marta (tutor/a de 4º A)']]);
+await comprobar('10. la tarea «Avisar a la tutoría»', pagina.locator('.hito-en-mesa .mesa-receta').allTextContents(), ['Avisar a la tutoría']);
 await pagina.click('.hito-en-mesa .mesa-receta');
 await esperarCuadro();
 c = await cuadro();
-await comprobar('10. el cuadro se abre con la dirección del tutor del grupo y «Buenas:»', [c.otro, c.saludo, c.arriba, c.docs.length], ['motero@correo-demo.es', 'Buenas:', '', 0]);
+await comprobar('10. una tarea sin plantilla se abre sin nadie propuesto (el «a quién» lo dice la plantilla) y con el saludo de siempre', [c.otro, /^Estimados tutores legales/.test(c.saludo), c.docs.length], ['', true, 0]);
 await comprobar('10. sin plantilla que adjunte: ninguna línea de documentos', c.avisoDoc, '');
 await cerrarCuadro();
 
@@ -267,14 +250,12 @@ await pagina.evaluate(() => HitoMesa.cerrarPanelSiAbierto && HitoMesa.cerrarPane
 await pagina.locator('.hito-en-mesa .guion-paso').first().locator('.guion-tarea-menu-boton').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Abrir en la guía' }).click();
 await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila');
-await comprobar('3. en la guía: «Tutor/a del grupo», por correo y la plantilla de la sanción',
+await comprobar('3. en la guía: por correo, la plantilla de la sanción y «A quién va (lo dice la plantilla)» con el tutor/a del grupo',
   pagina.evaluate(() => {
     const f = document.querySelector('#capa .paso-guion .guion-fila[data-id="g-demo-tutor-avisar"]');
     const sel = (cl) => f.querySelector(cl).selectedOptions[0].textContent;
-    return [sel('.guion-receta-a'), sel('.guion-receta-via'), sel('.guion-receta-plantilla')];
-  }), ['Tutor/a del grupo', 'Por correo', 'Informar al tutor/a de la sanción (SANCION)']);
-await comprobar('3. y la opción ya no se llama «La tutoría»', pagina.evaluate(() => [...document.querySelectorAll('#capa .guion-receta-a option')].map((o) => o.textContent)),
-  ['A quien toque', 'El tercero', 'La familia', 'Tutor/a del grupo', 'Los relacionados', 'Otro']);
+    return [!!f.querySelector('.guion-receta-a'), sel('.guion-receta-via'), sel('.guion-receta-plantilla'), f.querySelector('.guion-a-quien-va').textContent];
+  }), [false, 'Por correo', 'Informar al tutor/a de la sanción (SANCION)', 'A quién va (lo dice la plantilla) Para: Tutor/a del grupo']);
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForTimeout(500);
 await pagina.evaluate(async () => {

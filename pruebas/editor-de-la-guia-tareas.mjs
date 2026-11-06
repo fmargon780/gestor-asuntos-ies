@@ -78,7 +78,7 @@ await comprobar('cada tarea: su texto, lo que hace en gris y «▸»',
     f.querySelector(':scope > .guion-resumen .guion-resumen-texto').textContent,
     f.querySelector(':scope > .guion-resumen .guion-resumen-que').textContent,
     getComputedStyle(f.querySelector(':scope > .guion-resumen .guion-resumen-flecha'), '::before').content])),
-  [['Acusar recibo del parte', 'Comunicar · Tutor/a del grupo · por correo', '"▸"'], ['Sellar el parte', 'Sin acción', '"▸"'],
+  [['Acusar recibo del parte', 'Comunicar · por correo', '"▸"'], ['Sellar el parte', 'Sin acción', '"▸"'],
    ['¿Viene completo?', 'Pregunta · 2 respuestas', '"▸"'], ['Archivar el parte', 'Sin acción', '"▸"']]);
 await comprobar('cerradas, solo se ve la línea (sin campos)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos > .paso-editor[data-pos="0"] .guion-lista > .guion-fila')).map(f =>
@@ -97,16 +97,16 @@ await comprobar('«Texto de la tarea», ↑, ↓ y «Quitar» en la misma línea
       Array.from(f.querySelectorAll('.guion-linea-texto .requisito-mandos .boton')).map(b => b.textContent),
       Math.abs(y('.guion-texto') - y('.guion-subir')) < 30];
   }, F('g1')), ['Texto de la tarea', ['↑', '↓', 'Quitar'], true]);
-await comprobar('«Qué se hace» con sus seis opciones, y para «Comunicar»: «A quién», «Por dónde» y «Plantilla de correo»',
+await comprobar('«Qué se hace» con sus ocho opciones, y para «Comunicar»: «A quién va (lo dice la plantilla)», «Por dónde» y «Plantilla de correo»',
   pagina.evaluate((s) => {
     const f = document.querySelector(s);
     return [f.querySelector('.guion-linea-accion .etiqueta').textContent,
       Array.from(f.querySelectorAll('.guion-accion option')).map(o => o.textContent),
       Array.from(f.querySelectorAll('.guion-receta .etiqueta')).map(e => e.textContent),
-      f.querySelector('.guion-receta-a').value, f.querySelector('.guion-receta-via').value];
+      !!f.querySelector('.guion-receta-a'), f.querySelector('.guion-receta-via').value];
   }, F('g1')),
-  ['Qué se hace', ['Sin acción (se marca a mano)', 'Generar un documento', 'Firmar un documento', 'Registrar un documento', 'Comunicar', 'Añadir un documento'],
-   ['A quién', 'Por dónde', 'Plantilla de correo'], 'tutoria', 'correo']);
+  ['Qué se hace', ['Sin acción (se marca a mano)', 'Generar un documento', 'Firmar un documento', 'Registrar un documento', 'Comunicar', 'Añadir un documento', 'Pedir datos', 'Copiar a otra carpeta'],
+   ['Por dónde', 'Plantilla de correo', 'A quién va (lo dice la plantilla)'], false, 'correo']);
 await pagina.locator(F('g1') + ' .guion-accion').selectOption('generar');
 await comprobar('con «Generar un documento»: «Plantilla de documento»; la línea lo dice y la tarea sigue abierta',
   pagina.evaluate((s) => {
