@@ -2,4 +2,4 @@
 
 Lo pone al día cada sesión de Claude Code según la regla de CLAUDE.md «Pasada completa de pruebas: una vez al día si tarda».
 
-Última pasada completa: 5-nov-2026 10:33 (Madrid) · 34 min · con fallos (15 de main limpio, del entorno; 2 conocidos en RETIRADAS) · commit 1d5a7cf
+Última pasada completa: 6-nov-2026 02:53 (Madrid) · sin dato (no arranca en el entorno: undici; 4 pruebas de guías fallan igual en main) · con fallos · commit 6772948
