@@ -86,14 +86,14 @@ summary::marker{color:var(--tinta-suave)}
 </style>
 
 <div class="marco">
-  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada. Dos partes: aplicar el plan de las guías, y la tarea nueva «Copiar a otra carpeta».</p>
-  <div class="pestanas" role="tablist">
+  <p class="prueba">Pantalla de prueba con datos inventados. No guarda nada. La tarea nueva «Copiar a otra carpeta».</p>
+  <div class="pestanas" role="tablist" hidden>
     <button type="button" class="pestana on" id="p-plan" role="tab">1 · Aplicar el plan</button>
     <button type="button" class="pestana" id="p-copiar" role="tab">2 · Copiar a otra carpeta</button>
   </div>
 
   <!-- ================= PARTE 1 ================= -->
-  <section id="v-plan">
+  <section id="v-plan" hidden>
     <div class="dos">
       <div class="col">
         <div class="panel" id="plan-antes">
@@ -226,7 +226,7 @@ summary::marker{color:var(--tinta-suave)}
   </section>
 
   <!-- ================= PARTE 2 ================= -->
-  <section id="v-copiar" hidden>
+  <section id="v-copiar">
     <div class="dos">
       <div class="col">
         <div class="panel">
@@ -353,7 +353,7 @@ summary::marker{color:var(--tinta-suave)}
   $('t-patron').addEventListener('input',pintarEjemplo); pintarEjemplo();
   $('b-campo').onclick=function(){
     var l=$('campos-lista'); if(!l.hidden){l.hidden=true;return}
-    l.innerHTML=''; Object.keys(datos).forEach(function(c){var b=document.createElement('button');b.type='button';b.className='boton mini';b.textContent=c;b.onclick=function(){$('t-patron').value+=' {'+c+'}';l.hidden=true;pintarEjemplo()};l.appendChild(b)});
+    l.innerHTML='<span class="pequeno suave" style="flex-basis:100%">En la app se abre la ventana de elegir campo de las plantillas. Aquí, unos pocos de ejemplo:</span>'; Object.keys(datos).forEach(function(c){var b=document.createElement('button');b.type='button';b.className='boton mini';b.textContent=c;b.onclick=function(){$('t-patron').value+=' {'+c+'}';l.hidden=true;pintarEjemplo()};l.appendChild(b)});
     l.hidden=false;
   };
   $('b-carpeta').onclick=function(){
