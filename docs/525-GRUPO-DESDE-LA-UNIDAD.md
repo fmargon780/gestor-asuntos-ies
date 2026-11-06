@@ -57,4 +57,12 @@ Aviso completo: https://drive.google.com/file/d/1C7VPRUWSgEQr_jVoHnvaW6UysyT7btQ
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (6-nov-2026, sin pantalla de prueba; leyó el código y pasó `pruebas/grupo-desde-la-unidad.mjs`):
+  - Matriculado sin grupo en el asunto: sale su unidad y desaparece «Faltan datos: Grupo» (el aviso del correo sale de los mismos valores). Coincide; la pantalla del correo no se abrió.
+  - Documento Word: usa la misma función (`plantillas-documento.js`, `word-faltan.js`). Coincide leyendo el código; no se generó ningún Word.
+  - No matriculado: sale su última unidad. Coincide.
+  - Grupo propio del asunto: gana el del asunto. Coincide.
+  - Asunto de grupo, tercero no alumno y alumno no encontrado: vacío como hoy. Coincide; el asunto de grupo se vio solo en el código.
+  - Hace la app algo no pedido: el formato del grupo del nombre de carpeta es compacto («2ºESOC») y el de la unidad lleva espacios («1º ESO B»). Aceptado. Todo lo que usa los valores del asunto (cuadros de datos, formularios) ve también el grupo.
+  - Publicación: comprobada la dirección publicada (el fichero cambiado sirve la línea nueva); la app publicada no se abrió en un navegador.
+  - Pruebas: `personas-del-grupo.mjs` falla en esta sesión también sin el cambio (entorno); la pasada completa no arranca (undici, ya apuntado).

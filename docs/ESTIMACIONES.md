@@ -32,4 +32,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 529 | 120 | Editor por pasos y cálculo con pruebas, respetando los calculados de antes |
 | 530 | 180 | Toca Word, correo, Séneca, tareas y alta; acción nueva |
 | 531 | 240 | Ficheros nuevos, guías por referencia y propuesta de paso; la de más riesgo |
-| 525 | 40 | Un cambio en `valoresDeAsunto`, novedades, prueba y revisor |
