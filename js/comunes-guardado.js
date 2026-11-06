@@ -61,7 +61,7 @@ var ComunesGuardado = (function () {
   async function reemplazar(clave, elemento) {
     var normal = clave === 'tareas' ? Comunes.normalizarTarea(elemento) : Comunes.normalizarHito(elemento);
     await cambiar(clave, function (lista) {
-      if (Comunes.existeNombre(lista, normal.nombre, normal.id)) throw new Error('Ya hay uno con el nombre «' + normal.nombre + '».');
+      if (Comunes.existeIgual(clave, lista, normal, normal.id)) throw new Error('Ya hay uno con el nombre «' + normal.nombre + '».');
       return lista.map(function (x) { return x.id === normal.id ? normal : x; });
     });
     return normal;

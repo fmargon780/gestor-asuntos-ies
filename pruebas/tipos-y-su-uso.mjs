@@ -80,14 +80,15 @@ await p.click('#tu-desactivar');
 await p.waitForSelector('#capa:not(.oculto)');
 await comprobar('4a. el cuadro lista los tipos y dice que sus guías se conservan', p.evaluate((e) => { const t = document.getElementById('cuadro-cuerpo').textContent; return [e.every((n) => t.indexOf(n) !== -1), t.indexOf('Dejarán de salir al crear asuntos') !== -1, t.indexOf('se conservan') !== -1, document.getElementById('cuadro-titulo').textContent]; }, elegidos), [true, true, true, 'Desactivar 2 tipos']);
 await p.click('#cuadro-cancelar');
-await comprobar('4b. cancelar no desactiva nada', p.evaluate(() => App.E.tipos.filter((t) => t.desactivado).length), 0);
+/* Fila 551: la demostración trae un tipo desactivado de partida («Alta y actualización de datos», js/demo/datos-plan-guias.js). */
+await comprobar('4b. cancelar no desactiva nada', p.evaluate(() => App.E.tipos.filter((t) => t.desactivado).map((t) => t.tipo)), ['Alta y actualización de datos']);
 await p.click('#tu-desactivar');
 await p.waitForSelector('#capa:not(.oculto)');
 await p.click('#cuadro-aceptar');
 await p.waitForFunction(() => document.getElementById('tu-mensaje').textContent.indexOf('tipos desactivados') !== -1);
 await comprobar('4c. tipos.json se escribe una sola vez', p.evaluate(() => window.__guardados), 1);
 await comprobar('4d. ya no salen al crear asuntos; guías y asuntos abiertos siguen igual', p.evaluate(async ([e, ant]) => [e.every((n) => App.tiposParaElegir().map((x) => x.tipo).indexOf(n) === -1), JSON.stringify([GuiasDelCentro.todas(), App.E.listaAbiertos.length]) === ant], [elegidos, antes]), [true, true]);
-await comprobar('4e. salen en «Desactivados» con su Activar', p.evaluate((e) => [document.querySelector('.tu-pastilla.on').textContent.startsWith('Desactivados'), [...document.querySelectorAll('#tu-filas tr[data-t]')].map((t) => t.dataset.t).sort().join('|') === [...e].sort().join('|'), document.querySelectorAll('#tu-filas [data-a]').length], elegidos), [true, true, 2]);
+await comprobar('4e. salen en «Desactivados» con su Activar', p.evaluate((e) => [document.querySelector('.tu-pastilla.on').textContent.startsWith('Desactivados'), [...document.querySelectorAll('#tu-filas tr[data-t]')].map((t) => t.dataset.t).sort().join('|') === [...e, 'Alta y actualización de datos'].sort().join('|'), document.querySelectorAll('#tu-filas [data-a]').length], elegidos), [true, true, 3]);
 
 console.log('--- 4b. «Activar» se ve entero, a 1300 y a 800 px ---');
 for (const ancho of [1300, 800]) {

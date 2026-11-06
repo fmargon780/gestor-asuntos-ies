@@ -2,8 +2,7 @@
 
 Se lee en toda conversación y en cada sesión de Claude Code. Es para **decidir**, no para
 programar: para eso está `docs/CONTEXTO.md` y sus hijos en `docs/contexto/`. El porqué de las
-cosas y el diario están en `docs/HISTORIA.md`. **Máximo 40.000 caracteres** (regla 9 de `docs/COLA.md`; fila 301, 7-oct-2026:
-antes 14.000, que ya no se cumplía).
+cosas y el diario están en `docs/HISTORIA.md`. **Máximo 40.000 caracteres** (regla 9 de `docs/COLA.md`; antes 14.000, que ya no se cumplía).
 
 ## 0. La regla que no se puede olvidar
 
@@ -84,6 +83,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Correo (Gmail por script, se queda en recibidos, fila 480), Séneca, Centro de datos y control del registro.
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
+- Plan de las guías (fila 551): Herramientas → «Aplicar el plan de las guías» pasa las guías a las listas comunes de tareas y de hitos y, una vez aplicado, quita lo viejo (tareas e hitos libres en la guía, «Traer un hito de otro tipo», «Nueva tarea…», «Tipos y su uso»).
 - Medidas, «Qué hay de nuevo» y el botón «Soporte» común.
 - El tutor y las tutorías vienen solo de las fichas `hecho/tutorias` del Centro de datos, todos los cursos; el Gestor ya no lee el PDF de la función tutorial (fila 376).
 

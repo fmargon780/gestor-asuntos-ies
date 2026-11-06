@@ -265,6 +265,7 @@
       ], null);
     }
 
+    if (window.Demo.planGuias) await Demo.planGuias.construir({ crearTipoConGuia: crearTipoConGuia });   /* fila 551 */
     await crearReclamacion();   /* fila 284: guía de la tabla de plazos, sin plazo (lo pone js/plazos-del-centro.js) */
 
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,

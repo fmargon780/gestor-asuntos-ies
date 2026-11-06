@@ -204,6 +204,7 @@ async function main() {
   /* 4. copia-datos/: un fichero por cada dato estático que la
         aplicación pide con `App.leerFicheroDeLaApp`. */
   generarCopiaDatosDeJson('datos-biblioteca/biblioteca-centro.json');
+  generarCopiaDatosDeJson('datos-biblioteca/plan-guias.json');   /* fila 551 */
   generarCopiaDatosDeJson('datos/formularios.json');
   generarCopiaDatosDeJson('plantillas/indice.json');
   /* Fila 149: la letra y el símbolo del membrete (js/membrete.js). */

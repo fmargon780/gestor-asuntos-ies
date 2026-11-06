@@ -76,6 +76,15 @@ var Comunes = (function () {
       return norm(x.nombre) === norm(nombre) || palabras(x.nombre).some(function (p) { return w.indexOf(p) !== -1; });
     }).slice(0, max || 4);
   }
+  /* Fila 551: tras pasar las guías puede haber dos tareas (u hitos) con el mismo nombre que no dicen lo mismo (otra plantilla, otras tareas).
+     Al cambiar una, solo cuenta como repetida la que es igual en todo. */
+  function existeIgual(clave, lista, e, salvoId) {
+    return (lista || []).some(function (x) {
+      if (x.id === salvoId || norm(x.nombre) !== norm(e.nombre)) return false;
+      if (clave === 'hitos') return (x.tareas || []).join(',') === (e.tareas || []).join(',');
+      return (x.accion || '') === (e.accion || '') && ((x.receta && x.receta.plantilla) || '') === ((e.receta && e.receta.plantilla) || '');
+    });
+  }
   function existeNombre(lista, nombre, salvoId) {
     return (lista || []).some(function (x) { return x.id !== salvoId && norm(x.nombre) === norm(nombre); });
   }
@@ -221,7 +230,7 @@ var Comunes = (function () {
   return {
     HACE: HACE, textoDeHace: textoDeHace, accionValida: accionValida,
     normalizarTarea: normalizarTarea, normalizarHito: normalizarHito, normalizarFichero: normalizarFichero,
-    buscar: buscar, parecidas: parecidas, existeNombre: existeNombre,
+    buscar: buscar, parecidas: parecidas, existeNombre: existeNombre, existeIgual: existeIgual,
     recorrerGuias: recorrerGuias, usos: usos, textoUsos: textoUsos,
     lineaDeTarea: lineaDeTarea, pasoDeHito: pasoDeHito, aplicarATarea: aplicarATarea, textoIgual: textoIgual,
     cambiarTareaEnGuias: cambiarTareaEnGuias, cambiarHitoEnGuias: cambiarHitoEnGuias, propuesta: propuesta
