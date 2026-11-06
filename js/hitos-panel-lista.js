@@ -232,8 +232,8 @@ var HitosPanelLista = (function () {
        botones del guion pulsan los de siempre por debajo; las plantillas,
        los formularios y «Comunicar» van a los desplegables de la cabecera
        (fila 145). */
-    var grandeGuion = '<section class="mesa-bloque mesa-grande-guion" data-tarjeta="guion">' +
-      (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
+    var grandeGuion = (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +   /* fila 553: la explicación, encima del recuadro */
+      '<section class="mesa-bloque mesa-grande-guion" data-tarjeta="guion">' +
       '<div class="mesa-guion"></div>' +
     '</section>';
 
@@ -244,9 +244,9 @@ var HitosPanelLista = (function () {
             U.escapar(d) + '">' + U.escapar(d) + '</button></span>';
         }).join('');
     var grandeDocs = '<section class="mesa-bloque mesa-grande-docs mesa-docs" data-tarjeta="docs">' +
-        '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Documentos del hito' +
+        '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Documentos' +
           (window.HitoMesaDocumentos && HitoMesaDocumentos.cuentaTitulo
-            ? ' <span class="mesa-docs-cuenta">· ' + U.escapar(HitoMesaDocumentos.cuentaTitulo(h, hitos || [], nombresDeLaCarpeta)) + '</span>' : '') +
+            ? ' <span class="mesa-docs-cuenta">' + U.escapar(HitoMesaDocumentos.cuentaTitulo(h, hitos || [], nombresDeLaCarpeta)) + '</span>' : '') +
           (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</span></div>' +
         '<div class="mesa-seleccion oculto"></div>' +
         (abierto || documentosHTML ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
@@ -261,7 +261,7 @@ var HitosPanelLista = (function () {
     var lineasHito = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h], conSueltas: true }) : [];
     var grandeNotas = '<section class="mesa-bloque mesa-grande-notas" data-tarjeta="notas">' +
       '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Registro</span>' +
-        (lineasHito.length ? '<span class="mesa-docs-cuenta">· ' + lineasHito.length + (lineasHito.length === 1 ? ' línea' : ' líneas') + '</span>' : '') + '</div>' +
+        (lineasHito.length ? '<span class="mesa-docs-cuenta">' + lineasHito.length + (lineasHito.length === 1 ? ' línea' : ' líneas') + '</span>' : '') + '</div>' +
       '<div class="mesa-notas">' +
         (abierto ? '<div class="nota-nueva">' +
           '<textarea class="campo hito-nota-texto" rows="5" placeholder="Anotar algo que ha pasado… (Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +

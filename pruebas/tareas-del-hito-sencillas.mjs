@@ -115,9 +115,9 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Uno', 'c1');
 await abrirMenuDeTarea('g1');
-await comprobar('2. la tarea de la guía trae Anotar/Cambiar/Borrar/Abrir en la guía',
+await comprobar('2. la tarea de la guía trae Subir/Bajar (fila 553) y Anotar/Cambiar/Borrar/Abrir en la guía',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'), (b) => b.textContent)),
-  ['Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
+  ['Subir', 'Bajar', 'Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
 await elegirDelMenu('Cambiar');
 await pagina.fill('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Avisar a la tutoría (por iPasen)');
 await pagina.press('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Enter');
@@ -173,12 +173,12 @@ await abrirMesaDe('Sola Dos', 'c1');
 await comprobar('4. y el otro asunto abierto ya no la tiene',
   pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-paso[data-id="g2"]')), false);
 
-/* 5. El botón «Hito ▾»: solo Crear · Cambiar · Borrar arriba. */
+/* 5. El botón «Hito ▾»: solo Cambiar · Borrar arriba (fila 553: sin «Crear»). */
 await pagina.click('.hito-en-mesa .mesa-mas');
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
-await comprobar('5. arriba, sin repetir la palabra: Crear, Cambiar, Borrar',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'), (b) => b.textContent).slice(0, 3)),
-  ['Crear', 'Cambiar', 'Borrar']);
+await comprobar('5. arriba, sin repetir la palabra: Cambiar, Borrar (sin Crear)',
+  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'), (b) => b.textContent).slice(0, 2)),
+  ['Cambiar', 'Borrar']);
 await comprobar('5. ninguna opción de tareas en el menú del hito',
   pagina.evaluate(() => !Array.prototype.some.call(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'),
     (b) => b.textContent.indexOf('tarea') !== -1)), true);

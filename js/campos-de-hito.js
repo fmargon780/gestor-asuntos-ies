@@ -93,7 +93,8 @@ window.CamposDeHito = (function () {
         '</div>';
     }).join('');
     return '<section class="mesa-bloque mesa-campos-hito' + (campos.length ? '' : ' mesa-campos-hito-vacia') + '">' +
-      '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Campos de este hito</span>' +
+      '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Campos</span>' +
+      (campos.length ? '<span class="mesa-docs-cuenta">' + campos.length + '</span>' : '') +
       (editable ? '<button type="button" class="boton mesa-campo-hito-anadir">+ Añadir campo</button>' : '') +
       '</div>' + filas + '</section>';
   }

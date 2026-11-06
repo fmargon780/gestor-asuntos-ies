@@ -117,7 +117,7 @@ await abrirMesaDe('Sola Uno', 'c1');
 await comprobar('1. la pregunta lleva sus tres puntitos', pagina.locator(Q + ' .guion-tarea-menu-boton').isVisible(), true);
 await comprobar('1. sigue sin casilla', pagina.locator(Q + ' .guion-casilla').count(), 0);
 await pagina.click(Q + ' .guion-tarea-menu-boton');
-await comprobar('2. trae Anotar · Cambiar · Borrar · Abrir en la guía', opcionesDelMenu(), ['Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
+await comprobar('2. trae Subir · Bajar (fila 553) y Anotar · Cambiar · Borrar · Abrir en la guía', opcionesDelMenu(), ['Subir', 'Bajar', 'Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
 await pagina.keyboard.press('Escape');
 
 /* 3. «Cambiar»: a la guía, sin preguntar. El texto cambia y la respuesta elegida se queda. */

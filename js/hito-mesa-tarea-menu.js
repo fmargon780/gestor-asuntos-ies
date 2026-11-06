@@ -135,10 +135,28 @@ var HitoMesaTareaMenu = (function () {
   /* Las opciones del «⋮», según venga la tarea de la guía o sea «solo
      aquí». `repintar` es un repintado local, inmediato, para abrir el
      modo de edición/anotar sin esperar al repintado general. */
-  function opciones(a, h, g, repintar) {
-    var lista = [
-      { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
+  /* Fila 553: «Subir» y «Bajar» (apagados en la primera y la última), separados por una raya; el orden cambia al momento en este asunto. */
+  function moverOpciones(a, h, g) {
+    if (!g.clave || !Hitos.moverGuion) return [];
+    var pos = Hitos.posicionGuion(a, h, g.clave);
+    function mover(delta) {
+      return function () {
+        Hitos.moverGuion(a, h.id, g.clave, delta).then(function () {
+          if (window.HitosPanel) HitosPanel.programarRepintado();
+        }).catch(function (err) { U.fallo('No he podido mover la tarea', err); });
+      };
+    }
+    return [
+      { texto: 'Subir', clase: 'mesa-tarea-subir', deshabilitado: pos.indice <= 0, alPulsar: mover(-1) },
+      { texto: 'Bajar', clase: 'mesa-tarea-bajar', deshabilitado: pos.indice === -1 || pos.indice >= pos.total - 1, alPulsar: mover(1) },
+      { raya: true }
     ];
+  }
+
+  function opciones(a, h, g, repintar) {
+    var lista = moverOpciones(a, h, g).concat([
+      { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
+    ]);
     if (g.comun && window.ComunesCambiar) {   /* fila 531: una tarea de la lista común se cambia en todas las guías */
       lista.push({ texto: 'Cambiar la tarea', clase: 'mesa-comun-cambiar', alPulsar: async function () {
         try {

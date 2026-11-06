@@ -118,9 +118,9 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('1. el guion dice «2 de 5»',
     pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '2 de 5');
   await comprobar('1. los documentos dicen cuántos son',
-    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-docs-cuenta').textContent), '· 2');
+    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-docs-cuenta').textContent), '2');
   await comprobar('1. el registro dice «2 líneas»',
-    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-docs-cuenta').textContent), '· 2 líneas');
+    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-docs-cuenta').textContent), '2 líneas');
   if (fotos) await capturar(pagina, 'mesa-una-columna');
 
   /* 2. */

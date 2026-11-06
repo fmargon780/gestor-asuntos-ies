@@ -80,7 +80,7 @@ const resumenTarjeta = () => pagina.evaluate(() => {
 /* 1. La tarjeta. */
 await abrirMesa(A1, H[1].id);
 await comprobar('1. «Tramitar el pago»: la tarjeta lleva «Fecha de la factura»',
-  resumenTarjeta(), { titulo: 'Campos de este hito', boton: '+ Añadir campo', campos: ['Fecha de la factura'] });
+  resumenTarjeta(), { titulo: 'Campos', boton: '+ Añadir campo', campos: ['Fecha de la factura'] });
 await comprobar('1. el control es el de la clase Fecha', pagina.evaluate(() => document.querySelector('.mesa-campos-hito input').type), 'date');
 await abrirMesa(A1, H[0].id);
 await comprobar('1. «Revisar la factura»: sin campos, la tarjeta sale pequeña con el botón',

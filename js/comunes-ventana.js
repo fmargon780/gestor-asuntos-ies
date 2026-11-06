@@ -50,7 +50,8 @@ var ComunesVentana = (function () {
       uso = Comunes.usos(GuiasDelCentro.todas());
     } catch (e) { U.fallo('No he podido leer la lista', e); return; }
 
-    var st = ctx.estado || { q: '', f: null, modo: 'lista', nuevo: null, sel: 0, para: ctx.para && ctx.para.length ? ctx.para[0].valor : '' };
+    var st = ctx.estado || { q: '', f: null, modo: 'lista', nuevo: null, sel: 0, para: ctx.para && ctx.para.length ? ctx.para[0].valor : '',
+      detras: ctx.detras && ctx.detras.length ? ctx.detras[ctx.detras.length - 1].valor : '' };   /* fila 553: «Va detrás de», por defecto el último */
     var capa = document.createElement('div');
     capa.className = 'capa capa-campos';
     capa.innerHTML = '<div class="cuadro cuadro-campos" role="dialog" aria-modal="true" aria-label="' + (tarea ? 'Elegir una tarea' : 'Elegir un hito') + '"></div>';
@@ -63,7 +64,7 @@ var ComunesVentana = (function () {
 
     var lista = tarea ? listas.tareas : listas.hitos;
     var mapaUso = tarea ? uso.tareas : uso.hitos;
-    function elegir(x) { cerrar(); ctx.alElegir(x, st.para); }
+    function elegir(x) { cerrar(); ctx.alElegir(x, st.para, st.detras); }
     function tareasDe(h) { return (h.tareas || []).map(function (id) { var t = Comunes.buscar(listas.tareas, id); return t ? t.nombre : ''; }).filter(Boolean).join(' · '); }
 
     function fila(x) {
@@ -92,6 +93,8 @@ var ComunesVentana = (function () {
         (st.modo === 'lista' ? '<input type="search" id="cv-buscar" class="campo" placeholder="Buscar por nombre" aria-label="Buscar por nombre" autocomplete="off" value="' + esc(st.q) + '">' : '') + '</div>' +
         '<div class="campos-elegir-cuerpo"' + (grupos ? '' : ' style="grid-template-columns:minmax(0,1fr)"') + '>' + grupos + '<div class="campos-elegir-centro" id="cv-centro">' + centro + '</div></div>' +
         '<div class="campos-elegir-pie">' +
+        (ctx.detras && ctx.detras.length ? '<span class="campos-elegir-para"><label class="suave pequeno" for="cv-detras">Va detrás de</label> <select id="cv-detras" class="campo">' +
+          ctx.detras.map(function (o) { return '<option value="' + esc(o.valor) + '"' + (o.valor === st.detras ? ' selected' : '') + '>' + esc(o.texto) + '</option>'; }).join('') + '</select></span>' : '') +
         (ctx.para && ctx.para.length > 1 ? '<span class="campos-elegir-para"><label class="suave pequeno" for="cv-para">Para</label> <select id="cv-para" class="campo">' +
           ctx.para.map(function (o) { return '<option value="' + esc(o.valor) + '"' + (o.valor === st.para ? ' selected' : '') + '>' + esc(o.texto) + '</option>'; }).join('') + '</select></span>' : '<span></span>') +
         (st.modo === 'lista' ? '<button type="button" class="boton" id="cv-crear">+ Crear ' + (tarea ? 'una tarea nueva' : 'un hito nuevo') + '</button>' : '') + '</div>';
@@ -99,6 +102,8 @@ var ComunesVentana = (function () {
       cuadro.querySelector('#cv-cerrar').onclick = cerrar;
       var paraSel = cuadro.querySelector('#cv-para');
       if (paraSel) paraSel.onchange = function () { st.para = paraSel.value; };
+      var detrasSel = cuadro.querySelector('#cv-detras');
+      if (detrasSel) detrasSel.onchange = function () { st.detras = detrasSel.value; };
       var b = cuadro.querySelector('#cv-buscar');
       if (b) {
         b.oninput = function () { st.q = b.value; st.sel = 0; pintar(); var n = cuadro.querySelector('#cv-buscar'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); };

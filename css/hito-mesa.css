@@ -287,3 +287,50 @@ details.mesa-normativa > summary { cursor: pointer; }
 /* Fila 423: el hueco del botón «Ruta» de cada documento de la mesa. */
 .ruta-documento-lugar { display: inline-flex; align-items: center; flex: 0 0 auto; }
 .ruta-documento-lugar:empty { display: none; }
+
+/* ---------- fila 553 (docs/553-PARTES-DEL-HITO.md): las cuatro partes del hito, cada una en su recuadro ----------
+   Tareas, Campos, Documentos y Registro: cabecera de fondo propio, título más grande y oscuro, con su cuenta al lado.
+   Un recuadro no lleva `overflow: hidden` (cortaría el menú ⋮): la esquina redonda va en la propia cabecera. */
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) {
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 10px; padding: 0 0 12px; gap: 8px;
+}
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-bloque-cabecera {
+  background: #eef3f9; border-bottom: 1px solid var(--linea); border-radius: 10px 10px 0 0; padding: 8px 12px;
+  justify-content: flex-start; gap: 10px; flex-wrap: wrap;
+}
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-bloque-titulo,
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-grande-titulo {
+  font-size: 15px; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--tinta);
+}
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-grande-titulo { flex: 1 1 auto; gap: 10px; }
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-grande-titulo .boton { margin-left: auto; }
+.mesa-col-hito .mesa-docs-cuenta, .mesa-col-hito .mesa-guion-cuenta { font-size: 12.5px; font-weight: 400; color: var(--tinta-suave); }
+/* Lo de dentro de cada recuadro, con su margen a los lados (la cabecera va de lado a lado). */
+.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) > :not(.mesa-bloque-cabecera):not(.mesa-guion),
+.mesa-col-hito > .mesa-grande-guion > .mesa-guion > :not(.mesa-bloque-cabecera) { margin-left: 12px; margin-right: 12px; }
+.mesa-col-hito > .mesa-grande-guion > .mesa-guion { display: flex; flex-direction: column; gap: 4px; }
+.mesa-col-hito > .mesa-campos-hito { padding: 0 0 12px; }
+.mesa-col-hito > .mesa-campos-hito.mesa-campos-hito-vacia { padding: 0 0 8px; }
+.mesa-col-hito > .mesa-grande-notas .nota-nueva { margin-bottom: 8px; }
+/* La explicación del hito, encima del recuadro de las tareas. */
+.mesa-col-hito > .hito-explicacion { margin: 0 2px; }
+
+/* La etiqueta de lo que hace cada tarea («Comunicar», «Pedir datos»…), al lado del nombre. */
+.guion-paso .guion-tarea-accion {
+  font-size: 11px; font-weight: 600; color: var(--azul); background: var(--azul-claro); border-radius: 10px;
+  padding: 1px 8px; white-space: nowrap;
+}
+
+/* La franja de «Has cambiado el orden de las tareas en este asunto.» */
+.guion-orden-cambiado {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--azul-claro);
+  border: 1px solid var(--azul); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-top: 6px;
+}
+.guion-orden-cambiado > span { flex: 1 1 220px; min-width: 0; }
+
+/* «+ Añadir hito», al final de la tira de hitos. */
+.mesa-tira-anadir {
+  flex: 0 0 auto; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  border: 0; border-bottom: 3px solid transparent; padding: 5px 10px; background: #eef2f6; color: var(--azul);
+}
+.mesa-tira-anadir:hover { background: #e3eefb; }

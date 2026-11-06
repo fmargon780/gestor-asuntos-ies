@@ -57,7 +57,7 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
 - **A la derecha, los botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
   (fila 434: sin «Registrar» en la cabecera; la tarea de registrar se marca sola al unir el PDF sellado a un documento del hito, `RegistroSellado.asociar`, salvo `{ noMarcar: true }` del registro por personas; «Registrar» del ⋯ del documento sigue, y lleva el bloque «Documentos del hito» a la vista con `HitoMesa.verDocumentos`) «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
   hecho, «Hecho ✓ (desmarcar)») y **«Hito ▾»** (fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`, antes
-  «···»): arriba, sin repetir la palabra, **Crear · Cambiar · Borrar** (fila 206, no en un
+  «···»): arriba, sin repetir la palabra, **Cambiar · Borrar** (fila 206; fila 553: sin «Crear», los hitos nuevos salen de «+ Añadir hito» de la tira; no en un
   hito-pregunta: ver más abajo; mismas funciones, solo el texto cambia), y debajo de una raya
   «Saltar a este hito…» (fila 129, si se puede), «Dejarlo solo informativo»/«Pedírmelo a mí», «Cambiar
   la guía…» (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y
@@ -139,8 +139,7 @@ apagado si el hito no está vacío).
 ### El hito en una columna (fila 425, 22-oct-2026, `docs/FICHA-VISTA-DE-TRABAJO.md`; antes, tres tarjetas: fila 147)
 
 El hito entero, de arriba abajo y en una sola columna (`.mesa-columnas > .mesa-col-hito`), con este
-orden: **Tareas** (`.mesa-grande-guion`) → **Campos de este hito** (`.mesa-campos-hito`) → **Documentos
-del hito** (`.mesa-grande-docs`) → **Registro** (`.mesa-grande-notas`; fila 426: además de las líneas del hito, las notas escritas a mano del asunto que no van unidas a ningún hito, con la etiqueta «del asunto»: `RegistroAsunto.lineas(a, { hito, hitos, conSueltas: true })`; las líneas automáticas sin hito no salen, siguen en la pestaña Registro) y «Normativa (N)» plegada al pie.
+orden: **Tareas** (`.mesa-grande-guion`) → **Campos** (`.mesa-campos-hito`) → **Documentos** (`.mesa-grande-docs`) → **Registro** (`.mesa-grande-notas`; fila 426: además de las líneas del hito, las notas escritas a mano del asunto que no van unidas a ningún hito, con la etiqueta «del asunto»: `RegistroAsunto.lineas(a, { hito, hitos, conSueltas: true })`; las líneas automáticas sin hito no salen, siguen en la pestaña Registro) y «Normativa (N)» plegada al pie.
 La columna es la izquierda de «Trabajo»; la pinta `HitosPanelLista.cuerpoDeHito`. Ya no hay tarjetas de
 resumen ni cambio de tarjeta (`.mesa-resumen`, `HitoMesa.abrirTarjeta`, «← Volver al guion» y
 `js/hito-mesa-tarjetas.js` desaparecieron). Los botones del guion pulsan los de siempre por debajo.
@@ -189,7 +188,7 @@ resumen ni cambio de tarjeta (`.mesa-resumen`, `HitoMesa.abrirTarjeta`, «← Vo
   de marcados encima, una sola línea por documento (fila 439: casilla, tipo en negrita, el nombre del fichero (abre el visor),
   «Ruta», fecha y registro `.mesa-doc-registro` y campos en gris cortados con «…», estado «Registrado»/«Sin registrar», Enviar y
   ⋯; ya no hay «Abrir» suelto) y los gemelos debajo de su documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir»). El
-  título dice «Documentos del hito · 2» (`cuentaTitulo`). Cada documento de la carpeta (derecha) lleva
+  título dice «Documentos» y su cuenta al lado (`cuentaTitulo`). Cada documento de la carpeta (derecha) lleva
   una casilla `.ficha-documento-marca` (solo con un hito abierto para trabajar): lo marcado allí se
   suma a lo marcado a la izquierda (`HitoMesaDocumentos.marcados`, `alMarcar`) y se adjunta al
   «Comunicar» y al «Enviar» del hito; los del hito abierto llevan la marca «Hito N» (`.ficha-marca-hito`,
@@ -472,3 +471,12 @@ Cada documento de la mesa (los del hito, los de otros hitos, los sueltos, los ge
 plantillas de «Generar documento») lleva el hueco `.ruta-documento-lugar` (`RutaCarpetas.huecoHTML`) que
 `HitoMesaDocumentos.enganchar` rellena con `RutaCarpetas.enganchar(fila, a, modo)` (`modo` sale de `abierto`). Las
 previas traen su subcarpeta real en `nombresDeLaCarpeta.carpetaDePrevias` (`js/hitos-panel.js`). Ver `docs/contexto/DOCUMENTOS.md`.
+
+**Las partes del hito, ordenar tareas y añadir hitos (fila 553, `docs/553-PARTES-DEL-HITO.md`)**: Tareas, Campos, Documentos y Registro van cada una en su recuadro
+(`css/hito-mesa.css`, final: `.mesa-col-hito > .mesa-bloque`, cabecera de fondo propio y título de 15 px; sin `overflow: hidden`, para no cortar el menú ⋮). La explicación del hito
+va encima del recuadro de Tareas. Cada tarea con acción lleva su etiqueta (`.guion-tarea-accion`). **Subir/Bajar**: el «⋮» de la tarea
+(`HitoMesaTareaMenu.moverOpciones`) llama a `Hitos.moverGuion` (`js/hitos-guion-orden.js`), que guarda `guionOrden` (claves de los bloques: id de la tarea de la guía, también si aquí la
+sustituye otra, o id de la «solo aquí»; una pregunta con sus respuestas es un solo bloque) en el hito; `Hitos.guionDe` lo respeta y devuelve `bloques` y `ordenGuia`. Si el orden de las
+tareas de la guía difiere del de la guía, sale la franja `.guion-orden-cambiado` (`Hitos.ordenDeLaGuiaCambiado`): «Guardar también en la guía» (`guardarOrdenEnLaGuia`: antes fija el orden de
+los demás asuntos abiertos del tipo y guarda la guía con `sinLlevar`) o «Solo en este asunto» (`guionOrdenVisto`). «Cambiar la tarea» (`ComunesCambiar.tarea`) trae «Qué se hace» y sus datos.
+«+ Añadir hito» está al final de la tira (`.mesa-tira-anadir`, `ComunesAsunto.anadirHito(a)`) y la ventana de la lista común añade «Va detrás de» (`ctx.detras`, `alElegir(x, para, idDetras)`).
