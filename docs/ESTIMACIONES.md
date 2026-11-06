@@ -32,5 +32,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | 529 | 120 | Editor por pasos y cálculo con pruebas, respetando los calculados de antes |
 | 530 | 180 | Toca Word, correo, Séneca, tareas y alta; acción nueva |
 | 531 | 240 | Ficheros nuevos, guías por referencia y propuesta de paso; la de más riesgo |
-| 552 | 120 | clase nueva de tarea, carpeta con permiso, nombre con campos, copia al llegar el registrado, «(2)», pruebas, revisor |
 | 555 | 300 | destinatarios que se buscan escribiendo con la lista cerrada del asunto, custodia, otro correo para un envío, plantilla con papeles en tres campos y saludo y firma, tarea sin «a quién», quitar «Va a», «Añadir un grupo», «+ Tutor/a» y las casillas de «Comunicar ▾», paso de las plantillas viejas, adaptar seis pruebas y una nueva, revisor |
