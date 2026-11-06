@@ -8,7 +8,8 @@
    cierra mientras se escribe y vuelve con la plantilla ya elegida). Hito
    nuevo: nombre, explicación y tareas de la lista. Al escribir el nombre
    salen las parecidas, para no duplicar. «Crear y añadir» guarda en la lista
-   común y llama a `elegir`.
+   común y llama a `elegir`; con «Solo este asunto» (fila 539) no guarda en la
+   lista: pasa el elemento suelto a `elegir`.
    ============================================================ */
 (function () {
 
@@ -104,7 +105,8 @@
 
     caja.querySelector('#cn-crear').onclick = async function () {
       var texto = String(n.nombre || '').trim();
-      var error = !texto ? 'Ponle un nombre.' : Comunes.existeNombre(lista, texto) ? 'Ya existe con ese nombre.' : '';
+      var soloAqui = c.st.para === 'aqui'; /* fila 539: «Solo este asunto» no entra en la lista común ni ocupa su nombre */
+      var error = !texto ? 'Ponle un nombre.' : !soloAqui && Comunes.existeNombre(lista, texto) ? 'Ya existe con ese nombre.' : '';
       if (error) { caja.querySelector('#cn-err').innerHTML = '<div class="aviso aviso-ambar">' + esc(error) + '</div>'; return; }
       var boton = caja.querySelector('#cn-crear');
       boton.disabled = true;
@@ -112,7 +114,7 @@
         var elemento = tarea
           ? { nombre: texto, accion: n.accion, receta: n.plantilla ? { plantilla: n.plantilla } : null }
           : { nombre: texto, explicacion: n.explicacion, tareas: n.tareas };
-        var guardado = await ComunesGuardado.anadir(tarea ? 'tareas' : 'hitos', elemento);
+        var guardado = soloAqui ? elemento : await ComunesGuardado.anadir(tarea ? 'tareas' : 'hitos', elemento);
         c.elegir(guardado);
       } catch (e) { boton.disabled = false; U.fallo('No he podido crearla', e); }
     };

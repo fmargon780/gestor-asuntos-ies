@@ -100,7 +100,9 @@ await comprobar('4b. «Solo este asunto» no toca la guía y deja la tarea solo 
   const t = l.tareas.filter((x) => x.nombre === 'Generar la resolución de baja')[0];
   const propia = (await window.__hito('__a')).guionPropio || [];
   return [JSON.stringify(window.__guiaDe(window.__a.tipo)) === antes, !!(t && t.receta && t.receta.plantilla), propia.map((g) => [g.texto, g.accion, !!(g.receta && g.receta.plantilla), g.comun || ''])];
-}, guiaAntes), [true, true, [['Generar la resolución de baja', 'generar', true, '']]]);
+}, guiaAntes), [true, false, [['Generar la resolución de baja', 'generar', true, '']]]);
+/* Fila 539: lo creado «solo este asunto» ya no entra en la lista; las pruebas de abajo la necesitan, así que se añade aparte. */
+await p.evaluate(async () => { const g = (await window.__hito('__a')).guionPropio.filter((x) => x.texto === 'Generar la resolución de baja')[0]; await ComunesGuardado.anadir('tareas', { nombre: 'Generar la resolución de baja', accion: 'generar', receta: g.receta }); });
 
 await p.evaluate(async () => ComunesAsunto.anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
 await p.waitForSelector('#cv-crear');
@@ -118,8 +120,8 @@ await p.waitForSelector('#cn-pl');
 await comprobar('4d. al guardarla, la ventana vuelve con lo escrito y la plantilla nueva elegida', p.evaluate(() => [document.querySelector('#cn-nombre').value, document.querySelector('#cn-hace').value, document.querySelector('#cn-pl').selectedOptions[0].textContent.indexOf('Correo de prueba 531') !== -1, document.querySelector('#cv-para').value]), ['Enviar el correo a la familia', 'comunicar', true, 'aqui']);
 await p.click('#cn-crear');
 await esperar(900);
-await comprobar('4e. la tarea se crea con esa plantilla', p.evaluate(async () => {
-  const t = (await ComunesGuardado.leer()).tareas.filter((x) => x.nombre === 'Enviar el correo a la familia')[0];
+await comprobar('4e. la tarea se crea en el asunto con esa plantilla (fila 539: no en la lista)', p.evaluate(async () => {
+  const t = ((await window.__hito('__a')).guionPropio || []).filter((x) => x.texto === 'Enviar el correo a la familia')[0];
   const pl = Plantillas.enMemoria().lista.filter((x) => x.nombre === 'Correo de prueba 531')[0];
   return [t.accion, !!pl && t.receta.plantilla === pl.id];
 }), ['comunicar', true]);

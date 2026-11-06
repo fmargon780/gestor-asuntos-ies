@@ -42,4 +42,11 @@ Al debatirlo, el 6-nov-2026: «Lo cambiamos así».
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (6-nov-2026, ayudante sin ver el código, por la interfaz en la copia demo):
+  1. Tarea nueva «Solo este asunto»: COINCIDE (sale en el asunto, la lista común sigue vacía, al reabrir la ventana no está).
+  2. Hito nuevo «Solo este asunto» con una tarea de la lista: COINCIDE (sale en el asunto con su tarea; no entra en la lista de hitos).
+  3. «Este asunto y los siguientes»: COINCIDE en lista y asunto. NO LO HE PODIDO VER en pantalla: la línea concreta enlazada en la guía (lo cubre la prueba `pruebas/comunes-solo-aqui.mjs`, 3a) y que repetir el nombre siga sin dejarse (visto en el código; la prueba 3b lo comprueba).
+  4. La guía no cambia: COINCIDE (JSON idéntico antes y después).
+  5. Plantilla con «Solo este asunto»: COINCIDE con una plantilla ya existente. NO LO HE PODIDO VER el camino «Plantilla nueva…» (lo cubre la prueba 4e de `pruebas/comunes-ventanas.mjs`).
+  Lo que hace de más: nada. Solo permite repetir el nombre con «Solo este asunto» (acordado) y las ventanas de la guía siguen guardando en la lista.
+- Pruebas: nuevas en `pruebas/comunes-solo-aqui.mjs`; en `pruebas/comunes-ventanas.mjs` 4b y 4e esperan ahora que la tarea «solo aquí» no esté en la lista.
