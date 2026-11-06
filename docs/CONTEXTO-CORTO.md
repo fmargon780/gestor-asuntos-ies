@@ -84,6 +84,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
 - Plan de las guías (fila 551): Herramientas → «Aplicar el plan de las guías» pasa las guías a las listas comunes de tareas y de hitos y, una vez aplicado, quita lo viejo (tareas e hitos libres en la guía, «Traer un hito de otro tipo», «Nueva tarea…», «Tipos y su uso»).
+- Tarea «Copiar a otra carpeta» (fila 552): al llegar el registrado a su hito copia el documento a una carpeta de fuera del asunto (recordada por ordenador), con nombre de campos, sin pisar nunca (« (2)») y con «Dar permiso» si falta el permiso (`js/tarea-copiar*.js`).
 - Medidas, «Qué hay de nuevo» y el botón «Soporte» común.
 - El tutor y las tutorías vienen solo de las fichas `hecho/tutorias` del Centro de datos, todos los cursos; el Gestor ya no lee el PDF de la función tutorial (fila 376).
 
