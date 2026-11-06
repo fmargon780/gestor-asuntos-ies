@@ -64,7 +64,9 @@ console.log('--- 2. Enviar correo ---');
 await pagina.locator('.guion-paso[data-id="g-hacer-comunicar"] .guion-accion-tarea').click();
 await pagina.waitForSelector('#capa:not(.oculto) #correo-caja', { timeout: 15000 });
 await pagina.waitForTimeout(1500);
-await comprobar('2. el cuadro de Correo trae el destinatario y el texto de la plantilla',
+/* Fila 555: a quién va lo dice la plantilla (esta no propone a nadie): se elige a quien se escribe. */
+await pagina.evaluate(() => { CorreoPara.ponerDirecciones('para', ['familia@correo-demo.es']); CorreoPara.repintar(); });
+await comprobar('2. el cuadro de Correo trae el texto de la plantilla y se puede elegir a quién va',
   pagina.evaluate(() => { const c = document.getElementById('correo-caja'); const t = c.innerText + ' ' + Array.from(c.querySelectorAll('input,textarea')).map((x) => x.value).join(' ');
     return [/@/.test(t), /certificado de notas que nos solicit/i.test(t)]; }), [true, true]);
 await pagina.locator('#correo-caja button:text-is("Enviar")').click();

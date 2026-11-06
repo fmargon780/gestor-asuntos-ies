@@ -159,9 +159,9 @@ console.log('--- 3. a quién se propone ---');
 capturado = null;
 const hitoParaTutor = Object.assign({}, hitoConCorreo, { responsable: 'tutor' });
 await HitosComunicar.comunicar(asunto1, hitoParaTutor, 'correo');
-comprobar('responsable "tutor": propone al tutor legal 1, con su correo',
+comprobar('responsable "tutor": el nombre es el del tutor legal 1 y el correo ya no se propone (fila 555: lo dice la plantilla)',
   [capturado.extra.comunicarHito.nombreDestinatario, capturado.extra.correoPreferente],
-  ['Pérez Ruiz, Luis', 'luis@ejemplo.es']);
+  ['Pérez Ruiz, Luis', '']);
 
 capturado = null;
 const hitoParaCentro = Object.assign({}, hitoConCorreo, { responsable: 'yo' });
