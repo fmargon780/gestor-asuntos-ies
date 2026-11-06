@@ -46,6 +46,10 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (5-nov-2026, tema 518) Los **hitos** se comparten **enteros**, con sus tareas (opción 1). El plazo y el lugar en la guía son de cada guía. Los otros asuntos abiertos no cambian.
 - (5-nov-2026, tema 518) Lo que hace una tarea sale de una lista fija; un comportamiento nuevo es trabajo de programación.
 - (5-nov-2026, tema 518) Las guías actuales se pasan **con Claude**: «preferiría hacer esto ayudado por tí».
+- (6-nov-2026, idea 538) **Al pasar las guías (fila 532) se quita también la caja «Nueva tarea…» del asunto**: queda solo «+ Añadir tarea». Hasta entonces conviven.
+- (6-nov-2026, idea 538) **«Cambiar la tarea» va en el ⋮** de la tarea, no como botón visible, aunque la pantalla aprobada lo traía visible.
+- (6-nov-2026, idea 538) **Añadir no es cambiar:** un hito nuevo en la guía llega también a los asuntos abiertos de ese tipo; cambiar una tarea o un hito no les llega.
+- (6-nov-2026, idea 538) **Lo creado «solo este asunto» no entra en la lista común** («Lo cambiamos así», fila 539).
 
 ## Correo
 
