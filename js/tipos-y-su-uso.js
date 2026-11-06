@@ -216,6 +216,6 @@ var TiposYSuUso = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', engancharRefresco);
   else engancharRefresco();
 
-  return { recoger: recoger, guiaDe: guiaDe, fechaLegible: fechaLegible, pintar: pintar };
+  return { crear: bloque, recoger: recoger, guiaDe: guiaDe, fechaLegible: fechaLegible, pintar: pintar };
 })();
 window.TiposYSuUso = TiposYSuUso;

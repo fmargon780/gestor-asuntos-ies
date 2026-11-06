@@ -21,12 +21,7 @@ async function abrir(extra) {
   await p.waitForSelector('#franja-demo', { timeout: 30000 });
   await p.waitForTimeout(2500);
   /* Entrando directo a Herramientas, sin pasar por Ajustes. */
-  await p.evaluate(() => {
-    document.querySelectorAll('.pantalla').forEach((x) => x.classList.add('oculto'));
-    document.getElementById('pantalla-herramientas').classList.remove('oculto');
-    App.pantallaALaVista = (c) => c === 'herramientas';
-    Gestor.alRefrescar.forEach((f) => { try { f(); } catch (e) { /* solo pintar */ } });
-  });
+  await p.evaluate(() => App.ir('herramientas'));
   await p.waitForSelector('#bloque-tipos-uso', { state: 'attached' });
   await p.evaluate(() => { document.getElementById('bloque-tipos-uso').open = true; });
   await p.waitForSelector('#tu-filas tr[data-t]');

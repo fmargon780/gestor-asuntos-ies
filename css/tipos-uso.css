@@ -2,14 +2,15 @@
 .tu-cab { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 .tu-cab .tu-resumen { color: var(--tinta-suave); font-size: 13px; }
 .tu-cab .tu-enviar { margin-left: auto; }
-.tu-dos { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr); gap: 12px; align-items: start; margin-top: 10px; }
+.tu-dos { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 12px; align-items: start; margin-top: 10px; }
 .tu-panel { border: 1px solid var(--linea, #dde3ea); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .tu-filtros { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .tu-pastilla { font: inherit; font-size: 13px; border: 1px solid var(--linea, #dde3ea); background: transparent; color: inherit; border-radius: 999px; padding: 4px 11px; cursor: pointer; }
 .tu-pastilla.on { background: var(--azul, #1f4e79); color: #fff; border-color: var(--azul, #1f4e79); }
-.tu-caja { overflow-x: auto; max-height: 460px; overflow-y: auto; }
+.tu-caja { overflow-x: auto; max-height: 560px; overflow-y: auto; }
 .tu-tabla { border-collapse: collapse; width: 100%; font-size: 14px; }
 .tu-tabla th { text-align: left; font-size: 12px; color: var(--tinta-suave, #5d6b7a); font-weight: 600; padding: 5px 8px; border-bottom: 1px solid var(--linea, #dde3ea); white-space: nowrap; }
+.tu-tabla td:last-child { white-space: nowrap; }
 .tu-tabla td { padding: 6px 8px; border-bottom: 1px solid var(--linea, #dde3ea); vertical-align: middle; }
 .tu-tabla .num { text-align: right; font-variant-numeric: tabular-nums; }
 .tu-tabla tbody tr { cursor: pointer; }
@@ -24,4 +25,5 @@
 .tu-hito li { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; align-items: baseline; }
 .tu-guia h3 { margin: 0; font-size: 16px; }
 .tu-suave { color: var(--tinta-suave, #5d6b7a); font-size: 13px; }
+@media (max-width: 1100px) { .tu-dos { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 860px) { .tu-dos { grid-template-columns: minmax(0, 1fr); } .tu-cab .tu-enviar { margin-left: 0; } }

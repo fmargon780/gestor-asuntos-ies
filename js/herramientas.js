@@ -12,6 +12,8 @@
    con ellos. Se llama desde App.ir (js/nucleo.js). */
 
 App.pintarHerramientas = async function () {
+  /* Fila 543: el bloque temporal «Tipos y su uso» sale al entrar, sin haber pasado antes por Ajustes. */
+  if (window.TiposYSuUso) TiposYSuUso.crear();
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   /* Fila 344: las etiquetas también se cierran (antes de cualquier espera: se abren desde un asunto con App.ir); su botón se engancha. */
