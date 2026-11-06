@@ -24,6 +24,7 @@ var Comunes = (function () {
     { valor: 'generar', texto: 'Generar documento' }, { valor: 'firmar', texto: 'Firmar' },
     { valor: 'registrar', texto: 'Registrar' }, { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir documento' }, { valor: 'pedir', texto: 'Pedir datos' },
+    { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
     { valor: '', texto: 'Otra cosa' }
   ];
 
@@ -82,7 +83,8 @@ var Comunes = (function () {
     return (lista || []).some(function (x) {
       if (x.id === salvoId || norm(x.nombre) !== norm(e.nombre)) return false;
       if (clave === 'hitos') return (x.tareas || []).join(',') === (e.tareas || []).join(',');
-      return (x.accion || '') === (e.accion || '') && ((x.receta && x.receta.plantilla) || '') === ((e.receta && e.receta.plantilla) || '');
+      return (x.accion || '') === (e.accion || '') && ((x.receta && x.receta.plantilla) || '') === ((e.receta && e.receta.plantilla) || '') &&
+        ((x.receta && x.receta.carpeta) || '') === ((e.receta && e.receta.carpeta) || '');   /* fila 552: dos «Copiar» a carpetas distintas no son la misma */
     });
   }
   function existeNombre(lista, nombre, salvoId) {

@@ -46,6 +46,7 @@
     if (g.accion === 'firmar') return 'Firmar un documento' + (GG.firmasNecesarias(g) > 1 ? ' · ' + GG.firmasNecesarias(g) + ' firmas' : '');
     if (g.accion === 'registrar') return 'Registrar un documento';
     if (g.accion === 'anadir') return 'Añadir un documento';
+    if (g.accion === 'copiar') return 'Copiar a otra carpeta' + (r.carpeta ? ' · ' + r.carpeta : '');   /* fila 552 */
     if (g.accion === 'pedir') return 'Pedir datos' + (r.campos && r.campos.length ? ' · ' + r.campos.length + (r.campos.length === 1 ? ' campo' : ' campos') : '');   /* fila 530 */
     return 'Sin acción';
   }
@@ -175,6 +176,7 @@
       var leida = {};
       [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
         .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
+      if (receta.classList.contains('guion-receta-copiar') && window.TareaCopiarEditor) Object.assign(leida, TareaCopiarEditor.leerGuia(receta));   /* fila 552 */
       if (receta.dataset.campos) { try { leida.campos = JSON.parse(receta.dataset.campos); } catch (e) { /* sin campos */ } }   /* fila 530 */
       var limpia = normalizarReceta(base.accion, leida);
       if (limpia) base.receta = limpia;
@@ -277,6 +279,7 @@
           } catch (e) { U.fallo('No he podido añadir el campo', e); }
         } });
       };
+      if (window.TareaCopiarEditor) TareaCopiarEditor.guia(fila, alCambiar);   /* fila 552: «Elegir carpeta» e «Insertar campo» */
       /* Fila 164: al cambiar la acción, sale (o se va) su receta. */
       var accionSel = fila.querySelector(':scope > .guion-fila-linea .guion-accion');
       if (accionSel) accionSel.onchange = function () { alCambiar(function () { /* solo repintar con lo leído */ }); };

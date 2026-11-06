@@ -75,12 +75,18 @@ var ComunesCambiar = (function () {
     var cuerpo = avisoUsos('Esta tarea', uso) +
       '<label class="et" for="cc-nombre">Nombre</label><input id="cc-nombre" class="campo" value="' + esc(t.nombre) + '">' +
       (conPlantilla ? '<label class="et" for="cc-pl">Plantilla</label><select id="cc-pl" class="campo"><option value="">Sin plantilla fija</option>' +
-        plantillas.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === actual ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') + '</select>' : '');
+        plantillas.map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === actual ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') + '</select>' : '') +
+      (t.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.formularioHTML(t.receta) : '');   /* fila 552 */
     var capa = ventana('Cambiar la tarea', cuerpo, async function (c) {
       var nombre = c.querySelector('#cc-nombre').value.trim();
       if (!nombre) return 'Ponle un nombre.';
       var pl = c.querySelector('#cc-pl'), nueva = JSON.parse(JSON.stringify(t));
       nueva.nombre = nombre;
+      if (t.accion === 'copiar' && window.TareaCopiarEditor) {   /* fila 552 */
+        var rc = TareaCopiarEditor.leer(c);
+        if (!rc || !rc.carpeta) return 'Elige la carpeta de destino.';
+        nueva.receta = rc;
+      }
       if (pl) { var r0 = Object.assign({}, t.receta || {}); if (pl.value) r0.plantilla = pl.value; else delete r0.plantilla; nueva.receta = r0; }
       if (Comunes.existeIgual('tareas', d.listas.tareas, nueva, t.id)) return 'Ya hay otra tarea con ese nombre.';
       try { nueva = await ComunesGuardado.reemplazar('tareas', nueva); } catch (e) { U.fallo('No he podido guardar el cambio', e); return 'No se ha guardado.'; }
@@ -90,6 +96,7 @@ var ComunesCambiar = (function () {
       if (window.HitosPanel) HitosPanel.programarRepintado();
       return '';
     });
+    if (t.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(capa);   /* fila 552 */
     var n = capa.querySelector('#cc-nombre'); n.focus(); n.setSelectionRange(n.value.length, n.value.length);
   }
 

@@ -47,7 +47,8 @@
       Comunes.HACE.map(function (h) { return '<option value="' + esc(h.valor) + '"' + (h.valor === n.accion ? ' selected' : '') + '>' + esc(h.texto) + '</option>'; }).join('') + '</select></div>' +
       (conPlantilla ? '<div><label class="et" for="cn-pl">Plantilla</label><select id="cn-pl" class="campo"><option value="">Sin plantilla fija</option>' +
         plantillasDe(n.accion).map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === n.plantilla ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') +
-        '<option value="__nueva">Plantilla nueva…</option></select></div>' : '') + '</div>';
+        '<option value="__nueva">Plantilla nueva…</option></select></div>' : '') + '</div>' +
+      (n.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.formularioHTML(null) : '');   /* fila 552 */
   }
 
   function formularioHito(n, listas) {
@@ -86,6 +87,7 @@
     caja.querySelector('#cn-volver').onclick = c.volver;
 
     if (tarea) {
+      if (n.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(caja);   /* fila 552 */
       caja.querySelector('#cn-hace').onchange = function (ev) { n.accion = ev.target.value; n.plantilla = ''; pintarNuevo(caja, c); };
       var pl = caja.querySelector('#cn-pl');
       if (pl) pl.onchange = function () {
@@ -106,13 +108,15 @@
     caja.querySelector('#cn-crear').onclick = async function () {
       var texto = String(n.nombre || '').trim();
       var soloAqui = c.st.para === 'aqui'; /* fila 539: «Solo este asunto» no entra en la lista común ni ocupa su nombre */
-      var error = !texto ? 'Ponle un nombre.' : !soloAqui && Comunes.existeNombre(lista, texto) ? 'Ya existe con ese nombre.' : '';
+      var copia = tarea && n.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.leer(caja) : null;
+      var error = tarea && n.accion === 'copiar' && !(copia && copia.carpeta) ? 'Elige la carpeta de destino.'
+        : !texto ? 'Ponle un nombre.' : !soloAqui && Comunes.existeNombre(lista, texto) ? 'Ya existe con ese nombre.' : '';
       if (error) { caja.querySelector('#cn-err').innerHTML = '<div class="aviso aviso-ambar">' + esc(error) + '</div>'; return; }
       var boton = caja.querySelector('#cn-crear');
       boton.disabled = true;
       try {
         var elemento = tarea
-          ? { nombre: texto, accion: n.accion, receta: n.plantilla ? { plantilla: n.plantilla } : null }
+          ? { nombre: texto, accion: n.accion, receta: n.accion === 'copiar' ? copia : (n.plantilla ? { plantilla: n.plantilla } : null) }
           : { nombre: texto, explicacion: n.explicacion, tareas: n.tareas };
         var guardado = soloAqui ? elemento : await ComunesGuardado.anadir(tarea ? 'tareas' : 'hitos', elemento);
         c.elegir(guardado);
