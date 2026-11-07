@@ -46,12 +46,11 @@ salvo que la instrucción lo pida.
 
 ## 3. Cuándo se para la sesión
 
-**A. Pregunta para la persona** (Francisco u otra), solo en dos casos:
-- aparece algo que la instrucción no cubre y que **cambia lo que ve o hace la usuaria**;
-- el cambio sale **más del doble** de lo estimado.
+**A. Pregunta para la persona** (Francisco u otra), solo en un caso: aparece algo que la
+instrucción no cubre y que **cambia lo que ve o hace la usuaria**.
 
 Una frase de lanzamiento o una regla de la app que diga «sin preguntarme nada» significa que la
-sesión va sola: en estos dos casos no decide ella, deja la fila BLOQUEADA como se explica abajo.
+sesión va sola: en ese caso no decide ella, deja la fila BLOQUEADA como se explica abajo.
 
 Cómo se pregunta: en lenguaje llano, una sola pregunta, con las opciones numeradas y sus pros y
 contras, **sin marcar ninguna como recomendada**. Si la persona está en la conversación, se le
@@ -104,8 +103,8 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 6. **La cola no pierde filas.** Antes de escribir en `docs/COLA.md`, baja `main`. Después de
    subir, comprueba que siguen todas las filas que había. Si falta alguna, la recuperas antes de
    seguir.
-7. Estimación: en la subida que marca EN CURSO se pone al día `docs/ESTIMACIONES.md` (minutos de
-   cada fila que queda). Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`.
+7. Tiempo: no se estima. Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`;
+   lo que tardó cada fila sale de esa hora y de la subida que la marcó EN CURSO.
 
 ## 6. Segundo revisor, comprobar y publicar
 

@@ -27,7 +27,7 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
 1. Cada fila trabaja en su propia rama `fila-<nº>`, creada desde `main` al empezar (o en la rama
    `claude/...` que el entorno permita). **Nunca se nivela ninguna rama a la fuerza** si tiene
    commits que no están en `main`. La rama de una fila no se borra hasta que su trabajo está en
-   `main`. Las subidas que solo tocan `docs/` (EN CURSO, estimaciones, HECHA) van directas a
+   `main`. Las subidas que solo tocan `docs/` (EN CURSO, HECHA) van directas a
    `main`: no publican nada (Vercel ya no publica solo, ver «Vercel no publica nada solo» abajo).
 2. Nada se sube a `pruebas` para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
    la subida a tu rama, sube a una `claude/...`, abre una petición de cambios y fusiónala tú mismo

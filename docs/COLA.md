@@ -85,7 +85,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Vercel no publica nada solo: ninguna subida a GitHub crea
     una publicación. **La única publicación de una fila con código es la hecha a propósito** con
     `create_deployment` (regla de `CLAUDE.md`), tras fusionar su rama `fila-<nº>` en `main` con la
-    APROBADA del revisor. Las subidas de solo `docs/` (marca EN CURSO, estimaciones, HECHA) van
+    APROBADA del revisor. Las subidas de solo `docs/` (marca EN CURSO, HECHA) van
     directas a `main` y no cuentan en ningún tope. Nada de un commit por fichero.
 
 16. **Si delegas una fila de documentación en una sesión auxiliar**, pídele explícitamente que lea
