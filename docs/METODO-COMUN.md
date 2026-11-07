@@ -84,7 +84,10 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 2. No se espera ni se persigue a GitHub Actions si solo pasa pruebas, salvo que la publicación
    misma vaya por ahí.
 3. Como mucho tres subidas por fila (EN CURSO, el cambio, HECHA), nunca fichero a fichero.
-4. Ningún fichero de código pasa de 400 líneas: el que haya que tocar y las pase, se parte antes.
+4. **Ficheros de código: tope de 400 líneas, pero nunca se parte uno en mitad de una tarea.** Un
+   fichero nuevo nace por debajo del tope. Los que ya lo pasan solo se parten en una tarea aparte,
+   sin cambiar nada de lo que ve la usuaria, que Claude apunta en la cola cuando un fichero grande
+   se toca a menudo (decidido por Francisco el 7-nov-2026).
 5. **Tamaño de la cola y del resumen.** `docs/COLA.md` no pasa de 40 KB (40.000 bytes según
    `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas ni de 20 KB (20.000 bytes), porque
    lo leen todas las conversaciones de la app. Se actualizan sustituyendo la línea vieja, no
