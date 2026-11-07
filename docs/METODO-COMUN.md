@@ -87,10 +87,11 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 3. Como mucho tres subidas por fila (EN CURSO, el cambio, HECHA), nunca fichero a fichero.
 4. Ningún fichero de código pasa de 400 líneas: el que haya que tocar y las pase, se parte antes.
 5. **Tamaño de la cola y del resumen.** `docs/COLA.md` no pasa de 40 KB (40.000 bytes según
-   `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas. Se actualizan sustituyendo la línea
-   vieja, no añadiendo otra debajo.
+   `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas ni de 20 KB (20.000 bytes), porque
+   lo leen todas las conversaciones de la app. Se actualizan sustituyendo la línea vieja, no
+   añadiendo otra debajo.
    **Al marcar una fila HECHA**, en esa misma subida, la sesión los mide (`wc -c docs/COLA.md`,
-   `wc -l docs/CONTEXTO-CORTO.md`) y, si alguno se pasa, lo reduce:
+   `wc -l -c docs/CONTEXTO-CORTO.md`) y, si alguno se pasa, lo reduce:
    - **Cola:** las filas HECHA, SUSTITUIDA y DESCARTADA salen de la cola y pasan, con su texto
      completo, a `docs/HISTORIA.md`. Las HECHA de hoy y de ayer se quedan un día más, porque el
      Centro de mando saca de la cola su «Terminado hoy». Las notas largas de las filas que siguen
