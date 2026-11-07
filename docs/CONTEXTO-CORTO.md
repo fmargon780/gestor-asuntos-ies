@@ -2,7 +2,7 @@
 
 Se lee en toda conversación y en cada sesión de Claude Code. Es para **decidir**, no para
 programar: para eso está `docs/CONTEXTO.md` y sus hijos en `docs/contexto/`. El porqué de las
-cosas y el diario están en `docs/HISTORIA.md`. **Máximo 40.000 caracteres** (regla 9 de `docs/COLA.md`; antes 14.000, que ya no se cumplía).
+cosas y el diario están en `docs/HISTORIA.md`. **Máximo 160 líneas y 20 KB** (`docs/METODO-COMUN.md`, 5.5).
 
 ## 0. La regla que no se puede olvidar
 
@@ -11,7 +11,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - Actualizar este documento y `docs/CONTEXTO.md` (o el hijo de `docs/contexto/` que toque)
   **sustituyendo la línea vieja, no añadiendo una debajo**. Si algo deja de ser verdad, se borra.
 - Añadir a `docs/HISTORIA.md` lo que merezca recordarse, con su fecha.
-- No dejar que este documento pase de 40.000 caracteres. La sección 5 es una línea por cosa, sin
+- No dejar que este documento pase de 160 líneas ni de 20 KB. La sección 5 es una línea por cosa, sin
   números de fila ni fechas: el detalle vive en `HISTORIA.md` y en el documento de cada fila.
 
 ## 1. Lo básico

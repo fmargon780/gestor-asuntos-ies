@@ -8,7 +8,7 @@ y preguntar, atascos, lecciones, ahorro, segundo revisor y publicar. Es una copi
 (`fmargon780/metodo-apps`): no se edita aquí. Lo que sigue en este fichero son reglas propias de
 esta app; mandan solo en lo propio (cómo se publica, ramas, revisor, pruebas).
 
-Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la cola.
+Al empezar, lee lo que dice `docs/METODO-COMUN.md`, apartado 1.
 
 **Una sola sesión a la vez, una fila tras otra** (27-sep-2026, cambiado el 1-oct-2026): nunca
 trabajan dos sesiones de Claude Code a la vez en este repositorio ni dos filas a la vez. Por
@@ -17,7 +17,7 @@ de la cola, de `docs/COLA.md`, la lleva hasta el final (revisor incluido)
 y para. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o «todas»), la
 misma conversación las hace de una en una, en el orden de la cola, cada una completa (EN CURSO,
 revisor, publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila
-nueva mira `docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en la regla 0 de la cola y en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+nueva mira `docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
@@ -150,21 +150,42 @@ verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
      publicación que no arranca, cola de más de 20 minutos): no es una publicación rota. **Se
      sigue trabajando.**
    Además, las filas SIN PUBLICACIÓN COMPROBADA se comprueban ahora: si la web ya sirve una
-   `App.VERSION` igual o posterior a la suya, pasan a HECHA en la misma subida que marca la nueva
-   fila EN CURSO.
+   `App.VERSION` igual o posterior a la suya **y además el commit de la fila está en `main`**, pasan
+   a HECHA en la misma subida que marca la nueva fila EN CURSO.
 3. **Si no puedes comprobarlo por una causa ajena:** la fila no se marca HECHA. Se deja como
-   **SIN PUBLICACIÓN COMPROBADA**, con el motivo en una línea, y la sesión termina con normalidad
-   (regla 0: para, y el siguiente lanzamiento coge la siguiente PENDIENTE). El tope de Vercel
+   **SIN PUBLICACIÓN COMPROBADA**, con el motivo y el SHA de `main` en una línea, y la sesión
+   termina con normalidad (para, y el siguiente lanzamiento coge la siguiente PENDIENTE). El tope de Vercel
    **no para la cola**. Tu mensaje final empieza exactamente con: «AVISO: no he podido comprobar
    que los cambios estén publicados.» **Un `create_deployment` por fila con código** (es el camino normal, ya no el de emergencia); si
-   responde 402, no se reintenta. Esto sustituye el «déjalo anotado para que otra sesión lo
-   compruebe» de la regla 19 de `docs/COLA.md`.
+   responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
+   `docs/PUBLICAR-SIN-PARAR.md`).
 4. **Si Francisco dice que no ve un cambio,** lo primero es comprobar si se publicó. Nunca
    suponer que es la caché del navegador sin haberlo comprobado.
 5. **«En verde»** en un mensaje a Francisco solo se dice si la publicación también lo está.
 
 Cómo se comprueba en este proyecto: se publica en Vercel. Por el primer camino que funcione:
-a) `curl` a `js/version.js?v=<algo distinto>` de `asuntos.fmargon.com` o
-`gestor-de-asuntos.vercel.app`: `App.VERSION` igual o posterior a la de la fila; b) el estado
-«Vercel» del commit en GitHub (`success`); c) `list_deployments` con el `sha`. Detalle en la regla
-19 de `docs/COLA.md`.
+a) `curl` a `https://asuntos.fmargon.com/js/version.js?v=<algo distinto>` o a
+`https://gestor-de-asuntos.vercel.app/js/version.js?v=<algo distinto>`: `App.VERSION` igual o
+posterior a la de la fila; b) el estado «Vercel» del commit en GitHub (`success`); c)
+`list_deployments` con el `sha`. Un solo `curl` por fichero tocado, no en bucle. Sin el commit de
+la fila en `main`, nunca HECHA, lo diga la web o no.
+
+## Reglas propias que estaban en la cabecera de `docs/COLA.md` (7-nov-2026)
+
+1. **La tabla de la cola está en orden de trabajo, no de número** (desde el 18-sep-2026): la
+   primera PENDIENTE no tiene por qué ser la del número más bajo.
+2. **La hora de `App.VERSION` la pone el programa** (`node scripts/poner-version.mjs`, fila 549),
+   nunca a mano ni a ojo: el 17-sep-2026 y el 6-nov-2026 salieron versiones con horas por delante
+   de la real.
+3. **Antes de subir nada, vuelve a bajar `main`** (`git fetch`): marcar la fila EN CURSO no basta,
+   y subir sin releer pisa lo de otro. Hazlo justo antes de cada subida.
+4. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
+   contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se quedó
+   en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más. Después de subir, vuelve a bajar
+   lo subido y compruébalo.
+5. **Si delegas una fila de documentación en una sesión auxiliar**, pídele que lea el fichero
+   entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El 19-sep-2026 una
+   sesión auxiliar retipeó tres ficheros e introdujo erratas en los tres.
+6. **Novedades visibles** (fila 248, `docs/NOVEDADES-AL-RECARGAR.md`). Al terminar una fila que
+   cambia algo que se ve en pantalla, añade su línea al principio de `js/novedades.js` en el mismo
+   commit del código. Si la fila no cambia nada visible, no se añade.

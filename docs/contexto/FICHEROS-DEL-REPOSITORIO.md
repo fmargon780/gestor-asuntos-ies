@@ -665,7 +665,6 @@ de `App` va después del fichero que lo define.
 | `docs/REPARTO-CONTEXTO.md` | El encargo de repartir el contexto en tres documentos |
 | `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto y seguir el hilo |
 | `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | El encargo de meter un documento suelto en un asunto que ya existe |
-| `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
 | `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
 | `docs/HITOS.md` | El encargo de los hitos de un asunto |
