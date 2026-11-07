@@ -4,10 +4,10 @@
 > **No se edita aquí.** Cuando el método cambia, Claude sustituye este fichero entero en todas las
 > apps. Si una regla de este fichero choca con `CLAUDE.md` de la app, manda `CLAUDE.md` solo en lo
 > propio de la app (cómo se publica, ramas, revisores técnicos propios, pruebas propias); en todo
-> lo demás manda este fichero. El segundo revisor (apartado 6) se hace siempre, también en las
-> apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro revisor es técnico y
-> se suma, no lo sustituye. Tampoco puede el `CLAUDE.md` de la app permitir pruebas que toquen los
-> datos reales (apartado 6.4).
+> lo demás manda este fichero. El segundo revisor (apartado 6) se hace en todas las tareas grandes,
+> también en las apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro
+> revisor es técnico y se suma, no lo sustituye. Tampoco puede el `CLAUDE.md` de la app permitir
+> pruebas que toquen los datos reales (apartado 6.4).
 
 ## 1. Al empezar cada sesión (y nada más)
 
@@ -29,8 +29,9 @@ salvo que la instrucción lo pida.
 ## 2. La instrucción manda
 
 1. Se programa solo lo que dicen, en la instrucción de la fila, «Lo que escribió <persona>», «Lo
-   que entendió Claude» y la pantalla de prueba (`docs/pantallas/<nº>.html`). Nada de mejoras de
-   paso.
+   que entendió Claude» y la pantalla de prueba (`docs/pantallas/<nº>.html`), si la hay. Nada de
+   mejoras de paso. Una pantalla de prueba ligera solo dice qué hay y dónde va: los colores, letras
+   y botones son los de la app.
 2. «Notas técnicas de Claude» solo dice **cómo** se programa. Si una nota cambiara lo que ve o
    hace la usuaria y eso no está en el texto ni en la pantalla de prueba, no se programa: se
    pregunta (apartado 3.A).
@@ -107,14 +108,17 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 
 ## 6. Segundo revisor, comprobar y publicar
 
-1. **Segundo revisor.** Al terminar de programar, y antes de publicar, lanza otro ayudante (la
-   herramienta de agentes) que no haya visto cómo se programó. Pásale solo: el texto de la
-   persona, lo entendido por Claude, la pantalla de prueba, «Cómo lo comprueba el segundo
-   revisor» y dónde están los cambios. Pídele que compare **lo que verá y hará la usuaria** con
-   eso, punto por punto, y que diga también qué hace la app que el texto no pide.
-2. El revisor escribe en la instrucción, en «Revisión y respuestas durante el trabajo», una línea
-   por punto: coincide / no coincide y por qué / no lo he podido ver y por qué. Nunca da por
-   bueno lo que no ha podido ver.
+1. **Segundo revisor, solo en las tareas grandes.** Una tarea es pequeña si su instrucción lo dice
+   («Tarea pequeña»); todas las demás son grandes. En una grande, al terminar de programar, y antes
+   de publicar, lanza otro ayudante (la herramienta de agentes) que no haya visto cómo se programó.
+   Pásale solo: el texto de la persona, lo entendido por Claude, la pantalla de prueba si la hay,
+   «Cómo lo comprueba el segundo revisor» y dónde están los cambios. Pídele que compare **lo que
+   verá y hará la usuaria** con eso, punto por punto, y que diga también qué hace la app que el
+   texto no pide. En una pequeña no hay segundo revisor: la sesión compara ella misma lo hecho con
+   la instrucción y lo apunta igual que lo haría el revisor.
+2. El revisor (o la sesión, en una tarea pequeña) escribe en la instrucción, en «Revisión y
+   respuestas durante el trabajo», una línea por punto: coincide / no coincide y por qué / no lo he
+   podido ver y por qué. Nunca da por bueno lo que no ha podido ver.
 3. Lo que no coincide se corrige y el revisor vuelve a mirarlo. Lo que hace la app sin que el
    texto lo pida se quita. Si después de dos vueltas sigue sin coincidir, la fila pasa a
    BLOQUEADA con «ATASCO PARA CLAUDE».
@@ -128,17 +132,19 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    datos, no se cambia: el revisor lo deja como «no lo he podido ver» y por qué. Esto manda
    también sobre el `CLAUDE.md` de la app (decidido por Francisco el 30-oct-2026).
 5. **Una fila solo es HECHA cuando está en `main`, publicada y comprobada** en la dirección real.
-   Después de publicar, el revisor mira la app publicada si puede entrar; si no puede, lo deja
-   escrito. Si no se puede comprobar la publicación por una causa ajena, queda SIN PUBLICACIÓN
-   COMPROBADA y el mensaje final empieza con «AVISO: no he podido comprobar que los cambios
-   estén publicados.»
+   Después de publicar, el revisor (o la sesión, en una tarea pequeña) mira la app publicada si
+   puede entrar; si no puede, lo deja escrito. Si no se puede comprobar la publicación por una
+   causa ajena, queda SIN PUBLICACIÓN COMPROBADA y el mensaje final empieza con «AVISO: no he
+   podido comprobar que los cambios estén publicados.»
 6. Al empezar cada sesión, lo primero es comprobar que la última publicación salió bien. Si está
    rota por nuestro código, arreglarla es lo único que se hace.
 7. Una publicación por tarea. Cómo se publica en esta app lo dice su `CLAUDE.md`.
 8. Si la persona dice que no ve un cambio, primero se comprueba si se publicó. Nunca se supone
    caché del navegador sin comprobarlo.
-9. Mensaje final para la persona, en dos líneas: qué ha quedado hecho y qué no pudo ver el
-   revisor. Que compare la app con su texto y con la pantalla de prueba.
+9. Mensaje final para la persona: qué ha quedado hecho, en una línea; qué no se pudo ver; y lo que
+   dice «Qué mirar al terminar» de la instrucción, una cosa por línea. Si la instrucción no tiene
+   ese apartado (instrucciones de antes del 7-nov-2026), la sesión lo escribe en ella a partir de
+   lo hecho, en la subida que marca HECHA.
 
 ## Lecciones para Claude Code (de todas las apps)
 
