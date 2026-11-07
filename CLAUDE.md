@@ -1,23 +1,21 @@
 # Gestor de asuntos del IES
 
-## Reglas comunes (método de trabajo, 29-oct-2026)
+**Lo primero, antes de leer nada más:** pon al día las reglas comunes con esta orden, desde la raíz
+del repositorio:
 
-**Lee y sigue `docs/METODO-COMUN.md` antes de coger cualquier fila.** Son las reglas comunes a
-todas las apps: qué leer al empezar (incluido `docs/LECCIONES.md`), la instrucción manda, cuándo parar
-y preguntar, atascos, lecciones, ahorro, segundo revisor y publicar. Es una copia del método
-(`fmargon780/metodo-apps`): no se edita aquí. Lo que sigue en este fichero son reglas propias de
-esta app; mandan solo en lo propio (cómo se publica, ramas, revisor, pruebas).
+    curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/METODO-COMUN.md -o /tmp/METODO-COMUN.md && grep -q '^# Reglas comunes para Claude Code' /tmp/METODO-COMUN.md && cp /tmp/METODO-COMUN.md docs/METODO-COMUN.md
 
-Al empezar, lee lo que dice `docs/METODO-COMUN.md`, apartado 1.
+Después lee y sigue `docs/METODO-COMUN.md`: son las reglas comunes a todas las apps y mandan en todo
+lo que no sea propio de esta app. Si la orden falla, sigue con la copia que ya hay y dilo en la nota
+de la fila.
 
-**Una sola sesión a la vez, una fila tras otra** (27-sep-2026, cambiado el 1-oct-2026): nunca
-trabajan dos sesiones de Claude Code a la vez en este repositorio ni dos filas a la vez. Por
-defecto, cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA o PENDIENTE**, en el orden
-de la cola, de `docs/COLA.md`, la lleva hasta el final (revisor incluido)
-y para. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o «todas»), la
-misma conversación las hace de una en una, en el orden de la cola, cada una completa (EN CURSO,
-revisor, publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila
-nueva mira `docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+Lo de abajo son **solo** las reglas propias de esta app.
+
+**Qué fila se coge** (27-sep-2026, cambiado el 1-oct-2026): la primera **DEVUELTA o PENDIENTE**,
+en el orden de la cola. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o
+«todas»), la misma conversación las hace de una en una, cada una completa (EN CURSO, revisor,
+publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila nueva mira
+`docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
@@ -30,28 +28,21 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    `main`. Las subidas que solo tocan `docs/` (EN CURSO, HECHA) van directas a
    `main`: no publican nada (Vercel ya no publica solo, ver «Vercel no publica nada solo» abajo).
 2. Nada se sube a `pruebas` para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
-   la subida a tu rama, sube a una `claude/...`, abre una petición de cambios y fusiónala tú mismo
-   al momento (`merge_pull_request`). Nunca dejes una petición de cambios abierta.
-3. Nunca subas ficheros de código uno a uno con las herramientas de ficheros de GitHub
-   (`create_or_update_file` o `push_files`): los ficheros grandes se cortan al subir. Si git no
-   puede subir de ninguna manera, para: deja la fila EN CURSO y dilo en tu mensaje final.
-4. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
-   `npm test` en tu sesión y la publicación comprobada (regla general de abajo). Si Actions falla
+   la subida a tu rama, vale lo de `docs/METODO-COMUN.md` 5.7 (rama `claude/...` y petición de
+   cambios fusionada al momento; nunca código con las herramientas de ficheros de GitHub).
+3. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
+   `npm test` en tu sesión y la publicación comprobada (apartado «Cómo se publica y se comprueba aquí»). Si Actions falla
    en una prueba que en tu sesión pasa, apúntala en una línea en `docs/COLA.md` («Lo que queda por
    hablar con Francisco») y sigue.
-5. Con la aprobación del revisor, la rama de la fila se fusiona en `main` (avance limpio o fusión
+4. Con la aprobación del revisor, la rama de la fila se fusiona en `main` (avance limpio o fusión
    normal; sin `git push`, petición de cambios fusionada al momento) y se publica a propósito, una
    sola vez (`create_deployment`, regla de abajo): es la única publicación de la fila. La rama `pruebas` ya no existe ni se nivela.
 
-**Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
-Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
+**Pruebas** (cuándo se pasa cada tanda: `docs/METODO-COMUN.md` 5.1):
 
-1. Mientras programas, pasa solo las pruebas de lo que tocas: `npm test -- <palabra> [<palabra>…]`
-   (el ejecutor lanza las que llevan esas palabras en el nombre), más las pruebas nuevas de la fila.
-2. La pasada completa (`npm test` sin palabras) se hace **una sola vez**, justo antes de la subida
-   del cambio (salvo que sea larga: ver «Pasada completa de pruebas: una vez al día si tarda»). Si sale en verde, se sube; no se repite «para confirmar».
-3. Si en esa pasada falla una prueba: arréglalo y repite **solo esa prueba y las de lo que hayas
-   vuelto a tocar**, no las 170. Y además:
+1. Solo lo tocado: `npm test -- <palabra> [<palabra>…]` (el ejecutor lanza las que llevan esas
+   palabras en el nombre), más las pruebas nuevas de la fila. Pasada completa: `npm test`.
+2. Si en la pasada falla una prueba:
    - (11-oct-2026, fila 333, `docs/PRUEBAS-SEGUNDO-INTENTO-A-SOLAS.md`) El ejecutor repite solo, una
      vez y a solas, cada prueba que falla en la tanda en paralelo. Si pasa en ese segundo intento,
      la pasada sale en verde y no hay nada que apuntar ni que apartar: **a `EN_SOLITARIO` ya no se
@@ -62,46 +53,10 @@ Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas com
      falla igual en `main` sin tu cambio, va a `RETIRADAS` (mismo fichero) con fecha y motivo, y se
      dice en la nota de la fila en una línea.
 
-## Pasada completa de pruebas: una vez al día si tarda (norma de Francisco, 22-oct-2026)
-
-Sustituye a «la pasada completa, una sola vez justo antes de subir» cuando esa pasada es larga.
-Manda sobre cualquier otra regla de `docs/COLA.md` o de `docs/` que diga lo contrario.
-
-1. **`docs/PASADA-DIARIA.md`** guarda una sola línea viva, que se sustituye cada vez:
-   `Última pasada completa: <fecha y hora de Madrid> · <minutos> min · <verde | con fallos> · commit <sha corto de main>`.
-   Si no existe, la primera sesión que haga una pasada completa lo crea.
-2. **Pasada corta (10 minutos o menos, o sin dato todavía):** todo sigue como antes. Pruebas de lo
-   tocado mientras se trabaja; la completa, una vez justo antes de subir. Al terminarla se apunta en
-   `docs/PASADA-DIARIA.md` cuánto ha tardado.
-3. **Pasada larga (más de 10 minutos según `docs/PASADA-DIARIA.md`):** modo diario.
-   a. Al empezar la sesión, si la fecha apuntada no es la de hoy (hora de Madrid), **lo primero** es
-      la pasada completa sobre `main` recién bajado, antes de tocar la fila. Se apunta el resultado.
-   b. Si sale en verde, se sigue con la fila normal.
-   c. Si falla una prueba, se repite a solas. Si a solas pasa, es fallo de carga: se apunta en una
-      línea y no cuenta como fallo. Si a solas también falla, se añade una fila nueva
-      «Arreglar la prueba <nombre>, que falla en la pasada diaria del <fecha>» **encima de todas las
-      PENDIENTE** de la cola (solo una DEVUELTA va delante), y esta misma sesión trabaja esa fila en
-      vez de la que iba a hacer.
-   d. Durante la fila, solo las pruebas de lo tocado, más las fijas que este repositorio obligue
-      siempre. **No se repite la pasada completa antes de subir.** El revisor, donde lo haya, sigue
-      igual.
-   e. Si la sesión hace varias filas seguidas, la pasada diaria se hace una sola vez, al principio.
-   f. Si en el día no se lanza ninguna fila, no se hace pasada: nada se programa solo.
-4. **El mensaje final** de la primera fila del día empieza su resumen con
-   «Pasada completa del día: <minutos> min, <en verde | con N fallos, arreglo apuntado el primero>.»
-   Las demás filas del día no la mencionan.
-5. Si una pasada completa (la diaria o una corta) tarda más o menos de lo apuntado, se actualiza el
-   dato: la frontera de 10 minutos se mira siempre con la última medida.
-
 **Terminal de la sesión** (fila 466, 27-oct-2026): **nunca `pkill -f` ni `pgrep -f`**: buscan en la línea de órdenes de todos los
 procesos, también en la de la terminal de la sesión, y la cierran. Para parar un proceso, guarda su
 número (PID) al lanzarlo y usa `kill <PID>`. `npm test` elige solo un puerto libre desde el 8123, así
 que pueden correr dos tandas a la vez.
-
-**Ideas y diseño** (28-sep-2026, decidido por Francisco): en `docs/COLA.md` puede haber filas
-con estado IDEA o EN DISEÑO. No son trabajo para Claude Code: nunca se cogen, ni se marcan, ni se mueven, ni se borran. «La primera PENDIENTE» se
-cuenta saltándolas. Solo una conversación de diseño las pasa a PENDIENTE, cuando Francisco
-cierra el diseño.
 
 **Tamaño de `docs/COLA.md` y `docs/CONTEXTO-CORTO.md`:** lo manda `docs/METODO-COMUN.md` 5.5
 (se miden al marcar cada fila HECHA). Es una subida solo de `docs/`, va directa a `main` y no
@@ -116,28 +71,23 @@ agente aparte, con contexto limpio (sin ver el código ni el diff), que entra po
 `docs/REVISOR-GUION.md` (fila 242). Un punto
 **[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
-publica en `main` (regla general de abajo) y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
+publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
 `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; nada pasa a esperar su revisión ni existe el estado
 EN EL PAQUETE). **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
 con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El
 siguiente lanzamiento coge la primera DEVUELTA o PENDIENTE en el orden de la cola (Francisco decide el orden completo); DEVUELTA dos
-lanzamientos seguidos pasa a BLOQUEADA. Nada de esto se para a pedir permiso ni a preguntarle nada
-a Francisco: las decisiones a mitad camino las toma la sesión y las deja escritas en la nota de la
-fila. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+lanzamientos seguidos pasa a BLOQUEADA. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 **Vercel no publica nada solo** (11-oct-2026, `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Ninguna subida a GitHub crea una
 publicación. Una tarea que cambia la app publica **una sola vez, a propósito**, cuando su código ya está en `main`: herramienta `create_deployment` de Vercel con `teamId` `team_gnCjBLTS8m8PNTFVUf7ST0uN`, `name` y `project` `gestor-de-asuntos`, `target` `production` y `gitSource` `{ type: github, org: fmargon780, repo: gestor-asuntos-ies, ref: main }`; después `get_deployment` hasta `READY` y comprobar la dirección publicada. Las subidas de solo documentos no publican y no hay nada que comprobar. Si responde 402 no se reintenta. Nunca se vuelve a encender la publicación automática ni se añade un `ignoreCommand`: las publicaciones canceladas también cuentan en el tope de 100 al día de toda la cuenta.
 
-## Regla general de publicación (manda sobre cualquier otra regla)
+## Cómo se publica y se comprueba aquí
 
-Acordada con Francisco el 26-sep-2026 para todos sus proyectos. Ese día, en otro proyecto,
-ninguna publicación salió bien durante horas y se marcaron filas como HECHAS «con todo en
-verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
+La regla general está en `docs/METODO-COMUN.md`, apartado 6. Lo propio de esta app:
 
-1. **Una fila solo es HECHA cuando está publicada y comprobada.** Probar en tu entorno (tipos,
-   pruebas, compilar) es necesario, pero no basta. Hacen falta las dos cosas (fila 242,
+1. **HECHA** necesita las dos cosas (fila 242,
    `docs/REVISOR-EN-LOCAL.md`): (a) **el commit de la fila está en `main`**
    (`git merge-base --is-ancestor <sha> origin/main`; «la web sirve una versión posterior» no lo
    demuestra); y (b) Vercel lo ha publicado (la dirección sirve la versión nueva, o la
@@ -159,9 +109,6 @@ verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
    que los cambios estén publicados.» **Un `create_deployment` por fila con código** (es el camino normal, ya no el de emergencia); si
    responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
    `docs/PUBLICAR-SIN-PARAR.md`).
-4. **Si Francisco dice que no ve un cambio,** lo primero es comprobar si se publicó. Nunca
-   suponer que es la caché del navegador sin haberlo comprobado.
-5. **«En verde»** en un mensaje a Francisco solo se dice si la publicación también lo está.
 
 Cómo se comprueba en este proyecto: se publica en Vercel. Por el primer camino que funcione:
 a) `curl` a `https://asuntos.fmargon.com/js/version.js?v=<algo distinto>` o a

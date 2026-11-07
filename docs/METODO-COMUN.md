@@ -1,13 +1,26 @@
 # Reglas comunes para Claude Code
 
-> Copia exacta de `METODO-COMUN.md` del repositorio `fmargon780/metodo-apps`.
-> **No se edita aquí.** Cuando el método cambia, Claude sustituye este fichero entero en todas las
-> apps. Si una regla de este fichero choca con `CLAUDE.md` de la app, manda `CLAUDE.md` solo en lo
+> El original vive en el repositorio público `fmargon780/metodo-reglas` y solo se cambia allí.
+> Cada app guarda una copia en `docs/METODO-COMUN.md`, que no se edita en la app: cada sesión la
+> pone al día al empezar (apartado 0). Si una regla de este fichero choca con `CLAUDE.md` de la app, manda `CLAUDE.md` solo en lo
 > propio de la app (cómo se publica, ramas, revisores técnicos propios, pruebas propias); en todo
 > lo demás manda este fichero. El segundo revisor (apartado 6) se hace en todas las tareas grandes,
 > también en las apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro
 > revisor es técnico y se suma, no lo sustituye. Tampoco puede el `CLAUDE.md` de la app permitir
 > pruebas que toquen los datos reales (apartado 6.4).
+
+## 0. Antes de nada: poner al día estas reglas
+
+La primera orden de cada sesión, antes de leer nada más, desde la raíz del repositorio de la app:
+
+    curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/METODO-COMUN.md -o /tmp/METODO-COMUN.md && grep -q '^# Reglas comunes para Claude Code' /tmp/METODO-COMUN.md && cp /tmp/METODO-COMUN.md docs/METODO-COMUN.md
+
+- Si funciona y `docs/METODO-COMUN.md` ha cambiado, lee la copia nueva y súbela junto con la
+  primera subida de la fila (la marca EN CURSO).
+- Si falla (sin red, GitHub no contesta), sigue con la copia que ya tiene la app y dilo en una
+  línea en la nota de la fila. No es un atasco.
+- `CLAUDE.md` de cada app repite esta orden en su primera línea, para que funcione aunque la
+  copia sea antigua.
 
 ## 1. Al empezar cada sesión (y nada más)
 
@@ -78,9 +91,28 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 
 ## 5. Ahorro de tiempo y de cuota
 
-1. Pruebas parciales mientras se trabaja (solo lo tocado); la pasada
-   completa, una vez antes de subir, o una vez al día si tarda más de 10 minutos
-   (`docs/PASADA-DIARIA.md`).
+1. **Pruebas parciales mientras se trabaja** (solo lo tocado, con la orden que diga `CLAUDE.md`).
+   **La pasada completa, una vez justo antes de subir; si tarda más de 10 minutos, una vez al día**
+   (norma de Francisco, 22-oct-2026):
+   - `docs/PASADA-DIARIA.md` guarda una sola línea viva, que se sustituye cada vez:
+     `Última pasada completa: <fecha y hora de Madrid> · <minutos> min · <verde | con fallos> · commit <sha corto de main>`.
+     Si no existe, la primera sesión que haga una pasada completa lo crea.
+   - **Pasada corta** (10 minutos o menos, o sin dato todavía): la completa, una vez justo antes de
+     subir. Al terminarla se apunta cuánto ha tardado.
+   - **Pasada larga** (más de 10 minutos): al empezar la sesión, si la fecha apuntada no es la de
+     hoy (hora de Madrid), lo primero es la pasada completa sobre `main` recién bajado, antes de
+     tocar la fila, y se apunta el resultado. Si una prueba falla, se repite a solas: si a solas
+     pasa, es fallo de carga, se apunta en una línea y no cuenta; si también falla, se añade la fila
+     «Arreglar la prueba <nombre>, que falla en la pasada diaria del <fecha>» encima de todas las
+     PENDIENTE (solo una DEVUELTA va delante) y esta sesión trabaja esa fila. Durante la fila, solo
+     las pruebas de lo tocado y las fijas que obligue `CLAUDE.md`; no se repite la pasada completa
+     antes de subir. Si la sesión hace varias filas seguidas, una sola pasada, al principio. Si en
+     el día no se lanza ninguna fila, no hay pasada.
+   - El mensaje final de la primera fila del día empieza con «Pasada completa del día: <minutos>
+     min, <en verde | con N fallos, arreglo apuntado el primero>.»; las demás no la mencionan.
+   - La frontera de 10 minutos se mira siempre con la última medida.
+   - Si en la pasada falla una prueba que no tiene que ver con el cambio y a solas pasa, se aparta,
+     se dice en una línea de la nota y se sigue. Nunca se sube con pruebas en rojo.
 2. No se espera ni se persigue a GitHub Actions si solo pasa pruebas, salvo que la publicación
    misma vaya por ahí.
 3. Como mucho tres subidas por fila (EN CURSO, el cambio, HECHA), nunca fichero a fichero.
@@ -106,7 +138,14 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 6. **La cola no pierde filas.** Antes de escribir en `docs/COLA.md`, baja `main`. Después de
    subir, comprueba que siguen todas las filas que había. Si falta alguna, la recuperas antes de
    seguir.
-7. Tiempo: no se estima. Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`;
+7. **Cómo se sube** (salvo que el `CLAUDE.md` de la app diga otra cosa, por ejemplo una rama por
+   fila): directo a `main`, con `git pull --rebase origin main` y `git push origin HEAD:main`. Si
+   git rechaza la subida a `main`, se sube a la rama `claude/...`, se abre una petición de cambios
+   y se fusiona en ese momento (`merge_pull_request`), sin esperar a nadie: nunca se deja una
+   abierta. Nunca se sube código con las herramientas de ficheros de GitHub (`create_or_update_file`,
+   `push_files`): los ficheros grandes se cortan. Si git no puede subir de ninguna manera, la fila
+   se queda EN CURSO y se dice en el mensaje final.
+8. Tiempo: no se estima. Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`;
    lo que tardó cada fila sale de esa hora y de la subida que la marcó EN CURSO.
 
 ## 6. Segundo revisor, comprobar y publicar
@@ -137,8 +176,10 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 5. **Una fila solo es HECHA cuando está en `main`, publicada y comprobada** en la dirección real.
    Después de publicar, el revisor (o la sesión, en una tarea pequeña) mira la app publicada si
    puede entrar; si no puede, lo deja escrito. Si no se puede comprobar la publicación por una
-   causa ajena, queda SIN PUBLICACIÓN COMPROBADA y el mensaje final empieza con «AVISO: no he
-   podido comprobar que los cambios estén publicados.»
+   causa ajena, queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, no se empieza otra
+   fila (salvo que el `CLAUDE.md` de la app diga que la cola sigue) y el mensaje final empieza con
+   «AVISO: no he podido comprobar que los cambios estén publicados.» «En verde», en un mensaje a la
+   persona, solo se dice si la publicación también lo está.
 6. Al empezar cada sesión, lo primero es comprobar que la última publicación salió bien. Si está
    rota por nuestro código, arreglarla es lo único que se hace.
 7. Una publicación por tarea. Cómo se publica en esta app lo dice su `CLAUDE.md`.
