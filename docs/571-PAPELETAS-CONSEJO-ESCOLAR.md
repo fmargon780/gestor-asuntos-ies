@@ -62,4 +62,6 @@ Te adjunto el modelo que se usó en las anteriores elecciones para el alumnado p
 - Saca las de Profesorado y mira que van 8 por hoja y se leen bien.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (9-nov-2026, servidor local, datos de la demo), APROBADA. Coincide: botón «Papeletas» junto a «Lista de candidaturas»; ventana con una fila por sector, admitidas, cruces ya puestas (demo con 7 unidades: 3·4·6·1) y PAS sin admitidas bloqueado; la casilla de la AMPA baja y sube madres y padres; sin papeletas, aviso y nada guardado; dos PDF guardados con aviso verde de uno por línea y botón por sector en el visor; PDF con solo admitidas, numeradas, por apellidos, recuadro vacío, grupo en Alumnado, sin DNI; 10 por hoja hasta 8 admitidas y 8 con más y letra mayor; excluir quita la candidatura; «Es de la AMPA» solo en Madres y padres, con etiqueta en la fila y nombre a la derecha en la papeleta; vocabulario y consola correctos.
+- No lo ha podido ver: el PDF pintado dentro del visor (Chromium sin interfaz lo enseña como binario); la rama de 12 unidades o más (5·5·8·1) con la demo (la cubre la prueba por la función); «Marca hasta 1 cruz» en un PDF real (lo cubre la prueba de la función).
+- Extras sin pedir: «· sin admitidas» en la celda de admitidas; cada «Sacar las papeletas» crea PDF nuevos sin sustituir los anteriores (documento propio, como pide el texto).
