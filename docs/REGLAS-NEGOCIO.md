@@ -153,6 +153,9 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 
 - (9-nov-2026, fila 566) Tras registrar, el documento registrado se queda siempre en la carpeta del asunto, con su «Ruta»; a versiones previas solo va el original sin sellar, si es otro fichero («Estoy de acuerdo»).
 
+- (9-nov-2026, tema 517) Cada documento registrado guarda **su fecha de registro**, aparte de la suya: del sello al registrar o, sin sello, del listado de Séneca; si no coinciden, manda el listado. **Nunca se escribe a mano** («Vale, de acuerdo. Juntamos las dos»).
+- (9-nov-2026, tema 517) La fecha de registro va en las plantillas (marca «fecha de registro») y los plazos de la guía eligen «desde que se hace» o «desde su registro»; las guías de antes siguen «desde que se hace» (eligió tratarlo en esta idea, opción 1; «Me parecen bien tus propuesta»).
+
 ## Elecciones al Consejo Escolar
 
 - (9-nov-2026, tema 570) Las papeletas salen de la tarjeta «Candidaturas» del asunto de las elecciones, no de la pantalla de Etiquetas, con las candidaturas admitidas de los cuatro sectores («1»: también madres y padres y PAS).
