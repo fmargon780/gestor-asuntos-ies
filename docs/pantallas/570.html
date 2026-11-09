@@ -1,0 +1,244 @@
+<meta charset="utf-8">
+<title>Papeletas del Consejo Escolar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Pantalla de prueba ligera de la fila 570: la tarjeta «Candidaturas» de la ficha del asunto, con lo nuevo.
+   Un solo aspecto, claro, como la app. */
+:root {
+  --papel: #ffffff; --fondo: #f4f6f9; --tinta: #1d2733; --suave: #6b7686; --linea: #d9dee6;
+  --azul: #1f4e79; --azul-claro: #e7eef7; --ambar: #8a5a00; --ambar-claro: #fff4dc; --verde: #1e6b3a; --verde-claro: #e6f4ea;
+  --letra: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--fondo); color: var(--tinta); font-family: var(--letra); font-size: 14px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
+.aviso-prueba { background: #7a4f00; color: #fff; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+.tarjeta { background: var(--papel); border: 1px solid var(--linea); border-radius: 10px; padding: 16px 18px; }
+h3 { margin: 0 0 12px; font-size: 16px; }
+.barra { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+button, select, input { font: inherit; }
+.boton { background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 7px 14px; cursor: pointer; color: var(--tinta); }
+.boton:hover { background: var(--azul-claro); }
+.boton.principal { background: var(--azul); color: #fff; border-color: var(--azul); }
+.boton:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.bloques { display: flex; flex-direction: column; gap: 10px; }
+.bloque { border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; }
+.bloque h4 { margin: 0 0 6px; font-size: 14px; }
+.suave { color: var(--suave); font-weight: normal; }
+ul.filas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.fila { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; border-top: 1px solid var(--linea); padding-top: 6px; }
+.fila:first-child { border-top: 0; padding-top: 0; }
+.datos { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 220px; }
+.datos small { color: var(--suave); }
+.chip { display: inline-block; background: var(--ambar-claro); color: var(--ambar); border-radius: 10px; padding: 0 8px; font-size: 12px; margin-left: 6px; }
+.estado { display: flex; gap: 6px; align-items: center; position: relative; }
+.menu-btn { border: 1px solid var(--linea); background: var(--papel); border-radius: 6px; padding: 2px 9px; cursor: pointer; }
+.menu { position: absolute; right: 0; top: 30px; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.12); z-index: 5; min-width: 200px; display: flex; flex-direction: column; padding: 4px; }
+.menu button { text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 6px; cursor: pointer; }
+.menu button:hover { background: var(--azul-claro); }
+.aviso { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--verde-claro); color: var(--verde); }
+/* el cuadro */
+.capa { position: fixed; inset: 0; background: rgba(20,30,45,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 20; overflow: auto; }
+.cuadro { background: var(--papel); border-radius: 10px; width: min(760px, 100%); display: flex; flex-direction: column; }
+.cuadro header { padding: 14px 18px; border-bottom: 1px solid var(--linea); font-weight: 600; font-size: 15px; }
+.cuadro .cuerpo { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.cuadro footer { padding: 12px 18px; border-top: 1px solid var(--linea); display: flex; justify-content: flex-end; gap: 8px; }
+.tabla-env { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--linea); vertical-align: middle; }
+th { font-size: 12px; color: var(--suave); font-weight: 600; }
+td input { width: 80px; padding: 4px 6px; border: 1px solid var(--linea); border-radius: 6px; }
+td.num { font-variant-numeric: tabular-nums; }
+.error { color: #a12020; font-size: 13px; }
+.campo { padding: 6px 8px; border: 1px solid var(--linea); border-radius: 6px; width: 100%; }
+/* el visor del PDF */
+.visor { margin-top: 14px; }
+.visor-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.hojas { display: flex; flex-wrap: wrap; gap: 14px; }
+.hojas > div { width: 420px; max-width: 100%; min-width: 0; }
+.hoja { width: 100%; aspect-ratio: 210 / 297; background: #fff; border: 1px solid #b9c0ca; box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); }
+.hoja-pie { font-size: 11px; color: var(--suave); text-align: center; margin-top: 3px; }
+.papeleta { border: 1px dashed #9aa3ae; padding: 5px 7px; font-size: 7.6px; line-height: 1.25; color: #000; overflow: hidden; }
+.papeleta.vacia { border-color: transparent; }
+.papeleta .t1 { font-weight: 700; text-align: center; }
+.papeleta .t2 { text-align: center; margin-bottom: 2px; }
+.papeleta .t3 { font-weight: 600; margin: 2px 0 3px; }
+.papeleta ol { list-style: none; margin: 0; padding: 0; }
+.papeleta li { display: grid; grid-template-columns: 9px 12px 1fr auto; gap: 3px; align-items: center; }
+.papeleta .caja { width: 8px; height: 8px; border: 1px solid #000; font-size: 7px; line-height: 7px; text-align: center; }
+</style>
+
+<div class="aviso-prueba">Pantalla de prueba · datos inventados · nada se guarda</div>
+
+<div class="tarjeta">
+  <h3>Candidaturas</h3>
+  <div class="barra">
+    <button type="button" class="boton" id="anadir">+ Añadir candidatura</button>
+    <button type="button" class="boton" id="lista">Lista de candidaturas ▾</button>
+    <button type="button" class="boton" id="papeletas">Papeletas</button>
+  </div>
+  <div class="bloques" id="bloques"></div>
+  <div id="mensaje"></div>
+  <div class="visor" id="visor" hidden></div>
+</div>
+
+<div class="capa" id="capa" hidden></div>
+
+<script>
+var SECTORES = ['Alumnado', 'Madres y padres', 'Profesorado', 'PAS'];
+var ESTADOS = ['Presentada', 'Admitida', 'Excluida', 'Retirada'];
+var C = [
+  ['Alumnado', 'Alcaide Rueda', 'Paula', '3º ESO B'], ['Alumnado', 'Benítez Gil', 'Hugo', '4º ESO A'],
+  ['Alumnado', 'Cabello Ortiz', 'Lucía', '1º BCH B'], ['Alumnado', 'Domínguez Peña', 'Marcos', '2º BCH A'],
+  ['Alumnado', 'Escobar Lima', 'Noa', '4º ESO C'], ['Alumnado', 'Fuentes Mora', 'Iván', '3º ESO A'],
+  ['Alumnado', 'Gallego Ruiz', 'Sara', '1º BCH A', 'Retirada'],
+  ['Madres y padres', 'Herrero Campos', 'Rocío'], ['Madres y padres', 'Iglesias Soto', 'Andrés'],
+  ['Madres y padres', 'Jurado Paz', 'Elena'], ['Madres y padres', 'Lara Vílchez', 'Miguel Ángel', '', 'Admitida', 'AMPA Los Olivos'],
+  ['Profesorado', 'Marín Sáez', 'Ana Isabel'], ['Profesorado', 'Navarro Díaz', 'Juan Carlos'], ['Profesorado', 'Ocaña Ríos', 'Beatriz'],
+  ['Profesorado', 'Pardo León', 'Javier'], ['Profesorado', 'Quesada Toro', 'Inés'], ['Profesorado', 'Ramos Vela', 'Pedro'],
+  ['Profesorado', 'Salas Mena', 'Carmen'], ['Profesorado', 'Téllez Bravo', 'Óscar'], ['Profesorado', 'Urbano Cid', 'Laura'],
+  ['Profesorado', 'Vargas Rey', 'Daniel'], ['Profesorado', 'Zamora Luque', 'Marta'],
+  ['PAS', 'Molina Castro', 'Rafael']
+].map(function (x, i) { return { id: i, sector: x[0], ap: x[1], nom: x[2], grupo: x[3] || '', estado: x[4] || 'Admitida', ampa: x[5] || '' }; });
+C.forEach(function (c) { if (c.sector !== 'Alumnado') c.grupo = ''; });
+C[8].estado = 'Presentada';
+
+var recordado = {};   /* lo escrito en el cuadro la última vez */
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); }
+function porSector(s) { return C.filter(function (c) { return c.sector === s; }).sort(function (a, b) { return a.ap.localeCompare(b.ap, 'es'); }); }
+function admitidas(s) { return porSector(s).filter(function (c) { return c.estado === 'Admitida'; }); }
+
+function pintar() {
+  $('bloques').innerHTML = SECTORES.map(function (s) {
+    var fs = porSector(s);
+    return '<div class="bloque"><h4>' + s + ' <span class="suave">(' + fs.length + ')</span></h4><ul class="filas">' +
+      fs.map(function (c) {
+        return '<li class="fila" data-id="' + c.id + '"><div class="datos"><strong>' + esc(c.ap + ', ' + c.nom) +
+          (c.ampa ? '<span class="chip">' + esc(c.ampa) + '</span>' : '') + '</strong>' +
+          '<small>02/11/2026 · 26EM04' + (10 + c.id) + ' · Candidatura ' + (c.id + 1) + '.pdf</small></div>' +
+          '<div class="estado"><select class="sel" aria-label="Estado">' + ESTADOS.map(function (e) {
+            return '<option' + (e === c.estado ? ' selected' : '') + '>' + e + '</option>'; }).join('') + '</select>' +
+          '<button type="button" class="menu-btn" aria-label="Más">⋮</button></div></li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+  document.querySelectorAll('.fila').forEach(function (li) {
+    var c = C[+li.dataset.id];
+    li.querySelector('.sel').onchange = function (e) { c.estado = e.target.value; };
+    li.querySelector('.menu-btn').onclick = function (e) { e.stopPropagation(); abrirMenu(li, c); };
+  });
+}
+
+function cerrarMenus() { document.querySelectorAll('.menu').forEach(function (m) { m.remove(); }); }
+document.addEventListener('click', cerrarMenus);
+
+function abrirMenu(li, c) {
+  cerrarMenus();
+  var m = document.createElement('div'); m.className = 'menu';
+  var ops = ['Ver su ficha', 'Cambiar el sector'];
+  if (c.sector === 'Madres y padres') ops.push(c.ampa ? 'Ya no es de la AMPA' : 'Es de la AMPA');
+  ops.push('Quitar la candidatura');
+  ops.forEach(function (t) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = t;
+    b.onclick = function (e) {
+      e.stopPropagation(); cerrarMenus();
+      if (t === 'Es de la AMPA') pedirAmpa(c);
+      else if (t === 'Ya no es de la AMPA') { c.ampa = ''; pintar(); }
+      else mensaje('En la prueba, «' + t + '» no hace nada: es lo de siempre.');
+    };
+    m.appendChild(b);
+  });
+  li.querySelector('.estado').appendChild(m);
+}
+
+function mensaje(t) { $('mensaje').innerHTML = t ? '<div class="aviso">' + esc(t) + '</div>' : ''; }
+
+function cuadro(titulo, cuerpo, textoOk, alOk) {
+  var capa = $('capa');
+  capa.innerHTML = '<div class="cuadro" role="dialog" aria-label="' + esc(titulo) + '"><header>' + esc(titulo) + '</header>' +
+    '<div class="cuerpo">' + cuerpo + '</div><footer><button type="button" class="boton" id="q-no">Cancelar</button>' +
+    '<button type="button" class="boton principal" id="q-si">' + esc(textoOk) + '</button></footer></div>';
+  capa.hidden = false;
+  $('q-no').onclick = function () { capa.hidden = true; };
+  $('q-si').onclick = function () { if (alOk() !== false) capa.hidden = true; };
+}
+
+function pedirAmpa(c) {
+  cuadro('Es de la AMPA', '<p>¿Qué AMPA presenta a «' + esc(c.ap + ', ' + c.nom) + '»? En la papeleta sale con este nombre al lado y la cruz ya puesta.</p>' +
+    '<label for="q-ampa">Nombre de la AMPA</label><input id="q-ampa" class="campo" value="">', 'Guardar', function () {
+      var v = $('q-ampa').value.trim();
+      if (!v) { $('q-ampa').focus(); return false; }
+      c.ampa = v; pintar();
+    });
+}
+
+/* ---------- Papeletas ---------- */
+$('papeletas').onclick = function () {
+  mensaje('');
+  var filas = SECTORES.map(function (s, i) {
+    var n = admitidas(s).length, r = recordado[s] || {};
+    var off = n ? '' : ' disabled';
+    return '<tr><td>' + s + '</td><td class="num">' + n + (n ? '' : ' <span class="suave">· sin admitidas</span>') + '</td>' +
+      '<td><input id="cr' + i + '" type="number" min="1" inputmode="numeric" value="' + (r.cruces || '') + '"' + off + ' aria-label="Cruces de ' + s + '"></td>' +
+      '<td><input id="pp' + i + '" type="number" min="0" inputmode="numeric" value="' + (r.papeletas || '') + '"' + off + ' aria-label="Papeletas de ' + s + '"></td></tr>';
+  }).join('');
+  cuadro('Papeletas', '<p>Salen solo las candidaturas admitidas. Deja en blanco las papeletas del sector que no quieras sacar.</p>' +
+    '<div class="tabla-env"><table><thead><tr><th>Sector</th><th>Admitidas</th><th>Cruces que se pueden marcar</th><th>Papeletas</th></tr></thead><tbody>' + filas + '</tbody></table></div>' +
+    '<p id="q-error" class="error"></p>', 'Sacar las papeletas', sacar);
+};
+
+function sacar() {
+  var pedido = [], error = '';
+  SECTORES.forEach(function (s, i) {
+    var cr = parseInt($('cr' + i).value, 10), pp = parseInt($('pp' + i).value, 10);
+    recordado[s] = { cruces: $('cr' + i).value, papeletas: $('pp' + i).value };
+    if (!(pp > 0)) return;
+    if (!(cr > 0)) { error = error || 'Falta cuántas cruces se pueden marcar en ' + s + '.'; return; }
+    pedido.push({ sector: s, cruces: cr, papeletas: pp });
+  });
+  if (error) { $('q-error').textContent = error; return false; }
+  if (!pedido.length) { $('q-error').textContent = 'Escribe cuántas papeletas hacen falta en algún sector.'; return false; }
+  verPdf(pedido);
+}
+
+function papeletaHtml(p) {
+  var cs = admitidas(p.sector);
+  var hayAmpa = p.sector === 'Madres y padres' && cs.some(function (c) { return c.ampa; });
+  var marca = 'Marca hasta ' + p.cruces + ' ' + (p.cruces === 1 ? 'cruz' : 'cruces') + (hayAmpa ? ' más' : '');
+  return '<div class="papeleta"><div class="t1">Elecciones al Consejo Escolar 2026-2027</div>' +
+    '<div class="t2">IES Fuente Lucena · Sector ' + esc(p.sector) + '</div><div class="t3">' + marca + '</div><ol>' +
+    cs.map(function (c, k) {
+      return '<li><span class="caja">' + (c.ampa ? '✕' : '') + '</span><span>' + (k + 1) + '</span><span>' + esc(c.ap + ', ' + c.nom) + '</span><span>' +
+        esc(c.grupo || c.ampa || '') + '</span></li>';
+    }).join('') + '</ol></div>';
+}
+
+function verPdf(pedido) {
+  var hojas = [];
+  pedido.forEach(function (p) {
+    for (var hechas = 0; hechas < p.papeletas; hechas += 8) {
+      var en = Math.min(8, p.papeletas - hechas), celdas = '';
+      for (var k = 0; k < 8; k++) celdas += k < en ? papeletaHtml(p) : '<div class="papeleta vacia"></div>';
+      hojas.push({ sector: p.sector, html: celdas });
+    }
+  });
+  var total = pedido.reduce(function (a, p) { return a + p.papeletas; }, 0);
+  $('visor').hidden = false;
+  $('visor').innerHTML = '<div class="visor-barra"><strong>261109 PAPELETAS D26-01250.pdf</strong>' +
+    '<span class="suave">' + total + ' papeletas en ' + hojas.length + (hojas.length === 1 ? ' hoja' : ' hojas') + '</span>' +
+    '<span><button type="button" class="boton">Imprimir</button> <button type="button" class="boton" id="cerrar-visor">Cerrar</button></span></div>' +
+    '<div class="hojas">' + hojas.map(function (h, i) {
+      return '<div><div class="hoja">' + h.html + '</div><div class="hoja-pie">Hoja ' + (i + 1) + ' · ' + esc(h.sector) + '</div></div>';
+    }).join('') + '</div>';
+  $('cerrar-visor').onclick = function () { $('visor').hidden = true; };
+  mensaje('Papeletas guardadas en el asunto: 261109 PAPELETAS D26-01250.pdf');
+}
+
+$('anadir').onclick = function () { mensaje('En la prueba, «+ Añadir candidatura» no hace nada: es lo de siempre.'); };
+$('lista').onclick = function () { mensaje('En la prueba, «Lista de candidaturas» no hace nada: es lo de siempre.'); };
+pintar();
+</script>
