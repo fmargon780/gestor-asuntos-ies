@@ -104,7 +104,7 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
      tocar la fila, y se apunta el resultado. Si una prueba falla, se repite a solas: si a solas
      pasa, es fallo de carga, se apunta en una línea y no cuenta; si también falla, se añade la fila
      «Arreglar la prueba <nombre>, que falla en la pasada diaria del <fecha>» encima de todas las
-     PENDIENTE (solo una DEVUELTA va delante) y esta sesión trabaja esa fila. Durante la fila, solo
+     PENDIENTE y DEVUELTA, y esta sesión trabaja esa fila. Durante la fila, solo
      las pruebas de lo tocado y las fijas que obligue `CLAUDE.md`; no se repite la pasada completa
      antes de subir. Si la sesión hace varias filas seguidas, una sola pasada, al principio. Si en
      el día no se lanza ninguna fila, no hay pasada.

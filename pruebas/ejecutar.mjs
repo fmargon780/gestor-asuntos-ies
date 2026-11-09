@@ -30,6 +30,7 @@ import { existsSync, readdirSync, realpathSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { pedir } from './apoyo/pedir.mjs';
 import { aRepetir, decidir, lineasDelResumen, tituloSegundoIntento } from './apoyo/segundo-intento.mjs';
 
 const CARPETA = fileURLToPath(new URL('.', import.meta.url));
@@ -141,7 +142,7 @@ async function servidorListo(hijo) {
   for (let i = 0; i < 50; i++) {
     if (hijo.salio) return false;
     try {
-      const r = await fetch(DIRECCION);
+      const r = await pedir(DIRECCION);
       if (r.ok) return true;
     } catch (e) { /* todavía no está arriba */ }
     await esperar(200);
