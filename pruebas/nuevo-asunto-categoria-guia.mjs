@@ -83,7 +83,12 @@ await pagina.locator('.categoria-boton[data-categoria="ALUMNADO"]').click();
 await comprobar('el cursor está en el buscador de personas',
   pagina.evaluate(() => document.activeElement && document.activeElement.id), 'buscar-tercero');
 await comprobar('el buscador está justo debajo de las pastillas',
-  pagina.evaluate(() => document.getElementById('categorias-lista').nextElementSibling.id), 'buscar-tercero');
+  pagina.evaluate(() => {
+    /* El siguiente elemento que se ve (la app puede intercalar nodos vacíos u ocultos). */
+    let e = document.getElementById('categorias-lista').nextElementSibling;
+    while (e && (e.offsetHeight === 0 || e.classList.contains('oculto'))) e = e.nextElementSibling;
+    return e && (e.id || (e.querySelector('#buscar-tercero') ? 'buscar-tercero' : e.tagName));
+  }), 'buscar-tercero');
 await comprobar('la lista de tipos solo tiene ALUMNADO', categoriasVisibles(), ['ALUMNADO']);
 await comprobar('como mucho 8', visibles().count(), 8);
 await comprobar('con «Ver todos (12)»', pagina.locator('#btn-ver-tipos').textContent().then(t => t.trim()), 'Ver todos (12)');
