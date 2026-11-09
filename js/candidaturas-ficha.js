@@ -8,6 +8,7 @@
    en la propia fila y se guarda al cambiar (Presentada, Admitida, Excluida —pide el motivo— o Retirada).
    El ⋮ de cada fila: «Cambiar el sector», «Quitar la candidatura» y «Ver su ficha». «+ Añadir candidatura»
    apunta una sin documento (llegó en papel). «Lista de candidaturas ▾» saca el PDF (js/candidaturas-lista.js).
+   «Papeletas» saca las papeletas (js/candidaturas-papeletas.js); «Es de la AMPA» (fila 571) en el ⋮ de madres y padres.
    Los datos y el guardado viven en js/candidaturas.js. Se pinta desde js/ficha-asunto.js.
    ============================================================ */
 var CandidaturasFicha = (function () {
@@ -40,7 +41,8 @@ var CandidaturasFicha = (function () {
     }).join(' ');
     var off = soloConsulta() ? ' disabled' : '';
     return '<li class="cand-fila" data-id="' + esc(c.id) + '">' +
-      '<div class="cand-fila-datos"><strong class="cand-nombre">' + esc(Candidaturas.visible(c.persona)) + '</strong>' +
+      '<div class="cand-fila-datos"><strong class="cand-nombre">' + esc(Candidaturas.visible(c.persona)) +
+          (c.ampa ? ' <span class="cand-ampa">' + esc(c.ampa) + '</span>' : '') + '</strong>' +
         '<span class="suave cand-cuando">' + esc([fechaCorta(c.fecha), c.registro].filter(Boolean).join(' · ')) + '</span>' +
         '<span class="cand-docs">' + (docs || '<span class="suave">Sin documento</span>') + '</span></div>' +
       '<div class="cand-fila-estado">' +
@@ -68,6 +70,7 @@ var CandidaturasFicha = (function () {
     return '<div class="cand-barra">' +
         '<button type="button" class="boton" id="cand-anadir"' + off + '>+ Añadir candidatura</button>' +
         '<span class="cand-lista-menu" id="cand-lista-menu"></span>' +
+        '<button type="button" class="boton" id="cand-papeletas"' + off + '>Papeletas</button>' +
       '</div>' +
       '<div class="cand-bloques">' + bloques.join('') + '</div>';
   }
@@ -83,6 +86,7 @@ var CandidaturasFicha = (function () {
   var turno = 0;
 
   async function pintar(a) {
+    if (a && actual && actual.nombre !== a.nombre && window.CandidaturasPapeletas) CandidaturasPapeletas.olvidar();
     actual = a || null;
     var caja = $('ficha-candidaturas');
     if (!caja || !a) return;
@@ -140,6 +144,26 @@ var CandidaturasFicha = (function () {
     if (!ok || !campo || campo.value === c.sector) return;
     try { await Candidaturas.cambiar(actual, c.id, function (x) { x.sector = campo.value; }); }
     catch (e) { U.fallo('No he podido cambiar el sector', e); }
+    repintar();
+  }
+
+  /* «Es de la AMPA» (fila 571): pregunta el nombre y lo apunta en la candidatura; «Ya no es de la AMPA» lo quita. */
+  async function esDeLaAmpa(c) {
+    var ok = await U.preguntar('Es de la AMPA',
+      '<p>¿Qué AMPA presenta a «' + esc(Candidaturas.visible(c.persona)) + '»? En la papeleta sale con este nombre al lado.</p>' +
+      '<label class="etiqueta" for="cand-ampa">Nombre de la AMPA</label><input id="cand-ampa" class="campo" value="">', 'Guardar');
+    var campo = $('cand-ampa');
+    var nombre = campo ? campo.value.trim() : '';
+    if (!ok) return;
+    if (!nombre) { U.aviso('Escribe el nombre de la AMPA.', 'ambar'); return; }
+    await apuntarAmpa(c, nombre);
+  }
+
+  async function apuntarAmpa(c, nombre) {
+    try {
+      await Candidaturas.cambiar(actual, c.id, function (x) { x.ampa = nombre; });
+      if (window.RegistroAsunto) await RegistroAsunto.auto(actual, 'Candidatura de ' + Candidaturas.visible(c.persona) + (nombre ? ': es de la AMPA ' + nombre : ': ya no es de la AMPA'));
+    } catch (e) { U.fallo('No he podido apuntar la AMPA', e); }
     repintar();
   }
 
@@ -248,6 +272,8 @@ var CandidaturasFicha = (function () {
   function enganchar(a, caja, ficheros) {
     var anadir = $('cand-anadir');
     if (anadir) anadir.onclick = anadirSinDocumento;
+    var papeletas = $('cand-papeletas');
+    if (papeletas) papeletas.onclick = function () { if (window.CandidaturasPapeletas) CandidaturasPapeletas.hacer(actual); };
     var menuLista = $('cand-lista-menu');
     if (menuLista && window.CandidaturasLista) menuLista.appendChild(menuDeLista(a));
     Array.prototype.forEach.call(caja.querySelectorAll('.cand-fila'), function (fila) {
@@ -258,6 +284,10 @@ var CandidaturasFicha = (function () {
       var botones = [botonMenu('Ver su ficha', function () { verFicha(c); })];
       if (!soloConsulta()) {
         botones.push(botonMenu('Cambiar el sector', function () { cambiarSector(c); }));
+        if (c.sector === 'Madres y padres') {
+          botones.push(c.ampa ? botonMenu('Ya no es de la AMPA', function () { apuntarAmpa(c, ''); })
+            : botonMenu('Es de la AMPA', function () { esDeLaAmpa(c); }));
+        }
         botones.push(botonMenu('Quitar la candidatura', function () { quitar(c); }));
       }
       fila.querySelector('.cand-menu').appendChild(U.menuDeAcciones(botones));

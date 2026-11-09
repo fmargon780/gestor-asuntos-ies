@@ -865,4 +865,8 @@ sector, estado en la fila (Presentada, Admitida, Excluida con motivo, Retirada),
 candidatura», y «+ Añadir candidatura» sin documento. `js/candidaturas-lista.js`: «Lista de candidaturas ▾» → provisional o definitiva, PDF con
 membrete, solo nombres, firma de la Presidencia de la Junta Electoral (cargo en `cargos.json`) o de Dirección, guardado como
 `AAMMDD LISTA CANDIDATURAS D26-….pdf` (tipo LISTA DE CANDIDATURAS). `DocumentoRenombrar` pone al día los nombres de documento. Prueba:
-`pruebas/candidaturas.mjs`.
+`pruebas/candidaturas.mjs`. **Papeletas** (9-nov-2026, fila 571, `docs/571-PAPELETAS-CONSEJO-ESCOLAR.md`): botón «Papeletas» de la tarjeta →
+`js/candidaturas-papeletas.js` (`CandidaturasPapeletas`): ventana con admitidas, cruces ya puestas por sector (Decreto 327/2010: 5·5·8·1 con 12 unidades o más,
+3·4·6·1 con menos; la casilla de la AMPA baja madres y padres en uno) y papeletas a sacar; un PDF por sector (tipo PAPELETAS, guardado con
+`CandidaturasLista.guardarPdf`), solo admitidas, 10 por hoja hasta 8 admitidas y 8 con más. «Es de la AMPA» en el ⋮ de madres y padres guarda `ampa`
+en la candidatura. Prueba: `pruebas/candidaturas-papeletas.mjs`.
