@@ -60,9 +60,9 @@ td.num { font-variant-numeric: tabular-nums; }
 .hojas { display: flex; flex-wrap: wrap; gap: 14px; }
 .hojas > div { width: 420px; max-width: 100%; min-width: 0; }
 .hoja { width: 100%; aspect-ratio: 210 / 297; background: #fff; border: 1px solid #b9c0ca; box-shadow: 0 2px 6px rgba(0,0,0,.1);
-  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); }
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, 1fr); }
 .hoja-pie { font-size: 11px; color: var(--suave); text-align: center; margin-top: 3px; }
-.papeleta { border: 1px dashed #9aa3ae; padding: 5px 7px; font-size: 7.6px; line-height: 1.25; color: #000; overflow: hidden; }
+.papeleta { border: 1px dashed #9aa3ae; padding: 3px 7px; font-size: 6.6px; line-height: 1.15; color: #000; overflow: hidden; }
 .papeleta.vacia { border-color: transparent; }
 .papeleta .t1 { font-weight: 700; text-align: center; }
 .papeleta .t2 { text-align: center; margin-bottom: 2px; }
@@ -220,9 +220,9 @@ function papeletaHtml(p) {
 function verPdf(pedido) {
   var hojas = [];
   pedido.forEach(function (p) {
-    for (var hechas = 0; hechas < p.papeletas; hechas += 8) {
-      var en = Math.min(8, p.papeletas - hechas), celdas = '';
-      for (var k = 0; k < 8; k++) celdas += k < en ? papeletaHtml(p) : '<div class="papeleta vacia"></div>';
+    for (var hechas = 0; hechas < p.papeletas; hechas += 10) {
+      var en = Math.min(10, p.papeletas - hechas), celdas = '';
+      for (var k = 0; k < 10; k++) celdas += k < en ? papeletaHtml(p) : '<div class="papeleta vacia"></div>';
       hojas.push({ sector: p.sector, html: celdas });
     }
   });
