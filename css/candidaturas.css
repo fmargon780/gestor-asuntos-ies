@@ -18,3 +18,12 @@
 .cand-estado { width: auto; padding: 4px 6px; }
 .cand-motivo { flex-basis: 100%; margin: 0; }
 .cand-lista-btn { cursor: pointer; }
+/* Fila 571: papeletas */
+.cand-ampa { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 10px; background: var(--fondo-suave, #eef2f7); font-size: 12px; font-weight: 600; }
+.pap-tabla { overflow-x: auto; margin: 8px 0; }
+.pap-tabla table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.pap-tabla th, .pap-tabla td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--linea); }
+.pap-num { text-align: center !important; }
+.pap-papeletas { width: 90px; }
+.pap-sectores { display: flex; flex-wrap: wrap; gap: 6px; }
+.mensaje-lineas { white-space: pre-line; }

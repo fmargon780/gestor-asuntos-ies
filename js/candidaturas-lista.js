@@ -170,14 +170,16 @@ var CandidaturasLista = (function () {
 
   /* ---------- guardar y enseñar ---------- */
 
-  async function guardarPdf(a, bytes, fecha) {
+  /* `tipoDoc` y `corto` (fila 571): js/candidaturas-papeletas.js guarda sus PDF con este mismo camino. */
+  async function guardarPdf(a, bytes, fecha, tipoDoc, corto) {
+    tipoDoc = tipoDoc || TIPO_DOCUMENTO; corto = corto || CORTO;
     if (!a || !a.handle) throw new Error('No encuentro la carpeta del asunto.');
-    await Candidaturas.asegurarTipoDeDocumento(TIPO_DOCUMENTO, CORTO);
+    await Candidaturas.asegurarTipoDeDocumento(tipoDoc, corto);
     var numeroDoc = (await Numeros.reservar('documentos', '')).numero;
-    var nombre = Nombres.montarDocumento({ fecha: fecha, tipo: TIPO_DOCUMENTO, extension: 'pdf', numeroDoc: numeroDoc });
+    var nombre = Nombres.montarDocumento({ fecha: fecha, tipo: tipoDoc, extension: 'pdf', numeroDoc: numeroDoc });
     await Carpetas.escribirBytes(a.handle, nombre, bytes, 'application/pdf');
     try {
-      await DocumentosDatos.anotar(a.nombre, numeroDoc, { tipo: TIPO_DOCUMENTO, fecha: fecha, registros: [], campos: [], texto: '' });
+      await DocumentosDatos.anotar(a.nombre, numeroDoc, { tipo: tipoDoc, fecha: fecha, registros: [], campos: [], texto: '' });
     } catch (e) { U.accesorio('El PDF está guardado, pero no he podido apuntar sus datos en la ficha', e); }
     return nombre;
   }
@@ -212,6 +214,6 @@ var CandidaturasLista = (function () {
     } catch (e) { U.fallo('No he podido sacar la lista', e); }
   }
 
-  return { hacer: hacer, datosDe: datosDe, pdfDe: pdfDe, firmante: firmante, TIPO_DOCUMENTO: TIPO_DOCUMENTO };
+  return { hacer: hacer, datosDe: datosDe, pdfDe: pdfDe, firmante: firmante, limpio: limpio, guardarPdf: guardarPdf, TIPO_DOCUMENTO: TIPO_DOCUMENTO };
 })();
 window.CandidaturasLista = CandidaturasLista;
