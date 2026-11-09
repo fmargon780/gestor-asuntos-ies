@@ -55,4 +55,11 @@ Contexto: copia sin internet · perfil Administración · Envía: Francisco Javi
 - Al volver al correo, lo que habías escrito sigue ahí y la persona nueva sale al buscarla.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (9-nov-2026, tarea pequeña: sin segundo revisor; la sesión compara lo hecho con la instrucción, con Chromium real, `pruebas/relacionar-desde-el-aviso.mjs`)
+- Coincide: en Para, Copia y Copia oculta, un nombre o una dirección que no encaja con nadie saca en el aviso el botón «Relacionar a alguien con el asunto».
+- Coincide: el botón abre «Añadir un relacionado»; al terminar o cancelar vuelve al correo con las pastillas que había.
+- Coincide: con una dirección, «+ Dar de alta» abre la ficha con esa dirección en la casilla de correo (Correo / Correo de contacto).
+- Coincide: con un nombre, el buscador sale con ese nombre escrito (al elegir la categoría).
+- Coincide: el botón del pie del cuadro sigue igual; el editor de plantillas no recibe el botón (no se le pasa la opción).
+- Cambio de texto del aviso (lo pedía la nota técnica): «Nadie de este asunto se llama así / tiene esa dirección. Para escribirle, relaciónalo con el asunto:» + botón. Se ajustó la prueba 555 que comprobaba el texto antiguo.
+- No lo he podido ver: dar de alta de verdad y que la persona nueva salga al buscarla (la prueba cancela el alta para no tocar datos); y los textos en la app publicada con la copia real.

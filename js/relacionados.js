@@ -54,7 +54,15 @@ var Relacionados = (function () {
      null si se cancela.
      ========================================================== */
 
-  function elegirTercero(titulo) {
+  /* Fila 562: `escrito` (opcional) es lo que se había escrito en el correo. Una dirección de correo va a la casilla de correo del
+     alta; un nombre sale ya escrito en el buscador. */
+  function elegirTercero(titulo, escrito) {
+    var direccion = '', nombreEscrito = '';
+    var txt = String(escrito || '').trim();
+    if (txt) {
+      var m = txt.match(Destinatarios.RE_CORREO);
+      if (m && m.length === 1 && m[0] === txt) direccion = txt; else if (!m) nombreEscrito = txt;
+    }
     return new Promise(function (resolver) {
       var resuelto = false;
       function resolverUnaVez(v) {
@@ -93,6 +101,10 @@ var Relacionados = (function () {
         if (!def) { resolverUnaVez(null); return; }
         var deEntrada = {};
         deEntrada[def.cabecera[0]] = texto || '';
+        if (direccion) {
+          var colCorreo = def.cabecera.filter(function (c) { return /correo|e-?mail/i.test(c); })[0];
+          if (colCorreo) deEntrada[colCorreo] = direccion;
+        }
         var tituloAlta = categoria === 'ALUMNADO'
           ? 'Dar de alta un solicitante' : 'Dar de alta en ' + categoria;
         var valores = await App.cuadroDeTercero(categoria, deEntrada, tituloAlta);
@@ -105,7 +117,7 @@ var Relacionados = (function () {
           U.aviso('No he podido darlo de alta: ' + U.mensajeDeError(e), 'malo');
           resolverUnaVez(null);
         }
-      });
+      }, nombreEscrito ? { textoInicial: nombreEscrito } : undefined);
     });
   }
 
@@ -145,8 +157,8 @@ var Relacionados = (function () {
     return true;
   }
 
-  async function agregarRelacionado(a) {
-    var p = await elegirTercero('Añadir un relacionado');
+  async function agregarRelacionado(a, escrito) {
+    var p = await elegirTercero('Añadir un relacionado', escrito);
     if (!p) return false;
     var nombre = App.textoTercero(p);
     return validarYAgregar(a, p.categoria, nombre);

@@ -14,6 +14,8 @@
        cfg.alQuitar(id)     se ha quitado una pastilla
        cfg.alCambiarVez(id, correo)   (opcional) un correo solo para este envío; '' = volver al guardado
        cfg.sinResultado(texto)        (opcional) el aviso cuando lo escrito no encaja con nadie
+       cfg.alRelacionar(texto)        (opcional, fila 562) el aviso lleva el botón «Relacionar a alguien con el asunto»; al
+                                      pulsarlo se llama con lo escrito. Sin esta opción (editor de plantillas) no sale el botón.
 
    Escribir saca las opciones que encajan (sin tildes ni mayúsculas, todas las palabras). Flechas e Intro eligen;
    Retroceso con la casilla vacía quita la última pastilla.
@@ -49,6 +51,18 @@ var CampoDestinatarios = (function () {
 
     function ocultarLista() { lista.className = 'cdest-lista oculto'; lista.innerHTML = ''; visibles = []; }
     function decir(texto) { aviso.textContent = texto || ''; aviso.className = 'nota cdest-aviso' + (texto ? '' : ' oculto'); }
+    /* Fila 562: el aviso de «no encaja con nadie» con su botón para relacionar a esa persona con el asunto. */
+    function decirConBoton(texto, escrito) {
+      aviso.className = 'nota cdest-aviso';
+      aviso.textContent = texto + ' ';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'boton boton-chico cdest-relacionar';
+      b.textContent = 'Relacionar a alguien con el asunto';
+      b.onmousedown = function (ev) { ev.preventDefault(); };
+      b.onclick = function () { cfg.alRelacionar(escrito); };
+      aviso.appendChild(b);
+    }
 
     function repintar() {
       var puestos = cfg.elegidos();
@@ -104,9 +118,13 @@ var CampoDestinatarios = (function () {
       if (!visibles.length) {
         ocultarLista();
         var sin = cfg.sinResultado ? cfg.sinResultado(entrada.value) : '';
-        if (!sin) sin = /@/.test(entrada.value)
-          ? 'Solo se escribe a personas de este asunto. Para escribir a alguien más, relaciónalo antes con el asunto.'
-          : 'Nadie de este asunto se llama así. Para escribir a alguien más, relaciónalo antes con el asunto.';
+        if (!sin) {
+          var nadie = /@/.test(entrada.value) ? 'Nadie de este asunto tiene esa dirección.' : 'Nadie de este asunto se llama así.';
+          if (cfg.alRelacionar) { decirConBoton(nadie + ' Para escribirle, relaciónalo con el asunto:', entrada.value); return; }
+          sin = /@/.test(entrada.value)
+            ? 'Solo se escribe a personas de este asunto. Para escribir a alguien más, relaciónalo antes con el asunto.'
+            : 'Nadie de este asunto se llama así. Para escribir a alguien más, relaciónalo antes con el asunto.';
+        }
         decir(sin);
         return;
       }

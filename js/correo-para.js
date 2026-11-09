@@ -286,7 +286,8 @@ var CorreoPara = (function () {
         elegidos: function () { return elegidosDe(campo); },
         alElegir: function (id) { ponerElegido(campo, id); repintarTodos(); },
         alQuitar: function (id) { S.dest[campo] = S.dest[campo].filter(function (p) { return p.id !== id; }); },
-        alCambiarVez: function (id, correo) { S.dest[campo].forEach(function (p) { if (p.id === id) p.vez = correo; }); }
+        alCambiarVez: function (id, correo) { S.dest[campo].forEach(function (p) { if (p.id === id) p.vez = correo; }); },
+        alRelacionar: function (texto) { if (window.CorreoRelacionar && CorreoRelacionar.alRelacionarEscrito) CorreoRelacionar.alRelacionarEscrito(texto); }
       });
     });
   }

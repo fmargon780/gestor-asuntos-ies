@@ -187,6 +187,8 @@ App.altaTercero = async function (categoria, sugerencia, alDarDeAlta) {
    escrito). El alta de verdad la hace quien llama, con
    App.cuadroDeTercero: así aquí no se abren dos cuadros a la vez.
 
+   `opciones.textoInicial` (fila 562): al elegir la primera categoría, el buscador sale con ese texto ya escrito.
+
    `opciones.categorias` (fila 306): solo esas categorías salen para elegir.
 
    `opciones.multiple` (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md):
@@ -334,6 +336,8 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
         campoBuscar.value = '';
         cajaResultados.innerHTML = '';
         campoBuscar.focus();
+        /* Fila 562: lo escrito en el correo sale ya puesto en el buscador (solo al elegir la primera categoría). */
+        if (opciones && opciones.textoInicial) { campoBuscar.value = opciones.textoInicial; opciones.textoInicial = ''; buscar(); }
         if (opciones && opciones.alCambiarCategoria) opciones.alCambiarCategoria(cat);
       };
       cajaCategorias.appendChild(b);

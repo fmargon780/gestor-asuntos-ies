@@ -82,9 +82,9 @@ await comprobar('2. «tutor» saca a la tutora del grupo y a los dos tutores leg
 await pagina.click('#correo-para .cdest-opcion:has-text("Javier")');
 await comprobar('2. ponerlo en Para lo quita de Copia: una persona solo en un campo', campos(), [['Javier Jimenez Mora'], [], []]);
 await escribir('oculta', 'Fuentes');
-await comprobar('2. el apellido de otro alumno no saca a nadie y dice que antes se relacione', Promise.all([lista('oculta'), aviso('oculta')]), [[], 'Nadie de este asunto se llama así. Para escribir a alguien más, relaciónalo antes con el asunto.']);
+await comprobar('2. el apellido de otro alumno no saca a nadie y dice que antes se relacione', Promise.all([lista('oculta'), aviso('oculta')]), [[], 'Nadie de este asunto se llama así. Para escribirle, relaciónalo con el asunto: Relacionar a alguien con el asunto']);
 await escribir('oculta', 'alguien@otro.es');
-await comprobar('2. una dirección de correo tampoco', aviso('oculta'), 'Solo se escribe a personas de este asunto. Para escribir a alguien más, relaciónalo antes con el asunto.');
+await comprobar('2. una dirección de correo tampoco', aviso('oculta'), 'Nadie de este asunto tiene esa dirección. Para escribirle, relaciónalo con el asunto: Relacionar a alguien con el asunto');
 await escribir('oculta', '');
 await escribir('oculta', 'otero');
 await pagina.keyboard.press('Enter');
