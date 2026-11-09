@@ -147,3 +147,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 ## Tamaño de los ficheros
 
 - (5-nov-2026, tema 534) No se parten todos los ficheros largos a la vez: se parten los 10 de más de 600 líneas y `js/hitos-guion.js`, en dos tareas; los demás de más de 400, cuando se toquen («Hagámoslo como tú propones»). Si al empezar la 536 hay otro de más de 600, se parte también («Añádela»).
+
+## Registro de documentos
+
+- (9-nov-2026, fila 566) Tras registrar, el documento registrado se queda siempre en la carpeta del asunto, con su «Ruta»; a versiones previas solo va el original sin sellar, si es otro fichero («Estoy de acuerdo»).
