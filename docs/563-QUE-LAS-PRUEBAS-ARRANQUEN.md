@@ -1,4 +1,4 @@
-# 541 — Que las pruebas arranquen
+# 563 — Que las pruebas arranquen
 
 ## Lo que escribió Francisco
 Tema: Que las pruebas arranquen. Junta las ideas 537 (solo la parte de las pruebas) y 542: que `npm test` no se caiga al arrancar con el fallo de `undici`, sin depender del remedio a mano de `docs/LECCIONES.md`, y aclarar si las pruebas de guías que fallan también en `main` (cambiar-tipo-y-guia, editor-de-la-guia-tareas, nuevo-asunto-categoria-guia, hacer-este-hito) son del entorno o de la app, para dejar la pasada completa funcionando. La parte de Vercel se queda fuera porque no ha vuelto a pasar.
@@ -37,7 +37,7 @@ Tema: Que las pruebas arranquen. Junta las ideas 537 (solo la parte de las prueb
 - `git diff main --stat` no toca nada fuera de `pruebas/` y `docs/`.
 
 ## Qué mirar al terminar
-- En la nota de la fila 541 de la cola: que la pasada completa terminó sin caerse y cuántas pruebas pasaron.
+- En la nota de la fila 563 de la cola: que la pasada completa terminó sin caerse y cuántas pruebas pasaron.
 - Si `hacer-este-hito` sigue apartada, el motivo en una línea y, si aparece, el número de la IDEA nueva.
 
 ## Revisión y respuestas durante el trabajo
