@@ -59,18 +59,19 @@ td.num { font-variant-numeric: tabular-nums; }
 .visor-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .hojas { display: flex; flex-wrap: wrap; gap: 14px; }
 .hojas > div { width: 420px; max-width: 100%; min-width: 0; }
-.hoja { width: 100%; aspect-ratio: 210 / 297; background: #fff; border: 1px solid #b9c0ca; box-shadow: 0 2px 6px rgba(0,0,0,.1);
+.visor.grande .hojas > div { width: 1000px; }
+.hoja { container-type: inline-size; width: 100%; aspect-ratio: 210 / 297; background: #fff; border: 1px solid #b9c0ca; box-shadow: 0 2px 6px rgba(0,0,0,.1);
   display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, 1fr); }
 .hoja-pie { font-size: 11px; color: var(--suave); text-align: center; margin-top: 3px; }
-.papeleta { border: 1px dashed #9aa3ae; padding: 3px 7px; font-size: 6.6px; line-height: 1.15; color: #000; overflow: hidden; }
-.hoja.ocho .papeleta { font-size: 7.6px; line-height: 1.25; padding: 5px 7px; }
+.papeleta { border: 1px dashed #9aa3ae; padding: 0.71cqw 1.67cqw; font-size: 1.57cqw; line-height: 1.15; color: #000; overflow: hidden; }
+.hoja.ocho .papeleta { font-size: 1.81cqw; line-height: 1.25; padding: 1.19cqw 1.67cqw; }
 .papeleta.vacia { border-color: transparent; }
 .papeleta .t1 { font-weight: 700; text-align: center; }
-.papeleta .t2 { text-align: center; margin-bottom: 2px; }
-.papeleta .t3 { font-weight: 600; margin: 2px 0 3px; }
+.papeleta .t2 { text-align: center; margin-bottom: 0.48cqw; }
+.papeleta .t3 { font-weight: 600; margin: 0.48cqw 0 0.71cqw; }
 .papeleta ol { list-style: none; margin: 0; padding: 0; }
-.papeleta li { display: grid; grid-template-columns: 9px 12px 1fr auto; gap: 3px; align-items: center; }
-.papeleta .caja { width: 8px; height: 8px; border: 1px solid #000; font-size: 7px; line-height: 7px; text-align: center; }
+.papeleta li { display: grid; grid-template-columns: 2.14cqw 2.86cqw 1fr auto; gap: 0.71cqw; align-items: center; }
+.papeleta .caja { width: 1.9cqw; height: 1.9cqw; border: 1px solid #000; }
 </style>
 
 <div class="aviso-prueba">Pantalla de prueba · datos inventados · nada se guarda</div>
@@ -239,12 +240,13 @@ function verPdf(pedido) {
     $('visor').hidden = false;
     $('visor').innerHTML = '<div class="visor-barra"><span class="pdfs">' + pdfs.map(function (x, j) {
         return '<button type="button" class="boton' + (j === i ? ' principal' : '') + '" data-pdf="' + j + '">' + esc(x.sector) + '</button>'; }).join(' ') + '</span>' +
-      '<span><button type="button" class="boton">Imprimir</button> <button type="button" class="boton" id="cerrar-visor">Cerrar</button></span></div>' +
+      '<span><button type="button" class="boton" id="ampliar">' + ($('visor').classList.contains('grande') ? 'Reducir' : 'Ampliar') + '</button> <button type="button" class="boton">Imprimir</button> <button type="button" class="boton" id="cerrar-visor">Cerrar</button></span></div>' +
       '<p><strong>' + esc(d.nombre) + '</strong> <span class="suave">· ' + d.papeletas + ' papeletas, ' + d.porHoja + ' por hoja, en ' + d.hojas.length + (d.hojas.length === 1 ? ' hoja' : ' hojas') + '</span></p>' +
       '<div class="hojas">' + d.hojas.map(function (h, k) {
         return '<div><div class="hoja' + (d.porHoja === 8 ? ' ocho' : '') + '" style="grid-template-rows: repeat(' + d.porHoja / 2 + ', 1fr)">' + h + '</div><div class="hoja-pie">Hoja ' + (k + 1) + '</div></div>';
       }).join('') + '</div>';
     $('cerrar-visor').onclick = function () { $('visor').hidden = true; };
+    $('ampliar').onclick = function () { $('visor').classList.toggle('grande'); ver(i); };
     document.querySelectorAll('[data-pdf]').forEach(function (b) { b.onclick = function () { ver(+b.dataset.pdf); }; });
   }
   ver(0);
