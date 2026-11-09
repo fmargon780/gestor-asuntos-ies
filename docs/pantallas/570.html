@@ -169,7 +169,7 @@ function cuadro(titulo, cuerpo, textoOk, alOk) {
 }
 
 function pedirAmpa(c) {
-  cuadro('Es de la AMPA', '<p>¿Qué AMPA presenta a «' + esc(c.ap + ', ' + c.nom) + '»? En la papeleta sale con este nombre al lado y la cruz ya puesta.</p>' +
+  cuadro('Es de la AMPA', '<p>¿Qué AMPA presenta a «' + esc(c.ap + ', ' + c.nom) + '»? En la papeleta sale con este nombre al lado.</p>' +
     '<label for="q-ampa">Nombre de la AMPA</label><input id="q-ampa" class="campo" value="">', 'Guardar', function () {
       var v = $('q-ampa').value.trim();
       if (!v) { $('q-ampa').focus(); return false; }
@@ -178,42 +178,47 @@ function pedirAmpa(c) {
 }
 
 /* ---------- Papeletas ---------- */
+/* Puestos a cubrir (Decreto 327/2010, art. 50), según las unidades del centro (en la app, las del listado del alumnado). */
+var UNIDADES = 24;
+var PUESTOS = UNIDADES >= 12 ? { 'Alumnado': 5, 'Madres y padres': 5, 'Profesorado': 8, 'PAS': 1 } : { 'Alumnado': 3, 'Madres y padres': 4, 'Profesorado': 6, 'PAS': 1 };
+var designada = false;
+function cruces(s) { return PUESTOS[s] - (s === 'Madres y padres' && designada ? 1 : 0); }
+
 $('papeletas').onclick = function () {
   mensaje('');
   var filas = SECTORES.map(function (s, i) {
     var n = admitidas(s).length, r = recordado[s] || {};
     var off = n ? '' : ' disabled';
     return '<tr><td>' + s + '</td><td class="num">' + n + (n ? '' : ' <span class="suave">· sin admitidas</span>') + '</td>' +
-      '<td><input id="cr' + i + '" type="number" min="1" inputmode="numeric" value="' + (r.cruces || '') + '"' + off + ' aria-label="Cruces de ' + s + '"></td>' +
+      '<td class="num" id="cr' + i + '">' + cruces(s) + '</td>' +
       '<td><input id="pp' + i + '" type="number" min="0" inputmode="numeric" value="' + (r.papeletas || '') + '"' + off + ' aria-label="Papeletas de ' + s + '"></td></tr>';
   }).join('');
   cuadro('Papeletas', '<p>Salen solo las candidaturas admitidas, en un PDF por sector. Deja en blanco las papeletas del sector que no quieras sacar.</p>' +
     '<div class="tabla-env"><table><thead><tr><th>Sector</th><th>Admitidas</th><th>Cruces que se pueden marcar</th><th>Papeletas</th></tr></thead><tbody>' + filas + '</tbody></table></div>' +
+    '<p class="suave">Cruces: tantas como puestos a cubrir (Decreto 327/2010, art. 50; el centro tiene ' + UNIDADES + ' unidades).</p>' +
+    '<label><input type="checkbox" id="q-designada"' + (designada ? ' checked' : '') + '> La AMPA ha designado representante (madres y padres eligen uno menos)</label>' +
     '<p id="q-error" class="error"></p>', 'Sacar las papeletas', sacar);
+  $('q-designada').onchange = function (e) { designada = e.target.checked; $('cr1').textContent = cruces('Madres y padres'); };
 };
 
 function sacar() {
-  var pedido = [], error = '';
+  var pedido = [];
   SECTORES.forEach(function (s, i) {
-    var cr = parseInt($('cr' + i).value, 10), pp = parseInt($('pp' + i).value, 10);
-    recordado[s] = { cruces: $('cr' + i).value, papeletas: $('pp' + i).value };
-    if (!(pp > 0)) return;
-    if (!(cr > 0)) { error = error || 'Falta cuántas cruces se pueden marcar en ' + s + '.'; return; }
-    pedido.push({ sector: s, cruces: cr, papeletas: pp });
+    var pp = parseInt($('pp' + i).value, 10);
+    recordado[s] = { papeletas: $('pp' + i).value };
+    if (pp > 0) pedido.push({ sector: s, cruces: cruces(s), papeletas: pp });
   });
-  if (error) { $('q-error').textContent = error; return false; }
   if (!pedido.length) { $('q-error').textContent = 'Escribe cuántas papeletas hacen falta en algún sector.'; return false; }
   verPdf(pedido);
 }
 
 function papeletaHtml(p) {
   var cs = admitidas(p.sector);
-  var hayAmpa = p.sector === 'Madres y padres' && cs.some(function (c) { return c.ampa; });
-  var marca = 'Marca hasta ' + p.cruces + ' ' + (p.cruces === 1 ? 'cruz' : 'cruces') + (hayAmpa ? ' más' : '');
+  var marca = 'Marca hasta ' + p.cruces + ' ' + (p.cruces === 1 ? 'cruz' : 'cruces');
   return '<div class="papeleta"><div class="t1">Elecciones al Consejo Escolar 2026-2027</div>' +
     '<div class="t2">IES Fuente Lucena · Sector ' + esc(p.sector) + '</div><div class="t3">' + marca + '</div><ol>' +
     cs.map(function (c, k) {
-      return '<li><span class="caja">' + (c.ampa ? '✕' : '') + '</span><span>' + (k + 1) + '</span><span>' + esc(c.ap + ', ' + c.nom) + '</span><span>' +
+      return '<li><span class="caja"></span><span>' + (k + 1) + '</span><span>' + esc(c.ap + ', ' + c.nom) + '</span><span>' +
         esc(c.grupo || c.ampa || '') + '</span></li>';
     }).join('') + '</ol></div>';
 }
