@@ -1,4 +1,6 @@
-# 570 — Papeletas del Consejo Escolar
+# 571 — Papeletas del Consejo Escolar
+
+(Tema 570, diseñado con Francisco el 9-nov-2026.)
 
 ## Lo que escribió Francisco
 Hay que preparar las papeletas a las elecciones del Consejo Escolar, para el alumnado y para el profesorado. ¿Podemos aprovechar la herramienta que ya tenemos para la elaboración de las etiquetas?

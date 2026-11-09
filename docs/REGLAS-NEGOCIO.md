@@ -151,3 +151,10 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 ## Registro de documentos
 
 - (9-nov-2026, fila 566) Tras registrar, el documento registrado se queda siempre en la carpeta del asunto, con su «Ruta»; a versiones previas solo va el original sin sellar, si es otro fichero («Estoy de acuerdo»).
+
+## Elecciones al Consejo Escolar
+
+- (9-nov-2026, tema 570) Las papeletas salen de la tarjeta «Candidaturas» del asunto de las elecciones, no de la pantalla de Etiquetas, con las candidaturas admitidas de los cuatro sectores («1»: también madres y padres y PAS).
+- (9-nov-2026, tema 570) Un PDF por sector; hasta 8 candidatos, 10 papeletas por hoja, y con más, 8, sin poder cambiarlo («Prefiero la 1, el problema del corte se soluciona sacando un pdf por cada sector y cortandolos por grupo»).
+- (9-nov-2026, tema 570) Las cruces las pone la app por la norma, tantas como puestos a cubrir, y una casilla dice si la AMPA ha designado representante («Si podemos evitar que el usuario tenga que contestar a esa pregunta, pues mejor»; «Hazlo así»).
+- (9-nov-2026, tema 570) La candidatura presentada por la AMPA lleva su nombre al lado en la papeleta, sin cruz puesta (Orden de 7-oct-2010, art. 9.1.c); el representante designado por la AMPA no sale en la papeleta.
