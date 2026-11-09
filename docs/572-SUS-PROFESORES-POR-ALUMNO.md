@@ -1,4 +1,6 @@
-# 564 — Sus profesores por alumno
+# 572 — Sus profesores por alumno
+
+Diseñada en el tema 564 (junta la idea 559).
 
 ## Lo que escribió Francisco
 «Sus profesores» por alumno: que el correo de un asunto proponga solo los profesores que dan clase al
@@ -37,7 +39,7 @@ vez de todos los del grupo. Lo decidió Francisco al diseñar el tema 134 del Ce
 ## Notas técnicas de Claude
 - Datos: conjuntos `profesorado-alumnos` y `profesorado-grupos` del Centro de datos. Su contrato,
   copiado en `docs/CENTRO-DE-DATOS-CONTRATO-2.md`, sección «Lo que el Gestor toma: los conjuntos
-  `profesorado-grupos` y `profesorado-alumnos` (fila 564)». Se toman igual que `tutorias`
+  `profesorado-grupos` y `profesorado-alumnos` (fila 572)». Se toman igual que `tutorias`
   (`js/centro-de-datos-tutorias.js`, `js/tablas-datos-tutorias.js`): por el índice `hechos`, parte
   `curso`, todos los cursos; copia a `_GESTOR/datos` apuntada con `DatosQueTengo.apuntar`.
 - Curso: el del asunto; si no tiene, el actual.

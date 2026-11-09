@@ -248,9 +248,9 @@ Todos con `dueno: "centro-de-datos-ies"` y `fuente: "libros"`. Una clave solo es
 
 **Los avisos** (lista cerrada): `libros-fichero` (el listado está vacío, no se lee, le falta una de las columnas `Materia`, `ISBN/EAN`, `Editorial` o `Título`, o trae filas sin asignatura; `datos`: `nivel` y `detalle`, una frase llana), `libros-repetido` (`datos`: `materia`, `nivel`) y `libros-dato` (`datos`: `materia`, `nivel`, `columna`). En `hecho/estado.json` se cuentan con tres contadores nuevos: `librosFichero`, `librosRepetido` y `librosDato`.
 
-## Lo que el Gestor toma: los conjuntos `profesorado-grupos` y `profesorado-alumnos` (fila 564, 9-nov-2026)
+## Lo que el Gestor toma: los conjuntos `profesorado-grupos` y `profesorado-alumnos` (fila 572, 9-nov-2026)
 
-Copia de `docs/CONTRATO.md` del Centro de datos (la versión buena es la suya). Allí dice «fila 555» por error: quien lo lee es la fila 564.
+Copia de `docs/CONTRATO.md` del Centro de datos (la versión buena es la suya). Allí dice «fila 555» por error: quien lo lee es la fila 572.
 
 Desde CD v72 (fila 136) el Centro de datos guarda el listado de Séneca **«Materias, profesorado y unidades»** y deja, **por curso escolar**, dos datos ya hechos: quién da cada materia en cada grupo y, de cada alumno, solo los profesores de las materias de su matrícula. Es solo añadir: el contrato sigue en **2** y `acuerdoHecho` en **1**. No toca nada de lo que ya existe.
 
