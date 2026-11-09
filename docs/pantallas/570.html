@@ -63,6 +63,7 @@ td.num { font-variant-numeric: tabular-nums; }
   display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, 1fr); }
 .hoja-pie { font-size: 11px; color: var(--suave); text-align: center; margin-top: 3px; }
 .papeleta { border: 1px dashed #9aa3ae; padding: 3px 7px; font-size: 6.6px; line-height: 1.15; color: #000; overflow: hidden; }
+.hoja.ocho .papeleta { font-size: 7.6px; line-height: 1.25; padding: 5px 7px; }
 .papeleta.vacia { border-color: transparent; }
 .papeleta .t1 { font-weight: 700; text-align: center; }
 .papeleta .t2 { text-align: center; margin-bottom: 2px; }
@@ -186,7 +187,7 @@ $('papeletas').onclick = function () {
       '<td><input id="cr' + i + '" type="number" min="1" inputmode="numeric" value="' + (r.cruces || '') + '"' + off + ' aria-label="Cruces de ' + s + '"></td>' +
       '<td><input id="pp' + i + '" type="number" min="0" inputmode="numeric" value="' + (r.papeletas || '') + '"' + off + ' aria-label="Papeletas de ' + s + '"></td></tr>';
   }).join('');
-  cuadro('Papeletas', '<p>Salen solo las candidaturas admitidas. Deja en blanco las papeletas del sector que no quieras sacar.</p>' +
+  cuadro('Papeletas', '<p>Salen solo las candidaturas admitidas, en un PDF por sector. Deja en blanco las papeletas del sector que no quieras sacar.</p>' +
     '<div class="tabla-env"><table><thead><tr><th>Sector</th><th>Admitidas</th><th>Cruces que se pueden marcar</th><th>Papeletas</th></tr></thead><tbody>' + filas + '</tbody></table></div>' +
     '<p id="q-error" class="error"></p>', 'Sacar las papeletas', sacar);
 };
@@ -218,24 +219,32 @@ function papeletaHtml(p) {
 }
 
 function verPdf(pedido) {
-  var hojas = [];
-  pedido.forEach(function (p) {
-    for (var hechas = 0; hechas < p.papeletas; hechas += 10) {
-      var en = Math.min(10, p.papeletas - hechas), celdas = '';
-      for (var k = 0; k < 10; k++) celdas += k < en ? papeletaHtml(p) : '<div class="papeleta vacia"></div>';
-      hojas.push({ sector: p.sector, html: celdas });
+  /* Un PDF por sector. Hasta 8 candidatos, 10 papeletas por hoja; con más, 8. */
+  var pdfs = pedido.map(function (p, i) {
+    var porHoja = admitidas(p.sector).length > 8 ? 8 : 10, hojas = [];
+    for (var hechas = 0; hechas < p.papeletas; hechas += porHoja) {
+      var en = Math.min(porHoja, p.papeletas - hechas), celdas = '';
+      for (var k = 0; k < porHoja; k++) celdas += k < en ? papeletaHtml(p) : '<div class="papeleta vacia"></div>';
+      hojas.push(celdas);
     }
+    return { sector: p.sector, papeletas: p.papeletas, porHoja: porHoja, hojas: hojas, nombre: '261109 PAPELETAS D26-0' + (1250 + i) + '.pdf' };
   });
-  var total = pedido.reduce(function (a, p) { return a + p.papeletas; }, 0);
-  $('visor').hidden = false;
-  $('visor').innerHTML = '<div class="visor-barra"><strong>261109 PAPELETAS D26-01250.pdf</strong>' +
-    '<span class="suave">' + total + ' papeletas en ' + hojas.length + (hojas.length === 1 ? ' hoja' : ' hojas') + '</span>' +
-    '<span><button type="button" class="boton">Imprimir</button> <button type="button" class="boton" id="cerrar-visor">Cerrar</button></span></div>' +
-    '<div class="hojas">' + hojas.map(function (h, i) {
-      return '<div><div class="hoja">' + h.html + '</div><div class="hoja-pie">Hoja ' + (i + 1) + ' · ' + esc(h.sector) + '</div></div>';
-    }).join('') + '</div>';
-  $('cerrar-visor').onclick = function () { $('visor').hidden = true; };
-  mensaje('Papeletas guardadas en el asunto: 261109 PAPELETAS D26-01250.pdf');
+  function ver(i) {
+    var d = pdfs[i];
+    $('visor').hidden = false;
+    $('visor').innerHTML = '<div class="visor-barra"><span class="pdfs">' + pdfs.map(function (x, j) {
+        return '<button type="button" class="boton' + (j === i ? ' principal' : '') + '" data-pdf="' + j + '">' + esc(x.sector) + '</button>'; }).join(' ') + '</span>' +
+      '<span><button type="button" class="boton">Imprimir</button> <button type="button" class="boton" id="cerrar-visor">Cerrar</button></span></div>' +
+      '<p><strong>' + esc(d.nombre) + '</strong> <span class="suave">· ' + d.papeletas + ' papeletas, ' + d.porHoja + ' por hoja, en ' + d.hojas.length + (d.hojas.length === 1 ? ' hoja' : ' hojas') + '</span></p>' +
+      '<div class="hojas">' + d.hojas.map(function (h, k) {
+        return '<div><div class="hoja' + (d.porHoja === 8 ? ' ocho' : '') + '" style="grid-template-rows: repeat(' + d.porHoja / 2 + ', 1fr)">' + h + '</div><div class="hoja-pie">Hoja ' + (k + 1) + '</div></div>';
+      }).join('') + '</div>';
+    $('cerrar-visor').onclick = function () { $('visor').hidden = true; };
+    document.querySelectorAll('[data-pdf]').forEach(function (b) { b.onclick = function () { ver(+b.dataset.pdf); }; });
+  }
+  ver(0);
+  $('mensaje').innerHTML = '<div class="aviso">Papeletas guardadas en el asunto, una por sector:<br>' +
+    pdfs.map(function (d) { return esc(d.nombre + ' (' + d.sector + ')'); }).join('<br>') + '</div>';
 }
 
 $('anadir').onclick = function () { mensaje('En la prueba, «+ Añadir candidatura» no hace nada: es lo de siempre.'); };
