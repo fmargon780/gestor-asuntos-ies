@@ -405,7 +405,7 @@ await comprobar('sin Nº, el nombre de la carpeta va solo con el nombre',
   pagina.locator('#vista-nombre').textContent()
     .then(t => t.indexOf('Nuevo Aspirante, Lucas') !== -1), true);
 await comprobar('se ha escrito el solicitantes.csv', pagina.evaluate(async () => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const d = await g.getDirectoryHandle('datos');
   const n = [];
   for await (const p of d.entries()) n.push(p[0]);
@@ -459,7 +459,7 @@ await pagina.selectOption('#bc-categoria', 'OTROS');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 await comprobar('el tipo nuevo se guarda en mayúsculas', pagina.evaluate(async () => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const h = await g.getFileHandle('tipos.json');
   const t = JSON.parse(await (await h.getFile()).text());
   return t.filter(x => x.tipo === 'EVACUACION').length;
@@ -615,7 +615,7 @@ await comprobar('la carpeta archivada NO se ha tocado', pagina.evaluate(async ()
   return n.filter(x => x.indexOf('SANCION') !== -1).length;
 }), 1);
 await comprobar('el nombre viejo queda guardado como alias', pagina.evaluate(async () => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const h = await g.getFileHandle('tipos.json');
   const t = JSON.parse(await (await h.getFile()).text());
   const x = t.find(y => y.tipo === 'EXPEDIENTE DISCIPLINARIO');

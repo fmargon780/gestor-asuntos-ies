@@ -151,7 +151,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await elegirDelMenu(pagina, '.hito-en-mesa .mesa-etq-resp', 'Yo');
   await comprobar('2. el responsable, cambiado desde su etiqueta y guardado', leerHito(pagina, 'm1').then((h) => h.responsable), 'yo');
   await pagina.locator('.hito-en-mesa .mesa-etq-plazo').click();
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la fecha' }).first().click();
+  /* Fila 584: el menú se recoloca mientras la mesa termina de repintar tras el cambio anterior; se pulsa la opción por el DOM, que no exige verla quieta. */
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la fecha' }).first().dispatchEvent('click');
   await pagina.waitForSelector('#mesa-fecha-nueva');
   const dentroDe20 = await pagina.evaluate(() => Plazos.sumarDias ? Plazos.sumarDias(U.hoyIso(), 20) : '');
   await pagina.fill('#mesa-fecha-nueva', dentroDe20);
