@@ -228,3 +228,15 @@
 .guia-plantilla-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .guia-plantilla-pie { margin-top: 14px; }
 .guion-receta .guia-plantilla-ver, .paso-avisar-lopide-plantilla .guia-plantilla-ver { align-self: flex-end; }
+
+/* ---------- «Cuándo se hace» (fila 576) ---------- */
+.cuando-bloque { border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.cuando-linea { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.cuando-linea .etiqueta { margin: 0; }
+.cuando-linea .cuando-campo { width: auto; flex: 1 1 260px; }
+.cuando-valores { display: flex; gap: 14px; flex-wrap: wrap; }
+.cuando-valor-et { display: flex; gap: 6px; align-items: center; }
+.cuando-nota { margin: 0; }
+.guia-lista-solo-si { align-self: flex-start; margin: 4px 0 0; }
+.guion-resumen-si { margin-left: 8px; }
+.guion-resumen-si[hidden] { display: none; }

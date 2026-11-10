@@ -142,6 +142,9 @@
             if (tocaA) h.tocaA = tocaA; else delete h.tocaA;
             n++;
           }
+          /* Fila 576: «Cuándo se hace» llega a todos los hitos que ya existen, empezados o no: solo decide si salen. */
+          var ahoraSi = window.SoloSi ? SoloSi.normalizar(p.soloSi) : (p.soloSi || null);
+          if (JSON.stringify(h.soloSi || null) !== JSON.stringify(ahoraSi)) { if (ahoraSi) h.soloSi = ahoraSi; else delete h.soloSi; n++; }
           /* Fila 414: «Recibe varios documentos» llega igual a los hitos que ya existen. */
           if (!h.variosPropio && !!h.variosDocumentos !== !!p.variosDocumentos) { h.variosDocumentos = !!p.variosDocumentos; n++; }
         }
@@ -258,7 +261,7 @@
      en hitos del asunto, cuántos se han puesto como la guía, cuántos se han
      quitado y cuántos se han dejado como estaban por estar empezados. */
   var CAMPOS_DEL_PASO = ['titulo', 'cuerpo', 'responsable', 'responsableNombre', 'plazo', 'toca', 'tocaA', 'requisitos',
-    'normativa', 'formularios', 'textoDocumentos', 'tipoDocumento', 'avisarLoPide', 'avisarLoPidePlantilla', 'variosDocumentos'];
+    'normativa', 'formularios', 'textoDocumentos', 'tipoDocumento', 'avisarLoPide', 'avisarLoPidePlantilla', 'variosDocumentos', 'soloSi'];
 
   function paraComparar(p) {
     var n = Hitos.pasoAHito(p);

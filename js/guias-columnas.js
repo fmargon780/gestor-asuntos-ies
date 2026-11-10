@@ -102,6 +102,7 @@ var GuiasColumnas = (function () {
     poner(dir('paso-cabecera'));
     poner(dir('paso-aviso-plazo'));
     poner(dir('paso-extra'));
+    poner(dir('paso-cuando'));   /* fila 576: «Cuándo se hace» justo debajo de los datos */
     poner(dir('paso-opciones'));
     var guion = dir('paso-guion');
     if (guion) {

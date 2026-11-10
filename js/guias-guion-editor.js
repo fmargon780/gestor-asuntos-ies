@@ -80,6 +80,8 @@
       '<button type="button" class="guion-resumen" aria-expanded="' + (abierta ? 'true' : 'false') + '">' +
         '<span class="guion-resumen-texto">' + U.escapar(g.texto || '(tarea sin texto)') + '</span>' +
         '<span class="guion-resumen-que suave">' + U.escapar(resumenDe(g)) + '</span>' +
+        '<span class="solo-si-etiqueta guion-resumen-si"' + (window.GuiasCuando && GuiasCuando.etiqueta(g.soloSi) ? '' : ' hidden') + '>' +
+          U.escapar(window.GuiasCuando ? GuiasCuando.etiqueta(g.soloSi) : '') + '</span>' +   /* fila 576 */
         '<span class="guion-resumen-flecha"></span></button>';
     var lineaTexto = dentro
       ? '<input class="campo guion-texto" value="' + U.escapar(g.texto || '') + '" placeholder="Texto de la tarea">'
@@ -99,6 +101,8 @@
     var comunHTML = (!dentro && !pregunta && g.comun)
       ? '<div class="guion-fila-linea guion-comun"><span class="suave pequeno">Tarea de la lista común. Si cambias aquí su texto o su plantilla, deja de serlo.</span>' +
         '<button type="button" class="boton boton-chico comunes-cambiar-tarea" data-comun="' + U.escapar(g.comun) + '">Cambiar la tarea</button></div>' : '';
+    /* Fila 576: «Cuándo se hace» (js/guias-cuando.js), en las tareas que no son pregunta. */
+    var cuandoHTML = (!dentro && !pregunta && window.GuiasCuando) ? GuiasCuando.html(g.soloSi, 'guion-cuando') : '';
     var opcionesHTML2 = pregunta ? '<div class="guion-opciones">' + (g.opciones || []).map(function (o) {
       return '<div class="guion-opcion" data-id="' + U.escapar(o.id) + '">' +
         '<div class="guion-fila-linea guion-opcion-cabecera"><input class="campo guion-opcion-texto" value="' +
@@ -122,7 +126,7 @@
         (!dentro && !pregunta && g.comun ? ' data-comun="' + U.escapar(g.comun) + '"' : '') + '>' +
       cabeza +
       '<div class="guion-fila-linea guion-linea-texto">' + lineaTexto + mandos + '</div>' +
-      queSeHace + comunHTML +
+      queSeHace + cuandoHTML + comunHTML +
       (pregunta ? '' : recetaHTML(Object.assign({ editorGuia: true }, g), false)) +   /* fila 530: «Pedir datos» se edita aquí */
       opcionesHTML2 +
       '<button type="button" class="enlace guion-mas-cab" aria-expanded="' + (masAbierto ? 'true' : 'false') + '"><span class="guion-mas-flecha"></span> Más de esta tarea</button>' +
@@ -170,6 +174,8 @@
     }
     var sel = q('.guion-fila-linea .guion-accion');
     var cita = m('.guion-norma > .guion-cita');
+    var cuando = (!dentro && window.GuiasCuando) ? GuiasCuando.leer(f, ':scope > .cuando-bloque') : null;   /* fila 576 */
+    if (cuando) base.soloSi = cuando;
     base.accion = sel ? sel.value : '';
     var receta = q('.guion-receta');
     if (receta) {
@@ -256,7 +262,10 @@
         var q = resumen && resumen.querySelector('.guion-resumen-que');
         if (t) t.textContent = leida.texto || '(tarea sin texto)';
         if (q) q.textContent = resumenDe(leida);
+        var si = resumen && resumen.querySelector('.guion-resumen-si');   /* fila 576 */
+        if (si && window.GuiasCuando) { si.textContent = GuiasCuando.etiqueta(leida.soloSi); si.hidden = !si.textContent; }
       }
+      if (window.GuiasCuando) GuiasCuando.enganchar(fila.querySelector(':scope > .cuando-bloque'), alisarLinea);
       fila.addEventListener('input', alisarLinea);
       fila.addEventListener('change', alisarLinea);
       /* Fila 464, B4: «Obligatorio» y «Un documento / Un dato» solo salen con «Hay que reunirlo» marcado; lo guardado no se borra. */

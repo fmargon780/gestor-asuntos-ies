@@ -225,6 +225,8 @@
     // "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3).
     // Fila 510: los textos condicionales {si:Campo=Valor}; antes de js/plantillas.js y js/docx.js, que los resuelven.
     'js/texto-condicional.js',
+    'js/solo-si.js',
+    'js/guias-sin-preguntas.js',   // fila 576: las preguntas de las guías pasan a «Solo si»; después de solo-si.js   // fila 576: «Cuándo se hace» de hitos y tareas; después de texto-condicional.js
     'js/plantillas.js',
     'js/plantillas-valores.js',
     // js/huecos-buscador.js va antes que quien lo use: el botón "Insertar

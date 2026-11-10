@@ -94,7 +94,8 @@ var HitoMesaGuion = (function () {
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
         (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" data-ayuda-clave="plantilla-fuera-de-uso">plantilla fuera de uso</span>' : '') +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar + etiquetaPropia + '</label>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar + etiquetaPropia +
+        (window.SoloSi ? SoloSi.faltaHTML(g.falta) : '') + '</label>' +   /* fila 576 */
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +
       /* Fila 530: los datos de su plantilla (o los campos de «Pedir datos»), para escribir lo que falte (js/datos-de-la-tarea.js). */

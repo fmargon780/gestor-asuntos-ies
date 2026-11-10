@@ -49,6 +49,7 @@
     for (var i = 0; i < (lista || []).length; i++) {
       var h = lista[i];
       if (h.delTipoAnterior) continue;   /* fila 94: va con los huérfanos */
+      if (h.cond === 'quita' && h.estado !== 'hecho') continue;   /* fila 576: «Solo si» y el campo tiene otro valor */
       out.push(h);
       if (h.clase === 'decision') {
         if (!h.elegida) return true;   /* se corta aquí: nada más se ve */
@@ -206,6 +207,7 @@
          arriba, solo de los pasos de arriba, nunca de una pregunta. */
       avisarLoPide: esDecision ? false : !!p.avisarLoPide,
       avisarLoPidePlantilla: esDecision ? '' : (p.avisarLoPidePlantilla || ''),
+      soloSi: p.soloSi || null,   /* fila 576 */
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],

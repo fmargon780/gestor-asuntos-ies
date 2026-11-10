@@ -138,6 +138,7 @@ var GuiasPlegado = (function () {
           '<span class="guia-lista-texto">' +
             '<span class="guia-lista-titulo' + (p.titulo ? '' : ' suave') + '">' + U.escapar(p.titulo || 'Hito sin título') + '</span>' +
             '<span class="guia-lista-gris suave">' + U.escapar(lineaDeLista(p, o.responsables)) + '</span>' +
+            (window.SoloSi && SoloSi.etiqueta(p.soloSi) ? '<span class="solo-si-etiqueta guia-lista-solo-si">' + U.escapar(SoloSi.etiqueta(p.soloSi)) + '</span>' : '') +   /* fila 576 */
           '</span>';
         if (b.dataset.html !== html) { b.innerHTML = html; b.dataset.html = html; }
       });

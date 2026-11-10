@@ -77,7 +77,7 @@ La lista completa (una línea por cosa, con su fila) está en `docs/contexto/QUE
 (pasada tal cual el 2-nov-2026, fila 498). **Léela antes de proponer o programar algo que pueda
 existir ya.** Lo principal, en una línea cada cosa:
 
-- Asuntos con guía de hitos, estado automático, «Qué me toca», «Cuentas», reservados y recurrentes.
+- Asuntos con guía de hitos (cada hito y tarea con «Cuándo se hace»: «Siempre» o «Solo si» un campo de lista; sin hitos-pregunta, fila 576), estado automático, «Qué me toca», «Cuentas», reservados y recurrentes.
 - Nuevo asunto por persona o por tipo, con tipos de una o varias clases de tercero (fila 493).
 - Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478) y reconocimiento de PDF firmados con su marca «Firmado» (fila 515); cada tarea de generar o registrar del hito lleva su documento colgado (fila 522) y la tarea «Firmar un documento» se marca sola al llegar el firmado (fila 523).
 - Correo (Gmail por script, se queda en recibidos, fila 480; «Sus profesores» por alumno o grupo desde el Centro de datos, fila 572), Séneca, Centro de datos y control del registro.

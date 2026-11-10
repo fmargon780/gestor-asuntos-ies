@@ -373,6 +373,8 @@ var HitosBiblioteca = (function () {
     delete copia.origenBiblioteca;
     delete copia.divergido;
     copia.opciones = [];
+    delete copia.soloSi;   /* fila 576: el campo es de otro tipo */
+    (copia.guion || []).forEach(function (g) { delete g.soloSi; });
     if (copia.plazo && copia.plazo.dias) {
       copia.plazo = desde ? { dias: copia.plazo.dias, desde: desde, cuenta: copia.plazo.cuenta } : null;
       copia.avisoPlazoAjeno = true;
