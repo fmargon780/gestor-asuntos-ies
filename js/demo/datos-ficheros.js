@@ -69,7 +69,18 @@
       var id = fila[1];
       if (id === '2100008') return fila.concat(['', '', '', '', '', '', '']);
       if (id === '2100001' || id === '2100002') return fila.concat(['Calle Mayor 4', '14900', 'Lucena', 'Córdoba', 'Rocío', 'Ponce', 'Duarte']);
+      if (id === '2100012') return fila.concat(['Calle Demo 12, 1º', '14900', 'Lucena', 'Córdoba', 'Elena', 'Soto', 'Mora']);   /* fila 578: un tutor y una custodia que no coincide */
       return fila.concat(['Calle Demo ' + (parseInt(id.slice(-2), 10) || 1) + ', 1º', '14900', 'Lucena', 'Córdoba', '', '', '']);
+    })
+    /* Fila 578: segundo tutor y «Custodia» (como el RegAlum de Séneca: el nombre de quien la tiene).
+       Aguilar Ponce, Marina y Pablo: dos tutores y la custodia es de la primera (Ponce Duarte, Rocío);
+       Klein Soto, Ana: una tutora y un texto que no coincide con ninguna; los demás, sin custodia. */
+    .map(function (fila, i) {
+      if (i === 0) return fila.concat(['Nombre Segundo tutor', 'Primer apellido Segundo tutor', 'Segundo apellido Segundo tutor', 'Custodia']);
+      var id = fila[1];
+      if (id === '2100001' || id === '2100002') return fila.concat(['Joaquín', 'Aguilar', 'Reyes', 'Ponce Duarte, Rocío']);
+      if (id === '2100012') return fila.concat(['', '', '', 'Abuela materna']);
+      return fila.concat(['', '', '', '']);
     })));
 
     /* RelPerCen: profesorado de este curso (Vidal Cano, el ordenanza, va en el listado de no docentes: fila 352). */

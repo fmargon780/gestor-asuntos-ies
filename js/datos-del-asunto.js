@@ -16,7 +16,7 @@
                                { ok: false, aviso } si no se entiende
      infoDe(nombre, a, valores) la clase y las opciones para pintar su control
      tutoresDe(valores)        los tutores del alumno
-     completar(valores)        «Tutor con custodia»: con un solo tutor, cae solo
+     completar(valores, persona) «Tutor con custodia»: lo de Séneca, o con un solo tutor, cae solo
 
    Un campo que no es del tipo se añade a `ficha.camposPropiosDelAsunto`,
    como «solo aquí» (js/campo-desde-el-asunto-escribir.js).
@@ -57,13 +57,24 @@ var DatosDelAsunto = (function () {
     return [valores && valores.tutor1, valores && valores.tutor2].map(function (t) { return String(t || '').trim(); }).filter(Boolean);
   }
 
-  /* «Tutor con custodia»: con un solo tutor, cae solo (sin escribirlo en el asunto); con dos, se elige una vez. */
-  function completar(valores) {
+  /* «Tutor con custodia»: lo que dice Séneca (columna «Custodia», fila 578) cae solo; si Séneca no lo dice, con un solo tutor cae
+     solo y con dos se elige una vez. Lo ya escrito en el asunto manda. `persona`: el alumno (opcional, sin él no hay lo de Séneca). */
+  function completar(valores, persona) {
     if (!valores) return valores;
     var campos = valores.campos = valores.campos || {};
     var ya = Object.keys(campos).some(function (k) { return esTutorConCustodia(k) && String(campos[k] || '').trim(); });
     var t = tutoresDe(valores);
-    if (!ya && t.length === 1) campos[TUTOR_CON_CUSTODIA] = t[0];
+    if (ya) return valores;
+    var deSeneca = '';
+    if (persona && window.Datos && Datos.custodiaDe) {
+      var c = Datos.custodiaDe(persona);
+      var num = c.numeros[0];
+      deSeneca = (num === 1 || num === 2) ? String(valores['tutor' + num] || '').trim() : '';
+    }
+    if (deSeneca) {
+      campos[TUTOR_CON_CUSTODIA] = deSeneca;
+      Object.defineProperty(valores, 'custodiaDeSeneca', { enumerable: false, configurable: true, value: deSeneca });
+    } else if (t.length === 1) campos[TUTOR_CON_CUSTODIA] = t[0];
     return valores;
   }
 
@@ -89,7 +100,12 @@ var DatosDelAsunto = (function () {
       if (propio) info.clase = propio.clase || 'texto';
     }
     if (propio && propio.clase === 'lista') info.valores = (propio.valores || []).slice();
-    if (esTutorConCustodia(nombre)) { info.clase = 'lista'; info.valores = tutoresDe(valores); }
+    if (esTutorConCustodia(nombre)) {
+      info.clase = 'lista'; info.valores = tutoresDe(valores);
+      /* Fila 578: primero el que tiene la custodia según Séneca. */
+      var primero = valores && valores.custodiaDeSeneca;
+      if (primero && info.valores.indexOf(primero) > 0) info.valores = [primero].concat(info.valores.filter(function (x) { return x !== primero; }));
+    }
     if (!info.valores && window.TextoCondicional) {
       var ops = TextoCondicional.opcionesDeFalta(nombre);
       var delTipo = valores && valores.camposLista ? valores.camposLista[Object.keys(valores.camposLista).filter(function (k) { return norm(k) === norm(nombre); })[0]] : null;

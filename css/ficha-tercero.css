@@ -121,3 +121,6 @@
 .tablas-ficha { border-collapse: collapse; font-size: 12px; margin-top: 2px; }
 .tablas-ficha th, .tablas-ficha td { border: 1px solid var(--linea); padding: 2px 8px; text-align: left; }
 .tablas-ficha th { background: #eef1f5; }
+/* Fila 578: «tiene la custodia» junto al tutor y «Custodia: …» cuando no coincide con ninguno. */
+.vt-etq-chica.vt-custodia { color: #1e7a46; border-color: currentColor; }
+.vt-tarjeta-custodia .vt-custodia { font-weight: 600; }

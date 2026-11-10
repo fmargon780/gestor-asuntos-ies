@@ -90,4 +90,13 @@ Al diseñarlo (10-nov-2026):
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026), punto por punto:
+  - Dos tutores, Custodia = uno: coincide (Datos y contacto / ficha completa y correo Para, Copia, Copia oculta). No coincidía: la etiqueta se veía casi blanca (usaba el fondo verde como color); corregido con un verde oscuro.
+  - Texto que no coincide: coincide («Custodia: Abuela materna» en la ficha y en el correo).
+  - Custodia vacía: coincide (ninguna marca; la columna no sale suelta en «Otros datos»).
+  - «Tutor con custodia» de los documentos: coincide, comprobado por llamada interna y con la prueba `pruebas/custodia-junto-al-tutor.mjs`; no abierto un documento real en pantalla.
+  - Perfil de directivo: coincide con el modo «solo consultar»; no he podido ver el perfil de directivo real (la demo solo le deja ver bajas médicas).
+  - Los dos tutores siguen pudiendo ir en Para/Copia: coincide.
+  - Cabecera del asunto: no lo he podido ver; la línea sin elegir no muestra tutores. Con «Elegir datos» sale la columna «Custodia» tal cual, y en la ayuda del teléfono del tutor se añade «· tiene la custodia».
+  - Hace sin pedirlo el texto: «Custodia» sale como dato elegible en «Elegir datos» (es una columna más del fichero); con un solo tutor que no coincide, «Tutor con custodia» sigue cayendo en ese tutor (regla de antes); la lista de elegir pone primero al de Séneca.
+- Pruebas: `custodia-junto-al-tutor` (nueva) y las de lo tocado, en verde; `etiquetas-desde-el-grupo` y `plantillas-desde-un-tipo` fallan igual en `main` sin este cambio (ya apuntadas: idea 593).

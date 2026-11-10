@@ -253,7 +253,7 @@
      `telefonoPropio` y `js/dni.js` (tutor/familia, teléfono, correo,
      domicilio, cuenta y documento de identidad). Nada de columnas que
      no se consultan nunca, y nada del CSV entero. */
-  var CAMPO_UTIL = /tutor|padre|madre|responsable|familia|telefono|movil|correo|e-?mail|domicilio|direccion|localidad|cuenta|dni\b|nif\b|nie\b|documento|identidad|pasaporte/;
+  var CAMPO_UTIL = /tutor|padre|madre|responsable|familia|custodia|telefono|movil|correo|e-?mail|domicilio|direccion|localidad|cuenta|dni\b|nif\b|nie\b|documento|identidad|pasaporte/;
 
   function ficheroDeCategoria(categoria) {
     if (categoria === 'ALUMNADO') return 'RegAlum.csv';

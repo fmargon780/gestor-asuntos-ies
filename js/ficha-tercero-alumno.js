@@ -254,14 +254,24 @@ var FichaTerceroAlumno = (function () {
         /* El DNI ya está en la cabecera: no se repite aquí. */
         Object.assign({}, alumno, { documento: '' }), igualA));
     }
+    /* Fila 578: «tiene la custodia» junto al tutor que dice Séneca; si no coincide con ninguno, «Custodia: <texto>». */
+    var custodia = Datos.custodiaDe(persona, tutores);
     tutores.forEach(function (t) {
       var etiqueta = etiquetaDeTutor(t);
+      var tiene = custodia.numeros.indexOf(t.numero) !== -1;
       caja.appendChild(tarjeta('vt-tarjeta-tutor vt-tarjeta-tutor' + t.numero,
         '<div class="vt-tutor-cabecera">' + circulo(t.iniciales, 'vt-circulo-tutor' + t.numero) +
           '<div><div class="vt-tutor-nombre">' + U.escapar(t.nombre || etiqueta) + '</div>' +
-          '<span class="vt-etq-chica">' + U.escapar(etiqueta) + '</span></div>' +
+          '<span class="vt-etq-chica">' + U.escapar(etiqueta) + '</span>' +
+          (tiene ? ' <span class="vt-etq-chica vt-custodia">tiene la custodia</span>' : '') + '</div>' +
         '</div>', t, null));
     });
+    if (custodia.sinTutor) {
+      var sola = document.createElement('div');
+      sola.className = 'vt-tarjeta vt-tarjeta-custodia';
+      sola.innerHTML = '<div class="vt-tarjeta-titulo vt-custodia">Custodia: ' + U.escapar(custodia.sinTutor) + '</div>';
+      caja.appendChild(sola);
+    }
     if (otrosFamilia.length) {
       var otros = document.createElement('div');
       otros.className = 'vt-tarjeta vt-tarjeta-otros';

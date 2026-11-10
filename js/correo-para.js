@@ -86,7 +86,15 @@ var CorreoPara = (function () {
        reparten: con un solo tutor sin correo, son suyos; si no, salen como «La familia». */
     var tutores = persona && window.Datos && Datos.tutoresDe ? Datos.tutoresDe(persona) : [];
     var nombres = tutores.map(function (t) { return t.nombre; }).filter(Boolean);
-    var conCustodia = custodiaDe(nombres, custodiaEscrita(a));
+    var escrita = custodiaEscrita(a);
+    /* Fila 578: primero lo que dice el asunto; si no dice nada, lo que dice Séneca (columna «Custodia»). */
+    var deSeneca = persona && Datos.custodiaDe ? Datos.custodiaDe(persona, tutores) : { numeros: [], sinTutor: '' };
+    var conCustodia = custodiaDe(nombres, escrita);
+    var custodiaSin = '';
+    if (!escrita && deSeneca.numeros.length) {
+      var porNumero = tutores.filter(function (t) { return deSeneca.numeros.indexOf(t.numero) !== -1; })[0];
+      if (porNumero) conCustodia = porNumero.nombre;
+    } else if (!escrita && deSeneca.sinTutor) { conCustodia = ''; custodiaSin = deSeneca.sinTutor; }
     var delTutor = {};
     tutores.forEach(function (t) { t.correos.forEach(function (d) { delTutor[d.toLowerCase()] = true; }); });
     var sueltos = [];
@@ -105,7 +113,7 @@ var CorreoPara = (function () {
       if (!dirs.length && sueltos.length && sinCorreoPropio.length === 1 && tutores.length === 1) { dirs = sueltos.slice(); sueltos = []; }
       var quien = /padre|madre/.test(norm(t.relacion)) ? t.relacion : 'padre madre';
       lista.push(nuevo('legal' + t.numero, t.nombre || etiqueta, 'Tutor legal · ' + etiqueta.toLowerCase(), dirs, {
-        papel: 'legales', familia: true, custodia: tiene,
+        papel: 'legales', familia: true, custodia: tiene, custodiaSin: custodiaSin,
         nota: '',
         buscar: etiqueta + ' ' + quien + ' tutor legal tutores legales familia' + (tiene ? ' custodia' : '')
       }));
@@ -258,7 +266,7 @@ var CorreoPara = (function () {
     return S.candidatos.map(function (c) {
       var ahora = campoDe(c.id);
       return {
-        id: c.id, nombre: c.nombre, rol: c.rol + (c.custodia ? ' · tiene la custodia' : ''),
+        id: c.id, nombre: c.nombre, rol: c.rol + (c.custodia ? ' · tiene la custodia' : (c.custodiaSin ? ' · Custodia: ' + c.custodiaSin : '')),
         correo: c.dirs.join(', '), buscar: c.buscar + (c.custodia ? ' custodia' : ''), sinCorreo: c.sinCorreo,
         nota: ahora ? 'Ahora en ' + ROTULOS[ahora] + ': pasará a este campo' : ''
       };

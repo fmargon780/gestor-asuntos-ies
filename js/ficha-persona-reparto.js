@@ -26,6 +26,7 @@ var FichaPersonaReparto = (function () {
   var REGLAS_DE_TITULO = [
     { re: /^dni$|^documento$|^nie$|^nif$|^alumno(\/a)?$|^nombre$|^n.? ?id\.? escolar$|^nº ?id\.? escolar$/, tarjeta: null },
     { re: /tutor.*unidad|unidad.*tutor/, tarjeta: 'matricula' },
+    { re: /^custodia$/, tarjeta: null },   /* fila 578: va junto al tutor, en «Familia y contacto» */
     { re: /tutor|padre|madre|responsable|familia/, tarjeta: null },
     { re: /telefono|movil|correo|e-?mail/, tarjeta: null },
     { re: /^(primer|segundo) apellido$|^apellidos?$/, tarjeta: null },

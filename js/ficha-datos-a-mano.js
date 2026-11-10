@@ -49,6 +49,8 @@ var FichaDatosAMano = (function () {
       var deTutor = !!(r.telefono && r.telefono.etiqueta);
       telefono = (r.telefono && r.telefono.valor) || alumno.telefonos[0] || '';
       etiquetaTel = deTutor ? r.telefono.etiqueta : '';
+      /* Fila 578: si el tutor de ese teléfono tiene la custodia, también se dice. */
+      if (deTutor && tutores[0] && Datos.custodiaDe(p, tutores).numeros.indexOf(tutores[0].numero) !== -1) etiquetaTel += ' · tiene la custodia';
       var delTutor = (tutores[0] && tutores[0].correos[0]) || '';
       correo = deTutor ? (delTutor || alumno.correos[0] || '') : (alumno.correos[0] || delTutor);
     } else {

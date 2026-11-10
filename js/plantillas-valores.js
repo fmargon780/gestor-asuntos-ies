@@ -420,7 +420,7 @@
       valores.tutor2 = t2.nombre; valores.tutor2telefono = t2.telefono; valores.tutor2correo = t2.correo;
     }
     /* Fila 530: «Tutor con custodia» cae solo si el alumno tiene un solo tutor (js/datos-del-asunto.js). */
-    if (window.DatosDelAsunto) DatosDelAsunto.completar(valores);
+    if (window.DatosDelAsunto) DatosDelAsunto.completar(valores, categoria === 'ALUMNADO' ? persona : null);
 
     /* Fila 111: los sexos de cada persona, para el masculino o el femenino
        (Plantillas.rellenar -> Genero.resolver); el tratamiento con barra

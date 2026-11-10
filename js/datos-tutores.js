@@ -148,7 +148,56 @@
     return salida;
   }
 
+  /* ---------- la custodia (fila 578, docs/578-CUSTODIA-JUNTO-AL-TUTOR.md) ----------
+
+     Séneca trae una columna «Custodia» con el nombre de quien la tiene. El título no
+     lleva «tutor», así que `tutoresDe` no la recoge sola: se lee aquí, aparte. */
+
+  /* El texto de la columna «Custodia» del alumno (vacío si no hay columna o no hay texto). */
+  function custodiaTexto(alumno) {
+    var campos = (alumno && alumno.campos) || {};
+    var claves = Object.keys(campos).filter(function (k) {
+      var t = U.normalizar(k);
+      return /custodia/.test(t) && !/tutor|padre|madre|responsable|familia/.test(t);
+    });
+    for (var i = 0; i < claves.length; i++) {
+      var v = String(campos[claves[i]] || '').trim();
+      if (v) return v;
+    }
+    return '';
+  }
+
+  function trozosDe(nombre) {
+    return U.normalizar(String(nombre || '')).replace(/[^a-z0-9ñ\s]/g, ' ').split(/\s+/).filter(Boolean);
+  }
+
+  /* PURA. ¿Es el mismo nombre, en cualquier orden («Ponce Duarte, Rocío» = «Rocío Ponce Duarte»)?
+     También vale que uno esté entero dentro del otro, con al menos dos palabras. */
+  function mismoNombre(a, b) {
+    var x = trozosDe(a), y = trozosDe(b);
+    if (!x.length || !y.length) return false;
+    var corto = x.length <= y.length ? x : y, largo = x.length <= y.length ? y : x;
+    if (corto.length < 2 && x.length !== y.length) return false;
+    return corto.every(function (t) { return largo.indexOf(t) !== -1; });
+  }
+
+  /* { texto, numeros[], sinTutor }: lo que dice Séneca y a qué tutores (por número) corresponde.
+     `sinTutor` es el texto cuando no coincide con ninguno; con la columna vacía, todo vacío. */
+  function custodiaDe(alumno, tutores) {
+    var texto = custodiaTexto(alumno);
+    var r = { texto: texto, numeros: [], sinTutor: '' };
+    if (!texto) return r;
+    (tutores || tutoresDe(alumno)).forEach(function (t) {
+      if (mismoNombre(t.nombre, texto) || mismoNombre(t.nombreApellidos, texto)) r.numeros.push(t.numero);
+    });
+    if (!r.numeros.length) r.sinTutor = texto;
+    return r;
+  }
+
   Datos.tutoresDe = tutoresDe;
+  Datos.custodiaTexto = custodiaTexto;
+  Datos.custodiaDe = custodiaDe;
+  Datos.mismoNombre = mismoNombre;
   /* Para la ventana «Ver todo» (js/ficha-tercero.js) y las pruebas. */
   Datos.sexoNormalizado = sexoNormalizado;
   Datos.nombreNatural = nombreNatural;
