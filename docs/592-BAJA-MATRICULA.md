@@ -1,4 +1,4 @@
-# 519 — BAJA MATRICULA: tipo, guía y plantillas, con el traslado al extranjero
+# 592 — BAJA MATRICULA: tipo, guía y plantillas, con el traslado al extranjero
 
 ## Lo que escribió Francisco
 
@@ -49,7 +49,7 @@ Al diseñar el tema 519 (10-nov-2026):
   5. «Baja en Séneca»: tarea «Otra cosa»: grabar la baja en Séneca con su fecha.
   6. «Comunicar»: tarea «Comunicar» con el correo a la familia; y tarea «Comunicar» con el correo a
      Servicios Sociales, «Solo si Protocolo de absentismo iniciado = Sí».
-- **Plantillas del tipo**, con los textos de `docs/519-TEXTOS-BAJA-MATRICULA.md`:
+- **Plantillas del tipo**, con los textos de `docs/592-TEXTOS-BAJA-MATRICULA.md`:
   - Word: la resolución, con textos condicionales para protocolo, acreditación y matrícula de
     destino.
   - Word: el anexo I y el anexo II, sueltos en el tipo (no son pasos de la guía), para sacarlos
@@ -118,7 +118,7 @@ Al diseñar el tema 519 (10-nov-2026):
 - La resolución generada con protocolo «Sí», declaración de la familia y matrícula «Sí» lleva el
   Tercero del «Sí», el Cuarto del anexo I y la frase del certificado; con «No», diligencia y «No»,
   los otros.
-- La resolución lleva todos los textos de `docs/519-TEXTOS-BAJA-MATRICULA.md`, sin `{si:` ni `{{`
+- La resolución lleva todos los textos de `docs/592-TEXTOS-BAJA-MATRICULA.md`, sin `{si:` ni `{{`
   sueltos.
 - El anexo I y el anexo II se pueden generar desde el asunto, con nombre, curso y año del alumno
   rellenos y las líneas en blanco sin pedir nada.

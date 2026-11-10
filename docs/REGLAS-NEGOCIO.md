@@ -169,3 +169,11 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (9-nov-2026, tema 570) Las cruces las pone la app por la norma, tantas como puestos a cubrir, y una casilla dice si la AMPA ha designado representante («Si podemos evitar que el usuario tenga que contestar a esa pregunta, pues mejor»; «Hazlo así»).
 - (9-nov-2026, tema 570) La candidatura presentada por la AMPA lleva su nombre al lado en la papeleta, sin cruz puesta (Orden de 7-oct-2010, art. 9.1.c); el representante designado por la AMPA no sale en la papeleta.
 - (10-nov-2026, fila 575) Este año la persona designada por la AMPA sale en la papeleta de madres y padres con la cruz ya puesta y «Marca hasta N cruces más», como en años anteriores, aunque la norma no lo pide («Yo este año soy un recién aterrizado y no quiero cambiar demasiadas cosas. Elijo la opción 1. Dentro de dos años […] propondré hacerlo conforme al estricto cumplimiento de la norma»). Sustituye, solo para la persona designada, a la regla anterior de la candidatura de la AMPA sin cruz.
+
+## Bajas del alumnado
+
+- (10-nov-2026, tema 519) El tipo «BAJA» pasa a llamarse **BAJA MATRICULA**, para no confundirlo con otras bajas; es distinto de la anulación de matrícula, que tiene su tipo («Pues me parece bien tu idea si en vez de Baja lo llamamos BAJA MATRICULA»).
+- (10-nov-2026, tema 519) Un solo tipo para todas las bajas de matrícula, con el dato «Motivo de la baja» y los pasos de cada motivo con «Solo si»; el primero, «Traslado al extranjero» (ESO). Los demás supuestos en que un alumno deja el centro durante el curso se diseñan uno a uno (filas 586 a 591) («debemos diseñar todos los supuestos en los que un alumno deja de ser alumno del centro durante el curso»).
+- (10-nov-2026, tema 519) La guía cubre solo la parte de Administración: recibir el encargo de Dirección, preparar la resolución, firma de Dirección, registro de salida, baja en Séneca y comunicar (familia y, si se inició el protocolo de absentismo, Servicios Sociales) («Solo nuestra parte»).
+- (10-nov-2026, tema 519) Los anexos I y II son plantillas del tipo para sacarlas cuando Dirección las pida, no pasos de la guía; lo que rellena la familia va como líneas en blanco.
+

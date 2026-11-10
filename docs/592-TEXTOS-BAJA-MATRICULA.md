@@ -1,4 +1,4 @@
-# 519 — Textos de las plantillas de BAJA MATRICULA
+# 592 — Textos de las plantillas de BAJA MATRICULA
 
 Textos acordados con Francisco. La resolución y los anexos salen de la plantilla Word que preparó con
 Claude el 4-nov-2026 (conversación «Anulación de matrículas en Secundaria»), en su versión
@@ -8,7 +8,7 @@ el repositorio: estos textos son la fuente.
 Convenciones:
 - `{{…}}`: campo variable. Los nombres de campos que ya existen en la app (`{{MEMBRETE}}`,
   `{{NOMBRE NATURAL}}`, `{{CURSO}}`, `{{GRUPO}}`, `{{LUGAR Y FECHA}}`, `{{FIRMANTE}}`…) se usan
-  tal cual; los nuevos son los datos del tipo (instrucción 519, «Datos del asunto»).
+  tal cual; los nuevos son los datos del tipo (instrucción 592, «Datos del asunto»).
 - `{si:Campo=Valor}` al principio de un párrafo: texto condicional (fila 510).
 - `________`: línea en blanco que se rellena a mano. **No es un campo**: la app no la pide.
 
