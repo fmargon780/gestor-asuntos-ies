@@ -132,8 +132,8 @@ var CorreoPara = (function () {
 
     /* Los relacionados con el asunto. */
     var rel = (a && a.ficha && a.ficha.relacionados) || [];
+    var resueltos = [];
     if (rel.length && window.CorreoGrupos) {
-      var resueltos = [];
       try { resueltos = await CorreoGrupos.resolverMiembros(rel); } catch (e) { resueltos = []; }
       if (S.grupoDeFamilias && !tutores.length && window.Datos && Datos.tutoresDe) {
         var fam = [];
@@ -149,10 +149,11 @@ var CorreoPara = (function () {
       });
     }
 
-    /* Sus profesores: cuando el Centro de datos traiga el horario. Hoy no sale ninguno. */
-    var profes = window.Horario && Horario.profesoresDeUnidades ? await Horario.profesoresDeUnidades(a) : [];
+    /* Sus profesores (fila 572): los de las materias del alumno, o todos los del grupo (js/horario.js). Sin el dato del Centro de datos, ninguno. */
+    var profes = window.Horario && Horario.profesoresDeUnidades ? await Horario.profesoresDeUnidades(a, { persona: persona, relacionados: resueltos }) : [];
     (profes || []).forEach(function (p, i) {
-      lista.push(nuevo('profe:' + (p.clave || i), p.nombre, 'Profesor/a de ' + (p.materia || 'su grupo'), p.correos || [], { papel: 'profes', buscar: 'profesor profesora profesores ' + (p.materia || '') }));
+      lista.push(nuevo('profe:' + (p.clave || i), p.nombre, 'Profesor/a de ' + (p.materia || 'su grupo'), p.correos || [], {
+        papel: 'profes', claveCorreo: p.claveCorreo || '', buscar: 'profesor profesora profesores sus profesores ' + (p.materia || '') }));
     });
 
     /* Las listas del personal. */

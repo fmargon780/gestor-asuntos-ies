@@ -18,7 +18,7 @@ var PlantillaPapeles = (function () {
     { id: 'interesado', nombre: 'El interesado', buscar: 'interesado alumno alumna' },
     { id: 'legales', nombre: 'Tutores legales', buscar: 'tutores legales padre madre familia custodia' },
     { id: 'tutor', nombre: 'Tutor/a del grupo', buscar: 'tutor tutora grupo tutoria' },
-    { id: 'profes', nombre: 'Profesores del grupo', buscar: 'profesores profesorado docentes' },
+    { id: 'profes', nombre: 'Sus profesores', buscar: 'sus profesores profesores profesorado docentes' },
     { id: 'pide', nombre: 'Quien lo pide', buscar: 'pide solicita' },
     { id: 'relac', nombre: 'Relacionados con el asunto', buscar: 'relacionados terceros' }
   ];
@@ -99,7 +99,7 @@ var PlantillaPapeles = (function () {
     return areaHTML(prefijo + '-firma', 'Firma', existente && existente.firma, 3) +
       '<p class="nota">Vacía: sale la firma general de Ajustes.</p>' +
       '<div class="plantilla-papeles">' + CAMPOS.map(function (c) { return CampoDestinatarios.html(prefijo + '-' + c, ROTULOS[c]); }).join('') +
-      '<p class="nota">Escribe lo que es: tutor, tutores legales, profesores, quien lo pide, relacionados, el interesado, o el nombre de una lista del personal ' +
+      '<p class="nota">Escribe lo que es: tutor, tutores legales, sus profesores, quien lo pide, relacionados, el interesado, o el nombre de una lista del personal ' +
       '(director, secretaría…). Al preparar el correo con esta plantilla, salen ya puestos y se pueden cambiar. Si no pones a nadie, se eligen al enviar.</p></div>';
   }
 
@@ -125,7 +125,7 @@ var PlantillaPapeles = (function () {
           repintar(prefijo);
         },
         alQuitar: function (id) { estado[prefijo][campo] = estado[prefijo][campo].filter(function (x) { return x !== id; }); },
-        sinResultado: function () { return 'Eso no es un papel ni una lista del personal. Prueba con: tutor, tutores legales, profesores, quien lo pide, relacionados o el interesado.'; }
+        sinResultado: function () { return 'Eso no es un papel ni una lista del personal. Prueba con: tutor, tutores legales, sus profesores, quien lo pide, relacionados o el interesado.'; }
       });
     });
   }

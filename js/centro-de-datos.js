@@ -389,6 +389,17 @@ var CentroDeDatos = (function () {
         delTutor.fallos.forEach(function (f) { salida.fallos.push(f); });
         if (delTutor.cursos.length) salida.tomados.push('tutorias');
       }
+      /* Fila 572: el profesorado ya preparado (profesores por grupo y por alumno, todos los cursos). */
+      var delProfes = null;
+      if (window.CentroDeDatosProfesorado) {
+        try { delProfes = await CentroDeDatosProfesorado.tomar(dir, r.indice, apuntes, op); }
+        catch (x) { salida.fallos.push('Profesorado: ' + U.mensajeDeError(x)); }
+      }
+      if (delProfes) {
+        Object.keys(delProfes.nuevos).forEach(function (k) { nuevos[k] = delProfes.nuevos[k]; });
+        delProfes.fallos.forEach(function (f) { salida.fallos.push(f); });
+        if (delProfes.cursos.length) salida.tomados.push('profesorado');
+      }
       await R.terminar(ctx);
       await apuntar(nuevos);
       if (delPersonal && delPersonal.cursos.length && window.Problemas) Problemas.recalcular('personal');   /* fila 327: sus avisos */
@@ -406,6 +417,7 @@ var CentroDeDatos = (function () {
         if (delPersonal && delPersonal.cursos.length && !vistos.personal) partes.push(TITULOS.personal + ' (' + fechaCorta(delPersonal.subido, false) + ')');
         if (delosLibros && delosLibros.cursos.length) partes.push(TITULOS.libros + ' (' + fechaCorta(delosLibros.subido, false) + ')');
         if (delTutor && delTutor.cursos.length && !vistos.tutorias) partes.push(TITULOS.tutorias + ' (' + fechaCorta(delTutor.subido, false) + ')');
+        if (delProfes && delProfes.cursos.length) partes.push('Profesorado (' + fechaCorta(delProfes.subido, false) + ')');
         avisarTraido(partes, config);
       } else if (op.avisar && !salida.fallos.length) {
         U.aviso('No hay nada nuevo en el Centro de datos.', 'bueno');

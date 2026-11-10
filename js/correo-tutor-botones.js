@@ -20,12 +20,29 @@ var CorreoTutorBotones = (function () {
   /* Los correos de los tutores, sin repetir. */
   function correos() { var d = datos(); return d ? d.correos.slice() : []; }
 
+  /* Fila 572: los profesores de «Sus profesores» a los que les falta el correo (con su ficha del personal, se puede escribir y guardar aquí). */
+  function profesSinCorreo() {
+    return window.CorreoPara ? CorreoPara.candidatos().filter(function (c) { return c.papel === 'profes' && c.sinCorreo; }) : [];
+  }
+
+  function lineasDeProfes() {
+    return profesSinCorreo().map(function (c) {
+      var quien = esc(c.nombre) + ' (' + esc(String(c.rol || '').replace(/^Profesor\/a/, 'profesor/a')) + ')';
+      if (!c.claveCorreo) return '<p class="aviso aviso-ambar correo-tutor-falta" data-profe="' + esc(c.id) + '">Falta el correo de ' + quien + '</p>';
+      return '<p class="aviso aviso-ambar correo-tutor-falta" data-profe="' + esc(c.id) + '" data-clave="' + esc(c.claveCorreo) + '">Falta el correo de ' + quien +
+        '<br><input type="email" class="campo correo-tutor-escribir" data-clave="' + esc(c.claveCorreo) + '" data-profe="' + esc(c.id) + '" data-nombre="' + esc(c.nombre) +
+        '" placeholder="Escribe su correo" aria-label="Correo de ' + esc(c.nombre) + '"> ' +
+        '<button type="button" class="boton boton-chico correo-tutor-guardar" data-clave="' + esc(c.claveCorreo) + '" data-profe="' + esc(c.id) + '">Guardar</button></p>';
+    });
+  }
+
   /* Debajo de los campos: una línea ámbar por cada tutor al que le falta el correo, con su casilla para escribirlo y «Guardar»
      (fila 434, docs/ARREGLOS-DEL-HITO-EN-TRABAJO.md, punto 2). Sin tutor en la tabla, solo el aviso; sin clave, tampoco se puede guardar. */
   function avisosHtml() {
     var d = datos();
-    if (!d || !d.faltan.length) return '';
-    var lineas = [];
+    var lineas = lineasDeProfes();
+    if (!d || !d.faltan.length) return lineas.length ? '<div id="correo-tutor-faltas">' + lineas.join('') + '</div>' : '';
+    lineas = [];
     d.unidades.forEach(function (u) {
       if (!u.tutores.length) { lineas.push('<p class="aviso aviso-ambar correo-tutor-falta">No sé quién es el tutor o tutora de ' + esc(u.unidad) + '. Las tutorías se suben al Centro de datos.</p>'); return; }   /* fila 376 */
       u.tutores.forEach(function (t) {
@@ -37,7 +54,7 @@ var CorreoTutorBotones = (function () {
           '<button type="button" class="boton boton-chico correo-tutor-guardar" data-clave="' + esc(t.clave) + '">Guardar</button></p>');
       });
     });
-    return '<div id="correo-tutor-faltas">' + lineas.join('') + '</div>';
+    return '<div id="correo-tutor-faltas">' + lineas.concat(lineasDeProfes()).join('') + '</div>';
   }
 
   /* PURA. Apunta el correo en el tutor `clave` de los datos del cuadro y recalcula lo que sale de ahí. */
@@ -48,16 +65,21 @@ var CorreoTutorBotones = (function () {
     Object.assign(d, TutorDelGrupo.resumenParaElCuadro(d.unidades));
   }
 
-  async function guardarCorreo(clave, nombre, texto) {
+  async function guardarCorreo(clave, nombre, texto, idProfe) {
     var m = String(texto || '').match(Destinatarios.RE_CORREO);
     if (!m || m.length !== 1) { U.aviso('Escribe un correo válido (una sola dirección).', 'ambar'); return false; }
     var correo = m[0];
     var d = datos();
-    if (!d) return false;
+    if (!d && !idProfe) return false;
     try {
       /* Al momento, sin esperar al envío: mismo fichero y mismo guardado que al enviar (js/correos-a-mano.js). */
       if (!(await CorreosAMano.guardar(clave, correo, nombre))) { U.aviso('No he podido guardar el correo.', 'malo'); return false; }
     } catch (e) { U.fallo('No he podido guardar el correo', e); return false; }
+    if (idProfe) {   /* fila 572: un profesor de «Sus profesores» */
+      if (window.CorreoPara) { CorreoPara.actualizarCorreo(idProfe, correo); CorreoPara.repintar(); }
+      repintar();
+      return true;
+    }
     aplicarCorreo(d, clave, correo);
     if (window.CorreoTutor && CorreoTutor.apuntarAMano) CorreoTutor.apuntarAMano(clave, correo);
     if (window.CorreoPara) { CorreoPara.actualizarCorreo('tutor:' + clave, correo); CorreoPara.repintar(); }
@@ -68,7 +90,6 @@ var CorreoTutorBotones = (function () {
   function repintar() {
     var caja = $('correo-tutor-faltas');
     if (!caja) return;
-    var d = datos();
     var nuevo = document.createElement('div');
     nuevo.innerHTML = avisosHtml();
     if (nuevo.firstChild) caja.replaceWith(nuevo.firstChild); else caja.remove();
@@ -78,8 +99,11 @@ var CorreoTutorBotones = (function () {
 
   function engancharAvisos(caja) {
     Array.prototype.forEach.call(caja.querySelectorAll('.correo-tutor-guardar'), function (b) {
-      var campo = caja.querySelector('.correo-tutor-escribir[data-clave="' + b.getAttribute('data-clave') + '"]');
-      b.onclick = function () { if (campo) U.mientrasGuarda(b, function () { return guardarCorreo(campo.getAttribute('data-clave'), campo.getAttribute('data-nombre'), campo.value); }); };
+      var profe = b.getAttribute('data-profe');
+      var campo = Array.prototype.filter.call(caja.querySelectorAll('.correo-tutor-escribir'), function (c) {
+        return c.getAttribute('data-clave') === b.getAttribute('data-clave') && (c.getAttribute('data-profe') || '') === (profe || '');
+      })[0];
+      b.onclick = function () { if (campo) U.mientrasGuarda(b, function () { return guardarCorreo(campo.getAttribute('data-clave'), campo.getAttribute('data-nombre'), campo.value, campo.getAttribute('data-profe')); }); };
       if (campo) campo.onkeydown = function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); b.click(); } };
     });
   }

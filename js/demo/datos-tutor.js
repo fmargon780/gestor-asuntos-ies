@@ -64,6 +64,34 @@
     if (window.TablasDatos) TablasDatos.olvidar();
   }
 
+  /* Fila 572 (docs/572-SUS-PROFESORES-POR-ALUMNO.md): el profesorado como lo deja el Centro de datos, ya copiado a la carpeta de datos
+     (`PROFESORADO-GRUPOS-HECHO <curso>.json` y `PROFESORADO-ALUMNOS-HECHO <curso>.json`), del curso de hoy.
+     4º A: Matemáticas y Física y Química las da Otero Campos (dos materias, un solo profesor), Lengua Reyes Palma, Inglés Cabello Ruiz
+     (sin correo en su ficha) y Geografía e Historia Uceda Molina, que NO le da clase a Jimenez Rubio, Mateo (2100011).
+     1º Bach A: Fuentes Calvo, Rubén (2100007) tiene Inglés con Cabello Ruiz. */
+  async function escribirProfesorado() {
+    var curso = U.cursoActual();
+    var DOC = { 'Otero Campos, Marta': '11223344A', 'Reyes Palma, Fernando': '22334455B', 'Uceda Molina, Patricia': '33445566C', 'Cabello Ruiz, Esperanza': '77889900G' };
+    var lineas = [
+      ['4º A', 'Matemáticas', 'Otero Campos, Marta'], ['4º A', 'Física y Química', 'Otero Campos, Marta'],
+      ['4º A', 'Lengua Castellana y Literatura', 'Reyes Palma, Fernando'], ['4º A', 'Inglés', 'Cabello Ruiz, Esperanza'],
+      ['4º A', 'Geografía e Historia', 'Uceda Molina, Patricia'], ['1º Bach A', 'Inglés', 'Cabello Ruiz, Esperanza']
+    ];
+    var base = { acuerdoHecho: 1, parte: 'curso', cursoEscolar: curso, generado: new Date().toISOString(), origen: 'centro-de-datos-ies', campos: [], avisos: [] };
+    var grupos = Object.assign({ conjunto: 'profesorado-grupos', registros: lineas.map(function (l, i) {
+      return { id: 'g-demo' + i, datos: { nivel: l[0].indexOf('Bach') !== -1 ? '1º de Bachillerato' : '4º de E.S.O.', unidad: l[0], materia: l[1], profesor: l[2], fichaConjunto: 'personal', fichaId: DOC[l[2]] } };
+    }) }, base);
+    var alumnos = Object.assign({ conjunto: 'profesorado-alumnos', registros: [
+      { id: '2100011', datos: { alumno: 'Jimenez Rubio, Mateo', unidad: '4º A', profesores: [
+        { materia: 'Matemáticas', profesor: 'Otero Campos, Marta' }, { materia: 'Física y Química', profesor: 'Otero Campos, Marta' },
+        { materia: 'Lengua Castellana y Literatura', profesor: 'Reyes Palma, Fernando' }, { materia: 'Inglés', profesor: 'Cabello Ruiz, Esperanza' }] } },
+      { id: '2100007', datos: { alumno: 'Fuentes Calvo, Rubén', unidad: '1º Bach A', profesores: [{ materia: 'Inglés', profesor: 'Cabello Ruiz, Esperanza' }] } }
+    ] }, base);
+    await Carpetas.escribirTexto(App.E.datos, 'PROFESORADO-GRUPOS-HECHO ' + curso + '.json', JSON.stringify(grupos));
+    await Carpetas.escribirTexto(App.E.datos, 'PROFESORADO-ALUMNOS-HECHO ' + curso + '.json', JSON.stringify(alumnos));
+    if (window.Horario) Horario.olvidar();
+  }
+
   async function pdf(texto) {
     var PDFLib = await PdfHerramientas.cargarPdfLib();
     var doc = await PDFLib.PDFDocument.create();
@@ -74,6 +102,7 @@
 
   async function construir(o) {
     await escribirTutorias();
+    await escribirProfesorado();   /* fila 572 */
     /* El sexo de los cuatro alumnos (su RegAlum no trae la columna «Sexo»): «al alumno» sale ya resuelto.
        Una sola escritura de `sexos.json` (el montaje de la demostración tiene que seguir siendo rápido). */
     try {

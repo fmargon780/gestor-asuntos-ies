@@ -451,6 +451,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/centro-de-datos-entregar.mjs` | Prueba en navegador (fila 328): la entrega de empresas, sus id, no repetir, cambios, vacía, fallos, solo escribir ese fichero, solo permiso de leer y la comprobación al entrar |
 | `js/centro-de-datos-personal.js` | Toma las partes del personal ya preparadas por el Centro de datos (huella SHA-256, copia a `_GESTOR/datos/PERSONAL-HECHO <curso>.json`, apunte `hecho-personal|<curso>`) (fila 327) |
 | `js/centro-de-datos-tutorias.js` | Toma las partes de tutorías ya preparadas por el Centro de datos, de todos los cursos (huella SHA-256, copia a `_GESTOR/datos/TUTORIAS-HECHO <curso>.json`, apunte `hecho-tutorias|<curso>`) (fila 376) |
+| `js/centro-de-datos-profesorado.js` | Toma las partes `profesorado-grupos` y `profesorado-alumnos` ya preparadas por el Centro de datos, de todos los cursos (huella SHA-256, copia a `_GESTOR/datos/PROFESORADO-GRUPOS-HECHO <curso>.json` y `PROFESORADO-ALUMNOS-HECHO <curso>.json`, apunte `hecho-profesorado-*\|<curso>`) (fila 572) |
+| `js/horario.js` | «Sus profesores» de un asunto: `Horario.profesoresDeUnidades(a, ctx)` junta por alumno (o por grupo) los profesores con sus materias y su correo del personal; lo usa `js/correo-para.js` (fila 572) |
 | `js/datos-personal-hecho.js` | Convierte una parte del personal en las filas de un RelPerCen (`filasDe`, `vale`, `avisosDe`) (fila 327) |
 | `js/problemas-personal.js` | Las tres tarjetas de Ajustes → Problemas con los avisos del personal del curso más alto (fila 327) |
 | `js/demo/personal-hecho.js` | `?personalhecho=avisos|limpio|amano` de la copia de pruebas (fila 327) |
