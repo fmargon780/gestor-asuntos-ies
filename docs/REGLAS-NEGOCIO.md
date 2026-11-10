@@ -138,6 +138,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   las clases permitidas; una pastilla se fija pulsándola y se suelta pulsándola otra vez.
 - (10-nov-2026, tema 502) En «Cambiar el asunto», el aviso ámbar de tercero de otra clase sale
   solo si la clase del tercero no es **ninguna** de las clases permitidas del tipo («Estoy de acuerdo»).
+- (10-nov-2026, tema 490) Al cambiar el nombre de un tipo de asunto que tiene nombre corto, el mismo cuadro deja cambiar o vaciar el nombre corto, y las carpetas abiertas de ese tipo pasan a llevar el que le toque; si no tiene nombre corto, no se le ofrece ponerle uno ahí («Ok. Me parece bien»). El arreglo de las carpetas que se recortaban mal va en la misma tarea (elegido por Francisco).
 
 ## Libros de texto
 
