@@ -189,7 +189,7 @@ var GuiasSinPreguntas = (function () {
   }
 
   /* Mientras se monta la copia de pruebas la conversión espera (js/demo/datos-solo-si.js la llama al terminar). */
-  var pausada = false;
+  var pausada = !!window.__pruebaSinConvertirPreguntas;   /* solo para las pruebas que miran los hitos-pregunta de antes */
   function pausar(si) { pausada = !!si; }
 
   async function convertir() {

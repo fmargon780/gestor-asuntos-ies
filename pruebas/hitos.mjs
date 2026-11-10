@@ -17,6 +17,7 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+await pagina.addInitScript('window.__pruebaSinConvertirPreguntas = true;');   /* fila 576: esta prueba mira los hitos-pregunta de antes */
 /* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
    prueba trabaja dentro de una: se entra con ella ya abierta en grande
    (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */

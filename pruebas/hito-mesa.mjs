@@ -67,6 +67,7 @@ async function preparar(ancho, alto) {
   pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
   pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
   await pagina.addInitScript(preparacion);
+  await pagina.addInitScript('window.__pruebaSinConvertirPreguntas = true;');   /* fila 576: esta prueba mira los hitos-pregunta de antes */
   await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
   await pagina.click('#btn-abiertos');
   await pagina.click('#btn-archivo');

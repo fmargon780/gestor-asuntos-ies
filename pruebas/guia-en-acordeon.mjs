@@ -29,6 +29,7 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+await pagina.addInitScript('window.__pruebaSinConvertirPreguntas = true;');   /* fila 576: esta prueba mira los hitos-pregunta de antes */
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;
@@ -127,13 +128,8 @@ await comprobar('subido, sigue elegido', elegidos(), ['Registrar la entrada']);
 /* ================= 5 ================= */
 console.log('--- 5. tras repintar ---');
 await enLista(3);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="3"] > .paso-apartado-cab[data-ap="otros"]');   /* «es una pregunta» va en «Otros» */
-await pagina.locator('#guia-pasos > .paso-editor[data-pos="3"] > .paso-es-pregunta-fila .paso-es-pregunta').check();
-await comprobar('marcar «es una pregunta» repinta y el hito sigue elegido', elegidos(), ['Archivar']);
-await comprobar('(ya con sus dos opciones a la vista)',
-  pagina.locator('#guia-pasos > .paso-editor[data-pos="3"] .opcion-editor').evaluateAll(o => o.filter(x => x.offsetParent !== null).length), 2);
-await pagina.locator('#guia-pasos > .paso-editor[data-pos="3"] > .paso-es-pregunta-fila .paso-es-pregunta').uncheck();
-await comprobar('y al desmarcarla, igual', elegidos(), ['Archivar']);
+/* Fila 576: ya no se crean hitos-pregunta, así que un hito normal no ofrece la casilla «es una pregunta». */
+await comprobar('un hito normal no tiene la casilla de pregunta', pagina.locator('#guia-pasos > .paso-editor[data-pos="3"] > .paso-es-pregunta-fila').count(), 0);
 
 /* ================= 6 ================= */
 console.log('--- 6. un hito dentro de una opción ---');
