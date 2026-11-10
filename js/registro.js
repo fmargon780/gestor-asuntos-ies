@@ -229,6 +229,12 @@ var Registro = (function () {
      mismo nombre: el original pasa a «_Previas» como «SIN SELLAR» y la
      sellada ocupa su sitio. El registro se apunta en la ficha (se pueden
      añadir varios: entrada y salida, en el mismo papel). */
+  /* Fila 573: la fecha de registro, la del sello (si lo hay). */
+  function fechaDelSello(sello) {
+    var iso = window.FechaDeRegistro && sello ? FechaDeRegistro.isoDeSello(sello.fecha) : '';
+    return iso ? { fecha: iso, fuente: 'sello' } : {};
+  }
+
   async function guardarNumerado(asunto) {
     var registro = registroDelFormulario();
     registro.codigo = Nombres.codigoRegistro(registro);
@@ -253,8 +259,10 @@ var Registro = (function () {
     }
     try {
       await DocumentosDatos.anotar(asunto.nombre, estado.previo.numero, {
-        tipo: estado.previo.tipo, fecha: estado.previo.fecha, anadirRegistro: registro
+        tipo: estado.previo.tipo, fecha: estado.previo.fecha,
+        anadirRegistro: Object.assign({}, registro, fechaDelSello(estado.sello))   /* fila 573 */
       });
+      if (window.FechaDeRegistro) await FechaDeRegistro.repasar();   /* si el listado ya trae ese código, manda el listado */
       var fechaSello = estado.sello && estado.sello.fecha ? ' el ' + estado.sello.fecha : '';
       await quitarDePendientes(asunto, nombre);
       await window.Notas.sustituir(asunto, 'Registrado ' + registro.codigo + fechaSello + ' · ' + nombre,

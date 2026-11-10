@@ -59,7 +59,10 @@ var DocumentosDatos = (function () {
       if (datos && datos.anadirRegistro) {
         var lista = (nuevo.registros || []).slice();
         var codigo = datos.anadirRegistro.codigo;
-        if (!lista.some(function (r) { return r.codigo === codigo; })) lista.push(datos.anadirRegistro);
+        var iExiste = -1;
+        lista.forEach(function (r, i) { if (r.codigo === codigo) iExiste = i; });
+        if (iExiste === -1) lista.push(datos.anadirRegistro);
+        else if (datos.anadirRegistro.fecha && window.FechaDeRegistro) lista[iExiste] = FechaDeRegistro.conFecha(lista[iExiste], datos.anadirRegistro.fecha, datos.anadirRegistro.fuente || 'sello');   /* fila 573 */
         nuevo.registros = lista;
       }
       /* Fila 515: `firmas` fija el número (0 lo quita); `firmasMinimo` nunca lo baja. */
@@ -107,11 +110,14 @@ var DocumentosDatos = (function () {
     return n > 1 ? 'Firmado (' + n + ')' : (n === 1 ? 'Firmado' : '');
   }
 
+  /* Fila 573: «Registro 26EM0123 · 03/11/2026» (solo el código si aún no hay fecha). */
+  function textoDeRegistro(r) { return window.FechaDeRegistro ? FechaDeRegistro.texto(r) : 'Registro ' + r.codigo; }
+
   function resumen(d) {
     if (!d) return '';
     var partes = [];
     if (marcaFirmado(d)) partes.push(marcaFirmado(d));
-    (d.registros || []).forEach(function (r) { if (r.codigo) partes.push('Registro ' + r.codigo); });
+    (d.registros || []).forEach(function (r) { if (r.codigo) partes.push(textoDeRegistro(r)); });
     (d.campos || []).forEach(function (c) { if (c) partes.push(c); });
     if (d.texto) partes.push(d.texto);
     return partes.join(' · ');
@@ -157,7 +163,7 @@ var DocumentosDatos = (function () {
     var solo = !!(opciones && opciones.soloCampos);
     var partes = [];
     if (d && !solo && marcaFirmado(d)) partes.push(marcaFirmado(d));   /* fila 515 */
-    if (d && !solo) (d.registros || []).forEach(function (r) { if (r.codigo) partes.push('Registro ' + r.codigo); });
+    if (d && !solo) (d.registros || []).forEach(function (r) { if (r.codigo) partes.push(textoDeRegistro(r)); });
     if (window.Candidaturas && Candidaturas.lista) {
       var cand = Candidaturas.lista(a).filter(function (c) { return (c.documentos || []).indexOf(nombreFichero) !== -1; })[0];
       if (cand && cand.persona) partes.push('Candidato: ' + Candidaturas.visible(cand.persona));

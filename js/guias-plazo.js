@@ -29,6 +29,17 @@ var GuiasPlazo = (function () {
       }).join('') + '</select>';
   }
 
+  /* Fila 573 (docs/573-FECHA-DE-REGISTRO.md): «desde que se hace» (lo de siempre) o «desde su registro» (la fecha de registro del
+     documento de ese hito). Se guarda en el plazo como `base` ('registro'); sin `base`, «desde que se hace». */
+  function htmlBase(p, id) {
+    var registro = !!(p && p.plazo && p.plazo.base === 'registro');
+    return '<select' + (id ? ' id="' + id + '"' : '') + ' class="campo paso-plazo-base">' +
+      '<option value="hecho"' + (registro ? '' : ' selected') + '>desde que se hace</option>' +
+      '<option value="registro"' + (registro ? ' selected' : '') + '>desde su registro</option></select>';
+  }
+
+  function leerBaseSelect(sel) { return sel && sel.value === 'registro' ? 'registro' : 'hecho'; }
+
   function leer(caja) {
     return leerSelect(caja.querySelector(':scope > .paso-extra .paso-plazo-cuenta'));
   }
@@ -46,6 +57,6 @@ var GuiasPlazo = (function () {
     if (dias) dias.placeholder = sel.value === 'meses' ? 'meses' : 'días';
   });
 
-  return { html: html, htmlConId: htmlConId, leer: leer, leerSelect: leerSelect };
+  return { html: html, htmlConId: htmlConId, leer: leer, leerSelect: leerSelect, htmlBase: htmlBase, leerBaseSelect: leerBaseSelect };
 })();
 window.GuiasPlazo = GuiasPlazo;

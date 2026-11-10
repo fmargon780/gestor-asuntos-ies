@@ -354,7 +354,7 @@
     await Carpetas.escribirBytes(carpeta, nombreNuevo, PDF_DE_MENTIRA, 'application/pdf');
     await DocumentosDatos.anotar(asuntoNombre, numeroDoc, {
       tipo: 'SOLICITUD', fecha: fecha, texto: 'Curso 26-27', campos: [], valores: {},
-      registros: [{ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123', codigo: Nombres.codigoRegistro({ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123' }) }]
+      registros: [{ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123', fecha: hace(1), fuente: 'sello', codigo: Nombres.codigoRegistro({ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123' }) }]
     });
     var antiguo = Nombres.montarDocumento({ fecha: hace(9), codigo: fecha.slice(2, 4) + 'EM0098', tipo: 'INFORME', curso: 'Antiguo', extension: 'pdf' });
     await Carpetas.escribirBytes(carpeta, antiguo, PDF_DE_MENTIRA, 'application/pdf');

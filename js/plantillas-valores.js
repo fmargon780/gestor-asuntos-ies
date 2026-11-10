@@ -168,11 +168,33 @@
   }
 
   async function registroDelAsunto(a) {
-    if (!a || !a.handle || !window.Carpetas) return '';
-    try {
-      var lista = await Carpetas.ficheros(a.handle);
-      return ultimoRegistroDe(lista.map(function (f) { return f.nombre; }));
-    } catch (e) { return ''; }
+    return (await registroYFechaDelAsunto(a)).codigo;
+  }
+
+  /* Fila 573: {registro} y {fecha de registro} salen del MISMO documento. Los registros de la ficha (documentos con el nombre nuevo,
+     donde el registro no va en el nombre) cuentan igual que los del nombre antiguo; con los dos, manda el del nombre (como hasta ahora). */
+  function registrosDeLaFicha(a) {
+    var docs = (a && a.ficha && a.ficha.documentos) || {};
+    var salida = [];
+    Object.keys(docs).forEach(function (n) {
+      var d = docs[n] || {};
+      (d.registros || []).forEach(function (r) { if (r && r.codigo) salida.push({ codigo: r.codigo, fecha: r.fecha || '', docFecha: d.fecha || '' }); });
+    });
+    return salida;
+  }
+
+  async function registroYFechaDelAsunto(a) {
+    var codigo = '';
+    if (a && a.handle && window.Carpetas) {
+      try { codigo = ultimoRegistroDe((await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; })); } catch (e) { codigo = ''; }
+    }
+    var delaFicha = registrosDeLaFicha(a);
+    if (!codigo && delaFicha.length) {
+      delaFicha.sort(function (x, y) { return (x.docFecha + x.codigo) < (y.docFecha + y.codigo) ? 1 : -1; });
+      codigo = delaFicha[0].codigo;
+    }
+    var igual = delaFicha.filter(function (r) { return r.codigo === codigo && r.fecha; })[0];
+    return { codigo: codigo, fecha: igual ? igual.fecha : '' };
   }
 
   /* La persona (tercero) de este asunto, tal y como la trae el CSV de
@@ -224,7 +246,8 @@
     var datosCentro = await datosDelCentro();
 
     var persona = (window.AsuntoDeGrupo && AsuntoDeGrupo.esGrupo(a)) ? null : await personaDelAsunto(categoria, terceroTexto);   /* fila 293 */
-    var registro = await registroDelAsunto(a);
+    var registroYFecha = await registroYFechaDelAsunto(a);
+    var registro = registroYFecha.codigo;
     /* Fila 280: con `opciones.fecha` (la de un documento ya hecho), «hoy» es esa fecha. Sin ella, la de hoy. */
     var fechaBase = /^\d{4}-\d{2}-\d{2}$/.test(op.fecha || '') ? op.fecha : '';
     var dateBase = fechaBase ? new Date(+fechaBase.slice(0, 4), +fechaBase.slice(5, 7) - 1, +fechaBase.slice(8, 10)) : null;
@@ -247,6 +270,7 @@
       /* Fila 129: el hito actual; en el ARCHIVO, dónde se quedó. */
       estado: !window.EstadoHito || !a.nombre ? '' : (f.estado === 'cerrado' ? EstadoHito.textoArchivado(f) : EstadoHito.textoDeNombre(a.nombre)),
       registro: registro,
+      'fecha de registro': registroYFecha.fecha && window.FechaDeRegistro ? FechaDeRegistro.legible(registroYFecha.fecha) : '',   /* fila 573 */
       hoy: U.fechaLegible(U.aAaMmDd(fechaBase || U.hoyIso())),
       hoyLargo: fechaLargaDe(dateBase),
       lugarYFecha: (datosCentro.localidad ? 'En ' + datosCentro.localidad + ', a ' : 'A ') + fechaLargaDe(dateBase),

@@ -124,13 +124,22 @@ var HitoMesaDocumentos = (function () {
       }).join('') + '</details>';
   }
 
+  /* Fila 573: el registro con su fecha («26EM0123 · 03/11/2026»): el de la ficha (documentos con el nombre nuevo) o el del nombre. */
+  function registroConFecha(a, nombre) {
+    var d = window.DocumentosDatos && a ? DocumentosDatos.deFichero(a.ficha, nombre) : null;
+    var regs = ((d && d.registros) || []).filter(function (r) { return r && r.codigo; });
+    if (regs.length && window.FechaDeRegistro) return regs.map(FechaDeRegistro.codigoYFecha).join(', ');
+    return codigoDe(nombre);
+  }
+
   function datosDeLaLinea(a, nombre, falta) {
     var fecha = fechaDe(nombre);
+    var registro = registroConFecha(a, nombre);
     var campos = !falta && window.DocumentosDatos ? DocumentosDatos.linea(a, nombre, { soloCampos: true }) : '';
     var marca = !falta && window.DocumentosDatos ? DocumentosDatos.marcaDe(a, nombre) : '';   /* fila 515: «Firmado» delante del registro */
-    var texto = [fecha, marca, codigoDe(nombre) || '—', campos].filter(Boolean).join(' · ');
+    var texto = [fecha, marca, registro || '—', campos].filter(Boolean).join(' · ');
     return '<div class="doc-datos mesa-doc-datos" title="' + U.escapar(texto) + '"><span class="mesa-doc-fecha">' + U.escapar(fecha) + '</span>' +
-      (fecha ? ' · ' : '') + (marca ? '<span class="mesa-doc-firmado">' + U.escapar(marca) + '</span> · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(codigoDe(nombre) || '—') + '</span>' +
+      (fecha ? ' · ' : '') + (marca ? '<span class="mesa-doc-firmado">' + U.escapar(marca) + '</span> · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(registro || '—') + '</span>' +
       (campos ? ' · ' + U.escapar(campos) : '') + '</div>';
   }
 
@@ -376,7 +385,7 @@ var HitoMesaDocumentos = (function () {
     if (abierto && window.HitoMesaComunicar) HitoMesaComunicar.pintar(fila, a, h);
   }
 
-  return { filasHTML: filasHTML, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
+  return { filasHTML: filasHTML, datosDeLaLinea: datosDeLaLinea, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
            moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar,
            datosDeLaLinea: datosDeLaLinea, abrirEnVisor: abrirEnVisor, codigoDe: codigoDe };   /* fila 522 */
 })();

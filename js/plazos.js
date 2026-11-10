@@ -273,11 +273,18 @@ var Plazos = (function () {
     return { texto: 'Sin prisa · ' + fechaCortaSinAno(fecha), clase: 'plazo-lejos' };
   }
 
+  /* Fila 573: desde cuándo cuenta un plazo que cuenta «desde» otro hito: `base` es 'hecho' (cuando se hace; lo de siempre, sin
+     escribir nada) o 'registro' (desde la fecha de registro del documento de ese hito). Pasa la base de `origen` a `plazo`. */
+  function conBase(plazo, origen) {
+    if (plazo && origen && origen.base === 'registro') plazo.base = 'registro';
+    return plazo;
+  }
+
   return {
     DIAS_CERCA: DIAS_CERCA,
     sumarDias: sumarDias, sumarDiasHabiles: sumarDiasHabiles,
     diasHasta: diasHasta, legible: legible,
-    CUENTAS: CUENTAS, cuentaValida: cuentaValida, sumarPlazo: sumarPlazo,
+    CUENTAS: CUENTAS, cuentaValida: cuentaValida, sumarPlazo: sumarPlazo, conBase: conBase,
     diasQueQuedan: diasQueQuedan, textoPlazo: textoPlazo, textoDias: textoDias,
     de: de, pasaFiltro: pasaFiltro,
     etiquetaVencimiento: etiquetaVencimiento,

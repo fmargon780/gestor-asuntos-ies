@@ -153,7 +153,8 @@
         var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
         var desdeValor = desdeSel ? desdeSel.value : ((opciones && opciones.esModelo) ? '-' : '');
         nivel[i].plazo = (!isNaN(dias) && dias > 0 && desdeValor)
-          ? { dias: dias, desde: desdeSel ? desdeSel.value : '', cuenta: window.GuiasPlazo ? GuiasPlazo.leer(caja) : 'habiles' } : null;
+          ? Plazos.conBase({ dias: dias, desde: desdeSel ? desdeSel.value : '', cuenta: window.GuiasPlazo ? GuiasPlazo.leer(caja) : 'habiles' },
+              { base: window.GuiasPlazo ? GuiasPlazo.leerBaseSelect(caja.querySelector(':scope > .paso-extra .paso-plazo-base')) : 'hecho' }) : null;   /* fila 573 */
 
         /* "Lo que hay que reunir" (18-sep-2026, fila 59): solo en los
            hitos que no son pregunta (ver pintar()), así que un hito que

@@ -299,6 +299,7 @@ var ControlRegistro = (function () {
         });
       });
     }
+    if (window.FechaDeRegistro) FechaDeRegistro.repasar();   /* fila 573: las fechas de registro de los documentos ya registrados */
     return { ok: true, porLibro: porLibro, rechazados: rechazados };
   }
 

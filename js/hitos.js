@@ -139,7 +139,11 @@ var Hitos = (function () {
       if (nuevoEstado === 'encurso') h.desde = U.hoyIso();
       if (nuevoEstado === 'hecho') h.hechoEl = U.hoyIso();
       else delete h.hechoEl;
-      if (nuevoEstado === 'hecho') aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes);
+      if (nuevoEstado === 'hecho') {
+        aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes, window.FechaDeRegistroPlazos ? function (id) {
+          return FechaDeRegistroPlazos.fechaDelHito(clave, buscar(entrada.hitos, id));   /* fila 573 */
+        } : null);
+      }
       resultado = recomputeEnCurso(entrada.hitos);
       return d;
     });

@@ -73,7 +73,8 @@ window.GuiasEditorPlazo = (function () {
                   return '<option value="' + U.escapar(o.id) + '"' +
                     (p.plazo && p.plazo.desde === o.id ? ' selected' : '') + '>' +
                     U.escapar(o.titulo || 'Hito sin título') + '</option>';
-                }).join('') + '</select></label>') +
+                }).join('') + '</select></label>' +
+                (window.GuiasPlazo ? '<label class="dato dato-base"><span class="etiqueta">Cuenta</span>' + GuiasPlazo.htmlBase(p) + '</label>' : '')) +   /* fila 573 */
           '</div>' +
         '</div>' +
       '</div>';

@@ -16,7 +16,8 @@
     var dias = parseInt(($('hda-plazo-dias') || {}).value, 10);
     var desde = ($('hda-plazo-desde') || {}).value || '';
     var cuenta = window.GuiasPlazo ? GuiasPlazo.leerSelect($('hda-plazo-cuenta')) : 'habiles';
-    return (!isNaN(dias) && dias > 0) ? { dias: dias, desde: desde, cuenta: cuenta } : null;
+    var base = window.GuiasPlazo ? GuiasPlazo.leerBaseSelect($('hda-plazo-base')) : 'hecho';   /* fila 573 */
+    return (!isNaN(dias) && dias > 0) ? Plazos.conBase({ dias: dias, desde: desde, cuenta: cuenta }, { base: base }) : null;
   }
 
   /* Fila 228 (docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md): la explicación del
@@ -89,6 +90,7 @@
         (window.GuiasPlazo ? GuiasPlazo.htmlConId(opts, 'hda-plazo-cuenta') : '') +
         '<span class="suave">desde</span>' +
         '<select id="hda-plazo-desde" class="campo">' + opcionesDesde + '</select>' +
+        (window.GuiasPlazo ? GuiasPlazo.htmlBase(opts, 'hda-plazo-base') : '') +   /* fila 573 */
       '</div>' +
       /* Fila 414: no se ofrece en una pregunta ni al crear desde la biblioteca. */
       (opts.sinVarios ? '' :

@@ -156,12 +156,15 @@
      Francisco no haya tocado a mano) recalculan su fecha, contada como
      diga su plazo (fila 131: hábiles, lectivos o naturales) con los
      festivos y los no lectivos de Ajustes › Hitos. */
-  function aplicarPlazosDependientes(raiz, idHecho, ajustes) {
+  /* Fila 573: con `plazo.base === 'registro'` cuenta desde la fecha de registro del documento del hito `desde` (`fechaRegistroDe`, la
+     más reciente si hay varios); si aún no la tiene, desde hoy, y se recalcula al llegar el listado (js/fecha-de-registro-plazos.js). */
+  function aplicarPlazosDependientes(raiz, idHecho, ajustes, fechaRegistroDe) {
     var aj = ajustes || {};
     (function recorrer(lista) {
       (lista || []).forEach(function (h) {
         if (h.plazo && h.plazo.desde === idHecho && !h.fechaManual) {
-          h.fecha = Plazos.sumarPlazo(U.hoyIso(), h.plazo.dias, h.plazo.cuenta, aj.festivos, aj.noLectivos);
+          var base = (h.plazo.base === 'registro' && fechaRegistroDe && fechaRegistroDe(idHecho)) || U.hoyIso();
+          h.fecha = Plazos.sumarPlazo(base, h.plazo.dias, h.plazo.cuenta, aj.festivos, aj.noLectivos);
         }
         if (h.clase === 'decision') h.opciones.forEach(function (o) { recorrer(o.hitos); });
       });
@@ -184,7 +187,7 @@
       clase: esDecision ? 'decision' : 'paso', estado: 'pendiente',
       responsable: p.responsable || '', estadoAsunto: p.estadoAsunto || null,
       toca: p.toca || '', tocaA: p.tocaA || '',
-      plazo: (p.plazo && p.plazo.dias) ? { dias: p.plazo.dias, desde: p.plazo.desde || '', cuenta: p.plazo.cuenta } : null,
+      plazo: (p.plazo && p.plazo.dias) ? Plazos.conBase({ dias: p.plazo.dias, desde: p.plazo.desde || '', cuenta: p.plazo.cuenta }, p.plazo) : null,   /* fila 573: base */
       /* Una pregunta no lleva requisitos propios (fila 59, sección 4.1
          del encargo: el editor no se los deja poner); los de sus
          opciones llegan solos, porque cada paso de dentro se convierte

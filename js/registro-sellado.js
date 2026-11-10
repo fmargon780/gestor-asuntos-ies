@@ -138,6 +138,12 @@ var RegistroSellado = (function () {
     });
   }
 
+  /* Fila 573: la fecha de registro, la del sello. */
+  function fechaDelSello(sello) {
+    var iso = window.FechaDeRegistro && sello ? FechaDeRegistro.isoDeSello(sello.fecha) : '';
+    return iso ? { fecha: iso, fuente: 'sello' } : {};
+  }
+
   function hayColision(nombresExistentes, nombreNuevo) {
     return nombresExistentes.indexOf(nombreNuevo) !== -1;
   }
@@ -224,8 +230,9 @@ var RegistroSellado = (function () {
       }
       await DocumentosDatos.anotar(asunto.nombre, previo.numero, {
         tipo: previo.tipo, fecha: previo.fecha,
-        anadirRegistro: { ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero, codigo: codigo }
+        anadirRegistro: Object.assign({ ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero, codigo: codigo }, fechaDelSello(sello))   /* fila 573 */
       });
+      if (window.FechaDeRegistro) await FechaDeRegistro.repasar();
       var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';
       await window.Notas.sustituir(asunto,
         'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal + (mismo ? '.' : '. Se conserva el original sin sellar.'),

@@ -81,8 +81,8 @@
       fecha: String((h && h.fecha) || ''),
       fechaManual: !!(h && h.fechaManual),
       plazo: (h && h.plazo && h.plazo.dias)
-        ? { dias: parseInt(h.plazo.dias, 10) || 0, desde: String(h.plazo.desde || ''),
-            cuenta: cuentaDePlazo(h.plazo.cuenta) } : null,   /* fila 131: hábiles si no dice */
+        ? Plazos.conBase({ dias: parseInt(h.plazo.dias, 10) || 0, desde: String(h.plazo.desde || ''),
+            cuenta: cuentaDePlazo(h.plazo.cuenta) }, h.plazo) : null,   /* fila 131: hábiles si no dice */
       estadoAsunto: (h && h.estadoAsunto) || null,
       notas: Array.isArray(h && h.notas) ? h.notas.map(normalizarNota) : [],
       documentos: Array.isArray(h && h.documentos) ? h.documentos.map(String) : [],

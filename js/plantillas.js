@@ -74,6 +74,7 @@ var Plantillas = (function () {
     { clave: 'descripcion', etiqueta: 'Descripción del asunto' },
     { clave: 'estado', etiqueta: 'Estado de tramitación' },
     { clave: 'registro', etiqueta: 'Nº de registro de Séneca del asunto' },
+    { clave: 'fecha de registro', etiqueta: 'Fecha de registro de ese mismo documento' },   /* fila 573 */
     { clave: 'hoy', etiqueta: 'Fecha de hoy' },
     { clave: 'hoyLargo', etiqueta: 'Fecha de hoy, en letra' },
     { clave: 'lugarYFecha', etiqueta: 'Lugar y fecha, en letra' },
