@@ -48,4 +48,9 @@ Tema: Repasar las pruebas que fallan. Junta la idea 568: repasar por familias lo
 - Las ideas nuevas que hayan salido por fallos reales, una línea cada una.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026, sin ejecutar nada; la pasada la hizo la sesión):
+  - Coincide: no se toca nada fuera de `pruebas/`, `docs/` y `CLAUDE.md`; no queda ningún `_rev_*.mjs`; `CLAUDE.md` ya no permite apartar una prueba solo porque «falla igual en main»; el ejecutor exige «idea N» en cada motivo de `RETIRADAS`.
+  - Coincide: las 29 pruebas están puestas al día sin debilitarlas, o apartadas con su idea (585 etiquetas y plantillas desde otra pantalla; 586 control de registro; 587 notas de directivos; 569 cambiar de tipo; 588 menú bajo la barra lateral, citada en `donde-se-guarda`).
+  - Pérdidas de cobertura aceptadas en `campo-desde-el-asunto` (la fila 530 quitó el panel de Ajustes): «Deshacer», el valor pedido en la ventana, crear un campo propio desde el panel y la maquetación a 1280 y 600 px. `opciones.mjs` se borra porque la fila 576 quitó los hitos-pregunta.
+  - Matiz: `hito-mesa` pulsa «Cambiar la fecha» sin exigir el menú quieto; `donde-se-guarda` pulsa la parte visible del menú (idea 588).
+  - No lo ha podido ver: si `tras-cada-accion`, `conflictos-que-cambia` y `actividades-aviso` pasan (lo confirma la pasada completa).
