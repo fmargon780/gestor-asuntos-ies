@@ -79,6 +79,9 @@ await comprobar('2. lleva el membrete de la app', pagina.locator('.cep-col').nth
 
 console.log('--- 3. guardar y generar con ella ---');
 await pagina.click('text=Guardar plantilla');
+/* Fila 584: el tipo ya tiene una plantilla para ese tipo de documento («Resguardo de matrícula»): la app pregunta y aquí se elige «Guardar como otra». */
+await pagina.waitForSelector('#cep-otra', { timeout: 10000 });
+await pagina.click('#cep-otra');
 await pagina.waitForSelector('#convertir-plantilla', { state: 'detached', timeout: 20000 });
 await comprobar('3. aviso verde', (await avisos()).some((a) => /^Plantilla guardada\. Ya sale en «Generar documento» de este tipo de asunto\.\|bueno$/.test(a)), true);
 await comprobar('3. en el asunto, el PDF sigue y no hay ningún Word nuevo', nombresDeCarpeta('Aguilar Ponce, Pablo'), antes);

@@ -81,6 +81,12 @@ await pagina.evaluate(() => {
 /* nos vamos del campo para no chocar con la barrera del foco: aquí lo
    que se comprueba es la huella, no la escritura */
 await pagina.evaluate(() => document.getElementById('tablon-texto').blur());
+/* Fila 584: a los 7 s de arrancar, la app prepara una sola vez el tipo de asunto de la ficha de entrega de libros
+   (js/libros-ficha.js) y recarga la lista. Eso no es el intervalo de presencia: se espera a que ese trabajo termine
+   y desde ahí se cuenta. */
+await pagina.waitForFunction(() => window.LibrosFicha && LibrosFicha.tipoQueHay(), null, { timeout: 40000 });
+await pagina.waitForTimeout(2500);
+await pagina.evaluate(() => { window.__pintados = 0; });
 await pagina.waitForTimeout(10500);
 await comprobar('el intervalo de 10s no ha repintado nada: nadie ha entrado ni salido de ningún asunto',
   pagina.evaluate(() => window.__pintados), 0);

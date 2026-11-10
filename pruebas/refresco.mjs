@@ -130,11 +130,19 @@ await comprobar('empieza en 0 de 2', pagina.locator('.hitos-cuenta').textContent
 const casilla = pagina.locator('.hito-casilla').first();
 /* Mismo motivo que arriba: marcar y comprobar 'disabled' en el mismo
    'evaluate', sin ninguna vuelta al bucle de eventos por en medio. */
-const seApagaAlMarcar = await pagina.evaluate(() => {
+/* Fila 584: desde la fila 524 la app mira primero «lo que falta por firmar o registrar» (un await) y solo después apaga
+   la casilla; ya no se apaga en el mismo instante. Se comprueba que se apaga en algún momento del guardado. */
+const seApagaAlMarcar = await pagina.evaluate(async () => {
   var c = document.querySelector('.hito-casilla');
+  var visto = c.disabled;
+  var obs = new MutationObserver(function () { if (c.disabled) visto = true; });
+  obs.observe(c, { attributes: true, attributeFilter: ['disabled'] });
   c.checked = true;
   c.dispatchEvent(new Event('change', { bubbles: true }));
-  return c.disabled;
+  var limite = Date.now() + 5000;
+  while (!visto && Date.now() < limite) await new Promise(function (r) { setTimeout(r, 5); });
+  obs.disconnect();
+  return visto;
 });
 await comprobar('la casilla se apaga mientras guarda', seApagaAlMarcar, true);
 await pagina.waitForTimeout(300);

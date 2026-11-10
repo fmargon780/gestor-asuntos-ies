@@ -58,10 +58,12 @@ const K = {
   H: '260908 TRASLADO 26-27 Ocho Dormido, Hugo 8888'
 };
 const FECHA_AYER = isoHaceDias(1);
+/* Fila 584: las fechas de los asuntos que NO son «dormidos» son de hace pocos días (antes fijas, de septiembre: con el tiempo pasaban a dormidos). */
+const RECIENTES = { a: isoHaceDias(9), b: isoHaceDias(8), e: isoHaceDias(7), eh: isoHaceDias(6), f: isoHaceDias(5), fh: isoHaceDias(4), g: isoHaceDias(3), h: isoHaceDias(2) };
 const HACE_75 = new Date(Date.now() - 75 * 86400000).toISOString();
 const HACE_80 = new Date(Date.now() - 80 * 86400000).toISOString();
 
-await pagina.evaluate(async ({ K, FECHA_AYER, HACE_75, HACE_80 }) => {
+await pagina.evaluate(async ({ K, FECHA_AYER, HACE_75, HACE_80, RECIENTES }) => {
   const abiertos = window.__disco.abiertos;
   for (const k of Object.keys(K)) await abiertos.getDirectoryHandle(K[k], { create: true });
   const g = await abiertos.getDirectoryHandle('_GESTOR', { create: true });
@@ -89,17 +91,17 @@ await pagina.evaluate(async ({ K, FECHA_AYER, HACE_75, HACE_80 }) => {
   await escribir('hitos.json', {
     ajustes: { responsables: [], noLectivos: [] },
     porAsunto: {
-      [K.A]: { creados: '2026-09-01', hitos: [{ id: 'a1', titulo: 'Revisar', estado: 'encurso', responsable: 'administracion', fecha: FECHA_AYER }] },
-      [K.B]: { creados: '2026-09-02', hitos: [{ id: 'b1', titulo: 'Esperar a la familia', estado: 'encurso', responsable: 'tutor' }] },
-      [K.E]: { creados: '2026-09-05', hitos: [{ id: 'e1', titulo: 'Hecho', estado: 'hecho', responsable: 'administracion', hechoEl: '2026-09-06' }] },
-      [K.F]: { creados: '2026-09-06', hitos: [{ id: 'f1', titulo: 'Hecho', estado: 'hecho', responsable: 'administracion', hechoEl: '2026-09-07' }] },
-      [K.G]: { creados: '2026-09-07', hitos: [{ id: 'g1', titulo: 'Reclamar', estado: 'encurso', responsable: 'administracion', esperandoA: 'tutor' }] },
-      [K.H]: { creados: '2026-09-08', hitos: [{ id: 'h1', titulo: 'Esperar a la familia', estado: 'encurso', responsable: 'tutor' }] }
+      [K.A]: { creados: RECIENTES.a, hitos: [{ id: 'a1', titulo: 'Revisar', estado: 'encurso', responsable: 'administracion', fecha: FECHA_AYER }] },
+      [K.B]: { creados: RECIENTES.b, hitos: [{ id: 'b1', titulo: 'Esperar a la familia', estado: 'encurso', responsable: 'tutor' }] },
+      [K.E]: { creados: RECIENTES.e, hitos: [{ id: 'e1', titulo: 'Hecho', estado: 'hecho', responsable: 'administracion', hechoEl: RECIENTES.eh }] },
+      [K.F]: { creados: RECIENTES.f, hitos: [{ id: 'f1', titulo: 'Hecho', estado: 'hecho', responsable: 'administracion', hechoEl: RECIENTES.fh }] },
+      [K.G]: { creados: RECIENTES.g, hitos: [{ id: 'g1', titulo: 'Reclamar', estado: 'encurso', responsable: 'administracion', esperandoA: 'tutor' }] },
+      [K.H]: { creados: RECIENTES.h, hitos: [{ id: 'h1', titulo: 'Esperar a la familia', estado: 'encurso', responsable: 'tutor' }] }
     }
   });
   await App.cargarRegistro();
   await App.cargarTipos();
-}, { K, FECHA_AYER, HACE_75, HACE_80 });
+}, { K, FECHA_AYER, HACE_75, HACE_80, RECIENTES });
 
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(500);
