@@ -12,6 +12,9 @@
    Cruces (Decreto 327/2010, art. 50, 53.4 y 58.6): 12 unidades o más, 5 · 5 · 8 · 1; con menos, 3 · 4 · 6 · 1.
    Si la AMPA ha designado representante, madres y padres eligen uno menos (Orden de 7-oct-2010, art. 5).
    «Es de la AMPA» (en el ⋮ de js/candidaturas-ficha.js) apunta `ampa` en la candidatura: sale a la derecha del nombre.
+   Fila 575 (10-nov-2026, docs/575-REPRESENTANTE-AMPA-EN-LA-PAPELETA.md): al marcar «La AMPA ha designado representante»
+   sale un desplegable «¿Quién?»; la persona elegida va en la papeleta de madres y padres con la cruz ya puesta y
+   «Marca hasta N cruces más». Con «Nadie», no sale y el texto no lleva «más».
    ============================================================ */
 var CandidaturasPapeletas = (function () {
 
@@ -34,13 +37,13 @@ var CandidaturasPapeletas = (function () {
     return Math.max(1, t[sector] - (sector === 'Madres y padres' && designada ? 1 : 0));
   }
 
-  function textoMarca(n) { return 'Marca hasta ' + n + ' ' + (n === 1 ? 'cruz' : 'cruces'); }
+  function textoMarca(n, mas) { return 'Marca hasta ' + n + ' ' + (n === 1 ? 'cruz' : 'cruces') + (mas ? ' más' : ''); }
 
   /* Las admitidas de un sector, por apellidos. `grupos`: { clave: unidad } del alumnado. */
   function admitidasDe(cands, sector, grupos) {
     return Candidaturas.porSector(cands, sector).filter(function (c) { return c.estado === 'Admitida'; }).map(function (c) {
       var derecha = sector === 'Alumnado' ? ((grupos || {})[(c.persona || {}).clave] || '') : (sector === 'Madres y padres' ? (c.ampa || '') : '');
-      return { nombre: Candidaturas.visible(c.persona), derecha: derecha };
+      return { id: c.id, nombre: Candidaturas.visible(c.persona), derecha: derecha };
     });
   }
 
@@ -49,7 +52,8 @@ var CandidaturasPapeletas = (function () {
 
   /* ---------- el PDF ---------- */
 
-  /* `d` = { centro, curso, sector, cruces, papeletas, candidatos: [{ nombre, derecha }] }. Devuelve los bytes. */
+  /* `d` = { centro, curso, sector, cruces, papeletas, candidatos: [{ id, nombre, derecha }], marcado }. Devuelve los bytes.
+     `marcado`: el `id` del candidato que sale con la cruz ya puesta (el de la AMPA); vacío, ninguno. */
   async function pdfDe(d) {
     var PDFLib = await PdfHerramientas.cargarPdfLib();
     var limpio = CandidaturasLista.limpio;
@@ -58,6 +62,7 @@ var CandidaturasPapeletas = (function () {
     var negrita = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
     var negro = PDFLib.rgb(0, 0, 0), gris = PDFLib.rgb(0.45, 0.45, 0.45);
     var ANCHO = 595.28, ALTO = 841.89, MX = 20, MY = 20, COLS = 2, RELLENO = 7;
+    var marcado = d.marcado && d.candidatos.some(function (c) { return c.id === d.marcado; }) ? d.marcado : '';
     var n = d.candidatos.length, hoja = porHoja(n), filas = hoja / COLS;
     var celdaW = (ANCHO - 2 * MX) / COLS, celdaH = (ALTO - 2 * MY) / filas;
     var tam = n > 8 ? 10.5 : 9;
@@ -77,15 +82,21 @@ var CandidaturasPapeletas = (function () {
       var y = y0 + celdaH - RELLENO - tam;
       centrado(p, 'Elecciones al Consejo Escolar ' + d.curso, x, celdaW, y, tam, negrita); y -= tam * 1.3;
       centrado(p, (d.centro ? d.centro + ' · ' : '') + 'Sector ' + d.sector, x, celdaW, y, tam - 0.5, normal); y -= tam * 1.5;
-      p.drawText(limpio(textoMarca(d.cruces)), { x: x + RELLENO, y: y, size: tam - 0.5, font: negrita, color: negro });
+      p.drawText(limpio(textoMarca(d.cruces, !!marcado)), { x: x + RELLENO, y: y, size: tam - 0.5, font: negrita, color: negro });
       y -= tam * 0.6;
       var libre = y - (y0 + RELLENO), paso = Math.min(tam * 1.7, libre / n), letra = Math.max(6, Math.min(tam, paso / 1.3));
       var caja = Math.min(letra, paso - 2);
       d.candidatos.forEach(function (c, i) {
         var yy = y - paso * (i + 1) + (paso - letra) / 2 + letra * 0.12;
-        var derecha = c.derecha ? limpio(c.derecha) : '';
+        var esMarcado = !!marcado && c.id === marcado;
+        var derecha = limpio(c.derecha || (esMarcado ? 'AMPA' : ''));
         var anchoDerecha = derecha ? normal.widthOfTextAtSize(derecha, letra) + 6 : 0;
         p.drawRectangle({ x: x + RELLENO, y: yy - 1, width: caja, height: caja, borderColor: negro, borderWidth: 0.7 });
+        if (esMarcado) {   /* la cruz ya impresa dentro de su casilla */
+          var m = caja * 0.2;
+          p.drawLine({ start: { x: x + RELLENO + m, y: yy - 1 + m }, end: { x: x + RELLENO + caja - m, y: yy - 1 + caja - m }, thickness: 1.2, color: negro });
+          p.drawLine({ start: { x: x + RELLENO + m, y: yy - 1 + caja - m }, end: { x: x + RELLENO + caja - m, y: yy - 1 + m }, thickness: 1.2, color: negro });
+        }
         p.drawText(String(i + 1), { x: x + RELLENO + caja + 5, y: yy, size: letra, font: normal, color: negro });
         var xNombre = x + RELLENO + caja + 5 + letra * 1.6 + 4;
         p.drawText(recortado(c.nombre, normal, letra, celdaW - RELLENO - (xNombre - x) - anchoDerecha), { x: xNombre, y: yy, size: letra, font: normal, color: negro });
@@ -140,20 +151,29 @@ var CandidaturasPapeletas = (function () {
   /* Pregunta qué sacar. → { designada, pedido: [{ sector, cruces, papeletas }] } o null si cancela. */
   async function preguntar(a, cands, unidades, grupos) {
     var previo = recordado[a.nombre] || { designada: false, papeletas: {} };
+    var madres = admitidasDe(cands, 'Madres y padres', grupos);
+    var quien = madres.some(function (c) { return c.id === previo.quien; }) || previo.quien === '' ? previo.quien : undefined;
+    if (quien === undefined) { var deAmpa = madres.filter(function (c) { return c.derecha; })[0]; quien = deAmpa ? deAmpa.id : ''; }
+    var opciones = madres.map(function (c) { return '<option value="' + esc(c.id) + '"' + (c.id === quien ? ' selected' : '') + '>' + esc(c.nombre) + '</option>'; }).join('') +
+      '<option value=""' + (quien === '' ? ' selected' : '') + '>Nadie (no sale en la papeleta)</option>';
     var cuerpo = '<p>Salen solo las candidaturas admitidas, en un PDF por sector. Deja en blanco las papeletas del sector que no quieras sacar.</p>' +
       '<div class="pap-tabla"><table><thead><tr><th>Sector</th><th>Admitidas</th><th>Cruces que se pueden marcar</th><th>Papeletas</th></tr></thead><tbody>' +
       filasHtml(cands, unidades, grupos, previo) + '</tbody></table></div>' +
       '<p class="suave" id="pap-norma">Cruces: tantas como puestos a cubrir (Decreto 327/2010, art. 50, 53.4 y 58.6). ' +
       (unidades ? 'El centro tiene ' + unidades + ' unidades.' : 'No hay listado del alumnado: se toman 12 unidades o más.') + '</p>' +
       '<label class="interruptor"><input type="checkbox" id="pap-designada"' + (previo.designada ? ' checked' : '') + '>' +
-      '<span>La AMPA ha designado representante (madres y padres eligen uno menos)</span></label>';
+      '<span>La AMPA ha designado representante (madres y padres eligen uno menos)</span></label>' +
+      '<div id="pap-quien-caja"' + (previo.designada ? '' : ' hidden') + '><label class="etiqueta" for="pap-quien">¿Quién?</label>' +
+      '<select id="pap-quien" class="campo">' + opciones + '</select></div>';
     var respuesta = U.preguntar('Papeletas', cuerpo, 'Sacar las papeletas');
     $('pap-designada').onchange = function () {
       var i = Candidaturas.SECTORES.indexOf('Madres y padres');
       $('pap-cruces-' + i).textContent = crucesDe('Madres y padres', unidades, this.checked);
+      $('pap-quien-caja').hidden = !this.checked;
     };
     var ok = await respuesta;
     var designada = $('pap-designada') ? $('pap-designada').checked : false;
+    var elegido = $('pap-quien') ? $('pap-quien').value : '';
     var pedido = [], escritas = {};
     Candidaturas.SECTORES.forEach(function (s, i) {
       var campo = $('pap-n-' + i);
@@ -162,8 +182,8 @@ var CandidaturasPapeletas = (function () {
       var n = Math.min(MAXIMO, parseInt(campo.value, 10) || 0);
       if (!campo.disabled && n > 0) pedido.push({ sector: s, cruces: crucesDe(s, unidades, designada), papeletas: n });
     });
-    recordado[a.nombre] = { designada: designada, papeletas: escritas };
-    return ok ? { designada: designada, pedido: pedido } : null;
+    recordado[a.nombre] = { designada: designada, quien: elegido, papeletas: escritas };
+    return ok ? { designada: designada, quien: designada ? elegido : '', pedido: pedido } : null;
   }
 
   /* ---------- guardar y enseñar ---------- */
@@ -200,7 +220,8 @@ var CandidaturasPapeletas = (function () {
         var p = r.pedido[i];
         var bytes = await pdfDe({
           centro: valores.centro || Plantillas.POR_DEFECTO_CENTRO, curso: cursoLargo(), sector: p.sector,
-          cruces: p.cruces, papeletas: p.papeletas, candidatos: admitidasDe(cands, p.sector, centro.grupos)
+          cruces: p.cruces, papeletas: p.papeletas, candidatos: admitidasDe(cands, p.sector, centro.grupos),
+          marcado: p.sector === 'Madres y padres' ? r.quien : ''
         });
         var nombre = await CandidaturasLista.guardarPdf(a, bytes, fecha, TIPO_DOCUMENTO, CORTO);
         guardados.push({ sector: p.sector, nombre: nombre, papeletas: p.papeletas });

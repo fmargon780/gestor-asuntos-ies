@@ -7,7 +7,8 @@
    4. Con papeletas en dos sectores: dos PDF guardados (tipo PAPELETAS), 10 por hoja hasta 8 admitidas y 8 con más.
    5. Solo las admitidas, por apellidos, con grupo (Alumnado) o AMPA (Madres y padres); sin dígitos de DNI.
    6. Excluir una candidatura baja las admitidas.
-   7. «Es de la AMPA» / «Ya no es de la AMPA» solo en Madres y padres. */
+   7. «Es de la AMPA» / «Ya no es de la AMPA» solo en Madres y padres.
+   8. (fila 575) «¿Quién?»: la persona de la AMPA sale con la cruz ya puesta y «Marca hasta N cruces más»; con «Nadie», como antes. */
 import { chromium } from 'playwright';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
@@ -128,7 +129,7 @@ await comprobar('5. hojas: 10 hasta 8 admitidas, 8 con más', pagina.evaluate(()
 await comprobar('5. «Marca hasta N cruces» y «cruz» en singular', pagina.evaluate(() => [CandidaturasPapeletas.textoMarca(5), CandidaturasPapeletas.textoMarca(1)]), ['Marca hasta 5 cruces', 'Marca hasta 1 cruz']);
 const sale = (s) => pagina.evaluate((s) => CandidaturasPapeletas.admitidasDe(Candidaturas.lista(window.__a), s, {}).map((c) => c.nombre), s);
 await comprobar('5. Alumnado: solo las admitidas y por apellidos (la presentada no sale)', sale('Alumnado'), ['Alcaide Rueda, Paula', 'Benítez Gil, Hugo']);
-await comprobar('5. ni DNI ni número escolar', pagina.evaluate(() => /\d/.test(JSON.stringify(Candidaturas.SECTORES.map((s) => CandidaturasPapeletas.admitidasDe(Candidaturas.lista(window.__a), s, {}))))), false);
+await comprobar('5. ni DNI ni número escolar', pagina.evaluate(() => /\d/.test(JSON.stringify(Candidaturas.SECTORES.map((s) => CandidaturasPapeletas.admitidasDe(Candidaturas.lista(window.__a), s, {}).map((c) => [c.nombre, c.derecha]))))), false);
 
 console.log('--- 6. excluir una candidatura ---');
 await estado('Alcaide', 'Excluida');
@@ -162,6 +163,55 @@ await comprobar('7. «Ya no es de la AMPA» lo quita', (async () => {
   await pagina.waitForTimeout(1500);
   return pagina.locator('.cand-fila', { hasText: 'Herrero' }).locator('.cand-ampa').count();
 })(), 0);
+
+console.log('--- 8. el representante de la AMPA en la papeleta (fila 575) ---');
+await pagina.evaluate(() => CandidaturasFicha.repintar());
+await pagina.waitForTimeout(800);
+await menu('Herrero').click();
+await pagina.locator('.cand-fila', { hasText: 'Herrero' }).locator('.fila-menu button', { hasText: 'Es de la AMPA' }).click();
+await pagina.waitForSelector('#cand-ampa');
+await pagina.fill('#cand-ampa', 'AMPA Los Olivos');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(1500);
+await pagina.evaluate(() => { CandidaturasPapeletas.olvidar(); });
+await pagina.click('#cand-papeletas');
+await pagina.waitForSelector('#pap-designada');
+await comprobar('8. el desplegable está oculto sin la casilla', pagina.evaluate(() => document.getElementById('pap-quien-caja').hidden), true);
+await pagina.check('#pap-designada');
+await comprobar('8. al marcar la casilla sale «¿Quién?»', pagina.evaluate(() => [document.getElementById('pap-quien-caja').hidden, document.querySelector('label[for=pap-quien]').textContent]), [false, '¿Quién?']);
+await comprobar('8. opciones: las dos admitidas y «Nadie»; viene elegida la de la AMPA', pagina.evaluate(() => {
+  const s = document.getElementById('pap-quien');
+  return [Array.from(s.options).map((o) => o.textContent), s.selectedOptions[0].textContent];
+}), [['Herrero Campos, Rocío', 'Iglesias Soto, Andrés', 'Nadie (no sale en la papeleta)'], 'Herrero Campos, Rocío']);
+await pagina.uncheck('#pap-designada');
+await comprobar('8. al desmarcar se oculta otra vez', pagina.evaluate(() => document.getElementById('pap-quien-caja').hidden), true);
+await pagina.check('#pap-designada');
+await pagina.fill('#pap-n-1', '10');
+await pagina.evaluate(async () => {
+  const L = await PdfHerramientas.cargarPdfLib();
+  window.__dib = [];
+  const t = L.PDFPage.prototype.drawText, l = L.PDFPage.prototype.drawLine;
+  L.PDFPage.prototype.drawText = function (x, o) { window.__dib.push(['t', x]); return t.call(this, x, o); };
+  L.PDFPage.prototype.drawLine = function (o) { window.__dib.push(['l']); return l.call(this, o); };
+});
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => /Papeletas guardadas/.test(m.textContent) && /Madres y padres/.test(m.textContent)), null, { timeout: 30000 });
+const dib = await pagina.evaluate(() => window.__dib);
+const grande2 = grande ? 4 : 3;
+await comprobar('8. arriba pone «Marca hasta N cruces más» (ya rebajada en uno)', dib.some((d) => d[0] === 't' && d[1] === 'Marca hasta ' + grande2 + ' cruces más'), true);
+await comprobar('8. la AMPA sale con su nombre a la derecha, y la cruz (dos líneas) en cada una de las 10 papeletas', [dib.some((d) => d[0] === 't' && d[1] === 'AMPA Los Olivos'), dib.filter((d) => d[0] === 'l').length], [true, 20]);
+await comprobar('8. «Marca hasta N cruces» sin «más» si se pregunta con «Nadie»', pagina.evaluate(() => [CandidaturasPapeletas.textoMarca(4, true), CandidaturasPapeletas.textoMarca(4, false), CandidaturasPapeletas.textoMarca(1, true)]), ['Marca hasta 4 cruces más', 'Marca hasta 4 cruces', 'Marca hasta 1 cruz más']);
+await pagina.evaluate(() => { Visor.cerrar(); FichaTarjetas.abrir('candidaturas'); });
+await pagina.waitForSelector('#cand-papeletas', { state: 'visible' });
+await pagina.click('#cand-papeletas');
+await pagina.waitForSelector('#pap-quien');
+await comprobar('8. la ventana recuerda la casilla y a quién', pagina.evaluate(() => [document.getElementById('pap-designada').checked, document.getElementById('pap-quien').selectedOptions[0].textContent]), [true, 'Herrero Campos, Rocío']);
+await pagina.selectOption('#pap-quien', '');
+await pagina.evaluate(() => { window.__dib = []; });
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForFunction(() => window.__dib.length > 0, null, { timeout: 30000 });
+const dib2 = await pagina.evaluate(() => window.__dib);
+await comprobar('8. con «Nadie»: sin «más», sin cruz y sin nombre de la AMPA marcada', [dib2.some((d) => d[0] === 't' && d[1] === 'Marca hasta ' + grande2 + ' cruces'), dib2.some((d) => d[0] === 't' && /más$/.test(d[1])), dib2.filter((d) => d[0] === 'l').length], [true, false, 0]);
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();
