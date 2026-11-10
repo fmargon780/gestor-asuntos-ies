@@ -33,4 +33,8 @@ Tema: «Cambiar el asunto» y botones de los cuadros. Junta las ideas 494, 569 y
 - Archiva un asunto con notas de directivos sin ver: el cuadro dice «Verlas».
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Revisión (10-nov-2026, tarea pequeña, sin segundo revisor; comprobada contra la instrucción):
+  - Coincide: aviso ámbar solo si la clase del tercero no es ninguna del tipo (y nombra las clases del tipo unidas con « · »); «Dejar los hitos como están», «Guardarlos ahora» y «Verlas» salen como texto del botón de cancelar; lo que hace cada botón no cambia.
+  - Pruebas: `cambiar-tipo-y-guia` y `notas-de-directivos` salen de RETIRADAS y pasan; prueba nueva del aviso con un tipo de varias clases. Se cambió en `cambiar-tipo-y-guia` la comprobación «el texto de Cancelar vuelve a ser el de siempre» (era de la solución a mano antigua) por «el siguiente cuadro normal dice Cancelar».
+  - No se ha podido ver: la pantalla real en el navegador de la usuaria; solo las pruebas automáticas.
+  - `candidaturas.mjs` falla igual en main: fila 608.
