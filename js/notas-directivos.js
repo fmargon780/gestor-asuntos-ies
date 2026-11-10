@@ -242,12 +242,9 @@ var NotasDirectivos = (function () {
     if (!n) return;
     var faltan = await pendientes(n);
     if (faltan.length) {
-      var cancelar = $('cuadro-cancelar');
-      if (cancelar) cancelar.textContent = 'Guardarlos ahora';
       var deTodosModos = await U.preguntar('Notas de directivos',
         '<p>' + U.escapar('Tiene ' + plural(faltan.length, 'documento', 'documentos') + ' sin guardar en el asunto.') + '</p>',
-        'Marcar como vista de todos modos');
-      if (cancelar) cancelar.textContent = 'Cancelar';
+        'Marcar como vista de todos modos', false, 'Guardarlos ahora');
       if (!deTodosModos) { await guardarDocumentos(a, n, faltan); await repintarFicha(a); return; }
     }
     try { await marcarVista(a, n, n); }
@@ -334,11 +331,8 @@ var NotasDirectivos = (function () {
     if (activa()) return true;
     var n = sinVer(a).length;
     if (!n) return true;
-    var cancelar = $('cuadro-cancelar');
-    if (cancelar) cancelar.textContent = 'Verlas';
     var archivar = await U.preguntar('Notas de directivos',
-      '<p>' + U.escapar('Tiene ' + plural(n, 'nota de directivo', 'notas de directivos') + ' sin ver.') + '</p>', 'Archivar de todos modos');
-    if (cancelar) cancelar.textContent = 'Cancelar';
+      '<p>' + U.escapar('Tiene ' + plural(n, 'nota de directivo', 'notas de directivos') + ' sin ver.') + '</p>', 'Archivar de todos modos', false, 'Verlas');
     if (!archivar && window.App && App.abrirFicha) { try { App.abrirFicha(a, 'abierto'); } catch (e) { /* solo mirar */ } }
     return archivar;
   }

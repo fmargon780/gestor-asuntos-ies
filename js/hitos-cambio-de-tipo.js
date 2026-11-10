@@ -83,19 +83,13 @@ window.HitosCambioDeTipo = (function () {
       U.aviso('El tipo nuevo no tiene guía escrita: los hitos se quedan como estaban.', 'ambar');
       return false;
     }
-    /* U.preguntar no deja poner el texto de Cancelar: se pone aquí y
-       se devuelve como estaba al cerrar. */
-    var cancelar = document.getElementById('cuadro-cancelar');
-    var textoCancelar = cancelar ? cancelar.textContent : '';
-    if (cancelar) cancelar.textContent = 'Dejar los hitos como están';
     var si = await U.preguntar('El tipo ha cambiado',
       '<p class="explica">Este asunto era <b>' + U.escapar(tipoViejo) + '</b> y ahora es <b>' +
       U.escapar(tipoNuevo) + '</b>. Sus hitos siguen siendo los del tipo viejo. ¿Traigo la guía de <b>' +
       U.escapar(tipoNuevo) + '</b>?</p>' +
       '<p class="explica suave">Los hitos viejos que tengan algo apuntado no se pierden: se quedan ' +
       'abajo, plegados, como «no aplica».</p>',
-      'Traer la guía nueva');
-    if (cancelar) cancelar.textContent = textoCancelar;
+      'Traer la guía nueva', false, 'Dejar los hitos como están');
     if (!si) return false;
     var conservados = await traerGuia(clave, tipoViejo, tipoNuevo);
     U.aviso('Guía de ' + tipoNuevo + ' traída.' +

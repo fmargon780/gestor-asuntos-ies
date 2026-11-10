@@ -279,14 +279,15 @@ async function abrirCuadroDeEdicion(a, p, base) {
     var caja = $('ed-aviso-categoria');
     var elegido = controlesTercero.terceroElegido();
     var tipo = $('ed-tipo').value;
-    var categoriaTipo = tipo && Nombres.categoriaDeTipo(App.E.tipos, tipo);
-    if (!elegido || !categoriaTipo || categoriaTipo === elegido.categoria) {
+    var clasesTipo = tipo ? Nombres.categoriasDeTipo(App.E.tipos, tipo) : [];
+    /* Fila 604: solo avisa si la clase del tercero no es NINGUNA de las del tipo. */
+    if (!elegido || !clasesTipo.length || clasesTipo.indexOf(elegido.categoria) !== -1) {
       caja.classList.add('oculto');
       caja.textContent = '';
       return;
     }
     caja.classList.remove('oculto');
-    caja.textContent = 'Este tipo es de ' + Nombres.textoCategoria(categoriaTipo, 'lista') + '; ' +
+    caja.textContent = 'Este tipo es de ' + clasesTipo.map(function (c) { return Nombres.textoCategoria(c, 'lista'); }).join(' · ') + '; ' +
       App.textoTercero(elegido) + ' es de ' + Nombres.textoCategoria(elegido.categoria, 'lista') +
       '. Cambia el tipo si no encaja.';
   }

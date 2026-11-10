@@ -136,8 +136,10 @@ await comprobar('los hitos son solo los de BECA, el primero en curso',
   hitosDe(N1b).then(h => h.todos), ['Revisar la convocatoria:encurso', 'Enviar la documentación:pendiente']);
 await comprobar('nota en el asunto con el cambio',
   pagina.evaluate((n) => (App.E.registro.asuntos[n].notas || []).some(x => x.texto.indexOf('Cambiado el tipo de MATRICULA a BECA') === 0), N1b), true);
-await comprobar('el texto de Cancelar vuelve a ser el de siempre',
-  pagina.locator('#cuadro-cancelar').textContent().then(t => t !== 'Dejar los hitos como están'), true);
+/* Fila 604: el texto sale por U.preguntar; el siguiente cuadro normal vuelve a decir «Cancelar». */
+await comprobar('el siguiente cuadro normal dice Cancelar',
+  pagina.evaluate(() => { U.preguntar('x', '<p>x</p>'); return document.getElementById('cuadro-cancelar').textContent; }), 'Cancelar');
+await pagina.click('#cuadro-cancelar');
 
 /* ---------- 2. uno hecho y otro con una nota: se quedan abajo ---------- */
 console.log('--- 2. con trabajo hecho ---');

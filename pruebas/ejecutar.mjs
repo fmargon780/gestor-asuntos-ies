@@ -79,10 +79,6 @@ const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
    (`npm test -- tutores-legales`) sí. El fichero no se borra. Cada entrada: fichero, fecha en que entra y
    motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
 const RETIRADAS = [
-  { fichero: 'notas-de-directivos.mjs', desde: '10-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 595: los cuadros «Vista» con documentos sin guardar y «archivar con notas sin ver» enseñan «Cancelar» en vez de «Guardarlos ahora» y «Verlas» (js/notas-directivos.js, líneas 246 y 338, ponen el texto antes de U.preguntar y este lo pisa; la misma causa que la idea 569)' },
-  { fichero: 'cambiar-tipo-y-guia.mjs', desde: '9-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 569: el cuadro de cambio de tipo debe decir «Dejar los hitos como están» en el botón de cancelar, pero U.preguntar (js/util.js, fila 524) lo pisa con «Cancelar» después de que js/hitos-cambio-de-tipo.js lo ponga; también en main' },
 ];
 
 {

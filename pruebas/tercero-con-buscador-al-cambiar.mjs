@@ -239,6 +239,20 @@ await pagina.waitForTimeout(200);
 await comprobar('5. aviso ámbar: el tipo es de Empresas y ella es de Alumnado',
   pagina.locator('#ed-aviso-categoria').textContent().then(t =>
     /Empresas/.test(t) && /Alumnado/.test(t) && /Cambia el tipo/.test(t)), true);
+/* Fila 604: si el tipo admite varias clases y la del tercero es una de ellas, no hay aviso. */
+const tipoActual = await pagina.locator('#ed-tipo').inputValue();
+await pagina.evaluate((t) => {
+  const f = App.E.tipos.find(x => x.tipo === t);
+  window.__clasesAntes = f.categorias;
+  f.categorias = ['EMPRESAS', 'ALUMNADO'];
+}, tipoActual);
+await pagina.locator('#ed-fecha').dispatchEvent('input');
+await comprobar('5. tipo de Empresas y Alumnado + tercero de Alumnado: sin aviso ámbar',
+  pagina.locator('#ed-aviso-categoria').isHidden(), true);
+await pagina.evaluate((t) => { App.E.tipos.find(x => x.tipo === t).categorias = window.__clasesAntes; }, tipoActual);
+await pagina.locator('#ed-fecha').dispatchEvent('input');
+await comprobar('5. con el tipo otra vez solo de Empresas, vuelve el aviso',
+  pagina.locator('#ed-aviso-categoria').isVisible(), true);
 await comprobar('6. con ella (Alumnado), sigue sin desplegable de departamento',
   pagina.locator('#ed-departamento-caja select').count(), 0);
 
