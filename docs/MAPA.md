@@ -21,4 +21,4 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Que los directivos sigan los asuntos por sí mismos, sin preguntar a Secretaría.
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
 
-Última reflexión: 9-nov-2026
+Última reflexión: 10-nov-2026
