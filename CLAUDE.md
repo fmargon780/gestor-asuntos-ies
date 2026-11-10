@@ -50,8 +50,10 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    - Excepción: si la que ha necesitado segundo intento es una prueba **de tu fila** (nueva, o que
      has tocado), no vale. Arréglala para que espere a una condición y no a una pausa fija.
    - Una prueba que falla **también en el segundo intento**: si es de tu cambio, se arregla. Si
-     falla igual en `main` sin tu cambio, va a `RETIRADAS` (mismo fichero) con fecha y motivo, y se
-     dice en la nota de la fila en una línea.
+     falla igual en `main` sin tu cambio (fila 584, 10-nov-2026): **no se cierra la fila con una prueba en rojo
+     «porque ya fallaba»**. Se abre la fila «Arreglar la prueba <nombre>…» delante de las demás (`docs/METODO-COMUN.md`
+     5.1). Solo va a `RETIRADAS` (mismo fichero, con fecha y motivo) una prueba que destapa un **fallo real de la
+     app**, y su motivo tiene que nombrar su IDEA en `docs/COLA.md` («idea N»); el ejecutor no arranca sin ella.
 
 **Terminal de la sesión** (fila 466, 27-oct-2026): **nunca `pkill -f` ni `pgrep -f`**: buscan en la línea de órdenes de todos los
 procesos, también en la de la terminal de la sesión, y la cierran. Para parar un proceso, guarda su
