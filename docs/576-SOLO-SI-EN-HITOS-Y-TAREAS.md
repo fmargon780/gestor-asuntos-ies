@@ -104,4 +104,14 @@ dentro de la respuesta a una pregunta no me deja cambiarlos de orden».
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026, demo con Playwright, sin errores de consola): **APROBADA**.
+  - «Cuándo se hace» en cada hito y tarea, con «Siempre» y los campos de lista del tipo, casillas y nota: coincide (mismo sitio que `docs/pantallas/576.html`).
+  - Etiqueta amarilla en la tira de hitos y en la línea de la tarea: coincide.
+  - Tipo sin campos de lista (solo «Siempre»): coincide. Sin casilla de pregunta ni respuestas: coincide. ↑ ↓ de un hito condicionado: coincide.
+  - Guía de RECLAMACIÓN DE NOTAS convertida (campo de lista, hitos en lista única con «Solo si»): coincide.
+  - Asunto que contestó (campo «Familia», solo lo que toca) y asunto con el campo vacío (todo con «Falta: …» en amarillo): coincide.
+  - Cambiar el campo repinta sola la pantalla (sin recargar) y lo que no toca desaparece y vuelve: coincide. Un hito ya hecho no desaparece: coincide.
+  - No lo he podido ver: «Guardar» de la guía en un asunto real (la demo no guarda nada).
+  - Rareza vista y corregida antes de publicar: al volver el campo a un valor que hace reaparecer un hito de más arriba, dos hitos quedaban «en curso»; ahora el en curso es siempre el primero sin hacer que sale.
+  - Límite conocido (no es de esta fila): en «Campos del asunto» un campo de lista vacío no aparece (solo los que tienen valor); se rellena desde «Cambiar el asunto → Datos del asunto». La etiqueta «Falta: …» no es pulsable.
+- Pasada completa de `npm test`: en verde.

@@ -173,13 +173,15 @@ var SoloSi = (function () {
     recorrer(hitos, function (h) { if (h.soloSi) hay = true; if (h.estado === 'encurso' && h.cond === 'quita') escondido = true; });
     if (!hay) return false;
     var vis = Hitos.visibles(hitos);
-    var faltaEnCurso = !vis.some(function (h) { return h.estado === 'encurso'; }) && vis.some(function (h) { return h.estado === 'pendiente'; });
-    if (!escondido && !faltaEnCurso) return false;
+    var sinHacer = vis.filter(function (h) { return h.estado === 'pendiente' || h.estado === 'encurso'; });
+    /* El en curso es siempre el primero sin hacer de los que salen: si vuelve uno de más arriba, pasa a ser él. */
+    var desordenado = !!sinHacer[0] && sinHacer[0].estado !== 'encurso' && !sinHacer.some(function (h) { return h.estado === 'encurso' && h.cadena; });
+    if (!escondido && !desordenado) return false;
     var nuevo = null;
     await Hitos.cambiar(function (d) {
       var e = d.porAsunto[clave];
       if (!e) return d;
-      recorrer(e.hitos, function (h) { if (h.estado === 'encurso' && h.cond === 'quita') { h.estado = 'pendiente'; delete h.desde; } });
+      recorrer(e.hitos, function (h) { if (h.estado === 'encurso' && (h.cond === 'quita' || desordenado)) { h.estado = 'pendiente'; delete h.desde; } });
       nuevo = Hitos.recomputeEnCurso(e.hitos);
       return d;
     });
