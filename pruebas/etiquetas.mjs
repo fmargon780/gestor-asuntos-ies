@@ -10,7 +10,7 @@
    6. «Nuevo modelo» 2×2: cada etiqueta, un cuarto del A4.
    7. Un diseño propio de dos renglones se guarda en _GESTOR/etiquetas.json y sale en la vista previa.
    8. «Guardar PDF»: A4 con las hojas que dice el pie, y la letra a tamaño real.
-   9. Desde el asunto de grupo, «Imprimir etiquetas» abre la pantalla con sus personas.
+   9. (Fila 584: pasó a etiquetas-desde-el-grupo.mjs, apartada con la idea 585.)
    10. Pestaña Personal con el diseño «Profesor». */
 import { chromium } from 'playwright';
 import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
@@ -175,20 +175,6 @@ await comprobar('8. el texto está en el PDF', pagina.evaluate(async (b64) => {
   return d.getPage(0).node.Contents() ? true : false;
 }, bytes.toString('base64')), true);
 await comprobar('8. aviso de impresión a tamaño real', pagina.locator('.et-pie-nota').textContent(), 'En el cuadro de impresión, elige tamaño real (100 %), no «Ajustar».');
-
-console.log('--- 9. desde el asunto de grupo ---');
-await pagina.evaluate(() => App.ir('abiertos'));
-const demo = await pagina.evaluate(() => App.E.listaAbiertos.filter((a) => /GRUPO 2ºB$/.test(a.nombre))[0].nombre);
-await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'), demo);
-await pagina.waitForTimeout(1500);
-await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
-await pagina.waitForSelector('.pg-etiquetas', { state: 'visible', timeout: 20000 });
-const miembros = await pagina.evaluate((n) => App.E.registro.asuntos[n].relacionados.filter((r) => r.categoria === 'ALUMNADO').length, demo);
-await pagina.click('.pg-etiquetas');
-await esperarVista();
-await comprobar('9. la pantalla se abre con las personas del grupo', pagina.evaluate(() => [document.getElementById('et-resumen').textContent, document.querySelector('.repartir-filtro-resumen').textContent]),
-  [miembros + ' personas · ' + miembros + ' etiquetas', 'Sin criterios: se ve todo como siempre.']);
-await comprobar('9. y «Volver» lleva a la ficha del asunto', (async () => { await pagina.click('#et-volver'); await pagina.waitForSelector('#pantalla-asunto:not(.oculto)'); return true; })(), true);
 
 console.log('--- 10. personal ---');
 await pagina.evaluate(() => App.ir('herramientas'));

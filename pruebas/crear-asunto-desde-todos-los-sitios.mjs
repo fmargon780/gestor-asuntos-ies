@@ -59,7 +59,7 @@ await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async ([tipos, campos, alumnos]) => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   g._hijos.set('tipos.json', window.__disco.fich('tipos.json', JSON.stringify(tipos)));
   g._hijos.set('campos.json', window.__disco.fich('campos.json', JSON.stringify(campos)));
   g._hijos.set('tablon.json', window.__disco.fich('tablon.json',
@@ -84,7 +84,11 @@ const categoriasVisibles = () => pagina.locator('#tipos-lista .tipo-boton:not(.o
 
 async function comprobarInvariantes(etiqueta) {
   await comprobar(etiqueta + ': las pastillas están encima del buscador de personas',
-    pagina.evaluate(() => document.getElementById('categorias-lista').nextElementSibling.id), 'buscar-tercero');
+    pagina.evaluate(() => {
+      /* Hoy el buscador va dentro de una fila con el selector de unidad (fila 584): vale con que las pastillas vayan antes. */
+      const c = document.getElementById('categorias-lista'), b = document.getElementById('buscar-tercero');
+      return !!(c && b && (c.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING));
+    }), true);
   await comprobar(etiqueta + ': «Crear el asunto» está a la vista',
     pagina.locator('#btn-crear').isVisible(), true);
   await comprobar(etiqueta + ': no llevan lo escrito de la visita anterior (basura)',

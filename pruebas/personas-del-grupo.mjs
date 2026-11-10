@@ -221,7 +221,8 @@ const demo4 = await pagina4.evaluate(() => App.E.listaAbiertos.filter((a) => /GR
 await pagina4.evaluate((n) => { App.cerrarAsunto(App.E.listaAbiertos.filter((x) => x.nombre === n)[0]); }, demo4);
 await pagina4.waitForSelector('#capa:not(.oculto)');
 await pagina4.evaluate(() => document.getElementById('cuadro-aceptar').click());   /* «Avisar a los relacionados» */
-await pagina4.waitForFunction(() => document.getElementById('cuadro-titulo').textContent === 'Archivar el asunto');
+/* Fila 584: según lo que quede por hacer, el segundo cuadro es «Archivar el asunto» o «Falta por hacer en este asunto» (botón «Archivar igualmente»); se acepta el que salga. */
+await pagina4.waitForFunction(() => ['Archivar el asunto', 'Falta por hacer en este asunto'].indexOf(document.getElementById('cuadro-titulo').textContent) !== -1);
 await pagina4.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina4.waitForFunction((n) => !App.E.listaAbiertos.some((a) => a.nombre === n), demo4, { timeout: 30000 });
 await pagina4.waitForTimeout(1500);

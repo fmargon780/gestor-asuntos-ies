@@ -48,7 +48,7 @@ await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async ([tipos, campos, alumnos]) => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   g._hijos.set('tipos.json', window.__disco.fich('tipos.json', JSON.stringify(tipos)));
   g._hijos.set('campos.json', window.__disco.fich('campos.json', JSON.stringify(campos)));
   g._hijos.set('tablon.json', window.__disco.fich('tablon.json',

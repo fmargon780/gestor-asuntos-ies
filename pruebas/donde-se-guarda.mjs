@@ -98,7 +98,7 @@ async function abrirMenuDeTarea(idTarea) {
 }
 
 async function elegirDelMenu(texto) {
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click();
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea de la cola); se pulsa la parte visible */
 }
 const elegirDelMenuAbierto = elegirDelMenu;
 
@@ -206,13 +206,14 @@ await pagina.waitForTimeout(300);
 
 /* 5. Hito «solo para este asunto»: marca visible; «Pasar a la guía» lo lleva entero. */
 await abrirMesaDe('Sola Uno', 'c1');
-await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Crear' }).first().click();
-await pagina.waitForSelector('#capa:not(.oculto) #hda-titulo');
-await pagina.fill('#hda-titulo', 'Revisión extra');
-await pagina.selectOption('#hda-despues', 'c2');
-await pagina.check('#hda-solo-aqui');
-await pagina.click('#cuadro-aceptar');
+/* Fila 553: el hito nuevo se crea con «+ Añadir hito» de la tira (ventana «Va detrás de» / «Para»; fila 584: prueba puesta al día). */
+await pagina.click('.comunes-anadir-hito');
+await pagina.waitForSelector('.capa-campos #cv-crear');
+await pagina.selectOption('#cv-detras', 'c2');
+await pagina.selectOption('#cv-para', 'aqui');
+await pagina.click('#cv-crear');
+await pagina.fill('#cn-nombre', 'Revisión extra');
+await pagina.click('#cn-crear');
 await pagina.waitForTimeout(600);
 const idPropio = await pagina.evaluate(async (clave) => {
   const d = await Hitos.leer();
@@ -229,7 +230,7 @@ await comprobar('5. no está en la guía',
 /* El fallo de «no me carga el mapa previo»: con el hito recién creado solo en este asunto,
    «Cambiar la guía…» y el mapa del asunto enseñan la guía que ya había, entera. */
 await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea de la cola); se pulsa la parte visible */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });
@@ -274,7 +275,7 @@ await comprobar('7. y en el otro asunto, que no lo había empezado',
 
 /* 8. «Cambiar la guía…» tras crear un hito: la guía previa se ve entera. */
 await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea de la cola); se pulsa la parte visible */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');   /* la advertencia de «Vale para todos los asuntos…» */
 await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });

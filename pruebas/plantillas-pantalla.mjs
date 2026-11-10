@@ -1,4 +1,5 @@
-/* Fila 320 (docs/PANTALLA-DE-PLANTILLAS.md): la pantalla «Plantillas» de Herramientas. Con Chromium real y la copia de pruebas. */
+/* Fila 320 (docs/PANTALLA-DE-PLANTILLAS.md): la pantalla «Plantillas» de Herramientas. Con Chromium real y la copia de pruebas.
+   (Fila 584: el paso 20, «Ver todas las plantillas» desde un tipo, pasó a plantillas-desde-un-tipo.mjs, apartada con la idea 585.) */
 import { chromium } from 'playwright';
 
 const BASE = (process.env.DIRECCION || 'http://localhost:8123/index.html');
@@ -182,14 +183,6 @@ await p.waitForTimeout(300);
 await p.evaluate(() => { App.ir('herramientas'); });
 await p.waitForTimeout(800);
 await comprobar('19. al volver a Herramientas se ve la lista de bloques, no la tabla', p.evaluate(() => [document.getElementById('herramientas-lista').classList.contains('oculto'), document.getElementById('plantillas-vista').classList.contains('oculto')]), [false, true]);
-
-/* ---------- 20: desde un tipo ---------- */
-console.log('--- 20. «Ver todas las plantillas» desde un tipo ---');
-await p.evaluate(async () => { await App.abrirTipoDeAsunto((App.E.tipos || []).filter((t) => t.tipo === 'FACTURA')[0]); });
-await p.waitForSelector('#tipo-pd-nueva', { state: 'attached', timeout: 15000 });
-await p.evaluate(() => document.getElementById('tipo-pd-nueva').nextElementSibling.querySelector('button').click());
-await p.waitForSelector('.pt-tabla', { timeout: 15000 });
-await comprobar('20. se abre en «Word» con ese tipo puesto', p.evaluate(() => [document.querySelector('.pt-pestana.activa').textContent.replace(/\d+/, 'N'), document.getElementById('pt-tipo').value, document.querySelectorAll('.pt-tabla tbody tr').length]), ['Word (N)', 'FACTURA', 1]);
 
 /* ---------- 21: el buscador de Ajustes ---------- */
 console.log('--- 21. el buscador de Ajustes ---');

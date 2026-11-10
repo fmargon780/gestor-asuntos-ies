@@ -79,6 +79,10 @@ const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
    (`npm test -- tutores-legales`) sí. El fichero no se borra. Cada entrada: fichero, fecha en que entra y
    motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
 const RETIRADAS = [
+  { fichero: 'plantillas-desde-un-tipo.mjs', desde: '10-nov-2026',
+    motivo: 'fallo real de la aplicación, idea 585: «Ver todas las plantillas» desde la pantalla de un tipo no abre la pantalla (js/herramientas.js, fila 551, la cierra después de un await)' },
+  { fichero: 'etiquetas-desde-el-grupo.mjs', desde: '10-nov-2026',
+    motivo: 'fallo real de la aplicación, idea 585: «Imprimir etiquetas» de un asunto de grupo no abre la pantalla (js/herramientas.js, fila 551, cierra Etiquetas después de un await y la deja oculta)' },
   { fichero: 'ha-llegado-sustituye-la-vista.mjs', desde: '18-oct-2026',
     motivo: 'falla igual en main sin la fila 367, también en solitario (no se puede pulsar el trozo de «Ha llegado»: el elemento no está visible)' },
   { fichero: 'tutores-legales.mjs', desde: '7-oct-2026',

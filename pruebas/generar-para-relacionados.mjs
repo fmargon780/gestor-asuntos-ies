@@ -154,7 +154,11 @@ async function lanzarOtraVez() {
     window.__lote = GenerarParaRelacionados.generar(a, Plantillas.enMemoria().documentos[0], null).then(() => 'hecho', (e) => 'error ' + e.message);
   });
   await pagina.waitForSelector('#capa:not(.oculto) .word-falta');
-  for (const [clave, v] of Object.entries(valores)) await pagina.fill('#capa .word-falta[data-hueco="' + clave + '"]', v);
+  /* Fila 530 (puesta al día en la 584): lo de la actividad ya está guardado en el asunto y no se vuelve a preguntar; se rellena solo lo que se pregunte. */
+  for (const [clave, v] of Object.entries(valores)) {
+    const caja = pagina.locator('#capa .word-falta[data-hueco="' + clave + '"]');
+    if (await caja.count()) await caja.fill(v);
+  }
   await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
   await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent.indexOf('generado') !== -1, null, { timeout: 20000 });
 }
