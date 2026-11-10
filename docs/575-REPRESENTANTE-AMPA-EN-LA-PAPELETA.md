@@ -37,4 +37,7 @@ Yo este año soy un recién aterrizado y no quiero cambiar demasiadas cosas. Eli
 - Saca las de Madres y padres: ella sale con la cruz puesta y arriba «Marca hasta 4 cruces más».
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- 10-nov-2026, Claude Code (tarea pequeña, sin segundo revisor; comprobado contra «Lo que entendió Claude» con `pruebas/candidaturas-papeletas.mjs`, sección 8):
+  - Coincide: desplegable «¿Quién?» solo con la casilla marcada; opciones = admitidas de Madres y padres + «Nadie (no sale en la papeleta)»; viene elegida la de «Es de la AMPA»; se recuerda; cruz impresa (dos líneas) dentro de su casilla en cada papeleta; nombre de la AMPA a la derecha («AMPA» si no tiene); «Marca hasta N cruces más»; con «Nadie» sin «más», sin cruz; otros sectores igual.
+  - Decisión: con «Nadie» y la casilla marcada las cruces siguen rebajadas en uno («Marca hasta 4 cruces»), como hoy.
+  - No he podido ver: el PDF dibujado a ojo (la prueba comprueba lo que se dibuja, no la imagen). Queda para mirar al terminar.
