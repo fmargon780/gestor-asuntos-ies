@@ -340,6 +340,8 @@ await comprobar('el cuadro dice a dónde va',
   'ARCHIVO / ALUMNADO / Aguilar Ponce, Marina 1140233');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');
+/* Fila 584: archivar va en segundo plano; con la máquina cargada la carpeta tarda en llegar. Se espera a ella. */
+for (let i = 0; i < 60; i++) { if (await pagina.evaluate(async () => { try { await (await window.__disco.archivo.getDirectoryHandle('ALUMNADO')).getDirectoryHandle('Aguilar Ponce, Marina 1140233'); return true; } catch (e) { return false; } })) break; await pagina.waitForTimeout(500); }
 await comprobar('la carpeta ha aterrizado en el archivo', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Aguilar Ponce, Marina 1140233');

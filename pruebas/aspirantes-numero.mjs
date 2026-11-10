@@ -91,6 +91,8 @@ await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');
+/* Fila 584: archivar va en segundo plano; con la máquina cargada la carpeta tarda en llegar al archivo. Se espera a ella. */
+for (let i = 0; i < 60; i++) { if (await pagina.evaluate(async () => { try { await (await window.__disco.archivo.getDirectoryHandle('ALUMNADO')).getDirectoryHandle('Pendiente De Numero, Nora'); return true; } catch (e) { return false; } })) break; await pagina.waitForTimeout(500); }
 const nombreArchivado = (await pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Pendiente De Numero, Nora');
