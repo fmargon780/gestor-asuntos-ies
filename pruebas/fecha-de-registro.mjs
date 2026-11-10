@@ -84,6 +84,15 @@ await comprobar('5. sin fecha, la marca queda vacía', pagina.evaluate(async () 
   const v = await Plantillas.valoresDeAsunto({ nombre: 'X', ficha: { tipo: 'INFORME', tercero: 'Prueba', documentos: { 'D26-00002': { tipo: 'X', registros: [{ codigo: '26EM0123' }] } } } });
   return [v.registro, v['fecha de registro']]; }), ['26EM0123', '']);
 
+await comprobar('5. con un documento de nombre antiguo y otro nuevo, gana el más reciente', pagina.evaluate(async () => {
+  const mk = (docFecha) => ({ nombre: 'X', handle: { _f: 1 }, ficha: { tipo: 'INFORME', tercero: 'Prueba', documentos: { 'D26-00002': { tipo: 'X', fecha: docFecha, registros: [{ codigo: '26EM0123', fecha: '2026-11-03' }] } } } });
+  const antes = Carpetas.ficheros;
+  Carpetas.ficheros = async () => [{ nombre: '261101 26EM0098 INFORME Antiguo.pdf' }, { nombre: '261106 INFORME D26-00002.pdf' }];
+  const nuevo = await Plantillas.valoresDeAsunto(mk('2026-11-06'));
+  const viejo = await Plantillas.valoresDeAsunto(mk('2026-10-01'));
+  Carpetas.ficheros = antes;
+  return [nuevo.registro, nuevo['fecha de registro'], viejo.registro, viejo['fecha de registro']]; }), ['26EM0123', '03/11/2026', '26EM0098', '']);
+
 console.log('--- 6. plazos ---');
 await comprobar('6. un plazo «desde su registro» se conserva al normalizar; sin elegir, no lleva `base`', pagina.evaluate(() => {
   const n = (p) => Hitos.normalizarHito({ titulo: 'x', plazo: p }).plazo;

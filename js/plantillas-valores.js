@@ -184,15 +184,21 @@
   }
 
   async function registroYFechaDelAsunto(a) {
-    var codigo = '';
+    var delNombre = '', claveNombre = '';
     if (a && a.handle && window.Carpetas) {
-      try { codigo = ultimoRegistroDe((await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; })); } catch (e) { codigo = ''; }
+      try {
+        var nombres = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; });
+        delNombre = ultimoRegistroDe(nombres);
+        var conCodigo = nombres.filter(function (n) { return n.indexOf(' ' + delNombre) === 6; }).sort().reverse()[0];
+        claveNombre = conCodigo ? conCodigo.slice(0, 6) : '';
+      } catch (e) { delNombre = ''; }
     }
     var delaFicha = registrosDeLaFicha(a);
-    if (!codigo && delaFicha.length) {
-      delaFicha.sort(function (x, y) { return (x.docFecha + x.codigo) < (y.docFecha + y.codigo) ? 1 : -1; });
-      codigo = delaFicha[0].codigo;
-    }
+    /* Gana el documento más reciente (por la fecha del documento), sea de nombre antiguo o nuevo. */
+    var cand = delaFicha.map(function (r) { return { codigo: r.codigo, clave: String(r.docFecha || '').replace(/-/g, '').slice(2) }; });
+    if (delNombre) cand.push({ codigo: delNombre, clave: claveNombre });
+    cand.sort(function (x, y) { return x.clave < y.clave ? 1 : (x.clave > y.clave ? -1 : 0); });
+    var codigo = cand.length ? cand[0].codigo : '';
     var igual = delaFicha.filter(function (r) { return r.codigo === codigo && r.fecha; })[0];
     return { codigo: codigo, fecha: igual ? igual.fecha : '' };
   }

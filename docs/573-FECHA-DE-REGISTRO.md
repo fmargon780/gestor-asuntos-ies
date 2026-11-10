@@ -98,4 +98,14 @@ Aviso de usuario (idea 509, 4-nov-2026, «Ficha de un asunto»), tal cual:
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026, copia de pruebas local, sin leer el código; lo marcado «forzado» se provocó por consola):
+  - Fecha junto al código en la ficha y en la lista de documentos («Registro 26EM0123 · 09/11/2026», distinta de la del documento): coincide.
+  - La fecha del documento y el nombre del fichero no cambian: coincide (solo vio documentos ya registrados de la demo; no registró uno nuevo).
+  - Sin fecha → solo el código; con listado (forzado) → la fecha del listado; con sello y listado distintos, el listado (visto en los datos, no en pantalla): coincide.
+  - Columna de registro de la mesa del hito con la misma fecha: coincide.
+  - Lista de campos (Ajustes → El centro → «Campos» y «Campo variable») con «fecha de registro»: coincide. Marca en plantilla: NO coincidía en un asunto con un documento antiguo (con el código en el nombre) y otro nuevo: {registro} cogía el antiguo y {fecha de registro} salía vacía. Corregido: gana el documento más reciente, sea antiguo o nuevo (`pruebas/fecha-de-registro.mjs`, punto 5). Esta corrección la ha recomprobado la sesión con la prueba, no un segundo pase del revisor.
+  - Editor de la guía («desde que se hace» / «desde su registro», las guías que ya había en «desde que se hace»): coincide. Sale también con «Desde» en «(sin plazo)», algo más de lo que pide el texto; no se ha cambiado.
+  - Plazo «desde su registro»: con fecha cuenta desde el registro, sin fecha desde hoy, se recalcula al llegar el listado (forzado), y con la fecha puesta a mano no se toca: coincide.
+  - Plazo desde el asunto (Hito ▾ → Cambiar) con la misma elección: coincide. «+ Añadir hito» no lo probó (comparte el mismo formulario; lo cubre la prueba).
+  - Sin errores de consola. Nada que el texto no pida salvo lo indicado.
+  - Pruebas: `fecha-de-registro` (nueva) y las relacionadas pasan; fallan igual en `main` sin esta fila: `campos`, `arreglos-del-hito-demo`, `plantillas-pantalla`, `convertir-en-plantilla-pdf-pantalla` (y las ya retiradas). Ajustadas por el cambio: `documentos-firmados` (ahora la línea lleva la fecha), `guia-en-acordeon` y `editor-de-la-guia-columnas` (el rótulo nuevo «Cuenta»).
