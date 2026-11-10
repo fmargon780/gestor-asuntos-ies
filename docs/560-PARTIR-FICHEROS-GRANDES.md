@@ -77,3 +77,10 @@ programarlo después de lo que hay ahora en la cola».
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code)
+- Segundo revisor (10-nov-2026), APROBADA:
+  - Tamaños: coincide. Ninguna pieza ni los cinco ficheros pasan de 400 líneas (el mayor, `hito-mesa-guion.js`, 399; `index.html` 163).
+  - Pantallas: coincide. 60 pares de fotos antes/después (ordenador 1400x900 y móvil 390x844, demo): portada, cada pantalla, asunto y sus pestañas, mesa del hito, Herramientas → Plantillas, Ajustes y tipo de asunto, sin diferencia de un píxel.
+  - Textos: coincide, idénticos (el HTML estático también, salvo comentarios y espacios).
+  - Copia sin internet (`npm run copia-local`, por `file://`): coincide; llega a la portada de la demo, abre un asunto, sin errores de consola.
+  - Lo que la app hace sin pedirlo: nada. Mismas peticiones de red salvo los 13 ficheros nuevos; sin errores de consola ni antes ni después.
+  - Aviso suelto «Documento registrado…» a veces en móvil: sale al azar también antes (tiempos de la demo).
