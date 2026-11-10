@@ -1,0 +1,177 @@
+<meta charset="utf-8">
+<title>Guía con «Solo si»</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: como el editor de guías real — tira de hitos a la izquierda, datos del hito a la derecha. */
+:root{
+  --bg:#f3f5f9; --panel:#ffffff; --fg:#1d2433; --suave:#5d6779; --borde:#d5dbe5;
+  --acento:#1f4f8f; --acento-claro:#e7eef8; --si:#8a5a00; --si-fondo:#fff4d6;
+  --franja:#7a4f00; --franja-fg:#fff;
+  --letra:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141922; --panel:#1c2330; --fg:#e6ebf3; --suave:#9aa5b8; --borde:#323c4d;
+  --acento:#8fb6ec; --acento-claro:#22324a; --si:#f2c56b; --si-fondo:#3a2f17;
+  --franja:#5a3c05; --franja-fg:#fff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141922; --panel:#1c2330; --fg:#e6ebf3; --suave:#9aa5b8; --borde:#323c4d;
+  --acento:#8fb6ec; --acento-claro:#22324a; --si:#f2c56b; --si-fondo:#3a2f17;
+  --franja:#5a3c05; --franja-fg:#fff; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--letra);font-size:14px}
+.franja{background:var(--franja);color:var(--franja-fg);text-align:center;font-size:13px;padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.cuadro{background:var(--panel);margin-block:12px;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:17px;margin:0 0 14px}
+.rejilla{display:grid;grid-template-columns:minmax(220px,30%) 1fr;gap:20px}
+@media (max-width:760px){.rejilla{grid-template-columns:1fr}}
+.tira{display:flex;flex-direction:column;gap:8px}
+.hito{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--borde);border-radius:6px;padding:10px 12px;background:var(--panel);cursor:pointer;text-align:left;font:inherit;color:inherit}
+.hito.activo{border-color:var(--acento);background:var(--acento-claro)}
+.num{min-width:22px;height:22px;border-radius:50%;background:var(--acento-claro);color:var(--acento);display:grid;place-items:center;font-size:12px;font-weight:600}
+.hito b{display:block;font-size:15px;font-weight:600}
+.hito small{color:var(--suave);font-size:12.5px}
+.chip{display:inline-block;margin-top:4px;background:var(--si-fondo);color:var(--si);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:500}
+.boton{border:1px solid var(--borde);background:var(--panel);color:var(--fg);border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer}
+.boton:focus-visible,.hito:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.etiqueta{font-size:12px;color:var(--suave);margin-bottom:4px;display:block}
+.campo{border:1px solid var(--borde);border-radius:6px;padding:8px 10px;font:inherit;background:var(--panel);color:var(--fg);width:100%;box-sizing:border-box}
+.fila{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.fila > div{flex:1 1 180px;min-width:0}
+.seccion{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--suave);margin:0 0 8px}
+.cuando{border:1px solid var(--borde);border-radius:6px;padding:10px 12px;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.cuando .linea{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.valores{display:flex;gap:14px;flex-wrap:wrap}
+.valores label{display:flex;gap:6px;align-items:center}
+.tareas{border:1px solid var(--borde);border-radius:6px;padding:12px;margin-top:14px;background:var(--bg);display:flex;flex-direction:column;gap:8px}
+.tarea{background:var(--panel);border:1px solid var(--borde);border-radius:6px}
+.tarea-cab{display:flex;gap:10px;align-items:center;padding:10px 12px;cursor:pointer}
+.tarea-cab .t{flex:1;min-width:0;font-weight:500}
+.tarea-cab .a{color:var(--suave);font-size:12.5px}
+.tarea-cuerpo{padding:0 12px 12px}
+.flechas{display:flex;gap:6px}
+.flechas .boton{padding:4px 9px}
+.nota{color:var(--suave);font-size:12.5px;margin:0}
+</style>
+
+<div class="franja">Pantalla de prueba · datos inventados · nada se guarda</div>
+<div class="cuadro">
+  <h1>Guía de CAMBIO DE GRUPO</h1>
+  <div class="rejilla">
+    <div class="tira" id="tira"></div>
+    <div id="detalle"></div>
+  </div>
+</div>
+
+<script>
+/* Campos del asunto que son listas (inventados). */
+var CAMPOS = {
+  'Quién lo pide': ['Familia', 'Alumno mayor de edad', 'Jefatura de Estudios'],
+  'Etapa': ['ESO', 'Bachillerato']
+};
+var RESP = ['Administración','Dirección','Jefatura de Estudios','Secretaría','El tutor del alumnado'];
+function siempre(){return {campo:'',valores:[]};}
+var hitos = [
+  {t:'Recoger la solicitud o la propuesta', r:'Administración', c:siempre(), tareas:[
+    {t:'Registrar en Libro de Entrada', a:'Registrar un documento', c:{campo:'Quién lo pide',valores:['Familia','Alumno mayor de edad']}},
+    {t:'Enviar correo de aviso', a:'Comunicar · por correo', c:siempre()}]},
+  {t:'Valorar la petición', r:'Jefatura de Estudios', c:{campo:'Quién lo pide',valores:['Familia','Alumno mayor de edad']}, tareas:[]},
+  {t:'Modificar el grupo en Séneca', r:'Administración', c:siempre(), tareas:[]},
+  {t:'Resolver', r:'Jefatura de Estudios', c:siempre(), tareas:[]},
+  {t:'Comunicar a la familia, a las dos tutorías y al equipo docente', r:'Administración', c:siempre(), tareas:[
+    {t:'Comunicar a la familia', a:'Comunicar · por correo', c:siempre()},
+    {t:'Comunicar al alumno', a:'Comunicar · por correo', c:{campo:'Quién lo pide',valores:['Alumno mayor de edad']}},
+    {t:'Avisar al equipo docente', a:'Comunicar · por correo', c:siempre()}]},
+  {t:'Archivar', r:'Administración', c:siempre(), tareas:[]}
+];
+var activo = 0, tareaAbierta = -1;
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x];});}
+function textoSi(c){ if(!c.campo) return ''; return 'Solo si ' + c.campo + ': ' + (c.valores.length ? c.valores.join(' o ') : '(elige al menos un valor)'); }
+
+function pintarTira(){
+  var tira = document.getElementById('tira'); tira.innerHTML='';
+  hitos.forEach(function(h,i){
+    var b=document.createElement('button'); b.type='button'; b.className='hito'+(i===activo?' activo':''); b.id='hito-'+i;
+    var nt = h.tareas.length ? ' · ' + h.tareas.length + (h.tareas.length===1?' tarea':' tareas') : '';
+    b.innerHTML='<span class="num">'+(i+1)+'</span><span><b>'+esc(h.t)+'</b><small>'+esc(h.r)+nt+'</small>'+(h.c.campo?'<br><span class="chip">'+esc(textoSi(h.c))+'</span>':'')+'</span>';
+    b.onclick=function(){activo=i;tareaAbierta=-1;pintar();};
+    tira.appendChild(b);
+  });
+  var mas=document.createElement('button'); mas.type='button'; mas.className='boton'; mas.textContent='+ Añadir un hito'; mas.id='anadir-hito';
+  mas.onclick=function(){hitos.push({t:'Hito nuevo',r:'Administración',c:siempre(),tareas:[]});activo=hitos.length-1;tareaAbierta=-1;pintar();};
+  tira.appendChild(mas);
+}
+
+/* El recuadro «Cuándo se hace», igual para hito y tarea. */
+function bloqueCuando(c, prefijo, alCambiar){
+  var d=document.createElement('div'); d.className='cuando';
+  var opc='<option value="">Siempre</option>'+Object.keys(CAMPOS).map(function(k){return '<option'+(c.campo===k?' selected':'')+' value="'+esc(k)+'">Solo si el campo «'+esc(k)+'» vale…</option>';}).join('');
+  d.innerHTML='<div class="linea"><label class="etiqueta" for="'+prefijo+'-campo" style="margin:0">Cuándo se hace</label>'+
+    '<select class="campo" id="'+prefijo+'-campo" style="width:auto;flex:1 1 260px">'+opc+'</select></div>';
+  if(c.campo){
+    var v=document.createElement('div'); v.className='valores';
+    CAMPOS[c.campo].forEach(function(val,j){
+      var l=document.createElement('label');
+      l.innerHTML='<input type="checkbox" id="'+prefijo+'-v'+j+'"'+(c.valores.indexOf(val)>=0?' checked':'')+'> '+esc(val);
+      l.querySelector('input').onchange=function(e){
+        if(e.target.checked){ if(c.valores.indexOf(val)<0) c.valores.push(val);} else c.valores=c.valores.filter(function(x){return x!==val;});
+        alCambiar();
+      };
+      v.appendChild(l);
+    });
+    d.appendChild(v);
+    var n=document.createElement('p'); n.className='nota';
+    n.textContent='En el asunto, si el campo tiene otro valor, esto no sale.';
+    d.appendChild(n);
+  }
+  d.querySelector('select').onchange=function(e){ c.campo=e.target.value; c.valores=[]; alCambiar(); };
+  return d;
+}
+
+function mover(lista,i,paso){ var j=i+paso; if(j<0||j>=lista.length) return false; var x=lista[i]; lista[i]=lista[j]; lista[j]=x; return j; }
+
+function pintarDetalle(){
+  var h=hitos[activo], det=document.getElementById('detalle'); det.innerHTML='';
+  var cab=document.createElement('p'); cab.className='seccion'; cab.textContent='Datos del hito'; det.appendChild(cab);
+  var fila=document.createElement('div'); fila.className='fila';
+  fila.innerHTML='<div><label class="etiqueta" for="h-titulo">Título del hito</label><input class="campo" id="h-titulo" value="'+esc(h.t)+'"></div>'+
+    '<div><label class="etiqueta" for="h-resp">Responsable</label><select class="campo" id="h-resp">'+RESP.map(function(r){return '<option'+(r===h.r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select></div>'+
+    '<div style="flex:0 0 auto"><span class="etiqueta">Orden</span><div class="flechas"><button type="button" class="boton" id="h-subir" title="Subir">↑</button><button type="button" class="boton" id="h-bajar" title="Bajar">↓</button></div></div>';
+  det.appendChild(fila);
+  fila.querySelector('#h-titulo').oninput=function(e){h.t=e.target.value;pintarTira();};
+  fila.querySelector('#h-resp').onchange=function(e){h.r=e.target.value;pintarTira();};
+  fila.querySelector('#h-subir').onclick=function(){var j=mover(hitos,activo,-1); if(j!==false){activo=j;pintar();}};
+  fila.querySelector('#h-bajar').onclick=function(){var j=mover(hitos,activo,1); if(j!==false){activo=j;pintar();}};
+  det.appendChild(bloqueCuando(h.c,'h',function(){pintar();}));
+
+  var t=document.createElement('div'); t.className='tareas';
+  t.innerHTML='<p class="seccion" style="margin:0">Tareas de este hito ('+h.tareas.length+')</p>';
+  h.tareas.forEach(function(ta,i){
+    var caja=document.createElement('div'); caja.className='tarea';
+    var c=document.createElement('div'); c.className='tarea-cab'; c.id='tarea-'+i; c.tabIndex=0;
+    c.innerHTML='<span class="t">'+esc(ta.t)+(ta.c.campo?'<br><span class="chip">'+esc(textoSi(ta.c))+'</span>':'')+'</span><span class="a">'+esc(ta.a)+'</span><span>'+(tareaAbierta===i?'▼':'▶')+'</span>';
+    c.onclick=function(){tareaAbierta=(tareaAbierta===i?-1:i);pintarDetalle();};
+    c.onkeydown=function(e){if(e.key==='Enter'){c.onclick();}};
+    caja.appendChild(c);
+    if(tareaAbierta===i){
+      var cu=document.createElement('div'); cu.className='tarea-cuerpo';
+      var fl=document.createElement('div'); fl.className='fila';
+      fl.innerHTML='<div><label class="etiqueta" for="t-titulo">Título de la tarea</label><input class="campo" id="t-titulo" value="'+esc(ta.t)+'"></div>'+
+        '<div style="flex:0 0 auto"><span class="etiqueta">Orden</span><div class="flechas"><button type="button" class="boton" id="t-subir">↑</button><button type="button" class="boton" id="t-bajar">↓</button></div></div>';
+      fl.querySelector('#t-titulo').onchange=function(e){ta.t=e.target.value;pintarDetalle();};
+      fl.querySelector('#t-subir').onclick=function(){var j=mover(h.tareas,i,-1); if(j!==false){tareaAbierta=j;pintarDetalle();}};
+      fl.querySelector('#t-bajar').onclick=function(){var j=mover(h.tareas,i,1); if(j!==false){tareaAbierta=j;pintarDetalle();}};
+      cu.appendChild(fl);
+      cu.appendChild(bloqueCuando(ta.c,'t',function(){pintar();}));
+      caja.appendChild(cu);
+    }
+    t.appendChild(caja);
+  });
+  var add=document.createElement('button'); add.type='button'; add.className='boton'; add.id='anadir-tarea'; add.textContent='+ Añadir una tarea';
+  add.onclick=function(){h.tareas.push({t:'Tarea nueva',a:'A mano',c:siempre()});tareaAbierta=h.tareas.length-1;pintar();};
+  t.appendChild(add);
+  det.appendChild(t);
+}
+function pintar(){pintarTira();pintarDetalle();}
+pintar();
+</script>
