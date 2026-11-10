@@ -76,6 +76,7 @@
     'js/guias-editor-abrir.js',
     'js/guias-editor.js',
     'js/guias-columnas.js',
+    'js/guias-cuando.js',   // fila 576: «Cuándo se hace»
     'js/guias-plantilla.js',
     'js/guias-plegado.js',
     'js/guias-opciones-editor.js',

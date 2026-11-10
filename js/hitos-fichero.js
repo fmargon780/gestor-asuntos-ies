@@ -11,6 +11,8 @@
   function gestor() { return I.gestor.apply(this, arguments); }
   function normalizar() { return I.normalizar.apply(this, arguments); }
   function vacio() { return I.vacio.apply(this, arguments); }
+  /* Fila 576: lo que dice el campo de cada asunto sobre sus hitos y tareas «Solo si» (js/solo-si.js). */
+  function marcar(datos) { return window.SoloSi ? SoloSi.marcarTodo(datos) : datos; }
 
   /* La lectura pasa por la misma cola que el guardado (`cambiar`,
      más abajo): sin esto, una lectura lanzada mientras una escritura
@@ -24,7 +26,7 @@
     var g = gestor();
     if (!g) return vacio();
     var hacerlo = async function () {
-      var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
+      var leido = marcar(normalizar(await Carpetas.leerJson(g, FICHERO)));
       var n = Object.keys(leido.porAsunto).length;
       if (n) vistosConDatos = n;
       ultimos = leido;
@@ -84,7 +86,7 @@
 
   async function leerParaCambiar(g) {
     for (var i = 0; ; i++) {
-      var datos = normalizar(await Carpetas.leerJson(g, FICHERO));
+      var datos = marcar(normalizar(await Carpetas.leerJson(g, FICHERO)));
       var n = Object.keys(datos.porAsunto).length;
       if (n || !vistosConDatos) { vistosConDatos = n; return datos; }
       if (i >= ESPERAS_LECTURA_VACIA_MS.length) {

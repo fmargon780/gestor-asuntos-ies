@@ -117,7 +117,8 @@
                obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '',
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
                receta: g.receta || null,
-               copia: x.copia || null };   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
+               copia: x.copia || null,   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
+               soloSi: (!propio && g.soloSi) || null };   /* fila 576: «Cuándo se hace» (js/solo-si.js) */
       if (g.comun && !propio) salida.comun = g.comun;   /* fila 531: viene de la lista común de tareas */
       return salida;
     }
@@ -181,7 +182,25 @@
   function guionDe(a, hito) {
     if (!hito || hito.clase === 'decision') { var vacia = []; vacia.plegadas = []; return vacia; }
     var paso = pasoDe(a, hito);
-    return unir((paso && paso.guion) || [], hito);
+    return conSoloSi(unir((paso && paso.guion) || [], hito), a);
+  }
+
+  /* Fila 576: las tareas con «Solo si» según el campo del asunto: se quita la que no toca (si no está hecha) y la que
+     encuentra el campo vacío sale con `falta` (el nombre del campo, para el «Falta: …» en amarillo). */
+  function conSoloSi(lista, a) {
+    var v = window.SoloSi && a ? SoloSi.valoresDe(a) : null;
+    if (!v || !lista.some(function (l) { return l.soloSi; })) return lista;
+    var fuera = {}, salida = [];
+    lista.forEach(function (l) {
+      var e = l.soloSi ? SoloSi.detalle(l.soloSi, v) : { estado: 'sale' };
+      if (e.estado === 'quita' && !l.hecho && !l.noaplica) { fuera[l.clave || l.id] = true; return; }
+      if (e.estado === 'falta') l.falta = e.campo;
+      salida.push(l);
+    });
+    salida.plegadas = lista.plegadas;
+    salida.bloques = (lista.bloques || []).filter(function (b) { return !fuera[b.clave]; });
+    salida.ordenGuia = (lista.ordenGuia || []).filter(function (k) { return !fuera[k]; });
+    return salida;
   }
 
   /* Fila 154: un paso «No aplica» no cuenta ni para lo hecho ni para el

@@ -205,6 +205,16 @@
       if (completados && completados.length) hitos = completados;
     }
 
+    /* Fila 576: si el campo de un «Solo si» ha cambiado, el hito en curso se ajusta a lo que sale ahora. */
+    if (!errorLectura && hitos.length && window.SoloSi) {
+      try {
+        if (await SoloSi.ajustarEnCurso(clave, hitos)) {
+          datos = await Hitos.leer(); entrada = datos.porAsunto[clave] || entrada; hitos = entrada ? entrada.hitos : hitos;
+        }
+      } catch (e3) { /* se pinta con lo que hay */ }
+      if (actual !== a || turno !== turnoRepintado) return;
+    }
+
     /* Los documentos apuntados a un hito (fila 31, 17-sep-2026) se
        pintan sabiendo ya si el fichero sigue en la carpeta: se lee
        aquí, una vez por repintado, antes de tocar el DOM. Corregirlo

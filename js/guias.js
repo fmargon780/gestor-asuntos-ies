@@ -160,6 +160,8 @@ var Guias = (function () {
          al guardar la guía. Igual que lo de arriba: nunca en una pregunta. */
       avisarLoPide: !!(p && p.avisarLoPide),
       avisarLoPidePlantilla: (p && p.avisarLoPide) ? String(p.avisarLoPidePlantilla || '') : '',
+      /* Fila 576: «Cuándo se hace» (js/solo-si.js): solo en los pasos de arriba y solo con al menos un valor. */
+      soloSi: window.SoloSi ? SoloSi.normalizar(p && p.soloSi) : ((p && p.soloSi && p.soloSi.campo) ? p.soloSi : null),
       origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
         ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
             divergido: !!p.origenBiblioteca.divergido }

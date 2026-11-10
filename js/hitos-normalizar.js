@@ -155,6 +155,9 @@
     if (h && h.variosDocumentos && !esDecision) salida.variosDocumentos = true;   /* fila 414: solo si lo lleva */
     /* Fila 416: algo de este hito (título, explicación, responsable, plazo, «solo informativo») se cambió a mano solo en este asunto: la guía ya no lo pisa. */
     if (h && h.cambioAqui) salida.cambioAqui = true;
+    /* Fila 576: «Cuándo se hace» (js/solo-si.js). `cond` (lo que dice el campo del asunto ahora) nunca se guarda: se pone al leer. */
+    var soloSi = h && h.soloSi ? (window.SoloSi ? SoloSi.normalizar(h.soloSi) : h.soloSi) : null;
+    if (soloSi) salida.soloSi = soloSi;
     if (h && h.variosPropio && !esDecision) salida.variosPropio = true;   /* fila 414: cambiado «solo en este asunto»: la guía ya no lo pisa */
     if (h && h.esperandoA) {
       salida.esperandoA = String(h.esperandoA);

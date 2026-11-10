@@ -223,6 +223,9 @@ var GuiasGuion = (function () {
       base.normativa = normalizarNormativa(g && g.normativa);
       var receta = normalizarReceta(base.accion, g && g.receta);
       if (receta) base.receta = receta;
+      /* Fila 576: «Cuándo se hace» de la tarea (js/solo-si.js). */
+      var soloSi = window.SoloSi ? SoloSi.normalizar(g && g.soloSi) : null;
+      if (soloSi) base.soloSi = soloSi;
       if (g && g.comun) base.comun = String(g.comun);   /* fila 531: viene de la lista común de tareas (js/comunes.js) */
       /* Fila 138: algo que hay que reunir. */
       if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {

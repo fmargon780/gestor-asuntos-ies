@@ -42,6 +42,7 @@
        camino es { pregunta, opcion, lista } (lista: los hitos de esa
        opción, el mismo array que hay dentro del árbol). */
     var nivel = pasos;
+    if (window.GuiasCuando) GuiasCuando.ponerTipo(nombreTipo);   /* fila 576 */
     var opcionesResp = listaResponsables || [];
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-guia');   /* fila 463: a todo lo ancho, en dos columnas */
@@ -165,6 +166,7 @@
         }
 
         if (window.GuiasGuion && caja.querySelector(':scope > .paso-guion')) nivel[i].guion = GuiasGuion.leer(caja);   /* fila 109 */
+        if (window.GuiasCuando && caja.querySelector(':scope > .cuando-bloque')) nivel[i].soloSi = GuiasCuando.leer(caja);   /* fila 576 */
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
            solo en los hitos que no son pregunta. */
@@ -318,24 +320,19 @@
            en js/guias-paso-bloques.js, con el mismo contexto que las opciones). */
         GuiasPasoBloques.anadir(d, p, i, pregunta, opcionesCtx);
 
-        /* ---- la casilla de "esto es una pregunta" ---- */
-        var fila = document.createElement('label');
-        fila.className = 'interruptor paso-es-pregunta-fila';
-        fila.innerHTML = '<input type="checkbox" class="paso-es-pregunta"' +
-          (pregunta ? ' checked' : '') + '>' +
-          '<span>Este hito es una pregunta: el trámite sigue por un camino o por otro</span>';
-        d.appendChild(fila);
+        /* Fila 576: ya no se crean hitos-pregunta. Una guía con preguntas se pasa sola al abrir la aplicación (js/guias-sin-preguntas.js);
+           si todavía queda alguna, conserva su casilla para poder verla y quitarla. */
+        if (pregunta) {
+          var fila = document.createElement('label');
+          fila.className = 'interruptor paso-es-pregunta-fila';
+          fila.innerHTML = '<input type="checkbox" class="paso-es-pregunta" checked>' +
+            '<span>Este hito es una pregunta: el trámite sigue por un camino o por otro</span>';
+          d.appendChild(fila);
+          fila.querySelector('.paso-es-pregunta').onchange = function () { recoger(); pintar(); };
+        }
 
-        fila.querySelector('.paso-es-pregunta').onchange = function () {
-          recoger();
-          if (this.checked && !nivel[i].opciones.length) {
-            nivel[i].opciones = [
-              { id: G.nuevoId(), titulo: '', pasos: [] },
-              { id: G.nuevoId(), titulo: '', pasos: [] }
-            ];
-          }
-          pintar();
-        };
+        /* Fila 576: «Cuándo se hace», debajo de los datos del hito (no en los pasos-pregunta). */
+        if (window.GuiasCuando && !pregunta) d.appendChild(GuiasCuando.bloque(p.soloSi, 'paso-cuando'));
 
         if (pregunta) d.appendChild(GuiasOpcionesEditor.caja(opcionesCtx, p, i));
 
