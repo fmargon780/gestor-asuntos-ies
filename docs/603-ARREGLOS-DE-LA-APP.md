@@ -1,4 +1,4 @@
-# 597 — Arreglos de la app
+# 603 — Arreglos de la app
 
 ## Lo que escribió Francisco
 Tema: Arreglos de la app. Junta las ideas 593, 594 y 596: que «Imprimir etiquetas» y «Ver todas
