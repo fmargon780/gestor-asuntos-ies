@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '606', fecha: '2026-11-10', texto: 'Al cambiar el nombre de un tipo que tiene nombre corto, el cuadro enseña también la casilla «Nombre corto» para cambiarlo o vaciarlo, y las carpetas abiertas de ese tipo pasan a llevar el que toque, sin recortarse mal.' },
   { id: '604', fecha: '2026-11-10', texto: 'En «Cambiar el asunto», el aviso de tercero de otra clase ya no sale si el tercero es de una de las clases que admite el tipo. Los cuadros «El tipo ha cambiado» y los de las notas de directivos dicen «Dejar los hitos como están», «Guardarlos ahora» y «Verlas» en vez de «Cancelar».' },
   { id: '603', fecha: '2026-11-10', texto: '«Imprimir etiquetas» y «Ver todas las plantillas» vuelven a abrir su pantalla. Al crear un asunto desde el control del registro se reconoce también a tutores legales y Administraciones. El menú «Hito ▾» se ve entero, sin quedar bajo la barra lateral.' },
   { id: '578', fecha: '2026-11-10', texto: 'Junto al tutor legal que tiene la custodia, según la columna «Custodia» de Séneca, sale «tiene la custodia»: en Datos y contacto, en la ficha del alumno, en el correo y al elegir a quién escribir. Si el texto no coincide con ningún tutor, sale «Custodia: …». En los documentos, «Tutor con custodia» se rellena solo con lo que dice Séneca. Los correos siguen yendo a los tutores legales que elijas.' },

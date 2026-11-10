@@ -48,6 +48,29 @@ var TiposNombre = (function () {
     return salida;
   }
 
+  /* Fila 606 (docs/606-NOMBRE-CORTO-AL-CAMBIAR-EL-NOMBRE.md): las comprobaciones del nombre corto, una sola
+     vez para Ajustes y para «Cambiar el nombre». `texto` ya va limpio y en mayúsculas. Devuelve el motivo
+     por el que no vale, o '' si vale. Un tipo se compara con el nombre corto (o el nombre) de los demás. */
+  function problemaDelCorto(texto, tipo) {
+    if (texto.length > 25) return 'El nombre corto no puede pasar de 25 caracteres.';
+    var otros = (App.E.tipos || []).filter(function (t) { return t !== tipo; })
+      .map(function (t) { return t.nombreCorto || t.tipo; });
+    if (texto && otros.some(function (o) { return n(o) === n(texto); })) return 'Ya lo usa otro tipo: no puede repetirse.';
+    return '';
+  }
+
+  /* Fila 606: el trozo con que una carpeta lleva de verdad el tipo en `desde`: el nombre corto viejo, el largo
+     viejo o un alias (Nombres.leer reconoce los tres). '' si la carpeta no empieza por ninguno ahí. */
+  function trozoDeCarpeta(nombreCarpeta, desde, candidatos) {
+    var lista = candidatos.filter(function (c, i, a) { return c && a.indexOf(c) === i; })
+      .sort(function (x, y) { return y.length - x.length; });
+    for (var i = 0; i < lista.length; i++) {
+      var c = lista[i];
+      if (n(nombreCarpeta.slice(desde, desde + c.length)) === n(c) && nombreCarpeta.charAt(desde + c.length) === ' ') return nombreCarpeta.slice(desde, desde + c.length);
+    }
+    return '';
+  }
+
   function cuentaPasos(pasos) { return (pasos || []).length; }
 
   /* ---------- mover ---------- */
@@ -278,7 +301,8 @@ var TiposNombre = (function () {
        tal cual, sin cambiar lo que hacen para App.renombrarTipo. La guía
        y los campos, al unir dos tipos, llevan su propia regla, distinta
        de moverGuia/moverCampos de aquí arriba. */
-    n: n, moverPlantillas: moverPlantillas, moverRecurrentes: moverRecurrentes
+    n: n, moverPlantillas: moverPlantillas, moverRecurrentes: moverRecurrentes,
+    problemaDelCorto: problemaDelCorto, trozoDeCarpeta: trozoDeCarpeta
   };
 })();
 window.TiposNombre = TiposNombre;
@@ -306,38 +330,81 @@ async function unirDesdeCambioDeNombre(tipo, otro) {
 }
 
 App.renombrarTipo = async function (tipo) {
-  var ok = await U.preguntar('Cambiar el nombre del tipo',
-    '<label class="etiqueta">Nombre nuevo</label>' +
-    '<input id="tipo-nuevo-nombre" class="campo" value="' + U.escapar(tipo.tipo) + '">' +
-    '<p class="nota">Se cambiará en los asuntos abiertos que lo usen. ' +
-    'Las carpetas del archivo no se tocan: se seguirán llamando como se llaman, ' +
-    'y el buscador las encontrará igual.</p>', 'Cambiar');
-  if (!ok) return;
-
-  var nombreNuevo = U.limpiarNombre($('tipo-nuevo-nombre').value).toUpperCase();
-  if (!nombreNuevo || nombreNuevo === tipo.tipo) return;
+  /* Fila 606: un tipo con nombre corto enseña también su casilla (para cambiarlo o vaciarlo); sin él, el cuadro
+     queda como siempre. Si el corto no vale, el cuadro se vuelve a abrir con lo escrito y el motivo. */
+  var conCorto = !!tipo.nombreCorto;
+  var nombreNuevo, cortoNuevo = '', textoNombre = tipo.tipo, textoCorto = tipo.nombreCorto || '', motivo = '';
+  for (;;) {
+    var pregunta = U.preguntar('Cambiar el nombre del tipo',
+      '<label class="etiqueta">Nombre nuevo</label>' +
+      '<input id="tipo-nuevo-nombre" class="campo" value="' + U.escapar(textoNombre) + '">' +
+      (conCorto ?
+        '<label class="etiqueta" style="margin-top:10px">Nombre corto <span class="suave">(para el nombre de la carpeta)</span></label>' +
+        '<input id="tipo-nuevo-corto" class="campo" maxlength="25" placeholder="Igual que el nombre nuevo" value="' + U.escapar(textoCorto) + '">' +
+        '<div class="aviso-en-vivo" id="tipo-nuevo-corto-aviso"></div>' : '') +
+      (motivo ? '<p class="nota" id="tipo-nuevo-motivo" style="color:var(--malo,#b00020)">' + U.escapar(motivo) + '</p>' : '') +
+      '<p class="nota">Se cambiará en los asuntos abiertos que lo usen. ' +
+      'Las carpetas del archivo no se tocan: se seguirán llamando como se llaman, ' +
+      'y el buscador las encontrará igual.</p>', 'Cambiar');
+    if (conCorto) {
+      var campoCorto = $('tipo-nuevo-corto'), avisoCorto = $('tipo-nuevo-corto-aviso');
+      var pintar = function () {
+        var t = U.limpiarNombre(campoCorto.value).toUpperCase();
+        var problema = TiposNombre.problemaDelCorto(t, tipo);
+        avisoCorto.className = 'aviso-en-vivo' + (problema ? ' aviso-en-vivo-malo' : '');
+        avisoCorto.textContent = problema || (t ? t.length + ' de 25 caracteres' : '');
+      };
+      campoCorto.oninput = pintar;
+      pintar();
+    }
+    var ok = await pregunta;
+    if (!ok) return;
+    nombreNuevo = U.limpiarNombre($('tipo-nuevo-nombre').value).toUpperCase();
+    if (!conCorto) break;
+    cortoNuevo = U.limpiarNombre($('tipo-nuevo-corto').value).toUpperCase();
+    motivo = TiposNombre.problemaDelCorto(cortoNuevo, tipo);
+    if (!motivo) break;
+    textoNombre = $('tipo-nuevo-nombre').value; textoCorto = $('tipo-nuevo-corto').value;
+  }
+  if (cortoNuevo === nombreNuevo) cortoNuevo = '';   /* un corto igual al largo no aporta nada */
+  var cortoViejo = tipo.nombreCorto || '';
+  var cambiaLargo = !!nombreNuevo && nombreNuevo !== tipo.tipo;
+  var cambiaCorto = conCorto && cortoNuevo !== cortoViejo;
+  if (!nombreNuevo || (!cambiaLargo && !cambiaCorto)) return;
 
   /* Fila 279: si ya hay un tipo con ese nombre (o es su nombre corto), se ofrece unirlos; si es un nombre antiguo
      de otro o se parece, el cuadro común con «Unir con él» en cada fila. Sus propios nombres antiguos no preguntan. */
-  var igual = TiposParecidos.paraNombreNuevo(nombreNuevo, tipo).filter(function (x) { return x.motivo === 'igual'; })[0];
-  if (igual) { await unirDesdeCambioDeNombre(tipo, igual.tipo); return; }
-  var parecidos = await TiposParecidos.confirmarNombre(nombreNuevo, {
-    salvo: tipo, verbo: 'Vas a cambiarle el nombre a', boton: 'Unir con él', seguir: 'Cambiar el nombre de todas formas',
-    alPulsar: function (otro) { setTimeout(function () { unirDesdeCambioDeNombre(tipo, otro); }, 0); }
-  });
-  if (!parecidos) return;
+  var parecidos = [];
+  if (cambiaLargo) {
+    var igual = TiposParecidos.paraNombreNuevo(nombreNuevo, tipo).filter(function (x) { return x.motivo === 'igual'; })[0];
+    if (igual) { await unirDesdeCambioDeNombre(tipo, igual.tipo); return; }
+    parecidos = await TiposParecidos.confirmarNombre(nombreNuevo, {
+      salvo: tipo, verbo: 'Vas a cambiarle el nombre a', boton: 'Unir con él', seguir: 'Cambiar el nombre de todas formas',
+      alPulsar: function (otro) { setTimeout(function () { unirDesdeCambioDeNombre(tipo, otro); }, 0); }
+    });
+    if (!parecidos) return;
+  }
 
   var nombreViejo = tipo.tipo;
   var afectadas = App.E.listaAbiertos.filter(function (a) {
     return a.leido.reconocido && a.leido.tipo === nombreViejo;
   });
 
+  /* Fila 606: lo que las carpetas llevan por el tipo es el nombre corto si lo hay, el largo si no, y lo que hay
+     que quitar es lo que la carpeta lleva DE VERDAD (el corto viejo, el largo viejo o un alias), no tantas letras
+     como tiene el largo. Antes, con nombre corto, la carpeta se recortaba mal. */
+  var paraCarpeta = (conCorto && cortoNuevo) ? cortoNuevo : nombreNuevo;
+  var candidatos = [cortoViejo, nombreViejo].concat(tipo.alias || []);
+
   var cambiadas = 0, fallos = [];
   for (var i = 0; i < afectadas.length; i++) {
     var a = afectadas[i];
     /* Fila 239: con número de asunto, el tipo va detrás de `AAMMDD A26-0137 `. */
     var desde = a.leido.numero ? 7 + a.leido.numero.length + 1 : 7;
-    var nombreCarpeta = a.nombre.slice(0, desde) + nombreNuevo + a.nombre.slice(desde + nombreViejo.length);
+    var quitar = TiposNombre.trozoDeCarpeta(a.nombre, desde, candidatos);
+    if (!quitar) { fallos.push(a.nombre + ': su carpeta no lleva el nombre del tipo donde se esperaba'); continue; }
+    var nombreCarpeta = a.nombre.slice(0, desde) + paraCarpeta + a.nombre.slice(desde + quitar.length);
+    if (nombreCarpeta === a.nombre) continue;
     try {
       /* Fila 303 (docs/CARPETAS-PERDIDAS-QUE-ESTAN-ARCHIVADAS.md, 7): la clave de la ficha no se toca si su carpeta
          no existe con el nombre viejo. */
@@ -357,28 +424,38 @@ App.renombrarTipo = async function (tipo) {
   }
 
   tipo.alias = tipo.alias || [];
-  if (tipo.alias.indexOf(nombreViejo) === -1) tipo.alias.push(nombreViejo);
+  if (cambiaLargo && tipo.alias.indexOf(nombreViejo) === -1) tipo.alias.push(nombreViejo);
+  /* Fila 606: el nombre corto viejo, si deja de usarse, pasa a alias para que se sigan reconociendo las carpetas
+     que lo llevan (las del archivo). */
+  if (conCorto) {
+    if (cambiaCorto && cortoViejo && cortoViejo !== nombreNuevo && cortoViejo !== cortoNuevo && tipo.alias.indexOf(cortoViejo) === -1) tipo.alias.push(cortoViejo);
+    if (cortoNuevo) tipo.nombreCorto = cortoNuevo; else delete tipo.nombreCorto;
+  }
   tipo.tipo = nombreNuevo;
 
-  /* 20-sep-2026, fila 79, apartado 9: sin esto, App.fusionarConDisco
-     veía el nombre viejo como algo que el otro ordenador tiene de más
-     y lo devolvía a la vida como tipo fantasma en cuanto alguien
-     guardara cualquier otra cosa (mismo mecanismo de la fila 77). Se
-     revive el nombre nuevo por si alguna vez se borró él mismo: si no,
-     renombrar a un nombre que se borró en el pasado lo haría
-     desaparecer al guardar. */
-  await Borrados.marcar(App.E.gestor, 'tipos', nombreViejo);
-  await Borrados.revivir(App.E.gestor, 'tipos', nombreNuevo);
-  TiposParecidos.alCrearNombre(nombreNuevo, parecidos);   /* fila 279: sale del `alias` de quien lo llevaba */
+  var llevado = null;
+  if (cambiaLargo) {
+    /* 20-sep-2026, fila 79, apartado 9: sin esto, App.fusionarConDisco
+       veía el nombre viejo como algo que el otro ordenador tiene de más
+       y lo devolvía a la vida como tipo fantasma en cuanto alguien
+       guardara cualquier otra cosa (mismo mecanismo de la fila 77). Se
+       revive el nombre nuevo por si alguna vez se borró él mismo: si no,
+       renombrar a un nombre que se borró en el pasado lo haría
+       desaparecer al guardar. */
+    await Borrados.marcar(App.E.gestor, 'tipos', nombreViejo);
+    await Borrados.revivir(App.E.gestor, 'tipos', nombreNuevo);
+    TiposParecidos.alCrearNombre(nombreNuevo, parecidos);   /* fila 279: sale del `alias` de quien lo llevaba */
+  }
   await App.guardarTipos();
-  await TiposParecidos.apuntarParejas(nombreNuevo, parecidos);
+  if (cambiaLargo) await TiposParecidos.apuntarParejas(nombreNuevo, parecidos);
 
   /* Fila 126: la guía, los campos, las plantillas y los recurrentes se
      van con el tipo. Lo principal (el nombre) ya está guardado: si esto
      falla, ámbar. */
-  var llevado = null;
-  try { llevado = await TiposNombre.mover(nombreViejo, nombreNuevo); }
-  catch (e) { U.accesorio('Tipo renombrado, pero no he podido llevarle su guía, campos o plantillas', e); }
+  if (cambiaLargo) {
+    try { llevado = await TiposNombre.mover(nombreViejo, nombreNuevo); }
+    catch (e) { U.accesorio('Tipo renombrado, pero no he podido llevarle su guía, campos o plantillas', e); }
+  }
 
   await App.verAbiertos();
   App.pintarAjustes();
@@ -389,7 +466,7 @@ App.renombrarTipo = async function (tipo) {
   if (fallos.length) {
     U.aviso('Cambiadas ' + cambiadas + ' carpetas. ' + fallos.length + ' no se han podido.', 'malo');
   } else {
-    U.aviso('Tipo renombrado. Carpetas abiertas cambiadas: ' + cambiadas + '.' +
+    U.aviso((cambiaLargo ? 'Tipo renombrado' : 'Nombre corto cambiado') + '. Carpetas abiertas cambiadas: ' + cambiadas + '.' +
       (llevado && TiposNombre.hayAlgo(llevado) ? ' ' + TiposNombre.textoDe(llevado) : ''), 'bueno');
   }
 };

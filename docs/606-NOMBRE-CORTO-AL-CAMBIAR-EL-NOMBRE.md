@@ -76,4 +76,14 @@ Cuando cambio el nombre de un asunto, el sistema debe proponer el cambio tambié
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026, otro ayudante, con su propio script contra la app local y datos inventados):
+  - Casilla con el corto de hoy en un tipo con corto: coincide.
+  - Tipo sin corto, sin casilla: coincide (visto en código y en la prueba de la fila, no en su script).
+  - Corto de otro tipo: coincide (aviso en vivo, el cuadro vuelve con el motivo, no se guarda). Más de 25: coincide, visto en código y en la prueba de la fila.
+  - Nombre y corto cambiados: coincide, el resto de la carpeta queda igual (también con número A26-xxxx, por la prueba de la fila).
+  - Corto vaciado: coincide, la carpeta lleva el largo nuevo; el corto viejo queda como alias.
+  - Ajustes enseña lo guardado: no lo he podido ver del todo (no abrió la pantalla de Ajustes; comprobó en datos que `nombreCorto` queda guardado o quitado). Las comprobaciones comunes sustituyen a las de Ajustes con la misma lógica.
+  - Casos límite bien: carpeta con alias, carpeta con el largo viejo en un tipo con corto, solo el largo, solo el corto, nada cambia. Sin riesgo de perder carpetas ni fichas; sin errores de consola.
+  - Corregido tras el informe: un corto igual al largo nuevo ya no se guarda (queda vacío).
+  - Anotado, sin cambiar: el motivo sale dos veces en el cuadro reabierto (cosmético); con el nombre nuevo vacío el cuadro se cierra sin guardar (como ya hacía); si el largo nuevo coincide con otro tipo salta «Unir» y el corto escrito no se aplica (norma anterior de unir).
+- Prueba `nombre-corto-al-cambiar-el-nombre.mjs`: pasa. Tanda de lo tocado (tipo, nombre, renombr, ajustes, carpetas-perdidas, borrados, avisar): 32 de 33 bien; falla `tipos-unir.mjs` por el entorno (falta el paquete jsdom en esta sesión), no por la app.
