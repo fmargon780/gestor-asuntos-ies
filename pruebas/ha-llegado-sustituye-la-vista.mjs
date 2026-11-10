@@ -130,11 +130,15 @@ await comprobar('con el punto de antes guardado ("clasificar" ya a la vista)',
 await pagina.click('#btn-ha-llegado-volver');
 await pagina.waitForTimeout(300);
 await comprobar('la tabla de asuntos vuelve', visible('#inicio-cuerpo'), true);
-await comprobar('la fila de arriba vuelve', visible('#inicio-fila-superior'), true);
+/* Fila 353 (puesta al día en la 584): con la página bajada la cabecera va encogida y esconde «Ha llegado» y los avisos; vuelven al desplegarse (arriba del todo). */
+await comprobar('la fila de arriba sigue escondida mientras la cabecera va encogida (página bajada)', visible('#inicio-fila-superior'), false);
 await comprobar('"Ver todo" se esconde', visible('#zona-clasificar'), false);
 await comprobar('sigue en "Todos los abiertos"',
   pagina.locator('.inicio-pestana[data-pestana="todos"]').evaluate((b) => b.classList.contains('activa')), true);
 await comprobar('el mismo punto de la página', pagina.evaluate(() => window.scrollY).then(cerca), true);
+await pagina.evaluate(() => window.scrollTo(0, 0));
+await pagina.waitForTimeout(500);
+await comprobar('la fila de arriba vuelve al subir del todo', visible('#inicio-fila-superior'), true);
 
 /* ================= 3. EL BOTÓN DE COMPATIBILIDAD, LO MISMO ================= */
 
@@ -159,6 +163,8 @@ await comprobar('sigue en "Todos los abiertos"',
 /* ================= 4. NADA QUE CLASIFICAR: SE SIGUE DENTRO ================= */
 
 console.log('--- 4. si deja de haber nada que clasificar, se sigue dentro ---');
+await pagina.evaluate(() => window.scrollTo(0, 0));
+await pagina.waitForTimeout(500);   /* con la cabecera desplegada, «Ha llegado» se ve */
 await pagina.locator('#inicio-ha-llegado-linea .inicio-ha-llegado-trozo').nth(0).click();
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => {

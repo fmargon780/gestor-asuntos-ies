@@ -178,7 +178,7 @@ await filaUnidad.locator('label:has-text("Obligatorio") input').check();
 await comprobar('los campos puestos ya no ofrecen «Añadir al nombre» (fila 251)',
   pagina.locator('#campos-puestos label:has-text("Añadir al nombre")').count(), 0);
 
-await pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Campos' }).screenshot({
+await pagina.locator('.tipo-asunto-seccion[data-seccion="campos"]').screenshot({
   path: path.join(CARPETA_CAPTURAS, 'campos-cuadro-ajustes.png')
 });
 

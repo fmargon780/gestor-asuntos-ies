@@ -1,18 +1,20 @@
 /* Prueba en navegador de verdad de la fila 245 de docs/COLA.md
-   (docs/CAMPO-DESDE-EL-ASUNTO.md): añadir un campo desde un asunto abierto.
+   (docs/CAMPO-DESDE-EL-ASUNTO.md), puesta al día en la fila 584 con lo que cambió la fila 530
+   (docs/530-DATOS-EN-EL-ASUNTO.md, punto 8): «+ Añadir campo» ya no abre el panel de Ajustes con pestañas y
+   «¿Dónde se guarda?», sino la ventana «Elegir un campo» con el desplegable «Para»
+   (Solo este asunto · Los siguientes: pedirlo al crear · Los siguientes: en la parte general). El valor ya no se
+   pide en la ventana: el campo sale en su sitio, con su caja para escribirlo.
 
-   1. «+ Añadir campo» en «Campos del asunto»: abre el panel de Ajustes.
-   2. Elegir un campo, su valor, «¿Dónde se guarda?» («En el tipo …» marcada,
-      «Llegará a N … vacío»), aviso verde con «Deshacer».
-   3. El campo entra en el tipo, sin «Obligatorio» ni «Añadir al nombre».
-   4. El otro asunto del tipo lo tiene, vacío (en «Cambiar el asunto»).
-   5. «Solo en este asunto»: marca «solo aquí»; el tipo y el otro asunto no.
-   6. «Deshacer»: el tipo vuelve atrás y en este asunto se queda «solo aquí».
-   7. «⋮» → «Pasar al tipo» y «Quitar».
-   8. Escape en «¿Dónde se guarda?»: no se guarda nada.
-   9. Un campo propio nuevo, creado desde el panel, funciona igual.
-   10. En el ARCHIVO y en modo consulta no sale «+ Añadir campo».
-   Más: sin tipo no se pregunta dónde, y las funciones puras. */
+   1. «+ Añadir campo» en «Campos del asunto» abre «Elegir un campo», con el desplegable «Para».
+   2. «Los siguientes: pedirlo al crear»: el campo entra en el tipo, sin «Obligatorio» ni «Añadir al nombre»; el otro
+      asunto del tipo lo trae, vacío (en «Cambiar el asunto»); aviso verde.
+   3. «Solo este asunto»: marca «solo aquí»; el tipo y el otro asunto no cambian.
+   4. «⋮» → «Pasar al tipo» y «Quitar».
+   5. Cerrar la ventana no guarda nada.
+   6. Sin tipo solo se ofrece «Solo este asunto».
+   7. En el ARCHIVO y en modo consulta no sale «+ Añadir campo».
+   8. Pulsar el botón no cambia de pestaña.
+   9. Un fallo al guardar nunca se queda en silencio. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -95,14 +97,18 @@ const fichaDe = (nombre) => pagina.evaluate((n) => {
 const avisos = () => pagina.evaluate(() => Array.prototype.map.call(
   document.querySelectorAll('#mensajes .mensaje'), (m) => m.firstChild.textContent));
 
-/* Abre el panel, va a «Míos» y añade el campo propio `nombre`. */
-async function elegirPropio(nombre) {
+/* Abre «Elegir un campo», va al grupo «Asunto», pone el «Para» y pulsa el campo `nombre`. */
+async function abrirVentana() {
   await pagina.click('#ficha-campo-anadir');
-  await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-  await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
-  await pagina.waitForSelector('#campos-mios-lista .fila-tipo');
-  await pagina.locator('#campos-mios-lista .fila-tipo', { hasText: nombre }).getByRole('button', { name: 'Añadir' }).click();
-  await pagina.waitForSelector('#capa:not(.oculto) #cad-valor');
+  await pagina.waitForSelector('.capa-campos .campos-grupo');
+  await pagina.locator('.campos-grupo', { hasText: 'Asunto' }).click();
+  await pagina.waitForSelector('.capa-campos .campos-fila-campo');
+}
+async function elegirCampo(nombre, para) {
+  await abrirVentana();
+  if (para) await pagina.selectOption('#ce-para', para);
+  await pagina.locator('.campos-fila-campo', { hasText: nombre }).first().click();
+  await pagina.waitForTimeout(900);
 }
 
 /* 0. Las funciones puras. */
@@ -115,7 +121,7 @@ await comprobar('0. el aviso de después',
   pagina.evaluate(() => [CampoDesdeElAsunto.textoAlTipo('CONV', 3), CampoDesdeElAsunto.textoAlTipo('CONV', 1), CampoDesdeElAsunto.textoAlTipo('CONV', 0)]),
   ['Campo añadido al tipo CONV y a 3 asuntos abiertos.', 'Campo añadido al tipo CONV y a 1 asunto abierto.', 'Campo añadido al tipo CONV.']);
 
-/* 1. El botón y el panel. */
+/* 1. El botón y la ventana. */
 await abrirFichaDe('Sola Uno');
 await comprobar('1. la tarjeta «Campos del asunto» lleva el botón en su título (fila 254)',
   pagina.evaluate(() => ({ boton: document.getElementById('ficha-campo-anadir').textContent,
@@ -123,150 +129,87 @@ await comprobar('1. la tarjeta «Campos del asunto» lleva el botón en su títu
     titulo: (document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"] > .ficha-titulo').firstChild.textContent.trim()),
     viejo: document.body.textContent.indexOf('Datos del trámite') !== -1 })),
   { boton: '+ Añadir campo', enTitulo: true, titulo: 'Campos del asunto', viejo: false });
-await pagina.click('#ficha-campo-anadir');
-await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-await comprobar('1. sale el mismo panel de Ajustes, con sus tres pestañas',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#campos-catalogo-pestanas .pestana-categoria'),
-    (b) => b.dataset.pestana)), ['ficha', 'mios', 'calculados']);
-await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
-await pagina.waitForSelector('#campos-mios-lista .fila-tipo');
-await comprobar('1. los campos propios, sin los que el asunto ya tiene',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#campos-mios-lista .nombre-tipo'), (x) => x.textContent)),
-  ['Trimestre', 'Observaciones', 'Extra']);
-await pagina.click('#campos-catalogo-volver');
-await comprobar('1. «← Volver» cierra el cuadro sin guardar nada',
-  pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')), true);
+await abrirVentana();
+await comprobar('1. sale «Elegir un campo», con los campos del grupo «Asunto» y el desplegable «Para»',
+  pagina.evaluate(() => ({ titulo: document.querySelector('.capa-campos .campos-elegir-titulo h3').textContent,
+    campos: Array.prototype.map.call(document.querySelectorAll('.campos-fila-campo .campos-fila-nombre'), (x) => x.textContent).slice(0, 3),
+    para: Array.prototype.map.call(document.querySelectorAll('#ce-para option'), (o) => o.value) })),
+  { titulo: 'Elegir un campo', campos: ['Trimestre', 'Observaciones', 'Extra'], para: ['aqui', 'crear', 'general'] });
+await pagina.click('#ce-cerrar');
+await comprobar('1. «Cerrar» cierra la ventana sin guardar nada',
+  Promise.all([pagina.locator('.capa-campos').count(), configTipo().then((c) => c.length), fichaDe(ASUNTO_1).then((f) => Object.keys(f.campos || {}).length)]), [0, 0, 0]);
 
-/* 2. Un campo al tipo. */
-await elegirPropio('Trimestre');
-await pagina.selectOption('#cad-valor', '2º');
-await comprobar('2. «En el tipo» marcada y la frase de a cuántos llega, vacío',
-  pagina.evaluate(() => ({
-    marcada: document.querySelector('input[name="dsg-donde"]:checked').value,
-    opcion: document.querySelector('.dsg-opcion span').textContent,
-    nota: (document.querySelector('.dsg-nota') || {}).textContent
-  })), { marcada: 'guia', opcion: 'En el tipo CONVALIDACION', nota: 'Llegará a 1 asunto abierto de este tipo, vacío.' });
-await pagina.press('#cad-valor', 'Enter');
-await pagina.waitForTimeout(700);
-await comprobar('2. aviso verde con «Deshacer»',
-  pagina.evaluate(() => {
-    const m = Array.prototype.filter.call(document.querySelectorAll('#mensajes .mensaje'), (x) => x.textContent.indexOf('Campo añadido') === 0)[0];
-    return m ? { texto: m.firstChild.textContent, boton: m.querySelector('.mensaje-boton').textContent } : null;
-  }), { texto: 'Campo añadido al tipo CONVALIDACION y a 1 asunto abierto.', boton: 'Deshacer' });
-await comprobar('2. el campo sale en la ficha con su valor', filasDatos(), ['Trimestre2º']);
-await comprobar('2. el valor está en la ficha del asunto, sin ir al nombre',
-  fichaDe(ASUNTO_1).then((f) => ({ c: f.campos['propio:p1'], solo: f.solo })), { c: { valor: '2º', enNombre: false }, solo: undefined });
-
-/* 3. Ajustes del tipo. */
-await comprobar('3. el tipo lo lleva, al final, sin Obligatorio ni Añadir al nombre', configTipo(),
+/* 2. Un campo al tipo («Los siguientes: pedirlo al crear»). */
+await elegirCampo('Trimestre', 'crear');
+await comprobar('2. aviso: está en la parte general y llega a los siguientes asuntos',
+  avisos().then((a) => a.indexOf('«Trimestre»: la parte general, y se pide al crear el asunto, también en los siguientes asuntos.') !== -1), true);
+await comprobar('2. el tipo lo lleva, al final, sin Obligatorio ni Añadir al nombre', configTipo(),
   [{ origen: 'propio', id: 'p1', obligatorio: false, enNombre: false }]);
-
-/* 4. El otro asunto del tipo lo tiene, vacío. */
-await comprobar('4. «Cambiar el asunto» del otro asunto trae el campo, vacío',
+await comprobar('2. no sale «solo aquí» en este asunto', fichaDe(ASUNTO_1).then((f) => f.solo), undefined);
+await comprobar('2. «Cambiar el asunto» del otro asunto trae el campo, vacío',
   pagina.evaluate((n) => {
     const r = App.pintarCamposEditar('CONVALIDACION', {}, App.E.registro.asuntos[n] || {});
     return r.items.map((i) => ({ nombre: i.nombre, valor: i.valor, solo: i.soloAqui }));
   }, ASUNTO_2), [{ nombre: 'Trimestre', valor: '', solo: false }]);
 
-/* 5. «Solo en este asunto». */
+/* 3. «Solo este asunto». */
 await pagina.waitForTimeout(8500);   /* que caduque el aviso anterior */
-await elegirPropio('Observaciones');
-await pagina.fill('#cad-valor', 'Falta el sello');
-await pagina.click('input[name="dsg-donde"][value="aqui"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(600);
+await elegirCampo('Observaciones', 'aqui');
 const soloAqui = (nombre) => pagina.evaluate((n) => Array.prototype.map.call(
   Array.prototype.filter.call(document.querySelectorAll('#ficha-datos-tramite .ficha-dato-aqui'), (f) => f.textContent.indexOf(n) !== -1),
-  (f) => ({ campo: f.children[0].firstChild.textContent.trim(), marca: f.querySelector('.marca-solo-aqui').textContent,
-    valor: f.children[1].firstChild.textContent.trim(), menu: !!f.querySelector('.campo-aqui-menu') })), nombre);
-await comprobar('5. sale en la ficha con «solo aquí»', soloAqui('Observaciones'),
-  [{ campo: 'Observaciones', marca: 'solo aquí', valor: 'Falta el sello', menu: true }]);
-await comprobar('5. el tipo no cambia', configTipo().then((c) => c.map((x) => x.id)), ['p1']);
-await comprobar('5. en el otro asunto no está',
-  fichaDe(ASUNTO_2).then((f) => f.solo), undefined);
-await comprobar('5. aviso: solo a este asunto', avisos().then((a) => a.indexOf('Campo añadido solo a este asunto.') !== -1), true);
-await comprobar('5. en «Cambiar el asunto» sale también, sin «Añadir al nombre»',
+  (f) => ({ campo: f.children[0].firstChild.textContent.trim(), marca: f.querySelector('.marca-solo-aqui').textContent, menu: !!f.querySelector('.campo-aqui-menu') })), nombre);
+await comprobar('3. sale en la ficha con «solo aquí» y su «⋮»', soloAqui('Observaciones'),
+  [{ campo: 'Observaciones', marca: 'solo aquí', menu: true }]);
+await comprobar('3. el tipo no cambia', configTipo().then((c) => c.map((x) => x.id)), ['p1']);
+await comprobar('3. en el otro asunto no está', fichaDe(ASUNTO_2).then((f) => f.solo), undefined);
+await comprobar('3. aviso: solo en este asunto', avisos().then((a) => a.some((t) => /^«Observaciones» sale en .*, solo en este asunto\.$/.test(t))), true);
+await comprobar('3. en «Cambiar el asunto» sale también, sin «Añadir al nombre»',
   pagina.evaluate((n) => {
     const r = App.pintarCamposEditar('CONVALIDACION', App.E.registro.asuntos[n].campos, App.E.registro.asuntos[n]);
-    return { items: r.items.map((i) => i.nombre + ':' + i.valor + ':' + i.soloAqui),
-      sinCasilla: r.html.indexOf('ed-campo-1-en') === -1, conCasilla: r.html.indexOf('ed-campo-0-en') !== -1 };
-  }, ASUNTO_1), { items: ['Trimestre:2º:false', 'Observaciones:Falta el sello:true'], sinCasilla: true, conCasilla: false });
+    return { items: r.items.map((i) => i.nombre + ':' + i.soloAqui), sinCasilla: r.html.indexOf('ed-campo-1-en') === -1 };
+  }, ASUNTO_1), { items: ['Trimestre:false', 'Observaciones:true'], sinCasilla: true });
 
-/* 6. «Deshacer». */
-await pagina.waitForTimeout(8500);
-await elegirPropio('Extra');
-await pagina.fill('#cad-valor', 'dato extra');
-await pagina.press('#cad-valor', 'Enter');
-await pagina.waitForTimeout(700);
-await comprobar('6. ahora el tipo lo lleva', configTipo().then((c) => c.map((x) => x.id)), ['p1', 'p3']);
-await pagina.click('#mensajes .mensaje-boton');
-await pagina.waitForTimeout(800);
-await comprobar('6. el tipo vuelve a como estaba', configTipo().then((c) => c.map((x) => x.id)), ['p1']);
-await comprobar('6. en este asunto se queda «solo aquí», con su valor',
-  fichaDe(ASUNTO_1).then((f) => ({ v: f.campos['propio:p3'].valor, solo: f.solo.map((c) => c.id) })), { v: 'dato extra', solo: ['p2', 'p3'] });
-await comprobar('6. aviso de deshecho', avisos().then((a) => a.indexOf('Deshecho: se queda solo en este asunto.') !== -1), true);
-
-/* 7. «⋮» → Pasar al tipo / Quitar. */
+/* 4. «⋮» → Pasar al tipo / Quitar. */
 await pagina.waitForTimeout(8500);
 await pagina.locator('.ficha-dato-aqui', { hasText: 'Observaciones' }).locator('.campo-aqui-menu').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar al tipo' }).click();
 await pagina.waitForTimeout(700);
-await comprobar('7. «Pasar al tipo»: está en el tipo y pierde la marca',
-  Promise.all([configTipo().then((c) => c.map((x) => x.id)),
-    pagina.locator('.ficha-dato-aqui', { hasText: 'Observaciones' }).count(),
-    fichaDe(ASUNTO_1).then((f) => f.campos['propio:p2'].valor)]), [['p1', 'p2'], 0, 'Falta el sello']);
+await comprobar('4. «Pasar al tipo»: está en el tipo y pierde la marca',
+  Promise.all([configTipo().then((c) => c.map((x) => x.id)), pagina.locator('.ficha-dato-aqui', { hasText: 'Observaciones' }).count(), fichaDe(ASUNTO_1).then((f) => f.solo)]),
+  [['p1', 'p2'], 0, undefined]);
+await pagina.waitForTimeout(8500);
+await elegirCampo('Extra', 'aqui');
 await pagina.locator('.ficha-dato-aqui', { hasText: 'Extra' }).locator('.campo-aqui-menu').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(600);
-await comprobar('7. «Quitar» (con confirmación): desaparece de la ficha y su valor también',
-  Promise.all([pagina.locator('#ficha-datos-tramite .ficha-dato', { hasText: 'Extra' }).count(),
-    fichaDe(ASUNTO_1).then((f) => ({ v: f.campos['propio:p3'], solo: f.solo }))]), [0, { v: undefined, solo: undefined }]);
+await comprobar('4. «Quitar» (con confirmación): desaparece de la ficha y no queda en el asunto',
+  Promise.all([pagina.locator('.ficha-dato-aqui', { hasText: 'Extra' }).count(), fichaDe(ASUNTO_1).then((f) => f.solo)]), [0, undefined]);
 
-/* 8. Escape no guarda nada. */
+/* 5. Cerrar con Escape no guarda nada. */
 await pagina.waitForTimeout(8500);
-await elegirPropio('Extra');
-await pagina.fill('#cad-valor', 'no debe guardarse');
+await abrirVentana();
 await pagina.keyboard.press('Escape');
 await pagina.waitForTimeout(300);
-await comprobar('8. Escape: ni el tipo ni la ficha cambian',
-  Promise.all([configTipo().then((c) => c.map((x) => x.id)), fichaDe(ASUNTO_1).then((f) => Object.keys(f.campos)), fichaDe(ASUNTO_1).then((f) => f.solo)]),
-  [['p1', 'p2'], ['propio:p1', 'propio:p2'], undefined]);
+await comprobar('5. Escape: ni el tipo ni la ficha cambian',
+  Promise.all([pagina.locator('.capa-campos').count(), configTipo().then((c) => c.map((x) => x.id)), fichaDe(ASUNTO_1).then((f) => f.solo)]),
+  [0, ['p1', 'p2'], undefined]);
 
-/* 9. Un campo propio nuevo, desde el panel. */
-await pagina.click('#ficha-campo-anadir');
-await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
-await pagina.click('#campos-mios-crear');
-await pagina.fill('#propio-nombre', 'Fecha de entrega');
-await pagina.click('#propio-crear');
-await pagina.waitForSelector('#capa:not(.oculto) #cad-valor');
-await pagina.fill('#cad-valor', 'mañana');
-await pagina.click('input[name="dsg-donde"][value="aqui"]');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(700);
-await comprobar('9. el campo nuevo existe y sale «solo aquí»',
-  Promise.all([pagina.evaluate(() => App.E.campos.propios.map((p) => p.nombre)), soloAqui('Fecha de entrega')]),
-  [['Trimestre', 'Observaciones', 'Extra', 'Actividades desde', 'Actividades hasta', 'Fecha de entrega'],
-   [{ campo: 'Fecha de entrega', marca: 'solo aquí', valor: 'mañana', menu: true }]]);
+/* 6. Sin tipo solo se ofrece «Solo este asunto». */
+await comprobar('6. sin tipo, el «Para» solo ofrece «Solo este asunto»; con tipo, las tres',
+  pagina.evaluate((n) => {
+    const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0];
+    const con = CampoElegirEnAsunto.opcionesPara(a).map((o) => o.valor);
+    const tipoDe = DatosDelAsunto.tipoDe;
+    DatosDelAsunto.tipoDe = () => '';
+    const sin = CampoElegirEnAsunto.opcionesPara(a).map((o) => o.valor);
+    DatosDelAsunto.tipoDe = tipoDe;
+    return [sin, con];
+  }, ASUNTO_1), [['aqui'], ['aqui', 'crear', 'general']]);
 
-/* Sin tipo: no se pregunta dónde, se guarda solo en el asunto. */
-await pagina.waitForTimeout(8500);
-await pagina.evaluate(() => { window.__tipoDe = DondeSeGuarda.tipoDe; DondeSeGuarda.tipoDe = () => ''; });
-await elegirPropio('Extra');
-await comprobar('sin tipo: no sale «¿Dónde se guarda?»', pagina.evaluate(() => !document.querySelector('.dsg')), true);
-await pagina.fill('#cad-valor', 'sin tipo');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(600);
-await comprobar('sin tipo: se guarda solo en el asunto, y el tipo no cambia',
-  Promise.all([configTipo().then((c) => c.map((x) => x.id)),
-    fichaDe(ASUNTO_1).then((f) => ({ solo: f.solo.map((c) => c.id).indexOf('p3') !== -1, v: f.campos['propio:p3'].valor }))]),
-  [['p1', 'p2'], { solo: true, v: 'sin tipo' }]);
-await pagina.evaluate(() => { DondeSeGuarda.tipoDe = window.__tipoDe; });
-
-/* 10. El ARCHIVO y el modo consulta. */
-await comprobar('10. en el ARCHIVO no sale «+ Añadir campo»',
+/* 7. El ARCHIVO y el modo consulta. */
+await comprobar('7. en el ARCHIVO no sale «+ Añadir campo»',
   pagina.evaluate((n) => {
     const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0];
     App.abrirFicha(a, 'archivado');
@@ -276,69 +219,32 @@ await pagina.evaluate((n) => { App.abrirFicha(App.E.listaAbiertos.filter((x) => 
 await pagina.waitForSelector('#ficha-campo-anadir');
 await pagina.evaluate(() => { FichaNucleo.ocupacionActual = { usuario: 'Compañero' }; FichaNucleo.pintar(); });
 await pagina.waitForTimeout(400);
-await comprobar('10. en modo consulta el botón y los «⋮» no se ven',
+await comprobar('7. en modo consulta el botón y los «⋮» no se ven',
   pagina.evaluate(() => ({
     boton: getComputedStyle(document.getElementById('ficha-campo-anadir')).display,
     menu: Array.prototype.every.call(document.querySelectorAll('.campo-aqui-menu'), (b) => getComputedStyle(b.closest('.ficha-menu-envoltorio') || b).display === 'none' || getComputedStyle(b).display === 'none')
   })), { boton: 'none', menu: true });
 
-/* 11. Fila 254: pulsar el botón no abre ni cierra la tarjeta (fila 425: ni cambia de pestaña). */
+/* 8. Fila 254: pulsar el botón no abre ni cierra la tarjeta (fila 425: ni cambia de pestaña). */
 await pagina.evaluate((n) => { FichaNucleo.ocupacionActual = null; App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'); }, ASUNTO_1);
 await pagina.waitForSelector('#ficha-campo-anadir');
 await pagina.waitForTimeout(400);
 await pagina.click('#ficha-campo-anadir');
-await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-await comprobar('11. el botón no cambia de pestaña',
+await pagina.waitForSelector('.capa-campos .campos-grupo');
+await comprobar('8. el botón no cambia de pestaña',
   pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta || ''), 'tramite');
+await pagina.click('#ce-cerrar');
 
-/* 12. La ventana ancha: 1280 de ancho, tres columnas o más, solo baja la rejilla. */
-await pagina.setViewportSize({ width: 1280, height: 800 });
-await pagina.evaluate(() => {
-  App.E.campos.propios = App.E.campos.propios.concat(Array.from({ length: 40 }, (_, i) => ({ id: 'z' + i, nombre: 'Campo de relleno número ' + i + ' con un nombre largo largo largo', clase: 'texto', valores: [] })));
-});
-await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
-await pagina.waitForSelector('#campos-mios-lista .fila-tipo');
-await pagina.waitForTimeout(300);
-const medida = () => pagina.evaluate(() => {
-  const c = document.querySelector('#capa .cuadro');
-  const rej = document.getElementById('campos-mios-lista');
-  const cuerpo = document.getElementById('campos-catalogo-cuerpo');
-  const f = document.querySelector('.campos-catalogo-franja').getBoundingClientRect();
-  const antes = f.top;
-  cuerpo.scrollTop = 300;
-  const despues = document.querySelector('.campos-catalogo-franja').getBoundingClientRect().top;
-  const nombre = document.querySelector('#campos-mios-lista .nombre-tipo');
-  return { ancho: Math.round(c.getBoundingClientRect().width),
-    columnas: getComputedStyle(rej).gridTemplateColumns.split(' ').length,
-    cabeEnPantalla: c.getBoundingClientRect().height <= window.innerHeight,
-    soloBajaLaRejilla: cuerpo.scrollHeight > cuerpo.clientHeight && antes === despues && cuerpo.scrollTop > 0,
-    nombreCortado: nombre.scrollWidth > nombre.clientWidth ? nombre.title.length > 0 : true,
-    franjaUnaLinea: f.height < 90 };
-});
-const m1280 = await medida();
-await comprobar('12. a 1280: ventana ancha, 3 columnas o más, solo baja la rejilla',
-  Promise.resolve([m1280.ancho >= 1150, m1280.columnas >= 3, m1280.cabeEnPantalla, m1280.soloBajaLaRejilla, m1280.nombreCortado, m1280.franjaUnaLinea]),
-  [true, true, true, true, true, true]);
-await pagina.setViewportSize({ width: 600, height: 800 });
-await pagina.waitForTimeout(200);
-await comprobar('12. a 600: una sola columna',
-  pagina.evaluate(() => getComputedStyle(document.getElementById('campos-mios-lista')).gridTemplateColumns.split(' ').length), 1);
-await pagina.setViewportSize({ width: 1500, height: 1000 });
-await pagina.click('#campos-catalogo-volver');
-
-/* 13. Un fallo al guardar nunca se queda en silencio (aviso rojo, y el campo no sale). */
+/* 9. Un fallo al guardar nunca se queda en silencio (aviso rojo, y el campo no sale). */
 await pagina.evaluate(() => {
   window.__guardarOrig = Campos.guardarConfigDeTipo;
   Campos.guardarConfigDeTipo = async () => { throw new Error('disco roto'); };
+  document.querySelectorAll('#mensajes .mensaje').forEach((m) => m.remove());
 });
-await pagina.evaluate(() => document.querySelectorAll('#mensajes .mensaje').forEach((m) => m.remove()));
-await elegirPropio('número 5 con');
-await pagina.fill('#cad-valor', 'x');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(800);
-await comprobar('13. con el guardado roto sale un aviso rojo que dice qué ha fallado',
+await elegirCampo('Fecha de la entrega original', 'crear');
+await comprobar('9. con el guardado roto sale un aviso rojo que dice qué ha fallado',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#mensajes .mensaje.malo'), (m) => m.textContent.indexOf('No he podido añadir el campo') === 0)), [true]);
-await comprobar('13. y el campo no aparece en la ficha', filasDatos().then((f) => f.some((x) => x.indexOf('Campo de relleno') === 0)), false);
+await comprobar('9. y el campo no entra en el tipo', configTipo().then((c) => c.length), 2);
 await pagina.evaluate(() => { Campos.guardarConfigDeTipo = window.__guardarOrig; });
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);

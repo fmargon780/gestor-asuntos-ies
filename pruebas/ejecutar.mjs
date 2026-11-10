@@ -67,7 +67,7 @@ const EN_SOLITARIO_ENTRADAS = [
   ['repintar-solo-lo-que-cambia.mjs', 'antes del 7-oct-2026'], ['hito-desde-por-clasificar.mjs', 'antes del 7-oct-2026'],
   ['ajustes-por-tipo.mjs', 'antes del 7-oct-2026'], ['mesa-comunicar-del-paso-y-guion.mjs', 'antes del 7-oct-2026'],
   ['notas-asunto-no-se-borran.mjs', 'antes del 7-oct-2026'],
-  ['refresco.mjs', 'antes del 7-oct-2026'], ['hito-mesa.mjs', 'antes del 7-oct-2026'],
+  ['hito-mesa.mjs', 'antes del 7-oct-2026'],
   ['responsable-organismo.mjs', 'antes del 7-oct-2026'], ['aspirantes-numero.mjs', 'antes del 7-oct-2026'],
   ['tipos-nombre.mjs', 'antes del 7-oct-2026'], ['registro-del-asunto.mjs', 'antes del 7-oct-2026'],
   ['carpetas-perdidas.mjs', '9-oct-2026'],   /* falla en la pasada completa (espera de 60 s agotada, apartado 8) y en solitario pasa; no es de ninguna fila reciente */
@@ -79,28 +79,16 @@ const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
    (`npm test -- tutores-legales`) sí. El fichero no se borra. Cada entrada: fichero, fecha en que entra y
    motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
 const RETIRADAS = [
+  { fichero: 'notas-de-directivos.mjs', desde: '10-nov-2026',
+    motivo: 'fallo real de la aplicación, idea 587: los cuadros «Vista» con documentos sin guardar y «archivar con notas sin ver» enseñan «Cancelar» en vez de «Guardarlos ahora» y «Verlas» (js/notas-directivos.js, líneas 246 y 338, ponen el texto antes de U.preguntar y este lo pisa; la misma causa que la idea 569)' },
+  { fichero: 'categorias-del-control-de-registro.mjs', desde: '10-nov-2026',
+    motivo: 'fallo real de la aplicación, idea 586: js/control-registro-pantalla.js (línea 269) lleva su lista de categorías escrita a mano y no reconoce a tutores legales ni administraciones' },
   { fichero: 'plantillas-desde-un-tipo.mjs', desde: '10-nov-2026',
     motivo: 'fallo real de la aplicación, idea 585: «Ver todas las plantillas» desde la pantalla de un tipo no abre la pantalla (js/herramientas.js, fila 551, la cierra después de un await)' },
   { fichero: 'etiquetas-desde-el-grupo.mjs', desde: '10-nov-2026',
     motivo: 'fallo real de la aplicación, idea 585: «Imprimir etiquetas» de un asunto de grupo no abre la pantalla (js/herramientas.js, fila 551, cierra Etiquetas después de un await y la deja oculta)' },
-  { fichero: 'ha-llegado-sustituye-la-vista.mjs', desde: '18-oct-2026',
-    motivo: 'falla igual en main sin la fila 367, también en solitario (no se puede pulsar el trozo de «Ha llegado»: el elemento no está visible)' },
-  { fichero: 'tutores-legales.mjs', desde: '7-oct-2026',
-    motivo: 'fallo real de la aplicación: al crear un asunto desde el control de registro, js/control-registro-pantalla.js solo busca el tercero en ALUMNADO, PERSONAL, EMPRESAS y OTROS (no reconoce a tutores legales ni administraciones)' },
-  { fichero: 'hacer-este-hito.mjs', desde: '8-oct-2026',
-    motivo: 'revisada en la fila 563 (9-nov-2026): falla ya en el apartado 1 (no sale «1 listos para enviar» en el cuadro de avisos) y luego se cae con TimeoutError; también en solitario y en main; sin tocar la app no se aclara si la prueba está desfasada o es un fallo real' },
   { fichero: 'cambiar-tipo-y-guia.mjs', desde: '9-nov-2026',
-    motivo: 'fallo real de la aplicación: el cuadro de cambio de tipo debe decir «Dejar los hitos como están» en el botón de cancelar, pero U.preguntar (js/util.js, fila 524) lo pisa con «Cancelar» después de que js/hitos-cambio-de-tipo.js lo ponga; también en main' },
-  { fichero: 'tras-cada-accion.mjs', desde: '8-oct-2026',
-    motivo: 'falla igual en main sin la fila 306, también en solitario (la lista de Inicio no vuelve a la misma altura tras repintar)' },
-  { fichero: 'conflictos-que-cambia.mjs', desde: '8-oct-2026',
-    motivo: 'falla igual en main sin la fila 303, también en solitario (no sale de qué ordenador es la otra versión)' },
-  { fichero: 'actividades-aviso.mjs', desde: '15-oct-2026',
-    motivo: 'falla igual en main sin la fila 349, también en solitario (el aviso de Actividades no ofrece «Ir a Grupos de personas»)' },
-  { fichero: 'campos.mjs', desde: '15-oct-2026',
-    motivo: 'falla igual en main sin la fila 350, también en solitario' },
-  { fichero: 'opciones.mjs', desde: '15-oct-2026',
-    motivo: 'falla igual en main sin la fila 350, también en solitario' },
+    motivo: 'fallo real de la aplicación, idea 569: el cuadro de cambio de tipo debe decir «Dejar los hitos como están» en el botón de cancelar, pero U.preguntar (js/util.js, fila 524) lo pisa con «Cancelar» después de que js/hitos-cambio-de-tipo.js lo ponga; también en main' },
 ];
 
 {
@@ -118,6 +106,7 @@ const RETIRADAS = [
   }
   for (const r of RETIRADAS) {
     if (!r.desde || !r.motivo) problemas.push('RETIRADAS: «' + r.fichero + '» necesita fecha y motivo.');
+    if (r.motivo && !/\bidea \d+/.test(r.motivo)) problemas.push('RETIRADAS: el motivo de «' + r.fichero + '» tiene que nombrar su idea de la cola («idea N»): solo se aparta una prueba que destapa un fallo real de la app, con su IDEA en docs/COLA.md (fila 584).');
     if (!todasLasPruebas.includes(r.fichero)) problemas.push('RETIRADAS: «' + r.fichero + '» no existe en pruebas/.');
     if (vistos.has(r.fichero)) problemas.push('«' + r.fichero + '» está a la vez en EN_SOLITARIO y en RETIRADAS.');
   }

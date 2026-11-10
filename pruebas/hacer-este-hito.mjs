@@ -39,7 +39,15 @@ async function paginaNueva(consulta) {
 }
 
 let pagina = await paginaNueva(false);
-const avisos = () => pagina.$$eval('#avisos-linea .avisos-linea-trozo', (e) => e.map((x) => x.textContent));
+/* Fila 584: desde la fila 353 el cuadro de avisos de Inicio va plegado («N avisos ▸»); se abre como lo haría la usuaria, se lee y se vuelve a plegar. */
+const avisos = async () => {
+  /* La línea puede no estar a la vista (otra pantalla, cabecera encogida): se pulsa por el DOM, que no exige verla. */
+  const estabaPlegado = await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-plegado'); if (b) b.click(); return !!b; });
+  if (estabaPlegado) await pagina.waitForTimeout(300);
+  const textos = await pagina.$$eval('#avisos-linea .avisos-linea-trozo', (e) => e.map((x) => x.textContent));
+  if (estabaPlegado) await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-pliega'); if (b) b.click(); });
+  return textos;
+};
 const mensajes = () => pagina.$$eval('#mensajes .mensaje', (e) => e.map((x) => x.textContent));
 const hitoDe = (frag) => pagina.evaluate(async (frag) => {
   const a = Gestor.asuntos().filter((x) => x.nombre.indexOf(frag) !== -1)[0];
@@ -60,7 +68,8 @@ async function abrirMesa(frag) {
   await pagina.waitForTimeout(1200);
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
-  if (!(await pagina.locator('#ficha-guia.con-mesa').count())) await pagina.locator('#ficha-guia .hito .hito-titulo').first().click();
+  /* Fila 425: la mesa del hito actual se abre sola al entrar; se espera a ella (antes se miraba a los 400 ms). */
+  await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 15000 });
   await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 10000 });
   /* Fila 425: al entrar se abre el hito actual; esta prueba trabaja con el primero de la guía. */
   const primero = pagina.locator('.hito-en-mesa .mesa-tira-hito').first();
@@ -178,8 +187,7 @@ const consulta = await paginaNueva(true);
 await consulta.locator('#inicio-tabla-cuerpo tr[data-asunto*="Vidal Soto"] .tarjeta-nombre').first().click();
 await consulta.waitForTimeout(1200);
 await consulta.evaluate(() => FichaTarjetas.abrir('hitos'));
-await consulta.locator('#ficha-guia .hito .hito-titulo').first().click();
-await consulta.waitForSelector('#ficha-guia.con-mesa', { timeout: 10000 });
+await consulta.waitForSelector('#ficha-guia.con-mesa', { timeout: 15000 });   /* fila 425: se abre sola */
 await consulta.waitForTimeout(600);
 await comprobar('7. el botón está apagado', consulta.locator('.hito-en-mesa .mesa-hacer-hito').isDisabled(), true);
 
