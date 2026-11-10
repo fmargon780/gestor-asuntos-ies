@@ -136,6 +136,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   se elige **solo entre las clases permitidas** del tipo.
 - (30-oct-2026, tema 492) En «Nuevo asunto» **no hay pastilla «Todas»**: sin ninguna pulsada salen
   las clases permitidas; una pastilla se fija pulsándola y se suelta pulsándola otra vez.
+- (10-nov-2026, tema 502) En «Cambiar el asunto», el aviso ámbar de tercero de otra clase sale
+  solo si la clase del tercero no es **ninguna** de las clases permitidas del tipo («Estoy de acuerdo»).
 
 ## Libros de texto
 

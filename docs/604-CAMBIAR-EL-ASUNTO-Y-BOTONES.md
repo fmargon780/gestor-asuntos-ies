@@ -1,4 +1,4 @@
-# 502 — «Cambiar el asunto» y botones de los cuadros
+# 604 — «Cambiar el asunto» y botones de los cuadros
 
 ## Lo que escribió Francisco
 Tema: «Cambiar el asunto» y botones de los cuadros. Junta las ideas 494, 569 y 595: que el aviso ámbar de tercero de otra clase no salga cuando la clase del tercero es una de las permitidas del tipo; que, al cambiar el tipo de un asunto, la pregunta de después diga «Dejar los hitos como están» en vez de «Cancelar»; y que los cuadros «Vista con documentos sin guardar» y «archivar con notas sin ver» de las notas de directivos digan «Guardarlos ahora» y «Verlas», que hoy salen como «Cancelar» por la misma causa. Las tres parecen tareas pequeñas.
