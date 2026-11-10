@@ -78,4 +78,13 @@ vez de todos los del grupo. Lo decidió Francisco al diseñar el tema 134 del Ce
 - En una plantilla de correo, mira que el papel se llama «Sus profesores».
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (10-nov-2026, copia de pruebas local, sin leer el código):
+  - Profesores de un alumno al escribir «profesor»: coincide (Otero Campos, Reyes Palma, Cabello Ruiz; Uceda Molina, que no le da clase, no sale).
+  - Escribir una materia: coincide. Dos materias de un profesor, una sola vez: coincide.
+  - Asunto de grupo: no lo he podido ver del todo con la demo (sus grupos no traen unidad o solo un profesor); lo cubre `pruebas/sus-profesores.mjs` con datos propios (4º A: cuatro profesores, una vez cada uno).
+  - Varios alumnos: visto con un relacionado puesto desde la consola (la profesora común sale una vez); `pruebas/sus-profesores.mjs` lo comprueba.
+  - Plantilla: coincide («Sus profesores» en Copia coloca a los que tienen correo; el que no, no).
+  - Sin correo: coincide en lo visible («Falta el correo de…» con casilla; guardarlo lo cubre la prueba).
+  - Sin el dato del curso: no sale nadie y no hay errores. Nada que el texto no pida.
+  - Observación: si el tutor del grupo es también profesor del alumno, sale en Para (como tutor) y en Copia (como profesor); el texto no lo trata y no se ha cambiado.
+  - Pruebas: `plantillas-pantalla` y `convertir-en-plantilla-pdf-pantalla` fallan igual en `main` sin esta fila (no son de este cambio).
