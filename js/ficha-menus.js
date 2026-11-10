@@ -92,6 +92,11 @@ var FichaMenus = (function () {
       }
       var m = menu.getBoundingClientRect(), b = disparador.getBoundingClientRect();
       if (m.bottom > limite && b.top - m.height - 4 > 0) menu.classList.add('ficha-menu-arriba');
+      /* Fila 603: el menú nunca queda bajo la barra lateral; si al abrirse hacia la izquierda no cabe, se corre hacia la derecha. */
+      menu.classList.remove('ficha-menu-derecha');
+      var lat = document.querySelector('.lateral');
+      var borde = lat ? lat.getBoundingClientRect().right : 0;
+      if (menu.getBoundingClientRect().left < borde) menu.classList.add('ficha-menu-derecha');
       abierto = propio;
     };
 

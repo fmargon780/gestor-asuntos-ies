@@ -266,7 +266,7 @@ var ControlRegistroPantalla = (function () {
     var h = ControlRegistro.hueso(parte);
     if (!h || !window.Datos || !App.E.datos) return null;
     var hallados = [];
-    var categorias = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+    var categorias = Nombres.CATEGORIAS;
     for (var i = 0; i < categorias.length; i++) {
       try {
         var f = await Datos.cargar(App.E.datos, categorias[i]);

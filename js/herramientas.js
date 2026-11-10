@@ -14,15 +14,18 @@
 App.pintarHerramientas = async function () {
   /* Fila 543: el bloque temporal «Tipos y su uso» sale al entrar, sin haber pasado antes por Ajustes. */
   if (window.TiposYSuUso) TiposYSuUso.crear();
+  /* Fila 603: Etiquetas y Plantillas se cierran ANTES de cualquier espera (se abren desde un asunto o un tipo con App.ir; si se cierran después de un await, quedan ocultas). */
+  if (window.EtiquetasPantalla) EtiquetasPantalla.cerrar();
+  if (window.PlantillasPantalla) PlantillasPantalla.cerrar();
   /* Fila 551: «Aplicar el plan de las guías» (js/plan-guias-pantalla.js); sale al entrar y desaparece al aplicarlo. */
   if (window.PlanGuiasAplicar) await PlanGuiasAplicar.leerMarca();
   if (window.PlanGuiasPantalla) PlanGuiasPantalla.crear();
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   /* Fila 344: las etiquetas también se cierran (antes de cualquier espera: se abren desde un asunto con App.ir); su botón se engancha. */
-  if (window.EtiquetasPantalla) { EtiquetasPantalla.cerrar(); EtiquetasPantalla.enlazarBloque(); }
+  if (window.EtiquetasPantalla) EtiquetasPantalla.enlazarBloque();
   /* Fila 320: lo mismo con la pantalla de plantillas; y la línea de su bloque («12 de Word · 30 de correo»). */
-  if (window.PlantillasPantalla) { PlantillasPantalla.cerrar(); await PlantillasPantalla.pintarBloque(); }
+  if (window.PlantillasPantalla) await PlantillasPantalla.pintarBloque();
   /* Fila 310: lo mismo con la pantalla de actividades extraescolares, que se reabre si se vuelve de la ficha de una actividad. */
   if (window.ActividadesPantalla) await ActividadesPantalla.alEntrarEnHerramientas();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();

@@ -102,6 +102,7 @@
   min-width: 220px; background: var(--papel); border: 1px solid var(--linea);
   border-radius: var(--radio); box-shadow: var(--sombra); padding: 6px; display: flex; flex-direction: column;
 }
+.ficha-menu.ficha-menu-derecha { right: auto; left: 0; }   /* fila 603: no queda bajo la barra lateral */
 .ficha-menu-opcion {
   font: inherit; font-size: 14px; text-align: left; background: none; border: 0;
   padding: 8px 10px; border-radius: 6px; cursor: pointer; color: var(--tinta);
