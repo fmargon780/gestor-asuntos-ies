@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '566', fecha: '2026-11-10', texto: 'Al registrar un documento, el registrado ya no puede quedar apartado en versiones previas: si el sellado y el original son el mismo fichero, se queda donde está y solo se apunta el registro.' },
   { id: '572', fecha: '2026-11-10', texto: 'En el correo de un asunto, al escribir «profesor» (o el nombre de una materia) en Para, Copia o Copia oculta salen los profesores del alumno, cada uno como «Profesor/a de <materia>»; en un asunto de grupo salen todos los del grupo. En las plantillas de correo, el papel «Profesores del grupo» pasa a llamarse «Sus profesores» y los coloca solos. Si a un profesor le falta el correo, sale el aviso para escribirlo ahí mismo.' },
   { id: '575', fecha: '2026-11-10', texto: 'En «Papeletas», al marcar «La AMPA ha designado representante» sale «¿Quién?»: esa persona va en la papeleta de madres y padres con el nombre de la AMPA y la cruz ya puesta, y arriba pone «Marca hasta N cruces más».' },
   { id: '571', fecha: '2026-11-09', texto: 'En la tarjeta «Candidaturas» hay un botón nuevo, «Papeletas»: saca un PDF por sector con las candidaturas admitidas, con las cruces que se pueden marcar ya puestas y las papeletas que hagan falta, 10 por hoja. En el ⋮ de las madres y padres, «Es de la AMPA» apunta la asociación que presenta la candidatura.' },

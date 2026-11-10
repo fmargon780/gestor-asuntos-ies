@@ -78,16 +78,24 @@
     var nombres = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }).filter(function (n) { return n !== d.nombre; });
     var conservado = RegistroSellado.nombreLibreEntre(nombres, sinExtension(original) + DocumentosFirmados.sufijoDelAnterior(caso, previas) + extensionCon(original));
     var nombreFinal = sinExtension(original) + extensionCon(d.nombre);
-    await Carpetas.renombrarFichero(a.handle, original, conservado);
+    /* Fila 566: si el firmado es el propio original, no se aparta nada (el original ya es el firmado). */
+    var mismo = RegistroSellado.esElMismoFichero(d.nombre, original);
     var enPrevias = false;
-    if (window.VersionesPrevias) {
-      try { await VersionesPrevias.mover(a.handle, conservado); enPrevias = true; } catch (e) { enPrevias = false; }
+    if (!mismo) {
+      await Carpetas.renombrarFichero(a.handle, original, conservado);
+      if (window.VersionesPrevias) {
+        try { await VersionesPrevias.mover(a.handle, conservado); enPrevias = true; } catch (e) { enPrevias = false; }
+      }
+      if (nombreFinal !== d.nombre) await Carpetas.renombrarFichero(a.handle, d.nombre, nombreFinal);
+      if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(a.handle);
+      if (!(await Carpetas.existeFichero(a.handle, nombreFinal))) {
+        if (enPrevias) { try { await VersionesPrevias.sacar(a.handle, conservado); } catch (e5) { /* se avisa abajo */ } }
+        throw new Error('el documento firmado no ha quedado en la carpeta; he dejado el original donde estaba');
+      }
     }
-    if (nombreFinal !== d.nombre) await Carpetas.renombrarFichero(a.handle, d.nombre, nombreFinal);
-    if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(a.handle);
     var carpeta = enPrevias && VersionesPrevias.nombreDeCarpeta ? await VersionesPrevias.nombreDeCarpeta(a.handle) : '';
-    await DocumentosFirmados.alLlegar(a, nombreFinal, caso, d.firmas, carpeta || '');
-    if (!carpeta) U.aviso('El original se ha quedado en la carpeta, con el nombre «' + conservado + '».', 'ambar');
+    await DocumentosFirmados.alLlegar(a, mismo ? original : nombreFinal, caso, d.firmas, carpeta || '');
+    if (!carpeta && !mismo) U.aviso('El original se ha quedado en la carpeta, con el nombre «' + conservado + '».', 'ambar');
   }
 
   /* «Es un documento nuevo»: el cuadro de poner nombre de siempre; al guardar, la marca y la nota. */

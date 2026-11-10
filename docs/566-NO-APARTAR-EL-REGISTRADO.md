@@ -66,4 +66,8 @@ hito no tengo documento a la vista, no sé qué ruta copiar.»
   previas» y mira si trae el sello de Séneca.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Tarea pequeña, sin segundo revisor; comparado por la sesión con la instrucción (10-nov-2026):
+  - El registrado sigue en la carpeta con su nombre cuando sellado y original son el mismo fichero (con y sin número de documento): coincide (`pruebas/no-apartar-el-registrado.mjs`).
+  - A versiones previas solo va el original sin sellar si es otro fichero: coincide (caso normal comprobado igual que antes).
+  - Si tras apartar el original el registrado no está en la carpeta, se devuelve lo apartado y se avisa en rojo: hecho en `js/registro-sellado.js` y `js/ficha-firmas.js`. `js/registro.js` (`guardarNumerado`) ya tenía la protección (`otroFichero`).
+  - Nada más cambia en pantalla. Las pruebas `registro sellado ruta firmas` (12) pasan.

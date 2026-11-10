@@ -165,6 +165,11 @@ var RegistroSellado = (function () {
     return base + ' (' + n + ')' + ext;
   }
 
+  /* Fila 566: ¿el PDF sellado y el documento original son el mismo fichero? (mismo nombre, sin mirar mayúsculas). */
+  function esElMismoFichero(nombrePdf, nombreDocumentoOriginal) {
+    return String(nombrePdf || '').toLowerCase() === String(nombreDocumentoOriginal || '').toLowerCase();
+  }
+
   /* ---------- asociar el sello a un documento ----------
 
      Renombra el PDF sellado con el nombre que le toca y apunta la
@@ -175,6 +180,17 @@ var RegistroSellado = (function () {
      volver a escanear. Si ese nombre ya existe, se numera "(2)", como
      en el resto de la aplicación. No se crea ningún fichero nuevo de
      verdad: solo se renombran los dos que ya había. */
+  /* Fila 566: si tras apartar el original el documento registrado no está en la carpeta, se devuelve lo apartado y se avisa en rojo. */
+  async function devolverSiFalta(asunto, nombreFinal, nombreConservado, aPrevias) {
+    var hay = false;
+    try { hay = await Carpetas.existeFichero(asunto.handle, nombreFinal); } catch (e) { hay = true; }
+    if (hay) return;
+    if (aPrevias && window.VersionesPrevias) {
+      try { await VersionesPrevias.sacar(asunto.handle, nombreConservado); } catch (e2) { /* ya se avisa abajo */ }
+    }
+    throw new Error('el documento registrado no ha quedado en la carpeta; he dejado el original donde estaba');
+  }
+
   /* Fila 239: el original tiene número de documento. El original y el
      sellado son el mismo documento (mismo número, mismo nombre): el
      original pasa a «SIN SELLAR» en la subcarpeta de previas y el
@@ -192,23 +208,32 @@ var RegistroSellado = (function () {
       var extOriginal = Nombres.extensionDe(nombreDocumentoOriginal);
       var base = extOriginal ? nombreDocumentoOriginal.slice(0, -(extOriginal.length + 1)) : nombreDocumentoOriginal;
       var nombreFinal = base + (extSellado ? '.' + extSellado : '');
+      /* Fila 566: si el sellado y el original son el mismo fichero, no se aparta nada: solo se apunta el registro. */
+      var mismo = esElMismoFichero(nombrePdf, nombreDocumentoOriginal);
       var nombreConservado = nombreLibreEntre(nombres, nombreSinSellar(nombreDocumentoOriginal));
-      await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
       var aPrevias = false;
-      if (window.VersionesPrevias) {
-        try { await VersionesPrevias.mover(asunto.handle, nombreConservado); aPrevias = true; } catch (e3) { aPrevias = false; }
+      if (!mismo) {
+        await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
+        if (window.VersionesPrevias) {
+          try { await VersionesPrevias.mover(asunto.handle, nombreConservado); aPrevias = true; } catch (e3) { aPrevias = false; }
+        }
+        if (nombreFinal !== nombrePdf) await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreFinal);
+        if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
+        await devolverSiFalta(asunto, nombreFinal, nombreConservado, aPrevias);
+        if (aPrevias && window.TareasConDocumento) await TareasConDocumento.versionConservada(asunto, nombreDocumentoOriginal, nombreConservado, nombreFinal);   /* fila 522 */
       }
-      if (nombreFinal !== nombrePdf) await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreFinal);
-      if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
-      if (aPrevias && window.TareasConDocumento) await TareasConDocumento.versionConservada(asunto, nombreDocumentoOriginal, nombreConservado, nombreFinal);   /* fila 522 */
       await DocumentosDatos.anotar(asunto.nombre, previo.numero, {
         tipo: previo.tipo, fecha: previo.fecha,
         anadirRegistro: { ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero, codigo: codigo }
       });
       var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';
       await window.Notas.sustituir(asunto,
-        'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal + '. Se conserva el original sin sellar.',
+        'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal + (mismo ? '.' : '. Se conserva el original sin sellar.'),
         'registroDeDocumento', nombreDocumentoOriginal);
+      if (mismo) {
+        U.aviso('Documento registrado' + avisoCodigo(opciones, codigo) + '.', 'bueno');
+        return nombreFinal;
+      }
       var carpetaPrevias = window.VersionesPrevias && VersionesPrevias.nombreDeCarpeta
         ? await VersionesPrevias.nombreDeCarpeta(asunto.handle) : '_Previas';
       U.aviso(aPrevias ? 'Documento registrado' + avisoCodigo(opciones, codigo) + '. El original sin sellar se conserva en «' + carpetaPrevias + '».'
@@ -266,6 +291,15 @@ var RegistroSellado = (function () {
 
       await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreNuevo);
 
+      /* Fila 566: si el sellado era el propio original, ya está renombrado: no hay original que apartar. */
+      if (esElMismoFichero(nombrePdf, nombreDocumentoOriginal)) {
+        var codigoMismo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
+        await window.Notas.sustituir(asunto,
+          'Registrado ' + codigoMismo + (sello.fecha ? ' el ' + sello.fecha : '') + ' · ' + nombreDocumentoOriginal + '.',
+          'registroDeDocumento', nombreDocumentoOriginal, { auto: true });
+        U.aviso('Documento registrado' + avisoCodigo(opciones, codigoMismo) + '.', 'bueno');
+        return nombreNuevo;
+      }
       var nombreConservado = nombreLibreEntre(nombres.concat([nombreNuevo]), nombreSinSellar(nombreDocumentoOriginal));
       await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
       /* Fila 160 (docs/VERSIONES-PREVIAS.md): el «SIN SELLAR», a «Versiones
@@ -303,6 +337,7 @@ var RegistroSellado = (function () {
     nombreSinSellar: nombreSinSellar,
     nombreLibreEntre: nombreLibreEntre,
     hayColision: hayColision,
+    esElMismoFichero: esElMismoFichero,
     pendientesDeLeer: pendientesDeLeer,
     pendientesDeResolver: pendientesDeResolver
   };
