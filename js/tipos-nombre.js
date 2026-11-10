@@ -366,6 +366,7 @@ App.renombrarTipo = async function (tipo) {
     if (!motivo) break;
     textoNombre = $('tipo-nuevo-nombre').value; textoCorto = $('tipo-nuevo-corto').value;
   }
+  if (cortoNuevo === nombreNuevo) cortoNuevo = '';   /* un corto igual al largo no aporta nada */
   var cortoViejo = tipo.nombreCorto || '';
   var cambiaLargo = !!nombreNuevo && nombreNuevo !== tipo.tipo;
   var cambiaCorto = conCorto && cortoNuevo !== cortoViejo;
