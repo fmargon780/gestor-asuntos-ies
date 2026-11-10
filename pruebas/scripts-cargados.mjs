@@ -12,6 +12,7 @@
       escriben): nunca un ReferenceError. */
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { indexEntero } from './apoyo/index-entero.mjs';
 
 const RAIZ = new URL('..', import.meta.url);
 let fallos = 0;
@@ -21,7 +22,7 @@ function comprobar(titulo, ok, detalle) {
 }
 
 /* ---------- 1. index.html carga todos los js/*.js ---------- */
-const html = fs.readFileSync(new URL('index.html', RAIZ), 'utf8');
+const html = indexEntero(new URL('..', import.meta.url).pathname);   /* fila 560: index.html + js/pagina-*.js + js/cargar-piezas-*.js */
 const cargados = new Set([...html.matchAll(/<script[^>]*\ssrc="(js\/[^"?]+)/g)].map((m) => m[1]));
 const enDisco = fs.readdirSync(new URL('js/', RAIZ)).filter((f) => f.endsWith('.js')).map((f) => 'js/' + f);
 const sinCargar = enDisco.filter((f) => !cargados.has(f));

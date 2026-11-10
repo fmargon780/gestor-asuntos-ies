@@ -188,11 +188,12 @@ cualquier instrucción de la cola, actualizar este documento y `CONTEXTO-CORTO.m
 la línea vieja, no añadiendo una debajo**, y anotar en `docs/HISTORIA.md` lo que merezca
 recordarse, con su fecha.
 
-**Ningún fichero de `js/` pasa de 600 líneas** (fila 133, 24-sep-2026,
-`docs/PARTIR-FICHEROS-GRANDES.md`). Si uno crece, se parte por temas en trozos de menos de 400,
+**Tope de 400 líneas por fichero de código** (fila 560, 10-nov-2026, `docs/560-PARTIR-FICHEROS-GRANDES.md`; antes 600, fila 133). Uno nuevo nace por debajo; los que ya lo pasan solo se parten en una tarea aparte, por temas, de menos de 400,
 moviendo funciones enteras: el estado que comparten va en un objeto interno (`X._interno`, o
-`window.XNucleo`), cada trozo se carga en `index.html` justo después de su origen, y las pruebas
+`window.XNucleo`), cada trozo se carga justo después de su origen **en su lista `js/cargar-piezas-N.js`** (no en `index.html`), y las pruebas
 que cargan el origen suelto (con `vm`) cargan también sus trozos.
+
+**`index.html` ya no lleva las etiquetas `<script>` de las piezas ni el HTML de las ventanas** (fila 560): lo escriben, con `document.write` y en el mismo orden y sitio, `js/cargar-piezas-1.js`, `-2.js` y `-3.js` (la lista de piezas de código: el orden de la lista ES el orden de carga) y `js/pagina-*.js` (las ventanas). Así cargan igual de seguidas también desde el disco (`file://`, copia sin internet). Las pruebas que leen el texto de la página sin navegador usan `pruebas/apoyo/index-entero.mjs`, que lo vuelve a armar. Un fichero de código nuevo: una línea en la lista que toque (nunca en `index.html`).
 
 ### Publicar: comprobarlo siempre, no darlo por hecho ← IMPORTANTE
 
@@ -579,7 +580,7 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
   el tablón (`js/tablon.js`, fila 33) resuelve el mismo problema con un mecanismo propio, anterior
   a esta ayuda. Se comprueba con `pruebas/tablon-no-se-borra.mjs` y
   `pruebas/notas-asunto-no-se-borran.mjs`.
-- **Ojo con el orden de los `<script>` de `index.html`.** `ficha-asunto.js` poda la tarjeta con
+- **Ojo con el orden de la lista de piezas (`js/cargar-piezas-N.js`, antes los `<script>` de `index.html`).** `ficha-asunto.js` poda la tarjeta con
   su lista blanca, así que un módulo que quiera poner un botón ahí tiene que cargarse después.
   `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
   `bandeja-pantalla.js` va justo después de `bandeja-correos.js` (necesita `window.Bandeja`) y
@@ -611,7 +612,7 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
   donde el fallo se ve (por ejemplo, 1905px para el monitor del trabajo). Comprobar siempre que
   la prueba **falla** sin el arreglo, antes de darla por buena.
 - Un módulo nuevo puede crearse su propio bloque en Ajustes, su propia columna, su propio botón
-  en la barra o su propio panel; así `index.html` solo necesita la línea del `<script>`. Para
+  en la barra o su propio panel; así solo hace falta apuntar el fichero en su lista `js/cargar-piezas-N.js`. Para
   meter un botón en un panel que se repinta entero, vale un `MutationObserver`.
 
 ---

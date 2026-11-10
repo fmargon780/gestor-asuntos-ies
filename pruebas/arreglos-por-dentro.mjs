@@ -10,6 +10,7 @@
       (js/destinatarios.js), y da lo mismo para el mismo asunto. */
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { indexEntero } from './apoyo/index-entero.mjs';
 
 const raiz = new URL('../', import.meta.url).pathname;
 let fallos = 0;
@@ -76,7 +77,7 @@ comprobar('2. nadie define ni llama a pintarTablaEstados', quien(/pintarTablaEst
 comprobar('2. ni a App.cargarEstados / App.guardarEstados / App.ponerEstado / App.colorEstado',
   quien(/App\.(cargarEstados|guardarEstados|ponerEstado|colorEstado|posDeEstado|esDeEspera)\b/), []);
 comprobar('2. nadie lee App.E.estados', quien(/App\.E\.estados/), []);
-comprobar('2. index.html ya no trae la rejilla', /tabla-estados/.test(leer('index.html')), false);
+comprobar('2. index.html ya no trae la rejilla', /tabla-estados/.test(indexEntero(raiz)), false);
 
 /* ---------- 3 ---------- */
 console.log('--- 3. cabeceras de seguridad ---');

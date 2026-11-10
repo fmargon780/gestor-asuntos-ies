@@ -23,109 +23,12 @@
 
   function $(id) { return document.getElementById(id); }
 
-  var datosDeAjustes = null;   /* { firma, centro, lista } ya leído, para pintar sin esperar */
-
-  async function cargar() {
-    if (!App.E.gestor) return datosDeAjustes;
-    datosDeAjustes = await Plantillas.cargar(App.E.gestor);
-    return datosDeAjustes;
-  }
-
-  /* ---------- Datos del centro y firma ---------- */
-
-  function pintarFirmaYCentro() {
-    if (!datosDeAjustes || !$('plantillas-firma')) return;
-    $('plantillas-firma').value = datosDeAjustes.firma;
-    $('plantillas-centro').value = datosDeAjustes.centro;
-    $('plantillas-localidad').value = datosDeAjustes.localidad;
-    $('plantillas-direccion').value = datosDeAjustes.direccion;
-    $('plantillas-codigo').value = datosDeAjustes.codigo;
-    $('plantillas-cargo').value = datosDeAjustes.cargo;
-    /* 20-sep-2026, fila 84: para el hueco {{PROVINCIA}} de un impreso. */
-    if ($('plantillas-provincia')) $('plantillas-provincia').value = datosDeAjustes.provincia;
-    /* 20-sep-2026, fila 79, apartado 4.7. */
-    if ($('plantillas-direccion-normativa')) {
-      $('plantillas-direccion-normativa').value = datosDeAjustes.direccionNormativa;
-    }
-    /* Fila 411: el nombre del remitente y la cuenta de Administración. */
-    if ($('plantillas-remitente')) $('plantillas-remitente').value = datosDeAjustes.remitente;
-    if ($('plantillas-cuenta-admin')) $('plantillas-cuenta-admin').value = datosDeAjustes.cuentaAdministracion;
-    if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();
-    if (window.HitosNormativa) HitosNormativa.refrescar();
-    if (window.CentroDeDatosConfiguracion) CentroDeDatosConfiguracion.marcarCampos();   /* fila 313: lo que viene del Centro de datos no se escribe aquí */
-  }
-
-  /* Fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md: solo el texto de
-     ayuda del campo, nunca el valor guardado. Se monta desde aquí (el
-     campo en sí sigue estático en index.html) para no tocar ningún
-     otro fichero. */
-  function ayudarConLaDireccionNormativa() {
-    var campo = $('plantillas-direccion-normativa');
-    if (!campo) return;
-    campo.placeholder = 'https://normativa.fmargon.com';
-    if ($('plantillas-direccion-normativa-ayuda')) return;
-    var ayuda = document.createElement('p');
-    ayuda.id = 'plantillas-direccion-normativa-ayuda';
-    ayuda.className = 'nota';
-    ayuda.textContent = 'Escribe solo eso, sin "/norma" ni el nombre de ningún bloque. Ojo: la ' +
-      'red del instituto bloquea las direcciones "vercel.app".';
-    campo.parentNode.insertBefore(ayuda, campo.nextSibling);
-  }
-
-  /* Fila 411 (docs/CORREO-DESDE-LA-CUENTA-COMUN.md): los dos campos del correo, creados desde aquí
-     (como la ayuda de la dirección de normativa) para no tocar index.html. */
-  function montarCamposDeCorreo() {
-    if ($('plantillas-remitente')) return;
-    var boton = $('plantillas-guardar-firma');
-    if (!boton) return;
-    var caja = document.createElement('div');
-    caja.id = 'plantillas-correo-campos';
-    caja.innerHTML =
-      '<label class="etiqueta" for="plantillas-remitente">Nombre del remitente de los correos</label>' +
-      '<input id="plantillas-remitente" class="campo" placeholder="' + U.escapar(Plantillas.POR_DEFECTO_REMITENTE) + '">' +
-      '<p class="nota">Es lo que ve quien recibe un correo del Gestor, lo envíe quien lo envíe.</p>' +
-      '<label class="etiqueta" for="plantillas-cuenta-admin">Cuenta de correo de Administración</label>' +
-      '<input id="plantillas-cuenta-admin" class="campo" placeholder="' + U.escapar(Plantillas.POR_DEFECTO_CUENTA_ADMIN) + '">' +
-      '<p class="nota">La cuenta común desde la que el Gestor recoge y envía. Si un ordenador trabaja con otra, Ajustes avisa.</p>';
-    boton.parentNode.insertBefore(caja, boton);
-  }
-
-  async function guardarFirma() {
-    var firma = $('plantillas-firma').value;
-    var centro = $('plantillas-centro').value.trim() || Plantillas.POR_DEFECTO_CENTRO;
-    var localidad = $('plantillas-localidad').value.trim();
-    var direccion = $('plantillas-direccion').value.trim();
-    var codigo = $('plantillas-codigo').value.trim();
-    var cargo = $('plantillas-cargo').value.trim();
-    var remitente = $('plantillas-remitente') ? ($('plantillas-remitente').value.trim() || Plantillas.POR_DEFECTO_REMITENTE) : datosDeAjustes.remitente;
-    var cuentaAdministracion = $('plantillas-cuenta-admin') ? ($('plantillas-cuenta-admin').value.trim() || Plantillas.POR_DEFECTO_CUENTA_ADMIN) : datosDeAjustes.cuentaAdministracion;
-    var provincia = $('plantillas-provincia') ? $('plantillas-provincia').value.trim() : datosDeAjustes.provincia;
-    var direccionNormativa = $('plantillas-direccion-normativa')
-      ? $('plantillas-direccion-normativa').value.trim().replace(/\/$/, '')
-      : datosDeAjustes.direccionNormativa;
-    try {
-      datosDeAjustes = await Plantillas.guardar(App.E.gestor, function (actual) {
-        actual.firma = firma;
-        actual.centro = centro;
-        actual.localidad = localidad;
-        actual.direccion = direccion;
-        actual.codigo = codigo;
-        actual.cargo = cargo;
-        actual.remitente = remitente;
-        actual.cuentaAdministracion = cuentaAdministracion;
-        actual.provincia = provincia;
-        actual.direccionNormativa = direccionNormativa;
-        return actual;
-      });
-      if (window.HitosNormativa) HitosNormativa.refrescar();
-      if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();
-      U.aviso('Firma y centro guardados.', 'bueno');
-    } catch (e) {
-      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-    }
-  }
-
-  if ($('plantillas-guardar-firma')) $('plantillas-guardar-firma').onclick = guardarFirma;
+  /* Fila 560: lo de «Datos del centro y firma» vive en js/plantillas-ajustes-centro.js (se carga antes que este fichero). */
+  var Centro = window.PlantillasAjustesCentro;
+  var cargar = Centro.cargar;
+  var pintarFirmaYCentro = Centro.pintarFirmaYCentro;
+  var ayudarConLaDireccionNormativa = Centro.ayudarConLaDireccionNormativa;
+  var montarCamposDeCorreo = Centro.montarCamposDeCorreo;
 
   /* ---------- las plantillas de UN tipo (sección de js/ajustes-tipo.js) ---------- */
 
@@ -177,7 +80,7 @@
     await cargar();
     refrescarSeccionActual = function () { pintarDeTipo(contenedor, tipo); };
 
-    var lista = (datosDeAjustes ? datosDeAjustes.lista : [])
+    var lista = (Centro.datos() ? Centro.datos().lista : [])
       .filter(function (p) { return p.tipo === tipo.tipo; })
       .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
 
@@ -229,14 +132,14 @@
         hoy: hoy,
         limite: f.limite ? U.fechaLegible(U.aAaMmDd(f.limite)) : '',
         usuario: App.E.usuario || 'Quien firme',
-        centro: (datosDeAjustes && datosDeAjustes.centro) || Plantillas.POR_DEFECTO_CENTRO,
+        centro: (Centro.datos() && Centro.datos().centro) || Plantillas.POR_DEFECTO_CENTRO,
         campos: {}
       };
     }
     return {
       nombre: 'Pérez García, Ana', grupo: '2ºA', curso: U.cursoActual(), tipo: tipo || 'Tipo de ejemplo',
       hoy: hoy, limite: hoy, usuario: App.E.usuario || 'Quien firme',
-      centro: (datosDeAjustes && datosDeAjustes.centro) || Plantillas.POR_DEFECTO_CENTRO, campos: {}
+      centro: (Centro.datos() && Centro.datos().centro) || Plantillas.POR_DEFECTO_CENTRO, campos: {}
     };
   }
 
@@ -408,158 +311,6 @@
     });
   }
 
-  /* ---------- el editor en línea, dentro del cuadro de Correo o de
-     Séneca (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md)
-
-     A diferencia de `abrirCuadroDePlantilla`, no abre un `U.preguntar`
-     (solo hay una capa de diálogo, y ya la está usando el cuadro de
-     Correo o de Séneca): se monta dentro de `contenedor`, un bloque
-     hermano del formulario del cuadro, que ese mismo fichero esconde y
-     vuelve a enseñar. El tipo y la categoría son los del asunto abierto,
-     no se preguntan. Reutiliza `campoDeTextoHTML`/`engancharCampoDeTexto`
-     (el mismo "Insertar hueco" de arriba); la vista previa usa los datos
-     reales del asunto en el que se está, con `Plantillas.valoresDeAsunto`. */
-
-  /* `inicial` (fila 270, js/plantilla-de-lo-escrito.js): { texto, cambios } de
-     «Guardar como plantilla nueva»: el texto de partida, la lista de datos
-     cambiados por su hueco y la nota de que el saludo y la firma no entran. */
-  function cuerpoEditorEnLineaHTML(existente, inicial) {
-    return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
-      '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
-      (window.PlantillaPapeles ? PlantillaPapeles.antesDelTextoHTML('pl2', existente) : '') +
-      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', inicial ? inicial.texto : ((existente && existente.texto) || ''), 6) +
-      (window.PlantillaPapeles ? PlantillaPapeles.despuesDelTextoHTML('pl2', existente) : '') +
-      (inicial ? '<div id="pl2-cambios"></div>' : '') +
-      campoSenecaHTML('pl2', existente && existente.textoSeneca) +
-      (window.PlantillaAdjuntar ? PlantillaAdjuntar.selectHTML('pl2-adjuntar', existente && existente.adjuntar) : '') +
-      '<label class="etiqueta">Vista previa</label>' +
-      '<div class="vista-previa"><div class="vista-nombre" id="pl2-previa"></div></div>' +
-      '<div id="pl2-aviso"></div>' +
-      '<div class="correo-botones" style="margin-top:14px">' +
-        '<button type="button" class="boton boton-principal" id="pl2-guardar">Guardar</button>' +
-        '<button type="button" class="boton" id="pl2-cancelar">Cancelar</button>' +
-      '</div>';
-  }
-
-  /* `a`: el asunto abierto (de ahí salen el tipo, la categoría y los
-     datos de la vista previa). `existente`: la plantilla a editar, o
-     `null` para crear una nueva. `alGuardar(plantillaGuardada)` se
-     llama al terminar bien; `alCancelar()`, al pulsar Cancelar. */
-  /* La lista «He cambiado estos datos por su hueco» (fila 270): una línea por
-     cambio, con «Deshacer» (devuelve el dato en todos los sitios de ese hueco);
-     pulsar la línea deja seleccionado el hueco en el texto; si el hueco desaparece
-     del texto a mano, su línea desaparece sola. Devuelve el manejador de `input`
-     del texto. */
-  function montarCambios(cambios, alCambiar) {
-    var caja = $('pl2-cambios');
-    var vivos = (cambios || []).slice();
-    function pintar() {
-      if (!caja) return;
-      if (!vivos.length) { caja.innerHTML = ''; return; }
-      caja.innerHTML = '<p class="nota">He cambiado estos datos por su campo variable. Revísalos:</p>';
-      vivos.forEach(function (c) {
-        var fila = document.createElement('div');
-        fila.className = 'pl2-cambio';
-        fila.style.cssText = 'display:flex;align-items:center;gap:8px;margin:4px 0;cursor:pointer';
-        var t = document.createElement('span');
-        t.textContent = c.dato + ' → ' + c.hueco;
-        var b = document.createElement('button');
-        b.type = 'button'; b.className = 'boton boton-chico'; b.textContent = 'Deshacer';
-        b.onclick = function (ev) {
-          ev.stopPropagation();
-          var campo = $('pl2-texto');
-          campo.value = campo.value.split(c.hueco).join(c.dato);
-          vivos = vivos.filter(function (x) { return x !== c; });
-          pintar();
-          alCambiar();
-        };
-        fila.onclick = function () {
-          var campo = $('pl2-texto');
-          var i = campo.value.indexOf(c.hueco);
-          if (i === -1) return;
-          campo.focus();
-          campo.setSelectionRange(i, i + c.hueco.length);
-        };
-        fila.appendChild(t); fila.appendChild(b);
-        caja.appendChild(fila);
-      });
-    }
-    pintar();
-    return function () {
-      var texto = $('pl2-texto').value;
-      var antes = vivos.length;
-      vivos = vivos.filter(function (c) { return texto.indexOf(c.hueco) !== -1; });
-      if (vivos.length !== antes) pintar();
-      alCambiar();
-    };
-  }
-
-  function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar, inicial) {
-    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente, inicial);
-    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
-    function tipoDelAsunto() { return tipo; }
-    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', window.PlantillaPapeles ? PlantillaPapeles.camposDeTexto('pl2') : [], tipoDelAsunto);
-    if (window.PlantillaPapeles) PlantillaPapeles.enganchar('pl2');
-    engancharCampoDeTexto('pl2-texto-seneca', 'pl2-insertar-hueco-seneca', [], tipoDelAsunto);
-
-    /* Con el cuadro abierto desde un hito, la vista previa lleva también el hito (fila 270). */
-    var hitoDelCuadro = (window.CorreoNucleo && CorreoNucleo._interno && CorreoNucleo._interno.hitoActual) || undefined;
-    function pintarPrevia() {
-      Plantillas.valoresDeAsunto(a, hitoDelCuadro ? { hito: hitoDelCuadro } : undefined).then(function (valores) {
-        var r = Plantillas.rellenar($('pl2-texto').value, valores || {});
-        if ($('pl2-previa')) $('pl2-previa').textContent = r.texto || '(vacío)';
-      }).catch(function () { if ($('pl2-previa')) $('pl2-previa').textContent = '(vacío)'; });
-    }
-    var alCambiarTexto = pintarPrevia;
-    if (inicial) alCambiarTexto = montarCambios(inicial.cambios, pintarPrevia);
-    $('pl2-texto').oninput = alCambiarTexto;
-    pintarPrevia();
-    if (inicial) $('pl2-nombre').focus();
-
-    $('pl2-cancelar').onclick = function () { if (typeof alCancelar === 'function') alCancelar(); };
-    $('pl2-guardar').onclick = async function () {
-      var nombre = $('pl2-nombre').value.trim();
-      var texto = $('pl2-texto').value;
-      var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
-      var adjuntar2 = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl2-adjuntar') : '';
-      var papeles2 = window.PlantillaPapeles ? PlantillaPapeles.leer('pl2') : null;
-      if (!nombre || !texto.trim()) {
-        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Hace falta el nombre y el texto.</p>';
-        return;
-      }
-      /* Fila 270: no dos plantillas con el mismo nombre en un tipo de asunto. */
-      var yaEsta = ((Plantillas.enMemoria() || {}).lista || []).some(function (x) {
-        return (!existente || x.id !== existente.id) && x.categoria === categoria &&
-          U.normalizar(x.tipo || '') === U.normalizar(tipo) && U.normalizar(x.nombre || '') === U.normalizar(nombre);
-      });
-      if (yaEsta) {
-        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Ya hay una plantilla con ese nombre en este tipo de asunto.</p>';
-        return;
-      }
-      try {
-        var guardada = null;
-        await Plantillas.guardar(App.E.gestor, function (actual) {
-          if (existente) {
-            var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-            if (i !== -1) {
-              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], papeles2);
-              guardada = actual.lista[i];
-            }
-          } else {
-            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, papeles2);
-            actual.lista.push(guardada);
-          }
-          return actual;
-        });
-        await cargar();
-        if (typeof alGuardar === 'function') alGuardar(guardada);
-      } catch (e) {
-        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">No he podido guardarlo: ' + U.escapar(U.mensajeDeError(e)) + '</p>';
-      }
-    };
-  }
-
   /* ==========================================================
      ENGANCHE
      ========================================================== */
@@ -589,9 +340,8 @@
     guardarCuadro: guardarCuadro,
     campoDeTextoHTML: campoDeTextoHTML,
     engancharCampoDeTexto: engancharCampoDeTexto,
-    /* Fila 151: el editor de plantilla dentro del cuadro de Correo o de
-       Séneca, sin U.preguntar. */
-    montarEditorEnLinea: montarEditorEnLinea
+    /* Fila 560: lo que necesita js/plantillas-ajustes-editor.js, que cuelga aquí `montarEditorEnLinea` (fila 151). */
+    _interno: { campoSenecaHTML: campoSenecaHTML, filaDePlantilla: filaDePlantilla }
   };
 
 })();

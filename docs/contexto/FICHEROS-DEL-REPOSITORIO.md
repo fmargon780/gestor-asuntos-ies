@@ -11,7 +11,13 @@ de `App` va después del fichero que lo define.
 
 | Fichero | Qué hace |
 |---|---|
-| `index.html` | La página |
+| `index.html` | La página: cabecera, la pantalla de entrada, el cuadro de diálogo y tres etiquetas de ventanas (`js/pagina-*.js`) y tres de listas (`js/cargar-piezas-*.js`) (fila 560) |
+| `js/pagina-inicio-y-asuntos.js`, `js/pagina-herramientas-y-ajustes.js`, `js/pagina-ajustes-y-tipo.js` | El HTML de las ventanas de la aplicación (menú lateral, Inicio, asunto, nuevo, archivo, personas, Herramientas, Ajustes, tipo de asunto), escrito con `document.write` donde antes estaba en `index.html` (fila 560) |
+| `js/cargar-piezas-1.js`, `js/cargar-piezas-2.js`, `js/cargar-piezas-3.js` | La lista, en orden, de todas las piezas de código de la página; escriben las etiquetas `<script src>` (fila 560). Un fichero de código nuevo se apunta aquí |
+| `js/ficha-documentos-fila.js` | La fila de cada documento de la ficha del asunto (sale de `js/ficha-documentos.js`, fila 560) |
+| `js/plantillas-ajustes-centro.js`, `js/plantillas-ajustes-editor.js` | «Datos del centro y firma» y el editor de plantilla en línea (salen de `js/plantillas-ajustes.js`, fila 560) |
+| `js/demo/datos-ficheros.js`, `js/demo/datos-tipos.js`, `js/demo/datos-asuntos.js`, `js/demo/datos-resto.js` | Las partes del juego de datos de la demo (salen de `js/demo/datos.js`, fila 560); se cargan desde `js/demo/arrancar.js` |
+| `pruebas/apoyo/index-entero.mjs` | Vuelve a armar el `index.html` «de antes» (ventanas y etiquetas `<script>` en su sitio) para las pruebas que leen su texto (fila 560) |
 | `vercel.json` | Que el navegador no se quede con copias viejas, las cabeceras de seguridad, que Vercel no publique nada solo (`git.deploymentEnabled: false`, fila 331) y la hora de la versión al publicar (`buildCommand`, fila 76) |
 | `fonts/NotoSansHK-latin-400.woff2`, `fonts/NotoSansHK-latin-700.woff2`, `fonts/OFL.txt` | La letra del manual de la Junta para el membrete (fila 149), recortada a los caracteres latinos, con su licencia |
 | `img/junta-andalucia-simbolo.svg` | El símbolo de la Junta, en vectorial, para el membrete (fila 149) |

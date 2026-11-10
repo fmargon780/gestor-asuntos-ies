@@ -1,1 +1,1 @@
-Última pasada completa: 9-nov-2026 14:10 (Madrid) · 36 min · con fallos (49 fallan igual a solas en main limpio, por el entorno; ninguna es de la fila 571) · commit 7baa550
+Última pasada completa: 10-nov-2026 12:05 (Madrid) · 35 min · con fallos (25 fallan en main limpio, por el entorno: nueve ya retiradas y el resto de carga o del entorno; ninguna es de la fila 560) · commit e25ea29

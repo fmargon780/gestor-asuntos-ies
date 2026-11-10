@@ -9,6 +9,7 @@
    cadenas más fáciles de reconocer, como red de seguridad. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { indexEntero } from './apoyo/index-entero.mjs';
 
 const RAIZ = new URL('../', import.meta.url).pathname;
 
@@ -52,11 +53,11 @@ function comprobar(fichero, texto) {
   }
 }
 
-const indexHtml = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
+const indexHtml = indexEntero(RAIZ);   /* fila 560: index.html con las ventanas de js/pagina-*.js en su sitio */
 comprobar('index.html', sinComentariosHtml(indexHtml));
 
 const carpetaJs = path.join(RAIZ, 'js');
-const ficherosJs = fs.readdirSync(carpetaJs).filter((f) => f.endsWith('.js')).sort();
+const ficherosJs = fs.readdirSync(carpetaJs).filter((f) => f.endsWith('.js') && !f.startsWith('pagina-')).sort();   /* las pagina-*.js (HTML) ya van dentro de indexHtml */
 for (const fichero of ficherosJs) {
   const texto = fs.readFileSync(path.join(carpetaJs, fichero), 'utf8');
   comprobar('js/' + fichero, sinComentariosJs(texto));
