@@ -117,7 +117,7 @@ existir ya.** Lo principal, en una línea cada cosa:
   lleva contador de turno (el último gana).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
-- Ningún fichero de `js/` pasa de 600 líneas: se parte por temas, con el estado común en `X._interno`.
+- Tope de 400 líneas por fichero de código (`docs/METODO-COMUN.md` 5.4): uno nuevo nace por debajo; los que lo pasan se parten solo en una tarea aparte, por temas, con el estado común en `X._interno`. Un fichero de código nuevo se apunta en su lista `js/cargar-piezas-N.js`, no en `index.html` (que solo lleva las tres listas y las tres piezas `js/pagina-*.js` con las ventanas).
 - Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: asuntos, hitos, tablón,
   CSV de terceros, índice, borrados); nunca `Copias.guardar` directo de `asuntos.json`.
   Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.

@@ -27,12 +27,10 @@
      elegida. Lo marcado de una respuesta que se cambió, plegado al final.
    - Un hito-pregunta enseña "¿Qué supuesto es?" con las opciones como
      tarjetas; elegir otra cambia de rama como siempre.
-
    - Algo que hay que reunir (fila 138, docs/UNA-SOLA-LISTA-EN-EL-HITO.md):
      📎 delante si es un documento (se marca solo al añadirlo o asociarlo
      al hito, y dice cuál), ✎ si es un dato (con su caja: se marca al
      escribirlo), y «obligatorio» en negrita si lo es.
-
    El dato y el guardado viven en js/hitos-guion.js (Hitos.guionDe,
    Hitos.marcarGuion, Hitos.anadirGuionPropio). Lo llama js/hito-mesa.js.
    ============================================================ */

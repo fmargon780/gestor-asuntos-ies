@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import { indexEntero } from './apoyo/index-entero.mjs';
 
 const raiz = fileURLToPath(new URL('../', import.meta.url));
 let fallos = 0;
@@ -130,7 +131,7 @@ for (const f of fs.readdirSync(raiz + 'js').filter((x) => x.endsWith('.js'))) {
   const texto = fs.readFileSync(raiz + 'js/' + f, 'utf8');
   if (f !== 'nombres.js' && f !== 'nombres-tipos.js' && /\[\s*'ALUMNADO'\s*,\s*'PERSONAL'/.test(texto)) aMano.push(f);
 }
-const html = fs.readFileSync(raiz + 'index.html', 'utf8');
+const html = indexEntero(raiz);   /* fila 560 */
 if (/<option value="(EMPRESAS|OTROS|PERSONAL)"/.test(html)) aMano.push('index.html');
 comprobar('5. ninguna lista de categorías escrita a mano', aMano, []);
 comprobar('5. js/tutores-legales.js se carga después de js/puente.js y de js/archivo-personas.js',
