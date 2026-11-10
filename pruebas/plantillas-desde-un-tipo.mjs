@@ -1,6 +1,6 @@
 /* Fila 320 (docs/PANTALLA-DE-PLANTILLAS.md), paso 20, separado de plantillas-pantalla.mjs en la fila 584:
    «Ver todas las plantillas» desde la pantalla de un tipo abre la pantalla de Plantillas con ese tipo puesto.
-   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la app, idea 585 de docs/COLA.md. */
+   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la app, idea 593 de docs/COLA.md. */
 import { chromium } from 'playwright';
 
 const BASE = (process.env.DIRECCION || 'http://localhost:8123/index.html');

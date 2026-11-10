@@ -1,7 +1,7 @@
 /* Prueba de la fila 344 (docs/ETIQUETAS.md), paso 9, separada de etiquetas.mjs en la fila 584:
    desde el asunto de grupo (tarjeta «Personas del grupo»), «Imprimir etiquetas» abre la pantalla de Etiquetas con
    las personas del grupo, y «Volver» lleva a la ficha del asunto.
-   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la app, idea 585 de docs/COLA.md. */
+   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la app, idea 593 de docs/COLA.md. */
 import { chromium } from 'playwright';
 import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 import fs from 'node:fs';

@@ -1,1 +1,1 @@
-Última pasada completa: 10-nov-2026 12:05 (Madrid) · 35 min · con fallos (25 fallan en main limpio, por el entorno: nueve ya retiradas y el resto de carga o del entorno; ninguna es de la fila 560) · commit e25ea29
+Última pasada completa: 10-nov-2026 18:30 (Madrid) · 27 min · verde (371 pruebas, 371 bien) · commit de la rama de la fila 584, sobre main de la 592

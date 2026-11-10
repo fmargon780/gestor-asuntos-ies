@@ -10,7 +10,7 @@
    6. «Nuevo modelo» 2×2: cada etiqueta, un cuarto del A4.
    7. Un diseño propio de dos renglones se guarda en _GESTOR/etiquetas.json y sale en la vista previa.
    8. «Guardar PDF»: A4 con las hojas que dice el pie, y la letra a tamaño real.
-   9. (Fila 584: pasó a etiquetas-desde-el-grupo.mjs, apartada con la idea 585.)
+   9. (Fila 584: pasó a etiquetas-desde-el-grupo.mjs, apartada con la idea 593.)
    10. Pestaña Personal con el diseño «Profesor». */
 import { chromium } from 'playwright';
 import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';

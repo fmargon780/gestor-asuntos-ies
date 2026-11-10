@@ -130,7 +130,7 @@ const aMano = [];
 for (const f of fs.readdirSync(raiz + 'js').filter((x) => x.endsWith('.js'))) {
   const texto = fs.readFileSync(raiz + 'js/' + f, 'utf8');
   /* Fila 584: «campos-lista.js» y «campos-calculados-editor.js» listan solo las dos categorías con DNI (no son «todas las categorías»);
-     la del control de registro, que sí es una lista de categorías a mano, va aparte en categorias-del-control-de-registro.mjs (idea 586). */
+     la del control de registro, que sí es una lista de categorías a mano, va aparte en categorias-del-control-de-registro.mjs (idea 594). */
   const DOS_CON_DNI = ['campos-lista.js', 'campos-calculados-editor.js', 'control-registro-pantalla.js'];
   if (f !== 'nombres.js' && f !== 'nombres-tipos.js' && DOS_CON_DNI.indexOf(f) === -1 && /\[\s*'ALUMNADO'\s*,\s*'PERSONAL'/.test(texto)) aMano.push(f);
 }

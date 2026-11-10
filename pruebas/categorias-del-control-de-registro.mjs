@@ -1,7 +1,7 @@
 /* Prueba (sin navegador), separada de tutores-legales.mjs en la fila 584 (paso 5, «ninguna lista de categorías escrita a mano»):
    js/control-registro-pantalla.js no debe llevar su propia lista de categorías; tiene que salir de Nombres.CATEGORIAS
    para que los tutores legales y las administraciones también se reconozcan al crear un asunto desde el control de registro.
-   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la aplicación, idea 586 de docs/COLA.md. */
+   APARTADA (RETIRADAS de pruebas/ejecutar.mjs): fallo real de la aplicación, idea 594 de docs/COLA.md. */
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 

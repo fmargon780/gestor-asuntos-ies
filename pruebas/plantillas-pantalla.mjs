@@ -1,5 +1,5 @@
 /* Fila 320 (docs/PANTALLA-DE-PLANTILLAS.md): la pantalla «Plantillas» de Herramientas. Con Chromium real y la copia de pruebas.
-   (Fila 584: el paso 20, «Ver todas las plantillas» desde un tipo, pasó a plantillas-desde-un-tipo.mjs, apartada con la idea 585.) */
+   (Fila 584: el paso 20, «Ver todas las plantillas» desde un tipo, pasó a plantillas-desde-un-tipo.mjs, apartada con la idea 593.) */
 import { chromium } from 'playwright';
 
 const BASE = (process.env.DIRECCION || 'http://localhost:8123/index.html');

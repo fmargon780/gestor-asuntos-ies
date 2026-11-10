@@ -80,13 +80,13 @@ const EN_SOLITARIO = EN_SOLITARIO_ENTRADAS.map((e) => e[0]);
    motivo en una línea. Qué haría falta para volver a meterlas: docs/PRUEBAS-RETIRADAS.md. */
 const RETIRADAS = [
   { fichero: 'notas-de-directivos.mjs', desde: '10-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 587: los cuadros «Vista» con documentos sin guardar y «archivar con notas sin ver» enseñan «Cancelar» en vez de «Guardarlos ahora» y «Verlas» (js/notas-directivos.js, líneas 246 y 338, ponen el texto antes de U.preguntar y este lo pisa; la misma causa que la idea 569)' },
+    motivo: 'fallo real de la aplicación, idea 595: los cuadros «Vista» con documentos sin guardar y «archivar con notas sin ver» enseñan «Cancelar» en vez de «Guardarlos ahora» y «Verlas» (js/notas-directivos.js, líneas 246 y 338, ponen el texto antes de U.preguntar y este lo pisa; la misma causa que la idea 569)' },
   { fichero: 'categorias-del-control-de-registro.mjs', desde: '10-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 586: js/control-registro-pantalla.js (línea 269) lleva su lista de categorías escrita a mano y no reconoce a tutores legales ni administraciones' },
+    motivo: 'fallo real de la aplicación, idea 594: js/control-registro-pantalla.js (línea 269) lleva su lista de categorías escrita a mano y no reconoce a tutores legales ni administraciones' },
   { fichero: 'plantillas-desde-un-tipo.mjs', desde: '10-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 585: «Ver todas las plantillas» desde la pantalla de un tipo no abre la pantalla (js/herramientas.js, fila 551, la cierra después de un await)' },
+    motivo: 'fallo real de la aplicación, idea 593: «Ver todas las plantillas» desde la pantalla de un tipo no abre la pantalla (js/herramientas.js, fila 551, la cierra después de un await)' },
   { fichero: 'etiquetas-desde-el-grupo.mjs', desde: '10-nov-2026',
-    motivo: 'fallo real de la aplicación, idea 585: «Imprimir etiquetas» de un asunto de grupo no abre la pantalla (js/herramientas.js, fila 551, cierra Etiquetas después de un await y la deja oculta)' },
+    motivo: 'fallo real de la aplicación, idea 593: «Imprimir etiquetas» de un asunto de grupo no abre la pantalla (js/herramientas.js, fila 551, cierra Etiquetas después de un await y la deja oculta)' },
   { fichero: 'cambiar-tipo-y-guia.mjs', desde: '9-nov-2026',
     motivo: 'fallo real de la aplicación, idea 569: el cuadro de cambio de tipo debe decir «Dejar los hitos como están» en el botón de cancelar, pero U.preguntar (js/util.js, fila 524) lo pisa con «Cancelar» después de que js/hitos-cambio-de-tipo.js lo ponga; también en main' },
 ];

@@ -98,7 +98,7 @@ async function abrirMenuDeTarea(idTarea) {
 }
 
 async function elegirDelMenu(texto) {
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 588 de la cola); se pulsa la parte visible */
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 596 de la cola); se pulsa la parte visible */
 }
 const elegirDelMenuAbierto = elegirDelMenu;
 
@@ -230,7 +230,7 @@ await comprobar('5. no está en la guía',
 /* El fallo de «no me carga el mapa previo»: con el hito recién creado solo en este asunto,
    «Cambiar la guía…» y el mapa del asunto enseñan la guía que ya había, entera. */
 await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 588 de la cola); se pulsa la parte visible */
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 596 de la cola); se pulsa la parte visible */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });
@@ -275,7 +275,7 @@ await comprobar('7. y en el otro asunto, que no lo había empezado',
 
 /* 8. «Cambiar la guía…» tras crear un hito: la guía previa se ve entera. */
 await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 588 de la cola); se pulsa la parte visible */
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click({ position: { x: 180, y: 8 } });   /* fila 584: la parte izquierda del menú queda bajo la barra lateral (idea 596 de la cola); se pulsa la parte visible */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');   /* la advertencia de «Vale para todos los asuntos…» */
 await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });
