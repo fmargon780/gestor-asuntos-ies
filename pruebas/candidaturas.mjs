@@ -172,7 +172,7 @@ await comprobar('5. el sector PAS sale solo para el personal no docente', pagina
 await comprobar('5. el resumen', pagina.evaluate(() => document.getElementById('ficha-candidaturas').dataset.resumen), '4 candidaturas · Alumnado 1 · Madres y padres 1 · Profesorado 1 · PAS 1');
 await comprobar('5. cuatro bloques, uno por sector', pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#ficha-candidaturas .cand-bloque'), (b) => b.dataset.sector)), ['Alumnado', 'Madres y padres', 'Profesorado', 'PAS']);
 const estado = (frag) => pagina.locator('.cand-fila', { hasText: frag }).locator('.cand-estado');
-await estado('Aguilar').selectOption('Admitida');
+await estado('Aguilar Ponce').selectOption('Admitida');
 await pagina.waitForTimeout(1200);
 await estado('Otero').selectOption('Retirada');
 await pagina.waitForTimeout(1200);
