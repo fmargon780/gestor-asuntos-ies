@@ -151,15 +151,10 @@ function construirSeccionDatos(tipo) {
   campoCorto.onchange = async function () {
     var texto = U.limpiarNombre(campoCorto.value).toUpperCase();
     if (texto === (tipo.nombreCorto || '')) return;
-    if (texto.length > 25) {
-      U.aviso('El nombre corto no puede pasar de 25 caracteres.', 'malo');
-      campoCorto.value = tipo.nombreCorto || '';
-      pintarAvisoCorto();
-      return;
-    }
-    var otros = App.E.tipos.filter(function (t) { return t !== tipo; }).map(efectivoDe);
-    if (texto && otros.some(function (o) { return U.normalizar(o) === U.normalizar(texto); })) {
-      U.aviso('Ya lo usa otro tipo: no puede repetirse.', 'malo');
+    /* Fila 606: las mismas comprobaciones que en «Cambiar el nombre» (TiposNombre.problemaDelCorto). */
+    var problema = TiposNombre.problemaDelCorto(texto, tipo);
+    if (problema) {
+      U.aviso(problema, 'malo');
       campoCorto.value = tipo.nombreCorto || '';
       pintarAvisoCorto();
       return;
