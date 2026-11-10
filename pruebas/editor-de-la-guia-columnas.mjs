@@ -156,7 +156,7 @@ await comprobar('«Datos del hito» y, en cada cosa, su rótulo',
     const d = document.querySelector('#guia-pasos > .paso-editor[data-pos="0"]');
     return [d.querySelector(':scope > .paso-datos-titulo').textContent,
             Array.from(d.querySelectorAll(':scope > .paso-cabecera .etiqueta, :scope > .paso-extra .etiqueta')).map(e => e.textContent)];
-  }), ['Datos del hito', ['Título del hito', 'Responsable', 'A quién le toca', 'Plazo (días)', 'Cómo se cuentan', 'Desde']]);
+  }), ['Datos del hito', ['Título del hito', 'Responsable', 'A quién le toca', 'Plazo (días)', 'Cómo se cuentan', 'Desde', 'Cuenta']]);
 await comprobar('«A quién le toca» se ve siempre (sin abrir nada)',
   pagina.evaluate(() => document.querySelector('#guia-pasos > .paso-editor[data-pos="0"] .paso-toca').offsetParent !== null), true);
 await comprobar('los desplegables y ↑, ↓ y «Quitar» en la zona de datos',

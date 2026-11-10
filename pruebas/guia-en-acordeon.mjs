@@ -207,7 +207,7 @@ await comprobar('«Datos del hito» y «Tareas de este hito» van antes que los 
 await comprobar('cada desplegable del hito lleva su rótulo',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos > .paso-editor[data-pos="2"] .dato > .etiqueta, #guia-pasos > .paso-editor[data-pos="2"] .dato .etiqueta'))
     .map(e => e.textContent)),
-  ['Título del hito', 'Responsable', 'A quién le toca', 'Plazo (días)', 'Cómo se cuentan', 'Desde']);
+  ['Título del hito', 'Responsable', 'A quién le toca', 'Plazo (días)', 'Cómo se cuentan', 'Desde', 'Cuenta']);
 await comprobar('el resumen de «Otros» dice «Solo informativo»; el de «Al terminar este hito», «no»',
   pagina.locator('#guia-pasos > .paso-editor[data-pos="2"] > .paso-apartado-cab .ap-resumen').allTextContents(),
   ['', 'avisar a quien lo pide: no', '', '', 'Solo informativo']);

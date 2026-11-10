@@ -162,14 +162,14 @@ console.log('--- 5. el firmado que luego se registra ---');
 await pulsarRuta(D1);
 await escribirEncima(D1, SELLO);
 await mirar();
-await comprobar('5. «Firmado (2) · Registro 26EM0368»', linea(D1), 'Firmado (2) · Registro 26EM0368');
+await comprobar('5. «Firmado (2) · Registro 26EM0368»', linea(D1), 'Firmado (2) · Registro 26EM0368 · 10/09/2026');
 await comprobar('5. el original va a previas como «SIN SELLAR»', previas().then((l) => l.filter((n) => / SIN SELLAR/.test(n)).length), 1);
 
 console.log('--- sello y firma a la vez: entra por el sello y se anota la firma ---');
 await pulsarRuta(D2);
 await escribirEncima(D2, SELLO + '\n% /ByteRange [0 1 2 3]');
 await mirar();
-await comprobar('sello+firma. registrado y firmado', linea(D2), 'Firmado · Registro 26EM0368');
+await comprobar('sello+firma. registrado y firmado', linea(D2), 'Firmado · Registro 26EM0368 · 10/09/2026');
 
 console.log('--- 6. sin firma ni sello encima de un documento sin firmar ---');
 await pulsarRuta(D3);
