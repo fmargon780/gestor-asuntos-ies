@@ -85,6 +85,7 @@
     if (window.Demo.tutor) await Demo.tutor.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 299 */
     if (window.Demo.orden) await Demo.orden.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 300 */
     if (window.Demo.soloSi) await Demo.soloSi.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 576 */
+    if (window.Demo.baja) await Demo.baja.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 592 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();
@@ -98,6 +99,7 @@
       var plazos = await PlazosDelCentro.pasada({ forzar: true });
       if (plazos) PlazosDelCentro.avisar(plazos);
     }
+    if (window.Demo.baja) await Demo.baja.alAcabar();   /* fila 592: BAJA pasa a BAJA MATRICULA (antes de recargar) */
     /* Fila 285: ya recargado, la pasada que coloca el PDF sellado (sale «1 listos para enviar»). */
     if (window.Gestor && Gestor.recargar) await Gestor.recargar();
     if (window.Demo.libros) await Demo.libros.construir();   /* fila 501: ?libros=1 */

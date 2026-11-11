@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "fuente": "docs/592-BAJA-MATRICULA.md (11-nov-2026). Lo pone al día js/baja-matricula.js una vez, al entrar; los textos de las plantillas están en plantillas/*.md (tipo «BAJA MATRICULA»).",
+  "tipo": {
+    "largo": "Baja de matrícula", "corto": "BAJA MATRICULA", "categoria": "ALUMNADO",
+    "antes": ["BAJA", "Baja del alumnado"], "indice": "BAJA MATRICULA"
+  },
+  "campos": [
+    { "nombre": "Motivo de la baja", "clase": "lista", "valores": ["Traslado al extranjero"], "donde": "crear" },
+    { "nombre": "País de destino", "clase": "texto", "valores": [], "donde": "general" },
+    { "nombre": "Fecha de efectos de la baja", "clase": "fecha", "valores": [], "donde": "general" },
+    { "nombre": "Protocolo de absentismo iniciado", "clase": "lista", "valores": ["Sí", "No"], "donde": "general" },
+    { "nombre": "Cómo se acredita el traslado", "clase": "lista", "valores": ["Declaración de la familia", "Diligencia de Dirección"], "donde": "general" },
+    { "nombre": "Aporta matrícula del país de destino", "clase": "lista", "valores": ["Sí", "No"], "donde": "general" }
+  ],
+  "camposDelAlumno": [ { "origen": "calculado", "id": "curso" }, { "origen": "fichero", "columna": "Fecha de nacimiento" } ],
+  "tareas": [
+    { "clave": "anadir", "nombre": "Añadir la declaración de la familia o la diligencia de Dirección", "accion": "anadir",
+      "explicacion": "La declaración firmada por la familia (anexo I) o la diligencia de Dirección (anexo II)." },
+    { "clave": "pedir", "nombre": "Pedir los datos de la baja", "accion": "pedir",
+      "campos": ["País de destino", "Fecha de efectos de la baja", "Protocolo de absentismo iniciado", "Cómo se acredita el traslado", "Aporta matrícula del país de destino"],
+      "explicacion": "Se apuntan en el asunto y de ahí salen a la resolución y a los correos." },
+    { "clave": "generar", "nombre": "Generar la resolución de baja", "accion": "generar", "plantilla": "Resolución de baja por traslado al extranjero",
+      "explicacion": "Resolución de la Dirección por la que se da de baja la matrícula. Léela entera antes de ponerla a la firma." },
+    { "clave": "firmar", "nombre": "Firmar un documento", "accion": "firmar" },
+    { "clave": "registrar", "nombre": "Registrar de salida el documento", "accion": "registrar", "receta": { "sentido": "salida" } },
+    { "clave": "seneca", "nombre": "Grabar la baja en Séneca con su fecha", "accion": "",
+      "explicacion": "Abrir la matrícula del alumno o alumna en Séneca y dar la baja con la fecha de efectos de la resolución." },
+    { "clave": "familia", "nombre": "Comunicar la resolución a la familia", "accion": "comunicar",
+      "receta": { "a": "tutores", "via": "correo" }, "plantilla": "Resolución de baja · familia" },
+    { "clave": "sociales", "nombre": "Comunicar la resolución a Servicios Sociales", "accion": "comunicar",
+      "receta": { "a": "relacionados", "via": "correo" }, "plantilla": "Resolución de baja · Servicios Sociales" }
+  ],
+  "guia": [
+    { "id": "bm-1", "nombre": "Recibir el encargo de Dirección", "responsable": "yo",
+      "explicacion": "<p>Dirección pide la baja. Se reúne el documento que acredita el traslado y los datos de la baja.</p>",
+      "soloSi": { "campo": "Motivo de la baja", "valores": ["Traslado al extranjero"] }, "tareas": ["anadir", "pedir"] },
+    { "id": "bm-2", "nombre": "Preparar la resolución", "responsable": "yo",
+      "explicacion": "<p>Se genera la resolución con los datos del asunto.</p>",
+      "soloSi": { "campo": "Motivo de la baja", "valores": ["Traslado al extranjero"] }, "tareas": ["generar"] },
+    { "id": "bm-3", "nombre": "Firma de Dirección", "responsable": "direccion",
+      "explicacion": "<p>La Dirección firma la resolución.</p>", "tareas": ["firmar"] },
+    { "id": "bm-4", "nombre": "Registro de salida", "responsable": "yo",
+      "explicacion": "<p>Se registra de salida la resolución firmada.</p>", "tareas": ["registrar"] },
+    { "id": "bm-5", "nombre": "Baja en Séneca", "responsable": "yo",
+      "explicacion": "<p>Se graba la baja en Séneca.</p>", "tareas": ["seneca"] },
+    { "id": "bm-6", "nombre": "Comunicar", "responsable": "yo",
+      "explicacion": "<p>Se envía la resolución a la familia y, si se inició el protocolo de absentismo, a Servicios Sociales.</p>",
+      "tareas": ["familia", { "tarea": "sociales", "soloSi": { "campo": "Protocolo de absentismo iniciado", "valores": ["Sí"] } }] }
+  ]
+}

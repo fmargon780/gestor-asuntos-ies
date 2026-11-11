@@ -24,7 +24,10 @@
 
   var URL_INDICE_PLANTILLAS = 'plantillas/indice.json';
 
-  async function cargarPlantillasDelCentro() {
+  /* Fila 592: `opciones.soloTipo` (el `tipo` del índice) y `opciones.tipoReal` (el nombre con que ese tipo está en el centro)
+     cargan solo las plantillas de un tipo, colgadas del nombre que tiene de verdad. Sin opciones, todas, como siempre. */
+  async function cargarPlantillasDelCentro(opciones) {
+    opciones = opciones || {};
     var indice = await App.leerFicheroDeLaApp(URL_INDICE_PLANTILLAS, 'json');
 
     var actual = await Plantillas.cargar(App.E.gestor);
@@ -38,6 +41,8 @@
 
     for (var i = 0; i < indice.length; i++) {
       var e = indice[i];
+      if (opciones.soloTipo && e.tipo !== opciones.soloTipo) continue;
+      if (opciones.soloTipo && opciones.tipoReal) e = Object.assign({}, e, { tipo: opciones.tipoReal });
       var clave = e.tipo + '|' + e.nombre;
 
       if (e.clase === 'documento') {
@@ -69,12 +74,15 @@
         });
       } else {
         if (yaCorreo[clave]) { correoYaEstaban++; continue; }
+        var idFijoCorreo = e.id && !(actual.lista || []).some(function (p) { return p.id === e.id; }) ? e.id : '';   /* fila 592 */
         var nuevo = {
-          id: Plantillas.idNuevo(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
+          id: idFijoCorreo || Plantillas.idNuevo(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
           texto: e.cuerpo || ''
         };
         /* Fila 170: el texto propio para el mensaje de Séneca, si lo trae. */
         if (e.cuerpoSeneca) nuevo.textoSeneca = e.cuerpoSeneca;
+        if (e.para && e.para.length) nuevo.para = e.para.slice();   /* fila 592 (papeles, fila 555) */
+        if (e.saludo) nuevo.saludo = e.saludo;
         nuevosCorreo.push(nuevo);
       }
     }
@@ -93,7 +101,7 @@
     /* Y las repetidas que ya hubiera (fila 126): se queda la unida a un
        paso de guía; la otra, a la papelera. */
     var quitadas = 0;
-    if (window.TiposNombre) {
+    if (window.TiposNombre && !opciones.soloTipo) {
       try { quitadas = await TiposNombre.quitarRepetidas(); } catch (e) { quitadas = 0; }
     }
 
