@@ -175,19 +175,36 @@ App.revisarArranque = function () {
   $('btn-entrar').disabled = !(App.E.abiertos && App.E.archivo);
 };
 
-/* Si el usuario cierra el cuadro de elegir carpeta, el navegador devuelve
-   AbortError y no hay nada que decir. Cualquier otro fallo sí se cuenta:
-   callarlo dejaría el botón de Entrar apagado sin explicación. */
+/* Fila 609 (docs/609-AVISO-SI-LA-CARPETA-NO-QUEDA.md): si al pulsar el botón
+   de una carpeta esta no queda señalada, sale siempre un aviso en rojo con lo
+   que dice Chrome tal cual, también si dice «cancelado» (AbortError). Si sí
+   queda señalada pero no se puede recordar, aviso ámbar y se entra igual. */
+App.textoDeChrome = function (e) {
+  return (e && e.name ? e.name + ': ' : '') + ((e && e.message) || String(e));
+};
+
 App.pedirCarpeta = async function (cual, idCuadro, idEstado) {
+  var h;
   try {
-    var h = await Carpetas.elegir(idCuadro);
-    App.E[cual] = h;
-    App.marcarCarpeta(idEstado, h.name);
-    App.revisarArranque();
+    h = await Carpetas.elegir(idCuadro);
+  } catch (e) {
+    console.warn('Carpeta no señalada', e);
+    if (e && e.name === 'AbortError') {
+      U.aviso('La carpeta no ha quedado señalada. Chrome dice: ' + App.textoDeChrome(e) +
+        '. Si has cerrado el cuadro tú, no pasa nada; si no, manda este aviso con el botón «Soporte».', 'malo');
+    } else {
+      U.aviso('No he podido usar esa carpeta: ' + U.mensajeDeError(e) + ' Chrome dice: ' + App.textoDeChrome(e), 'malo');
+    }
+    return;
+  }
+  App.E[cual] = h;
+  App.marcarCarpeta(idEstado, h.name);
+  App.revisarArranque();
+  try {
     await Almacen.guardar(cual, h);
   } catch (e) {
-    if (e.name === 'AbortError') return;
-    U.aviso('No he podido usar esa carpeta: ' + U.mensajeDeError(e), 'malo');
+    console.warn('Carpeta señalada pero no recordada', e);
+    U.aviso('La carpeta está señalada, pero este navegador no la va a recordar. Chrome dice: ' + App.textoDeChrome(e), 'ambar');
   }
 };
 
