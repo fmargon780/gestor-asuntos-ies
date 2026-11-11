@@ -53,6 +53,10 @@
       if (cfg.soloAqui) {
         salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
       } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
+      else if (window.FichaCamposListaVacia) {   /* fila 592: un dato de lista vacío sale con su desplegable */
+        var vacia = FichaCamposListaVacia.fila(cfg, a);
+        if (vacia) salida.push(vacia);
+      }
     });
     Object.keys(guardados).forEach(function (clave) {
       if (vistos[clave]) return;
@@ -100,7 +104,7 @@
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo); });
+    ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo || x.elegir); });
     /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que
        envuelve App.abrirFicha), porque hace falta leer los hitos del

@@ -342,6 +342,7 @@ async function main() {
          el correo, abajo el texto propio del mensaje de Séneca (que no
          adjunta ficheros). Sin la línea, no hay `cuerpoSeneca`. */
       const partes = cuerpo.split(SEPARADOR_SENECA);
+      if (datos.id) entrada.id = datos.id;   /* fila 592: un id fijo también en el correo, para que una tarea de comunicar lo cite */
       entrada.cuerpo = textoPlanoDe(partes[0]);
       if (partes.length > 1 && partes.slice(1).join('\n').trim()) {
         entrada.cuerpoSeneca = textoPlanoDe(partes.slice(1).join('\n'));

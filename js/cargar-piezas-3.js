@@ -230,6 +230,10 @@
     // carga el contenido de la biblioteca del centro, en Mantenimiento.
     'js/cargar-biblioteca.js',
     'js/plazos-del-centro.js',
+    // Fila 592: el tipo BAJA MATRICULA llega solo al centro. Después de js/plantillas-centro.js, js/comunes-guardado.js y js/guias-enganche.js.
+    'js/ficha-campos-lista-vacia.js',
+    'js/baja-matricula-guia.js',
+    'js/baja-matricula.js',
     // Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js.
     'js/actividades.js',
     'js/actividades-formulario.js',

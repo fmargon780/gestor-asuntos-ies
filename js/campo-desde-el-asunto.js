@@ -349,6 +349,7 @@ window.CampoDesdeElAsunto = (function () {
     var b = caja.querySelector('#ficha-campo-anadir');
     /* Fila 530: «+ Añadir campo» abre la ventana de elegir (js/campo-elegir-en-asunto.js). */
     if (b) b.onclick = function () { if (window.CampoElegirEnAsunto) CampoElegirEnAsunto.abrir(a); else abrir(a); };
+    if (window.FichaCamposListaVacia) FichaCamposListaVacia.alPintar(caja, a);   /* fila 592 */
     Array.prototype.forEach.call(caja.querySelectorAll('.campo-aqui-menu'), function (boton) {
       var clave = boton.dataset.clave;
       var nombre = boton.dataset.nombre || clave;

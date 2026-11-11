@@ -38,6 +38,58 @@
     "vistoBueno": "direccion"
   },
   {
+    "nombre": "Anexo I · Declaración de traslado de residencia al extranjero",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA MATRICULA",
+    "clase": "documento",
+    "id": "pd-baja-anexo-i",
+    "fichero": "anexo-i-declaracion-traslado.docx",
+    "tipoDocumento": "ANEXO",
+    "texto": "anexo I",
+    "firmante": "",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Anexo II · Diligencia de la Dirección",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA MATRICULA",
+    "clase": "documento",
+    "id": "pd-baja-anexo-ii",
+    "fichero": "anexo-ii-diligencia-direccion.docx",
+    "tipoDocumento": "ANEXO",
+    "texto": "anexo II",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Resolución de baja · familia",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA MATRICULA",
+    "clase": "correo",
+    "id": "pl-baja-familia",
+    "cuerpo": "Les enviamos firmada la resolución de la Dirección por la que se da de baja la matrícula de {{NOMBRE NATURAL}} en el {{CENTRO}}, con efectos desde el {campo:Fecha de efectos de la baja}.\n\n{si:Protocolo de absentismo iniciado=Sí}Como se había iniciado el protocolo de absentismo, enviamos también copia a los Servicios Sociales Comunitarios para su cierre.\n\n{si:Aporta matrícula del país de destino=No}Si disponen del certificado de matrícula en el nuevo centro, les agradecemos que nos lo hagan llegar para completar el expediente."
+  },
+  {
+    "nombre": "Resolución de baja · Servicios Sociales",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA MATRICULA",
+    "clase": "correo",
+    "id": "pl-baja-sociales",
+    "cuerpo": "Les comunicamos que la Dirección del {{CENTRO}} ha resuelto la baja de la matrícula de {{NOMBRE NATURAL}}, de {campo:Curso}, con efectos desde el {campo:Fecha de efectos de la baja}, por traslado de residencia de la familia a {campo:País de destino}. Adjuntamos la resolución, a efectos del cierre del protocolo de absentismo."
+  },
+  {
+    "nombre": "Resolución de baja por traslado al extranjero",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA MATRICULA",
+    "clase": "documento",
+    "id": "pd-baja-resolucion",
+    "fichero": "resolucion-baja-traslado-extranjero.docx",
+    "tipoDocumento": "RESOLUCION",
+    "texto": "baja",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
     "nombre": "Comunicación de baja",
     "categoria": "ALUMNADO",
     "tipo": "BAJA",
