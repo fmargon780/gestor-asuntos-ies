@@ -137,4 +137,10 @@ Al diseñar el tema 519 (10-nov-2026):
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- 11-nov-2026, 1.ª vuelta del segundo revisor (otro ayudante, sin ver el código; en la pantalla de prueba `?demo=1&auto=1&baja=1`):
+  - Tipo, «Nuevo asunto» con el motivo, seis hitos con sus tareas y el «Falta: Motivo de la baja», «Pedir datos» con los cinco datos, Servicios Sociales solo con protocolo «Sí», «Campos del asunto» con desplegable, y que no se duplica nada: **coincide**.
+  - Resolución leída entera en cuatro combinaciones: Tercero, Cuarto y frase del certificado **coinciden**, sin `{si:` ni `{{` sueltos. Anexos I y II con nombre, curso y año rellenos: **coinciden**.
+  - **No coincidía** (corregido): el asunto de antes de «BAJA» recibía los seis hitos nuevos al abrir su ficha (9 hitos). Ahora se apuntan como ya conocidos y sigue con los suyos.
+  - **No coincidía** (corregido): el correo a la familia salía sin nadie en «Para» y el de Servicios Sociales con el saludo «Estimados tutores legales». Ahora la familia propone a los tutores legales y Servicios Sociales a los relacionados, con saludo «Estimados señores:» (el saludo no estaba en el texto acordado: se pone solo para no decir «tutores» a Servicios Sociales).
+  - **Hace sin que el texto lo pida** (se deja y se avisa): «Nuevo asunto» trae también «Curso» y «Fecha de nacimiento» ya rellenos con los del alumno (la resolución los necesita); en los correos no sale la línea «Asunto:» de los textos porque las plantillas de correo no tienen ese campo; cuando faltan datos la app cambia «alumno/a» por «alumna» y «el/la director/a» por «la directora» (comportamiento de siempre de la app); la ventana «Faltan datos» pide también tutores y provincia, que están en el texto acordado.
+  - **No lo he podido ver**: el correo con tutor que tiene correo (en la demo no lo tienen); «entrar dos veces» con datos guardados de verdad (la demo se rehace en cada carga; la prueba automática comprueba que la pasada forzada no duplica); el tipo con un alumno de Bachillerato (la resolución es de ESO y no avisa; no se pidió).
