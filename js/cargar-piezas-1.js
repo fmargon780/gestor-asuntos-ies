@@ -13,6 +13,8 @@
     'js/ayuda-raton.js',   // fila 462: el recuadro (ya no hay ayudas grises del navegador)
     'js/solo-consulta.js',
     'js/util-parecidos.js',
+    'js/lista-nuevo.js',   // fila 615: «+ Nuevo…» en los desplegables (el cuadro, los parecidos, el escucha)
+    'js/lista-nuevo-listas.js',   // fila 615: lo propio de cada lista (responsables, tipos de documento, campos de lista)
     'js/buscar-o-crear.js',
     'js/util-pantalla.js',
     'js/almacen.js',
@@ -78,6 +80,7 @@
     'js/guias-columnas.js',
     'js/guias-cuando.js',   // fila 576: «Cuándo se hace»
     'js/guias-plantilla.js',
+    'js/guias-plantilla-nueva.js',   // fila 615: «+ Nueva plantilla…»
     'js/guias-plegado.js',
     'js/guias-opciones-editor.js',
     'js/guias-mapa.js',

@@ -59,6 +59,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | El tutor o tutora en el correo (fila 348) | **«+ Tutor/a de 1º ESO G»**, **«+ Tutores (3 grupos)»**, **«Va a:»** (La familia, El tutor o tutora del grupo, Quien lo pide), **«A quién va cada plantilla»** | tutor de curso, delegado, destinatario (para «Va a:») |
 | La lista de todos los datos que usan las plantillas (fila 528) y la ventana para elegir uno | **«Campos»** (Ajustes → El centro); los grupos **Persona, Tutores, Asunto, Centro, Firmantes**; de dónde sale: **Centro de datos, El asunto, Ajustes del centro, Tabla de datos, Calculado, Manual**; **«Campo variable»**, **«+ Campo manual nuevo»**, **«+ Crear a partir de otros»** | catálogo de campos, hueco, «Insertar hueco» |
 | Que un hito o una tarea de la guía salga solo según un campo del asunto (fila 576) | **«Cuándo se hace»**, **«Siempre»**, **«Solo si el campo «X» vale…»**; etiqueta amarilla **«Solo si X: a o b»** en la guía y **«Falta: X»** en el asunto con el campo vacío | hito-pregunta, ramas, condición |
+| Crear un valor nuevo desde un desplegable de hitos y tareas (fila 615) | **«+ Nuevo responsable…»**, **«+ Nuevo tipo de documento…»**, **«+ Nuevo campo de lista…»**, **«+ Nueva plantilla…»**; el aviso: «Ya hay algo parecido en esta lista:» con **«Usar “X”»** | «Añadir al desplegable», «otro…» |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

@@ -19,6 +19,12 @@ var GuiasCuando = (function () {
   var contador = 0;
 
   function ponerTipo(t) { tipo = String(t || ''); }
+  function tipoActual() { return tipo; }
+
+  /* Fila 615: «+ Nuevo campo de lista…» solo con un tipo de asunto de verdad (no en un modelo de la biblioteca). */
+  function tipoReal() {
+    return !!(tipo && window.App && App.E && (App.E.tipos || []).some(function (t) { return t.tipo === tipo; }));
+  }
 
   function camposDelTipo() {
     return window.TextoCondicional ? TextoCondicional.camposDeLista(tipo) : [];
@@ -44,6 +50,7 @@ var GuiasCuando = (function () {
       return '<option value="' + U.escapar(n) + '"' + (actual && U.normalizar(n) === U.normalizar(actual) ? ' selected' : '') +
         '>Solo si el campo «' + U.escapar(n) + '» vale…</option>';
     }).join('');
+    if (tipoReal() && window.ListaNuevo) opts += ListaNuevo.opcionHTML('+ Nuevo campo de lista…');   /* fila 615 */
     var html = '<div class="cuando-linea"><label class="etiqueta" for="' + id + '">Cuándo se hace</label>' +
       '<select class="campo cuando-campo" id="' + id + '">' + opts + '</select></div>';
     if (actual) {
@@ -112,6 +119,6 @@ var GuiasCuando = (function () {
   /* La frase gris del resumen de un hito o tarea: '' si es «Siempre». */
   function etiqueta(soloSi) { return window.SoloSi ? SoloSi.etiqueta(soloSi) : ''; }
 
-  return { ponerTipo: ponerTipo, bloque: bloque, html: html, enganchar: enganchar, leer: leer, etiqueta: etiqueta };
+  return { ponerTipo: ponerTipo, tipoActual: tipoActual, bloque: bloque, html: html, enganchar: enganchar, leer: leer, etiqueta: etiqueta };
 })();
 window.GuiasCuando = GuiasCuando;

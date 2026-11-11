@@ -186,7 +186,7 @@ var GuiasPasoBloques = (function () {
         ((window.App && App.E && App.E.tiposDocumento) || []).map(function (t) {
           return '<option value="' + U.escapar(t) + '"' + (t === p.tipoDocumento ? ' selected' : '') + '>' +
             U.escapar(t) + '</option>';
-        }).join('') + '</select>';
+        }).join('') + (window.ListaNuevo ? ListaNuevo.opcionHTML('+ Nuevo tipo de documento…') : '') + '</select>';   /* fila 615 */
       d.appendChild(filaTextoDoc);
       if (window.HuecosBuscador) {
         HuecosBuscador.montar({

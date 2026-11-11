@@ -24,6 +24,7 @@
   var PAPELES = [
     { id: 'tercero', nombre: 'El tercero del asunto', clase: 'papel' },
     { id: 'tutor', nombre: 'El tutor del alumnado', clase: 'papel' },
+    { id: 'profesores', nombre: 'Sus profesores', clase: 'papel' },   /* fila 615 */
     { id: 'relacionado', nombre: 'Un relacionado', clase: 'papel' }
   ];
 

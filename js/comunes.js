@@ -143,6 +143,7 @@ var Comunes = (function () {
   function pasoDeHito(h, tareas) {
     var base = window.Guias ? Guias.normalizar([{ titulo: h.nombre, cuerpo: h.explicacion }])[0] : { titulo: h.nombre, cuerpo: h.explicacion, opciones: [] };
     base.comun = h.id;
+    if (h.responsable) base.responsable = h.responsable;   /* fila 615: el elegido al crear el hito */
     base.guion = (h.tareas || []).map(function (id) { return buscar(tareas, id); }).filter(Boolean).map(lineaDeTarea);
     return base;
   }

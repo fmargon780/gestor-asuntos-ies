@@ -175,7 +175,10 @@
     }).join('');
   }
 
-  async function abrirCuadroDePlantillaDoc(existente, tipoPreset, alGuardar) {
+  /* Fila 615: el editor de plantillas de documento en tres piezas (el cuerpo, el enganche y el guardado) para poder
+     pintarlo también en la columna derecha del editor de la guía (js/guias-plantilla-nueva.js), sin abrir un cuadro
+     nuevo que cerraría la guía. `abrirCuadroDePlantillaDoc` las junta, igual que antes. */
+  async function prepararCuadroDoc(existente, tipoPreset) {
     var categorias = Nombres.CATEGORIAS;
     var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
     var ficheros = await ficherosDeWordDisponibles();
@@ -237,9 +240,7 @@
         (existente && existente.conLogoCentro === false ? '' : ' checked') + '> Con el logo del centro</label>' +
       '<p class="nota">En el membrete, a la derecha (Ajustes → El centro → Membrete). Sin marcar, esa parte sale en blanco.</p>';
 
-    var promesa = U.preguntar(existente ? 'Cambiar plantilla de documento' : 'Nueva plantilla de documento',
-      cuerpo, existente ? 'Guardar' : 'Crear');
-
+    function enganchar() {
     $('pd-categoria').onchange = function () {
       $('pd-tipo').innerHTML = opcionesTipos($('pd-categoria').value);
     };
@@ -260,9 +261,10 @@
       };
     }
 
-    var ok = await promesa;
-    if (!ok) return;
+    }   /* fin de enganchar() */
 
+    /* Lee los campos y guarda. Devuelve true si ha guardado (si falta algo o falla, avisa y devuelve false). */
+    async function guardar(alGuardar) {
     var nombre = $('pd-nombre').value.trim();
     var tipo = $('pd-tipo').value;
     var categoria = $('pd-categoria').value;
@@ -275,7 +277,7 @@
 
     if (!nombre || !tipo || !fichero || !tipoDocumento) {
       U.aviso('Hace falta el nombre, el tipo, el fichero y el tipo de documento.', 'malo');
-      return;
+      return false;
     }
 
     try {
@@ -297,9 +299,24 @@
       });
       U.aviso(existente ? 'Plantilla de documento guardada.' : 'Plantilla de documento creada.', 'bueno');
       if (typeof alGuardar === 'function') alGuardar();
+      return true;
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
+      return false;
     }
+    }   /* fin de guardar() */
+
+    return { cuerpo: cuerpo, enganchar: enganchar, guardar: guardar };
+  }
+
+  async function abrirCuadroDePlantillaDoc(existente, tipoPreset, alGuardar) {
+    var cuadro = await prepararCuadroDoc(existente, tipoPreset);
+    var promesa = U.preguntar(existente ? 'Cambiar plantilla de documento' : 'Nueva plantilla de documento',
+      cuadro.cuerpo, existente ? 'Guardar' : 'Crear');
+    cuadro.enganchar();
+    var ok = await promesa;
+    if (!ok) return;
+    await cuadro.guardar(alGuardar);
   }
 
   /* «Cargar las plantillas del centro» vive en js/plantillas-centro.js
@@ -307,4 +324,5 @@
 
   window.PlantillasDocumento.pintarDeTipo = pintarDeTipo;
   window.PlantillasDocumento.abrirCuadroDePlantillaDoc = abrirCuadroDePlantillaDoc;
+  window.PlantillasDocumento.prepararCuadroDoc = prepararCuadroDoc;   /* fila 615 */
 })();

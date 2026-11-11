@@ -1,0 +1,10 @@
+/* Fila 615 (docs/615-LISTAS-EDITABLES.md): el cuadro de «+ Nuevo…» (js/lista-nuevo.js). Va encima del editor de la
+   guía, que es el cuadro de siempre (#capa, z-index 50): por debajo de los avisos (60). Usa la regla común de los
+   cuadros (.capa > .cuadro: título y botones fijos), con el cuerpo que se desplaza. */
+.capa.ln-capa { z-index: 55; }
+.capa.ln-capa > .cuadro { max-width: 460px; }
+.ln-cuadro > .ln-cuerpo { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+.ln-cuadro .etiqueta { margin-top: 4px; }
+.ln-aviso { background: var(--ambar, #fff4d6); border: 1px solid var(--ambar-linea, #e0b44a); border-radius: 6px; padding: 8px; font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+.ln-error { color: var(--rojo-linea, #c0392b); font-size: 13px; margin: 0; }
+.ln-parecidos:empty { display: none; }

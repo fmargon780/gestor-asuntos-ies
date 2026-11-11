@@ -44,6 +44,7 @@
     var nivel = pasos;
     if (window.GuiasCuando) GuiasCuando.ponerTipo(nombreTipo);   /* fila 576 */
     var opcionesResp = listaResponsables || [];
+    if (window.ListaNuevoListas) ListaNuevoListas.responsablesDeLaGuia(opcionesResp);   /* fila 615: lo creado con «+ Nuevo responsable…» entra aquí */
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-guia');   /* fila 463: a todo lo ancho, en dos columnas */
     GuiasBarra.reiniciar();
@@ -371,7 +372,7 @@
     plegado.enganchar();
     pintar();
     /* Fila 465, C2: «Ver y cambiar el texto» de una plantilla; al guardarla se repinta la guía con lo escrito. */
-    if (window.GuiasPlantilla) GuiasPlantilla.enganchar({ col: $('guia-col-der'), pasos: $('guia-pasos'),
+    if (window.GuiasPlantilla) GuiasPlantilla.enganchar({ col: $('guia-col-der'), pasos: $('guia-pasos'), tipo: nombreTipo,
       alGuardar: function () { recoger(); pintar(); } });
     GuiasEditorAbrir.enganchar({ nombreTipo: nombreTipo, plegado: plegado, niveles: niveles, pintar: pintar, recoger: recoger, pasos: pasos, opciones: opciones, nivel: function () { return nivel; } });
 

@@ -18,7 +18,7 @@
 var GuiasToca = (function () {
 
   /* El nombre corto de cada papel fijo, el mismo de la tarjeta. */
-  var PAPELES = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado' };
+  var PAPELES = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado', profesores: 'Sus profesores' };   /* fila 615: «Sus profesores» */
 
   function nombreDe(id, responsables) {
     if (PAPELES[id]) return PAPELES[id];
@@ -54,6 +54,7 @@ var GuiasToca = (function () {
             return '<option value="' + U.escapar(r.id) + '"' + (r.id === tocaA ? ' selected' : '') + '>' +
               U.escapar(r.nombre) + '</option>';
           }).join('') +
+          (window.ListaNuevo ? ListaNuevo.opcionHTML('+ Nuevo responsable…') : '') +   /* fila 615 */
         '</select>' +
       '</div>';
   }

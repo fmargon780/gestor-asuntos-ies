@@ -128,6 +128,11 @@ var GuiasGuion = (function () {
     return [{ valor: '', texto: 'Sin plantilla fija' }].concat(lista);
   }
 
+  /* Fila 615: la última opción, «+ Nueva plantilla…», solo en el editor de la guía (js/guias-plantilla-nueva.js). */
+  function nuevaPlantillaHTML(g) {
+    return g && g.editorGuia && window.ListaNuevo ? ListaNuevo.opcionHTML('+ Nueva plantilla…') : '';
+  }
+
   /* Fila 321: la misma marca que en la mesa del hito. */
   function marcaFueraDeUso(g) {
     return (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g)) ? ' <span class="guion-fuera-de-uso">plantilla fuera de uso</span>' : '';
@@ -165,7 +170,7 @@ var GuiasGuion = (function () {
     if (g.accion === 'comunicar') {
       return '<div class="guion-fila-linea guion-receta"' + (r.a ? ' data-a="' + U.escapar(r.a) + '"' : '') + '>' + titulo +   /* fila 555: el «a quién» antiguo se conserva, aunque ya no manda */
         conRotulo('Por dónde', '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>', dentro) +
-        conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select>', dentro) +
+        conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla" data-clase="lista">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + nuevaPlantillaHTML(g) + '</select>', dentro) +
         /* Fila 465, C1: «Ver y cambiar el texto» solo con una plantilla elegida (js/guias-plantilla.js). */
         (window.GuiasPlantilla ? GuiasPlantilla.botonHTML(!r.plantilla) : '') +
         marcaFueraDeUso(g) +
@@ -174,7 +179,7 @@ var GuiasGuion = (function () {
     }
     if (g.accion === 'generar') {
       return '<div class="guion-fila-linea guion-receta">' + titulo +
-        conRotulo('Plantilla de documento', '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select>', dentro) +
+        conRotulo('Plantilla de documento', '<select class="campo guion-receta-plantilla" data-clase="documentos">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + nuevaPlantillaHTML(g) + '</select>', dentro) +
         marcaFueraDeUso(g) + '</div>';
     }
     if (g.accion === 'registrar') {
