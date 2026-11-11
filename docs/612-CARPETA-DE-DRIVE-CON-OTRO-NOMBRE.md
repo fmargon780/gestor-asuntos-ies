@@ -1,4 +1,4 @@
-# 611 — Aceptar la carpeta de Google Drive aunque no se llame «Mi unidad»
+# 612 — Aceptar la carpeta de Google Drive aunque no se llame «Mi unidad»
 
 ## Lo que escribió Francisco
 El jueves y viernes estaré solo en la oficina y he pensado que será un buen momento para terminar de
@@ -48,7 +48,7 @@ Realmente no recuerdo por dónde nos quedamos.
 - Pruebas: `pruebas/pasar-a-drive.mjs` y `pruebas/nube-drive.mjs` con carpetas «Google Drive»,
   «Mi unidad (correo)» y una con `.tmp.drivedownload`, y una que se rechaza. El disco de mentira de la
   demostración (`js/demo/disco.js`) puede seguir llamándose «Mi unidad».
-- Lo visto en el ordenador real está en `docs/notas-diseno/607.md` (incluye que Drive deja las copias en
+- Lo visto en el ordenador real está en `docs/612-LO-VISTO-EN-EL-INSTITUTO.md` (incluye que Drive deja las copias en
   conflicto como `registro (1).json`, lo que suponía la fila 457).
 - Novedades: una línea en `js/novedades.js`.
 

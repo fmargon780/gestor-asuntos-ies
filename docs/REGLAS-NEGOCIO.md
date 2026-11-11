@@ -180,3 +180,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (10-nov-2026, tema 519) La guía cubre solo la parte de Administración: recibir el encargo de Dirección, preparar la resolución, firma de Dirección, registro de salida, baja en Séneca y comunicar (familia y, si se inició el protocolo de absentismo, Servicios Sociales) («Solo nuestra parte»).
 - (10-nov-2026, tema 519) Los anexos I y II son plantillas del tipo para sacarlas cuando Dirección las pida, no pasos de la guía; lo que rellena la familia va como líneas en blanco.
 
+## Carpetas en Google Drive
+
+- (11-nov-2026, tema 607) **Todo el Gestor pasa a Google Drive** (asuntos vivos, ARCHIVO, `_GESTOR` y la copia sin internet), nada se queda repartido: «no veo bien tener unas cosas en un lugar y otras en otro». No se comprime el ARCHIVO (ahorraría un 13 %).
+- (11-nov-2026, tema 607) En los ordenadores del instituto, Drive va en **«Replicar archivos» con la carpeta en `C:\Google Drive`**, la misma en los dos, para tener un solo marcador. El modo «Ver archivos sin descargarlos» se descartó: más lento.
+- (11-nov-2026, tema 607) **Cuando falte espacio** en la cuenta común (50 GB), que lo amplíe la Junta o, si no, el centro.

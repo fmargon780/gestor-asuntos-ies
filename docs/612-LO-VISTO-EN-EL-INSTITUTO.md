@@ -1,6 +1,6 @@
-# Notas de diseño del tema 607 — Terminar el paso a Drive (11-nov-2026)
+# Lo visto en el instituto al diseñar el tema 607 (fila 612, 11-nov-2026)
 
-Conversación con Francisco, a medias. Lo averiguado, para no repetirlo.
+Lo averiguado con Francisco en el ordenador «Propietario», para no repetirlo.
 
 ## Cómo está Drive en el ordenador «Propietario»
 - Drive para ordenadores tiene dos cuentas: la de Francisco (unidad G) y la común de Administración (unidad H).
@@ -24,7 +24,10 @@ Conclusión de Francisco: descartado ese modo; elegido volver a «Replicar» con
 - Con «Replicar», la raíz es unos 27 caracteres más larga que la de Dropbox (lleva usuario y correo):
   menos sitio para los nombres, al revés de lo que se buscaba (análisis del 21-oct-2026).
 - El ARCHIVO ocupa ~1 GB tras dos meses; la cuenta común tiene 50 GB, compartidos con el correo.
-Francisco pide parar y revisar todo antes de seguir.
+Revisado con datos: el Gestor ocupa ~1,4 GB tras dos meses (unos 8 GB por curso); la cuenta común tenía 1,33 GB
+usados de 50 GB; Dropbox del centro tiene 2,01 TB. Comprimir el ARCHIVO ahorraría un 13 % (995,9 → 864,6 MB):
+descartado. Dejar el ARCHIVO en Dropbox: descartado («no veo bien tener unas cosas en un lugar y otras en otro»).
+Decisión: todo a Drive, en `C:\Google Drive`; cuando falte espacio, que lo amplíe la Junta o el centro.
 
 ## Carpeta de «Replicar» en `C:\Google Drive` (11-nov-2026, ordenador «Propietario»)
 - Francisco eligió `C:\Google Drive` en «Seleccionar carpeta». Drive usa esa carpeta como «Mi unidad» directamente:
