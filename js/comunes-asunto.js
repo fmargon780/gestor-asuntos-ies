@@ -68,7 +68,7 @@ var ComunesAsunto = (function () {
       await GuiasDelCentro.guardarPasos(tipo, pasos, { claveActual: a.nombre });
       await N.avisarGuia(tipo, a, antes, N.repartoDe(), function () { return G.desenlazar(a.nombre, nuevo.id); });
     } else {
-      var hito = Hitos.normalizarHito({ titulo: hc.nombre, cuerpo: hc.explicacion, clase: 'paso', estado: 'pendiente' });
+      var hito = Hitos.normalizarHito({ titulo: hc.nombre, cuerpo: hc.explicacion, clase: 'paso', estado: 'pendiente', responsable: hc.responsable || '' });
       hito.guionPropio = (hc.tareas || []).map(function (id) { return Comunes.buscar(listas.tareas, id); }).filter(Boolean).map(function (t) {
         var g = Comunes.lineaDeTarea(t);
         delete g.comun;

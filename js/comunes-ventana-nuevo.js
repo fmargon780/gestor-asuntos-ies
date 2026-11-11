@@ -52,7 +52,10 @@
   }
 
   function formularioHito(n, listas) {
-    return '<div><label class="et" for="cn-exp">Explicación</label><input id="cn-exp" class="campo" value="' + esc(n.explicacion) + '"></div>' +
+    return '<div><label class="et" for="cn-resp">Responsable <span class="suave">(opcional)</span></label>' +   /* fila 615: con «+ Nuevo responsable…» */
+      '<select id="cn-resp" class="campo paso-responsable"><option value="">(sin responsable)</option>' +
+      (window.ListaNuevo ? ListaNuevo.opcionHTML('+ Nuevo responsable…') : '') + '</select></div>' +
+      '<div><label class="et" for="cn-exp">Explicación</label><input id="cn-exp" class="campo" value="' + esc(n.explicacion) + '"></div>' +
       '<div><strong class="pequeno">Tareas del hito</strong>' +
       (n.tareas.length ? '<ul class="lista-usos">' + n.tareas.map(function (id, j) {
         var t = Comunes.buscar(listas.tareas, id);
@@ -97,6 +100,14 @@
     } else {
       var exp = caja.querySelector('#cn-exp');
       exp.oninput = function () { n.explicacion = exp.value; };
+      /* Fila 615: el responsable de este hito (no se guarda en la lista común: es del hito que se añade). */
+      var resp = caja.querySelector('#cn-resp');
+      resp.onchange = function () { n.responsable = resp.value; };
+      Hitos.leer().then(function (d) {
+        var lista = (window.HitosAdministracion ? HitosAdministracion.paraGuia(d.ajustes) : d.ajustes.responsables).concat(Hitos.PAPELES || []);
+        lista.forEach(function (r) { ListaNuevo.ponerOpcion(resp, r.id, r.nombre); });
+        resp.value = n.responsable || '';
+      }).catch(function () { /* sin la lista, solo «sin responsable» */ });
       caja.querySelector('#cn-at').onchange = function (ev) {
         if (ev.target.value) { n.tareas.push(ev.target.value); pintarNuevo(caja, c); }
       };
@@ -119,7 +130,7 @@
           ? { nombre: texto, accion: n.accion, receta: n.accion === 'copiar' ? copia : (n.plantilla ? { plantilla: n.plantilla } : null) }
           : { nombre: texto, explicacion: n.explicacion, tareas: n.tareas };
         var guardado = soloAqui ? elemento : await ComunesGuardado.anadir(tarea ? 'tareas' : 'hitos', elemento);
-        c.elegir(guardado);
+        c.elegir(!tarea && n.responsable ? Object.assign({}, guardado, { responsable: n.responsable }) : guardado);
       } catch (e) { boton.disabled = false; U.fallo('No he podido crearla', e); }
     };
   }

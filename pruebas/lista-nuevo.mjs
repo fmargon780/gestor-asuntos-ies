@@ -303,6 +303,33 @@ await comprobar('desde la mesa: el hito queda con el responsable nuevo', pagina.
   const r = d.ajustes.responsables.filter((x) => x.nombre === 'Ponencia')[0];
   return !!r && Hitos.buscar(d.porAsunto[asunto].hitos, 'm1').responsable === r.id; }, [ASUNTO]), true);
 
+/* «+ Añadir hito» del asunto (la ventana de la lista común): «+ Crear un hito nuevo» lleva Responsable */
+console.log('--- 8. «+ Añadir hito» del asunto ---');
+await pagina.evaluate(async (asunto) => {
+  const a = App.E.listaAbiertos.filter((x) => x.nombre === asunto)[0];
+  window.__anadir = ComunesAsunto.anadirHito(a);
+}, ASUNTO);
+await pagina.waitForSelector('#cv-crear');
+await pagina.click('#cv-crear');
+await pagina.waitForSelector('#cn-resp');
+await pagina.waitForFunction(() => document.querySelectorAll('#cn-resp option').length > 3);
+await comprobar('«Crear un hito nuevo» lleva Responsable, con lo ya creado y «+ Nuevo responsable…» al final', opciones('#cn-resp').then((o) =>
+  [o[0], o.indexOf('Ponencia') !== -1, o[o.length - 1]]), ['(sin responsable)', true, '+ Nuevo responsable…']);
+await pagina.selectOption('#cn-resp', '__nuevo__');
+await pagina.fill(cuadro('#ln-nombre'), 'Departamento de Orientación');
+await pagina.click(cuadro('#ln-crear'));
+await pagina.waitForSelector('.ln-capa', { state: 'detached' });
+await comprobar('lo creado queda elegido', pagina.locator('#cn-resp').evaluate((s) => s.options[s.selectedIndex].textContent), 'Departamento de Orientación');
+await pagina.fill('#cn-nombre', 'Reunión con orientación');
+await pagina.selectOption('#cv-para', 'aqui');
+await pagina.click('#cn-crear');
+await pagina.waitForTimeout(800);
+await comprobar('el hito añadido al asunto lleva ese responsable', pagina.evaluate(async ([asunto]) => {
+  const d = await Hitos.leer();
+  const r = d.ajustes.responsables.filter((x) => x.nombre === 'Departamento de Orientación')[0];
+  const h = d.porAsunto[asunto].hitos.filter((x) => x.titulo === 'Reunión con orientación')[0];
+  return !!r && !!h && h.responsable === r.id; }, [ASUNTO]), true);
+
 /* solo consulta: ninguna opción «+ Nuevo…» */
 await pagina.evaluate(() => { window.__soloAntes = window.SoloConsulta; window.SoloConsulta = Object.assign({}, window.SoloConsulta, { activo: () => true }); });
 await abrirEditor();
