@@ -156,7 +156,8 @@ var BajaMatricula = (function () {
       setTimeout(async function () {
         if (window.ColaGuardado && ColaGuardado.hayGuardado() && ++intentos < 10) return turno();
         if (window.Demo && Demo.montando) return;
-        if (/[?&]demo=1/.test(location.search) && !/[?&]baja=1/.test(location.search)) return;   /* la copia de pruebas solo la lleva con ?baja=1 */   /* la copia de pruebas hace su propia pasada al acabar de montar */
+        /* La copia de pruebas y los navegadores automáticos (las pruebas, con su disco de mentira) solo la llevan con ?baja=1. */
+        if ((/[?&]demo=1/.test(location.search) || navigator.webdriver) && !/[?&]baja=1/.test(location.search)) return;   /* la copia de pruebas hace su propia pasada al acabar de montar */
         try {
           var r = await pasada();
           if (r) U.aviso('El tipo «BAJA MATRICULA» ya está al día: guía de ' + r.hitos + ' hitos, con sus datos y plantillas.', 'bueno');

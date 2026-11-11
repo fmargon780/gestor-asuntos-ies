@@ -104,7 +104,7 @@ function huecosDeTexto(texto) {
   while ((m = reDoble.exec(texto))) salida.push(m[1].trim());
   /* quitamos lo que ya iba en llave doble, para no contar dos veces
      su llave sencilla de dentro (el mismo truco que docx.js) */
-  const sinDobles = texto.replace(reDoble, '');
+  const sinDobles = texto.replace(reDoble, '').replace(/\{si:[^{}]*\}/gi, '');   /* fila 592: la marca de «Texto condicional» (fila 510) no es un hueco */
   const reSencilla = /\{([^{}]+)\}/g;
   while ((m = reSencilla.exec(sinDobles))) salida.push(m[1].trim());
   return salida;
