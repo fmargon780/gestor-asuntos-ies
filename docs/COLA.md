@@ -113,3 +113,4 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 610 | Aviso de usuario: mejora en «Inicio» | IDEA (11-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1mYMpjbzcX3MPIaj536OjAXwVEJgh0nwn/view?usp=drivesdk |
 | 611 | Aviso de usuario: error en «Inicio» | EN DISEÑO (11-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/11ZdAhHrgVg7q2aX4q8c13H4EPy8K39ob/view?usp=drivesdk |
 | 613 | Aviso de usuario: error en «Inicio» | IDEA (11-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1qvuLGmayUnNOV6Q9ZDBaXvQFIqtIkZAU/view?usp=drivesdk |
+| 614 | Aviso de usuario: mejora en «Herramientas» | IDEA (11-nov-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/17OkmORav9u1zCxL1upNDdA_kJ-iSgrWC/view?usp=drivesdk |
