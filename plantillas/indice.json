@@ -67,6 +67,9 @@
     "tipo": "BAJA MATRICULA",
     "clase": "correo",
     "id": "pl-baja-familia",
+    "para": [
+      "legales"
+    ],
     "cuerpo": "Les enviamos firmada la resolución de la Dirección por la que se da de baja la matrícula de {{NOMBRE NATURAL}} en el {{CENTRO}}, con efectos desde el {campo:Fecha de efectos de la baja}.\n\n{si:Protocolo de absentismo iniciado=Sí}Como se había iniciado el protocolo de absentismo, enviamos también copia a los Servicios Sociales Comunitarios para su cierre.\n\n{si:Aporta matrícula del país de destino=No}Si disponen del certificado de matrícula en el nuevo centro, les agradecemos que nos lo hagan llegar para completar el expediente."
   },
   {
@@ -75,6 +78,10 @@
     "tipo": "BAJA MATRICULA",
     "clase": "correo",
     "id": "pl-baja-sociales",
+    "para": [
+      "relac"
+    ],
+    "saludo": "Estimados señores:",
     "cuerpo": "Les comunicamos que la Dirección del {{CENTRO}} ha resuelto la baja de la matrícula de {{NOMBRE NATURAL}}, de {campo:Curso}, con efectos desde el {campo:Fecha de efectos de la baja}, por traslado de residencia de la familia a {campo:País de destino}. Adjuntamos la resolución, a efectos del cierre del protocolo de absentismo."
   },
   {

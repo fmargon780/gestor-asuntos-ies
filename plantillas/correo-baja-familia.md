@@ -3,6 +3,7 @@ nombre: Resolución de baja · familia
 tipo: BAJA MATRICULA
 categoria: ALUMNADO
 id: pl-baja-familia
+para: legales
 ---
 
 Les enviamos firmada la resolución de la Dirección por la que se da de baja la matrícula de {{NOMBRE NATURAL}} en el {{CENTRO}}, con efectos desde el {campo:Fecha de efectos de la baja}.

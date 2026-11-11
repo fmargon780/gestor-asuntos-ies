@@ -343,6 +343,8 @@ async function main() {
          adjunta ficheros). Sin la línea, no hay `cuerpoSeneca`. */
       const partes = cuerpo.split(SEPARADOR_SENECA);
       if (datos.id) entrada.id = datos.id;   /* fila 592: un id fijo también en el correo, para que una tarea de comunicar lo cite */
+      if (datos.para) entrada.para = datos.para.split(',').map((x) => x.trim()).filter(Boolean);   /* fila 592: a quién propone (papeles de la fila 555) */
+      if (datos.saludo) entrada.saludo = datos.saludo;
       entrada.cuerpo = textoPlanoDe(partes[0]);
       if (partes.length > 1 && partes.slice(1).join('\n').trim()) {
         entrada.cuerpoSeneca = textoPlanoDe(partes.slice(1).join('\n'));

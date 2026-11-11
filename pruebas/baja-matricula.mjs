@@ -94,6 +94,11 @@ await comprobar('resolución, anexo I, anexo II y dos correos, colgados del tipo
 }, TIPO), ['Anexo I · Declaración de traslado de residencia al extranjero', 'Anexo II · Diligencia de la Dirección', 'Resolución de baja por traslado al extranjero',
   'Resolución de baja · Servicios Sociales', 'Resolución de baja · familia']);
 
+await comprobar('los correos proponen a quien toca: la familia a los tutores legales; Servicios Sociales a los relacionados, con su saludo',
+  pagina.evaluate(async () => { const pl = await Plantillas.cargar(App.E.gestor); const f = (n) => pl.lista.filter((p) => p.nombre === n)[0];
+    return [f('Resolución de baja · familia').para, f('Resolución de baja · Servicios Sociales').para, f('Resolución de baja · Servicios Sociales').saludo]; }),
+  [['legales'], ['relac'], 'Estimados señores:']);
+
 console.log('--- 5. una sola vez ---');
 const cuentas = () => pagina.evaluate(async (T) => {
   const pl = await Plantillas.cargar(App.E.gestor), l = await ComunesGuardado.leer(), c = await Campos.leer(App.E.gestor);
@@ -115,6 +120,8 @@ await comprobar('un asunto nuevo tiene los seis hitos; con el motivo vacío, los
   ['Baja en Séneca', ''], ['Comunicar', '']].map((x) => x));
 await comprobar('el asunto de antes conserva sus tres hitos', pagina.evaluate(async () => {
   const a = App.E.listaAbiertos.filter((x) => / BAJA /.test(x.nombre) && /Pardo Vega/.test(x.nombre))[0];
+  App.abrirFicha(a);   /* la red de seguridad de abrir la ficha tampoco le trae los hitos nuevos */
+  await new Promise((r) => setTimeout(r, 3000));
   return (await Hitos.hitosDe(a.nombre)).map((h) => h.titulo);
 }), ['Registrar el motivo de la baja', 'Dar la baja en Séneca', 'Comunicar a la tutoría']);
 

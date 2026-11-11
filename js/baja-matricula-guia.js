@@ -83,12 +83,32 @@ var BajaMatriculaGuia = (function () {
     });
   }
 
+  /* Los asuntos abiertos de este tipo que ya tienen hitos siguen con los que tenían: los pasos nuevos se apuntan como ya
+     conocidos, para que ni al guardar la guía ni al abrir su ficha (la red de seguridad de js/hitos-sincronizar.js) lleguen. */
+  async function dejarEnPazLosAbiertos(tipo, pasos) {
+    if (!window.Hitos || !Hitos.cambiar) return;
+    var claves = (App.E.listaAbiertos || []).filter(function (a) { return a.leido && a.leido.tipo === tipo.tipo; }).map(function (a) { return a.nombre; });
+    if (!claves.length) return;
+    var ids = pasos.map(function (p) { return p.id; });
+    await Hitos.cambiar(function (d) {
+      claves.forEach(function (c) {
+        var e = d.porAsunto && d.porAsunto[c];
+        if (!e || !(e.hitos || []).length) return;
+        var ya = Array.isArray(e.pasosConocidos) ? e.pasosConocidos.slice() : [];
+        ids.forEach(function (id) { if (ya.indexOf(id) === -1) ya.push(id); });
+        e.pasosConocidos = ya;
+      });
+      return d;
+    });
+  }
+
   /* `ids`: { campos: nombre -> id del campo propio, plantillas: nombre -> id }. Devuelve cuántas tareas, hitos y pasos. */
   async function poner(datos, tipo, ids) {
     var t = await ponerTareas(datos, ids);
     var h = await ponerHitos(datos, t.ids);
     var listas = await ComunesGuardado.leer();
     var pasos = pasosDe(datos, h.ids, listas);
+    await dejarEnPazLosAbiertos(tipo, pasos);
     await GuiasDelCentro.guardarPasos(tipo.tipo, pasos, { sinLlevar: true });
     return { tareas: t.nuevas, hitos: h.nuevos, pasos: pasos.length };
   }
