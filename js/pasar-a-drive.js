@@ -28,7 +28,10 @@ var PasarADrive = (function () {
   var CLAVE_ID = 'gestor.traslado.id';
   var URL_ESPACIO = 'https://drive.google.com/settings/storage';
   var DOCE_HORAS = 12 * 60 * 60 * 1000;
-  var NOMBRES_DRIVE = ['mi unidad', 'my drive'];
+  /* Fila 612: vale «Mi unidad» / «My Drive» (también con « (correo)» detrás), «Google Drive» o cualquier
+     carpeta que lleve dentro las carpetas ocultas de Drive para ordenadores. */
+  var NOMBRES_DRIVE = /^(mi unidad|my drive|google drive)( \(.*\))?$/i;
+  var OCULTAS_DRIVE = ['.tmp.drivedownload', '.tmp.driveupload'];
   var NO_SE_COPIA_DE_GESTOR = [CERROJO, AVANCE, MARCA, 'fechas-de-dropbox.json', 'presencia'];
   var CADA_CUANTOS_GUARDAR = 25;
 
@@ -136,10 +139,18 @@ var PasarADrive = (function () {
 
   /* ---------- preparar: el destino y la cuenta de lo que se va a copiar ---------- */
 
+  async function pareceDrive(h) {
+    if (NOMBRES_DRIVE.test(String(h.name || '').trim())) return true;
+    try {
+      for await (var p of h.entries()) { if (OCULTAS_DRIVE.indexOf(p[0].toLowerCase()) !== -1) return true; }
+    } catch (e) { /* si no se puede mirar dentro, vale solo el nombre */ }
+    return false;
+  }
+
   function elegirDrive() {
-    return window.showDirectoryPicker({ id: 'gestor-drive', mode: 'readwrite' }).then(function (h) {
-      if (NOMBRES_DRIVE.indexOf(String(h.name || '').trim().toLowerCase()) === -1) {
-        var e = new Error('Esa carpeta se llama «' + h.name + '». Tiene que ser la carpeta «Mi unidad» (o «My Drive») de Google Drive.');
+    return window.showDirectoryPicker({ id: 'gestor-drive', mode: 'readwrite' }).then(async function (h) {
+      if (!(await pareceDrive(h))) {
+        var e = new Error('Esa carpeta se llama «' + h.name + '». Tiene que ser la carpeta de Google Drive de la cuenta común (en el instituto, C:\\Google Drive).');
         e.name = 'NoEsDrive';
         throw e;
       }
@@ -564,7 +575,7 @@ var PasarADrive = (function () {
 
   return {
     CERROJO: CERROJO, AVANCE: AVANCE, MARCA: MARCA, URL_ESPACIO: URL_ESPACIO,
-    dentroDeLaApp: dentroDeLaApp, elegirDrive: elegirDrive, cerrar: cerrar, preparar: preparar, reanudar: reanudar, copiar: copiar,
+    dentroDeLaApp: dentroDeLaApp, elegirDrive: elegirDrive, pareceDrive: pareceDrive, cerrar: cerrar, preparar: preparar, reanudar: reanudar, copiar: copiar,
     comprobar: comprobar, reintentar: reintentar, cambiar: cambiar, comprobarArrastre: comprobarArrastre,
     textoFinal: textoFinal, cancelar: cancelar, estado: estado, alEntrar: alEntrar, resumen: function () { return T ? resumen() : null; },
     traslado: function () { return T; }

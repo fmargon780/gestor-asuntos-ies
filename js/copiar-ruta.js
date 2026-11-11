@@ -103,7 +103,8 @@ window.RutaCarpetas = (function () {
   function esTrozoDropbox(t) { return t === 'Dropbox' || /^Dropbox \(/.test(t); }
   /* Fila 456: la raíz de Google Drive para ordenadores acaba en «Mi unidad»
      (o «My Drive» si Windows está en inglés). */
-  function esTrozoDrive(t) { return /^(Mi unidad|My Drive)$/i.test(t); }
+  /* Fila 612: también «Google Drive» y «Mi unidad (correo)». */
+  function esTrozoDrive(t) { return /^(Mi unidad|My Drive|Google Drive)( \(.*\))?$/i.test(t); }
   function esTrozoNube(t) { return esTrozoDropbox(t) || esTrozoDrive(t); }
 
   /* 'dropbox', 'drive' o '' según el trozo de nube que lleve la ruta. */

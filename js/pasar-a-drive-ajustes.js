@@ -96,10 +96,10 @@ var PasarADriveAjustes = (function () {
 
   function pasoSenalar() {
     var z = limpiar();
-    z.appendChild(parrafo('Señala la carpeta «Mi unidad» de Google Drive (en el disco puede llamarse «Mi unidad» o «My Drive»). ' +
+    z.appendChild(parrafo('Señala la carpeta de Google Drive de la cuenta común (en el instituto, C:\\Google Drive). ' +
       'Dentro se crearán «asuntos vivos», «ARCHIVO» y la carpeta de la copia sin internet.'));
     z.appendChild(filaDeBotones([
-      boton('Señalar «Mi unidad»', pasoContar, 'traslado-senalar'),
+      boton('Señalar la carpeta de Google Drive', pasoContar, 'traslado-senalar'),
       boton('Cancelar', pasoCancelar, 'traslado-cancelar')
     ]));
   }

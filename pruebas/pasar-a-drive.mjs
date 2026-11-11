@@ -96,9 +96,19 @@ const arbol = (p, que) => p.evaluate(async (que) => {
 
   /* la carpeta equivocada */
   await p.evaluate(() => { const d = Demo.disco(); const bueno = d.drive; d.drive = Demo.carpetaDeMentira('Otra cosa'); window.__driveBueno = bueno; });
+  await comprobar('B. el botón se llama «Señalar la carpeta de Google Drive»', (await p.locator('#traslado-senalar').innerText()).trim(), 'Señalar la carpeta de Google Drive');
   await p.click('#traslado-senalar');
   await p.waitForSelector('.traslado-error');
-  await comprobar('B. una carpeta que no es «Mi unidad» no sigue', (await p.locator('.traslado-error').innerText()).indexOf('Mi unidad') !== -1, true);
+  await comprobar('B. una carpeta que no es de Google Drive no sigue', (await p.locator('.traslado-error').innerText()).indexOf('Google Drive') !== -1, true);
+  /* fila 612: qué carpetas se aceptan */
+  const quien = await p.evaluate(async () => {
+    const r = {};
+    for (const n of ['Mi unidad', 'My Drive', 'Google Drive', 'Mi unidad (29700692.administracion@g.educaand.es)', 'Otra cosa']) r[n] = await PasarADrive.pareceDrive(Demo.carpetaDeMentira(n));
+    const c = Demo.carpetaDeMentira('Cualquiera'); await c.getDirectoryHandle('.tmp.drivedownload', { create: true });
+    r['con .tmp.drivedownload'] = await PasarADrive.pareceDrive(c);
+    return r;
+  });
+  await comprobar('B. nombres que se aceptan y que no', quien, { 'Mi unidad': true, 'My Drive': true, 'Google Drive': true, 'Mi unidad (29700692.administracion@g.educaand.es)': true, 'Otra cosa': false, 'con .tmp.drivedownload': true });
   await p.evaluate(() => { Demo.disco().drive = window.__driveBueno; });
   await p.click('text=Señalar otra vez');
   await p.waitForSelector('#traslado-cuenta');

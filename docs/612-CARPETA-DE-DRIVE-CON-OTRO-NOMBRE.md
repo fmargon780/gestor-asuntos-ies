@@ -60,4 +60,4 @@ Realmente no recuerdo por dónde nos quedamos.
 - El día del traslado, al señalar `C:\Google Drive`, la acepta y enseña cuántos documentos va a copiar.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Tarea pequeña, sin segundo revisor; comprobado por Claude contra la instrucción (11-nov-2026): coincide todo (nombres aceptados, rechazo con el texto nuevo, texto y botón de Ajustes, «Ruta» con `C:\Google Drive`). Pruebas `pasar-a-drive` y `nube-drive` en verde. No visto: el navegador real con `C:\Google Drive` (solo el día del traslado).

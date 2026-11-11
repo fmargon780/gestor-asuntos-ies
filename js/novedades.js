@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '612', fecha: '2026-11-11', texto: '«Pasar a Drive» acepta la carpeta de Google Drive aunque no se llame «Mi unidad» (por ejemplo C:\\Google Drive), el botón pasa a llamarse «Señalar la carpeta de Google Drive» y «Ruta» reconoce también esas carpetas.' },
   { id: '609', fecha: '2026-11-11', texto: 'En la pantalla de entrada, si al pulsar el botón de una carpeta esta no queda señalada, sale un aviso en rojo con lo que dice Chrome (también si ha dicho «cancelado»); si queda señalada pero no se puede recordar para la próxima vez, sale un aviso ámbar y se puede entrar igual.' },
   { id: '592', fecha: '2026-11-11', texto: 'El tipo «BAJA» pasa a llamarse BAJA MATRICULA y trae solo su guía de seis hitos para el traslado al extranjero (ESO), con sus datos, la resolución, los anexos I y II y los correos a la familia y a Servicios Sociales. Las carpetas de antes siguen igual. En «Campos del asunto», un dato de lista que está vacío sale con su desplegable «Elegir…» para rellenarlo ahí mismo.' },
   { id: '606', fecha: '2026-11-10', texto: 'Al cambiar el nombre de un tipo que tiene nombre corto, el cuadro enseña también la casilla «Nombre corto» para cambiarlo o vaciarlo, y las carpetas abiertas de ese tipo pasan a llevar el que toque, sin recortarse mal.' },

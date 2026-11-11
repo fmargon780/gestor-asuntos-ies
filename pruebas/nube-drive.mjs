@@ -120,6 +120,9 @@ await comprobar('la nube en uso es Google Drive', pagina.evaluate(() => RutaCarp
 
 /* ---------- 3. partir ---------- */
 console.log('--- 3. reconocer la nube ---');
+await comprobar('fila 612: «Google Drive» y «Mi unidad (correo)» son Drive',
+  pagina.evaluate(() => [RutaCarpetas.nubeDeRuta('C:\\Google Drive\\asuntos vivos\\A'), RutaCarpetas.nubeDeRuta('C:\\Users\\x\\Mi unidad (a@b.es)\\A'), RutaCarpetas.nubeDeRuta('C:\\Otra\\A')]),
+  ['drive', 'drive', '']);
 await comprobar('«Mi unidad» en Windows',
   pagina.evaluate(() => RutaCarpetas.partir('G:\\Mi unidad\\ADMINISTRACIÓN\\ARCHIVO')),
   { dropbox: 'G:\\Mi unidad', comun: 'ADMINISTRACIÓN/ARCHIVO' });
