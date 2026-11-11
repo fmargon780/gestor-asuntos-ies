@@ -1,0 +1,242 @@
+<title>Listas editables 582</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Pantalla de prueba ligera: el panel derecho del editor de la guía y «Añadir un hito» del asunto, como en la app. */
+:root{--bg:#eef1f5;--panel:#ffffff;--suave:#f5f7fa;--borde:#d6dce4;--fg:#1d2733;--gris:#5d6b7a;--acento:#1f4e79;--acento-fg:#ffffff;--aviso:#fff4d6;--aviso-borde:#e0b44a;--rojo:#c0392b;--cuadro-fondo:rgba(20,30,40,.45)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151b22;--panel:#1d252e;--suave:#232c36;--borde:#36424f;--fg:#e4e9ef;--gris:#9aa7b4;--acento:#6fa3d6;--acento-fg:#0f1720;--aviso:#3b3320;--aviso-borde:#a8873a;--rojo:#e57468;--cuadro-fondo:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151b22;--panel:#1d252e;--suave:#232c36;--borde:#36424f;--fg:#e4e9ef;--gris:#9aa7b4;--acento:#6fa3d6;--acento-fg:#0f1720;--aviso:#3b3320;--aviso-borde:#a8873a;--rojo:#e57468;--cuadro-fondo:rgba(0,0,0,.6);color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif;font-size:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.banda{background:var(--aviso);border:1px solid var(--aviso-borde);border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--borde);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+h2{margin:0;font-size:16px}
+.rotulo{font-size:12px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.04em}
+.fila{display:grid;gap:10px;grid-template-columns:2fr 1.3fr 1.6fr .7fr}
+@media (max-width:760px){.fila{grid-template-columns:1fr}}
+label.et{display:block;font-size:12px;color:var(--gris);margin-bottom:3px}
+.campo{width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--borde);border-radius:6px;background:var(--panel);color:var(--fg);font:inherit}
+.caja{border:1px solid var(--borde);border-radius:8px;background:var(--suave);padding:10px;display:flex;flex-direction:column;gap:8px}
+.cuando{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cuando b{white-space:nowrap}.cuando select{flex:1;min-width:200px}
+.valores{display:flex;gap:14px;flex-wrap:wrap}
+.nota{font-size:12px;color:var(--gris);margin:0}
+.tarea{border:1px solid var(--borde);border-radius:6px;background:var(--panel);padding:10px;display:flex;flex-direction:column;gap:8px}
+.tarea-cab{display:flex;justify-content:space-between;gap:8px}.tarea-cab span{color:var(--gris);font-size:12px}
+.dos{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+@media (max-width:760px){.dos{grid-template-columns:1fr}}
+.boton{padding:7px 12px;border:1px solid var(--borde);border-radius:6px;background:var(--panel);color:var(--fg);font:inherit;cursor:pointer}
+.boton:focus-visible,.campo:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+.principal{background:var(--acento);color:var(--acento-fg);border-color:var(--acento)}
+.velo{position:fixed;inset:0;background:var(--cuadro-fondo);display:flex;align-items:center;justify-content:center;padding:16px}
+.cuadro{background:var(--panel);border-radius:10px;padding:16px;width:min(460px,100%);display:flex;flex-direction:column;gap:10px;box-sizing:border-box}
+.cuadro h3{margin:0;font-size:15px}
+.botones{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.parecido{background:var(--aviso);border:1px solid var(--aviso-borde);border-radius:6px;padding:8px;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.error{color:var(--rojo);font-size:13px;margin:0}
+.hecho{font-size:13px;color:var(--gris)}
+</style>
+
+<div class="banda">Pantalla de prueba · tema 582 «Listas editables» · datos inventados · no guarda nada</div>
+
+<div class="panel">
+  <h2>Guía de CAMBIO DE GRUPO · hito 1</h2>
+  <div class="rotulo">Datos del hito</div>
+  <div class="fila">
+    <div><label class="et" for="titulo">Título del hito</label><input id="titulo" class="campo" value="Recoger la solicitud o la propuesta"></div>
+    <div><label class="et" for="resp-guia">Responsable</label><select id="resp-guia" class="campo lista-resp"></select></div>
+    <div><label class="et" for="toca">A quién le toca</label>
+      <div style="display:flex;gap:6px"><select id="toca" class="campo"><option>Según el responsable</option><option>Nos toca</option><option value="espera" selected>Esperamos a…</option></select>
+      <select id="toca-a" class="campo lista-espera"></select></div></div>
+    <div><label class="et" for="plazo">Plazo (días)</label><input id="plazo" class="campo" placeholder="días"></div>
+  </div>
+  <div class="caja" id="cuando-hito"></div>
+
+  <div class="caja">
+    <b>Tareas de este hito (2)</b>
+    <div class="tarea"><div class="tarea-cab"><b>Registrar en Libro de Entrada</b><span>Registrar un documento ▸</span></div></div>
+    <div class="tarea">
+      <div class="tarea-cab"><b>Enviar correo de aviso</b><span>Comunicar · por correo ▾</span></div>
+      <div><label class="et" for="que">Qué se hace</label><select id="que" class="campo"><option>Comunicar</option></select></div>
+      <div class="caja" id="cuando-tarea"></div>
+      <div class="dos">
+        <div><label class="et" for="via">Por dónde</label><select id="via" class="campo"><option>Por correo</option><option>Por Séneca</option></select></div>
+        <div><label class="et" for="plantilla">Plantilla de correo</label><select id="plantilla" class="campo"></select></div>
+        <button class="boton" type="button">Ver y cambiar el texto</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="caja">
+    <b>▾ Documentos de este hito</b>
+    <label><input type="checkbox" id="varios"> Recibe varios documentos</label>
+    <div><label class="et" for="tipodoc">Tipo de documento que suele salir de aquí (opcional)</label><select id="tipodoc" class="campo"></select></div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>En un asunto · + Añadir un hito</h2>
+  <p class="nota">Asunto A26-0412 · CAMBIO DE GRUPO · Ruiz Ortega, Lucía. La lista de responsables es la misma: lo creado arriba sale también aquí.</p>
+  <div class="fila" style="grid-template-columns:2fr 1.3fr 1.6fr">
+    <div><label class="et" for="hda-titulo">Título</label><input id="hda-titulo" class="campo" value="Reunión con el equipo docente"></div>
+    <div><label class="et" for="resp-asunto">Responsable</label><select id="resp-asunto" class="campo lista-resp"></select></div>
+    <div><label class="et" for="hda-despues">Dónde ponerlo</label><select id="hda-despues" class="campo"><option>Al final</option></select></div>
+  </div>
+</div>
+
+<div class="velo" id="velo" hidden><div class="cuadro" id="cuadro" role="dialog" aria-modal="true"></div></div>
+
+<script>
+var NUEVO='__nuevo__';
+/* Todo lo que la app ya conoce. «clase» dice en qué desplegable se puede usar. */
+var CENTRO=['Administración','Secretaría con V.º B.º de Dirección','Dirección','Jefatura','Secretaría'];
+var PERSONAS=['Francisco','Diego'];
+var PAPELES=['El tercero del asunto','El tutor del alumnado','Sus profesores','Un relacionado','Una Administración…'];
+var ESPERA_FIJOS=['Tercero','Familia','Relacionado','Sus profesores'];
+var TIPOS_DOC=['SOLICITUD','FACTURA','CERTIFICADO','MATRICULA','RESOLUCION','NOTIFICACION','INFORME','ACTA','COMUNICACION','JUSTIFICANTE','ANEXO'];
+var PLANTILLAS=['Aviso de avance','Aviso de cierre','Documentación pendiente de matrícula (MATRICULA)','Envío del certificado de notas (CERTIFICADO DE NOTAS)'];
+/* La lista de campos: los de lista que se rellenan a mano y las columnas de las tablas. */
+var LISTA_CAMPOS=[
+  {nombre:'Motivo de la baja',de:'la lista de campos (lo usa BAJA MATRICULA)',opciones:['Traslado al extranjero','A petición','Fallecimiento']},
+  {nombre:'¿Quién lo pide?',de:'la lista de campos (lo usa SANCION)',opciones:['Familia','Tutoría','Jefatura']}
+];
+var CAMPOS=[]; /* los campos de lista del tipo CAMBIO DE GRUPO: hoy ninguno */
+var elegido={resp:{'resp-guia':'Administración','resp-asunto':''},espera:'Tercero',plantilla:'',tipodoc:'',cuando:{'cuando-hito':null,'cuando-tarea':null}};
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim()}
+function opt(v,t,sel){return '<option value="'+esc(v)+'"'+(sel?' selected':'')+'>'+esc(t)+'</option>'}
+function grupo(nombre,lista,actual){return '<optgroup label="'+nombre+'">'+lista.map(function(x){return opt(x,x,x===actual)}).join('')+'</optgroup>'}
+
+/* Todo lo conocido, para el aviso: {nombre, clase, donde, conocidoComo} */
+function todoLoConocido(){
+  var t=[];
+  CENTRO.forEach(function(n){t.push({nombre:n,clase:'responsable',donde:'los responsables (Ajustes › Hitos)'})});
+  PERSONAS.forEach(function(n){t.push({nombre:n,clase:'responsable',donde:'los responsables (Ajustes › Hitos)'})});
+  PAPELES.forEach(function(n){t.push({nombre:n,clase:'responsable',donde:'los papeles fijos de la app'});
+});
+  TIPOS_DOC.forEach(function(n){t.push({nombre:n,clase:'tipodoc',donde:'los tipos de documento (Ajustes)'})});
+  PLANTILLAS.forEach(function(n){t.push({nombre:n,clase:'plantilla',donde:'las plantillas'})});
+  LISTA_CAMPOS.forEach(function(c){t.push({nombre:c.nombre,clase:'campo',donde:c.de,campo:c})});
+  return t;
+}
+function parecido(a,b){var x=norm(a),y=norm(b);if(!x||!y)return false;if(x===y)return true;
+  var corto=x.length<y.length?x:y,largo=x.length<y.length?y:x;return corto.length>3&&(' '+largo+' ').indexOf(' '+corto+' ')>-1}
+function buscarParecidos(nombre,clase){return todoLoConocido().filter(function(k){return k.clase===clase}).filter(function(k){return parecido(nombre,k.conocidoComo||k.nombre)})}
+
+function pintarResp(){
+  document.querySelectorAll('.lista-resp').forEach(function(s){
+    var a=elegido.resp[s.id], enAsunto=s.id==='resp-asunto';
+    s.innerHTML=opt('','(sin responsable)',!a)+grupo('Del centro',CENTRO,a)+(enAsunto?grupo('Personas',PERSONAS,a):'')+grupo('Papeles',PAPELES,a)+opt(NUEVO,'+ Nuevo responsable…');
+  });
+  var e=document.getElementById('toca-a');
+  e.innerHTML=ESPERA_FIJOS.concat(CENTRO.slice(1)).map(function(x){return opt(x,x,x===elegido.espera)}).join('')+opt(NUEVO,'+ Nuevo responsable…');
+}
+function pintarPlantillas(){var s=document.getElementById('plantilla');s.innerHTML=opt('','Sin plantilla fija',!elegido.plantilla)+PLANTILLAS.map(function(x){return opt(x,x,x===elegido.plantilla)}).join('')+opt(NUEVO,'+ Nueva plantilla…')}
+function pintarTipos(){var s=document.getElementById('tipodoc');s.innerHTML=opt('','(sin elegir)',!elegido.tipodoc)+TIPOS_DOC.map(function(x){return opt(x,x,x===elegido.tipodoc)}).join('')+opt(NUEVO,'+ Nuevo tipo de documento…')}
+function pintarCuando(id){
+  var c=document.getElementById(id), v=elegido.cuando[id];
+  var h='<div class="cuando"><b>Cuándo se hace</b><select class="campo" id="sel-'+id+'">'+opt('','Siempre',!v)+CAMPOS.map(function(x){return opt(x.nombre,'Solo si el campo «'+x.nombre+'» vale…',v&&v.campo===x.nombre)}).join('')+opt(NUEVO,'+ Nuevo campo de lista…')+'</select></div>';
+  if(v){var f=CAMPOS.filter(function(x){return x.nombre===v.campo})[0];
+    if(f.de)h+='<p class="nota">De dónde sale: '+esc(f.de)+'.</p>';
+    h+='<div class="valores">'+f.opciones.map(function(o,i){return '<label><input type="checkbox" id="'+id+'-v'+i+'" '+(v.valores.indexOf(o)>-1?'checked':'')+' data-o="'+esc(o)+'"> '+esc(o)+'</label>'}).join('')+'</div><p class="nota">En el asunto, si el campo tiene otro valor, esto no sale.</p>';}
+  c.innerHTML=h;
+  c.querySelector('select').addEventListener('change',function(ev){
+    if(ev.target.value===NUEVO){ev.target.value=v?v.campo:'';cuadroCampo(id);return}
+    elegido.cuando[id]=ev.target.value?{campo:ev.target.value,valores:[]}:null;pintarCuando(id);
+  });
+  c.querySelectorAll('input[type=checkbox]').forEach(function(k){k.addEventListener('change',function(){var vs=elegido.cuando[id].valores,o=k.dataset.o;if(k.checked)vs.push(o);else vs.splice(vs.indexOf(o),1)})});
+}
+function todo(){pintarResp();pintarPlantillas();pintarTipos();pintarCuando('cuando-hito');pintarCuando('cuando-tarea')}
+
+/* ---- el cuadro ---- */
+var velo=document.getElementById('velo'),cuadro=document.getElementById('cuadro');
+function abrir(html){cuadro.innerHTML=html;velo.hidden=false;var f=cuadro.querySelector('input,textarea');if(f)f.focus()}
+function cerrar(){velo.hidden=true;cuadro.innerHTML=''}
+function textoEncontrado(k){return '«'+esc(k.nombre)+'»'+(k.conocidoComo?' (también se le llama «'+esc(k.conocidoComo)+'»)':'')+' en '+esc(k.donde)}
+
+/* Aviso común: busca en todo. Lo de la misma clase se puede usar; lo de otra clase solo se avisa. */
+function avisar(nombre,clase,cajaId,alUsar){
+  var encontrados=buscarParecidos(nombre,clase);
+  if(!encontrados.length)return false;
+  var mios=encontrados.filter(function(k){return k.clase===clase}),otros=encontrados.filter(function(k){return k.clase!==clase});
+  var h='<div class="parecido"><b>Ya hay algo parecido en esta lista:</b>';
+  mios.forEach(function(k,i){h+='<div>'+textoEncontrado(k)+'. <button class="boton usar" type="button" data-i="'+i+'" id="usar-'+i+'">Usar «'+esc(k.nombre)+'»</button></div>'});
+  otros.forEach(function(k){h+='<div>'+textoEncontrado(k)+'. Aquí no se puede elegir.</div>'});
+  h+='<span>Si es otra cosa distinta, pulsa otra vez el botón de crear.</span></div>';
+  var d=document.getElementById(cajaId);d.innerHTML=h;
+  d.querySelectorAll('.usar').forEach(function(b){b.onclick=function(){alUsar(mios[b.dataset.i]);cerrar();todo()}});
+  return true;
+}
+
+function cuadroNombre(o){
+  abrir('<h3>'+esc(o.titulo)+'</h3><div><label class="et" for="nuevo-nombre">'+esc(o.rotulo)+'</label><input id="nuevo-nombre" class="campo"></div>'+
+    '<div id="nuevo-parecido"></div><p class="error" id="nuevo-error" hidden></p><p class="nota">'+esc(o.donde)+'</p>'+
+    '<div class="botones"><button class="boton" id="nuevo-cancelar" type="button">Cancelar</button><button class="boton principal" id="nuevo-crear" type="button">Crear</button></div>');
+  var avisado=false;
+  document.getElementById('nuevo-cancelar').onclick=cerrar;
+  document.getElementById('nuevo-nombre').oninput=function(){avisado=false;document.getElementById('nuevo-parecido').innerHTML='';document.getElementById('nuevo-error').hidden=true};
+  document.getElementById('nuevo-crear').onclick=function(){
+    var nombre=document.getElementById('nuevo-nombre').value.trim(),e=document.getElementById('nuevo-error');
+    if(!nombre){e.textContent='Escribe el nombre.';e.hidden=false;return}
+    if(o.lista.some(function(x){return norm(x)===norm(nombre)})){e.textContent='«'+nombre+'» ya está en esta lista.';e.hidden=false;return}
+    if(!avisado&&avisar(nombre,o.clase,'nuevo-parecido',o.alUsar)){avisado=true;return}
+    o.alCrear(nombre);cerrar();todo();
+  };
+}
+function cuadroResp(selId){
+  function poner(n){if(selId==='toca-a')elegido.espera=n;else elegido.resp[selId]=n}
+  cuadroNombre({titulo:'Nuevo responsable',rotulo:'Nombre del responsable',clase:'responsable',donde:'Se guarda en Ajustes › Hitos y sale en todas las guías y asuntos.',
+    lista:CENTRO,alCrear:function(n){CENTRO.push(n);poner(n)},alUsar:function(k){
+      if(selId==='toca-a'&&ESPERA_FIJOS.indexOf(k.nombre)===-1&&CENTRO.indexOf(k.nombre)===-1)ESPERA_FIJOS.push(k.nombre);poner(k.nombre)}});
+}
+function cuadroTipoDoc(){
+  cuadroNombre({titulo:'Nuevo tipo de documento',rotulo:'Nombre del tipo de documento',clase:'tipodoc',donde:'Se guarda en Ajustes › Tipos de documento y sale en todos los documentos.',
+    lista:TIPOS_DOC,alCrear:function(n){TIPOS_DOC.push(n);elegido.tipodoc=n},alUsar:function(k){elegido.tipodoc=k.nombre}});
+}
+function cuadroCampo(id){
+  abrir('<h3>Nuevo campo de lista</h3><div><label class="et" for="campo-nombre">Nombre del campo</label><input id="campo-nombre" class="campo"></div>'+
+    '<div><label class="et" for="campo-opciones">Opciones (una por línea)</label><textarea id="campo-opciones" class="campo" rows="4"></textarea></div>'+
+    '<div id="campo-parecido"></div><p class="error" id="campo-error" hidden></p><p class="nota">Se añade a la lista de campos y al tipo CAMBIO DE GRUPO.</p>'+
+    '<div class="botones"><button class="boton" id="campo-cancelar" type="button">Cancelar</button><button class="boton principal" id="campo-crear" type="button">Crear</button></div>');
+  var avisado=false;
+  document.getElementById('campo-cancelar').onclick=cerrar;
+  document.getElementById('campo-nombre').oninput=function(){avisado=false;document.getElementById('campo-parecido').innerHTML='';document.getElementById('campo-error').hidden=true};
+  function usar(k){var c=k.campo;if(!CAMPOS.some(function(x){return x.nombre===c.nombre}))CAMPOS.push(c);elegido.cuando[id]={campo:c.nombre,valores:[]}}
+  document.getElementById('campo-crear').onclick=function(){
+    var n=document.getElementById('campo-nombre').value.trim(),e=document.getElementById('campo-error');
+    var ops=document.getElementById('campo-opciones').value.split('\n').map(function(x){return x.trim()}).filter(Boolean);
+    if(!n){e.textContent='Escribe el nombre del campo.';e.hidden=false;return}
+    if(CAMPOS.some(function(c){return norm(c.nombre)===norm(n)})){e.textContent='Ya hay un campo «'+n+'» en este tipo.';e.hidden=false;return}
+    if(!avisado&&avisar(n,'campo','campo-parecido',usar)){avisado=true;return}
+    if(ops.length<2){e.textContent='Escribe al menos dos opciones, una por línea.';e.hidden=false;return}
+    var nuevo={nombre:n,opciones:ops,de:''};CAMPOS.push(nuevo);LISTA_CAMPOS.push({nombre:n,de:'la lista de campos (lo usa CAMBIO DE GRUPO)',opciones:ops});
+    elegido.cuando[id]={campo:n,valores:[]};cerrar();todo();
+  };
+}
+function cuadroPlantilla(){
+  abrir('<h3>Editor de plantillas · Nueva plantilla de correo</h3><p class="nota">Es el editor de plantillas de siempre; aquí solo con lo básico.</p>'+
+    '<div><label class="et" for="pl-nombre">Nombre</label><input id="pl-nombre" class="campo"></div>'+
+    '<div><label class="et" for="pl-asunto">Asunto del correo</label><input id="pl-asunto" class="campo"></div>'+
+    '<div><label class="et" for="pl-texto">Texto</label><textarea id="pl-texto" class="campo" rows="4"></textarea></div>'+
+    '<div id="pl-parecido"></div><p class="error" id="pl-error" hidden></p>'+
+    '<div class="botones"><button class="boton" id="pl-cancelar" type="button">Cancelar</button><button class="boton principal" id="pl-guardar" type="button">Guardar y volver a la tarea</button></div>');
+  var avisado=false;
+  document.getElementById('pl-cancelar').onclick=cerrar;
+  document.getElementById('pl-nombre').oninput=function(){avisado=false;document.getElementById('pl-parecido').innerHTML=''};
+  document.getElementById('pl-guardar').onclick=function(){
+    var n=document.getElementById('pl-nombre').value.trim();
+    if(!n){var e=document.getElementById('pl-error');e.textContent='Escribe el nombre de la plantilla.';e.hidden=false;return}
+    if(!avisado&&avisar(n,'plantilla','pl-parecido',function(k){elegido.plantilla=k.nombre})){avisado=true;return}
+    var t=n+' (CAMBIO DE GRUPO)';PLANTILLAS.push(t);elegido.plantilla=t;cerrar();todo();
+  };
+}
+
+/* ---- enganches ---- */
+document.querySelectorAll('.lista-resp').forEach(function(s){s.addEventListener('change',function(){if(s.value===NUEVO){s.value=elegido.resp[s.id];cuadroResp(s.id)}else elegido.resp[s.id]=s.value})});
+document.getElementById('toca-a').addEventListener('change',function(ev){if(ev.target.value===NUEVO){ev.target.value=elegido.espera;cuadroResp('toca-a')}else elegido.espera=ev.target.value});
+document.getElementById('plantilla').addEventListener('change',function(ev){if(ev.target.value===NUEVO){ev.target.value=elegido.plantilla;cuadroPlantilla()}else elegido.plantilla=ev.target.value});
+document.getElementById('tipodoc').addEventListener('change',function(ev){if(ev.target.value===NUEVO){ev.target.value=elegido.tipodoc;cuadroTipoDoc()}else elegido.tipodoc=ev.target.value});
+document.getElementById('toca').addEventListener('change',function(ev){document.getElementById('toca-a').hidden=ev.target.value!=='espera'});
+velo.addEventListener('click',function(ev){if(ev.target===velo)cerrar()});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&!velo.hidden)cerrar()});
+todo();
+</script>
