@@ -150,8 +150,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Envío: pegar el script nuevo (filas 117, 130, 178 y 210), «Nueva versión» y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto.
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
-- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
-- Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia. Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
 - Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer tareas». Ajustes › Hitos: festivos.
 - Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento). Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
