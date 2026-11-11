@@ -141,6 +141,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Esconder el tablón del todo (desde la fila 353 solo se **pliega** a una línea con su número y la nota más reciente; nunca desaparece), sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
 - Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
+- Corregir en el Gestor datos del Centro de datos pulsando sobre el dato (tema 503, descartado por Francisco el 11-nov-2026).
 - Mudar el Gestor a Google Apps Script para esquivar el filtro de la red del centro: una página servida por Google no puede abrir carpetas del disco (idea 325).
 
 ## 8. Qué falta
