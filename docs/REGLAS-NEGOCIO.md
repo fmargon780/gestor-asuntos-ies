@@ -65,6 +65,10 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, idea 553) **Los hitos se añaden desde la tira de hitos**, no desde las tareas, y la ventana pregunta dónde situarlo, «con al final por defecto». «Hito ▾» ya no tiene «Crear».
 - (6-nov-2026, idea 553) Tareas, Campos, Documentos y Registro del hito, «muy bien diferenciadas»: cada una en su recuadro.
 
+- (11-nov-2026, tema 582) En los desplegables de hitos y tareas que son listas del centro (Responsable, «Esperamos a…», Tipo de documento, «Cuándo se hace» y Plantilla), **lo que falta se crea ahí mismo con «+ Nuevo…»** y queda en su lista para todos: «Debería poder crear ese valor desde el mismo proceso de trabajo». La plantilla nueva también («1»).
+- (11-nov-2026, tema 582) **«Sus profesores» es un responsable fijo**, como «El tutor del alumnado», en vez de escribir «Equipo educativo» como un nombre más («1»).
+- (11-nov-2026, tema 582) Al crear con «+ Nuevo…», **el aviso de parecidos solo mira la lista de ese desplegable**; que busque en todo lo que la app conoce queda como idea 616 («No lo termino de ver claro»; eligió la 1).
+
 ## Correo
 
 - (27-oct-2026, tema 469) La actualización del script de Gmail la hace **solo Francisco**: los
