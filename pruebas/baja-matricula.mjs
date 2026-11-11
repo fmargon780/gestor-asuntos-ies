@@ -1,5 +1,5 @@
 /* Prueba de la fila 592 (11-nov-2026, docs/592-BAJA-MATRICULA.md): el tipo BAJA MATRICULA.
-   Chromium real con los datos de la copia de pruebas (?demo=1&auto=1), que lleva el tipo «BAJA» de antes con un asunto abierto.
+   Chromium real con los datos de la copia de pruebas (?demo=1&auto=1&baja=1), que lleva el tipo «BAJA» de antes con un asunto abierto.
 
    1. El tipo: «BAJA» pasa a «Baja de matrícula» (BAJA MATRICULA), con el nombre de antes de alias; el asunto de antes se sigue
       abriendo como de ese tipo; BAJA MEDICA no se toca.
@@ -13,7 +13,7 @@
    8. «Campos del asunto»: un dato de lista vacío sale con su desplegable y se guarda ahí. */
 import { chromium } from 'playwright';
 
-const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
+const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1&baja=1';
 let fallos = 0;
 async function comprobar(titulo, promesa, esperado) {
   const real = await promesa;
