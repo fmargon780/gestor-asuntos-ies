@@ -89,8 +89,9 @@ async function elegirUnaAdministracion(conDepartamento) {
 console.log('--- 1. la mesa del hito ---');
 await abrirMesa('m1');
 await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
-await comprobar('la lista de responsables acaba con «Una Administración…»',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').last().textContent(), 'Una Administración…');
+/* Fila 615: la última opción es «+ Nuevo responsable…»; «Una Administración…» va justo antes. */
+await comprobar('la lista de responsables acaba con «Una Administración…» y «+ Nuevo responsable…»',
+  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents().then((t) => t.slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
 await pagina.keyboard.press('Escape');
 await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Una Administración…' }).first().click();
@@ -145,8 +146,8 @@ const abierto = await pagina.evaluate(() => {
   return true;
 });
 await pagina.waitForSelector('.paso-responsable', { state: 'attached' });
-await comprobar('«Una Administración…» es la última opción del desplegable',
-  pagina.evaluate(() => Array.from(document.querySelector('.paso-responsable').options).map((o) => o.textContent).pop()), 'Una Administración…');
+await comprobar('«Una Administración…» va justo antes de «+ Nuevo responsable…», la última opción del desplegable',
+  pagina.evaluate(() => Array.from(document.querySelector('.paso-responsable').options).map((o) => o.textContent).slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
 await pagina.selectOption('.paso-responsable', '__adm__');
 await pagina.waitForSelector('.ro-en-linea .ro-organismo');
 await comprobar('el buscador sale en línea, sin cerrar el editor', pagina.locator('.paso-responsable').isVisible(), true);

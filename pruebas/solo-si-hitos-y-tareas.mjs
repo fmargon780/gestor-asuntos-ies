@@ -110,7 +110,7 @@ const E = (id) => '#guia-pasos > .paso-editor[data-paso-id="' + id + '"]';
 await abrir('FACTURA', CAMPOS);
 await comprobar('cada hito tiene «Cuándo se hace», con «Siempre» y el campo de lista del tipo', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#guia-pasos > .paso-editor')).map(e => Array.from(e.querySelectorAll(':scope > .cuando-bloque .cuando-campo option')).map(o => o.textContent))),
-  [0, 1, 2].map(() => ['Siempre', 'Solo si el campo «Quién lo pide» vale…']));
+  [0, 1, 2].map(() => ['Siempre', 'Solo si el campo «Quién lo pide» vale…', '+ Nuevo campo de lista…']));   /* fila 615: la última opción */
 await comprobar('ya no hay casilla de pregunta en un hito normal', pagina.locator('#guia-pasos .paso-es-pregunta-fila').count(), 0);
 await elegirHito('p2');
 await pagina.selectOption(E('p2') + ' > .cuando-bloque .cuando-campo', 'Quién lo pide');

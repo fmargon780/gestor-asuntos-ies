@@ -44,6 +44,7 @@ var GuiasPlantilla = (function () {
     var col = o.col;
     var panel = col && col.querySelector('#guia-plantilla-panel');
     if (!panel || !o.pasos) return;
+    if (window.GuiasPlantillaNueva) GuiasPlantillaNueva.enganchar(o);   /* fila 615: «+ Nueva plantilla…» */
     var scroll = 0;
 
     function cerrar() {

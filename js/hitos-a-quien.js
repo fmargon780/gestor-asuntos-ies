@@ -28,7 +28,7 @@
   if (typeof window.Hitos === 'undefined') return;
 
   /* El nombre corto de cada papel fijo, para la tarjeta. */
-  var PAPELES_CORTOS = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado' };
+  var PAPELES_CORTOS = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado', profesores: 'Sus profesores' };   /* fila 615 */
 
   function esPapel(id) {
     return Hitos.PAPELES.some(function (p) { return p.id === id; });

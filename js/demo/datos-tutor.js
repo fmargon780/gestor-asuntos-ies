@@ -118,6 +118,14 @@
         guion: [{ id: 'g-demo-tutor-avisar', texto: 'Avisar al tutor/a', accion: 'comunicar' }] },
       { titulo: 'Entregar la notificación a la familia', cuerpo: '<p>En mano, con acuse de recibo.</p>', responsable: 'yo' }
     ], null);
+    /* Fila 615: un campo de lista en este tipo («¿Quién lo pide?»), para ver el aviso de parecidos con «Usar» al crear uno parecido desde «Cuándo se hace» de otro tipo. */
+    await Campos.guardarPropios(App.E.gestor, function (lista) {
+      lista.push({ id: 'p-demo-quien-lo-pide', nombre: '¿Quién lo pide?', clase: 'lista', valores: ['Familia', 'Tutoría', 'Jefatura de estudios'], grupo: 'Asunto' });
+      return lista;
+    });
+    var configSancion = ((await Campos.leer(App.E.gestor)).porTipo || {}).SANCION || [];
+    await Campos.guardarConfigDeTipo(App.E.gestor, 'SANCION', configSancion.concat([{ origen: 'propio', id: 'p-demo-quien-lo-pide', obligatorio: false, enNombre: false }]));
+    App.E.campos = await Campos.leer(App.E.gestor);
     var alumnos = [['Jimenez Rubio, Mateo', '2100011', true], ['Fuentes Calvo, Rubén', '2100007', false],
                    ['Delgado Prieto, Iker', '2100005', false], ['Klein Soto, Ana', '2100012', false]];
     for (var i = 0; i < alumnos.length; i++) {

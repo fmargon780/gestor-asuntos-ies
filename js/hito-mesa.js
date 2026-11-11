@@ -337,7 +337,10 @@ var HitoMesa = (function () {
       var r = await ResponsableOrganismo.elegir();
       if (!r) return;
       guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: r.id, responsableNombre: r.nombre }); });
-    } }] : []));
+    } }] : []).concat(window.ListaNuevoListas ? ListaNuevoListas.itemDeMenuResponsable(function (id) {
+      /* Fila 615: «+ Nuevo responsable…», la última opción. */
+      guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: id }); });
+    }) : []));
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
     /* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): arriba, sin repetir la

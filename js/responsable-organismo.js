@@ -234,7 +234,8 @@ var ResponsableOrganismo = (function () {
     var propia = esOrganismo(id)
       ? '<option value="' + U.escapar(id) + '" selected>' + U.escapar(nombreDe(id, '')) + '</option>'
       : '';
-    return propia + '<option value="' + OPCION + '">' + TEXTO + '</option>';
+    /* Fila 615: la última opción es «+ Nuevo responsable…» (js/lista-nuevo.js; no sale en solo consulta). */
+    return propia + '<option value="' + OPCION + '">' + TEXTO + '</option>' + (window.ListaNuevo ? ListaNuevo.opcionHTML('+ Nuevo responsable…') : '');
   }
 
   /* Al elegir «Una Administración…» en un desplegable: el desplegable
