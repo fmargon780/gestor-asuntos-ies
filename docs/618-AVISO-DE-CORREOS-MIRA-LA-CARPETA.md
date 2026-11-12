@@ -75,4 +75,11 @@ Sin nota y sin adjuntos.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- Revisión de la sesión (tarea pequeña, sin segundo revisor), 12-nov-2026, contra el texto, lo entendido y la prueba `pruebas/bandeja-latido.mjs`:
+  - Primer paso del cuadro = comprobar la carpeta de correos de este ordenador, con lo de Google Drive y el botón «Cambiar la carpeta», antes de los pasos del script: coincide (prueba 8).
+  - Los pasos del script siguen detrás: coincide; el texto de introducción y el primer paso del script se han reescrito un poco para encajar con el paso nuevo (se quita «Hay que despertar…» como frase de entrada).
+  - El botón abre el mismo elegidor que Ajustes → Mantenimiento: coincide (prueba 8, con el elegidor sustituido); al señalar otra carpeta se mira la señal sin esperar los 10 minutos del arranque: coincide por código, **no lo he podido ver** con un elegidor de carpetas real (la copia de pruebas no tiene uno).
+  - Carpeta que ya no existe: Inicio dice en ámbar «La carpeta de correos ya no está donde estaba. Señálala otra vez.» con «Cambiar la carpeta», sin «necesita permiso», y el latido no añade su aviso: coincide (prueba 9, con una carpeta que lanza `NotFoundError`). **No he podido ver** cómo responde Chrome de verdad con una carpeta borrada o movida.
+  - Solo permiso: sigue igual que hoy (no tocado).
+  - `docs/PASAR-A-DRIVE.md` apunta volver a señalar la carpeta de correos en cada ordenador: coincide. No se toca el script ni «Pasar a Drive»: coincide.
+  - Lo que hace la app sin que el texto lo pida: nada.

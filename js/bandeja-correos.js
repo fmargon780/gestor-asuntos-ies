@@ -107,10 +107,20 @@
     try { carpeta = await Almacen.leer(CLAVE); } catch (e) { carpeta = null; }
   }
 
+  /* Fila 618: la carpeta señalada ya no existe (Drive cambió de sitio, la borraron o la movieron). */
+  var carpetaNoEsta = false;
+  async function comprobarCarpeta() {
+    if (!carpeta) { carpetaNoEsta = false; return false; }
+    try { await Carpetas.ficheros(carpeta); carpetaNoEsta = false; }
+    catch (e) { if (e && e.name === 'NotFoundError') carpetaNoEsta = true; }
+    return carpetaNoEsta;
+  }
+
   async function elegirCarpeta() {
     try {
       var h = await window.showDirectoryPicker({ id: 'gestor-bandeja', mode: 'readwrite' });
       carpeta = h;
+      carpetaNoEsta = false;
       await Almacen.guardar(CLAVE, h);
       N.pintarBloqueAjustes();
       ultimaMirada = 0;
@@ -125,6 +135,7 @@
   async function olvidarCarpeta() {
     carpeta = null;
     correos = [];
+    carpetaNoEsta = false;
     try { await Almacen.guardar(CLAVE, null); } catch (e) {}
     N.pintarBloqueAjustes();
     repintarPantalla();
@@ -154,7 +165,7 @@
     if (!aLaFuerza && ahora - ultimaMirada < SEGUNDOS_ENTRE_MIRADAS * 1000) return;
     mirando = true;
     try {
-      if (!(await tienePermiso(false))) { correos = null; repintarPantalla(); return; }
+      if (!(await tienePermiso(false))) { await comprobarCarpeta(); correos = null; repintarPantalla(); return; }
       var lista = await Carpetas.ficheros(carpeta);
       var salida = [];
       for (var i = 0; i < lista.length; i++) {
@@ -181,9 +192,11 @@
         return fa < fb ? -1 : (fa > fb ? 1 : 0);
       });
       correos = salida;
+      carpetaNoEsta = false;
       ultimaMirada = ahora;
       repintarPantalla();
     } catch (e) {
+      if (e && e.name === 'NotFoundError') carpetaNoEsta = true;   /* fila 618 */
       correos = null;
       repintarPantalla();
     } finally {
@@ -271,6 +284,9 @@
     correos: function () { return correos; },
     mirarDeNuevo: function (aLaFuerza) { ultimaMirada = 0; return mirar(aLaFuerza !== false); },
     pedirPermiso: pedirPermiso,
+    carpetaNoEsta: function () { return carpetaNoEsta; },
+    comprobarCarpeta: comprobarCarpeta,
+    elegirCarpeta: elegirCarpeta,
     soloElDia: soloElDia,
     fechaLegible: fechaLegible,
     fechaHoraLegible: fechaHoraLegible,

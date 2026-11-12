@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '618', fecha: '2026-11-12', texto: 'Si no entran correos, el aviso «La recogida de correos está parada» pone primero comprobar la carpeta de correos de este ordenador, con el botón «Cambiar la carpeta»; y si esa carpeta ya no existe, Inicio lo dice y te deja señalarla otra vez.' },
   { id: '619', fecha: '2026-11-12', texto: '«Pasar a Drive» ya no se para si un fichero no se deja abrir: lo enseña en rojo, con su carpeta y su nombre, y copia todo lo demás.' },
   { id: '615', fecha: '2026-11-11', texto: 'En los desplegables de hitos y tareas de la guía (Responsable, «Esperamos a…», Tipo de documento, «Cuándo se hace» y las plantillas de correo y de documento) la última opción es «+ Nuevo…»: lo que creas queda en su lista para todas las guías y asuntos. Si se parece a algo que ya hay, sale un aviso con «Usar». «Sus profesores» es ahora un responsable fijo, como «El tutor del alumnado».' },
   { id: '612', fecha: '2026-11-11', texto: '«Pasar a Drive» acepta la carpeta de Google Drive aunque no se llame «Mi unidad» (por ejemplo C:\\Google Drive), el botón pasa a llamarse «Señalar la carpeta de Google Drive» y «Ruta» reconoce también esas carpetas.' },

@@ -60,9 +60,13 @@ window.BandejaLatido = (function () {
   }
 
   function pasos() {
-    return '<p>Hay que despertar el programa de Google que recoge los correos:</p>' +
+    return '<p>Puede fallar una de estas dos cosas. Mira primero la carpeta, que es lo más rápido:</p>' +
       '<ol>' +
-      '<li>Abre <a href="' + ENLACE_SCRIPT + '" target="_blank" rel="noopener">script.google.com</a> con la cuenta de Administración ' +
+      '<li>Comprueba la carpeta de correos de este ordenador. Si Google Drive ha cambiado de sitio en este ordenador, ' +
+      'la aplicación sigue mirando la carpeta de antes. ' +
+      '<button type="button" class="boton boton-principal" data-cambiar-carpeta-correos>Cambiar la carpeta</button></li>' +
+      '<li>Si la carpeta es la buena, hay que despertar el programa de Google que recoge los correos. ' +
+      'Abre <a href="' + ENLACE_SCRIPT + '" target="_blank" rel="noopener">script.google.com</a> con la cuenta de Administración ' +
       'y busca «Gestor - Correos». Si no está, mira la <a href="' + ENLACE_PAPELERA + '" target="_blank" rel="noopener">papelera</a> y pulsa «Restaurar».</li>' +
       '<li>Ábrelo, elige <code>prepararTodo</code> en el desplegable de arriba y pulsa «Ejecutar».</li>' +
       '<li>Si la aplicación avisa de que el script es viejo, pega antes el código nuevo en lugar del que hay: <a href="#" data-copiar-codigo>copiar el enlace del código</a> ' +
@@ -81,6 +85,18 @@ window.BandejaLatido = (function () {
     });
   });
 
+  /* Fila 618: «Cambiar la carpeta» abre lo mismo que Ajustes → Mantenimiento → «Bandeja de correos»; con la
+     carpeta nueva se mira la señal en el acto, sin esperar los 10 minutos de arranque. */
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest && ev.target.closest('[data-cambiar-carpeta-correos]');
+    if (!b) return;
+    ev.preventDefault();
+    var antes = window.Bandeja && Bandeja.carpeta();
+    Bandeja.elegirCarpeta().then(function () {
+      if (window.Bandeja && Bandeja.carpeta() !== antes) return mirar(true, true);
+    });
+  });
+
   function abrirPasos() {
     U.preguntar('La recogida de correos', pasos(), 'Entendido', true);
   }
@@ -91,7 +107,7 @@ window.BandejaLatido = (function () {
 
   /* Lee la señal y pone o quita el aviso. Devuelve el resultado, o null si
      no toca mirar nada (sin carpeta, sin permiso, directivo, arranque). */
-  async function mirar(aLaFuerza) {
+  async function mirar(aLaFuerza, sinEsperarArranque) {
     if (window.Perfil && Perfil.esDirectivo()) { registrar(''); return null; }   /* sin esperar a los 5 minutos: si entra otro nombre, el aviso se va ya */
     if (mirando) return null;
     if (!aLaFuerza && ultimaMirada && Date.now() - ultimaMirada < CADA_MS) return null;
@@ -101,13 +117,14 @@ window.BandejaLatido = (function () {
       var carpeta = window.Bandeja && Bandeja.carpeta();
       if (!carpeta) { registrar(''); return null; }
       if (!(await Carpetas.permiso(carpeta, false).catch(function () { return false; }))) { registrar(''); return null; }
+      if (window.Bandeja && Bandeja.comprobarCarpeta && await Bandeja.comprobarCarpeta()) { registrar(''); return null; }   /* fila 618: la carpeta ya no está; lo dice Inicio */
       var senal = null;
       try { senal = await Carpetas.leerJson(carpeta, FICHERO); } catch (e) { senal = null; }
       ultimaMirada = Date.now();
       cuentaDelLatido = (senal && typeof senal === 'object' && typeof senal.cuenta === 'string') ? senal.cuenta.trim() : '';
       if (window.CorreoEnviar && CorreoEnviar.repintarCuenta) CorreoEnviar.repintarCuenta();   /* fila 411 */
       var r = juzgar(senal, Date.now());
-      var enArranque = !esDemo() && Date.now() - abierta < ARRANQUE_MS;
+      var enArranque = !sinEsperarArranque && !esDemo() && Date.now() - abierta < ARRANQUE_MS;
       registrar(enArranque ? '' : texto(r));
       return r;
     } catch (e) {

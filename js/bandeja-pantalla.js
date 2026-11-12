@@ -94,6 +94,18 @@ var BandejaPantalla = (function () {
     if (!c) return;
     c.innerHTML = '';
 
+    if (correos === null && window.Bandeja.carpetaNoEsta && window.Bandeja.carpetaNoEsta()) {
+      /* Fila 618: la carpeta señalada ya no existe; pedir permiso no la arregla. */
+      c.className = 'aviso aviso-ambar';
+      c.innerHTML = '<strong>La carpeta de correos ya no está donde estaba. Señálala otra vez.</strong>';
+      var otra = document.createElement('button');
+      otra.className = 'boton boton-principal';
+      otra.textContent = 'Cambiar la carpeta';
+      otra.onclick = function () { window.Bandeja.elegirCarpeta(); };
+      c.appendChild(otra);
+      return;
+    }
+
     if (correos === null) {
       c.className = 'aviso aviso-ambar';
       c.innerHTML = '<strong>La bandeja de correos necesita permiso otra vez.</strong>' +

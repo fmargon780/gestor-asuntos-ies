@@ -63,6 +63,9 @@ carpeta de versiones previas).
   `centro-de-datos-carpeta`. Son de cada ordenador, de cada perfil de Chrome y de cada dirección
   (web, vercel.app y `file://` tienen cada una las suyas). Un handle no se puede construir desde una
   ruta: hay que señalar la carpeta a mano.
+- **Al cambiar Drive de sitio, en cada ordenador hay que volver a señalar la carpeta de correos**
+  (Ajustes → Mantenimiento → «Bandeja de correos» → «Cambiar la carpeta») en
+  `C:\Google Drive\GESTOR-BANDEJA`: la app sigue mirando la de antes y los correos no entran (fila 618).
 - `_GESTOR` está dentro de `abiertos` (`js/nucleo.js`, hacia la línea 223).
 - Los documentos sueltos se leen de la raíz de `abiertos`: `js/asuntos-lista.js` (34, 64),
   `js/documentos-vigilancia.js` (33), `js/documentos-sueltos.js` (173, 370).

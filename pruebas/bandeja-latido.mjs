@@ -62,6 +62,22 @@ console.log('--- 2 y 5. señal vieja ---');
   comprobar('2. el cuadro lleva los dos enlaces que se abren (el del código se copia, fila 471)', cuadro.enlaces.filter((h) => h.indexOf('https:') === 0), [
     'https://script.google.com/home', 'https://script.google.com/home/trash']);
   comprobar('2. y el del código, para copiar', await pagina.locator('#cuadro-cuerpo [data-copiar-codigo]').count(), 1);
+  /* 8 (fila 618): el primer paso es la carpeta, con su botón, y va antes que los del script. */
+  const orden = await pagina.evaluate(() => {
+    const li = Array.from(document.querySelectorAll('#cuadro-cuerpo ol > li'));
+    return { primero: li[0] ? li[0].textContent : '', boton: !!(li[0] && li[0].querySelector('[data-cambiar-carpeta-correos]')), segundo: li[1] ? li[1].textContent : '' };
+  });
+  comprobar('8. el primer paso habla de la carpeta y lleva «Cambiar la carpeta»', /carpeta de correos de este ordenador/.test(orden.primero) && /Google Drive ha cambiado de sitio/.test(orden.primero) && /Cambiar la carpeta/.test(orden.primero) && orden.boton, true);
+  comprobar('8. detrás van los pasos del script', /script\.google\.com/.test(orden.segundo), true);
+  /* 8b: pulsar el botón llama a elegir carpeta; al señalar una con señal reciente el aviso se quita sin esperar. */
+  await pagina.evaluate(() => {
+    window.__llamadas = 0;
+    const antes = Bandeja.carpeta();
+    Bandeja.elegirCarpeta = async function () { window.__llamadas++; };
+    window.__antes = antes;
+  });
+  await pagina.click('#cuadro-cuerpo [data-cambiar-carpeta-correos]');
+  comprobar('8. el botón abre el elegidor de la carpeta', await pagina.evaluate(() => window.__llamadas), 1);
   await pagina.click('#cuadro-aceptar');
   /* 5. la señal vuelve */
   await pagina.evaluate(async () => {
@@ -71,6 +87,24 @@ console.log('--- 2 y 5. señal vieja ---');
   const correos = await pagina.evaluate(async () => { await Bandeja.mirarDeNuevo(true); return Bandeja.correos().map((c) => c.fichero).sort(); });
   comprobar('6. latido.json no cuenta como correo', correos, ['demo-correo-1.json', 'demo-correo-2.json']);
   comprobar('2. sin errores', errores, []);
+  await contexto.close();
+}
+
+console.log('--- 9. la carpeta señalada ya no existe ---');
+{
+  const { contexto, pagina, errores } = await abrir('&latido=viejo');
+  await pagina.evaluate(() => {
+    const c = Bandeja.carpeta();
+    c.entries = function () { const e = new Error('no existe'); e.name = 'NotFoundError'; throw e; };
+  });
+  comprobar('9. sin el aviso de «no da señales» ni de «parada»', await aviso(pagina), null);
+  await pagina.evaluate(async () => { await Bandeja.mirarDeNuevo(true); });
+  const caja = await pagina.evaluate(() => {
+    const c = document.getElementById('bandeja-correos');
+    return { texto: c ? c.textContent : '', boton: c ? Array.from(c.querySelectorAll('button')).map((b) => b.textContent) : [] };
+  });
+  comprobar('9. Inicio dice que la carpeta ya no está, con «Cambiar la carpeta»', /La carpeta de correos ya no está donde estaba\. Señálala otra vez\./.test(caja.texto) && !/necesita permiso/.test(caja.texto) && JSON.stringify(caja.boton) === JSON.stringify(['Cambiar la carpeta']), true);
+  comprobar('9. sin errores', errores, []);
   await contexto.close();
 }
 
