@@ -48,6 +48,9 @@ var CamposLista = (function () {
     tutor2: ['Tutores', 'Centro de datos', 'RegAlum', 'Segundo tutor', AL],
     tutor2telefono: ['Tutores', 'Centro de datos', 'RegAlum', 'Teléfono Segundo tutor', AL],
     tutor2correo: ['Tutores', 'Centro de datos', 'RegAlum', 'Correo Segundo tutor', AL],
+    'tipo de documento': ['Asunto', 'El asunto', 'El documento', 'Tipo de documento'],   /* fila 627 */
+    'fecha del documento': ['Asunto', 'El asunto', 'El documento', 'Fecha'],
+    'numero del documento': ['Asunto', 'El asunto', 'El documento', 'Número del documento'],
     firmante: ['Firmantes', 'Ajustes del centro', 'Cargos del centro', 'Quien firma según el cargo'],
     'cargo firmante': ['Firmantes', 'Ajustes del centro', 'Cargos del centro', 'Cargo'],
     'tratamiento firmante': ['Firmantes', 'Ajustes del centro', 'Cargos del centro', 'Tratamiento'],

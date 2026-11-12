@@ -154,13 +154,31 @@
     };
   }
 
+  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): «Asunto» copia el asunto que compone la app (el general del centro, con el
+     número del asunto), no el nombre de la carpeta; un asunto de antes, sin número, sigue copiando el nombre. Se compone al
+     pulsar, así que el botón no cambia nada en la ficha al pintarse. */
+  function botonDelAsunto(a) {
+    var b = botonCopiarFila('Asunto', a.nombre, 'Copiar el asunto que compone la aplicación para los correos y mensajes de Séneca');
+    b.onclick = async function (ev) {
+      ev.stopPropagation();
+      ev.preventDefault();
+      var texto = a.nombre;
+      if (window.AsuntoExtracto) {
+        try { texto = await AsuntoExtracto.asunto(a); }
+        catch (e) { U.aviso('No he podido componer el asunto: ' + U.mensajeDeError(e), 'malo'); return; }
+      }
+      U.copiar(texto, b, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' });
+    };
+    return b;
+  }
+
   function ponerFilaDeCopiar(h2) {
     var cabecera = h2.closest('.ficha-cabecera');
     if (!window.Copiar || (cabecera || h2.parentNode).querySelector('.ficha-copiar-fila')) return;
     var a = viendo;
     var fila = document.createElement('div');
     fila.className = 'ficha-copiar-fila';
-    fila.appendChild(botonCopiarFila('Asunto', a.nombre, 'Copiar el nombre completo de la carpeta'));
+    fila.appendChild(botonDelAsunto(a));
     /* La ruta de la carpeta, con lo apuntado en Ajustes → El centro
        (fila 98, js/copiar-ruta.js). */
     if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.boton(a, modoDelAsunto));

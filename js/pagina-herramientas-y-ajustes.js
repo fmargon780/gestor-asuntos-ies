@@ -347,4 +347,12 @@ document.write(`    <section id="pantalla-herramientas" class="pantalla oculto">
       <button type="button" class="boton" id="plantillas-guardar-firma">Guardar firma y centro</button>
         </div>
       </details>
+
+      <details class="bloque-ajustes" id="bloque-asunto-extracto">
+        <summary>
+          <span class="bloque-titulo">Asunto y extracto</span>
+          <span class="bloque-pie">Cómo se escribe el asunto de los correos y mensajes de Séneca, y el extracto del registro</span>
+        </summary>
+        <div class="bloque-cuerpo" id="asunto-extracto-cuerpo"></div>
+      </details>
 `);

@@ -75,6 +75,12 @@ var Plantillas = (function () {
     { clave: 'estado', etiqueta: 'Estado de tramitación' },
     { clave: 'registro', etiqueta: 'Nº de registro de Séneca del asunto' },
     { clave: 'fecha de registro', etiqueta: 'Fecha de registro de ese mismo documento' },   /* fila 573 */
+    /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): el número del asunto y los datos del documento, para el asunto y el extracto
+       que compone la app (js/asunto-extracto.js). Los del documento solo tienen valor al copiar el extracto de un documento. */
+    { clave: 'numero del asunto', etiqueta: 'Número del asunto' },
+    { clave: 'tipo de documento', etiqueta: 'Tipo de documento' },
+    { clave: 'fecha del documento', etiqueta: 'Fecha del documento' },
+    { clave: 'numero del documento', etiqueta: 'Número del documento' },
     { clave: 'hoy', etiqueta: 'Fecha de hoy' },
     { clave: 'hoyLargo', etiqueta: 'Fecha de hoy, en letra' },
     { clave: 'lugarYFecha', etiqueta: 'Lugar y fecha, en letra' },
@@ -198,6 +204,11 @@ var Plantillas = (function () {
          `membreteCaja` que queden de la fila 81 se ignoran. */
       consejeria: l.consejeria || '',
       lista: Array.isArray(l.lista) ? l.lista : [],
+      /* Fila 627: el asunto general, el extracto general y el extracto propio de cada tipo de documento
+         (js/asunto-extracto.js). Vacíos: salen los modelos de partida. */
+      asuntoGeneral: typeof l.asuntoGeneral === 'string' ? l.asuntoGeneral : '',
+      extractoGeneral: typeof l.extractoGeneral === 'string' ? l.extractoGeneral : '',
+      extractosPorTipo: (l.extractosPorTipo && typeof l.extractosPorTipo === 'object' && !Array.isArray(l.extractosPorTipo)) ? l.extractosPorTipo : {},
       /* Plantillas de documento de Word (docs/PLANTILLAS-DE-DOCUMENTO.md,
          3.4): { id, categoria, tipo, nombre, fichero, tipoDocumento,
          texto }. Un fichero viejo sin esta clave sigue cargando igual. */
@@ -360,7 +371,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['telefono del centro', 'correo del centro', 'hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
+  var SIN_FALTA = ['tipo de documento', 'fecha del documento', 'numero del documento', 'telefono del centro', 'correo del centro', 'hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que

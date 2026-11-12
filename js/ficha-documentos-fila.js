@@ -59,6 +59,8 @@ var FichaDocumentosFila = (function () {
     /* Fila 423: «Ruta», pegado al nombre: copia la ruta entera del documento. Fila 439: es lo único que
        queda a la vista; lo demás, en el menú ⋮ de la derecha, y los datos, en gris, tras «Ruta». */
     if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: f.nombre }));
+    /* Fila 627: «Extracto», al lado de «Ruta»: copia el extracto de este documento para el registro de Séneca (en todos, también los registrados). */
+    if (window.ExtractoDocumento) fila.appendChild(ExtractoDocumento.boton(a, f.nombre));
 
     /* Fila 439: las entradas del menú ⋮, en este orden: copiar el nombre, Registrar, Cambiar el nombre,
        Asociar a un hito, Traer a este hito, y lo que ya tenía el menú. Cada una sale solo cuando hoy saldría su botón. */

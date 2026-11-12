@@ -56,8 +56,8 @@ console.log('--- 1. la carpeta: una línea por documento ---');
 await comprobar('1. cada documento de la carpeta mide un solo renglón y no lleva fila de botones debajo', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((f) => [f.getBoundingClientRect().height < 56,
     Array.from(f.children).every((c) => c.getBoundingClientRect().bottom <= f.getBoundingClientRect().bottom + 1)]).flat().every(Boolean)), true);
-await comprobar('1. a la vista solo hay «Ruta» (y el ⋮); ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
-  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Ruta', '⋮']);
+await comprobar('1. a la vista solo hay «Ruta» y «Extracto» (fila 627) y el ⋮; ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
+  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Ruta', 'Extracto', '⋮']);
 await comprobar('1. el orden: nombre, «Ruta», datos y ⋮', fila(UNO).evaluate((f) => {
   const orden = Array.from(f.children).filter((c) => c.offsetParent || c.matches('.doc-datos')).map((c) =>
     c.matches('.ficha-documento') ? 'nombre' : c.matches('.ruta-documento') ? 'ruta' : c.matches('.doc-datos') ? 'datos' : c.matches('.fila-menu-envoltorio') ? 'menu' : '');

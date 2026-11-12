@@ -42,6 +42,8 @@ var SenecaCuadro = (function () {
     copiadoElAsunto = false;
     var quien = n().aQuien ? n().aQuien(a) : '';
     var documento = n().documentoSeneca ? n().documentoSeneca() : '';
+    /* Fila 627: el cuerpo se prepara antes que el asunto, porque el asunto depende de la plantilla con la que se abre. */
+    var cuerpoYPlantilla = bloqueCuerpo(a);
 
     return '<div id="seneca-formulario">' +
            '<div class="cuadro-cabecera-ruta"><span id="seneca-ruta-lugar"></span></div>' +
@@ -61,7 +63,7 @@ var SenecaCuadro = (function () {
                bloqueAsunto(a) +
              '</div>' +
              '<div class="seneca-col-der">' +
-               '<div id="seneca-comunes-der">' + bloqueCuerpo(a) + '</div>' +
+               '<div id="seneca-comunes-der">' + cuerpoYPlantilla + '</div>' +
              '</div>' +
            '</div>' +
            '<div class="seneca-pasos">' +
@@ -79,12 +81,10 @@ var SenecaCuadro = (function () {
            '<div id="seneca-plantilla-editor" class="oculto"></div>';
   }
 
-  /* El asunto es siempre el nombre de la carpeta (fila 55, 18-sep-2026,
-     docs/ASUNTO-SIN-ELECCION.md): ya no hay botones para elegir entre
-     esa y una "versión legible". El campo se ve y se puede editar a
-     mano igual que antes; solo desaparece la elección. */
+  /* El asunto lo compone la app (fila 627, js/asunto-extracto.js): el de la plantilla con la que se abre o, sin ella, el
+     general del centro. El campo se ve y se puede retocar a mano antes de copiarlo. */
   function bloqueAsunto(a) {
-    var texto = n().asuntoDelCorreo ? n().asuntoDelCorreo(a) : (a.nombre || '');
+    var texto = n().asuntoDelCorreo ? n().asuntoDelCorreo(a, plantillaElegida) : (a.nombre || '');
     return '<label class="etiqueta" style="margin-top:0">Asunto</label>' +
       '<textarea id="seneca-asunto" class="campo">' + U.escapar(texto) + '</textarea>' +
       '<div class="seneca-asunto-pie">' +
@@ -231,8 +231,20 @@ var SenecaCuadro = (function () {
     caja2.appendChild(cancelar);
   }
 
-  function cambiarDePlantilla(a, idElegida) {
+  /* Fila 627: al cambiar de plantilla, el asunto cambia con ella (no al guardar una plantilla nueva desde lo escrito:
+     ahí `conservarAsunto`). */
+  function ponerElAsuntoDe(a, idElegida) {
+    var campo = $('seneca-asunto');
+    if (!campo || !n().asuntoDelCorreo) return;
+    campo.value = n().asuntoDelCorreo(a, idElegida);
+    ajustarAltoAsunto(campo);
+    actualizarCaracteres();
+  }
+
+  function cambiarDePlantilla(a, idElegida, conservarAsunto) {
+    var cambia = idElegida !== plantillaElegida;
     plantillaElegida = idElegida;
+    if (cambia && !conservarAsunto) ponerElAsuntoDe(a, idElegida);
     $('seneca-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
     if (window.CorreoAdjuntoPlantilla) CorreoAdjuntoPlantilla.paraSeneca(a, plantillaElegida);   /* fila 299 */
@@ -243,7 +255,7 @@ var SenecaCuadro = (function () {
      viven en js/plantilla-de-lo-escrito.js) ---------- */
 
   function dejarElegida(a, id, texto) {
-    cambiarDePlantilla(a, id);
+    cambiarDePlantilla(a, id, true);
     if ($('seneca-cuerpo-texto')) $('seneca-cuerpo-texto').value = texto;
   }
   var cfgPlantilla = { prefijo: 'seneca', elegir: elegirPlantilla, dejarElegida: dejarElegida };

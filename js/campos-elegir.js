@@ -57,6 +57,8 @@ var CamposElegir = (function () {
     var categoria = categoriaDelTipo(tipo);
     var entrada = await CamposListaDatos.entrada();
     var lista = CamposLista.reunir(entrada);
+    /* Fila 627: campos que no se ofrecen (el asunto de un correo no lleva los del documento). */
+    if (ctx.ocultar && ctx.ocultar.length) lista = lista.filter(function (c) { return ctx.ocultar.indexOf(c.id) === -1; });
     if (ctx.soloGuardables) lista = lista.filter(function (c) { return c.propioId || c.calculadoId || c.escritoAMano || c.id.indexOf('f:') === 0; });
     var personas = await CamposListaDatos.personas(categoria === 'PERSONAL' ? 'PERSONAL' : 'ALUMNADO');
     var persona = personas[0];

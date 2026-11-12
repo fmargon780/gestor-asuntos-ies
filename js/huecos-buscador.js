@@ -30,6 +30,7 @@
        campos: [asunto, texto],    // dónde puede entrar el hueco
        huecos: [{clave, etiqueta}] // opcional; por defecto Plantillas.HUECOS
        tipo: 'nombre' | función   // opcional (fila 528): el tipo de asunto, para los «más usados» y la clase de persona
+       ocultar: ['h:clave', …]    // opcional (fila 627): ids de campos que no se ofrecen
      });
 
    `campos` va en el orden en que están en el formulario. Se recuerda
@@ -132,7 +133,7 @@
       if (abierto) { cerrar(); return; }
       /* Fila 528: la ventana de elegir un campo (js/campos-elegir.js). El cuadro pequeño de abajo queda para quien pase `huecos` a mano. */
       if (window.CamposElegir && !opciones.huecos) {
-        CamposElegir.abrir({ tipo: opciones.tipo, alElegir: function (c) { ponerTexto(c.marca); } })
+        CamposElegir.abrir({ tipo: opciones.tipo, ocultar: opciones.ocultar, alElegir: function (c) { ponerTexto(c.marca); } })
           .catch(function (e) { if (window.U && U.fallo) U.fallo('No he podido abrir la lista de campos', e); });
         return;
       }

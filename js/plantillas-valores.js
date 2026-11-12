@@ -295,6 +295,12 @@
       /* Fila 510: los campos de lista del tipo y sus opciones, para los textos condicionales. */
       camposLista: window.TextoCondicional ? TextoCondicional.listasPorNombre(tipoDelAsunto(a), a.ficha) : undefined
     };
+    /* Fila 627: el número del asunto y, con `opciones.documento` ({ tipo, fecha, numero }; el extracto de un documento), los datos de ese documento. */
+    valores['numero del asunto'] = f.numero || (a.leido && a.leido.numero) || '';
+    var docOp = op.documento || {};
+    valores['tipo de documento'] = docOp.tipo || '';
+    valores['fecha del documento'] = /^\d{4}-\d{2}-\d{2}$/.test(docOp.fecha || '') ? U.fechaLegible(U.aAaMmDd(docOp.fecha)) : '';
+    valores['numero del documento'] = docOp.numero || '';
     /* Fila 238: sin documento en el tercero, el campo «DNI para el certificado». */
     if (!valores.dni) {
       Object.keys(valores.campos || {}).forEach(function (k) {

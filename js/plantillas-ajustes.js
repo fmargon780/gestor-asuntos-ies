@@ -171,6 +171,21 @@
   /* Fila 170 (docs/PLANTILLAS-DEL-COMPANERO.md, parte 2): un segundo
      recuadro, plegado, con el texto propio del mensaje de Séneca (Séneca
      no adjunta ficheros). Vacío, el cuadro de Séneca usa el `texto`. */
+  /* Fila 627: el campo «Asunto» de la plantilla (debajo del nombre) y su enganche. */
+  function campoAsuntoHTML(id, existente) {
+    return window.AsuntoExtractoCampo ? AsuntoExtractoCampo.html(id, {
+      etiqueta: 'Asunto', valor: (existente && existente.asunto) || '', placeholder: 'Vacío: sale el asunto general del centro'
+    }) : '';
+  }
+  function engancharAsunto(id, tipoDeLaPlantilla, valoresDelAsunto) {
+    if (!window.AsuntoExtractoCampo || !$(id)) return;
+    AsuntoExtractoCampo.enganchar(id, {
+      unaLinea: true, ocultar: AsuntoExtracto.SOLO_DEL_DOCUMENTO, tipo: tipoDeLaPlantilla, valores: valoresDelAsunto,
+      general: function () { return AsuntoExtracto.modeloGeneralDeAsunto(Plantillas.enMemoria()); },
+      deQuien: { propio: '(el de esta plantilla)', general: '(el general del centro)' }
+    });
+  }
+
   function campoSenecaHTML(prefijo, valor) {
     return '<details class="pl-seneca">' +
       '<summary>Texto para Séneca (opcional)' + (String(valor || '').trim() ? ' · escrito' : '') + '</summary>' +
@@ -180,8 +195,9 @@
   }
 
   /* La fila de `plantillas.json`: `textoSeneca` solo si trae algo. */
-  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa, papeles) {
+  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa, papeles, asunto) {
     var fila = { id: id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+    if (String(asunto || '').trim()) fila.asunto = String(asunto).trim();   /* fila 627: el asunto propio de la plantilla; vacío, sale el general del centro */
     if (previa && previa.fueraDeUso) fila.fueraDeUso = previa.fueraDeUso;   /* fila 321: cambiar una plantilla no pierde la marca */
     if (String(textoSeneca || '').trim()) fila.textoSeneca = textoSeneca;
     if (String(adjuntar || '').trim()) fila.adjuntar = adjuntar;   /* fila 299: «Adjuntar solo» */
@@ -231,6 +247,7 @@
       '</div>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
+      campoAsuntoHTML('pl-asunto', existente) +
       (window.PlantillaPapeles ? PlantillaPapeles.antesDelTextoHTML('pl', existente) : '') +
       campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', (existente && existente.texto) || '', 7) +
       (window.PlantillaPapeles ? PlantillaPapeles.despuesDelTextoHTML('pl', existente) : '') +
@@ -249,6 +266,7 @@
      insertar se lanza un evento `input`. */
   function engancharCuadro(existente, tipoPreset) {
     function tipoElegido() { return ($('pl-tipo') || {}).value || ''; }
+    engancharAsunto('pl-asunto', tipoElegido);
     engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', window.PlantillaPapeles ? PlantillaPapeles.camposDeTexto('pl') : [], tipoElegido);
     if (window.PlantillaPapeles) PlantillaPapeles.enganchar('pl');
     engancharCampoDeTexto('pl-texto-seneca', 'pl-insertar-hueco-seneca', [], tipoElegido);
@@ -275,6 +293,7 @@
     var categoria = $('pl-categoria').value;
     var texto = $('pl-texto').value;
     var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
+    var asunto = $('pl-asunto') ? $('pl-asunto').value : '';
     var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
     var papeles = window.PlantillaPapeles ? PlantillaPapeles.leer('pl') : null;
     if (!nombre || (!tipo && !esGeneral(existente)) || !texto.trim()) {
@@ -285,9 +304,9 @@
       await Plantillas.guardar(App.E.gestor, function (actual) {
         if (existente) {
           var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-          if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], papeles);
+          if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], papeles, asunto);
         } else {
-          actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, papeles));
+          actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, papeles, asunto));
         }
         return actual;
       });
@@ -341,7 +360,7 @@
     campoDeTextoHTML: campoDeTextoHTML,
     engancharCampoDeTexto: engancharCampoDeTexto,
     /* Fila 560: lo que necesita js/plantillas-ajustes-editor.js, que cuelga aquí `montarEditorEnLinea` (fila 151). */
-    _interno: { campoSenecaHTML: campoSenecaHTML, filaDePlantilla: filaDePlantilla }
+    _interno: { campoSenecaHTML: campoSenecaHTML, filaDePlantilla: filaDePlantilla, campoAsuntoHTML: campoAsuntoHTML, engancharAsunto: engancharAsunto }
   };
 
 })();

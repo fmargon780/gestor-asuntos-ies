@@ -164,7 +164,7 @@ var HitoMesaDocumentos = (function () {
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +
           (origen ? '<span class="mesa-doc-origen">' + U.escapar(origen) + '</span>' : '') +
           /* Fila 439: «Ruta», pegado al nombre, y los datos en gris, en la misma línea. */
-          (falta ? '' : ruta(g.nombre)) +
+          (falta ? '' : ruta(g.nombre) + (window.ExtractoDocumento ? ExtractoDocumento.huecoHTML(g.nombre) : '')) +   /* fila 627: «Extracto», al lado de «Ruta» */
           /* Fila 439: la fecha, el registro y los campos anotados (fila 436), en gris, en la misma línea; larga, se corta con «…». */
           datosDeLaLinea(a, g.nombre, falta) +
         '</div>' +
@@ -351,6 +351,7 @@ var HitoMesaDocumentos = (function () {
     if (!h) return;
     var modo = abierto ? 'abierto' : 'archivado';
     if (window.RutaCarpetas) RutaCarpetas.enganchar(fila, a, modo);   /* fila 423 */
+    if (window.ExtractoDocumento) ExtractoDocumento.enganchar(fila, a);   /* fila 627 */
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-gemelo'), function (b) {
       b.onclick = function () { abrirEnVisor(a, b.dataset.doc, modo); };
     });
