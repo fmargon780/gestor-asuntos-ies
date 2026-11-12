@@ -75,7 +75,8 @@ async function elegirPersonaYTipo(tipo) {
 console.log('--- 1. la pantalla vacía ---');
 await nuevoVacio();
 await comprobar('no hay título «Nuevo asunto» encima del formulario',
-  pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#pantalla-nuevo h2'), h => h.textContent.trim() === 'Nuevo asunto').length), 0);
+  pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#pantalla-nuevo h2'), h => h.offsetParent !== null).length), 0);
+await comprobar('pero sigue el «← Volver» de la cabecera', visible('#pantalla-nuevo .cabecera .boton-volver'), true);
 await comprobar('tres recuadros: fecha de inicio, tipo y tercero, en este orden',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.nuevo-tres-recuadros > .recuadro-nuevo .recuadro-titulo'), t => t.textContent.trim())),
   ['Fecha de inicio', 'Qué tipo de asunto', 'Tercero']);

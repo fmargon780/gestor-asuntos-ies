@@ -6,8 +6,7 @@
    a todo el ancho debajo.
    ============================================================ */
 
-.cabecera-nuevo { justify-content: flex-end; }
-.cabecera-nuevo:empty { display: none; }
+.cabecera-nuevo .titulo-escondido { display: none; }
 
 .nuevo-tres-recuadros {
   display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; margin-bottom: 14px;

@@ -229,8 +229,8 @@ document.write(`<div id="aplicacion" class="oculto">
     </section>
 
     <section id="pantalla-nuevo" class="pantalla oculto">
-      <!-- Fila 629 (docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md): sin el título «Nuevo asunto» (el nombre ya está en el menú); la cabecera queda solo para el «Cancelar» de js/usabilidad.js. -->
-      <header class="cabecera cabecera-nuevo"></header>
+      <!-- Fila 629 (docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md): el título «Nuevo asunto» no se ve (el nombre ya está en el menú); el h2 se queda, escondido, porque js/usabilidad.js cuelga de él el «← Volver» de la cabecera. -->
+      <header class="cabecera cabecera-nuevo"><h2 class="titulo-escondido">Nuevo asunto</h2></header>
 
       <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
 
