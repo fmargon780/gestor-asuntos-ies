@@ -107,6 +107,9 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, tema 487) Las plantillas viejas **se pasan solas**, sin lista de revisión (opción 1). «Comunicar ▾» del hito **pierde las casillas** de destinatarios (opción 1).
 - (12-nov-2026, idea 618) Cuando no llegan correos, el aviso manda **primero a comprobar la carpeta de correos** de ese ordenador y después al script: «El arreglo está hecho y ha funcionado. Ese era el problema» (Drive había cambiado de sitio y la app miraba la carpeta de antes).
 
+- (12-nov-2026, tema 623) **El asunto de correos y mensajes de Séneca lo compone la app**, ya no es el nombre de la carpeta (sustituye a la fila 55): hay un asunto general del centro y cada plantilla puede llevar el suyo («Me parece buena idea tener un asunto general que pueda ser personalizable para las plantillas de correo y de Séneca»). Se sigue pudiendo retocar antes de enviar.
+- (12-nov-2026, tema 623) **El número del asunto va siempre** en el asunto y en el extracto; si el modelo no lo lleva, la app lo añade al final (elegido «al final en los dos», sabiendo que en un asunto largo puede quedar cortado a la vista). Los asuntos de antes, sin número, siguen con el nombre de la carpeta.
+
 ## Registro de Séneca
 
 - (27-oct-2026, tema 477) El registrado se guarda **con el «Ruta» de siempre** del documento, sin
@@ -117,6 +120,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
   versiones previas: la app nunca deshace lo que se guardó (por ejemplo, un firmado).
 - (27-oct-2026, tema 477) Lo que llega **ya registrado por la bandeja electrónica** sigue entrando
   por la carpeta y «Es un documento nuevo».
+- (12-nov-2026, tema 623) **El extracto del registro lo compone la app** y es distinto del asunto: puede tener varias líneas y hay uno general y **uno por tipo de documento** («El extracto de una factura de proveedor no puede ser el mismo que el de un certificado de matrícula»). No se personaliza por plantilla. Se copia con el botón «Extracto» de cada documento y se pega en Séneca a mano.
 
 ## Documentos firmados
 
