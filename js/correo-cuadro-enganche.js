@@ -133,8 +133,12 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     caja2.appendChild(cancelar);
   }
 
-  function cambiarDePlantilla(a, idElegida) {
+  /* Fila 627: al cambiar de plantilla, el asunto cambia con ella (no al guardar una plantilla nueva desde lo escrito:
+     ahí `conservarAsunto`). */
+  function cambiarDePlantilla(a, idElegida, conservarAsunto) {
+    var cambia = idElegida !== I.S.plantillaElegida;
     I.S.plantillaElegida = idElegida;
+    if (cambia && !conservarAsunto && $('correo-asunto')) $('correo-asunto').value = n().asuntoDelCorreo(a, idElegida);
     $('correo-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
     aplicarDestino(a);   /* fila 348 */
@@ -148,7 +152,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
 
   /* Plantilla nueva desde lo escrito: queda elegida y el texto del mensaje no se toca. */
   function dejarElegida(a, id, texto) {
-    cambiarDePlantilla(a, id);
+    cambiarDePlantilla(a, id, true);
     if ($('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = texto;
   }
   var cfgPlantilla = { prefijo: 'correo', elegir: elegirPlantilla, dejarElegida: dejarElegida };

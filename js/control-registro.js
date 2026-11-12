@@ -76,12 +76,31 @@ var ControlRegistro = (function () {
     return { codigo: codigo, ano: m[1], serie: m[2], numero: parseInt(m[3], 10) };
   }
 
+  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): el extracto que compone la app puede tener varias líneas, y Séneca lo lista
+     en una sola celda entre comillas, con sus saltos de línea dentro. `Datos.aTabla` parte por líneas, así que los saltos de
+     dentro de comillas se cambian antes por una marca y se devuelven después. */
+  var MARCA_SALTO = '\u0001';
+  function juntarSaltosDeCelda(texto) {
+    var salida = '', dentro = false, t = String(texto || '');
+    for (var i = 0; i < t.length; i++) {
+      var c = t.charAt(i);
+      if (c === '"') dentro = !dentro;
+      if (dentro && c === '\r') continue;
+      salida += (dentro && c === '\n') ? MARCA_SALTO : c;
+    }
+    return salida;
+  }
+
   /* Un CSV (ya como texto) -> { ok, libro, apuntes, total } o { ok:false, motivo }.
      El libro se sabe por los títulos de las columnas, nunca por el nombre del fichero. */
   function leerCsv(texto) {
     var NO = { ok: false, motivo: 'No parece un listado del registro de Séneca.' };
     var tabla;
-    try { tabla = window.Datos.aTabla(texto).filas; } catch (e) { return NO; }
+    try {
+      tabla = window.Datos.aTabla(juntarSaltosDeCelda(texto)).filas.map(function (f) {
+        return f.map(function (c) { return String(c).split(MARCA_SALTO).join('\n'); });
+      });
+    } catch (e) { return NO; }
     if (!tabla || tabla.length < 1) return NO;
     var cab = tabla[0].map(hueso);
     function col(nombre) { return cab.indexOf(nombre); }

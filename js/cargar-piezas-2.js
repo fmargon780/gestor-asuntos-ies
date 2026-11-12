@@ -109,6 +109,7 @@
     // Fila 98 (docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md): el botón «Ruta» que
     // pone js/ficha-nombre-acciones.js, y su bloque en Ajustes → El centro.
     'js/copiar-ruta.js',
+    'js/extracto-documento.js',   // fila 627: «Extracto» de cada documento, al lado de «Ruta»
     'js/largo-de-rutas.js',
     'js/ficha-nombre-acciones.js',
     // Los documentos de la carpeta del asunto, separado de
@@ -229,6 +230,8 @@
     'js/guias-sin-preguntas.js',   // fila 576: las preguntas de las guías pasan a «Solo si»; después de solo-si.js   // fila 576: «Cuándo se hace» de hitos y tareas; después de texto-condicional.js
     'js/plantillas.js',
     'js/plantillas-valores.js',
+    'js/asunto-extracto.js',   // fila 627: el asunto y el extracto compuestos por la app; después de plantillas-valores.js
+    'js/asunto-extracto-campo.js',
     // js/huecos-buscador.js va antes que quien lo use: el botón "Insertar
     // hueco" del editor de plantillas (docs/HUECOS-INSERTAR.md, fila 35).
     'js/huecos-buscador.js',
@@ -236,6 +239,7 @@
     'js/plantillas-ajustes-centro.js',   // fila 560: «Datos del centro y firma», antes que js/plantillas-ajustes.js
     'js/plantillas-ajustes.js',
     'js/plantillas-ajustes-editor.js',   // fila 560: el editor en línea, después de js/plantillas-ajustes.js
+    'js/asunto-extracto-ajustes.js',   // fila 627: la tarjeta «Asunto y extracto» y el extracto de cada tipo de documento
     // Fila 270: «Guardar como plantilla nueva» (lo usan los cuadros de Correo y de Séneca).
     'js/plantilla-de-lo-escrito.js',
     'js/destinatarios.js',

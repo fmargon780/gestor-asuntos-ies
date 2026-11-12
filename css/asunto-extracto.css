@@ -1,0 +1,9 @@
+/* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): el asunto y el extracto, y el botón «Extracto» de cada documento. */
+.ae-fila { display: flex; gap: 8px; align-items: flex-start; }
+.ae-fila > .campo { flex: 1; min-width: 0; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 13px; }
+.ae-fila > .boton { white-space: nowrap; }
+.ae-sale { margin-top: 6px; }
+.ae-sale .ae-resultado { font-weight: 600; overflow-wrap: anywhere; }
+.ae-sale .ae-lineas { display: block; white-space: pre-line; }
+.ae-numero { margin-top: 10px; }
+.extracto-documento { white-space: nowrap; }

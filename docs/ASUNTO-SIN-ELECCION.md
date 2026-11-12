@@ -1,3 +1,5 @@
+> **SUSTITUIDO por la fila 627** (12-nov-2026, `docs/627-ASUNTO-Y-EXTRACTO.md`): el asunto de correos y mensajes de Séneca ya no es el nombre de la carpeta; lo compone la aplicación. Lo de abajo es solo historia.
+
 # El asunto del mensaje es siempre el nombre de la carpeta
 
 Instrucción acordada con Francisco el 18-sep-2026. Fila 55 de `docs/COLA.md`.

@@ -732,3 +732,16 @@ hueco») y, solo en plantillas de correo (también el texto para Séneca), «Tex
 del tipo; «Poner la marca» la escribe, o la cambia, al principio del párrafo del cursor). En «Retocar» una
 plantilla de Word, «Texto condicional…» es un cambio de tipo `condicion` (`PlantillaRetocar`,
 `DocxSustituir.aplicar` con `op.condiciones`) y la marca se enseña en morado (`.cep-condicion`).
+
+## Asunto y extracto compuestos por la app (fila 627, tema 623, `docs/627-ASUNTO-Y-EXTRACTO.md`)
+
+Sustituye a `docs/ASUNTO-SIN-ELECCION.md` (fila 55): el asunto de correos y mensajes de Séneca ya no es el nombre de la carpeta.
+
+- **Dónde vive** (`_GESTOR/plantillas.json`, por `Plantillas.guardar`; `Plantillas.limpio` los conserva): `asuntoGeneral` (una línea), `extractoGeneral` (varias líneas), `extractosPorTipo` (`{ TIPO DE DOCUMENTO: texto }`) y, en cada plantilla de correo o de Séneca, `asunto`. Vacíos: modelos de partida `{tipo} · {nombre}` y `{tipo de documento} · {tipo}` + salto + `{nombre} · {grupo}`.
+- **Componer** (`js/asunto-extracto.js`, `AsuntoExtracto`): `componer(modelo, valores, numero, unaLinea)` rellena con `Plantillas.rellenar`, quita separadores « · » sueltos y líneas vacías y añade el número del asunto (`A26-0137`) al final (de la última línea) si el modelo no lo lleva; `asuntoCon`/`extractoCon` (síncronas), `asunto(a, idPlantilla)` y `extractoDeDocumento(a, nombre)` (asíncronas). Sin número del asunto (carpetas de antes de la fila 239), el nombre de la carpeta.
+- **Campos nuevos** (`Plantillas.HUECOS`): `{numero del asunto}`, `{tipo de documento}`, `{fecha del documento}`, `{numero del documento}` (los tres últimos solo con `valoresDeAsunto(a, { documento })`; el asunto no los ofrece, `ocultar` de `CamposElegir`).
+- **Quién lo usa**: `CorreoNucleo.asuntoDelCorreo(a, idPlantilla)` (cuadros de Correo y de Séneca, que preparan el cuerpo antes que el asunto; al cambiar de plantilla el asunto cambia con ella, salvo al guardar una plantilla nueva desde lo escrito), el envío a varias personas (`js/grupo-enviar-pantalla.js`) y el botón «Asunto» de la ficha. `extra.asuntoListo` (informes, mensaje del hito) sigue mandando.
+- **Pantalla**: tarjeta «Asunto y extracto» de Ajustes → El centro y «Extracto de este tipo» (menú ⋮ de Tipos de documento) en `js/asunto-extracto-ajustes.js`; campo con «+ Campo variable» y «Así sale» en `js/asunto-extracto-campo.js` (también el campo «Asunto» de las plantillas, `js/plantillas-ajustes.js` y su editor en línea).
+- **Bandeja**: `asuntoQueYaExiste` (`js/bandeja-huella.js`) busca primero el número del asunto dentro del asunto del correo (entero y suelto), luego el nombre de la carpeta como antes; `asuntoDeEsteCorreo` no cambia de orden.
+- **Control del registro**: `ControlRegistro.leerCsv` lee los extractos de varias líneas (saltos dentro de comillas) y `clasificar` los une por el número.
+- Se comprueba con `pruebas/asunto-y-extracto.mjs` (`pruebas/asunto-sin-eleccion.mjs` sigue valiendo para asuntos sin número).

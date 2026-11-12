@@ -137,15 +137,13 @@
 
   /* ---------- los tres campos ---------- */
 
-  /* El asunto del mensaje es siempre el nombre de la carpeta (fila 55,
-     18-sep-2026, docs/ASUNTO-SIN-ELECCION.md): es lo que permite
-     reconocer después a qué asunto pertenece cada mensaje del hilo.
-     Antes había una "versión legible" alternativa, con sus dos
-     botones para elegir una u otra; se ha quitado, junto con la
-     función que la fabricaba (`piezasDelNombre`, que ya no tiene para
-     qué usarse) y el estado que guardaba cuál estaba elegida. */
-  function asuntoDelCorreo(a) {
-    return asuntoListoActual || a.nombre;
+  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): el asunto lo compone la app (js/asunto-extracto.js): el de la plantilla
+     elegida si lo tiene; si no, o sin plantilla, el general del centro; siempre con el número del asunto. Un asunto de
+     antes, sin número, sigue con el nombre de la carpeta. `extra.asuntoListo` (informes, mensaje del hito) manda sobre todo. */
+  function asuntoDelCorreo(a, idPlantilla) {
+    if (asuntoListoActual) return asuntoListoActual;
+    if (!window.AsuntoExtracto || !valoresActuales) return a.nombre;
+    return AsuntoExtracto.asuntoCon(a, valoresActuales, plantillasDatos, plantillaPorId(idPlantilla));
   }
 
   /* Desde la fila 17 de la cola, {firma} ya sale calculado dentro de

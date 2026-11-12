@@ -157,8 +157,12 @@ await comprobar('3. el resultado: «2 enviados.»', pagina.locator('.ge-hechos')
 const env = await pagina.evaluate(() => window.__env.map((d) => ({ para: d.para, cco: d.cco, asunto: d.asunto, adj: d.adjuntos.map((x) => x.nombre), id: d.idEnvio, hola: d.cuerpo.split('\n')[0], cuerpo: d.cuerpo })));
 await comprobar('3. dos correos, uno por persona, con todas sus direcciones en Para y su adjunto',
   env.map((e) => [e.para, e.cco, e.adj.length, e.hola]), [['tutor.bruno@correo-demo.es', '', 1, 'Hola, Bruno Lara Quintero:'], ['tutor.sara@correo-demo.es, sara.ibarra@correo-demo.es', '', 1, 'Hola, Sara Ibarra Nieto:']]);
-await comprobar('3. cada uno con su texto, su asunto de siempre y un idEnvio distinto y fijo',
-  pagina.evaluate((e) => [/certificado de Bruno Lara Quintero\./.test(e[0].cuerpo), /certificado de Sara Ibarra Nieto\./.test(e[1].cuerpo), e[0].asunto === window.__asunto,
+/* Fila 627: el asunto lo compone la app (el general del centro, con el número del asunto), ya no es el nombre de la carpeta. */
+await comprobar('3. el asunto sale compuesto y lleva el número del asunto',
+  pagina.evaluate(async (e) => { const a = App.E.listaAbiertos.filter((x) => x.nombre === window.__asunto)[0]; const n = AsuntoExtracto.numeroDe(a);
+    return [!!n, e[0].asunto === await AsuntoExtracto.asunto(a), e[0].asunto.indexOf(n) !== -1, e[0].asunto !== window.__asunto]; }, env), [true, true, true, true]);
+await comprobar('3. cada uno con su texto y un idEnvio distinto y fijo',
+  pagina.evaluate((e) => [/certificado de Bruno Lara Quintero\./.test(e[0].cuerpo), /certificado de Sara Ibarra Nieto\./.test(e[1].cuerpo), true,
     e[0].id === GrupoEnviar.idEnvioDe({ nombre: window.__asunto }, e[0].adj[0], 'ALUMNADO|' + App.E.registro.asuntos[window.__asunto].relacionados[2].nombre.replace(/.*/, (n) => n)), e[0].id !== e[1].id], env),
   [true, true, true, true, true]);
 await comprobar('3. «Enviar a los 0» queda apagado, y se puede cerrar', Promise.all([textoBoton(pagina, '.ge-enviar'), pagina.locator('.ge-cancelar').textContent()]), [['Enviar a los 0', true], 'Cerrar']);

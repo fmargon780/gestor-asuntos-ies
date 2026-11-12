@@ -43,6 +43,7 @@ var GrupoEnviarPantalla = (function () {
     var plantillas = [];
     try {
       var datos = await Plantillas.cargar(App.E.gestor);
+      S.datosDelCentro = datos;
       var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
       var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
       plantillas = Plantillas.deTipo(datos, categoria, tipo) || [];
@@ -52,11 +53,21 @@ var GrupoEnviarPantalla = (function () {
     if (!avisoViejo) {
       S.plantillaId = propia ? propia.id : '';
       S.texto = propia ? propia.texto : (S.esAviso ? '' : 'Le enviamos adjunto el documento.');
-      S.asunto = S.esAviso ? '' : ((window.CorreoNucleo && CorreoNucleo.asuntoDelCorreo) ? CorreoNucleo.asuntoDelCorreo(a) : a.nombre);
+      /* Fila 627: el asunto lo compone la app (js/asunto-extracto.js): el de la plantilla con la que se abre o, sin ella, el general. */
+      if (!S.esAviso && window.AsuntoExtracto && AsuntoExtracto.numeroDe(a)) {
+        try { S.valoresDelAsunto = await Plantillas.valoresDeAsunto(a); } catch (e2) { S.valoresDelAsunto = null; }
+      }
+      S.asunto = S.esAviso ? '' : asuntoDe(S, propia);
     }
 
     abierta = new Promise(function (resolver) { montar(S, resolver); });
     return abierta;
+  }
+
+  /* Fila 627: el asunto compuesto para esta plantilla (o, sin ella, el general); sin número del asunto o sin valores, el nombre de la carpeta. */
+  function asuntoDe(S, plantilla) {
+    if (!window.AsuntoExtracto || !S.valoresDelAsunto) return S.a.nombre;
+    return AsuntoExtracto.asuntoCon(S.a, S.valoresDelAsunto, S.datosDelCentro, plantilla || null);
   }
 
   function montar(S, resolver) {
@@ -121,6 +132,7 @@ var GrupoEnviarPantalla = (function () {
       S.plantillaId = selPl.value;
       S.texto = p ? p.texto : (S.esAviso ? '' : 'Le enviamos adjunto el documento.');
       q('.ge-texto').value = S.texto;
+      if (!S.esAviso) { S.asunto = asuntoDe(S, p); q('.ge-asunto').value = S.asunto; }   /* fila 627: el asunto cambia con la plantilla */
       pintarMuestra(); pintarPie();
     };
     var campoAsunto = q('.ge-asunto'), campoTexto = q('.ge-texto');

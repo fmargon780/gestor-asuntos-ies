@@ -35,8 +35,31 @@
     return t;
   }
 
+  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): el asunto del correo lleva siempre el número del asunto (A26-0137), también
+     cuando quien contesta cambia el principio. Se busca el asunto que tiene ese número; el número tiene que estar entero
+     (A26-013 no es A26-0137) y suelto (sin letras o cifras pegadas). */
+  function asuntoPorNumeroEnElTexto(texto) {
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var t = String(texto || '').toUpperCase();
+    if (t.indexOf('A') === -1) return null;
+    var hallado = null;
+    Object.keys(registro).forEach(function (nombre) {
+      var numero = String((registro[nombre] || {}).numero || (window.Numeros && Numeros.delNombreDeAsunto ? Numeros.delNombreDeAsunto(nombre) : '') || '').trim().toUpperCase();
+      if (!numero || hallado) return;
+      var desde = 0, i;
+      while ((i = t.indexOf(numero, desde)) !== -1) {
+        var antes = i === 0 ? '' : t.charAt(i - 1), despues = t.charAt(i + numero.length);
+        if (!/[A-Z0-9]/.test(antes) && !/[A-Z0-9]/.test(despues)) { hallado = { nombre: nombre, ficha: registro[nombre] || {} }; return; }
+        desde = i + 1;
+      }
+    });
+    return hallado;
+  }
+
   function asuntoQueYaExiste(datos) {
     var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var porNumero = asuntoPorNumeroEnElTexto(sinElRe(datos.asunto));
+    if (porNumero) return porNumero;
     var titulo = U.normalizar(sinElRe(datos.asunto));
     if (titulo.length < 12) return null;
     var mejor = null;
@@ -246,6 +269,7 @@
     escribirSeguidos: escribirSeguidos,
     asuntoDeLaMatricula: asuntoDeLaMatricula,
     asuntoDeEsteCorreo: asuntoDeEsteCorreo,
+    asuntoPorNumeroEnElTexto: asuntoPorNumeroEnElTexto,
     enlaceAGmail: enlaceAGmail
   });
   Object.assign(N, {

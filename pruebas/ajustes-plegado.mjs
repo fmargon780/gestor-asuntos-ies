@@ -195,8 +195,8 @@ const titulosCentro = await pagina.locator('#ajustes-tab-centro > details.bloque
    propios" ya no lleva una tabla que contar y ordenar (se queda con un
    enlace fijo a Tipos de asunto), así que sale de este reordenado
    automático de más uso a menos uso. */
-await comprobar('los seis primeros, en el orden de la fila 288', titulosCentro.slice(0, 6), [
-  'Datos del centro y firma', 'Cargos del centro', 'Quién usa la aplicación',
+await comprobar('los siete primeros, en el orden de la fila 288 (con «Asunto y extracto», fila 627, detrás de los datos del centro)', titulosCentro.slice(0, 7), [
+  'Datos del centro y firma', 'Asunto y extracto', 'Cargos del centro', 'Quién usa la aplicación',
   'Membrete', 'Sello y firma en el papel', 'Calendario y responsables']);
 await comprobar('"Campos propios" ya no existe (fila 288: estaba vacía)',
   titulosCentro.indexOf('Campos propios'), -1);

@@ -31,6 +31,9 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
       }
     }
 
+    /* Fila 627: el cuerpo se prepara antes que el asunto, porque el asunto depende de la plantilla con la que se abre. */
+    var cuerpoYPlantilla = bloqueCuerpo(a);
+
     return '<div id="correo-formulario">' +
              '<div class="cuadro-cabecera-ruta"><span id="correo-ruta-lugar"></span></div>' +
              '<div id="correo-ruta-en-linea" class="oculto"></div>' +
@@ -43,7 +46,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
                  (window.CorreoAdjuntoPlantilla ? CorreoAdjuntoPlantilla.avisoHtml() : '') +   /* fila 299 */
                '</div>' +
                '<div class="correo-col-der">' +
-                 '<div id="correo-comunes-der">' + bloqueCuerpo(a) + '</div>' +
+                 '<div id="correo-comunes-der">' + cuerpoYPlantilla + '</div>' +
                '</div>' +
              '</div>' +
              '<div class="correo-botones" style="margin-top:14px">' +
@@ -87,11 +90,11 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
       '<div id="correo-cco-sin-correo"></div>';
   }
 
-  /* El asunto del mensaje, siempre el nombre de la carpeta (fila 55,
-     18-sep-2026, docs/ASUNTO-SIN-ELECCION.md). */
+  /* El asunto del mensaje lo compone la app (fila 627, js/asunto-extracto.js): el de la plantilla con la que se abre o,
+     sin ella, el general del centro. Se puede retocar a mano antes de enviar. */
   function bloqueAsunto(a) {
     return '<label class="etiqueta">Asunto</label>' +
-      '<input id="correo-asunto" class="campo" value="' + U.escapar(n().asuntoDelCorreo(a)) + '">';
+      '<input id="correo-asunto" class="campo" value="' + U.escapar(n().asuntoDelCorreo(a, I.S.plantillaElegida)) + '">';
   }
 
   /* La plantilla y el cuerpo del correo. */

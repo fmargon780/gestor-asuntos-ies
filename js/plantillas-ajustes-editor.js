@@ -16,6 +16,8 @@
   var engancharCampoDeTexto = P.engancharCampoDeTexto;
   var campoSenecaHTML = P._interno.campoSenecaHTML;
   var filaDePlantilla = P._interno.filaDePlantilla;
+  var campoAsuntoHTML = P._interno.campoAsuntoHTML;
+  var engancharAsunto = P._interno.engancharAsunto;
 
   /* ---------- el editor en línea, dentro del cuadro de Correo o de
      Séneca (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md)
@@ -35,6 +37,7 @@
   function cuerpoEditorEnLineaHTML(existente, inicial) {
     return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
       '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
+      campoAsuntoHTML('pl2-asunto', existente) +
       (window.PlantillaPapeles ? PlantillaPapeles.antesDelTextoHTML('pl2', existente) : '') +
       campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', inicial ? inicial.texto : ((existente && existente.texto) || ''), 6) +
       (window.PlantillaPapeles ? PlantillaPapeles.despuesDelTextoHTML('pl2', existente) : '') +
@@ -108,6 +111,11 @@
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
     function tipoDelAsunto() { return tipo; }
+    /* Fila 627: «Así sale» con los datos reales del asunto en el que se está (si tiene número del asunto). */
+    engancharAsunto('pl2-asunto', tipoDelAsunto, function () {
+      var v = window.CorreoNucleo && CorreoNucleo.valoresDelCuadro ? CorreoNucleo.valoresDelCuadro() : null;
+      return v && v['numero del asunto'] ? v : null;
+    });
     engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', window.PlantillaPapeles ? PlantillaPapeles.camposDeTexto('pl2') : [], tipoDelAsunto);
     if (window.PlantillaPapeles) PlantillaPapeles.enganchar('pl2');
     engancharCampoDeTexto('pl2-texto-seneca', 'pl2-insertar-hueco-seneca', [], tipoDelAsunto);
@@ -131,6 +139,7 @@
       var nombre = $('pl2-nombre').value.trim();
       var texto = $('pl2-texto').value;
       var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
+      var asunto2 = $('pl2-asunto') ? $('pl2-asunto').value : '';
       var adjuntar2 = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl2-adjuntar') : '';
       var papeles2 = window.PlantillaPapeles ? PlantillaPapeles.leer('pl2') : null;
       if (!nombre || !texto.trim()) {
@@ -152,11 +161,11 @@
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
             if (i !== -1) {
-              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], papeles2);
+              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], papeles2, asunto2);
               guardada = actual.lista[i];
             }
           } else {
-            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, papeles2);
+            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, papeles2, asunto2);
             actual.lista.push(guardada);
           }
           return actual;
