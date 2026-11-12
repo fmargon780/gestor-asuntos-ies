@@ -238,6 +238,45 @@ const arbol = (p, que) => p.evaluate(async (que) => {
   await p.close();
 }
 
+/* ---------- F. fila 619: un fichero que no se deja abrir no para la cuenta ---------- */
+{
+  const p = await abrir();
+  const nombre = await p.evaluate(async () => {
+    /* un documento de las Elecciones que al abrirlo da «No encuentro la carpeta o el fichero» */
+    let carpeta = null;
+    for await (const [n, h] of Demo.disco().abiertos.entries()) if (h.kind === 'directory' && n.indexOf('ELECC') !== -1) carpeta = h;
+    const f = await carpeta.getFileHandle('Candidatura 03.pdf');
+    window.__getFileBueno = f.getFile;
+    f.getFile = () => { const e = new Error('no existe'); e.name = 'NotFoundError'; return Promise.reject(e); };
+    window.__fichero619 = f;
+    return carpeta.name;
+  });
+  await irAMantenimiento(p);
+  await p.click('#traslado-pasar');
+  await p.click('#traslado-senalar');
+  await p.waitForSelector('#traslado-empezar', { timeout: 30000 });
+  await comprobar('F. la cuenta sale aunque un fichero no se abra', /^Vas a copiar \d+ documentos/.test(await p.locator('#traslado-cuenta').innerText()), true);
+  const nl = await p.locator('#traslado-no-leidos').innerText();
+  await comprobar('F. dice «No se pueden leer 1 (no se copiarán):»', nl, 'No se pueden leer 1 (no se copiarán):');
+  const lista = await p.locator('#traslado-no-leidos + ul li, #traslado-no-leidos ~ ul li').allInnerTexts();
+  await comprobar('F. lo nombra con su carpeta y su nombre', lista.length === 1 && lista[0].indexOf('ASUNTOS ABIERTOS / ' + nombre + ' / Candidatura 03.pdf') === 0, true);
+  await p.click('#traslado-empezar');
+  await p.waitForSelector('#traslado-faltan', { timeout: 60000 });
+  const falta = await p.locator('#traslado-faltan + ul li, #traslado-faltan ~ ul li').allInnerTexts();
+  await comprobar('F. al final sale en lo que falta y no sigue', [falta.length, falta[0].indexOf('Candidatura 03.pdf') !== -1], [1, true]);
+  const copiado = await p.evaluate(async (n) => {
+    const d = await (await Demo.disco().drive.getDirectoryHandle('ASUNTOS ABIERTOS')).getDirectoryHandle(n);
+    const sal = []; for await (const [x] of d.entries()) sal.push(x); return sal.includes('Candidatura 03.pdf') ? 'está' : sal.length;
+  }, nombre);
+  await comprobar('F. lo demás del asunto sí se ha copiado (y ese no)', typeof copiado === 'number' && copiado > 5, true);
+  /* ya se deja abrir: «Reintentar lo que falta» lo lee, lo copia y termina */
+  await p.evaluate(() => { window.__fichero619.getFile = window.__getFileBueno; });
+  await p.click('#traslado-reintentar');
+  await p.waitForSelector('#traslado-resultado', { timeout: 60000 });
+  await comprobar('F. reintentar lo copia y termina sin faltar nada', /No falta ninguno\.$/.test(await p.locator('#traslado-resultado').innerText()), true);
+  await p.close();
+}
+
 /* ---------- E. el cerrojo de otro ordenador ---------- */
 {
   const p = await abrir();

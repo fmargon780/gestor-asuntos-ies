@@ -132,6 +132,15 @@ var PasarADriveAjustes = (function () {
     a.textContent = r.urlEspacio;
     p.appendChild(a);
     z.appendChild(p);
+    /* Fila 619: lo que no se deja abrir no para la cuenta; se enseña y no se copiará. */
+    var nl = r.noLeidos || [];
+    if (nl.length) {
+      var pn = parrafo('No se pueden leer ' + nl.length + ' (no se copiarán):', 'nota traslado-error');
+      pn.id = 'traslado-no-leidos';
+      z.appendChild(pn);
+      z.appendChild(lista(nl.slice(0, 50).map(function (x) { return x.ruta + ' (' + x.motivo + ')'; })));
+      if (nl.length > 50) z.appendChild(parrafo('… y ' + (nl.length - 50) + ' más.'));
+    }
     z.appendChild(filaDeBotones([
       boton('Empezar', pasoCopiar, 'traslado-empezar'),
       boton('Cancelar', pasoCancelar, 'traslado-cancelar')

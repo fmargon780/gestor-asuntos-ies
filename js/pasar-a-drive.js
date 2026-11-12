@@ -158,19 +158,58 @@ var PasarADrive = (function () {
     });
   }
 
+  /* La ruta tal como se ve en el explorador: empieza por la carpeta madre (asuntos abiertos, ARCHIVO, la copia o
+     `_GESTOR`) y sigue con el nombre del asunto o de la categoría (fila 619). */
+  function rutaVisible(u, ruta) {
+    var base;
+    if (u.zona === 'abiertos') base = [T.o.abiertos.name, u.nombre];
+    else if (u.zona === 'archivo') base = u.esFichero ? [T.o.archivo.name] : [T.o.archivo.name, u.nombre];
+    else if (u.zona === 'copia') base = [T.o.copia.name];
+    else base = [T.o.abiertos.name, App.CARPETA_GESTOR];
+    return base.concat(ruta).join(' / ');
+  }
+
+  /* Fila 619: lo que no se deja abrir o recorrer no para la cuenta; se apunta en `salida.noLeidos` y se sigue. */
   async function recorrer(dir, ruta, zona, salida) {
-    for await (var p of dir.entries()) {
-      var n = p[0], h = p[1];
-      if (Carpetas.noSeCopia(n, h)) continue;
-      if (zona === 'gestor' && !ruta.length && NO_SE_COPIA_DE_GESTOR.indexOf(n) !== -1) continue;
-      if (h.kind === 'file') {
-        var f = await h.getFile();
-        salida.ficheros.push({ ruta: ruta.concat([n]), handle: h, size: f.size, mod: f.lastModified, esDocumento: zona !== 'gestor' && zona !== 'copia' && !Carpetas.esFicheroDeGoogle(n) });
-      } else {
-        salida.carpetas.push(ruta.concat([n]));
-        await recorrer(h, ruta.concat([n]), zona, salida);
+    try {
+      for await (var p of dir.entries()) {
+        var n = p[0], h = p[1];
+        if (Carpetas.noSeCopia(n, h)) continue;
+        if (zona === 'gestor' && !ruta.length && NO_SE_COPIA_DE_GESTOR.indexOf(n) !== -1) continue;
+        if (h.kind === 'file') {
+          var f;
+          try { f = await h.getFile(); }
+          catch (e) { salida.noLeidos.push({ ruta: rutaVisible(salida, ruta.concat([n])), motivo: U.mensajeDeError(e) }); continue; }
+          salida.ficheros.push({ ruta: ruta.concat([n]), handle: h, size: f.size, mod: f.lastModified, esDocumento: zona !== 'gestor' && zona !== 'copia' && !Carpetas.esFicheroDeGoogle(n) });
+        } else {
+          salida.carpetas.push(ruta.concat([n]));
+          await recorrer(h, ruta.concat([n]), zona, salida);
+        }
       }
+    } catch (e) {
+      salida.noLeidos.push({ ruta: rutaVisible(salida, ruta), motivo: U.mensajeDeError(e) });
     }
+  }
+
+  /* Rellena una unidad leyendo su origen (también para volver a intentarlo al reintentar). */
+  async function llenar(u) {
+    u.ficheros = []; u.carpetas = []; u.noLeidos = [];
+    if (u.esFichero) {
+      try {
+        var f = await u.origen.getFile();
+        u.ficheros.push({ ruta: [u.nombre], handle: u.origen, size: f.size, mod: f.lastModified, esDocumento: !Carpetas.esFicheroDeGoogle(u.nombre) });
+      } catch (e) { u.noLeidos.push({ ruta: rutaVisible(u, [u.nombre]), motivo: U.mensajeDeError(e) }); }
+    } else {
+      await recorrer(u.origen, [], u.zona, u);
+    }
+  }
+
+  function contar() {
+    T.documentos = 0; T.bytes = 0; T.noLeidos = [];
+    T.unidades.forEach(function (u) {
+      u.ficheros.forEach(function (f) { T.bytes += f.size; if (f.esDocumento) T.documentos++; });
+      T.noLeidos = T.noLeidos.concat(u.noLeidos);
+    });
   }
 
   /* Las unidades de copia: cada carpeta de asunto, el ARCHIVO (cada cosa de su raíz), la copia sin internet y,
@@ -178,13 +217,8 @@ var PasarADrive = (function () {
   async function planear() {
     var o = T.o, unidades = [];
     async function unidad(clave, zona, nombre, origen, esFichero) {
-      var u = { clave: clave, zona: zona, nombre: nombre, origen: origen, ficheros: [], carpetas: [], esFichero: !!esFichero };
-      if (esFichero) {
-        var f = await origen.getFile();
-        u.ficheros.push({ ruta: [nombre], handle: origen, size: f.size, mod: f.lastModified, esDocumento: !Carpetas.esFicheroDeGoogle(nombre) });
-      } else {
-        await recorrer(origen, [], zona, u);
-      }
+      var u = { clave: clave, zona: zona, nombre: nombre, origen: origen, ficheros: [], carpetas: [], noLeidos: [], esFichero: !!esFichero };
+      await llenar(u);
       unidades.push(u);
     }
     var cont = await Carpetas.contenido(o.abiertos);
@@ -232,7 +266,7 @@ var PasarADrive = (function () {
     if (copia) { try { await copia.entries().next(); } catch (e2) { copia = null; } }
     var gestorViejo = await abiertosViejo.getDirectoryHandle(App.CARPETA_GESTOR);
     T = { drive: drive, o: { abiertos: abiertosViejo, archivo: archivoViejo, copia: copia, gestor: gestorViejo },
-          avance: null, fechas: {}, unidades: [], documentos: 0, bytes: 0 };
+          avance: null, fechas: {}, unidades: [], documentos: 0, bytes: 0, noLeidos: [] };
     T.dAbiertos = await drive.getDirectoryHandle(abiertosViejo.name, { create: true });
     T.dArchivo = await drive.getDirectoryHandle(archivoViejo.name, { create: true });
     T.dCopia = copia ? await drive.getDirectoryHandle(copia.name, { create: true }) : null;
@@ -242,12 +276,7 @@ var PasarADrive = (function () {
     var fe = await leerJsonSuave(T.dGestor, FechasOrigen.FICHERO);
     T.fechas = (fe && fe.ficheros && typeof fe.ficheros === 'object') ? fe.ficheros : {};
     T.unidades = await planear();
-    T.unidades.forEach(function (u) {
-      u.ficheros.forEach(function (f) {
-        T.bytes += f.size;
-        if (f.esDocumento) T.documentos++;
-      });
-    });
+    contar();
     return resumen();
   }
 
@@ -255,7 +284,7 @@ var PasarADrive = (function () {
     return {
       documentos: T.documentos, bytes: T.bytes, texto: 'Vas a copiar ' + T.documentos + ' documentos (' + gb(T.bytes) + ' GB). ' +
         'La cuenta común tiene 50 GB. Mira el espacio libre aquí antes de seguir: ' + URL_ESPACIO,
-      urlEspacio: URL_ESPACIO, aMedias: Object.keys(T.avance.unidades).length > 0
+      urlEspacio: URL_ESPACIO, noLeidos: T.noLeidos.slice(), aMedias: Object.keys(T.avance.unidades).length > 0
     };
   }
 
@@ -365,6 +394,8 @@ var PasarADrive = (function () {
         hechos++;
         if (++desdeElGuardado >= CADA_CUANTOS_GUARDAR) { desdeElGuardado = 0; await guardarAvance(); await marcarCerrojo(); }
       }
+      /* Fila 619: lo que no se pudo leer cuenta como fallo de la unidad (sale al final y no se da por hecha). */
+      u.noLeidos.forEach(function (x) { fallosDeLaUnidad++; fallos.push({ ruta: x.ruta, motivo: x.motivo }); });
       if (!fallosDeLaUnidad) T.avance.unidades[u.clave] = true;
       await guardarAvance();
       await marcarCerrojo();
@@ -406,6 +437,9 @@ var PasarADrive = (function () {
         } catch (e) { motivo = 'no está en Drive'; }
         if (motivo) faltan.push({ clave: clave, unidad: u.clave, ruta: u.nombre + ' / ' + f.ruta.join(' / '), motivo: motivo });
       }
+      u.noLeidos.forEach(function (x) {
+        faltan.push({ clave: 'noleido:' + u.clave + ':' + x.ruta, unidad: u.clave, ruta: x.ruta, motivo: 'no se puede leer: ' + x.motivo, noLeido: true });
+      });
     }
     return { documentos: T.documentos, faltan: faltan };
   }
@@ -413,7 +447,19 @@ var PasarADrive = (function () {
   /* Vuelve a copiar solo lo que faltaba y lo comprueba otra vez. */
   async function reintentar(faltan, progreso) {
     var solo = {};
-    faltan.forEach(function (x) { solo[x.clave] = true; delete T.fechas[x.clave]; });
+    /* Fila 619: lo que no se podía leer se vuelve a intentar leer; lo que ahora sí se lee, se copia. */
+    var aReleer = {};
+    faltan.forEach(function (x) { if (x.noLeido) aReleer[x.unidad] = true; });
+    for (var i = 0; i < T.unidades.length; i++) {
+      var u = T.unidades[i];
+      if (!aReleer[u.clave]) continue;
+      var conocidos = {};
+      u.ficheros.forEach(function (f) { conocidos[claveFecha(u, f.ruta)] = true; });
+      await llenar(u);
+      u.ficheros.forEach(function (f) { var k = claveFecha(u, f.ruta); if (!conocidos[k]) solo[k] = true; });
+    }
+    contar();
+    faltan.forEach(function (x) { if (!x.noLeido) { solo[x.clave] = true; delete T.fechas[x.clave]; } });
     faltan.forEach(function (x) { delete T.avance.unidades[x.unidad]; });
     var r = await copiar(progreso, solo);
     var c = await comprobar();
