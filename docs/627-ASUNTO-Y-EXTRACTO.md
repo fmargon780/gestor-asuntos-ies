@@ -95,4 +95,9 @@ Tema 623 de la cola («Asunto de las comunicaciones»), diseñado con Francisco 
 
 ## Revisión y respuestas durante el trabajo
 
+- 12-nov-2026, primer revisor: RECHAZADA por un punto: «Enviar un aviso…» a las personas del grupo abría con el asunto vacío. Arreglado (commit 370584e).
+- 12-nov-2026, segundo revisor (desde cero): RECHAZADA por un solo punto, menor: en «Correo de este asunto» y «Mensaje de Séneca», al abrir «Cambiar la plantilla», ponerle Asunto y pulsar Guardar, el cuerpo se refresca pero el Asunto del cuadro sigue siendo el general (esperaba el de la plantilla guardada; al reelegir la plantilla sí cambia). Todo lo demás, BIEN. Punto 10 (correo entrante reconocido por el número del asunto): NO COMPROBADO en pantalla (la demo no tiene bandeja real; sí lo cubre `pruebas/asunto-y-extracto.mjs`).
+- Detalles menores vistos, no rechazados: «+ Campo variable» pega el campo sin espacio entre campos seguidos (la pantalla 623 añadía uno); el «Así sale» del editor de plantilla usa siempre el mismo asunto de ejemplo.
+- Dudas de la sesión (elegido lo más pequeño): botón «Guardar asunto y extracto» en la tarjeta de Ajustes (la pantalla no dibuja ninguno); modelo general vacío = modelos de partida; al cambiar de plantilla el asunto retocado a mano se sustituye; el extracto propio de un tipo de documento borrado o renombrado queda huérfano en `plantillas.json`.
+- Qué queda: arreglar solo ese punto (tras guardar en «Cambiar la plantilla», recomponer el asunto con la plantilla guardada) y pasar un revisor nuevo. Todo el trabajo está en la rama `claude/gestor-asuntos-filas-613-618-627-oi05zc`, sin fusionar en `main` ni publicado.
 - (las apunta Claude Code)
