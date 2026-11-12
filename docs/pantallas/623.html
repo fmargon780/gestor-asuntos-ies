@@ -1,0 +1,314 @@
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Prueba 623 Asunto y extracto</title>
+<style>
+/* Una sola columna ancha con cuatro pestañas: cada pestaña es un trozo de la app donde cambia algo. */
+:root{
+  --fondo:#f3f5f9; --papel:#ffffff; --tinta:#1b2433; --suave:#5b6678; --raya:#d6dce6;
+  --marino:#1f4a7a; --marino-tinta:#ffffff; --nuevo:#fff4cf; --nuevo-raya:#d9a400; --bien:#1f7a45; --pildora:#e8eef7;
+  --letra: Inter, "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --fondo:#131922; --papel:#1c2431; --tinta:#e8edf5; --suave:#a3aec0; --raya:#364256;
+  --marino:#5b97d6; --marino-tinta:#0d1520; --nuevo:#4a3d0f; --nuevo-raya:#e0b530; --bien:#4fc07e; --pildora:#2a3547; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --fondo:#131922; --papel:#1c2431; --tinta:#e8edf5; --suave:#a3aec0; --raya:#364256;
+  --marino:#5b97d6; --marino-tinta:#0d1520; --nuevo:#4a3d0f; --nuevo-raya:#e0b530; --bien:#4fc07e; --pildora:#2a3547; color-scheme:dark }
+body{background:var(--fondo);color:var(--tinta);font-family:var(--letra);font-size:15px;line-height:1.4;
+  padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+h1{font-size:19px;margin:0}
+h2{font-size:16px;margin:0}
+.cab{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:10px}
+.cab p{margin:0;color:var(--suave);font-size:13px}
+.marca{background:var(--nuevo);border:1px solid var(--nuevo-raya);border-radius:4px;padding:0 5px;font-size:12px;font-weight:600;white-space:nowrap}
+.pest{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pest button{border-radius:999px;padding:7px 14px}
+.pest button[aria-selected="true"]{background:var(--marino);color:var(--marino-tinta);border-color:var(--marino)}
+button{font:inherit;color:var(--tinta);background:var(--papel);border:1px solid var(--raya);border-radius:7px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--marino)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--marino);outline-offset:2px}
+button.ppal{background:var(--marino);color:var(--marino-tinta);border-color:var(--marino);font-weight:600}
+button.chico{font-size:12px;padding:2px 9px;border-radius:999px}
+.caja{background:var(--papel);border:1px solid var(--raya);border-radius:10px;padding:14px 16px}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dos>*{min-width:0}
+@media (max-width:820px){.dos{grid-template-columns:1fr}}
+label.etq{display:block;font-weight:600;margin:12px 0 4px}
+label.etq:first-child{margin-top:0}
+input[type=text],textarea,select{font:inherit;color:var(--tinta);background:var(--papel);border:1px solid var(--raya);border-radius:7px;padding:8px 10px;width:100%}
+textarea{resize:vertical}
+.modelo{font-family:var(--mono);font-size:13px}
+.fila-campo{display:flex;gap:8px;align-items:flex-start}
+.fila-campo>input,.fila-campo>textarea{flex:1;min-width:0}
+.fila-campo>button{white-space:nowrap}
+.sale{margin-top:6px;font-size:13px;color:var(--suave)}
+.sale b{color:var(--tinta);font-weight:600;overflow-wrap:anywhere}
+.nota{font-size:13px;color:var(--suave);margin:8px 0 0}
+.plegada{display:flex;gap:10px;align-items:baseline;padding:10px 16px;color:var(--suave);font-size:13px}
+.plegada b{color:var(--tinta);font-size:15px}
+.pila{display:flex;flex-direction:column;gap:8px}
+.elegir{position:relative}
+.lista{position:absolute;right:0;top:calc(100% + 4px);z-index:5;width:min(300px,80vw);background:var(--papel);border:1px solid var(--marino);border-radius:8px;padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.lista input{margin-bottom:6px}
+.lista ul{list-style:none;margin:0;padding:0;max-height:210px;overflow:auto}
+.lista li button{width:100%;text-align:left;border:0;border-radius:5px;padding:5px 8px;display:flex;justify-content:space-between;gap:8px}
+.lista li button:hover{background:var(--pildora)}
+.lista li small{color:var(--suave)}
+.titulo-asunto{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.pildora{background:var(--pildora);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.copiar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--suave)}
+.doc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--raya);border-radius:8px;padding:8px 10px}
+.doc .nom{flex:1;min-width:180px;overflow-wrap:anywhere}
+.tipo{font-size:11px;font-weight:700;border:1px solid var(--raya);border-radius:4px;padding:1px 5px}
+.reg{font-size:12px;color:var(--bien);font-weight:600}
+#aviso{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--bien);color:#fff;border-radius:9px;padding:10px 16px;max-width:min(680px,92vw);font-size:14px;z-index:20;overflow-wrap:anywhere}
+#aviso small{display:block;opacity:.9}
+</style>
+
+<div class="cab">
+  <h1>Prueba 623 · Asunto y extracto</h1>
+  <p>Datos inventados. Nada se guarda. Lo nuevo va con <span class="marca">nuevo</span>.</p>
+</div>
+
+<div class="pest" role="tablist">
+  <button role="tab" id="pt-ajustes" aria-selected="true" data-v="v-ajustes">1 · Ajustes › El centro</button>
+  <button role="tab" id="pt-plantilla" aria-selected="false" data-v="v-plantilla">2 · Plantilla de correo</button>
+  <button role="tab" id="pt-correo" aria-selected="false" data-v="v-correo">3 · Correo de este asunto</button>
+  <button role="tab" id="pt-ficha" aria-selected="false" data-v="v-ficha">4 · Ficha del asunto</button>
+</div>
+
+<!-- 1. AJUSTES -->
+<section id="v-ajustes" class="pila">
+  <div class="caja plegada"><b>› Datos del centro y firma</b> Lo que rellena los campos variables de correos y documentos</div>
+  <div class="caja">
+    <div class="titulo-asunto"><h2>⌄ Asunto y extracto</h2> <span class="marca">nuevo</span>
+      <span class="nota" style="margin:0">Cómo se escribe el asunto de los correos y mensajes de Séneca, y el extracto del registro</span></div>
+    <div class="dos">
+      <div>
+        <label class="etq" for="m-asunto">Asunto de correos y mensajes de Séneca</label>
+        <div class="fila-campo">
+          <input type="text" class="modelo" id="m-asunto" value="{{TIPO}} · {{TERCERO}}">
+          <div class="elegir"><button id="b-campo-asunto" data-para="m-asunto">+ Campo variable</button></div>
+        </div>
+        <div class="sale">Así sale: <b id="s-asunto"></b></div>
+        <p class="nota">Cada plantilla de correo o de Séneca puede llevar su propio asunto. Si lo deja vacío, sale este.</p>
+      </div>
+      <div>
+        <label class="etq" for="m-extracto">Extracto del registro de Séneca</label>
+        <div class="fila-campo">
+          <input type="text" class="modelo" id="m-extracto" value="{{TIPO DE DOCUMENTO}} · {{TIPO}} · {{TERCERO}}">
+          <div class="elegir"><button id="b-campo-extracto" data-para="m-extracto">+ Campo variable</button></div>
+        </div>
+        <div class="sale">Así sale: <b id="s-extracto"></b></div>
+        <p class="nota">Es uno solo para todos los documentos. Puede llevar datos del documento que se registra.</p>
+      </div>
+    </div>
+    <p class="nota"><b>El número del asunto se añade siempre al final</b>, aunque no lo pongas: con él la app reconoce las respuestas y los apuntes del registro. En los asuntos de antes, sin número, sigue saliendo el nombre de la carpeta.</p>
+  </div>
+  <div class="caja plegada"><b>› Cargos del centro</b> Quién firma cada documento, según la fecha</div>
+</section>
+
+<!-- 2. PLANTILLA -->
+<section id="v-plantilla" hidden>
+  <div class="caja">
+    <h2 style="margin-bottom:10px">Cambiar la plantilla</h2>
+    <div class="dos">
+      <div>
+        <label class="etq" for="p-nombre">Nombre de la plantilla</label>
+        <input type="text" id="p-nombre" value="Comunicar la resolución a la familia">
+        <label class="etq" for="p-asunto">Asunto <span class="marca">nuevo</span></label>
+        <div class="fila-campo">
+          <input type="text" class="modelo" id="p-asunto" value="" placeholder="Vacío: sale el asunto general del centro">
+          <div class="elegir"><button id="b-campo-plantilla" data-para="p-asunto">+ Campo variable</button></div>
+        </div>
+        <div class="sale">Así sale: <b id="s-plantilla"></b> <span id="s-plantilla-de"></span></div>
+        <label class="etq" for="p-saludo">Saludo</label>
+        <input type="text" id="p-saludo" value="Estimados tutores legales de {{TERCERO}}:">
+      </div>
+      <div>
+        <label class="etq" for="p-texto">Texto</label>
+        <textarea id="p-texto" rows="6">Les enviamos la resolución de baja de matrícula. Pueden recoger el original en Secretaría.</textarea>
+        <label class="etq" for="p-firma">Firma</label>
+        <input type="text" id="p-firma" value="" placeholder="Vacía: sale la firma de Ajustes">
+      </div>
+    </div>
+    <p class="nota">La plantilla de mensaje de Séneca lleva el mismo campo «Asunto», en el mismo sitio.</p>
+  </div>
+</section>
+
+<!-- 3. CORREO -->
+<section id="v-correo" hidden>
+  <div class="caja">
+    <h2 style="margin-bottom:10px">Correo de este asunto</h2>
+    <div class="dos">
+      <div>
+        <label class="etq" for="c-para">Para</label>
+        <input type="text" id="c-para" value="Montes Rey, Lucía (madre) · Espejo Gil, Raúl (padre)">
+        <label class="etq" for="c-asunto">Asunto</label>
+        <input type="text" id="c-asunto">
+        <p class="nota" id="c-de"></p>
+        <p class="nota">Se puede retocar antes de enviar, como hoy.</p>
+      </div>
+      <div>
+        <label class="etq" for="c-plantilla">Plantilla</label>
+        <select id="c-plantilla">
+          <option value="">Sin plantilla</option>
+          <option value="p">Comunicar la resolución a la familia</option>
+        </select>
+        <label class="etq" for="c-cuerpo">Cuerpo</label>
+        <textarea id="c-cuerpo" rows="5">Estimados tutores legales de Espejo Montes, Carla:
+
+Un saludo.</textarea>
+      </div>
+    </div>
+    <p class="nota">El cuadro «Mensaje de Séneca» y el envío a varias personas llevan el asunto igual.</p>
+  </div>
+</section>
+
+<!-- 4. FICHA -->
+<section id="v-ficha" hidden>
+  <div class="caja" style="margin-bottom:12px">
+    <div class="titulo-asunto">
+      <span class="pildora">BAJA MATRICULA</span><span class="pildora">A26-0003</span>
+      <h2>261023 A26-0003 BAJA MATRICULA Espejo Montes, Carla 2100006</h2>
+    </div>
+    <div class="copiar">Copiar:
+      <button class="chico" id="f-asunto">Asunto</button>
+      <button class="chico" id="f-ruta">Ruta</button>
+      <button class="chico" id="f-nie">NIE</button>
+      <button class="chico" id="f-nombre">Nombre</button>
+      <span>«Asunto» copia ahora el asunto que compone la app, no el nombre de la carpeta.</span>
+    </div>
+  </div>
+  <div class="dos">
+    <div class="caja">
+      <h2 style="margin-bottom:8px">Hito 3 · Registrar la resolución › Documentos</h2>
+      <div class="pila">
+        <div class="doc"><span class="tipo">PDF</span><span class="nom">261109 RESOLUCION D26-00008.pdf</span>
+          <button class="chico" data-ruta="1">Ruta</button>
+          <button class="chico" data-extracto="RESOLUCION" data-fecha="09/11/2026">Extracto</button><span class="marca">nuevo</span>
+          <button class="chico">Enviar ▾</button></div>
+      </div>
+    </div>
+    <div class="caja">
+      <h2 style="margin-bottom:8px">Documentos de la carpeta</h2>
+      <div class="pila">
+        <div class="doc"><span class="tipo">PDF</span><span class="nom">261109 RESOLUCION D26-00008.pdf</span>
+          <button class="chico" data-ruta="1">Ruta</button>
+          <button class="chico" data-extracto="RESOLUCION" data-fecha="09/11/2026">Extracto</button></div>
+        <div class="doc"><span class="tipo">PDF</span><span class="nom">261110 ANEXO I D26-00009.pdf</span>
+          <button class="chico" data-ruta="1">Ruta</button>
+          <button class="chico" data-extracto="ANEXO I" data-fecha="10/11/2026">Extracto</button></div>
+        <div class="doc"><span class="tipo">PDF</span><span class="nom">261102 SOLICITUD D26-00004.pdf</span>
+          <span class="reg">26EM0412</span>
+          <button class="chico" data-ruta="1">Ruta</button>
+          <button class="chico" data-extracto="SOLICITUD" data-fecha="02/11/2026">Extracto</button></div>
+      </div>
+      <p class="nota">El botón sale en todos los documentos, también en los ya registrados.</p>
+    </div>
+  </div>
+</section>
+
+<div id="aviso" hidden role="status"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var NUMERO='A26-0003';
+  var DATOS={'TIPO':'BAJA MATRICULA','TERCERO':'Espejo Montes, Carla','NÚMERO DEL ASUNTO':NUMERO,'UNIDAD':'4º A',
+    'CURSO':'4º de E.S.O.','FECHA DE INICIO':'23/10/2026','TIPO DE DOCUMENTO':'RESOLUCION','FECHA DEL DOCUMENTO':'09/11/2026',
+    'NÚMERO DEL DOCUMENTO':'D26-00008','CENTRO':'IES Fuente Lucena'};
+  var SOLO_DOC=['TIPO DE DOCUMENTO','FECHA DEL DOCUMENTO','NÚMERO DEL DOCUMENTO'];
+
+  function componer(modelo, extra){
+    var d=Object.assign({},DATOS,extra||{});
+    var t=String(modelo||'').replace(/\{\{([^}]+)\}\}/g,function(_,k){k=k.trim();return d[k]!==undefined?d[k]:'';});
+    t=t.replace(/\s+/g,' ').replace(/^( ?· ?)+|( ?· ?)+$/g,'').trim();
+    if(t.indexOf(NUMERO)===-1) t=(t?t+' · ':'')+NUMERO;
+    return t;
+  }
+  function asuntoGeneral(){return componer($('m-asunto').value);}
+  function asuntoDePlantilla(){var p=$('p-asunto').value.trim();return p?componer(p):asuntoGeneral();}
+
+  function pintar(){
+    $('s-asunto').textContent=asuntoGeneral();
+    $('s-extracto').textContent=componer($('m-extracto').value);
+    $('s-plantilla').textContent=asuntoDePlantilla();
+    $('s-plantilla-de').textContent=$('p-asunto').value.trim()?'(el de esta plantilla)':'(el general del centro)';
+    pintarCorreo(false);
+  }
+  var retocado=false;
+  function pintarCorreo(forzar){
+    if(retocado&&!forzar) return;
+    var conPl=$('c-plantilla').value==='p';
+    $('c-asunto').value=conPl?asuntoDePlantilla():asuntoGeneral();
+    $('c-de').textContent=conPl?($('p-asunto').value.trim()?'Sale de la plantilla elegida.':'La plantilla no tiene asunto propio: sale el general del centro.'):'Sin plantilla: sale el general del centro.';
+  }
+  ['m-asunto','m-extracto','p-asunto'].forEach(function(id){$(id).addEventListener('input',pintar);});
+  $('c-plantilla').addEventListener('change',function(){retocado=false;pintarCorreo(true);});
+  $('c-asunto').addEventListener('input',function(){retocado=true;$('c-de').textContent='Retocado a mano: se envía tal como está escrito.';});
+
+  /* pestañas */
+  var pest=[].slice.call(document.querySelectorAll('.pest button'));
+  pest.forEach(function(b){b.addEventListener('click',function(){
+    pest.forEach(function(o){o.setAttribute('aria-selected',o===b?'true':'false');$(o.dataset.v).hidden=(o!==b);});
+    cerrarLista();
+  });});
+
+  /* elegir campo variable */
+  var abierta=null;
+  function cerrarLista(){if(abierta){abierta.remove();abierta=null;}}
+  [].slice.call(document.querySelectorAll('.elegir button')).forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      var era=abierta&&abierta.dataset.de===b.id; cerrarLista(); if(era) return;
+      var campo=$(b.dataset.para), conDoc=(b.dataset.para==='m-extracto');
+      var caja=document.createElement('div');caja.className='lista';caja.dataset.de=b.id;
+      caja.innerHTML='<input type="text" placeholder="Buscar un campo…" aria-label="Buscar un campo"><ul></ul>';
+      var ul=caja.querySelector('ul'), busca=caja.querySelector('input');
+      function llenar(){
+        ul.innerHTML='';var q=busca.value.toLowerCase();
+        Object.keys(DATOS).filter(function(k){return (conDoc||SOLO_DOC.indexOf(k)===-1)&&k.toLowerCase().indexOf(q)!==-1;}).forEach(function(k){
+          var li=document.createElement('li'),bt=document.createElement('button');
+          bt.innerHTML='<span></span><small></small>';bt.firstChild.textContent=k;bt.lastChild.textContent=DATOS[k];
+          bt.addEventListener('click',function(){
+            var fin=campo.value.length, tocado=campo.dataset.tocado==='1';
+            var pos=tocado&&campo.selectionStart!=null?campo.selectionStart:fin;
+            var antes=campo.value.slice(0,pos), despues=campo.value.slice(tocado&&campo.selectionEnd!=null?campo.selectionEnd:pos);
+            campo.value=antes+((antes&&!/\s$/.test(antes))?' ':'')+'{{'+k+'}}'+((despues&&!/^\s/.test(despues))?' ':'')+despues;
+            cerrarLista();campo.focus();pintar();
+          });
+          li.appendChild(bt);ul.appendChild(li);
+        });
+        if(!ul.children.length){var v=document.createElement('li');v.textContent='Ningún campo con ese nombre.';v.style.padding='5px 8px';ul.appendChild(v);}
+      }
+      busca.addEventListener('input',llenar);caja.addEventListener('click',function(ev){ev.stopPropagation();});
+      llenar();b.parentNode.appendChild(caja);abierta=caja;busca.focus();
+    });
+  });
+  ['m-asunto','m-extracto','p-asunto'].forEach(function(id){$(id).addEventListener('focus',function(){$(id).dataset.tocado='1';});});
+  document.addEventListener('click',cerrarLista);
+
+  /* copiar */
+  var reloj=null;
+  function avisar(titulo,texto){
+    var a=$('aviso');a.innerHTML='';var s=document.createElement('small');s.textContent=titulo;a.appendChild(s);a.appendChild(document.createTextNode(texto));
+    a.hidden=false;clearTimeout(reloj);reloj=setTimeout(function(){a.hidden=true;},6000);
+    try{if(navigator.clipboard) navigator.clipboard.writeText(texto).catch(function(){});}catch(e){}
+  }
+  $('f-asunto').addEventListener('click',function(){avisar('Asunto copiado:',asuntoGeneral());});
+  $('f-ruta').addEventListener('click',function(){avisar('Ruta copiada:','C:\\Google Drive\\ABIERTOS\\261023 A26-0003 BAJA MATRICULA Espejo Montes, Carla 2100006');});
+  $('f-nie').addEventListener('click',function(){avisar('NIE copiado:','2100006');});
+  $('f-nombre').addEventListener('click',function(){avisar('Nombre copiado:','Espejo Montes, Carla');});
+  [].slice.call(document.querySelectorAll('[data-extracto]')).forEach(function(b){b.addEventListener('click',function(){
+    avisar('Extracto copiado:',componer($('m-extracto').value,{'TIPO DE DOCUMENTO':b.dataset.extracto,'FECHA DEL DOCUMENTO':b.dataset.fecha}));
+  });});
+  [].slice.call(document.querySelectorAll('[data-ruta]')).forEach(function(b){b.addEventListener('click',function(){
+    avisar('Ruta copiada:','C:\\Google Drive\\ABIERTOS\\261023 A26-0003 BAJA MATRICULA Espejo Montes, Carla 2100006\\'+b.parentNode.querySelector('.nom').textContent);
+  });});
+
+  pintar();
+})();
+</script>
