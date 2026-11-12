@@ -45,6 +45,8 @@ textarea{resize:vertical}
 .fila-campo>button{white-space:nowrap}
 .sale{margin-top:6px;font-size:13px;color:var(--suave)}
 .sale b{color:var(--tinta);font-weight:600;overflow-wrap:anywhere}
+.lineas{display:block;white-space:pre-line}
+#aviso span{display:block;white-space:pre-line}
 .nota{font-size:13px;color:var(--suave);margin:8px 0 0}
 .plegada{display:flex;gap:10px;align-items:baseline;padding:10px 16px;color:var(--suave);font-size:13px}
 .plegada b{color:var(--tinta);font-size:15px}
@@ -98,11 +100,12 @@ textarea{resize:vertical}
       <div>
         <label class="etq" for="m-extracto">Extracto del registro de Séneca</label>
         <div class="fila-campo">
-          <input type="text" class="modelo" id="m-extracto" value="{{TIPO DE DOCUMENTO}} · {{TIPO}} · {{TERCERO}}">
+          <textarea class="modelo" id="m-extracto" rows="3">{{TIPO DE DOCUMENTO}} · {{TIPO}}
+{{TERCERO}} · {{UNIDAD}}</textarea>
           <div class="elegir"><button id="b-campo-extracto" data-para="m-extracto">+ Campo variable</button></div>
         </div>
-        <div class="sale">Así sale: <b id="s-extracto"></b></div>
-        <p class="nota">Es uno solo para todos los documentos. Puede llevar datos del documento que se registra.</p>
+        <div class="sale">Así sale:<b id="s-extracto" class="lineas"></b></div>
+        <p class="nota">Es uno solo para todos los documentos. Puede tener varias líneas y llevar datos del documento que se registra.</p>
       </div>
     </div>
     <p class="nota"><b>El número del asunto se añade siempre al final</b>, aunque no lo pongas: con él la app reconoce las respuestas y los apuntes del registro. En los asuntos de antes, sin número, sigue saliendo el nombre de la carpeta.</p>
@@ -225,7 +228,8 @@ Un saludo.</textarea>
   function componer(modelo, extra){
     var d=Object.assign({},DATOS,extra||{});
     var t=String(modelo||'').replace(/\{\{([^}]+)\}\}/g,function(_,k){k=k.trim();return d[k]!==undefined?d[k]:'';});
-    t=t.replace(/\s+/g,' ').replace(/^( ?· ?)+|( ?· ?)+$/g,'').trim();
+    var lineas=t.split('\n').map(function(l){return l.replace(/\s+/g,' ').replace(/^( ?· ?)+|( ?· ?)+$/g,'').trim();}).filter(function(l){return l;});
+    t=lineas.join('\n');
     if(t.indexOf(NUMERO)===-1) t=(t?t+' · ':'')+NUMERO;
     return t;
   }
@@ -294,7 +298,7 @@ Un saludo.</textarea>
   /* copiar */
   var reloj=null;
   function avisar(titulo,texto){
-    var a=$('aviso');a.innerHTML='';var s=document.createElement('small');s.textContent=titulo;a.appendChild(s);a.appendChild(document.createTextNode(texto));
+    var a=$('aviso');a.innerHTML='';var s=document.createElement('small');s.textContent=titulo;a.appendChild(s);var c=document.createElement('span');c.textContent=texto;a.appendChild(c);
     a.hidden=false;clearTimeout(reloj);reloj=setTimeout(function(){a.hidden=true;},6000);
     try{if(navigator.clipboard) navigator.clipboard.writeText(texto).catch(function(){});}catch(e){}
   }
