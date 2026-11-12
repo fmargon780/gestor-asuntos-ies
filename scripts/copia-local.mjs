@@ -203,8 +203,11 @@ async function main() {
 
   /* 4. copia-datos/: un fichero por cada dato estático que la
         aplicación pide con `App.leerFicheroDeLaApp`. */
-  generarCopiaDatosDeJson('datos-biblioteca/biblioteca-centro.json');
-  generarCopiaDatosDeJson('datos-biblioteca/plan-guias.json');   /* fila 551 */
+  /* Fila 613: todos los JSON de datos-biblioteca/ (el de BAJA MATRICULA, fila 592, no estaba y la
+     copia sin internet avisaba «No se ha podido cargar copia-datos/datos-biblioteca~baja-matricula.json.js»). */
+  for (const nombre of listarFicheros(rutaRaiz('datos-biblioteca'), (n) => n.toLowerCase().endsWith('.json'))) {
+    generarCopiaDatosDeJson('datos-biblioteca/' + nombre);
+  }
   generarCopiaDatosDeJson('datos/formularios.json');
   generarCopiaDatosDeJson('plantillas/indice.json');
   /* Fila 149: la letra y el símbolo del membrete (js/membrete.js). */

@@ -177,6 +177,12 @@ function scriptDeDiscoDeMentira() {
     return Array.isArray(datos.tipos) && datos.tipos.length > 0;
   }), true);
 
+  /* --- fila 613: cada JSON de datos-biblioteca/ viaja en la copia (el de BAJA MATRICULA faltaba) --- */
+  await comprobarAsync('el JSON de BAJA MATRICULA se lee desde copia-datos/', pagina.evaluate(async () => {
+    const datos = await window.App.leerFicheroDeLaApp('datos-biblioteca/baja-matricula.json', 'json');
+    return !!datos && typeof datos === 'object';
+  }), true);
+
   /* --- el catálogo de formularios sale --- */
   await comprobarAsync('el catálogo de formularios carga', pagina.evaluate(async () => {
     const catalogo = await window.Formularios.cargar();
