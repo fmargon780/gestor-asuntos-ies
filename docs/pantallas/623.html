@@ -47,6 +47,12 @@ textarea{resize:vertical}
 .sale b{color:var(--tinta);font-weight:600;overflow-wrap:anywhere}
 .lineas{display:block;white-space:pre-line}
 #aviso span{display:block;white-space:pre-line}
+.tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.tipo-tarjeta{position:relative;border:1px solid var(--raya);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.tipo-tarjeta b{display:block}
+.tipo-tarjeta small{color:var(--suave)}
+.menu{position:absolute;right:8px;top:38px;z-index:5;background:var(--papel);border:1px solid var(--marino);border-radius:8px;padding:4px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.menu button{border:0;white-space:nowrap}
 .nota{font-size:13px;color:var(--suave);margin:8px 0 0}
 .plegada{display:flex;gap:10px;align-items:baseline;padding:10px 16px;color:var(--suave);font-size:13px}
 .plegada b{color:var(--tinta);font-size:15px}
@@ -76,9 +82,10 @@ textarea{resize:vertical}
 
 <div class="pest" role="tablist">
   <button role="tab" id="pt-ajustes" aria-selected="true" data-v="v-ajustes">1 · Ajustes › El centro</button>
-  <button role="tab" id="pt-plantilla" aria-selected="false" data-v="v-plantilla">2 · Plantilla de correo</button>
-  <button role="tab" id="pt-correo" aria-selected="false" data-v="v-correo">3 · Correo de este asunto</button>
-  <button role="tab" id="pt-ficha" aria-selected="false" data-v="v-ficha">4 · Ficha del asunto</button>
+  <button role="tab" id="pt-tipos" aria-selected="false" data-v="v-tipos">2 · Ajustes › Tipos de documento</button>
+  <button role="tab" id="pt-plantilla" aria-selected="false" data-v="v-plantilla">3 · Plantilla de correo</button>
+  <button role="tab" id="pt-correo" aria-selected="false" data-v="v-correo">4 · Correo de este asunto</button>
+  <button role="tab" id="pt-ficha" aria-selected="false" data-v="v-ficha">5 · Ficha del asunto</button>
 </div>
 
 <!-- 1. AJUSTES -->
@@ -98,14 +105,14 @@ textarea{resize:vertical}
         <p class="nota">Cada plantilla de correo o de Séneca puede llevar su propio asunto. Si lo deja vacío, sale este.</p>
       </div>
       <div>
-        <label class="etq" for="m-extracto">Extracto del registro de Séneca</label>
+        <label class="etq" for="m-extracto">Extracto general del registro de Séneca</label>
         <div class="fila-campo">
           <textarea class="modelo" id="m-extracto" rows="3">{{TIPO DE DOCUMENTO}} · {{TIPO}}
 {{TERCERO}} · {{UNIDAD}}</textarea>
           <div class="elegir"><button id="b-campo-extracto" data-para="m-extracto">+ Campo variable</button></div>
         </div>
         <div class="sale">Así sale:<b id="s-extracto" class="lineas"></b></div>
-        <p class="nota">Es uno solo para todos los documentos. Puede tener varias líneas y llevar datos del documento que se registra.</p>
+        <p class="nota">Puede tener varias líneas y llevar datos del documento que se registra. Cada tipo de documento puede llevar su propio extracto (pestaña 2). Si lo deja vacío, sale este.</p>
       </div>
     </div>
     <p class="nota"><b>El número del asunto se añade siempre al final</b>, aunque no lo pongas: con él la app reconoce las respuestas y los apuntes del registro. En los asuntos de antes, sin número, sigue saliendo el nombre de la carpeta.</p>
@@ -113,7 +120,26 @@ textarea{resize:vertical}
   <div class="caja plegada"><b>› Cargos del centro</b> Quién firma cada documento, según la fecha</div>
 </section>
 
-<!-- 2. PLANTILLA -->
+<!-- 2. TIPOS DE DOCUMENTO -->
+<section id="v-tipos" class="pila" hidden>
+  <div class="caja">
+    <div class="titulo-asunto"><h2>⌄ Tipos de documento</h2><span class="pildora">6</span>
+      <span class="nota" style="margin:0">Los que salen al nombrar un documento dentro de un asunto</span></div>
+    <div class="tipos" id="t-lista"></div>
+    <p class="nota">En el menú ⋮ de cada tipo, además de lo que ya tiene hoy, sale «Extracto de este tipo» <span class="marca">nuevo</span>. Los que tienen extracto propio lo dicen en su tarjeta.</p>
+  </div>
+  <div class="caja" id="t-editor" hidden>
+    <h2 style="margin-bottom:8px">Extracto de <span id="t-cual"></span> <span class="marca">nuevo</span></h2>
+    <div class="fila-campo">
+      <textarea class="modelo" id="t-extracto" rows="3" placeholder="Vacío: sale el extracto general del centro"></textarea>
+      <div class="elegir"><button id="b-campo-tipo" data-para="t-extracto">+ Campo variable</button></div>
+    </div>
+    <div class="sale">Así sale:<b id="s-tipo" class="lineas"></b><span id="s-tipo-de"></span></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="ppal" id="t-guardar">Guardar</button><button id="t-cancelar">Cancelar</button></div>
+  </div>
+</section>
+
+<!-- 3. PLANTILLA -->
 <section id="v-plantilla" hidden>
   <div class="caja">
     <h2 style="margin-bottom:10px">Cambiar la plantilla</h2>
@@ -209,7 +235,7 @@ Un saludo.</textarea>
           <button class="chico" data-ruta="1">Ruta</button>
           <button class="chico" data-extracto="SOLICITUD" data-fecha="02/11/2026">Extracto</button></div>
       </div>
-      <p class="nota">El botón sale en todos los documentos, también en los ya registrados.</p>
+      <p class="nota">El botón sale en todos los documentos, también en los ya registrados. Cada uno copia el extracto de su tipo de documento; si su tipo no tiene, el general.</p>
     </div>
   </div>
 </section>
@@ -233,6 +259,32 @@ Un saludo.</textarea>
     if(t.indexOf(NUMERO)===-1) t=(t?t+' · ':'')+NUMERO;
     return t;
   }
+  var TIPOS=['SOLICITUD','FACTURA','CERTIFICADO','RESOLUCION','NOTIFICACION','ANEXO I'];
+  var EXTRACTOS={'RESOLUCION':'Resolución de {{TIPO}}\n{{TERCERO}} · {{UNIDAD}}','FACTURA':'Factura de {{TERCERO}}\n{{TIPO}}'};
+  function extractoDe(tipo,extra){return componer(EXTRACTOS[tipo]||$('m-extracto').value,Object.assign({'TIPO DE DOCUMENTO':tipo},extra||{}));}
+  var editando='';
+  function pintarTipos(){
+    var l=$('t-lista');l.innerHTML='';
+    TIPOS.forEach(function(t){
+      var d=document.createElement('div');d.className='tipo-tarjeta';
+      var i=document.createElement('div');var b=document.createElement('b');b.textContent=t;var sm=document.createElement('small');
+      sm.textContent=EXTRACTOS[t]?'Extracto propio':'Extracto general';i.appendChild(b);i.appendChild(sm);
+      var m=document.createElement('button');m.className='chico';m.textContent='⋮';m.setAttribute('aria-label','Menú de '+t);m.dataset.menu=t;
+      m.addEventListener('click',function(e){
+        e.stopPropagation();var ya=d.querySelector('.menu');cerrarMenus();if(ya) return;
+        var mn=document.createElement('div');mn.className='menu';var op=document.createElement('button');op.textContent='Extracto de este tipo';
+        op.addEventListener('click',function(){cerrarMenus();editando=t;$('t-cual').textContent=t;$('t-extracto').value=EXTRACTOS[t]||'';$('t-editor').hidden=false;pintarEditor();$('t-extracto').focus();});
+        mn.appendChild(op);d.appendChild(mn);
+      });
+      d.appendChild(i);d.appendChild(m);l.appendChild(d);
+    });
+  }
+  function cerrarMenus(){[].slice.call(document.querySelectorAll('.menu')).forEach(function(x){x.remove();});}
+  function pintarEditor(){
+    if(!editando) return;var v=$('t-extracto').value.trim();
+    $('s-tipo').textContent=componer(v||$('m-extracto').value,{'TIPO DE DOCUMENTO':editando});
+    $('s-tipo-de').textContent=v?'(el de este tipo)':'(el general del centro)';
+  }
   function asuntoGeneral(){return componer($('m-asunto').value);}
   function asuntoDePlantilla(){var p=$('p-asunto').value.trim();return p?componer(p):asuntoGeneral();}
 
@@ -241,7 +293,7 @@ Un saludo.</textarea>
     $('s-extracto').textContent=componer($('m-extracto').value);
     $('s-plantilla').textContent=asuntoDePlantilla();
     $('s-plantilla-de').textContent=$('p-asunto').value.trim()?'(el de esta plantilla)':'(el general del centro)';
-    pintarCorreo(false);
+    pintarCorreo(false);pintarEditor();
   }
   var retocado=false;
   function pintarCorreo(forzar){
@@ -250,7 +302,9 @@ Un saludo.</textarea>
     $('c-asunto').value=conPl?asuntoDePlantilla():asuntoGeneral();
     $('c-de').textContent=conPl?($('p-asunto').value.trim()?'Sale de la plantilla elegida.':'La plantilla no tiene asunto propio: sale el general del centro.'):'Sin plantilla: sale el general del centro.';
   }
-  ['m-asunto','m-extracto','p-asunto'].forEach(function(id){$(id).addEventListener('input',pintar);});
+  ['m-asunto','m-extracto','p-asunto','t-extracto'].forEach(function(id){$(id).addEventListener('input',pintar);});
+  $('t-guardar').addEventListener('click',function(){var v=$('t-extracto').value.trim();if(v) EXTRACTOS[editando]=v; else delete EXTRACTOS[editando];$('t-editor').hidden=true;var t=editando;editando='';pintarTipos();avisar('Guardado:',v?('El tipo '+t+' tiene extracto propio.'):('El tipo '+t+' usa el extracto general.'),true);});
+  $('t-cancelar').addEventListener('click',function(){$('t-editor').hidden=true;editando='';});
   $('c-plantilla').addEventListener('change',function(){retocado=false;pintarCorreo(true);});
   $('c-asunto').addEventListener('input',function(){retocado=true;$('c-de').textContent='Retocado a mano: se envía tal como está escrito.';});
 
@@ -258,7 +312,7 @@ Un saludo.</textarea>
   var pest=[].slice.call(document.querySelectorAll('.pest button'));
   pest.forEach(function(b){b.addEventListener('click',function(){
     pest.forEach(function(o){o.setAttribute('aria-selected',o===b?'true':'false');$(o.dataset.v).hidden=(o!==b);});
-    cerrarLista();
+    cerrarLista();cerrarMenus();
   });});
 
   /* elegir campo variable */
@@ -268,7 +322,7 @@ Un saludo.</textarea>
     b.addEventListener('click',function(e){
       e.stopPropagation();
       var era=abierta&&abierta.dataset.de===b.id; cerrarLista(); if(era) return;
-      var campo=$(b.dataset.para), conDoc=(b.dataset.para==='m-extracto');
+      var campo=$(b.dataset.para), conDoc=(b.dataset.para==='m-extracto'||b.dataset.para==='t-extracto');
       var caja=document.createElement('div');caja.className='lista';caja.dataset.de=b.id;
       caja.innerHTML='<input type="text" placeholder="Buscar un campo…" aria-label="Buscar un campo"><ul></ul>';
       var ul=caja.querySelector('ul'), busca=caja.querySelector('input');
@@ -292,27 +346,27 @@ Un saludo.</textarea>
       llenar();b.parentNode.appendChild(caja);abierta=caja;busca.focus();
     });
   });
-  ['m-asunto','m-extracto','p-asunto'].forEach(function(id){$(id).addEventListener('focus',function(){$(id).dataset.tocado='1';});});
-  document.addEventListener('click',cerrarLista);
+  ['m-asunto','m-extracto','p-asunto','t-extracto'].forEach(function(id){$(id).addEventListener('focus',function(){$(id).dataset.tocado='1';});});
+  document.addEventListener('click',function(){cerrarLista();cerrarMenus();});
 
   /* copiar */
   var reloj=null;
-  function avisar(titulo,texto){
+  function avisar(titulo,texto,sinCopiar){
     var a=$('aviso');a.innerHTML='';var s=document.createElement('small');s.textContent=titulo;a.appendChild(s);var c=document.createElement('span');c.textContent=texto;a.appendChild(c);
     a.hidden=false;clearTimeout(reloj);reloj=setTimeout(function(){a.hidden=true;},6000);
-    try{if(navigator.clipboard) navigator.clipboard.writeText(texto).catch(function(){});}catch(e){}
+    try{if(!sinCopiar&&navigator.clipboard) navigator.clipboard.writeText(texto).catch(function(){});}catch(e){}
   }
   $('f-asunto').addEventListener('click',function(){avisar('Asunto copiado:',asuntoGeneral());});
   $('f-ruta').addEventListener('click',function(){avisar('Ruta copiada:','C:\\Google Drive\\ABIERTOS\\261023 A26-0003 BAJA MATRICULA Espejo Montes, Carla 2100006');});
   $('f-nie').addEventListener('click',function(){avisar('NIE copiado:','2100006');});
   $('f-nombre').addEventListener('click',function(){avisar('Nombre copiado:','Espejo Montes, Carla');});
   [].slice.call(document.querySelectorAll('[data-extracto]')).forEach(function(b){b.addEventListener('click',function(){
-    avisar('Extracto copiado:',componer($('m-extracto').value,{'TIPO DE DOCUMENTO':b.dataset.extracto,'FECHA DEL DOCUMENTO':b.dataset.fecha}));
+    avisar('Extracto copiado:',extractoDe(b.dataset.extracto,{'FECHA DEL DOCUMENTO':b.dataset.fecha}));
   });});
   [].slice.call(document.querySelectorAll('[data-ruta]')).forEach(function(b){b.addEventListener('click',function(){
     avisar('Ruta copiada:','C:\\Google Drive\\ABIERTOS\\261023 A26-0003 BAJA MATRICULA Espejo Montes, Carla 2100006\\'+b.parentNode.querySelector('.nom').textContent);
   });});
 
-  pintar();
+  pintarTipos();pintar();
 })();
 </script>
