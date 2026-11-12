@@ -137,6 +137,10 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (29-oct-2026, tema 486) Las personas de **Alumnado y Personal** se dan de alta y se cambian con dos
   casillas, **«Apellidos» y «Nombre»**; la app pone la coma. Lo guardado sigue siendo
   «Apellidos, Nombre» en una sola línea. Empresas, Otros y Administraciones siguen con su casilla.
+- (12-nov-2026, tema 602) En «Nuevo asunto» quedan **fijos solo la fecha de inicio, el tipo y el tercero**. Año académico, descripción corta, fecha límite, quién lo pide y por qué vía son campos de la lista única, y cada tipo elige si los pide al crear. **El día del cambio no los pide ningún tipo** (eligió «1», sabiendo que los asuntos nacen sin plazo ni «quién lo pide» hasta marcarlo tipo a tipo).
+- (12-nov-2026, tema 602) Disposición de «Nuevo asunto»: fecha, tipo y tercero **en una sola fila**, cada uno en su recuadro, la fecha estrecha a la izquierda («Yo pondría la fecha arriba a la izquierda»; «pondría alguna línea para separar o un relieve»; de la fila de tres: «Así me convence más»). Las clases de tercero, en botones pequeños («En esta idea»).
+- (12-nov-2026, tema 602) En «Nuevo asunto» los tipos salen **sin rótulos de departamento** y **sin desplegable de unidad**: «Quitalos. También la unidad»; «Lo de la unidad de antes no hace falta porque ya tenemos la opción de que es para un grupo de personas».
+- (12-nov-2026, tema 602) **La vista del asunto se rehace en su propio diseño** (idea 622), no quitando repeticiones: «Tremendamente recargado. No invita a pensar y veo difícil encontrar nada si no te conoces el asunto de memoria. Tampoco veo un flujo de trabajo claro». Lo ya decidido para ese diseño, en `docs/notas-diseno/622.md`.
 
 ## Tipos de asunto y clases de tercero
 
