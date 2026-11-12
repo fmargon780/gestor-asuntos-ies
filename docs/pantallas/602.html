@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de prueba 602 · Nuevo asunto</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; color: #1c2733; background: #f3f5f8; }
+  .franja { background: #7a4d00; color: #fff; padding: 6px 14px; font-size: 13px; text-align: center; }
+  .pestanas { display: flex; gap: 6px; padding: 10px 14px 0; flex-wrap: wrap; }
+  .pestanas button { border: 1px solid #c9d1dc; background: #fff; padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 15px; cursor: pointer; }
+  .pestanas button.activa { background: #1f4b7a; color: #fff; border-color: #1f4b7a; font-weight: 600; }
+  .pantalla { padding: 14px; }
+  .oculto { display: none !important; }
+  .caja { background: #fff; border: 1px solid #d9dfe7; border-radius: 10px; padding: 16px; }
+  h2 { margin: 0 0 12px; font-size: 21px; }
+  h3 { margin: 0; font-size: 18px; }
+  .etiqueta { display: block; font-weight: 600; margin: 12px 0 5px; }
+  .suave { color: #6a7685; font-weight: 400; }
+  .nota { color: #5d6977; font-size: 13px; margin: 6px 0; }
+  .campo { width: 100%; padding: 8px 10px; border: 1px solid #c9d1dc; border-radius: 7px; font-size: 15px; background: #fff; font-family: inherit; }
+  .fila3 { display: grid; grid-template-columns: auto 1fr 1fr; gap: 14px; align-items: stretch; }
+  @media (max-width: 760px) { .fila3 { grid-template-columns: 1fr; } }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 760px) { .dos, .tres, .mesa { grid-template-columns: 1fr !important; } }
+  .pastillas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pastilla { border: 1px solid #c9d1dc; background: #fff; border-radius: 999px; padding: 5px 13px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .pastilla.pulsada { background: #1f4b7a; color: #fff; border-color: #1f4b7a; }
+  .pastilla[disabled] { opacity: .35; cursor: default; }
+  .grupo-tipos { font-size: 12px; letter-spacing: .05em; color: #5d6977; font-weight: 700; margin: 10px 0 5px; }
+  .boton { border: 1px solid #c9d1dc; background: #fff; border-radius: 7px; padding: 7px 13px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .boton.principal { background: #1f4b7a; color: #fff; border-color: #1f4b7a; font-weight: 600; }
+  .boton.principal[disabled] { background: #b7c6d6; border-color: #b7c6d6; cursor: default; }
+  .mini { font-size: 12px; padding: 2px 9px; border-radius: 999px; }
+  .enlace { background: none; border: 0; color: #1f4b7a; text-decoration: underline; cursor: pointer; padding: 0; font-size: 14px; font-family: inherit; }
+  .resultado { border: 1px solid #d9dfe7; border-radius: 7px; padding: 8px 10px; margin-top: 6px; cursor: pointer; background: #fff; display: block; width: 100%; text-align: left; font-family: inherit; font-size: 14px; }
+  .resultado:hover { background: #eef3f9; }
+  .elegido { background: #e6f3ea; border: 1px solid #a9cfb5; border-radius: 8px; padding: 10px 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 600; }
+  .aviso-rojo { border: 1px solid #d9dfe7; background: #f6f7f9; border-radius: 8px; padding: 10px 12px; margin-top: 14px; }
+  .aviso-rojo b { color: #b3261e; }
+  .pie { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .bloque { border: 1px solid #c9d1dc; border-radius: 9px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); background: #fff; }
+  .tit-bloque { display: block; background: #e9eff6; border-bottom: 1px solid #c9d1dc; padding: 8px 12px; font-weight: 700; }
+  .cuerpo-bloque { padding: 12px; }
+  .cuerpo-bloque .etiqueta { margin-top: 0; }
+  .datos-asunto { background: #f6f8fb; border: 1px solid #d9dfe7; border-radius: 8px; padding: 4px 12px 12px; }
+  /* vista del asunto */
+  .cab { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .cab h2 { margin: 0; font-size: 23px; }
+  .chip { border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700; background: #e4edf7; color: #1f4b7a; }
+  .chip.num { background: #fff; border: 1px solid #5d6977; color: #333; }
+  .linea { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .empuja { margin-left: auto; }
+  .mesa { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; align-items: start; }
+  .tira { display: flex; border: 1px solid #d9dfe7; border-radius: 7px; overflow: hidden; margin-bottom: 12px; flex-wrap: wrap; }
+  .tira button { border: 0; border-right: 1px solid #d9dfe7; background: #f1f4f8; padding: 7px 11px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .tira button.actual { background: #fff; font-weight: 700; color: #1f4b7a; border-bottom: 2px solid #1f4b7a; }
+  .recuadro { border: 1px solid #d9dfe7; border-radius: 8px; margin-top: 12px; overflow: hidden; }
+  .recuadro > .tit { background: #edf2f8; padding: 8px 12px; font-weight: 700; display: flex; gap: 10px; align-items: center; }
+  .recuadro > .cuerpo { padding: 10px 12px; }
+  .tarea { border: 1px solid #e3c98a; background: #fff8e6; border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; }
+  .tarea.hecha { border-color: #a9cfb5; background: #eef7f0; }
+  .tarea .fila { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .doc { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 7px; padding: 6px 8px; background: #fff; border: 1px solid #d9dfe7; border-radius: 6px; font-size: 14px; }
+  .doc .nombre { font-weight: 600; }
+  .de-donde { font-size: 12px; color: #5d6977; }
+  #toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: #1e7a45; color: #fff; padding: 10px 16px; border-radius: 8px; max-width: 92vw; font-size: 14px; z-index: 5; }
+  .menu { position: relative; display: inline-block; }
+  .menu .lista { position: absolute; top: 105%; left: 0; background: #fff; border: 1px solid #c9d1dc; border-radius: 7px; min-width: 190px; z-index: 3; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  .menu .lista button { display: block; width: 100%; text-align: left; border: 0; background: #fff; padding: 8px 12px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .menu .lista button:hover { background: #eef3f9; }
+</style>
+</head>
+<body>
+<div class="franja">Pantalla de prueba 602 · Nuevo asunto · datos inventados · nada se guarda · solo se ha pintado lo que cambia</div>
+
+<!-- ================= NUEVO ASUNTO ================= -->
+<section id="pan-nuevo" class="pantalla">
+  <div class="caja">
+    <div class="fila3">
+      <div class="bloque">
+        <label class="tit-bloque" for="fecha">Fecha de inicio</label>
+        <div class="cuerpo-bloque"><input id="fecha" type="date" class="campo" style="width:auto" value="2026-11-12"></div>
+      </div>
+      <div class="bloque">
+        <div class="tit-bloque">Qué tipo de asunto</div>
+        <div class="cuerpo-bloque">
+          <input id="buscar-tipo" class="campo" placeholder="Buscar tipo: escribe tres letras">
+          <div id="tipos"></div>
+        </div>
+      </div>
+      <div class="bloque">
+        <div class="tit-bloque">Tercero</div>
+        <div class="cuerpo-bloque">
+          <p class="nota oculto" id="admite" style="margin-top:0"></p>
+          <div class="pastillas" id="clases"></div>
+          <input id="buscar" class="campo" style="margin-top:8px" placeholder="Escribe dos letras del nombre">
+          <button type="button" class="enlace" id="grupo" style="margin-top:6px">Es para un grupo de personas</button>
+          <div id="resultados"></div>
+          <div id="elegido" class="elegido oculto"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bloque-datos" class="bloque oculto" style="margin-top:14px">
+      <div class="tit-bloque">Datos del asunto</div>
+      <div class="cuerpo-bloque"><div class="tres" id="datos"></div></div>
+    </div>
+
+    <div id="ya-tiene" class="aviso-rojo oculto">
+      <b>Ya tiene abierto un asunto de este tipo</b>
+      <div><button type="button" class="enlace" id="ir-al-abierto">A26-0034 SANCION · Delgado Prieto, Iker 2100005</button></div>
+      <div class="nota">Es solo un aviso. Si es otra gestión, créalo sin más.</div>
+    </div>
+
+    <div class="pie">
+      <button type="button" class="boton" id="cancelar">Cancelar</button>
+      <button type="button" class="boton principal" id="crear" disabled>Falta elegir la persona y el tipo de asunto</button>
+    </div>
+  </div>
+  <p class="nota">En esta prueba, para que se vea la diferencia: SANCION y MATRICULA no piden ningún dato al crear (así quedarán todos los tipos el día del cambio);
+  CERTIFICADO DE NOTAS pide «Quién lo pide» y «Por qué vía»; FACTURA pide «Descripción corta» y «Fecha límite»; SEGURO ESCOLAR pide «Año académico» y un dato propio.</p>
+</section>
+
+<div id="toast" class="oculto" role="status"></div>
+
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  var temporizador = null;
+  function decir(texto) {
+    var t = $('toast'); t.textContent = texto; t.classList.remove('oculto');
+    clearTimeout(temporizador); temporizador = setTimeout(function () { t.classList.add('oculto'); }, 3800);
+  }
+  function sinCambios(nombre) { decir('«' + nombre + '»: no cambia, hace lo mismo que hoy.'); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-sin]'); if (b) sinCambios(b.getAttribute('data-sin'));
+  });
+
+  /* ---------- NUEVO ASUNTO ---------- */
+  var CLASES = ['Alumnado', 'Personal', 'Empresas', 'Otros', 'Tutores legales', 'Administraciones'];
+  var PERSONAS = [
+    { nombre: 'Delgado Prieto, Iker', id: '2100005', clase: 'Alumnado', detalle: '2º B · 2º de E.S.O.' },
+    { nombre: 'Fuentes Calvo, Marta', id: '2100018', clase: 'Alumnado', detalle: '4º A · 4º de E.S.O.' },
+    { nombre: 'Jimenez Rubio, Daniel', id: '2100031', clase: 'Alumnado', detalle: '2º B · 2º de E.S.O.' },
+    { nombre: 'Reyes Palma, Francisca', id: '482K', clase: 'Personal', detalle: 'Profesorado · Matemáticas' },
+    { nombre: 'Suministros Escolares del Sur SL', id: 'B12345678', clase: 'Empresas', detalle: 'Proveedor' },
+    { nombre: 'Delgado Ruiz, Antonio', id: '915T', clase: 'Tutores legales', detalle: 'Tutor legal de Delgado Prieto, Iker' },
+    { nombre: 'Ayuntamiento de Alhaurín el Grande', id: '', clase: 'Administraciones', detalle: 'Organismo' }
+  ];
+  var TIPOS = [
+    { grupo: 'SECRETARÍA', nombre: 'FACTURA', clases: ['Empresas'], pide: ['descripcion', 'limite'] },
+    { grupo: 'SECRETARÍA', nombre: 'CERTIFICADO DE NOTAS', clases: ['Alumnado'], pide: ['lopide', 'via'] },
+    { grupo: 'JEFATURA DE ESTUDIOS', nombre: 'MATRICULA', clases: ['Alumnado'], pide: [] },
+    { grupo: 'JEFATURA DE ESTUDIOS', nombre: 'SANCION', clases: ['Alumnado'], pide: [] },
+    { grupo: 'VARIOS', nombre: 'SEGURO ESCOLAR', clases: ['Alumnado'], pide: ['curso', 'centro'] },
+    { grupo: 'VARIOS', nombre: 'CERTIFICADO', clases: ['Alumnado', 'Personal'], pide: ['lopide'] }
+  ];
+  var CAMPOS = {
+    curso: '<label class="etiqueta">Año académico</label><input class="campo" value="26-27">',
+    descripcion: '<label class="etiqueta">Descripción corta</label><input class="campo" placeholder="Por ejemplo: Tóner de la fotocopiadora">',
+    limite: '<label class="etiqueta">Fecha límite</label><input type="date" class="campo">',
+    lopide: '<label class="etiqueta">Quién lo pide</label><select class="campo"><option>— sin apuntar —</option><option>El interesado</option><option>Su familia</option><option>Dirección</option><option>Jefatura de estudios</option></select>',
+    via: '<label class="etiqueta">Por qué vía</label><select class="campo"><option>Sin indicar</option><option>En ventanilla</option><option>Por teléfono</option><option>Por correo</option></select>',
+    centro: '<label class="etiqueta">Centro sanitario</label><input class="campo" placeholder="Dato propio de este tipo">'
+  };
+  var E = { clase: '', tercero: null, tipo: null };
+
+  function clasesPermitidas() { return E.tipo ? E.tipo.clases : CLASES; }
+  function pintarClases() {
+    var perm = clasesPermitidas();
+    $('clases').innerHTML = '';
+    CLASES.forEach(function (c) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'pastilla' + (E.clase === c ? ' pulsada' : ''); b.textContent = c;
+      if (perm.indexOf(c) === -1) b.disabled = true;
+      b.onclick = function () { E.clase = (E.clase === c ? '' : c); pintarClases(); pintarResultados(); };
+      $('clases').appendChild(b);
+    });
+    var a = $('admite');
+    if (E.tipo) { a.textContent = E.tipo.nombre + ' admite: ' + E.tipo.clases.join(' · ') + '.'; a.classList.remove('oculto'); }
+    else a.classList.add('oculto');
+  }
+  function pintarResultados() {
+    var caja = $('resultados'); caja.innerHTML = '';
+    if (E.tercero) return;
+    var q = $('buscar').value.trim().toLowerCase();
+    if (q.length < 2) return;
+    var perm = clasesPermitidas();
+    var lista = PERSONAS.filter(function (p) {
+      return p.nombre.toLowerCase().indexOf(q) !== -1 && perm.indexOf(p.clase) !== -1 && (!E.clase || p.clase === E.clase);
+    });
+    if (!lista.length) { caja.innerHTML = '<p class="nota">Nadie con esas letras en las clases elegidas.</p>'; return; }
+    lista.forEach(function (p) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'resultado';
+      b.innerHTML = '<b></b> <span class="chip"></span><div class="nota" style="margin:2px 0 0"></div>';
+      b.querySelector('b').textContent = p.nombre + (p.id ? ' ' + p.id : '');
+      b.querySelector('.chip').textContent = p.clase.toUpperCase();
+      b.querySelector('.nota').textContent = p.detalle;
+      b.onclick = function () { E.tercero = p; $('buscar').value = ''; pintarTodo(); };
+      caja.appendChild(b);
+    });
+  }
+  function pintarElegido() {
+    var c = $('elegido');
+    if (!E.tercero) { c.classList.add('oculto'); c.innerHTML = ''; return; }
+    c.classList.remove('oculto'); c.innerHTML = '<span></span><button type="button" class="boton">Cambiar</button>';
+    c.querySelector('span').textContent = E.tercero.nombre + (E.tercero.id ? ' ' + E.tercero.id : '');
+    c.querySelector('button').onclick = function () { E.tercero = null; pintarTodo(); $('buscar').focus(); };
+  }
+  function pintarTipos() {
+    var caja = $('tipos'); caja.innerHTML = '';
+    var q = $('buscar-tipo').value.trim().toLowerCase();
+    var ultimo = '', fila = null;
+    TIPOS.forEach(function (t) {
+      if (q.length >= 3 && t.nombre.toLowerCase().indexOf(q) === -1) return;
+      if (E.tercero && t.clases.indexOf(E.tercero.clase) === -1) return;
+      if (!fila) { fila = document.createElement('div'); fila.className = 'pastillas'; fila.style.marginTop = '10px'; caja.appendChild(fila); }
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'pastilla' + (E.tipo === t ? ' pulsada' : ''); b.textContent = t.nombre;
+      b.onclick = function () {
+        E.tipo = (E.tipo === t ? null : t);
+        if (E.tipo && E.clase && E.tipo.clases.indexOf(E.clase) === -1) E.clase = '';
+        pintarTodo();
+      };
+      fila.appendChild(b);
+    });
+    if (!caja.children.length) caja.innerHTML = '<p class="nota">Ningún tipo para esta persona con esas letras.</p>';
+  }
+  function pintarDatos() {
+    var bloque = $('bloque-datos'), caja = $('datos');
+    if (!E.tipo || !E.tercero || !E.tipo.pide.length) { bloque.classList.add('oculto'); caja.innerHTML = ''; return; }
+    bloque.classList.remove('oculto');
+    caja.innerHTML = E.tipo.pide.map(function (k) { return '<div>' + CAMPOS[k] + '</div>'; }).join('');
+  }
+  function pintarPie() {
+    var b = $('crear');
+    var falta = !E.tercero && !E.tipo ? 'Falta elegir la persona y el tipo de asunto' : !E.tercero ? 'Falta elegir la persona' : !E.tipo ? 'Falta elegir el tipo de asunto' : '';
+    b.disabled = !!falta; b.textContent = falta || 'Crear el asunto';
+    $('ya-tiene').classList.toggle('oculto', !(E.tercero && E.tipo && E.tercero.id === '2100005' && E.tipo.nombre === 'SANCION'));
+  }
+  function pintarTodo() { pintarClases(); pintarResultados(); pintarElegido(); pintarTipos(); pintarDatos(); pintarPie(); }
+
+  $('buscar').oninput = pintarResultados;
+  $('buscar-tipo').oninput = pintarTipos;
+  $('grupo').onclick = function () { sinCambios('Es para un grupo de personas'); };
+  $('cancelar').onclick = function () { E = { clase: '', tercero: null, tipo: null }; $('buscar').value = ''; $('buscar-tipo').value = ''; pintarTodo(); decir('Cancelado: la pantalla vuelve a estar vacía.'); };
+  $('crear').onclick = function () {
+    decir('Asunto creado: A26-0889 ' + E.tipo.nombre + ' · ' + E.tercero.nombre + '. Se abriría el asunto, como hoy.');
+  };
+  $('ir-al-abierto').onclick = function () { decir('Abriría ese asunto, como hoy.'); };
+  pintarTodo();
+
+})();
+</script>
+</body>
+</html>
