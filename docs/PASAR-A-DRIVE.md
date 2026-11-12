@@ -196,7 +196,7 @@ Dropbox:
 
 ## Fila 458 — El botón «Pasar a Drive»
 
-**Qué hay que hacer.** En Ajustes → Mantenimiento, una sección «Pasar las carpetas a Google Drive»
+**Qué hay que hacer.** En Ajustes → «Este ordenador» → «Carpetas de este ordenador», una sección «Pasar las carpetas a Google Drive»
 con el botón **«Pasar a Drive»**. Solo para el perfil Administración y nunca en «solo consultar».
 
 1. **Antes de empezar:**
@@ -331,3 +331,11 @@ con el botón **«Pasar a Drive»**. Solo para el perfil Administración y nunca
   https://asuntos.fmargon.com. Necesita la 460 hecha. Si el Chromebook no deja entrar con la cuenta
   común (puede que la Junta lo impida en un Chromebook personal), decírselo a Claude: no se ha
   comprobado. En el Chromebook Drive no guarda copia completa: abrir el ARCHIVO puede ir más lento.
+
+## Fila 619 (12-nov-2026): un fichero que no se deja abrir no para la cuenta
+
+Al contar antes de copiar, un fichero que no se deja abrir (o una carpeta que no se deja recorrer) ya no
+corta el traslado. La pantalla de «Vas a copiar N documentos…» añade, en rojo, «No se pueden leer M (no se
+copiarán):» con la carpeta y el nombre de cada uno y el motivo; esos M no entran en N. Con «Empezar» se
+copia lo demás y, al final, esos mismos salen en la lista de lo que falta, con «Reintentar lo que falta»
+(que vuelve a intentar leerlos). No se pasa al cambio mientras falte alguno (regla de la fila 458).
