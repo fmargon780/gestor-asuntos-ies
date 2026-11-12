@@ -105,6 +105,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, tema 487) **En un asunto de grupo, las familias van siempre a Copia oculta** (opción 1).
 - (6-nov-2026, tema 487) La plantilla de correo lleva **su saludo y su firma**; vacíos, salen el de siempre y la firma de Ajustes.
 - (6-nov-2026, tema 487) Las plantillas viejas **se pasan solas**, sin lista de revisión (opción 1). «Comunicar ▾» del hito **pierde las casillas** de destinatarios (opción 1).
+- (12-nov-2026, idea 618) Cuando no llegan correos, el aviso manda **primero a comprobar la carpeta de correos** de ese ordenador y después al script: «El arreglo está hecho y ha funcionado. Ese era el problema» (Drive había cambiado de sitio y la app miraba la carpeta de antes).
 
 ## Registro de Séneca
 
