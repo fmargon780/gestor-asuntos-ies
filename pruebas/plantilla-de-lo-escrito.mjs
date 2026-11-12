@@ -109,6 +109,7 @@ async function recorrido(p, nombreNueva, tipo) {
     /He cambiado estos datos por su campo variable\. Revísalos:/.test(document.getElementById('pl2-cambios').textContent),
     !/El saludo y la firma no van en la plantilla/.test(document.getElementById(p + '-plantilla-editor').textContent)
   ], p), [3, true, true, true]);
+  await pagina.waitForFunction(() => document.getElementById('pl2-previa') && document.getElementById('pl2-previa').textContent !== '', null, { timeout: 10000 });   /* la vista previa se rellena con una promesa: se espera a ella, no a una pausa */
   await comprobar(p + ' · la vista previa lee lo que se había escrito', pagina.locator('#pl2-previa').textContent(), FRASE);
   await pagina.locator('#pl2-cambios .pl2-cambio', { hasText: '{grupo}' }).locator('button').click();
   await comprobar(p + ' · «Deshacer» devuelve el grupo y quita su línea; las otras siguen', pagina.evaluate(() => [

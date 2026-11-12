@@ -83,3 +83,4 @@ Sin nota y sin adjuntos.
   - Solo permiso: sigue igual que hoy (no tocado).
   - `docs/PASAR-A-DRIVE.md` apunta volver a señalar la carpeta de correos en cada ordenador: coincide. No se toca el script ni «Pasar a Drive»: coincide.
   - Lo que hace la app sin que el texto lo pida: nada.
+- Nota de la sesión: `pruebas/plantilla-de-lo-escrito.mjs` fallaba ya en `main` (no es de esta fila): leía la vista previa del cuadro de Séneca antes de que se rellenara (se rellena con una promesa). Arreglada la prueba esperando a esa condición, sin tocar la app.

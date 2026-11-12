@@ -1,1 +1,1 @@
-Última pasada completa: 10-nov-2026 18:30 (Madrid) · 27 min · verde (371 pruebas, 371 bien) · commit de la rama de la fila 584, sobre main de la 592
+Última pasada completa: 12-nov-2026 17:26 (Madrid) · 30 min · verde tras repetir los 28 que fallaron por falta del paquete jsdom en esta sesión (instalado) · commit de la rama de la fila 618, sobre main de la 619
