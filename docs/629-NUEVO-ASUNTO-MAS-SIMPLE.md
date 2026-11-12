@@ -71,4 +71,13 @@ Todo esto es de la pantalla «Nuevo asunto». Manda la pantalla de prueba.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Segundo revisor** (12-nov-2026, ayudante aparte con Playwright en local, sin ver el código): **APROBADA**.
+  - Punto 1 (pantalla vacía, tres recuadros, sin lo retirado): coincide. Diferencias menores con la pantalla de prueba: «Ver todos (N)», línea de resumen del tipo, clase en cada botón de tipo y el texto «¿Falta un tipo?…» (ya estaban en la app y la prueba no los pintaba).
+  - Punto 2 (clases de tercero): coincide. Con un tipo elegido, las clases que no admite se ocultan (la prueba las pinta apagadas; el texto permite ambas). No vio un tipo con varias clases.
+  - Punto 3 (tipo sin datos: no salen y se crea): coincide.
+  - Punto 4 (tipo que los pide: salen a todo el ancho, «Quién lo pide» sin «Fecha», quedan en la ficha): coincide. No llegó a ver los campos propios junto a los datos de siempre (lo cubre `pruebas/nuevo-asunto-mas-simple.mjs`).
+  - Punto 5 (sin pedirlos, se escriben luego en la ficha): coincide. No comprobó que el plazo salga en Inicio.
+  - Punto 6 (plazo de la guía aunque no se pida): coincide.
+  - Punto 7 (aviso «Ya tiene abierto…»): coincide; «Es para un grupo de personas» sigue en su sitio, no lo pulsó.
+  - Punto 8 (colocación igual que la pantalla de prueba) y consola, pantallas y crear/archivar: coincide. Impresos y Cuentas no los abrió.
+  - Lo que la app hace y el texto no pide: nada nuevo. Observó, sin relación con este cambio, que a 600 px «Archivo» se desborda unos 19 px; no comprobó si ya pasaba antes.
