@@ -155,7 +155,10 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     cambiarDePlantilla(a, id, true);
     if ($('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = texto;
   }
-  var cfgPlantilla = { prefijo: 'correo', elegir: elegirPlantilla, dejarElegida: dejarElegida };
+  function recomponerAsunto(a) {
+    if ($('correo-asunto')) $('correo-asunto').value = n().asuntoDelCorreo(a, I.S.plantillaElegida);   /* fila 627 */
+  }
+  var cfgPlantilla = { prefijo: 'correo', elegir: elegirPlantilla, dejarElegida: dejarElegida, recomponerAsunto: recomponerAsunto };
 
   /* ---------- ENVIAR: resumen y confirmación (fila 115) ---------- */
 

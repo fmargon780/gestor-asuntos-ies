@@ -258,7 +258,8 @@ var SenecaCuadro = (function () {
     cambiarDePlantilla(a, id, true);
     if ($('seneca-cuerpo-texto')) $('seneca-cuerpo-texto').value = texto;
   }
-  var cfgPlantilla = { prefijo: 'seneca', elegir: elegirPlantilla, dejarElegida: dejarElegida };
+  function recomponerAsunto(a) { ponerElAsuntoDe(a, plantillaElegida); }   /* fila 627 */
+  var cfgPlantilla = { prefijo: 'seneca', elegir: elegirPlantilla, dejarElegida: dejarElegida, recomponerAsunto: recomponerAsunto };
 
   /* Los dos botones numerados (3.4): cada uno copia siempre lo suyo,
      se pulse en el orden que se pulse. El que toca se destaca; al

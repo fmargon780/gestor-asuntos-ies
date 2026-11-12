@@ -266,6 +266,17 @@ await comprobar('5. el editor de la plantilla dentro del cuadro: «Asunto» deba
     document.querySelector('#pl2-asunto-sale .ae-resultado').textContent]),
   ['Asunto', 'Resolución · {nombre}', PROPIO]);
 await pagina.click('#pl2-cancelar');
+/* Tras guardar cambios en «Cambiar la plantilla», el asunto del cuadro se recompone con la plantilla guardada. */
+for (const [seneca, id, plantilla, editar] of [[false, '#correo-asunto', '#correo-plantilla', '#correo-plantilla-editar'], [true, '#seneca-asunto', '#seneca-plantilla', '#seneca-plantilla-editar']]) {
+  if (seneca) { await cerrar(); await abrir(NUEVO, true); await pagina.selectOption(plantilla, { label: 'Con asunto' }); }
+  await pagina.click(editar);
+  await pagina.waitForSelector('#pl2-asunto');
+  await pagina.fill('#pl2-asunto', 'ASUNTO NUEVO {nombre}');
+  await pagina.click('#pl2-guardar');
+  await pagina.waitForSelector('#pl2-asunto', { state: 'hidden' });
+  await comprobar('5. ' + (seneca ? 'Séneca' : 'correo') + ': tras guardar en «Cambiar la plantilla», el asunto del cuadro es el de la plantilla guardada',
+    pagina.locator(id).inputValue(), 'ASUNTO NUEVO Espejo Montes, Carla · A26-0003');
+}
 await cerrar();
 await comprobar('5. el asunto que pide un informe (`asuntoListo`) manda sobre todo',
   (async () => { await pagina.evaluate((n) => { CorreoNucleo.abrirCuadro(App.E.listaAbiertos.find((x) => x.nombre === n), false, { asuntoListo: 'Informe de la actividad' }); }, NUEVO);

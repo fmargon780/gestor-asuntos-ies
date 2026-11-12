@@ -135,7 +135,11 @@ var PlantillaDeLoEscrito = (function () {
         if (inicial) {
           cfg.dejarElegida(a, guardada.id, escrito);
           U.aviso('Plantilla guardada. Queda elegida en este cuadro.', 'bueno');
-        } else cfg.elegir(a, guardada.id);
+        } else {
+          cfg.elegir(a, guardada.id);
+          /* Fila 627: al guardar los cambios de la plantilla que ya estaba elegida (mismo id), su asunto nuevo también entra en el cuadro. */
+          if (cfg.recomponerAsunto) cfg.recomponerAsunto(a);
+        }
       });
     }, cerrar, inicial);
   }
