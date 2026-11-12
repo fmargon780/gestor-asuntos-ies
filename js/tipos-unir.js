@@ -73,6 +73,7 @@ var TiposUnir = (function () {
   async function moverCamposUnir(viejo, nuevo, r) {
     var g = App.E.gestor;
     var actual = await Campos.leer(g);
+    App.E.campos = await Campos.moverDatosAlCrear(g, viejo, nuevo);   /* fila 629: lo que pedía al crear */
     var origen = (actual.porTipo || {})[viejo] || [];
     if (!origen.length) return;
     var destino = (actual.porTipo || {})[nuevo] || [];

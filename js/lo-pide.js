@@ -179,7 +179,9 @@ var LoPide = (function () {
     }
     var esOtro = inicial === 'otro';
 
+    /* Fila 629: cada parte va en su envoltorio (`lopide-parte-*`), para que «Nuevo asunto» pueda enseñar «Quién lo pide» y «Por qué vía» por separado y sin la fecha. */
     caja.innerHTML =
+      '<div class="lopide-parte-quien">' +
       '<label class="etiqueta">Quién lo pide</label>' +
       '<select class="campo lopide-quien">' +
         '<option value="">— sin apuntar —</option>' +
@@ -196,6 +198,8 @@ var LoPide = (function () {
         '<label class="etiqueta">Correo, si lo tienes</label>' +
         '<input class="campo lopide-otro-correo" value="' + U.escapar(esOtro ? (v.correo || '') : '') + '">' +
       '</div>' +
+      '</div>' +
+      '<div class="lopide-parte-via">' +
       '<label class="etiqueta">Por qué vía</label>' +
       '<select class="campo lopide-via"><option value="">Sin indicar</option>' +
         Nombres.VIAS.map(function (via) {
@@ -205,8 +209,11 @@ var LoPide = (function () {
       '</select>' +
       '<input class="campo lopide-via-dato" value="' + U.escapar(via0.viaDato || '') + '" ' +
       'placeholder="Teléfono, correo o aclaración (opcional)">' +
+      '</div>' +
+      '<div class="lopide-parte-fecha">' +
       '<label class="etiqueta">Fecha</label>' +
-      '<input type="date" class="campo lopide-fecha" value="' + U.escapar((v && v.fecha) || U.hoyIso()) + '">';
+      '<input type="date" class="campo lopide-fecha" value="' + U.escapar((v && v.fecha) || U.hoyIso()) + '">' +
+      '</div>';
 
     var selQuien = caja.querySelector('.lopide-quien');
     var cajaOtro = caja.querySelector('.lopide-otro');

@@ -189,6 +189,7 @@
     'js/contacto-a-la-vista.js',
     'js/asuntos-nuevo.js',
     'js/asuntos-nuevo-campos.js',
+    'js/asuntos-nuevo-datos-fijos.js',   // fila 629: los cinco datos de siempre, solo en los tipos que los piden
     'js/asuntos-nuevo-crear.js',
     'js/asuntos-nuevo-alta.js',
     // Fila 489: el cuadro de los datos de un tercero (Apellidos y Nombre), App.cuadroDeTercero. Solo se usa al ejecutarse.

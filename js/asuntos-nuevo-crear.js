@@ -83,6 +83,7 @@ App.refrescarVista = function () {
   if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) {
     $('vista-nombre').textContent = '';
     $('vista-ruta').textContent = '';
+    $('vista-ruta').classList.add('oculto');
     $('btn-crear').disabled = true;
     /* Fila 215: el botón está siempre a la vista; en gris, dice qué falta. */
     $('btn-crear').textContent = !App.E.nuevo.tercero && !App.E.nuevo.tipo
@@ -96,6 +97,7 @@ App.refrescarVista = function () {
     $('vista-nombre').textContent = App.E.nuevo.fallaNumero ? '' : 'Calculando el número del asunto…';
     $('vista-ruta').textContent = App.E.nuevo.fallaNumero
       ? 'No he podido calcular el número del asunto: ' + App.E.nuevo.fallaNumero : '';
+    $('vista-ruta').classList.toggle('oculto', !App.E.nuevo.fallaNumero);   /* fila 629: «Se creará esta carpeta» ya no se enseña, pero este fallo sí se dice */
     $('btn-crear').disabled = true;
     Nombres.avisoRecorte($('vista-nombre'), false, false);
     if (!App.E.nuevo.fallaNumero) App.pedirNumeroNuevo();
@@ -105,6 +107,7 @@ App.refrescarVista = function () {
   var nombre = ajustado.nombre;
   $('vista-nombre').textContent = nombre;
   Nombres.avisoRecorte($('vista-nombre'), ajustado.recortado, ajustado.noCabe, 'nuevo');   /* filas 130, 177 y 263 */
+  $('vista-ruta').classList.add('oculto');
   $('vista-ruta').textContent = 'En ' + App.E.abiertos.name +
     '. Al cerrarlo irá a ' + App.E.archivo.name + ' / ' + App.E.nuevo.categoria + ' / ' + d.tercero;
   /* Fila 263: una ruta larga avisa en ámbar, pero no impide crear. */
@@ -267,8 +270,8 @@ App.crearAsuntoDelFormulario = async function () {
     App.limiteNuevoAuto = '';
     App.loPideNuevoControles = null;
     $('lopide-caja-nuevo').innerHTML = '';
-    $('bloque-campos').classList.add('oculto');
     $('campos-lista-nuevo').innerHTML = '';
+    App.pintarDatosFijosNuevo();   /* fila 629 */
     /* Fila 215: bloque-detalles ya no se esconde entre un asunto y el
        siguiente (el botón "Crear" tiene que seguir a la vista); lo
        deja como corresponde el propio App.refrescarVista de más abajo. */

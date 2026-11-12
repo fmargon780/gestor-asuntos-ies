@@ -1,13 +1,5 @@
 /* Quién encarga cada tipo (fila 134, js/tipos-organo.js). */
 
-/* Nuevo asunto: el rótulo de cada grupo ocupa su propia línea de la parrilla. */
-.tipos-grupo-organo {
-  flex-basis: 100%;
-  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
-  color: var(--tinta-suave); margin-top: 6px;
-}
-.tipos-grupo-organo:first-child { margin-top: 0; }
-
 /* La pantalla de un tipo: el desplegable, junto a la categoría. */
 .tipo-organo-fila .tipo-organo { max-width: 260px; }
 

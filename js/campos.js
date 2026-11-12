@@ -103,6 +103,9 @@ var Campos = (function () {
   function guardarPropios() { return I.guardarPropios.apply(this, arguments); }
   function guardarCalculados() { return I.guardarCalculados.apply(this, arguments); }
   function guardarConfigDeTipo() { return I.guardarConfigDeTipo.apply(this, arguments); }
+  function guardarDatosAlCrear() { return I.guardarDatosAlCrear.apply(this, arguments); }
+  function datosAlCrearDe() { return I.datosAlCrearDe.apply(this, arguments); }
+  function moverDatosAlCrear() { return I.moverDatosAlCrear.apply(this, arguments); }
   function guardarCamposDeDocumento() { return I.guardarCamposDeDocumento.apply(this, arguments); }
   function camposDeDocumento() { return I.camposDeDocumento.apply(this, arguments); }
   function guardarTextoPorDefectoDeDocumento() { return I.guardarTextoPorDefectoDeDocumento.apply(this, arguments); }
@@ -190,6 +193,8 @@ var Campos = (function () {
     normalizar: normalizar, leer: leer,
     guardarPropios: guardarPropios, guardarCalculados: guardarCalculados,
     guardarConfigDeTipo: guardarConfigDeTipo,
+    guardarDatosAlCrear: guardarDatosAlCrear, datosAlCrearDe: datosAlCrearDe, moverDatosAlCrear: moverDatosAlCrear,
+    DATOS_AL_CREAR: I.DATOS_AL_CREAR,
     guardarCamposDeDocumento: guardarCamposDeDocumento, camposDeDocumento: camposDeDocumento,
     guardarTextoPorDefectoDeDocumento: guardarTextoPorDefectoDeDocumento,
     textoPorDefectoDeDocumento: textoPorDefectoDeDocumento,

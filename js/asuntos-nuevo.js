@@ -106,9 +106,9 @@ App.prepararNuevo = function () {
   ['bloque-tercero', 'bloque-tipos', 'bloque-detalles'].forEach(function (id) {
     $(id).classList.remove('oculto');
   });
-  $('bloque-campos').classList.add('oculto');
   $('campos-lista-nuevo').innerHTML = '';
   $('lopide-caja-nuevo').innerHTML = '';
+  App.pintarDatosFijosNuevo();   /* fila 629: sin tipo ni tercero, el recuadro «Datos del asunto» no sale */
   /* El resumen de la guía (js/guias-enganche.js) se engancha por el
      clic de verdad sobre un botón de tipo (delegado en #tipos-lista):
      al repintar la parrilla desde aquí, sin ningún tipo elegido, no
@@ -166,12 +166,11 @@ App.pintarCategorias = function () {
     var b = document.createElement('button');
     b.className = 'categoria-boton' + (App.E.nuevo.categoria === cat ? ' elegido' : '');
     b.setAttribute('data-categoria', cat);
-    b.innerHTML = U.escapar(cat) +
-      '<small>' + U.escapar(App.DESCRIPCION_CATEGORIA[cat]) + ' · ' + cuantos + ' tipos</small>';
+    b.textContent = cat;
+    b.title = App.DESCRIPCION_CATEGORIA[cat] + ' · ' + cuantos + ' tipos';   /* fila 629: botones pequeños; la descripción queda al pasar el ratón */
     b.onclick = function () { App.pulsarCategoriaNuevo(cat); };
     caja.appendChild(b);
   });
-  if (window.NuevoUnidad) NuevoUnidad.actualizar();   /* fila 501: el desplegable «Unidad» */
 };
 
 /* Fila 493: la clase que deja puesta un tipo recién elegido. Con persona elegida, la de la persona; con un
@@ -311,8 +310,8 @@ App.elegirTipo = function (t) {
   App.pintarTipos();
   App.loPideNuevoControles = null;
   App.E.nuevo.configCampos = [];
-  $('bloque-campos').classList.add('oculto');
   $('campos-lista-nuevo').innerHTML = '';
+  App.pintarDatosFijosNuevo();   /* fila 629 */
   App.actualizarLimiteNuevo();
   if (terceroActual) {
     App.fijarTercero(terceroActual);
@@ -402,26 +401,17 @@ $('buscar-tercero').oninput = function () {
 App.buscarTercero = async function () {
   var texto = $('buscar-tercero').value;
   var caja = $('resultados-tercero');
-  var unidad = window.NuevoUnidad ? NuevoUnidad.unidad() : '';   /* fila 501 */
-  if (U.normalizar(texto).length < 2 && !unidad) { caja.innerHTML = ''; return; }
+  if (U.normalizar(texto).length < 2) { caja.innerHTML = ''; return; }
   caja.innerHTML = '<div class="explica">Buscando…</div>';
 
   var filtro = App.E.nuevo.categoria;
   /* Fila 493: sin pastilla pulsada, se busca en las clases que admite el tipo elegido (todas si no hay tipo). */
-  var categorias = unidad ? ['ALUMNADO'] : (filtro ? [filtro] : App.clasesPermitidasNuevo());
-  var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8, unidad);
+  var categorias = filtro ? [filtro] : App.clasesPermitidasNuevo();
+  var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8);
   caja.innerHTML = '';
 
   var total = 0;
   porCategoria.forEach(function (p) { total += p.resultados.length; });
-
-  if (!total && unidad) {
-    var sinNadie = document.createElement('div');
-    sinNadie.className = 'vacio';
-    sinNadie.textContent = 'Nadie coincide en ' + unidad + '.';
-    caja.appendChild(sinNadie);
-    return;
-  }
 
   if (!total && filtro && await App.avisoPersonaEnOtraLista(texto, caja, App.buscarTercero)) return;   /* fila 386 */
 

@@ -238,8 +238,10 @@ async function construirSeccionCampos(tipo) {
       '<div id="campos-puestos" class="lista"></div>' +
       '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
       '<button type="button" class="boton" id="campos-btn-anadir">+ Añadir campo</button>' +
-      '</div>';
+      '</div>' +
+      '<div id="datos-al-crear" class="datos-al-crear"></div>';
     pintarPuestos();
+    pintarDatosAlCrear();
     $('campos-btn-anadir').onclick = abrirCatalogo;
   }
 
@@ -323,6 +325,48 @@ async function construirSeccionCampos(tipo) {
 
       cont.appendChild(envoltorio);
     });
+  }
+
+  /* Fila 629: los cinco datos de siempre del asunto, que ahora pide al crear solo el tipo que lo marque
+     (por defecto, ninguno). Se guardan solos, en `campos.json` → `datosAlCrear`. */
+  var NOMBRES_AL_CREAR = { curso: 'Año académico', descripcion: 'Descripción corta', limite: 'Fecha límite',
+    lopide: 'Quién lo pide', via: 'Por qué vía' };
+
+  function pintarDatosAlCrear() {
+    var cont = $('datos-al-crear');
+    if (!cont) return;
+    var puestos = Campos.datosAlCrearDe(App.E.campos, tipo.tipo);
+    cont.innerHTML = '<div class="suave" style="margin-top:14px">Datos de siempre que pide al crear el asunto (si no se marca, se pueden escribir después en su ficha):</div>';
+    var fila = document.createElement('div');
+    fila.className = 'datos-al-crear-filas';
+    Campos.DATOS_AL_CREAR.forEach(function (clave) {
+      var et = document.createElement('label');
+      et.className = 'interruptor interruptor-fila';
+      var c = document.createElement('input');
+      c.type = 'checkbox';
+      c.setAttribute('data-dato-al-crear', clave);
+      c.checked = puestos.indexOf(clave) !== -1;
+      c.onchange = function () { guardarDatosAlCrear(); };
+      var t = document.createElement('span');
+      t.textContent = NOMBRES_AL_CREAR[clave];
+      et.appendChild(c);
+      et.appendChild(t);
+      fila.appendChild(et);
+    });
+    cont.appendChild(fila);
+  }
+
+  async function guardarDatosAlCrear() {
+    var claves = Array.prototype.map.call(cuerpo.querySelectorAll('input[data-dato-al-crear]:checked'),
+      function (c) { return c.getAttribute('data-dato-al-crear'); });
+    try {
+      App.E.campos = await App.enFila('campos.json', function () {
+        return Campos.guardarDatosAlCrear(App.E.gestor, tipo.tipo, claves);
+      });
+      U.aviso('Datos que pide ' + tipo.tipo + ' al crear: guardados.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardarlos: ' + U.mensajeDeError(e), 'malo');
+    }
   }
 
   function mover(i, salto) {

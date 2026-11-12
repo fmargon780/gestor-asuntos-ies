@@ -99,6 +99,24 @@ var CamposNucleo = CamposNucleo || {};
       .filter(function (c) { return c.nombre; });
   }
 
+  /* Fila 629 (docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md): los cinco datos de siempre del asunto
+     (año académico, descripción corta, fecha límite, quién lo pide, por qué vía) que cada tipo
+     pide al crear. `datosAlCrear[tipo]` = lista de esas claves; un tipo sin entrada no pide ninguno. */
+  var DATOS_AL_CREAR = ['curso', 'descripcion', 'limite', 'lopide', 'via'];
+
+  function normalizarDatosAlCrear(origen) {
+    var salida = {};
+    var mapa = (origen && typeof origen === 'object') ? origen : {};
+    Object.keys(mapa).forEach(function (tipo) {
+      var claves = (Array.isArray(mapa[tipo]) ? mapa[tipo] : []).filter(function (k, i, todas) {
+        return DATOS_AL_CREAR.indexOf(k) !== -1 && todas.indexOf(k) === i;
+      });
+      claves.sort(function (a, b) { return DATOS_AL_CREAR.indexOf(a) - DATOS_AL_CREAR.indexOf(b); });
+      if (claves.length) salida[tipo] = claves;
+    });
+    return salida;
+  }
+
   function normalizar(leido) {
     var c = leido || {};
     var propios = (Array.isArray(c.propios) ? c.propios : [])
@@ -117,6 +135,10 @@ var CamposNucleo = CamposNucleo || {};
     });
 
     var salida = { propios: propios, calculados: calculados, porTipo: porTipo };
+
+    /* Solo si hay alguno, para no cambiar la forma del fichero de nadie que no lo use. */
+    var datosAlCrear = normalizarDatosAlCrear(c.datosAlCrear);
+    if (Object.keys(datosAlCrear).length) salida.datosAlCrear = datosAlCrear;
 
     /* Fila 96: solo si hay alguno, para no cambiar la forma del
        fichero de nadie que no lo use. */
@@ -160,5 +182,7 @@ var CamposNucleo = CamposNucleo || {};
   I.normalizarCampoDeTipo = normalizarCampoDeTipo;
   I.normalizarListaDeDocumento = normalizarListaDeDocumento;
   I.normalizar = normalizar;
+  I.DATOS_AL_CREAR = DATOS_AL_CREAR;
+  I.normalizarDatosAlCrear = normalizarDatosAlCrear;
   I.RECETA_CURSO_DE_FABRICA = RECETA_CURSO_DE_FABRICA;
 })();

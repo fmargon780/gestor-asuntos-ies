@@ -260,7 +260,6 @@
     'js/candidaturas-lista.js',
     'js/candidaturas-papeletas.js',   // fila 571
     'js/actividades-tabla.js',   // fila 311: la tabla de datos y el tipo del certificado
-    'js/nuevo-unidad.js',   // fila 501: el desplegable «Unidad» de Nuevo asunto
     'js/libros-hecho.js',   // fila 501: los libros por nivel y su cruce con la matrícula
     'js/libros-ficha.js',   // fila 501: la ficha de entrega de libros
     'js/informar-al-tutor.js',   // fila 299: «Informar al tutor/a» en la guía de las sanciones

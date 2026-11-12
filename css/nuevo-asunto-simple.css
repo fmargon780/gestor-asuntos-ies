@@ -1,0 +1,43 @@
+/* ============================================================
+   nuevo-asunto-simple.css — «Nuevo asunto» más simple (fila 629,
+   docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md; pantalla de prueba
+   docs/pantallas/602.html): una fila de tres recuadros (fecha de
+   inicio, tipo, tercero) con el título sombreado, y «Datos del asunto»
+   a todo el ancho debajo.
+   ============================================================ */
+
+.cabecera-nuevo { justify-content: flex-end; }
+.cabecera-nuevo:empty { display: none; }
+
+.nuevo-tres-recuadros {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; margin-bottom: 14px;
+}
+@media (max-width: 900px) { .nuevo-tres-recuadros { grid-template-columns: 1fr; } }
+
+.recuadro-nuevo {
+  border: 1px solid var(--linea); border-radius: 9px; overflow: hidden; background: var(--papel);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+.recuadro-titulo { display: block; background: #e9eff6; border-bottom: 1px solid var(--linea); padding: 8px 12px; font-weight: 700; }
+.recuadro-cuerpo { padding: 12px; }
+.recuadro-fecha .campo { width: auto; }
+
+/* «Datos del asunto»: los cinco datos de siempre que el tipo pida y los campos propios del tipo, en tres columnas. */
+#bloque-campos { margin-bottom: 14px; }
+#bloque-campos .recuadro-cuerpo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 14px; }
+#bloque-campos .campos-lista { display: contents; }
+#bloque-campos .campo-fila { display: block; padding: 0; border: 0; background: none; }
+#bloque-campos .campo-fila > .etiqueta { display: block; margin: 0 0 5px; font-weight: 600; }
+#bloque-campos .campo-fila > .campo { width: 100%; }
+#bloque-campos .campo-fila.oculto { display: none; }
+@media (max-width: 900px) { #bloque-campos .recuadro-cuerpo { grid-template-columns: 1fr; } }
+
+/* «Quién lo pide» y «Por qué vía» salen cada uno donde su tipo lo pida; la fecha no sale nunca (es la de inicio). */
+#lopide-caja-nuevo .lopide-parte-fecha { display: none; }
+#lopide-caja-nuevo.sin-quien .lopide-parte-quien { display: none; }
+#lopide-caja-nuevo.sin-via .lopide-parte-via { display: none; }
+#lopide-caja-nuevo .etiqueta { margin-top: 0; }
+
+/* Ya no se enseña «Se creará esta carpeta»; quedan solo sus avisos (carpeta larga, número que no llega). */
+.vista-previa-nuevo { background: none; border: 0; padding: 0; margin: 0 0 8px; }
+.vista-previa-nuevo:empty { display: none; }

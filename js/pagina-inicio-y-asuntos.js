@@ -229,72 +229,80 @@ document.write(`<div id="aplicacion" class="oculto">
     </section>
 
     <section id="pantalla-nuevo" class="pantalla oculto">
-      <header class="cabecera"><h2>Nuevo asunto</h2></header>
+      <!-- Fila 629 (docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md): sin el título «Nuevo asunto» (el nombre ya está en el menú); la cabecera queda solo para el «Cancelar» de js/usabilidad.js. -->
+      <header class="cabecera cabecera-nuevo"></header>
 
       <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
 
       <div class="formulario">
-        <div class="nuevo-dos-bloques">
-          <div id="bloque-tercero">
-            <label class="etiqueta" id="etiqueta-tercero">Tercero</label>
-            <p class="nota oculto" id="categorias-admite"></p>   <!-- fila 493: «TIPO admite: Otros · Administraciones.» -->
-            <div class="categorias" id="categorias-lista"></div>
-            <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
-            <button type="button" class="enlace" id="btn-grupo-nuevo">Es para un grupo de personas</button>   <!-- fila 293: js/asunto-de-grupo.js -->
-            <div id="actividad-nuevo-caja" class="oculto"></div>   <!-- fila 306: js/actividades-formulario.js -->
-            <div id="resultados-tercero" class="resultados"></div>
-            <div id="tercero-elegido" class="elegido oculto"></div>
+        <!-- Fila 629: fijos solo la fecha de inicio, el tipo y el tercero, en una fila de tres recuadros. -->
+        <div class="nuevo-tres-recuadros">
+          <div id="bloque-fecha" class="recuadro-nuevo recuadro-fecha">
+            <label class="recuadro-titulo" for="campo-fecha">Fecha de inicio</label>
+            <div class="recuadro-cuerpo"><input id="campo-fecha" type="date" class="campo"></div>
           </div>
 
-          <div id="bloque-tipos">
-            <label class="etiqueta">Qué tipo de asunto</label>
-            <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
-            <button type="button" id="guia-resumen-nuevo" class="guia-resumen oculto"></button>
-            <div id="guia-nuevo" class="oculto"></div>
-            <div id="tipo-linea-nuevo" class="oculto"></div>   <!-- fila 257: js/tipo-en-linea.js -->
-            <div class="tipos" id="tipos-lista"></div>
-            <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
-               <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
-               para completar su guía, sus campos y sus plantillas.</p>
+          <div id="bloque-tipos" class="recuadro-nuevo">
+            <div class="recuadro-titulo">Qué tipo de asunto</div>
+            <div class="recuadro-cuerpo">
+              <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
+              <button type="button" id="guia-resumen-nuevo" class="guia-resumen oculto"></button>
+              <div id="guia-nuevo" class="oculto"></div>
+              <div id="tipo-linea-nuevo" class="oculto"></div>   <!-- fila 257: js/tipo-en-linea.js -->
+              <div class="tipos" id="tipos-lista"></div>
+              <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
+                 <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
+                 para completar su guía, sus campos y sus plantillas.</p>
+            </div>
+          </div>
+
+          <div id="bloque-tercero" class="recuadro-nuevo">
+            <div class="recuadro-titulo" id="etiqueta-tercero">Tercero</div>
+            <div class="recuadro-cuerpo">
+              <p class="nota oculto" id="categorias-admite"></p>   <!-- fila 493: «TIPO admite: Otros · Administraciones.» -->
+              <div class="categorias" id="categorias-lista"></div>
+              <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
+              <button type="button" class="enlace" id="btn-grupo-nuevo">Es para un grupo de personas</button>   <!-- fila 293: js/asunto-de-grupo.js -->
+              <div id="actividad-nuevo-caja" class="oculto"></div>   <!-- fila 306: js/actividades-formulario.js -->
+              <div id="resultados-tercero" class="resultados"></div>
+              <div id="tercero-elegido" class="elegido oculto"></div>
+            </div>
           </div>
         </div>
 
         <div id="bloque-detalles">
-          <div class="dos-columnas">
-            <div>
-              <label class="etiqueta">Fecha de inicio</label>
-              <input id="campo-fecha" type="date" class="campo">
+          <!-- Fila 629: «Datos del asunto», a todo el ancho. Solo sale con tipo y tercero elegidos y si el tipo pide algo.
+               Los cinco datos de siempre (año académico, descripción corta, fecha límite, quién lo pide, por qué vía)
+               se enseñan solo en los tipos que los pidan al crear (js/asuntos-nuevo-datos-fijos.js); si no se enseñan,
+               se guardan igualmente con lo que valgan por sí solos (el curso en marcha, el plazo de la guía). -->
+          <div id="bloque-campos" class="recuadro-nuevo oculto">
+            <div class="recuadro-titulo">Datos del asunto</div>
+            <div class="recuadro-cuerpo">
+              <div id="datos-fijos-nuevo" class="campos-lista datos-fijos-nuevo">
+                <div class="campo-fila oculto" id="dato-nuevo-curso">
+                  <label class="etiqueta" for="campo-curso">Año académico</label>
+                  <input id="campo-curso" class="campo" placeholder="26-27">
+                </div>
+                <div class="campo-fila oculto" id="dato-nuevo-descripcion">
+                  <label class="etiqueta" for="campo-descripcion">Descripción corta</label>
+                  <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
+                </div>
+                <div class="campo-fila oculto" id="dato-nuevo-limite">
+                  <label class="etiqueta" for="campo-limite">Fecha límite</label>
+                  <input id="campo-limite" type="date" class="campo">
+                  <p id="nota-limite" class="nota oculto"></p>
+                </div>
+                <div class="campo-fila oculto" id="grupo-lopide">
+                  <div id="lopide-caja-nuevo" class="lopide-nuevo"></div>
+                </div>
+              </div>
+              <div id="campos-lista-nuevo" class="campos-lista"></div>
             </div>
-            <div>
-              <label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>
-              <input id="campo-curso" class="campo" placeholder="26-27">
-            </div>
           </div>
 
-          <div id="bloque-campos" class="oculto">
-            <label class="etiqueta">Datos del asunto</label>
-            <div id="campos-lista-nuevo" class="campos-lista"></div>
-          </div>
-
-          <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
-          <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
-
-          <label class="etiqueta">Fecha límite <span class="suave">(opcional)</span></label>
-          <input id="campo-limite" type="date" class="campo">
-          <p id="nota-limite" class="nota oculto"></p>
-
-          <p class="nota">El estado y la fecha límite no salen en el nombre de la carpeta.
-             Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
-
-          <div id="grupo-lopide">
-            <label class="etiqueta">Quién lo pide y por qué vía <span class="suave">(opcional)</span></label>
-            <div id="lopide-caja-nuevo"></div>
-          </div>
-
-          <div class="vista-previa">
-            <div class="vista-rotulo">Se creará esta carpeta</div>
-            <div id="vista-nombre" class="vista-nombre"></div>
-            <div id="vista-ruta" class="vista-ruta"></div>
+          <div class="vista-previa vista-previa-nuevo">
+            <div id="vista-nombre" class="vista-nombre oculto"></div>
+            <div id="vista-ruta" class="vista-ruta oculto"></div>
           </div>
 
           <button id="btn-crear" class="boton boton-principal boton-ancho">Crear el asunto</button>

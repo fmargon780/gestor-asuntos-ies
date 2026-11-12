@@ -336,12 +336,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
    identificación escolar (js/copiar.js) al final de la línea, y con
    las dos columnas iguales ese botón puede quedar justo en el centro
    de la tarjeta, el punto donde cae un clic sin más precisión. */
-.nuevo-dos-bloques {
-  display: grid; grid-template-columns: 3fr 2fr; gap: 18px; align-items: start; margin-bottom: 18px;
-}
-@media (max-width: 900px) {
-  .nuevo-dos-bloques { grid-template-columns: 1fr; }
-}
+/* (Fila 629: ahora son tres recuadros, en css/nuevo-asunto-simple.css.) */
 
 /* El resumen de la guía, en una línea, encima de la parrilla de tipos:
    pulsable, despliega la guía entera (#guia-nuevo) debajo. */
@@ -379,16 +374,15 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   color: var(--tinta-suave); margin-left: 8px;
 }
 
-.categorias { display: flex; flex-wrap: wrap; gap: 10px; }
+/* Fila 629: las clases de tercero, una fila de botones pequeños (antes, tarjetas grandes con su descripción). */
+.categorias { display: flex; flex-wrap: wrap; gap: 6px; }
 .categoria-boton {
-  font: inherit; font-size: 15px; font-weight: 600;
-  background: var(--papel); border: 1px solid var(--linea); border-radius: 10px;
-  padding: 18px 26px; cursor: pointer; min-width: 150px; text-align: left;
+  font: inherit; font-size: 14px;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 999px;
+  padding: 5px 13px; cursor: pointer; text-align: left;
 }
-.categoria-boton small { display: block; font-weight: 400; font-size: 12px; color: var(--tinta-suave); margin-top: 3px; }
 .categoria-boton:hover { border-color: var(--azul); }
 .categoria-boton.elegido { background: var(--azul); border-color: var(--azul); color: #fff; }
-.categoria-boton.elegido small { color: #cfe0ee; }
 
 .enlace {
   font: inherit; font-size: inherit; background: none; border: 0; padding: 0;

@@ -89,6 +89,40 @@ var CamposNucleo = CamposNucleo || {};
     return actual;
   }
 
+  /* Fila 629: qué datos de siempre pide al crear UN tipo (`datosAlCrear`). Relee antes de escribir y solo
+     toca su trozo. Como `guardarConfigDeTipo`, quien lo llame seguido se pone en la cola de `campos.json`. */
+  async function guardarDatosAlCrear(gestor, claveTipo, claves) {
+    var actual = await leer(gestor);
+    var mapa = Object.assign({}, actual.datosAlCrear || {});
+    mapa[claveTipo] = claves || [];
+    mapa = I.normalizarDatosAlCrear(mapa);
+    if (Object.keys(mapa).length) actual.datosAlCrear = mapa;
+    else delete actual.datosAlCrear;
+    await Copias.guardar(gestor, FICHERO, actual);
+    return actual;
+  }
+
+  /* Los datos que pide al crear un tipo: lista de claves, vacía si no pide ninguno. PURA. */
+  function datosAlCrearDe(config, tipo) {
+    return ((config && config.datosAlCrear) || {})[tipo] || [];
+  }
+
+  /* Un tipo cambia de nombre o se une a otro: lo que pedía al crear pasa al nuevo (se suman, sin repetir). */
+  async function moverDatosAlCrear(gestor, viejo, nuevo) {
+    var actual = await leer(gestor);
+    var origen = (actual.datosAlCrear || {})[viejo] || [];
+    if (!origen.length) return actual;
+    var suma = ((actual.datosAlCrear || {})[nuevo] || []).concat(origen);
+    var mapa = Object.assign({}, actual.datosAlCrear);
+    delete mapa[viejo];
+    mapa[nuevo] = suma;
+    mapa = I.normalizarDatosAlCrear(mapa);
+    if (Object.keys(mapa).length) actual.datosAlCrear = mapa;
+    else delete actual.datosAlCrear;
+    await Copias.guardar(gestor, FICHERO, actual);
+    return actual;
+  }
+
   /* Los campos de UN tipo de documento (fila 96). Relee antes de
      escribir y solo toca su trozo, como guardarConfigDeTipo. */
   async function guardarCamposDeDocumento(gestor, tipoDoc, listaCampos) {
@@ -172,6 +206,9 @@ var CamposNucleo = CamposNucleo || {};
   I.guardarPropios = guardarPropios;
   I.guardarCalculados = guardarCalculados;
   I.guardarConfigDeTipo = guardarConfigDeTipo;
+  I.guardarDatosAlCrear = guardarDatosAlCrear;
+  I.datosAlCrearDe = datosAlCrearDe;
+  I.moverDatosAlCrear = moverDatosAlCrear;
   I.guardarCamposDeDocumento = guardarCamposDeDocumento;
   I.camposDeDocumento = camposDeDocumento;
   I.guardarTextoPorDefectoDeDocumento = guardarTextoPorDefectoDeDocumento;

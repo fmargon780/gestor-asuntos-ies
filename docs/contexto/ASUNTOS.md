@@ -870,3 +870,12 @@ membrete, solo nombres, firma de la Presidencia de la Junta Electoral (cargo en 
 3·4·6·1 con menos; la casilla de la AMPA baja madres y padres en uno) y papeletas a sacar; un PDF por sector (tipo PAPELETAS, guardado con
 `CandidaturasLista.guardarPdf`), solo admitidas, 10 por hoja hasta 8 admitidas y 8 con más. «Es de la AMPA» en el ⋮ de madres y padres guarda `ampa`
 en la candidatura. Prueba: `pruebas/candidaturas-papeletas.mjs`.
+
+**«Nuevo asunto» más simple** (12-nov-2026, fila 629, `docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md`): fijos solo la fecha de inicio, el tipo y el tercero, en una fila de tres
+recuadros (`.nuevo-tres-recuadros`, `css/nuevo-asunto-simple.css`); sin título, sin rótulos de departamento (`TiposOrgano.agruparParrilla` retirada), sin el desplegable
+de unidad (`js/nuevo-unidad.js` borrado) y sin «Se creará esta carpeta» (`#vista-nombre` sigue en el DOM, oculto; los avisos de carpeta larga y de número que no llega sí se ven).
+Año académico, descripción corta, fecha límite, quién lo pide y por qué vía: `campos.json` → `datosAlCrear[tipo]` (`Campos.datosAlCrearDe`, `Campos.guardarDatosAlCrear`,
+`Campos.moverDatosAlCrear` al renombrar o unir tipos; se marcan en Ajustes → el tipo → Campos). `js/asuntos-nuevo-datos-fijos.js` (`App.pintarDatosFijosNuevo`) enseña en «Datos del
+asunto» solo los que pide el tipo; los controles de siempre (`#campo-curso`, `#campo-descripcion`, `#campo-limite`, `#lopide-caja-nuevo`) siguen en el DOM y se leen igual al crear, así que
+lo que valgan solos (curso en marcha, plazo de la guía, lo que traiga `App.nuevoAsuntoCon`) se guarda aunque no se vea. `LoPide.controles` lleva sus partes en `.lopide-parte-quien/via/fecha`
+(la fecha no se enseña en «Nuevo asunto»). En la lista de campos (`CamposLista`) esos cinco huecos llevan `pideAlCrear` y `dondeDetalle`. Prueba: `pruebas/nuevo-asunto-mas-simple.mjs`.

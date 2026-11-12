@@ -62,20 +62,13 @@ App.botonesAlta = function (texto) {
    por categoría. En ALUMNADO, matriculados y solicitantes antes que
    los antiguos, el mismo criterio que ya usa Personas
    (js/personas-familias.js, PersonasFamilias.pintar). */
-App.buscarEnCategorias = async function (texto, categorias, topePorCategoria, unidad) {
+App.buscarEnCategorias = async function (texto, categorias, topePorCategoria) {
   var salida = [];
   for (var i = 0; i < categorias.length; i++) {
     var categoria = categorias[i];
     try {
       var fuente = await Datos.cargar(App.E.datos, categoria);
-      var encontrados;
-      if (unidad && categoria === 'ALUMNADO') {
-        /* Fila 501 (js/nuevo-unidad.js): la unidad entera, sin tope; si se escribe algo, se acota dentro de ella. */
-        var trozos = U.normalizar(texto).split(' ').filter(Boolean);
-        encontrados = fuente.lista.filter(function (p) {
-          return p.matriculado && p.unidad === unidad && trozos.every(function (t) { return p.busca.indexOf(t) !== -1; });
-        });
-      } else encontrados = Datos.buscar(fuente.lista, texto, topePorCategoria);
+      var encontrados = Datos.buscar(fuente.lista, texto, topePorCategoria);
       if (categoria === 'ALUMNADO') {
         var actuales = encontrados.filter(function (p) { return p.matriculado || p.solicitante; });
         var antiguos = encontrados.filter(function (p) { return !p.matriculado && !p.solicitante; });

@@ -73,6 +73,9 @@ var CamposLista = (function () {
     'correo del centro': ['Centro', 'Centro de datos', 'Datos del centro', 'Correo común']
   };
 
+  /* Fila 629: los cinco datos de siempre del asunto, que cada tipo pide (o no) al crear (`datosAlCrear`). */
+  var AL_CREAR = { 'h:curso': 'curso', 'h:descripcion': 'descripcion', 'h:limite': 'limite', 'h:quienlopide': 'lopide', 'h:quienlopidevia': 'via' };
+
   function norm(t) { return window.U && U.normalizar ? U.normalizar(String(t || '')) : String(t || '').toLowerCase(); }
   function marcaDeClave(clave) { return '{' + clave + '}'; }
   function marcaDeCampo(nombre) { return '{campo:' + nombre + '}'; }
@@ -194,6 +197,11 @@ var CamposLista = (function () {
       if (c.calculadoId && window.Campos) c.dondeSePide = Campos.tiposQueUsanCalculado(config, c.calculadoId);
       /* Fila 530: lo que hace cada tipo con el campo (al crear, en la parte general sin pedirlo al crear, o un hito). */
       c.dondeDetalle = detalleDeDonde(config, c);
+      if (AL_CREAR[c.id]) {
+        c.pideAlCrear = AL_CREAR[c.id];
+        c.dondeSePide = Object.keys(config.datosAlCrear || {}).filter(function (t) { return config.datosAlCrear[t].indexOf(c.pideAlCrear) !== -1; });
+        c.dondeDetalle = c.dondeSePide.map(function (t) { return { tipo: t, donde: 'crear', hito: '' }; });
+      }
       c.enTipos = c.dondeSePide.length;
       c.dondeSePide.forEach(function (t) { c.usos.push('Tipo de asunto «' + t + '»'); });
     });
@@ -212,6 +220,7 @@ var CamposLista = (function () {
   }
 
   function dondeSePide(c) {
+    if (c.pideAlCrear) return !c.enTipos ? 'Sale solo' : (c.enTipos === 1 ? 'Al crear, en 1 tipo' : 'Al crear, en ' + c.enTipos + ' tipos');
     if (c.origen !== 'Manual') return 'Sale solo';
     if (!c.enTipos) return 'Al usarlo';
     return c.enTipos === 1 ? 'En 1 tipo' : 'En ' + c.enTipos + ' tipos';

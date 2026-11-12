@@ -15,8 +15,6 @@
      pantalla de un tipo (js/ajustes-tipo.js, junto a la categoría).
    - `opcionesHtml(valor)`: las opciones, para el panel de «+ Crear tipo
      nuevo» (js/tipo-al-vuelo.js).
-   - `agruparParrilla(lista, botones)`: la parrilla de tipos de Nuevo
-     asunto, agrupada por órgano (js/tipos-buscador.js).
    - `pasaFiltro(nombreDeTipo, filtro)`: el filtro «Lo encarga» de
      Asuntos abiertos (js/asuntos-lista-pintar.js).
    - `deNombre(nombreDeTipo)`, `texto(valor)`: para Cuentas (js/cuentas.js).
@@ -122,36 +120,6 @@ var TiposOrgano = (function () {
     return fila;
   }
 
-  /* ---------- la parrilla de Nuevo asunto ----------
-
-     `botones` ya viene ordenado (y con los que no se enseñan marcados
-     con `.oculto`) por js/tipos-buscador.js. Aquí solo se reparten por
-     órgano, sin cambiar el orden dentro de cada uno. Si todos los de la
-     categoría son del mismo órgano (por ejemplo, todos sin asignar), no
-     se pone ningún rótulo: no diría nada. */
-  function agruparParrilla(lista, botones) {
-    Array.prototype.forEach.call(lista.querySelectorAll('.tipos-grupo-organo'), function (r) { r.remove(); });
-    /* Fila 197: sin persona elegida cada botón lleva también su
-       categoría, en un <small> dentro del propio botón; el nombre de
-       verdad va en `data-tipo`. */
-    var deCada = {};
-    botones.forEach(function (b) {
-      var o = deNombre(b.dataset.tipo || b.textContent.trim());
-      (deCada[o] = deCada[o] || []).push(b);
-    });
-    if (Object.keys(deCada).length < 2) return;
-    ORGANOS.forEach(function (o) {
-      var suyos = deCada[o.valor];
-      if (!suyos) return;
-      var rotulo = document.createElement('div');
-      rotulo.className = 'tipos-grupo-organo';
-      rotulo.textContent = o.texto;
-      rotulo.classList.toggle('oculto', !suyos.some(function (b) { return !b.classList.contains('oculto'); }));
-      lista.appendChild(rotulo);
-      suyos.forEach(function (b) { lista.appendChild(b); });
-    });
-  }
-
   /* ---------- Ajustes › Tipos de asunto › «Quién encarga cada tipo» ---------- */
 
   var bloque = null;
@@ -216,7 +184,7 @@ var TiposOrgano = (function () {
     ORGANOS: ORGANOS, FILTRO_SIN: FILTRO_SIN,
     normalizar: normalizar, deTipo: deTipo, deNombre: deNombre, texto: texto,
     pasaFiltro: pasaFiltro, opcionesHtml: opcionesHtml, guardar: guardar,
-    filaDeTipo: filaDeTipo, agruparParrilla: agruparParrilla, pintarAjustes: pintarAjustes
+    filaDeTipo: filaDeTipo, pintarAjustes: pintarAjustes
   };
 })();
 window.TiposOrgano = TiposOrgano;

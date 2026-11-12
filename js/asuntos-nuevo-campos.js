@@ -77,13 +77,12 @@ App.pintarCamposDelTipo = function () {
   });
 
   if (!lista.length) {
-    caja.classList.add('oculto');
     contenedor.innerHTML = '';
     App.E.nuevo.configCampos = [];
+    App.pintarDatosFijosNuevo();   /* fila 629: el recuadro sale si el tipo pide alguno de los cinco datos de siempre */
     return;
   }
 
-  caja.classList.remove('oculto');
   contenedor.innerHTML = '';
   App.E.nuevo.configCampos = lista.map(function (cfg) {
     /* `porTipo` no guarda la clase ni los valores de un campo propio
@@ -105,6 +104,7 @@ App.pintarCamposDelTipo = function () {
   App.E.nuevo.configCampos.forEach(function (item) {
     contenedor.appendChild(App.filaCampoNuevo(item));
   });
+  App.pintarDatosFijosNuevo();   /* fila 629 */
 
 };
 
