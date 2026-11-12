@@ -15,6 +15,7 @@
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -122,7 +123,7 @@ async function dejarSucio() {
   await pagina.locator('#resultados-tercero .resultado').first().click();
   await pagina.waitForSelector('#tercero-elegido:not(.oculto)');
   await pagina.waitForSelector('#campos-lista-nuevo .campo');
-  await pagina.fill('#campo-descripcion', 'BASURA DE LA VISITA ANTERIOR, no debería verse nunca más');
+  await rellenarOculto(pagina, '#campo-descripcion', 'BASURA DE LA VISITA ANTERIOR, no debería verse nunca más');
   await pagina.fill('#campos-lista-nuevo .campo', 'BASURA en el campo propio');
 }
 

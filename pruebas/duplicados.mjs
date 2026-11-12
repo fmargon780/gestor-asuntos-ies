@@ -36,6 +36,7 @@
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -607,7 +608,7 @@ await comprobar('y la nota al pie',
   pagina.locator('#aviso-duplicado .parecidos-pie').textContent(), 'Es solo un aviso. Si es otra gestión, créalo sin más.');
 
 await pagina.evaluate(() => { App.E.nuevo.tipo = 'TRANSPORTE'; App.refrescarVista(); });
-await pagina.fill('#campo-descripcion', 'texto a mano');
+await rellenarOculto(pagina, '#campo-descripcion', 'texto a mano');
 await pagina.waitForTimeout(500);
 await pagina.click('#aviso-duplicado .parecido-mismo-tipo');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');

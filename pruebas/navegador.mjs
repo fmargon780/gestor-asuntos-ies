@@ -1,6 +1,7 @@
 /* Prueba de la aplicación entera en un navegador de verdad,
    con un disco de mentira y un almacén de mentira. */
 import { chromium } from 'playwright';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const preparacion = `
 (function () {
@@ -205,8 +206,8 @@ await pagina.fill('#buscar-tercero', 'marina');
 await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-07');
-await pagina.fill('#campo-curso', '26-27');
-await pagina.fill('#campo-descripcion', 'Cambio de optativa');
+await rellenarOculto(pagina, '#campo-curso', '26-27');
+await rellenarOculto(pagina, '#campo-descripcion', 'Cambio de optativa');
 /* Fila 239: `AAMMDD A<año>-0001 TIPO Tercero`; el año académico, el grupo y la descripción ya no entran. */
 const NOMBRE_NUEVO = '260907 A' + String(new Date().getFullYear()).slice(2) + '-0001 MATRICULA Aguilar Ponce, Marina 1140233';
 await comprobar('el nombre se monta sin el grupo',

@@ -138,28 +138,14 @@ await comprobar('3. el duplicado es solo para un alumno: en un grupo se ignora',
 await comprobar('3. Generar para 5 de 6, con el aviso de quien se queda fuera', [r3.generables, r3.total, r3.avisos.length, /Taller de Teatro/.test(r3.avisos[0] || '')], [5, 6, 1, true]);
 
 /* ================= 4. EL BUSCADOR ================= */
-console.log('--- 4. el desplegable de unidad ---');
+console.log('--- 4. el buscador (sin desplegable de unidad, fila 629) ---');
 await p.evaluate(() => App.ir('nuevo'));
 await p.waitForSelector('#buscar-tercero', { state: 'visible' });
 await p.click('.categoria-boton[data-categoria="ALUMNADO"]');
 await p.waitForTimeout(500);
 const r4 = {};
-r4.visible = await p.isVisible('#unidad-tercero');
-r4.opciones = await p.$$eval('#unidad-tercero option', (o) => o.map((x) => x.textContent));
-await p.selectOption('#unidad-tercero', '2º B');
-await p.waitForTimeout(800);
-r4.unidad = await p.$$eval('#resultados-tercero .resultado', (r) => r.length);
-r4.nombres = await p.$$eval('#resultados-tercero .resultado', (r) => r.map((x) => x.firstChild.textContent.slice(0, 20)));
-await p.fill('#buscar-tercero', 'nerea');
-await p.waitForTimeout(800);
-r4.acotado = await p.$$eval('#resultados-tercero .resultado', (r) => r.length);
-await p.fill('#buscar-tercero', 'soler');
-await p.waitForTimeout(800);
-r4.fuera = await p.$$eval('#resultados-tercero .resultado', (r) => r.length);
-await p.selectOption('#unidad-tercero', '');
-await p.waitForTimeout(800);
-r4.todas = await p.$$eval('#resultados-tercero .resultado', (r) => r.length);
-await p.selectOption('#unidad-tercero', '');
+/* Fila 629: el desplegable de unidad ya no sale en «Nuevo asunto» (para una unidad entera está «Es para un grupo de personas»). */
+r4.sinDesplegable = (await p.locator('#unidad-tercero').count()) === 0;
 const dniNerea = await p.evaluate(async () => Dni.de((await Datos.cargar(App.E.datos, 'ALUMNADO')).lista.filter((a) => a.id === '2100016')[0]));
 r4.dniNerea = dniNerea;
 await p.fill('#buscar-tercero', String(dniNerea).toLowerCase());
@@ -174,13 +160,8 @@ r4.porLetras = await p.$$eval('#resultados-tercero .resultado', (r) => r.map((x)
 await p.fill('#buscar-tercero', '');
 await p.click('.categoria-boton[data-categoria="PERSONAL"]');
 await p.waitForTimeout(500);
-r4.personal = await p.isVisible('#unidad-tercero');
-await comprobar('4. con ALUMNADO sale el desplegable con «Todas» y las unidades', [r4.visible, r4.opciones[0], r4.opciones.indexOf('2º B') !== -1], [true, 'Todas', true]);
-await comprobar('4. con una unidad y sin escribir, salen los 6 de 2º B', r4.unidad, 6);
-await comprobar('4. escribiendo se acota dentro de la unidad', [r4.acotado, r4.fuera], [1, 0]);
-await comprobar('4. sin unidad vuelve a pedir letras', r4.todas, 2);
+await comprobar('4. ya no hay desplegable de unidad', r4.sinDesplegable, true);
 await comprobar('4. por DNI, por NIE y por letras sale la misma alumna', [/^\d{8}[A-Z]$/.test(r4.dniNerea), r4.porDni, r4.porNie, r4.porLetras], [true, ['Pardo Luna,'], ['Pardo Luna,'], ['Pardo Luna,']]);
-await comprobar('4. con PERSONAL no sale', r4.personal, false);
 
 /* ================= 5. EL TIPO Y EL CENTRO DE DATOS ================= */
 console.log('--- 5. el tipo y las partes del Centro de datos ---');

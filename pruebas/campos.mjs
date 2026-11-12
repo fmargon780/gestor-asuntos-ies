@@ -18,6 +18,7 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -217,7 +218,7 @@ await comprobar('Modalidad sale opcional y ya rellena',
   }), { etiqueta: 'Modalidad de Bachillerato', valor: 'Ciencias' });
 
 await pagina.fill('#campo-fecha', '2026-09-11');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 await pagina.waitForTimeout(150);
 
 await pagina.locator('.formulario').screenshot({
@@ -251,7 +252,7 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.waitForSelector('#bloque-campos:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-11');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 
 await comprobar('los campos de Nuevo asunto no llevan «Añadir al nombre»',
   pagina.locator('#campos-lista-nuevo .interruptor-fila').count(), 0);
@@ -282,7 +283,7 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.waitForSelector('#bloque-campos:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-12');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 await pagina.waitForTimeout(150);
 
 await comprobar('la modalidad sale en blanco, no es un error',
@@ -308,7 +309,7 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.waitForSelector('#bloque-campos:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-13');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 
 await comprobar('la Unidad de Marta sale vacía',
   pagina.evaluate(() => document.querySelectorAll('#campos-lista-nuevo .campo-fila')[0]
@@ -379,7 +380,7 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.waitForSelector('#bloque-campos:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-14');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 
 await comprobar('el campo propio sale como desplegable',
   pagina.evaluate(() => document.querySelectorAll('#campos-lista-nuevo .campo-fila')[2]
@@ -415,7 +416,7 @@ await pagina.waitForTimeout(200);
 
 await comprobar('el bloque de campos no se enseña', pagina.locator('#bloque-campos').isHidden(), true);
 await pagina.fill('#campo-fecha', '2026-09-15');
-await pagina.fill('#campo-curso', '');
+await rellenarOculto(pagina, '#campo-curso', '');
 await pagina.waitForTimeout(150);
 await comprobar('el nombre lleva fecha, número, tipo y tercero, sin ningún campo de más',
   pagina.locator('#vista-nombre').textContent().then(t => /^260915 A\d{2}-\d{4} MATRICULA Ramos Vidal, Elena 1150001$/.test(t)), true);

@@ -16,6 +16,7 @@
 import { chromium } from 'playwright';
 import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -66,6 +67,8 @@ await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async ([tipos, guias]) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   g._hijos.set('tipos.json', window.__disco.fich('tipos.json', JSON.stringify(tipos)));
+  /* Fila 629: «Quién lo pide» y «Por qué vía» solo salen en los tipos que los piden al crear. */
+  g._hijos.set('campos.json', window.__disco.fich('campos.json', JSON.stringify({ datosAlCrear: { AVISO: ['lopide', 'via'], RECLAMACION: ['lopide', 'via'], TRAMITE: ['lopide', 'via'] } })));
   g._hijos.set('guias.json', window.__disco.fich('guias.json', JSON.stringify(guias)));
   const d = await g.getDirectoryHandle('datos', { create: true });
   const csv = [
@@ -124,13 +127,13 @@ console.log('--- (c) una sola pregunta de vía, guardada en ficha.via ---');
 await comprobar('no queda ningún "#campo-via" suelto', pagina.evaluate(() => !document.getElementById('campo-via') && !document.getElementById('campo-via-dato')), true);
 await comprobar('solo hay una pregunta de "por qué vía", dentro de Lo pide',
   pagina.locator('#pantalla-nuevo select.lopide-via').count(), 1);
-await comprobar('el grupo se llama "Quién lo pide y por qué vía"',
-  pagina.locator('#grupo-lopide .etiqueta').first().textContent().then(t => t.indexOf('Quién lo pide y por qué vía') !== -1), true);
+await comprobar('el grupo empieza por «Quién lo pide» (fila 629: ya no lleva «y por qué vía» en el título)',
+  pagina.locator('#grupo-lopide .etiqueta').first().textContent().then(t => t.indexOf('Quién lo pide') !== -1), true);
 
 await pagina.selectOption('#lopide-caja-nuevo .lopide-via', 'TELEFONO');
-await pagina.fill('#lopide-caja-nuevo .lopide-via-dato', '600999888');
+await rellenarOculto(pagina, '#lopide-caja-nuevo .lopide-via-dato', '600999888');
 await pagina.fill('#campo-fecha', '2026-09-20');
-await pagina.fill('#campo-descripcion', 'Aviso de prueba');
+await rellenarOculto(pagina, '#campo-descripcion', 'Aviso de prueba');
 await pagina.waitForTimeout(150);
 await pagina.click('#btn-crear');
 await Promise.race([

@@ -21,6 +21,7 @@
    9. Un asunto de antes se edita sin recibir número ni cambiar de nombre. */
 import { chromium } from 'playwright';
 import fs from 'fs';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -139,8 +140,8 @@ async function nuevoAsunto(fecha, curso, descripcion) {
   await pagina.waitForSelector('#resultados-tercero .resultado');
   await pagina.click('#resultados-tercero .resultado');
   await pagina.fill('#campo-fecha', fecha);
-  await pagina.fill('#campo-curso', curso || '');
-  await pagina.fill('#campo-descripcion', descripcion || '');
+  await rellenarOculto(pagina, '#campo-curso', curso || '');
+  await rellenarOculto(pagina, '#campo-descripcion', descripcion || '');
   await pagina.waitForFunction(() => /^\d{6} A\d{2}-\d{4} /.test(document.getElementById('vista-nombre').textContent));
   return pagina.locator('#vista-nombre').textContent();
 }

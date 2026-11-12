@@ -13,6 +13,7 @@
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
+import { rellenarOculto } from './apoyo/rellenar-oculto.mjs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
@@ -62,7 +63,7 @@ await pagina.fill('.alta-campo[data-campo="Nº Id. Escolar"]', '1112223');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#tercero-elegido:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-20');
-await pagina.fill('#campo-descripcion', 'Matrícula de prueba');
+await rellenarOculto(pagina, '#campo-descripcion', 'Matrícula de prueba');
 await pagina.waitForTimeout(150);
 await pagina.click('#btn-crear');
 await Promise.race([
