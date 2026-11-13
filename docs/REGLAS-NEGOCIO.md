@@ -223,3 +223,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (13-nov-2026, tema 565) Las llamadas de una tarea salen plegadas en una línea con su cuenta: «puede salir plegada por defecto y no ocuparía tanto espacio».
 - (13-nov-2026, tema 565) El día y la hora de la llamada se pueden cambiar al apuntarla («estaría bien poder cambiarla»); quién la apunta, no.
 - (13-nov-2026, tema 565) Una llamada apuntada se puede corregir, «quedando registrada la modificación»: el Registro guarda cómo estaba antes. No se borra.
+
+## Nombre de las carpetas de asunto
+
+- (13-nov-2026, tema 631) La carpeta de un asunto con número **pierde el nombre de la persona solo al archivar**, cuando entra en la carpeta de esa persona, y lo recupera al reabrir. Abierta se llama como siempre, porque en Asuntos abiertos no hay carpeta de persona y el nombre es lo único que dice de quién es («Adelante con tu forma mejor»; él había pedido quitarlo de todas para acortar las rutas).
+- (13-nov-2026, tema 631) **Las carpetas ya archivadas con número se acortan** con un botón de Herramientas, que se pulsa con la otra persona fuera de la app (eligió «2», sabiendo que Drive sincroniza de nuevo cada carpeta en los dos ordenadores). Para ellas deja de valer «lo que ya existe no se renombra» (fila 239). Las carpetas sin número no se tocan.
