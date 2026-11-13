@@ -280,7 +280,7 @@
   function aceptaCuadro(){
     var c=cuadro, x=hitos[c.hito], v=document.querySelector('input[name=c-t]:checked').value, t;
     if(v==='nueva'){t={nombre:c.tipo,clase:'anadir',hecha:true};x.tareas.push(t)}else{t=x.tareas[+v];t.hecha=true}
-    t.doc=c.doc; if(c.nuevo)carpeta.push(c.doc); delete sinTarea[c.doc];
+    t.doc=c.doc; if(c.nuevo)carpeta.push(c.doc); if(c.antes){carpeta[carpeta.indexOf(c.antes)]=c.doc;delete sinTarea[c.antes]} delete sinTarea[c.doc];
     apunta(x.nombre,(c.nuevo?'Añadido':'Colgado')+' «'+c.doc+'» en la tarea «'+t.nombre+'»');
     visto=c.hito; cierraCuadro(); abiertos.docs=true; pinta();
     toast('El documento queda colgado de «'+t.nombre+'», en el hito «'+x.nombre+'».');
@@ -320,7 +320,10 @@
       toast('Se abre la ventana «Crear un hito», la de hoy. Aquí se crea «Atender la petición».'); return;
     }
     if(b.id==='b-anadir-doc'){abreCuadro(nombreNuevo(),'Recibí',true);toast('Antes, la ventana de hoy para elegir el fichero y su tipo. Después, esta pregunta.');return}
-    if(b.dataset.colgar){abreCuadro(b.dataset.colgar,b.dataset.colgar.replace(/\.[^.]+$/,''),false);return}
+    if(b.dataset.colgar){var dc=b.dataset.colgar;
+      if(/^\d{6} /.test(dc))abreCuadro(dc,'Documento',false);
+      else{abreCuadro('261112 ESCRITO D26-00059.pdf','Escrito',false);cuadro.antes=dc;toast('Antes, la ventana «Cambiar el nombre» de hoy: se elige el tipo (aquí, Escrito) y el fichero toma su nombre.')}
+      return}
     if(b.id==='c-no'){cierraCuadro();return}
     if(b.id==='c-ok'){aceptaCuadro();return}
     if(b.name==='c-t')return;
