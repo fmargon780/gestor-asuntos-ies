@@ -129,7 +129,8 @@ await comprobar('4. en la mesa no sale «Archivar el asunto»',
   { aviso: true, archivar: false });
 await comprobar('4. y en la cabecera de la ficha: «Por liquidar», ni «Listo para archivar» ni «Archivar el asunto»',
   pagina.evaluate(() => {
-    const m = [...document.querySelectorAll('#pantalla-ficha .marca-hito, #ficha-asunto-cuerpo .marca-hito, #ficha-guia .marca-hito')].map((e) => e.textContent).join(' / ') + ' ' + document.querySelector('#ficha-asunto-cuerpo .ficha-marcas').textContent;
+    /* Fila 637: la marca «Hito N de M · …» ya no sale; «Por liquidar» queda en el botón de la cabecera («Ir a Por liquidar»), y no sale «Listo para archivar». */
+    const m = [...document.querySelectorAll('#pantalla-ficha .marca-hito, #ficha-asunto-cuerpo .marca-hito, #ficha-guia .marca-hito, #ficha-estado-hito, #ficha-acciones')].map((e) => e.textContent).join(' / ') + ' ' + document.querySelector('#ficha-asunto-cuerpo .ficha-marcas').textContent + ' ' + document.querySelector('#ficha-archivar').textContent;
     return { marca: /Por liquidar/.test(m), listo: /Listo para archivar/.test(m), boton: document.querySelector('#ficha-archivar button').textContent };
   }), { marca: true, listo: false, boton: 'Ir a Por liquidar' });
 await pagina.click('.mensaje-boton');

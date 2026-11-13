@@ -1,16 +1,16 @@
-/* Prueba en navegador de verdad de los datos a mano de «Trabajo»
-   (23-oct-2026, fila 426 de docs/COLA.md, docs/FICHA-VISTA-DE-TRABAJO.md, parte B).
+/* Prueba en navegador de verdad de los datos de uso diario del bloque «Datos» de la vista del asunto
+   (23-oct-2026, fila 426, docs/FICHA-VISTA-DE-TRABAJO.md, parte B; reescrita el 13-nov-2026 para la fila 637: la franja «Datos del
+   asunto» pasó a ser el bloque plegable «Datos» de la columna derecha, js/ficha-datos-bloque.js).
 
    Con un asunto de alumnado de la demostración (sus datos, guardados en el propio asunto):
-     1. Cerrada, la franja «Datos del asunto» enseña NIE, curso, unidad, teléfono y correo en una sola
-        línea, encima de la carpeta.
-     2. A 900 px de ancho de ventana el NIE sigue a la vista.
-     3. El ⧉ del NIE copia el NIE y no despliega la franja.
-     4. Al pulsarla se despliega con los datos completos y los campos del asunto, empujando la carpeta
-        hacia abajo; pulsarla otra vez la cierra; se recuerda al repintar la ficha.
-     5. Una nota a mano sin hito sale en el Registro del hito con «del asunto»; una línea automática sin
-        hito no sale; una nota de otro hito tampoco.
-     6. Un tercero que no es alumnado (empresa) enseña NIF, teléfono y correo. */
+     1. Con el bloque plegado, en su cabecera hay la línea de datos de uso diario (NIE, curso, unidad, teléfono y correo), cada uno con su ⧉; es de una sola línea y el bloque va encima de «Documentos», en la columna derecha.
+     2. A 900 px y a 1120 px de ancho de ventana el NIE sigue a la vista.
+     3. El ⧉ del NIE copia el NIE y no abre el bloque.
+     4. Al pulsar el título se abre con los datos completos («La alumna», «Contacto» con teléfono y correo, «Campos de este
+        asunto»), empujando lo de debajo hacia abajo; pulsarlo otra vez lo pliega; se recuerda al repintar la ficha.
+     5. Una nota a mano sin hito sale en el Registro del hito con «del asunto»; una línea automática sin hito no sale; una nota
+        de otro hito tampoco.
+     6. Un tercero que no es alumnado (empresa) enseña NIF, teléfono y correo; y al entrar en otro asunto, el bloque está plegado. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -82,63 +82,69 @@ async function preparar() {
   return { pagina, errores };
 }
 
+const LINEA = '[data-resumen-bloque="datos"]';
+const CAB = '.ficha-plegable[data-tarjeta="datos"] .plegable-cab';
+const TITULO = '.ficha-plegable[data-tarjeta="datos"] .plegable-titulo';
+const dato = (pagina, t) => pagina.locator(LINEA + ' .datos-mano-dato', { hasText: t });
+
 async function abrirFicha(pagina, asunto) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + asunto + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
-  await pagina.waitForSelector('#datos-mano-linea .datos-mano-dato', { state: 'attached' });
+  await pagina.waitForSelector(LINEA + ' .datos-mano-dato', { state: 'attached' });
   await pagina.waitForTimeout(400);
 }
 
 const caja = (pagina, sel) => pagina.evaluate((s) => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, b: r.bottom, r: r.right }; }, sel);
 const texto = (pagina, sel) => pagina.evaluate((s) => (document.querySelector(s) || {}).textContent || '', sel);
+const abierto = (pagina, t) => pagina.evaluate((id) => FichaTarjetas.estaAbierto(id), t);
 
 const { pagina, errores } = await preparar();
 await abrirFicha(pagina, ASUNTO);
 
 /* 1. */
-const linea1 = (await texto(pagina, '#datos-mano-linea')).replace(/[⧉\s]+/g, ' ').trim();
-await comprobar('1. la línea cerrada trae NIE, curso, unidad, teléfono y correo, en ese orden', linea1,
+const linea1 = (await texto(pagina, LINEA)).replace(/[⧉\s]+/g, ' ').trim();
+/* En esta demostración los datos van en el propio asunto (sin fichero RegAlum.csv), así que lo elegido de fábrica no se
+   encuentra por su nombre de columna y sale la línea de uso diario de siempre. */
+await comprobar('1. la línea plegada trae NIE, curso, unidad, teléfono y correo, en ese orden', linea1,
   'NIE 9876543 · Curso 4º ESO · Unidad 4º ESO E · Tel. 655 645 995 · ana.perez@example.com');
-await comprobar('1. la franja está cerrada y es de una sola línea', [await pagina.locator('#datos-mano-cuerpo').isVisible(), (await caja(pagina, '#datos-mano-cabeza')).h < 60], [false, true]);
-const franja = await caja(pagina, '#datos-mano'), carpeta = await caja(pagina, '#trabajo-carpeta');
-await comprobar('1. encima de la carpeta, en la columna derecha', franja.b <= carpeta.y + 1 && franja.x >= (await caja(pagina, '#trabajo-izq')).r, true);
+await comprobar('1. el bloque está plegado y su cabecera es de una sola línea', [await abierto(pagina, 'datos'), (await caja(pagina, CAB)).h < 60], [false, true]);
+const franja = await caja(pagina, '.ficha-plegable[data-tarjeta="datos"]'), carpeta = await caja(pagina, '.ficha-plegable[data-tarjeta="documentos"]');
+await comprobar('1. encima de «Documentos», en la columna derecha', franja.b <= carpeta.y + 1 && franja.x >= (await caja(pagina, '#trabajo-izq')).r, true);
 
 /* 3. */
-await pagina.locator('#datos-mano-linea .datos-mano-dato', { hasText: 'NIE' }).locator('.dato-copiable').click();
+await dato(pagina, 'NIE').locator('.dato-copiable').click();
 await pagina.waitForTimeout(200);
 await comprobar('3. el ⧉ del NIE copia el NIE', pagina.evaluate(() => navigator.clipboard.readText()), '9876543');
-await comprobar('3. y no despliega la franja', pagina.locator('#datos-mano-cuerpo').isVisible(), false);
-await pagina.locator('#datos-mano-linea .datos-mano-dato', { hasText: 'ana.perez' }).locator('.dato-copiable').click();
-await pagina.waitForTimeout(200);
-await comprobar('3. el ⧉ del correo copia el correo', pagina.evaluate(() => navigator.clipboard.readText()), 'ana.perez@example.com');
+await comprobar('3. y no abre el bloque', abierto(pagina, 'datos'), false);
 
 /* 4. */
-const carpetaAntes = (await caja(pagina, '#trabajo-carpeta')).y;
-await pagina.locator('#datos-mano-cabeza .datos-mano-titulo').click();
+const carpetaAntes = (await caja(pagina, '.ficha-plegable[data-tarjeta="documentos"]')).y;
+await pagina.locator(TITULO).click();
 await pagina.waitForTimeout(400);
-await comprobar('4. al pulsarla se despliega', pagina.locator('#datos-mano-cuerpo').isVisible(), true);
-const cuerpo = await texto(pagina, '#datos-mano-cuerpo');
+await comprobar('4. al pulsar el título se abre', abierto(pagina, 'datos'), true);
+const cuerpo = await texto(pagina, '#ficha-datos-bloque');
+const grupos = await pagina.locator('#ficha-datos-bloque .datos-grupo h4').allTextContents();
 
-await comprobar('4. con los datos completos del alumno', /Ana Pérez Ruiz/.test(cuerpo) && /9876543/.test(cuerpo) && /655 645 995/.test(cuerpo), true);
-await comprobar('4. y los campos del asunto', /Campos del asunto/.test(cuerpo) && (await pagina.locator('#dm-campos .ficha-dato').count()) > 0, true);
-await comprobar('4. empuja la carpeta hacia abajo', (await caja(pagina, '#trabajo-carpeta')).y > carpetaAntes + 40, true);
+await comprobar('4. con los datos completos del alumno: su recuadro y «Contacto», con el teléfono y el correo',
+  [/^La alumna|^El alumno/.test(grupos[0]), grupos.indexOf('Contacto') !== -1, /655 645 995/.test(cuerpo), /ana\.perez@example\.com/.test(cuerpo), /9876543/.test(cuerpo)], [true, true, true, true, true]);
+await pagina.evaluate(() => navigator.clipboard.writeText('(nada)'));
+await pagina.locator('#ficha-datos-bloque dd', { hasText: 'ana.perez@example.com' }).locator('.dato-copiable').first().click();
+await pagina.waitForTimeout(200);
+await comprobar('3. el ⧉ del correo (dentro del bloque abierto) copia el correo', pagina.evaluate(() => navigator.clipboard.readText()), 'ana.perez@example.com');
+await comprobar('4. y los campos del asunto', /Campos de este asunto/.test(cuerpo) && grupos.indexOf('Campos de este asunto') !== -1, true);
+await comprobar('4. empuja lo de debajo («Documentos») hacia abajo', (await caja(pagina, '.ficha-plegable[data-tarjeta="documentos"]')).y > carpetaAntes + 40, true);
 await pagina.evaluate(() => HitosPanel.programarRepintado());
 await pagina.waitForTimeout(500);
-await comprobar('4. un repintado de la ficha la deja como estaba (abierta)', pagina.locator('#datos-mano-cuerpo').isVisible(), true);
-await pagina.locator('#datos-mano-cabeza .datos-mano-titulo').click();
+await comprobar('4. un repintado de la ficha la deja como estaba (abierto)', abierto(pagina, 'datos'), true);
+await pagina.locator(TITULO).click();
 await pagina.waitForTimeout(300);
-await comprobar('4. pulsar el título otra vez la cierra', pagina.locator('#datos-mano-cuerpo').isVisible(), false);
-await pagina.locator('#datos-mano-cabeza .datos-mano-titulo').click();
-await pagina.waitForTimeout(300);
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="contacto"]');
-await comprobar('4. las pestañas «Datos y contacto» y «Campos del asunto» siguen ahí',
-  pagina.locator('#ficha-tarjetas-pestanas .ficha-pestana').allTextContents().then((t) => t.filter((x) => /^(Datos y contacto|Campos del asunto)/.test(x)).length), 2);
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="trabajo"]');
-await pagina.locator('#datos-mano-cabeza .datos-mano-titulo').click();
-await pagina.waitForTimeout(300);
+await comprobar('4. pulsar el título otra vez la pliega', abierto(pagina, 'datos'), false);
+await comprobar('4. no hay pestañas: «Datos» y «Campos de este asunto» son de este mismo bloque',
+  pagina.evaluate(() => [!!document.getElementById('ficha-tarjetas-pestanas'), !!document.querySelector('.ficha-pestana'),
+    !!document.querySelector('.ficha-plegable[data-tarjeta="datos"] #ficha-datos-tramite')]), [false, false, true]);
 
 /* 5. */
 const registro = (await texto(pagina, '.hito-en-mesa .mesa-grande-notas .hito-notas'));
@@ -146,44 +152,43 @@ await comprobar('5. la nota a mano sin hito sale en el Registro del hito', regis
 await comprobar('5. con la etiqueta «del asunto»', pagina.locator('.hito-en-mesa .mesa-grande-notas .registro-linea', { hasText: NOTA_SUELTA }).locator('.registro-del-asunto').textContent(), 'del asunto');
 await comprobar('5. la línea automática sin hito no sale', registro.indexOf(NOTA_AUTO) === -1, true);
 await comprobar('5. la nota de otro hito tampoco', registro.indexOf(NOTA_OTRO_HITO) === -1, true);
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="notas"]');
-await comprobar('5. la pestaña Registro sigue enseñando las tres',
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
+await comprobar('5. el bloque Registro sigue enseñando las tres',
   pagina.evaluate(([a, b, c]) => { const t = document.getElementById('ficha-notas').textContent; return [a, b, c].every((x) => t.indexOf(x) !== -1); }, [NOTA_SUELTA, NOTA_AUTO, NOTA_OTRO_HITO]), true);
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="trabajo"]');
+await pagina.evaluate(() => FichaTarjetas.plegar('notas'));
 
-/* 5b. Una nota escrita a mano en la pestaña Registro sale enseguida en el Registro del hito. */
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="notas"]');
+/* 5b. Una nota escrita a mano en el bloque Registro sale enseguida en el Registro del hito. */
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'Escrita después de abrir');
 await pagina.click('#ficha-nota-guardar');
 await pagina.waitForTimeout(1200);
-await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="trabajo"]');
+await pagina.evaluate(() => FichaTarjetas.plegar('notas'));
 await pagina.waitForTimeout(800);
-await comprobar('5. una nota escrita ahora en la pestaña Registro sale también en el del hito',
+await comprobar('5. una nota escrita ahora en el bloque Registro sale también en el del hito',
   pagina.evaluate(() => document.querySelector('.hito-en-mesa .hito-notas').textContent.indexOf('Escrita después') !== -1), true);
 
 /* 2. */
 await pagina.setViewportSize({ width: 900, height: 900 });
 await pagina.waitForTimeout(300);
-await pagina.locator('#datos-mano-cabeza .datos-mano-titulo').click();   /* cerrada */
-await pagina.waitForTimeout(300);
+await pagina.waitForTimeout(300);   /* el bloque Datos sigue plegado */
 /* Pulsar el ⧉ del correo (cortado a 1600 px) corrió la línea; aquí se mira la línea recién pintada. */
-await pagina.evaluate(() => { document.getElementById('datos-mano-linea').scrollLeft = 0; });
-const nie = await caja(pagina, '#datos-mano-linea .datos-mano-dato'), cab = await caja(pagina, '#datos-mano-cabeza');
+await pagina.evaluate((L) => { document.querySelector(L).scrollLeft = 0; }, LINEA);
+const nie = await caja(pagina, LINEA + ' .datos-mano-dato'), cab = await caja(pagina, CAB);
 await comprobar('2. a 900 px, el NIE sigue a la vista', nie.r <= cab.r + 1 && nie.x >= cab.x, true);
 await pagina.setViewportSize({ width: 1120, height: 900 });   /* dos columnas, la línea no cabe entera */
 await pagina.waitForTimeout(300);
-await pagina.evaluate(() => { document.getElementById('datos-mano-linea').scrollLeft = 0; });
-const nie2 = await caja(pagina, '#datos-mano-linea .datos-mano-dato'), cab2 = await caja(pagina, '#datos-mano-cabeza');
+await pagina.evaluate((L) => { document.querySelector(L).scrollLeft = 0; }, LINEA);
+const nie2 = await caja(pagina, LINEA + ' .datos-mano-dato'), cab2 = await caja(pagina, CAB);
 await comprobar('2. con dos columnas estrechas la línea se corta y el NIE sigue a la vista',
-  [await pagina.evaluate(() => { const l = document.getElementById('datos-mano-linea'); return l.scrollWidth > l.clientWidth; }), nie2.r <= cab2.r + 1 && nie2.x >= cab2.x], [true, true]);
+  [await pagina.evaluate((L) => { const l = document.querySelector(L); return l.scrollWidth > l.clientWidth; }, LINEA), nie2.r <= cab2.r + 1 && nie2.x >= cab2.x], [true, true]);
 await pagina.setViewportSize({ width: 1600, height: 900 });
 await pagina.waitForTimeout(200);
 
 /* 6. */
 await abrirFicha(pagina, EMPRESA);
-const lineaE = (await texto(pagina, '#datos-mano-linea')).replace(/[⧉\s]+/g, ' ').trim();
+const lineaE = (await texto(pagina, LINEA)).replace(/[⧉\s]+/g, ' ').trim();
 await comprobar('6. una empresa enseña NIF, teléfono y correo', lineaE, 'NIF B12345678 · Tel. 957 123 456 · pedidos@sillas.example.com');
-await comprobar('6. y al entrar en otro asunto, la franja está cerrada', pagina.locator('#datos-mano-cuerpo').isVisible(), false);
+await comprobar('6. y al entrar en otro asunto, el bloque está plegado', abierto(pagina, 'datos'), false);
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

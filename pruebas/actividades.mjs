@@ -160,15 +160,15 @@ await comprobar('5. el fichero del disco lleva la marca y la actividad', pagina.
 console.log('--- 6. la tarjeta «La actividad» ---');
 await pagina.waitForSelector('.ficha-tarjeta[data-tarjeta="actividad"]', { state: 'attached' });
 await pagina.waitForTimeout(500);
-await comprobar('6. la pestaña va justo detrás de «Trabajo» y se llama «La actividad» (fila 425)',
-  pagina.evaluate(() => [Array.from(document.querySelectorAll('.ficha-tarjetas-rejilla > .ficha-tarjeta')).slice(0, 2).map((e) => e.dataset.tarjeta), document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-titulo').textContent.trim()]), [['trabajo', 'actividad'], 'La actividad']);
+await comprobar('6. el bloque va el primero de la columna derecha y se llama «La actividad» (fila 425)',
+  pagina.evaluate(() => [Array.from(document.querySelectorAll('#ficha-plegables > .ficha-plegable')).slice(0, 2).map((e) => e.dataset.tarjeta), document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"] .ficha-titulo').textContent.trim()]), [['actividad', 'datos'], 'La actividad']);
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(500);
 await comprobar('6. abierta: las unidades con «van N de M» y el profesorado separado',
   pagina.evaluate(() => { const c = document.getElementById('ficha-actividad'); const cols = c.querySelectorAll('.act-ficha-col'); return [c.textContent.indexOf('del 20 de noviembre') === -1 && c.textContent.indexOf('20 de noviembre de 2026') !== -1, [...cols[1].querySelectorAll('li')].map((l) => l.textContent), [...cols[2].querySelectorAll('li')].map((l) => l.textContent.length > 0), cols[2].querySelectorAll('h4')[0].textContent, cols[2].querySelectorAll('h4')[1].textContent, cols[2].querySelectorAll('ul')[0].children.length, cols[2].querySelectorAll('ul')[1].children.length, c.querySelector('.act-situacion').textContent]; }),
   [true, ['2º B · van 5 de 6', '3º A · van 4 de 4'], [true, true, true], 'Organiza', 'Acompaña', 1, 2, 'Prevista']);
-await comprobar('6. ocupa todo el ancho de la rejilla',
-  pagina.evaluate(() => { const t = document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"]').getBoundingClientRect(), r = document.getElementById('ficha-tarjetas-rejilla').getBoundingClientRect(); return Math.abs(t.width - r.width) < 4; }), true);
+await comprobar('6. ocupa todo el ancho de la columna',
+  pagina.evaluate(() => { const t = document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"]').getBoundingClientRect(), r = document.getElementById('ficha-plegables').getBoundingClientRect(); return Math.abs(t.width - r.width) < 4; }), true);
 await comprobar('6. «Personas del grupo (9)»', pagina.evaluate(() => document.querySelector('.ficha-tarjeta[data-tarjeta="relacionados"]').dataset.titulo), 'Personas del grupo (9)');
 
 /* «Cambiar»: desmarcar a uno y guardar. */

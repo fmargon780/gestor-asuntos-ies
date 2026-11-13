@@ -282,6 +282,11 @@ await comprobar('5. el asunto que pide un informe (`asuntoListo`) manda sobre to
   (async () => { await pagina.evaluate((n) => { CorreoNucleo.abrirCuadro(App.E.listaAbiertos.find((x) => x.nombre === n), false, { asuntoListo: 'Informe de la actividad' }); }, NUEVO);
     await pagina.waitForSelector('#correo-asunto'); const v = await pagina.locator('#correo-asunto').inputValue(); await cerrar(); return v; })(), 'Informe de la actividad');
 
+/* (fila 637) «Asunto» ya no es un botón de la cabecera: es una opción de «Copiar» en el menú «⋯». */
+const copiarDelMenu = async (rotulo) => {
+  await pagina.click('.ficha-nombre-menu-boton');
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: new RegExp('^' + rotulo + '$') }).click();
+};
 /* ================= 6. LA FICHA ================= */
 console.log('--- 6. la ficha ---');
 await pagina.evaluate(() => App.ir('abiertos'));
@@ -289,7 +294,7 @@ await pagina.waitForTimeout(150);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + NUEVO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('6. «Asunto» copia el asunto compuesto con el general, no el nombre de la carpeta',
-  pegado(() => pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).click()), GENERAL);
+  pegado(() => copiarDelMenu('Asunto')), GENERAL);
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('.ficha-documento-fila .extracto-documento');
 await comprobar('6. «Extracto» sale junto a «Ruta», en todos los documentos de la carpeta',
@@ -319,7 +324,7 @@ await pagina.waitForTimeout(150);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + VIEJO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('6. un asunto de antes: «Asunto» copia el nombre de la carpeta',
-  pegado(() => pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).click()), VIEJO);
+  pegado(() => copiarDelMenu('Asunto')), VIEJO);
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('.ficha-documento-fila .extracto-documento');
 await comprobar('6. un asunto de antes: «Extracto» copia el nombre de la carpeta',

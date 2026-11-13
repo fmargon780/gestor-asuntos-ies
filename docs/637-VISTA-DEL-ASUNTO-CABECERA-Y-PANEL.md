@@ -77,4 +77,14 @@ La columna derecha:
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- **Revisión (13-nov-2026, segundo revisor, ayudante aparte con la demo en Chromium).** Coincide: cabecera de una línea con «← Volver», tipo, número y tercero, y «Ruta» y «Archivar el asunto» a la derecha, sin la carpeta como título; el menú «⋯» en su orden y cada opción hace lo de hoy; no salen «Hito N de M», «El encargo», «Elegir datos», la fila de copiar ni «Abierto el…» en la cabecera; fila de hitos con el actual marcado y «+ Añadir hito», y pulsar un hito lo enseña; sin pestañas y cinco bloques plegados en su orden que se abren y se pliegan; «Datos» plegado con la línea y su ⧉, abierto con sus tres recuadros, «Ver todo», «Elegir qué se ve plegado», «+ Añadir campo» y «Abierto el…» al pie; «La empresa», «El grupo» (sin «Contacto»), «La persona», «El alumno»/«La alumna»; «Quién lo pide» y «Por qué vía» solo con datos; el documento tapa los bloques y «← Carpeta» lo cierra; una nota de «Registro» queda la primera; consola sin errores; archivado y tipo sin guía abren bien; a 1000 px no hay desbordes.
+- No lo he podido ver: «El organismo» (la demo no tiene asuntos de Administración) y «el tipo los pide aunque estén vacíos» (ningún tipo de la demo pide «Quién lo pide» ni «Por qué vía»); ambos los cubre el código y no se han probado en pantalla.
+- Lo que el revisor señaló y no coincide con el texto, y qué se decidió (Claude, sin cambiar lo que el texto pide):
+  - «Esperando a…» y el plazo del asunto («Venció hace N días») siguen a la derecha de la fila de hitos (`#ficha-acciones`). El texto y la pantalla de prueba no dicen dónde van; para no perder esas dos funciones se dejan ahí hasta que la 638 los lleve al hito. **Para Francisco: confirmar o decir dónde van.**
+  - Los bloques «La actividad» (asuntos de actividad extraescolar) y «Candidaturas» (elecciones) salen delante de «Datos»: eran pestañas aparte y el texto no los nombra; se conservan como bloques.
+  - «Quién lo pide» y «Por qué vía» llevan un botón «Cambiar» que abre el cuadro «El encargo» de siempre: sin él no habría forma de cambiarlos al desaparecer el botón de la cabecera.
+  - Se quitó también el botón «← Hitos» de la fila de hitos (no está en la pantalla de prueba); la lista de hitos sigue con Escape.
+  - De fábrica, la línea plegada de «Datos» en alumnado lleva NIE, curso y unidad (antes de «Elegir datos» solo la unidad).
+  - Sin cambios por ser de la 638 o previos: el aviso amarillo del sello de registro entre cabecera y hitos; asuntos sin hitos o con todos hechos no llevan fila de hitos; la columna izquierda repite Campos, Documentos y Registro.
+  - Contadores: salen en Documentos, Registro (tras haber notas), Personas y Otros asuntos cuando hay; plegado, «Registro» no enseña la última entrada (el texto solo pide la cuenta).
+- Errores que se arreglaron tras el revisor y las pruebas: los botones «+ Añadir documento», «Generar documento» y «Repartir» no salían en «Documentos de la carpeta»; «Ver todo» y las opciones de copiar del menú «⋯» se apagaban en solo consulta.

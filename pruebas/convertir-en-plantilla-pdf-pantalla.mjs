@@ -32,8 +32,7 @@ async function abrirFicha(texto) {
   await pagina.click('.pestana[data-pantalla="abiertos"]');
   await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: texto }).first().click();
   await pagina.waitForSelector('#ficha-documentos', { state: 'attached' });
-  const tarjeta = pagina.locator('.ficha-tarjeta', { hasText: 'Documentos de la carpeta' }).first();
-  if (!(await tarjeta.evaluate((t) => t.classList.contains('abierta')))) await tarjeta.click();
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* vista nueva: el bloque Documentos llega plegado */
   await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
   await pagina.waitForTimeout(800);
 }

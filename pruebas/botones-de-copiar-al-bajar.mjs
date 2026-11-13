@@ -1,10 +1,9 @@
 /* Prueba en navegador de verdad de los botones de copiar al bajar
-   (20-oct-2026, fila 382, docs/BOTONES-DE-COPIAR-AL-BAJAR.md): con la
-   cabecera de la ficha encogida, la fila de copiar (Asunto, Ruta, NIE,
-   Nombre, DNI) sigue a la vista y funciona; solo se esconde la línea
-   gris. Si no caben en el renglón de la barra de acciones, bajan juntos
-   a una línea debajo, sin partirse ni desplazamiento lateral. Se mira a
-   1920 y a 1366 px, y con el visor de PDF abierto al lado. */
+   (20-oct-2026, fila 382, docs/BOTONES-DE-COPIAR-AL-BAJAR.md; adaptada a la fila 637): la fila de copiar de la cabecera
+   ya no existe, sus botones (Asunto, NIE, DNI, Nombre) son opciones de «Copiar» en el menú «⋯» de la cabecera de una
+   línea. Con la columna derecha bajada (ahora cada columna se desplaza sola, la página no), la cabecera sigue a la vista
+   en un solo renglón, el menú sigue ofreciendo las cuatro opciones y copiar funciona. Se mira a 1920 y a 1366 px, y con
+   el visor de PDF abierto al lado. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -86,99 +85,72 @@ async function abrirFicha(nombre) {
   await pagina.waitForTimeout(150);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombre + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.waitForSelector('.ficha-copiar-fila');
+  await pagina.waitForSelector('.ficha-nombre-menu-boton');
 }
-
-/* "Nombre" y DNI/CIF viven en el DOM desde el primer pintado, ocultos
-   con `hidden` hasta que responde el fichero de datos (18-sep-2026,
-   fila 58: así revelarlos no mete un nodo nuevo, y no le hace repintar
-   de más al panel de hitos, js/hitos-panel.js). Por eso todo lo de
-   aquí filtra `:not([hidden])`: un botón sin dato sigue en el DOM,
-   pero no debe contar como "puesto". */
-function etiquetas() {
-  return pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])'))
-    .map((b) => b.textContent.trim()));
-}
-
-async function esperarBotones(n) {
-  await pagina.waitForFunction((minimo) =>
-    document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])').length >= minimo, n);
-}
-
-async function copiarYLeer(etiqueta) {
-  await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("' + etiqueta + '")');
-  await pagina.waitForFunction((et) => {
-    const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-      .find((x) => x.textContent.trim() === 'Copiado');
-    return !!b;
-  }, etiqueta);
-  return pagina.evaluate(() => navigator.clipboard.readText());
-}
-
 
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(150);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ALUMNO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('.ficha-copiar-fila');
-/* Una lista larga de verdad: con «Trabajo» la página no baja (cada columna se desplaza sola, fila 425), así que se
-   alarga el hueco de otra pestaña, a todo el ancho, para tener por dónde bajar. */
+await pagina.waitForSelector('.ficha-nombre-menu-boton');
+/* Una lista larga de verdad: la página no baja (cada columna se desplaza sola, fila 425), así que se alarga el hueco
+   de «Registro», en la columna de la derecha, para tener por dónde bajar. */
 await pagina.addStyleTag({ content: '#ficha-notas { min-height: 2500px; }' });
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 
-const visibles = () => pagina.evaluate(() => {
-  const dentro = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= window.innerWidth + 1; };
-  return Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])'))
-    .map((b) => b.textContent.trim() + (dentro(b) ? '' : ' (fuera)'));
+/* Las opciones de «Copiar» del menú «⋯» que se ven (las de DNI y Nombre salen cuando llega el dato). */
+const ABRIR_MENU = async () => {
+  if (await pagina.locator('.ficha-menu:not(.oculto)').count() === 0) await pagina.click('.ficha-nombre-menu-boton');
+  await pagina.waitForSelector('.ficha-menu:not(.oculto)');
+};
+const opciones = () => pagina.evaluate(() => {
+  const m = document.querySelector('.ficha-menu:not(.oculto)');
+  const rot = Array.from(m.children).findIndex((e) => e.classList.contains('ficha-menu-rotulo'));
+  return Array.from(m.children).slice(rot + 1).filter((e) => e.classList.contains('ficha-menu-opcion') && !e.hidden && !e.classList.contains('ficha-menu-peligro'))
+    .map((b) => b.textContent.trim() + ((r) => (r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= window.innerWidth + 1 ? '' : ' (fuera)'))(b.getBoundingClientRect()));
 });
+const cerrarMenu = async () => {
+  await pagina.keyboard.press('Escape');
+  if (await pagina.locator('.ficha-menu:not(.oculto)').count()) await pagina.mouse.click(5, 5);
+  await pagina.waitForFunction(() => !document.querySelector('.ficha-menu:not(.oculto)'));
+};
 
+/* La columna que se desplaza es la de la derecha (con la lista larga de «Registro»). */
+const columna = () => pagina.evaluate(() => { const c = document.getElementById('trabajo-der'); return [c.scrollHeight > c.clientHeight + 100, c.scrollTop]; });
 async function bajar() {
-  await pagina.evaluate(() => window.scrollTo(0, 600));
-  await pagina.waitForFunction(() => document.querySelector('.ficha-cabecera').classList.contains('encogida'));
-  /* Nombre y DNI llegan después de medir: se espera a que salgan, no una pausa fija. */
-  await pagina.waitForFunction(() =>
-    document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])').length >= 5);
+  await pagina.evaluate(() => { document.getElementById('trabajo-der').scrollTop = 600; });
+  await pagina.waitForFunction(() => document.getElementById('trabajo-der').scrollTop > 100);
 }
 
 async function revisar(etiqueta) {
   console.log('--- ' + etiqueta + ' ---');
-  await pagina.evaluate(() => window.scrollTo(0, 0));
-  await pagina.waitForFunction(() => !document.querySelector('.ficha-cabecera').classList.contains('encogida'));
+  await pagina.evaluate(() => { document.getElementById('trabajo-der').scrollTop = 0; });
   await bajar();
-  await comprobar(etiqueta + ': los cinco botones a la vista',
-    visibles(), ['Asunto', 'Ruta', 'NIE', 'Nombre', 'DNI']);
-  await comprobar(etiqueta + ': la línea gris se esconde y la fila de copiar no',
-    pagina.evaluate(() => {
-      const s = document.querySelector('.ficha-subtitulo');
-      const f = document.querySelector('.ficha-copiar-fila');
-      return [!s || getComputedStyle(s).display === 'none', getComputedStyle(f).display !== 'none'];
-    }), [true, true]);
-  await comprobar(etiqueta + ': fila en un solo renglón y sin desplazamiento lateral',
-    pagina.evaluate(() => {
-      const bs = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])'));
-      const tops = new Set(bs.map((b) => Math.round(b.getBoundingClientRect().top)));
-      const h = document.documentElement;
-      return [tops.size, h.scrollWidth <= h.clientWidth + 1];
-    }), [1, true]);
-  await comprobar(etiqueta + ': la fila de copiar queda dentro de la cabecera',
+  await comprobar(etiqueta + ': la columna de la derecha baja de verdad y la cabecera sigue arriba, en una línea',
     pagina.evaluate(() => {
       const c = document.querySelector('.ficha-cabecera').getBoundingClientRect();
-      const f = document.querySelector('.ficha-copiar-fila').getBoundingClientRect();
-      return f.bottom <= c.bottom + 1 && f.top >= c.top - 1;
-    }), true);
-  await comprobar(etiqueta + ': «DNI» copia el DNI',
+      const l = document.querySelector('.ficha-linea1').getBoundingClientRect();
+      return [document.getElementById('trabajo-der').scrollTop > 100, c.top >= -1 && c.top < 40, l.height < 60];
+    }), [true, true, true]);
+  await ABRIR_MENU();
+  /* Nombre y DNI llegan después de pintar: se espera a que salgan, no una pausa fija. */
+  await pagina.waitForFunction(() => {
+    const m = document.querySelector('.ficha-menu:not(.oculto)');
+    return Array.from(m.querySelectorAll('.ficha-menu-opcion:not([hidden])')).map((b) => b.textContent.trim()).filter((t) => /^(Asunto|NIE|DNI|Nombre)$/.test(t)).length >= 4;
+  });
+  await comprobar(etiqueta + ': «Copiar» ofrece, a la vista, Asunto, NIE, DNI y Nombre',
+    opciones(), ['Asunto', 'NIE', 'DNI', 'Nombre']);
+  await comprobar(etiqueta + ': sin desplazamiento lateral',
+    pagina.evaluate(() => { const h = document.documentElement; return h.scrollWidth <= h.clientWidth + 1; }), true);
+  await comprobar(etiqueta + ': «DNI» copia el DNI y avisa',
     (async () => {
-      await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("DNI")');
-      await pagina.waitForFunction(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-        .some((x) => x.textContent.trim() === 'Copiado'));
+      await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: /^DNI$/ }).click();
+      await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => /Copiado/.test(m.textContent)));
       return pagina.evaluate(() => navigator.clipboard.readText());
     })(), '12345678Z');
-  await pagina.waitForFunction(() => !Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-    .some((x) => x.textContent.trim() === 'Copiado'));
-  await pagina.evaluate(() => window.scrollTo(0, 0));
-  await pagina.waitForFunction(() => !document.querySelector('.ficha-cabecera').classList.contains('encogida'));
-  await comprobar(etiqueta + ': al subir del todo vuelve la línea gris',
-    pagina.evaluate(() => { const s = document.querySelector('.ficha-subtitulo'); return !s || getComputedStyle(s).display !== 'none'; }), true);
+  await pagina.waitForFunction(() => !document.querySelector('.ficha-menu:not(.oculto)'));
+  await pagina.waitForFunction(() => !Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => /Copiado/.test(m.textContent)), null, { timeout: 15000 });
+  await pagina.evaluate(() => { document.getElementById('trabajo-der').scrollTop = 0; });
 }
 
 await revisar('1920 px');
@@ -189,15 +161,6 @@ await pagina.evaluate(() => {
   document.documentElement.style.setProperty('--ancho-visor', '520px');
 });
 await revisar('1366 px con el visor abierto');
-
-/* Sin que tiemble: encogida y desplegada no se alternan solas. */
-await pagina.evaluate(() => window.scrollTo(0, 600));
-await pagina.waitForFunction(() => document.querySelector('.ficha-cabecera').classList.contains('encogida'));
-const estados = await pagina.evaluate(() => new Promise((res) => {
-  const r = []; let n = 0;
-  const t = setInterval(() => { r.push(document.querySelector('.ficha-cabecera').classList.contains('encogida')); if (++n >= 10) { clearInterval(t); res(r); } }, 100);
-}));
-await comprobar('quieta abajo, la cabecera no tiembla', estados.every((x) => x === true), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

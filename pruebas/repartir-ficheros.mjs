@@ -95,8 +95,8 @@ await pagina.evaluate(async ([origen, oficio, sueltos, personas]) => {
 console.log('--- el botón y la lista de ficheros ---');
 await pagina.evaluate(async (origen) => { const a = App.E.listaAbiertos.filter(x => x.nombre === origen)[0]; await App.abrirFicha(a); }, ORIGEN);
 await pagina.waitForSelector('.ficha-documentos-repartir', { state: 'attached', timeout: 15000 });
-await comprobarP('1. «Documentos de la carpeta» está a la vista en «Trabajo» (fila 425), y el botón con ella', pagina.locator('.ficha-documentos-repartir').isVisible(), true);
-await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
+await comprobarP('1. «Documentos» está a la vista al abrir el bloque (fila 637; antes en «Trabajo», fila 425), y el botón con él', pagina.locator('.ficha-documentos-repartir').isVisible(), true);
 await comprobarP('1. y dice lo que hace', pagina.locator('.ficha-documentos-repartir').textContent(), 'Repartir ficheros entre terceros');
 await pagina.click('.ficha-documentos-repartir');
 await pagina.waitForSelector('.repartir-elegir');

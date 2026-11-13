@@ -319,6 +319,8 @@
 
   window.FichaTercero = {
     pintarLinea: pintarLinea, datosBasicos: datosBasicos, construirVerTodo: construirVerTodo, datoConCopiar: datoConCopiar,
+    /* fila 637: el bloque «Datos» abre «Ver todo» y «Cambiar los datos» con las mismas ventanas de siempre */
+    verTodo: abrirVerTodo, cambiarDatos: cambiarDatos, sePuedeCambiar: sePuedeCambiar,
     /* para las pruebas: la cascada CSV -> ficha.contacto -> nada, sin
        tener que montar un DOM entero para leer el resultado. */
     _buscarPersona: buscarPersona

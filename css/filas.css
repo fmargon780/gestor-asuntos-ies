@@ -110,7 +110,7 @@
 
 .mesa-doc-nombre { flex-direction: row; align-items: center; gap: 8px; flex: 1 1 0; min-width: 8em; }
 .mesa-doc-tipo { flex: 0 0 auto; }
-.mesa-doc-nombre .hito-doc-abrir { flex: 0 1 auto; min-width: 7em; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mesa-doc-nombre .hito-doc-abrir { flex: 0 1 auto; min-width: 7em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mesa-doc-nombre .mesa-doc-origen { flex: 0 0 auto; white-space: nowrap; }
 .mesa-doc-nombre > .ruta-documento-lugar { flex: 0 0 auto; }
 .mesa-doc-nombre > .doc-datos { flex: 1 1 0; width: auto; min-width: 0; max-width: none; margin: 0; }

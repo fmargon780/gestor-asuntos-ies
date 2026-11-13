@@ -47,6 +47,8 @@ await pagina.evaluate(async ([uno, dos, previa, largo]) => {
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: 'Aguilar Ponce, Marina' }).first().click();
+await pagina.waitForSelector('#ficha-documentos', { state: 'attached', timeout: 15000 });
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* vista nueva: el bloque llega plegado */
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { timeout: 15000 });
 await pagina.waitForTimeout(1500);
 

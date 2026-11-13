@@ -97,32 +97,48 @@ async function abrirFicha(nombre) {
   await pagina.waitForTimeout(150);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombre + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.waitForSelector('.ficha-copiar-fila');
+  await pagina.waitForSelector('.ficha-nombre-menu-boton');
 }
 
-/* "Nombre" y DNI/CIF viven en el DOM desde el primer pintado, ocultos
-   con `hidden` hasta que responde el fichero de datos (18-sep-2026,
-   fila 58: así revelarlos no mete un nodo nuevo, y no le hace repintar
-   de más al panel de hitos, js/hitos-panel.js). Por eso todo lo de
-   aquí filtra `:not([hidden])`: un botón sin dato sigue en el DOM,
-   pero no debe contar como "puesto". */
-function etiquetas() {
-  return pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])'))
-    .map((b) => b.textContent.trim()));
+/* Fila 637: la fila de copiar de debajo del nombre ya no existe; cada botón es ahora una opción del menú «⋯»
+   (rótulo «Copiar»), en el mismo orden. «Ruta» pasó a ser el botón #ficha-ruta de la cabecera.
+   "Nombre" y DNI/CIF viven en el menú desde el primer pintado, ocultos con `hidden` hasta que responde el fichero de
+   datos. Por eso todo lo de aquí filtra los `hidden`: una opción sin dato sigue en el DOM, pero no debe contar. */
+async function abrirMenu() {
+  if (!(await pagina.locator('.ficha-menu:not(.oculto)').count())) await pagina.click('.ficha-nombre-menu-boton');
+  await pagina.waitForSelector('.ficha-menu:not(.oculto)');
+}
+async function cerrarMenu() {
+  if (await pagina.locator('.ficha-menu:not(.oculto)').count()) await pagina.keyboard.press('Escape');
+  if (await pagina.locator('.ficha-menu:not(.oculto)').count()) await pagina.click('.ficha-nombre-menu-boton');
+}
+/* Las opciones de «Copiar» del menú, más «Ruta» si el botón de la cabecera está. */
+async function etiquetas() {
+  await abrirMenu();
+  const copiar = await pagina.evaluate(() => {
+    const hijos = Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) > *'));
+    const i = hijos.findIndex((e) => e.classList.contains('ficha-menu-rotulo') && e.textContent.trim() === 'Copiar');
+    const r = [];
+    for (let k = i + 1; k < hijos.length && hijos[k].tagName !== 'HR'; k++) if (!hijos[k].hidden) r.push(hijos[k].textContent.trim());
+    return r;
+  });
+  await cerrarMenu();
+  const ruta = await pagina.locator('#ficha-ruta').count() ? ['Ruta'] : [];
+  return [copiar[0], ...ruta, ...copiar.slice(1)];
 }
 
-async function esperarBotones(n) {
-  await pagina.waitForFunction((minimo) =>
-    document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])').length >= minimo, n);
+async function esperarBotones(n) {   /* n incluye «Ruta» */
+  await pagina.waitForFunction((minimo) => {
+    const m = document.querySelectorAll('.ficha-menu .ficha-menu-opcion');
+    return Array.from(m).filter((e) => !e.hidden && ['Asunto', 'NIE', 'DNI', 'CIF', 'Nombre'].includes(e.textContent.trim())).length + 1 >= minimo;
+  }, n);
 }
 
 async function copiarYLeer(etiqueta) {
-  await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("' + etiqueta + '")');
-  await pagina.waitForFunction((et) => {
-    const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-      .find((x) => x.textContent.trim() === 'Copiado');
-    return !!b;
-  }, etiqueta);
+  await pagina.evaluate(() => navigator.clipboard.writeText('__nada__'));
+  await abrirMenu();
+  await pagina.click('.ficha-menu:not(.oculto) .ficha-menu-opcion:text-is("' + etiqueta + '")');
+  await pagina.waitForFunction(() => navigator.clipboard.readText().then((t) => t !== '__nada__'));
   return pagina.evaluate(() => navigator.clipboard.readText());
 }
 
@@ -132,8 +148,8 @@ async function copiarYLeer(etiqueta) {
 console.log('--- 1. alumnado con DNI: los cuatro botones ---');
 await abrirFicha(ALUMNO_CON_DNI);
 await esperarBotones(4 + 1);  // + «Ruta» (fila 98)
-await comprobar('1. los cuatro botones, en orden',
-  etiquetas(), ['Asunto', 'Ruta', 'NIE', 'Nombre', 'DNI']);
+await comprobar('1. las cuatro opciones del menú (y «Ruta»), en orden (en el menú, el documento va antes que el nombre)',
+  etiquetas(), ['Asunto', 'Ruta', 'NIE', 'DNI', 'Nombre']);
 await comprobar('1. "Asunto" copia el nombre completo de la carpeta',
   copiarYLeer('Asunto'), ALUMNO_CON_DNI);
 await comprobar('1. "NIE" copia el número, sin el nombre',
@@ -160,7 +176,7 @@ console.log('--- 3. personal: Nombre y DNI, sin NIE ---');
 await abrirFicha(PERSONAL);
 await esperarBotones(3 + 1);  // + «Ruta» (fila 98)
 await comprobar('3. tres botones: Asunto, Nombre y DNI, sin NIE',
-  etiquetas(), ['Asunto', 'Ruta', 'Nombre', 'DNI']);
+  etiquetas(), ['Asunto', 'Ruta', 'DNI', 'Nombre']);
 await comprobar('3. "DNI" copia el documento del empleado',
   copiarYLeer('DNI'), '44556677B');
 
@@ -171,7 +187,7 @@ console.log('--- 4. empresas: el botón del documento se llama CIF ---');
 await abrirFicha(EMPRESA);
 await esperarBotones(3 + 1);  // + «Ruta» (fila 98)
 await comprobar('4. tres botones: Asunto, Nombre y CIF, sin NIE',
-  etiquetas(), ['Asunto', 'Ruta', 'Nombre', 'CIF']);
+  etiquetas(), ['Asunto', 'Ruta', 'CIF', 'Nombre']);
 await comprobar('4. "Nombre" copia la razón social',
   copiarYLeer('Nombre'), 'Suministros Escolares SL');
 await comprobar('4. "CIF" copia el NIF de la empresa',

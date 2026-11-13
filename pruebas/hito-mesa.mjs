@@ -214,15 +214,15 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('5. el hito-pregunta enseña sus opciones, la elegida en verde',
     pagina.locator('.hito-en-mesa .mesa-opcion.elegida').textContent().then((t) => t.indexOf('Ordinario') !== -1), true);
   await comprobar('5. la tira lleva el hito de la rama elegida',
-    pagina.locator('.hito-en-mesa .mesa-tira-hito').allTextContents().then((t) => t.join('|').indexOf('Grabar en Séneca') !== -1), true);
+    pagina.locator('#ficha-tira .mesa-tira-hito').allTextContents().then((t) => t.join('|').indexOf('Grabar en Séneca') !== -1), true);
   await pagina.locator('.hito-en-mesa .mesa-opcion[data-opcion="o2"]').click();
   await pagina.waitForTimeout(900);
   await comprobar('5. al elegir la otra, la tira se actualiza',
-    pagina.locator('.hito-en-mesa .mesa-tira-hito').allTextContents().then((t) => t.join('|')).then((t) =>
+    pagina.locator('#ficha-tira .mesa-tira-hito').allTextContents().then((t) => t.join('|')).then((t) =>
       t.indexOf('Pedir informe a la Delegación') !== -1 && t.indexOf('Grabar en Séneca') === -1), true);
 
   /* 6. */
-  await pagina.locator('.hito-en-mesa .mesa-tira-hito', { hasText: 'Recoger la solicitud' }).click();
+  await pagina.locator('#ficha-tira .mesa-tira-hito', { hasText: 'Recoger la solicitud' }).click();
   await pagina.waitForTimeout(300);
   await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .hito-doc-abrir').click();
   await pagina.waitForSelector('body.con-visor');
@@ -254,7 +254,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible(), true);
 
   /* 7b. Fila 194: «← Volver a los hitos» hace lo mismo que Escape. */
-  await pagina.click('#mesa-volver-hitos');
+  await pagina.evaluate(() => HitoMesa.cerrar());   /* fila 637: «← Hitos» ya no existe; Escape y cerrar() hacen lo mismo */
   await pagina.waitForTimeout(200);
   await comprobar('7b. «← Volver a los hitos» cierra la mesa',
     pagina.evaluate(() => !document.getElementById('ficha-guia').classList.contains('con-mesa')), true);

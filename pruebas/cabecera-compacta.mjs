@@ -3,16 +3,15 @@
    inventados.
 
    A 1600×920, con un hito abierto:
-     1. La cabecera del asunto en dos líneas: «← Volver», tipo, nombre y
-        «Archivar» en la primera; estado, plazo, encargo, «Comunicar» y la
-        línea gris en la segunda.
+     1. (fila 637) La cabecera del asunto en una sola línea: «← Volver», tipo, número, nombre, «Ruta» y
+        «Archivar»; debajo, la fila de hitos y a su derecha el plazo y el estado del hito.
      2. Sin «Volver a las tarjetas», «Volver a la lista de hitos» ni la
         línea de ruta; sin el título «Hitos» del recuadro.
      3. El título del guion («QUÉ HAY QUE HACER» desde la fila 145), a 250 px o menos del borde de arriba.
      4. El nombre del hito, sus etiquetas y «Marcar hito como hecho», en
         una sola línea.
-     5. «← Hitos» (fila 425; antes, pulsar otra vez la pestaña «Hitos»): a la lista de hitos,
-        con «Trabajo» abierta y sin salir de la ficha.
+     5. (fila 637) Cerrar la mesa del hito (`HitoMesa.cerrar()`; antes «← Hitos»): a la lista de hitos,
+        sin salir de la ficha.
    A 800×900: nada se sale por la derecha (sin desplazamiento lateral). */
 import { chromium } from 'playwright';
 import { abrirHito, verLaLista } from './apoyo/hito.mjs';
@@ -110,15 +109,16 @@ async function abrirMesa(pagina) {
 
   /* 1. */
   const v = await alto(pagina, '#ficha-volver');
-  const a = await alto(pagina, '#ficha-archivar .boton-principal');
+  const a = await alto(pagina, '#ficha-archivar button');
   const n = await alto(pagina, '.ficha-nombre');
-  const e = await alto(pagina, '#ficha-acciones .marca-hito');   /* fila 129: el hito actual, en vez del desplegable de estado */
-  const s = await alto(pagina, '.ficha-subtitulo');
+  const r = await alto(pagina, '#ficha-ruta button');
+  const tira = await alto(pagina, '#ficha-tira');
+  const plazo = await alto(pagina, '#ficha-acciones .boton-vencimiento');
   await comprobar('1. «← Volver», nombre y «Archivar», en la misma línea',
-    Promise.resolve([Math.abs(v.top - a.top) < 12, Math.abs(v.top - n.top) < 12]), [true, true]);
-  await comprobar('1. «Archivar» a la derecha', Promise.resolve(a.left > n.left), true);
-  await comprobar('1. el hito actual y la línea gris, en la segunda línea',
-    Promise.resolve([e.top > v.bottom - 2, Math.abs((s.top + s.bottom) / 2 - (e.top + e.bottom) / 2) < 16]), [true, true]);
+    Promise.resolve([Math.abs(v.top - a.top) < 12, Math.abs(v.top - n.top) < 12, Math.abs(v.top - r.top) < 12]), [true, true, true]);
+  await comprobar('1. «Ruta» y «Archivar» a la derecha del nombre', Promise.resolve([a.left > n.left, r.left > n.left]), [true, true]);
+  await comprobar('1. la fila de hitos y el plazo, en la línea de debajo',
+    Promise.resolve([tira.top > v.bottom - 2, plazo.top > v.bottom - 2, Math.abs((tira.top + tira.bottom) / 2 - (plazo.top + plazo.bottom) / 2) < 24]), [true, true, true]);
   await comprobar('1. el texto del botón de volver', pagina.locator('#ficha-volver').textContent(), '← Volver');
 
   /* 2. */
@@ -151,9 +151,9 @@ async function abrirMesa(pagina) {
     Promise.resolve([Math.abs(t.top - et.top) < 14, h.top >= t.bottom - 2 && h.top - t.bottom < 100]), [true, true]);
 
   /* 5. */
-  await pagina.click('#mesa-volver-hitos');
+  await pagina.evaluate(() => HitoMesa.cerrar());
   await pagina.waitForTimeout(300);
-  await comprobar('5. «← Hitos»: a la lista de hitos, con «Trabajo» abierta y sin salir de la ficha',
+  await comprobar('5. cerrar la mesa: a la lista de hitos, con «Trabajo» abierta y sin salir de la ficha',
     pagina.evaluate(() => [!!document.querySelector('#ficha-guia.con-mesa'), document.getElementById('ficha-tarjetas').dataset.abierta || '',
       !document.getElementById('pantalla-asunto').classList.contains('oculto')]),
     [false, 'trabajo', true]);

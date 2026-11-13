@@ -72,7 +72,8 @@ var EstadoHito = (function () {
 
   /* ---------- la marca de la tarjeta y de la cabecera ---------- */
 
-  function marcaHTML(a, modo, lado) {
+  /* `sinHito` (fila 637): la cabecera de la ficha ya no repite «Hito N de M · …»; queda solo «Esperando a…». */
+  function marcaHTML(a, modo, lado, sinHito) {
     if (modo === 'archivado') {
       return '<span class="marca-hito marca-hito-archivado">' + esc(textoArchivado(a.ficha)) + '</span>';
     }
@@ -83,7 +84,7 @@ var EstadoHito = (function () {
     var texto = l.texto || Hitos.textoDelEstado(l);
     /* Fila 249: un asunto ya «Por liquidar» no está «listo para archivar». */
     if (l.listo && window.PorLiquidar && PorLiquidar.estaPorLiquidar(a)) texto = 'Por liquidar';
-    var html = l.hito
+    var html = sinHito ? '' : l.hito
       ? '<button type="button" class="marca-hito' + clase + '" data-hito="' + esc(l.hito) +
         '" data-ayuda-clave="abrir-este-hito">' + esc(texto) + '</button>'
       : '<span class="marca-hito' + clase + '">' + esc(texto) + '</span>';
@@ -121,6 +122,7 @@ var EstadoHito = (function () {
     var cont = document.createElement('div');
     cont.className = 'ficha-estado-hito';
     cont.id = 'ficha-estado-hito';
+    cont.dataset.sinHito = '1';   /* fila 637 */
     caja.appendChild(cont);
     pintarCaja(cont, a);
     if (window.Hitos && !Hitos.ultimosLeidos()) Hitos.leer().catch(function () { /* se queda como está */ });
@@ -136,7 +138,7 @@ var EstadoHito = (function () {
   function pintarCaja(cont, a) {
     var l = estadoDe(a);
     cont.dataset.firma = firmaDe(l);
-    cont.innerHTML = marcaHTML(a, 'abierto', l);
+    cont.innerHTML = marcaHTML(a, 'abierto', l, cont.dataset.sinHito === '1');
     engancharMarca(cont, a, 'abierto');
     if (l.esperando && l.esperando.auto) {
       /* Fila 162: la espera del responsable del hito no se quita: es el hito. */

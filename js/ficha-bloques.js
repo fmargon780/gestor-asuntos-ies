@@ -99,12 +99,16 @@
 
   function datosDelAsunto(a) {
     var f = a.ficha || {};
+    /* Fila 637: «Quién lo pide» y «Por qué vía» salen aquí, con los demás campos, si están rellenos o si el tipo los pide al
+       crear; en un asunto abierto, con «Cambiar» (la ventana de siempre). «El encargo» ya no es un botón de la cabecera. */
+    var pide = (window.Campos && Campos.datosAlCrearDe) ? (Campos.datosAlCrearDe(App.E.campos, N.tipoDe(a)) || []) : [];
+    var puedeCambiar = N.modoActual === 'abierto' && !!window.LoPide;
     var buenas = conRotulosDeHito(a, filasDeCampos(a)).concat([
-      { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
-      { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
+      { titulo: 'Quién lo pide', valor: window.LoPide ? LoPide.texto(f) : '', encargo: puedeCambiar, pide: pide.indexOf('lopide') !== -1 },
+      { titulo: 'Por qué vía', valor: App.textoVia(f), encargo: puedeCambiar, pide: pide.indexOf('via') !== -1 },
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo || x.elegir); });
+    ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo || x.elegir || x.pide); });
     /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que
        envuelve App.abrirFicha), porque hace falta leer los hitos del

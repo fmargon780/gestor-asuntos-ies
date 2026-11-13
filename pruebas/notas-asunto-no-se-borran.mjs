@@ -201,10 +201,10 @@ await comprobar('6. y el foco y el cursor también',
 console.log('--- 7. la ficha en tarjetas (fila 107, 24-sep-2026): el orden ---');
 /* docs/FICHA-EN-TARJETAS.md, 1 (fila 425: pestañas): «Trabajo», Datos y contacto, Campos, Registro,
    Otros asuntos, Personas. Sustituye a la comprobación de las tres columnas de la fila 51. */
-await comprobar('7. el orden de las pestañas',
+await comprobar('7. el orden de «Trabajo» y de los bloques de la derecha (fila 637)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
   /* Fila 245: «Campos del asunto» sale siempre en un asunto abierto (con «+ Añadir campo»). */
-  ['trabajo', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
+  ['trabajo', 'datos', 'relacionados', 'documentos', 'notas', 'otros']);
 
 console.log('--- 8. la nota ya no se guarda sola mientras se escribe (fila 58) ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
@@ -241,7 +241,9 @@ console.log('--- 10. salir de la ficha con una nota sin guardar avisa ---');
    solo el evento "click" sintético). */
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'Nota sin guardar de verdad');
-/* Fila 425: ya no hay «cerrar la tarjeta»: un solo Escape sale de la ficha. */
+/* Fila 637: con la mesa del hito abierta, el primer Escape la cierra (la lista de hitos) y el siguiente sale de la ficha. */
+await pagina.keyboard.press('Escape');
+await pagina.waitForTimeout(300);
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('10. el aviso es el que toca',

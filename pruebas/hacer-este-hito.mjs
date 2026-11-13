@@ -72,7 +72,7 @@ async function abrirMesa(frag) {
   await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 15000 });
   await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 10000 });
   /* Fila 425: al entrar se abre el hito actual; esta prueba trabaja con el primero de la guía. */
-  const primero = pagina.locator('.hito-en-mesa .mesa-tira-hito').first();
+  const primero = pagina.locator('#ficha-tira .mesa-tira-hito').first();
   if (await primero.count() && !(await primero.evaluate((e) => e.classList.contains('actual')))) await primero.click();
   await pagina.waitForTimeout(600);
 }

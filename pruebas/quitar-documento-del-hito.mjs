@@ -112,6 +112,8 @@ const abrirMesa = async (i) => {
   await pagina.evaluate(async (i) => { const hs = await window.__h.hitos(); HitoMesa.abrir(window.__h.a(), hs[i].id); }, i);
   await pagina.waitForTimeout(800);
   await pagina.waitForSelector('.hito-en-mesa', { timeout: 10000 });
+  await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { state: 'attached', timeout: 10000 });
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
   await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { timeout: 10000 });
   await cerrarCuadro();
 };

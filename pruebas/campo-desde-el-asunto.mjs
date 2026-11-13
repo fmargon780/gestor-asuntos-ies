@@ -47,7 +47,7 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
-/* Fila 425: «Campos del asunto» es una pestaña; esta prueba trabaja dentro de ella (al entrar en una ficha, con ella ya abierta). */
+/* Fila 637: «Campos de este asunto» es un recuadro del bloque «Datos»; esta prueba trabaja con ese bloque abierto (`abrirAlEntrar('tramite')` abre «Datos»). */
 await pagina.addInitScript(() => {
   window.addEventListener('DOMContentLoaded', () => {
     if (!window.FichaTarjetas) return;
@@ -123,12 +123,13 @@ await comprobar('0. el aviso de después',
 
 /* 1. El botón y la ventana. */
 await abrirFichaDe('Sola Uno');
-await comprobar('1. la tarjeta «Campos del asunto» lleva el botón en su título (fila 254)',
+/* Fila 637: «Campos del asunto» ya no es una tarjeta: es el recuadro «Campos de este asunto» del bloque «Datos», con el botón al pie. */
+await comprobar('1. el recuadro «Campos de este asunto» lleva el botón (fila 254)',
   pagina.evaluate(() => ({ boton: document.getElementById('ficha-campo-anadir').textContent,
-    enTitulo: !!document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"] > .ficha-titulo #ficha-campo-anadir'),
-    titulo: (document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"] > .ficha-titulo').firstChild.textContent.trim()),
+    enRecuadro: !!document.querySelector('#ficha-datos-bloque .datos-grupo.ancho #ficha-campo-anadir'),
+    titulo: document.querySelector('#ficha-datos-bloque .datos-grupo.ancho > h4').textContent.trim(),
     viejo: document.body.textContent.indexOf('Datos del trámite') !== -1 })),
-  { boton: '+ Añadir campo', enTitulo: true, titulo: 'Campos del asunto', viejo: false });
+  { boton: '+ Añadir campo', enRecuadro: true, titulo: 'Campos de este asunto', viejo: false });
 await abrirVentana();
 await comprobar('1. sale «Elegir un campo», con los campos del grupo «Asunto» y el desplegable «Para»',
   pagina.evaluate(() => ({ titulo: document.querySelector('.capa-campos .campos-elegir-titulo h3').textContent,
@@ -225,14 +226,14 @@ await comprobar('7. en modo consulta el botón y los «⋮» no se ven',
     menu: Array.prototype.every.call(document.querySelectorAll('.campo-aqui-menu'), (b) => getComputedStyle(b.closest('.ficha-menu-envoltorio') || b).display === 'none' || getComputedStyle(b).display === 'none')
   })), { boton: 'none', menu: true });
 
-/* 8. Fila 254: pulsar el botón no abre ni cierra la tarjeta (fila 425: ni cambia de pestaña). */
+/* 8. Fila 254: pulsar el botón no abre ni cierra el bloque. */
 await pagina.evaluate((n) => { FichaNucleo.ocupacionActual = null; App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'); }, ASUNTO_1);
 await pagina.waitForSelector('#ficha-campo-anadir');
 await pagina.waitForTimeout(400);
 await pagina.click('#ficha-campo-anadir');
 await pagina.waitForSelector('.capa-campos .campos-grupo');
-await comprobar('8. el botón no cambia de pestaña',
-  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta || ''), 'tramite');
+await comprobar('8. el botón no pliega el bloque «Datos» (fila 637: ya no hay pestañas)',
+  pagina.evaluate(() => !!document.querySelector('.ficha-plegable[data-tarjeta="datos"].abierto')), true);
 await pagina.click('#ce-cerrar');
 
 /* 9. Un fallo al guardar nunca se queda en silencio (aviso rojo, y el campo no sale). */

@@ -62,37 +62,47 @@ await pagina.evaluate(async (ASUNTOS) => {
   await App.verAbiertos();
 }, ASUNTOS);
 
+/* Fila 637: los datos favoritos ya no van en la cabecera junto al nombre. Con el bloque «Datos» plegado salen en su línea
+   (`[data-resumen-bloque="datos"]`, dentro de la cabecera del bloque), cada uno con su ⧉; el cuadro se abre con «Elegir qué se
+   ve plegado», dentro del bloque abierto (antes, «Elegir datos»). De fábrica, ALUMNADO lleva NIE, curso y unidad; con nada elegido
+   que se vea (empresa, alumno sin matrícula) sale la línea de uso diario (NIF/DNI, teléfono y correo). */
 async function abrir(clave, modo) {
   await pagina.evaluate(([n, modo]) => {
     const a = App.E.listaAbiertos.filter(x => x.nombre === n)[0];
     App.abrirFicha(a, modo || 'abierto');
   }, [ASUNTOS[clave], modo]);
-  await pagina.waitForSelector('#fav-elegir');
-  await pagina.waitForTimeout(500);
+  await pagina.waitForSelector('#ficha-datos-bloque', { state: 'attached' });
+  await pagina.waitForFunction(() => !/^Leyendo/.test(document.getElementById('ficha-datos-bloque').textContent.trim()));
+  await pagina.waitForTimeout(600);
 }
-const datos = () => pagina.locator('#ficha-favoritos-datos').innerText().then(t => t.replace(/\s+/g, ' ').trim());
+const datos = () => pagina.locator('[data-resumen-bloque="datos"]').innerText().then(t => t.replace(/⧉/g, '').replace(/\s+/g, ' ').trim());
+const botonElegir = () => pagina.locator('#ficha-datos-bloque').getByRole('button', { name: 'Elegir qué se ve plegado' });
 async function abrirCuadro() {
-  await pagina.click('#fav-elegir');
+  await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+  await botonElegir().click();
   await pagina.waitForSelector('#fav-lista input');
   await pagina.waitForTimeout(100);
 }
 const marcadas = () => pagina.evaluate(() => Array.from(document.querySelectorAll('#fav-lista input:checked')).map(c => c.dataset.clave));
 async function marcar(clave) { await pagina.locator('#fav-lista input[data-clave="' + clave + '"]').click(); }
 
-console.log('--- 1 a 3. lo que se ve en la cabecera ---');
+console.log('--- 1 a 3. lo que se ve con el bloque plegado ---');
 await abrir('marina');
-await comprobar('1. alumna matriculada: «Unidad: 2º B»', datos(), 'Unidad: 2º B');
-await comprobar('1. el botón «Elegir datos» sale detrás', pagina.locator('#fav-elegir').innerText(), 'Elegir datos');
-await comprobar('1. a la derecha del nombre y a la izquierda de «Archivar»', pagina.evaluate(() => {
-  const n = document.querySelector('.ficha-nombre').getBoundingClientRect();
-  const f = document.getElementById('ficha-favoritos').getBoundingClientRect();
-  const ar = document.getElementById('ficha-archivar').getBoundingClientRect();
-  return [f.left >= n.right - 1, f.right <= ar.left + 1, f.top < n.bottom];
-}), [true, true, true]);
+await comprobar('1. alumna matriculada: de fábrica NIE, curso y unidad', datos(), 'NIE 1140233 · Curso 2º de E.S.O. · Unidad 2º B');
+await comprobar('1. cada dato lleva su ⧉ para copiarlo', pagina.evaluate(() =>
+  Array.from(document.querySelectorAll('[data-resumen-bloque="datos"] .datos-mano-dato')).map(d => /⧉/.test(d.textContent) || !!d.querySelector('button'))), [true, true, true]);
+await comprobar('1. el botón «Elegir qué se ve plegado» está dentro del bloque Datos', pagina.evaluate(async () => {
+  FichaTarjetas.abrir('datos');
+  return !!Array.from(document.querySelectorAll('#ficha-datos-bloque button')).filter(b => b.textContent.trim() === 'Elegir qué se ve plegado').length;
+}), true);
+await comprobar('1. y la línea está en la cabecera del bloque, a la vista con el bloque plegado', pagina.evaluate(() => {
+  const l = document.querySelector('[data-resumen-bloque="datos"]');
+  return [!!l.closest('.plegable-cab'), !!l.closest('.ficha-plegable[data-tarjeta="datos"]')];
+}), [true, true]);
 await abrir('luis');
-await comprobar('2. alumno no matriculado: ni «Unidad» ni hueco, solo el botón', [await datos(), await pagina.locator('#fav-elegir').isVisible()], ['', true]);
+await comprobar('2. alumno no matriculado este curso: ni «Unidad» ni hueco (solo el NIE y el curso que sí constan)', datos(), 'NIE 1140999 · Curso 1º de E.S.O.');
 await abrir('empresa');
-await comprobar('3. empresa sin elegir nada: solo el botón', [await datos(), await pagina.locator('#fav-elegir').isVisible()], ['', true]);
+await comprobar('3. empresa sin elegir nada: la línea de uso diario (NIF, teléfono y correo)', datos().then(t => /^NIF B12345674 · Tel\. .*955.* · info@suministros\.invalid$/.test(t)), true);
 
 console.log('--- 4 y 5. el cuadro ---');
 await abrir('marina');
@@ -101,10 +111,10 @@ await comprobar('4. título y línea de ayuda', pagina.evaluate(() => [
   document.getElementById('cuadro-titulo').textContent,
   /^Marca hasta 3\. Se verán junto al nombre en todos los asuntos de alumnado, en todos los ordenadores del centro\.$/.test(document.querySelector('#cuadro-cuerpo .explica').textContent)
 ]), ['Elegir datos · Alumnado', true]);
-await comprobar('4. «Unidad» marcada, la primera, con «2º B» en gris', pagina.evaluate(() => {
-  const f = document.querySelector('#fav-lista .fav-fila');
-  return [f.querySelector('input').checked, f.querySelector('.fav-fila-nombre').textContent, f.querySelector('.fav-fila-valor').textContent];
-}), [true, 'Unidad', '— 2º B']);
+await comprobar('4. NIE, curso y unidad marcadas, arriba, con «2º B» en gris', pagina.evaluate(() => {
+  const fs = Array.from(document.querySelectorAll('#fav-lista .fav-fila')).slice(0, 3);
+  return fs.map(f => [f.querySelector('input').checked, f.querySelector('.fav-fila-nombre').textContent, f.querySelector('.fav-fila-valor').textContent]);
+}), [[true, 'Nº Id. Escolar', '— 1140233'], [true, 'Curso', '— 2º de E.S.O.'], [true, 'Unidad', '— 2º B']]);
 await comprobar('5. ni nombre ni apellidos en la lista', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#fav-lista .fav-fila-nombre')).some(e => /^(nombre|apellidos?|alumno\/a)$/i.test(e.textContent.trim()))), false);
 await comprobar('5. sí hay datos que esta alumna tiene vacíos («Nacionalidad»)', pagina.evaluate(() => {
@@ -116,38 +126,46 @@ await pagina.click('#cuadro-cancelar');
 
 console.log('--- 6 a 8. elegir, máximo 3, cancelar (con la otra alumna) ---');
 await abrir('ana');
+await comprobar('6. de fábrica, tres marcados', datos(), 'NIE 1141000 · Curso 3º de E.S.O. · Unidad 3º C');
 await abrirCuadro();
-await marcar('nacionalidad');
-await marcar('telefono del tutor');
-await comprobar('7. con 3 marcados, las demás apagadas y «Máximo 3»', pagina.evaluate(() => [
+await comprobar('7. con 3 marcados (los de fábrica), las demás apagadas y «Máximo 3»', pagina.evaluate(() => [
   Array.from(document.querySelectorAll('#fav-lista input:not(:checked)')).every(c => c.disabled),
   !document.getElementById('fav-maximo').classList.contains('oculto')
 ]), [true, true]);
+await marcar('nº id. escolar');
+await marcar('curso');
+await marcar('nacionalidad');
+await marcar('telefono del tutor');
+await comprobar('7. al desmarcar dos y marcar otras dos, otra vez tres, y las demás apagadas', pagina.evaluate(() => [
+  Array.from(document.querySelectorAll('#fav-lista input:checked')).length,
+  Array.from(document.querySelectorAll('#fav-lista input:not(:checked)')).every(c => c.disabled)
+]), [3, true]);
 await marcar('nacionalidad');
 await comprobar('7. al desmarcar una, se encienden', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#fav-lista input:not(:checked)')).every(c => !c.disabled)), true);
 await pagina.click('#cuadro-cancelar');
-await comprobar('8. «Cancelar» no cambia nada', datos(), 'Unidad: 3º C');
+await comprobar('8. «Cancelar» no cambia nada', datos(), 'NIE 1141000 · Curso 3º de E.S.O. · Unidad 3º C');
 await abrirCuadro();
-await marcar('nacionalidad');
+await marcar('curso');
 await pagina.keyboard.press('Escape');
 await pagina.waitForTimeout(200);
-await comprobar('8. Escape tampoco', [await datos(), await pagina.locator('#capa.oculto').count()], ['Unidad: 3º C', 1]);
+await comprobar('8. Escape tampoco', [await datos(), await pagina.locator('#capa.oculto').count()], ['NIE 1141000 · Curso 3º de E.S.O. · Unidad 3º C', 1]);
 await abrirCuadro();
+await marcar('nº id. escolar');
+await marcar('curso');
 await marcar('telefono del tutor');
 await marcar('nacionalidad');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 await comprobar('6. «Guardar»: los tres, en el orden marcado, con su nombre delante', datos(),
-  'Unidad: 3º C · Teléfono del tutor: 600333444 · Nacionalidad: Española');
+  'Unidad 3º C · Teléfono del tutor 600333444 · Nacionalidad Española');
 
 console.log('--- 9. otro asunto de alumnado ---');
 await abrir('marina');
-await comprobar('9. los mismos datos, con los valores de esa alumna (sin lo que no tiene)', datos(), 'Unidad: 2º B · Teléfono del tutor: 600111222');
+await comprobar('9. los mismos datos, con los valores de esa alumna (sin lo que no tiene)', datos(), 'Unidad 2º B · Teléfono del tutor 600111222');
 
 console.log('--- 10. la empresa no se mezcla ---');
 await abrir('empresa');
-await comprobar('10. la empresa sigue sin datos', datos(), '');
 await abrirCuadro();
 await comprobar('10. sin «Unidad» en su lista, con «NIF»', pagina.evaluate(() => {
   const n = Array.from(document.querySelectorAll('#fav-lista .fav-fila-nombre')).map(e => e.textContent);
@@ -156,7 +174,7 @@ await comprobar('10. sin «Unidad» en su lista, con «NIF»', pagina.evaluate((
 await marcar('nif');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
-await comprobar('10. «NIF» sale en la empresa', datos(), 'NIF: B12345674');
+await comprobar('10. «NIF» sale en la empresa, y solo él', datos(), 'NIF B12345674');
 await abrir('marina');
 await comprobar('10. y no en el alumnado', (await datos()).indexOf('NIF') === -1, true);
 
@@ -169,7 +187,8 @@ await abrirCuadro();
 for (const k of ['unidad', 'telefono del tutor']) await marcar(k);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
-await comprobar('12. quitadas dos, queda la tercera (Marina no tiene nacionalidad: solo el botón)', [await datos(), await pagina.locator('#fav-elegir').isVisible()], ['', true]);
+await comprobar('12. quitadas dos, queda la tercera (Marina no tiene nacionalidad: sin nada elegido que se vea, sale la línea de uso diario)',
+  datos().then(t => /^NIE 1140233 · Curso 2º de E\.S\.O\. · Unidad 2º B/.test(t) && t.indexOf('Nacionalidad') === -1), true);
 await comprobar('12. (se quita «Unidad» y «Teléfono»: queda «Nacionalidad») y el disco lo guarda', pagina.evaluate(async () => {
   const r = await App.leerRegistroDelDisco();
   return [r.ajustesAvisos.datosFavoritos.ALUMNADO, r.ajustesAvisos.datosFavoritos.EMPRESAS];
@@ -180,28 +199,28 @@ await comprobar('12. y tras volver a abrir (otra vez desde el disco)', pagina.ev
   return DatosFavoritos.elegidos('ALUMNADO');
 }), ['nacionalidad']);
 
-console.log('--- 13. cabecera encogida ---');
+console.log('--- 13. la línea en la cabecera del bloque, estrecha ---');
 await abrir('ana');
-await comprobar('13. el botón se esconde y los datos siguen', pagina.evaluate(() => {
-  document.querySelector('.ficha-cabecera').classList.add('encogida');
-  const b = document.getElementById('fav-elegir');
-  const d = document.getElementById('ficha-favoritos-datos');
-  const r = [getComputedStyle(b).display === 'none', d.textContent.indexOf('Nacionalidad: Española') !== -1,
-    getComputedStyle(d).whiteSpace === 'nowrap'];
-  document.querySelector('.ficha-cabecera').classList.remove('encogida');
-  return r;
+await comprobar('13. con el bloque plegado la línea se ve y no hace desbordar la página', pagina.evaluate(() => {
+  FichaTarjetas.plegar('datos');
+  const l = document.querySelector('[data-resumen-bloque="datos"]');
+  const r = l.getBoundingClientRect();
+  return [r.width > 0 && r.height > 0, l.textContent.indexOf('Nacionalidad Española') !== -1, document.documentElement.scrollWidth <= window.innerWidth];
 }), [true, true, true]);
 
 console.log('--- 14. en el ARCHIVO ---');
 await abrir('ana', 'archivado');
-await comprobar('14. se ven los datos y el botón funciona', [await datos(), await pagina.locator('#fav-elegir').isEnabled()], ['Nacionalidad: Española', true]);
+await comprobar('14. se ven los datos y el botón funciona', [await datos(), await pagina.evaluate(() => { FichaTarjetas.abrir('datos'); return Array.from(document.querySelectorAll('#ficha-datos-bloque button')).filter(b => b.textContent.trim() === 'Elegir qué se ve plegado').map(b => !b.disabled); })],
+  ['Nacionalidad Española', [true]]);
 
 console.log('--- 15. modo consulta ---');
 await abrir('ana');
 await comprobar('15. con el compañero dentro, los datos se ven y el botón está apagado', pagina.evaluate(() => {
+  FichaTarjetas.abrir('datos');
   FichaNucleo.ocupacionActual = { usuario: 'Otra Persona' };
   FichaNucleo.aplicarModoConsulta();
-  const r = [document.getElementById('fav-elegir').disabled, document.getElementById('ficha-favoritos-datos').textContent.length > 0];
+  const b = Array.from(document.querySelectorAll('#ficha-datos-bloque button')).filter(x => x.textContent.trim() === 'Elegir qué se ve plegado')[0];
+  const r = [b.disabled, document.querySelector('[data-resumen-bloque="datos"]').textContent.length > 0];
   FichaNucleo.ocupacionActual = null;
   FichaNucleo.aplicarModoConsulta();
   return r;
@@ -211,18 +230,16 @@ console.log('--- 16. otras pantallas ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.waitForTimeout(300);
 await comprobar('16. la tabla de Inicio no enseña estos datos', pagina.evaluate(() =>
-  /Nacionalidad:|Unidad:/.test(document.getElementById('pantalla-abiertos').innerText)), false);
+  /Nacionalidad|Unidad /.test(document.getElementById('pantalla-abiertos').innerText)), false);
 
 console.log('--- 17. pantalla estrecha (1280 px) ---');
 await pagina.setViewportSize({ width: 1280, height: 900 });
 await abrir('ana');
-await comprobar('17. el bloque no se tapa con «Archivar» ni con el nombre', pagina.evaluate(() => {
-  const n = document.querySelector('.ficha-nombre').getBoundingClientRect();
-  const f = document.getElementById('ficha-favoritos').getBoundingClientRect();
-  const ar = document.getElementById('ficha-archivar').getBoundingClientRect();
-  const sinTaparNombre = f.left >= n.right - 1 || f.top >= n.bottom - 1;
-  const sinTaparArchivar = f.right <= ar.left + 1 || f.top >= ar.bottom - 1 || ar.top >= f.bottom - 1 ? true : false;
-  return [sinTaparNombre, sinTaparArchivar, document.documentElement.scrollWidth <= window.innerWidth];
+await comprobar('17. la línea no se tapa con nada ni desborda la página', pagina.evaluate(() => {
+  FichaTarjetas.plegar('datos');
+  const l = document.querySelector('[data-resumen-bloque="datos"]').getBoundingClientRect();
+  const cab = document.querySelector('.ficha-datos-cab, .ficha-plegable[data-tarjeta="datos"] .plegable-cab').getBoundingClientRect();
+  return [l.right <= cab.right + 1, l.left >= cab.left - 1, document.documentElement.scrollWidth <= window.innerWidth];
 }), [true, true, true]);
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);

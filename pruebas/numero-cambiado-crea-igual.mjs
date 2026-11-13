@@ -141,8 +141,10 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-const ASUNTO = await pagina.locator('.ficha-nombre-texto').textContent();
+const ASUNTO = await pagina.locator('.ficha-nombre-texto').getAttribute('data-ayuda');   /* fila 637: el texto es el tercero; la carpeta, en su title (que la aplicación pasa a data-ayuda) */
 async function anadirDocumento(fecha, antesDeGuardar) {
+  await pagina.waitForSelector('.ficha-documentos-anadir', { state: 'attached' });
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
   await pagina.click('.ficha-documentos-anadir');
   await pagina.waitForSelector('#doc-vista');
   await pagina.fill('#doc-fecha', fecha);
@@ -156,6 +158,8 @@ async function anadirDocumento(fecha, antesDeGuardar) {
   await pagina.waitForTimeout(300);
   return vista;
 }
+await pagina.waitForSelector('.ficha-documentos-anadir', { state: 'attached' });
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
 await pagina.waitForSelector('.ficha-documentos-anadir');
 const ficheros = () => pagina.evaluate(async (a) => {
   const c = await window.__disco.abiertos.getDirectoryHandle(a);

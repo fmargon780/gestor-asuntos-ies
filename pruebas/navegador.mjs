@@ -500,6 +500,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('la carpeta del asunto empieza sin documentos',
   pagina.locator('#ficha-documentos .ficha-documento').count(), 0);
 
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: el botón está en el bloque «Documentos», plegado al entrar */
 await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-vista');
 await comprobar('el documento se ve al lado del formulario',

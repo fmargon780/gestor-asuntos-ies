@@ -130,6 +130,8 @@ await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { state: 'attached' });
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
 console.log('--- antes de registrar ---');
@@ -257,6 +259,8 @@ async function prepararDocumentoYSello(nombreOriginal, textoSello) {
   await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
   await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+  await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { state: 'attached' });
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: los bloques entran plegados */
   await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 }
 

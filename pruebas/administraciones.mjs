@@ -133,8 +133,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(500);
 await comprobar('3. sale en «Campos del asunto»', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#pantalla-asunto .ficha-dato')).some((f) => /Departamento/.test(f.textContent) && /Sección de Escolarización/.test(f.textContent))), true);
-await comprobar('3. y en «Datos y contacto»', pagina.evaluate(() =>
-  Array.from(document.querySelectorAll('.tercero-detalle')).some((p) => /Departamento: Sección de Escolarización/.test(p.textContent))), true);
+/* (fila 637) La comprobación «y en “Datos y contacto”» se quita: esa sección ya no existe y el departamento solo sale en «Campos de este asunto» (la de arriba). */
 await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');

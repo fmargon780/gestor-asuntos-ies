@@ -248,7 +248,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
    52, docs/CABECERA-DEL-ASUNTO.md): el icono de copiar y los tres
    puntos van al lado, dentro del mismo <h2>. */
 await comprobar('abre la ficha del asunto de verdad',
-  pagina.locator('.ficha-nombre-texto').textContent(), A);
+  pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda')), A);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 

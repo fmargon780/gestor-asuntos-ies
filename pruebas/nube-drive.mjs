@@ -79,12 +79,12 @@ async function abrirAbierto() {
   await pagina.waitForTimeout(150);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.waitForSelector('.ficha-copiar-fila');
+  await pagina.waitForSelector('#ficha-ruta .boton-copiar-fila');   /* fila 637: «Ruta» está en la cabecera, junto a «Archivar» */
 }
 async function copiarRuta() {
   await pagina.evaluate(() => navigator.clipboard.writeText('(nada)'));
-  await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
-  await pagina.waitForFunction(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
+  await pagina.click('#ficha-ruta .boton-copiar-fila:has-text("Ruta")');
+  await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#ficha-ruta .boton-copiar-fila'))
     .some((x) => x.textContent.trim() === 'Copiado'));
   const texto = await pagina.evaluate(() => navigator.clipboard.readText());
   await pagina.waitForTimeout(1500);
@@ -169,7 +169,7 @@ await comprobarQue('6. el bloque de rutas de Ajustes no dice «Dropbox en este o
 /* ---------- 7. ficheros de Google ---------- */
 console.log('--- 7. ficheros de Google ---');
 await abrirAbierto();
-await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
+await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila', { state: 'attached' });
 const textoDocs = await pagina.evaluate(() => document.getElementById('ficha-documentos').textContent);
 await comprobarQue('7. el PDF sale en la lista del asunto', Promise.resolve(textoDocs.indexOf('FACTURA') !== -1));
 await comprobarQue('7. el .gdoc no sale', Promise.resolve(!/gdoc/i.test(textoDocs)));

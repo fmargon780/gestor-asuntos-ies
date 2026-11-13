@@ -1,48 +1,49 @@
 /* ============================================================
-   ficha-tarjetas.js — las pestañas de la ficha del asunto y la vista de
-   trabajo (24-sep-2026, fila 107; 22-oct-2026, fila 425,
-   docs/FICHA-VISTA-DE-TRABAJO.md).
+   ficha-tarjetas.js — la vista del asunto: el hito a la izquierda y, a la
+   derecha, cinco bloques plegados (13-nov-2026, fila 637,
+   docs/637-VISTA-DEL-ASUNTO-CABECERA-Y-PANEL.md; antes, seis pestañas,
+   filas 107 y 425).
 
-   Debajo de la cabecera de la ficha hay siempre una fila de pestañas:
-   «Trabajo» (la primera, y la que está abierta al entrar), «La actividad»
-   y «Candidaturas» (donde existen), «Datos y contacto», «Campos del
-   asunto» (si lo hay), «Registro», «Otros asuntos de este tercero» y
-   «Personas y entidades relacionadas».
+   - Arriba, la fila de hitos (`#ficha-tira`, la pinta js/hito-mesa.js) con, a
+     su derecha, `#ficha-acciones` (vencimiento, «Esperando a…», «Comunicar»).
+   - «Trabajo» son dos columnas de igual ancho: a la izquierda el hito entero
+     de arriba abajo (`#ficha-guia`, js/hitos-panel.js y js/hito-mesa.js) y a
+     la derecha los bloques plegados (`#ficha-plegables`), o el documento
+     abierto tapándolos (js/ficha-trabajo-visor.js).
+   - Los bloques, en este orden, cada uno con su icono: Datos, Personas y
+     entidades relacionadas, Documentos de la carpeta, Registro y Otros
+     asuntos de este tercero (y «La actividad» / «Candidaturas» al principio,
+     solo donde existen: filas 306 y 347). Se abren y se pliegan al pulsar su
+     título; cuáles están abiertos se recuerda mientras no se salga del asunto.
+   - Los huecos de dentro (`#ficha-documentos`, `#ficha-notas`, `#ficha-otros`,
+     `#ficha-relacionados`…) son los de siempre y los sigue pintando el mismo
+     módulo. «Datos» lo pinta js/ficha-datos-bloque.js.
 
-   - «Trabajo» son dos columnas de igual ancho: a la izquierda el hito
-     entero de arriba abajo (`#ficha-guia`, que pinta js/hitos-panel.js y
-     js/hito-mesa.js) y a la derecha los documentos de la carpeta
-     (`#ficha-documentos`, js/ficha-documentos.js), o el documento abierto
-     en lugar de la lista (js/ficha-trabajo-visor.js). Sustituye a las
-     antiguas pestañas «Hitos» y «Documentos de la carpeta».
-   - Las demás pestañas se abren a todo el ancho.
-   - Al entrar en una ficha, siempre «Trabajo»; desde «Qué me toca»
-     (`abrirAlEntrar('trabajo')`) también. Un repintado de la misma ficha
-     no cambia de pestaña.
+   js/ficha-asunto.js monta el HTML con `html(tramite, a)` y llama a
+   `alEntrar()` al abrir una ficha y a `alPintar(raiz, a)` al terminar de
+   pintarla.
 
-   js/ficha-asunto.js monta el HTML con `html(tramite)` y llama a
-   `alEntrar()` al abrir una ficha y a `alPintar(raiz, a)` al terminar
-   de pintarla: puntos de enganche previstos, sin envolver nada.
+   `abrir(id)` se queda por quien lo llamaba con el nombre de una pestaña: ahora
+   abre el bloque que corresponde (`contacto` y `tramite` son «Datos»).
    ============================================================ */
 var FichaTarjetas = (function () {
 
-  /* En el orden de las pestañas. */
-  var TARJETAS = [
-    { id: 'trabajo', titulo: 'Trabajo' },
-    { id: 'actividad', titulo: 'La actividad' },   /* fila 306: solo en un asunto de actividad extraescolar */
-    { id: 'candidaturas', titulo: 'Candidaturas' },   /* fila 347: solo en el asunto de unas elecciones */
-    { id: 'contacto', titulo: 'Datos y contacto' },
-    { id: 'tramite', titulo: 'Campos del asunto' },
-    { id: 'notas', titulo: 'Registro' },
-    { id: 'otros', titulo: 'Otros asuntos de este tercero' },
-    { id: 'relacionados', titulo: 'Personas y entidades relacionadas' }
+  /* En el orden de los bloques. `icono`: el de su título. */
+  var BLOQUES = [
+    { id: 'actividad', titulo: 'La actividad', icono: '🎯' },        /* fila 306: solo en un asunto de actividad extraescolar */
+    { id: 'candidaturas', titulo: 'Candidaturas', icono: '🗳️' },    /* fila 347: solo en el asunto de unas elecciones */
+    { id: 'datos', titulo: 'Datos', icono: '📋' },
+    { id: 'relacionados', titulo: 'Personas y entidades relacionadas', icono: '👥', cuenta: true },
+    { id: 'documentos', titulo: 'Documentos de la carpeta', icono: '📁', cuentaId: 'ficha-cuenta-docs' },
+    { id: 'notas', titulo: 'Registro', icono: '📝', cuenta: true },
+    { id: 'otros', titulo: 'Otros asuntos de este tercero', icono: '🗂️', cuenta: true }
   ];
 
-  /* Las pestañas de antes (fila 425): «Hitos» y «Documentos de la carpeta» son ahora «Trabajo». */
-  var ALIAS = { hitos: 'trabajo', documentos: 'trabajo' };
+  /* Los nombres de las pestañas de antes. */
+  var ALIAS = { hitos: 'trabajo', contacto: 'datos', tramite: 'datos', carpeta: 'documentos' };
   function idDe(id) { return ALIAS[id] || id || 'trabajo'; }
 
-  var abierta = 'trabajo';     /* id de la pestaña abierta */
+  var abiertos = {};           /* { <id del bloque>: true } mientras se está en el asunto */
   var pendienteAlEntrar = null;
   var asuntoActual = null;
   var turnoResumen = null;
@@ -52,70 +53,64 @@ var FichaTarjetas = (function () {
 
   /* ---------- el HTML (lo pide js/ficha-asunto.js) ---------- */
 
-  function tarjeta(id, titulo, dentro, alLado) {
-    return '<section class="ficha-bloque ficha-tarjeta' + (id === abierta ? ' abierta' : '') + '" data-tarjeta="' + id + '">' +
-      (titulo ? '<h3 class="ficha-titulo">' + U.escapar(titulo) + (alLado || '') + '</h3>' : '') +
-      '<div class="ficha-tarjeta-cuerpo">' + dentro + '</div>' +
-    '</section>';
-  }
-
-  /* Fila 425: el hito a la izquierda y la carpeta a la derecha. Los huecos de dentro
-     (#ficha-guia, #ficha-documentos, #ficha-cuenta-docs) son los de siempre. */
-  function trabajo() {
-    return '<section class="ficha-tarjeta ficha-trabajo' + (abierta === 'trabajo' ? ' abierta' : '') + '" data-tarjeta="trabajo">' +
-      '<div class="trabajo-columnas" id="trabajo-columnas">' +
-        '<div class="trabajo-col trabajo-izq ficha-bloque" id="trabajo-izq">' +
-          '<div id="ficha-guia" class="explica">Leyendo…</div>' +
-        '</div>' +
-        '<div class="trabajo-col trabajo-der" id="trabajo-der">' +
-          '<div id="trabajo-der-arriba"></div>' +
-          '<section class="ficha-bloque trabajo-carpeta" id="trabajo-carpeta">' +
-            '<h3 class="ficha-titulo">Documentos de la carpeta<span class="ficha-cuenta" id="ficha-cuenta-docs"></span></h3>' +
-            '<div id="ficha-documentos" class="explica">Leyendo…</div>' +
-          '</section>' +
-        '</div>' +
+  function bloque(b, dentro) {
+    var abierto = !!abiertos[b.id];
+    return '<section class="ficha-tarjeta ficha-plegable' + (abierto ? ' abierto' : '') + '" data-tarjeta="' + b.id + '">' +
+      '<div class="plegable-cab" role="button" tabindex="0" aria-expanded="' + (abierto ? 'true' : 'false') + '">' +
+        '<span class="plegable-flecha" aria-hidden="true">▸</span>' +
+        '<span class="plegable-icono" aria-hidden="true">' + b.icono + '</span>' +
+        '<b class="ficha-titulo plegable-titulo">' + U.escapar(b.titulo) + '</b>' +
+        (b.cuenta ? '<span class="ficha-cuenta" data-cuenta-tarjeta="' + b.id + '"></span>' : '') +
+        (b.cuentaId ? '<span class="ficha-cuenta" id="' + b.cuentaId + '"></span>' : '') +
+        '<span class="plegable-resumen" data-resumen-bloque="' + b.id + '"></span>' +
       '</div>' +
+      '<div class="plegable-dentro ficha-tarjeta-cuerpo">' + dentro + '</div>' +
     '</section>';
   }
 
   function html(tramite, a) {
     var conActividad = !!(window.Actividades && Actividades.tarjetaAplica(a));   /* fila 306 */
     var conCandidaturas = !!(window.Candidaturas && Candidaturas.aplica(a));   /* fila 347 */
-    if (abierta === 'actividad' && !conActividad) abierta = 'trabajo';
-    if (abierta === 'candidaturas' && !conCandidaturas) abierta = 'trabajo';
-    if (abierta === 'tramite' && !tramite) abierta = 'trabajo';
-    return '<div class="ficha-tarjetas" id="ficha-tarjetas" data-abierta="' + abierta + '">' +
-      '<div class="ficha-tarjetas-pestanas" id="ficha-tarjetas-pestanas"></div>' +
-      '<div class="ficha-tarjetas-rejilla" id="ficha-tarjetas-rejilla">' +
-        trabajo() +
-        (conActividad ? tarjeta('actividad', 'La actividad', '<div id="ficha-actividad" class="explica">Leyendo…</div>') : '') +
-        (conCandidaturas ? tarjeta('candidaturas', 'Candidaturas', '<div id="ficha-candidaturas" class="explica">Leyendo…</div>') : '') +
-        /* "Datos y contacto" trae su propio título (js/ficha-tercero.js). */
-        tarjeta('contacto', '', '<div id="ficha-contacto-caja"></div>') +
-        (tramite ? tarjeta('tramite', 'Campos del asunto', tramite,
-          window.CampoDesdeElAsunto ? CampoDesdeElAsunto.botonTituloHtml() : '') : '') +
-        tarjeta('notas', 'Registro', '<div id="ficha-notas"></div>',
-                '<span class="ficha-cuenta" data-cuenta-tarjeta="notas"></span>') +
-        tarjeta('otros', 'Otros asuntos de este tercero', '<div id="ficha-otros" class="explica">Buscando…</div>',
-                '<span class="ficha-cuenta" data-cuenta-tarjeta="otros"></span>') +
-        tarjeta('relacionados', 'Personas y entidades relacionadas',
-                '<div id="ficha-relacionados" class="explica">Leyendo…</div>',
-                '<span class="ficha-cuenta" data-cuenta-tarjeta="relacionados"></span>') +
+    var dentro = {
+      actividad: '<div id="ficha-actividad" class="explica">Leyendo…</div>',
+      candidaturas: '<div id="ficha-candidaturas" class="explica">Leyendo…</div>',
+      datos: '<div id="ficha-datos-bloque" class="datos-bloque"><p class="explica">Leyendo…</p></div>',
+      relacionados: '<div id="ficha-relacionados" class="explica">Leyendo…</div>',
+      /* El hueco lleva su propia barra de botones («+ Añadir documento», «Generar documento»…) que pinta js/ficha-documentos.js. */
+      documentos: '<section class="ficha-bloque trabajo-carpeta" id="trabajo-carpeta"><h3 class="ficha-titulo ficha-titulo-barra"></h3><div id="ficha-documentos" class="explica">Leyendo…</div></section>',
+      notas: '<div id="ficha-notas"></div>',
+      otros: '<div id="ficha-otros" class="explica">Buscando…</div>'
+    };
+    var plegables = BLOQUES.filter(function (b) {
+      return (b.id !== 'actividad' || conActividad) && (b.id !== 'candidaturas' || conCandidaturas);
+    }).map(function (b) { return bloque(b, dentro[b.id]); }).join('');
+    return '<div class="ficha-tarjetas" id="ficha-tarjetas" data-abierta="trabajo">' +
+      '<div class="ficha-tira-fila">' +
+        '<div class="ficha-tira" id="ficha-tira"></div>' +
+        '<div class="ficha-acciones" id="ficha-acciones"></div>' +
       '</div>' +
+      '<section class="ficha-tarjeta ficha-trabajo abierta" data-tarjeta="trabajo">' +
+        '<div class="trabajo-columnas" id="trabajo-columnas">' +
+          '<div class="trabajo-col trabajo-izq ficha-bloque" id="trabajo-izq">' +
+            '<div id="ficha-guia" class="explica">Leyendo…</div>' +
+          '</div>' +
+          '<div class="trabajo-col trabajo-der" id="trabajo-der">' +
+            '<div class="ficha-plegables" id="ficha-plegables">' + plegables + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
     '</div>';
   }
 
-  /* ---------- entrar, pintar y cambiar de pestaña ---------- */
+  /* ---------- entrar, pintar, abrir y plegar ---------- */
 
-  /* Al entrar en una ficha, «Trabajo». Pero si es la misma que ya está a
-     la vista (la aplicación la vuelve a abrir sola tras guardar algo, por
-     ejemplo al cerrar el cuadro de Correo o al generar un documento), se
-     queda la pestaña que estuviera abierta. */
+  /* Al entrar en una ficha nueva, todos los bloques plegados. Si es la misma que ya está a la vista (la aplicación la vuelve
+     a abrir sola tras guardar algo), se quedan como estaban. */
   function alEntrar(a) {
     var r = raiz();
     var mismaALaVista = !!(a && asuntoActual && asuntoActual.nombre === a.nombre && r && r.offsetParent);
-    if (pendienteAlEntrar) abierta = pendienteAlEntrar;
-    else if (!mismaALaVista) abierta = 'trabajo';
+    if (!mismaALaVista) abiertos = {};
+    if (pendienteAlEntrar && pendienteAlEntrar !== 'trabajo') abiertos[pendienteAlEntrar] = true;
     pendienteAlEntrar = null;
     if (window.HitoMesa && HitoMesa.alEntrarEnLaFicha) HitoMesa.alEntrarEnLaFicha(a, mismaALaVista);   /* fila 425: el hito de partida */
   }
@@ -128,91 +123,70 @@ var FichaTarjetas = (function () {
     var r = raiz();
     if (!r) return;
     if (window.AsuntoDeGrupo) AsuntoDeGrupo.titularTarjeta(r, a);   /* fila 293 */
-    var rejilla = $('ficha-tarjetas-rejilla');
-    if (!r.querySelector('.ficha-tarjeta[data-tarjeta="' + abierta + '"]')) abierta = 'trabajo';
+    var plegables = $('ficha-plegables');
     new MutationObserver(function (cambios) {
       var deVerdad = cambios.some(function (c) {
         var t = c.target.nodeType === 1 ? c.target : c.target.parentNode;
-        return t && !t.closest('.ficha-cuenta[data-cuenta-tarjeta]');
+        return t && !t.closest('.ficha-cuenta');
       });
       if (deVerdad) programarResumen();
-    }).observe(rejilla, { childList: true, subtree: true, characterData: true });
-    aplicar();
+    }).observe(plegables, { childList: true, subtree: true, characterData: true });
+    engancharCabezas();
     resumirTodas();
     programarResumen();
     engancharVentana();
-  }
-
-  /* `deParte` (js/ficha-trabajo-visor.js): el cambio no lo pide quien mira, sino un documento que se abre. */
-  function abrir(id, deParte) {
-    id = idDe(id);
-    if (!raiz() || !raiz().querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"]')) return;
-    if (!deParte && window.FichaTrabajoVisor) FichaTrabajoVisor.olvidar();
-    abierta = id;
-    aplicar();
-    window.scrollTo(0, 0);
-  }
-
-  function aplicar() {
-    var r = raiz();
-    if (!r) return;
-    r.dataset.abierta = abierta;
-    Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta'), function (t) {
-      t.classList.toggle('abierta', t.dataset.tarjeta === abierta);
-    });
-    pintarPestanas();
     ajustarAlto();
-    /* El documento que esté abierto se pone en la columna derecha de «Trabajo», o se saca de ahí. */
     if (window.FichaTrabajoVisor) FichaTrabajoVisor.ubicar();
   }
 
-  /* ---------- las pestañas de arriba ---------- */
-
-  function tituloDe(id) {
-    var viva = raiz() && raiz().querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"]');
-    if (viva && viva.dataset.titulo) return viva.dataset.titulo;   /* fila 293: «Personas del grupo (N)» */
-    var t = TARJETAS.filter(function (x) { return x.id === id; })[0];
-    return t ? t.titulo : id;
+  function bloqueDe(id) {
+    var r = raiz();
+    return r && r.querySelector('.ficha-plegable[data-tarjeta="' + id + '"]');
   }
 
-  function cuentaDe(id) {
-    var r = raiz();
-    var el = r && r.querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"] .ficha-cuenta[data-cuenta-tarjeta]');
-    return el ? (el.textContent || '').trim() : '';
+  function poner(id, abierto) {
+    var b = bloqueDe(id);
+    if (!b) return;
+    if (abierto) abiertos[id] = true; else delete abiertos[id];
+    b.classList.toggle('abierto', !!abierto);
+    var cab = b.querySelector('.plegable-cab');
+    if (cab) cab.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    ajustarAlto();
   }
 
-  function pintarPestanas() {
-    var caja = $('ficha-tarjetas-pestanas');
-    var r = raiz();
-    if (!caja || !r) return;
-    var firma = [];
-    var tarjetas = Array.prototype.slice.call(r.querySelectorAll('.ficha-tarjeta'));
-    tarjetas.forEach(function (t) {
-      var id = t.dataset.tarjeta;
-      firma.push(id + '|' + tituloDe(id) + '|' + cuentaDe(id) + '|' + (id === abierta ? '1' : '0'));
-    });
-    firma = firma.join('\n');
-    if (caja.dataset.firma === firma) return;   /* solo se rehace si cambia algo: no despierta al observador en balde */
-    caja.dataset.firma = firma;
-    caja.innerHTML = '';
-    tarjetas.forEach(function (t) {
-      var id = t.dataset.tarjeta;
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'ficha-pestana' + (id === abierta ? ' activa' : '');
-      b.dataset.tarjeta = id;
-      var cuenta = cuentaDe(id);
-      b.innerHTML = U.escapar(tituloDe(id)) + (cuenta ? ' <span class="ficha-pestana-cuenta">' + U.escapar(cuenta) + '</span>' : '');
-      b.onclick = function () { if (id !== abierta) abrir(id); };
-      caja.appendChild(b);
+  function engancharCabezas() {
+    Array.prototype.forEach.call(document.querySelectorAll('#ficha-plegables .plegable-cab'), function (cab) {
+      var id = cab.parentNode.dataset.tarjeta;
+      function alternar(ev) {
+        /* Un botón de dentro del título (⧉ de un dato) hace lo suyo, no pliega. */
+        if (ev.target && ev.target.closest && ev.target.closest('button, a, input, select')) return;
+        poner(id, !abiertos[id]);
+      }
+      cab.onclick = alternar;
+      cab.onkeydown = function (ev) {
+        if (ev.target !== cab || (ev.key !== 'Enter' && ev.key !== ' ')) return;
+        ev.preventDefault();
+        alternar(ev);
+      };
     });
   }
 
-  /* ---------- los números de las pestañas ---------- */
+  /* El nombre de una pestaña de antes (o de un bloque) abre ese bloque. `deParte` ya no hace falta: se queda para quien lo llama. */
+  function abrir(id) {
+    id = idDe(id);
+    if (id === 'trabajo') { if (window.FichaTrabajoVisor) FichaTrabajoVisor.ubicar(); return; }
+    if (!bloqueDe(id)) return;
+    poner(id, true);
+  }
+
+  function plegar(id) { poner(idDe(id), false); }
+  function estaAbierto(id) { return !!abiertos[idDe(id)]; }
+
+  /* ---------- los números de los bloques ---------- */
 
   function programarResumen() {
     clearTimeout(turnoResumen);
-    turnoResumen = setTimeout(function () { resumirTodas(); pintarPestanas(); ajustarAlto(); }, 80);
+    turnoResumen = setTimeout(function () { resumirTodas(); ajustarAlto(); }, 80);
   }
 
   /* Los números viven en js/ficha-tarjetas-resumen.js. */
@@ -245,7 +219,7 @@ var FichaTarjetas = (function () {
   function ajustarAlto() {
     var columnas = $('trabajo-columnas');
     var r = raiz();
-    if (!columnas || !r || abierta !== 'trabajo' || !columnas.offsetParent) return;
+    if (!columnas || !r || !columnas.offsetParent) return;
     if (window.innerWidth <= ANCHO_DE_UNA_COLUMNA) { if (columnas.style.height) columnas.style.height = ''; return; }   /* una columna debajo de otra: la página baja */
     var arriba = columnas.getBoundingClientRect().top + window.scrollY;
     var hueco = Math.max(360, window.innerHeight - arriba - debajoDe(columnas) - 1);
@@ -265,8 +239,9 @@ var FichaTarjetas = (function () {
 
   return {
     html: html, alEntrar: alEntrar, alPintar: alPintar, abrirAlEntrar: abrirAlEntrar,
-    abrir: abrir,
-    abierta: function () { return abierta; },
+    abrir: abrir, plegar: plegar, estaAbierto: estaAbierto,
+    /* La vista es siempre la misma («Trabajo»): lo usan el visor y la mesa del hito. */
+    abierta: function () { return 'trabajo'; },
     alCambiarLaMesa: function () { ajustarAlto(); },
     ajustarAlto: ajustarAlto
   };

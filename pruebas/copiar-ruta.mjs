@@ -109,16 +109,18 @@ async function abrirAbierto() {
   await pagina.waitForTimeout(150);
   await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.waitForSelector('.ficha-copiar-fila');
+  await pagina.waitForSelector('#ficha-ruta .boton-copiar-fila');
 }
 
 async function copiarRuta() {
   await pagina.evaluate(() => navigator.clipboard.writeText('(nada)'));
-  await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
-  await pagina.waitForFunction(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-    .some((x) => x.textContent.trim() === 'Copiado'));
+  const avisosAntes = await pagina.locator('#mensajes .mensaje.bueno', { hasText: 'Ruta copiada: ' }).count();
+  await pagina.click('#ficha-ruta .boton-copiar-fila');
+  /* Fila 637: el botón de la cabecera puede seguir diciendo «Copiado» de la vez anterior; se espera al aviso nuevo. */
+  await pagina.waitForFunction((n) => document.querySelectorAll('#mensajes .mensaje.bueno').length > 0 &&
+    Array.from(document.querySelectorAll('#mensajes .mensaje.bueno')).filter((m) => m.textContent.indexOf('Ruta copiada: ') === 0).length > n, avisosAntes);
   const texto = await pagina.evaluate(() => navigator.clipboard.readText());
-  await pagina.waitForTimeout(1500);   /* que el botón vuelva a decir «Ruta» */
+  await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#ficha-ruta .boton-copiar-fila')).some((x) => x.textContent.trim() === 'Ruta'));   /* que el botón vuelva a decir «Ruta» */
   return texto;
 }
 
@@ -132,10 +134,11 @@ async function avisoConRuta() {
 /* ---------- 1. sin ruta apuntada: ya no copia el nombre suelto ---------- */
 console.log('--- 1. sin ruta apuntada (ficha) ---');
 await abrirAbierto();
-await comprobar('el botón «Ruta» va detrás de «Asunto»',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila:not([hidden])'))
-    .map(b => b.textContent.trim()).slice(0, 2)), ['Asunto', 'Ruta']);
-await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
+/* Fila 637: «Asunto» pasó al menú «⋯» (rótulo «Copiar») y «Ruta» es el botón de la cabecera, junto a «Archivar». */
+await comprobar('la opción «Asunto» del menú «⋯» y el botón «Ruta» de la cabecera',
+  pagina.evaluate(() => [Array.from(document.querySelectorAll('.ficha-menu .ficha-menu-opcion')).filter(b => !b.hidden).map(b => b.textContent.trim()).includes('Asunto'),
+    Array.from(document.querySelectorAll('#ficha-ruta .boton-copiar-fila')).map(b => b.textContent.trim())]), [true, ['Ruta']]);
+await pagina.click('#ficha-ruta .boton-copiar-fila');
 await pagina.waitForSelector('#capa:not(.oculto) #ruta-pedida-ficha');
 await comprobarQue('10. pide la ruta en un cuadro que nombra la carpeta, con su nota',
   pagina.evaluate(() => document.getElementById('cuadro-titulo').textContent === 'Ruta de la carpeta ASUNTOS ABIERTOS' &&
@@ -174,7 +177,7 @@ await comprobar('la parte de este ordenador no va a la carpeta compartida',
 /* ---------- 5. modo consulta ---------- */
 await comprobar('lleva la clase que el modo consulta deja encendida (copiar no cambia nada)',
   pagina.evaluate(() => {
-    const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila')).find(x => x.textContent.trim() === 'Ruta');
+    const b = Array.from(document.querySelectorAll('#ficha-ruta .boton-copiar-fila')).find(x => x.textContent.trim() === 'Ruta');
     return b.classList.contains('boton-copiar-fila') && !b.disabled;
   }), true);
 
@@ -197,7 +200,8 @@ await pagina.evaluate(async ([ARCHIVADO, TERCERO]) => {
     leido: Nombres.leer(ARCHIVADO, App.E.tipos), ficha: { categoria: 'ALUMNADO', tercero: TERCERO }
   }, 'archivado');
 }, [ARCHIVADO, TERCERO]);
-await pagina.waitForSelector('.ficha-copiar-fila');
+await pagina.waitForFunction((n) => { const t = document.querySelector('.ficha-nombre-texto'); return t && (t.getAttribute('title') || t.getAttribute('data-ayuda')) === n; }, ARCHIVADO);   /* que ya sea la ficha nueva */
+await pagina.waitForSelector('#ficha-ruta .boton-copiar-fila');
 const RUTA_ARCHIVADO = '/home/francisco/Dropbox/ARCHIVO/ALUMNADO/' + TERCERO + '/' + ARCHIVADO;
 await comprobar('copia /home/... con ARCHIVO / categoría / tercero / nombre, con /',
   copiarRuta(), RUTA_ARCHIVADO);
@@ -371,7 +375,7 @@ await pagina.evaluate(async ([ABIERTO, TERCERO]) => {
   await App.verAbiertos();
 }, [ABIERTO, TERCERO]);
 await abrirAbierto();
-await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
+await pagina.click('#ficha-ruta .boton-copiar-fila');
 await pagina.waitForFunction(() => window.__copiado !== null);
 const baseEsperada = path.join(tmp, 'Users', 'Propietario', 'Dropbox (Personal)');
 await comprobar('13. copia la ruta completa, deducida de la propia dirección, con / y sin codificar',

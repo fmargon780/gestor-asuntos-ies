@@ -54,7 +54,15 @@ var FichaMenus = (function () {
 
     var menu = document.createElement('div');
     menu.className = 'ficha-menu oculto';
+    var porClave = {};
     (opciones || []).forEach(function (o) {
+      if (o.rotulo) {   /* fila 637: un título pequeño dentro del menú («Copiar») */
+        var rot = document.createElement('div');
+        rot.className = 'ficha-menu-rotulo';
+        rot.textContent = o.rotulo;
+        menu.appendChild(rot);
+        return;
+      }
       if (o.raya) {
         var raya = document.createElement('hr');
         raya.className = 'ficha-menu-raya';
@@ -66,6 +74,9 @@ var FichaMenus = (function () {
       item.className = 'ficha-menu-opcion' + (o.clase ? ' ' + o.clase : '');
       item.textContent = o.texto;
       item.disabled = !!o.deshabilitado;
+      if (o.oculto) item.hidden = true;   /* fila 637: se enseña luego con `item(clave).hidden = false` */
+      if (o.clave) porClave[o.clave] = item;
+      if (o.soloLectura) item.setAttribute('data-solo-lectura', '');   /* fila 637: copiar sigue encendido en solo consulta */
       if (o.title) item.title = o.title;   /* fila 206: el motivo de una opción apagada */
       item.onclick = function () {
         cerrar();
@@ -100,7 +111,7 @@ var FichaMenus = (function () {
       abierto = propio;
     };
 
-    return { cerrar: function () { if (abierto === propio) cerrar(); } };
+    return { cerrar: function () { if (abierto === propio) cerrar(); }, item: function (clave) { return porClave[clave] || null; } };
   }
 
   return { montar: montar };

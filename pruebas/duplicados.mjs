@@ -193,7 +193,7 @@ await comprobar('de partida se elige el abierto más reciente',
 
 await pagina.click('#dup-abrir');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await comprobar('lleva a la ficha del asunto elegido', pagina.locator('.ficha-nombre-texto').textContent(), NUEVA);
+await comprobar('lleva a la ficha del asunto elegido', pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda')), NUEVA);
 await comprobar('no se ha creado una tercera carpeta',
   nombresDeAbiertos().then(n => n.filter(x => x.indexOf('TRANSPORTE') !== -1).length), 2);
 
@@ -232,7 +232,7 @@ await pagina.click('#dup-abrir');
 /* Fila 119: abre directamente su ficha de archivado. */
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(300);
-await comprobar('lleva a la ficha del archivado', pagina.locator('.ficha-nombre-texto').textContent(), ARCHIVADO);
+await comprobar('lleva a la ficha del archivado', pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda')), ARCHIVADO);
 await comprobar('en modo archivo (con «Reabrir el asunto»)',
   pagina.getByRole('button', { name: 'Reabrir el asunto', exact: true }).count(), 1);
 await comprobar('no se ha creado una cuarta carpeta abierta',
@@ -324,7 +324,7 @@ await pagina.click('#visor-cerrar');
 await pagina.locator('.columna-nombre').filter({ hasText: NUEVA }).click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('el nombre de la columna abre la ficha de ese asunto',
-  pagina.locator('.ficha-nombre-texto').textContent(), NUEVA);
+  pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda')), NUEVA);
 await pagina.click('#ficha-volver');
 
 /* ============================================================
@@ -612,7 +612,7 @@ await rellenarOculto(pagina, '#campo-descripcion', 'texto a mano');
 await pagina.waitForTimeout(500);
 await pagina.click('#aviso-duplicado .parecido-mismo-tipo');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await comprobar('163 pulsar un abierto del recuadro abre su ficha', pagina.locator('.ficha-nombre-texto').textContent(), P_ROJO);
+await comprobar('163 pulsar un abierto del recuadro abre su ficha', pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda')), P_ROJO);
 await pagina.click('.pestana[data-pantalla="nuevo"]');
 await pagina.waitForTimeout(400);
 /* Fila 220 (docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md): "Nuevo

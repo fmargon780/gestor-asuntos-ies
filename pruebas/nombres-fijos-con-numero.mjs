@@ -216,8 +216,9 @@ await comprobar('un número gastado no se reutiliza aunque el asunto desaparezca
 console.log('--- 4. documentos ---');
 await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('.ficha-documentos-anadir');
+await pagina.waitForSelector('.ficha-documentos-anadir', { state: 'attached' });
 async function anadirElExterno(fecha, tipo, texto, conRegistro) {
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));   /* fila 637: el botón está en la cabecera del bloque «Documentos», plegado al entrar */
   await pagina.click('.ficha-documentos-anadir');
   await pagina.waitForSelector('#doc-vista');
   await pagina.fill('#doc-fecha', fecha);
@@ -236,7 +237,7 @@ async function anadirElExterno(fecha, tipo, texto, conRegistro) {
   await pagina.waitForTimeout(300);
   return vista;
 }
-const ASUNTO_ABIERTO = await pagina.locator('.ficha-nombre-texto').textContent();
+const ASUNTO_ABIERTO = await pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda'))   /* la ayuda del ratón pasa el title a data-ayuda */;
 const vistaDoc = await anadirElExterno('2026-09-07', 'SOLICITUD', 'Curso 26-27', true);
 const NUM_DOC = 'D' + AA + '-00001';
 await comprobar('el documento se llama AAMMDD TIPO D26-NNNNN.ext, sin registro ni texto', vistaDoc, '260907 SOLICITUD ' + NUM_DOC + '.pdf');
@@ -259,7 +260,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + NOMBRE_2 + '"] .nombre-pulsable, #inicio-tabla-cuerpo tr[data-asunto="' + NOMBRE_1 + '"] .nombre-pulsable').last().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('.ficha-documentos-anadir');
+await pagina.waitForSelector('.ficha-documentos-anadir', { state: 'attached' });
 const vistaOtro = await anadirElExterno('2026-09-08', 'SOLICITUD', '', false);
 await comprobar('el mismo fichero en otro asunto lleva el mismo número de documento', vistaOtro, '260908 SOLICITUD ' + NUM_DOC + '.pdf');
 
@@ -269,7 +270,7 @@ await pagina.evaluate(async ([a, d]) => {
   const nombre = '260908 SOLICITUD ' + d + '.pdf';
   window.__disco.externo = window.__disco.fich('sellado.pdf', 'el sellado');
   window.__cuadroRegistro = Registro.abrirCuadro(App.asuntoDeLaFicha(), nombre, function () {});   /* espera al cuadro: no se aguarda */
-}, [await pagina.locator('.ficha-nombre-texto').textContent(), NUM_DOC]);
+}, [await pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda'))   /* la ayuda del ratón pasa el title a data-ayuda */, NUM_DOC]);
 await pagina.waitForSelector('#capa:not(.oculto) #reg-numero');
 await pagina.fill('#reg-ano', AA);
 await pagina.fill('#reg-numero', '77');
@@ -278,7 +279,7 @@ await comprobar('la vista previa conserva el nombre (el registro va a la ficha)'
   '260908 SOLICITUD ' + NUM_DOC + '.pdf');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(600);
-const ASUNTO_2 = await pagina.locator('.ficha-nombre-texto').textContent();
+const ASUNTO_2 = await pagina.locator('.ficha-nombre-texto').evaluate((e) => e.getAttribute('title') || e.getAttribute('data-ayuda'))   /* la ayuda del ratón pasa el title a data-ayuda */;
 await comprobar('el sellado se queda con el mismo nombre; el original sin sellar, en «_Previas», con el mismo número', pagina.evaluate(async (a) => {
   const c = await window.__disco.abiertos.getDirectoryHandle(a);
   const arriba = [], previas = [];

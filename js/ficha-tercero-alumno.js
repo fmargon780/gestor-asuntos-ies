@@ -376,6 +376,6 @@ var FichaTerceroAlumno = (function () {
              tutores: tutores, textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores, otrosFamilia); } };
   }
 
-  return { ventana: ventana, familia: familia, contactoDelAlumno: contactoDelAlumno, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,
+  return { ventana: ventana, familia: familia, contactoDelAlumno: contactoDelAlumno, sexoDelAlumno: sexoDelAlumno, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,
            telefonoLegible: telefonoLegible, etiquetaDeTutor: etiquetaDeTutor };
 })();

@@ -159,7 +159,8 @@ await pagina.click('.ficha-nombre-menu-boton');
 await pagina.click('.ficha-menu:not(.oculto) >> text=Marcar como reservado');
 await esperar(() => document.querySelectorAll('.ficha-nombre .marca-reservado').length === 1);
 await comprobar('candado en la cabecera', pagina.locator('.ficha-nombre .marca-reservado').count(), 1);
-await comprobar('la ficha se ve entera', pagina.locator('.ficha-nombre-texto').textContent(), COMPRA);
+/* (fila 637) El texto de la cabecera es ahora el tercero con su identificación; la carpeta queda en su atributo de ayuda (`title`, que la aplicación pasa a `data-ayuda`). */
+await comprobar('la ficha se ve entera', pagina.locator('.ficha-nombre-texto').evaluate((e) => [e.textContent, e.getAttribute('data-ayuda')]), ['Papeles del Sur SL B29111222', COMPRA]);
 await comprobar('guardado en asuntos.json', pagina.evaluate(async (n) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
   return JSON.parse(await (await (await g.getFileHandle('asuntos.json')).getFile()).text()).asuntos[n].reservado;

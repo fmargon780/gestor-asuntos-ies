@@ -108,10 +108,16 @@ await pagina.evaluate(async (a1) => {
   HitosPanel.programarRepintado();
 }, ASUNTO);
 await pagina.waitForTimeout(900);
-const cabecera = () => pagina.evaluate(() => [
-  (document.querySelector('#ficha-estado-hito .marca-hito') || {}).textContent,
+/* Fila 637: «Hito N de M · …» ya no sale en la cabecera. Su equivalente es la tira de hitos de debajo (`#ficha-tira`): los
+   hechos van con `.hecho` y el paso en el que va el asunto es el primero que no lo está. Se da como «Hito N de M · título». */
+const cabecera = () => pagina.evaluate(() => {
+  const tira = Array.from(document.querySelectorAll('#ficha-tira .mesa-tira-hito'));
+  const i = tira.findIndex((b) => !b.classList.contains('hecho'));
+  const titulo = i < 0 ? '' : (document.querySelector('#ficha-guia .hito[data-id="' + tira[i].dataset.id + '"] .hito-titulo-texto') || {}).textContent;
+  return [i < 0 ? null : 'Hito ' + (i + 1) + ' de ' + tira.length + ' · ' + (titulo || tira[i].textContent.replace(/^✓ /, '').replace(/^\d+[.)]?\s*/, '').trim()),
   ((document.querySelector('#ficha-estado-hito .marca-esperando') || {}).textContent || '').replace(/ desde el .*$/, ''),
-  !!document.querySelector('#ficha-estado-hito .boton-ya-llegado')]);
+  !!document.querySelector('#ficha-estado-hito .boton-ya-llegado')];
+});
 comprobar('4. la cabecera: el paso 3 y «Esperando a Secretaría», sin «Ya ha llegado»', await cabecera(),
   ['Hito 3 de 5 · Puesta a la firma', 'Esperando a Secretaría', false]);
 comprobar('4. «Hito actual» solo en el 3; «Saltar a este hito» en el 4 y el 5',
@@ -119,6 +125,7 @@ comprobar('4. «Hito actual» solo en el 3; «Saltar a este hito» en el 4 y el 
     [h.dataset.id, !!h.querySelector(':scope > .hito-linea .etiqueta-paso-actual'), (h.querySelector(':scope > .hito-linea .hito-situar') || {}).textContent || ''])),
   [['h1', false, ''], ['h2', false, ''], ['h3', true, ''], ['h4', false, 'Saltar a este hito'], ['h5', false, 'Saltar a este hito']]);
 await pagina.evaluate(async (a1) => { await Hitos.marcar(a1, 'h3', 'hecho', ''); }, ASUNTO);
+await pagina.waitForSelector('#ficha-tira .mesa-tira-hito[data-id="h3"].hecho', { state: 'attached' });   /* la tira se pone al día sola */
 await pagina.waitForTimeout(800);
 comprobar('4. al marcar el 3, la cabecera se pone al día sola', await cabecera(), ['Hito 4 de 5 · Registro de Salida', '', false]);
 
