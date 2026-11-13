@@ -83,11 +83,23 @@
   .grupo.ancho{grid-column:1/-1}
   .grupo h4{margin:2px 0 4px}
   @media(max-width:700px){.grupos{grid-template-columns:1fr}}
+  .aviso button{margin-left:10px;padding:1px 9px;font-size:12.5px}
+  .marca{font-size:11.5px;font-weight:700;color:#7a4b00;background:var(--ambar);border:1px solid var(--ambarb);border-radius:9px;padding:0 7px;white-space:nowrap}
+  #capa{position:fixed;inset:0;background:rgba(20,30,45,.45);display:none;align-items:center;justify-content:center;z-index:40;padding:14px}
+  #capa.abierto{display:flex}
+  .cuadro{background:#fff;border-radius:12px;width:min(560px,100%);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .cuadro h3{margin:0;padding:13px 16px;border-bottom:1px solid var(--borde);font-size:17px}
+  .cuadro .cuerpo{padding:12px 16px;overflow:auto}
+  .cuadro .pie{padding:10px 16px;border-top:1px solid var(--borde);display:flex;justify-content:flex-end;gap:8px}
+  .cuadro select{font:inherit;padding:6px 8px;border:1px solid var(--borde);border-radius:8px;width:100%}
+  .cuadro label.op{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--borde);border-radius:8px;padding:7px 10px;margin:6px 0;cursor:pointer}
+  .cuadro label.op small{color:var(--gris)}
+  .vacio{text-align:center;padding:26px 10px}
   #toast{position:fixed;right:16px;bottom:16px;background:var(--verde);color:#fff;padding:10px 14px;border-radius:9px;max-width:360px;display:none;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
-<div class="aviso">Pantalla de prueba 630 · datos inventados · nada se guarda</div>
+<div class="aviso">Pantalla de prueba 630 · datos inventados · nada se guarda <button id="b-cambia">Ver un asunto sin hitos</button></div>
 <div class="pagina">
 
   <div class="cab">
@@ -122,6 +134,7 @@
     <div id="lado"></div>
   </div>
 </div>
+<div id="capa"><div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="c-tit"><h3 id="c-tit">¿De qué tarea es?</h3><div class="cuerpo" id="c-cuerpo"></div><div class="pie"><button id="c-no">Cancelar</button><button class="p" id="c-ok">Añadir</button></div></div></div>
 <div id="toast"></div>
 
 <script>
@@ -135,11 +148,14 @@
     {nombre:'Preparar y enviar el certificado',estado:'actual',expl:'Con la plantilla del tipo. Lo firma Secretaría con el V.º B.º de Dirección.',
      tareas:[{nombre:'Generar el certificado',clase:'generar',hecha:false,datos:[['Nombre','Marina Rubio Ortega'],['Curso','3º de E.S.O.'],['Hoy','13/11/2026']]},
              {nombre:'Registrar la salida en Séneca',clase:'registrar',hecha:false,espera:0},
-             {nombre:'Enviar el certificado por correo',clase:'comunicar',hecha:false,espera:0}]},
+             {nombre:'Enviar el certificado por correo',clase:'comunicar',hecha:false,espera:0},
+             {nombre:'Añadir el recibí de la familia',clase:'anadir',hecha:false}]},
     {nombre:'Archivar el expediente',estado:'',expl:'Cuando la familia confirme que lo ha recibido.',toca:'Familia',tareas:[]}
   ];
   var visto=1, formAbierto=false, espera=null, viendo=null;
-  var carpeta=['261109 SOLICITUD D26-00051.pdf'];
+  var carpeta=['261109 SOLICITUD D26-00051.pdf','escaneo0012.pdf'];
+  var sinTarea={'escaneo0012.pdf':true};
+  var sinHitos=false, hitosCon=hitos, hitosSin=[], nuevos=0, cuadro=null;
   var registro=[
     {h:'Recibir la solicitud',q:'Revisor',f:'09/11/2026 · 10:12',t:'Tarea hecha: Registrar la entrada en Séneca (26EM0131)'},
     {h:'Recibir la solicitud',q:'Revisor',f:'09/11/2026 · 10:05',t:'La madre lo pide para una beca; lo necesita antes del día 20.'}
@@ -155,6 +171,7 @@
 
   function pintaTira(){
     var h='';
+    $('tira').style.display=hitos.length?'':'none';
     hitos.forEach(function(x,i){
       var c=(x.estado==='hecho'?'hecho ':'')+(x.estado==='actual'?'actual ':'')+(i===visto?'visto':'');
       h+='<button class="'+c+'" data-hito="'+i+'">'+(x.estado==='hecho'?'✓ ':'')+(i+1)+'. '+esc(x.nombre)+'</button>';
@@ -164,6 +181,12 @@
   }
 
   function pintaHito(){
+    if(!hitos.length){
+      $('hito').innerHTML='<div class="vacio"><p class="expl">Este tipo no tiene guía. Puedes ir apuntando los hitos a mano.</p>'+
+        '<p><button class="p" id="b-primer">+ Añadir el primer hito</button> <button data-t="Se abre la ventana para escribir la guía del tipo">Escribir la guía de CERTIFICADO DE NOTAS</button></p>'+
+        '<p class="linea">Para generar, comunicar o añadir un documento, crea antes el hito y su tarea.</p></div>';
+      return;
+    }
     var x=hitos[visto], esActual=x.estado==='actual', sig=-1;
     if(esActual)for(var i=0;i<x.tareas.length;i++)if(!x.tareas[i].hecha){sig=i;break}
     var est=x.estado==='hecho'?'Hecho':(esActual?'En curso':'Sin empezar');
@@ -222,8 +245,8 @@
       '<div class="grupo ancho"><h4>✏️ Campos de este asunto</h4><dl class="dl"><dt>Curso del certificado</dt><dd>2025/2026</dd><dt>Motivo</dt><dd>Beca</dd><dt>Quién lo pide</dt><dd>Ortega Lima, Rosa (madre)</dd><dt>Por qué vía</dt><dd>En persona</dd></dl>'+
         '<button class="mini" data-t="Se abre «+ Añadir campo»">+ Añadir campo</button></div>'+
       '</div><p class="linea" style="margin:8px 2px 0">Abierto el 09/11/2026 · Revisor</p>';
-    var docs=carpeta.map(function(d){return '<div class="fdoc"><span class="ext">'+(d.slice(-4)==='docx'?'DOCX':'PDF')+'</span><span class="n"><button class="ver" data-ver="'+esc(d)+'">'+esc(d)+'</button></span><button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button><button class="mini" data-t="Menú del documento">⋮</button></div>'}).join('')+
-      '<p style="margin:8px 0 0"><button class="mini" data-t="Se abre la ventana para añadir un documento del ordenador">+ Añadir documento</button> <button class="mini" data-t="Se abre «Repartir ficheros entre terceros»">Repartir ficheros entre terceros</button></p>';
+    var docs=carpeta.map(function(d){return '<div class="fdoc"><span class="ext">'+(d.slice(-4)==='docx'?'DOCX':'PDF')+'</span><span class="n"><button class="ver" data-ver="'+esc(d)+'">'+esc(d)+'</button></span>'+(sinTarea[d]?'<span class="marca">sin tarea</span><button class="mini" data-colgar="'+esc(d)+'">Colgar de una tarea</button>':'')+'<button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button><button class="mini" data-t="Menú del documento">⋮</button></div>'}).join('')+
+      '<p style="margin:8px 0 0"><button class="mini" id="b-anadir-doc"'+(hitos.length?'':' disabled')+'>+ Añadir documento</button> <button class="mini" data-t="Se abre «Repartir ficheros entre terceros»">Repartir ficheros entre terceros</button></p>'+(hitos.length?'':'<p class="linea">Para añadir un documento, crea antes el hito.</p>');
     var reg='<div class="nueva" style="margin:0 0 6px"><input id="r-texto" placeholder="Escribe una nota del asunto"><button id="r-ok">Guardar</button></div>'+
       registro.map(function(r){return '<div class="reg"><small>'+r.f+' · '+r.q+' · ⚑ '+esc(r.h)+'</small><br>'+esc(r.t)+'</div>'}).join('');
     var otros='<div class="fdoc"><span class="n">MATRICULA · A26-0009 · abierto</span><button class="mini" data-t="Se abre ese asunto">Abrir</button></div><div class="fdoc"><span class="n">JUSTIFICANTE · curso 25/26 · archivado</span><button class="mini" data-t="Se abre ese asunto">Abrir</button></div>';
@@ -232,11 +255,36 @@
       plegado('datos','📋 Datos',null,'NIE 2100071 '+cp('2100071')+' · Curso 3º de E.S.O. '+cp('3º de E.S.O.')+' · Unidad 3º B '+cp('3º B'),datos)+
       plegado('pers','👥 Personas y entidades relacionadas',0,'',pers)+
       plegado('docs','📁 Documentos de la carpeta',carpeta.length,'',docs)+
-      plegado('reg','📝 Registro',registro.length,esc(registro[0].t),reg)+
+      plegado('reg','📝 Registro',registro.length,registro.length?esc(registro[0].t):'',reg)+
       plegado('otros','🗂️ Otros asuntos de este tercero',2,'',otros);
   }
   function pinta(){pintaTira();pintaHito();pintaLado()}
   function cierraMenus(){[].forEach.call(document.querySelectorAll('.menu.abierto'),function(m){m.classList.remove('abierto')})}
+
+  function nombreNuevo(){nuevos++;return '261113 RECIBI D26-0006'+nuevos+'.pdf'}
+  function esperan(i){var r=[];hitos[i].tareas.forEach(function(t,k){if(!t.hecha&&!t.doc&&t.clase==='anadir')r.push(k)});return r}
+  function abreCuadro(doc,tipo,nuevo){
+    var a=actual(); cuadro={doc:doc,tipo:tipo,nuevo:nuevo,hito:a>-1?a:0};
+    pintaCuadro(); $('capa').classList.add('abierto'); $('c-hito').focus();
+  }
+  function pintaCuadro(){
+    var c=cuadro, e=esperan(c.hito);
+    var h='<p style="margin:0 0 10px"><span class="ext">PDF</span> <b>'+esc(c.doc)+'</b></p>'+
+      '<h4>Hito</h4><select id="c-hito">'+hitos.map(function(x,i){return '<option value="'+i+'"'+(i===c.hito?' selected':'')+'>'+(i+1)+'. '+esc(x.nombre)+(x.estado==='actual'?' (el actual)':'')+'</option>'}).join('')+'</select>'+
+      '<h4>Tarea</h4>';
+    e.forEach(function(k,n){h+='<label class="op"><input type="radio" name="c-t" value="'+k+'"'+(n===0?' checked':'')+'><span>'+esc(hitos[c.hito].tareas[k].nombre)+'<br><small>Espera un documento. Queda hecha.</small></span></label>'});
+    h+='<label class="op"><input type="radio" name="c-t" value="nueva"'+(e.length?'':' checked')+'><span>Tarea nueva: «'+esc(c.tipo)+'»<br><small>La app la crea en ese hito y la deja hecha.</small></span></label>';
+    $('c-cuerpo').innerHTML=h; $('c-ok').textContent=c.nuevo?'Añadir':'Colgar';
+  }
+  function cierraCuadro(){cuadro=null;$('capa').classList.remove('abierto')}
+  function aceptaCuadro(){
+    var c=cuadro, x=hitos[c.hito], v=document.querySelector('input[name=c-t]:checked').value, t;
+    if(v==='nueva'){t={nombre:c.tipo,clase:'anadir',hecha:true};x.tareas.push(t)}else{t=x.tareas[+v];t.hecha=true}
+    t.doc=c.doc; if(c.nuevo)carpeta.push(c.doc); delete sinTarea[c.doc];
+    apunta(x.nombre,(c.nuevo?'Añadido':'Colgado')+' «'+c.doc+'» en la tarea «'+t.nombre+'»');
+    visto=c.hito; cierraCuadro(); abiertos.docs=true; pinta();
+    toast('El documento queda colgado de «'+t.nombre+'», en el hito «'+x.nombre+'».');
+  }
 
   function hacer(i){
     var x=hitos[visto], t=x.tareas[i];
@@ -248,6 +296,9 @@
       t.reg='26SM0407'; t.hecha=true; apunta(x.nombre,'Tarea hecha: '+t.nombre+' (26SM0407)'); toast('Se abre la ventana de registrar en Séneca. Aquí se da por registrado: 26SM0407.');
     }else if(t.clase==='comunicar'){
       t.hecha=true; apunta(x.nombre,'Correo enviado a la familia con el certificado'); toast('Se abre la ventana del correo, ya rellena. Aquí se da por enviado.');
+    }else if(t.clase==='anadir'){
+      var da=nombreNuevo(); t.doc=da; t.hecha=true; carpeta.push(da); apunta(x.nombre,'Añadido «'+da+'» en la tarea «'+t.nombre+'»');
+      toast('Se abre la ventana de hoy para elegir el fichero y su tipo. No pregunta de qué tarea es: ya se sabe.');
     }else{ t.hecha=true; apunta(x.nombre,'Tarea hecha: '+t.nombre); toast('Se abre la ventana de «'+BOTON[t.clase]+'». Aquí se da por hecha.'); }
     pinta();
   }
@@ -260,6 +311,19 @@
       cierraMenus(); if(!ab)m.classList.add('abierto'); return;
     }
     cierraMenus();
+    if(b.id==='b-cambia'){
+      sinHitos=!sinHitos; hitos=sinHitos?hitosSin:hitosCon; visto=actual()>-1?actual():0; formAbierto=false; viendo=null; espera=null;
+      b.textContent=sinHitos?'Volver al asunto con hitos':'Ver un asunto sin hitos'; pinta(); return;
+    }
+    if(b.id==='b-primer'){
+      hitos.push({nombre:'Atender la petición',estado:'actual',expl:'Hito apuntado a mano.',tareas:[]}); visto=0; pinta();
+      toast('Se abre la ventana «Crear un hito», la de hoy. Aquí se crea «Atender la petición».'); return;
+    }
+    if(b.id==='b-anadir-doc'){abreCuadro(nombreNuevo(),'Recibí',true);toast('Antes, la ventana de hoy para elegir el fichero y su tipo. Después, esta pregunta.');return}
+    if(b.dataset.colgar){abreCuadro(b.dataset.colgar,b.dataset.colgar.replace(/\.[^.]+$/,''),false);return}
+    if(b.id==='c-no'){cierraCuadro();return}
+    if(b.id==='c-ok'){aceptaCuadro();return}
+    if(b.name==='c-t')return;
     if(b.dataset.ver){viendo=b.dataset.ver;pintaLado();return}
     if(b.id==='b-cerrar-doc'){viendo=null;pintaLado();return}
     if(b.dataset.hito!==undefined){visto=+b.dataset.hito;formAbierto=false;pinta();return}
@@ -287,12 +351,13 @@
     }
     if(b.id==='r-ok'){
       var v=$('r-texto').value.trim(); if(!v)return;
-      registro.unshift({h:hitos[actual()>-1?actual():visto].nombre,q:'Revisor',f:ahora(),t:v}); pintaLado(); return;
+      registro.unshift({h:hitos.length?hitos[actual()>-1?actual():visto].nombre:'Sin hito',q:'Revisor',f:ahora(),t:v}); pintaLado(); return;
     }
     if(b.dataset.t){toast(b.dataset.t);return}
   });
+  document.addEventListener('change',function(e){if(e.target.id==='c-hito'){cuadro.hito=+e.target.value;pintaCuadro()}});
   document.addEventListener('keydown',function(e){
-    if(e.key==='Escape')cierraMenus();
+    if(e.key==='Escape'){cierraMenus();if(cuadro)cierraCuadro()}
     if(e.key==='Enter'&&e.target.id==='n-nombre')$('n-ok').click();
     if(e.key==='Enter'&&e.target.id==='r-texto')$('r-ok').click();
   });
