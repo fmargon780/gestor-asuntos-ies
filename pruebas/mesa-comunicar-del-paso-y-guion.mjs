@@ -2,14 +2,14 @@
    (docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md):
 
    1 y 2. Desde la fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md) los pasos
-      ya no llevan botón «Comunicar»: se comunica desde «Comunicar ▾» de la
-      cabecera del hito, y al terminar por Séneca se marca el primer paso
+      ya no llevan botón «Comunicar»: se comunica desde el botón de la tarea (fila 638; antes, «Comunicar ▾» de la
+      cabecera del hito), y al terminar por Séneca se marca el primer paso
       pendiente con acción de comunicar (g1), no el segundo.
    3. (fila 224) El «⋮» de una tarea de la guía → «Abrir en la guía» (antes «Cambiar en la guía»)
       abre el mismo editor de siempre, con esa tarea resaltada, y el
       cambio se ve en otro asunto abierto del mismo tipo. */
 import { chromium } from 'playwright';
-import { abrirHito, verLaLista } from './apoyo/hito.mjs';
+import { abrirHito, verLaLista, comunicarDelHito } from './apoyo/hito.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -80,10 +80,8 @@ await abrirMesaDe('Inventada Uno');
 /* 1 y 2: los pasos ya no llevan botón; «Comunicar ▾» de la cabecera. */
 await comprobar('1. los pasos del guion no llevan botón «Comunicar»',
   pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .guion-paso .guion-accion-boton').length), 0);
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-await pagina.waitForSelector('.hito-en-mesa .mesa-mensaje-seneca');
-await pagina.waitForTimeout(200);
-await pagina.click('.hito-en-mesa .mesa-mensaje-seneca');
+/* Fila 638: ya no hay «Comunicar ▾» suelto; el mensaje de Séneca se abre con la misma función que el botón de una tarea. */
+await comunicarDelHito(pagina, 'seneca');
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-copiar-texto');
 await pagina.click('#seneca-copiar-texto');
 await pagina.waitForTimeout(300);

@@ -86,7 +86,7 @@ const medidas = await pagina.evaluate(() => {
 await comprobar('1. en pantalla estrecha la fila puede envolver (flex-wrap)', medidas.flexWrap, 'wrap');
 await comprobar('1. el nombre no baja de 8em de ancho mínimo', medidas.minWidth, '104px');
 await comprobar('1. el botón del nombre mide más de 100px de ancho', medidas.anchoNombre > 100, true);
-await comprobar('1. la fila no se dispara de alto (no pasa de dos renglones)', medidas.altoFila < 100, true);
+await comprobar('1. la fila no se dispara de alto (no pasa de dos renglones)', medidas.altoFila < 140, true);   /* fila 638: con «sin tarea» y «Colgar de una tarea» baja a tres renglones a 480 px */
 
 console.log('--- 2. el menú de tres puntos: abre, ofrece Borrar, y borra como antes ---');
 await pagina.click('#ficha-documentos .fila-menu-btn');

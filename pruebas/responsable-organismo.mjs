@@ -76,41 +76,47 @@ async function abrirMesa(id) {
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="' + id + '"]');
   await pagina.waitForTimeout(300);
 }
+/* Fila 638: el responsable ya no es una etiqueta de la mesa con su menú; se cambia en «Hito ▾ → Cambiar» (su desplegable «Responsable»). */
+async function abrirCambiar() {
+  await pagina.locator('.hito-en-mesa .mesa-mas').click();
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar' }).first().click();
+  await pagina.waitForSelector('#hda-responsable');
+}
 async function elegirUnaAdministracion(conDepartamento) {
-  await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Una Administración…' }).first().click();
-  await pagina.waitForSelector('#ro-caja .ro-organismo');
-  await pagina.locator('#ro-caja .ro-organismo', { hasText: 'Delegación Territorial' }).click();
-  if (conDepartamento) await pagina.selectOption('#ro-caja .ro-dep', ids.dep);
+  await abrirCambiar();
+  await pagina.selectOption('#hda-responsable', '__adm__');
+  await pagina.waitForSelector('.ro-en-linea .ro-organismo');
+  await pagina.locator('.ro-en-linea .ro-organismo', { hasText: 'Delegación Territorial' }).click();
+  if (conDepartamento) await pagina.selectOption('.ro-en-linea .ro-dep', ids.dep);
+  await pagina.click('.ro-en-linea .ro-elegir');
   await pagina.click('#cuadro-aceptar');
-  await pagina.waitForTimeout(600);
+  await pagina.waitForTimeout(900);
 }
 
 console.log('--- 1. la mesa del hito ---');
 await abrirMesa('m1');
-await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
+await abrirCambiar();
 /* Fila 615: la última opción es «+ Nuevo responsable…»; «Una Administración…» va justo antes. */
 await comprobar('la lista de responsables acaba con «Una Administración…» y «+ Nuevo responsable…»',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents().then((t) => t.slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
-await pagina.keyboard.press('Escape');
-await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Una Administración…' }).first().click();
-await pagina.waitForSelector('#ro-caja .ro-organismo');
-await comprobar('el buscador enseña lo dado de alta', pagina.locator('#ro-caja .ro-organismo').count(), 1);
-await pagina.fill('#ro-caja .ro-buscar', 'zzzz');
-await comprobar('un texto que no coincide no deja nada', pagina.locator('#ro-caja .ro-organismo').count(), 0);
-await pagina.fill('#ro-caja .ro-buscar', 'delegac');
-await comprobar('buscando «delegac» sale la Delegación', pagina.locator('#ro-caja .ro-organismo').count(), 1);
-await pagina.locator('#ro-caja .ro-organismo').click();
-await comprobar('al pulsarla, se ofrece su departamento (opcional)', pagina.locator('#ro-caja .ro-dep option').count(), 2);
+  pagina.evaluate(() => Array.from(document.getElementById('hda-responsable').options).map((o) => o.textContent).slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
+await pagina.selectOption('#hda-responsable', '__adm__');
+await pagina.waitForSelector('.ro-en-linea .ro-organismo');
+await comprobar('el buscador enseña lo dado de alta', pagina.locator('.ro-en-linea .ro-organismo').count(), 1);
+await pagina.fill('.ro-en-linea .ro-buscar', 'zzzz');
+await comprobar('un texto que no coincide no deja nada', pagina.locator('.ro-en-linea .ro-organismo').count(), 0);
+await pagina.fill('.ro-en-linea .ro-buscar', 'delegac');
+await comprobar('buscando «delegac» sale la Delegación', pagina.locator('.ro-en-linea .ro-organismo').count(), 1);
+await pagina.locator('.ro-en-linea .ro-organismo').click();
+await comprobar('al pulsarla, se ofrece su departamento (opcional)', pagina.locator('.ro-en-linea .ro-dep option').count(), 2);
+await pagina.click('.ro-en-linea .ro-elegir');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(600);
+await pagina.waitForTimeout(900);
 await comprobar('se guarda el id del organismo', hito('m1').then((h) => h.responsable), 'adm:' + ids.org);
 await comprobar('y una copia de su nombre', hito('m1').then((h) => h.responsableNombre), 'Delegación Territorial');
 await comprobar('un hito normal no lleva copia de nombre',
   pagina.evaluate(async ([asunto]) => Object.prototype.hasOwnProperty.call(Hitos.buscar((await Hitos.leer()).porAsunto[asunto].hitos, 'm2'), 'responsableNombre'), [ASUNTO]), false);
-await comprobar('la etiqueta de la mesa dice su nombre corto',
-  pagina.locator('.hito-en-mesa .mesa-etq-resp').textContent(), 'Delegación Territorial');
+await comprobar('la línea del hito dice su nombre corto («Le toca a: …»)',
+  pagina.locator('.hito-en-mesa .mesa-linea-toca').textContent(), 'Le toca a: Delegación Territorial');
 
 console.log('--- 2. nunca es de Administración ---');
 const estado = await pagina.evaluate(async ([asunto]) => {
@@ -122,14 +128,14 @@ const estado = await pagina.evaluate(async ([asunto]) => {
 await comprobar('«adm:…» no es de Administración', estado.esAdm, false);
 await comprobar('el asunto pasa a «Pendiente de terceros»', estado.lado, 'terceros');
 await comprobar('esperando a la Delegación', [estado.quien, estado.espera], ['Delegación Territorial', 'Delegación Territorial']);
-await comprobar('la cabecera lo dice («Esperando a Delegación Territorial»)',
-  pagina.evaluate(() => /Esperando a Delegación Territorial/.test(document.body.innerText)), true);
+await comprobar('la línea del hito lo dice («Le toca a: Delegación Territorial»)',
+  pagina.evaluate(() => /Le toca a: Delegación Territorial/.test(document.querySelector('.hito-en-mesa .mesa-linea').innerText)), true);
 
 console.log('--- 3. con departamento ---');
 await elegirUnaAdministracion(true);
 await comprobar('el id lleva también el departamento', hito('m1').then((h) => h.responsable), 'adm:' + ids.org + ':' + ids.dep);
 await comprobar('«Delegación Territorial · Inspección»', hito('m1').then((h) => h.responsableNombre), 'Delegación Territorial · Inspección');
-await comprobar('la etiqueta también', pagina.locator('.hito-en-mesa .mesa-etq-resp').textContent(), 'Delegación Territorial · Inspección');
+await comprobar('la línea también', pagina.locator('.hito-en-mesa .mesa-linea-toca').textContent(), 'Le toca a: Delegación Territorial · Inspección');
 
 console.log('--- 4. el filtro de Inicio ---');
 await pagina.evaluate(async () => { await App.verAbiertos(); await InicioTabla.pintar(); });

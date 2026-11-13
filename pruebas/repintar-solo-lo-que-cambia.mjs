@@ -116,7 +116,7 @@ await comprobar('solo mira la carpeta y relee y escribe hitos.json',
 await comprobar('como mucho una relectura', Promise.resolve((r1.cuenta['leerJson:hitos.json'] || 0) <= 1), true);
 await comprobar('la lista, oculta detrás de la ficha, queda pendiente', Promise.resolve(r1.pendiente), true);
 await comprobar('la cabecera lo enseña, sin repintar la ficha',
-  pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a Familia') === 0), true);
+  pagina.locator('#ficha-guia .mesa-linea-espera').textContent().then(t => t.indexOf('Esperando a Familia') === 0), true);   /* fila 638: «Esperando a…» está en la línea del hito */
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('al volver a la lista se pinta, y el asunto ya va con los de terceros',
@@ -137,7 +137,7 @@ await comprobar('la fila de hitos pasa al hito 2 de 2 · Tramitar, con el 1 hech
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tira .mesa-tira-hito')).map((b) => [b.dataset.id, b.classList.contains('hecho'), b.classList.contains('actual')])),
   [['h1', true, false], ['h2', false, true]]);
 await comprobar('y el «Esperando a…» del hito hecho se ha quitado solo',
-  pagina.locator('#ficha-acciones .marca-esperando').count(), 0);
+  pagina.locator('#ficha-guia .mesa-linea-espera').count(), 0);
 
 /* ---------- 3. el aviso de consulta, una sola vez ---------- */
 console.log('--- 3. el aviso de consulta no se repite ---');

@@ -2,11 +2,11 @@
    (docs/CAMPOS-DE-UN-HITO.md): campos de un hito. Con los datos de demostración:
    el tipo FACTURA lleva «Fecha de la factura» en el hito «Tramitar el pago».
 
-   1. La tarjeta «Campos de este hito» de la mesa, con «+ Añadir campo»; sin campos, pequeña.
-   2. Rellenar en el sitio: se guarda solo, y sale en la ficha bajo el título de su hito.
-   3. El otro asunto del tipo lo tiene, vacío.
-   4. «+ Añadir campo» desde un hito: «Ya están en este asunto», «¿Dónde se guarda?» con su frase.
-   5. «⋮» → «Quitar de este hito», y «Solo en este asunto».
+   Fila 638: la tarjeta «Campos de este hito» de la mesa (con «+ Añadir campo», su «⋮» y «¿Dónde se guarda?») ya no existe; las
+   partes 4, 5 y 6 de esta prueba (todas de esa tarjeta) se han quitado. Quedan:
+   1. El hito ya no lleva la tarjeta de campos; el tipo conserva el campo con la marca de su hito.
+   2. El valor está en el asunto y sale en «Datos».
+   3. El otro asunto del tipo no lo tiene.
    7. Borrar el paso de la guía: el campo pasa a ser del asunto, con su valor.
    Más: las funciones puras, y sin errores en la consola. */
 import { chromium } from 'playwright';
@@ -77,89 +77,35 @@ const resumenTarjeta = () => pagina.evaluate(() => {
     campos: Array.prototype.map.call(t.querySelectorAll('.mesa-campo-hito > .etiqueta'), (e) => e.textContent.trim()) } : null;
 });
 
-/* 1. La tarjeta. */
-await abrirMesa(A1, H[1].id);
-await comprobar('1. «Tramitar el pago»: la tarjeta lleva «Fecha de la factura»',
-  resumenTarjeta(), { titulo: 'Campos', boton: '+ Añadir campo', campos: ['Fecha de la factura'] });
-await comprobar('1. el control es el de la clase Fecha', pagina.evaluate(() => document.querySelector('.mesa-campos-hito input').type), 'date');
-await abrirMesa(A1, H[0].id);
-await comprobar('1. «Revisar la factura»: sin campos, la tarjeta sale pequeña con el botón',
-  pagina.evaluate(() => { const t = document.querySelector('#ficha-guia .hito-en-mesa .mesa-campos-hito');
-    return { vacia: t.classList.contains('mesa-campos-hito-vacia'), boton: !!t.querySelector('.mesa-campo-hito-anadir'), filas: t.querySelectorAll('.mesa-campo-hito').length }; }),
-  { vacia: true, boton: true, filas: 0 });
+/* Fila 638 (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): el hito ya no lleva la tarjeta «Campos de este hito» (con su «+ Añadir campo»,
+   «⋮» y la ventana «¿Dónde se guarda?»): los campos están en el bloque «Datos» de la derecha. Se comprueba lo que sigue en pie: el hito
+   sin la tarjeta, el campo con la marca de su hito en el tipo, el valor en el asunto y en el otro asunto vacío. */
 
-/* 2. Rellenar en el sitio. */
+/* 1. Sin tarjeta. */
 await abrirMesa(A1, H[1].id);
+await comprobar('1. «Tramitar el pago»: el hito ya no lleva tarjeta de campos', pagina.evaluate(() => document.querySelectorAll('#ficha-guia .hito-en-mesa .mesa-campos-hito').length), 0);
+await comprobar('1. el tipo sigue llevando «Fecha de la factura» con la marca de ese hito',
+  configTipo().then((c) => c.filter((x) => x.id === 'p-fecha-factura').map((x) => x.hito === H[1].origen)), [true]);
+
+/* 2. El valor, en el asunto (se escribe como lo hacía la tarjeta) y a la vista en «Datos». */
 await quitarAvisos();
-await pagina.fill('.mesa-campos-hito input[type="date"]', '2026-09-30');
-await pagina.locator('.mesa-campos-hito input[type="date"]').dispatchEvent('change');
+await pagina.evaluate(async (n) => {
+  const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0];
+  await CampoDesdeElAsunto._i.escribirEnAsunto(a, 'propio:p-fecha-factura', { valor: '2026-09-30' });
+  CampoDesdeElAsunto._i.repintar(a);
+}, A1);
 await pagina.waitForTimeout(800);
-await comprobar('2. se guarda solo, con aviso verde', avisos().then((a) => a.some((t) => t.indexOf('«Fecha de la factura» guardado') === 0)), true);
 await comprobar('2. el valor está en la ficha del asunto', fichaDe(A1).then((f) => f.campos['propio:p-fecha-factura'].valor), '2026-09-30');
-await comprobar('2. en la ficha sale bajo el título de su hito',
-  pagina.evaluate(() => {
-    const filas = Array.prototype.map.call(document.querySelectorAll('#ficha-datos-tramite .ficha-dato:not(.oculto)'), (f) => f.textContent.replace(/\s+/g, ' ').trim());
-    const i = filas.indexOf('Tramitar el pago');
-    return i === -1 ? filas : filas.slice(i, i + 2);
-  }), ['Tramitar el pago', 'Fecha de la factura30/09/2026']);
-await comprobar('2. al repintar sigue en la caja', pagina.evaluate(() => document.querySelector('.mesa-campos-hito input[type="date"]').value), '2026-09-30');
+await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+await pagina.waitForTimeout(700);
+await comprobar('2. en «Datos» sale en «Campos de este asunto» con su valor',
+  pagina.evaluate(() => /Fecha de la factura\s*30\/09\/2026/.test(document.getElementById('ficha-datos-bloque').innerText.replace(/\s+/g, ' '))), true);
+await pagina.evaluate(() => FichaTarjetas.plegar('datos'));
 
 /* 3. El otro asunto. */
 await abrirMesa(A2, H2[1].id);
-await comprobar('3. en el otro asunto está, vacío',
-  pagina.evaluate(() => ({ campos: Array.prototype.map.call(document.querySelectorAll('.mesa-campos-hito .mesa-campo-hito > .etiqueta'), (e) => e.textContent.trim()),
-    valor: document.querySelector('.mesa-campos-hito input[type="date"]').value })), { campos: ['Fecha de la factura'], valor: '' });
-await comprobar('3. y la ficha no le pone rótulo (no tiene valor)',
-  pagina.evaluate(() => document.querySelectorAll('#ficha-datos-tramite .ficha-dato-hito').length), 0);
-
-/* 4. «+ Añadir campo» desde «Revisar la factura». */
-await abrirMesa(A1, H[0].id);
-await quitarAvisos();
-await pagina.click('.hito-en-mesa .mesa-campo-hito-anadir');
-await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
-await comprobar('4. la ventana trae el título del hito',
-  pagina.evaluate(() => document.getElementById('cuadro-titulo').textContent), 'Añadir un campo al hito «Revisar la factura»');
-await comprobar('4. «Ya están en este asunto»: los del asunto sin hito (no el de otro hito)',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#campos-catalogo-yaestan .nombre-tipo'), (e) => e.textContent)), ['Importe de la factura']);
-await pagina.locator('#campos-catalogo-yaestan .fila-tipo', { hasText: 'Importe de la factura' }).getByRole('button', { name: 'Añadir' }).click();
-await pagina.waitForSelector('#capa:not(.oculto) .dsg');
-await comprobar('4. «¿Dónde se guarda?»: en el tipo, y la frase del hito',
-  pagina.evaluate(() => ({ marcada: document.querySelector('input[name="dsg-donde"]:checked').value,
-    nota: document.querySelector('.dsg-nota').textContent })),
-  { marcada: 'guia', nota: 'El hito «Revisar la factura» lo tendrá en 2 asuntos abiertos de este tipo, vacío.' });
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(900);
-await comprobar('4. aviso verde con «Deshacer»', pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#mensajes .mensaje'),
-  (m) => m.textContent).some((t) => t.indexOf('Campo añadido al tipo FACTURA') === 0 && t.indexOf('Deshacer') !== -1)), true);
-await comprobar('4. el tipo lleva el campo con la marca del hito (el paso de la guía)',
-  configTipo().then((c) => c.filter((x) => x.id === 'p-importe-factura').map((x) => x.hito === H[0].origen)), [true]);
-await comprobar('4. la tarjeta del hito lo enseña, con su valor intacto',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.hito-en-mesa .mesa-campos-hito .mesa-campo-hito'),
-    (f) => f.querySelector('.etiqueta').textContent.trim() + '=' + f.querySelector('input.campo').value)), ['Importe de la factura=' + (await pagina.evaluate((n) => (App.E.registro.asuntos[n].campos['propio:p-importe-factura'] || {}).valor || '', A1))]);
-
-/* 5. «⋮» → «Quitar de este hito» (el del hito «Revisar»). */
-await abrirMesa(A1, H[0].id);
-await quitarAvisos();
-await pagina.locator('.hito-en-mesa .mesa-campo-hito .campo-hito-menu').first().click();
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar de este hito' }).click();
-await pagina.waitForSelector('#capa:not(.oculto) .dsg');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(900);
-await comprobar('6. el tipo ya no lleva la marca', configTipo().then((c) => c.filter((x) => x.id === 'p-importe-factura').map((x) => !x.hito)), [true]);
-await comprobar('6. la tarjeta del hito vuelve a estar vacía', resumenTarjeta().then((r) => r.campos), []);
-
-/* 6. Solo en este asunto: el campo va al hito solo aquí, y el tipo no cambia. */
-await pagina.click('.hito-en-mesa .mesa-campo-hito-anadir');
-await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-yaestan');
-await pagina.locator('#campos-catalogo-yaestan .fila-tipo', { hasText: 'Importe de la factura' }).getByRole('button', { name: 'Añadir' }).click();
-await pagina.waitForSelector('#capa:not(.oculto) .dsg');
-await pagina.click('.dsg-opcion:nth-of-type(2)');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(900);
-await comprobar('7. la tarjeta del hito lo enseña', resumenTarjeta().then((r) => r.campos), ['Importe de la factura']);
-await comprobar('7. el tipo no cambia (sin hito)', configTipo().then((c) => c.filter((x) => x.id === 'p-importe-factura').map((x) => !x.hito)), [true]);
-await comprobar('7. el otro asunto no lo tiene en ese hito',
-  (async () => { await abrirMesa(A2, H2[0].id); return resumenTarjeta().then((r) => r.campos); })(), []);
+await comprobar('3. en el otro asunto el campo no tiene valor',
+  fichaDe(A2).then((f) => !f.campos || !f.campos['propio:p-fecha-factura'] || !f.campos['propio:p-fecha-factura'].valor), true);
 
 /* 7. Borrar el paso de la guía: el campo del tipo pasa a ser del asunto. */
 await comprobar('8. «Fecha de la factura» sigue con hito antes de borrar el paso',

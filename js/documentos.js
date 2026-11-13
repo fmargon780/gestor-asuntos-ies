@@ -49,6 +49,12 @@ var Documentos = (function () {
      js/hitos-anadir.js. Vale para todo lo que se guarde mientras este
      cuadro esté abierto, no solo para el primer documento. */
   N.hitoActual = null;
+  /* Fila 638: de qué tarea es lo que se guarde en este cuadro. `tareaActual`: ya se sabe (el botón «Añadir documento» de una
+     tarea); `preguntarTarea`: «+ Añadir documento» de la carpeta, que pregunta «¿De qué tarea es?» antes de guardar;
+     `colgar`: «Colgar de una tarea» de un documento sin nombre según la norma: tras ponerle nombre, pregunta. */
+  N.tareaActual = null;
+  N.preguntarTarea = false;
+  N.colgar = false;
 
   function configurar(o) { N.ctx = o; }
 
@@ -63,6 +69,9 @@ var Documentos = (function () {
   async function abrir(asunto, opciones) {
     N.asuntoActual = asunto;
     N.hitoActual = (opciones && opciones.hito) || null;
+    N.tareaActual = (opciones && opciones.tarea) || null;
+    N.preguntarTarea = !!(opciones && opciones.preguntarTarea);
+    N.colgar = !!(opciones && opciones.colgar);
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
@@ -90,6 +99,9 @@ var Documentos = (function () {
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
     N.hitoActual = null;
+    N.tareaActual = null;
+    N.preguntarTarea = false;
+    N.colgar = false;
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se

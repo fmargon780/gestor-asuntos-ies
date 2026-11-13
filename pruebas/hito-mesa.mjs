@@ -4,19 +4,18 @@
    A 1905×1000 y a 1280×800:
      1. Pulsar un hito en la lista abre su mesa con sus dos zonas (fila
         145; a 1905 px, una al lado de otra y sin desplazarse).
-     2. Cambiar el responsable y el plazo desde sus etiquetas; se guarda.
-     3. Generar un documento desde la mesa marca solo el paso de guion
-        `generar`, y el documento sale en la tabla; un PDF con su .docx
-        del mismo nombre enseña el gemelo colgando.
-     4. Seleccionar dos documentos y "Enviar por correo": el cuadro sale
+     2. Cambiar el responsable (en «Hito ▾ → Cambiar», fila 638) y el plazo desde su etiqueta; se guarda.
+     3. Generar un documento desde la tarea marca solo el paso de guion
+        `generar`, y el documento queda colgado bajo la tarea y sale en la carpeta (fila 638: sin tabla de
+        documentos en el hito); un PDF con su .docx del mismo nombre son gemelos; el registrado dice su código.
+     4. Marcar dos documentos de la carpeta y «Enviar correo» de la tarea: el cuadro sale
         con los dos premarcados.
      5. Un hito-pregunta enseña las opciones; elegir otra actualiza la tira.
      6. Con un documento abierto a la derecha, la mesa sigue abierta.
      7. Escape vuelve a la lista; desde "Qué me toca" se entra directo en
         la mesa.
      8. "Traer los guiones del instituto" no pisa un guion ya escrito.
-     9. (filas 224 y 235) La caja «Nueva tarea…» pregunta «¿Dónde se
-        guarda?» (aquí, «Solo en este asunto»); su
+     9. (filas 224 y 235; fila 638) «+ Añadir tarea» abre su formulario y guarda «Solo en este asunto»; su
         «⋮» → «Pasar a la guía» lleva la línea al guion del paso de la
         guía y sale también en otro asunto abierto del mismo tipo; una
         segunda tarea nueva, sin pasarla, no toca la guía.
@@ -36,7 +35,7 @@ const GUIAS = {
     { id: 'm1', titulo: 'Recoger la solicitud', cuerpo: '', opciones: [], plantillasDocumento: ['pd-b'],
       guion: [
         { id: 'g1', texto: 'Comprobar que la solicitud está firmada', explicacion: '', accion: '' },
-        { id: 'g2', texto: 'Generar el recibí', explicacion: '', accion: 'generar', normativa: { cita: 'Decreto 21/2020, art. 5' } },
+        { id: 'g2', texto: 'Generar el recibí', explicacion: '', accion: 'generar', receta: { plantilla: 'pd-b' }, normativa: { cita: 'Decreto 21/2020, art. 5' } },
         { id: 'g3', texto: 'Comunicar a la familia', explicacion: '', accion: 'comunicar' }
       ] },
     { id: 'm2', titulo: '¿Qué supuesto es?', opciones: [
@@ -136,7 +135,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('1. la mesa se abre, con el hito en una sola columna (fila 425)',
     pagina.locator('.hito-en-mesa .mesa-col:visible').count(), 1);
   await comprobar('1. los demás hitos no se ven', pagina.locator('#ficha-guia .hito[data-id="m3"]').isVisible(), false);
-  await comprobar('1. el guion, con su cuenta', pagina.locator('.hito-en-mesa .mesa-guion-cuenta').textContent(), '0 de 3');
+  await comprobar('1. las tres tareas del guion, sin recuadro «Tareas» ni cuenta (fila 638)', pagina.evaluate(() =>
+    [document.querySelectorAll('.hito-en-mesa .guion-paso').length, document.querySelectorAll('.hito-en-mesa .mesa-guion-cuenta').length]), [3, 0]);
   if (ancho === 1905) {
     await comprobar('1. a 1905 px, el hito a la izquierda y la carpeta a la derecha, una al lado de otra y a la vista, sin bajar (fila 425)',
       pagina.evaluate(() => {
@@ -148,8 +148,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   }
 
   /* 2. */
-  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-etq-resp', 'Yo');
-  await comprobar('2. el responsable, cambiado desde su etiqueta y guardado', leerHito(pagina, 'm1').then((h) => h.responsable), 'yo');
+  /* Fila 638: el responsable ya no es una etiqueta de la cabecera; se cambia en «Hito ▾ → Cambiar». */
+  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-mas', 'Cambiar');
+  await pagina.waitForSelector('#hda-responsable');
+  await pagina.selectOption('#hda-responsable', 'administracion');
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForTimeout(900);
+  await comprobar('2. el responsable, cambiado en «Hito ▾ → Cambiar» y guardado', leerHito(pagina, 'm1').then((h) => h.responsable), 'administracion');
+  await comprobar('2. un hito de Administración no dice a quién le toca', pagina.evaluate(() => /Le toca a/.test(document.querySelector('.hito-en-mesa .mesa-linea').innerText)), false);
   await pagina.locator('.hito-en-mesa .mesa-etq-plazo').click();
   /* Fila 584: el menú se recoloca mientras la mesa termina de repintar tras el cambio anterior; se pulsa la opción por el DOM, que no exige verla quieta. */
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la fecha' }).first().dispatchEvent('click');
@@ -164,37 +170,34 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('2. la mesa sigue abierta tras guardar', pagina.locator('.hito-en-mesa[data-id="m1"]').isVisible(), true);
 
   /* 3. */
-  /* Fila 145: las plantillas, en el desplegable «Generar documento ▾». */
-  await pagina.locator('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]').click();
-  await pagina.locator('.hito-en-mesa .mesa-plantilla-generar').first().click();
+  /* Fila 638: se genera con el botón de la tarea (su receta lleva la plantilla). */
+  await pagina.locator('.hito-en-mesa .guion-paso[data-id="g2"] .guion-accion-tarea').click();
+  await pagina.waitForSelector('.hito-en-mesa .guion-paso[data-id="g2"].hecho', { timeout: 15000 });
   await pagina.waitForTimeout(900);
   await comprobar('3. generar marca solo el paso «generar» del guion',
     leerHito(pagina, 'm1').then((h) => Object.keys(h.guionHecho || {}).filter((k) => h.guionHecho[k].hecho)), ['g2']);
-  await comprobar('3. y la cuenta del guion lo dice', pagina.locator('.hito-en-mesa .mesa-guion-cuenta').textContent(), '1 de 3');
+  await comprobar('3. y se ve una tarea hecha', pagina.locator('.hito-en-mesa .guion-paso.hecho').count(), 1);
   const generado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-b'), U.hoyIso(), 'D' + U.hoyIso().slice(2, 4) + '-00001'));
-  await comprobar('3. el documento generado sale en la tabla',
-    pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + generado + '"]').count(), 1);
-  await comprobar('3. el PDF enseña su .docx gemelo colgando, sin fila propia',
-    pagina.evaluate(() => {
-      const fila = document.querySelector('.hito-en-mesa .hito-documento[data-doc="260901 SOLICITUD.pdf"]');
-      return !!fila && !!fila.querySelector('.mesa-doc-gemelo') && fila.querySelector('.mesa-doc-gemelo-que').textContent;
-    }), 'Borrador en Word');
-  /* Fila 147: el código, en su columna; el estado, aparte. */
-  await comprobar('3. el registrado dice su código',
-    pagina.evaluate((d) => {
-      const f = document.querySelector('.hito-en-mesa .hito-documento[data-doc="' + d + '"]');
-      return [f.querySelector('.mesa-doc-registro').textContent, f.querySelector('.mesa-doc-estado').textContent];
-    }, DOCS[2]), ['26EM0617', 'Registrado']);
+  await comprobar('3. el documento generado cuelga de su tarea',
+    pagina.locator('.hito-en-mesa .guion-paso[data-id="g2"] .tcd .tcd-abrir[data-doc="' + generado + '"]').count(), 1);
+  await comprobar('3. y sale en la carpeta',
+    pagina.locator('#ficha-documentos .ficha-documento-fila[data-doc="' + generado + '"]').count(), 1);
+  await comprobar('3. un PDF con su .docx del mismo nombre son gemelos (el .docx cuelga del PDF)',
+    pagina.evaluate(() => HitoMesaDocumentos.agrupar(['260901 SOLICITUD.pdf', '260901 SOLICITUD.docx']).map((g) => [g.nombre, g.gemelos])),
+    [['260901 SOLICITUD.pdf', ['260901 SOLICITUD.docx']]]);
+  /* Fila 147: el código, en su columna. */
+  await comprobar('3. el registrado dice su código', pagina.evaluate((d) => HitoMesaDocumentos.codigoDe(d), DOCS[2]), '26EM0617');
 
   /* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
   await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
-  /* 4. Fila 147: los documentos se trabajan en su tarjeta grande. */
+  await pagina.waitForTimeout(500);
 
-  /* 4. */
-  await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[0] + '"] .mesa-doc-marca').check();
-  await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .mesa-doc-marca').check();
-  await comprobar('4. sale la barra de la selección', pagina.locator('.hito-en-mesa .mesa-seleccion').textContent().then((t) => t.indexOf('2 marcados') !== -1), true);
-  await pagina.locator('.hito-en-mesa .mesa-sel-enviar').click();
+  /* 4. Fila 638: los documentos de la carpeta (derecha) se marcan para adjuntarlos; «Enviar correo» de la tarea los lleva. */
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+  await pagina.waitForTimeout(400);
+  await pagina.locator('#ficha-documentos .ficha-documento-fila[data-doc="' + DOCS[0] + '"] .ficha-documento-marca').check();
+  await pagina.locator('#ficha-documentos .ficha-documento-fila[data-doc="' + DOCS[2] + '"] .ficha-documento-marca').check();
+  await pagina.locator('.hito-en-mesa .guion-paso[data-id="g3"] .guion-accion-tarea').click();
   await pagina.waitForSelector('#correo-caja input[type="checkbox"]', { timeout: 10000 }).catch(() => {});
   await pagina.waitForTimeout(800);
   await comprobar('4. el cuadro de correo sale con los dos premarcados',
@@ -224,11 +227,12 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* 6. */
   await pagina.locator('#ficha-tira .mesa-tira-hito', { hasText: 'Recoger la solicitud' }).click();
   await pagina.waitForTimeout(300);
-  await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .hito-doc-abrir').click();
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+  await pagina.locator('#ficha-documentos .ficha-documento-fila[data-doc="' + DOCS[2] + '"] button.ficha-documento').click();
   await pagina.waitForSelector('body.con-visor');
   await pagina.waitForTimeout(300);
   await comprobar('6. con el documento a la derecha, la mesa sigue abierta',
-    pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-grande-docs').isVisible(), true);
+    pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-guion').isVisible(), true);
   await pagina.keyboard.press('Escape');   /* cierra el documento */
   await pagina.waitForTimeout(200);
   /* Fila 425: ya no hay «volver al guion»; el siguiente Escape es el de la lista de hitos (7). */
@@ -311,13 +315,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible())) await abrirMesa(pagina, 'm1');
   await comprobar('9. el aviso de hito sin guion ya no manda a Ajustes',
     pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
-  /* Fila 224: la caja «Nueva tarea…» añade solo a este asunto. */
+  /* Fila 224: «Nueva tarea…» añade solo a este asunto. Fila 638: tras «+ Añadir tarea». */
+  await pagina.click('.hito-en-mesa .tcd-abrir-form');
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Pedir el certificado de empadronamiento');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
   /* Fila 416: Intro guarda solo en este asunto, sin preguntar. */
   await pagina.waitForSelector('.hito-en-mesa .guion-paso .guion-tarea-propia');
-  await comprobar('9. la caja queda vacía tras Intro',
-    pagina.inputValue('.hito-en-mesa .guion-nueva-tarea'), '');
+  await comprobar('9. el formulario se cierra tras Intro',
+    pagina.locator('.hito-en-mesa .guion-nueva-tarea').count(), 0);
   await comprobar('9. la tarea sale con la etiqueta «solo aquí»',
     pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
       .locator('.guion-tarea-propia').isVisible(), true);
@@ -345,6 +350,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('9. la mesa sigue abierta en el mismo hito, con la línea sin marcar',
     pagina.locator('.hito-en-mesa[data-id="m1"] .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
       .locator('.guion-casilla').isChecked(), false);
+  await pagina.click('.hito-en-mesa .tcd-abrir-form');
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Solo para Ana');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
   await pagina.waitForTimeout(800);

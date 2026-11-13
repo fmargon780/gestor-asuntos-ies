@@ -127,36 +127,34 @@ await pagina.evaluate(async () => { await window.App.reengancharFicha(); });
 await comprobar('el campo de la nota sigue siendo el mismo elemento (no se ha rehecho la ficha)',
   pagina.evaluate(() => document.getElementById('ficha-nota-texto') === window.__marcaNota), true);
 
-console.log('--- 4) lo mismo con la nota de un hito ---');
+console.log('--- 4) lo mismo con lo que se escribe en el hito (fila 638: ya no tiene caja de notas; el formulario de «+ Añadir tarea») ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await abrirHito(pagina, 'p1');
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto');
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.click('#ficha-guia .hito[data-id="p1"] .hito-nota-texto');
+await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .tcd-abrir-form');
+await pagina.click('#ficha-guia .hito[data-id="p1"] .tcd-abrir-form');
+await pagina.waitForSelector('#guion-nueva-tarea');
+await pagina.click('#guion-nueva-tarea');
 await pagina.keyboard.type('Llamar antes de aprobarlo', { delay: 10 });
 await pagina.evaluate(() => {
-  document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto').setSelectionRange(6, 6);
+  document.getElementById('guion-nueva-tarea').setSelectionRange(6, 6);
 });
 
 console.log('--- un repintado del panel de hitos, sin tocar la carpeta ---');
 await pagina.evaluate(async () => { window.HitosPanel.programarRepintado(); });
 await pagina.waitForTimeout(80);
 
-await comprobar('la nota del hito sigue escrita',
-  pagina.evaluate(() => document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto').value),
+await comprobar('lo escrito en el hito sigue escrito',
+  pagina.evaluate(() => document.getElementById('guion-nueva-tarea').value),
   'Llamar antes de aprobarlo');
-await comprobar('el campo de la nota del hito sigue teniendo el foco',
-  pagina.evaluate(() =>
-    document.activeElement === document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto')),
+await comprobar('el campo sigue teniendo el foco',
+  pagina.evaluate(() => document.activeElement === document.getElementById('guion-nueva-tarea')),
   true);
-await comprobar('el cursor de la nota del hito sigue en el mismo sitio',
+await comprobar('el cursor sigue en el mismo sitio',
   pagina.evaluate(() => {
-    var c = document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-nota-texto');
+    var c = document.getElementById('guion-nueva-tarea');
     return [c.selectionStart, c.selectionEnd];
   }), [6, 6]);
-await comprobar('el hito sigue desplegado (si no, el foco habría ido a un campo escondido)',
+await comprobar('el hito sigue abierto (si no, el foco habría ido a un campo escondido)',
   pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-cuerpo').evaluate((el) => !el.classList.contains('oculto')),
   true);
 

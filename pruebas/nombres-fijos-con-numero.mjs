@@ -232,6 +232,7 @@ async function anadirElExterno(fecha, tipo, texto, conRegistro) {
   await pagina.waitForTimeout(150);
   const vista = await pagina.locator('#doc-vista').textContent();
   await pagina.click('#doc-guardar');
+await pagina.waitForTimeout(600); if (await pagina.locator('#pt-ok').count()) await pagina.click('#pt-ok');   /* fila 638: «¿De qué tarea es?» → «Tarea nueva» */
   await pagina.waitForSelector('#doc-cuerpo .fila-documento');
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForTimeout(300);

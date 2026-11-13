@@ -24,10 +24,14 @@
    ============================================================ */
 window.TareasConDocumento = (function () {
 
-  var CON_DOCUMENTO = { generar: true, registrar: true, firmar: true };
+  /* Fila 638: también «comunicar» (el documento que se envía) y, aparte, «Añadir documento». */
+  var CON_DOCUMENTO = { generar: true, registrar: true, firmar: true, comunicar: true };
 
-  /* ¿Esta línea del guion lleva un documento colgado? */
+  /* ¿Esta línea del guion lleva un documento colgado que viene de generar (el encadenado de abajo)? */
   function conDocumento(g) { return !!g && !g.pregunta && !!CON_DOCUMENTO[g.accion]; }
+
+  /* ¿Se enseña su documento colgado? Las anteriores y «Añadir documento», cuyo documento es el que se añade (fila 638). */
+  function colgable(g) { return conDocumento(g) || (!!g && !g.pregunta && g.accion === 'anadir'); }
 
   function claveDe(nombre) {
     var n = String(nombre || '');
@@ -154,6 +158,6 @@ window.TareasConDocumento = (function () {
     });
   }
 
-  return { conDocumento: conDocumento, mismo: mismo, de: de, asignar: asignar, elegirPaso: elegirPaso, alMarcar: alMarcar,
+  return { conDocumento: conDocumento, colgable: colgable, mismo: mismo, de: de, asignar: asignar, elegirPaso: elegirPaso, alMarcar: alMarcar,
            alGenerar: alGenerar, versionConservada: versionConservada, alRenombrar: alRenombrar, mover: mover, claveDe: claveDe, recorrer: recorrer };
 })();

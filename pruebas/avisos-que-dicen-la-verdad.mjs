@@ -159,12 +159,12 @@ await pagina.evaluate(async (B) => {
   await App.verAbiertos();
   App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto');
 }, B);
-await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
+await pagina.waitForSelector('#ficha-guia .mesa-ya-llego');   /* fila 638: «Ya ha llegado» está en la línea del hito */
 const r4 = await pagina.evaluate(async () => {
   const cambiar = Hitos.cambiar;
   let soltar;
   Hitos.cambiar = function (f) { return new Promise(r => { soltar = () => r(cambiar(f)); }); };
-  const b = document.querySelector('#ficha-acciones .boton-ya-llegado');
+  const b = document.querySelector('#ficha-guia .mesa-ya-llego');
   b.click();
   await new Promise(r => setTimeout(r, 20));
   /* Algo nuevo en la ficha: el modo consulta repasa los controles. */

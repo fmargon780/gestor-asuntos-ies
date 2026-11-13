@@ -116,7 +116,6 @@
     // js/ficha-asunto.js el 17-sep-2026 (fila 26) al quitarle trabajo la
     // fila "los hitos son la guía". Se habla con él por
     // window.FichaDocumentos.pintar.
-    'js/ficha-generar-documento.js',
     'js/ficha-documentos-fila.js',   // fila 560: la fila de cada documento, movida de js/ficha-documentos.js
     'js/ficha-documentos.js',
     // "Datos y contacto" del tercero, la línea resumen y la ventana "Ver

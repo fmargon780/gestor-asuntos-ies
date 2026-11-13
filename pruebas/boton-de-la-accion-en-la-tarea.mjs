@@ -2,10 +2,12 @@
    Con Chromium real y los datos inventados de la copia de pruebas (?demo=1&auto=1): «Vidal Soto, Irene» tiene un primer hito
    con tres tareas (generar con plantilla, registrar en Séneca, comunicar por correo con la plantilla del acuse).
 
-   1. «Generar documento» y «Enviar correo» salen en sus tareas; la de registrar no lleva botón; la cabecera no cambia.
-   2. «Enviar correo» abre el cuadro de Correo con el destinatario y la plantilla de la receta; al enviar, esa tarea queda
+   1. «Generar documento», «Registrar» y «Enviar correo» salen en sus tareas (fila 638: cada tarea, su único botón; sin
+      «Generar documento ▾» ni «Comunicar ▾» en la cabecera).
+   2. «Generar documento» genera el documento y marca esa tarea; su botón desaparece y los otros dos se encienden (fila 638:
+      antes de generar, «Registrar» y «Enviar correo» salen apagados, con «Saldrá aquí al generar…»).
+   3. «Enviar correo» abre el cuadro de Correo con el destinatario y la plantilla de la receta; al enviar, esa tarea queda
       marcada y su botón desaparece.
-   3. «Generar documento» genera el documento y marca esa tarea; su botón desaparece.
    4. Solo consulta: los botones salen apagados, con su título. */
 import { chromium } from 'playwright';
 
@@ -51,22 +53,38 @@ let pagina = await paginaNueva(false);
 await abrirMesa(pagina, 'Vidal Soto');
 
 console.log('--- 1. los botones en sus tareas ---');
-await comprobar('1. generar y comunicar llevan botón; registrar no',
-  botonesDeTareas(pagina), ['g-hacer-generar:Generar documento', 'g-hacer-registrar:', 'g-hacer-comunicar:Enviar correo']);
-await comprobar('1. la cabecera no cambia',
-  pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), ['Generar documento ▾', 'Comunicar ▾']);
+await comprobar('1. generar, registrar y comunicar llevan su botón',
+  botonesDeTareas(pagina), ['g-hacer-generar:Generar documento', 'g-hacer-registrar:Registrar', 'g-hacer-comunicar:Enviar correo']);
+await comprobar('1. antes de generar, registrar y comunicar salen apagados, con «Saldrá aquí al generar…»',
+  pagina.$$eval('.hito-en-mesa .guion-paso .guion-accion-tarea', (l) => l.map((b) => b.disabled)), [false, true, true]);
+await comprobar('1. la cabecera no tiene desplegables',
+  pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), []);
 await comprobar('1. el botón va delante del «⋮», en la misma línea',
   pagina.evaluate(() => { const f = document.querySelector('.guion-paso[data-id="g-hacer-comunicar"] .guion-paso-fila');
     const c = Array.from(f.children).map((x) => x.matches('.guion-accion-tarea') ? 'accion' : (x.querySelector('.guion-tarea-menu-boton') ? 'menu' : ''));
     return c.indexOf('accion') > -1 && c.indexOf('accion') < c.indexOf('menu'); }), true);
 
-console.log('--- 2. Enviar correo ---');
+console.log('--- 2. Generar documento ---');
+await pagina.locator('.guion-paso[data-id="g-hacer-generar"] .guion-accion-tarea').click();
+await pagina.waitForSelector('#word-visor:not(.oculto)', { timeout: 30000 });
+await pagina.waitForTimeout(1500);
+await pagina.evaluate(() => WordVisor.cerrar());
+await pagina.waitForTimeout(1500);
+await comprobar('2. la tarea de generar queda marcada y sin botón',
+  pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
+    const h = (await Hitos.hitosDe(a.nombre))[0];
+    return Hitos.guionDe(a, h).filter((g) => g.hecho).map((g) => g.id).sort(); }), ['g-hacer-generar']);
+await comprobar('2. y registrar y comunicar se encienden', botonesDeTareas(pagina),
+  ['g-hacer-generar:', 'g-hacer-registrar:Registrar', 'g-hacer-comunicar:Enviar correo']);
+await comprobar('2. ya no están apagados', pagina.$$eval('.hito-en-mesa .guion-paso .guion-accion-tarea', (l) => l.map((b) => b.disabled)), [false, false]);
+
+console.log('--- 3. Enviar correo ---');
 await pagina.locator('.guion-paso[data-id="g-hacer-comunicar"] .guion-accion-tarea').click();
 await pagina.waitForSelector('#capa:not(.oculto) #correo-caja', { timeout: 15000 });
 await pagina.waitForTimeout(1500);
 /* Fila 555: a quién va lo dice la plantilla (esta no propone a nadie): se elige a quien se escribe. */
 await pagina.evaluate(() => { CorreoPara.ponerDirecciones('para', ['familia@correo-demo.es']); CorreoPara.repintar(); });
-await comprobar('2. el cuadro de Correo trae el texto de la plantilla y se puede elegir a quién va',
+await comprobar('3. el cuadro de Correo trae el texto de la plantilla y se puede elegir a quién va',
   pagina.evaluate(() => { const c = document.getElementById('correo-caja'); const t = c.innerText + ' ' + Array.from(c.querySelectorAll('input,textarea')).map((x) => x.value).join(' ');
     return [/@/.test(t), /certificado de notas que nos solicit/i.test(t)]; }), [true, true]);
 await pagina.locator('#correo-caja button:text-is("Enviar")').click();
@@ -75,25 +93,13 @@ await pagina.locator('#cuadro-cuerpo button:visible', { hasText: /^(Sí|Mandar|E
 await pagina.waitForTimeout(3000);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(2500);
-await comprobar('2. la tarea de comunicar queda marcada y sin botón',
-  pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
-    const h = (await Hitos.hitosDe(a.nombre))[0];
-    return Hitos.guionDe(a, h).filter((g) => g.hecho).map((g) => g.id); }), ['g-hacer-comunicar']);
-await comprobar('2. su botón desaparece y el de generar sigue', botonesDeTareas(pagina),
-  ['g-hacer-generar:Generar documento', 'g-hacer-registrar:', 'g-hacer-comunicar:']);
-
-console.log('--- 3. Generar documento ---');
-await pagina.locator('.guion-paso[data-id="g-hacer-generar"] .guion-accion-tarea').click();
-await pagina.waitForSelector('#word-visor:not(.oculto)', { timeout: 30000 });
-await pagina.waitForTimeout(1500);
-await pagina.evaluate(() => WordVisor.cerrar());
-await pagina.waitForTimeout(1500);
-await comprobar('3. la tarea de generar queda marcada y sin botón',
+await comprobar('3. la tarea de comunicar queda marcada y sin botón',
   pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
     const h = (await Hitos.hitosDe(a.nombre))[0];
     return Hitos.guionDe(a, h).filter((g) => g.hecho).map((g) => g.id).sort(); }), ['g-hacer-comunicar', 'g-hacer-generar']);
-await comprobar('3. ya no queda ningún botón', botonesDeTareas(pagina),
-  ['g-hacer-generar:', 'g-hacer-registrar:', 'g-hacer-comunicar:']);
+await comprobar('3. su botón desaparece', botonesDeTareas(pagina),
+  ['g-hacer-generar:', 'g-hacer-registrar:Registrar', 'g-hacer-comunicar:']);
+
 await pagina.close();
 
 console.log('--- 4. solo consultar ---');
@@ -101,7 +107,7 @@ const consulta = await paginaNueva(true);
 await abrirMesa(consulta, 'Vidal Soto');
 await comprobar('4. los botones salen apagados, con su título',
   consulta.$$eval('.hito-en-mesa .guion-accion-tarea', (l) => l.map((b) => [b.disabled, AyudaRaton.ayuda(b).motivo])),
-  [[true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.'], [true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.']]);
+  [[true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.'], [true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.'], [true, 'Este ordenador está en «solo consulta»: se puede mirar, pero no cambiar nada.']]);
 await consulta.close();
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);

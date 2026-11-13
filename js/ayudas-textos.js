@@ -18,7 +18,6 @@ var AyudasNucleo = AyudasNucleo || {};
   var TEXTOS = {
     'a-que-hora-es-si-tiene': 'La hora de la nota, si la tiene. Hace falta poner el día.',
     'abre-el-alta-con-estos-datos': 'Abre el alta con estos datos ya escritos. Hay que revisar y guardar.',
-    'abre-el-hito-actual-con-sus': 'Abre el hito actual, con sus plantillas para generar documentos.',
     'abrir-correo-enviado': 'Abre el PDF del correo que se envió.',
     'abrir-en-otra-pestana': 'Abre el documento en otra pestaña del navegador.',
     'abrir-este-hito': 'Abre la mesa de trabajo de este hito.',
@@ -56,6 +55,7 @@ var AyudasNucleo = AyudasNucleo || {};
     'correo-siguiente': 'Enseña el correo de la siguiente persona de la lista.',
     'cortar-aqui': 'Divide el PDF por aquí para separar el trozo de antes.',
     'crea-el-asunto-con-lo-leido': 'Crea el asunto con lo leído y guarda el documento dentro.',
+    'documento-sin-tarea': 'Este documento no cuelga de ninguna tarea. Puedes colgarlo de una; nadie te obliga.',
     'dar-por-hechos-anteriores': 'Marca como hechos los hitos anteriores que sigan sin terminar.',
     'dar-registro': 'Pide el número de registro de entrada o de salida para este documento.',
     'datos-del-asunto-plegar': 'Enseña u oculta los datos del asunto.',

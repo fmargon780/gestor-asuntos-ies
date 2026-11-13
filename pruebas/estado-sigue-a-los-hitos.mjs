@@ -115,11 +115,14 @@ const cabecera = () => pagina.evaluate(() => {
   const i = tira.findIndex((b) => !b.classList.contains('hecho'));
   const titulo = i < 0 ? '' : (document.querySelector('#ficha-guia .hito[data-id="' + tira[i].dataset.id + '"] .hito-titulo-texto') || {}).textContent;
   return [i < 0 ? null : 'Hito ' + (i + 1) + ' de ' + tira.length + ' · ' + (titulo || tira[i].textContent.replace(/^✓ /, '').replace(/^\d+[.)]?\s*/, '').trim()),
-  ((document.querySelector('#ficha-estado-hito .marca-esperando') || {}).textContent || '').replace(/ desde el .*$/, ''),
-  !!document.querySelector('#ficha-estado-hito .boton-ya-llegado')];
+  /* Fila 638: «Esperando a…» ya no está en la cabecera de la ficha: en la línea del hito, «Le toca a: …» (un responsable que no es de Administración). */
+  ((document.querySelector('#ficha-guia .hito-en-mesa .mesa-linea-toca') || {}).textContent || '').replace(/^Le toca a: /, ''),
+  !!document.querySelector('#ficha-guia .hito-en-mesa .mesa-ya-llego')];
 });
-comprobar('4. la cabecera: el paso 3 y «Esperando a Secretaría», sin «Ya ha llegado»', await cabecera(),
-  ['Hito 3 de 5 · Puesta a la firma', 'Esperando a Secretaría', false]);
+await pagina.evaluate(() => HitoMesa.abrir(FichaNucleo.actual, 'h3'));   /* fila 638: la mesa del hito actual, donde sale «Le toca a: …» */
+await pagina.waitForTimeout(900);
+comprobar('4. la cabecera: el paso 3 y «Le toca a: Secretaría» en la línea del hito, sin «Ya ha llegado»', await cabecera(),
+  ['Hito 3 de 5 · Puesta a la firma', 'Secretaría', false]);
 comprobar('4. «Hito actual» solo en el 3; «Saltar a este hito» en el 4 y el 5',
   await pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-guia .hito')).map((h) =>
     [h.dataset.id, !!h.querySelector(':scope > .hito-linea .etiqueta-paso-actual'), (h.querySelector(':scope > .hito-linea .hito-situar') || {}).textContent || ''])),

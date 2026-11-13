@@ -2,8 +2,9 @@
    Con Chromium real y los datos inventados de la copia de pruebas (?demo=1&auto=1): «Vidal Soto, Irene» tiene un
    primer hito con tres tareas (generar con plantilla, registrar en Séneca, comunicar por correo).
 
-   1. Antes de generar, la tarea de registrar dice «Saldrá aquí al generar …».
-   2. «Hacer este hito»: el documento cuelga de la tarea de generar y de la de registrar.
+   1. Antes de generar, las tareas de registrar y de comunicar dicen «Saldrá aquí al generar …» (fila 638: también la de comunicar).
+   2. «Hacer este hito» (fila 638: lanzado a mano con `HacerEsteHito.ejecutar`; ya no hay botón): el documento cuelga de la tarea de generar,
+      de la de registrar y de la de comunicar.
    3. «Elegir documento» (lista los del asunto) y «Cambiar»; «Cancelar».
    4. Registrar: con el sellado de otro documento no se marca; con el de su documento, sí (llega solo).
    5. La tarea de generar, hecha, muestra la versión «SIN SELLAR» (sin «Ruta») y la abre; la de registrar, el documento actual.
@@ -62,28 +63,32 @@ const claveDe = (frag) => pagina.evaluate((frag) => Gestor.asuntos().filter((x) 
 /* ===== 1. Antes de generar ===== */
 console.log('--- 1. antes de generar ---');
 await abrirMesa('Vidal Soto');
-await comprobar('1. la tarea de registrar dice «Saldrá aquí al generar el certificado.»; las demás, nada', colgados(),
-  { 'g-hacer-registrar': 'Saldrá aquí al generar el certificado.' });
+await comprobar('1. las tareas de registrar y de comunicar dicen «Saldrá aquí al generar el certificado.»; la de generar, nada', colgados(),
+  { 'g-hacer-registrar': 'Saldrá aquí al generar el certificado.', 'g-hacer-comunicar': 'Saldrá aquí al generar el certificado.' });
 
 /* ===== 2. Generar ===== */
 console.log('--- 2. «Hacer este hito» ---');
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+await pagina.evaluate(async () => {
+  const a = FichaNucleo.actual;
+  const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito);
+  setTimeout(() => HacerEsteHito.ejecutar(a, h), 0);
+});
 await pagina.waitForSelector('#word-visor:not(.oculto) .word-visor-franja', { timeout: 30000 });
 await pagina.waitForTimeout(1500);
 await pagina.evaluate(() => WordVisor.cerrar());
 await pagina.waitForTimeout(1500);
 const e2 = await estado('Vidal Soto');
-await comprobar('2. el documento queda en la tarea de generar y en la de registrar, el mismo',
-  [Object.keys(e2.docs || {}).sort(), e2.docs && e2.docs['g-hacer-generar'].doc === e2.docs['g-hacer-registrar'].doc], [['g-hacer-generar', 'g-hacer-registrar'], true]);
-await comprobar('2. sale colgado de las dos, con «Ruta»; la de comunicar, nada',
+await comprobar('2. el documento queda en la tarea de generar, en la de registrar y en la de comunicar, el mismo',
+  [Object.keys(e2.docs || {}).sort(), e2.docs && e2.docs['g-hacer-generar'].doc === e2.docs['g-hacer-registrar'].doc && e2.docs['g-hacer-generar'].doc === e2.docs['g-hacer-comunicar'].doc], [['g-hacer-comunicar', 'g-hacer-generar', 'g-hacer-registrar'], true]);
+await comprobar('2. sale colgado de las tres, con «Ruta»',
   pagina.evaluate(() => {
     const r = {};
     document.querySelectorAll('.hito-en-mesa .guion-paso').forEach((p) => { r[p.dataset.id] = p.querySelectorAll('.tcd .tcd-abrir').length + ':' + p.querySelectorAll('.tcd .ruta-documento-lugar').length; });
     return r;
-  }), { 'g-hacer-generar': '1:1', 'g-hacer-registrar': '1:1', 'g-hacer-comunicar': '0:0' });
+  }), { 'g-hacer-generar': '1:1', 'g-hacer-registrar': '1:1', 'g-hacer-comunicar': '1:1' });
 await comprobar('2. la de generar, hecha, no lleva «Cambiar»; la de registrar, pendiente, sí',
   pagina.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .guion-paso')].map((p) => p.dataset.id + ':' + p.querySelectorAll('.tcd-cambiar').length)),
-  ['g-hacer-generar:0', 'g-hacer-registrar:1', 'g-hacer-comunicar:0']);
+  ['g-hacer-generar:0', 'g-hacer-registrar:1', 'g-hacer-comunicar:1']);
 const nombreDoc = e2.docs['g-hacer-generar'].doc;
 
 /* ===== 3. Elegir documento / Cambiar ===== */
@@ -178,6 +183,7 @@ await comprobar('5. la versión existe en _Previas (no sale «ya no está»)',
 
 /* ===== 6. Nueva tarea con «Qué se hace»; Cambiar; Pasar a la guía ===== */
 console.log('--- 6. «Qué se hace» ---');
+await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();   /* fila 638: el formulario se abre con «+ Añadir tarea» */
 await pagina.locator('#guion-nueva-tarea').fill('Registrar la entrada del acuse');
 await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('registrar');
 await pagina.locator('.hito-en-mesa .tcd-nueva .guion-receta-sentido').selectOption('entrada');
@@ -191,7 +197,8 @@ const nueva = () => pagina.evaluate(async () => {
 });
 const n1 = await nueva();
 await comprobar('6. la tarea nueva es «solo aquí», de registrar, con su dato', n1 && [n1.propio, n1.accion, n1.receta], [true, 'registrar', { sentido: 'entrada' }]);
-await comprobar('6. la caja vuelve a «Sin acción»', pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').inputValue(), '');
+await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();
+await comprobar('6. el formulario se cerró al añadir, y al abrirlo otra vez vuelve a «Sin acción»', pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').inputValue(), '');
 await comprobar('6. sin elegir nada, una tarea nueva sale como siempre (sin acción)',
   (async () => {
     await pagina.locator('#guion-nueva-tarea').fill('Llamar a la familia');

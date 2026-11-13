@@ -304,10 +304,10 @@
     caja.innerHTML = '';
 
     if (abierto) {
-      /* Fila 129 y fila 637: ya no sale «Hito N de M · …» (el hito se ve en la fila de hitos),
-         solo «Esperando a…» / «Ya ha llegado» (js/estado-hito.js). «El encargo» ya no es un botón:
-         quién lo pide y por qué vía están en «Datos». */
-      if (window.EstadoHito) EstadoHito.pintarEnFicha(caja, a);
+      /* Fila 129 y fila 637: ya no sale «Hito N de M · …» (el hito se ve en la fila de hitos). «El encargo» ya no es un
+         botón: quién lo pide y por qué vía están en «Datos». Fila 638: «Esperando a…» y «Ya ha llegado» están en la
+         línea del hito (js/hito-mesa-linea.js); aquí solo queda el vencimiento del asunto. */
+      if (window.EstadoHito) EstadoHito.alAbrirFicha(a);
 
       var et = Plazos.etiquetaVencimiento(a.ficha.limite);
       var bplazo = document.createElement('button');

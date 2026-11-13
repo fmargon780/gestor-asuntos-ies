@@ -11,8 +11,9 @@
    responsable, «Marcar hito como hecho», menú «Hito ▾» y la tira de
    hitos) y, debajo, de arriba abajo y en una sola columna, lo que pinta
    js/hitos-panel-lista.js en el cuerpo del hito: tareas, campos,
-   documentos del hito y registro. Los desplegables «Generar documento ▾»
-   y «Comunicar ▾» (fila 145) van en la cabecera.
+   documentos del hito y registro. (Fila 638: la cabecera es el nombre, «Marcar
+   como hecho» y «Hito ▾», con su línea debajo; el hito lleva solo sus tareas y
+   no hay botones sueltos de generar ni de comunicar.)
 
    No hay pantalla nueva: la mesa es el mismo `.hito` con su
    `.hito-cuerpo` visible y la clase `con-mesa` en `#ficha-guia`, que
@@ -53,13 +54,6 @@ var HitoMesa = (function () {
       FichaTarjetas.abrir('trabajo');
     }
     window.scrollTo(0, 0);
-  }
-
-  /* Fila 267: la mesa de un hito con un desplegable ya abierto (el atajo
-     «Generar documento» de la ficha). */
-  function abrirConPanel(a, idHito, panel) {
-    panelAbierto = { clave: a.nombre, idHito: idHito, panel: panel };
-    abrir(a, idHito);
   }
 
   /* Para "Qué me toca": se abrirá en cuanto se pinte ese asunto. */
@@ -132,6 +126,24 @@ var HitoMesa = (function () {
     if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
   }
 
+  /* Fila 638: «Esperando a…» (y lo que cambia sola la espera al llegar un documento) se ve en la línea del hito: se pone al día solo
+     esa línea, con lo último leído de hitos.json, sin volver a leer nada ni repintar el hito entero. */
+  function refrescarLinea() {
+    if (!abierta || !ultimo || !ultimo.a || ultimo.a.nombre !== abierta.clave || !window.HitoMesaLinea || !window.Hitos || !Hitos.ultimosLeidos) return false;
+    var datos = Hitos.ultimosLeidos();
+    var entrada = datos && datos.porAsunto ? datos.porAsunto[ultimo.a.nombre] : null;
+    var fila = ultimo.caja && ultimo.caja.querySelector('.hito.hito-en-mesa');
+    var cab = fila && fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
+    var linea = cab && cab.querySelector('.mesa-linea');
+    var h = entrada ? hitoPorId(entrada.hitos, abierta.idHito) : null;
+    if (!linea || !h) return false;
+    ultimo.hitos = entrada.hitos;
+    ultimo.ajustes = datos.ajustes;
+    linea.outerHTML = HitoMesaLinea.html(ultimo.a, h, entrada.hitos, datos.ajustes, ultimo.abierto);
+    HitoMesaLinea.enganchar(cab, ultimo.a, h, entrada.hitos, datos.ajustes, ultimo.abierto);
+    return true;
+  }
+
   /* Tras marcar un hito como hecho (fila 173, punto 5): al hito que
      haya quedado en curso, con los datos recién guardados (no los del
      último `aplicar`, que son de antes de marcar). Sin ninguno en
@@ -147,18 +159,6 @@ var HitoMesa = (function () {
   }
 
   /* ---------- la cabecera de la mesa ---------- */
-
-  var ESTADOS = [
-    { valor: 'pendiente', texto: 'Pendiente' },
-    { valor: 'encurso', texto: 'En curso' },
-    { valor: 'hecho', texto: 'Hecho' },
-    { valor: 'noaplica', texto: 'No aplica' }
-  ];
-
-  function textoEstado(e) {
-    var x = ESTADOS.filter(function (s) { return s.valor === e; })[0];
-    return x ? x.texto : 'Pendiente';
-  }
 
   /* "Vence el 15-oct · quedan N días hábiles", con los no lectivos de
      Ajustes › Hitos; colores de Plazos.de. */
@@ -181,48 +181,28 @@ var HitoMesa = (function () {
     return { texto: texto, clase: clase };
   }
 
-  function contextoDe(a) {
-    var f = a.ficha || {};
-    return { tercero: f.tercero || (a.leido && a.leido.resto) || '', relacionados: f.relacionados || [], tutor: null };
-  }
-
-  function guardar(control, queNo, hacer) {
-    if (window.HitosPanelLista && HitosPanelLista.guardarHito) return HitosPanelLista.guardarHito(control, queNo, hacer);
-    return hacer();
-  }
-
+  /* Fila 638 (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): la cabecera del hito es su nombre, «Marcar como hecho» (solo
+     en el hito actual) y «Hito ▾»; debajo, su línea (js/hito-mesa-linea.js). Ya no hay «Generar documento ▾», «Comunicar ▾»
+     ni «Hacer este hito»: todo documento y toda comunicación salen de una tarea (js/hito-mesa-guion.js). */
   function pintarCabecera(fila, a, h, hitos, ajustes, abierto) {
     var cab = fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
     if (!cab || !h) return;
     var visibles = Hitos.visibles(hitos).filter(function (x) { return x.estado !== 'noaplica' && !x.delTipoAnterior; });
-    /* Fila 154: los números, con la misma cuenta que «Hito N de M» y la
-       pestaña «Hitos N/M» (sin los «solo informativo», que en la tira
+    /* Fila 154: los números, con la misma cuenta que «Hito N de M» (sin los «solo informativo», que en la tira
        salen sin número). */
     var numerados = Hitos.numerados ? Hitos.numerados(hitos) : visibles;
     function numeroDe(x) { return numerados.indexOf(x) + 1; }
     var n = numeroDe(h);
-    var plazo = textoPlazo(h.fecha, ajustes, h.plazo && h.plazo.cuenta);
-    var resp = h.responsable ? Hitos.resolverResponsable(h.responsable, ajustes, contextoDe(a)) : null;
     var guion = Hitos.guionDe ? Hitos.guionDe(a, h) : [];
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };
     var completo = cuenta.total > 0 && cuenta.hechos === cuenta.total && h.estado !== 'hecho';
-
-    /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): arriba, la tira de hitos a
-       todo el ancho; debajo, una línea con el título, lo de plazo y
-       responsable en texto pequeño (pulsable) y, a la derecha, cuatro
-       botones: «Generar documento ▾», «Comunicar ▾», «Marcar como hecho» y
-       «···». El estado solo se ve como etiqueta si está hecho. */
     var decision = h.clase === 'decision';
-    var estadoHTML = h.estado === 'hecho'
-      ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">' + (window.Esperas ? Esperas.textoHecho(h) : 'Hecho') + '</button>'
-      : '<button type="button" class="mesa-meta mesa-etq-estado">' + U.escapar(textoEstado(h.estado)) + '</button><span class="mesa-meta-punto">·</span>';
-    /* Fila 173, punto 5: sin ningún hito en curso (todos hechos o "No
-       aplica"), se enseña aquí mismo, se esté viendo el hito que se esté
-       viendo, con un atajo para archivar. */
-    var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual &&
-      EstadoHito.idActual(hitos, ajustes) === null;
-    /* Fila 637: la fila de hitos ya no está en esta columna: va a todo el ancho, debajo de la cabecera
-       de la ficha (`#ficha-tira`, js/ficha-tarjetas.js), con el hito actual marcado y «+ Añadir hito» al final. */
+    var esElActual = !!(window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id);
+    /* Fila 173, punto 5: sin ningún hito en curso (todos hechos o "No aplica"), se enseña aquí mismo, se esté viendo el
+       hito que se esté viendo, con un atajo para archivar. */
+    var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === null;
+    /* Fila 637: la fila de hitos va a todo el ancho, debajo de la cabecera de la ficha (`#ficha-tira`,
+       js/ficha-tarjetas.js), con el hito actual marcado y «+ Añadir hito» al final. */
     var tira = document.getElementById('ficha-tira');
     if (tira) {
       tira.innerHTML = visibles.map(function (x) {
@@ -239,34 +219,20 @@ var HitoMesa = (function () {
       var anadirHito = tira.querySelector('.mesa-tira-anadir');
       if (anadirHito) anadirHito.onclick = function () { ComunesAsunto.anadirHito(a); };
     }
+    var puedeMarcar = abierto && !decision && (esElActual || h.estado === 'hecho');
     cab.innerHTML =
       '<div class="mesa-titulo-fila">' +
         '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
         (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +
-        '<div class="mesa-etiquetas">' +
-          (window.ContactoALaVista ? ContactoALaVista.html(a) : '') +   /* fila 305 */
-          /* Fila 162: «Paso actual», el mismo que en la lista y en la cabecera. */
-          (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML() : '') +
-          estadoHTML +
-          '<button type="button" class="mesa-meta mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
-          '<span class="mesa-meta-punto">·</span>' +
-          '<button type="button" class="mesa-meta mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
-        '</div>' +
         '<div class="mesa-acciones">' +
-          (abierto && window.HacerEsteHito ? HacerEsteHito.botonHTML(a, h) : '') +   /* fila 285 */
-          (abierto ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="generar" aria-expanded="false">Generar documento ▾</button>' +
-            '<div class="mesa-panel mesa-panel-generar oculto"><div class="mesa-plantillas"></div>' +
-            (window.Formularios ? Formularios.listaHTML(h.formularios, 'Impresos') : '') + '</div></div>' : '') +
-          (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
-            '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
           (abierto && !decision && window.Esperas ? Esperas.botonHTML(a, h) : '') +   /* fila 286 */
-          (abierto && !decision
+          (puedeMarcar
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
           (abierto ? '<button type="button" class="boton mesa-mas" data-ayuda-clave="menu-del-hito">Hito ▾</button>' : '') +
         '</div>' +
       '</div>' +
-      (abierto && window.HacerEsteHito ? HacerEsteHito.lineaHTML(a, h) : '') +
+      (window.HitoMesaLinea ? HitoMesaLinea.html(a, h, hitos, ajustes, abierto) : '') +
       (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
         /* Fila 249: en un tipo que hay que liquidar, no se archiva: se pasa a «Por liquidar». */
         (window.PorLiquidar && PorLiquidar.exige(a) && PorLiquidar.estaPorLiquidar(a)
@@ -275,24 +241,21 @@ var HitoMesa = (function () {
             (window.PorLiquidar ? PorLiquidar.textoDelBoton(a) : 'Archivar el asunto') + '</button>') +
         '</div>' : '');
 
-    engancharPaneles(cab, a, h);
-    if (abierto && window.HacerEsteHito) HacerEsteHito.enganchar(cab, a, h);
     if (abierto && window.Esperas) Esperas.enganchar(cab, a, h);
     var archivarBtn = cab.querySelector('.mesa-archivar-asunto');
     if (archivarBtn) archivarBtn.onclick = function () {
-      /* Lo mismo que el botón de la cabecera de la ficha (fila 106,
-         js/ficha-asunto.js): se pulsa el de verdad, para no repetir su
-         guardado ni su navegación al terminar. */
+      /* Lo mismo que el botón de la cabecera de la ficha (fila 106, js/ficha-asunto.js): se pulsa el de verdad, para no
+         repetir su guardado ni su navegación al terminar. */
       var real = document.querySelector('#ficha-archivar button');
       if (real) { real.click(); return; }
       U.mientrasGuarda(archivarBtn, function () { return ArchivarFondo.archivar(a); });
     };
+    if (window.HitoMesaLinea) HitoMesaLinea.enganchar(cab, a, h, hitos, ajustes, abierto);
     if (!abierto || !window.FichaMenus) return;
 
-    /* "Marcar como hecho": pulsa por debajo la misma casilla de siempre
-       (así sigue avisando de lo obligatorio sin reunir), y cuando el
-       guardado termina y se ha marcado (no al desmarcar), pasa al hito
-       que haya quedado en curso (fila 173, punto 5). */
+    /* "Marcar como hecho": pulsa por debajo la misma casilla de siempre (así sigue avisando de lo obligatorio sin
+       reunir), y cuando el guardado termina y se ha marcado (no al desmarcar), pasa al hito que haya quedado en curso
+       (fila 173, punto 5). */
     var marcarBtn = cab.querySelector('.mesa-marcar-hecho');
     if (marcarBtn) marcarBtn.onclick = async function () {
       var casilla = fila.querySelector(':scope > .hito-linea .hito-casilla');
@@ -305,47 +268,11 @@ var HitoMesa = (function () {
       if (ok && seMarca) irAlSiguienteTrasMarcar(a);
     };
 
-    FichaMenus.montar(cab.querySelector('.mesa-etq-estado'), ESTADOS.map(function (e) {
-      return { texto: e.texto, alPulsar: function () {
-        guardar(null, 'cambiar el estado', function () { return Hitos.marcar(a.nombre, h.id, e.valor, window.RegistroAsunto ? RegistroAsunto.notaDeEstado(h.estado, e.valor) : ''); });
-      } };
-    }));
-    FichaMenus.montar(cab.querySelector('.mesa-etq-plazo'), [
-      { texto: 'Cambiar la fecha…', alPulsar: async function () {
-        var ok = await U.preguntar('Fecha límite de este hito',
-          '<input type="date" class="campo" id="mesa-fecha-nueva" value="' + U.escapar(h.fecha || '') + '">', 'Guardar');
-        if (!ok) return;
-        var v = ($('mesa-fecha-nueva') && $('mesa-fecha-nueva').value) || '';
-        guardar(null, 'guardar la fecha', function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: v }); });
-      } },
-      { texto: 'Quitar la fecha', alPulsar: function () {
-        guardar(null, 'quitar la fecha', function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: '' }); });
-      } }
-    ]);
-    var responsables = ((ajustes && ajustes.responsables) || []).concat(Hitos.PAPELES || []);
-    FichaMenus.montar(cab.querySelector('.mesa-etq-resp'), [{ texto: '(sin responsable)', alPulsar: function () {
-      guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: '' }); });
-    } }].concat(responsables.map(function (r) {
-      return { texto: r.nombre, alPulsar: function () {
-        guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: r.id }); });
-      } };
-    })).concat(window.ResponsableOrganismo ? [{ texto: ResponsableOrganismo.TEXTO, clase: 'mesa-resp-administracion', alPulsar: async function () {
-      /* Fila 205: una Administración dada de alta (Delegación, otro centro…) como responsable. */
-      var r = await ResponsableOrganismo.elegir();
-      if (!r) return;
-      guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: r.id, responsableNombre: r.nombre }); });
-    } }] : []).concat(window.ListaNuevoListas ? ListaNuevoListas.itemDeMenuResponsable(function (id) {
-      /* Fila 615: «+ Nuevo responsable…», la última opción. */
-      guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: id }); });
-    }) : []));
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
-    /* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): arriba, sin repetir la
-       palabra, Cambiar · Borrar (fila 553: sin «Crear»; los hitos nuevos, con «+ Añadir hito» de la tira; antes «+ Crear un hito»,
-       «Cambiar este hito» y «Borrar este hito», al final; fila 206).
-       Nunca en un hito-pregunta (las preguntas se siguen escribiendo en
-       Ajustes). Las demás opciones se quedan debajo de una raya, con su
-       texto de siempre: esta fila no las mueve. */
+    /* Fila 224: arriba, sin repetir la palabra, Cambiar · Borrar (fila 553: sin «Crear»). Nunca en un hito-pregunta
+       (las preguntas se siguen escribiendo en Ajustes). Fila 638: ya no están «Dejarlo solo informativo» (sigue en la
+       guía del tipo) ni «Enviar estado»; el responsable se cambia en «Cambiar». */
     if (window.HitosDesdeElAsunto && !decision) {
       opcionesMas.push({ texto: 'Cambiar', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
       var puedeBorrar = HitosDesdeElAsunto.sinTrabajo(h, a);
@@ -363,23 +290,8 @@ var HitoMesa = (function () {
     if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Saltar a este hito…', clase: 'mesa-situar', alPulsar: function () {
       EstadoHito.situar(a, h.id, mas);
     } });
-    opcionesMas.push({ texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {
-      var b = fila.querySelector('.hito-solo-informativo'); if (b) b.click();
-    } });
     if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
-    /* «Enviar estado» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md, punto
-       3): en el menú «Hito ▾», que ya crece sin romper el ancho fijo de
-       la cabecera (fila 50, docs/CABECERA-NO-TIEMBLA.md). */
-    if (window.AvisosLoPide) {
-      opcionesMas.push({ texto: 'Enviar estado', clase: 'mesa-enviar-estado', alPulsar: function () { AvisosLoPide.enviarEstado(a); } });
-    }
     if (mas) FichaMenus.montar(mas, opcionesMas);
-  }
-
-  /* Fila 425: lo que hacía «abrir antes la tarjeta de documentos»: llevar el bloque a la vista, a la izquierda. */
-  function verDocumentos() {
-    var docs = document.querySelector('.hito-en-mesa .mesa-grande-docs');
-    if (docs && docs.scrollIntoView) docs.scrollIntoView({ block: 'nearest' });
   }
 
   function tipoDe(a) { return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || ''; }
@@ -395,87 +307,14 @@ var HitoMesa = (function () {
     if (hecho && window.HitosPanel) HitosPanel.programarRepintado();
   }
 
-  /* ---------- los dos desplegables de la cabecera (fila 145) ----------
-
-     «Generar documento ▾» (plantillas de la tarea y del tipo, «Buscar otra
-     plantilla…» y formularios: las rellena js/hito-mesa-documentos.js) y
-     «Comunicar ▾» (js/hito-mesa-comunicar.js). Van dentro de la página,
-     no son un U.preguntar. Uno solo abierto; se cierran con Escape
-     (js/usabilidad.js, antes que la mesa), al pulsar fuera o al abrir el
-     otro. Cuál estaba abierto se recuerda, para que un repintado no lo
-     cierre. */
-  var panelAbierto = null;   /* { clave, idHito, panel } */
-
-  function engancharPaneles(cab, a, h) {
-    Array.prototype.forEach.call(cab.querySelectorAll('.mesa-abrir-panel'), function (b) {
-      b.onclick = function (ev) {
-        ev.stopPropagation();
-        var cual = b.dataset.panel;
-        var yaEra = panelAbierto && panelAbierto.panel === cual;
-        cerrarPaneles();
-        if (!yaEra) mostrarPanel(cab, cual, a, h);
-      };
-    });
-    if (panelAbierto && panelAbierto.clave === a.nombre && panelAbierto.idHito === h.id) mostrarPanel(cab, panelAbierto.panel, a, h);
-    else panelAbierto = null;
-  }
-
-  function mostrarPanel(cab, cual, a, h) {
-    var panel = cab.querySelector('.mesa-panel-' + cual);
-    var boton = cab.querySelector('.mesa-abrir-panel[data-panel="' + cual + '"]');
-    if (!panel || !boton) return;
-    panel.classList.remove('oculto');
-    colocarPanel(panel);
-    boton.setAttribute('aria-expanded', 'true');
-    boton.classList.add('abierto');
-    panelAbierto = { clave: a.nombre, idHito: h.id, panel: cual };
-  }
-
-  /* Fila 425: la columna del hito es la mitad de la pantalla: el desplegable, de 420 px y pegado por defecto al borde
-     derecho de su botón, no se sale por los lados de esa columna (se taparía con el menú de la izquierda o la carpeta). */
-  function colocarPanel(panel) {
-    panel.style.left = '';
-    panel.style.right = '';
-    var col = document.getElementById('trabajo-izq');
-    if (!col || !panel.offsetParent) return;
-    var c = col.getBoundingClientRect();
-    var r = panel.getBoundingClientRect();
-    var dx = 0;
-    if (r.left < c.left + 4) dx = c.left + 4 - r.left;
-    else if (r.right > c.right - 4) dx = Math.min(0, c.right - 4 - r.right);
-    if (!dx) return;
-    var base = panel.offsetParent.getBoundingClientRect();
-    panel.style.right = 'auto';
-    panel.style.left = Math.round(r.left + dx - base.left) + 'px';
-  }
-
-  function cerrarPaneles() {
-    var hubo = false;
-    Array.prototype.forEach.call(document.querySelectorAll('.mesa-panel:not(.oculto)'), function (p) { p.classList.add('oculto'); hubo = true; });
-    Array.prototype.forEach.call(document.querySelectorAll('.mesa-abrir-panel.abierto'), function (b) {
-      b.classList.remove('abierto');
-      b.setAttribute('aria-expanded', 'false');
-    });
-    panelAbierto = null;
-    return hubo;
-  }
-
-  /* Para Escape: true si había uno abierto y se ha cerrado. */
-  function cerrarPanelSiAbierto() { return cerrarPaneles(); }
-
-  /* Pulsar fuera cierra (sin contar los cuadros que se abren desde dentro). */
-  document.addEventListener('mousedown', function (ev) {
-    if (!panelAbierto) return;
-    var t = ev.target;
-    if (t && t.closest && (t.closest('.mesa-desplegable') || t.closest('#capa') || t.closest('.huecos-cuadro'))) return;
-    cerrarPaneles();
-  }, true);
+  /* Fila 638: ya no hay desplegables en la cabecera (Escape y `usabilidad.js` los siguen preguntando: nunca hay uno abierto). */
+  function cerrarPanelSiAbierto() { return false; }
 
   return {
-    abrir: abrir, abrirConPanel: abrirConPanel, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
+    abrir: abrir, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
     cerrarSiAbierta: cerrarSiAbierta, estaAbierta: estaAbierta,
-    abierta: function () { return abierta; }, textoPlazo: textoPlazo,
-    cerrarPanelSiAbierto: cerrarPanelSiAbierto, verDocumentos: verDocumentos,
+    abierta: function () { return abierta; }, textoPlazo: textoPlazo, refrescarLinea: refrescarLinea,
+    cerrarPanelSiAbierto: cerrarPanelSiAbierto,
     alEntrarEnLaFicha: alEntrarEnLaFicha
   };
 })();

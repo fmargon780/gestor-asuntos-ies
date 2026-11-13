@@ -6,9 +6,8 @@
       queda la automática.
    2. Migrar dos veces no duplica.
    3. En la ficha, las notas llevan la etiqueta; pulsarla abre la mesa.
-   4. En la mesa: solo las notas de ese hito, y aparte la «Historia».
-   5. Una nota escrita en la mesa sobrevive a un repintado, y al
-      guardarla va a las del asunto con la etiqueta. */
+   4. En el registro de la ficha (fila 638: el hito ya no tiene su recuadro de «Registro»): las líneas de ese hito y la nota suelta.
+   5. Una nota escrita desde el hito (fila 638: ya sin caja de notas; con la misma función) va a las del asunto con la etiqueta. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -105,32 +104,29 @@ await pagina.evaluate(() => document.querySelector('#ficha-notas .nota-hito').cl
 await esperar(() => HitoMesa.estaAbierta && HitoMesa.estaAbierta());
 await comprobar('pulsar la etiqueta abre la mesa de ese hito', pagina.evaluate(() => {
   const fila = document.querySelector('#ficha-guia .hito[data-id="h1"]');
-  return !!(fila && fila.querySelector('.mesa-notas'));
+  return !!(fila && fila.classList.contains('hito-en-mesa'));
 }), true);
 
-console.log('--- 4. la mesa ---');
+console.log('--- 4. el registro de la ficha ---');
 const mesa = () => pagina.evaluate(() => {
-  const b = document.querySelector('#ficha-guia .hito[data-id="h1"] .mesa-notas');
+  const l = Array.prototype.filter.call(document.querySelectorAll('#ficha-notas .registro-linea'), x => /Recoger los papeles/.test(x.querySelector('.nota-cabeza').textContent) || !x.querySelector('.nota-hito'));
   return {
-    notas: Array.prototype.map.call(b.querySelectorAll('.hito-notas .registro-linea'), x => x.querySelector('.nota-texto').textContent),
-    auto: Array.prototype.map.call(b.querySelectorAll('.hito-notas .registro-linea'), x => x.classList.contains('registro-auto'))
+    notas: l.map(x => x.querySelector('.nota-texto').textContent),
+    auto: l.map(x => x.classList.contains('registro-auto'))
   };
 });
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
+await pagina.waitForTimeout(500);
 /* Fila 229: una sola lista por fechas, con lo automático en gris. */
-/* Fila 426: y la nota a mano del asunto sin hito. */
 await comprobar('las líneas de ese hito y la nota suelta del asunto, en una lista (la más nueva arriba)', mesa(), {
   notas: ['Trae la solicitud el lunes', AUTO, 'Nota del asunto', 'Ha llamado la madre'], auto: [false, true, false, false]
 });
 
-console.log('--- 5. escribir en la mesa ---');
-const ta = '#ficha-guia .hito[data-id="h1"] .hito-nota-texto';
-/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.fill(ta, 'Llamada a la familia');
-await pagina.evaluate(() => HitosPanel.programarRepintado());
-await pagina.waitForTimeout(800);
-await comprobar('lo escrito sobrevive a un repintado', pagina.locator(ta).inputValue(), 'Llamada a la familia');
-/* Fila 145: sin botón «Añadir nota»; Intro guarda. */
-await pagina.press(ta, 'Enter');
+console.log('--- 5. una nota escrita desde el hito ---');
+await pagina.evaluate(async (ana) => {
+  const a = App.E.listaAbiertos.filter((x) => x.nombre === ana)[0];
+  await NotasHito.anadirDesdeHito(a, Hitos.buscar(await Hitos.hitosDe(ana), 'h1'), 'Llamada a la familia');
+}, ANA);
 await esperar(async (ana) => {
   const r = await Carpetas.leerJson(App.E.gestor, 'asuntos.json');
   return r.asuntos[ana].notas.some(n => n.texto === 'Llamada a la familia');
@@ -139,8 +135,10 @@ await comprobar('guardada en las del asunto, con la etiqueta', notasAsunto().the
   [['Llamada a la familia', 'h1', 'Recoger los papeles']]);
 await comprobar('y no en el hito', notasHito(), [AUTO]);
 await pagina.waitForTimeout(800);
-await comprobar('la caja se queda vacía tras guardar', pagina.locator(ta).inputValue(), '');
-await comprobar('y sale en la mesa', mesa().then(m => m.notas[0]), 'Llamada a la familia');
+await comprobar('y sale la primera del registro, con el hito', pagina.evaluate(() => {
+  const l = document.querySelector('#ficha-notas .registro-linea');
+  return [l.querySelector('.nota-texto').textContent, /Recoger los papeles/.test(l.querySelector('.nota-cabeza').textContent)];
+}), ['Llamada a la familia', true]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

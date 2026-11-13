@@ -84,7 +84,9 @@ await comprobar('a la vista, «Ruta» pegado al nombre; ni ⧉ ni «Registrar» 
   filaDe(PDF).evaluate(f => {
     var b = f.querySelector('.ficha-documento');
     var sueltos = Array.from(f.querySelectorAll(':scope > button')).map(x => x.textContent.trim());
-    return [!!(b && b.nextElementSibling && b.nextElementSibling.classList.contains('ruta-documento')), sueltos.filter(t => t === '⧉' || t === 'Registrar' || t === 'Cambiar el nombre')];
+    var r = b && b.nextElementSibling;   /* fila 638: puede ir antes «sin tarea» y «Colgar de una tarea» */
+    while (r && (r.classList.contains('marca-sin-tarea') || r.classList.contains('ficha-documento-colgar'))) r = r.nextElementSibling;
+    return [!!(r && r.classList.contains('ruta-documento')), sueltos.filter(t => t === '⧉' || t === 'Registrar' || t === 'Cambiar el nombre')];
   }), [true, []]);
 await filaDe(PDF).locator('.fila-menu-btn').click();
 await comprobar('el menú ⋮ trae, en orden, copiar el nombre, Registrar, Cambiar el nombre, «Convertir en plantilla» (fila 280: en un PDF sin Word sale apagada), «Pasar a versiones previas» y «Borrar»',

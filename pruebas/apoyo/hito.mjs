@@ -30,3 +30,13 @@ export async function verLaLista(pagina) {
   }
   await pagina.waitForSelector('#ficha-guia:not(.con-mesa) .hito', { state: 'attached' });
 }
+
+/* Fila 638: ya no hay «Comunicar ▾» ni «Preparar correo» sueltos en el hito (todo se comunica desde una tarea). Esto abre el
+   cuadro de Correo (o de Séneca) del hito abierto en la mesa, con la misma función que usa el botón de una tarea. */
+export async function comunicarDelHito(pagina, canal, opciones) {
+  await pagina.evaluate(async ([c, o]) => {
+    const a = FichaNucleo.actual;
+    const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito);
+    HitosComunicar.comunicar(a, h, c || 'correo', o || {});
+  }, [canal || 'correo', opciones || {}]);
+}

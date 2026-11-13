@@ -81,11 +81,14 @@ async function meter(nombre) {
   if (await pagina.evaluate(() => document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-cuerpo').classList.contains('oculto'))) {
     await hito1.locator('.hito-titulo').click();
   }
-  /* Fila 147: «Añadir documento» está en la tarjeta de documentos de la mesa. */
-  await hito1.locator('.hito-anadir-documento').click();
-  await hito1.locator('.ficha-menu-opcion', { hasText: 'Por clasificar' }).click();
-  await pagina.waitForSelector('.enlace-asunto');
-  await pagina.locator('.enlace-asunto', { hasText: nombre }).click();
+  /* Fila 638: el menú «Añadir documento ▾ → Desde "Por clasificar"» del recuadro «Documentos» del hito ya no existe; lo que hacía
+     (`HitosAnadir.desdePorClasificar`) es meter el suelto en este asunto con este hito, y es lo que se pide aquí directamente. */
+  await pagina.evaluate(async ([A, nombre]) => {
+    const a = App.E.listaAbiertos.filter((x) => x.nombre === A)[0];
+    const s = App.E.sueltos.filter((x) => x.nombre === nombre)[0];
+    const h = Hitos.buscar(await Hitos.hitosDe(A), 'p1');
+    App.meterSueltoEnAsuntoElegido(s, { nombre: a.nombre, ficha: a.ficha }, { hito: h });
+  }, [A, nombre]);
   await pagina.waitForSelector('#doc-cuerpo #doc-guardar');
 }
 async function estado() {

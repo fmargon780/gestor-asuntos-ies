@@ -1,8 +1,7 @@
-/* Prueba de la fila 267 (docs/GENERAR-DOCUMENTO-DESDE-LA-FICHA.md): en la
-   tarjeta «Documentos de la carpeta» de la ficha, un botón «Generar
-   documento» junto a «+ Añadir documento» que abre el hito actual con el
-   desplegable «Generar documento ▾» ya abierto. Solo con hitos y asunto
-   abierto; se calcula el hito al pulsar; no se duplica al repintar.
+/* Prueba de la fila 267 (docs/GENERAR-DOCUMENTO-DESDE-LA-FICHA.md), puesta al revés por la fila 638
+   (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): en la tarjeta «Documentos de la carpeta» ya no hay botón «Generar documento»
+   (antes abría el hito actual con «Generar documento ▾»; ahora se genera desde la tarea de generar del hito). Solo queda
+   «+ Añadir documento», con hitos y sin ellos, en un asunto abierto, archivado y en consulta; y no se duplica al repintar.
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
@@ -82,48 +81,16 @@ const mesa = () => pagina.evaluate(() => {
   return m ? { hito: m.dataset.id, abierto: !!panel && !panel.classList.contains('oculto') } : null;
 });
 
-console.log('--- 1. con hitos: dos botones, también con la carpeta vacía ---');
+console.log('--- 1. con hitos: solo «+ Añadir documento», también con la carpeta vacía ---');
 await abrir(A, 'abierto');
-await comprobar('«+ Añadir documento» y «Generar documento», en ese orden', botones(), ['+ Añadir documento', 'Generar documento']);
-await comprobar('no es el botón principal', pagina.evaluate(() => document.querySelector('.ficha-documentos-generar').classList.contains('boton-principal')), false);
-
-console.log('--- 2. al pulsarlo, la mesa del hito actual con el desplegable abierto ---');
-await pagina.click('.ficha-documentos-generar');
-await pagina.waitForTimeout(500);
-await comprobar('mesa de Tramitar (p1) con «Generar documento ▾» abierto', mesa(), { hito: 'p1', abierto: true });
-
-console.log('--- 6. Escape cierra; entrar por el título no lo abre ---');
-await pagina.keyboard.press('Escape');
-await pagina.waitForTimeout(200);
-await comprobar('Escape cierra el desplegable', mesa(), { hito: 'p1', abierto: false });
-await pagina.evaluate(() => HitoMesa.cerrar());
-await pagina.evaluate((A) => HitoMesa.abrir(App.E.listaAbiertos.filter(x => x.nombre === A)[0], 'p1'), A);
-await pagina.waitForTimeout(300);
-await comprobar('abrir por el título: sin desplegable', mesa(), { hito: 'p1', abierto: false });
-
-console.log('--- 4. el hito se calcula al pulsar ---');
-await pagina.evaluate(() => HitoMesa.cerrar());
-await pagina.evaluate((A) => Hitos.marcar(A, 'p1', 'hecho'), A);
-await abrir(A, 'abierto');
-await pagina.click('.ficha-documentos-generar');
-await pagina.waitForTimeout(500);
-await comprobar('con Tramitar hecho, abre Firmar (p2) con el desplegable abierto', mesa(), { hito: 'p2', abierto: true });
-
-console.log('--- 5. todos hechos: el último ---');
-await pagina.evaluate(() => HitoMesa.cerrar());
-await pagina.evaluate(async (A) => { await Hitos.marcar(A, 'p2', 'hecho'); await Hitos.marcar(A, 'p3', 'hecho'); }, A);
-await abrir(A, 'abierto');
-await pagina.click('.ficha-documentos-generar');
-await pagina.waitForTimeout(500);
-await comprobar('abre Entregar (p3)', mesa().then(m => m && m.hito), 'p3');
+await comprobar('solo «+ Añadir documento»', botones(), ['+ Añadir documento']);
+await comprobar('y no hay «Generar documento» en ningún sitio de la carpeta', pagina.evaluate(() => document.querySelectorAll('.ficha-documentos-generar, #trabajo-carpeta .boton-generar-documento').length), 0);
 
 console.log('--- 8, 9, 11. barra de arriba, mesa y repintado ---');
 await comprobar('la barra de arriba sigue sin «Generar documento» (fila 154)',
   pagina.evaluate(() => { const b = document.querySelector('#ficha-acciones .boton-generar-documento'); return !b || b.offsetParent === null; }), true);
-await comprobar('dentro de la mesa no hay botón nuevo en su tarjeta de documentos',
-  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .ficha-documentos-generar').length), 0);
 await pagina.evaluate(async () => { const a = App.E.listaAbiertos[0]; await FichaDocumentos.pintar(a); await FichaDocumentos.pintar(a); });
-await comprobar('repintar no duplica el botón', pagina.evaluate(() => document.querySelectorAll('.ficha-documentos-generar').length), 1);
+await comprobar('repintar no duplica el botón', pagina.evaluate(() => document.querySelectorAll('.ficha-documentos-anadir').length), 1);
 
 console.log('--- 7. sin hitos: solo «+ Añadir documento» ---');
 await pagina.evaluate(() => HitoMesa.cerrar());
@@ -131,7 +98,7 @@ await abrir(B, 'abierto');
 /* Desde la fila 129 un tipo sin guía recibe la guía mínima («Tramitar»…), así
    que un asunto abierto sin hitos se simula quitando la marca que pone el panel. */
 await pagina.evaluate(() => document.getElementById('pantalla-asunto').classList.remove('asunto-con-hitos'));
-await comprobar('sin hitos, un solo botón', botones(), ['+ Añadir documento']);
+await comprobar('sin hitos, el mismo botón', botones(), ['+ Añadir documento']);
 
 console.log('--- 10. archivo y consulta ---');
 await abrir(A, 'archivado');

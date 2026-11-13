@@ -1,4 +1,4 @@
-/* Fila 553 (docs/553-PARTES-DEL-HITO.md): las partes del hito en recuadros, «Subir» y «Bajar» con su franja,
+/* Fila 553 (docs/553-PARTES-DEL-HITO.md; fila 638: los recuadros ya no existen): «Subir» y «Bajar» con su franja,
    «Cambiar la tarea» con «Qué se hace», «+ Añadir hito» al final de la tira con «Va detrás de» y «Hito ▾» sin «Crear».
    Copia de pruebas (demo), Chromium real: el disco es falso, nunca se tocan datos reales. */
 import { chromium } from 'playwright';
@@ -77,15 +77,10 @@ async function menuDe(id) { await p.locator('.hito-en-mesa .guion-paso[data-id="
 const opcionesAbiertas = () => p.evaluate(() => [...document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')].map((b) => b.textContent + (b.disabled ? '(apagado)' : '')));
 async function elegir(texto) { await p.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: new RegExp('^' + texto + '$') }).first().click(); await p.waitForTimeout(700); }
 
-console.log('--- 1. las cuatro partes, cada una en su recuadro ---');
+console.log('--- 1. el hito solo lleva sus tareas (fila 638: ya no hay recuadros Tareas, Campos, Documentos ni Registro) ---');
 await abrirMesaDe(A);
-await comprobar('1a. títulos de los recuadros', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .mesa-col-hito > .mesa-bloque:not(.mesa-normativa)')]
-  .map((s) => (s.querySelector('.mesa-bloque-titulo, .mesa-grande-titulo').firstChild.textContent || '').trim())), ['Tareas', 'Campos', 'Documentos', 'Registro']);
-await comprobar('1b. cada uno con borde y cabecera de fondo propio', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .mesa-col-hito > .mesa-bloque:not(.mesa-normativa)')].map((s) => {
-  const c = getComputedStyle(s), k = getComputedStyle(s.querySelector('.mesa-bloque-cabecera'));
-  return c.borderTopWidth !== '0px' && k.backgroundColor !== 'rgba(0, 0, 0, 0)' && parseFloat(getComputedStyle(s.querySelector('.mesa-bloque-titulo, .mesa-grande-titulo')).fontSize) >= 15;
-})), [true, true, true, true]);
-await comprobar('1c. la cuenta de Tareas', p.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '0 de 4');
+await comprobar('1a. ningún recuadro de Tareas, Campos, Documentos ni Registro', p.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-col-hito > .mesa-bloque:not(.mesa-normativa), .hito-en-mesa .mesa-campos-hito, .hito-en-mesa .mesa-grande-docs, .hito-en-mesa .mesa-grande-notas').length), 0);
+await comprobar('1c. cuatro tareas, sin cuenta ni barra de progreso', p.evaluate(() => [document.querySelectorAll('.hito-en-mesa .guion-paso').length, document.querySelectorAll('.hito-en-mesa .mesa-guion-cuenta, .hito-en-mesa .mesa-barra').length]), [4, 0]);
 await comprobar('1d. «Normativa» sigue como era (sin recuadro)', p.evaluate(() => { const n = document.querySelector('.hito-en-mesa .mesa-normativa'); return !n || getComputedStyle(n).borderTopWidth === '0px' || n.classList.contains('oculto'); }), true);
 await comprobar('1e. cada tarea con acción lleva su etiqueta', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .guion-paso')].map((e) => (e.querySelector('.guion-tarea-accion') || {}).textContent || '')), ['Comunicar', 'Pedir datos', '', '']);
 

@@ -532,6 +532,7 @@ await comprobar('el registro ya no entra en el nombre: va a la ficha',
   pagina.locator('#doc-vista').textContent(), '260902 CERTIFICADO ' + DOC + '.pdf');
 
 await pagina.click('#doc-guardar');
+await pagina.waitForTimeout(600); if (await pagina.locator('#pt-ok').count()) await pagina.click('#pt-ok');   /* fila 638: «¿De qué tarea es?» → «Tarea nueva» */
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
 await comprobar('el documento se ha guardado en la carpeta del asunto', pagina.evaluate(async () => {
   const nombres = [];
@@ -556,6 +557,7 @@ await comprobar('al renombrar se leen los datos del nombre y de la ficha; el reg
 await pagina.uncheck('#doc-hay-registro');
 await pagina.waitForTimeout(150);
 await pagina.click('#doc-guardar');
+await pagina.waitForTimeout(600); if (await pagina.locator('#pt-ok').count()) await pagina.click('#pt-ok');   /* fila 638: «¿De qué tarea es?» → «Tarea nueva» */
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
 await comprobar('quitar el registro no cambia el nombre del fichero (mismo número)', pagina.evaluate(async () => {
   const nombres = [];

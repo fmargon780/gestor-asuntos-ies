@@ -102,20 +102,21 @@ await comprobar('la mesa dice «Hito 3 de 4» y la tira numera igual (el informa
   pagina.evaluate(() => [document.querySelector('.hito-en-mesa .mesa-titulo').title,
     document.querySelector('#ficha-tira .mesa-tira-hito.actual').textContent.trim(),
     document.querySelector('#ficha-tira .mesa-tira-hito[data-id="p2"]').textContent.trim()]), ['Hito 3 de 4', '3. Comunicar', 'i · Informar']);
-await comprobar('la barra del guion no cuenta el «No aplica»: «1 de 3»',
-  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '1 de 3');
+/* Fila 638: la barra y su cuenta ya no se ven; la cuenta (sin los «No aplica») sigue siendo la misma. */
+await comprobar('la cuenta del guion no cuenta el «No aplica»: «1 de 3»',
+  pagina.evaluate(async () => { const a = FichaNucleo.actual; const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito); const c = Hitos.cuentaGuion(Hitos.guionDe(a, h)); return c.hechos + ' de ' + c.total; }), '1 de 3');
 
 console.log('--- 1. las acciones, solo en el hito ---');
 await comprobar('ningún paso del guion lleva el botón de acción de antes',
   pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-guion button.guion-accion-boton').length), 0);
-/* Fila 410: solo las tareas pendientes de comunicar y de generar llevan su botón; registrar y las sin acción, no. */
-await comprobar('solo comunicar y generar llevan botón dentro de la tarea',
+/* Fila 410: las tareas pendientes de comunicar y de generar llevan su botón; fila 638: también las de registrar, firmar, añadir y pedir datos; las sin acción, no. */
+await comprobar('solo las tareas con acción llevan botón dentro de la tarea',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-guion .guion-paso .guion-accion-tarea'))
     .map(b => b.closest('.guion-paso').dataset.id + ':' + b.textContent.trim())), ['g2:Enviar correo', 'g4:Generar documento']);
-await comprobar('la cabecera lleva Generar, Comunicar, Marcar y ··· (sin «Registrar», fila 434)',
+await comprobar('la cabecera lleva solo «Marcar como hecho» y «Hito ▾» (fila 638)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button.boton'))
     .filter(b => b.offsetParent).map(b => b.textContent.trim())),
-  ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Marcar como hecho', 'Hito ▾']);   /* fila 285 */
+  ['Marcar como hecho', 'Hito ▾']);
 await comprobar('con hitos, la barra de arriba no enseña «Comunicar»',
   pagina.evaluate(() => { const b = document.querySelector('#ficha-acciones .boton-comunicar'); return !!(b && b.offsetParent); }), false);
 

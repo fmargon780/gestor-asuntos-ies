@@ -291,13 +291,17 @@ await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await abrirHito(pagina, 'm1');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]');
 await pagina.waitForTimeout(300);
-await pagina.locator('.hito-en-mesa .mesa-etq-resp').click();
-await comprobar('el menú del responsable termina en «+ Nuevo responsable…»', pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents().then((t) => t.slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: '+ Nuevo responsable…' }).click();
+/* Fila 638: el responsable se cambia en «Hito ▾ → Cambiar»; su desplegable termina en «+ Nuevo responsable…». */
+await pagina.locator('.hito-en-mesa .mesa-mas').click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar' }).first().click();
+await pagina.waitForSelector('#hda-responsable');
+await comprobar('el desplegable del responsable termina en «+ Nuevo responsable…»', pagina.evaluate(() => Array.from(document.getElementById('hda-responsable').options).map((o) => o.textContent).slice(-2)), ['Una Administración…', '+ Nuevo responsable…']);
+await pagina.selectOption('#hda-responsable', '__nuevo__');
 await pagina.fill(cuadro('#ln-nombre'), 'Ponencia');
 await pagina.click(cuadro('#ln-crear'));
 await pagina.waitForSelector('.ln-capa', { state: 'detached' });
-await pagina.waitForTimeout(600);
+await pagina.click('#cuadro-aceptar');   /* fila 638: el responsable queda elegido en «Cambiar»; se guarda con «Aceptar» */
+await pagina.waitForTimeout(900);
 await comprobar('desde la mesa: el hito queda con el responsable nuevo', pagina.evaluate(async ([asunto]) => {
   const d = await Hitos.leer();
   const r = d.ajustes.responsables.filter((x) => x.nombre === 'Ponencia')[0];

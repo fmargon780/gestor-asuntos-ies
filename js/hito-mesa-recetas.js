@@ -78,9 +78,14 @@ var HitoMesaRecetas = (function () {
     if (fuera) { Plantillas.avisoFueraDeUso(fuera); return; }
     var via = canalDe(a, h, g);
     var op = await opcionesDePaso(a, h, g, lista, via);
+    var propio = await documentoColgado(a, h, g);   /* fila 638: el documento colgado de la tarea */
     if (via === 'correo') {
       var marcados = window.HitoMesaDocumentos && HitoMesaDocumentos.marcados ? HitoMesaDocumentos.marcados(document) : [];
+      /* Va adjunto, con los que se hayan marcado en la carpeta. */
+      if (propio && marcados.indexOf(propio) === -1) marcados = [propio].concat(marcados);
       if (marcados.length) op.adjuntos = marcados;
+    } else if (via === 'seneca' && propio) {
+      op.documentoSeneca = propio;   /* Séneca no puede enganchar ficheros desde la web: se señala cuál adjuntar a mano */
     }
     HitosComunicar.comunicar(a, h, via, op);
   }
@@ -110,23 +115,72 @@ var HitoMesaRecetas = (function () {
     } catch (e) { U.fallo('No he podido generar el documento', e); }
   }
 
-  /* ---------- el botón dentro de la propia tarea (fila 410) ---------- */
+  /* ---------- el botón dentro de la propia tarea (fila 410; fila 638: uno por cada «Qué se hace») ---------- */
 
-  /* «Enviar correo», «Enviar por Séneca» o «Generar documento», en la línea de cada tarea pendiente con esa
-     acción (registrar no lleva). Vacío si no toca. */
-  function botonDeTareaHTML(a, h, g) {
-    if (!g || g.pregunta || g.hecho || g.noaplica) return '';
-    var texto = g.accion === 'generar' ? 'Generar documento'
-      : (g.accion === 'comunicar' ? (canalDe(a, h, g) === 'seneca' ? 'Enviar por Séneca' : 'Enviar correo') : '');
-    if (!texto) return '';
-    var consulta = window.SoloConsulta && SoloConsulta.activo();
-    return '<button type="button" class="boton boton-chico guion-accion-tarea" data-accion="' + g.accion + '"' +
-      (consulta ? ' disabled data-motivo-clave="consulta"' : '') + '>' + texto + '</button>';
+  var TEXTO = { generar: 'Generar documento', firmar: 'Firmar', registrar: 'Registrar', anadir: 'Añadir documento', pedir: 'Rellenar' };
+
+  /* El documento colgado de la tarea, con el nombre que tiene ahora; '' si no tiene. Lee los hitos al momento. */
+  async function documentoColgado(a, h, g) {
+    if (!window.TareasConDocumento) return '';
+    try {
+      var hitos = await Hitos.hitosDe(a.nombre);
+      var fresco = Hitos.buscar(hitos, h.id) || h;
+      var e = TareasConDocumento.de(fresco, g.id);
+      if (!e || !e.doc) return '';
+      return window.TareasConDocumentoVista ? TareasConDocumentoVista.nombreActual(e.doc, hitos) : e.doc;
+    } catch (err) { return ''; }
   }
 
-  /* Lo mismo que elegir esa tarea en el menú de la cabecera. */
+  /* El botón de la tarea pendiente, o ''. `o`: { siguiente (resaltado), guion }. Registrar y firmar sin documento, y
+     registrar, firmar o comunicar cuyo documento saldrá de una tarea de generar pendiente, salen apagados. */
+  /* Algo 📎 que hay que reunir, sin acción, se añade con «Añadir documento» (fila 145). */
+  function accionDe(g) { return g.accion || (g.reunir === 'documento' ? 'anadir' : ''); }
+
+  function botonDeTareaHTML(a, h, g, o) {
+    if (!g || g.pregunta || g.hecho || g.noaplica) return '';
+    o = o || {};
+    var accion = accionDe(g);
+    var texto = accion === 'comunicar' ? (canalDe(a, h, g) === 'seneca' ? 'Enviar por Séneca' : 'Enviar correo') : TEXTO[accion];
+    if (!texto) return '';
+    var consulta = window.SoloConsulta && SoloConsulta.activo();
+    var apagado = '';
+    if (accion === 'registrar' || accion === 'firmar' || accion === 'comunicar') {
+      var tiene = !!(window.TareasConDocumento && TareasConDocumento.de(h, g.id) && TareasConDocumento.de(h, g.id).doc);
+      var saldra = !tiene && window.TareasConDocumentoVista ? TareasConDocumentoVista.saldra(g, o.guion || []) : '';
+      if (saldra) apagado = saldra;
+      else if (!tiene && accion !== 'comunicar') apagado = 'Elige antes el documento';
+    }
+    return '<button type="button" class="boton boton-chico guion-accion-tarea' + (o.siguiente ? ' boton-principal' : '') + '" data-accion="' + accion + '"' +
+      (consulta ? ' disabled data-motivo-clave="consulta"' : (apagado ? ' disabled title="' + U.escapar(apagado) + '"' : '')) + '>' + texto + '</button>';
+  }
+
+  /* Registrar: la ventana de siempre del documento de la tarea (la de «Registrar» del menú del documento). */
+  async function registrarPaso(a, h, g) {
+    var doc = await documentoColgado(a, h, g);
+    if (!doc) { U.aviso('Esta tarea aún no tiene documento.', 'ambar'); return; }
+    if (window.HitosDocumentoMenu) await HitosDocumentoMenu.registrar(a, h, doc);
+  }
+
+  /* Firmar: lo que se hace es llevar el documento a firmar, que empieza con «Ruta» (js/documentos-firmados.js reconoce el firmado). */
+  function firmarPaso(a, h, g, fila) {
+    var ruta = (fila || document).querySelector('.tcd[data-tarea="' + g.id + '"] .ruta-documento');
+    if (ruta) ruta.click();
+    else U.aviso('Esta tarea aún no tiene documento.', 'ambar');
+  }
+
+  /* Añadir documento: la ventana de siempre; ya se sabe de qué tarea es, así que no pregunta. */
+  function anadirPaso(a, h, g) {
+    if (window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, tarea: g.id, irDirectoAAnadir: true });
+  }
+
+  /* Lo mismo que elegir esa tarea en el menú de la cabecera (antes de la fila 638) o su botón. */
   async function lanzarTarea(a, h, g, fila, boton) {
-    if (g.accion === 'generar') return generarPaso(a, h, g, fila, boton);
+    var accion = accionDe(g);
+    if (accion === 'generar') return generarPaso(a, h, g, fila, boton);
+    if (accion === 'registrar') return registrarPaso(a, h, g);
+    if (accion === 'firmar') return firmarPaso(a, h, g, fila);
+    if (accion === 'anadir') return anadirPaso(a, h, g);
+    if (accion === 'pedir') { if (window.DatosDeLaTarea) DatosDeLaTarea.abrir(a, h, g, fila); return; }
     return comunicarPaso(a, h, g, []);
   }
 

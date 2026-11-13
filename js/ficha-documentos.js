@@ -26,6 +26,8 @@ var FichaDocumentos = (function () {
   var alBorrarActual = null;
 
   function $(id) { return document.getElementById(id); }
+  var hitosDelAsunto = [];   /* fila 638: todos los hitos del asunto, para saber qué documentos no cuelgan de ninguna tarea */
+  var firmaDeHitos = null;   /* fila 638: cómo estaban los hitos (y sus documentos colgados) la última vez que se pintó la carpeta */
   var cepEstados = null;   /* fila 280: { <nombre>: { visible, apagada, motivo } } del asunto que se está pintando */
 
   /* Lo que la aplicación mete cuando entra un correo: el hilo en PDF
@@ -111,7 +113,7 @@ var FichaDocumentos = (function () {
      documento" (js/hitos-documentos.js, `h.documentos`), solo los
      visibles (`Hitos.visibles`), igual que el panel de la izquierda. */
   async function hitosParaAsociar(a) {
-    if (!window.Hitos) return { visibles: [], porDocumento: {} };
+    if (!window.Hitos) return { visibles: [], porDocumento: {}, todos: [] };
     try {
       var todos = await Hitos.hitosDe(a.nombre);
       var visibles = Hitos.visibles(todos);
@@ -119,32 +121,62 @@ var FichaDocumentos = (function () {
       visibles.forEach(function (h) {
         (h.documentos || []).forEach(function (d) { porDocumento[d] = h; });
       });
-      return { visibles: visibles, porDocumento: porDocumento };
+      return { visibles: visibles, porDocumento: porDocumento, todos: todos };
     } catch (e) {
-      return { visibles: [], porDocumento: {} };
+      return { visibles: [], porDocumento: {}, todos: [] };
     }
+  }
+
+  /* Lo que importa de los hitos a esta lista: cuáles son y qué documento cuelga de cada tarea. */
+  function firmaDe(hitos) {
+    var lista = [];
+    (function recorrer(hs) {
+      (hs || []).forEach(function (h) { lista.push([h.id, h.guionDocumento || null]); (h.opciones || []).forEach(function (o) { recorrer(o && o.hitos); }); });
+    })(hitos);
+    return JSON.stringify(lista);
+  }
+
+  /* Fila 638: los hitos han cambiado (el primer hito de un asunto sin hitos, un documento colgado o descolgado): la lista de
+     la carpeta se pone al día (la marca «sin tarea», «+ Añadir documento» apagado o no). Solo si ya estaba pintada. */
+  function alCambiarLosHitos(a, hitos) {
+    if (!a || firmaDeHitos === null) return;
+    if (firmaDeHitos === a.nombre + '|' + firmaDe(hitos || [])) return;
+    pintar(a);
   }
 
   /* «+ Añadir documento», en la cabecera del bloque (fila 168,
      docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md; antes «Documentos ▾», que abría
      la ventana entera): el mismo cuadro de añadir, directo al selector.
-     Se pinta una sola vez por bloque: el `<h3>` no se rehace. */
-  function ponerBotonAnadir(bloqueEl, a) {
+     Se pinta una sola vez por bloque: el `<h3>` no se rehace.
+     Fila 638: tras la ventana de fichero y tipo, pregunta «¿De qué tarea es?»; sin hitos sale apagado, con su línea
+     («Para añadir un documento, crea antes el hito.»); y ya no hay «Generar documento» aquí. */
+  function ponerBotonAnadir(bloqueEl, a, hayHitos) {
     if (!bloqueEl) return;
     var titulo = bloqueEl.querySelector('.ficha-titulo');
     if (!titulo) return;
-    var viejo = titulo.querySelector('.ficha-documentos-anadir');
-    if (viejo) { viejo.onclick = alPulsar; if (window.FichaGenerarDocumento) FichaGenerarDocumento.poner(titulo, a); return; }
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'boton boton-principal ficha-documentos-anadir';
-    b.textContent = '+ Añadir documento';
-    b.setAttribute('data-ayuda-clave', 'traer-un-documento-del-ordenador-a');
+    var b = titulo.querySelector('.ficha-documentos-anadir');
+    if (!b) {
+      b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'boton boton-principal ficha-documentos-anadir';
+      b.textContent = '+ Añadir documento';
+      b.setAttribute('data-ayuda-clave', 'traer-un-documento-del-ordenador-a');
+      titulo.appendChild(b);
+    }
     b.onclick = alPulsar;
-    titulo.appendChild(b);
-    if (window.FichaGenerarDocumento) FichaGenerarDocumento.poner(titulo, a);
+    var abierto = !window.FichaNucleo || FichaNucleo.modoActual === 'abierto';
+    var sinHito = abierto && !hayHitos;
+    b.disabled = sinHito;
+    if (sinHito) b.title = 'Para añadir un documento, crea antes el hito.'; else b.removeAttribute('title');
+    var aviso = bloqueEl.querySelector('.ficha-documentos-sin-hito');
+    if (sinHito && !aviso) {
+      aviso = document.createElement('p');
+      aviso.className = 'nota ficha-documentos-sin-hito';
+      aviso.textContent = 'Para añadir un documento, crea antes el hito.';
+      titulo.insertAdjacentElement('afterend', aviso);
+    } else if (!sinHito && aviso) aviso.remove();
     async function alPulsar() {
-      await App.verDocumentos(a, { irDirectoAAnadir: true });
+      await App.verDocumentos(a, { irDirectoAAnadir: true, preguntarTarea: abierto });
       pintar(a);
     }
   }
@@ -216,8 +248,11 @@ var FichaDocumentos = (function () {
          (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 8). */
       var bloqueEl = caja.closest('.ficha-bloque');
       if (bloqueEl) bloqueEl.classList.toggle('vacio', !lista.length);
-      ponerBotonAnadir(bloqueEl, a);
       ponerBotonRepartir(bloqueEl, a, sinIndice.length);   /* fila 337 */
+      var hitos = await hitosParaAsociar(a);
+      hitosDelAsunto = hitos.todos;
+      firmaDeHitos = a.nombre + '|' + firmaDe(hitos.todos);
+      ponerBotonAnadir(bloqueEl, a, !!(window.DocumentoATarea && DocumentoATarea.hitosElegibles(hitos.todos).length));
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';
@@ -230,7 +265,6 @@ var FichaDocumentos = (function () {
       var correos = lista.filter(function (f) { return esDeCorreo(f.nombre); });
       var expediente = lista.filter(function (f) { return !esDeCorreo(f.nombre); });
 
-      var hitos = await hitosParaAsociar(a);
       /* Fila 280: qué documentos pueden convertirse en plantilla (los PDF, si tienen su Word). */
       try { cepEstados = window.ConvertirEnPlantilla ? await ConvertirEnPlantilla.estados(a) : null; } catch (eCep) { cepEstados = null; }
 
@@ -298,6 +332,8 @@ var FichaDocumentos = (function () {
     enMesa: function () { return enMesa; },
     marcados: function () { return marcadosCarpeta; },
     cepEstados: function () { return cepEstados; },
+    sinTarea: function (nombre) { return !!window.DocumentoATarea && DocumentoATarea.sinTarea(hitosDelAsunto, nombre); },   /* fila 638 */
+    hayHitos: function () { return !!window.DocumentoATarea && DocumentoATarea.hitosElegibles(hitosDelAsunto).length > 0; },
     alBorrar: function () { return alBorrarActual; },
     esSinSellar: esSinSellar,
     abrirDocumento: abrirDocumento,
@@ -310,6 +346,6 @@ var FichaDocumentos = (function () {
       alBorrarActual = alBorrar || null;
       return pintar(a);
     },
-    marcarHito: marcarHito
+    marcarHito: marcarHito, alCambiarLosHitos: alCambiarLosHitos
   };
 })();

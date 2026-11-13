@@ -117,7 +117,7 @@ await comprobar('3. el cursor sigue donde estaba',
     return [c.selectionStart, c.selectionEnd];
   }), [11, 11]);
 
-console.log('--- 4. la nota de un hito desplegado ---');
+console.log('--- 4. lo escrito en un hito (fila 638: ya no tiene caja de notas; el formulario de «+ Añadir tarea») ---');
 /* Un hito a mano: este asunto no tiene tipo con guía, así que no se
    crea ninguno solo. */
 await pagina.evaluate(async (asunto) => {
@@ -130,26 +130,27 @@ await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 /* Fila 425: al entrar se abre sola la mesa del hito actual: no hay que desplegarlo. */
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
-await pagina.waitForSelector('#ficha-guia .hito-nota-texto');
+await pagina.waitForSelector('#ficha-guia .tcd-abrir-form');
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.click('#ficha-guia .hito-nota-texto');
+await pagina.click('#ficha-guia .tcd-abrir-form');
+await pagina.waitForSelector('#guion-nueva-tarea');
+await pagina.click('#guion-nueva-tarea');
 await pagina.keyboard.type('Me lo mandan el lunes', { delay: 5 });
 await pagina.evaluate(() => {
-  document.querySelector('#ficha-guia .hito-nota-texto').setSelectionRange(6, 6);
+  document.getElementById('guion-nueva-tarea').setSelectionRange(6, 6);
 });
 
 await repasosAutomaticos();
 await pagina.waitForTimeout(300);
 
-await comprobar('4. lo escrito en la nota del hito sigue ahí',
-  pagina.inputValue('#ficha-guia .hito-nota-texto'), 'Me lo mandan el lunes');
-await comprobar('4. el campo de la nota del hito sigue teniendo el foco',
-  pagina.evaluate(() => document.activeElement === document.querySelector('#ficha-guia .hito-nota-texto')), true);
-await comprobar('4. el cursor de la nota del hito sigue donde estaba',
+await comprobar('4. lo escrito en el hito sigue ahí',
+  pagina.inputValue('#guion-nueva-tarea'), 'Me lo mandan el lunes');
+await comprobar('4. el campo del hito sigue teniendo el foco',
+  pagina.evaluate(() => document.activeElement === document.getElementById('guion-nueva-tarea')), true);
+await comprobar('4. el cursor del campo sigue donde estaba',
   pagina.evaluate(() => {
-    const c = document.querySelector('#ficha-guia .hito-nota-texto');
+    const c = document.getElementById('guion-nueva-tarea');
     return [c.selectionStart, c.selectionEnd];
   }), [6, 6]);
 await comprobar('4. el hito sigue desplegado',

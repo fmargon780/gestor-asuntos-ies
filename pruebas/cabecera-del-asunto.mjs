@@ -93,9 +93,10 @@ function elementosDeAcciones() {
 console.log('--- 1 y 2. la barra de acciones ---');
 await abrirFicha(RICO);
 
-/* Fila 637: «El encargo» ya no es un botón de la barra (se abre con «Cambiar» en «Quién lo pide», bloque «Datos»). */
-await comprobar('1. exactamente cuatro elementos, en este orden',
-  elementosDeAcciones(), ['estado', 'vencimiento', 'comunicar', 'archivar']);
+/* Fila 637: «El encargo» ya no es un botón de la barra (se abre con «Cambiar» en «Quién lo pide», bloque «Datos»).
+   Fila 638: «Esperando a…» / «Ya ha llegado» (el elemento «estado») ya no está aquí: van en la línea del hito. */
+await comprobar('1. exactamente tres elementos, en este orden',
+  elementosDeAcciones(), ['vencimiento', 'comunicar', 'archivar']);
 
 await comprobar('2. ya no hay ningún botón de los viejos',
   pagina.evaluate(() => {

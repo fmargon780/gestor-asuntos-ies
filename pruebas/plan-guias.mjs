@@ -132,14 +132,14 @@ await comprobar('7b. el editor de la guía no tiene añadir hito o tarea en blan
 })(), [false, false, true, false, true]);
 await p.evaluate(() => { const c = document.getElementById('cuadro-cancelar'); if (c) c.click(); });
 await p.waitForTimeout(400);
-await comprobar('7c. en un asunto no está la caja «Nueva tarea…» y sí «+ Añadir tarea»', (async () => {
+await comprobar('7c. en un asunto no está el formulario de «Nueva tarea» (fila 638: con el plan aplicado, «+ Añadir tarea» abre la lista común) y sí «+ Añadir tarea»', (async () => {
   const n = await p.evaluate(() => App.E.listaAbiertos.filter((x) => (x.leido && x.leido.tipo || x.ficha && x.ficha.tipo) === 'MATRICULA')[0].nombre);
   await p.evaluate((nombre) => App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === nombre)[0], 'abierto'), n);
   const id = await p.evaluate(async (nombre) => (await Hitos.hitosDe(nombre))[0].id, n);
   await abrirHito(p, id);
   await p.waitForSelector('.hito-en-mesa .comunes-anadir-tarea');
   return [await hay('.hito-en-mesa .tcd-nueva'), await visible('.hito-en-mesa .tcd-nueva'), await visible('.hito-en-mesa .comunes-anadir-tarea')];
-})(), [true, false, true]);
+})(), [false, false, true]);
 
 console.log('--- 8. activar un tipo después ---');
 const antesActivar = await p.evaluate(() => JSON.stringify(GuiasDelCentro.pasosDe('Alta y actualización de datos').map((x) => (x.guion || []).map((g) => !!g.comun))));

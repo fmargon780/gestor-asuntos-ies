@@ -71,6 +71,7 @@ const DOC_OTRO = '261105 OTRO D26-09103.pdf';
 /* ===== 1. La acción nueva ===== */
 console.log('--- 1. «Firmar un documento» ---');
 await abrirMesa('Vidal Soto');
+await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();   /* fila 638: el formulario se abre con «+ Añadir tarea» */
 await comprobar('1. «Qué se hace» ofrece «Firmar un documento»',
   pagina.$$eval('.hito-en-mesa .tcd-nueva .tcd-accion option', (o) => o.map((x) => x.textContent).includes('Firmar un documento')), true);
 await pagina.locator('#guion-nueva-tarea').fill('Firmar la resolución');
@@ -84,6 +85,7 @@ await comprobar('1. sale «Firmas necesarias» con 1, 2 y 3 (por defecto 1)',
 await pagina.locator('.hito-en-mesa .tcd-nueva .guion-receta-firmas').selectOption('2');
 await pagina.locator('#guion-nueva-tarea').press('Enter');
 await pagina.waitForTimeout(1500);
+await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();
 await pagina.locator('#guion-nueva-tarea').fill('Firmar el informe');
 await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('firmar');
 await pagina.locator('#guion-nueva-tarea').press('Enter');
@@ -177,14 +179,11 @@ const e4 = await estadoHito();
 await comprobar('4. se para en la tarea con documento, esperando la firma', e4.cadena, ['esperando-firma', 'con', DOC_A]);
 await comprobar('4. la tarea sin documento no se espera: queda pendiente', [e4.sin, e4.con, e4.reg], [false, false, false]);
 await comprobar('4. el botón dice «Esperando el PDF firmado» y «Dejar de esperar»', /Esperando el PDF firmado/.test(e4.boton) && /Dejar de esperar/.test(e4.boton), true);
-await pagina.evaluate((idH) => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Aguilar Ponce') !== -1)[0]; HitoMesa.abrir(a, idH); HitosPanel.programarRepintado(); }, prep.hito);
-await pagina.waitForTimeout(2000);
-await comprobar('4. la mesa dice «Esperando el PDF firmado» y la línea gris no repite lo que se espera',
-  pagina.locator('.hito-en-mesa .mesa-hacer-espera').innerText().then((t) => t.trim()), 'Esperando el PDF firmado');
-await comprobar('4. «Dejar de esperar» quita la espera',
+/* Fila 638: la mesa ya no enseña «Esperando el PDF firmado» ni «Dejar de esperar» (el botón de la cabecera se quitó); se quita el apunte a mano. */
+await comprobar('4. quitar el apunte de la cadena quita la espera',
   (async () => {
-    await pagina.locator('.hito-en-mesa .mesa-hacer-dejar').click();
-    await pagina.waitForTimeout(1200);
+    await pagina.evaluate(async (idH) => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Aguilar Ponce') !== -1)[0]; await Hitos.guardarCampos(a.nombre, idH, { cadena: null }); }, prep.hito);
+    await pagina.waitForTimeout(800);
     return (await estadoHito()).cadena;
   })(), null);
 await pagina.evaluate(async (idH) => {

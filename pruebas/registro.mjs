@@ -204,6 +204,7 @@ await comprobar('la casilla se ofrece cuando el documento no lleva registro',
 await pagina.check('#doc-pendiente-registro');
 await pagina.waitForTimeout(100);
 await pagina.click('#doc-guardar');
+await pagina.waitForTimeout(600); if (await pagina.locator('#pt-ok').count()) await pagina.click('#pt-ok');   /* fila 638: «¿De qué tarea es?» → «Tarea nueva» */
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
 await comprobar('la marca ámbar sale también dentro de "Gestionar documentos"',
   pagina.locator('#doc-cuerpo .marca-sin-registrar').count(), 1);

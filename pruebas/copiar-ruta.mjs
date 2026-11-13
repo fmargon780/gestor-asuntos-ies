@@ -34,7 +34,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
-import { abrirHito, verLaLista } from './apoyo/hito.mjs';
+import { abrirHito, verLaLista, comunicarDelHito } from './apoyo/hito.mjs';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -329,10 +329,8 @@ await pagina.waitForTimeout(300);
 await abrirHito(pagina, 'h1');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="h1"]');
 await pagina.waitForTimeout(300);
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-await pagina.waitForSelector('.hito-en-mesa .mesa-preparar-correo');
 await pagina.waitForTimeout(200);
-await pagina.click('.hito-en-mesa .mesa-preparar-correo');
+await comunicarDelHito(pagina);   /* fila 638: ya no hay «Preparar correo» suelto; la misma función que usa el botón de una tarea */
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario');
 await comprobarQue('el botón «Ruta» sale también abierto desde «Comunicar ▾» de la mesa del hito',
   pagina.evaluate(() => !!document.querySelector('#correo-ruta-lugar .boton-copiar-fila')));
