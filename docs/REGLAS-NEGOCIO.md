@@ -63,7 +63,7 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (6-nov-2026, idea 553) Las tareas de un asunto se pueden **subir y bajar**, «con la opción de guardar ese cambio en la guía». Guardarlo en la guía no cambia los asuntos abiertos.
 - (6-nov-2026, idea 553) «Cambiar la tarea» deja cambiar también **«Qué se hace»**, en todas las guías que la usan; los asuntos abiertos siguen como estaban.
 - (6-nov-2026, idea 553) **Los hitos se añaden desde la tira de hitos**, no desde las tareas, y la ventana pregunta dónde situarlo, «con al final por defecto». «Hito ▾» ya no tiene «Crear».
-- (6-nov-2026, idea 553) Tareas, Campos, Documentos y Registro del hito, «muy bien diferenciadas»: cada una en su recuadro.
+- (13-nov-2026, tema 630; sustituye a la del 6-nov-2026, idea 553, de los cuatro recuadros) El hito ya no lleva los recuadros Tareas, Campos, Documentos y Registro: queda solo con sus tareas. Ver «Vista del asunto».
 
 - (11-nov-2026, tema 582) En los desplegables de hitos y tareas que son listas del centro (Responsable, «Esperamos a…», Tipo de documento, «Cuándo se hace» y Plantilla), **lo que falta se crea ahí mismo con «+ Nuevo…»** y queda en su lista para todos: «Debería poder crear ese valor desde el mismo proceso de trabajo». La plantilla nueva también («1»).
 - (11-nov-2026, tema 582) **«Sus profesores» es un responsable fijo**, como «El tutor del alumnado», en vez de escribir «Equipo educativo» como un nombre más («1»).
@@ -198,3 +198,17 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (11-nov-2026, tema 607) **Todo el Gestor pasa a Google Drive** (asuntos vivos, ARCHIVO, `_GESTOR` y la copia sin internet), nada se queda repartido: «no veo bien tener unas cosas en un lugar y otras en otro». No se comprime el ARCHIVO (ahorraría un 13 %).
 - (11-nov-2026, tema 607) En los ordenadores del instituto, Drive va en **«Replicar archivos» con la carpeta en `C:\Google Drive`**, la misma en los dos, para tener un solo marcador. El modo «Ver archivos sin descargarlos» se descartó: más lento.
 - (11-nov-2026, tema 607) **Cuando falte espacio** en la cuenta común (50 GB), que lo amplíe la Junta o, si no, el centro.
+
+## Vista del asunto
+
+- (13-nov-2026, tema 630) La vista del asunto se rehace entera: estaba «tremendamente recargado. No invita a pensar y veo difícil encontrar nada si no te conoces el asunto de memoria. Tampoco veo un flujo de trabajo claro».
+- (13-nov-2026, tema 630) **Todo documento y toda comunicación salen de una tarea**; en el hito no quedan botones sueltos («el hito pasaría a ser una mera estructura a la que colgar tareas»; «tarea y acción son casi sinónimos»). También desaparece «Hacer este hito».
+- (13-nov-2026, tema 630) El documento se ve colgado de su tarea: «en la tarea es necesario para poder usarlos en las acciones que esas tareas conlleven».
+- (13-nov-2026, tema 630) Al añadir una tarea, queda en la lista y no se abre ninguna ventana; después se pulsa su botón (cuesta una pulsación más).
+- (13-nov-2026, tema 630) El responsable no se enseña en la vista del asunto cuando el hito es de Administración, ni se distingue entre Francisco y Diego; si es de otro, «Le toca a: …». En el resto de la app sigue.
+- (13-nov-2026, tema 630) Del menú del hito se quitan «Dejarlo solo informativo» (sigue en la guía) y «Enviar estado»: «No recuerdo haberlos usado nunca».
+- (13-nov-2026, tema 630) Cabecera de una línea con tipo, número y tercero; el nombre de la carpeta deja de ser el título. Fuera las seis pestañas: cinco bloques plegados a la derecha. «Datos» (nombre elegido por Francisco) junta datos y contacto, campos del asunto y «El encargo»; «Quién lo pide» y «Por qué vía» salen con los campos, solo si están rellenos o el tipo los pide.
+- (13-nov-2026, tema 630) **Para añadir un documento hace falta hito y tarea**: «Yo obligaría a crear el hito y la tarea también para poder añadir un documento al asunto». La app pregunta «¿De qué tarea es?» y ofrece crear una tarea nueva con el nombre del tipo de documento.
+- (13-nov-2026, tema 630) Los ficheros que llegan solos a la carpeta y los documentos de antes salen «sin tarea», con «Colgar de una tarea»; nadie está obligado a colgarlos. Francisco sabe que así la regla anterior no se cumple del todo («Ahora lo entiendo. Me parece bien tu idea»).
+- (13-nov-2026, tema 630) Una tarea nueva nunca toma el nombre de un fichero: «Crear una tarea nueva, sí. Que le ponga ese nombre, no». Un fichero sin tipo pasa antes por «Cambiar el nombre».
+- (13-nov-2026, tema 630) Aparte, como ideas: elegir hito y tarea al clasificar desde la bandeja (634), una marca única para llevar o no los cambios a la guía (635) y ordenar con buscador la lista de acciones (636).
