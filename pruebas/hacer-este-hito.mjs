@@ -39,6 +39,16 @@ async function paginaNueva(consulta) {
   await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 40000 });
   if (consulta) await pagina.waitForSelector('#franja-solo-consulta', { timeout: 20000 });
   await pagina.waitForTimeout(consulta ? 5000 : 3000);
+  /* Fila 649: la pasada de fondo que coloca el PDF sellado de Hugo tarda lo que tarda la máquina; se espera a su resultado en vez de a una pausa fija. */
+  if (!consulta) {
+    await pagina.waitForFunction(async () => {
+      const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Moreno Sanz') !== -1)[0];
+      if (!a) return false;
+      const hs = await Hitos.hitosDe(a.nombre);
+      return !!(hs[0] && hs[0].cadena && hs[0].cadena.estado === 'listo-para-enviar');
+    }, null, { timeout: 40000, polling: 500 }).catch(() => {});
+    await pagina.waitForTimeout(800);
+  }
   return pagina;
 }
 
