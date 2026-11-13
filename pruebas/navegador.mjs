@@ -349,7 +349,7 @@ await comprobar('la carpeta ha aterrizado en el archivo', pagina.evaluate(async 
   const n = [];
   for await (const p of ter.entries()) n.push(p[0]);
   return n;
-}), [NOMBRE_NUEVO]);
+}), [NOMBRE_NUEVO.replace(/ Aguilar Ponce, Marina 1140233$/, '')]);   /* fila 648: en el archivo, sin la persona */
 
 /* --- archivo y reapertura --- */
 /* La primera vez que se entra en el Archivo en la sesión ya carga

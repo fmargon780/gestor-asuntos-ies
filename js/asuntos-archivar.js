@@ -24,7 +24,7 @@
    añade al índice. Silencioso a propósito: sin índice todavía, o si
    algo falla al leer la carpeta, no pasa nada (queda para la próxima
    reconstrucción). */
-async function actualizarIndiceAlArchivar(nombre, categoria, tercero, handle) {
+async function actualizarIndiceAlArchivar(nombre, categoria, tercero, handle, claveFicha) {
   if (!window.IndiceArchivo) return;
   try {
     /* La ficha todavía está en App.E.registro.asuntos en este punto:
@@ -32,7 +32,7 @@ async function actualizarIndiceAlArchivar(nombre, categoria, tercero, handle) {
        después, envolviendo App.cerrarAsunto por fuera de esto. Se
        pasa aquí para que el índice guarde ya los pocos campos que
        hacen falta para pintar la tarjeta y para buscar. */
-    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[nombre]) || {};
+    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[claveFicha || nombre]) || {};   /* fila 648: la ficha sigue con su clave de siempre, la carpeta puede llevar otro nombre */
     var entrada = await IndiceArchivo.entradaDe(
       handle, nombre, categoria, tercero, categoria + ' / ' + tercero, '', App.E.tipos, ficha);
     await IndiceArchivo.anadirEntrada(entrada);
@@ -125,10 +125,15 @@ App.cerrarAsunto = async function (a) {
     tercero = window.Nombres.carpetaDeTercero(tercero, await Carpetas.subcarpetas(dirCategoria));
   } catch (e) { if (window.Nombres && Nombres.acortarNombrePila) tercero = Nombres.acortarNombrePila(tercero); }
 
+  /* Fila 648: en el archivo, la carpeta de un asunto con número va sin el nombre de la persona (ya está en la carpeta
+     de la persona). Si de un intento anterior, de antes de esta fila, ya hay allí una carpeta con el nombre entero,
+     se junta con esa y se queda con su nombre: el botón de Herramientas la acorta después. */
+  var nombreEnArchivo = window.ArchivoNombreCorto ? ArchivoNombreCorto.paraArchivo(a.nombre, a.ficha, tercero) : a.nombre;
   var yaExiste = false;
   try {
     var carpetaDelTercero = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false);
-    yaExiste = await Carpetas.existe(carpetaDelTercero, a.nombre);
+    if (nombreEnArchivo !== a.nombre && await Carpetas.existe(carpetaDelTercero, a.nombre)) nombreEnArchivo = a.nombre;
+    yaExiste = await Carpetas.existe(carpetaDelTercero, nombreEnArchivo);
   } catch (e) { yaExiste = false; }
 
   var avisoFusion = yaExiste
@@ -144,7 +149,7 @@ App.cerrarAsunto = async function (a) {
   var yaPreguntado = avisoFalta.hayAviso;
   if (window.ArchivarCabe) {
     var medida = null;
-    try { medida = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero); } catch (eM) { medida = null; }
+    try { medida = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero, nombreEnArchivo); } catch (eM) { medida = null; }
     if (!ArchivarCabe.sinProblema(medida)) {
       /* Archivar varios de golpe: este se queda donde estaba y el lote avisa al acabar. */
       if (App.E.archivarSinPreguntar) { ArchivarCabe.anotarNoCabe(a.nombre); return; }
@@ -153,7 +158,7 @@ App.cerrarAsunto = async function (a) {
       if (decision.accion !== 'acortar') return;
       if (!(await ArchivarCabe.acortar(a, medida, decision.nuevos))) return;
       var otraVez = null;
-      try { otraVez = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero); } catch (eM2) { otraVez = null; }
+      try { otraVez = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero, nombreEnArchivo); } catch (eM2) { otraVez = null; }
       if (!ArchivarCabe.sinProblema(otraVez)) {
         U.aviso('Todavía hay documentos que no caben en el archivo. No se ha movido nada.', 'ambar');
         return;
@@ -169,6 +174,9 @@ App.cerrarAsunto = async function (a) {
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +
     '</div></div>' +
+    (nombreEnArchivo !== a.nombre
+      ? '<p>Allí se llamará: <strong class="nombre-en-archivo">' + U.escapar(nombreEnArchivo) + '</strong></p>'
+      : '') +
     avisoFusion + lineaGmail +
     '<p class="nota">Se copia primero y se comprueba que ha llegado todo. ' +
     'Si algo falla, la carpeta se queda donde está.</p>', 'Archivar el asunto');
@@ -188,17 +196,18 @@ App.cerrarAsunto = async function (a) {
       var carpetaTerceroYa = null, yaArchivada = false;
       try {
         carpetaTerceroYa = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false);
-        yaArchivada = await Carpetas.existe(carpetaTerceroYa, a.nombre);
+        yaArchivada = await Carpetas.existe(carpetaTerceroYa, nombreEnArchivo) || await Carpetas.existe(carpetaTerceroYa, a.nombre);
+        if (yaArchivada && !(await Carpetas.existe(carpetaTerceroYa, nombreEnArchivo))) nombreEnArchivo = a.nombre;
       } catch (e) { yaArchivada = false; }
 
       if (yaArchivada) {
-        var handleYaArchivada = await carpetaTerceroYa.getDirectoryHandle(a.nombre);
+        var handleYaArchivada = await carpetaTerceroYa.getDirectoryHandle(nombreEnArchivo);
         var totalFicherosYa = await Carpetas.contarFicheros(handleYaArchivada);
         await App.anotar(a.nombre, {
           estado: 'cerrado', categoria: categoria, tercero: tercero,
           cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa, archivandose: undefined
         });
-        await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleYaArchivada);
+        await actualizarIndiceAlArchivar(nombreEnArchivo, categoria, tercero, handleYaArchivada, a.nombre);
         App.E.recienArchivados[a.nombre] = true;
         U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
       } else {
@@ -216,11 +225,14 @@ App.cerrarAsunto = async function (a) {
        carpeta a mitad del traslado ya sabe que esto no es "otro
        ordenador". */
     App.E.recienArchivados[a.nombre] = true;
-    var haciendoFusion = await Carpetas.existe(destino, a.nombre);
+    var haciendoFusion = await Carpetas.existe(destino, nombreEnArchivo);
     var resultado = haciendoFusion
-      ? await Carpetas.fusionarEn(App.E.abiertos, a.nombre, destino, a.nombre)
+      ? await Carpetas.fusionarEn(App.E.abiertos, a.nombre, destino, nombreEnArchivo)
       : { conSufijo: [] };
-    if (!haciendoFusion) await Carpetas.mover(App.E.abiertos, a.nombre, destino);
+    if (!haciendoFusion) {
+      if (window.ArchivoNombreCorto && nombreEnArchivo !== a.nombre) await ArchivoNombreCorto.trasladarComo(App.E.abiertos, a.nombre, destino, nombreEnArchivo);
+      else await Carpetas.mover(App.E.abiertos, a.nombre, destino);
+    }
   } catch (e) {
     if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
     if (window.ArchivarFondo && ArchivarFondo.fallo(a, e, 'el archivo')) return;
@@ -233,16 +245,21 @@ App.cerrarAsunto = async function (a) {
      docs/AVISOS-QUE-DICEN-LA-VERDAD.md): antes salía rojo «No se ha
      podido archivar» y al repetir, «ya hay una carpeta…». */
   try {
-    var handleArchivado = await destino.getDirectoryHandle(a.nombre);
+    var handleArchivado = await destino.getDirectoryHandle(nombreEnArchivo);
     var totalFicheros = await Carpetas.contarFicheros(handleArchivado);
     await App.anotar(a.nombre, {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros, archivandose: undefined
     });
+    /* Fila 648: quien busca la carpeta con la clave de siempre (hitos, ficha, notas de los relacionados) la encuentra
+       con `ArchivoNombreCorto.deArchivo`. */
+    if (window.ArchivoNombreCorto) ArchivoNombreCorto.apuntar(a.nombre, nombreEnArchivo);
     if (window.CorreoGmail && hilosGmail.length) CorreoGmail.asuntoArchivado(hilosGmail);   /* fila 480 */
     /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');
     if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'archivar');   /* fila 289: sus encargos pasan a «Terminado» */
+    /* Fila 648: lo que se guardó con el nombre abierto (encargos, actividades) pasa a llamarse como la carpeta del archivo. */
+    if (window.ArchivoNombreCorto) await ArchivoNombreCorto.moverLoDeFuera(a.nombre, nombreEnArchivo);
   } catch (e) {
     U.accesorio('La carpeta ya está en el archivo, pero no he podido apuntar el cierre en su ficha. ' +
       'Pulsa Recargar', e);
@@ -253,14 +270,14 @@ App.cerrarAsunto = async function (a) {
      falla, ámbar: el asunto queda archivado igual. */
   if (window.IndiceExpediente) {
     try {
-      await IndiceExpediente.crear({ nombre: a.nombre, handle: handleArchivado, leido: a.leido,
+      await IndiceExpediente.crear({ nombre: nombreEnArchivo, handle: handleArchivado, leido: a.leido,
         ficha: Object.assign({}, a.ficha, { tercero: tercero, categoria: categoria }) }, { archivadoEl: U.hoyIso() });
     } catch (e) {
       U.accesorio('Asunto archivado, pero no he podido hacer su índice del expediente', e);
     }
   }
   try {
-    await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleArchivado);
+    await actualizarIndiceAlArchivar(nombreEnArchivo, categoria, tercero, handleArchivado, a.nombre);
     /* Para que App.reengancharFicha (js/ficha-asunto.js), llamado dentro
        de App.verAbiertos() justo abajo, sepa que este ordenador acaba de
        archivarlo y no dé el aviso de "otro ordenador" (fila 90). */

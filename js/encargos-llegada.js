@@ -154,7 +154,9 @@
       if (que === 'reabrir') {
         try {
           var dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
-          await App.reabrirAsunto({ nombre: elegido.nombre, padre: dentro, ficha: ficha });
+          var pedido = { nombre: elegido.nombre, padre: dentro, ficha: ficha };
+          await App.reabrirAsunto(pedido);
+          elegido.nombre = pedido.nombre;   /* fila 648: al reabrir, la carpeta puede cambiar de nombre (recupera a su persona) */
         } catch (err) { U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + U.mensajeDeError(err), 'malo'); return; }
         if (!(await Carpetas.existe(App.E.abiertos, elegido.nombre))) return;
         ficha = {};

@@ -15,7 +15,15 @@ var NombresNucleo = NombresNucleo || {};
      Eso pasa cuando se le cambia el nombre: las carpetas ya archivadas
      siguen llamándose como se llamaban, y no se tocan, pero aquí se
      reconocen igual y se enseñan con el nombre nuevo. */
-  function leer(nombre, tipos) {
+  function leer(nombre, tipos, terceroDeFuera) {
+    var r = leerNombre(nombre, tipos);
+    /* Fila 648: una carpeta archivada con número ya no lleva a la persona en el nombre; quien la lee sabe de qué
+       carpeta del tercero viene y se la pasa, para que `resto` siga diciendo quién es. */
+    if (terceroDeFuera && r.numero && !r.resto) r.resto = String(terceroDeFuera);
+    return r;
+  }
+
+  function leerNombre(nombre, tipos) {
     var m = String(nombre).match(/^(\d{6})\s+(.*)$/);
     if (!m) return { fecha: '', tipo: '', resto: nombre, reconocido: false };
     var fecha = m[1], resto = m[2], numero = '';
@@ -42,7 +50,9 @@ var NombresNucleo = NombresNucleo || {};
 
     for (var i = 0; i < candidatos.length; i++) {
       var t = candidatos[i].texto;
-      if (U.normalizar(resto).indexOf(U.normalizar(t) + ' ') === 0) {
+      var enResto = U.normalizar(resto), enTipo = U.normalizar(t);
+      /* Fila 648: el tipo puede ser lo último del nombre (carpeta archivada, sin la persona detrás). */
+      if (enResto === enTipo || enResto.indexOf(enTipo + ' ') === 0) {
         return { fecha: fecha, numero: numero, tipo: candidatos[i].tipo, categoria: candidatos[i].categoria,
                  nombreViejo: candidatos[i].porAlias ? t : '',
                  resto: resto.slice(t.length).trim(), reconocido: true };
@@ -50,9 +60,60 @@ var NombresNucleo = NombresNucleo || {};
     }
     /* No está en la lista de tipos: nos quedamos con la primera palabra en
        mayúsculas, que es lo que se ha venido usando siempre. */
-    var m2 = resto.match(/^([A-ZÁÉÍÓÚÜÑ0-9._-]{2,})\s+(.*)$/);
-    if (m2) return { fecha: fecha, numero: numero, tipo: m2[1], resto: m2[2], reconocido: false };
+    var m2 = resto.match(/^([A-ZÁÉÍÓÚÜÑ0-9._-]{2,})(?:\s+(.*))?$/);
+    if (m2) return { fecha: fecha, numero: numero, tipo: m2[1], resto: m2[2] || '', reconocido: false };
     return { fecha: fecha, numero: numero, tipo: '', resto: resto, reconocido: false };
+  }
+
+
+  /* ---------- el nombre de la carpeta archivada (fila 648, docs/648-CARPETAS-ARCHIVADAS-MAS-CORTAS.md) ----------
+
+     Un asunto con número, ya archivado, entra en la carpeta de su persona sin el nombre de la persona:
+     `261113 A26-0137 BAJA MATRICULA`. Abierto lleva `261113 A26-0137 BAJA MATRICULA Cordero Navas, Lucía 1139877`.
+     Los asuntos sin número (`A26-…`) no cambian nunca. */
+  var RE_CON_NUMERO = /^\d{6} A\d{2}-\d{4}(?: |$)/;
+  function tieneNumeroEnElNombre(nombre) { return RE_CON_NUMERO.test(String(nombre || '')); }
+
+  /* Las formas en que puede acabar el nombre abierto: la persona de la ficha o de su carpeta, y sus versiones cortas. */
+  function formasDeLaPersona(terceros) {
+    var vistas = {}, salida = [];
+    (terceros || []).forEach(function (t) {
+      if (!t) return;
+      [U.limpiarNombre(String(t)), acortarNombrePila(String(t))].forEach(function (f) {
+        if (f && !vistas[f]) { vistas[f] = true; salida.push(f); }
+      });
+    });
+    return salida.sort(function (a, b) { return b.length - a.length; });
+  }
+
+  /* PURA. Cuál de esas formas lleva puesta al final el nombre ('' si ninguna: ya es corto, o no tiene número). */
+  function personaAlFinal(nombre, terceros) {
+    nombre = String(nombre || '');
+    if (!tieneNumeroEnElNombre(nombre)) return '';
+    var formas = formasDeLaPersona(terceros);
+    for (var i = 0; i < formas.length; i++) {
+      var f = formas[i];
+      if (nombre.length > f.length + 1 && nombre.slice(-(f.length + 1)) === ' ' + f
+          && RE_CON_NUMERO.test(nombre.slice(0, nombre.length - f.length - 1))) return f;
+    }
+    return '';
+  }
+
+  /* PURA. El nombre que lleva en el archivo: sin la persona. Si no tiene número, o ya es corto, el mismo. */
+  function nombreEnArchivo(nombre, terceros) {
+    var f = personaAlFinal(nombre, terceros);
+    return f ? String(nombre).slice(0, String(nombre).length - f.length - 1) : String(nombre || '');
+  }
+
+  /* PURA. ¿Es un nombre con número al que le falta la persona? */
+  function esNombreCorto(nombre, terceros) {
+    return tieneNumeroEnElNombre(nombre) && !personaAlFinal(nombre, terceros);
+  }
+
+  /* PURA. El nombre de una carpeta abierta: el corto más la persona, como `montarAsunto`. Si el nombre ya la lleva, el mismo. */
+  function nombreAbierto(nombre, tercero) {
+    if (!esNombreCorto(nombre, [tercero]) || !tercero) return String(nombre || '');
+    return U.limpiarNombre(String(nombre) + ' ' + acortarNombrePila(String(tercero)));
   }
 
   /* ---------- nombres de pila largos (fila 247, docs/NOMBRES-DE-PILA-LARGOS.md) ----------
@@ -196,6 +257,10 @@ var NombresNucleo = NombresNucleo || {};
      ============================================================ */
 
   I.leer = leer;
+  I.tieneNumeroEnElNombre = tieneNumeroEnElNombre;
+  I.nombreEnArchivo = nombreEnArchivo;
+  I.esNombreCorto = esNombreCorto;
+  I.nombreAbierto = nombreAbierto;
   I.acortarNombrePila = acortarNombrePila;
   I.claveDeTercero = claveDeTercero;
   I.carpetaDeTercero = carpetaDeTercero;

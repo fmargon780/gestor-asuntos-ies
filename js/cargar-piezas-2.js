@@ -170,6 +170,12 @@
     // IndiceArchivo.resolverHandle para completar una tarjeta del ARCHIVO
     // que no trae manejador de carpeta).
     'js/ficha-archivo.js',
+    // Fila 648 (docs/648-CARPETAS-ARCHIVADAS-MAS-CORTAS.md): el nombre corto de las carpetas archivadas. Después de
+    // js/ficha-archivo.js (envuelve App.reabrirAsunto por fuera de ella: la ficha ya se ha recuperado) y de
+    // js/relacionados.js; usa AsuntoRenombrar (js/asunto-renombrar.js) solo al reabrir, ya con todo cargado.
+    'js/archivo-nombre-corto.js',
+    // Fila 648: el botón «Acortar las carpetas del archivo» de Herramientas.
+    'js/archivo-acortar.js',
     // Fila 66 (docs/CONTACTO-GUARDADO-EN-LA-FICHA.md): el botón de
     // Ajustes → Mantenimiento que rellena `ficha.contacto` en los
     // asuntos abiertos que todavía no lo tienen. Usa Datos.fotoDeContacto

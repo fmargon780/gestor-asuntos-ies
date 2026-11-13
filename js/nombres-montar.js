@@ -67,8 +67,10 @@ var NombresNucleo = NombresNucleo || {};
       var corto = acortarNombrePila(datos.tercero);
       var fijo = unir([U.aAaMmDd(datos.fecha), datos.numero, U.limpiarNombre(datos.tipo).toUpperCase(),
         corto]);
+      /* Fila 648: en el archivo la carpeta lleva el nombre sin la persona; es esa ruta la que se mide. */
+      var enArchivo = unir([U.aAaMmDd(datos.fecha), datos.numero, U.limpiarNombre(datos.tipo).toUpperCase()]);
       var cabe = typeof window !== 'undefined' && window.Nombres && typeof window.Nombres.cabeEnRuta === 'function'
-        ? window.Nombres.cabeEnRuta(fijo, corto, datos.categoria) : { cabe: true };
+        ? window.Nombres.cabeEnRuta(enArchivo, corto, datos.categoria) : { cabe: true };
       return { nombre: fijo, recortado: false, noCabe: !cabe.cabe, margen: cabe.margen };
     }
     var antes = [U.aAaMmDd(datos.fecha), U.limpiarNombre(datos.tipo).toUpperCase()];

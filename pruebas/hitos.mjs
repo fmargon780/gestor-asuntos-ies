@@ -506,7 +506,7 @@ await comprobar('los hitos han salido de hitos.json', pagina.evaluate(async (cla
 await comprobar('aparece HISTORIAL DE TRAMITACION.txt en la carpeta archivada', pagina.evaluate(async (clave) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Aguilar Ponce, Marina 1140233');
-  const asunto = await ter.getDirectoryHandle(clave);
+  const asunto = await ter.getDirectoryHandle(Nombres.nombreEnArchivo(clave, ['Aguilar Ponce, Marina 1140233']));   /* fila 648: sin la persona en el archivo */
   const h = await asunto.getFileHandle('HISTORIAL DE TRAMITACION.txt');
   const texto = await (await h.getFile()).text();
   return texto.indexOf('HISTORIAL DE TRAMITACI') !== -1 && texto.indexOf('Registrar la solicitud') !== -1;

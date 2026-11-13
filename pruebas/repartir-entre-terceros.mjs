@@ -171,7 +171,7 @@ let ordenAsunto = 0;
 for (const [tercero, desde] of [['Gómez Ruiz, Luis 2222222', 3], ['Sanz Mora, Eva 3333333', 7], ['Pérez López, Ana 1111111', 11]]) {
   ordenAsunto++;
   await comprobarP('archivado en la carpeta de ' + tercero.split(',')[0] + ', con su trozo de 4 páginas, el número de documento del original y «Viene de…»',
-    archivado(tercero), [{ asunto: '260915 A' + AA + '-000' + ordenAsunto + ' CUESTIONARIO ALTAS CAPACIDADES ' + tercero,
+    archivado(tercero), [{ asunto: '260915 A' + AA + '-000' + ordenAsunto + ' CUESTIONARIO ALTAS CAPACIDADES',   /* fila 648: en el archivo, sin la persona */
       pdfs: ['260915 CUESTIONARIO ' + NUMERO_DOC + '.pdf'], pags: 4, viene: true }]);
 }
 const origen = () => pagina.evaluate(async ([origen]) => {

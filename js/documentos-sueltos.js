@@ -312,10 +312,13 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
       U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + U.mensajeDeError(e), 'malo');
       return;
     }
-    await App.reabrirAsunto({ nombre: elegido.nombre, padre: dentro, ficha: ficha });
+    var pedido = { nombre: elegido.nombre, padre: dentro, ficha: ficha };
+    await App.reabrirAsunto(pedido);
     /* Si no se ha llegado a reabrir (se canceló, o falló el traslado de
-       la carpeta), el documento no se toca. */
-    if (!(await Carpetas.existe(App.E.abiertos, elegido.nombre))) return;
+       la carpeta), el documento no se toca. Fila 648: al reabrir, la carpeta puede cambiar de
+       nombre (recupera a su persona); `pedido.nombre` ya trae el de ahora. */
+    if (!(await Carpetas.existe(App.E.abiertos, pedido.nombre))) return;
+    elegido.nombre = pedido.nombre;
     await App.llevarSueltoA(s, elegido.nombre, {}, opciones);
   } else if (que === 'guardar') {
     await App.llevarSueltoA(s, elegido.nombre, elegido.ficha, opciones);

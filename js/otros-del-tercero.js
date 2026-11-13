@@ -138,7 +138,7 @@ var OtrosDelTercero = (function () {
     var objeto = {
       nombre: nombre, handle: handle, padre: padre,
       ruta: categoria + ' / ' + tercero,
-      leido: Nombres.leer(nombre, App.E.tipos),
+      leido: Nombres.leer(nombre, App.E.tipos, tercero),   /* fila 648 */
       /* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de
          un archivado ya no vive en App.E.registro.asuntos, se lee de
          su propia carpeta, que ya se tiene aquí mismo. */

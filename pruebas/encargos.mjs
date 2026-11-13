@@ -252,7 +252,7 @@ await comprobar('4. archivar el asunto: su encargo pasa a «terminado»', estado
    aún no estaba en la lista del archivo y se «reabría» uno que no existía. Se espera a verlo en el archivo. */
 await pagina.evaluate((n) => { window.__cierre = (async () => {
   let a = null;
-  for (let i = 0; i < 100 && !a; i++) { await App.verArchivo(); a = App.E.listaArchivo.filter((x) => x.nombre === n)[0]; if (!a) await new Promise((r) => setTimeout(r, 200)); }
+  for (let i = 0; i < 100 && !a; i++) { await App.verArchivo(); a = App.E.listaArchivo.filter((x) => x.nombre === n || x.nombre === Nombres.nombreEnArchivo(n, [x.tercero]))[0];   /* fila 648: en el archivo va sin la persona */ if (!a) await new Promise((r) => setTimeout(r, 200)); }
   return App.reabrirAsunto(a);
 })(); }, asuntoNuevo);
 await pagina.waitForSelector('#cuadro-aceptar', { state: 'visible', timeout: 5000 });

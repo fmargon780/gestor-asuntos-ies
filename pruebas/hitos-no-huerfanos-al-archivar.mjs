@@ -152,7 +152,7 @@ await comprobar('1. aun así, los hitos NO se quedan huérfanos: han salido de h
 await comprobar('1. el asunto ha quedado archivado de todas formas', pagina.evaluate(async (clave) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Ejemplo Prueba, Alumno Uno 9000001');
-  try { await ter.getDirectoryHandle(clave); return true; } catch (e) { return false; }
+  try { await ter.getDirectoryHandle(clave.replace(/ Ejemplo Prueba.*$/, '')); return true; }   /* fila 648: sin la persona en el archivo */ catch (e) { return false; }
 }, CLAVE1), true);
 
 await comprobar('1. se han intentado exactamente dos escrituras (una y su reintento)',
@@ -177,7 +177,7 @@ await abrirFichaYArchivar(CLAVE2);
 await comprobar('2. el historial se ha escrito de verdad, gracias al reintento', pagina.evaluate(async (clave) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Ejemplo Prueba, Alumno Dos 9000002');
-  const asunto = await ter.getDirectoryHandle(clave);
+  const asunto = await ter.getDirectoryHandle(clave.replace(/ Ejemplo Prueba.*$/, ''));   /* fila 648 */
   const h = await asunto.getFileHandle('HISTORIAL DE TRAMITACION.txt');
   const texto = await (await h.getFile()).text();
   return texto.indexOf('HISTORIAL DE TRAMITACI') !== -1 && texto.indexOf('Paso único') !== -1;

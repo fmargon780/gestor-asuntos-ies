@@ -96,7 +96,7 @@
      reconstruir el índice desde cero), se intenta leer `_ficha.json`
      de la propia carpeta. */
   async function entradaDe(handle, nombre, categoria, tercero, ruta, sueltoEn, tipos, fichaConocida) {
-    var leido = Nombres.leer(nombre, tipos);
+    var leido = Nombres.leer(nombre, tipos, tercero);   /* fila 648: sin la persona en el nombre, `resto` es su carpeta */
     var cursoGrupo = Nombres.cursoYGrupoDeResto(leido.resto);
     var documentos = await nombresDeDocumentos(handle);
     var ficha = fichaConocida;

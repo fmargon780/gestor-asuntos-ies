@@ -57,7 +57,9 @@ comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; des
 
 - Carpeta de asunto nueva (fila 239): `AAMMDD A26-0137 TIPO Tercero`, con número único anual de
   asunto, sin año académico, grupo, campos ni texto libre (van a la ficha) y sin recorte. Los asuntos
-  de antes conservan `AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos] [texto libre] Tercero`.
+  de antes conservan `AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos] [texto libre] Tercero`. Ya archivada, la
+  carpeta con número va **sin el tercero** (`AAMMDD A26-0137 TIPO`, dentro de la carpeta de la persona) y lo
+  recupera al reabrir (fila 648; detalle en `docs/contexto/NOMBRES-FIJOS.md`).
 - Tercero: alumnado `Apellido1 Apellido2, Nombre` + Nº de identificación escolar; personal y
   tutores legales igual + 4 últimos caracteres del documento; empresas **razón social** (nunca el
   nombre comercial) + NIF; Administraciones, nombre corto estable (centros, + su código).

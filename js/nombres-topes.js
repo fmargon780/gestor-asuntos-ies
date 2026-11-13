@@ -204,7 +204,8 @@
       if (n.length > tipoAsunto.length) tipoAsunto = n;
     });
     var largoTipoDoc = largoDelTipoDeDocumentoMasLargo();
-    var asuntoPeor = [ 'x'.repeat(LARGO_FECHA), 'A00-0000', tipoAsunto.toUpperCase(), tercero ].filter(Boolean).join(' ');
+    /* Fila 648: en el archivo, la carpeta del asunto no lleva a la persona detrás (la carpeta de la persona ya la cuenta). */
+    var asuntoPeor = [ 'x'.repeat(LARGO_FECHA), 'A00-0000', tipoAsunto.toUpperCase() ].filter(Boolean).join(' ');
     var r = cabeEnRuta(asuntoPeor, tercero, categoria, largoTipoDoc);
     var partes = [
       { clave: 'dropbox', texto: 'dónde está la nube en este ordenador', largo: raizDeEsteOrdenador() },

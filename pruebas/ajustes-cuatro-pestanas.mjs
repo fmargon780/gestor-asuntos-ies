@@ -88,7 +88,7 @@ await pagina.waitForTimeout(1500);
 await comprobar('4. «Puesta a punto y reparaciones» con sus doce secciones, en orden',
   pagina.evaluate(() => [document.querySelector('.herramientas-puesta-titulo').textContent, [...document.querySelectorAll('#herramientas-puesta-cuerpo > details .bloque-titulo')].map((t) => t.textContent.trim())]),
   ['Puesta a punto y reparaciones', ['Plantillas del centro', 'Cargar tipos, guías y tareas del instituto', 'Pasar las guías a las listas comunes', 'Aplicar el plan de las guías', 'Tipos y su uso', 'Poner en orden las fichas del ARCHIVO', 'Guardar el contacto de los asuntos abiertos',
-    'Versiones previas', 'Duplicados descartados', 'Pasar a Administraciones', 'Borrados que se fusionan', 'Medidas', 'Tablas para informes']]);
+    'Versiones previas', 'Duplicados descartados', 'Pasar a Administraciones', 'Borrados que se fusionan', 'Acortar las carpetas del archivo', 'Medidas', 'Tablas para informes']]);
 await comprobar('4. y no queda en Ajustes ninguna sección «Herramientas»', pagina.evaluate(() => [...document.querySelectorAll('#pantalla-ajustes .bloque-titulo')].some((t) => t.textContent.trim() === 'Herramientas')), false);
 
 console.log('--- 5. el buscador ---');

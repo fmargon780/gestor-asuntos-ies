@@ -108,7 +108,7 @@ var FichaArchivo = (function () {
       if (!ficha || ficha.estado !== 'cerrado') return;   /* canceló, o algo ha fallado */
       try {
         var carpetaTercero = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
-        var handle = await carpetaTercero.getDirectoryHandle(clave);
+        var handle = await carpetaTercero.getDirectoryHandle(window.ArchivoNombreCorto ? ArchivoNombreCorto.deArchivo(clave) : clave);   /* fila 648: en el archivo puede llevar un nombre más corto */
         await escribir(handle, ficha);
         await App.guardarRegistroFresco(async function (registro) {
           delete registro.asuntos[clave];

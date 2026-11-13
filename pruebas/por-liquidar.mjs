@@ -177,8 +177,9 @@ const pdfs = await pagina.evaluate(async (ns) => {
     for (const tt of terceros) {
       const t = tt.nombre;
       const dirT = await Carpetas.bajar(App.E.archivo, [categoria, t], false);
-      if (await Carpetas.existe(dirT, n)) {
-        const dir = await dirT.getDirectoryHandle(n);
+      const nc = Nombres.nombreEnArchivo(n, [t]);   /* fila 648: en el archivo la carpeta va sin la persona */
+      if (await Carpetas.existe(dirT, nc)) {
+        const dir = await dirT.getDirectoryHandle(nc);
         const ficheros = [];
         for await (const [nombre, h] of dir.entries()) if (h.kind === 'file') ficheros.push(nombre);
         hallado = { t, ficheros };
@@ -192,7 +193,7 @@ await comprobar('5. los tres están en el ARCHIVO', pdfs.map((p) => !!p), [true,
 await comprobar('5. cada carpeta guarda su LIQUIDACION D26-… .pdf',
   pdfs.map((p) => p && p.ficheros.filter((f) => /^\d{6} LIQUIDACION D\d{2}-\d{5}\.pdf$/.test(f)).length), [1, 1, 1]);
 const bytesPdf = await pagina.evaluate(async ([n, t]) => {
-  const dir = await (await Carpetas.bajar(App.E.archivo, ['ALUMNADO', t], false)).getDirectoryHandle(n);
+  const dir = await (await Carpetas.bajar(App.E.archivo, ['ALUMNADO', t], false)).getDirectoryHandle(Nombres.nombreEnArchivo(n, [t]));   /* fila 648 */
   for await (const [nombre, h] of dir.entries()) if (/LIQUIDACION/.test(nombre)) { const f = await h.getFile(); return Array.from(new Uint8Array(await f.arrayBuffer())); }
   return [];
 }, [nombresMarcados[0], pdfs[0].t]);
@@ -207,12 +208,12 @@ await comprobar('5. el tipo de documento LIQUIDACION se ha dado de alta', pagina
 
 const reabierto = await pagina.evaluate(async ([n, t]) => {
   const dirT = await Carpetas.bajar(App.E.archivo, ['ALUMNADO', t], false);
-  const a = { nombre: n, padre: dirT, ficha: { categoria: 'ALUMNADO', tercero: t, estado: 'cerrado' }, leido: Nombres.leer ? (Nombres.leer(n) || {}) : {} };
+  const a = { nombre: Nombres.nombreEnArchivo(n, [t]), padre: dirT, ficha: { categoria: 'ALUMNADO', tercero: t, estado: 'cerrado' }, leido: Nombres.leer ? (Nombres.leer(n) || {}) : {} };
   const esperar = App.reabrirAsunto(a);
   await new Promise((r) => setTimeout(r, 300));
   document.getElementById('cuadro-aceptar').click();
   await esperar;
-  const ab = Gestor.asuntos().filter((x) => x.nombre === n)[0];
+  const ab = Gestor.asuntos().filter((x) => x.nombre === n)[0];   /* la carpeta recupera a su persona al reabrir (fila 648) */
   const ficheros = [];
   for await (const [nombre, h] of (await App.E.abiertos.getDirectoryHandle(n)).entries()) ficheros.push(nombre);
   return { abierto: !!ab, porLiquidar: ab ? PorLiquidar.estaPorLiquidar(ab) : null, pdf: ficheros.some((f) => /LIQUIDACION/.test(f)) };

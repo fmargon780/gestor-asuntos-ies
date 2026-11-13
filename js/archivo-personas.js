@@ -88,7 +88,7 @@ App.verArchivo = async function () {
     return {
       nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
       categoria: e.categoria, tercero: e.tercero, sueltoEn: e.sueltoEn || '',
-      leido: Nombres.leer(e.nombre, App.E.tipos), ficha: ficha,
+      leido: Nombres.leer(e.nombre, App.E.tipos, e.tercero), ficha: ficha,   /* fila 648 */
       /* Fila 73, docs/BUSCAR-EN-LAS-NOTAS.md: busca lleva las notas,
          buscaSinNotas no, para saber si una palabra ha salido solo
          por una nota (App.fragmentoDeNota). */

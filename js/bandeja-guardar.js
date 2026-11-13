@@ -127,8 +127,11 @@
       U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + U.mensajeDeError(e), 'malo');
       return;
     }
-    await App.reabrirAsunto({ nombre: elAsunto.nombre, padre: dentro, ficha: ficha });
-    if (!(await Carpetas.existe(App.E.abiertos, elAsunto.nombre))) return;
+    var pedido = { nombre: elAsunto.nombre, padre: dentro, ficha: ficha };
+    await App.reabrirAsunto(pedido);
+    /* Fila 648: al reabrir, la carpeta puede cambiar de nombre (recupera a su persona); `pedido.nombre` ya trae el de ahora. */
+    if (!(await Carpetas.existe(App.E.abiertos, pedido.nombre))) return;
+    elAsunto.nombre = pedido.nombre;
     await guardarEnAsunto(item, elAsunto, true);
   }
 

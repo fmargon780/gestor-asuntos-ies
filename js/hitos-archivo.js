@@ -415,7 +415,7 @@
         var entrada = await hitosDeConCreados(clave);
         if (!entrada || !entrada.hitos.length) return;
         var destino = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
-        var carpetaAsunto = await destino.getDirectoryHandle(clave);
+        var carpetaAsunto = await destino.getDirectoryHandle(window.ArchivoNombreCorto ? ArchivoNombreCorto.deArchivo(clave) : clave);   /* fila 648: en el archivo puede llevar un nombre más corto */
         var texto = textoHistorial(clave, entrada.hitos, entrada.creados);
         /* Fila 178: si falla, se reintenta una vez. Escriba o no, la
            entrada de hitos.json se quita igualmente aquí abajo, en la

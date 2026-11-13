@@ -183,7 +183,7 @@ U.envolver(App, 'App.cerrarAsunto', 'relacionados-archivar.js', function (comoEr
     await comoEra(a);
     var ficha = App.E.registro.asuntos[a.nombre] || {};
     if (ficha.estado === 'cerrado' && marcarEstos.length) {
-      await Relacionados.crearMarcadores(a, ficha.categoria, ficha.tercero, marcarEstos);
+      await Relacionados.crearMarcadores(window.ArchivoNombreCorto ? { nombre: ArchivoNombreCorto.deArchivo(a.nombre) } : a, ficha.categoria, ficha.tercero, marcarEstos);   /* fila 648: la nota lleva el nombre de la carpeta en el archivo */
     }
   };
 });

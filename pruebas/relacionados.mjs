@@ -245,7 +245,9 @@ await pagina.waitForSelector('#cuadro-titulo:has-text("Archivar el asunto")');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
-const NOMBRE_MARCADOR = '(RELACIONADO) ' + nombreAsuntoA;
+/* Fila 648: en el archivo la carpeta de un asunto con número va sin el nombre de la persona. */
+const nombreCortoA = nombreAsuntoA.replace(/ Pérez Ejemplo, Prueba Uno 0000001$/, '');
+const NOMBRE_MARCADOR = '(RELACIONADO) ' + nombreCortoA;
 async function leerMarcadorEnPagina(categoria, tercero, nombreMarcador) {
   return pagina.evaluate(async ([c, n, m]) => {
     try {
@@ -276,10 +278,10 @@ await comprobar('6) se crea la carpeta ARCHIVO/PERSONAL de Persona Uno, que no e
     .then(t => t !== null), true);
 await comprobar('y la nota dice dónde está el asunto de verdad',
   leerMarcadorEnPagina('PERSONAL', 'Pérez Ejemplo, Persona Uno 000T', NOMBRE_MARCADOR)
-    .then(t => t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreAsuntoA) !== -1), true);
+    .then(t => t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreCortoA) !== -1), true);
 await comprobar('lo mismo para López Ejemplo',
   leerMarcadorEnPagina('PERSONAL', 'López Ejemplo, Persona Dos 111H', NOMBRE_MARCADOR)
-    .then(t => t !== null && t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreAsuntoA) !== -1), true);
+    .then(t => t !== null && t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreCortoA) !== -1), true);
 await comprobar('en la nota no hay ningún documento del asunto: solo el fichero de texto',
   pagina.evaluate(async ([c, n, m]) => {
     const cat = await window.__disco.archivo.getDirectoryHandle(c);
@@ -307,7 +309,7 @@ await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
 await comprobar('la ficha de Persona Uno dice que está relacionado (archivado)',
   pagina.locator('.ficha-relacionado-de').textContent()
-    .then(t => t.indexOf(nombreAsuntoA) !== -1 && t.indexOf('Archivado') !== -1), true);
+    .then(t => t.indexOf(nombreCortoA) !== -1 && t.indexOf('Archivado') !== -1), true);
 
 /* 7) Reabrir el asunto borra las dos notas, pero la lista de
    relacionados sigue en la ficha. */

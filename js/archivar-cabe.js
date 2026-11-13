@@ -63,14 +63,15 @@ var ArchivarCabe = (function () {
      `<categoría>/<tercero>/`. Devuelve null si no hay con qué medir;
      si no, { carpeta: {sobran} | null, lista: [{dir, sub, nombre, base, ext, sobran}],
      nombresPorCarpeta, ctx }. */
-  async function medir(abiertos, nombre, categoria, tercero) {
-    var ctx = { nombre: nombre, categoria: categoria, tercero: tercero };
-    if (Nombres.largoEnArchivo(categoria, tercero, nombre, '') === null) return null;
+  async function medir(abiertos, nombre, categoria, tercero, nombreEnArchivo) {
+    /* Fila 648: en el archivo la carpeta puede llevar un nombre más corto; es el que se mide. */
+    var ctx = { nombre: nombreEnArchivo || nombre, categoria: categoria, tercero: tercero };
+    if (Nombres.largoEnArchivo(categoria, tercero, ctx.nombre, '') === null) return null;
     var ficheros = [], nombresPorCarpeta = {};
     await recorrer(await abiertos.getDirectoryHandle(nombre), [], ficheros, nombresPorCarpeta);
 
     /* ¿Deja la carpeta sitio, siquiera, a un documento corto? */
-    var sobraCarpeta = Nombres.largoEnArchivo(categoria, tercero, nombre, 'x'.repeat(DOCUMENTO_MINIMO)) +
+    var sobraCarpeta = Nombres.largoEnArchivo(categoria, tercero, ctx.nombre, 'x'.repeat(DOCUMENTO_MINIMO)) +
       EXTRA_FICHERO - Nombres.TOPE_TOTAL_RUTA;
     var lista = [];
     ficheros.forEach(function (f) {

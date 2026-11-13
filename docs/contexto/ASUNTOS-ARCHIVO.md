@@ -171,6 +171,20 @@ ahí…». «No se ha movido nada» solo si es verdad; si la limpieza falla (`li
 (`copiaAMedias`): «Puede haber quedado una copia a medias… al repetir, se juntan.» Pruebas:
 `pruebas/archivar-no-cabe.mjs`. La causa del aviso original (`NotFoundError` sin más) sigue sin confirmarse.
 
+### La carpeta archivada, con el nombre más corto (fila 648, 13-nov-2026)
+
+Al archivar un asunto con número, `App.cerrarAsunto` calcula `nombreEnArchivo` (`ArchivoNombreCorto.paraArchivo`): el
+nombre sin la persona del final. Lo usa para medir la ruta (`ArchivarCabe.medir` 5.º parámetro), para el cuadro
+«Archivar el asunto» (debajo de adónde va, «Allí se llamará:»), para «ya existe / ya archivada» (mira las dos formas) y
+para mover la carpeta (`ArchivoNombreCorto.trasladarComo`: copia con el otro nombre; con el mismo nombre es
+`Carpetas.mover` de siempre). El índice del ARCHIVO, el índice del expediente y la nota de los relacionados llevan el
+nombre corto; la ficha sigue por su clave de siempre (`actualizarIndiceAlArchivar(…, claveFicha)`) y los envoltorios
+que buscan la carpeta con esa clave (`hitos-archivo.js`, `ficha-archivo.js`) usan `ArchivoNombreCorto.deArchivo`.
+Reabrir: ver `docs/contexto/NOMBRES-FIJOS.md`. «Acortar las carpetas del archivo» (Herramientas,
+`js/archivo-acortar.js`) recorre `ARCHIVO/<categoría>/<persona>/`, cuenta las de número con la persona detrás y las
+renombra de una en una (`ArchivoNombreCorto.acortarUna`: renombra, cambia la entrada del índice, las notas de los
+relacionados, encargos y actividades; las que fallan se quedan como estaban y se dicen al final).
+
 ### Archivar desde la ficha, sin avisos de más (fila 90, 21-sep-2026)
 
 `docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la

@@ -229,7 +229,8 @@ async function archivar(nombre, hilos) {
   /* reabrir el primero: sus hilos están en la ficha archivada */
   const prom = pagina.evaluate(async (n) => {
     const ficha = Object.assign({}, window.__fichas[n], { hilos: [{ id: 'HA' }, { id: 'HB' }] });
-    await App.reabrirAsunto({ nombre: n, ficha: ficha });
+    /* Fila 648: en el archivo la carpeta va sin la persona. */
+    await App.reabrirAsunto({ nombre: Nombres.nombreEnArchivo(n, [ficha.tercero]), ficha: ficha });
   }, nombres[0]).catch(() => {});
   await pagina.waitForSelector('#capa .cuadro', { timeout: 15000 });
   await pagina.click('#cuadro-aceptar');

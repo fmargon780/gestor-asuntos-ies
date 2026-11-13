@@ -83,6 +83,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-duplicados-descartados', donde: 'herramientas', otras: 'duplicados, descartados, unir' },
     { id: 'bloque-pasar-administraciones', donde: 'herramientas', otras: 'administraciones, terceros, pasar' },
     { id: 'bloque-borrados-fusion', donde: 'herramientas', otras: 'borrados, fusionan, resucitar' },
+    { id: 'bloque-acortar-archivo', donde: 'herramientas', otras: 'archivo, carpetas, acortar, nombre, persona, rutas, largo, Drive' },   /* fila 648 */
     { id: 'bloque-medidas', donde: 'herramientas', otras: 'medidas, velocidad, tiempos, lento, cuánto tarda' },
     { id: 'bloque-base', donde: 'herramientas', otras: 'tablas, informes, estadísticas, base, archivados, apuntados, poner al día' },
     /* Dentro de otra sección */

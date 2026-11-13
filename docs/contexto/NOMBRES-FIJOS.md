@@ -2,7 +2,8 @@
 
 Diseño: `docs/NOMBRES-FIJOS-CON-NUMERO.md`. Sustituye a los nombres de largo libre y al recorte
 silencioso de la fila 130/177. Solo lo creado desde esta versión lleva número y estructura fija;
-**lo que ya existe no se renombra** y se sigue leyendo igual.
+**lo que ya existe no se renombra** y se sigue leyendo igual (salvo las carpetas ya ARCHIVADAS con número, que
+el botón de Herramientas «Acortar las carpetas del archivo» deja sin el nombre de la persona: fila 648, abajo).
 
 ## Los números (`js/numeros.js`, `Numeros`)
 
@@ -33,6 +34,26 @@ silencioso de la fila 130/177. Solo lo creado desde esta versión lleva número 
   separar/unir/sacar páginas, repartir (documentos). «Cambiar el nombre» a un documento que ya sigue la
   norma de antes, «Cambiar el asunto» de uno antiguo y unir/cambiar tipos: conservan su estructura.
 - Un asunto con número lo conserva siempre (cambiar tipo, tercero o fecha, archivar, reabrir, unir).
+- **Carpeta archivada con número, sin la persona (fila 648, 13-nov-2026, `docs/648-CARPETAS-ARCHIVADAS-MAS-CORTAS.md`).** Al
+  archivar, la carpeta entra en `ARCHIVO/<categoría>/<persona>/` como `AAMMDD A26-0137 TIPO` (sin el tercero del final); al
+  reabrir recupera el nombre entero. Los asuntos sin número no cambian. Funciones puras en `js/nombres-terceros.js`:
+  `Nombres.nombreEnArchivo(nombre, [terceros])` (quita el tercero del final si lo lleva, por forma larga o corta),
+  `Nombres.nombreAbierto(corto, tercero)` (lo contrario), `Nombres.esNombreCorto`, `Nombres.tieneNumeroEnElNombre`;
+  `Nombres.leer(nombre, tipos, terceroDeFuera)` reconoce el tipo aunque sea lo último del nombre y, si se le pasa la
+  carpeta de la persona, la devuelve en `resto` (así `leido.resto` sigue diciendo quién es en archivadas: lo pasan el
+  índice del ARCHIVO, la pantalla de la persona y «Otros asuntos de este tercero»). `js/archivo-nombre-corto.js`
+  (`ArchivoNombreCorto`): `paraArchivo`, `paraAbrir`, `apuntar`/`deArchivo` (el nombre con que quedó en el archivo un
+  asunto recién archivado, para hitos-archivo, ficha-archivo y las notas de relacionados, que lo buscan por su clave de
+  siempre), `acortarUna` y `pendientes` (el botón, `js/archivo-acortar.js`), y la única envoltura nueva
+  (`App.reabrirAsunto`, apuntada en `js/envolturas-esperadas.js`): tras reabrir con el nombre corto, renombra la carpeta
+  en Asuntos abiertos y mueve ficha, hitos y presencia con `AsuntoRenombrar.mover` (antes revive la lápida del nombre
+  entero) y deja `a.nombre` con el nombre entero; quien llama a reabrir y sigue usando el nombre (bandeja, por clasificar,
+  encargos) lo lee de ese mismo objeto. La clave de la ficha, de los hitos y de los encargos sigue siendo el nombre
+  entero mientras el asunto está abierto; al archivar, encargos y actividades pasan al nombre corto
+  (`moverLoDeFuera`) y la ficha/hitos viven dentro de la carpeta. La ruta se mide con el nombre corto
+  (`ArchivarCabe.medir(…, nombreEnArchivo)`, `Nombres.cabeEnRuta` desde `montarAsunto`, `Nombres.medidor`). Si en el
+  archivo ya hay una carpeta con el nombre entero (intento de antes), se junta con ella y conserva su nombre. Pruebas:
+  `pruebas/carpetas-archivadas-cortas.mjs`.
 
 ## Datos del documento (`js/documentos-datos.js`, `DocumentosDatos`)
 

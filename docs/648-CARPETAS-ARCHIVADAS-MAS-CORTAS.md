@@ -164,4 +164,30 @@ Con la demo (`?demo=1&auto=1`). Lo que no pueda ver, lo dice.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+Segundo revisor (13-nov-2026, demo `?demo=1&auto=1`, sin ver cómo se programó):
+
+- Cuadro «Archivar el asunto» con adónde va y «Allí se llamará: …» sin la persona: coincide.
+- Asunto archivado, buscado en el archivo: sale con su persona y se abre: coincide.
+- «Ruta» termina en `… / <persona> / <fecha> <número> <TIPO>`: coincide.
+- Reabrir desde la ficha archivada: coincide (vuelve con la persona al final).
+- Reabrir desde el botón de la tarjeta del Archivo: NO COINCIDÍA (volvía con el nombre corto, sin aviso). Corregido: la
+  persona se toma también de la tarjeta y de la ficha recuperada; prueba nueva con el objeto tal cual sale de la lista.
+  Comprobado por la sesión con `pruebas/carpetas-archivadas-cortas.mjs`; el revisor no ha vuelto a mirarlo en pantalla.
+- Asunto nuevo abierto con la persona; archivado sin número con su nombre entero; «Otros asuntos de este tercero»: coincide.
+- Herramientas: bloque, cuadro con cuántas son, aviso de la otra persona y Drive, «Acortar las N carpetas» / «Cancelar»,
+  avance «Acortando… 1 de 8», resultado, y «No queda ninguna carpeta por acortar.»: coincide.
+- Una que falla se queda como estaba y sale con su persona y el motivo; sin número no se toca ni se cuenta; «solo
+  consulta» lo dice: coincide.
+- Ajustes → «Largo de las rutas» no empeora: no lo he podido ver (la demo no tiene ruta de ARCHIVO). El bloque está en
+  la pestaña «Este ordenador», no en «El centro».
+- Cortarse a medias y reanudar: no lo he podido ver en pantalla (lo cubre la prueba: repetir cuenta solo la que faltaba).
+- Lo que hace la app y el texto no pide: la frase «Si se corta a medias, se vuelve a pulsar…» en el cuadro; si el
+  ordenador pasa a «solo consulta» a mitad, para y lo dice; si ya hay en el archivo una carpeta con el nombre entero
+  de un intento anterior, se junta con ella y conserva su nombre (el botón la acorta después); pone al día el índice, las
+  notas de los relacionados, encargos y actividades (necesario para que nada se pierda).
+- **[SOLO FRANCISCO]** Con las carpetas reales en Google Drive: que tras pulsar el botón el archivo queda con los nombres
+  cortos en los dos ordenadores: NO COMPROBADO (copiado a `docs/COMPROBAR-A-MANO.md`).
+
+Decisión técnica de Claude: la ruta se mide con el nombre corto y la carpeta se copia ya con el nombre corto al
+archivarla; al reabrir se copia con el nombre corto a Asuntos abiertos y después se le pone la persona (una copia más,
+sin problema de ruta porque Asuntos abiertos es más corto).

@@ -37,6 +37,10 @@ var Nombres = (function () {
   function grupoCompacto() { return I.grupoCompacto.apply(this, arguments); }
   function nivelYEnsenanza() { return I.nivelYEnsenanza.apply(this, arguments); }
   function leer() { return I.leer.apply(this, arguments); }
+  function tieneNumeroEnElNombre() { return I.tieneNumeroEnElNombre.apply(this, arguments); }
+  function nombreEnArchivo() { return I.nombreEnArchivo.apply(this, arguments); }
+  function esNombreCorto() { return I.esNombreCorto.apply(this, arguments); }
+  function nombreAbierto() { return I.nombreAbierto.apply(this, arguments); }
   function acortarNombrePila() { return I.acortarNombrePila.apply(this, arguments); }
   function claveDeTercero() { return I.claveDeTercero.apply(this, arguments); }
   function carpetaDeTercero() { return I.carpetaDeTercero.apply(this, arguments); }
@@ -188,6 +192,8 @@ var Nombres = (function () {
     textoCategoria: textoCategoria, opcionesCategorias: opcionesCategorias, terceroTutor: terceroTutor,
     terceroAdministracion: terceroAdministracion,
     ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
+    tieneNumeroEnElNombre: tieneNumeroEnElNombre, nombreEnArchivo: nombreEnArchivo, esNombreCorto: esNombreCorto,
+    nombreAbierto: nombreAbierto,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo, tipoParaCarpeta: tipoParaCarpeta,
     tipoParaVer: tipoParaVer, nombresDeTipo: nombresDeTipo,
     grupoCompacto: grupoCompacto, nivelYEnsenanza: nivelYEnsenanza,

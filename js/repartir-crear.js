@@ -110,7 +110,7 @@ var RepartirCrear = (function () {
       var archivado = false;
       try {
         var destino = await Carpetas.bajar(App.E.archivo, [a.ficha.categoria || 'ALUMNADO', trozo.tercero], false);
-        archivado = await Carpetas.existe(destino, nombre);
+        archivado = await Carpetas.existe(destino, window.ArchivoNombreCorto ? ArchivoNombreCorto.deArchivo(nombre) : nombre);   /* fila 648: en el archivo puede llevar un nombre más corto */
       } catch (e) { archivado = false; }
       if (archivado) return { ok: true, asunto: nombre };
       var noCupo = window.ArchivarCabe && ArchivarCabe.noCupo(nombre);   /* fila 265 */
