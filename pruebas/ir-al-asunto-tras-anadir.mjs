@@ -113,7 +113,7 @@ await guardar('cuatro.pdf');
 await pagina.locator('#mensajes .mensaje-boton', { hasText: 'Ir al asunto' }).click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(400);
-await comprobar('3. abre la ficha de ese asunto', pagina.evaluate((d) => (document.querySelector('#pantalla-asunto .ficha-nombre') || {}).textContent.indexOf(d.slice(0, 20)) !== -1, DESTINO), true);
+await comprobar('3. abre la ficha de ese asunto', pagina.evaluate((d) => (((document.querySelector('#pantalla-asunto .ficha-nombre-texto') || { getAttribute: () => '' }).getAttribute('title') || (document.querySelector('#pantalla-asunto .ficha-nombre-texto') || { getAttribute: () => '' }).getAttribute('data-ayuda') || '')).indexOf(d.slice(0, 20)) !== -1, DESTINO), true);
 await comprobar('3. en la pestaña «Trabajo»', pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
 await comprobar('3. con el hito en curso en la mesa', pagina.evaluate(() => (HitoMesa.abierta() || {}).idHito), 'h-curso');
 await comprobar('3. el aviso se ha cerrado', avisosConIr(), 0);

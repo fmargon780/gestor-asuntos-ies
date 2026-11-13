@@ -64,7 +64,7 @@ await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="MATRICULA Aguilar Po
 await pagina.waitForTimeout(1500);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 10000 });
-await pagina.locator('.hito-en-mesa .mesa-tira-hito', { hasText: 'Comprobar la documentación' }).click();
+await pagina.locator('#ficha-tira .mesa-tira-hito', { hasText: 'Comprobar la documentación' }).click();
 await pagina.waitForFunction(() => document.querySelector('.hito-en-mesa .mesa-titulo').textContent === 'Comprobar la documentación');
 await pagina.waitForTimeout(600);
 await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');

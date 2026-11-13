@@ -1,14 +1,14 @@
-/* Prueba en navegador de verdad de las pestañas de la ficha del asunto (24-sep-2026, fila 107 de
-   docs/COLA.md, docs/FICHA-EN-TARJETAS.md; adaptada el 22-oct-2026 a la fila 425,
-   docs/FICHA-VISTA-DE-TRABAJO.md: antes era una cuadrícula de tarjetas con resumen, ahora pestañas).
+/* Prueba en navegador de verdad de los bloques plegados de la ficha del asunto (24-sep-2026, fila 107 de
+   docs/COLA.md; adaptada a la fila 425 y, el 13-nov-2026, a la fila 637, docs/637-VISTA-DEL-ASUNTO-CABECERA-Y-PANEL.md:
+   antes eran pestañas, ahora son cinco bloques plegados a la derecha del hito).
 
    A 1905×1000 y a 1280×800:
-     1. Las pestañas están siempre a la vista y «Trabajo» es la primera y la abierta.
-     2. Pasar a otra pestaña por su botón; solo se ve la abierta.
-     3. Con un documento abierto a la derecha, Escape lo cierra primero; el siguiente cierra la mesa del
-        hito (la lista) y el siguiente sale de la ficha.
-     4. Escribir una nota, provocar un repintado: ni cambia la pestaña ni se pierde lo escrito.
-     5. Desde «En Administración» (Inicio), entra en «Trabajo» con la mesa del hito. */
+     1. No hay pestañas; los cinco bloques están a la vista, en su orden, plegados, y «Registro» lleva su número.
+     2. Pulsar el título de un bloque lo abre (y se ve su contenido); volver a pulsarlo lo pliega; abrir uno no pliega otro.
+     3. Con un documento abierto a la derecha (tapando los bloques), Escape lo cierra primero; el siguiente cierra la
+        mesa del hito (la lista) y el siguiente sale de la ficha.
+     4. Escribir una nota, provocar un repintado: ni se pliega lo abierto ni se pierde lo escrito.
+     5. Desde «En Administración» (Inicio), entra con la mesa del hito y con los bloques plegados. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -81,7 +81,9 @@ async function abrirFicha(pagina) {
   await pagina.waitForTimeout(500);
 }
 
-const pestanaAbierta = (pagina) => pagina.evaluate(() => (document.getElementById('ficha-tarjetas') || {}).dataset?.abierta || null);
+/* Los bloques de la derecha que están abiertos, en su orden. */
+const bloquesAbiertos = (pagina) => pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-plegables .ficha-plegable.abierto')).map((b) => b.dataset.tarjeta));
+const cabecera = (pagina, titulo) => pagina.locator('#ficha-plegables .plegable-cab', { hasText: titulo }).first();
 
 for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   console.log('--- a ' + ancho + '×' + alto + ' ---');
@@ -89,36 +91,48 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await abrirFicha(pagina);
 
   /* 1. */
-  await comprobar('1. las pestañas están a la vista, «Trabajo» primera',
-    pagina.locator('#ficha-tarjetas-pestanas .ficha-pestana').allTextContents().then((t) => [t.length >= 6, t[0]]), [true, 'Trabajo']);
-  await comprobar('1. «Trabajo» está abierta', pestanaAbierta(pagina), 'trabajo');
+  await comprobar('1. los bloques, a la vista y en su orden',
+    pagina.locator('#ficha-plegables .plegable-titulo').allTextContents(),
+    ['Datos', 'Personas y entidades relacionadas', 'Documentos de la carpeta', 'Registro', 'Otros asuntos de este tercero']);
+  await comprobar('1. no hay pestañas', pagina.locator('#ficha-tarjetas-pestanas, .ficha-pestana').count(), 0);
+  await comprobar('1. todos plegados al entrar', bloquesAbiertos(pagina), []);
+  await comprobar('1. y la vista es la de siempre («Trabajo»)', pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
   await comprobar('1. «Registro» lleva su número (1 nota)',
-    pagina.locator('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="notas"] .ficha-pestana-cuenta').textContent(), '1');
+    pagina.locator('#ficha-plegables .ficha-cuenta[data-cuenta-tarjeta="notas"]').textContent(), '1');
+  await comprobar('1. con el contenido de «Registro» plegado (oculto)', pagina.locator('#ficha-notas textarea').first().isVisible(), false);
 
   /* 2. */
-  await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="notas"]');
-  await comprobar('2. por su pestaña se pasa a Registro', pestanaAbierta(pagina), 'notas');
+  await cabecera(pagina, 'Registro').click();
+  await comprobar('2. por su título se abre Registro', bloquesAbiertos(pagina), ['notas']);
   await comprobar('2. y se ve la caja de escribir la nota', pagina.locator('#ficha-notas textarea').first().isVisible(), true);
-  await comprobar('2. las demás no se ven', pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"]').isVisible(), false);
-  await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="trabajo"]');
+  await comprobar('2. los demás siguen plegados (su contenido no se ve)', pagina.locator('#ficha-relacionados').isVisible(), false);
+  await cabecera(pagina, 'Documentos de la carpeta').click();
+  await comprobar('2. abrir otro no pliega el primero', bloquesAbiertos(pagina), ['documentos', 'notas']);
+  await cabecera(pagina, 'Registro').click();
+  await comprobar('2. volver a pulsar un título lo pliega', bloquesAbiertos(pagina), ['documentos']);
+  await comprobar('2. y su contenido se oculta', pagina.locator('#ficha-notas textarea').first().isVisible(), false);
+  await pagina.evaluate(() => FichaTarjetas.plegar('documentos'));
+  await comprobar('2. «FichaTarjetas.plegar» los deja todos plegados', bloquesAbiertos(pagina), []);
 
   /* 3. */
+  await cabecera(pagina, 'Documentos de la carpeta').click();
   await pagina.locator('#ficha-documentos button.ficha-documento', { hasText: DOCS[0] }).click();
   await pagina.waitForSelector('body.con-visor');
+  await comprobar('3. el documento tapa los bloques', pagina.locator('#trabajo-der.con-documento #ficha-plegables').isVisible(), false);
   await pagina.waitForTimeout(300);
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(200);
-  await comprobar('3. el primer Escape cierra el documento y deja la mesa', [await pestanaAbierta(pagina), await hitoEnLaMesa(pagina)], ['trabajo', 'm1']);
+  await comprobar('3. el primer Escape cierra el documento y deja la mesa (y vuelven los bloques)', [await pagina.locator('#ficha-plegables').isVisible(), await hitoEnLaMesa(pagina)], [true, 'm1']);
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(200);
-  await comprobar('3. el siguiente cierra la mesa del hito (la lista de hitos)', [await pestanaAbierta(pagina), await hitoEnLaMesa(pagina)], ['trabajo', null]);
+  await comprobar('3. el siguiente cierra la mesa del hito (la lista de hitos)', [await pagina.locator('#ficha-plegables').isVisible(), await hitoEnLaMesa(pagina)], [true, null]);
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(300);
   await comprobar('3. y el siguiente sale de la ficha', pagina.locator('#pantalla-asunto').isVisible(), false);
   await abrirFicha(pagina);
 
   /* 4. */
-  await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="notas"]');
+  await cabecera(pagina, 'Registro').click();
   await pagina.locator('#ficha-notas textarea').first().fill('Nota a medias que no se puede perder');
   /* Un repintado entero de verdad: llega un documento a la carpeta. */
   await pagina.evaluate(async (asunto) => {
@@ -130,7 +144,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.waitForTimeout(400);
   await comprobar('4. la ficha se ha repintado de verdad',
     pagina.evaluate(() => window.__nodoFicha !== document.getElementById('ficha-tarjetas')), true);
-  await comprobar('4. tras el repintado, Registro sigue abierta', pestanaAbierta(pagina), 'notas');
+  await comprobar('4. tras el repintado, Registro sigue abierto (no se pliega)', bloquesAbiertos(pagina), ['notas']);
   await comprobar('4. y lo escrito sigue ahí',
     pagina.locator('#ficha-notas textarea').first().inputValue(), 'Nota a medias que no se puede perder');
   await pagina.locator('#ficha-notas textarea').first().fill('');
@@ -158,7 +172,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.evaluate(() => document.querySelector('#inicio-tabla-cuerpo tr[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(600);
-  await comprobar('5. desde "En Administración" (Inicio), entra en «Trabajo»', pestanaAbierta(pagina), 'trabajo');
+  await comprobar('5. desde "En Administración" (Inicio), entra con los bloques plegados', bloquesAbiertos(pagina), []);
   await comprobar('5. y con la mesa del hito', hitoEnLaMesa(pagina), 'm1');
 
   await comprobar('sin errores en la consola', errores, []);

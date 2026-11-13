@@ -70,6 +70,8 @@ async function abrir(nombre, modo) {
   await pagina.evaluate(([n, m]) => { App.volverALaLista && App.volverALaLista(); }, [nombre, modo]);
   await pagina.evaluate(([n, m]) => App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === n)[0], m), [nombre, modo]);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+  /* Fila 637: los botones están dentro del bloque «Documentos de la carpeta», plegado al entrar. */
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
   await pagina.waitForTimeout(600);
 }
 const botones = () => pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-documentos-anadir, .ficha-documentos-generar'))

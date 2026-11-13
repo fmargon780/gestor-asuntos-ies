@@ -1,1 +1,1 @@
-Última pasada completa: 12-nov-2026 17:26 (Madrid) · 30 min · verde tras repetir los 28 que fallaron por falta del paquete jsdom en esta sesión (instalado) · commit de la rama de la fila 618, sobre main de la 619
+Última pasada completa: 13-nov-2026 (Madrid) · 31 min · verde (385 pruebas; hito-mesa arreglada en la fila 637, fallaba también en main) · filas 637 y 638 en la rama claude/gestor-asuntos-filas-637-638-w763gk

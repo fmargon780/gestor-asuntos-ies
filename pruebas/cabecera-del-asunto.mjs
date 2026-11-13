@@ -81,7 +81,6 @@ function elementosDeAcciones() {
     /* Fila 129: el estado es el hito actual (#ficha-estado-hito), no un desplegable. */
     if (el.id === 'ficha-estado-hito') return 'estado';
     if (el.classList.contains('boton-vencimiento')) return 'vencimiento';
-    if (el.classList.contains('ficha-encargo')) return 'encargo';
     if (el.classList.contains('ficha-menu-envoltorio')) return 'comunicar';
     if (el.classList.contains('boton-principal')) return 'archivar';
     return 'desconocido:' + el.className;
@@ -94,8 +93,9 @@ function elementosDeAcciones() {
 console.log('--- 1 y 2. la barra de acciones ---');
 await abrirFicha(RICO);
 
-await comprobar('1. exactamente cinco elementos, en este orden',
-  elementosDeAcciones(), ['estado', 'vencimiento', 'encargo', 'comunicar', 'archivar']);
+/* Fila 637: «El encargo» ya no es un botón de la barra (se abre con «Cambiar» en «Quién lo pide», bloque «Datos»). */
+await comprobar('1. exactamente cuatro elementos, en este orden',
+  elementosDeAcciones(), ['estado', 'vencimiento', 'comunicar', 'archivar']);
 
 await comprobar('2. ya no hay ningún botón de los viejos',
   pagina.evaluate(() => {
@@ -117,9 +117,10 @@ await pagina.waitForTimeout(100);
    fila de copiar, siempre a la vista (punto 4 de esta misma prueba). */
 /* «Índice del expediente» (fila 137) y «Marcar como reservado» (fila
    135) van entre las dos de siempre. */
-await comprobar('3. las cuatro opciones, en orden',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Cambiar el asunto', 'Índice del expediente', 'Marcar como reservado', 'Borrar el asunto']);
+/* Fila 637: el menú trae también «Copiar» (Asunto, NIE; DNI y Nombre salen cuando llega el dato del tercero). */
+await comprobar('3. las opciones a la vista, en orden',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')).filter((b) => !b.hidden).map((b) => b.textContent.trim())),
+  ['Cambiar el asunto', 'Índice del expediente', 'Marcar como reservado', 'Asunto', 'NIE', 'Borrar el asunto']);
 await comprobarQue('3. "Borrar el asunto" se ve en rojo',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'))
     .some((b) => b.textContent.trim() === 'Borrar el asunto' && b.classList.contains('ficha-menu-peligro'))));
@@ -138,22 +139,27 @@ await comprobarQue('3. Escape lo cierra, sin echar de la ficha',
    el "NIE", que no depende de ningún fichero de datos (sale del
    propio nombre de la carpeta). */
 console.log('--- 4. la fila de copiar de un gesto ---');
-await comprobar('4. el botón "Asunto" siempre sale',
-  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).count(), 1);
+/* Fila 637: la fila de copiar de la cabecera ya no existe; sus botones son las opciones de «Copiar» del menú «⋯». */
+const opcionCopiar = (t) => pagina.locator('.ficha-menu .ficha-menu-opcion:not([hidden])', { hasText: new RegExp('^' + t + '$') });
+async function abrirMenu() {
+  if (await pagina.locator('.ficha-menu:not(.oculto)').count() === 0) await pagina.click('.ficha-nombre-menu-boton');
+  await pagina.waitForSelector('.ficha-menu:not(.oculto)');
+}
+await abrirMenu();
+await comprobar('4. la opción "Asunto" siempre sale',
+  opcionCopiar('Asunto').count(), 1);
 await comprobar('4. el "NIE" sale en un asunto de alumnado con número',
-  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'NIE' }).count(), 1);
-await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("NIE")');
-await pagina.waitForFunction(() => {
-  const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-    .find((x) => x.textContent.trim() === 'Copiado');
-  return !!b;
-});
+  opcionCopiar('NIE').count(), 1);
+await opcionCopiar('NIE').click();
+await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => /Copiado/.test(m.textContent)));
 await comprobar('4. copia de verdad el número, sin el nombre',
   pagina.evaluate(() => navigator.clipboard.readText()), '1140233');
 
 await abrirFicha(MINIMO);
+await abrirMenu();
 await comprobar('4. el "NIE" no sale en un asunto que no es de alumnado',
-  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'NIE' }).count(), 0);
+  opcionCopiar('NIE').count(), 0);
+await pagina.keyboard.press('Escape');
 await comprobar('4. el icono viejo pegado al nombre ha desaparecido',
   pagina.locator('.ficha-nombre .boton-nie').count(), 0);
 
@@ -202,7 +208,11 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
    8. "EL ENCARGO": QUIÉN LO PIDE Y LA VÍA, DE UNA VEZ
    ============================================================ */
 console.log('--- 8. El encargo guarda quién lo pide y la vía juntos ---');
-await pagina.click('.ficha-encargo button');
+/* Fila 637: «El encargo» ya no es un botón de la barra; se abre con «Cambiar» en la fila «Quién lo pide» del bloque
+   «Datos». Esa fila solo sale si está rellena o si el tipo la pide al crear: este asunto aún no tiene nada, así que la
+   primera vez se abre el mismo cuadro por su función (`FichaNucleo.abrirLoPide`) y la vuelta a abrirlo, abajo, ya es
+   por el botón «Cambiar». */
+await pagina.evaluate((n) => { FichaNucleo.abrirLoPide(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], null); }, RICO);
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('8. el cuadro es "El encargo"', pagina.locator('#cuadro-titulo').textContent(), 'El encargo');
 
@@ -226,11 +236,17 @@ await comprobar('8. quedan escritos donde estaban antes: loPide y via/viaDato',
 
 /* Fila 106 (docs/LO-PIDE-EN-LA-CABECERA.md): quién lo pide sale una sola
    vez, arriba, con la relación en minúscula; debajo del botón, nada. */
-await comprobar('8. la etiqueta de arriba lleva la relación entre paréntesis',
-  pagina.locator('#pantalla-asunto .marca-lopide .lp-nombre').textContent(), 'Lo pide: María López (tutora)');   /* fila 305: el contacto va aparte, en la misma marca */
-await comprobar('8. debajo de "El encargo" ya no hay línea gris',
-  pagina.locator('.ficha-encargo').evaluate((e) => e.children.length), 1);
-await pagina.click('.ficha-encargo button');
+/* Fila 637: la marca de «Lo pide» ya no sale en la cabecera; quién lo pide va en la fila «Quién lo pide» del bloque «Datos». */
+await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+await pagina.waitForFunction(() => document.querySelector('#ficha-datos-bloque .ficha-dato-encargo'), null, { timeout: 10000 }).catch(() => {});
+await comprobar('8. «Quién lo pide» lleva la relación entre paréntesis',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-datos-bloque .ficha-dato-encargo')).map((f) => f.firstElementChild.textContent.trim() + ' = ' + f.children[1].textContent.replace(/Cambiar/, '').trim().split(' · ')[0]).filter((t) => /^Quién lo pide/.test(t))),
+  ['Quién lo pide = María López (Tutora)']);   /* la fila lleva la relación tal como se escribió, con «T» (la marca de la cabecera la ponía en minúscula) */
+await comprobar('8. y la cabecera no repite «Lo pide»',
+  pagina.evaluate(() => /Lo pide/.test(document.querySelector('.ficha-cabecera').innerText)), false);
+await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+await pagina.waitForSelector('#ficha-datos-bloque .encargo-cambiar', { state: 'visible' });
+await pagina.click('#ficha-datos-bloque .encargo-cambiar');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#lopide-caja-ficha .lopide-via');
 await comprobar('8. al volver a abrir "El encargo", la vía sale con lo guardado',
@@ -242,19 +258,25 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
    9. "DOCUMENTOS ▾", EN EL BLOQUE, TAMBIÉN VACÍO
    ============================================================ */
 console.log('--- 9. "+ Añadir documento" en el bloque de documentos (fila 168) ---');
+/* Fila 637: el bloque de Documentos es ahora un bloque plegable; vacío = sin cuenta. Hay que abrirlo para ver su contenido. */
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+await pagina.waitForTimeout(500);
 await comprobarQue('9. el bloque de Documentos está vacío (RICO no tiene ficheros)',
-  pagina.evaluate(() => {
-    const doc = document.getElementById('ficha-documentos');
-    return !!(doc && doc.closest('.ficha-bloque') && doc.closest('.ficha-bloque').classList.contains('vacio'));
-  }));
-await pagina.click('.ficha-documentos-anadir');
-await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('9. abre exactamente lo mismo que abría "Gestionar documentos"',
-  pagina.locator('#cuadro-titulo').textContent(), RICO);
-await comprobarQue('9. trae el hueco de siempre de la lista de documentos',
-  pagina.locator('#doc-cuerpo').count().then((n) => n === 1));
-await pagina.keyboard.press('Escape');
-await pagina.waitForSelector('#capa', { state: 'hidden' });
+  pagina.evaluate(() => document.getElementById('ficha-cuenta-docs').textContent.trim() === '' &&
+    !!document.querySelector('.ficha-plegable[data-tarjeta="documentos"].abierto')));
+/* «Documentos de la carpeta» conserva sus botones (docs/637, «Lo que NO cambia»): si falta, FALLA sin parar la prueba. */
+const hayAnadir = await pagina.locator('.ficha-documentos-anadir').first().waitFor({ state: 'visible', timeout: 5000 }).then(() => true, () => false);
+await comprobarQue('9. «+ Añadir documento» está a la vista en el bloque de Documentos', Promise.resolve(hayAnadir));
+if (hayAnadir) {
+  await pagina.click('.ficha-documentos-anadir');
+  await pagina.waitForSelector('#capa:not(.oculto)');
+  await comprobar('9. abre exactamente lo mismo que abría "Gestionar documentos"',
+    pagina.locator('#cuadro-titulo').textContent(), RICO);
+  await comprobarQue('9. trae el hueco de siempre de la lista de documentos',
+    pagina.locator('#doc-cuerpo').count().then((n) => n === 1));
+  await pagina.keyboard.press('Escape');
+  await pagina.waitForSelector('#capa', { state: 'hidden' });
+}
 
 /* ============================================================
    5. LOS TEXTOS Y COLORES DE LA ETIQUETA DE VENCIMIENTO
@@ -300,53 +322,41 @@ await comprobar('10. "Cambiar el asunto" está apagado',
   pagina.getByRole('button', { name: 'Cambiar el asunto', exact: true }).isDisabled(), true);
 await comprobar('10. "Borrar el asunto" está apagado',
   pagina.getByRole('button', { name: 'Borrar el asunto', exact: true }).isDisabled(), true);
-/* "Copiar el nombre del asunto" ya no vive en el menú (fila 58): el
-   botón "Asunto" de la fila de copiar es el que sigue activo en
-   consulta (`esControlDeSoloLectura`, js/ficha-asunto.js). */
-await pagina.keyboard.press('Escape');
-await comprobar('10. el botón "Asunto" sigue activo en consulta',
-  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).isDisabled(), false);
-await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Asunto")');
-await pagina.waitForFunction(() => {
-  const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
-    .find((x) => x.textContent.trim() === 'Copiado');
-  return !!b;
-});
-await comprobar('10. copiar de verdad funciona en consulta: el nombre entero, en el portapapeles',
-  pagina.evaluate(() => navigator.clipboard.readText()), RICO);
+/* Fila 637: las opciones de «Copiar» del propio menú son las que siguen activas en consulta
+   (`esControlDeSoloLectura`, js/ficha-asunto.js). */
+const copiarActivo = await opcionCopiar('Asunto').isDisabled().then((d) => !d);
+await comprobarQue('10. la opción "Asunto" del menú sigue activa en consulta', Promise.resolve(copiarActivo));
+if (copiarActivo) {
+  await opcionCopiar('Asunto').click();
+  await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => /Copiado/.test(m.textContent)));
+  await comprobar('10. copiar de verdad funciona en consulta: el nombre entero, en el portapapeles',
+    pagina.evaluate(() => navigator.clipboard.readText()), RICO);
+}
 
 /* ============================================================
    11. CABECERA ENCOGIDA: EL NOMBRE Y LA BARRA SIGUEN A LA VISTA
    ============================================================ */
-console.log('--- 11. con la cabecera encogida, el nombre y la barra siguen visibles ---');
-/* Fila 107: la cuadrícula de tarjetas cabe sin bajar; para tener por
-   dónde bajar se abre una tarjeta en grande con contenido largo. */
-/* Fila 425: con «Trabajo» la página no baja (cada columna se desplaza sola); se alarga el hueco de otra pestaña. */
+console.log('--- 11. con la columna de la derecha bajada, el nombre y la barra siguen visibles ---');
+/* Fila 425: con «Trabajo» la página no baja (cada columna se desplaza sola); se alarga el hueco de «Registro».
+   Fila 637: la cabecera es de una sola línea y ya no se encoge; no hay fila de copiar (sus botones están en el menú «⋯»). */
 await pagina.addStyleTag({ content: '#ficha-notas { min-height: 2000px; }' });
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.waitForTimeout(200);
-await pagina.evaluate(() => window.scrollTo(0, 400));
+await pagina.evaluate(() => { document.getElementById('trabajo-der').scrollTop = 400; });
 await pagina.waitForTimeout(500);
-await comprobarQue('11. la cabecera está encogida',
-  pagina.evaluate(() => document.querySelector('.ficha-cabecera').classList.contains('encogida')));
-/* Fila 382: la fila de copiar sigue a la vista con la cabecera encogida;
-   solo se esconde la línea gris (pruebas/botones-de-copiar-al-bajar.mjs). */
-await comprobarQue('11. la fila de copiar sigue a la vista, con la cabecera encogida',
-  pagina.evaluate(() => {
-    const b = document.querySelector('.ficha-copiar-fila');
-    return !!b && getComputedStyle(b).display !== 'none' && b.getBoundingClientRect().height > 0;
-  }));
+await comprobarQue('11. la columna de la derecha ha bajado',
+  pagina.evaluate(() => document.getElementById('trabajo-der').scrollTop > 100));
 await comprobarQue('11. los tres puntos siguen visibles',
   pagina.evaluate(() => {
     const b = document.querySelector('.ficha-nombre-menu-boton');
-    return !!b && b.getBoundingClientRect().width > 0;
+    return !!b && b.getBoundingClientRect().width > 0 && b.getBoundingClientRect().top >= 0 && b.getBoundingClientRect().bottom < 80;
   }));
 await comprobarQue('11. la barra de acciones sigue visible',
   pagina.evaluate(() => {
     const b = document.getElementById('ficha-acciones');
-    return !!b && b.getBoundingClientRect().height > 0;
+    return !!b && b.getBoundingClientRect().height > 0 && b.getBoundingClientRect().top >= 0;
   }));
-await pagina.evaluate(() => window.scrollTo(0, 0));
+await pagina.evaluate(() => { document.getElementById('trabajo-der').scrollTop = 0; });
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

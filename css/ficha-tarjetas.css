@@ -1,39 +1,23 @@
 /* ============================================================
-   ficha-tarjetas.css — las pestañas de la ficha del asunto y la vista de
-   trabajo (24-sep-2026, fila 107; 22-oct-2026, fila 425,
-   docs/FICHA-VISTA-DE-TRABAJO.md, js/ficha-tarjetas.js).
-
-   Siempre hay una fila de pestañas; solo se ve la abierta. «Trabajo» son
-   dos columnas de igual ancho que llenan el alto visible (el alto lo pone
-   js/ficha-tarjetas.js; cada columna se desplaza por su cuenta); las demás
-   se abren a todo el ancho.
+   ficha-tarjetas.css — la vista del asunto: el hito a la izquierda y, a la derecha, cinco bloques plegados
+   (13-nov-2026, fila 637, js/ficha-tarjetas.js; antes, pestañas, filas 107 y 425).
+   Las dos columnas llenan el alto visible (el alto lo pone js/ficha-tarjetas.js; cada columna se desplaza por su cuenta).
    ============================================================ */
 
-.ficha-tarjetas { margin-top: 10px; }
-/* Con la vista de dos columnas, la página usa todo el ancho (como la mesa del hito desde la fila 109) y
-   las columnas llegan hasta abajo: menos relleno al pie. */
-.contenido:has(.ficha-tarjetas[data-abierta="trabajo"]) { max-width: none; padding-bottom: 14px; }
+.ficha-tarjetas { margin-top: 6px; }
+/* La página usa todo el ancho (como la mesa del hito desde la fila 109) y las columnas llegan hasta abajo. */
+.contenido:has(.ficha-tarjetas) { max-width: none; padding-bottom: 14px; }
 
 .ficha-tarjeta { margin: 0; min-width: 0; }
-.ficha-tarjetas[data-abierta] .ficha-tarjeta:not(.abierta) { display: none; }
-.ficha-tarjeta.vacio {          /* la clase de "bloque vacío" de antes no encoge la tarjeta */
-  display: flex; flex-direction: column; align-items: stretch; padding: 16px 18px;
-  font-size: inherit; color: inherit; margin-top: 0;
-}
 .ficha-tarjeta .ficha-cuenta:empty { display: none; }
-.ficha-tarjeta[data-tarjeta="contacto"] { padding: 0; }
-.ficha-tarjeta[data-tarjeta="contacto"] .ficha-bloque { border: 0; margin: 0; box-shadow: none; }
 
-/* Las pestañas de arriba. */
-.ficha-tarjetas-pestanas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
-.ficha-pestana {
-  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
-  background: var(--papel); color: var(--tinta-suave);
-  border: 1px solid var(--linea); border-radius: 16px; padding: 5px 12px;
-}
-.ficha-pestana:hover { color: var(--tinta); border-color: #b9c6d6; }
-.ficha-pestana.activa { background: var(--azul); border-color: var(--azul); color: #fff; }
-.ficha-pestana-cuenta { font-weight: 400; opacity: .8; }
+/* La fila de hitos, a todo el ancho debajo de la cabecera; a su derecha, lo que había en la barra de acciones. */
+.ficha-tira-fila { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin: 0 0 10px; min-width: 0; }
+.ficha-tira { display: flex; flex: 1 1 420px; min-width: 0; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; background: var(--papel); }
+.ficha-tira:empty { display: none; }
+.ficha-tira-fila .ficha-acciones { flex: 0 0 auto; }
+.ficha-tira-fila .ficha-acciones:empty { display: none; }
+.ficha-tira .mesa-tira-hito { padding: 9px 12px; font-size: 13px; }
 
 /* ---------- «Trabajo»: el hito a la izquierda, la carpeta a la derecha ---------- */
 .ficha-trabajo { background: none; border: 0; box-shadow: none; padding: 0; }
@@ -44,14 +28,11 @@
 .trabajo-col { min-width: 0; min-height: 0; overflow: auto; }
 .trabajo-izq { padding: 16px 18px; }
 .trabajo-izq #ficha-guia.explica { margin: 0; }
-.trabajo-der { display: flex; flex-direction: column; gap: 12px; }
-.trabajo-der > #trabajo-der-arriba { flex: none; }
-.trabajo-der > .trabajo-carpeta { flex: 1 1 auto; }
 .trabajo-columnas.encima { outline: 2px dashed var(--azul); outline-offset: -3px; }
 
 /* Con un documento abierto a la derecha, ocupa el sitio de la lista (js/ficha-trabajo-visor.js). */
-.trabajo-der.con-documento { overflow: hidden; }
-.trabajo-der.con-documento .trabajo-carpeta { display: none; }
+.trabajo-der.con-documento { overflow: hidden; display: flex; flex-direction: column; }
+.trabajo-der.con-documento .ficha-plegables { display: none; }
 .trabajo-der > #visor-lateral.en-trabajo,
 .trabajo-der > #word-visor.en-trabajo { flex: 1 1 0; min-height: 0; }
 
@@ -69,24 +50,48 @@
 .ficha-documento-traer { flex: none; }
 .ficha-documento-traer.oculto { display: none; }
 
-/* La franja «Datos del asunto» (fila 426, js/ficha-datos-a-mano.js): arriba de la columna derecha. */
-.datos-mano { padding: 0; }
-.datos-mano-cabeza {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; min-width: 0;
-}
-.datos-mano-cabeza:focus-visible { outline: 2px solid var(--azul); outline-offset: -2px; border-radius: 8px; }
-.datos-mano-flecha { flex: none; color: var(--tinta-suave); font-size: 12px; }
-.datos-mano-titulo { flex: none; font-weight: 700; font-size: 13.5px; }
-.datos-mano-linea {
+/* Los bloques plegados de la columna derecha (fila 637). */
+.trabajo-der { display: block; }
+.ficha-plegables { display: flex; flex-direction: column; gap: 8px; }
+.ficha-plegable { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 0; }
+.plegable-cab { display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer; min-width: 0; border-radius: var(--radio); }
+.plegable-cab:hover { background: #f4f7fb; }
+.plegable-cab:focus-visible { outline: 2px solid var(--azul); outline-offset: -2px; }
+.plegable-flecha { flex: none; color: var(--tinta-suave); font-size: 12px; transition: transform .1s; }
+.ficha-plegable.abierto > .plegable-cab .plegable-flecha { transform: rotate(90deg); }
+.plegable-icono { flex: none; }
+.plegable-titulo { flex: none; margin: 0; font-size: 14.5px; }
+.plegable-resumen {
   flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--tinta-suave);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.datos-mano-linea.vacia { font-style: italic; }
-.datos-mano-linea .dato-copiable { margin-left: 2px; }
-.datos-mano-cuerpo { padding: 4px 14px 12px; border-top: 1px solid var(--linea); max-height: 60vh; overflow: auto; }
-.datos-mano-cuerpo.oculto { display: none; }
-.dm-sub { margin: 10px 0 6px; font-size: 13px; font-weight: 700; }
-.trabajo-der.con-documento .datos-mano-cuerpo { max-height: 30vh; }
+.plegable-resumen:empty { display: none; }
+.plegable-resumen .dato-copiable { margin-left: 2px; }
+.ficha-plegable.abierto > .plegable-cab .plegable-resumen { display: none; }
+.plegable-dentro { display: none; padding: 2px 14px 14px; }
+.ficha-plegable.abierto > .plegable-dentro { display: block; }
+.ficha-plegable .ficha-cuenta {
+  flex: none; font-size: 12px; font-weight: 700; background: #e3ecf8; color: var(--azul); border-radius: 9px; padding: 0 7px;
+}
+/* «Documentos de la carpeta» y los demás huecos ya no son tarjetas con borde propio. */
+.plegable-dentro .ficha-bloque { border: 0; box-shadow: none; padding: 0; margin: 0; }
+
+/* El bloque «Datos» (js/ficha-datos-bloque.js). */
+.datos-bloque .datos-grupos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.datos-grupo { border: 1px solid var(--linea); border-radius: 9px; padding: 6px 10px 9px; background: #fafbfd; min-width: 0; }
+.datos-grupo.ancho { grid-column: 1 / -1; }
+.datos-grupo h4 { margin: 2px 0 6px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--tinta-suave); }
+.datos-grupo .ficha-datos { margin: 0; }
+.datos-dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; font-size: 14px; margin: 4px 0 8px; }
+.datos-dl dt { color: var(--tinta-suave); }
+.datos-dl dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.datos-botones { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.datos-botones .boton { padding: 2px 8px; font-size: 12.5px; }
+.datos-pie { margin: 8px 2px 0; font-size: 12.5px; color: var(--tinta-suave); }
+.datos-aviso { color: #8a6100; font-size: 13px; margin: 2px 0 6px; }
+.datos-grupo .dm-extra { border: 0; box-shadow: none; padding: 0; margin: 6px 0 0; }
+.datos-grupo h4 .boton { margin-left: 8px; text-transform: none; letter-spacing: 0; }
+@media (max-width: 700px) { .datos-bloque .datos-grupos { grid-template-columns: 1fr; } }
 
 /* Pantalla estrecha: una columna debajo de otra, y la página baja. */
 @media (max-width: 1100px) {
@@ -94,3 +99,6 @@
   .trabajo-col { overflow: visible; }
   .trabajo-der.con-documento { min-height: 70vh; }
 }
+/* La barra de botones de «Documentos de la carpeta» (sin título propio: el título es el del bloque). */
+.ficha-titulo-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 14px; }
+.ficha-titulo-barra:empty { display: none; }

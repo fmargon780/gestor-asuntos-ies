@@ -17,8 +17,12 @@
 /* Fila 272: el nombre ya no ocupa todo el hueco; lo que sobra es de los datos del tercero y de «Archivar». */
 .ficha-linea1 .ficha-nombre { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; }
 .ficha-linea1 .ficha-nombre-texto { min-width: 0; }
-.ficha-archivar { margin-left: auto; flex: 0 0 auto; }
+.ficha-archivar { flex: 0 0 auto; }
 .ficha-archivar:empty { display: none; }
+/* Fila 637: «Ruta» y «Archivar el asunto», a la derecha de la única línea. */
+.ficha-cab-der { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.ficha-ruta { display: inline-flex; }
+.ficha-ruta:empty { display: none; }
 .ficha-marcas { margin: 0; display: flex; gap: 6px; flex-wrap: wrap; }
 .ficha-linea2 { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin-top: 6px; min-width: 0; }
 .ficha-apertura {
@@ -337,3 +341,7 @@
 .ficha-tarjeta .ficha-documentos-repartir { display: none; margin: 1px 6px 0 0; padding: 0 8px; min-height: 0; height: 20px; line-height: 18px; vertical-align: top; font-size: 12px; }
 .ficha-tarjeta.abierta .ficha-documentos-repartir { display: inline-block; }
 .hitosdoc-fila > span, .correo-fila > span { min-width: 0; }
+
+/* Fila 637: el título pequeño «Copiar» dentro del menú «⋯». */
+.ficha-menu-rotulo { font-size: 11.5px; color: var(--tinta-suave); padding: 4px 10px 0; text-transform: uppercase; letter-spacing: .04em; }
+.ficha-ruta .boton { padding: 6px 12px; font-size: 14px; color: var(--tinta); }

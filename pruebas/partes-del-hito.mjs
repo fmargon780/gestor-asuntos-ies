@@ -125,7 +125,7 @@ await comprobar('4c. y no hace salir la franja', franja(), false);
 
 console.log('--- 5. «+ Añadir hito» y «Hito ▾» ---');
 await comprobar('5a. bajo las tareas solo «+ Añadir tarea»', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .guion-comunes button')].map((b) => b.textContent).filter((t) => t.indexOf('Añadir') !== -1)), ['+ Añadir tarea']);
-await comprobar('5b. «+ Añadir hito» es el último de la tira', p.evaluate(() => { const t = document.querySelector('.hito-en-mesa .mesa-tira, .mesa-tira'); const u = t.lastElementChild; return u.textContent; }), '+ Añadir hito');
+await comprobar('5b. «+ Añadir hito» es el último de la tira', p.evaluate(() => { const t = document.querySelector('#ficha-tira, .mesa-tira'); const u = t.lastElementChild; return u.textContent; }), '+ Añadir hito');
 await p.click('.mesa-tira-anadir');
 await p.waitForSelector('.capa-campos #cv-detras');
 await comprobar('5c. «Va detrás de», con el último marcado «(al final)»', p.evaluate(() => { const s = document.querySelector('#cv-detras'); return [s.options[s.selectedIndex].textContent.indexOf('(al final)') !== -1, s.selectedIndex === s.options.length - 1]; }), [true, true]);

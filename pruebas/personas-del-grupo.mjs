@@ -105,12 +105,12 @@ await comprobar('2. con algo generado, «Quitar del grupo» está apagado',
   pagina.locator('.pg-menu button').evaluateAll((bs) => bs.map((b) => b.textContent + ':' + b.disabled)), ['Abrir su ficha:false', 'Copiar el nombre:false', 'Quitar del grupo:true', 'Volver a generar:false']);
 await pagina.keyboard.press('Escape');
 await comprobar('2. Escape cierra solo el menú, no la tarjeta',
-  pagina.evaluate(() => [document.querySelector('.pg-menu').classList.contains('oculto'), FichaTarjetas.abierta()]), [true, 'relacionados']);
+  pagina.evaluate(() => [document.querySelector('.pg-menu').classList.contains('oculto'), FichaTarjetas.estaAbierto('relacionados')]), [true, true]);   /* fila 637: sin pestañas, el bloque «Personas» sigue abierto */
 await pagina.locator('.pg-tabla tbody tr').nth(1).locator('.pg-abrir').click();
 await pagina.waitForTimeout(2000);
 await comprobar('2. pulsar la fecha abre el documento de esa persona, con su nombre dentro',
   pagina.evaluate(() => [document.body.classList.contains('con-word-visor'), (document.getElementById('word-visor').textContent || '').indexOf('Iker Delgado Prieto') !== -1]), [true, true]);
-await comprobar('2. el documento se abre en «Trabajo» (fila 425), no en la pestaña de las personas', pagina.evaluate(() => FichaTarjetas.abierta()), 'trabajo');
+await comprobar('2. el documento se abre a la derecha, tapando los bloques (fila 637; antes en «Trabajo»), y el hito sigue a la izquierda', pagina.evaluate(() => [document.getElementById('trabajo-der').classList.contains('con-documento'), !!document.querySelector('#trabajo-izq #ficha-guia')]), [true, true]);
 await pagina.evaluate(() => document.querySelector('.word-visor-cerrar').click());
 await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 

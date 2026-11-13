@@ -126,8 +126,10 @@ await comprobar('3. la carpeta se llama «… GRUPO 4ºA»', /^\d{6} A26-\d{4} C
 await comprobar('3. `ficha.grupo` y los relacionados, guardados; sin foto de contacto',
   pagina.evaluate((n) => { const f = App.E.registro.asuntos[n]; return [f.grupo.nombre, f.grupo.origen, !!f.grupo.creado, f.relacionados.length, f.relacionados.every((r) => r.categoria === 'ALUMNADO'), f.tercero, f.categoria, f.contacto === undefined]; }, nombre),
   ['4ºA', 'unidad', true, 3, true, 'GRUPO 4ºA', 'ALUMNADO', true]);
-await comprobar('3. «Datos y contacto» dice «Grupo de 3 personas», sin «no encontrado»',
-  pagina.locator('#ficha-contacto-caja').textContent().then((t) => [t.indexOf('Grupo de 3 personas') !== -1, /no encontrado|no aparece/i.test(t)]), [true, false]);
+await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+await pagina.waitForTimeout(500);
+await comprobar('3. el bloque «Datos» dice «Grupo de 3 personas», sin «no encontrado»',
+  pagina.locator('#ficha-datos-bloque').textContent().then((t) => [t.indexOf('Grupo de 3 personas') !== -1, /no encontrado|no aparece/i.test(t)]), [true, false]);
 await comprobar('3. la tarjeta se llama «Personas del grupo (3)»',
   pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-titulo').first().textContent().then((t) => t.trim()), 'Personas del grupo (3)');
 await comprobar('3. al crear, el formulario vuelve a salir limpio',

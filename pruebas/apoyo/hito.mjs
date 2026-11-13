@@ -10,7 +10,7 @@ export async function abrirHito(pagina, id) {
   const limite = Date.now() + 20000;
   while (Date.now() < limite) {
     if (await pagina.locator(sel).count()) return;
-    const tira = pagina.locator('#ficha-guia .mesa-tira-hito[data-id="' + id + '"]');
+    const tira = pagina.locator('#ficha-tira .mesa-tira-hito[data-id="' + id + '"]');
     const titulo = pagina.locator('#ficha-guia .hito[data-id="' + id + '"] .hito-titulo');
     try {
       if (await tira.count() && await tira.isVisible()) { await tira.click({ timeout: 2000 }); }
@@ -26,7 +26,7 @@ export async function verLaLista(pagina) {
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.waitForTimeout(150);   /* que el panel termine de pintar (y de abrir el hito actual) */
   if (await pagina.locator('#ficha-guia.con-mesa').count()) {
-    await pagina.locator('#mesa-volver-hitos').click();
+    await pagina.evaluate(() => HitoMesa.cerrar());   /* fila 637: «← Hitos» ya no existe */
   }
   await pagina.waitForSelector('#ficha-guia:not(.con-mesa) .hito', { state: 'attached' });
 }

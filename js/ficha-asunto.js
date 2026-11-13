@@ -81,13 +81,19 @@
     });
   };
 
-  /* Las marcas de arriba (tipo y quién lo pide). "Lo pide" lleva la
-     relación entre paréntesis, en minúscula (fila 106, docs/LO-PIDE-EN-
-     LA-CABECERA.md): es el único sitio de la cabecera donde sale. */
+  /* Las marcas de arriba: el tipo y el número del asunto (fila 637: ya no sale «Lo pide»
+     ni el contacto; quién lo pide está en «Datos»). */
   function marcasDeFicha(a, tipo) {
     return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
-      (a.ficha.numero ? '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +   /* fila 239 */
-      ContactoALaVista.html(a);   /* fila 305: «Lo pide: …» con su contacto, o «Contacto: …» */
+      (a.ficha.numero ? '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(a.ficha.numero) + '</span>' : '');   /* fila 239 */
+  }
+
+  /* El tercero, con su identificación, que es el título de la cabecera (fila 637); sin él, el nombre de la carpeta. */
+  function terceroDe(a) {
+    var f = a.ficha || {};
+    if (f.tercero) return f.tercero;
+    if (a.leido && a.leido.resto && window.Nombres) return Nombres.terceroDeResto(a.leido.resto) || a.nombre;
+    return a.nombre;
   }
 
   /* Tras cambiar el estado, el plazo, la vía o el encargo, se repinta
@@ -165,6 +171,12 @@
           ' <button type="button" class="campo-aqui-menu" data-clave="' + U.escapar(f.clave || '') +
           '" data-nombre="' + U.escapar(f.titulo) + '" data-ayuda-clave="mas-opciones">⋮</button></span></div>';
       }
+      /* Fila 637: «Quién lo pide» y «Por qué vía», con «Cambiar» (js/ficha-datos-bloque.js lo engancha) y «sin valor» si el tipo los pide. */
+      if (f.encargo || f.pide) {
+        return '<div class="ficha-dato ficha-dato-encargo"><span>' + U.escapar(f.titulo) + '</span><span>' +
+          (f.valor ? U.escapar(f.valor) : '<span class="suave">sin valor</span>') +
+          (f.encargo ? ' <button type="button" class="boton boton-chico encargo-cambiar" title="Cambiar quién lo pide y por qué vía">Cambiar</button>' : '') + '</span></div>';
+      }
       return '<div class="ficha-dato' + (f.ambar ? ' ficha-dato-ambar' : '') + '"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span' + (f.ambar ? ' title="' + U.escapar(f.ayuda || '') + '"' : '') + '>' + U.escapar(f.valor) + '</span></div>';
     }).join('') + (extra || '') + '</div>';
@@ -212,10 +224,8 @@
     var origenDeFicha = window.Navegacion ? Navegacion.origen() : null;
     var vuelveAVerTodo = !!(origenDeFicha && origenDeFicha.verTodo);
     caja.innerHTML =
-      /* Dos líneas (24-sep-2026, fila 112, docs/CABECERA-COMPACTA.md):
-         volver, tipo, nombre y «⋯», con «Archivar» a la derecha; debajo,
-         la barra de acciones y, a la derecha, en gris, la fila de copiar
-         (js/ficha-nombre-acciones.js) y la línea de apertura. */
+      /* Una sola línea (13-nov-2026, fila 637): volver, tipo, número, el tercero y «⋯»; a la
+         derecha, «Ruta» y «Archivar el asunto». La fila de hitos va debajo (js/ficha-tarjetas.js). */
       '<header class="ficha-cabecera">' +
         '<div class="ficha-linea1">' +
           '<div class="ficha-volver-fila">' +
@@ -223,13 +233,11 @@
             '<div id="ficha-volver-origen"></div>' +
           '</div>' +
           '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
-          '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
-          (window.FichaDatosFavoritos ? FichaDatosFavoritos.html(a) : '') +   /* fila 272 */
-          '<div class="ficha-archivar" id="ficha-archivar"></div>' +
-        '</div>' +
-        '<div class="ficha-linea2">' +
-          '<div class="ficha-acciones" id="ficha-acciones"></div>' +
-          '<div class="ficha-apertura">' + subtituloDeFicha(a) + '</div>' +
+          '<h2 class="ficha-nombre"><span class="ficha-nombre-texto" title="' + U.escapar(a.nombre) + '">' + U.escapar(terceroDe(a)) + '</span></h2>' +
+          '<div class="ficha-cab-der">' +
+            '<span class="ficha-ruta" id="ficha-ruta"></span>' +
+            '<div class="ficha-archivar" id="ficha-archivar"></div>' +
+          '</div>' +
         '</div>' +
       '</header>' +
       '<div id="ficha-presencia"></div>' +
@@ -255,12 +263,13 @@
       volverALaLista();
     };
 
+    var sitioRuta = $('ficha-ruta');
+    if (sitioRuta && window.RutaCarpetas) sitioRuta.appendChild(RutaCarpetas.boton(a, N.modoActual));   /* fila 637: a la vista, junto a «Archivar» */
     pintarAcciones(a, abierto);
     N.pintarNotas(a, abierto);
     N.pintarAvisoDeTipo(a, tipo);
     N.pintarGuia(a, tipo, abierto);
-    N.pintarContacto(a);
-    if (window.FichaDatosAMano) FichaDatosAMano.pintar(a);   /* fila 426: la franja «Datos del asunto» de «Trabajo» */
+    if (window.FichaDatosBloque) FichaDatosBloque.pintar(a);   /* fila 637: el bloque «Datos» */
     N.pintarDocumentos(a);
     N.pintarOtrosDelTercero(a);
     N.pintarRelacionados(a, abierto);
@@ -274,7 +283,6 @@
     N.aplicarModoConsulta();
     FichaTarjetas.alPintar(caja, a);
     if (window.CampoDesdeElAsunto) CampoDesdeElAsunto.alPintar(caja, a);   /* fila 245 */
-    if (window.FichaDatosFavoritos) FichaDatosFavoritos.alPintar(caja, a);   /* fila 272 */
   }
 
 
@@ -296,9 +304,9 @@
     caja.innerHTML = '';
 
     if (abierto) {
-      /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): en vez del desplegable
-         de estado, el hito actual («Paso N de M · título», que abre su
-         mesa) y «Esperando a…» / «Ya ha llegado» (js/estado-hito.js). */
+      /* Fila 129 y fila 637: ya no sale «Hito N de M · …» (el hito se ve en la fila de hitos),
+         solo «Esperando a…» / «Ya ha llegado» (js/estado-hito.js). «El encargo» ya no es un botón:
+         quién lo pide y por qué vía están en «Datos». */
       if (window.EstadoHito) EstadoHito.pintarEnFicha(caja, a);
 
       var et = Plazos.etiquetaVencimiento(a.ficha.limite);
@@ -312,19 +320,6 @@
       };
       caja.appendChild(bplazo);
 
-      if (window.LoPide) {
-        var envoltorioEncargo = document.createElement('div');
-        envoltorioEncargo.className = 'ficha-encargo';
-        var tieneEncargo = !!((a.ficha.loPide && a.ficha.loPide.nombre) || a.ficha.via);
-        envoltorioEncargo.appendChild(boton('El encargo',
-          'Quién ha pedido esta gestión, por qué vía y en qué fecha',
-          async function (ev) {
-            try { await N.abrirLoPide(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
-          }, tieneEncargo));
-        /* Sin línea debajo (fila 106): quién lo pide ya sale arriba, en
-           su etiqueta, y la vía se ve al abrir "El encargo". */
-        caja.appendChild(envoltorioEncargo);
-      }
     }
 
     /* "Comunicar" (js/correo.js) entra aquí, y "Archivar"/"Reabrir" se

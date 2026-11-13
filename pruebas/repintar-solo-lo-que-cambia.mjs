@@ -81,8 +81,8 @@ await pagina.evaluate(async (B) => {
   await App.verAbiertos();
   App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto');
 }, B);
-await pagina.waitForSelector('#ficha-acciones .marca-hito');
-await pagina.waitForSelector('#ficha-guia .hito');
+await pagina.waitForSelector('#ficha-tira .mesa-tira-hito[data-id="h1"]');   /* fila 637: la fila de hitos sustituye a la marca «Hito N de M» */
+await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.waitForTimeout(1200);
 
 /* ---------- 1. «Esperando a…» ----------
@@ -129,12 +129,13 @@ await pagina.evaluate((B) => App.abrirFicha(App.E.listaAbiertos.filter(x => x.no
 await verLaLista(pagina);   /* fila 425: al entrar se abre la mesa del hito actual; la casilla de la lista, con «← Hitos» */
 await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .hito-casilla');
-await pagina.waitForFunction(() => {
-  const m = document.querySelector('#ficha-acciones .marca-hito');
-  return m && m.textContent === 'Hito 2 de 2 · Tramitar';
-}, null, { timeout: 5000 }).then(() => {}, () => {});
-await comprobar('la cabecera pasa a «Hito 2 de 2 · Tramitar»',
-  pagina.locator('#ficha-acciones .marca-hito').textContent(), 'Hito 2 de 2 · Tramitar');
+/* Fila 637: la marca «Hito 2 de 2 · Tramitar» ya no existe; su equivalente es la fila de hitos de debajo de la cabecera:
+   el primero hecho y el segundo, el actual (la fila solo sale con un hito abierto en la mesa). */
+await abrirHito(pagina, 'h2');
+await pagina.waitForSelector('#ficha-tira .mesa-tira-hito[data-id="h1"].hecho', { timeout: 5000 }).then(() => {}, () => {});
+await comprobar('la fila de hitos pasa al hito 2 de 2 · Tramitar, con el 1 hecho',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tira .mesa-tira-hito')).map((b) => [b.dataset.id, b.classList.contains('hecho'), b.classList.contains('actual')])),
+  [['h1', true, false], ['h2', false, true]]);
 await comprobar('y el «Esperando a…» del hito hecho se ha quitado solo',
   pagina.locator('#ficha-acciones .marca-esperando').count(), 0);
 

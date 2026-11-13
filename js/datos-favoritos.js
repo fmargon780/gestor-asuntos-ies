@@ -9,14 +9,15 @@
 
    La elección vive en `registro.ajustesAvisos.datosFavoritos`
    (`{ 'ALUMNADO': ['unidad'], … }`), en `_GESTOR`, como los demás
-   ajustes del centro. Una clase sin clave usa lo de fábrica (la unidad
-   para el alumnado, nada para las demás); una clase con lista vacía es
+   ajustes del centro. Una clase sin clave usa lo de fábrica (el NIE, el curso
+   y la unidad para el alumnado, nada para las demás); una clase con lista vacía es
    que alguien eligió no ver ninguno.
    ============================================================ */
 var DatosFavoritos = (function () {
 
   var MAXIMO = 3;
-  var DE_FABRICA = { 'ALUMNADO': ['unidad'] };
+  /* Fila 637: de fábrica, lo que enseña el bloque «Datos» plegado en un alumno: NIE, curso y unidad. */
+  var DE_FABRICA = { 'ALUMNADO': ['nº id. escolar', 'curso', 'unidad'] };
   /* Dos títulos que son el mismo dato (el grupo del alumno es su unidad). */
   var SINONIMOS = { 'grupo': 'unidad' };
   /* Ya están en el nombre del asunto: no se ofrecen. */

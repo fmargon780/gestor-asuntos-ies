@@ -119,6 +119,8 @@ var HitoMesa = (function () {
     if (columnas) columnas.classList.toggle('con-hito', !!fila);
     if (window.FichaDocumentos && FichaDocumentos.marcarHito) FichaDocumentos.marcarHito(a, hitos, fila ? abierta.idHito : null, !!(fila && abierto));   /* fila 425: «Hito N» y casillas en la carpeta */
     if (!fila) {
+      var tiraVacia = document.getElementById('ficha-tira');
+      if (tiraVacia) tiraVacia.innerHTML = '';   /* fila 637: sin hito abierto, no hay fila de hitos */
       if (window.HitoMesaDocumentos && HitoMesaDocumentos.soltarAlHito) HitoMesaDocumentos.soltarAlHito(null);
       if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
       return;
@@ -219,27 +221,29 @@ var HitoMesa = (function () {
        viendo, con un atajo para archivar. */
     var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual &&
       EstadoHito.idActual(hitos, ajustes) === null;
-    cab.innerHTML =
-      '<div class="mesa-tira">' +
-        /* Fila 194: «Volver a los hitos», dentro de la misma fila de la
-           tira (sin fila propia, para no bajar «QUÉ HAY QUE HACER»,
-           fila 145: la cabecera se midió a propósito para que quepa en
-           250 px). No estira como los botones de hito (flex: 0 0 auto). */
-        '<button type="button" class="mesa-tira-volver" id="mesa-volver-hitos" data-ayuda-clave="volver-a-los-hitos">← Hitos</button>' +
-        visibles.map(function (x) {
+    /* Fila 637: la fila de hitos ya no está en esta columna: va a todo el ancho, debajo de la cabecera
+       de la ficha (`#ficha-tira`, js/ficha-tarjetas.js), con el hito actual marcado y «+ Añadir hito» al final. */
+    var tira = document.getElementById('ficha-tira');
+    if (tira) {
+      tira.innerHTML = visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
           (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') + '</button>';
       }).join('') +
-        /* Fila 553: «+ Añadir hito», al final de la tira (antes, bajo las tareas). */
-        (abierto && window.ComunesAsunto ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '') + '</div>' +
+        /* Fila 553: «+ Añadir hito», al final de la fila. */
+        (abierto && window.ComunesAsunto ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '');
+      Array.prototype.forEach.call(tira.querySelectorAll('.mesa-tira-hito'), function (b) {
+        b.onclick = function () { abrir(a, b.dataset.id); };
+      });
+      var anadirHito = tira.querySelector('.mesa-tira-anadir');
+      if (anadirHito) anadirHito.onclick = function () { ComunesAsunto.anadirHito(a); };
+    }
+    cab.innerHTML =
       '<div class="mesa-titulo-fila">' +
         '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
         (window.HitosDesdeElAsunto ? HitosDesdeElAsunto.marcaSoloAquiHTML(a, h) : '') +
         '<div class="mesa-etiquetas">' +
-          /* Fila 239: el número del asunto, si lo tiene. */
-          (a && a.ficha && a.ficha.numero ? '<span class="marca-numero" data-ayuda-clave="numero-del-asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +
           (window.ContactoALaVista ? ContactoALaVista.html(a) : '') +   /* fila 305 */
           /* Fila 162: «Paso actual», el mismo que en la lista y en la cabecera. */
           (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML() : '') +
@@ -271,13 +275,6 @@ var HitoMesa = (function () {
             (window.PorLiquidar ? PorLiquidar.textoDelBoton(a) : 'Archivar el asunto') + '</button>') +
         '</div>' : '');
 
-    Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
-      b.onclick = function () { abrir(a, b.dataset.id); };
-    });
-    var anadirHito = cab.querySelector('.mesa-tira-anadir');
-    if (anadirHito) anadirHito.onclick = function () { ComunesAsunto.anadirHito(a); };
-    var volverHitos = cab.querySelector('#mesa-volver-hitos');
-    if (volverHitos) volverHitos.onclick = cerrar;
     engancharPaneles(cab, a, h);
     if (abierto && window.HacerEsteHito) HacerEsteHito.enganchar(cab, a, h);
     if (abierto && window.Esperas) Esperas.enganchar(cab, a, h);

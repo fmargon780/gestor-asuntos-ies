@@ -155,8 +155,11 @@ console.log('--- 4. "Enviar estado" abre el cuadro desde la ficha ---');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.locator('.tarjeta-nombre', { hasText: 'Uno Reves' }).first().click();
-await pagina.waitForSelector('#ficha-acciones .ficha-encargo');
-await pagina.click('#ficha-acciones .ficha-encargo button:has-text("El encargo")');
+/* (fila 637) «El encargo» ya no es un botón de la cabecera: se abre con «Cambiar» en «Quién lo pide», dentro del bloque «Datos». */
+await pagina.waitForSelector('#ficha-datos-bloque', { state: 'attached' });
+await pagina.evaluate(() => FichaTarjetas.abrir('datos'));
+await pagina.waitForSelector('#ficha-datos-bloque .encargo-cambiar', { state: 'visible' });
+await pagina.click('#ficha-datos-bloque .encargo-cambiar');
 await pagina.waitForSelector('#lopide-enviar-estado');
 await pagina.click('#lopide-enviar-estado');
 await pagina.waitForSelector('#correo-formulario');

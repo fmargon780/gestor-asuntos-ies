@@ -176,7 +176,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-grande-titulo').textContent]), [1, 0, 'Registro']);
 
   /* 5. */
-  await pagina.locator('.hito-en-mesa .mesa-tira-hito[data-id="c2"]').click();
+  await pagina.locator('#ficha-tira .mesa-tira-hito[data-id="c2"]').click();
   await pagina.waitForSelector('.hito-en-mesa[data-id="c2"]');
   await pagina.waitForTimeout(300);
   await comprobar('5. cambiar de hito con la tira abre su mesa', queSeVe(pagina).then((v) => v.indexOf('guion') !== -1 && v.indexOf('notas') !== -1), true);

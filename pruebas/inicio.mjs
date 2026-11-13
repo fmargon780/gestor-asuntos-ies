@@ -183,7 +183,7 @@ console.log('--- 3b. pulsar la fila abre la mesa del hito, no la ficha a secas -
 await pagina.click('#inicio-tabla-cuerpo tr[data-hito="a1"]');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(400);
-await comprobar('se abre la ficha de A', pagina.locator('.ficha-nombre-texto').textContent(), CLAVE_A);
+await comprobar('se abre la ficha de A', pagina.evaluate(() => { const e = document.querySelector('.ficha-nombre-texto'); return [e.textContent.trim(), e.getAttribute('title') || e.getAttribute('data-ayuda')]; }), ['Uno Vencido, Ana 1111', CLAVE_A]);   /* fila 637: el título es el tercero; la carpeta, en su `title` */
 await comprobar('con la mesa del hito a1 ya desplegada',
   pagina.locator('#ficha-guia .hito[data-id="a1"] .hito-cuerpo').getAttribute('class')
     .then(c => c === null || c.indexOf('oculto') === -1), true);
@@ -208,7 +208,7 @@ await comprobar('el texto dice "20 días"',
 await pagina.click('#inicio-tabla-cuerpo tr[data-hito="b1"]');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(400);
-await comprobar('pulsar la fila de "En espera" abre la ficha (no la mesa)', pagina.locator('.ficha-nombre-texto').textContent(), CLAVE_B);
+await comprobar('pulsar la fila de "En espera" abre la ficha (no la mesa)', pagina.evaluate(() => { const e = document.querySelector('.ficha-nombre-texto'); return [e.textContent.trim(), e.getAttribute('title') || e.getAttribute('data-ayuda')]; }), ['Dos Espera, Bea 2222', CLAVE_B]);   /* fila 637: el título es el tercero; la carpeta, en su `title` */
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(300);

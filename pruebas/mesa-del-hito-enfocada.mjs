@@ -122,12 +122,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       const e = document.querySelector('.hito-en-mesa ' + s);
       return e.classList.contains('mesa-meta') && !e.classList.contains('mesa-etq') && e.textContent;
     })), ['Sin plazo', 'Sin responsable']);
-  await comprobar('2. la tira ocupa todo el ancho, con el hito abierto marcado',
+  /* Fila 637: la tira ya no va dentro de la mesa sino debajo de la cabecera, en una fila con «#ficha-acciones» a su derecha. */
+  await comprobar('2. la tira va encima de la mesa, ancha y con sus acciones a la derecha, con el hito abierto marcado',
     pagina.evaluate(() => {
-      const t = document.querySelector('.hito-en-mesa .mesa-tira').getBoundingClientRect();
+      const t = document.querySelector('#ficha-tira').getBoundingClientRect();
       const c = document.querySelector('.hito-en-mesa .mesa-columnas').getBoundingClientRect();
-      const actual = document.querySelector('.hito-en-mesa .mesa-tira-hito.actual');
-      return [Math.abs(t.width - c.width) < 4, actual && actual.dataset.id];
+      const actual = document.querySelector('#ficha-tira .mesa-tira-hito.actual');
+      const ac = document.querySelector('#ficha-acciones').getBoundingClientRect();
+      return [t.width > c.width / 2 && t.bottom <= c.top + 1 && ac.left >= t.right - 1 && Math.abs(ac.top - t.top) < t.height, actual && actual.dataset.id];
     }), [true, 'c1']);
 
   /* 3. */

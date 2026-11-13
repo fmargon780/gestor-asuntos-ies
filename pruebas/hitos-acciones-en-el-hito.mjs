@@ -88,8 +88,9 @@ await pagina.evaluate(async (a1) => {
 await pagina.waitForTimeout(900);
 
 console.log('--- 5. los números cuadran ---');
-await comprobar('la marca de la cabecera dice «Hito 3 de 4» (sin el informativo)',
-  pagina.evaluate(() => (document.querySelector('#ficha-estado-hito .marca-hito') || {}).textContent), 'Hito 3 de 4 · Comunicar');
+/* Fila 637: la marca «Hito N de M · …» de la cabecera ya no existe; el hito actual lo dice la tira, debajo de la cabecera. */
+await comprobar('el primer hito numerado sin hacer en la tira es «3. Comunicar» (sin contar el informativo)',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tira .mesa-tira-hito:not(.hecho)')).map((b) => b.textContent.trim()).filter((t) => /^\d+\. /.test(t))[0]), '3. Comunicar');
 /* Fila 425: «Trabajo» no lleva número; la cuenta de hitos solo está en «Hito N de M». */
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
@@ -99,8 +100,8 @@ await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="p4"]')
 await pagina.waitForTimeout(300);
 await comprobar('la mesa dice «Hito 3 de 4» y la tira numera igual (el informativo, sin número)',
   pagina.evaluate(() => [document.querySelector('.hito-en-mesa .mesa-titulo').title,
-    document.querySelector('.hito-en-mesa .mesa-tira-hito.actual').textContent.trim(),
-    document.querySelector('.hito-en-mesa .mesa-tira-hito[data-id="p2"]').textContent.trim()]), ['Hito 3 de 4', '3. Comunicar', 'i · Informar']);
+    document.querySelector('#ficha-tira .mesa-tira-hito.actual').textContent.trim(),
+    document.querySelector('#ficha-tira .mesa-tira-hito[data-id="p2"]').textContent.trim()]), ['Hito 3 de 4', '3. Comunicar', 'i · Informar']);
 await comprobar('la barra del guion no cuenta el «No aplica»: «1 de 3»',
   pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '1 de 3');
 

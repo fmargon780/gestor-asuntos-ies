@@ -58,8 +58,8 @@
     'js/ficha-tarjetas.js',
     // Fila 425: el documento abierto, en la columna derecha de «Trabajo». Después de js/ficha-tarjetas.js; lo llaman js/visor.js y js/word-visor.js.
     'js/ficha-trabajo-visor.js',
-    // Fila 426: la franja «Datos del asunto» de «Trabajo». La llama js/ficha-asunto.js; usa js/ficha-tercero.js y js/ficha-bloques.js.
-    'js/ficha-datos-a-mano.js',
+    // Fila 637: el bloque «Datos» de la vista del asunto (antes, la franja de la fila 426). La llama js/ficha-asunto.js; usa js/ficha-tercero.js y js/ficha-bloques.js.
+    'js/ficha-datos-bloque.js',
     // Fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md: el hito a pantalla completa,
     // la mesa de trabajo. Después de los hitos, de la tarjeta de Hitos y del visor.
     'js/hito-mesa.js',

@@ -51,9 +51,41 @@
     App.volverALaLista();
   }
 
-  /* "Copiar el nombre del asunto" ya no vive aquí desde la fila 58
-     (docs/AJUSTES-DE-USO-2026-09-18.md, 1): es el botón "Asunto" de la
-     fila de copiar, siempre a la vista, sin menú. */
+  /* Fila 637: el menú «⋯» lleva, por este orden, «Cambiar el asunto», «Índice del expediente», «Marcar como
+     reservado», «Copiar» (Asunto, NIE o DNI/CIF y Nombre) y «Borrar el asunto». Antes, la fila de copiar de debajo del
+     nombre. «Nombre» y el documento necesitan el fichero de datos del tercero, que tarda: salen ocultos y se enseñan
+     cuando llega (si no hay dato, no salen). */
+  function copiarTexto(texto) {
+    return U.copiar(texto, null, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' }).then(function (ok) {
+      if (ok) U.aviso('Copiado: ' + texto, 'bueno');
+    });
+  }
+
+  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): «Asunto» copia el asunto que compone la app (el general del centro, con el
+     número del asunto), no el nombre de la carpeta; un asunto de antes, sin número, sigue copiando el nombre. Se compone al
+     pulsar, así que el menú no cambia nada en la ficha al pintarse. */
+  async function copiarAsunto(a) {
+    var texto = a.nombre;
+    if (window.AsuntoExtracto) {
+      try { texto = await AsuntoExtracto.asunto(a); }
+      catch (e) { U.aviso('No he podido componer el asunto: ' + U.mensajeDeError(e), 'malo'); return; }
+    }
+    await copiarTexto(texto);
+  }
+
+  function opcionesDeCopiar(a) {
+    var lista = [{ raya: true }, { rotulo: 'Copiar' }];
+    lista.push({ texto: 'Asunto', soloLectura: true, title: 'Copiar el asunto que compone la aplicación para los correos y mensajes de Séneca', alPulsar: function () { return copiarAsunto(a); } });
+    var nie = window.Copiar ? Copiar.nieDeAsunto(a) : '';
+    if (nie) lista.push({ texto: 'NIE', soloLectura: true, title: 'Copiar ' + nie + ', el Nº de identificación escolar', alPulsar: function () { return copiarTexto(nie); } });
+    var esEmpresa = window.Copiar && Copiar.categoriaDe(a) === 'EMPRESAS';
+    lista.push({ texto: esEmpresa ? 'CIF' : 'DNI', clave: 'documento', oculto: true, soloLectura: true, title: 'Copiar el ' + (esEmpresa ? 'CIF' : 'documento') + ' del tercero', alPulsar: function () { return copiarTexto(documentoDe[a.nombre] || ''); } });
+    lista.push({ texto: 'Nombre', clave: 'nombre', oculto: true, soloLectura: true, title: 'Copiar el nombre del tercero', alPulsar: function () { return copiarTexto(nombreDe[a.nombre] || ''); } });
+    return lista;
+  }
+
+  var nombreDe = {}, documentoDe = {};
+
   function opcionesDelMenu(a, abierto) {
     var lista = [];
     if (abierto) {
@@ -74,8 +106,9 @@
     if (window.IndiceExpediente) lista.push(IndiceExpediente.opcionDelMenu(a));
     /* Fila 135: «Marcar como reservado» / «Quitar la reserva». */
     if (abierto && window.Reservados) lista.push(Reservados.opcionDelMenu(a));
+    if (window.Copiar) lista = lista.concat(opcionesDeCopiar(a));
     if (abierto && window.Papelera) {
-      if (lista.length) lista.push({ raya: true });
+      lista.push({ raya: true });
       lista.push({ texto: 'Borrar el asunto', clase: 'ficha-menu-peligro', alPulsar: borrarAsunto });
     }
     return lista;
@@ -96,118 +129,22 @@
         boton.setAttribute('data-ayuda-clave', 'mas-acciones-sobre-el-asunto');
         boton.textContent = '⋯';
         h2.appendChild(boton);
-        FichaMenus.montar(boton, opciones);
+        var menu = FichaMenus.montar(boton, opciones);
+        revelarDatosDelTercero(viendo, menu);
       }
     }
-
-    ponerFilaDeCopiar(h2);
   }
 
-  /* ==========================================================
-     LA FILA DE COPIAR DE UN GESTO (18-sep-2026, fila 58,
-     docs/AJUSTES-DE-USO-2026-09-18.md, 1)
-
-     Debajo del nombre, siempre visible, sin menú: Asunto, Nombre, NIE
-     y DNI/CIF. Un botón sin dato no se pone. Reutiliza `Copiar.boton`
-     (js/copiar.js) para el copiado y el aviso "Copiado" de siempre.
-     ========================================================== */
-
-  function botonCopiarFila(etiqueta, texto, ayuda) {
-    return Copiar.boton({ etiqueta: etiqueta, texto: texto, ayuda: ayuda, clase: 'boton-copiar-fila' });
-  }
-
-  /* "Nombre" y el documento necesitan el fichero de datos de la
-     categoría (Datos.cargar), que tarda: no se sabe hasta entonces si
-     hay algo que copiar. En vez de añadir el botón cuando por fin
-     responde, se deja aquí mismo, oculto, desde el primer pintado, y
-     "revelar" solo le cambia `hidden` y a qué copia el clic —nunca
-     mete un nodo nuevo en el DOM. La diferencia importa: un botón
-     añadido tarde es una mutación más dentro de `#ficha-asunto-cuerpo`,
-     y js/hitos-panel.js vigila esa caja entera para saber cuándo
-     repintarse; sin este cuidado, ese repintado de sobra le cerraba a
-     Francisco un hito que acababa de desplegar para mirarlo, sin haber
-     tocado nada todavía (solo se salva un hito a medias si tiene el
-     foco o una nota sin guardar — uno abierto sin más se cierra en
-     cualquier repintado, y antes de esto un repintado de sobra era
-     justo lo que este botón causaba). */
-  function botonPendiente(etiqueta, ayuda) {
-    var b = botonCopiarFila(etiqueta, '', ayuda);
-    b.hidden = true;
-    return b;
-  }
-
-  function revelar(b, texto) {
-    b.hidden = false;
-    b.onclick = function (ev) {
-      ev.stopPropagation();
-      ev.preventDefault();
-      Copiar.copiar(texto).then(function (ok) {
-        if (!ok) { U.aviso('No he podido copiarlo. Es ' + texto + '.', 'malo'); return; }
-        var antes = b.textContent;
-        b.textContent = 'Copiado';
-        b.classList.add('boton-marcado');
-        setTimeout(function () {
-          b.textContent = antes;
-          b.classList.remove('boton-marcado');
-        }, 1400);
-      });
-    };
-  }
-
-  /* Fila 627 (docs/627-ASUNTO-Y-EXTRACTO.md): «Asunto» copia el asunto que compone la app (el general del centro, con el
-     número del asunto), no el nombre de la carpeta; un asunto de antes, sin número, sigue copiando el nombre. Se compone al
-     pulsar, así que el botón no cambia nada en la ficha al pintarse. */
-  function botonDelAsunto(a) {
-    var b = botonCopiarFila('Asunto', a.nombre, 'Copiar el asunto que compone la aplicación para los correos y mensajes de Séneca');
-    b.onclick = async function (ev) {
-      ev.stopPropagation();
-      ev.preventDefault();
-      var texto = a.nombre;
-      if (window.AsuntoExtracto) {
-        try { texto = await AsuntoExtracto.asunto(a); }
-        catch (e) { U.aviso('No he podido componer el asunto: ' + U.mensajeDeError(e), 'malo'); return; }
-      }
-      U.copiar(texto, b, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' });
-    };
-    return b;
-  }
-
-  function ponerFilaDeCopiar(h2) {
-    var cabecera = h2.closest('.ficha-cabecera');
-    if (!window.Copiar || (cabecera || h2.parentNode).querySelector('.ficha-copiar-fila')) return;
-    var a = viendo;
-    var fila = document.createElement('div');
-    fila.className = 'ficha-copiar-fila';
-    fila.appendChild(botonDelAsunto(a));
-    /* La ruta de la carpeta, con lo apuntado en Ajustes → El centro
-       (fila 98, js/copiar-ruta.js). */
-    if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.boton(a, modoDelAsunto));
-
-    var nie = Copiar.nieDeAsunto(a);
-    if (nie) fila.appendChild(botonCopiarFila('NIE', nie, 'Copiar ' + nie + ', el Nº de identificación escolar'));
-
-    /* La categoría (y con ella si el botón se llama DNI o CIF) ya se
-       sabe sin esperar a nada: viene del propio asunto, no del
-       fichero de datos. */
-    var esEmpresa = Copiar.categoriaDe(a) === 'EMPRESAS';
-    var botonNombre = botonPendiente('Nombre', 'Copiar el nombre del tercero');
-    fila.appendChild(botonNombre);
-    var botonDoc = botonPendiente(esEmpresa ? 'CIF' : 'DNI',
-      'Copiar el ' + (esEmpresa ? 'CIF' : 'documento') + ' del tercero');
-    fila.appendChild(botonDoc);
-
-    /* Desde la fila 112, en la segunda línea, a la derecha, antes de la línea gris. */
-    var datos = cabecera && cabecera.querySelector('.ficha-apertura');
-    if (datos) datos.insertBefore(fila, datos.firstChild);
-    else h2.parentNode.insertBefore(fila, h2.nextSibling);
-
+  /* «Nombre» y el documento aparecen cuando se sabe el dato; ninguno cambia nada en la ficha (el elemento ya está en el menú). */
+  function revelarDatosDelTercero(a, menu) {
     if (!window.FichaTercero || typeof FichaTercero.datosBasicos !== 'function') return;
     FichaTercero.datosBasicos(a).then(function (r) {
-      if (viendo !== a || !fila.isConnected) return;
-      if (r && r.resumen && r.resumen.nombre) revelar(botonNombre, r.resumen.nombre);
-      if (r && r.resumen && r.resumen.documento && r.resumen.documento.valor) {
-        revelar(botonDoc, r.resumen.documento.valor);
-      }
+      if (viendo !== a) return;
+      var n = r && r.resumen && r.resumen.nombre;
+      var d = r && r.resumen && r.resumen.documento && r.resumen.documento.valor;
+      var bn = menu.item && menu.item('nombre'), bd = menu.item && menu.item('documento');
+      if (n && bn) { nombreDe[a.nombre] = n; bn.hidden = false; }
+      if (d && bd) { documentoDe[a.nombre] = d; bd.hidden = false; }
     });
   }
 

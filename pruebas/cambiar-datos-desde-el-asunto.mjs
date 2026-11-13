@@ -19,7 +19,9 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
-/* Fila 425: «Datos y contacto» es una pestaña; esta prueba trabaja dentro de ella (al entrar en una ficha, con ella ya abierta). */
+/* Fila 637: «Cambiar los datos» (antes `#tercero-cambiar-datos`) es un botón del bloque «Datos»; esta prueba trabaja con ese bloque
+   abierto (al entrar en una ficha, `abrirAlEntrar('contacto')` abre «Datos»). */
+const CAMBIAR = '#ficha-datos-bloque button:has-text("Cambiar los datos")';
 await pagina.addInitScript(() => {
   window.addEventListener('DOMContentLoaded', () => {
     if (!window.FichaTarjetas) return;
@@ -130,9 +132,9 @@ const abrirFicha = (nombre) => pagina.evaluate((n) => {
 
 console.log('--- 1. el botón en la ficha del asunto ---');
 await abrirFicha(deTalleres[0]);
-await pagina.waitForSelector('#tercero-cambiar-datos');
-await comprobar('sale «Cambiar los datos» en la tarjeta del tercero', pagina.locator('#tercero-cambiar-datos').textContent(), 'Cambiar los datos');
-await pagina.click('#tercero-cambiar-datos');
+await pagina.waitForSelector(CAMBIAR);
+await comprobar('sale «Cambiar los datos» en la tarjeta del tercero', pagina.locator(CAMBIAR).textContent(), 'Cambiar los datos');
+await pagina.click(CAMBIAR);
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro sale relleno con los datos de la empresa',
   pagina.locator('.alta-campo[data-campo="NIF"]').inputValue(), 'B00000001');
@@ -142,13 +144,15 @@ await pagina.fill('.alta-campo[data-campo="Teléfono"]', '952999999');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(600);
 await comprobar('no sale ningún cuadro más', pagina.locator('#capa').evaluate(e => e.classList.contains('oculto')), true);
+/* Fila 637: el bloque «Datos» enseña el teléfono con espacios («952 999 999»); se compara sin ellos. */
+await pagina.waitForFunction(() => document.getElementById('ficha-asunto-cuerpo').textContent.replace(/\s/g, '').indexOf('952999999') !== -1, null, { timeout: 10000 }).catch(() => {});
 await comprobar('el teléfono nuevo se ve en la ficha del asunto',
-  pagina.locator('#ficha-asunto-cuerpo').textContent().then(t => t.indexOf('952999999') !== -1), true);
+  pagina.locator('#ficha-asunto-cuerpo').textContent().then(t => t.replace(/\s/g, '').indexOf('952999999') !== -1), true);
 await comprobar('ninguna carpeta cambia de nombre', nombresAbiertos(), abiertosAntes);
 
 console.log('--- 3 y 4. cambiar el NIF y cancelar ---');
 await limpiarAvisos();
-await pagina.click('#tercero-cambiar-datos');
+await pagina.click(CAMBIAR);
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.fill('.alta-campo[data-campo="NIF"]', 'B00000002');
 await pagina.click('#cuadro-aceptar');
@@ -170,7 +174,7 @@ await comprobar('«Cancelar»: ninguna carpeta ha cambiado', nombresAbiertos(), 
 
 console.log('--- 5, 6 y 7. «Adelante» ---');
 await limpiarAvisos();
-await pagina.click('#tercero-cambiar-datos');
+await pagina.click(CAMBIAR);
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.fill('.alta-campo[data-campo="NIF"]', 'B00000002');
 await pagina.click('#cuadro-aceptar');
@@ -277,12 +281,12 @@ await comprobar('ni el personal de Séneca',
   pagina.evaluate(() => App.sePuedeCambiarElTercero({ categoria: 'PERSONAL', deSeneca: true, nombre: 'X' })), false);
 const libreNuevo = libre.replace('B00000002', 'B00000003');
 await abrirFicha(libreNuevo);
-await pagina.waitForSelector('#tercero-cambiar-datos');
-await comprobar('en la ficha de un asunto abierto sale', pagina.locator('#tercero-cambiar-datos').count(), 1);
+await pagina.waitForSelector(CAMBIAR);
+await comprobar('en la ficha de un asunto abierto sale', pagina.locator(CAMBIAR).count(), 1);
 /* Un asunto en modo archivado (la misma ficha, vista desde el ARCHIVO). */
 await pagina.evaluate((n) => { App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === n)[0], 'archivado'); }, libreNuevo);
-await pagina.waitForSelector('#tercero-ver-todo');
-await comprobar('en la ficha de un asunto archivado no sale', pagina.locator('#tercero-cambiar-datos').count(), 0);
+await pagina.waitForSelector('#ficha-datos-bloque button:has-text("Ver todo")');   /* fila 637: antes `#tercero-ver-todo` */
+await comprobar('en la ficha de un asunto archivado no sale', pagina.locator(CAMBIAR).count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

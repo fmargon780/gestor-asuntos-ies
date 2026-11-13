@@ -142,9 +142,10 @@
     U.aviso('Datos de la ficha guardados.', 'bueno');
     var caja = $('ficha-favoritos-datos');
     if (caja && N_actual() === a) pintarDatos(caja, r);
+    if (window.FichaDatosBloque && N_actual() === a) FichaDatosBloque.pintar(a);   /* fila 637: la línea plegada de «Datos» */
   }
 
   function N_actual() { return window.FichaNucleo && FichaNucleo.actual; }
 
-  window.FichaDatosFavoritos = { html: html, alPintar: alPintar, elegir: elegir };
+  window.FichaDatosFavoritos = { html: html, alPintar: alPintar, elegir: elegir, cargar: cargar };
 })();

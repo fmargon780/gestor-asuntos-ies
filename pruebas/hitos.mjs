@@ -170,8 +170,8 @@ await pagina.click('#btn-crear');
    (js/hito-mesa.js) y, sin cerrarla, reabriría sola en cada repintado
    posterior. */
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('#mesa-volver-hitos');
-await pagina.click('#mesa-volver-hitos');
+await pagina.waitForSelector('#ficha-guia.con-mesa');
+await pagina.evaluate(() => HitoMesa.cerrar());   /* fila 637: «← Hitos» ya no existe */
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(400);
@@ -338,9 +338,11 @@ await comprobar('p2 pasa a estar en curso',
   pagina.locator('#ficha-guia .hito[data-id="p2"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
 
 console.log('--- escenario 6: el estado del asunto es el hito en curso (fila 129) ---');
-await comprobar('la cabecera enseña el hito en curso, pulsable', pagina.evaluate(() => {
-  const m = document.querySelector('#ficha-acciones .marca-hito');
-  return !!m && m.tagName === 'BUTTON' && /^Hito \d+ de \d+ · /.test(m.textContent);
+await abrirHito(pagina, 'p2');   /* fila 637: la fila de hitos solo está con un hito abierto en la mesa */
+await pagina.waitForSelector('#ficha-tira .mesa-tira-hito');
+await comprobar('la fila de hitos de debajo de la cabecera enseña el hito en curso, pulsable', pagina.evaluate(() => {
+  const m = Array.from(document.querySelectorAll('#ficha-tira .mesa-tira-hito:not(.hecho)')).filter((b) => /^\d+\. /.test(b.textContent.trim()))[0];
+  return !!m && m.tagName === 'BUTTON' && m.dataset.id === 'p2';
 }), true);
 await comprobar('y nada se escribe en el estado viejo de la ficha', pagina.evaluate((clave) => {
   return App.E.registro.asuntos[clave].situacion || '';
