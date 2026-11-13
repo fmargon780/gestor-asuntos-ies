@@ -153,14 +153,8 @@ await comprobar('5. el documento enseña ya el hito debajo de su nombre',
   filaDelDoc.locator('.ficha-documento-hito').textContent(), TITULO_HITO);
 
 console.log('--- 6. apuntar un documento a un hito, desde el propio hito ---');
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await verLaLista(pagina);
-const laFilaDelHito = pagina.locator('#ficha-guia .hito').first();
-await laFilaDelHito.locator('.hito-desplegar').click();
-await pagina.waitForSelector('.hito-anadir-documento:not(.oculto)');
-await laFilaDelHito.locator('.hito-anadir-documento').click();
-await pagina.waitForSelector('.ficha-menu:not(.oculto)');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
+/* Fila 638: el menú «Añadir documento ▾ → Uno que ya está en la carpeta» del hito ya no existe; el cuadro de apuntar es el mismo. */
+await pagina.evaluate(async () => { const a = FichaNucleo.actual; const hs = Hitos.visibles(await Hitos.hitosDe(a.nombre)); HitosDocumentos.abrir(a, hs[0]); });
 await pagina.waitForSelector('#hitosdoc-lista');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);

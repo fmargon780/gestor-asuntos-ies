@@ -287,7 +287,10 @@
           pintarVacio(caja, a, abierto, errorLectura);
         }
         if (nota) caja.appendChild(nota);
+        if (!(!errorLectura && hitos.length) && abierto && !errorLectura) caja.appendChild(avisoSinHitos());   /* fila 638 */
       }, claveDeCampoDeHito);
+      /* Fila 638: la lista de «Documentos de la carpeta» depende de los hitos («sin tarea», «+ Añadir documento»). */
+      if (!errorLectura && window.FichaDocumentos && FichaDocumentos.alCambiarLosHitos) FichaDocumentos.alCambiarLosHitos(a, hitos);
     } finally {
       repintando = false;
       asegurarObservador();
@@ -388,6 +391,15 @@
     p.textContent = 'Este tipo no tiene guía. Puedes ir apuntando los hitos a mano.';
     caja.appendChild(p);
     caja.appendChild(botonAnadirAMano(a));
+  }
+
+  /* Fila 638: sin hitos no hay de dónde generar, comunicar ni añadir un documento: primero, el hito y su tarea. Va debajo
+     de «Escribir la guía de <tipo>» (la nota de `#ficha-guia-nota`). */
+  function avisoSinHitos() {
+    var aviso = document.createElement('p');
+    aviso.className = 'nota hitos-sin-hitos-aviso';
+    aviso.textContent = 'Para generar, comunicar o añadir un documento, crea antes el hito y su tarea.';
+    return aviso;
   }
 
   function botonAnadirAMano(a) {

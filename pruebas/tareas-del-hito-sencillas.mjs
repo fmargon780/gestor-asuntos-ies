@@ -100,12 +100,12 @@ async function elegirDelMenu(texto) {
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click();
 }
 
-/* 1. Un hito sin tareas: ni frase ni enlaces, solo la caja. */
+/* 1. Un hito sin tareas: «Este hito no tiene tareas.» (fila 638) y «+ Añadir tarea», sin enlaces. */
 await abrirMesaDe('Sola Uno', 'c2');
-await comprobar('1. sin ninguna frase de «no tiene tareas»',
-  pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('todavía no tiene tareas') === -1), true);
-await comprobar('1. la caja «Nueva tarea…» está, y nada más al pie',
-  pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-nueva-tarea')), true);
+await comprobar('1. la frase «Este hito no tiene tareas.» (fila 638), no la vieja «todavía no tiene tareas»',
+  pagina.evaluate(() => { const t = (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent; return [t.indexOf('todavía no tiene tareas') === -1, /Este hito no tiene tareas\./.test(t)]; }), [true, true]);
+await comprobar('1. «+ Añadir tarea» está (el formulario, cerrado), y nada más al pie',
+  pagina.evaluate(() => [!!document.querySelector('.hito-en-mesa .tcd-abrir-form'), !document.querySelector('.hito-en-mesa .guion-nueva-tarea')]), [true, true]);
 await comprobar('1. sin el enlace viejo de añadir a la guía',
   pagina.evaluate(() => !document.querySelector('.hito-en-mesa .guion-cambiar-guion') &&
     !document.querySelector('.hito-en-mesa .guion-anadir-propio')), true);

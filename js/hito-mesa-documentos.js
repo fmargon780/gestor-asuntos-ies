@@ -132,15 +132,18 @@ var HitoMesaDocumentos = (function () {
     return codigoDe(nombre);
   }
 
-  function datosDeLaLinea(a, nombre, falta) {
+  /* `sinRaya` (fila 638): el documento colgado de una tarea dice su registro solo si lo tiene, sin la raya «—». */
+  function datosDeLaLinea(a, nombre, falta, sinRaya) {
     var fecha = fechaDe(nombre);
     var registro = registroConFecha(a, nombre);
     var campos = !falta && window.DocumentosDatos ? DocumentosDatos.linea(a, nombre, { soloCampos: true }) : '';
     var marca = !falta && window.DocumentosDatos ? DocumentosDatos.marcaDe(a, nombre) : '';   /* fila 515: «Firmado» delante del registro */
-    var texto = [fecha, marca, registro || '—', campos].filter(Boolean).join(' · ');
+    var vacio = sinRaya ? '' : '—';
+    var texto = [fecha, marca, registro || vacio, campos].filter(Boolean).join(' · ');
     return '<div class="doc-datos mesa-doc-datos" title="' + U.escapar(texto) + '"><span class="mesa-doc-fecha">' + U.escapar(fecha) + '</span>' +
-      (fecha ? ' · ' : '') + (marca ? '<span class="mesa-doc-firmado">' + U.escapar(marca) + '</span> · ' : '') + '<span class="mesa-doc-registro">' + U.escapar(registro || '—') + '</span>' +
-      (campos ? ' · ' + U.escapar(campos) : '') + '</div>';
+      (fecha && (marca || registro || vacio || campos) ? ' · ' : '') + (marca ? '<span class="mesa-doc-firmado">' + U.escapar(marca) + '</span>' + (registro || vacio || campos ? ' · ' : '') : '') +
+      '<span class="mesa-doc-registro">' + U.escapar(registro || vacio) + '</span>' +
+      (campos ? (registro || vacio ? ' · ' : '') + U.escapar(campos) : '') + '</div>';
   }
 
   function filasHTML(a, h, hitos, nombresDeLaCarpeta, abierto) {

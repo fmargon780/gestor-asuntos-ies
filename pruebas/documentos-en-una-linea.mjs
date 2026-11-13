@@ -58,8 +58,9 @@ console.log('--- 1. la carpeta: una línea por documento ---');
 await comprobar('1. cada documento de la carpeta mide un solo renglón y no lleva fila de botones debajo', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((f) => [f.getBoundingClientRect().height < 56,
     Array.from(f.children).every((c) => c.getBoundingClientRect().bottom <= f.getBoundingClientRect().bottom + 1)]).flat().every(Boolean)), true);
-await comprobar('1. a la vista solo hay «Ruta» y «Extracto» (fila 627) y el ⋮; ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
-  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Ruta', 'Extracto', '⋮']);
+/* Fila 638: un documento que no cuelga de ninguna tarea lleva además «sin tarea» (marca, no botón) y «Colgar de una tarea». */
+await comprobar('1. a la vista solo hay «Colgar de una tarea» (fila 638, solo si no cuelga de una tarea), «Ruta» y «Extracto» (fila 627) y el ⋮; ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
+  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Colgar de una tarea', 'Ruta', 'Extracto', '⋮']);
 await comprobar('1. el orden: nombre, «Ruta», datos y ⋮', fila(UNO).evaluate((f) => {
   const orden = Array.from(f.children).filter((c) => c.offsetParent || c.matches('.doc-datos')).map((c) =>
     c.matches('.ficha-documento') ? 'nombre' : c.matches('.ruta-documento') ? 'ruta' : c.matches('.doc-datos') ? 'datos' : c.matches('.fila-menu-envoltorio') ? 'menu' : '');
@@ -84,32 +85,28 @@ await comprobar('3b. el menú ⋮ cabe dentro de la ventana y de la tarjeta', fi
 await pagina.keyboard.press('Escape');
 
 console.log('--- 4. la mesa del hito y las versiones previas ---');
+/* Fila 638: el hito ya no tiene tabla de documentos con su ⋯; el documento cuelga de su tarea, con «Ruta» pegada a su nombre. */
 await pagina.evaluate(async () => {
   const hs = Hitos.visibles(await Hitos.hitosDe(window.__a.nombre));
   await Hitos.anadirDocumento(window.__a.nombre, hs[0].id, '260901 CERTIFICADO prueba uno.pdf');
+  const h = await Hitos.anadirGuionPropio(window.__a.nombre, hs[0].id, 'Registrar el certificado', { accion: 'registrar' });
+  await TareasConDocumento.asignar(window.__a.nombre, hs[0].id, h.guionPropio[h.guionPropio.length - 1].id, '260901 CERTIFICADO prueba uno.pdf');
   HitosPanel.programarRepintado();
   await new Promise((r) => setTimeout(r, 1200));
   HitoMesa.abrir(window.__a, hs[0].id);
 });
-await pagina.waitForSelector('.hito-en-mesa .mesa-doc', { timeout: 10000 });
+await pagina.waitForSelector('.hito-en-mesa .tcd .tcd-abrir', { timeout: 10000 });
 await pagina.waitForTimeout(800);
-await comprobar('4. el documento de la mesa mide un solo renglón y «Ruta» va pegado a su nombre', pagina.evaluate(() => {
-  const d = document.querySelector('.hito-en-mesa .mesa-doc');
-  const n = d.querySelector('.hito-doc-abrir');
+await comprobar('4. el documento de la tarea tiene «Ruta» pegado a su nombre, en la misma línea', pagina.evaluate(() => {
+  const d = document.querySelector('.hito-en-mesa .tcd');
+  const n = d.querySelector('.tcd-abrir');
   const r = d.querySelector('.ruta-documento');
-  return [d.getBoundingClientRect().height < 56, !!r && r.getBoundingClientRect().left >= n.getBoundingClientRect().right - 1 && Math.abs(r.getBoundingClientRect().top - n.getBoundingClientRect().top) < 12];
-}), [true, true]);
-await comprobar('4. la fila de la mesa cabe en su columna (no se corta por la derecha)', pagina.evaluate(() => {
-  const d = document.querySelector('.hito-en-mesa .mesa-doc'); const c = d.closest('.mesa-col') || d.parentElement;
+  return [!!r && r.getBoundingClientRect().left >= n.getBoundingClientRect().right - 1 && Math.abs(r.getBoundingClientRect().top - n.getBoundingClientRect().top) < 12];
+}), [true]);
+await comprobar('4. la línea del documento cabe en su columna (no se corta por la derecha)', pagina.evaluate(() => {
+  const d = document.querySelector('.hito-en-mesa .tcd'); const c = d.closest('.mesa-col') || d.parentElement;
   return d.getBoundingClientRect().right <= c.getBoundingClientRect().right + 1 && d.scrollWidth <= d.clientWidth + 1;
 }), true);
-await pagina.locator('.hito-en-mesa .mesa-doc .hito-doc-menu-boton').first().click();
-await comprobar('4. el menú ⋯ de la mesa cabe dentro de su tarjeta', pagina.evaluate(() => {
-  const m = Array.from(document.querySelectorAll('.ficha-menu:not(.oculto)')).pop(); if (!m) return false;
-  const r = m.getBoundingClientRect(); const c = m.closest('.trabajo-col') || document.body;
-  return r.top >= 0 && r.bottom <= Math.min(innerHeight, c.getBoundingClientRect().bottom) + 1;
-}), true);
-await pagina.keyboard.press('Escape');
 const previas = await pagina.evaluate(async () => {
   const det = document.querySelector('.hito-en-mesa .mesa-previas, #ficha-documentos .ficha-previas');
   if (!det) return null;

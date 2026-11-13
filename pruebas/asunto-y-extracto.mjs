@@ -307,17 +307,24 @@ await comprobar('6. sale el aviso «Extracto copiado»',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#mensajes .mensaje.bueno')).map((m) => m.textContent).some((t) => t.indexOf('Extracto copiado') === 0)), true);
 await comprobar('6. un tipo sin extracto propio copia el general',
   pegado(() => pagina.click(filaDe(DOC_FACTURA))), 'FACTURA · CONVALIDACION\nEspejo Montes, Carla · A26-0003');
-await pagina.evaluate(async ([N, D1, D2]) => { await Hitos.anadirDocumento(N, 'h1', D1); await Hitos.anadirDocumento(N, 'h1', D2); }, [NUEVO, DOC_RESOLUCION, DOC_FACTURA]);
+/* Fila 638: los documentos del hito ya no van en una tabla: cuelgan de su tarea. */
+await pagina.evaluate(async ([N, D1, D2]) => {
+  await Hitos.anadirDocumento(N, 'h1', D1); await Hitos.anadirDocumento(N, 'h1', D2);
+  for (const [d, t] of [[D1, 'Registrar la resolución'], [D2, 'Registrar la factura']]) {
+    const h = await Hitos.anadirGuionPropio(N, 'h1', t, { accion: 'registrar' });
+    await TareasConDocumento.asignar(N, 'h1', h.guionPropio[h.guionPropio.length - 1].id, d);
+  }
+}, [NUEVO, DOC_RESOLUCION, DOC_FACTURA]);
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.evaluate(() => HitosPanel.programarRepintado());
 await pagina.waitForTimeout(800);
 await abrirHito(pagina, 'h1');
-await pagina.waitForSelector('.hito-en-mesa .mesa-doc .extracto-documento >> visible=true');
-await comprobar('6. «Extracto» también sale junto a «Ruta» en los documentos del hito',
-  pagina.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .mesa-doc .mesa-doc-nombre')].map((f) => { const r = f.querySelector('.ruta-documento-lugar'); const e = r && r.nextElementSibling;
+await pagina.waitForSelector('.hito-en-mesa .tcd .extracto-documento >> visible=true');
+await comprobar('6. «Extracto» también sale junto a «Ruta» en los documentos colgados de las tareas del hito',
+  pagina.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .tcd')].map((f) => { const r = f.querySelector('.ruta-documento-lugar'); const e = r && r.nextElementSibling;
     return !!r && !!r.querySelector('.ruta-documento') && !!e && !!e.querySelector('.extracto-documento'); })), [true, true]);
 await comprobar('6. y copia lo mismo',
-  pegado(() => pagina.click('.hito-en-mesa .mesa-doc[data-doc="' + DOC_RESOLUCION + '"] .extracto-documento')), 'Resolución de CONVALIDACION\nEspejo Montes, Carla · 09/11/2026 · A26-0003');
+  pegado(() => pagina.click('.hito-en-mesa .tcd:has(.tcd-abrir[data-doc="' + DOC_RESOLUCION + '"]) .extracto-documento')), 'Resolución de CONVALIDACION\nEspejo Montes, Carla · 09/11/2026 · A26-0003');
 /* El asunto de antes. */
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(150);

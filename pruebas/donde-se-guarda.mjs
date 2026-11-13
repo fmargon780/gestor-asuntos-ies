@@ -112,6 +112,7 @@ async function tareasVistas(idHito) {
 }
 
 async function escribirTarea(texto) {
+  await pagina.click('.hito-en-mesa .tcd-abrir-form');   /* fila 638: el formulario se abre con «+ Añadir tarea» */
   await pagina.fill('#guion-nueva-tarea', texto);
   await pagina.press('#guion-nueva-tarea', 'Enter');
   await pagina.waitForTimeout(600);
@@ -127,9 +128,8 @@ await comprobar('1. la tarea sale con «solo aquí»',
 await comprobar('1. no está en la guía',
   guiaGuardada().then((g) => g.filter((p) => p.id === 'c1')[0].guion.map((x) => x.texto)),
   ['Avisar a la tutoría', 'Avisar a la familia']);
-await comprobar('1. la caja se ha vaciado y conserva el foco',
-  pagina.evaluate(() => ({ v: document.getElementById('guion-nueva-tarea').value, f: document.activeElement.id })),
-  { v: '', f: 'guion-nueva-tarea' });
+await comprobar('1. el formulario se ha cerrado (fila 638) y queda «+ Añadir tarea»',
+  pagina.evaluate(() => [!document.getElementById('guion-nueva-tarea'), !!document.querySelector('.hito-en-mesa .tcd-abrir-form')]), [true, true]);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Dos', 'c1');

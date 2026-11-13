@@ -89,20 +89,19 @@ await comprobar('la tarjeta se llama «Registro»', pagina.evaluate(() => docume
 console.log('--- 6. la etiqueta abre la mesa ---');
 await pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#ficha-notas-lista .nota-hito'), b => b.textContent.indexOf('Recoger') !== -1)[0].click());
 await esperar(() => HitoMesa.estaAbierta && HitoMesa.estaAbierta());
-await comprobar('mesa de «Recoger los papeles»', pagina.evaluate(() => !!document.querySelector('#ficha-guia .hito[data-id="h1"] .mesa-notas')), true);
+await comprobar('mesa de «Recoger los papeles»', pagina.evaluate(() => !!document.querySelector('#ficha-guia .hito[data-id="h1"].hito-en-mesa')), true);
 
-console.log('--- 2. la mesa ---');
-const mesa = () => pagina.evaluate(() => Array.prototype.map.call(
-  document.querySelectorAll('#ficha-guia .hito[data-id="h1"] .mesa-notas .hito-notas .registro-linea'), x => [x.querySelector('.nota-texto').textContent, x.classList.contains('registro-auto')]));
+console.log('--- 2. el registro, con lo de ese hito (fila 638: el hito ya no tiene su recuadro de Registro) ---');
+const mesa = () => pagina.evaluate(() => Array.prototype.filter.call(
+  document.querySelectorAll('#ficha-notas-lista .registro-linea'), x => { const e = x.querySelector('.nota-hito'); return e ? /Recoger los papeles/.test(e.textContent) : !x.classList.contains('registro-auto'); })
+  .map(x => [x.querySelector('.nota-texto').textContent, x.classList.contains('registro-auto')]));
 /* Fila 426: la nota a mano sin hito sale también en el Registro del hito (con «del asunto»). */
 await comprobar('las líneas de ese hito y las notas sueltas del asunto, una sola lista', mesa(), [['Sin hito, a mano', false], ['Generado «Justificante»', true], ['Llamada de la madre', false]]);
 
-console.log('--- 3. anotar desde la mesa ---');
-const ta = '#ficha-guia .hito[data-id="h1"] .hito-nota-texto';
-await pagina.fill(ta, 'Se ha visitado al tutor');
-await pagina.press(ta, 'Enter');
+console.log('--- 3. anotar desde el hito (fila 638: con la función de antes; ya no hay caja) ---');
+await pagina.evaluate(async () => { const a = FichaNucleo.actual; await NotasHito.anadirDesdeHito(a, Hitos.buscar(await Hitos.hitosDe(a.nombre), 'h1'), 'Se ha visitado al tutor'); });
 await esperar(() => Array.prototype.some.call(document.querySelectorAll('#ficha-notas-lista .nota-texto'), x => x.textContent === 'Se ha visitado al tutor'));
-await comprobar('sale arriba en la mesa', mesa().then(l => l[0]), ['Se ha visitado al tutor', false]);
+await comprobar('sale arriba en el registro', mesa().then(l => l[0]), ['Se ha visitado al tutor', false]);
 await comprobar('y en la ficha, con la etiqueta de ese hito', pagina.evaluate(() => {
   const f = Array.prototype.filter.call(document.querySelectorAll('#ficha-notas-lista .registro-linea'), x => x.querySelector('.nota-texto').textContent === 'Se ha visitado al tutor')[0];
   return f && f.querySelector('.nota-hito').textContent;

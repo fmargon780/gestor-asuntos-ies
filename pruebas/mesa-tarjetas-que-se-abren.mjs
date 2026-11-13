@@ -2,16 +2,15 @@
    (25-sep-2026, fila 147 de docs/COLA.md; adaptada el 22-oct-2026 a la fila 425,
    docs/FICHA-VISTA-DE-TRABAJO.md: antes eran tres tarjetas, una en grande y dos de resumen).
 
+   Fila 638 (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): el hito ya no tiene los recuadros Campos, Documentos ni Registro;
+   se quedan las comprobaciones de lo que sigue en pie.
+
    A 1905×1000 y a 1280×800, sobre un asunto inventado con un hito de cinco
-   pasos de guion (dos hechos), dos documentos (uno registrado, con su
-   gemelo sin sellar) y dos notas:
-     1. Al abrir el hito, el guion, los documentos del hito y el registro están a la vez,
-        de arriba abajo, sin tarjetas de resumen.
-     2. En los documentos, el nombre del fichero entero (sin «…») y el gemelo debajo,
-        con «26SM0617» y, sin la casilla de pendiente, sin marca (fila 524).
+   pasos de guion (dos hechos), dos documentos y dos notas:
+     1. Al abrir el hito, solo sus tareas (y la normativa, si la hay), sin tarjetas de resumen.
+     2. Las dos notas del hito salen en el «Registro» del asunto (derecha), cada una con su hito.
      3. Escape cierra la mesa (la lista de hitos) y no se vuelve a abrir sola.
-     4. Escribir una nota sin guardar y forzar un repintado: el texto sigue en la caja.
-        Intro guarda; la nota sale arriba del registro.
+     4. Los dos documentos están en «Documentos de la carpeta», sin «sin tarea» falsos para los de un hito sin tareas de documento.
      5. Cambiar de hito con la tira: se abre su mesa.
      6. Con CAPTURAS=1, una captura a 1905×1000 en pruebas/capturas/ (datos inventados). */
 import { chromium } from 'playwright';
@@ -94,8 +93,8 @@ function queSeVe(pagina) {
   return pagina.evaluate(() => {
     const vis = (e) => !!(e && e.offsetParent);
     const m = document.querySelector('.hito-en-mesa');
-    return Array.from(m.querySelectorAll('.mesa-col-hito > section')).filter(vis)
-      .map((e) => e.dataset.tarjeta || (e.classList.contains('mesa-campos-hito') ? 'campos' : '?'));
+    return Array.from(m.querySelectorAll('.mesa-col-hito > [data-tarjeta]')).filter(vis)
+      .map((e) => e.dataset.tarjeta || '?');
   });
 }
 
@@ -112,36 +111,25 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   const fotos = ancho === 1905;
 
   /* 1. */
-  await comprobar('1. tareas, campos, documentos y registro, de arriba abajo', queSeVe(pagina), ['guion', 'campos', 'docs', 'notas']);
+  await comprobar('1. solo las tareas, sin campos, documentos ni registro', queSeVe(pagina), ['guion']);
   await comprobar('1. sin tarjetas de resumen ni «← Volver al guion»',
     pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-resumen, .hito-en-mesa .mesa-volver-guion').length), 0);
-  await comprobar('1. el guion dice «2 de 5»',
-    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-guion-cuenta').textContent), '2 de 5');
-  await comprobar('1. los documentos dicen cuántos son',
-    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-docs-cuenta').textContent), '2');
-  await comprobar('1. el registro dice «2 líneas»',
-    pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-docs-cuenta').textContent), '2 líneas');
+  await comprobar('1. las cinco tareas, dos hechas',
+    pagina.evaluate(() => [document.querySelectorAll('.hito-en-mesa .guion-paso').length, document.querySelectorAll('.hito-en-mesa .guion-paso.hecho').length]), [5, 2]);
   if (fotos) await capturar(pagina, 'mesa-una-columna');
 
   /* 2. */
-  await comprobar('2. «26SM0617» y «Sin registrar»',
-    pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-grande-docs .mesa-doc-estado, .hito-en-mesa .mesa-grande-docs .mesa-doc-registro')).map((e) => e.textContent).filter((t) => t !== '—').sort()),
-    ['', '26SM0617', 'Registrado']);   /* fila 524: «Sin registrar» solo con casilla o tarea de registrar; aquí sin marca */
-  /* Fila 439: una sola línea; un nombre larguísimo puede cortarse con «…» y entonces se ve entero en el title. */
-  await comprobar('2. el nombre del fichero, entero (o cortado con «…» y entero en el title)',
-    pagina.evaluate((reg) => {
-      const b = document.querySelector('.hito-en-mesa .mesa-grande-docs .hito-documento[data-doc="' + reg + '"] .hito-doc-abrir');
-      const s = getComputedStyle(b);
-      return [b.textContent, b.title, b.scrollWidth <= b.clientWidth + 1 || (s.textOverflow === 'ellipsis' && b.title === b.textContent)];
-    }, REGISTRADO), [REGISTRADO, REGISTRADO, true]);
-  await comprobar('2. el gemelo, debajo de su documento, con su «Abrir»',
-    pagina.evaluate((reg) => {
-      const f = document.querySelector('.hito-en-mesa .mesa-grande-docs .hito-documento[data-doc="' + reg + '"]');
-      const g = f && f.querySelector('.mesa-doc-gemelo-fila');
-      const n = f && f.querySelector('.mesa-doc-nombre');
-      return [!!g && g.textContent.indexOf('Original sin sellar') === 0, !!g && g.getBoundingClientRect().top >= n.getBoundingClientRect().bottom - 1,
-        !!g && g.querySelector('.mesa-doc-gemelo').textContent];
-    }, REGISTRADO), [true, true, 'Abrir']);
+  await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
+  await pagina.waitForTimeout(500);
+  await comprobar('2. las dos notas salen en el registro del asunto, cada una con su hito',
+    pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-notas .registro-linea')).filter((l) => /La familia llamó|Traen el certificado/.test(l.textContent))
+      .map((l) => /Recoger la solicitud/.test(l.querySelector('.nota-cabeza').textContent))), [true, true]);
+  await pagina.evaluate(() => FichaTarjetas.plegar('notas'));
+  await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
+  await pagina.waitForTimeout(400);
+  await comprobar('2. los dos documentos, en «Documentos de la carpeta» (el gemelo sin sellar también)',
+    pagina.evaluate(() => document.querySelectorAll('#ficha-documentos .ficha-documento-fila').length), 3);
+  await pagina.evaluate(() => FichaTarjetas.plegar('documentos'));
 
   /* 3. */
   await pagina.keyboard.press('Escape');
@@ -157,29 +145,12 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await abrirHito(pagina, 'c1');
   await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]');
   await pagina.waitForTimeout(300);
-  const caja = '.hito-en-mesa .mesa-grande-notas .hito-nota-texto';
-  await pagina.click(caja);
-  await pagina.keyboard.type('Pendiente de la firma');
-  await pagina.evaluate(() => HitosPanel.programarRepintado());
-  await pagina.waitForTimeout(900);
-  await comprobar('4. tras un repintado, el texto sigue en la caja', pagina.inputValue(caja), 'Pendiente de la firma');
-  await pagina.press(caja, 'Enter');
-  await pagina.waitForTimeout(1000);
-  await comprobar('4. Intro guarda: la nota sale arriba y la caja se vacía',
-    pagina.evaluate(() => {
-      const n = document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-notas .hito-nota');
-      return [n && n.textContent.indexOf('Pendiente de la firma') !== -1, document.querySelector('.hito-en-mesa .hito-nota-texto').value];
-    }), [true, '']);
-  await comprobar('4. «Registro»: una sola lista por fechas, sin columna de Historia (fila 229)',
-    pagina.evaluate(() => [document.querySelectorAll('.hito-en-mesa .mesa-grande-notas .hito-notas').length,
-      document.querySelectorAll('.hito-en-mesa .mesa-historia, .hito-en-mesa .mesa-notas-columnas').length,
-      document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-grande-titulo').textContent]), [1, 0, 'Registro']);
 
   /* 5. */
   await pagina.locator('#ficha-tira .mesa-tira-hito[data-id="c2"]').click();
   await pagina.waitForSelector('.hito-en-mesa[data-id="c2"]');
   await pagina.waitForTimeout(300);
-  await comprobar('5. cambiar de hito con la tira abre su mesa', queSeVe(pagina).then((v) => v.indexOf('guion') !== -1 && v.indexOf('notas') !== -1), true);
+  await comprobar('5. cambiar de hito con la tira abre su mesa', queSeVe(pagina).then((v) => v.indexOf('guion') !== -1), true);
 
   if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
   await pagina.close();

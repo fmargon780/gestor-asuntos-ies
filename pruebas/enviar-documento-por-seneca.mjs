@@ -1,12 +1,12 @@
 /* Prueba en navegador de verdad de la fila 153 de docs/COLA.md
-   (docs/ENVIAR-DOCUMENTO-POR-SENECA.md): el «Enviar ▾» de un documento
-   del hito, en la mesa.
+   (docs/ENVIAR-DOCUMENTO-POR-SENECA.md): enviar un documento del hito, en la mesa.
+   Fila 638: el «Enviar ▾» de cada documento del hito ya no existe (el hito no tiene tabla de documentos); el documento
+   cuelga de su tarea de comunicar y se envía con el botón de esa tarea.
 
-   1. El enlace dice «Enviar ▾» y abre un menú con «Por correo» y
-      «Por Séneca» (no una acción directa).
-   2. «Por correo» abre el cuadro de Correo con ese documento ya
+   1. El documento colgado de la tarea se ve debajo de ella, con su botón «Enviar correo».
+   2. «Enviar correo» abre el cuadro de Correo con ese documento ya
       marcado entre los adjuntos.
-   3. «Por Séneca» abre el cuadro de Séneca con el documento señalado
+   3. Por Séneca (la tarea con esa vía) abre el cuadro de Séneca con el documento señalado
       («Adjunta este documento en Séneca: …», con «Copiar el nombre»).
    4. Al terminar (Séneca), se marca el paso del guion con
       `accion: 'comunicar'` de ese hito — la misma regla de la fila 150.
@@ -70,6 +70,7 @@ await pagina.evaluate(async ([asunto, documento]) => {
   await App.anotar(asunto, { abiertoEl: U.ahora(), tipo: 'CONVALIDACION', categoria: 'ALUMNADO',
     tercero: 'Inventada Tres, Eva 9990003', curso: '26-27', grupo: '', descripcion: '', campos: {} });
   await Hitos.anadirDocumento(asunto, 'c1', documento);
+  await TareasConDocumento.asignar(asunto, 'c1', 'g1', documento);   /* fila 638: cuelga de su tarea */
   await App.verAbiertos();
 }, [ASUNTO, DOCUMENTO]);
 
@@ -94,28 +95,17 @@ async function abrirMesa() {
 await pagina.locator('.tarjeta-nombre', { hasText: 'Inventada Tres' }).first().click();
 await abrirMesa();
 
-/* ---------- 1. «Enviar ▾» sale como menú ---------- */
-console.log('--- 1. «Enviar ▾» ---');
-await comprobarQue('el enlace dice «Enviar ▾»',
-  pagina.evaluate(() => {
-    const b = document.querySelector('.hito-en-mesa .mesa-doc-enviar');
-    return !!b && b.textContent.trim() === 'Enviar ▾';
-  }));
-await pagina.click('.hito-en-mesa .mesa-doc-enviar');
-await pagina.waitForTimeout(150);
-await comprobar('el menú trae «Por correo» y «Por Séneca»',
-  pagina.evaluate(() => {
-    const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-    return menu ? Array.from(menu.querySelectorAll('.ficha-menu-opcion')).map((o) => o.textContent.trim()) : null;
-  }), ['Por correo', 'Por Séneca']);
+/* ---------- 1. el documento, colgado de su tarea ---------- */
+console.log('--- 1. el documento colgado de la tarea ---');
+await comprobar('el documento sale debajo de la tarea, y la tarea lleva su botón',
+  pagina.evaluate((doc) => {
+    const p = document.querySelector('.hito-en-mesa .guion-paso[data-id="g1"]');
+    return [!!p.querySelector('.tcd .tcd-abrir[data-doc="' + doc + '"]'), (p.querySelector('.guion-accion-tarea') || {}).textContent];
+  }, DOCUMENTO), [true, 'Enviar correo']);
 
-/* ---------- 2. «Por correo»: el documento ya va marcado ---------- */
-console.log('--- 2. Por correo ---');
-await pagina.evaluate(() => {
-  const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-  const opcion = menu && Array.from(menu.querySelectorAll('.ficha-menu-opcion')).find((o) => /correo/.test(o.textContent));
-  if (opcion) opcion.click();
-});
+/* ---------- 2. «Enviar correo»: el documento ya va marcado ---------- */
+console.log('--- 2. Enviar correo ---');
+await pagina.click('.hito-en-mesa .guion-paso[data-id="g1"] .guion-accion-tarea');
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario');
 await comprobarQue('el documento sale ya marcado entre los adjuntos',
   pagina.evaluate((doc) => {
@@ -130,12 +120,12 @@ await abrirMesa();
 /* ---------- 3 y 4. «Por Séneca»: el documento señalado, y al terminar
    se marca el paso del guion ---------- */
 console.log('--- 3 y 4. Por Séneca ---');
-await pagina.click('.hito-en-mesa .mesa-doc-enviar');
-await pagina.waitForTimeout(150);
-await pagina.evaluate(() => {
-  const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-  const opcion = menu && Array.from(menu.querySelectorAll('.ficha-menu-opcion')).find((o) => /Séneca/.test(o.textContent));
-  if (opcion) opcion.click();
+/* La tarea con la vía de Séneca (se simula la receta de la tarea, que en la guía se elige en «Qué se hace»). */
+await pagina.evaluate(async () => {
+  const a = FichaNucleo.actual;
+  const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), 'c1');
+  const g = Hitos.guionDe(a, h).filter((x) => x.id === 'g1')[0];
+  HitoMesaRecetas.lanzarTarea(a, h, Object.assign({}, g, { receta: { via: 'seneca' } }), document, null);
 });
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-formulario');
 await comprobarQue('el cuadro de Séneca señala el documento a adjuntar',

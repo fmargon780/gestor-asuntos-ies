@@ -232,9 +232,10 @@ details.mesa-normativa > summary { cursor: pointer; }
 /* Fila 139: la historia automática del hito, debajo de sus notas. */
 .hito-historia-titulo { display: block; margin-top: 10px; }
 
-/* Fila 154: con hitos, las acciones solo en la cabecera de cada hito. */
-#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-comunicar,
-#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-generar-documento { display: none; }
+/* Fila 154 y fila 638: «Comunicar» y «Generar documento» no están arriba, ni con hitos ni sin ellos: salen de una tarea
+   (sin hitos, hay que crear antes el hito y su tarea). */
+#pantalla-asunto #ficha-acciones .boton-comunicar,
+#pantalla-asunto #ficha-acciones .boton-generar-documento { display: none; }
 
 
 /* Fila 164: los pasos con receta, arriba de «Comunicar ▾» y «Generar documento ▾». */
@@ -305,13 +306,7 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-grande-titulo { flex: 1 1 auto; gap: 10px; }
 .mesa-col-hito > .mesa-bloque:not(.mesa-normativa) .mesa-grande-titulo .boton { margin-left: auto; }
 .mesa-col-hito .mesa-docs-cuenta, .mesa-col-hito .mesa-guion-cuenta { font-size: 12.5px; font-weight: 400; color: var(--tinta-suave); }
-/* Lo de dentro de cada recuadro, con su margen a los lados (la cabecera va de lado a lado). */
-.mesa-col-hito > .mesa-bloque:not(.mesa-normativa) > :not(.mesa-bloque-cabecera):not(.mesa-guion),
-.mesa-col-hito > .mesa-grande-guion > .mesa-guion > :not(.mesa-bloque-cabecera) { margin-left: 12px; margin-right: 12px; }
-.mesa-col-hito > .mesa-grande-guion > .mesa-guion { display: flex; flex-direction: column; gap: 4px; }
-.mesa-col-hito > .mesa-campos-hito { padding: 0 0 12px; }
-.mesa-col-hito > .mesa-campos-hito.mesa-campos-hito-vacia { padding: 0 0 8px; }
-.mesa-col-hito > .mesa-grande-notas .nota-nueva { margin-bottom: 8px; }
+/* Fila 638: Tareas, Campos, Documentos y Registro ya no son recuadros del hito (las tareas van sueltas, cada una en su caja). */
 /* La explicación del hito, encima del recuadro de las tareas. */
 .mesa-col-hito > .hito-explicacion { margin: 0 2px; }
 

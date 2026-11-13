@@ -52,12 +52,14 @@ window.TareasConDocumentoVista = (function () {
     return '<span class="tcd-ext">' + U.escapar(extension(nombre) || 'DOC') + '</span>' +
       '<button type="button" class="enlace tcd-abrir" data-doc="' + U.escapar(nombre) + '" title="' + U.escapar(nombre) + '">' + U.escapar(nombre) + '</button>' +
       (window.RutaCarpetas ? RutaCarpetas.huecoHTML(nombre) : '') +
-      (HD && HD.datosDeLaLinea ? HD.datosDeLaLinea(a, nombre, false) : '');
+      (window.ExtractoDocumento ? ExtractoDocumento.huecoHTML(nombre) : '') +   /* fila 638: «Ruta» y «Extracto» */
+      (HD && HD.datosDeLaLinea ? HD.datosDeLaLinea(a, nombre, false, true) : '');
   }
 
   /* Lo que cuelga de la tarea `g`, o ''. `ctx`: { guion, hitos, abierto }. */
   function colgadoHTML(a, h, g, ctx) {
-    if (!T() || !T().conDocumento(g) || g.noaplica) return '';
+    if (!T() || !T().colgable(g) || g.noaplica) return '';
+    var soloAnadir = g.accion === 'anadir';   /* fila 638: su documento es el que se añade; no se elige ni se cambia aquí */
     var ent = T().de(h, g.id);
     var cuerpo = '';
     var apagado = false;
@@ -72,13 +74,14 @@ window.TareasConDocumentoVista = (function () {
     } else if (ent && ent.doc) {
       apagado = !!g.hecho;
       cuerpo = lineaDocumentoHTML(a, nombreActual(ent.doc, ctx.hitos), ctx.abierto) +
-        (!g.hecho && g.accion !== 'generar' && ctx.abierto ? '<button type="button" class="enlace tcd-cambiar">Cambiar</button>' : '');
-    } else if (g.accion === 'generar' || g.hecho) {
+        (!g.hecho && g.accion !== 'generar' && !soloAnadir && ctx.abierto ? '<button type="button" class="enlace tcd-cambiar">Cambiar</button>' : '');
+    } else if (g.accion === 'generar' || g.hecho || soloAnadir) {
       return '';
     } else {
       var saldra = textoDeSaldra(g, ctx.guion);
+      /* Fila 638: comunicar sin documento va libre (sin «Elegir documento»); registrar y firmar lo piden. */
       cuerpo = saldra ? '<span class="tcd-saldra">' + U.escapar(saldra) + '</span>'
-        : (ctx.abierto ? '<button type="button" class="enlace tcd-elegir">Elegir documento</button>' : '');
+        : (ctx.abierto && g.accion !== 'comunicar' ? '<button type="button" class="enlace tcd-elegir">Elegir documento</button>' : '');
       if (!cuerpo) return '';
     }
     return '<div class="tcd' + (apagado ? ' tcd-apagado' : '') + '" data-tarea="' + U.escapar(g.id) + '">' + cuerpo + '</div>';
@@ -104,6 +107,7 @@ window.TareasConDocumentoVista = (function () {
     Array.prototype.forEach.call(caja.querySelectorAll('.tcd'), function (c) {
       var id = c.dataset.tarea;
       if (window.RutaCarpetas) RutaCarpetas.enganchar(c, a, modo);
+      if (window.ExtractoDocumento) ExtractoDocumento.enganchar(c, a);   /* fila 638 */
       var abrir = c.querySelector('.tcd-abrir');
       if (abrir) abrir.onclick = function () { if (HD && HD.abrirEnVisor) HD.abrirEnVisor(a, abrir.dataset.doc, modo); };
       var version = c.querySelector('.tcd-abrir-version');
@@ -191,6 +195,6 @@ window.TareasConDocumentoVista = (function () {
     zona.onchange = function () { if (alCambiar) alCambiar(leerFormulario(raiz)); };
   }
 
-  return { colgadoHTML: colgadoHTML, enganchar: enganchar, formularioHTML: formularioHTML, leerFormulario: leerFormulario,
+  return { colgadoHTML: colgadoHTML, saldra: textoDeSaldra, enganchar: enganchar, formularioHTML: formularioHTML, leerFormulario: leerFormulario,
            engancharFormulario: engancharFormulario, nombreActual: nombreActual };
 })();

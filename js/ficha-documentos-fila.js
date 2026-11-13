@@ -56,6 +56,30 @@ var FichaDocumentosFila = (function () {
     }
     fila.appendChild(b);
 
+    /* Fila 638: un documento que ninguna tarea de ningún hito tiene colgado sale con la marca «sin tarea» y «Colgar de una
+       tarea» (la misma pregunta que «+ Añadir documento», con «Colgar»). Nadie está obligado a pulsarlo. */
+    if (!esIndice && I.sinTarea && I.sinTarea(f.nombre)) {
+      var sinTarea = document.createElement('span');
+      sinTarea.className = 'marca-sin-tarea';
+      sinTarea.textContent = 'sin tarea';
+      sinTarea.setAttribute('data-ayuda-clave', 'documento-sin-tarea');
+      fila.appendChild(sinTarea);
+      if (window.DocumentoATarea && (!window.RutaCarpetas || RutaCarpetas.modoDe(a) === 'abierto')) {
+        var colgar = document.createElement('button');
+        colgar.type = 'button';
+        colgar.className = 'boton boton-chico ficha-documento-colgar';
+        colgar.textContent = 'Colgar de una tarea';
+        if (!I.hayHitos()) { colgar.disabled = true; colgar.title = 'Para colgar un documento, crea antes el hito y su tarea.'; }
+        colgar.onclick = async function (ev) {
+          ev.stopPropagation();
+          colgar.disabled = true;
+          try { await DocumentoATarea.colgarDeCarpeta(a, f.nombre); }
+          finally { colgar.disabled = false; }
+        };
+        fila.appendChild(colgar);
+      }
+    }
+
     /* Fila 423: «Ruta», pegado al nombre: copia la ruta entera del documento. Fila 439: es lo único que
        queda a la vista; lo demás, en el menú ⋮ de la derecha, y los datos, en gris, tras «Ruta». */
     if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: f.nombre }));

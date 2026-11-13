@@ -3,7 +3,7 @@
 
    Con un asunto de la demostración con tres hitos y varios documentos:
      1. Al abrirlo (fila 637, sin pestañas) la vista es siempre «Trabajo», con el hito actual a la vista y los bloques plegados.
-     2. A la izquierda, el hito de arriba abajo (tareas, campos, documentos del hito, registro); a la
+     2. A la izquierda, el hito de arriba abajo (fila 638: solo sus tareas, sin recuadros de campos, documentos ni registro); a la
         derecha, los bloques plegados (con la carpeta); cada columna mide la mitad y la página no baja.
      3. Los documentos de la carpeta que son del hito abierto llevan «Hito N»; al cambiar de hito, cambian.
      4. Abrir un bloque («Datos») no cambia la vista: siguen las dos columnas y el mismo hito.
@@ -105,12 +105,12 @@ for (const [ancho, alto] of [[1905, 1000], [1600, 900]]) {
   await comprobar('1. se abre solo el hito actual (el primero sin hacer)', hitoEnMesa(pagina), 'm1');
 
   /* 2. */
-  await comprobar('2. a la izquierda: tareas, campos, documentos del hito y registro, en ese orden',
+  await comprobar('2. a la izquierda: solo las tareas (fila 638: ni campos, ni documentos del hito, ni registro)',
     pagina.evaluate(() => {
       const col = document.querySelector('#trabajo-izq .mesa-col-hito');
       return Array.from(col.children).map((e) => e.classList.contains('mesa-grande-guion') ? 'tareas' : e.classList.contains('mesa-campos-hito') ? 'campos'
         : e.classList.contains('mesa-grande-docs') ? 'docs' : e.classList.contains('mesa-grande-notas') ? 'registro' : e.classList.contains('mesa-normativa') ? 'normativa' : '?');
-    }).then((o) => o.filter((x) => x !== 'normativa')), ['tareas', 'campos', 'docs', 'registro']);
+    }).then((o) => o.filter((x) => x !== 'normativa')), ['tareas']);
   await comprobar('2. a la derecha: los bloques, con la carpeta y sus tres documentos',
     pagina.locator('#trabajo-der #ficha-documentos .ficha-documento-fila').count(), 3);
   const izq = await caja(pagina, '#trabajo-izq'), der = await caja(pagina, '#trabajo-der');
@@ -182,7 +182,6 @@ for (const [ancho, alto] of [[1905, 1000], [1600, 900]]) {
   await pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: DOCS[2] }).locator('.ficha-documento-marca').check();
   await comprobar('6. la casilla de un documento de la carpeta lo pone entre los adjuntos del hito',
     pagina.evaluate(() => HitoMesaDocumentos.marcados(document)), [DOCS[2]]);
-  await comprobar('6. y la barra de lo marcado lo cuenta', pagina.locator('.hito-en-mesa .mesa-seleccion').isVisible(), true);
   await pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: DOCS[2] }).locator('.ficha-documento-marca').uncheck();
 
   /* 7. */

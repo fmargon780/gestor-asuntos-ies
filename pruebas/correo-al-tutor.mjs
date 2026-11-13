@@ -14,6 +14,7 @@
    Y: el hito se llama «Informar al tutor/a», las casillas de «Comunicar ▾», la guía y la plantilla en Ajustes, y el
    asunto de otro tipo. */
 import { chromium } from 'playwright';
+import { comunicarDelHito } from './apoyo/hito.mjs';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
 let fallos = 0;
@@ -51,9 +52,9 @@ async function abrirMesa(frag) {
   if (await primero.count() && !(await primero.evaluate((e) => e.classList.contains('actual')))) await primero.click();
   await pagina.waitForTimeout(600);
 }
+/* Fila 638: los pasos pendientes de comunicar, cada uno con su botón (antes, arriba en «Comunicar ▾»). */
+const tareasDeComunicar = () => pagina.$$eval('.hito-en-mesa .guion-paso', (l) => l.filter((p) => p.querySelector('.guion-accion-tarea[data-accion="comunicar"]')).map((p) => p.querySelector('.guion-paso-texto').textContent.trim()));
 async function abrirComunicar() {
-  await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-  await pagina.waitForSelector('.hito-en-mesa .mesa-preparar-correo');
   await pagina.waitForTimeout(300);
 }
 async function cerrarCuadro() {
@@ -101,12 +102,12 @@ await comprobar('1. y en los cuatro asuntos y en la guía, ninguno «Notificar a
   return t.concat(GuiasDelCentro.pasosDe('SANCION').map((p) => p.titulo));
 }), ['Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Informar al tutor/a', 'Entregar la notificación a la familia']);
 await abrirComunicar();
-await comprobar('2. «Comunicar ▾»: ya no hay casillas de destinatarios (fila 555)', pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.length), 0);
-await comprobar('2. arriba, la tarea pendiente de comunicar', pagina.locator('.hito-en-mesa .mesa-receta').allTextContents(), ['Avisar al tutor/a']);
+await comprobar('2. ya no hay casillas de destinatarios (fila 555)', pagina.$$eval('.hito-en-mesa .mesa-chip', (c) => c.length), 0);
+await comprobar('2. arriba, la tarea pendiente de comunicar', tareasDeComunicar(), ['Avisar al tutor/a']);
 
 /* ===== 8. Mateo: el cuadro con todo ===== */
 console.log('--- 8. el cuadro del tutor con correo y NOTIFICACION ---');
-await pagina.click('.hito-en-mesa .mesa-receta');
+await pagina.locator('.hito-en-mesa .guion-accion-tarea[data-accion="comunicar"]').first().click();   /* fila 638: el botón de la tarea */
 await esperarCuadro();
 let c = await cuadro();
 await comprobar('8. el correo del tutor ya puesto (lo dice la plantilla), el saludo «Buenas:» y su texto', [c.otro, c.marcadas, c.saludo, /^Jefatura de Estudios entregará al alumno la notificación escrita para la familia\./m.test(c.cuerpo),
@@ -124,8 +125,9 @@ await comprobar('8. y la tarea queda hecha', t1.hechas, ['g-demo-tutor-avisar'])
 /* ===== 6. Delgado: dos tutores, desde «Hacer este hito» ===== */
 console.log('--- 6. dos tutores, «Hacer este hito» ---');
 await abrirMesa('SANCION Delgado Prieto');
-await comprobar('6. «Hacer este hito», con su línea', pagina.locator('.hito-en-mesa .mesa-hacer-linea').allTextContents(), ['correo']);
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+/* Fila 638: ya no hay botón «Hacer este hito» ni su línea; la cadena se lanza a mano con la misma función. */
+await comprobar('6. sin botón «Hacer este hito» (fila 638)', pagina.locator('.hito-en-mesa .mesa-hacer-hito, .hito-en-mesa .mesa-hacer-linea').count(), 0);
+await pagina.evaluate(async () => { const a = FichaNucleo.actual; const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito); setTimeout(() => HacerEsteHito.ejecutar(a, h), 0); });
 await esperarCuadro();
 c = await cuadro();
 await comprobar('6. las direcciones de los dos tutores y «Buenas:»', [c.otro, c.saludo, c.marcadas], ['freyes@correo-demo.es, puceda@correo-demo.es', 'Buenas:', []]);
@@ -138,7 +140,7 @@ await pagina.evaluate(() => Hitos.guionDe && 0);
 console.log('--- 9. sin correo: no se puede elegir; se escribe en el aviso y entra en «Para» ---');
 await abrirMesa('SANCION Fuentes Calvo');
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-receta');
+await pagina.locator('.hito-en-mesa .guion-accion-tarea[data-accion="comunicar"]').first().click();   /* fila 638: el botón de la tarea */
 await esperarCuadro();
 c = await cuadro();
 await comprobar('9. «Para» vacío (la tutora no tiene correo) y el saludo «Buenas:»', [c.otro, c.saludo], ['', 'Buenas:']);
@@ -157,7 +159,7 @@ await cerrarCuadro();
 /* Otra vez: ya viene su correo recordado */
 await abrirMesa('SANCION Fuentes Calvo');
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-receta');
+await pagina.locator('.hito-en-mesa .guion-accion-tarea[data-accion="comunicar"]').first().click();   /* fila 638: el botón de la tarea */
 await esperarCuadro();
 c = await cuadro();
 await comprobar('9. la segunda vez la dirección viene puesta por la plantilla', [c.otro, c.saludo], ['esperanza@correo-demo.es', 'Buenas:']);
@@ -167,7 +169,7 @@ await cerrarCuadro();
 console.log('--- 11. unidad sin tutor ---');
 await abrirMesa('SANCION Klein Soto');
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-receta');
+await pagina.locator('.hito-en-mesa .guion-accion-tarea[data-accion="comunicar"]').first().click();   /* fila 638: el botón de la tarea */
 await esperarCuadro();
 c = await cuadro();
 await comprobar('11. el cuadro se abre, con la línea ámbar y sin dirección', pagina.evaluate(() => [[...document.querySelectorAll('#correo-formulario .correo-tutor-falta')].map((p) => p.textContent), CorreoPara.texto('para'), document.getElementById('correo-cuerpo-texto').value.split('\n')[0]]),
@@ -183,7 +185,7 @@ await pagina.evaluate(async () => {
 });
 await abrirMesa('SANCION Jimenez Rubio');
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-preparar-correo');
+await comunicarDelHito(pagina);   /* fila 638: ya no hay «Preparar correo» suelto; la misma función que usa el botón de una tarea */
 await esperarCuadro();
 c = await cuadro();
 await comprobar('12. con el INFORME suelto en la carpeta, solo se marca la NOTIFICACION',
@@ -214,7 +216,7 @@ await cerrarCuadro();
 console.log('--- 12b. plantilla de lo escrito y Séneca ---');
 await abrirMesa('SANCION Jimenez Rubio');
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-preparar-correo');
+await comunicarDelHito(pagina);   /* fila 638: ya no hay «Preparar correo» suelto; la misma función que usa el botón de una tarea */
 await esperarCuadro();
 await pagina.click('#correo-plantilla-desde-escrito');
 await pagina.waitForSelector('#pl2-texto');
@@ -223,7 +225,7 @@ await comprobar('12b. el editor de la plantilla nueva no lleva el saludo «Buena
 await pagina.click('#pl2-cancelar');
 await cerrarCuadro();
 await abrirComunicar();
-await pagina.click('.hito-en-mesa .mesa-mensaje-seneca');
+await comunicarDelHito(pagina, 'seneca');
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-formulario');
 await pagina.waitForTimeout(900);
 await comprobar('12b. en Séneca, el documento NOTIFICACION se señala para adjuntarlo a mano',
@@ -235,8 +237,8 @@ await cerrarCuadro();
 console.log('--- 10. otro tipo de asunto ---');
 await abrirMesa('INCIDENCIA DE AULA Jimenez Rubio');
 await abrirComunicar();
-await comprobar('10. la tarea «Avisar a la tutoría»', pagina.locator('.hito-en-mesa .mesa-receta').allTextContents(), ['Avisar a la tutoría']);
-await pagina.click('.hito-en-mesa .mesa-receta');
+await comprobar('10. la tarea «Avisar a la tutoría»', tareasDeComunicar(), ['Avisar a la tutoría']);
+await pagina.locator('.hito-en-mesa .guion-accion-tarea[data-accion="comunicar"]').first().click();   /* fila 638: el botón de la tarea */
 await esperarCuadro();
 c = await cuadro();
 await comprobar('10. una tarea sin plantilla se abre sin nadie propuesto (el «a quién» lo dice la plantilla) y con el saludo de siempre', [c.otro, /^Estimados tutores legales/.test(c.saludo), c.docs.length], ['', true, 0]);

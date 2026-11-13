@@ -63,11 +63,16 @@
     // Fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md: el hito a pantalla completa,
     // la mesa de trabajo. Después de los hitos, de la tarjeta de Hitos y del visor.
     'js/hito-mesa.js',
+    // Fila 638: la línea del hito («Hito actual · En curso · plazo», «Esperando a…»). La llama js/hito-mesa.js al pintar la cabecera.
+    'js/hito-mesa-linea.js',
     'js/tareas-con-documento.js',
     'js/tareas-con-documento-vista.js',
     // Fila 524: lo que falta por firmar o registrar (cuadros de marcar, archivar y enviar, y «Sin registrar»). Antes de js/hito-mesa-documentos.js.
     'js/avisos-de-lo-que-falta.js',
     'js/hito-mesa-guion.js',
+    // Fila 638: «+ Añadir tarea» y su formulario, y «¿De qué tarea es?» (documento colgado de una tarea). Las llaman js/hito-mesa-guion.js, js/documentos-guardar.js y js/ficha-documentos-fila.js.
+    'js/hito-mesa-nueva-tarea.js',
+    'js/documento-a-tarea.js',
     'js/donde-se-guarda.js',
     'js/donde-se-guarda-tareas.js',
     'js/hito-mesa-tarea-menu.js',

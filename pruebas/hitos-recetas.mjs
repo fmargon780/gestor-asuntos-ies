@@ -1,8 +1,8 @@
 /* Prueba en navegador de verdad de la fila 164 de docs/COLA.md
    (docs/HITOS-ACCIONES-EN-EL-HITO.md, puntos 3 y 4):
 
-   a. Un paso con receta de comunicar sale arriba en «Comunicar ▾»; al
-      elegirlo, el cuadro (Séneca, por la receta) se abre ya con la
+   a. Un paso con receta de comunicar lleva su botón (fila 638; antes, arriba en «Comunicar ▾»); al
+      pulsarlo, el cuadro (Séneca, por la receta) se abre ya con la
       plantilla de la receta, y al terminar se marca ESE paso (el
       segundo), no el primero pendiente.
    b. Un documento del hito 2 se ve en la mesa del hito 3, en «De otros
@@ -100,18 +100,13 @@ await comprobar('la carpeta enseña los tres; ninguno es de este hito, así que 
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((d) =>
     [d.dataset.doc, (d.querySelector('.ficha-marca-hito') || {}).textContent || '', !!d.querySelector('.ficha-documento-traer') && !d.querySelector('.ficha-documento-traer').classList.contains('oculto')])),
   [['260905 SOLICITUD.pdf', '', true], ['260906 INFORME.pdf', '', true], ['260907 SUELTO.pdf', '', true]]);
-await comprobar('el título del hito cuenta solo los suyos',
-  pagina.evaluate(() => document.querySelector('.hito-en-mesa .mesa-docs-cuenta').textContent), '0');
 await comprobar('a la izquierda ya no hay filas «De otros hitos» ni «sin hito»',
   pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-doc-ajeno, .hito-en-mesa .mesa-docs-apartado').length), 0);
 
-console.log('--- d. «Generar documento ▾» y «Registrar» ---');
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
-await pagina.waitForTimeout(300);
-await comprobar('«Generar documento ▾» enseña arriba el paso con receta de generar',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-recetas[data-accion="generar"] .mesa-receta')).map((b) => b.textContent)),
+console.log('--- d. «Generar documento» y «Registrar» (fila 638: cada uno, el botón de su tarea) ---');
+await comprobar('la tarea con receta de generar lleva su botón «Generar documento»',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .guion-paso')).filter((p) => p.querySelector('.guion-accion-tarea[data-accion="generar"]')).map((p) => p.querySelector('.guion-paso-texto').textContent)),
   ['Generar el oficio']);
-await pagina.keyboard.press('Escape');
 await pagina.evaluate(async (a1) => {
   await Hitos.anadirDocumento(a1, 'p3', '260907 SUELTO.pdf');
   HitosPanel.programarRepintado();
@@ -120,12 +115,10 @@ await pagina.waitForTimeout(800);
 await comprobar('no hay botón «Registrar» en la cabecera (fila 434)', pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-registrar').length), 0);
 
 console.log('--- a. la receta de comunicar ---');
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-await pagina.waitForSelector('.hito-en-mesa .mesa-recetas[data-accion="comunicar"] .mesa-receta');
-await comprobar('arriba, los dos pasos pendientes de comunicar, con su texto',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-recetas[data-accion="comunicar"] .mesa-receta')).map((b) => b.textContent)),
-  ['Avisar a la tutoría', 'Enviarla a la familia por iPasen']);
-await pagina.click('.hito-en-mesa .mesa-receta[data-paso="g2"]');
+await comprobar('los dos pasos pendientes de comunicar, con su texto y su botón',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .guion-paso')).filter((p) => p.querySelector('.guion-accion-tarea[data-accion="comunicar"]')).map((p) => p.querySelector('.guion-paso-texto').textContent + ' · ' + p.querySelector('.guion-accion-tarea').textContent)),
+  ['Avisar a la tutoría · Enviar correo', 'Enviarla a la familia por iPasen · Enviar por Séneca']);
+await pagina.click('.hito-en-mesa .guion-paso[data-id="g2"] .guion-accion-tarea');
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-formulario');
 await comprobar('se abre el cuadro de Séneca (la vía de la receta) con su plantilla ya elegida',
   pagina.evaluate(() => [document.getElementById('seneca-plantilla').value,

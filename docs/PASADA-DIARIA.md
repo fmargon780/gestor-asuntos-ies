@@ -1,1 +1,1 @@
-Última pasada completa: 13-nov-2026 (Madrid) · 31 min · verde (385 pruebas; hito-mesa arreglada en la fila 637, fallaba también en main) · filas 637 y 638 en la rama claude/gestor-asuntos-filas-637-638-w763gk
+Última pasada completa: 13-nov-2026 (Madrid) · 36 min · verde salvo arreglos-del-hito-demo (falla también en main; fila 645) · filas 637 y 638 en la rama claude/gestor-asuntos-filas-637-638-w763gk

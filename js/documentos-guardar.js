@@ -119,6 +119,16 @@
     if (!nombre) return;
     /* Fila 177: por si acaso, se comprueba también aquí antes de guardar. */
     if (ajustadoFinal.noCabe) { U.aviso(Nombres.AVISO_NO_CABE, 'malo'); return; }
+    /* Fila 638: de qué tarea es el documento que entra. Desde el botón «Añadir documento» de una tarea, ya se sabe; desde
+       «+ Añadir documento» de la carpeta se pregunta ahora, antes de guardar nada («Cancelar» no añade nada). */
+    var tipoDelDocumento = datosDelFormulario(opciones).tipo;
+    var destino = null;
+    if (opciones.modo === 'anadir' && N.hitoActual && N.tareaActual) destino = { hitoId: N.hitoActual.id, tareaId: N.tareaActual };
+    else if (opciones.modo === 'anadir' && N.preguntarTarea && window.DocumentoATarea) {
+      destino = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: false });
+      if (!destino) return;
+    }
+    var hitoDelRegistro = destino ? { id: destino.hitoId } : N.hitoActual;
     /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
        Si otro ordenador se ha quedado el que enseñaba la vista previa, se
        guarda igual con el siguiente (fila 275) y se dice al terminar. */
@@ -193,7 +203,7 @@
     }
     /* Fila 229: guardado en el asunto, queda su línea en el registro. */
     if (opciones.modo === 'anadir' && window.RegistroAsunto) {
-      await RegistroAsunto.auto(N.asuntoActual, 'Documento guardado «' + nombre + '»', N.hitoActual);
+      await RegistroAsunto.auto(N.asuntoActual, 'Documento guardado «' + nombre + '»', hitoDelRegistro);
     }
     /* El tipo de documento elegido, para la próxima vez (fila 174,
        punto 1): por tipo de asunto, en este ordenador. */
@@ -207,7 +217,12 @@
        de "Lo que hay que reunir" que le toque (no crítico: el
        documento ya ha quedado guardado igual). Vale para todo lo que
        se guarde mientras el cuadro esté abierto, no solo lo primero. */
-    if (N.hitoActual) {
+    if (destino && window.DocumentoATarea) {
+      /* Fila 638: apuntado al hito, colgado de su tarea (o de la «Tarea nueva»), tarea hecha y su línea en el registro. */
+      try { await DocumentoATarea.colgar(N.asuntoActual, destino, nombre, tipoDelDocumento, { nuevo: true }); }
+      catch (e2c) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2c); }
+      if (window.HitosPanel && N.hitoActual) window.HitosPanel.desplegarAlAbrir(N.asuntoActual.nombre, N.hitoActual.id);
+    } else if (N.hitoActual) {
       try {
         /* Renombrar uno que ya estaba apuntado a este hito (el que entra
            desde "Por clasificar" se apunta nada más entrar): el nombre
@@ -235,6 +250,13 @@
     if (window.Candidaturas) {
       var dCand = datosDelFormulario(opciones);
       await Candidaturas.alGuardar(N.asuntoActual, nombre, { fecha: dCand.fecha, registro: dCand.codigo });
+    }
+    /* Fila 638: «Colgar de una tarea» de un documento sin nombre según la norma: ya tiene nombre; ahora, la pregunta. */
+    if (N.colgar && opciones.modo !== 'anadir' && window.DocumentoATarea) {
+      try {
+        var d2 = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: true });
+        if (d2) await DocumentoATarea.colgar(N.asuntoActual, d2, nombre, tipoDelDocumento, { nuevo: false });
+      } catch (e2d) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2d); }
     }
     N.soltarVisor();
     /* Abierto directo para ponerle nombre (opciones.ponerNombre, fila

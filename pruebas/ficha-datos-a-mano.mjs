@@ -8,7 +8,7 @@
      3. El ⧉ del NIE copia el NIE y no abre el bloque.
      4. Al pulsar el título se abre con los datos completos («La alumna», «Contacto» con teléfono y correo, «Campos de este
         asunto»), empujando lo de debajo hacia abajo; pulsarlo otra vez lo pliega; se recuerda al repintar la ficha.
-     5. Una nota a mano sin hito sale en el Registro del hito con «del asunto»; una línea automática sin hito no sale; una nota
+     5. (fila 638: el hito ya no tiene recuadro de Registro) El bloque Registro de la derecha enseña la nota a mano sin hito, la línea automática y la de otro hito; una nota
         de otro hito tampoco.
      6. Un tercero que no es alumnado (empresa) enseña NIF, teléfono y correo; y al entrar en otro asunto, el bloque está plegado. */
 import { chromium } from 'playwright';
@@ -146,26 +146,22 @@ await comprobar('4. no hay pestañas: «Datos» y «Campos de este asunto» son 
   pagina.evaluate(() => [!!document.getElementById('ficha-tarjetas-pestanas'), !!document.querySelector('.ficha-pestana'),
     !!document.querySelector('.ficha-plegable[data-tarjeta="datos"] #ficha-datos-tramite')]), [false, false, true]);
 
-/* 5. */
-const registro = (await texto(pagina, '.hito-en-mesa .mesa-grande-notas .hito-notas'));
-await comprobar('5. la nota a mano sin hito sale en el Registro del hito', registro.indexOf(NOTA_SUELTA) !== -1, true);
-await comprobar('5. con la etiqueta «del asunto»', pagina.locator('.hito-en-mesa .mesa-grande-notas .registro-linea', { hasText: NOTA_SUELTA }).locator('.registro-del-asunto').textContent(), 'del asunto');
-await comprobar('5. la línea automática sin hito no sale', registro.indexOf(NOTA_AUTO) === -1, true);
-await comprobar('5. la nota de otro hito tampoco', registro.indexOf(NOTA_OTRO_HITO) === -1, true);
+/* 5. Fila 638: el hito ya no tiene su recuadro de «Registro»; el bloque Registro de la derecha enseña todas las líneas. */
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
-await comprobar('5. el bloque Registro sigue enseñando las tres',
+await comprobar('5. el bloque Registro enseña las tres',
   pagina.evaluate(([a, b, c]) => { const t = document.getElementById('ficha-notas').textContent; return [a, b, c].every((x) => t.indexOf(x) !== -1); }, [NOTA_SUELTA, NOTA_AUTO, NOTA_OTRO_HITO]), true);
-await pagina.evaluate(() => FichaTarjetas.plegar('notas'));
+await comprobar('5. la nota a mano sin hito sale sin etiqueta de hito',
+  pagina.evaluate((n) => { const l = Array.from(document.querySelectorAll('#ficha-notas .registro-linea')).filter((x) => x.textContent.indexOf(n) !== -1)[0]; return !!l && !l.querySelector('.nota-hito'); }, NOTA_SUELTA), true);
+await comprobar('5. y el hito no tiene recuadro de Registro', pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-grande-notas, .hito-en-mesa .hito-notas').length), 0);
 
-/* 5b. Una nota escrita a mano en el bloque Registro sale enseguida en el Registro del hito. */
-await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
+/* 5b. Una nota escrita a mano en el bloque Registro sale enseguida en el Registro. */
 await pagina.fill('#ficha-nota-texto', 'Escrita después de abrir');
 await pagina.click('#ficha-nota-guardar');
 await pagina.waitForTimeout(1200);
+await comprobar('5. una nota escrita ahora en el bloque Registro sale la primera',
+  pagina.evaluate(() => document.querySelector('#ficha-notas .registro-linea').textContent.indexOf('Escrita después') !== -1), true);
 await pagina.evaluate(() => FichaTarjetas.plegar('notas'));
-await pagina.waitForTimeout(800);
-await comprobar('5. una nota escrita ahora en el bloque Registro sale también en el del hito',
-  pagina.evaluate(() => document.querySelector('.hito-en-mesa .hito-notas').textContent.indexOf('Escrita después') !== -1), true);
+await pagina.waitForTimeout(500);
 
 /* 2. */
 await pagina.setViewportSize({ width: 900, height: 900 });

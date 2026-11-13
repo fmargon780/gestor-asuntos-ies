@@ -101,7 +101,7 @@ await mover([UNO], 1);
 await comprobar('6. «mover» el PDF mueve también su Word', (await H('docs')).map((x) => x.slice()), [[], [UNO_W, UNO].sort(), []]);
 await H('limpiar');
 
-console.log('--- 7. la barra de marcados de la mesa ---');
+console.log('--- 7. «Mover a otro hito» de lo marcado (fila 638: sin la barra de la mesa) ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: 'Aguilar Ponce, Marina' }).first().click();
 await pagina.waitForSelector('#ficha-documentos', { state: 'attached' });
@@ -124,7 +124,8 @@ await comprobar('7. en la carpeta, con el hito 1 abierto, «uno» (del hito 2) y
   traer: Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).filter((f) => f.querySelector('.ficha-documento-traer') && !f.querySelector('.ficha-documento-traer').classList.contains('oculto')).map((f) => f.dataset.doc).filter((d) => n.indexOf(d) !== -1) }), [UNO, DOS]),
   { marcas: 0, traer: [DOS, UNO] });
 await pagina.locator('#ficha-documentos .ficha-documento-fila', { hasText: UNO }).locator('.ficha-documento-marca').check();
-await pagina.click('.hito-en-mesa .mesa-sel-mover');
+/* Fila 638: la barra de lo marcado (con «Mover a otro hito») estaba en el recuadro «Documentos» del hito, que ya no existe; el cuadro es el mismo. */
+await pagina.evaluate(async (n) => { const hs = await window.__h.hitos(); HitoMesaDocumentos.moverAOtroHito(window.__h.a(), hs[0], hs, [n]); }, UNO);
 await pagina.waitForSelector('#mesa-mover-destino');
 await comprobar('7. el desplegable lleva, el primero, «Este hito (…)»', pagina.locator('#mesa-mover-destino option').first().textContent(), 'Este hito (1 · Recibir la solicitud)');
 await pagina.click('#cuadro-aceptar');

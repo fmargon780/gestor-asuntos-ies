@@ -36,9 +36,6 @@
    ============================================================ */
 var HitoMesaGuion = (function () {
 
-  /* Fila 522: lo elegido en «Qué se hace» de la caja «Nueva tarea…», por hito, para que un repintado no lo borre. */
-  var nuevaForma = {};
-
   /* Fila 229: marcar, desmarcar o «No aplica» de una tarea deja su línea
      en el registro del hito (accesorio: si falla, ámbar). */
   function apuntarTarea(a, h, tarea, que) {
@@ -76,7 +73,7 @@ var HitoMesaGuion = (function () {
     /* Fila 154: las acciones viven en la cabecera del hito; fila 410: y cada
        tarea pendiente de comunicar o de generar lleva su botón, delante del
        💬 y del «⋮». Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
-    var botonAccion = (abierto && window.HitoMesaRecetas) ? HitoMesaRecetas.botonDeTareaHTML(a, h, g) : '';
+    var botonAccion = (abierto && window.HitoMesaRecetas) ? HitoMesaRecetas.botonDeTareaHTML(a, h, g, { siguiente: siguiente, guion: ctx && ctx.guion }) : '';
     var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
@@ -203,23 +200,16 @@ var HitoMesaGuion = (function () {
 
   function pintarGuion(caja, fila, a, h, abierto, hitos) {
     var guion = Hitos.guionDe(a, h);
-    var c = Hitos.cuentaGuion(guion);
-    var pct = c.total ? Math.round(100 * c.hechos / c.total) : 0;
     /* Fila 145: la siguiente tarea, la primera sin hacer y sin «No aplica»
        (con el hito ya hecho, ninguno). */
     var siguiente = h.estado === 'hecho' ? null : guion.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
     var ctx = { guion: guion, hitos: hitos || [], abierto: abierto };
+    /* Fila 638: sin recuadro ni cabecera «Tareas»; un hito sin tareas lo dice. Debajo, «+ Añadir tarea». */
     caja.innerHTML =
-      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas</span>' +
-        '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
-        '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
+      (!guion.length ? '<p class="mesa-sin-tareas">Este hito no tiene tareas.</p>' : '') +
       guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h, ctx); }).join('') + plegadasHTML(guion.plegadas) +
       (abierto ? franjaDelOrdenHTML(a, h) : '') +
-      (abierto ? '<div class="tcd-nueva"><input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' +
-        /* Fila 522: «Qué se hace» y su dato, como en la guía; sin elegir, como siempre. */
-        (window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML(nuevaForma[h.id]) +
-          '<button type="button" class="boton boton-chico tcd-anadir">Añadir</button>' : '') + '</div>' : '') +
-      (abierto && window.ComunesAsunto ? ComunesAsunto.botonesHTML(a, h) : '');   /* fila 531: la lista común de tareas y de hitos */
+      (abierto && window.HitoMesaNuevaTarea ? HitoMesaNuevaTarea.html(a, h) : '');
 
     /* La normativa de las tareas del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
@@ -313,43 +303,12 @@ var HitoMesaGuion = (function () {
         soltar.classList.remove('encima');
         var ficheros = ev.dataTransfer && ev.dataTransfer.files;
         if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287: un directivo no guarda documentos */
-        if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, ficheroSoltado: ficheros[0] });
+        var delPaso = soltar.closest('.guion-paso');
+        if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, tarea: delPaso ? delPaso.dataset.id : '', ficheroSoltado: ficheros[0] });   /* fila 638: ya se sabe de qué tarea es */
       };
     }
-    /* Fila 224: «Nueva tarea…», al pie de la lista. Intro añade solo a
-       este asunto, vacía la caja y deja el foco para escribir otra
-       (U.conservandoLoEscrito, más arriba, se encarga del foco tras el
-       repintado). */
-    var nueva = caja.querySelector('#guion-nueva-tarea');
-    var contNueva = caja.querySelector('.tcd-nueva');
-    if (contNueva && window.TareasConDocumentoVista) {
-      TareasConDocumentoVista.engancharFormulario(contNueva, function (forma) { nuevaForma[h.id] = forma; });
-    }
-    function anadirNueva() {
-      var texto = nueva.value.trim();
-      if (!texto || nueva.dataset.preguntando) return;
-      /* Fila 416: Intro guarda la tarea solo en este asunto, sin preguntar. La caja se
-         vacía al guardar (antes del repintado, para que no vuelva el texto). */
-      nueva.dataset.preguntando = '1';
-      var forma = (contNueva && window.TareasConDocumentoVista) ? TareasConDocumentoVista.leerFormulario(contNueva) : null;
-      delete nuevaForma[h.id];
-      DondeSeGuardaTareas.nueva(a, h, texto, function () {
-        var actual = document.getElementById('guion-nueva-tarea');
-        if (actual && actual.value.trim() === texto) actual.value = '';
-      }, forma).then(function () {
-        var actual = document.getElementById('guion-nueva-tarea');
-        if (actual) { delete actual.dataset.preguntando; actual.focus(); }
-        delete nueva.dataset.preguntando;
-      });
-    }
-    if (nueva) nueva.onkeydown = function (ev) {
-      if (ev.key !== 'Enter' || ev.isComposing) return;
-      ev.preventDefault();
-      anadirNueva();
-    };
-    var botonAnadir = caja.querySelector('.tcd-anadir');
-    if (botonAnadir) botonAnadir.onclick = anadirNueva;
-    if (window.ComunesAsunto) ComunesAsunto.enganchar(caja, a, h);
+    /* Fila 638: «+ Añadir tarea» y su formulario. */
+    if (window.HitoMesaNuevaTarea) HitoMesaNuevaTarea.enganchar(caja, a, h, function () { pintar(fila, a, h, abierto, hitos); });
     engancharFranjaDelOrden(caja, a, h);
   }
 

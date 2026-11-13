@@ -157,32 +157,21 @@ await pagina.waitForTimeout(400);
 await abrirHito(pagina, 'b2');
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="b2"]');
 await pagina.waitForTimeout(300);
-/* Fila 145: dentro del desplegable «Generar documento ▾». */
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
-await comprobar('4. en un hito sin plantillas sale «Buscar otra plantilla…»',
-  pagina.locator('.hito-en-mesa .mesa-buscar-plantilla').count(), 1);
-await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
-await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
-await comprobar('4. encuentra una de otro tipo', pagina.locator('.hito-en-mesa .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id)), ['pd-otra']);
-/* Fila 170: cargar las 64 plantillas del centro (parte 3) deja trabajo de
-   fondo que puede repintar la mesa justo aquí y llevarse la opción; si
-   pasa, se vuelve a abrir el desplegable y a buscar. */
-for (let intento = 0; ; intento++) {
-  try {
-    if (!(await pagina.locator('.hito-en-mesa .mesa-panel-generar:not(.oculto)').count())) {
-      await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
-    }
-    if (!(await pagina.locator('.hito-en-mesa .plantilla-buscar-campo').count())) {
-      await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
-      await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
-    }
-    await pagina.click('.hito-en-mesa .plantilla-buscar-opcion', { timeout: 5000 });
-    break;
-  } catch (e) {
-    if (intento >= 3) throw e;
-    await pagina.waitForTimeout(500);
-  }
-}
+/* Fila 638: ya no hay «Generar documento ▾» suelto: se genera desde una tarea de generar sin plantilla fija, cuyo botón abre el
+   cuadro de elegir (con «Buscar otra plantilla…»). */
+await pagina.evaluate(async (nombre) => {
+  await Hitos.anadirGuionPropio(nombre, 'b2', 'Generar el documento', { accion: 'generar' });
+  HitosPanel.programarRepintado();
+}, nuevoNombre);
+await pagina.waitForSelector('.hito-en-mesa .guion-accion-tarea[data-accion="generar"]');
+await pagina.click('.hito-en-mesa .guion-accion-tarea[data-accion="generar"]');
+await pagina.waitForSelector('#cuadro-cuerpo .pd-buscar-otra');
+await comprobar('4. el cuadro de elegir ofrece «Buscar otra plantilla…»', pagina.locator('#cuadro-cuerpo .pd-buscar-otra').count(), 1);
+await pagina.click('#cuadro-cuerpo .pd-buscar-otra');
+await pagina.waitForSelector('#cuadro-cuerpo .plantilla-buscar-campo');
+await pagina.fill('#cuadro-cuerpo .plantilla-buscar-campo', 'salida');
+await comprobar('4. encuentra una de otro tipo', pagina.locator('#cuadro-cuerpo .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id)), ['pd-otra']);
+await pagina.click('#cuadro-cuerpo .plantilla-buscar-opcion');
 await pagina.waitForTimeout(800);
 const r4 = await pagina.evaluate(async (nombre) => {
   const h = (await Hitos.hitosDe(nombre)).filter(x => x.id === 'b2')[0];

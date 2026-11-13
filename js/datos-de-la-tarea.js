@@ -72,7 +72,7 @@ var DatosDeLaTarea = (function () {
   async function pintarUno(el, a, h, g, siguiente, abierto, alRepintar) {
     var clave = a.nombre + '|' + h.id + '|' + g.id;
     var turno = turnos[clave] = (turnos[clave] || 0) + 1;
-    pintadas[clave] = { el: el, de: function () { pintarUno(el, a, h, g, siguiente, abierto, alRepintar); } };
+    pintadas[clave] = { el: el, de: function () { return pintarUno(el, a, h, g, siguiente, abierto, alRepintar); } };
     var open = clave in abiertas ? abiertas[clave] : !!(siguiente && siguiente.id === g.id);
     function conmutar() { abiertas[clave] = !open; pintarUno(el, a, h, g, siguiente, abierto, alRepintar); }
     if (!open) { el.innerHTML = cabeza(false, 'Ver los datos'); el.querySelector('.dat-cabeza').onclick = conmutar; return; }
@@ -147,6 +147,19 @@ var DatosDeLaTarea = (function () {
     });
   }
 
-  return { repintarTodas: repintarTodas, marcoHTML: marcoHTML, pintar: pintar, esDePlantilla: esDePlantilla, esDePedir: esDePedir, datosDePedir: datosDePedir };
+  /* Fila 638: el botón «Rellenar» de una tarea «Pedir datos»: abre su lista de datos y pone el cursor en el primer dato que falta. */
+  async function abrir(a, h, g, fila) {
+    var clave = a.nombre + '|' + h.id + '|' + g.id;
+    abiertas[clave] = true;
+    var p = pintadas[clave];
+    if (p && p.el.isConnected) await p.de();
+    var el = (fila || document).querySelector('.dat-tarea[data-paso="' + g.id + '"]');
+    var vacio = el && Array.prototype.filter.call(el.querySelectorAll('input.campo, select.campo, textarea.campo'), function (c) { return !c.value; })[0];
+    var campo = vacio || (el && el.querySelector('input.campo, select.campo, textarea.campo'));
+    if (campo) campo.focus();
+    else if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+  }
+
+  return { abrir: abrir, repintarTodas: repintarTodas, marcoHTML: marcoHTML, pintar: pintar, esDePlantilla: esDePlantilla, esDePedir: esDePedir, datosDePedir: datosDePedir };
 })();
 window.DatosDeLaTarea = DatosDeLaTarea;

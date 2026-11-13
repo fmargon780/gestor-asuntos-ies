@@ -6,11 +6,15 @@
    1. Al entrar: «1 listos para enviar» en Inicio, la coletilla «· listo para enviar» y el PDF sellado ya colocado sin preguntar.
    2. Hugo: «Enviar», «El documento ya está sellado.»; el correo con el PDF sellado adjunto y «Todavía no»; sigue en «Enviar».
    3. Enviar de verdad: hito hecho con «Deshacer», sin apunte, y se abre el siguiente; el aviso de Inicio desaparece.
-   4. Irene: «Hacer este hito» con su línea; genera, guarda el PDF solo, marca la tarea, se para en el registro (franja,
-      «Esperando el PDF sellado», «Dejar de esperar»); en Inicio, «· esperando el sello»; «Dejar de esperar» lo deshace.
+   4. Irene: la cadena genera, guarda el PDF solo, marca la tarea, se para en el registro (franja); en Inicio, «· esperando el
+      sello»; quitar el apunte lo deshace.
    5. Una pregunta sin responder: se para antes, con el aviso ámbar.
-   6. Un hito sin tareas de generar ni de comunicar: sin botón, y los tres menús siguen.
-   7. Solo consulta: el botón está apagado. */
+   6. Un hito sin tareas de generar ni de comunicar: ningún botón suelto.
+
+   Fila 638 (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): el botón «Hacer este hito», su línea, «Esperando el PDF sellado»,
+   «Dejar de esperar» y el botón «Enviar» de la cabecera ya no existen (cada tarea lleva su botón). La cadena sigue en el
+   programa (`HacerEsteHito.ejecutar`, el apunte `cadena` del hito y el reconocimiento del PDF sellado, que sigue avisando
+   en Inicio): esta prueba la lanza a mano con esa función, y las comprobaciones de la cabecera se han quitado. */
 import { chromium } from 'playwright';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
@@ -76,7 +80,12 @@ async function abrirMesa(frag) {
   if (await primero.count() && !(await primero.evaluate((e) => e.classList.contains('actual')))) await primero.click();
   await pagina.waitForTimeout(600);
 }
-const botones = () => pagina.locator('.hito-en-mesa .mesa-hacer-hito').allTextContents();
+/* Lanza la cadena del hito abierto en la mesa (sin esperar a que acabe: se para en cuadros y esperas). */
+const hacer = () => pagina.evaluate(async () => {
+  const a = FichaNucleo.actual;
+  const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito);
+  setTimeout(() => HacerEsteHito.ejecutar(a, h), 0);
+});
 
 /* ===== 1. Al entrar ===== */
 console.log('--- 1. al entrar ---');
@@ -91,10 +100,9 @@ await comprobar('1. el hito de Hugo: listo para enviar y la tarea de registrar h
 /* ===== 2. Hugo: Enviar y «Todavía no» ===== */
 console.log('--- 2. Hugo: «Enviar» ---');
 await abrirMesa('Moreno Sanz');
-await comprobar('2. el botón dice «Enviar»', botones(), ['Enviar']);
-await comprobar('2. «El documento ya está sellado.»', pagina.locator('.mesa-hacer-linea').allTextContents(), ['El documento ya está sellado.']);
+await comprobar('2. no hay botón «Enviar» ni «Hacer este hito» en la cabecera (fila 638)', pagina.locator('.hito-en-mesa .mesa-hacer-hito, .hito-en-mesa .mesa-hacer-linea').count(), 0);
 await comprobar('2. sin aviso ámbar de sello preguntando de qué documento es', pagina.locator('#ficha-sellos .aviso-sello').count(), 0);
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+await hacer();
 await pagina.waitForSelector('#capa:not(.oculto) #correo-caja', { timeout: 15000 });
 await pagina.waitForTimeout(1200);
 await comprobar('2. el cuadro de Correo, con el PDF sellado adjunto y «Todavía no»',
@@ -103,12 +111,12 @@ await comprobar('2. el cuadro de Correo, con el PDF sellado adjunto y «Todavía
   ['Correo de este asunto', 'Todavía no', true]);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(1500);
-await comprobar('2. «Todavía no»: el cuadro se cierra y el botón sigue en «Enviar»', Promise.all([pagina.locator('#capa:not(.oculto)').count(), botones()]), [0, ['Enviar']]);
+await comprobar('2. «Todavía no»: el cuadro se cierra', pagina.locator('#capa:not(.oculto)').count(), 0);
 await comprobar('2. el hito sigue listo para enviar', hitoDe('Moreno Sanz').then((h) => h.cadena), 'listo-para-enviar');
 
 /* ===== 3. Enviar de verdad ===== */
 console.log('--- 3. enviar de verdad ---');
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+await hacer();
 await pagina.waitForSelector('#capa:not(.oculto) #correo-caja');
 await pagina.waitForTimeout(1200);
 await pagina.evaluate(() => { CorreoPara.ponerDirecciones('para', ['familia@correo-demo.es']); CorreoPara.repintar(); });   /* fila 555: a quién va lo dice la plantilla */
@@ -127,10 +135,7 @@ await comprobar('3. en Inicio ya no hay «listos para enviar»', avisos().then((
 /* ===== 4. Irene: la cadena entera ===== */
 console.log('--- 4. Irene ---');
 await abrirMesa('Vidal Soto');
-await comprobar('4. «Hacer este hito»', botones(), ['Hacer este hito']);
-await comprobar('4. la línea de lo que hará', pagina.locator('.mesa-hacer-linea').allTextContents(),
-  ['Genera «Certificado de notas» → espera el registro en Séneca → correo']);
-await comprobar('4. los tres menús de siempre siguen', pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), ['Generar documento ▾', 'Comunicar ▾']);
+await comprobar('4. sin «Hacer este hito» ni línea de lo que hará (fila 638)', pagina.locator('.hito-en-mesa .mesa-hacer-hito, .mesa-hacer-linea, .hito-en-mesa .mesa-abrir-panel').count(), 0);
 /* 5. pregunta sin responder (se prueba antes de generar) */
 console.log('--- 5. pregunta sin responder ---');
 await pagina.evaluate(() => {
@@ -140,14 +145,14 @@ await pagina.evaluate(() => {
     return [{ id: 'q1', texto: '¿Es mayor de edad?', pregunta: true, hecho: false, noaplica: false, accion: '', opciones: [] }].concat(l);
   };
 });
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+await hacer();
 await pagina.waitForTimeout(1500);
 await comprobar('5. aviso ámbar «Antes hay que responder: …»', pagina.$$eval('#mensajes .mensaje.ambar', (e) => e.map((x) => x.textContent)), ['Antes hay que responder: «¿Es mayor de edad?».']);
 await comprobar('5. no se ha abierto nada ni se ha guardado ningún PDF', Promise.all([pagina.locator('#word-visor:not(.oculto)').count(), ficheros('Vidal Soto').then((f) => f.filter((n) => /\.pdf$/.test(n)).length)]), [0, 0]);
 await pagina.evaluate(() => { Hitos.guionDe = window.__guionDe; });
 
 console.log('--- 4b. generar, guardar el PDF y pararse en el registro ---');
-await pagina.locator('.hito-en-mesa .mesa-hacer-hito').click();
+await hacer();
 await pagina.waitForSelector('#word-visor:not(.oculto) .word-visor-franja', { timeout: 30000 });
 await pagina.waitForTimeout(1500);
 await comprobar('4. el Word se abre en grande con la franja verde',
@@ -157,9 +162,6 @@ await comprobar('4. el PDF se guardó solo', ficheros('Vidal Soto').then((f) => 
 await comprobar('4. la tarea de generar, marcada; el hito esperando el sello', hitoDe('Vidal Soto').then((h) => [h.hechas, h.cadena]), [['g-hacer-generar'], 'esperando-sello']);
 await pagina.evaluate(() => WordVisor.cerrar());
 await pagina.waitForTimeout(1200);
-await comprobar('4. el botón dice «Esperando el PDF sellado» (apagado) con «Dejar de esperar»',
-  Promise.all([botones(), pagina.locator('.hito-en-mesa .mesa-hacer-espera').isDisabled(), pagina.locator('.hito-en-mesa .mesa-hacer-dejar').count()]),
-  [['Esperando el PDF sellado'], true, 1]);
 await comprobar('4. en Inicio, la fila dice «· esperando el sello»', (async () => {
   await pagina.click('button.pestana[data-pantalla="abiertos"]');
   await pagina.evaluate(() => Gestor.recargar());
@@ -167,29 +169,19 @@ await comprobar('4. en Inicio, la fila dice «· esperando el sello»', (async (
   return pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="Vidal Soto"] .inicio-tabla-hito').textContent().then((t) => /· esperando el sello/.test(t));
 })(), true);
 await abrirMesa('Vidal Soto');
-await pagina.locator('.hito-en-mesa .mesa-hacer-dejar').click();
+await pagina.evaluate(async () => { const a = FichaNucleo.actual; await Hitos.guardarCampos(a.nombre, HitoMesa.abierta().idHito, { cadena: null }); });
 await pagina.waitForTimeout(1500);
-await comprobar('4. «Dejar de esperar»: el botón vuelve a «Hacer este hito» y no hay apunte', Promise.all([botones(), hitoDe('Vidal Soto').then((h) => h.cadena)]), [['Hacer este hito'], null]);
+await comprobar('4. quitar el apunte de la cadena la deshace', hitoDe('Vidal Soto').then((h) => h.cadena), null);
 
 /* ===== 6. Un hito sin tareas de generar ni de comunicar ===== */
 console.log('--- 6. un hito sin esas tareas ---');
 await pagina.close();
 pagina = await paginaNueva(false);
 await abrirMesa('Aguilar Ponce, Marina');
-await comprobar('6. sin botón «Hacer este hito» ni «Registrar» (fila 434), y los menús siguen',
-  Promise.all([pagina.locator('.hito-en-mesa .mesa-hacer-hito').count(), pagina.locator('.hito-en-mesa .mesa-abrir-panel').allTextContents(), pagina.locator('.hito-en-mesa .mesa-registrar').count()]),
-  [0, ['Generar documento ▾', 'Comunicar ▾'], 0]);
+await comprobar('6. sin botón «Hacer este hito», «Registrar» (fila 434) ni desplegables sueltos',
+  Promise.all([pagina.locator('.hito-en-mesa .mesa-hacer-hito').count(), pagina.locator('.hito-en-mesa .mesa-abrir-panel').count(), pagina.locator('.hito-en-mesa .mesa-registrar').count()]),
+  [0, 0, 0]);
 await pagina.close();
-
-/* ===== 7. Solo consulta ===== */
-console.log('--- 7. solo consultar ---');
-const consulta = await paginaNueva(true);
-await consulta.locator('#inicio-tabla-cuerpo tr[data-asunto*="Vidal Soto"] .tarjeta-nombre').first().click();
-await consulta.waitForTimeout(1200);
-await consulta.evaluate(() => FichaTarjetas.abrir('hitos'));
-await consulta.waitForSelector('#ficha-guia.con-mesa', { timeout: 15000 });   /* fila 425: se abre sola */
-await consulta.waitForTimeout(600);
-await comprobar('7. el botón está apagado', consulta.locator('.hito-en-mesa .mesa-hacer-hito').isDisabled(), true);
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

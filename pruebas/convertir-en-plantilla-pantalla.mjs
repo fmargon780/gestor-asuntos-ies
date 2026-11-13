@@ -298,19 +298,7 @@ await comprobar('12. en solo consultar, el menú ⋮ del Word sale apagado (y co
 await comprobar('12. y la propia entrada, si se pidiera, también', pagina.evaluate(() => { const a = App.E.listaAbiertos.filter((x) => /Espejo/.test(x.nombre))[0]; return ConvertirEnPlantilla.estadoRapido(a, '261003 CERTIFICADO D26-00002.docx').apagada; }), true);
 await pagina.evaluate(() => SoloConsulta.guardar(false));
 
-console.log('--- 13. la mesa del hito ---');
-await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: 'Espejo' }).first().click();
-await pagina.waitForSelector('#ficha-documentos', { state: 'attached' });
-await pagina.waitForTimeout(1200);
-/* Fila 425: al entrar se abre sola la mesa del hito actual; si no es este, su celda de la tira. */
-await pagina.waitForSelector('.hito-en-mesa .mesa-titulo');
-if ((await pagina.locator('.hito-en-mesa .mesa-titulo').textContent()) !== 'Preparar el certificado') await pagina.locator('.mesa-tira-hito', { hasText: 'Preparar el certificado' }).click();
-await pagina.waitForSelector('.hito-doc-menu-boton');
-await pagina.locator('.hito-doc-menu-boton').first().click();
-await comprobar('13. en la mesa del hito el menú del Word lleva «Convertir en plantilla», antes de «Pasar a versiones previas»',
-  pagina.locator('.ficha-menu-opcion:visible').allTextContents().then((l) => l.slice(l.indexOf('Convertir en plantilla'), l.indexOf('Convertir en plantilla') + 2)), ['Convertir en plantilla', 'Pasar a versiones previas']);
-await pagina.keyboard.press('Escape');
+/* Fila 638: el menú del documento dentro de la mesa del hito (parte 13) ya no existe; el de la carpeta se prueba en la parte 1. */
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

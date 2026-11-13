@@ -7,9 +7,8 @@
         «Archivar»; debajo, la fila de hitos y a su derecha el plazo y el estado del hito.
      2. Sin «Volver a las tarjetas», «Volver a la lista de hitos» ni la
         línea de ruta; sin el título «Hitos» del recuadro.
-     3. El título del guion («QUÉ HAY QUE HACER» desde la fila 145), a 250 px o menos del borde de arriba.
-     4. El nombre del hito, sus etiquetas y «Marcar hito como hecho», en
-        una sola línea.
+     3. La primera tarea del guion (fila 638; antes, el título «QUÉ HAY QUE HACER»), a 420 px o menos del borde de arriba.
+     4. El nombre del hito y «Marcar como hecho», en una sola línea, y debajo, la línea del hito (fila 638).
      5. (fila 637) Cerrar la mesa del hito (`HitoMesa.cerrar()`; antes «← Hitos»): a la lista de hitos,
         sin salir de la ficha.
    A 800×900: nada se sale por la derecha (sin desplazamiento lateral). */
@@ -129,15 +128,15 @@ async function abrirMesa(pagina) {
     pagina.evaluate(() => { const t = document.querySelector('.ficha-tarjeta.abierta > .ficha-titulo'); return !!(t && t.offsetParent); }), false);
 
   /* 3. */
-  const guion = await alto(pagina, '.mesa-guion .mesa-bloque-titulo');
+  const guion = await alto(pagina, '.mesa-guion .guion-paso');
   /* Fila 145: el título del guion es ahora «Qué hay que hacer». */
-  console.log('   (QUÉ HAY QUE HACER a ' + Math.round(guion.top) + ' px)');
+  console.log('   (la primera tarea a ' + Math.round(guion.top) + ' px)');
   /* Fila 302 (7-oct-2026): con la fila de botones del hito («Hacer este hito», «Generar documento»…) añadida
      después, el guion queda a unos 320 px; el tope pasa de 250 a 360 px (el 40 % de los 920 px de alto):
      sigue viéndose entero sin bajar. */
   /* Fila 425: con la fila de pestañas siempre a la vista y la columna del hito en una tarjeta, el guion queda a
      unos 375 px; el tope pasa a 420 px (algo menos de la mitad de los 920 px): sigue a la vista sin bajar. */
-  await comprobar('3. «QUÉ HAY QUE HACER» a 420 px o menos del borde (sin bajar)', Promise.resolve(guion.top <= 420), true);
+  await comprobar('3. la primera tarea a 420 px o menos del borde (sin bajar)', Promise.resolve(guion.top <= 420), true);
 
   /* 4. */
   const t = await alto(pagina, '.mesa-titulo');
@@ -147,8 +146,8 @@ async function abrirMesa(pagina) {
      justo debajo (a menos de 40 px del nombre). */
   /* Fila 425: la columna del hito mide media pantalla y la fila de botones puede ocupar dos renglones: «Hecho»
      queda a menos de 100 px del nombre (antes, 40). */
-  await comprobar('4. nombre y etiquetas en una sola línea, y «Hecho» en la fila de botones justo debajo',
-    Promise.resolve([Math.abs(t.top - et.top) < 14, h.top >= t.bottom - 2 && h.top - t.bottom < 100]), [true, true]);
+  await comprobar('4. nombre y «Marcar como hecho» en una sola línea, y la línea del hito justo debajo',
+    Promise.resolve([Math.abs(t.top - h.top) < 30, et.top >= t.bottom - 2 && et.top - t.bottom < 40]), [true, true]);
 
   /* 5. */
   await pagina.evaluate(() => HitoMesa.cerrar());

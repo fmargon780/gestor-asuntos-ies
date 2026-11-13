@@ -216,8 +216,8 @@ var HitosPanelLista = (function () {
   /* El cuerpo de un hito es su mesa de trabajo (24-sep-2026, fila 109,
      docs/EL-HITO-A-PANTALLA-COMPLETA.md): solo se ve con el hito abierto
      a pantalla completa (js/hito-mesa.js). Desde la fila 425, el hito entero
-     en una columna: el guion (lo pinta js/hito-mesa-guion.js en `.mesa-guion`),
-     los campos, los documentos y el registro. La cabecera (`.mesa-cabecera`) la pone js/hito-mesa.js. Los botones de
+     en una columna: el guion (lo pinta js/hito-mesa-guion.js en `.mesa-guion`);
+     fila 638: sin campos, documentos ni registro propios. La cabecera (`.mesa-cabecera`) la pone js/hito-mesa.js. Los botones de
      siempre conservan su clase, y los mismos `enganchar…` de cada módulo
      los encuentran dentro de la fila. */
   function cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta, hitos) {
@@ -226,58 +226,16 @@ var HitosPanelLista = (function () {
     var htmlRequisitos = (!abierto && window.HitosRequisitos && (h.requisitos || []).length)
       ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
 
-    /* Fila 425 (docs/FICHA-VISTA-DE-TRABAJO.md): el hito entero, de arriba
-       abajo y en una sola columna: Tareas → Campos de este hito → Documentos
-       del hito → Registro, y «Normativa», plegada, al pie. Desde la fila 147
-       había tres tarjetas, una en grande y dos de resumen; ya no. Los
-       botones del guion pulsan los de siempre por debajo; las plantillas,
-       los formularios y «Comunicar» van a los desplegables de la cabecera
-       (fila 145). */
-    var grandeGuion = (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +   /* fila 553: la explicación, encima del recuadro */
-      '<section class="mesa-bloque mesa-grande-guion" data-tarjeta="guion">' +
-      '<div class="mesa-guion"></div>' +
-    '</section>';
-
-    var documentosHTML = window.HitoMesaDocumentos
-      ? HitoMesaDocumentos.filasHTML(a, h, hitos || [], nombresDeLaCarpeta, abierto)
-      : (h.documentos || []).map(function (d) {
-          return '<span class="hito-documento" data-doc="' + U.escapar(d) + '"><button type="button" class="hito-doc-abrir" data-doc="' +
-            U.escapar(d) + '">' + U.escapar(d) + '</button></span>';
-        }).join('');
-    var grandeDocs = '<section class="mesa-bloque mesa-grande-docs mesa-docs" data-tarjeta="docs">' +
-        '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Documentos' +
-          (window.HitoMesaDocumentos && HitoMesaDocumentos.cuentaTitulo
-            ? ' <span class="mesa-docs-cuenta">' + U.escapar(HitoMesaDocumentos.cuentaTitulo(h, hitos || [], nombresDeLaCarpeta)) + '</span>' : '') +
-          (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</span></div>' +
-        '<div class="mesa-seleccion oculto"></div>' +
-        (abierto || documentosHTML ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
-        htmlRequisitos +
-      '</section>';
-
-    /* Fila 229 (docs/REGISTRO-DEL-ASUNTO.md): «Registro», una sola lista por
-       fechas con las líneas de este hito: las que se han anotado (notas del
-       asunto escritas desde aquí, js/notas-migracion.js) y lo que apunta la
-       aplicación sola (`h.notas`), en gris; desde la fila 426, también las notas
-       a mano del asunto que no van unidas a ningún hito, con «del asunto». */
-    var lineasHito = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h], conSueltas: true }) : [];
-    var grandeNotas = '<section class="mesa-bloque mesa-grande-notas" data-tarjeta="notas">' +
-      '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Registro</span>' +
-        (lineasHito.length ? '<span class="mesa-docs-cuenta">' + lineasHito.length + (lineasHito.length === 1 ? ' línea' : ' líneas') + '</span>' : '') + '</div>' +
-      '<div class="mesa-notas">' +
-        (abierto ? '<div class="nota-nueva">' +
-          '<textarea class="campo hito-nota-texto" rows="5" placeholder="Anotar algo que ha pasado… (Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +
-          '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
-        '<div class="hito-notas registro-lista" data-clave="' + U.escapar(a.nombre) + '">' +
-          (window.RegistroAsunto ? RegistroAsunto.html(lineasHito, { editable: abierto, conEtiqueta: false, clase: 'hito-nota' }) : '') +
-        '</div>' +
-      '</div>' +
-    '</section>';
+    /* Fila 638 (docs/638-VISTA-DEL-ASUNTO-HITO-Y-TAREAS.md): el hito es su explicación y sus tareas (las pinta
+       js/hito-mesa-guion.js en `.mesa-guion`, cada una con su único botón y su documento colgado). Ya no hay los
+       recuadros «Tareas», «Campos», «Documentos» ni «Registro»: los datos están en «Datos» de la derecha, los
+       documentos cuelgan de su tarea y en «Documentos de la carpeta», y las notas y lo hecho van al registro del
+       asunto (bloque «Registro» de la derecha, con el hito de cada línea). */
+    var grandeGuion = (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
+      '<div class="mesa-grande-guion" data-tarjeta="guion"><div class="mesa-guion"></div></div>';
 
     var cuantasNormas = (h.normativa || []).filter(function (r) { return r && r.cita; }).length;
-    var columna = '<div class="mesa-col mesa-col-hito">' + grandeGuion +
-      /* Fila 255 (docs/CAMPOS-DE-UN-HITO.md): los campos de este hito, para rellenar ahí mismo. */
-      (window.CamposDeHito ? CamposDeHito.tarjetaHtml(a, h, abierto) : '') +
-      grandeDocs + grandeNotas +
+    var columna = '<div class="mesa-col mesa-col-hito">' + grandeGuion + htmlRequisitos +
       (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
         '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
@@ -298,32 +256,6 @@ var HitosPanelLista = (function () {
     return '<div class="mesa-cabecera"></div><div class="mesa-columnas">' + columna + '</div>' + botones;
   }
 
-  /* Ya se sabe, desde que se pintó el cuerpo, qué documentos siguen en
-     la carpeta (nombresDeLaCarpeta, leído una vez en js/hitos-panel.js
-     antes de repintar): aquí solo se cuelgan los onclick. Abrir uno
-     pide su handle en el momento de pulsarlo, no antes: así no hace
-     falta guardar nada más que el nombre, y no se toca el DOM después
-     de pintar (evita el problema de siempre con el observador de aquí
-     abajo, que vigila #ficha-asunto-cuerpo entero). */
-  function engancharDocumentos(div, a, h, abierto) {
-    var caja = div.querySelector('.hito-documentos');
-    if (caja) {
-      Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-abrir'), function (b) {
-        if (b.classList.contains('hito-doc-falta')) return;
-        b.onclick = async function () {
-          try {
-            var handle = await a.handle.getFileHandle(b.dataset.doc);
-            if (window.Visor) window.Visor.abrir(handle, b.dataset.doc, { asunto: a, carpeta: a.handle, modo: abierto ? 'abierto' : 'archivado' });
-          } catch (e) { /* puede que ya no esté: el próximo repintado lo dirá */ }
-        };
-      });
-
-      /* El menú de tres puntos de cada documento (fila 103, sección
-         2), en vez de la ✕ de siempre. */
-      if (abierto && window.HitosDocumentoMenu) HitosDocumentoMenu.engancharTodos(caja, a, h);
-    }
-  }
-
   /* Guardar un cambio de un hito con el control apagado mientras tanto,
      aviso rojo si falla y repintado siempre (fila 100,
      docs/AVISOS-QUE-DICEN-LA-VERDAD.md: antes, si fallaba, el error se
@@ -339,12 +271,10 @@ var HitosPanelLista = (function () {
   }
 
   function engancharCuerpo(div, a, h, abierto) {
-    engancharDocumentos(div, a, h, abierto);
     if (!abierto) return;
     if (window.HitosAnadir) HitosAnadir.engancharBoton(div, a, h);   /* fila 103 */
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */
-    if (window.CamposDeHito) CamposDeHito.enganchar(div, a, h, abierto);   /* fila 255 */
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = function () {
       return guardarHito(resp, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });
@@ -352,25 +282,6 @@ var HitosPanelLista = (function () {
     var fecha = div.querySelector('.hito-campo-fecha');
     if (fecha) fecha.onchange = function () {
       return guardarHito(fecha, 'guardar la fecha', function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: fecha.value }); });
-    };
-    var notaTa = div.querySelector('.hito-nota-texto');
-    if (notaTa) notaTa.onkeydown = function (ev) {
-      if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); var b = div.querySelector('.hito-nota-anadir'); if (b) b.click(); }
-    };
-    /* Fila 145: de una línea, crece al escribir. */
-    if (notaTa) notaTa.oninput = function () { notaTa.style.height = 'auto'; notaTa.style.height = notaTa.scrollHeight + 'px'; };
-    var notaBtn = div.querySelector('.hito-nota-anadir');
-    if (notaBtn) notaBtn.onclick = async function () {
-      var ta = div.querySelector('.hito-nota-texto');
-      var texto = (ta.value || '').trim();
-      if (!texto) return;
-      /* Fila 139: a las notas del asunto, con la etiqueta de este hito. */
-      return guardarHito(notaBtn, 'guardar la nota', function () {
-        var guardar = window.NotasHito ? NotasHito.anadirDesdeHito(a, h, texto) : Hitos.anadirNota(a.nombre, h.id, texto);
-        /* Guardada, la caja se vacía: si no, el repintado (que conserva lo
-           escrito) la volvería a llenar con la nota ya guardada. */
-        return Promise.resolve(guardar).then(function (r) { ta.value = ''; return r; });
-      });
     };
     var quitar = div.querySelector('.hito-quitar');
     if (quitar) quitar.onclick = async function () {

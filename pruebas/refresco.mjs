@@ -91,13 +91,13 @@ console.log('--- 1) poner el asunto «Esperando a…» ---');
    verse en la ficha y en la tarjeta sin recargar. */
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('#ficha-acciones .boton-esperando');
-await pagina.click('#ficha-acciones .boton-esperando');
+await pagina.waitForSelector('#ficha-guia .mesa-esperando-a');
+await pagina.click('#ficha-guia .mesa-esperando-a');
 await pagina.waitForSelector('#capa:not(.oculto) #esperando-a');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
+await pagina.waitForSelector('#ficha-guia .mesa-ya-llego');
 await comprobar('la ficha ya enseña «Esperando a…», sin recargar',
-  pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a ') === 0), true);
+  pagina.locator('#ficha-guia .mesa-linea-espera').textContent().then(t => t.indexOf('Esperando a ') === 0), true);   /* fila 638: en la línea del hito */
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 /* Fila 192: la tabla enseña todos los asuntos a la vez, sin montones;
@@ -114,9 +114,9 @@ await comprobar('en la fila (todos los asuntos), la marca «Esperando a…» ya 
   pagina.locator('#inicio-tabla-cuerpo tr .marca-esperando').first().textContent().then(t => t.indexOf('Esperando a ') === 0), true);
 /* Se deja como estaba: «Ya ha llegado», y de vuelta al montón de siempre. */
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
-await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
-await pagina.click('#ficha-acciones .boton-ya-llegado');
-await pagina.waitForSelector('#ficha-acciones .boton-esperando');
+await pagina.waitForSelector('#ficha-guia .mesa-ya-llego');
+await pagina.click('#ficha-guia .mesa-ya-llego');
+await pagina.waitForSelector('#ficha-guia .mesa-esperando-a');
 await pagina.click('#ficha-volver');
 await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(200);

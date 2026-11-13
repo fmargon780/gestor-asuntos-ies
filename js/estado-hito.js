@@ -115,16 +115,14 @@ var EstadoHito = (function () {
 
   /* ---------- la cabecera de la ficha ---------- */
 
-  var enFicha = null;   /* el asunto cuya cabecera está pintada */
+  var enFicha = null;   /* el asunto cuya ficha está abierta */
+  var firmaVista = '';  /* cómo estaba su estado la última vez que se pintó su hito */
 
-  function pintarEnFicha(caja, a) {
+  /* Fila 638: «Esperando a…» y «Ya ha llegado» ya no van a la derecha de la fila de hitos: van en la línea del hito
+     (js/hito-mesa-linea.js). Aquí solo se apunta qué ficha está abierta y se mira si ha llegado lo que se esperaba. */
+  function alAbrirFicha(a) {
     enFicha = a;
-    var cont = document.createElement('div');
-    cont.className = 'ficha-estado-hito';
-    cont.id = 'ficha-estado-hito';
-    cont.dataset.sinHito = '1';   /* fila 637 */
-    caja.appendChild(cont);
-    pintarCaja(cont, a);
+    firmaVista = firmaDe(estadoDe(a));
     if (window.Hitos && !Hitos.ultimosLeidos()) Hitos.leer().catch(function () { /* se queda como está */ });
     revisarLlegadas([a], true);
   }
@@ -135,40 +133,14 @@ var EstadoHito = (function () {
     return [l.texto, l.hito, l.lado, l.quien, l.esperando ? [l.esperando.a, l.esperando.nombre, l.esperando.desde, l.esperando.auto ? 'auto' : ''].join('/') : ''].join('|');
   }
 
-  function pintarCaja(cont, a) {
-    var l = estadoDe(a);
-    cont.dataset.firma = firmaDe(l);
-    cont.innerHTML = marcaHTML(a, 'abierto', l, cont.dataset.sinHito === '1');
-    engancharMarca(cont, a, 'abierto');
-    if (l.esperando && l.esperando.auto) {
-      /* Fila 162: la espera del responsable del hito no se quita: es el hito. */
-    } else if (l.esperando) {
-      cont.appendChild(boton('Ya ha llegado', 'Quitar «Esperando a…»: el asunto vuelve a su montón', 'boton-ya-llegado',
-        function (ev) { yaHaLlegado(a, ev.currentTarget); }));
-    } else if (l.hito) {
-      cont.appendChild(boton('Esperando a…', 'Dejar el asunto en Pendiente de terceros hasta que llegue algo',
-        'boton-esperando', function (ev) { pedirEsperando(a, ev.currentTarget); }));
-    }
-  }
-
-  function boton(texto, ayuda, clase, alPulsar) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'boton ' + clase;
-    b.textContent = texto;
-    b.title = ayuda;
-    b.onclick = alPulsar;
-    return b;
-  }
-
-  /* Tras cada lectura o escritura de hitos.json: solo la marca, y solo
-     si ha cambiado (nada de repintar la ficha entera). */
+  /* Tras cada lectura o escritura de hitos.json: si el estado del asunto ha cambiado (una espera que se quita sola al
+     llegar un documento, el responsable…), se pone al día la línea del hito, y solo entonces. */
   function refrescarFicha() {
-    var cont = $('ficha-estado-hito');
-    if (!cont || !enFicha || !App.fichaAbierta || App.fichaAbierta() !== enFicha.nombre) return;
-    if (cont.querySelector('[data-guardando]')) return;
-    if (firmaDe(estadoDe(enFicha)) === cont.dataset.firma) return;
-    pintarCaja(cont, enFicha);
+    if (!enFicha || !App.fichaAbierta || App.fichaAbierta() !== enFicha.nombre) return;
+    var f = firmaDe(estadoDe(enFicha));
+    if (f === firmaVista) return;
+    firmaVista = f;
+    if (window.HitoMesa && HitoMesa.refrescarLinea) HitoMesa.refrescarLinea();
   }
 
   /* ---------- «Esperando a…» ---------- */
@@ -425,7 +397,7 @@ var EstadoHito = (function () {
 
   return {
     marcaHTML: marcaHTML, engancharMarca: engancharMarca, abrirHito: abrirHito,
-    pintarEnFicha: pintarEnFicha, textoArchivado: textoArchivado, textoDeNombre: textoDeNombre,
+    alAbrirFicha: alAbrirFicha, yaHaLlegado: yaHaLlegado, textoArchivado: textoArchivado, textoDeNombre: textoDeNombre,
     textoEsperando: textoEsperando, fechaCorta: fechaCorta,
     pedirEsperando: pedirEsperando, ponerEsperando: ponerEsperando, quitarEsperando: quitarEsperando,
     ponerEsperaEn: ponerEsperaEn, quitarEsperaDeLista: quitarEsperaDeLista, llegados: llegados,

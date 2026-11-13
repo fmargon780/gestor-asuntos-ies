@@ -168,7 +168,7 @@ const ficheros = (frag) => p.evaluate(async (f) => { const a = Gestor.asuntos().
 await abrirMesa('Vidal Soto');
 const antes = await ficheros('Vidal Soto');
 await comprobar('10. en la mesa, la tarea de generar lleva «plantilla fuera de uso»', p.evaluate(() => document.querySelector('.hito-en-mesa .guion-fuera-de-uso').textContent), 'plantilla fuera de uso');
-await p.evaluate(() => document.querySelector('.hito-en-mesa .mesa-receta').click());   /* está dentro del menú «Generar documento ▾» */
+await p.evaluate(() => document.querySelector('.hito-en-mesa .guion-accion-tarea[data-accion="generar"]').click());   /* fila 638: el botón de la tarea (antes, «Generar documento ▾») */
 await p.waitForFunction(() => [...document.querySelectorAll('#mensajes .mensaje.ambar')].some((m) => /está fuera de uso/.test(m.textContent)), null, { timeout: 10000 });
 await comprobar('10. su botón da el aviso ámbar con la plantilla y dónde activarla, y no crea ningún fichero', Promise.all([
   p.evaluate(() => [...document.querySelectorAll('#mensajes .mensaje.ambar')].filter((m) => /está fuera de uso/.test(m.textContent))[0].textContent),
@@ -180,9 +180,8 @@ await comprobar('11. «Generar documento ▾»: no ofrece la fuera de uso', p.ev
   return lista.map((x) => x.nombre).indexOf('Certificado de notas');
 }), -1);
 await p.evaluate(() => { document.querySelectorAll('#mensajes .mensaje').forEach((m) => m.remove()); });
-await comprobar('12. «Hacer este hito» se para con el mismo aviso y el hito no queda hecho', (async () => {
-  const b = p.locator('.hito-en-mesa .mesa-hacer-hito:not([disabled])').first();
-  await b.click();
+await comprobar('12. «Hacer este hito» (lanzado a mano; fila 638: ya no hay botón) se para con el mismo aviso y el hito no queda hecho', (async () => {
+  await p.evaluate(async () => { const a = FichaNucleo.actual; const h = Hitos.buscar(await Hitos.hitosDe(a.nombre), HitoMesa.abierta().idHito); setTimeout(() => HacerEsteHito.ejecutar(a, h), 0); });
   await p.waitForFunction(() => [...document.querySelectorAll('#mensajes .mensaje.ambar')].some((m) => /está fuera de uso/.test(m.textContent)), null, { timeout: 15000 });
   await p.waitForTimeout(800);
   return Promise.all([p.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0]; return (await Hitos.hitosDe(a.nombre))[0].estado !== 'hecho'; }),

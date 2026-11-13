@@ -4,15 +4,14 @@
    A 1905×1000 y a 1280×800, sobre un asunto inventado con un hito de
    cinco pasos de guion (dos hechos) y sin documentos:
      1. Dos zonas; la izquierda, más ancha; ninguna tercera columna.
-     2. En la cabecera, exactamente «Generar documento ▾», «Comunicar ▾»,
-        «Marcar como hecho» y «···».
+     2. En la cabecera, exactamente «Marcar como hecho» y «Hito ▾» (fila 638: ya no hay «Hacer este hito»,
+        «Generar documento ▾» ni «Comunicar ▾»); debajo, la línea del hito.
      3. El tercer paso es el siguiente (resaltado) y su acción es el botón
         principal; los dos hechos no enseñan explicación ni botones.
      4. «No aplica» no se ve sin pasar el ratón, y sí al pasarlo.
-     5. «Comunicar ▾» enseña los chips y «Preparar correo»; Escape lo
-        cierra y la mesa sigue abierta.
-     6. «Buscar otra plantilla…» está dentro de «Generar documento ▾».
-     7. Sin documentos, la columna derecha dice «Ninguno todavía.».
+     5. Ya no hay desplegables en la cabecera.
+     6. La tarea de generar lleva su botón «Generar documento», el principal.
+     7. El hito no tiene recuadros de Documentos ni de Registro (fila 638).
    Con CAPTURAS=1, deja pruebas/capturas/mesa-del-hito-enfocada.png (1905×1000). */
 import { chromium } from 'playwright';
 import { abrirHito, verLaLista } from './apoyo/hito.mjs';
@@ -113,15 +112,15 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
 
   /* 2. */
   /* Fila 154: más «Registrar», que antes vivía en un paso del guion. */
-  await comprobar('2. en la cabecera, exactamente los botones (sin «Registrar», fila 434)',
+  await comprobar('2. en la cabecera, exactamente los botones (fila 638: «Marcar como hecho» y «Hito ▾»)',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button'))
       .filter((b) => b.offsetParent && !b.closest('.mesa-panel') && !b.closest('.ficha-menu')).map((b) => b.textContent.trim())),
-    ['Hacer este hito', 'Generar documento ▾', 'Comunicar ▾', 'Marcar como hecho', 'Hito ▾']);   /* fila 434: sin «Registrar»; fila 285: el hito de la prueba tiene tareas de generar */
-  await comprobar('2. plazo y responsable, en texto pequeño y pulsable (no etiquetas de color)',
-    pagina.evaluate(() => ['.mesa-etq-plazo', '.mesa-etq-resp'].map((s) => {
-      const e = document.querySelector('.hito-en-mesa ' + s);
-      return e.classList.contains('mesa-meta') && !e.classList.contains('mesa-etq') && e.textContent;
-    })), ['Sin plazo', 'Sin responsable']);
+    ['Marcar como hecho', 'Hito ▾']);
+  await comprobar('2. el plazo, en texto pequeño y pulsable (no etiqueta de color), y el responsable ya no se enseña',
+    pagina.evaluate(() => {
+      const e = document.querySelector('.hito-en-mesa .mesa-etq-plazo');
+      return [e.classList.contains('mesa-meta') && !e.classList.contains('mesa-etq') && e.textContent, document.querySelectorAll('.hito-en-mesa .mesa-etq-resp').length];
+    }), ['Sin plazo', 0]);
   /* Fila 637: la tira ya no va dentro de la mesa sino debajo de la cabecera, en una fila con «#ficha-acciones» a su derecha. */
   await comprobar('2. la tira va encima de la mesa, ancha y con sus acciones a la derecha, con el hito abierto marcado',
     pagina.evaluate(() => {
@@ -159,41 +158,17 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate((s) => getComputedStyle(document.querySelector(s)).visibility, noAplica), 'visible');
 
   /* 5. */
-  await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-  await pagina.waitForSelector('.hito-en-mesa .mesa-panel-comunicar .mesa-preparar-correo');
-  await comprobar('5. «Comunicar ▾» ya no enseña chips (fila 555) y sí «Preparar correo»',
-    pagina.evaluate(() => {
-      const p = document.querySelector('.hito-en-mesa .mesa-panel-comunicar');
-      return [!!p.offsetParent, p.querySelectorAll('.mesa-chip').length === 0, !!(p.querySelector('.mesa-preparar-correo') || {}).offsetParent];
-    }), [true, true, true]);
-  await pagina.keyboard.press('Escape');
-  await pagina.waitForTimeout(200);
-  await comprobar('5. Escape lo cierra y la mesa sigue abierta',
-    pagina.evaluate(() => [!!document.querySelector('.hito-en-mesa .mesa-panel-comunicar').offsetParent,
-      !!document.querySelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="c1"]')]), [false, true]);
+  await comprobar('5. ya no hay desplegables en la cabecera (fila 638)',
+    pagina.evaluate(() => [document.querySelectorAll('.hito-en-mesa .mesa-abrir-panel').length, document.querySelectorAll('.hito-en-mesa .mesa-panel').length]), [0, 0]);
 
   /* 6. */
-  await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
-  await comprobar('6. «Buscar otra plantilla…» está dentro de «Generar documento ▾», con las del paso',
-    pagina.evaluate(() => {
-      const p = document.querySelector('.hito-en-mesa .mesa-panel-generar');
-      return [!!p.offsetParent, !!(p.querySelector('.mesa-buscar-plantilla') || {}).offsetParent, p.querySelectorAll('.mesa-plantilla').length];
-    }), [true, true, 1]);
-  await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-  await comprobar('6. abrir el otro cierra este: uno solo abierto',
-    pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-panel')).filter((p) => p.offsetParent).map((p) => p.className)),
-    ['mesa-panel mesa-panel-comunicar']);
-  await pagina.mouse.click(ancho / 3, alto - 20);
-  await comprobar('6. pulsar fuera lo cierra',
-    pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-panel')).filter((p) => p.offsetParent).length), 0);
+  await comprobar('6. la tarea de generar lleva su botón «Generar documento», el principal',
+    pagina.evaluate(() => { const b = document.querySelector('.hito-en-mesa .guion-paso[data-id="g3"] .guion-accion-tarea'); return [b && b.textContent, b && b.classList.contains('boton-principal')]; }),
+    ['Generar documento', true]);
 
   /* 7. */
-  /* Fila 425: lo dice el bloque «Documentos del hito», en una línea. */
-  await comprobar('7. sin documentos, «Ninguno todavía.» en una línea',
-    pagina.evaluate(() => {
-      const e = document.querySelector('.hito-en-mesa .mesa-grande-docs .mesa-sin-docs');
-      return e ? e.textContent.trim().indexOf('Ninguno todavía.') === 0 : null;
-    }), true);
+  await comprobar('7. el hito no tiene recuadros de Documentos ni de Registro',
+    pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-grande-docs, .hito-en-mesa .mesa-grande-notas').length), 0);
   await comprobar('7. sin el botón «Añadir nota» (Intro guarda)',
     pagina.evaluate(() => !!(document.querySelector('.hito-en-mesa .hito-nota-anadir') || {}).offsetParent), false);
 
