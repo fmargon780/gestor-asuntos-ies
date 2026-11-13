@@ -26,6 +26,8 @@ Durante el diseño (13-nov-2026):
 
 > [Del día y la hora:] Creo que estaría bien poder cambiarla.
 
+> [De la llamada ya apuntada:] Una vez añadida, sería bueno poder corregir algo, quedando registrada la modificación si es posible.
+
 ## Lo que entendió Claude (acordado con Francisco el 13-nov-2026)
 
 Manda la pantalla de prueba.
@@ -62,6 +64,14 @@ Las llamadas debajo de una tarea:
 - Salen plegadas en una línea con la cuenta: «3 llamadas · 1 con respuesta». Al pulsarla se abren, la más reciente arriba, cada una con día y hora, quién la apuntó, a quién o de quién, «Hablado» o «No contesta» y el comentario.
 - Se ordenan por el día y la hora de la llamada, también en el Registro.
 
+Corregir una llamada (no está en la pantalla de prueba; manda este texto):
+- Cada llamada, debajo de su tarea y en el Registro, lleva un «⋮» con «Corregir».
+- «Corregir» abre la misma ventana, con el título «Corregir llamada» y todo relleno como se apuntó. Se puede cambiar todo menos la tarea de la que es. El botón es «Guardar».
+- Al guardar, la llamada queda con lo nuevo y con la marca «corregida» al lado.
+- En el Registro queda además una línea nueva, con el día y la hora de la corrección y quién la hizo: «Llamada del <día y hora> corregida. Antes: <cómo estaba>». Lo de antes nunca se pierde.
+- Si al corregir pasa de «No contesta» a «He hablado» y es de una tarea de llamar pendiente, la tarea se marca sola. Al revés no se desmarca.
+- Una llamada no se puede borrar.
+
 ## Pantalla de prueba
 
 - Aprobada el 13-nov-2026: `docs/pantallas/565.html` · https://claude.ai/artifact/53aZ9zGaBMhjBthtrDriT4
@@ -71,7 +81,8 @@ Las llamadas debajo de una tarea:
 ## Qué NO se hace en esta tarea
 
 - Apuntar una llamada sin asunto, con un botón en Inicio y una lista de llamadas sin asunto: idea 640.
-- Corregir o borrar una llamada ya apuntada: no se habló. Una llamada apuntada se queda como está.
+- Borrar una llamada ya apuntada: solo se corrige.
+- Cambiar de tarea una llamada ya apuntada.
 - La app no marca números ni abre ningún programa de teléfono.
 - No se añade ninguna tarea de llamar a ninguna guía: cada guía la pondrá cuando se diseñe.
 - No cambia «Qué me toca», Inicio ni el resto de la vista del asunto.
@@ -80,6 +91,7 @@ Las llamadas debajo de una tarea:
 
 - Las acciones de tarea: `ACCIONES` de `js/guias-guion.js` (la lista con textos) y de `js/hitos-guion.js` (los valores); valor nuevo `llamar`. Modelo cercano: `js/tarea-copiar*.js` (fila 552) y `js/tarea-firmar.js` (fila 523). Leer antes `docs/contexto/HITO-MESA.md` y `docs/contexto/HITOS-Y-GUIAS.md`, y cómo han dejado las filas 637 y 638 la cabecera y las tareas.
 - Dónde se guarda: cada llamada es una línea del registro con sus datos aparte (sentido, persona, teléfono, resultado, día y hora de la llamada, hito y tarea). Las de una tarea, en las notas de su hito (`hitos.json`); las sueltas, en `ficha.notas` (`asuntos.json`) con `App.anotarLista`. La lista bajo la tarea se saca de ahí; no se guarda dos veces. Si al programar resulta mejor otro sitio, vale, siempre que nada se guarde dos veces.
+- La corrección guarda en la propia llamada cuándo y quién la corrigió, y lo de antes va en la línea nueva del registro (automática). Las líneas de llamada no llevan el «Cambiar» y «Borrar» de las notas a mano.
 - El registro ya funde las dos fuentes (`js/registro-asunto.js`); la línea de una llamada se ordena por la hora de la llamada, no por la de apuntarla.
 - Los teléfonos: los mismos sitios de donde ya los saca la app (contacto del tercero, tutores legales de `js/datos-tutores.js` con su custodia, `LoPide.contactoDe`, relacionados). Una persona con dos teléfonos, una línea por teléfono. Sin ningún teléfono conocido, solo la casilla «Otra persona o número».
 - Cuadro con la regla común (`.capa > .cuadro`); guardado por `ColaGuardado`; en «solo consulta» los dos botones no apuntan nada. Ficheros nuevos por debajo de 400 líneas y apuntados en su `js/cargar-piezas-N.js`.
@@ -104,6 +116,8 @@ Las llamadas debajo de una tarea:
 - Con una tarea que no es de llamar: queda bajo esa tarea, plegada, y la tarea no se marca.
 - Con una tarea de llamar, desde la cabecera: queda bajo ella y, hablada, la marca.
 - Cambiando el día y la hora a una anterior, la llamada se coloca en su sitio bajo la tarea y en el Registro.
+- «⋮ → Corregir» de una llamada abre «Corregir llamada» con sus datos; al guardar un cambio, la llamada sale con lo nuevo y «corregida», y el Registro tiene una línea nueva con «Antes: …» y lo que había. No hay «Borrar».
+- Corregir una llamada de «No contesta» a «He hablado» en una tarea de llamar pendiente la marca.
 - En un asunto sin hitos, el botón de la cabecera apunta la llamada y no pregunta por la tarea.
 - La colocación coincide con `docs/pantallas/565.html`.
 
@@ -115,6 +129,7 @@ Las llamadas debajo de una tarea:
 - Pulsa el teléfono de la cabecera, elige quién ha llamado y, en «¿Es de una tarea?», una tarea que no sea de llamar: mira esa tarea.
 - Apunta otra desde la cabecera sin tarea y mírala en el Registro.
 - Apunta una llamada cambiando la hora a una de ayer y mira dónde queda.
+- Pulsa el «⋮» de una llamada, «Corregir», cambia el comentario y guarda: mira la marca «corregida» y la línea nueva del Registro con lo de antes.
 - Mira que los teléfonos que salen son los del alumno, sus tutores y quien pide el asunto.
 
 ## Revisión y respuestas durante el trabajo
