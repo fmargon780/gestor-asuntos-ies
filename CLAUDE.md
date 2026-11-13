@@ -42,6 +42,9 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
 
 1. Solo lo tocado: `npm test -- <palabra> [<palabra>…]` (el ejecutor lanza las que llevan esas
    palabras en el nombre), más las pruebas nuevas de la fila. Pasada completa: `npm test`.
+   (13-nov-2026, fila 633) Las pruebas se pasan **siempre con `npm test`** (también una sola:
+   `npm test -- <palabra>`), nunca con `node pruebas/<prueba>.mjs` a pelo: `npm test` comprueba
+   antes los paquetes y, si falta alguno, los instala con `npm ci`.
 2. Si en la pasada falla una prueba:
    - (11-oct-2026, fila 333, `docs/PRUEBAS-SEGUNDO-INTENTO-A-SOLAS.md`) El ejecutor repite solo, una
      vez y a solas, cada prueba que falla en la tanda en paralelo. Si pasa en ese segundo intento,

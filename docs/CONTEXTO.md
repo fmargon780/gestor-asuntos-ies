@@ -453,6 +453,8 @@ Se comprueba con `pruebas/conflictos.mjs`.
 
 ### Pruebas automáticas en cada subida
 
+(Fila 633) Las pruebas se pasan siempre con `npm test` (también una sola: `npm test -- <palabra>`), nunca con `node pruebas/<prueba>.mjs` a pelo: antes de probar, `pruebas/apoyo/paquetes.mjs` comprueba que están los paquetes de `devDependencies` (versión de `package-lock.json`) y, si falta alguno, los instala con `npm ci`; si no puede, para con un solo mensaje.
+
 `package.json` trae `playwright` (versión exacta, la que casa con el Chromium de `/opt/pw-browsers`; fila 466) y `jsdom`; `npm test` (ejecuta `pruebas/ejecutar.mjs`) levanta
 el servidor local (en el primer puerto libre desde el 8123, así que pueden correr dos tandas a la vez; si el Chromium de Playwright no está, usa el de `/opt/pw-browsers` poniendo `CHROMIUM_PATH`) y corre las pruebas de `pruebas/` varias a la vez (fila 208, `PRUEBAS_A_LA_VEZ`
 o `os.availableParallelism() - 1`, entre 2 y 6), fallando si falla cualquiera; con palabras en la

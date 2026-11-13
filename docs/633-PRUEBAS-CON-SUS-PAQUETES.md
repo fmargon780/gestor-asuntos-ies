@@ -74,4 +74,12 @@ tema 632). Tal cual:
   fallos falsos por eso.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- 13-nov-2026, comprobado por la sesión (tarea pequeña, sin segundo revisor), contra la instrucción:
+  - Sin `node_modules`: `npm test -- paquetes` dijo «Faltan paquetes para las pruebas: esbuild,
+    jsdom, playwright. Los instalo con npm ci…», instaló y la prueba pasó. COINCIDE.
+  - Con todo instalado: ninguna línea de instalación. COINCIDE.
+  - Borrando `node_modules/jsdom`: una línea («…: jsdom…»), instaló y pasó. COINCIDE.
+  - Instalación imposible (`npm_config_registry` a una dirección inexistente y caché vacía, sin
+    `jsdom`): un solo mensaje, ninguna prueba lanzada, salida 1. COINCIDE.
+  - No he podido ver: la comprobación en GitHub Actions (no se toca, allí los paquetes ya están).
+  - Nada en la app: sin publicación en Vercel ni línea en `novedades.js`.
