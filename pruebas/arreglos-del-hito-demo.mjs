@@ -35,7 +35,8 @@ await pagina.evaluate(() => {
   window.__cuadro = CorreoNucleo.abrirCuadro(a, false, {});
 });
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
-await pagina.waitForTimeout(800);
+/* Se espera a la condición (el aviso del tutor con su casilla), no a una pausa fija: sale cuando acaba de leerse la tutoría. */
+await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 });
 await comprobar('2. el aviso trae la casilla y «Guardar», y no el enlace a las tablas', pagina.evaluate(() => ({
   texto: document.querySelector('.correo-tutor-falta').childNodes[0].textContent,
   casilla: document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length, guardar: document.querySelectorAll('.correo-tutor-guardar:not([data-profe])').length,
@@ -78,7 +79,8 @@ await comprobar('4. «Generar documento» ofrece la plantilla de documento del t
 }), { filas: ['Resguardo de matrícula'] });
 await comunicarDelHito(pagina);
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
-await pagina.waitForTimeout(800);
+/* Se espera a la condición (el aviso del tutor con su casilla), no a una pausa fija: sale cuando acaba de leerse la tutoría. */
+await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 });
 await comprobar('2. el aviso trae la casilla y «Guardar», y no el enlace a las tablas', pagina.evaluate(() => ({
   texto: document.querySelector('.correo-tutor-falta').childNodes[0].textContent,
   casilla: document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length, guardar: document.querySelectorAll('.correo-tutor-guardar:not([data-profe])').length,
