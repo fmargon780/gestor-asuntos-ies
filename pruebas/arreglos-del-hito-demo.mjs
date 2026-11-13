@@ -36,7 +36,10 @@ await pagina.evaluate(() => {
 });
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
 /* Se espera a la condición (el aviso del tutor con su casilla), no a una pausa fija: sale cuando acaba de leerse la tutoría. */
-await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 });
+await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 }).catch(async (e) => {
+  console.log('DEBUG ' + JSON.stringify(await pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1); const p = await HitosComunicar.buscarPersonaDelAsunto(a[0]); return { n: a.map((x) => x.nombre), persona: p && [p.nombre, p.unidad, p.matriculado], avisos: [...document.querySelectorAll('.correo-tutor-falta')].map((x) => x.textContent) }; })));
+  throw e;
+});
 await comprobar('2. el aviso trae la casilla y «Guardar», y no el enlace a las tablas', pagina.evaluate(() => ({
   texto: document.querySelector('.correo-tutor-falta').childNodes[0].textContent,
   casilla: document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length, guardar: document.querySelectorAll('.correo-tutor-guardar:not([data-profe])').length,
@@ -80,7 +83,10 @@ await comprobar('4. «Generar documento» ofrece la plantilla de documento del t
 await comunicarDelHito(pagina);
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
 /* Se espera a la condición (el aviso del tutor con su casilla), no a una pausa fija: sale cuando acaba de leerse la tutoría. */
-await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 });
+await pagina.waitForSelector('.correo-tutor-escribir:not([data-profe])', { timeout: 20000 }).catch(async (e) => {
+  console.log('DEBUG ' + JSON.stringify(await pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1); const p = await HitosComunicar.buscarPersonaDelAsunto(a[0]); return { n: a.map((x) => x.nombre), persona: p && [p.nombre, p.unidad, p.matriculado], avisos: [...document.querySelectorAll('.correo-tutor-falta')].map((x) => x.textContent) }; })));
+  throw e;
+});
 await comprobar('2. el aviso trae la casilla y «Guardar», y no el enlace a las tablas', pagina.evaluate(() => ({
   texto: document.querySelector('.correo-tutor-falta').childNodes[0].textContent,
   casilla: document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length, guardar: document.querySelectorAll('.correo-tutor-guardar:not([data-profe])').length,
