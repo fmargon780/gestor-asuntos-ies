@@ -53,3 +53,10 @@ summary.ll-cuenta { cursor: pointer; }
 .ll-cuando .campo { width: auto; font-size: 13.5px; padding: 3px 6px; }
 .ll-cuando small { color: var(--tinta-suave); }
 .ll-sin-tareas { display: block; padding: 4px 10px 4px 30px; color: var(--tinta-suave); font-size: 13.5px; }
+
+/* La cabecera de una línea no crece por el botón nuevo: si falta sitio, el nombre del tercero se recorta con «…». */
+.ficha-linea1 .ficha-nombre-texto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ficha-cab-der { gap: 6px; }
+.ficha-llamada .boton { padding: 6px 8px; }
+.ficha-linea1 { flex-wrap: nowrap; }
+.ficha-linea1 .ficha-marcas { flex: 0 0 auto; }
