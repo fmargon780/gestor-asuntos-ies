@@ -46,7 +46,8 @@ var GuiasGuion = (function () {
     { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir un documento' },
     { valor: 'pedir', texto: 'Pedir datos' },   /* fila 530 */
-    { valor: 'copiar', texto: 'Copiar a otra carpeta' }   /* fila 552 */
+    { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
+    { valor: 'llamar', texto: 'Llamar por teléfono' }   /* fila 639: la última */
   ];
 
   var A_QUIEN = [

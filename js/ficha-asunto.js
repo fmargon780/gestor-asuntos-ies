@@ -235,6 +235,7 @@
           '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
           '<h2 class="ficha-nombre"><span class="ficha-nombre-texto" title="' + U.escapar(a.nombre) + '">' + U.escapar(terceroDe(a)) + '</span></h2>' +
           '<div class="ficha-cab-der">' +
+            '<span class="ficha-llamada" id="ficha-llamada"></span>' +   /* fila 639 */
             '<span class="ficha-ruta" id="ficha-ruta"></span>' +
             '<div class="ficha-archivar" id="ficha-archivar"></div>' +
           '</div>' +
@@ -263,6 +264,8 @@
       volverALaLista();
     };
 
+    var sitioLlamada = $('ficha-llamada');
+    if (sitioLlamada && window.Llamadas && Llamadas.botonCabecera) sitioLlamada.appendChild(Llamadas.botonCabecera());   /* fila 639: «Apuntar llamada», antes de «Ruta» */
     var sitioRuta = $('ficha-ruta');
     if (sitioRuta && window.RutaCarpetas) sitioRuta.appendChild(RutaCarpetas.boton(a, N.modoActual));   /* fila 637: a la vista, junto a «Archivar» */
     pintarAcciones(a, abierto);

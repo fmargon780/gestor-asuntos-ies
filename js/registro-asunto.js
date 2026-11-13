@@ -59,7 +59,7 @@ var RegistroAsunto = (function () {
       var suelta = !!(filtro && opciones.conSueltas && !n.hito && !esAuto(n));
       if (filtro && n.hito !== filtro && !suelta) return;
       salida.push({ delAsunto: suelta, texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
-        hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, auto: esAuto(n),
+        hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, auto: esAuto(n), llamada: n.llamada || null,
         propia: n, orden: i, fuente: 'asunto' });
     });
     var hitos = opciones.hitos || hitosDe(a && a.nombre);
@@ -68,7 +68,7 @@ var RegistroAsunto = (function () {
       (h.notas || []).forEach(function (n, i) {
         if (!n || !String(n.texto || '').trim()) return;
         salida.push({ texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: h.id,
-          hitoTitulo: h.titulo || '', auto: true, propia: null, orden: 100000 + k * 1000 + i, fuente: 'hito' });
+          hitoTitulo: h.titulo || '', auto: true, llamada: n.llamada || null, propia: null, orden: 100000 + k * 1000 + i, fuente: 'hito' });
       });
     });
     salida.sort(function (x, y) {
@@ -96,6 +96,7 @@ var RegistroAsunto = (function () {
         '<span class="nota-cuando">' + U.escapar(window.Notas ? Notas.cuando(l.cuando) : l.cuando) + '</span>' +
         (l.quien ? '<span class="nota-quien">' + U.escapar(l.quien) + '</span>' : '') + hito +
         (l.delAsunto ? '<span class="registro-del-asunto" data-ayuda-clave="nota-del-asunto">del asunto</span>' : '') +
+        (l.llamada && window.Llamadas && Llamadas.marcasHTML ? Llamadas.marcasHTML(l.llamada) : '') +   /* fila 639: «corregida» y «⋮ → Corregir» */
         (editable ? '<span class="registro-menu"><button type="button" class="registro-mas" data-ayuda-clave="cambiar-o-borrar" aria-label="Cambiar o borrar esta línea">⋮</button>' +
           '<span class="registro-acciones oculto"><button type="button" class="boton registro-cambiar">Cambiar</button>' +
           '<button type="button" class="boton registro-borrar">Borrar</button></span></span>' : '') +
