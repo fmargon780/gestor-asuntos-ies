@@ -137,6 +137,8 @@ var HitoMesaRecetas = (function () {
   function accionDe(g) { return g.accion || (g.reunir === 'documento' ? 'anadir' : ''); }
 
   function botonDeTareaHTML(a, h, g, o) {
+    /* Fila 639: el teléfono de una tarea de llamar sigue estando con la tarea hecha, para seguir apuntando llamadas. */
+    if (g && !g.pregunta && !g.noaplica && g.accion === 'llamar' && window.Llamadas) return Llamadas.botonTareaHTML(g, !!(o && o.siguiente));
     if (!g || g.pregunta || g.hecho || g.noaplica) return '';
     o = o || {};
     var accion = accionDe(g);
@@ -180,6 +182,7 @@ var HitoMesaRecetas = (function () {
     if (accion === 'registrar') return registrarPaso(a, h, g);
     if (accion === 'firmar') return firmarPaso(a, h, g, fila);
     if (accion === 'anadir') return anadirPaso(a, h, g);
+    if (accion === 'llamar') { if (window.Llamadas) Llamadas.abrirDeTarea(a, h, g); return; }   /* fila 639 */
     if (accion === 'pedir') { if (window.DatosDeLaTarea) DatosDeLaTarea.abrir(a, h, g, fila); return; }
     return comunicarPaso(a, h, g, []);
   }

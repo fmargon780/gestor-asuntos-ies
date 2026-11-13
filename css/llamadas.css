@@ -1,0 +1,62 @@
+/* ============================================================
+   llamadas.css — llamar por teléfono (13-nov-2026, fila 639, docs/639-LLAMAR-POR-TELEFONO.md;
+   pantalla de prueba docs/pantallas/565.html): el botón del teléfono, las llamadas bajo la tarea y la
+   ventana «Apuntar llamada» / «Corregir llamada». Se carga después de css/hito-mesa-tareas.css.
+   ============================================================ */
+
+/* El botón del teléfono: icono de un solo color, sin texto. */
+.ll-boton { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; }
+.ficha-llamada { display: inline-flex; }
+.ficha-llamada .boton { padding: 6px 10px; color: var(--tinta); }
+
+/* Las llamadas bajo la tarea, plegadas. */
+.ll-lista { margin: 7px 0 0 27px; font-size: 13.5px; }
+.ll-cuenta { color: var(--tinta-suave); font-weight: 600; }
+summary.ll-cuenta { cursor: pointer; }
+.ll-linea { border-top: 1px solid var(--linea); padding: 4px 0; }
+.ll-linea-cab { display: block; overflow: hidden; }
+.ll-linea-cab .registro-menu { float: right; }
+.ll-linea small { color: var(--tinta-suave); }
+.ll-comentario { color: var(--tinta); }
+.ll-si { color: #1f7a3d; font-weight: 700; }
+.ll-no { color: #9a3412; font-weight: 700; }
+.ll-corregida { font-size: 11.5px; font-weight: 700; color: var(--tinta-suave); border: 1px solid var(--linea); border-radius: 9px; padding: 0 7px; margin-left: 4px; }
+.ll-linea .registro-menu, .registro-linea .registro-menu { margin-left: auto; }
+
+/* La ventana. */
+.capa.ll-capa { z-index: 56; }
+.capa.ll-capa > .cuadro { max-width: 560px; }
+.ll-cuadro > .ll-cuerpo { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 2px; }
+.ll-cuerpo [hidden], .ll-cuadro [hidden] { display: none !important; }
+.ll-rotulo { margin: 10px 0 4px; font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--tinta-suave); }
+.ll-dos { display: flex; gap: 8px; }
+.ll-dos label { flex: 1; display: flex; align-items: center; gap: 7px; border: 1px solid var(--linea); border-radius: 8px; padding: 7px 10px; cursor: pointer; }
+.ll-dos label.el { border-color: var(--azul); background: #e9f0fa; font-weight: 600; }
+.ll-dos input[type="radio"] { width: auto; margin: 0; }
+.ll-per { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; border: 1px solid var(--linea); border-radius: 8px; padding: 6px 10px; margin: 5px 0; cursor: pointer; }
+.ll-per.el { border-color: var(--azul); background: #e9f0fa; }
+.ll-per .ll-q { flex: 1 1 auto; }
+.ll-per small { color: var(--tinta-suave); }
+.ll-tel { white-space: nowrap; }
+.ll-cop { border: 1px solid var(--linea); background: var(--papel); border-radius: 5px; font-size: 12px; padding: 0 5px; cursor: pointer; }
+#ll-otra, #ll-com { width: 100%; box-sizing: border-box; }
+.ll-tarea { width: 100%; display: flex; justify-content: space-between; gap: 8px; text-align: left; }
+.ll-tarea-lista { border: 1px solid var(--linea); border-radius: 8px; margin-top: 4px; padding: 4px; }
+.ll-tarea-lista button { display: block; width: 100%; text-align: left; border: 0; background: transparent; border-radius: 6px; padding: 6px 10px; cursor: pointer; font: inherit; }
+.ll-tarea-lista button:hover { background: #eef2f8; }
+.ll-tarea-lista button.ll-hito { font-weight: 700; }
+.ll-tarea-lista button.ll-ta { padding-left: 30px; }
+.ll-tarea-lista button.el { background: #e9f0fa; }
+.ll-falta { color: #9a3412; font-size: 13.5px; margin: 6px 0 0; }
+.ll-pie { align-items: center; }
+.ll-cuando { flex: 1 1 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ll-cuando .campo { width: auto; font-size: 13.5px; padding: 3px 6px; }
+.ll-cuando small { color: var(--tinta-suave); }
+.ll-sin-tareas { display: block; padding: 4px 10px 4px 30px; color: var(--tinta-suave); font-size: 13.5px; }
+
+/* La cabecera de una línea no crece por el botón nuevo: si falta sitio, el nombre del tercero se recorta con «…». */
+.ficha-linea1 .ficha-nombre-texto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ficha-cab-der { gap: 6px; }
+.ficha-llamada .boton { padding: 6px 8px; }
+.ficha-linea1 { flex-wrap: nowrap; }
+.ficha-linea1 .ficha-marcas { flex: 0 0 auto; }

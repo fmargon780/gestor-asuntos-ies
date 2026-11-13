@@ -288,6 +288,10 @@
     'js/inicio-tabla.js',
     // Fila 249, docs/POR-LIQUIDAR.md: los asuntos «Por liquidar» (la pestaña de Inicio)
     // y el cuadro «Liquidar» con su PDF. Después de js/inicio-tabla.js.
+    'js/llamadas.js',   // fila 639
+    'js/llamadas-personas.js',
+    'js/llamadas-ventana.js',
+    'js/llamadas-vista.js',
     'js/por-liquidar.js',
     'js/por-liquidar-liquidar.js',
 

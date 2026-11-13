@@ -100,6 +100,7 @@ var HitoMesaGuion = (function () {
       (window.TareaCopiar ? TareaCopiar.vistaHTML(g, a, h) : '') +   /* fila 552: lo copiado, o el aviso de lo pendiente */
       /* Fila 522: su documento colgado (js/tareas-con-documento-vista.js). */
       (window.TareasConDocumentoVista && ctx ? TareasConDocumentoVista.colgadoHTML(a, h, g, ctx) : '') +
+      (window.Llamadas && Llamadas.debajoHTML ? Llamadas.debajoHTML(g, h) : '') +   /* fila 639: sus llamadas, plegadas */
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
@@ -307,6 +308,7 @@ var HitoMesaGuion = (function () {
         if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, tarea: delPaso ? delPaso.dataset.id : '', ficheroSoltado: ficheros[0] });   /* fila 638: ya se sabe de qué tarea es */
       };
     }
+    if (window.Llamadas && Llamadas.enganchar) Llamadas.enganchar(caja);   /* fila 639 */
     /* Fila 638: «+ Añadir tarea» y su formulario. */
     if (window.HitoMesaNuevaTarea) HitoMesaNuevaTarea.enganchar(caja, a, h, function () { pintar(fila, a, h, abierto, hitos); });
     engancharFranjaDelOrden(caja, a, h);

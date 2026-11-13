@@ -31,4 +31,4 @@
    Una prueba (pruebas/hora-de-la-version.mjs) falla si la hora escrita
    va más de 15 minutos por delante de la real.
    ============================================================ */
-App.VERSION = '13-nov-2026 · 08:59';
+App.VERSION = '13-nov-2026 · 10:26';

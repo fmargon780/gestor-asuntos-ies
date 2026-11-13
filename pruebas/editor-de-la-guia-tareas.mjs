@@ -97,7 +97,7 @@ await comprobar('«Texto de la tarea», ↑, ↓ y «Quitar» en la misma línea
       Array.from(f.querySelectorAll('.guion-linea-texto .requisito-mandos .boton')).map(b => b.textContent),
       Math.abs(y('.guion-texto') - y('.guion-subir')) < 30];
   }, F('g1')), ['Texto de la tarea', ['↑', '↓', 'Quitar'], true]);
-await comprobar('«Qué se hace» con sus ocho opciones, y para «Comunicar»: «A quién va (lo dice la plantilla)», «Por dónde» y «Plantilla de correo»',
+await comprobar('«Qué se hace» con sus nueve opciones, y para «Comunicar»: «A quién va (lo dice la plantilla)», «Por dónde» y «Plantilla de correo»',
   pagina.evaluate((s) => {
     const f = document.querySelector(s);
     return [f.querySelector('.guion-linea-accion .etiqueta').textContent,
@@ -105,7 +105,7 @@ await comprobar('«Qué se hace» con sus ocho opciones, y para «Comunicar»: �
       Array.from(f.querySelectorAll('.guion-receta .etiqueta')).map(e => e.textContent),
       !!f.querySelector('.guion-receta-a'), f.querySelector('.guion-receta-via').value];
   }, F('g1')),
-  ['Qué se hace', ['Sin acción (se marca a mano)', 'Generar un documento', 'Firmar un documento', 'Registrar un documento', 'Comunicar', 'Añadir un documento', 'Pedir datos', 'Copiar a otra carpeta'],
+  ['Qué se hace', ['Sin acción (se marca a mano)', 'Generar un documento', 'Firmar un documento', 'Registrar un documento', 'Comunicar', 'Añadir un documento', 'Pedir datos', 'Copiar a otra carpeta', 'Llamar por teléfono'],
    ['Por dónde', 'Plantilla de correo', 'A quién va (lo dice la plantilla)'], false, 'correo']);
 await pagina.locator(F('g1') + ' .guion-accion').selectOption('generar');
 await comprobar('con «Generar un documento»: «Plantilla de documento»; la línea lo dice y la tarea sigue abierta',

@@ -25,6 +25,7 @@ var Comunes = (function () {
     { valor: 'registrar', texto: 'Registrar' }, { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir documento' }, { valor: 'pedir', texto: 'Pedir datos' },
     { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
+    { valor: 'llamar', texto: 'Llamar por teléfono' },   /* fila 639 */
     { valor: '', texto: 'Otra cosa' }
   ];
 

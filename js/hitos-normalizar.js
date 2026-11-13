@@ -37,11 +37,14 @@
      ========================================================== */
 
   function normalizarNota(n) {
-    return {
+    var nota = {
       texto: String((n && n.texto) || ''),
       quien: String((n && n.quien) || ''),
       cuando: String((n && n.cuando) || '')
     };
+    /* Fila 639 (js/llamadas.js): una línea de llamada lleva sus datos aparte. */
+    if (n && n.llamada && typeof n.llamada === 'object') nota.llamada = JSON.parse(JSON.stringify(n.llamada));
+    return nota;
   }
 
   /* "Lo que hay que reunir" (18-sep-2026, fila 59,
