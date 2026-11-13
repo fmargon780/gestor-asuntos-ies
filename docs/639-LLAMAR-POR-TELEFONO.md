@@ -134,4 +134,5 @@ Corregir una llamada (no está en la pantalla de prueba; manda este texto):
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- (13-nov-2026) Segundo revisor, primera vuelta: APROBADA. Coincide todo lo del apartado «Cómo lo comprueba el segundo revisor» y lo entendido por Claude (también asunto sin hitos y solo consulta en la cabecera). No lo ha podido ver, por falta de datos en la copia de pruebas: relacionados con teléfono, «tiene la custodia» junto al tutor, una persona con dos teléfonos y el botón de la tarea en solo consulta.
+- Lo que hace la app y el texto no pide, y es lo de siempre de la app: «(el actual)» junto al hito actual en «¿Es de una tarea?», la línea «Tarea hecha: …» al marcarse sola, la etiqueta «solo aquí» de una tarea añadida y los avisos verdes. Diferencia menor con la pantalla de prueba: las etiquetas de clase van junto al nombre, como en las demás tareas.
