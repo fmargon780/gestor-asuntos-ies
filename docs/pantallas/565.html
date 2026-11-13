@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de prueba 565 · Llamar por teléfono</title>
+<style>
+  :root{--azul:#1e3a5f;--azul2:#2c5282;--borde:#d5dbe5;--gris:#5b6675;--fondo:#f3f5f9;--suave:#eef2f8;--ambar:#fff7e0;--ambarb:#e6b84a;--verde:#1f7a3d}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1c2430;background:var(--fondo)}
+  .aviso{background:#7a4b00;color:#fff;text-align:center;padding:6px 10px;font-size:13px}
+  .pagina{padding:14px 18px 40px}
+  button{font:inherit;cursor:pointer;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:5px 11px;color:#1c2430}
+  button:hover{background:var(--suave)}
+  button.p{background:var(--azul);color:#fff;border-color:var(--azul)}
+  button.p:hover{background:var(--azul2)}
+  button.mini{padding:2px 8px;font-size:12.5px;border-radius:6px}
+  .cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .cab h1{font-size:21px;margin:0;font-weight:700}
+  .eti{font-size:12px;font-weight:700;color:var(--azul);background:#e3ecf8;border-radius:10px;padding:2px 9px}
+  .num{font-size:12px;font-weight:700;border:1px solid #6b7686;border-radius:10px;padding:1px 8px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+  .caja{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:14px 16px}
+  .hito-cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hito-cab h2{font-size:19px;margin:0;flex:1 1 auto}
+  .linea{color:var(--gris);font-size:13.5px;margin:4px 0 0}
+  .expl{margin:12px 0 10px;color:#3a4452}
+  .tarea{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin:8px 0}
+  .tarea.sig{background:var(--ambar);border-color:var(--ambarb)}
+  .tarea.ok{background:#f6faf7}
+  .tarea .f1{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .tarea .nom{font-size:15.5px;flex:1 1 auto}
+  .tarea.ok .nom{color:var(--gris);text-decoration:line-through}
+  .clase{font-size:11.5px;font-weight:700;color:var(--azul);background:#e3ecf8;border-radius:9px;padding:1px 8px;white-space:nowrap}
+  .doc{display:flex;align-items:center;gap:8px;margin:6px 0 0 27px;font-size:13.5px;flex-wrap:wrap}
+  .ext{font-size:11px;font-weight:700;background:#f3e9cf;border-radius:5px;padding:1px 6px}
+  .llamadas{margin:7px 0 0 27px;font-size:13.5px}
+  .llamadas .cuenta{color:var(--gris);font-weight:600}
+  summary.cuenta{cursor:pointer}
+  .ll{border-top:1px solid #e6e9ef;padding:4px 0}
+  .ll small{color:var(--gris)}
+  .si{color:var(--verde);font-weight:700}
+  .no{color:#9a3412;font-weight:700}
+  .nueva{border:1px dashed var(--borde);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input[type=text],select,textarea{font:inherit;padding:6px 8px;border:1px solid var(--borde);border-radius:8px}
+  .nueva input{flex:1 1 220px}
+  .pl{background:#fff;border:1px solid var(--borde);border-radius:12px;margin-bottom:8px}
+  .pl>.t{display:flex;padding:10px 14px;gap:8px;align-items:center}
+  .pl>.t .res{color:var(--gris);font-size:13.5px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cnt{font-size:12px;font-weight:700;background:#e3ecf8;color:var(--azul);border-radius:9px;padding:0 7px}
+  .pl .dentro{padding:2px 14px 12px}
+  .reg{border-bottom:1px solid #eee;padding:6px 0;font-size:13.5px}
+  .reg small{color:var(--gris)}
+  #capa{position:fixed;inset:0;background:rgba(20,30,45,.45);display:none;align-items:center;justify-content:center;z-index:40;padding:14px}
+  #capa.abierto{display:flex}
+  .cuadro{background:#fff;border-radius:12px;width:min(560px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .cuadro h3{margin:0;padding:13px 16px;border-bottom:1px solid var(--borde);font-size:17px}
+  .cuadro .cuerpo{padding:10px 16px;overflow:auto}
+  .cuadro .pie{padding:10px 16px;border-top:1px solid var(--borde);display:flex;align-items:center;gap:8px}
+  .cuadro .pie small{color:var(--gris)}
+  .cuadro .pie .cuando{flex:1 1 auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .cuando input{font:inherit;font-size:13.5px;padding:3px 6px;border:1px solid var(--borde);border-radius:7px}
+  h4{margin:10px 0 4px;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--gris)}
+  .dos{display:flex;gap:8px}
+  .dos label{flex:1;border:1px solid var(--borde);border-radius:8px;padding:7px 10px;cursor:pointer;display:flex;gap:7px;align-items:center}
+  .dos label.el{border-color:var(--azul);background:#e9f0fa;font-weight:600}
+  .per{display:flex;gap:8px;align-items:center;border:1px solid var(--borde);border-radius:8px;padding:6px 10px;margin:5px 0;cursor:pointer;flex-wrap:wrap}
+  .per.el{border-color:var(--azul);background:#e9f0fa}
+  .per .q{flex:1 1 auto}
+  .per small{color:var(--gris)}
+  .per b.tel{white-space:nowrap}
+  .cop{border:1px solid var(--borde);background:#fff;border-radius:5px;font-size:12px;padding:0 5px}
+  #l-otra,#l-com{width:100%}
+  #l-tarea{width:100%;text-align:left;display:flex;gap:8px}
+  #l-tarea span{flex:1 1 auto}
+  #l-tarea-lista{border:1px solid var(--borde);border-radius:8px;margin-top:4px;padding:4px;display:none}
+  #l-tarea-lista.abierto{display:block}
+  #l-tarea-lista button{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:6px 10px}
+  #l-tarea-lista button.hi{font-weight:700}
+  #l-tarea-lista button.ta{padding-left:30px}
+  #l-tarea-lista button.el{background:#e9f0fa}
+  #l-falta{color:#9a3412;font-size:13.5px;margin:6px 0 0;display:none}
+  #toast{position:fixed;right:16px;bottom:16px;background:var(--verde);color:#fff;padding:10px 14px;border-radius:9px;max-width:360px;display:none;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="aviso">Pantalla de prueba 565 · Llamar por teléfono · datos inventados · nada se guarda</div>
+<div class="pagina">
+  <div class="cab">
+    <button data-t="Vuelve a la lista de asuntos">← Volver</button>
+    <span class="eti">ABSENTISMO</span>
+    <span class="num">A26-0052</span>
+    <h1>Rubio Ortega, Marina 2100071</h1>
+    <button data-t="Menú del asunto, como hoy" aria-label="Más acciones del asunto">⋯</button>
+    <span style="flex:1 1 auto"></span>
+    <button id="r-llamada" title="Apuntar llamada" aria-label="Apuntar llamada" style="padding:6px 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:block"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg></button>
+    <button data-t="Copiada la ruta de la carpeta">Ruta</button>
+    <button class="p" data-t="Se abre la ventana de archivar el asunto">Archivar el asunto</button>
+  </div>
+  <div class="cols">
+    <div class="caja" id="hito"></div>
+    <div id="lado"></div>
+  </div>
+</div>
+
+<div id="capa"><div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="c-tit">
+  <h3 id="c-tit">Apuntar llamada</h3>
+  <div class="cuerpo">
+    <div class="dos" id="l-sentido">
+      <label><input type="radio" name="sentido" value="emitida"> He llamado yo</label>
+      <label><input type="radio" name="sentido" value="recibida"> Me han llamado</label>
+    </div>
+    <h4 id="l-rot-quien">A quién</h4>
+    <div id="l-personas"></div>
+    <input type="text" id="l-otra" placeholder="Otra persona o número" aria-label="Otra persona o número">
+    <div id="l-bloque-res">
+      <h4>Qué ha pasado</h4>
+      <div class="dos" id="l-res">
+        <label><input type="radio" name="res" value="si"> He hablado</label>
+        <label><input type="radio" name="res" value="no"> No contesta</label>
+      </div>
+    </div>
+    <div id="l-bloque-tarea">
+      <h4>¿Es de una tarea?</h4>
+      <button type="button" id="l-tarea" aria-label="¿Es de una tarea?"></button>
+      <div id="l-tarea-lista"></div>
+    </div>
+    <h4>Comentario</h4>
+    <textarea id="l-com" rows="3" placeholder="Qué se ha dicho, o nada"></textarea>
+    <p id="l-falta"></p>
+  </div>
+  <div class="pie"><span class="cuando"><input type="date" id="l-dia" aria-label="Día de la llamada"><input type="time" id="l-hora" aria-label="Hora de la llamada"><small id="l-cuando"></small></span><button id="l-no">Cancelar</button><button class="p" id="l-ok">Apuntar</button></div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+  var YO='Francisco';
+  var personas=[
+    {n:'Ortega Lima, Rosa',p:'madre · tiene la custodia',t:'650 111 222'},
+    {n:'Rubio Sanz, Julián',p:'padre',t:'650 333 444'},
+    {n:'Rubio Ortega, Marina',p:'la alumna',t:'650 555 666'}
+  ];
+  var tareas=[
+    {nombre:'Generar la comunicación de faltas',clase:'Generar documento',hecha:true,doc:'261112 COMUNICACION FALTAS D26-00077.docx'},
+    {nombre:'Llamar a la familia',clase:'Llamar por teléfono',llamar:true,hecha:false,llamadas:[
+      {f:'12/11/2026 · 12:40',q:'Diego',s:'emitida',con:'Ortega Lima, Rosa (madre) · 650 111 222',r:'no',c:''},
+      {f:'12/11/2026 · 09:15',q:'Francisco',s:'emitida',con:'Ortega Lima, Rosa (madre) · 650 111 222',r:'no',c:'Salta el buzón.'}
+    ]},
+    {nombre:'Enviar la comunicación por correo',clase:'Comunicar',boton:'Enviar correo',hecha:false}
+  ];
+  var hitos=[
+    {nombre:'Recibir el aviso de faltas',tareas:[{nombre:'Añadir el parte de faltas del tutor',clase:'Añadir documento',hecha:true}]},
+    {nombre:'Avisar a la familia',actual:true,tareas:tareas},
+    {nombre:'Comunicar a Servicios Sociales',tareas:[{nombre:'Generar el informe de absentismo',clase:'Generar documento',hecha:false},{nombre:'Enviar el informe por correo',clase:'Comunicar',hecha:false}]}
+  ];
+  var abiertas={};
+  var registro=[
+    {f:'12/11/2026 · 12:40',q:'Diego',h:'Avisar a la familia',t:'Llamada a Ortega Lima, Rosa (madre) · 650 111 222: no contesta. Tarea: Llamar a la familia'},
+    {f:'12/11/2026 · 09:15',q:'Francisco',h:'Avisar a la familia',t:'Llamada a Ortega Lima, Rosa (madre) · 650 111 222: no contesta. Salta el buzón. Tarea: Llamar a la familia'},
+    {f:'12/11/2026 · 08:50',q:'Francisco',h:'Avisar a la familia',t:'Tarea hecha: Generar la comunicación de faltas'}
+  ];
+  var formAbierto=false, cuadro=null, minuto=25;
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function $(id){return document.getElementById(id)}
+  var tt;
+  function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(function(){e.style.display='none'},3000)}
+  function ahora(){return '13/11/2026 · 04:'+(minuto<10?'0':'')+minuto}
+
+  function lineaLlamada(l){
+    return '<div class="ll"><small>'+l.f+' · '+esc(l.q)+'</small> · '+(l.s==='recibida'?'Recibida de ':'A ')+esc(l.con)+' · '+
+      (l.r==='si'?'<span class="si">Hablado</span>':'<span class="no">No contesta</span>')+(l.c?'<br>'+esc(l.c):'')+'</div>';
+  }
+  function pintaHito(){
+    var sig=-1;
+    for(var i=0;i<tareas.length;i++)if(!tareas[i].hecha){sig=i;break}
+    var h='<div class="hito-cab"><h2>Avisar a la familia</h2><button class="p" data-t="El hito queda hecho">Marcar como hecho</button><button data-t="Menú del hito: Cambiar, Borrar, Cambiar la guía…">Hito ▾</button></div>'+
+      '<p class="linea"><b>Hito actual</b> · En curso · Sin plazo</p>'+
+      '<p class="expl">Se avisa a la familia de las faltas sin justificar, por teléfono y por escrito.</p>';
+    tareas.forEach(function(t,i){
+      h+='<div class="tarea'+(t.hecha?' ok':'')+(i===sig?' sig':'')+'"><div class="f1"><input type="checkbox" data-marca="'+i+'"'+(t.hecha?' checked':'')+' aria-label="Marcar la tarea"><span class="nom">'+esc(t.nombre)+'</span>';
+      if(t.clase)h+='<span class="clase">'+esc(t.clase)+'</span>';
+      if(t.llamar)h+='<button class="'+(i===sig?'p':'')+'" data-llamar="'+i+'" title="Apuntar llamada" aria-label="Apuntar llamada" style="padding:6px 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:block"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg></button>';
+      else if(!t.hecha&&t.boton)h+='<button class="'+(i===sig?'p':'')+'" data-t="Se abre la ventana del correo, como hoy">'+t.boton+'</button>';
+      h+='<button class="mini" data-t="Menú de la tarea: Anotar, Cambiar, Subir, Bajar, Borrar">⋮</button></div>';
+      if(t.doc)h+='<div class="doc"><span class="ext">DOCX</span>'+esc(t.doc)+'<button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button></div>';
+      var ls=t.llamadas||[], n=ls.length;
+      if(n){
+        var con=ls.filter(function(l){return l.r==='si'}).length;
+        h+='<details class="llamadas" data-ll="'+i+'"'+(abiertas[i]?' open':'')+'><summary class="cuenta">'+(n===1?'1 llamada':n+' llamadas')+' · '+con+' con respuesta</summary>'+ls.map(lineaLlamada).join('')+'</details>';
+      }else if(t.llamar)h+='<div class="llamadas"><span class="cuenta">Sin llamadas todavía</span></div>';
+      h+='</div>';
+    });
+    if(formAbierto){
+      h+='<div class="nueva"><input type="text" id="n-nombre" placeholder="Nombre de la tarea"><select id="n-clase">'+
+         '<option value="">Sin acción (se marca a mano)</option><option>Generar un documento</option><option>Firmar un documento</option>'+
+         '<option>Registrar un documento</option><option>Comunicar</option><option>Añadir un documento</option><option>Pedir datos</option><option>Copiar a otra carpeta</option>'+
+         '<option value="llamar">Llamar por teléfono</option></select>'+
+         '<button class="p" id="n-ok">Añadir</button><button id="n-no">Cancelar</button></div>';
+    }else h+='<p style="margin:10px 0 0"><button id="b-nueva">+ Añadir tarea</button></p>';
+    $('hito').innerHTML=h;
+    if(formAbierto)$('n-nombre').focus();
+  }
+  function pintaLado(){
+    var reg='<div class="nueva" style="margin:0 0 6px"><input type="text" id="r-texto" placeholder="Escribe una nota del asunto"><button id="r-ok">Guardar</button></div>'+
+      registro.map(function(r){return '<div class="reg"><small>'+r.f+' · '+esc(r.q)+(r.h?' · ⚑ '+esc(r.h):'')+'</small><br>'+esc(r.t)+'</div>'}).join('');
+    $('lado').innerHTML=
+      '<div class="pl"><div class="t"><span>▸</span><b>📋 Datos</b><span class="res">NIE 2100071 · Curso 2º de E.S.O. · Unidad 2º A</span></div></div>'+
+      '<div class="pl"><div class="t"><span>▸</span><b>👥 Personas y entidades relacionadas</b><span class="cnt">0</span></div></div>'+
+      '<div class="pl"><div class="t"><span>▸</span><b>📁 Documentos de la carpeta</b><span class="cnt">1</span></div></div>'+
+      '<div class="pl"><div class="t"><span>▾</span><b>📝 Registro</b><span class="cnt">'+registro.length+'</span></div><div class="dentro">'+reg+'</div></div>'+
+      '<div class="pl"><div class="t"><span>▸</span><b>🗂️ Otros asuntos de este tercero</b><span class="cnt">2</span></div></div>';
+  }
+  function clave(x){return x.f.slice(6,10)+x.f.slice(3,5)+x.f.slice(0,2)+x.f.slice(13)}
+  function ordena(l){l.forEach(function(x,i){x._i=i});l.sort(function(a,b){return clave(a)<clave(b)?1:clave(a)>clave(b)?-1:a._i-b._i})}
+  function pinta(){ordena(registro);hitos.forEach(function(x){x.tareas.forEach(function(t){if(t.llamadas)ordena(t.llamadas)})});pintaHito();pintaLado()}
+
+  /* ---- la ventana «Apuntar llamada» ---- */
+  function abre(tarea){
+    cuadro={tarea:tarea,cab:tarea===null,sentido:tarea===null?'recibida':'emitida',persona:-1,res:''};
+    cuadro.sel='';cuadro.lista=false;cuadro.hAb=-1;
+    cuadro.t=tarea===null?null:tareas[tarea]; cuadro.h=tarea===null?null:hitos[1];
+    $('l-bloque-tarea').style.display=cuadro.cab?'':'none';
+    $('l-otra').value='';$('l-com').value='';$('l-dia').value='2026-11-13';$('l-hora').value='04:'+(minuto<10?'0':'')+minuto;$('l-falta').style.display='none';
+    pintaCuadro();$('capa').classList.add('abierto');
+    (document.querySelector('input[name=sentido]:checked')||$('l-no')).focus();
+  }
+  function pintaCuadro(){
+    var c=cuadro, rec=c.sentido==='recibida';
+    $('c-tit').textContent='Apuntar llamada'+(!c.cab?' · '+c.t.nombre:'');
+    [].forEach.call(document.querySelectorAll('input[name=sentido]'),function(r){r.checked=r.value===c.sentido;r.parentNode.classList.toggle('el',r.checked)});
+    $('l-rot-quien').textContent=rec?'Quién ha llamado':'A quién';
+    $('l-personas').innerHTML=personas.map(function(p,i){
+      return '<div class="per'+(i===c.persona?' el':'')+'" data-per="'+i+'" role="button" tabindex="0"><span class="q">'+esc(p.n)+' <small>'+esc(p.p)+'</small></span><b class="tel">'+p.t+'</b><button class="cop" data-copia="'+p.t+'" aria-label="Copiar el teléfono">⧉</button></div>';
+    }).join('');
+    $('l-bloque-res').style.display=rec?'none':'';
+    [].forEach.call(document.querySelectorAll('input[name=res]'),function(r){r.checked=r.value===c.res;r.parentNode.classList.toggle('el',r.checked)});
+    $('l-cuando').textContent='· '+YO;
+    var v=c.sel.split('-'), txt=c.sel?hitos[+v[0]].nombre+' › '+hitos[+v[0]].tareas[+v[1]].nombre:'No, de ninguna';
+    $('l-tarea').innerHTML='<span>'+esc(txt)+'</span>'+(c.lista?'▴':'▾');
+    var op='<button type="button" data-sel=""'+(c.sel===''?' class="el"':'')+'>No, de ninguna</button>';
+    [1,0,2].forEach(function(k){var x=hitos[k];
+      op+='<button type="button" class="hi" data-hab="'+k+'">'+(c.hAb===k?'▾ ':'▸ ')+esc(x.nombre)+(x.actual?' (el actual)':'')+'</button>';
+      if(c.hAb===k)op+=x.tareas.map(function(t,i){return '<button type="button" class="ta'+(c.sel===k+'-'+i?' el':'')+'" data-sel="'+k+'-'+i+'">'+esc(t.nombre)+(t.hecha?' (hecha)':'')+'</button>'}).join('');
+    });
+    $('l-tarea-lista').innerHTML=op;$('l-tarea-lista').classList.toggle('abierto',c.lista);
+  }
+  function cierra(){$('capa').classList.remove('abierto');cuadro=null}
+  function apunta(){
+    var c=cuadro, rec=c.sentido==='recibida', otra=$('l-otra').value.trim();
+    var con=c.persona>-1?(personas[c.persona].n+' ('+personas[c.persona].p.split(' · ')[0]+') · '+personas[c.persona].t):otra;
+    var d=$('l-dia').value, hh=$('l-hora').value;
+    var falta=(!d||!hh)?'Pon el día y la hora de la llamada.':!con?(rec?'Di quién ha llamado.':'Di a quién has llamado.'):(!rec&&!c.res?'Di si has hablado o no contesta.':'');
+    if(falta){$('l-falta').textContent=falta;$('l-falta').style.display='block';return}
+    if(c.cab){var v=c.sel.split('-');c.h=v.length===2?hitos[+v[0]]:null;c.t=c.h?c.h.tareas[+v[1]]:null}
+    var r=rec?'si':c.res, com=$('l-com').value.trim(), f=d.slice(8)+'/'+d.slice(5,7)+'/'+d.slice(0,4)+' · '+hh; minuto++;
+    var texto=(rec?'Llamada recibida de ':'Llamada a ')+con+(rec?'':': '+(r==='si'?'hablado':'no contesta'))+'.'+(com?' '+com:'');
+    var aviso='Llamada apuntada en el Registro.';
+    if(c.t){
+      var t=c.t;
+      (t.llamadas=t.llamadas||[]).unshift({f:f,q:YO,s:c.sentido,con:con,r:r,c:com});
+      registro.unshift({f:f,q:YO,h:c.h.nombre,t:texto+' Tarea: '+t.nombre});
+      aviso='Llamada apuntada en la tarea «'+t.nombre+'»'+(c.h.actual?'':' del hito «'+c.h.nombre+'»')+' y en el Registro.';
+      if(t.llamar&&r==='si'&&!t.hecha){t.hecha=true;aviso='Llamada apuntada. La tarea «'+t.nombre+'» queda hecha; si hay que seguir llamando, desmárcala.'}
+    }else registro.unshift({f:f,q:YO,h:'',t:texto});
+    cierra();pinta();toast(aviso);
+  }
+
+  document.addEventListener('click',function(ev){
+    var b=ev.target.closest('button,[data-per]'); if(!b)return;
+    if(b.dataset.copia){ev.stopPropagation();toast('Copiado: '+b.dataset.copia);return}
+    if(b.dataset.per!==undefined){cuadro.persona=(cuadro.persona===+b.dataset.per)?-1:+b.dataset.per;if(cuadro.persona>-1)$('l-otra').value='';pintaCuadro();return}
+    if(b.dataset.t){toast(b.dataset.t);return}
+    if(b.id==='l-tarea'){cuadro.lista=!cuadro.lista;pintaCuadro();return}
+    if(b.dataset.hab!==undefined){cuadro.hAb=(cuadro.hAb===+b.dataset.hab)?-1:+b.dataset.hab;pintaCuadro();return}
+    if(b.dataset.sel!==undefined){cuadro.sel=b.dataset.sel;cuadro.lista=false;pintaCuadro();$('l-tarea').focus();return}
+    if(b.dataset.llamar!==undefined){abre(+b.dataset.llamar);return}
+    if(b.id==='r-llamada'){abre(null);return}
+    if(b.id==='l-no'){cierra();return}
+    if(b.id==='l-ok'){apunta();return}
+    if(b.id==='b-nueva'){formAbierto=true;pintaHito();return}
+    if(b.id==='n-no'){formAbierto=false;pintaHito();return}
+    if(b.id==='n-ok'){
+      var n=$('n-nombre').value.trim(), s=$('n-clase'); if(!n){$('n-nombre').focus();return}
+      var ll=s.value==='llamar';
+      tareas.push(ll?{nombre:n,clase:'Llamar por teléfono',llamar:true,hecha:false,llamadas:[]}:{nombre:n,clase:s.value?s.options[s.selectedIndex].text:'',hecha:false});
+      formAbierto=false;pintaHito();toast('Tarea añadida.');return
+    }
+    if(b.id==='r-ok'){var x=$('r-texto').value.trim();if(!x)return;registro.unshift({f:ahora(),q:YO,h:'',t:x});minuto++;pintaLado();return}
+  });
+  document.addEventListener('keydown',function(ev){
+    if(ev.key==='Escape'&&cuadro)cierra();
+    if((ev.key==='Enter'||ev.key===' ')&&ev.target.dataset&&ev.target.dataset.per!==undefined){ev.preventDefault();ev.target.click()}
+  });
+  document.addEventListener('change',function(ev){
+    var e=ev.target;
+    if(e.name==='sentido'){cuadro.sentido=e.value;pintaCuadro();return}
+    if(e.name==='res'){cuadro.res=e.value;pintaCuadro();return}
+    if(e.dataset.marca!==undefined){tareas[+e.dataset.marca].hecha=e.checked;pintaHito();return}
+  });
+  document.addEventListener('toggle',function(ev){var d=ev.target;if(d.dataset&&d.dataset.ll!==undefined)abiertas[d.dataset.ll]=d.open},true);
+  document.addEventListener('input',function(ev){
+    if(ev.target.id==='l-otra'&&cuadro&&ev.target.value&&cuadro.persona>-1){cuadro.persona=-1;var v=ev.target.value;pintaCuadro();$('l-otra').value=v;$('l-otra').focus()}
+  });
+  pinta();
+})();
+</script>
+</body>
+</html>

@@ -212,3 +212,14 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (13-nov-2026, tema 630) Los ficheros que llegan solos a la carpeta y los documentos de antes salen «sin tarea», con «Colgar de una tarea»; nadie está obligado a colgarlos. Francisco sabe que así la regla anterior no se cumple del todo («Ahora lo entiendo. Me parece bien tu idea»).
 - (13-nov-2026, tema 630) Una tarea nueva nunca toma el nombre de un fichero: «Crear una tarea nueva, sí. Que le ponga ese nombre, no». Un fichero sin tipo pasa antes por «Cambiar el nombre».
 - (13-nov-2026, tema 630) Aparte, como ideas: elegir hito y tarea al clasificar desde la bandeja (634), una marca única para llevar o no los cambios a la guía (635) y ordenar con buscador la lista de acciones (636).
+
+## Llamadas de teléfono
+
+- (13-nov-2026, tema 565) «Llamar por teléfono» es una tarea más de «Qué se hace», con sus llamadas apuntadas debajo (intentos, si se habló y comentario). Se marca sola con la primera llamada hablada y se puede desmarcar («Tus ideas me parecen bien»).
+- (13-nov-2026, tema 565) También se apuntan llamadas que no salen de una tarea, «emitidas, y sobre todo, recibidas, no ligadas a una tarea», siempre dentro de un asunto. Apuntarlas sin asunto, desde Inicio, queda como idea 640 (eligió la 2 y dejarla aparte).
+- (13-nov-2026, tema 565) El botón de apuntar es un icono de teléfono a la vista, en la cabecera del asunto y en la tarea, no dentro del Registro: «Hay que acordarse de que está ahí. Creo más útil que esté fuera, como otro botón con un símbolo».
+- (13-nov-2026, tema 565) Desde la cabecera la app pregunta si la llamada es de una tarea, y vale cualquier tarea, no solo las de llamar: «me llaman para preguntarme por ella o para aportarme alguna información que necesito para esa tarea». Solo las de llamar se marcan solas.
+- (13-nov-2026, tema 565) Para elegir la tarea salen primero los hitos, y al pulsar uno, sus tareas: «aparecen los hitos en negrita, sin mostrar sus tareas».
+- (13-nov-2026, tema 565) Las llamadas de una tarea salen plegadas en una línea con su cuenta: «puede salir plegada por defecto y no ocuparía tanto espacio».
+- (13-nov-2026, tema 565) El día y la hora de la llamada se pueden cambiar al apuntarla («estaría bien poder cambiarla»); quién la apunta, no.
+- (13-nov-2026, tema 565) Una llamada apuntada se puede corregir, «quedando registrada la modificación»: el Registro guarda cómo estaba antes. No se borra.
