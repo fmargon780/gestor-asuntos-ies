@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de prueba 630 · Vista del asunto</title>
+<style>
+  :root{--azul:#1e3a5f;--azul2:#2c5282;--borde:#d5dbe5;--gris:#5b6675;--fondo:#f3f5f9;--suave:#eef2f8;--ambar:#fff7e0;--ambarb:#e6b84a;--verde:#1f7a3d}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1c2430;background:var(--fondo)}
+  .aviso{background:#7a4b00;color:#fff;text-align:center;padding:6px 10px;font-size:13px}
+  .pagina{padding:14px 18px 40px}
+  button{font:inherit;cursor:pointer;border:1px solid var(--borde);background:#fff;border-radius:8px;padding:5px 11px;color:#1c2430}
+  button:hover{background:var(--suave)}
+  button.p{background:var(--azul);color:#fff;border-color:var(--azul)}
+  button.p:hover{background:var(--azul2)}
+  button.mini{padding:2px 8px;font-size:12.5px;border-radius:6px}
+  button:disabled{opacity:.45;cursor:default}
+  .cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cab h1{font-size:21px;margin:0;font-weight:700}
+  .eti{font-size:12px;font-weight:700;color:var(--azul);background:#e3ecf8;border-radius:10px;padding:2px 9px}
+  .num{font-size:12px;font-weight:700;border:1px solid #6b7686;border-radius:10px;padding:1px 8px}
+  .rel{position:relative;display:inline-block}
+  .menu{position:absolute;z-index:20;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--borde);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:230px;padding:5px;display:none}
+  .menu.der{left:auto;right:0}
+  .menu.abierto{display:block}
+  .menu button{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:6px 10px}
+  .menu .sep{border-top:1px solid var(--borde);margin:4px 0}
+  .menu .rot{font-size:11.5px;color:var(--gris);padding:4px 10px 0;text-transform:uppercase;letter-spacing:.04em}
+  .tira{display:flex;margin:12px 0 12px;border:1px solid var(--borde);border-radius:10px;overflow:hidden;background:#fff}
+  .tira button{flex:1;border:0;border-right:1px solid var(--borde);border-radius:0;padding:9px 10px;text-align:left;color:var(--gris)}
+  .tira button.hecho{background:#eef8f0;color:var(--verde)}
+  .tira button.actual{font-weight:700;color:var(--azul)}
+  .tira button.visto{box-shadow:inset 0 -3px 0 var(--azul)}
+  .tira button.mas{flex:0 0 auto;color:var(--azul);font-weight:600;border-right:0}
+  .cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+  .caja{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:14px 16px}
+  .hito-cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hito-cab h2{font-size:19px;margin:0;flex:1 1 auto}
+  .linea{color:var(--gris);font-size:13.5px;margin:4px 0 0}
+  .expl{margin:12px 0 10px;color:#3a4452}
+  .tarea{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin:8px 0}
+  .tarea.sig{background:var(--ambar);border-color:var(--ambarb)}
+  .tarea.ok{background:#f6faf7}
+  .tarea .f1{display:flex;align-items:center;gap:9px}
+  .tarea .nom{font-size:15.5px;flex:1 1 auto}
+  .tarea.ok .nom{color:var(--gris);text-decoration:line-through}
+  .clase{font-size:11.5px;font-weight:700;color:var(--azul);background:#e3ecf8;border-radius:9px;padding:1px 8px;white-space:nowrap}
+  .sub{margin:6px 0 0 27px;font-size:13.5px;color:var(--gris)}
+  .doc{display:flex;align-items:center;gap:8px;margin:6px 0 0 27px;font-size:13.5px;flex-wrap:wrap}
+  .ext{font-size:11px;font-weight:700;background:#f3e9cf;border-radius:5px;padding:1px 6px}
+  .datos-t{margin:6px 0 0 27px;font-size:13.5px}
+  .datos-t summary{cursor:pointer;color:var(--azul)}
+  .datos-t table{border-collapse:collapse;margin-top:4px}
+  .datos-t td{padding:2px 14px 2px 0;border-bottom:1px solid #eee}
+  .nueva{border:1px dashed var(--borde);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .nueva input,.nueva select,.pl textarea{font:inherit;padding:6px 8px;border:1px solid var(--borde);border-radius:8px}
+  .nueva input{flex:1 1 220px}
+  .pl{background:#fff;border:1px solid var(--borde);border-radius:12px;margin-bottom:8px}
+  .pl>.t{display:flex;cursor:pointer;padding:10px 14px;gap:8px;align-items:center;border-radius:12px}
+  .pl>.t:hover{background:var(--suave)}
+  .pl>.t b{white-space:nowrap}
+  .pl>.t .res{color:var(--gris);font-size:13.5px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cnt{font-size:12px;font-weight:700;background:#e3ecf8;color:var(--azul);border-radius:9px;padding:0 7px}
+  .pl .dentro{padding:2px 14px 12px;display:none}
+  .pl.abierto .dentro{display:block}
+  .pl.abierto>.t .fl{transform:rotate(90deg)}
+  .fl{display:inline-block;color:var(--gris)}
+  .dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;font-size:14px;margin:4px 0 8px}
+  .dl dt{color:var(--gris)}
+  .dl dd{margin:0}
+  h4{margin:10px 0 2px;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--gris)}
+  .fdoc{display:flex;align-items:center;gap:8px;border:1px solid var(--borde);border-radius:8px;padding:6px 9px;margin:5px 0;font-size:13.5px;flex-wrap:wrap}
+  .fdoc .n{flex:1 1 auto}
+  .reg{border-bottom:1px solid #eee;padding:6px 0;font-size:13.5px}
+  .reg small{color:var(--gris)}
+  .cop{border:1px solid var(--borde);background:#fff;border-radius:5px;font-size:11px;padding:0 4px;margin-left:2px}
+  button.ver{border:0;background:none;padding:0;color:var(--azul);text-decoration:underline;text-align:left}
+  .hoja{margin-top:12px;border:1px solid var(--borde);background:#fafbfc;border-radius:6px;height:520px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gris)}
+  .grupos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grupo{border:1px solid var(--borde);border-radius:9px;padding:6px 10px 9px;background:#fafbfd}
+  .grupo.ancho{grid-column:1/-1}
+  .grupo h4{margin:2px 0 4px}
+  @media(max-width:700px){.grupos{grid-template-columns:1fr}}
+  #toast{position:fixed;right:16px;bottom:16px;background:var(--verde);color:#fff;padding:10px 14px;border-radius:9px;max-width:360px;display:none;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="aviso">Pantalla de prueba 630 · datos inventados · nada se guarda</div>
+<div class="pagina">
+
+  <div class="cab">
+    <button data-t="Vuelve a la lista de asuntos">← Volver</button>
+    <span class="eti">CERTIFICADO DE NOTAS</span>
+    <span class="num">A26-0041</span>
+    <h1>Rubio Ortega, Marina 2100071</h1>
+    <span class="rel">
+      <button id="b-menu-asunto" aria-label="Más acciones del asunto">⋯</button>
+      <div class="menu" id="menu-asunto">
+        <button data-t="Se abre la ventana «Cambiar el asunto»">Cambiar el asunto</button>
+        <button data-t="Se abre el índice del expediente">Índice del expediente</button>
+        <button data-t="El asunto queda marcado como reservado">Marcar como reservado</button>
+        <div class="sep"></div>
+        <div class="rot">Copiar</div>
+        <button data-t="Copiado el asunto: Certificado de notas · Rubio Ortega, Marina · A26-0041">Asunto</button>
+        <button data-t="Copiado: 2100071">NIE</button>
+        <button data-t="Copiado: Marina Rubio Ortega">Nombre</button>
+        <div class="sep"></div>
+        <button data-t="Se pide confirmación para borrar el asunto">Borrar el asunto</button>
+      </div>
+    </span>
+    <span style="flex:1 1 auto"></span>
+    <button data-t="Copiada la ruta de la carpeta">Ruta</button>
+    <button class="p" data-t="Se abre la ventana de archivar el asunto">Archivar el asunto</button>
+  </div>
+
+  <div class="tira" id="tira"></div>
+
+  <div class="cols">
+    <div class="caja" id="hito"></div>
+    <div id="lado"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+  var CLASES={mano:'',generar:'Generar documento',firmar:'Firmar',registrar:'Registrar',comunicar:'Comunicar',anadir:'Añadir documento',datos:'Pedir datos'};
+  var BOTON={generar:'Generar documento',firmar:'Firmar',registrar:'Registrar',comunicar:'Enviar correo',anadir:'Añadir documento',datos:'Rellenar'};
+  var hitos=[
+    {nombre:'Recibir la solicitud',estado:'hecho',expl:'La familia la entrega en ventanilla o por correo.',
+     tareas:[{nombre:'Añadir la solicitud',clase:'anadir',hecha:true,doc:'261109 SOLICITUD D26-00051.pdf'},
+             {nombre:'Registrar la entrada en Séneca',clase:'registrar',hecha:true,doc:'261109 SOLICITUD D26-00051.pdf',reg:'26EM0131'}]},
+    {nombre:'Preparar y enviar el certificado',estado:'actual',expl:'Con la plantilla del tipo. Lo firma Secretaría con el V.º B.º de Dirección.',
+     tareas:[{nombre:'Generar el certificado',clase:'generar',hecha:false,datos:[['Nombre','Marina Rubio Ortega'],['Curso','3º de E.S.O.'],['Hoy','13/11/2026']]},
+             {nombre:'Registrar la salida en Séneca',clase:'registrar',hecha:false,espera:0},
+             {nombre:'Enviar el certificado por correo',clase:'comunicar',hecha:false,espera:0}]},
+    {nombre:'Archivar el expediente',estado:'',expl:'Cuando la familia confirme que lo ha recibido.',toca:'Familia',tareas:[]}
+  ];
+  var visto=1, formAbierto=false, espera=null, viendo=null;
+  var carpeta=['261109 SOLICITUD D26-00051.pdf'];
+  var registro=[
+    {h:'Recibir la solicitud',q:'Revisor',f:'09/11/2026 · 10:12',t:'Tarea hecha: Registrar la entrada en Séneca (26EM0131)'},
+    {h:'Recibir la solicitud',q:'Revisor',f:'09/11/2026 · 10:05',t:'La madre lo pide para una beca; lo necesita antes del día 20.'}
+  ];
+  var abiertos={};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function $(id){return document.getElementById(id)}
+  var tt;
+  function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(function(){e.style.display='none'},2600)}
+  function ahora(){return '13/11/2026 · 02:30'}
+  function apunta(h,t){registro.unshift({h:h,q:'Revisor',f:ahora(),t:t})}
+  function actual(){for(var i=0;i<hitos.length;i++)if(hitos[i].estado==='actual')return i;return -1}
+
+  function pintaTira(){
+    var h='';
+    hitos.forEach(function(x,i){
+      var c=(x.estado==='hecho'?'hecho ':'')+(x.estado==='actual'?'actual ':'')+(i===visto?'visto':'');
+      h+='<button class="'+c+'" data-hito="'+i+'">'+(x.estado==='hecho'?'✓ ':'')+(i+1)+'. '+esc(x.nombre)+'</button>';
+    });
+    h+='<button class="mas" data-t="Se abre la ventana de añadir un hito, que pregunta detrás de cuál va">+ Añadir hito</button>';
+    $('tira').innerHTML=h;
+  }
+
+  function pintaHito(){
+    var x=hitos[visto], esActual=x.estado==='actual', sig=-1;
+    if(esActual)for(var i=0;i<x.tareas.length;i++)if(!x.tareas[i].hecha){sig=i;break}
+    var est=x.estado==='hecho'?'Hecho':(esActual?'En curso':'Sin empezar');
+    if(esActual&&espera)est='<b>Esperando a '+espera+' desde el 13-nov</b>';
+    var h='<div class="hito-cab"><h2>'+esc(x.nombre)+'</h2>';
+    if(esActual)h+='<button class="p" id="b-hecho">Marcar como hecho</button>';
+    h+='<span class="rel"><button id="b-menu-hito">Hito ▾</button><div class="menu der" id="menu-hito">'+
+       '<button data-t="Se abre la ventana de cambiar el hito (nombre, plazo, responsable)">Cambiar</button>'+
+       '<button data-t="Se pide confirmación para borrar el hito">Borrar</button>'+
+       '<button data-t="Se abre la guía del tipo">Cambiar la guía…</button></div></span></div>';
+    h+='<p class="linea">'+(esActual?'<b>Hito actual</b> · ':'')+est+' · <button class="mini" data-plazo="1">'+(x.plazo||'Sin plazo')+'</button>'+(x.toca?' · <b>Le toca a: '+x.toca+'</b>':'')+
+       (esActual?' &nbsp; '+(espera?'<button class="mini" data-ya="1">Ya ha llegado</button>':'<button class="mini" data-espera="1">Esperando a…</button>'):'')+'</p>';
+    h+='<p class="expl">'+esc(x.expl)+'</p>';
+    if(!x.tareas.length)h+='<p class="linea">Este hito no tiene tareas.</p>';
+    x.tareas.forEach(function(t,i){
+      var c='tarea'+(t.hecha?' ok':'')+(i===sig?' sig':'');
+      h+='<div class="'+c+'"><div class="f1"><input type="checkbox" data-marca="'+i+'"'+(t.hecha?' checked':'')+' aria-label="Marcar la tarea"><span class="nom">'+esc(t.nombre)+'</span>';
+      if(CLASES[t.clase])h+='<span class="clase">'+CLASES[t.clase]+'</span>';
+      if(!t.hecha&&BOTON[t.clase]){
+        var falta=(t.clase==='registrar'||t.clase==='comunicar')&&('espera' in t)&&!t.doc;
+        h+='<button class="'+(i===sig?'p':'')+'" data-hacer="'+i+'"'+(falta?' disabled':'')+'>'+BOTON[t.clase]+'</button>';
+      }
+      h+='<button class="mini" data-t="Menú de la tarea: Anotar, Cambiar, Subir, Bajar, Borrar">⋮</button></div>';
+      if(t.datos&&!t.hecha)h+='<details class="datos-t"><summary>Datos</summary><table>'+t.datos.map(function(d){return '<tr><td>'+esc(d[0])+'</td><td>'+esc(d[1])+'</td></tr>'}).join('')+'</table></details>';
+      if(t.doc)h+='<div class="doc"><span class="ext">'+(t.doc.slice(-4)==='docx'?'DOCX':'PDF')+'</span><button class="ver" data-ver="'+esc(t.doc)+'">'+esc(t.doc)+'</button>'+(t.reg?'<small>Registro '+t.reg+'</small>':'')+
+         '<button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button></div>';
+      else if(('espera' in t)&&!t.hecha)h+='<div class="sub">Saldrá aquí al generar el certificado.</div>';
+      h+='</div>';
+    });
+    if(formAbierto){
+      h+='<div class="nueva"><input id="n-nombre" placeholder="Nombre de la tarea"><select id="n-clase">'+
+         '<option value="mano">Sin acción (se marca a mano)</option><option value="generar">Generar un documento</option><option value="firmar">Firmar un documento</option>'+
+         '<option value="registrar">Registrar un documento</option><option value="comunicar">Comunicar</option><option value="anadir">Añadir un documento</option><option value="datos">Pedir datos</option></select>'+
+         '<button class="p" id="n-ok">Añadir</button><button id="n-no">Cancelar</button></div>';
+    }else h+='<p style="margin:10px 0 0"><button id="b-nueva">+ Añadir tarea</button></p>';
+    $('hito').innerHTML=h;
+    if(formAbierto)$('n-nombre').focus();
+  }
+
+  function plegado(id,titulo,cnt,res,dentro){
+    return '<div class="pl'+(abiertos[id]?' abierto':'')+'"><div class="t" role="button" tabindex="0" data-pl="'+id+'"><span class="fl">▸</span><b>'+titulo+'</b>'+
+      (cnt!==null?'<span class="cnt">'+cnt+'</span>':'')+'<span class="res">'+res+'</span></div><div class="dentro">'+dentro+'</div></div>';
+  }
+  function pintaLado(){
+    if(viendo){
+      $('lado').innerHTML='<div class="caja"><div class="hito-cab"><button id="b-cerrar-doc">← Volver</button><b style="flex:1 1 auto">'+esc(viendo)+'</b>'+
+        '<button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button></div>'+
+        '<div class="hoja">Aquí se ve el documento,<br>como hoy.</div></div>';
+      return;
+    }
+    var cp=function(v){return '<button class="cop" data-t="Copiado: '+esc(v)+'">⧉</button>'};
+    var datos='<div class="grupos">'+
+      '<div class="grupo"><h4>👤 La alumna</h4><dl class="dl"><dt>NIE</dt><dd>2100071 '+cp('2100071')+'</dd><dt>Curso</dt><dd>3º de E.S.O. '+cp('3º de E.S.O.')+'</dd><dt>Unidad</dt><dd>3º B '+cp('3º B')+'</dd></dl>'+
+        '<button class="mini" data-t="Se abre «Ver todo» con todos los datos de la alumna">Ver todo</button> <button class="mini" data-t="Se abre la ventana para elegir qué tres datos salen en la línea plegada">Elegir qué se ve plegado</button></div>'+
+      '<div class="grupo"><h4>☎ Contacto</h4><dl class="dl"><dt>Tutora legal</dt><dd>Ortega Lima, Rosa</dd><dt>Teléfono</dt><dd>650 111 222 '+cp('650 111 222')+'</dd><dt>Correo</dt><dd>rosa.ortega@correo-demo.es '+cp('rosa.ortega@correo-demo.es')+'</dd></dl></div>'+
+      '<div class="grupo ancho"><h4>✏️ Campos de este asunto</h4><dl class="dl"><dt>Curso del certificado</dt><dd>2025/2026</dd><dt>Motivo</dt><dd>Beca</dd><dt>Quién lo pide</dt><dd>Ortega Lima, Rosa (madre)</dd><dt>Por qué vía</dt><dd>En persona</dd></dl>'+
+        '<button class="mini" data-t="Se abre «+ Añadir campo»">+ Añadir campo</button></div>'+
+      '</div><p class="linea" style="margin:8px 2px 0">Abierto el 09/11/2026 · Revisor</p>';
+    var docs=carpeta.map(function(d){return '<div class="fdoc"><span class="ext">'+(d.slice(-4)==='docx'?'DOCX':'PDF')+'</span><span class="n"><button class="ver" data-ver="'+esc(d)+'">'+esc(d)+'</button></span><button class="mini" data-t="Copiada la ruta del documento">Ruta</button><button class="mini" data-t="Copiado el extracto para Séneca">Extracto</button><button class="mini" data-t="Menú del documento">⋮</button></div>'}).join('')+
+      '<p style="margin:8px 0 0"><button class="mini" data-t="Se abre la ventana para añadir un documento del ordenador">+ Añadir documento</button> <button class="mini" data-t="Se abre «Repartir ficheros entre terceros»">Repartir ficheros entre terceros</button></p>';
+    var reg='<div class="nueva" style="margin:0 0 6px"><input id="r-texto" placeholder="Escribe una nota del asunto"><button id="r-ok">Guardar</button></div>'+
+      registro.map(function(r){return '<div class="reg"><small>'+r.f+' · '+r.q+' · ⚑ '+esc(r.h)+'</small><br>'+esc(r.t)+'</div>'}).join('');
+    var otros='<div class="fdoc"><span class="n">MATRICULA · A26-0009 · abierto</span><button class="mini" data-t="Se abre ese asunto">Abrir</button></div><div class="fdoc"><span class="n">JUSTIFICANTE · curso 25/26 · archivado</span><button class="mini" data-t="Se abre ese asunto">Abrir</button></div>';
+    var pers='<p class="linea" style="margin:0 0 8px">Nadie relacionado con este asunto todavía.</p><button class="mini" data-t="Se abre «Añadir relacionado»">+ Añadir relacionado</button>';
+    $('lado').innerHTML=
+      plegado('datos','📋 Datos',null,'NIE 2100071 '+cp('2100071')+' · Curso 3º de E.S.O. '+cp('3º de E.S.O.')+' · Unidad 3º B '+cp('3º B'),datos)+
+      plegado('pers','👥 Personas y entidades relacionadas',0,'',pers)+
+      plegado('docs','📁 Documentos de la carpeta',carpeta.length,'',docs)+
+      plegado('reg','📝 Registro',registro.length,esc(registro[0].t),reg)+
+      plegado('otros','🗂️ Otros asuntos de este tercero',2,'',otros);
+  }
+  function pinta(){pintaTira();pintaHito();pintaLado()}
+  function cierraMenus(){[].forEach.call(document.querySelectorAll('.menu.abierto'),function(m){m.classList.remove('abierto')})}
+
+  function hacer(i){
+    var x=hitos[visto], t=x.tareas[i];
+    if(t.clase==='generar'){
+      var d='261113 CERTIFICADO D26-00058.docx'; t.doc=d; t.hecha=true; carpeta.push(d);
+      x.tareas.forEach(function(o){if('espera' in o&&!o.doc)o.doc=d});
+      apunta(x.nombre,'Generado «Certificado de notas»'); toast('Documento generado. Queda colgado de su tarea y en la carpeta.');
+    }else if(t.clase==='registrar'){
+      t.reg='26SM0407'; t.hecha=true; apunta(x.nombre,'Tarea hecha: '+t.nombre+' (26SM0407)'); toast('Se abre la ventana de registrar en Séneca. Aquí se da por registrado: 26SM0407.');
+    }else if(t.clase==='comunicar'){
+      t.hecha=true; apunta(x.nombre,'Correo enviado a la familia con el certificado'); toast('Se abre la ventana del correo, ya rellena. Aquí se da por enviado.');
+    }else{ t.hecha=true; apunta(x.nombre,'Tarea hecha: '+t.nombre); toast('Se abre la ventana de «'+BOTON[t.clase]+'». Aquí se da por hecha.'); }
+    pinta();
+  }
+
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('button,input[type=checkbox]');
+    if(!b){cierraMenus();var pl=e.target.closest('[data-pl]');if(pl){abiertos[pl.dataset.pl]=!abiertos[pl.dataset.pl];pintaLado()}return}
+    if(b.id==='b-menu-asunto'||b.id==='b-menu-hito'){
+      var m=$(b.id==='b-menu-asunto'?'menu-asunto':'menu-hito'), ab=m.classList.contains('abierto');
+      cierraMenus(); if(!ab)m.classList.add('abierto'); return;
+    }
+    cierraMenus();
+    if(b.dataset.ver){viendo=b.dataset.ver;pintaLado();return}
+    if(b.id==='b-cerrar-doc'){viendo=null;pintaLado();return}
+    if(b.dataset.hito!==undefined){visto=+b.dataset.hito;formAbierto=false;pinta();return}
+    if(b.dataset.hacer!==undefined){hacer(+b.dataset.hacer);return}
+    if(b.dataset.marca!==undefined){
+      var t=hitos[visto].tareas[+b.dataset.marca]; t.hecha=b.checked;
+      if(t.hecha)apunta(hitos[visto].nombre,'Tarea hecha: '+t.nombre); pinta(); return;
+    }
+    if(b.dataset.plazo){hitos[visto].plazo=hitos[visto].plazo?'':'Vence el 20-nov';toast(hitos[visto].plazo?'Se abre el calendario para elegir el día. Aquí se pone el 20 de noviembre.':'Plazo quitado.');pintaHito();return}
+    if(b.dataset.espera){espera='la familia';apunta(hitos[visto].nombre,'En espera de la familia');toast('Se abre la ventana «Esperando a…». Aquí se pone en espera de la familia.');pinta();return}
+    if(b.dataset.ya){espera=null;apunta(hitos[visto].nombre,'Ya ha llegado');pinta();return}
+    if(b.id==='b-hecho'){
+      var a=actual(); hitos[a].estado='hecho'; espera=null; apunta(hitos[a].nombre,'Hito hecho');
+      if(hitos[a+1]){hitos[a+1].estado='actual';visto=a+1;toast('Hito hecho. El asunto pasa al siguiente.')}
+      else toast('Era el último hito. La app ofrece archivar el asunto.');
+      formAbierto=false;pinta();return;
+    }
+    if(b.id==='b-nueva'){formAbierto=true;pintaHito();return}
+    if(b.id==='n-no'){formAbierto=false;pintaHito();return}
+    if(b.id==='n-ok'){
+      var n=$('n-nombre').value.trim(), c=$('n-clase').value;
+      if(!n){toast('Escribe el nombre de la tarea.');return}
+      hitos[visto].tareas.push({nombre:n,clase:c,hecha:false}); formAbierto=false; pinta();
+      toast('Tarea añadida. Queda en la lista; no se abre nada más.'); return;
+    }
+    if(b.id==='r-ok'){
+      var v=$('r-texto').value.trim(); if(!v)return;
+      registro.unshift({h:hitos[actual()>-1?actual():visto].nombre,q:'Revisor',f:ahora(),t:v}); pintaLado(); return;
+    }
+    if(b.dataset.t){toast(b.dataset.t);return}
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')cierraMenus();
+    if(e.key==='Enter'&&e.target.id==='n-nombre')$('n-ok').click();
+    if(e.key==='Enter'&&e.target.id==='r-texto')$('r-ok').click();
+  });
+  pinta();
+})();
+</script>
+</body>
+</html>
