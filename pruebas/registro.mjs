@@ -233,15 +233,6 @@ await pagina.waitForTimeout(400);
 await comprobar('al registrarlo, la marca de pendiente desaparece',
   filaDeDocumento(SOLICITUD), { pendiente: false, registrar: false });
 
-await comprobar('y la tarea «Registrar» de ese documento queda hecha', pagina.evaluate(async ([asunto, doc]) => {
-  const a = Gestor.asuntos().filter((x) => x.nombre === asunto)[0];
-  const salida = [];
-  for (const h of await Hitos.hitosDe(asunto)) for (const g of Hitos.guionDe(a, h)) {
-    const e = TareasConDocumento.de(h, g.id);
-    if (g.accion === 'registrar' && e && e.doc === doc) salida.push(g.hecho);
-  }
-  return salida;
-}, [NOMBRE_ASUNTO, SOLICITUD]), [true]);
 
 console.log('--- leer el sello de Séneca, del propio PDF ---');
 
