@@ -117,7 +117,7 @@ main{padding:22px 28px}
 
 <script>
 var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Hacer en Séneca'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
-var ACC=[['generar','Generar documento'],['firmar','Firmar'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','En Séneca'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','En Séneca'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
 var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
@@ -233,7 +233,7 @@ function elegirTarea(hueco,op){
     if(st.a==='generar') return s.indexOf('Sin plantilla')===0?'Generar el documento':'Generar: '+s;
     if(st.a==='registrar') return 'Registrar '+(s?s.toLowerCase():'el documento');
     if(st.a==='anadir') return 'Añadir '+(s?s.toLowerCase():'el documento')+' al asunto';
-    if(st.a==='firmar') return 'Firmar '+(s?s.toLowerCase():'el documento');
+    if(st.a==='firmar') return 'Poner a la firma '+(s?s.toLowerCase():'el documento');
     if(st.a==='comunicar') return 'Comunicar: '+s.charAt(0).toLowerCase()+s.slice(1);
     if(st.a==='llamar') return 'Llamar '+s.charAt(0).toLowerCase()+s.slice(1);
     if(st.a==='') return '';
