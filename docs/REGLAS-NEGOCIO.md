@@ -251,3 +251,8 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (14-nov-2026, fila 660) Lo que se elige entre muchos (plantilla, sitio, qué se hace) va en casillas que se buscan escribiendo: un desplegable «puede dar problemas en el futuro, si hay muchas plantillas».
 - (14-nov-2026, fila 660) La app avisa solo cuando lo nuevo es igual o parecido a algo que existe, también un hito que ya está en el asunto; a veces hace falta repetirlo y se deja.
 - (14-nov-2026, fila 660) Un tipo sin guía nace sin ningún hito: «así obligamos a crear los correctos».
+- (14-nov-2026, fila 661) El hilo de un correo no cuelga de ningún hito ni tarea: va al Registro del asunto. «El hilo puede tratar sobre distintos hitos y tareas a lo largo del asunto y lo normal es mantener el hilo»; «asociar ese correo a un hito o tarea por defecto es arriesgado».
+- (14-nov-2026, fila 661) Un documento de la bandeja o un adjunto entra en un asunto diciendo de qué hito y de qué tarea es. La app solo los propone cuando una tarea espera justo ese tipo de documento; si no, se eligen a mano (eligió la opción 3). Que la app deduzca la tarea del contenido «sería mucho suponer».
+- (14-nov-2026, fila 661) Si el asunto no tiene hitos, el hito se crea desde el mismo cuadro (eligió la opción 2); «+ Añadir hito» está siempre en ese cuadro (eligió la opción 1).
+- (14-nov-2026, fila 661) El documento entra en el asunto al pulsar «Guardar»; si se deja a medias, sigue en la bandeja. En un correo, el adjunto que no se guarda se queda en la bandeja con el correo («Está bien»).
+- (14-nov-2026, tema 650) Qué hacer con la casilla «Pendiente de registro», que se pisa con la tarea «Registrar», queda como idea aparte (662; eligió la opción 2).
