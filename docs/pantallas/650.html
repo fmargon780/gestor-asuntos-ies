@@ -136,14 +136,14 @@ main{padding:22px 28px}
 
 <script>
 var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Generar documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
-var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Enviar'],['anadir','Añadir documento'],['pedir','Rellenar datos del asunto'],['copiar','Copiar a otra carpeta'],['llamar','Llamar'],['seneca','Grabar o cambiar datos'],['entregar','Entregar'],['recoger','Recoger'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Enviar'],['anadir','Añadir documento'],['pedir','Rellenar datos del asunto'],['copiar','Copiar a otra carpeta'],['llamar','Llamar'],['seneca','Grabar o cambiar datos'],['entregar','Entregar'],['recoger','Recoger'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['archivar','Archivar'],['','Otra cosa']];
 var MAPA=[{n:'Séneca',z:['Alumnado','Personal','Registro','Documentos','Ventanilla Electrónica']},{n:'iPasen',z:[]},{n:'Correo electrónico',z:[]},{n:'Correo postal',z:[]},{n:'Teléfono',z:[]},{n:'En mano',z:[]},{n:'Tablón',z:[]},{n:'Expediente del alumno',z:[]},{n:'Archivo del centro',z:[]},{n:'En esta app',z:[]}];
 function listaDonde(){var l=[];MAPA.forEach(function(x){l.push(x.n);x.z.forEach(function(z){l.push(x.n+' · '+z)})});return l}
 var DONDE=listaDonde();
 var DEF={registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',recoger:'En mano',publicar:'Tablón',comunicar:'Correo electrónico',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'};
 function dondeDe(a){return DEF[a]||''}
 /* «Qué se hace» se busca escribiendo, también por el sitio: cada acción con sus sitios habituales. Por dentro son dos datos. */
-var SITIOS={generar:['En esta app'],registrar:['Séneca · Registro'],comunicar:['Correo electrónico','iPasen','Correo postal','En mano'],anadir:['En esta app'],pedir:['En esta app'],copiar:['En esta app'],llamar:['Teléfono'],seneca:['Séneca · Alumnado','Séneca · Personal'],entregar:['En mano'],recoger:['En mano'],publicar:['Tablón'],cobrar:['En mano'],comprobar:['En mano','Séneca · Alumnado']};
+var SITIOS={generar:['En esta app'],registrar:['Séneca · Registro'],comunicar:['Correo electrónico','iPasen','Correo postal','En mano'],anadir:['En esta app'],pedir:['En esta app'],copiar:['En esta app'],llamar:['Teléfono'],seneca:['Séneca · Alumnado','Séneca · Personal'],entregar:['En mano'],recoger:['En mano'],publicar:['Tablón'],cobrar:['En mano'],comprobar:['En mano','Séneca · Alumnado'],archivar:['Expediente del alumno','Archivo del centro']};
 var QUE=[];function hacerQUE(){QUE=[];ACC.forEach(function(x){var l=SITIOS[x[0]]||[];if(!l.length)QUE.push({t:x[1],a:x[0],d:''});l.forEach(function(d){QUE.push({t:x[1]+' · '+d,a:x[0],d:d})})})}hacerQUE();
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
@@ -174,7 +174,7 @@ var TAREAS=[
  {n:'Llamar a la familia',a:'llamar',s:'Familia'},
  {n:'Comunicar el cambio a la familia por iPasen',a:'comunicar',s:'Aviso a la familia',d:'iPasen'},
  {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca · Alumnado'},
- {n:'Archivar en el expediente del alumno o alumna',a:'',s:'',d:'Expediente del alumno'}
+ {n:'Archivar en el expediente del alumno o alumna',a:'archivar',s:'',d:'Expediente del alumno'}
 ];
 TAREAS.forEach(function(t){t.d=t.d||dondeDe(t.a)||'En mano'});
 function dTxt(t){return t.d||dondeDe(t.a)||''}
