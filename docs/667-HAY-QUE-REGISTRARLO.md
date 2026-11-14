@@ -81,4 +81,17 @@ En el debate, sobre el análisis de Claude: «Ok. Me parece bien tu plan».
 - Guarda un documento escribiendo el número de registro a mano y mira que su tarea «Registrar» queda hecha.
 
 ## Revisión y respuestas durante el trabajo
+- (14-nov-2026, segundo revisor, APROBADA, en Chromium real sobre la copia de pruebas)
+  - Los tres cuadros dicen «Hay que registrarlo», nunca «Pendiente de registro»; se oculta al marcar «Está registrado en Séneca» — coincide (la bandeja la abrió desde la consola, no desde «Por clasificar»).
+  - Guardar desde un hito sin tarea «Registrar»: aparece sin hacer, con el documento, y «Sin registrar» — coincide.
+  - Hito con una «Registrar» que espera el tipo: no se crea otra — coincide.
+  - Bandeja: la tarea va al hito elegido — coincide.
+  - Sin hito: sale «Hito» con «+ Añadir hito» y sin elegirlo no guarda y lo dice — coincide (no llegó a crear un hito desde ahí: lo cubre la prueba de la fila 660).
+  - Número a mano: la tarea «Registrar» queda hecha — coincide.
+  - Marca antigua: pasa a tarea en su hito; la del documento ya registrado pierde la marca sin tarea — coincide.
+  - Avisos al marcar el hito y al archivar salen de la tarea y se puede seguir — coincide; el aviso al enviar un correo con adjuntos no lo ha podido ver (lo cubre `pruebas/avisos-de-lo-que-falta.mjs`).
+  - Consola sin errores, pantallas principales y crear/archivar un asunto — coincide.
+  - Lo que hace la app sin pedirlo: desde una tarea «Añadir documento» la tarea de añadir también queda hecha, como siempre (es la fila 638). Lo demás que anotó no viene de este cambio.
+  - Decisión técnica: desmarcar «Hay que registrarlo» en un documento que ya colgaba de una tarea «Registrar» no la borra (el texto no lo pide).
+  - Registrar con el botón «Registrar» de la ficha (sello de Séneca) no marca esta tarea, como ya ocurría con cualquier tarea «Registrar»: no se cambia el registro de Séneca en sí.
 - (las apunta Claude Code)
