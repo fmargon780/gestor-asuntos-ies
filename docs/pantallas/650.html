@@ -135,7 +135,7 @@ function sobreDe(acc){
   if(acc==='generar') return {et:'Con qué plantilla',ops:PLANT_DOC.concat(['Sin plantilla por ahora (se marca a mano)'])};
   if(acc==='comunicar') return {et:'Con qué plantilla de correo',ops:PLANT_CORREO};
   if(acc==='firmar'||acc==='registrar'||acc==='anadir') return {et:'Qué documento',ops:TIPOS_DOC};
-  if(acc==='llamar') return {et:'A quién',ops:['A quien lo pide','A la familia','A la tutoría']};
+  if(acc==='llamar') return {et:'A quién',ops:['Tercero','Familia','Relacionado','Sus profesores']};
   return null;
 }
 var TAREAS=[
@@ -153,7 +153,8 @@ var TAREAS=[
  {n:'Cobrar el importe',a:'cobrar',s:''},
  {n:'Comprobar los requisitos',a:'comprobar',s:''},
  {n:'Publicar en el tablón',a:'publicar',s:''},
- {n:'Llamar a quien lo pide',a:'llamar',s:'A quien lo pide'},
+ {n:'Llamar a quien lo pide',a:'llamar',s:'Tercero'},
+ {n:'Llamar a la familia',a:'llamar',s:'Familia'},
  {n:'Comunicar el cambio a la familia por iPasen',a:'comunicar',s:'Aviso a la familia',d:'iPasen'},
  {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca · Alumnado'},
  {n:'Archivar en el expediente del alumno o alumna',a:'',s:'',d:'Expediente del alumno'}
@@ -282,7 +283,7 @@ function elegirTarea(hueco,op){
     if(st.a==='anadir') return 'Añadir '+(s?s.toLowerCase():'el documento')+' al asunto';
     if(st.a==='firmar') return 'Poner a la firma '+(s?s.toLowerCase():'el documento');
     if(st.a==='comunicar') return 'Comunicar: '+s.charAt(0).toLowerCase()+s.slice(1);
-    if(st.a==='llamar') return 'Llamar '+s.charAt(0).toLowerCase()+s.slice(1);
+    if(st.a==='llamar') return 'Llamar: '+s;
     if(st.a==='') return '';
     return accTxt(st.a);
   }
