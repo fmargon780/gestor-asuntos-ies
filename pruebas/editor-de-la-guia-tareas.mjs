@@ -78,7 +78,7 @@ await comprobar('cada tarea: su texto, lo que hace en gris y «▸»',
     f.querySelector(':scope > .guion-resumen .guion-resumen-texto').textContent,
     f.querySelector(':scope > .guion-resumen .guion-resumen-que').textContent,
     getComputedStyle(f.querySelector(':scope > .guion-resumen .guion-resumen-flecha'), '::before').content])),
-  [['Acusar recibo del parte', 'Comunicar · por correo', '"▸"'], ['Sellar el parte', 'Otra cosa', '"▸"'],
+  [['Acusar recibo del parte', 'Enviar · Correo electrónico', '"▸"'], ['Sellar el parte', 'Otra cosa', '"▸"'],
    ['¿Viene completo?', 'Pregunta · 2 respuestas', '"▸"'], ['Archivar el parte', 'Otra cosa', '"▸"']]);
 await comprobar('cerradas, solo se ve la línea (sin campos)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos > .paso-editor[data-pos="0"] .guion-lista > .guion-fila')).map(f =>
@@ -113,7 +113,7 @@ await comprobar('con «Generar un documento»: «Plantilla de documento»; la l�
     const f = document.querySelector(s);
     return [Array.from(f.querySelectorAll('.guion-receta .etiqueta')).map(e => e.textContent),
       f.querySelector(':scope > .guion-resumen .guion-resumen-que').textContent, f.classList.contains('guion-abierta')];
-  }, F('g1')), [['Plantilla de documento'], 'Generar un documento', true]);
+  }, F('g1')), [['Plantilla de documento'], 'Generar documento · En esta app', true]);
 await pagina.locator(F('g1') + ' .guion-accion').selectOption('registrar');
 await comprobar('con «Registrar un documento»: «Entrada o salida»',
   pagina.evaluate((s) => Array.from(document.querySelectorAll(s + ' .guion-receta .etiqueta')).map(e => e.textContent), F('g1')), ['Entrada o salida']);
@@ -182,7 +182,7 @@ await comprobar('sus tareas también van en una línea',
   pagina.evaluate(() => {
     const f = document.querySelector('#guia-pasos .subpaso-editor .guion-lista > .guion-fila[data-id="ga"]');
     return [f.querySelector(':scope > .guion-resumen .guion-resumen-que').textContent, f.querySelector('.guion-texto').offsetParent === null];
-  }), ['Generar un documento', true]);
+  }), ['Generar documento', true]);
 await pagina.click('#cuadro-cancelar');
 
 /* ================= 7 ================= */
