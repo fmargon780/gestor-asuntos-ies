@@ -66,7 +66,7 @@ var RepasoGuiasPantalla = (function () {
     var boton = $('btn-repaso-lista-aplicar');
     var ok = await U.preguntar('Aplicar el repaso de la lista común',
       '<p>Se guarda una copia de las guías y de las dos listas comunes y se aplica el repaso: los hitos y las tareas repetidos se unen, los hitos seguidos de la misma fase se juntan en cada guía y cada tarea lleva su acción.</p>' +
-      '<p>Los asuntos abiertos no cambian. Esto no se puede repetir.</p>', 'Aplicar');
+      '<p>Los asuntos abiertos siguen con las tareas que tenían (las que cambian o se quitan se les quedan como estaban). Esto no se puede repetir.</p>', 'Aplicar');
     if (!ok) return;
     try {
       var r = await U.mientrasGuarda(boton, function () { return RepasoGuiasAplicar.aplicar(); });

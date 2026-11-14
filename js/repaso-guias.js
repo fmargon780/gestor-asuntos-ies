@@ -246,6 +246,9 @@ var RepasoGuias = (function () {
     /* Las marcas comunes de hoy ya no valen: `__v` guarda de cuáles venían. */
     Comunes.recorrerGuias(sub, function (p) { delete p.comun; }, function (g) { delete g.comun; });
 
+    /* El hito común guarda todas las explicaciones, pero cada guía conserva la suya: el repaso no mezcla textos de unas guías en otras. */
+    var cuerpos = [];
+    Comunes.recorrerGuias(sub, function (p) { cuerpos.push(p.cuerpo); }, null);
     var r = PlanGuiasListas.construir(sub, tipos, { tareas: [], hitos: [] });
     var tareas = r.listas.tareas, hitos = r.listas.hitos, rehechas = r.guias;
 
@@ -253,6 +256,7 @@ var RepasoGuias = (function () {
     var lineasR = [], pasosR = [];
     Comunes.recorrerGuias(rehechas, null, function (g) { if (!g.pregunta) lineasR.push(g); });
     Comunes.recorrerGuias(rehechas, function (p) { pasosR.push(p); }, null);
+    pasosR.forEach(function (p, i) { p.cuerpo = cuerpos[i]; });
 
     var candT = {}, candH = {}, fases = {};
     lineasR.forEach(function (g) {

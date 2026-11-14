@@ -54,9 +54,11 @@ const R = await p.evaluate(async () => {
       });
     });
   });
+  const cuerpoMal = []; Object.keys(plan.tipos).forEach((tipo) => { const ant = guias[tipo]; r.guias[tipo].forEach((p) => { if (p.__v) return; const o = ant.filter((x) => x.titulo === p.titulo)[0]; if (o && o.cuerpo !== p.cuerpo && !plan.tipos[tipo].some((h) => h.titulo === p.titulo && h.de.length > 1)) cuerpoMal.push(tipo + ' · ' + p.titulo); }); });
   const tit = (t) => r.guias[t].map((x) => x.titulo);
   const lin = (t, h) => ((r.guias[t].filter((x) => x.titulo === h)[0] || {}).guion || []).map((g) => g.texto);
   return {
+    cuerpoMal,
     nTipos: Object.keys(plan.tipos).length, hitos: r.listas.hitos.length, tareas: r.listas.tareas.length,
     hitosAntes: listas.hitos.length, tareasAntes: listas.tareas.length,
     sinFase: r.listas.hitos.filter((h) => FASES.indexOf(h.fase) === -1).map((h) => h.nombre),
@@ -88,6 +90,7 @@ await comprobar('1h. IPASEN ALUMNADO sigue con «Tramitar · Esperar respuesta»
   [R.ipasen, R.conformidad.indexOf('Tramitar'), R.certCE.indexOf('Tramitar')], [['Tramitar', 'Esperar respuesta'], -1, -1]);
 await comprobar('1i. las líneas «Hay que reunirlo» de «Alta y actualización de datos» siguen y «Recoger la cuenta corriente» ya no está', [R.altaReunir.some((l) => l.length > 0), R.altaTodas], [true, -1]);
 await comprobar('1j. los tres partes de BAJA MEDICA siguen separados', R.bajaPartes.filter((t) => /^Parte/.test(t)).length, 3);
+await comprobar('1m. un hito que no se junta con otro conserva el cuerpo de su guía (no se mezclan textos entre guías)', R.cuerpoMal, []);
 await comprobar('1k. las guías de los tipos desactivados no cambian', R.desactivadasIgual, []);
 await comprobar('1l. los hitos comunes conservan el id de hoy', R.idsConservados > 80, true);
 
