@@ -78,22 +78,25 @@
          nuevos aunque el correo ya estuviera apuntado. */
       await N.apuntarHuella(elAsunto.nombre, d);
       enGmail('metidoEnUnAsunto', d);
-      await borrarDeLaBandeja(item);
+      /* Fila 661: si le quedan adjuntos por guardar, solo se piden esos, y no hay otra línea en el Registro. */
+      var faltan = await BandejaAAsunto.faltan(d);
+      if (!faltan.length) await borrarDeLaBandeja(item);
       U.aviso('Ese correo ya estaba en ' + elAsunto.nombre + '. No lo he repetido.', 'bueno');
       if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
+      if (faltan.length) await BandejaAAsunto.adjuntos({ nombre: elAsunto.nombre, handle: destino }, d, item);
       return;
     }
 
     var resultado = await meterLosFicheros(d, destino, elAsunto.nombre);
     try {
-      var apunte = notaDelCorreo(d, 'Correo de',
-        reabierto ? '\nCon este correo se ha reabierto el asunto.' : '');
+      var apunte = notaDelCorreo(d, resultado, reabierto ? '\nCon este correo se ha reabierto el asunto.' : '');
       await window.Notas.anadirAuto({ nombre: elAsunto.nombre, ficha: {} },
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
     await N.apuntarHuella(elAsunto.nombre, d);
     enGmail('metidoEnUnAsunto', d);
-    var sinQuitar = await borrarDeLaBandeja(item);
+    /* Fila 661: con adjuntos por guardar, el correo sigue en la bandeja hasta que se guarden (js/bandeja-a-asunto.js). */
+    var sinQuitar = (d.adjuntos || []).length ? [] : await borrarDeLaBandeja(item);
     /* Fila 449: ya está en el asunto; que siga en la bandeja no es un fallo de guardar. */
     if (sinQuitar && sinQuitar.length) U.accesorio('El correo ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo');
     var texto = resultado.metidos ? 'Guardado en ' + elAsunto.nombre + '.' : 'Anotado en ' + elAsunto.nombre + '.';
@@ -103,7 +106,7 @@
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
     /* Fila 174, punto 5: los adjuntos de este correo, uno detrás de
        otro, igual que al crear el asunto (engancharCorreo). */
-    await abrirCuadroDeAdjuntos({ nombre: elAsunto.nombre, handle: destino }, d, resultado.adjuntos);
+    await abrirCuadroDeAdjuntos({ nombre: elAsunto.nombre, handle: destino }, d, item);
   }
 
   /* Una respuesta a un asunto archivado casi siempre quiere decir que
@@ -189,24 +192,24 @@
            (tronco ? ' ' + tronco : '') + extension;
   }
 
-  /* La nota que deja un correo en el asunto.
+  /* La línea que deja un correo en el Registro del asunto (fila 661): «Correo recibido de <quien>: «<asunto>»», sin hito, con
+     «Abrir el correo» y «Abrir el hilo» (abren esos dos PDF; el del hilo, el que haya en ese momento: js/registro-abrir-pdf.js) y,
+     si hay enlace, «Abrir en Gmail». El enlace a Gmail NO se escribe en el texto: se guarda aparte y la línea lo enseña como botón.
 
-     Una línea con quién escribe y cuándo, y debajo el asunto del
-     correo. El enlace a Gmail NO se escribe en el texto: se guarda
-     aparte y la nota lo enseña como botón. Escrito, ocupaba cuatro
-     líneas de letra ilegible.
-
-     `correo` es el identificador del correo. Es lo que luego permite
-     saber que ese correo ya está en el asunto y no repetirlo. */
-  function notaDelCorreo(d, comoEmpieza, cola) {
+     `correo` es el identificador del correo. Es lo que luego permite saber que ese correo ya está en el asunto y no repetirlo.
+     `resultado`: lo que devolvió meterLosFicheros (los nombres con que entraron el PDF del correo y el del hilo). */
+  function notaDelCorreo(d, resultado, cola) {
     var quien = (d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido';
+    var abrir = [];
+    if (resultado && resultado.correoPdf) abrir.push({ texto: 'Abrir el correo', fichero: resultado.correoPdf });
+    if (resultado && resultado.hiloMarca !== undefined) abrir.push({ texto: 'Abrir el hilo', hilo: resultado.hiloMarca });
     return {
-      texto: comoEmpieza + ' ' + quien + ' · ' + N.fechaLegible(d.fechaUltimo || d.fecha) +
-             (d.asunto ? '\n' + d.asunto : '') + (cola || ''),
+      texto: 'Correo recibido de ' + quien + (d.asunto ? ': «' + d.asunto + '»' : '') + (cola || ''),
       extra: {
         correo: d.id,
         enlace: d.enlace ? N.enlaceAGmail(d) : '',
-        enlaceTexto: 'Abrir en Gmail'
+        enlaceTexto: 'Abrir en Gmail',
+        abrir: abrir.length ? abrir : undefined
       }
     };
   }
@@ -244,13 +247,11 @@
     }
   }
 
-  /* Devuelve { metidos, adjuntos }: `adjuntos` son los nombres con los
-     que han entrado los adjuntos de verdad (nunca el PDF del correo ni
-     el del hilo), en el mismo orden — fila 174, punto 5: por ese nombre
-     ("… ADJUNTO …") se sabe cuáles todavía no se han nombrado. */
+  /* Devuelve { metidos, correoPdf, hiloMarca }: los nombres con que han entrado el PDF del correo y el del hilo (para el Registro). Los
+     adjuntos NO entran aquí (fila 661): cada uno entra al pulsar «Guardar» en su cuadro (js/bandeja-a-asunto.js). */
   async function meterLosFicheros(d, destino, nombreAsunto) {
     var metidos = 0;
-    var adjuntosGuardados = [];
+    var correoPdf = '', hiloMarca;
     var dia = U.aAaMmDd(N.soloElDia(d.fechaUltimo || d.fecha));
     var trozo = trozoDelAsunto(d);
 
@@ -261,6 +262,7 @@
         var comoCorreo = await nombreLibre(destino,
           dia + ' CORREO' + (trozo ? ' ' + trozo : '') + '.pdf');
         await copiarALaCarpeta(d.pdfMensaje, destino, comoCorreo);
+        correoPdf = comoCorreo;
         metidos++;
       } catch (e) { /* si no está, queda el hilo entero, que lo lleva dentro */ }
     }
@@ -270,18 +272,11 @@
         var comoHilo = dia + ' HILO' + (trozo ? ' ' + trozo : '') + '.pdf';
         await apartarElHiloViejo(destino, nombreAsunto, trozo);
         await copiarALaCarpeta(d.pdf, destino, await nombreLibre(destino, comoHilo));
+        hiloMarca = trozo;
         metidos++;
       } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + U.mensajeDeError(e), 'malo'); }
     }
-    for (var i = 0; i < (d.adjuntos || []).length; i++) {
-      try {
-        var suyo = await nombreLibre(destino, nombreDeAdjunto(d.adjuntos[i], d));
-        await copiarALaCarpeta(d.adjuntos[i], destino, suyo);
-        metidos++;
-        adjuntosGuardados.push(suyo);
-      } catch (e) { /* un adjunto que falle no puede parar lo demás */ }
-    }
-    return { metidos: metidos, adjuntos: adjuntosGuardados };
+    return { metidos: metidos, correoPdf: correoPdf, hiloMarca: hiloMarca };
   }
 
   /* Fila 174, punto 5: si ha entrado algún adjunto, se abre directo el
@@ -313,27 +308,12 @@
   if (window.Documentos && Documentos._interno) {
     Documentos._interno.alTerminarPonerNombre.push(function (nombreGuardado, opciones) {
       var serie = opciones && opciones.serieAdjuntos;
-      return serie ? abrirSiguienteAdjunto(serie.idCorreo, serie.restantes) : false;
+      return serie && !(opciones && opciones.desdeBandeja) ? abrirSiguienteAdjunto(serie.idCorreo, serie.restantes) : false;   /* fila 661: los de la bandeja los lleva js/bandeja-a-asunto.js */
     });
   }
 
-  /* `asunto` puede llegar aquí como un objeto a medio hacer (solo
-     nombre y handle, o con la ficha pero sin `leido`, según de dónde
-     venga: recién creado, elegido a mano en "Elegir el asunto"…), y
-     `App.tipoDeAsunto` (que usa el propio formulario del documento
-     para el tipo por defecto) necesita `a.leido`. Se completa con lo
-     mismo que ya usa `App.verAbiertosPorTurno` para cada asunto. */
-  async function abrirCuadroDeAdjuntos(asunto, d, adjuntos) {
-    if (!asunto || !adjuntos.length) return;
-    var completo = Object.assign({
-      leido: Nombres.leer(asunto.nombre, App.E.tipos),
-      ficha: App.E.registro.asuntos[asunto.nombre] || {}
-    }, asunto);
-    try { await App.verDocumentos(completo, {
-      ponerNombre: adjuntos[0], propuesta: propuestaDelAdjunto(d.id, adjuntos[0]),
-      serieAdjuntos: { idCorreo: d.id, restantes: adjuntos.slice(1) }
-    }); } catch (e) { /* el documento ya está guardado: solo falta ponerle nombre */ }
-  }
+  /* Fila 661: los adjuntos que quedan, uno detrás de otro, cada uno en el cuadro del nombre con su hito y su tarea (js/bandeja-a-asunto.js). */
+  function abrirCuadroDeAdjuntos(asunto, d, item) { return BandejaAAsunto.adjuntos(asunto, d, item); }
 
   async function engancharCorreo(item, nombreAsunto) {
     var d = item.datos;
@@ -341,18 +321,18 @@
     var resultado = await meterLosFicheros(d, destino, nombreAsunto);
 
     try {
-      var apunte = notaDelCorreo(d, 'Asunto abierto con el correo de');
+      var apunte = notaDelCorreo(d, resultado);
       await window.Notas.anadirAuto({ nombre: nombreAsunto, ficha: {} },
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 
     await N.apuntarHuella(nombreAsunto, d);
     enGmail('metidoEnUnAsunto', d);
-    await borrarDeLaBandeja(item);
+    if (!(d.adjuntos || []).length) await borrarDeLaBandeja(item);   /* fila 661: con adjuntos por guardar, sigue hasta que se guarden */
     U.aviso(resultado.metidos
       ? 'Asunto creado con el correo dentro.'
       : 'Asunto creado. El correo sale ya de la bandeja.', 'bueno');
-    await abrirCuadroDeAdjuntos({ nombre: nombreAsunto, handle: destino }, d, resultado.adjuntos);
+    await abrirCuadroDeAdjuntos({ nombre: nombreAsunto, handle: destino }, d, item);
   }
 
   async function borrarDeLaBandeja(item) {
@@ -431,6 +411,7 @@
     leerElCorreo: leerElCorreo,
     guardarEnAsunto: guardarEnAsunto,
     reabrirYGuardar: reabrirYGuardar,
+    nombreDeAdjunto: nombreDeAdjunto,   /* fila 661: el nombre con que se ve un adjunto en el cuadro del nombre */
     descartar: descartar,
     borrarDeLaBandeja: borrarDeLaBandeja
   });

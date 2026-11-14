@@ -8,6 +8,7 @@
    pasa por el camino de copiar, comprobar el tamaño y borrar, que es
    el que se usa de verdad en las carpetas de Dropbox. */
 import { chromium } from 'playwright';
+import { conUnHito, guardarEnElHito } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -148,23 +149,35 @@ await pagina.evaluate(async (n) => {
     window.__disco.fich('Conciliación FL.pdf', 'el que ya estaba dentro'));
 }, OTRO);
 
+/* Fila 661: el documento ya no se mueve al elegir el asunto, y el nombre que le toca lo pone el cuadro (fecha, tipo y número). Se prepara en
+   la carpeta un fichero con justo ese nombre y se pulsa «Guardar». */
+await conUnHito(pagina, OTRO);
 await tarjetaDe('Conciliación FL.pdf').getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Ordóñez');
 await pagina.waitForTimeout(300);
 await pagina.click('#enlace-todos .enlace-asunto');
+await pagina.waitForSelector('#doc-guardar');
+const NOMBRE_QUE_TOCA = await pagina.locator('#doc-vista').textContent();
+await pagina.evaluate(async ([n, nombre]) => {
+  const c = await window.__disco.abiertos.getDirectoryHandle(n);
+  c._hijos.set(nombre, window.__disco.fich(nombre, 'el que ya estaba dentro'));
+}, [OTRO, NOMBRE_QUE_TOCA]);
+await guardarEnElHito(pagina);
 await pagina.waitForTimeout(700);
 
 await comprobar('4. avisa de que ya hay uno con ese nombre',
-  elUltimoAviso().then(t => t.indexOf('sigue en Por clasificar') !== -1), true);
+  elUltimoAviso().then(t => t.indexOf('Ya hay un documento con ese nombre') !== -1), true);
 await comprobar('y el documento no se ha movido de la raíz',
   enLaRaiz().then(l => l.indexOf('Conciliación FL.pdf') !== -1), true);
 await comprobar('ni se ha pisado el que ya estaba dentro',
-  pagina.evaluate(async (n) => {
+  pagina.evaluate(async ([n, nombre]) => {
     const c = await window.__disco.abiertos.getDirectoryHandle(n);
-    const h = await c.getFileHandle('Conciliación FL.pdf');
+    const h = await c.getFileHandle(nombre);
     return (await (await h.getFile()).text());
-  }, OTRO), 'el que ya estaba dentro');
+  }, [OTRO, NOMBRE_QUE_TOCA]), 'el que ya estaba dentro');
+await pagina.click('#doc-volver');
+await pagina.waitForTimeout(300);
 
 /* ============================================================
    5. SI EL TRASLADO FALLA, EL DOCUMENTO SE QUEDA DONDE ESTABA
@@ -186,16 +199,18 @@ await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Ordóñez');
 await pagina.waitForTimeout(300);
 await pagina.click('#enlace-todos .enlace-asunto');
+await pagina.waitForSelector('#doc-guardar');
+await guardarEnElHito(pagina);
 await pagina.waitForTimeout(700);
 
-/* Desde la fila 100 (docs/AVISOS-QUE-DICEN-LA-VERDAD.md) dice también el motivo. */
+/* Desde la fila 100 (docs/AVISOS-QUE-DICEN-LA-VERDAD.md) dice también el motivo. Desde la fila 661 el traslado se hace al pulsar «Guardar». */
 await comprobar('5. si el traslado falla, se avisa, con el motivo',
-  elUltimoAviso(),
-  'El documento no ha podido entrar en el asunto. Sigue en Por clasificar: el disco se ha puesto tonto');
+  pagina.locator('#mensajes .mensaje').allTextContents().then(t => t.some(x => x === 'No he podido guardarlo: el disco se ha puesto tonto')),
+  true);
 await comprobar('y el documento sigue en la raíz',
   enLaRaiz().then(l => l.indexOf('Otro papel cualquiera.pdf') !== -1), true);
-await comprobar('y no se ha abierto el cuadro de ponerle nombre',
-  pagina.locator('#doc-anadir').count(), 0);
+await pagina.click('#doc-volver');
+await pagina.waitForTimeout(300);
 
 await pagina.evaluate(async (n) => {
   const c = await window.__disco.abiertos.getDirectoryHandle(n);
@@ -217,23 +232,27 @@ await comprobar('el asunto que encaja sale en "Podrían encajar"',
     .locator('.enlace-asunto').first().getAttribute('data-nombre'), OTRO);
 
 await pagina.click('#cuadro-cuerpo .enlace-bloque .enlace-asunto');
-await pagina.waitForTimeout(900);
+await pagina.waitForSelector('#doc-guardar');
 
-await comprobar('2. el documento ha entrado en la carpeta del asunto',
-  dentroDe(OTRO), ['Conciliación FL.pdf', 'Escrito de Ordóñez Gil, Rafael.pdf'].sort());
-await comprobar('y ya no está en la raíz',
-  enLaRaiz().then(l => l.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), false);
+/* Fila 661: el documento sigue en «Por clasificar» hasta pulsar «Guardar». */
+await comprobar('2. hasta pulsar «Guardar», el documento no ha entrado en la carpeta del asunto',
+  dentroDe(OTRO).then(l => l.filter(x => x.indexOf('Ordóñez') !== -1 || x.indexOf('Escrito de') !== -1)), []);
+await comprobar('y sigue en la raíz',
+  enLaRaiz().then(l => l.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), true);
 
 /* Fila 174, punto 2: se abre directo el formulario de ponerle nombre a
    ESE documento, no la lista de la carpeta. */
-await pagina.waitForSelector('#doc-guardar');
 await comprobar('3. se abre el cuadro de ponerle nombre',
   pagina.locator('#cuadro-titulo').textContent(), OTRO);
-await comprobar('directo al documento que se acaba de meter',
+await comprobar('directo al documento que se va a meter',
   pagina.locator('#doc-cuerpo').textContent()
     .then(t => t.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), true);
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(400);
+await guardarEnElHito(pagina);
+await pagina.waitForTimeout(1500);
+await comprobar('2. al pulsar «Guardar» el documento ha entrado en la carpeta del asunto, con el nombre que le toca',
+  dentroDe(OTRO).then(l => l.filter(x => /^\d{6} \S+ D26-\d{5}\.pdf$/.test(x)).length >= 1), true);
+await comprobar('y ya no está en la raíz',
+  enLaRaiz().then(l => l.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), false);
 
 /* La tarjeta ha desaparecido de "Por clasificar". */
 await comprobar('la tarjeta se va de "Por clasificar"',

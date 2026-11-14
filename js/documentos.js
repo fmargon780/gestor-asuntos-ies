@@ -86,6 +86,13 @@ var Documentos = (function () {
       N.pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre,
         ponerNombre: true, propuesta: (opciones && opciones.propuesta) || null });
     }
+    /* Fila 661: un documento de la bandeja. El fichero sigue allí hasta que se pulsa «Guardar»: el cuadro es el de añadir un documento,
+       con su fichero de origen en la bandeja y el bloque «¿De qué tarea es?». */
+    if (opciones && opciones.desdeBandeja) {
+      var db = opciones.desdeBandeja;
+      N.pintarFormulario({ modo: 'anadir', handle: db.handle, nombreActual: db.nombre, nombreVista: db.nombreVista || '', ponerNombre: true,
+        propuesta: opciones.propuesta || null, desdeBandeja: db, serieAdjuntos: opciones.serieAdjuntos || null });
+    }
     /* Un fichero soltado encima de la mesa del hito (fila 109): lo mismo
        que "Desde el ordenador", con el fichero ya elegido. */
     if (opciones && opciones.ficheroSoltado) {

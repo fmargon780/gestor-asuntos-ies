@@ -7,6 +7,7 @@
    Con el navegador de verdad y el disco de mentira de
    pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { elegirHitoYTareaNueva } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -103,31 +104,35 @@ async function estado() {
   }, A);
 }
 
-console.log('--- 1. se cierra el cuadro sin ponerle nombre ---');
+/* Fila 661: el documento ya no entra al elegir el asunto: entra al pulsar «Guardar», colgado de su tarea. Si se llega desde un hito, ese hito
+   viene puesto en el bloque «¿De qué tarea es?». «Volver» no guarda nada. */
+console.log('--- 1. «Volver» no guarda nada ---');
 await meter(PRIMERO);
 await comprobar('se abre directamente el formulario de ponerle nombre a ese documento',
   pagina.locator('#doc-vista').count(), 1);
-await pagina.click('#cuadro-aceptar');
+await comprobar('el hito desde el que se llega viene puesto', pagina.$eval('#dtb-hito', (e) => e.value), 'p1');
+await pagina.click('#doc-volver');
 await pagina.waitForTimeout(700);
 const r1 = await estado();
-await comprobar('queda apuntado al hito con el nombre que traía', Promise.resolve(r1.docs), [PRIMERO]);
-await comprobar('está en la carpeta del asunto', Promise.resolve(r1.carpeta), [PRIMERO]);
-await comprobar('sin salir de la ficha, y con el hito desplegado', Promise.resolve([r1.enLaFicha, r1.desplegado]), [true, true]);
+await comprobar('no queda apuntado al hito', Promise.resolve(r1.docs), []);
+await comprobar('no está en la carpeta del asunto, y sigue en «Por clasificar»', Promise.resolve([r1.carpeta, await pagina.evaluate((n) => window.__disco.abiertos._hijos.has(n), PRIMERO)]), [[], true]);
+await comprobar('sin salir de la ficha', Promise.resolve(r1.enLaFicha), true);
 
-console.log('--- 2. se le pone nombre ---');
+console.log('--- 2. se le pone nombre y se guarda ---');
 await meter(SEGUNDO);
 await pagina.fill('#doc-fecha', '2026-09-07');
 await pagina.fill('#doc-curso', 'prueba');
 await pagina.waitForTimeout(150);
 const nuevo = await pagina.locator('#doc-vista').textContent();
+await elegirHitoYTareaNueva(pagina);
 await pagina.click('#doc-guardar');
 /* Fila 174, punto 3: abierto directo para ponerle nombre, "Guardar"
    cierra el cuadro entero, en vez de volver a la lista. */
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 await pagina.waitForTimeout(700);
 const r2 = await estado();
-await comprobar('en el hito queda el nombre nuevo, y no el viejo', Promise.resolve(r2.docs), [PRIMERO, nuevo]);
-await comprobar('en la carpeta, con el nombre nuevo', Promise.resolve(r2.carpeta), [PRIMERO, nuevo].sort());
+await comprobar('en el hito queda el nombre nuevo', Promise.resolve(r2.docs), [nuevo]);
+await comprobar('en la carpeta, con el nombre nuevo', Promise.resolve(r2.carpeta), [nuevo]);
 await comprobar('el hito sigue desplegado', Promise.resolve(r2.desplegado), true);
 
 if (errores.length) { fallos++; console.log('FALLA  errores en la consola:\n   ' + errores.join('\n   ')); }

@@ -201,10 +201,8 @@ await comprobar('sin huella, lo reconoce por el texto del asunto',
 console.log('--- guardando el correo en el asunto ---');
 await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1200);
-/* Fila 174, punto 5: con adjuntos de verdad, se abre el cuadro de
-   ponerles nombre (sin "Cancelar": solo "Cerrar", `#cuadro-aceptar`);
-   aquí no hace falta nombrarlos (ya han entrado con un nombre válido),
-   así que se cierra sin más. */
+/* Fila 661: con adjuntos de verdad, se abre el cuadro del nombre de cada uno (con su hito y su tarea); aquí no se guardan: se cierra con
+   «Cerrar» y los adjuntos siguen en la bandeja, con el correo. El PDF del hilo sí ha entrado ya, y la línea del Registro. */
 if (await pagina.locator('#capa:not(.oculto)').isVisible().catch(() => false)) {
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForSelector('#capa', { state: 'hidden' });
@@ -222,10 +220,8 @@ async function notasDelAsunto() {
 
 const HILO_PDF = '260909 HILO 260903 FLEXIBILIDAD 26-27 Pacheco.pdf';
 
-await comprobar('los ficheros que hay ahora en la carpeta', ficherosDelAsunto(), [
+await comprobar('los ficheros que hay ahora en la carpeta (los adjuntos no, hasta que se guardan uno a uno)', ficherosDelAsunto(), [
   '260903 26EA0412 SOLICITUD.pdf',
-  '260909 ADJUNTO 1000082963.jpg',
-  '260909 ADJUNTO LITNAC2026050413001031751487.pdf',
   HILO_PDF,
   'Conciliación FL.pdf'
 ].sort());
@@ -233,7 +229,7 @@ await comprobar('los ficheros que hay ahora en la carpeta', ficherosDelAsunto(),
 const notas = await notasDelAsunto();
 await comprobar('hay una sola nota', notas.length, 1);
 await comprobar('el texto de la nota', notas[0] && notas[0].texto,
-  'Correo de Mercedes Pacheco · 09/09/2026\nRe: ' + ASUNTO);
+  'Correo recibido de Mercedes Pacheco: «Re: ' + ASUNTO + '»');
 await comprobar('la nota no lleva la dirección escrita',
   (notas[0] && notas[0].texto || '').indexOf('http'), -1);
 await comprobar('la nota guarda el enlace aparte', notas[0] && notas[0].enlace,
@@ -254,11 +250,14 @@ await dejarElCorreo(correoDeMentira());
 await mirarLaBandeja();
 await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1000);
+/* Fila 661: los adjuntos que siguen en la bandeja se vuelven a pedir (solo esos); aquí no se guardan. */
+if (await pagina.locator('#capa:not(.oculto)').isVisible().catch(() => false)) {
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForSelector('#capa', { state: 'hidden' });
+}
 
 await comprobar('no se repiten los ficheros', ficherosDelAsunto(), [
   '260903 26EA0412 SOLICITUD.pdf',
-  '260909 ADJUNTO 1000082963.jpg',
-  '260909 ADJUNTO LITNAC2026050413001031751487.pdf',
   HILO_PDF,
   'Conciliación FL.pdf'
 ].sort());
@@ -276,18 +275,16 @@ await pagina.waitForTimeout(700);
 
 await comprobar('los documentos salen en dos grupos',
   pagina.locator('#ficha-documentos .ficha-grupo-docs').allTextContents(),
-  ['Del expediente  (2)', 'Llegados por correo  (3)']);
+  ['Del expediente  (2)', 'Llegados por correo  (1)']);
 await comprobar('y en este orden',
   pagina.locator('#ficha-documentos .ficha-documento').allTextContents(),
   ['PDF260903 26EA0412 SOLICITUD.pdf', 'PDFConciliación FL.pdf',
-   'JPG260909 ADJUNTO 1000082963.jpg',
-   'PDF260909 ADJUNTO LITNAC2026050413001031751487.pdf',
    'PDF' + HILO_PDF]);
 
 await comprobar('la nota enseña un botón para abrir el correo',
-  pagina.locator('#ficha-notas .nota-boton').textContent(), 'Abrir en Gmail');
+  pagina.locator('#ficha-notas a.nota-boton').textContent(), 'Abrir en Gmail');
 await comprobar('y el botón lleva a Gmail',
-  pagina.locator('#ficha-notas .nota-boton').getAttribute('href'),
+  pagina.locator('#ficha-notas a.nota-boton').getAttribute('href'),
   'https://mail.google.com/mail/u/0/#search/rfc822msgid:abc123');
 
 /* ============================================================

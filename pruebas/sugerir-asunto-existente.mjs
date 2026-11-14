@@ -22,6 +22,7 @@
    Un quinto documento, sin ningún tercero reconocible, cubre el
    escenario 5 (la tarjeta se queda igual que antes de esta fila). */
 import { chromium } from 'playwright';
+import { conUnHito, guardarEnElHito } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 function pdfConTexto(texto) {
@@ -296,20 +297,21 @@ await comprobar('"Meter aquí" sí es el destacado de su línea',
    (el asunto está abierto: no hace falta preguntar si reabrir), y abre
    directo el formulario de ponerle nombre (fila 174, punto 2), no la
    lista. */
+await conUnHito(pagina, ABIERTO_BERMEJO);   /* fila 661: el documento entra al pulsar «Guardar», con su hito y su tarea */
 await sugerenciasDe(PDF_BERMEJO).first().locator('button').first().click();
 await pagina.waitForSelector('#doc-guardar');
 await comprobar('"Meter aquí" ha llevado directo al cuadro de ponerle nombre',
   pagina.locator('#cuadro-titulo').textContent(), ABIERTO_BERMEJO);
-/* Este cuadro (App.verDocumentos) no lleva botón Cancelar (se abre con
-   sinCancelar=true): se cierra con el único que hay, "Cerrar". */
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(300);
+/* Fila 661: hasta pulsar «Guardar» el documento sigue en «Por clasificar»; al guardarlo entra, con el nombre que le pone el cuadro. */
+await guardarEnElHito(pagina);
+await pagina.waitForTimeout(1500);
 await comprobar('y el documento ha entrado en la carpeta del asunto',
   pagina.evaluate(async (n) => {
     const c = await window.__disco.abiertos.getDirectoryHandle(n);
-    const h = await c.getFileHandle('Factura de Bermejo.pdf').then(() => true).catch(() => false);
-    return h;
-  }, ABIERTO_BERMEJO), true);
+    let dentro = 0; for await (const x of c.entries()) dentro++;
+    const sigueFuera = await window.__disco.abiertos.getFileHandle('Factura de Bermejo.pdf').then(() => true).catch(() => false);
+    return [dentro >= 1, sigueFuera];
+  }, ABIERTO_BERMEJO), [true, false]);
 
 /* ============================================================
    ESCENARIO 2. CUATRO ABIERTOS: 3 SALEN, MISMO TIPO PRIMERO,

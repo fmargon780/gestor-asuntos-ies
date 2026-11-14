@@ -131,6 +131,17 @@
       await Hitos.anadirNota(pabloClave, hitosPablo[1].id, 'Tarea hecha: Comprobar la documentación');
     }
 
+    /* Fila 661: lo que espera un documento de la bandeja. En la matrícula de Pablo, una tarea de «Añadir documento» por tipo (SOLICITUD y
+       JUSTIFICANTE) y otra sin tipo. (Sin hitos ya hay dos asuntos de demostración: «PEDIDO Imprenta Sol» y «JUSTIFICACION AUSENCIA».) */
+    try {
+      var hitosP = await Hitos.hitosDe(pabloClave);
+      if (hitosP.length > 1) {
+        await Hitos.anadirGuionPropio(pabloClave, hitosP[0].id, 'Recibir la solicitud de matrícula', { accion: 'anadir', tipoDocumento: 'SOLICITUD' });
+        await Hitos.anadirGuionPropio(pabloClave, hitosP[0].id, 'Recibir otra documentación', { accion: 'anadir' });
+        await Hitos.anadirGuionPropio(pabloClave, hitosP[1].id, 'Recibir el justificante del seguro escolar', { accion: 'anadir', tipoDocumento: 'JUSTIFICANTE' });
+      }
+    } catch (e661) { /* la demostración sigue sin lo de la fila 661 */ }
+
     /* 3. con la fecha límite ya vencida. */
     var carlaClave = await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {
       abiertoEl: hace(20) + 'T09:00:00.000Z',

@@ -10,7 +10,7 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
   no se escribe en el texto: se guarda aparte (`enlace`, `enlaceTexto`, `correo`) y se enseña
   como botón "Abrir en Gmail" (`Notas.anadir`).
 - Un correo no entra dos veces (`Notas.yaTieneCorreo`).
-- Los adjuntos entran con nombre de la casa: `AAMMDD ADJUNTO …`.
+- Los adjuntos (fila 661) ya no entran solos con el correo: cada uno entra al pulsar «Guardar» en su cuadro del nombre, con su hito y su tarea (`js/bandeja-a-asunto.js`, «Correo de X · adjunto 2 de 3»); los que no se guardan siguen en la bandeja con el correo. Entran con el nombre que le toca (`AAMMDD TIPO D26-nnnnn`); `AAMMDD ADJUNTO …` solo se usa para proponer la fecha. El PDF del correo (`CORREO`) y el del hilo (`HILO`) sí entran con el correo, sin hito ni tarea, y el Registro del asunto deja una línea «Correo recibido de <quien>: «<asunto>»» con «Abrir el correo» y «Abrir el hilo» (`js/registro-abrir-pdf.js`).
 - Los documentos de la ficha van en dos grupos, "Del expediente" y "Llegados por correo" (los
   rótulos solo salen cuando hay de las dos clases); lo de correo se reconoce por el nombre
   (CORREO, HILO o ADJUNTO).

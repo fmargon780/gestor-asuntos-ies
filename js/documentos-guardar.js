@@ -84,6 +84,7 @@
     $('doc-vista').textContent = nombre;
     Nombres.avisoRecorte($('doc-vista'), ajustado.recortado, ajustado.noCabe);   /* filas 130 y 177 */
     $('doc-guardar').disabled = nombre.length < 10 || !!ajustado.noCabe;
+    if (window.DocumentoTareaBloque && N.ultimasOpciones.desdeBandeja) DocumentoTareaBloque.cambioDeTipo();   /* fila 661 */
   }
 
   /* La lista de "pendientesRegistro" vive en la ficha del asunto, no
@@ -123,7 +124,13 @@
        «+ Añadir documento» de la carpeta se pregunta ahora, antes de guardar nada («Cancelar» no añade nada). */
     var tipoDelDocumento = datosDelFormulario(opciones).tipo;
     var destino = null;
-    if (opciones.modo === 'anadir' && N.hitoActual && N.tareaActual) destino = { hitoId: N.hitoActual.id, tareaId: N.tareaActual };
+    if (opciones.desdeBandeja && window.DocumentoTareaBloque) {
+      /* Fila 661: desde la bandeja, el hito y la tarea ya están elegidos en el propio cuadro; sin ellos no se guarda nada. */
+      var elegidoB = DocumentoTareaBloque.destino();
+      if (elegidoB.aviso) { U.aviso(elegidoB.aviso, 'malo'); return; }
+      destino = { hitoId: elegidoB.hitoId, tareaId: elegidoB.tareaId };
+    }
+    else if (opciones.modo === 'anadir' && N.hitoActual && N.tareaActual) destino = { hitoId: N.hitoActual.id, tareaId: N.tareaActual };
     else if (opciones.modo === 'anadir' && N.preguntarTarea && window.DocumentoATarea) {
       destino = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: false });
       if (!destino) return;
@@ -149,10 +156,12 @@
         }
       } catch (eRes) { U.fallo('No he podido reservar el número del documento', eRes); return; }
     }
+    /* Fila 661: antes de que el documento entre, las comprobaciones de siempre de la bandeja (ruta larga). */
+    if (opciones.desdeBandeja && !(await opciones.desdeBandeja.antes(N.asuntoActual, nombre))) return;
     try {
       var yaEsta = await Carpetas.ficheros(N.asuntoActual.handle);
       var repetido = yaEsta.some(function (f) {
-        return f.nombre === nombre && f.nombre !== opciones.nombreActual;
+        return f.nombre === nombre && (f.nombre !== opciones.nombreActual || !!opciones.desdeBandeja);   /* fila 661: lo que viene de la bandeja nunca pisa */
       });
       if (repetido) {
         U.aviso('Ya hay un documento con ese nombre en la carpeta.', 'malo');
@@ -177,6 +186,8 @@
       U.fallo('No he podido guardarlo', e);
       return;
     }
+    /* Fila 661: ya está dentro del asunto; ahora sale de «Por clasificar» (o del correo de la bandeja). */
+    if (opciones.desdeBandeja) await opciones.desdeBandeja.despues(N.asuntoActual, nombre);
     /* El documento ya está en la carpeta con su nombre: lo de después
        es accesorio, y si falla, ámbar (fila 100). */
     if (opciones.numeroDoc) {
@@ -219,7 +230,7 @@
        se guarde mientras el cuadro esté abierto, no solo lo primero. */
     if (destino && window.DocumentoATarea) {
       /* Fila 638: apuntado al hito, colgado de su tarea (o de la «Tarea nueva»), tarea hecha y su línea en el registro. */
-      try { await DocumentoATarea.colgar(N.asuntoActual, destino, nombre, tipoDelDocumento, { nuevo: true }); }
+      try { await DocumentoATarea.colgar(N.asuntoActual, destino, nombre, tipoDelDocumento, { nuevo: true, conMarca: !!opciones.desdeBandeja }); }
       catch (e2c) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2c); }
       if (window.HitosPanel && N.hitoActual) window.HitosPanel.desplegarAlAbrir(N.asuntoActual.nombre, N.hitoActual.id);
     } else if (N.hitoActual) {

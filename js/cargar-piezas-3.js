@@ -73,6 +73,10 @@
     // Fila 638: «+ Añadir tarea» y su formulario, y «¿De qué tarea es?» (documento colgado de una tarea). Las llaman js/hito-mesa-guion.js, js/documentos-guardar.js y js/ficha-documentos-fila.js.
     'js/hito-mesa-nueva-tarea.js',
     'js/documento-a-tarea.js',
+    // Fila 661: la bandeja con hito y tarea: el bloque «¿De qué tarea es?» del cuadro del nombre, la entrada al guardar y los botones del correo en el Registro.
+    'js/documento-tarea-bloque.js',
+    'js/bandeja-a-asunto.js',
+    'js/registro-abrir-pdf.js',
     'js/donde-se-guarda.js',
     'js/donde-se-guarda-tareas.js',
     'js/hito-mesa-tarea-menu.js',

@@ -31,6 +31,7 @@ var AnadirHito = (function () {
     abierta = null;
     document.removeEventListener('keydown', c.tecla, true);
     if (c.capa.parentNode) c.capa.parentNode.removeChild(c.capa);
+    if (c.alCerrar) { try { c.alCerrar(); } catch (e) { /* quien llama no puede romper el cierre */ } }   /* fila 661 */
   }
 
   function etiquetaDe(t) {
@@ -81,7 +82,9 @@ var AnadirHito = (function () {
 
   /* ---------- la ventana ---------- */
 
-  async function abrir(a, idAnclaPorDefecto) {
+  /* `alCerrar` (fila 661, opcional): se llama al cerrarse la ventana, se haya añadido un hito o se haya cancelado (el cuadro de
+     la bandeja mira entonces si hay un hito nuevo). */
+  async function abrir(a, idAnclaPorDefecto, alCerrar) {
     cerrar();
     try { await Fases.cargar(); } catch (e) { /* con las fijas */ }
     try { await SitiosGuardado.cargar(); } catch (e2) { /* con los de partida */ }
@@ -101,7 +104,7 @@ var AnadirHito = (function () {
     var cuadro = capa.firstChild;
     function tecla(ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cerrar(); } }
     document.addEventListener('keydown', tecla, true);
-    abierta = { capa: capa, tecla: tecla };
+    abierta = { capa: capa, tecla: tecla, alCerrar: alCerrar };
 
     function hitosDeLaFase() { return listas.hitos.filter(function (h) { return h.fase === st.f; }); }
     function tareasDe(hc) { return (hc.tareas || []).map(function (id) { return Comunes.buscar(listas.tareas, id); }).filter(Boolean); }
