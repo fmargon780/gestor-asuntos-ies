@@ -228,3 +228,13 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 
 - (13-nov-2026, tema 631) La carpeta de un asunto con número **pierde el nombre de la persona solo al archivar**, cuando entra en la carpeta de esa persona, y lo recupera al reabrir. Abierta se llama como siempre, porque en Asuntos abiertos no hay carpeta de persona y el nombre es lo único que dice de quién es («Adelante con tu forma mejor»; él había pedido quitarlo de todas para acortar las rutas).
 - (13-nov-2026, tema 631) **Las carpetas ya archivadas con número se acortan** con un botón de Herramientas, que se pulsa con la otra persona fuera de la app (eligió «2», sabiendo que Drive sincroniza de nuevo cada carpeta en los dos ordenadores). Para ellas deja de valer «lo que ya existe no se renombra» (fila 239). Las carpetas sin número no se tocan.
+
+## Crear tareas e hitos (tema 650)
+
+- (14-nov-2026, tema 650) Crear ante una situación nueva todo lo necesario, de manera fluida, es «fundamental para el futuro de la app», sobre todo en la atención en ventanilla; las plantillas con campos pueden llevar más tiempo.
+- (14-nov-2026, tema 650) Hitos y tareas no se crean ni se buscan solo por el nombre: «puede ser muy arriesgado», «me temo que crearíamos muchos hitos para lo mismo». Se eligen por lo que hacen: la tarea, por su acción y sobre qué; el hito, por su fase.
+- (14-nov-2026, tema 650) Las fases de los hitos son una lista fija del centro; las nuevas se crean solo en Ajustes, no al crear un asunto: «para frenar un poco a ese nivel».
+- (14-nov-2026, tema 650) El tema va en cuatro partes y en este orden: acciones que faltan, repaso de una vez de la lista común, crear tareas e hitos en el asunto y bandeja con hito y tarea (eligió la opción 1, sabiendo que el tema crece).
+- (14-nov-2026, fila 651) Las cinco acciones nuevas («En Séneca», «Entregar o recoger en mano», «Publicar», «Cobrar o pagar», «Comprobar») por ahora solo clasifican y se marcan a mano; que hagan algo propio queda como ideas 652 a 656 (eligió la opción 3). «Sin acción» pasa a llamarse «Otra cosa».
+- (14-nov-2026) Claude lee `guias.json`, `tareas-comunes.json`, `hitos-comunes.json` y `tipos.json` de `_GESTOR` porque están compartidos, solo como lector, con el Gmail personal de Francisco. Nada con datos de personas se comparte fuera de la cuenta del centro.
+
