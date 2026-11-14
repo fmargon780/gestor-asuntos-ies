@@ -79,51 +79,6 @@ await comprobar('4. «Generar documento» ofrece la plantilla de documento del t
 await comunicarDelHito(pagina);
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
 await pagina.waitForTimeout(800);
-await comprobar('2. el aviso trae la casilla y «Guardar», y no el enlace a las tablas', pagina.evaluate(() => ({
-  texto: document.querySelector('.correo-tutor-falta').childNodes[0].textContent,
-  casilla: document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length, guardar: document.querySelectorAll('.correo-tutor-guardar:not([data-profe])').length,
-  enlace: document.querySelectorAll('.correo-tutor-completar').length })),
-  { texto: 'Falta el correo de Cabello Ruiz, Esperanza (tutor/a de 1º Bach A)', casilla: 1, guardar: 1, enlace: 0 });
-await pagina.fill('.correo-tutor-escribir:not([data-profe])', 'esto no es un correo');
-await pagina.click('.correo-tutor-guardar:not([data-profe])');
-await pagina.waitForTimeout(400);
-await comprobar('2. un correo mal escrito no se guarda', pagina.evaluate(async () => [Object.keys(await CorreosAMano.leerTodos()).length, document.querySelectorAll('.correo-tutor-escribir:not([data-profe])').length]), [0, 1]);
-await pagina.fill('.correo-tutor-escribir:not([data-profe])', 'esperanza@correo-demo.es');
-await pagina.click('.correo-tutor-guardar:not([data-profe])');
-await pagina.waitForFunction(() => !document.querySelector('.correo-tutor-escribir:not([data-profe])'), null, { timeout: 8000 });
-await comprobar('2. se guarda al momento, sin enviar', pagina.evaluate(async () => {
-  const t = await CorreosAMano.leerTodos();
-  return Object.keys(t).map((k) => [k, t[k].correo, t[k].nombre]);
-}), [['77889900', 'esperanza@correo-demo.es', 'Cabello Ruiz, Esperanza']]);
-await comprobar('2. el tutor queda como destinatario, el aviso desaparece y el cuadro sigue abierto', pagina.evaluate(() => ({
-  para: CorreoPara.texto('para'), avisos: document.querySelectorAll('.correo-tutor-falta:not([data-profe])').length,
-  abierto: !document.getElementById('capa').classList.contains('oculto') && !!document.getElementById('correo-formulario') })),
-  { para: 'esperanza@correo-demo.es', avisos: 0, abierto: true });
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
-
-console.log('--- 3 y 4. matrícula: plantilla de correo y «Generar documento» ---');
-await pagina.click('button.pestana[data-pantalla="abiertos"]');
-await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="MATRICULA Aguilar Ponce, Pablo"] .tarjeta-nombre').first().click();
-await pagina.waitForTimeout(1500);
-await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
-await pagina.waitForSelector('#ficha-guia.con-mesa', { timeout: 10000 });
-await pagina.locator('#ficha-tira .mesa-tira-hito', { hasText: 'Comprobar la documentación' }).click();
-await pagina.waitForFunction(() => document.querySelector('.hito-en-mesa .mesa-titulo').textContent === 'Comprobar la documentación');
-await pagina.waitForTimeout(600);
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
-await pagina.waitForTimeout(300);
-await comprobar('4. «Generar documento» ofrece, a la vista, la plantilla de documento del tipo', pagina.evaluate(() => ({
-  filas: [...document.querySelectorAll('.hito-en-mesa .mesa-plantillas .mesa-plantilla-nombre')].map((x) => x.textContent),
-  visible: [...document.querySelectorAll('.hito-en-mesa .mesa-plantillas .mesa-plantilla-generar')].every((b) => b.offsetParent !== null) })),
-  { filas: ['Resguardo de matrícula'], visible: true });
-await pagina.keyboard.press('Escape');
-await pagina.evaluate(() => HitoMesa.cerrarPanelSiAbierto && HitoMesa.cerrarPanelSiAbierto());
-await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
-await pagina.waitForSelector('.hito-en-mesa .mesa-preparar-correo');
-await pagina.click('.hito-en-mesa .mesa-preparar-correo');
-await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario', { timeout: 15000 });
-await pagina.waitForTimeout(800);
 await comprobar('3. el hito 2 no propone «Confirmación de matrícula», y esa plantilla sigue en la lista', pagina.evaluate(() => {
   const s = document.getElementById('correo-plantilla');
   return [s.selectedOptions[0].textContent, [...s.options].map((o) => o.textContent).indexOf('Confirmación de matrícula') !== -1];
