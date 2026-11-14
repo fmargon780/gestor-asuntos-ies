@@ -1,6 +1,6 @@
 /* Fila 639 (13-nov-2026, docs/639-LLAMAR-POR-TELEFONO.md): llamar por teléfono, con Chromium real y los datos de la copia de
    pruebas (?demo=1&auto=1), en SANCION de Fuentes Calvo (1º Bach A):
-   - «Llamar por teléfono» es la última opción de «Qué se hace»; la tarea lleva su etiqueta, el icono y «Sin llamadas todavía».
+   - «Llamar» (fila 659; antes «Llamar por teléfono») va tras «Copiar a otra carpeta» en «Qué se hace»; la tarea lleva su etiqueta, el icono y «Sin llamadas todavía».
    - La ventana desde la tarea: «He llamado yo», el nombre de la tarea en el título, sin «¿Es de una tarea?»; no apunta sin lo que falta.
    - «No contesta»: cuenta bajo la tarea, la tarea sigue pendiente, línea en el Registro con su hito y su tarea.
    - «He hablado»: la tarea se marca sola; el botón sigue; la llamada se coloca por su hora.
@@ -54,26 +54,26 @@ async function lineasDelRegistro() {
   return pagina.evaluate(() => RegistroAsunto.lineas(FichaNucleo.actual).map((l) => ({ texto: l.texto, hito: l.hitoTitulo, auto: l.auto, llamada: !!l.llamada })));
 }
 
-console.log('--- la tarea «Llamar por teléfono» ---');
+console.log('--- la tarea «Llamar» ---');
 await pagina.click('.tcd-abrir-form');
-await comprobar('«Llamar por teléfono» va detrás de «Copiar» en «Qué se hace» al añadir una tarea', pagina.evaluate(() => {
+await comprobar('«Llamar» va en «Qué se hace» al añadir una tarea, antes de las que solo clasifican', pagina.evaluate(() => {
   const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
-  return o[o.length - 6];
-}), 'Llamar por teléfono');   // fila 651: detrás van las cinco que solo clasifican
-await comprobar('fila 651: las cinco acciones nuevas van al final de «Qué se hace», en orden, y «Otra cosa» no sale como «Sin acción»', pagina.evaluate(() => {
+  return o[o.indexOf('Grabar o cambiar datos') - 1];
+}), 'Llamar');   // fila 651: detrás van las que solo clasifican (fila 659: sin «Copiar», que no sale aquí)
+await comprobar('fila 651 (nombres de la 659): las acciones que solo clasifican van al final de «Qué se hace», en orden, y «Otra cosa» no sale como «Sin acción»', pagina.evaluate(() => {
   const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
-  return [o.slice(-5), o.indexOf('Otra cosa') !== -1, o.some((x) => /Sin acción/.test(x)),
-    ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar', 'zzz'].map((v) => Comunes.accionValida(v))];
-}), [['En Séneca', 'Entregar o recoger en mano', 'Publicar', 'Cobrar o pagar', 'Comprobar'], true, false, ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar', '']]);
+  return [o.slice(-8, -1), o.indexOf('Otra cosa') !== -1, o.some((x) => /Sin acción/.test(x)),
+    ['seneca', 'entregar', 'recoger', 'publicar', 'cobrar', 'comprobar', 'archivar', 'zzz'].map((v) => Comunes.accionValida(v))];
+}), [['Grabar o cambiar datos', 'Entregar', 'Recoger', 'Publicar', 'Cobrar o pagar', 'Comprobar', 'Archivar'], true, false, ['seneca', 'entregar', 'recoger', 'publicar', 'cobrar', 'comprobar', 'archivar', '']]);
 await pagina.click('.tcd-cancelar-form');
-await comprobar('«Llamar por teléfono» va detrás de «Copiar» en GuiasGuion.ACCIONES y sale en las listas comunes', pagina.evaluate(() => [
-  GuiasGuion.ACCIONES[GuiasGuion.ACCIONES.length - 6].texto, Comunes.textoDeHace('llamar')]), ['Llamar por teléfono', 'Llamar por teléfono']);
+await comprobar('«Llamar» va detrás de «Copiar» en GuiasGuion.ACCIONES y sale en las listas comunes', pagina.evaluate(() => [
+  GuiasGuion.ACCIONES[GuiasGuion.ACCIONES.map((x) => x.valor).indexOf('copiar') + 1].texto, Comunes.textoDeHace('llamar')]), ['Llamar', 'Llamar']);
 await anadirTarea(NOMBRE_TAREA);
 await comprobar('la tarea nueva: etiqueta, botón con el icono (sin texto) y «Sin llamadas todavía»', pagina.evaluate((n) => {
   const t = [...document.querySelectorAll('.guion-paso')].filter((x) => x.querySelector('.guion-paso-texto').textContent === n)[0];
   const b = t.querySelector('.ll-boton');
   return { etiqueta: t.querySelector('.guion-tarea-accion').textContent, icono: !!b.querySelector('svg'), texto: b.textContent.trim(), titulo: b.title, vacia: t.querySelector('.ll-lista').textContent.trim() };
-}, NOMBRE_TAREA), { etiqueta: 'Llamar por teléfono', icono: true, texto: '', titulo: 'Apuntar llamada', vacia: 'Sin llamadas todavía' });
+}, NOMBRE_TAREA), { etiqueta: 'Llamar', icono: true, texto: '', titulo: 'Apuntar llamada', vacia: 'Sin llamadas todavía' });
 
 console.log('--- desde el botón de la tarea ---');
 await tarea(NOMBRE_TAREA).locator('.ll-boton').click();

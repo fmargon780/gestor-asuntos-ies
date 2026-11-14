@@ -32,6 +32,11 @@
    receta, sin detalles: no hace falta convertir nada. Sale arriba en el
    menú del hito (js/hito-mesa-recetas.js).
 
+   Fila 659 (docs/659-DONDE-SE-HACE-Y-NOMBRES.md): una tarea dice QUÉ se hace (`accion`) y, aparte, DÓNDE:
+   `donde: { sitio, zona? }` (por `id`, js/sitios.js). Además, opcionales según su acción, `tipoDocumento`
+   (Registrar, Poner a la firma, Añadir documento: un tipo de documento de la app) y `aQuien` (Llamar: Tercero,
+   Familia, Relacionado o Sus profesores). Se normalizan con `Sitios.aplicarDatos`.
+
    Aquí, el dato (normalizar, la receta). Pintar, leer y enganchar la lista de
    tareas dentro de un contenedor, en js/guias-guion-editor.js (fila 464). Se
    carga después de js/guias.js.
@@ -39,22 +44,25 @@
 var GuiasGuion = (function () {
 
   var ACCIONES = [
-    { valor: '', texto: 'Otra cosa' },
-    { valor: 'generar', texto: 'Generar un documento' },
-    { valor: 'firmar', texto: 'Firmar un documento' },
-    { valor: 'registrar', texto: 'Registrar un documento' },
-    { valor: 'comunicar', texto: 'Comunicar' },
-    { valor: 'anadir', texto: 'Añadir un documento' },
-    { valor: 'pedir', texto: 'Pedir datos' },   /* fila 530 */
+    { valor: 'generar', texto: 'Generar documento' },
+    { valor: 'firmar', texto: 'Poner a la firma' },
+    { valor: 'registrar', texto: 'Registrar' },
+    { valor: 'comunicar', texto: 'Enviar' },
+    { valor: 'anadir', texto: 'Añadir documento' },
+    { valor: 'pedir', texto: 'Rellenar datos del asunto' },   /* fila 530 */
     { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
-    { valor: 'llamar', texto: 'Llamar por teléfono' },   /* fila 639 */
-    /* Fila 651: las cinco últimas solo clasifican; se marcan a mano. */
-    { valor: 'seneca', texto: 'En Séneca' },
-    { valor: 'entregar', texto: 'Entregar o recoger en mano' },
+    { valor: 'llamar', texto: 'Llamar' },   /* fila 639 */
+    /* Fila 651: las que solo clasifican se marcan a mano. Fila 659: los nombres dicen qué se hace, sin el sitio (el sitio es «Dónde se hace»). */
+    { valor: 'seneca', texto: 'Grabar o cambiar datos' },
+    { valor: 'entregar', texto: 'Entregar' },
+    { valor: 'recoger', texto: 'Recoger' },
     { valor: 'publicar', texto: 'Publicar' },
     { valor: 'cobrar', texto: 'Cobrar o pagar' },
-    { valor: 'comprobar', texto: 'Comprobar' }   /* fila 651: la última */
+    { valor: 'comprobar', texto: 'Comprobar' },
+    { valor: 'archivar', texto: 'Archivar' },
+    { valor: '', texto: 'Otra cosa' }
   ];
+
 
   var A_QUIEN = [
     { valor: '', texto: 'A quien toque' }, { valor: 'tercero', texto: 'El tercero' },
@@ -175,8 +183,9 @@ var GuiasGuion = (function () {
     var r = g.receta || {};
     var titulo = dentro ? '<span class="guion-receta-titulo">Detalles:</span>' : '';
     if (g.accion === 'comunicar') {
-      return '<div class="guion-fila-linea guion-receta"' + (r.a ? ' data-a="' + U.escapar(r.a) + '"' : '') + '>' + titulo +   /* fila 555: el «a quién» antiguo se conserva, aunque ya no manda */
-        conRotulo('Por dónde', '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>', dentro) +
+      /* Fila 555: el «a quién» antiguo se conserva, aunque ya no manda. Fila 659: lo mismo con la vía de antes («Por dónde»): ya no se elige aquí,
+         lo dice «Dónde se hace» (Correo electrónico o iPasen); la vía vieja se conserva como valor de reserva, sin verse. */
+      return '<div class="guion-fila-linea guion-receta"' + (r.a ? ' data-a="' + U.escapar(r.a) + '"' : '') + (r.via ? ' data-via="' + U.escapar(r.via) + '"' : '') + '>' + titulo +
         conRotulo('Plantilla de correo', '<select class="campo guion-receta-plantilla" data-clase="lista">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + nuevaPlantillaHTML(g) + '</select>', dentro) +
         /* Fila 465, C1: «Ver y cambiar el texto» solo con una plantilla elegida (js/guias-plantilla.js). */
         (window.GuiasPlantilla ? GuiasPlantilla.botonHTML(!r.plantilla) : '') +
@@ -235,6 +244,7 @@ var GuiasGuion = (function () {
       base.normativa = normalizarNormativa(g && g.normativa);
       var receta = normalizarReceta(base.accion, g && g.receta);
       if (receta) base.receta = receta;
+      if (window.Sitios) Sitios.aplicarDatos(base, base.accion, g);   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
       /* Fila 576: «Cuándo se hace» de la tarea (js/solo-si.js). */
       var soloSi = window.SoloSi ? SoloSi.normalizar(g && g.soloSi) : null;
       if (soloSi) base.soloSi = soloSi;

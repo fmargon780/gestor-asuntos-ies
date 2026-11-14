@@ -71,10 +71,10 @@ const falta = (alcance) => pagina.evaluate(async ([alcance, idH]) => {
 console.log('--- la función ---');
 await comprobar('5-6. el hito: firmar con «falta 2 de 2», registrar, sin documento y la casilla; no salen «No aplica», «Comunicar» ni sin acción',
   falta({ tipo: 'hito' }),
-  ['Firmar: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C]);
+  ['Poner a la firma: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C]);
 await comprobar('3. el asunto suma la casilla de otro hito',
   falta({ tipo: 'asunto' }),
-  ['Firmar: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C, 'Registrar: ' + DOC_D]);
+  ['Poner a la firma: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C, 'Registrar: ' + DOC_D]);
 await comprobar('4. los adjuntos: solo lo de esos documentos',
   falta({ tipo: 'docs', docs: [DOC_B, DOC_E, DOC_D] }), ['Registrar: ' + DOC_B, 'Registrar: ' + DOC_D]);
 await comprobar('4. adjuntos sin nada pendiente: nada', falta({ tipo: 'docs', docs: [DOC_E] }), []);
@@ -82,7 +82,7 @@ await pagina.evaluate(async ([doc]) => {
   const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
   await DocumentosFirmados.alLlegar(a, doc, 'firmado', 1, '_Previas');
 }, [DOC_A]);
-await comprobar('6. con una de dos firmas: «falta 1 de 2 firmas»', (await falta({ tipo: 'hito' }))[0], 'Firmar: ' + DOC_A + ' (falta 1 de 2 firmas)');
+await comprobar('6. con una de dos firmas: «falta 1 de 2 firmas»', (await falta({ tipo: 'hito' }))[0], 'Poner a la firma: ' + DOC_A + ' (falta 1 de 2 firmas)');
 await comprobar('7. «Sin registrar» solo en la casilla y en la tarea de registrar',
   pagina.evaluate(async ([A, B, C, D, E]) => {
     const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];

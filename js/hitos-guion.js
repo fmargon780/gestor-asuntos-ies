@@ -65,7 +65,7 @@
   var I = Hitos._guionInterno = Hitos._guionInterno || {};
   function quien() { return I.quien.apply(this, arguments); }
 
-  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir', 'copiar', 'llamar', 'seneca', 'entregar', 'publicar', 'cobrar', 'comprobar'];   /* fila 523: firmar; fila 530: pedir; fila 639: llamar; fila 651: las cinco que solo clasifican */
+  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir', 'copiar', 'llamar', 'seneca', 'entregar', 'recoger', 'publicar', 'cobrar', 'comprobar', 'archivar'];   /* fila 523: firmar; fila 530: pedir; fila 639: llamar; fila 651: las cinco que solo clasifican; fila 659: recoger y archivar */
 
   function tipoDe(a) {
     return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
@@ -120,6 +120,7 @@
                copia: x.copia || null,   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
                soloSi: (!propio && g.soloSi) || null };   /* fila 576: «Cuándo se hace» (js/solo-si.js) */
       if (g.comun && !propio) salida.comun = g.comun;   /* fila 531: viene de la lista común de tareas */
+      if (window.Sitios) Sitios.aplicarDatos(salida, salida.accion, g);   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
       return salida;
     }
     /* La línea de la guía en su sitio: la propia (si «Cambiar aquí» la

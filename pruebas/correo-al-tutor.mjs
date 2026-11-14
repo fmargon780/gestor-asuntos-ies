@@ -256,8 +256,8 @@ await comprobar('3. en la guía: por correo, la plantilla de la sanción y «A q
   pagina.evaluate(() => {
     const f = document.querySelector('#capa .paso-guion .guion-fila[data-id="g-demo-tutor-avisar"]');
     const sel = (cl) => f.querySelector(cl).selectedOptions[0].textContent;
-    return [!!f.querySelector('.guion-receta-a'), sel('.guion-receta-via'), sel('.guion-receta-plantilla'), f.querySelector('.guion-a-quien-va').textContent];
-  }), [false, 'Por correo', 'Informar al tutor/a de la sanción (SANCION)', 'A quién va (lo dice la plantilla) Para: Tutor/a del grupo']);
+    return [!!f.querySelector('.guion-receta-a'), f.querySelector('.donde-sitio').value, sel('.guion-receta-plantilla'), f.querySelector('.guion-a-quien-va').textContent];
+  }), [false, 'Correo electrónico', 'Informar al tutor/a de la sanción (SANCION)', 'A quién va (lo dice la plantilla) Para: Tutor/a del grupo']);
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForTimeout(500);
 await pagina.evaluate(async () => {

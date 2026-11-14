@@ -82,7 +82,7 @@ await abrirMesaDe(A);
 await comprobar('1a. ningún recuadro de Tareas, Campos, Documentos ni Registro', p.evaluate(() => document.querySelectorAll('.hito-en-mesa .mesa-col-hito > .mesa-bloque:not(.mesa-normativa), .hito-en-mesa .mesa-campos-hito, .hito-en-mesa .mesa-grande-docs, .hito-en-mesa .mesa-grande-notas').length), 0);
 await comprobar('1c. cuatro tareas, sin cuenta ni barra de progreso', p.evaluate(() => [document.querySelectorAll('.hito-en-mesa .guion-paso').length, document.querySelectorAll('.hito-en-mesa .mesa-guion-cuenta, .hito-en-mesa .mesa-barra').length]), [4, 0]);
 await comprobar('1d. «Normativa» sigue como era (sin recuadro)', p.evaluate(() => { const n = document.querySelector('.hito-en-mesa .mesa-normativa'); return !n || getComputedStyle(n).borderTopWidth === '0px' || n.classList.contains('oculto'); }), true);
-await comprobar('1e. cada tarea con acción lleva su etiqueta', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .guion-paso')].map((e) => (e.querySelector('.guion-tarea-accion') || {}).textContent || '')), ['Comunicar', 'Pedir datos', '', '']);
+await comprobar('1e. cada tarea con acción lleva su etiqueta', p.evaluate(() => [...document.querySelectorAll('.hito-en-mesa .guion-paso')].map((e) => (e.querySelector('.guion-tarea-accion') || {}).textContent || '')), ['Enviar', 'Rellenar datos del asunto', '', '']);
 
 console.log('--- 2. Subir y Bajar ---');
 await menuDe('ta');
@@ -158,7 +158,7 @@ await p.selectOption('#cc-hace', 'comunicar');
 await p.click('#cc-guardar');
 await p.waitForTimeout(1500);
 await comprobar('6d. la tarea de la lista común cambia de acción', p.evaluate(async (id) => (await ComunesGuardado.leer()).tareas.filter((t) => t.id === id)[0].accion, tarea), 'comunicar');
-await comprobar('6e. la etiqueta de la tarea dice la acción nueva', p.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="tz"] .guion-tarea-accion') || {}).textContent), 'Comunicar');
+await comprobar('6e. la etiqueta de la tarea dice la acción nueva', p.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="tz"] .guion-tarea-accion') || {}).textContent), 'Enviar');
 await comprobar('6f. y el otro asunto abierto conserva la acción vieja', p.evaluate(async ([n, h]) => {
   const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0];
   const g = Hitos.guionDe(a, (await Hitos.hitosDe(n)).filter((k) => k.id === h)[0]).filter((x) => x.texto === 'Tarea común 553');

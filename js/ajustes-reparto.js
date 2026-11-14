@@ -57,6 +57,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-membrete', donde: 'centro', otras: 'logo, cabecera, Junta, Consejería' },
     { id: 'bloque-sello', donde: 'centro', otras: 'tamaño, centímetros, sello de registro' },
     { id: 'bloque-hitos', donde: 'centro', otras: 'festivos, días no lectivos, vacaciones, responsables, plazos, hitos' },
+    { id: 'bloque-sitios', donde: 'centro', otras: 'dónde se hace, sitios, zonas, Séneca, iPasen, correo, en mano, tareas' },   /* fila 659 */
     { id: 'bloque-dias-aviso', donde: 'centro', otras: 'dormidos, vencimiento, antelación, papelera, registro' },
     { id: 'bloque-copias', donde: 'centro', otras: 'copia, restaurar, recuperar, caducidad' },
     { id: 'bloque-impresos', donde: 'centro', otras: 'casillas, PDF, anexo, catálogo, formularios' },
@@ -77,6 +78,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-comunes-propuesta', donde: 'herramientas', otras: 'guías, tareas, hitos, listas comunes, propuesta, pasar' },   /* fila 531 */
     { id: 'bloque-plan-guias', donde: 'herramientas', otras: 'guías, tareas, hitos, plan, aplicar, listas comunes, limpiar' },   /* fila 551 */
     { id: 'bloque-repaso-lista', donde: 'herramientas', otras: 'guías, tareas, hitos, repaso, fases, listas comunes, aplicar, unir' },   /* fila 657 */
+    { id: 'bloque-repaso-donde', donde: 'herramientas', otras: 'guías, tareas, dónde se hace, sitios, repaso, aplicar, documento' },   /* fila 659 */
     { id: 'bloque-tipos-uso', donde: 'herramientas', otras: 'tipos, uso, guías, desactivar, limpiar, enviar a Claude' },   /* fila 543 */
     { id: 'bloque-fichas-archivo', donde: 'herramientas', otras: 'fichas, ARCHIVO, poner en orden' },
     { id: 'bloque-contacto-migracion', donde: 'herramientas', otras: 'contacto, teléfono, correo, abiertos' },

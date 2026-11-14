@@ -31,6 +31,8 @@ var HitoMesaRecetas = (function () {
   function pendientes(a, h, accion) {
     if (!h || !window.Hitos || !Hitos.guionDe) return [];
     return Hitos.guionDe(a, h).filter(function (g) {
+      /* Fila 659: un «Enviar» a otro sitio que no sea el correo ni iPasen no envía nada: se marca a mano. */
+      if (accion === 'comunicar' && window.Sitios && Sitios.canalDeSitio(g.donde) === '') return false;
       return !g.pregunta && !g.hecho && !g.noaplica && g.accion === accion;
     });
   }
@@ -68,7 +70,10 @@ var HitoMesaRecetas = (function () {
   /* El canal que abrirá una tarea de comunicar: el de la receta, o el primero de siempre. */
   function canalDe(a, h, g) {
     var canales = window.HitosComunicar && HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
-    return ((g && g.receta && g.receta.via) || canales[0] || 'correo');
+    /* Fila 659: lo decide el sitio de la tarea (Correo electrónico → correo; iPasen → mensaje de Séneca; otro: nada); sin sitio, su vía de antes. */
+    var c = window.Sitios ? Sitios.canalDeTarea(g) : ((g && g.receta && g.receta.via) || null);
+    if (c === '') return '';
+    return (c || canales[0] || 'correo');
   }
 
   async function comunicarPaso(a, h, g, lista) {
@@ -117,7 +122,7 @@ var HitoMesaRecetas = (function () {
 
   /* ---------- el botón dentro de la propia tarea (fila 410; fila 638: uno por cada «Qué se hace») ---------- */
 
-  var TEXTO = { generar: 'Generar documento', firmar: 'Firmar', registrar: 'Registrar', anadir: 'Añadir documento', pedir: 'Rellenar' };
+  var TEXTO = { generar: 'Generar documento', firmar: 'Poner a la firma', registrar: 'Registrar', anadir: 'Añadir documento', pedir: 'Rellenar' };
 
   /* El documento colgado de la tarea, con el nombre que tiene ahora; '' si no tiene. Lee los hitos al momento. */
   async function documentoColgado(a, h, g) {
@@ -142,6 +147,7 @@ var HitoMesaRecetas = (function () {
     if (!g || g.pregunta || g.hecho || g.noaplica) return '';
     o = o || {};
     var accion = accionDe(g);
+    if (accion === 'comunicar' && canalDe(a, h, g) === '') return '';   /* fila 659: «Enviar» a otro sitio: sin botón, se marca a mano */
     var texto = accion === 'comunicar' ? (canalDe(a, h, g) === 'seneca' ? 'Enviar por Séneca' : 'Enviar correo') : TEXTO[accion];
     if (!texto) return '';
     var consulta = window.SoloConsulta && SoloConsulta.activo();
@@ -202,6 +208,6 @@ var HitoMesaRecetas = (function () {
     });
   }
 
-  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, botonDeTareaHTML: botonDeTareaHTML, lanzarTarea: lanzarTarea, opcionesDePaso: opcionesDePaso };
+  return { plantillaFueraDeUso: plantillaFueraDeUso, pendientes: pendientes, bloqueHTML: bloqueHTML, enganchar: enganchar, botonDeTareaHTML: botonDeTareaHTML, canalDe: canalDe, lanzarTarea: lanzarTarea, opcionesDePaso: opcionesDePaso };
 })();
 window.HitoMesaRecetas = HitoMesaRecetas;

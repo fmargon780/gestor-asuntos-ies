@@ -64,7 +64,7 @@ var DatosDeLaTarea = (function () {
     var clase = porClase(g);
     var p = ((datos && datos[clase]) || []).filter(function (x) { return x.id === plantillaDe(g); })[0];
     if (!p) return null;
-    var via = g.receta && g.receta.via;
+    var via = window.Sitios ? Sitios.canalDeTarea(g) : (g.receta && g.receta.via);   /* fila 659 */
     var r = await DatosDePlantilla.datosDeLaPlantilla(a, p, clase, h, via);
     return { datos: r.datos, titulo: 'Plantilla «' + p.nombre + '»' };
   }

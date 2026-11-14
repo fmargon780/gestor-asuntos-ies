@@ -64,6 +64,19 @@ document.write(`
         </div>
       </details>
 
+      <!-- Fila 659 (docs/659-DONDE-SE-HACE-Y-NOMBRES.md): el mapa de sitios donde se hacen las tareas. La ventana
+           la pinta js/sitios-ventana.js. -->
+      <details class="bloque-ajustes" id="bloque-sitios">
+        <summary>
+          <span class="bloque-titulo">Sitios</span>
+          <span class="bloque-pie">Dónde se hacen las tareas: Séneca, iPasen, el correo, en mano…, con sus zonas</span>
+        </summary>
+        <div class="bloque-cuerpo">
+          <p class="explica">Cada tarea dice qué se hace y, aparte, dónde. Aquí se ven todos los sitios, se les cambia el nombre, se borran o se crean nuevos.</p>
+          <button type="button" class="boton" id="sitios-abrir" data-solo-lectura>Abrir los sitios</button>
+        </div>
+      </details>
+
       <!-- Fila 84, 20-sep-2026, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md:
            el mapa de casillas de cada impreso con PDF. Lo pinta y lo
            guarda js/formularios-rellenar.js. -->
