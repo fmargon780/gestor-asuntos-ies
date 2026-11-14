@@ -1,0 +1,2945 @@
+{
+ "tipos": {
+  "ALUMNADO ABSENTISTA": [
+   {
+    "titulo": "Generar Oficio",
+    "fase": "elaborar",
+    "de": [
+     "pmuy3aqog1vxetcht"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el oficio",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmuy3dt1nxsvgab5t"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Revisar y escanear protocolos",
+    "fase": "comprobar",
+    "de": [
+     "pmuy3p2e04wrvzi4j"
+    ],
+    "tareas": [
+     {
+      "texto": "Revisar los protocolos",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Escanear los protocolos",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Registrar en Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmuy3fa4fj4ymiiof"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrarlo en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar por Correo Centro",
+    "fase": "enviar",
+    "de": [
+     "pmuy3g9dfuqsv88gh"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviarlo por el correo del centro",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "PAGO SEGURO ESCOLAR": [
+   {
+    "titulo": "Generar relación alumnado",
+    "fase": "elaborar",
+    "de": [
+     "gmvpag0nhnky3qryz"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar relación de alumnado numerado y con diligencia de totales firmada por Secretaría",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "gmw1yartvh9pir0po"
+     },
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmw1yd4jfljp8h1x9"
+     }
+    ]
+   },
+   {
+    "titulo": "Registrar y enviar a Secretaría",
+    "fase": "enviar",
+    "de": [
+     "pmw1tx5deyx9o5wqz"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmw1yfxmibzxglu9a"
+     },
+     {
+      "texto": "Descargar documentación y enviar a Secretaría para su tramitación",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw1ypg49s66nz4da"
+     }
+    ],
+    "antes": "Registro de salida"
+   },
+   {
+    "titulo": "Justificante pago y presentación",
+    "fase": "cobrar",
+    "de": [
+     "pmw1u2ket5i8u7z4g"
+    ],
+    "tareas": [
+     {
+      "texto": "Escanear documentos de pago y presentación",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "gmw1ysvcso93nvn3w"
+     },
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmw1ytn3sgg37zxqq"
+     }
+    ]
+   }
+  ],
+  "PROGRAMA DE TRÁNSITO": [
+   {
+    "titulo": "CALENDARIO",
+    "fase": "enviar",
+    "de": [
+     "gmwda704yg9nisris"
+    ],
+    "tareas": [
+     {
+      "texto": "Recibir calendario de coordinación",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "gmwda9pwdp1bosr1b"
+     },
+     {
+      "texto": "Enviar calendario de coordinación a los colegios adscritos",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwdab2wf8cw7y8p5"
+     }
+    ]
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmwda704yozn13nfw"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Archivar",
+    "fase": "archivar",
+    "de": [
+     "gmwda704y168leuqv"
+    ],
+    "tareas": []
+   }
+  ],
+  "PROTOCOLO CONDUCTAS SUICIDAS": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmw50f3wf5nmhr3os"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmw50f3wfauk17iml"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Archivar",
+    "fase": "archivar",
+    "de": [
+     "gmw50f3wfmhjqinpo"
+    ],
+    "tareas": []
+   }
+  ],
+  "ADMISION": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmugx61h4w7r8w5m4"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmugx61h43vcjvu5w"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Requerimiento Subsanación",
+    "fase": "pedir",
+    "de": [
+     "pmunrwqii50a0dx7r"
+    ],
+    "tareas": [
+     {
+      "texto": "Pedir que se subsane lo que falta",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Notificación matrícula",
+    "fase": "enviar",
+    "de": [
+     "pmuuwirlllcxkajc3"
+    ],
+    "tareas": [
+     {
+      "texto": "Notificar la matrícula",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "ANULACIÓN MATRÍCULA": [
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmu437g3b2ra"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Enviar al Director"
+   },
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmu438g4mgy2"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Registrar la solicitud"
+   },
+   {
+    "titulo": "Anular la matrícula",
+    "fase": "seneca",
+    "de": [
+     "pmuwj3dhclthhitlq"
+    ],
+    "tareas": [
+     {
+      "texto": "Anular la matrícula en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar a Jefatura",
+    "fase": "enviar",
+    "de": [
+     "pmu439tla1ur"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar correo electrónico a Jefatura y tutor/a del grupo",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw3fhpssxy2m7fi7"
+     }
+    ]
+   },
+   {
+    "titulo": "Certificado de entrega de libros",
+    "fase": "elaborar",
+    "de": [
+     "pmuwj5v8oagvhl1di"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el certificado de entrega de libros",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Certificado entrega de libros"
+   },
+   {
+    "titulo": "Enviar el documento al solicitante",
+    "fase": "enviar",
+    "de": [
+     "pmuwj7pf0eeyaq390"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw4x3a4z1qt5y3of"
+     }
+    ],
+    "antes": "Enviar el certificado"
+   },
+   {
+    "titulo": "Archivar en el expediente",
+    "fase": "archivar",
+    "de": [
+     "pmuwjo3xe1zp0jitk"
+    ],
+    "tareas": [
+     {
+      "texto": "Archivar en el expediente del alumno o alumna",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Archivar Expediente"
+   }
+  ],
+  "Baja de matrícula": [
+   {
+    "titulo": "Recibir el encargo de Dirección",
+    "fase": "recibir",
+    "de": [
+     "bm-1"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la declaración de la familia o la diligencia de Dirección",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "gmwc8pv83g4kp02t2"
+     },
+     {
+      "texto": "Pedir los datos de la baja",
+      "accion": "pedir",
+      "tipo": null,
+      "de": "gmwc8pv83bjdebktd"
+     }
+    ]
+   },
+   {
+    "titulo": "Preparar la resolución",
+    "fase": "elaborar",
+    "de": [
+     "bm-2"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar la resolución de baja",
+      "accion": "generar",
+      "tipo": null,
+      "de": "gmwc8pv83gtinwd7f"
+     }
+    ]
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "bm-3"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmwc8pv84z3ry9vzy"
+     }
+    ],
+    "antes": "Firma de Dirección"
+   },
+   {
+    "titulo": "Registro de salida",
+    "fase": "enviar",
+    "de": [
+     "bm-4"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmwc8pv8451mpmo88"
+     }
+    ]
+   },
+   {
+    "titulo": "Baja en Séneca",
+    "fase": "seneca",
+    "de": [
+     "bm-5"
+    ],
+    "tareas": [
+     {
+      "texto": "Grabar la baja en Séneca con su fecha",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "gmwc8pv84rd9dqwm7"
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar",
+    "fase": "enviar",
+    "de": [
+     "bm-6"
+    ],
+    "tareas": [
+     {
+      "texto": "Comunicar la resolución a la familia",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwc8pv84vtrmz38p"
+     },
+     {
+      "texto": "Comunicar la resolución a Servicios Sociales",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwc8pv84gwninn90"
+     }
+    ]
+   }
+  ],
+  "CAMBIO DE GRUPO": [
+   {
+    "titulo": "Recoger la solicitud o la propuesta",
+    "fase": "recibir",
+    "de": [
+     "pmuffcbuu444pqzlz"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar quién la hace y el motivo",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Modificar el grupo en Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmuffcbuuikqiommy"
+    ],
+    "tareas": [
+     {
+      "texto": "Abrir la matrícula del alumno o alumna en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Cambiar el grupo con la fecha de efectos",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar las materias y el horario del nuevo grupo",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar a la familia, a las dos tutorías y al equipo docente",
+    "fase": "enviar",
+    "de": [
+     "pmuffcbuuq7d9hhjk"
+    ],
+    "tareas": [
+     {
+      "texto": "Comunicar el cambio a la familia por iPasen",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Avisar a las dos tutorías",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Avisar al equipo docente del nuevo grupo",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   }
+  ],
+  "CERT. EXP. ESO": [
+   {
+    "titulo": "Recepción de la solicitud",
+    "fase": "recibir",
+    "de": [
+     "gmv82twmu05549hkp"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "gmwezi0d9i6uxgj72"
+     }
+    ],
+    "antes": "Solicitud"
+   },
+   {
+    "titulo": "Emitir el certificado desde Séneca",
+    "fase": "elaborar",
+    "de": [
+     "gmv82twmubgcfgpmn"
+    ],
+    "tareas": [
+     {
+      "texto": "Ir a Séneca / Documentos que se pueden pedir Buscar en Certificados",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "gmwez3uai3cssowuk"
+     }
+    ],
+    "antes": "Emitir Certificado desde Séneca"
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmwezc7kw8et65gjr"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmwezc7kwpuk39jrn"
+     }
+    ],
+    "antes": "Firma digital Dirección"
+   },
+   {
+    "titulo": "Enviar el documento al solicitante",
+    "fase": "enviar",
+    "de": [
+     "pmwez038qdencxujx"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwez038qtmvkxhzk"
+     }
+    ],
+    "antes": "Enviar el certificado"
+   }
+  ],
+  "CERT. MATRICULA": [
+   {
+    "titulo": "Recoger la solicitud",
+    "fase": "recibir",
+    "de": [
+     "pmufclxths9gnw1cp"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar que está firmada por quien corresponde",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar que trae la documentación necesaria",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g4"
+     },
+     {
+      "texto": "Solicitud firmada por la familia o por el alumnado mayor de edad",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r0"
+     }
+    ]
+   },
+   {
+    "titulo": "Emitir el certificado desde Séneca",
+    "fase": "elaborar",
+    "de": [
+     "pmufclhxh4y65d91a"
+    ],
+    "tareas": [
+     {
+      "texto": "Ir a Séneca / Documentos que se pueden pedir Buscar en Certificados",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "gmufd0hw36yjczsat"
+     }
+    ],
+    "antes": "Emisión del certificado"
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmufcmiwd211xng70"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmufd211famxh25en"
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar el certificado",
+    "fase": "enviar",
+    "de": [
+     "pmufcmtg58ah5pd21",
+     "pmufcp43ihu5kr0r2"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmunrk09lwbg84ctg"
+     },
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw4x3a54bsh93yev"
+     }
+    ]
+   }
+  ],
+  "CERTIFICADO": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmunvbtdyivu964qa"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmunvbtdywdo8btuu"
+    ],
+    "tareas": []
+   }
+  ],
+  "COBRO SEGURO ESCOLAR": [
+   {
+    "titulo": "Cobro",
+    "fase": "cobrar",
+    "de": [
+     "pmuqj6q61u7cunmo4"
+    ],
+    "tareas": [
+     {
+      "texto": "Cobrar el seguro escolar",
+      "accion": "cobrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "CONVALIDACIÓN CURSO": [
+   {
+    "titulo": "Recoger la solicitud y pasarla al departamento",
+    "fase": "recibir",
+    "de": [
+     "pmu9zgwnkpo8lvl4v"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar que está firmada por quien corresponde",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar que trae la documentación necesaria",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g4"
+     },
+     {
+      "texto": "Solicitud firmada por la familia o por el alumnado mayor de edad",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r0"
+     },
+     {
+      "texto": "Pasar la solicitud al departamento que corresponde",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g1"
+     }
+    ],
+    "antes": "Recoger la solicitud"
+   },
+   {
+    "titulo": "Resolver o remitir, según el supuesto",
+    "fase": "elaborar",
+    "de": [
+     "pmu9zgwnkt2c74w72"
+    ],
+    "tareas": [
+     {
+      "texto": "Comprobar el supuesto y quién tiene que resolver",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Generar la resolución o el escrito de remisión",
+      "accion": "generar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g4"
+     },
+     {
+      "texto": "Añadir el documento firmado al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g5"
+     }
+    ]
+   },
+   {
+    "titulo": "Anotar en el expediente y en Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmu9zgwnkeo2i1ulp"
+    ],
+    "tareas": [
+     {
+      "texto": "Anotar la convalidación o la exención en el expediente académico",
+      "accion": "",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Grabarla en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar que aparece en el historial",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar a la familia y a la tutoría",
+    "fase": "enviar",
+    "de": [
+     "pmu9zgwnk6lwyyktl"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar la comunicación de la resolución",
+      "accion": "generar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Enviarla a la familia por iPasen",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Avisar a la tutoría",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g4"
+     }
+    ]
+   }
+  ],
+  "Cambio en la situación familiar": [
+   {
+    "titulo": "Recoger la documentación",
+    "fase": "recibir",
+    "de": [
+     "pmu9zgwxtbo7lx4of"
+    ],
+    "tareas": [
+     {
+      "texto": "Recoger la resolución judicial o el documento que acredite el cambio",
+      "accion": "entregar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar que es copia auténtica o cotejarla",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Añadir el documento al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "resolución judicial o documento que acredite el cambio",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r0"
+     }
+    ]
+   },
+   {
+    "titulo": "Actualizar los datos en Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmu9zgwxua9vdrkaf"
+    ],
+    "tareas": [
+     {
+      "texto": "Abrir los datos del alumno o alumna en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Actualizar la guarda, la custodia y los datos de contacto",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Revisar quién puede recibir información y comunicaciones",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar a la tutoría lo que deba saber",
+    "fase": "enviar",
+    "de": [
+     "pmu9zgwxumv9mo82r"
+    ],
+    "tareas": [
+     {
+      "texto": "Decidir qué necesita saber la tutoría",
+      "accion": "",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comunicarlo a la tutoría",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g2"
+     }
+    ]
+   }
+  ],
+  "EXPULSIÓN DEL CENTRO": [
+   {
+    "titulo": "Recepción de la Comunicación de Incidente",
+    "fase": "recibir",
+    "de": [
+     "pmvhzeoyxeasq3n1p"
+    ],
+    "tareas": [
+     {
+      "texto": "Entrega de la comunicación por parte de Jefatura de Estudios",
+      "accion": "entregar",
+      "tipo": null,
+      "de": "gmvhzncvs7rcyf3y2"
+     },
+     {
+      "texto": "Poner el Sello Redondo sobre la firma del tutor/a",
+      "accion": "",
+      "tipo": null,
+      "de": "gmvhzogexw2rujavo"
+     }
+    ]
+   },
+   {
+    "titulo": "Envío de la Comunicación",
+    "fase": "enviar",
+    "de": [
+     "pmvhzfmi5ije6amc1",
+     "pmvhzgt5t5dyoajdj"
+    ],
+    "tareas": [
+     {
+      "texto": "Escanear comunicación",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "gmvhzshqpwt5z4m9l"
+     },
+     {
+      "texto": "¿La parte superior izquierda del documento está ocupada?",
+      "accion": null,
+      "tipo": "pregunta",
+      "de": "gmvhzti3dpy1fsape"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmvhzu75ey6thgy7j"
+     },
+     {
+      "texto": "Imprimir una copia registrada",
+      "accion": "",
+      "tipo": null,
+      "de": "gmvi17gnz0nritk7r"
+     },
+     {
+      "texto": "En un sobre se mete una copia del documento con el Sello \"Copia para el Interesado\"",
+      "accion": "",
+      "tipo": null,
+      "de": "gmvi1906ti5i0on87"
+     },
+     {
+      "texto": "Al sobre cerrado se le une con un clip la otra copia del documento con el sello \"Devolver firmado al Centro Educativo\"",
+      "accion": "",
+      "tipo": null,
+      "de": "gmvi1a1p93khhc6bb"
+     },
+     {
+      "texto": "Se envía comunicación por mail al tutor de la unidad y a los tutores legales adjuntando copia del documento.",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmvi1bia7za6vg51d"
+     },
+     {
+      "texto": "Se entrega el sobre a la Jefatura de Estudios",
+      "accion": "entregar",
+      "tipo": null,
+      "de": "gmvi1an7zowfq8rl7"
+     }
+    ]
+   }
+  ],
+  "Evaluación psicopedagógica y alumnado NEAE": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmw4x3a4xzmxz2f30"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmw4x3a4xpqkgw83j"
+     }
+    ],
+    "antes": "Registrar la solicitud de la familia"
+   },
+   {
+    "titulo": "Enviar al Dpto. Orientación",
+    "fase": "pedir",
+    "de": [
+     "pmw94b732sf2l7db0"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar al Dpto. Orientación",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw94g9j15yny7umz"
+     }
+    ]
+   },
+   {
+    "titulo": "Registrar el recibí",
+    "fase": "enviar",
+    "de": [
+     "pmw4x3a4xig3yscbd"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmw4x3a4x8y9j6lbg"
+     }
+    ]
+   }
+  ],
+  "IDENTIFICACION ALUMNO": [
+   {
+    "titulo": "Digitalización del documento",
+    "fase": "recibir",
+    "de": [
+     "gmvjepxrdma6mfkpz"
+    ],
+    "tareas": [
+     {
+      "texto": "Escanear el documento",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Anotar en Séneca",
+    "fase": "seneca",
+    "de": [
+     "gmvjepxrdp87dsp92"
+    ],
+    "tareas": [
+     {
+      "texto": "Anotarlo en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "INFORME VALORACIÓN EQUIPO EDUCATIVO": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "gmwahibjey9941dfz"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmwahndz2vtvyx39m"
+     }
+    ],
+    "antes": "Solicitud"
+   },
+   {
+    "titulo": "Emisión",
+    "fase": "pedir",
+    "de": [
+     "gmwahibjegwd1uxo3"
+    ],
+    "tareas": [
+     {
+      "texto": "Pedir el informe al equipo educativo",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Envío",
+    "fase": "enviar",
+    "de": [
+     "gmwahibjesmq0gmr7"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmwahlqueavsfq8q2"
+     },
+     {
+      "texto": "Dar al tutor para entregar a la familia",
+      "accion": "entregar",
+      "tipo": null,
+      "de": "gmwahveujktm4kz5d"
+     }
+    ]
+   }
+  ],
+  "MATRICULA": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmu2hef87v7g"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Grabar en Séneca la unidad y las optativas",
+    "fase": "seneca",
+    "de": [
+     "pmu2hb81c3ek",
+     "pmu2hc3pbn8b"
+    ],
+    "tareas": [
+     {
+      "texto": "Asignar la unidad y las optativas",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Grabar y comprobar la matrícula en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Preparar Ficha libros",
+    "fase": "elaborar",
+    "de": [
+     "pmucb0wfsef5q0qgj"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar la ficha de entrega de libros",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Comunicar al equipo educativo y entregar el horario",
+    "fase": "enviar",
+    "de": [
+     "pmuxvtf7c74tswals",
+     "pmuavw0ai87pylxq0"
+    ],
+    "tareas": [
+     {
+      "texto": "El horario de su unidad",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-rmuavx21my1ctdv6t"
+     },
+     {
+      "texto": "Comunicar la matrícula al equipo educativo",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Entregar el horario",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Foto para Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmuavzyduw67idfvk"
+    ],
+    "tareas": [
+     {
+      "texto": "Subir la foto a Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Abrir/Guardar en el Expediente",
+    "fase": "archivar",
+    "de": [
+     "pmuwjtmt09siivtgs"
+    ],
+    "tareas": [
+     {
+      "texto": "Guardar en el expediente del alumno o alumna",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "PAGO AYUDA TRANSPORTE": [
+   {
+    "titulo": "Solicitar número de cuenta",
+    "fase": "pedir",
+    "de": [
+     "gmwait02290g5khce"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar correo electrónico solicitanto número de cuenta para el abono de la ayuda",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwaiw5xurrf0ba1z"
+     }
+    ]
+   },
+   {
+    "titulo": "Esperar el número de cuenta",
+    "fase": "esperar",
+    "de": [
+     "gmwait022n3znpa3s"
+    ],
+    "tareas": [
+     {
+      "texto": "Descargar documentación y enviar a Secretaría para su tramitación",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwaj0k15jp20f1mx"
+     }
+    ],
+    "antes": "Esperar respuesta"
+   },
+   {
+    "titulo": "Comunicar a la tutoría la transferencia realizada",
+    "fase": "enviar",
+    "de": [
+     "pmwakcgjqvv387dt3"
+    ],
+    "tareas": [
+     {
+      "texto": "Comunicar a la familia la transferencia y citar para firma del recibí en Secretaría",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwakcgjqkf7926fz"
+     }
+    ]
+   },
+   {
+    "titulo": "Archivar",
+    "fase": "archivar",
+    "de": [
+     "gmwait0222rlwc19t"
+    ],
+    "tareas": []
+   }
+  ],
+  "SOLICITUD NACIONALIDAD": [
+   {
+    "titulo": "Pedir el documento de nacionalidad",
+    "fase": "pedir",
+    "de": [
+     "gmwalfptj2ks9k1k3"
+    ],
+    "tareas": [
+     {
+      "texto": "Solicitud a los tutores documento de nacionalidad",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmwalkvtdahkogceg"
+     }
+    ]
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmwalfptjmvencjwf"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Archivar",
+    "fase": "archivar",
+    "de": [
+     "gmwalfptjozyrimoo"
+    ],
+    "tareas": []
+   }
+  ],
+  "TRANSPORTE": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmtwp7n84bd2"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Registro de la solicitud"
+   },
+   {
+    "titulo": "Ajuste Planificacion",
+    "fase": "elaborar",
+    "de": [
+     "pmuxx4emn4xhqr0j5"
+    ],
+    "tareas": [
+     {
+      "texto": "Ajustar la planificación del transporte",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar a D.T. Servicios Transporte Escolar",
+    "fase": "enviar",
+    "de": [
+     "pmuy48hjk5aeyfvw9"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviarlo a la Delegación (Servicios de Transporte Escolar)",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Resolución",
+    "fase": "esperar",
+    "de": [
+     "pmtwp810cgvt"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la resolución al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Grabar la solicitud en Séneca con el resultado",
+    "fase": "seneca",
+    "de": [
+     "pmtwp71ikwer"
+    ],
+    "tareas": [
+     {
+      "texto": "Grabar la solicitud y el resultado en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Expedición Carne",
+    "fase": "elaborar",
+    "de": [
+     "pmu3x8sm7zui"
+    ],
+    "tareas": [
+     {
+      "texto": "Hacer el carné de transporte",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "TRAS. MATR. VIVA": [
+   {
+    "titulo": "Informe personal por traslado",
+    "fase": "pedir",
+    "de": [
+     "pmuwhuyyodyvb2xk9"
+    ],
+    "tareas": [
+     {
+      "texto": "Pedir el informe personal a la tutoría",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Historial Académido",
+    "fase": "elaborar",
+    "de": [
+     "pmuwi08jc4ucp2r01"
+    ],
+    "tareas": [
+     {
+      "texto": "Sacar el historial académico de Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Confirmación traslado",
+    "fase": "seneca",
+    "de": [
+     "pmuwi27pxwwf2ft1z"
+    ],
+    "tareas": [
+     {
+      "texto": "Confirmar el traslado en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Informar a Jefatura",
+    "fase": "enviar",
+    "de": [
+     "pmuwi7ceivqzvefh7"
+    ],
+    "tareas": [
+     {
+      "texto": "Comunicarlo a Jefatura de Estudios",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Certificado de entrega de libros",
+    "fase": "elaborar",
+    "de": [
+     "pmuwi8lwejp0ywrmn"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el certificado de entrega de libros",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Certificado entrega libros de texto"
+   },
+   {
+    "titulo": "Envío por V.E. documento oficiales",
+    "fase": "enviar",
+    "de": [
+     "pmuwia1umeups4ta6"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar los documentos oficiales por la Ventanilla Electrónica",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN": [
+   {
+    "titulo": "No es necesario pedir nada",
+    "fase": "comprobar",
+    "de": [
+     "pmucg5fk588zpcdzz"
+    ],
+    "tareas": [
+     {
+      "texto": "Comprobar que el expediente está en Séneca",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Pedir la documentación al centro de origen",
+    "fase": "pedir",
+    "de": [
+     "pmucg9kjf8b80ahr0"
+    ],
+    "tareas": [
+     {
+      "texto": "Informe Personal de Traslado",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-rmucga34s31j3gyob"
+     },
+     {
+      "texto": "Expediente Académico",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-rmucgacdwefcg9zvm"
+     },
+     {
+      "texto": "Pedir la documentación al centro de origen",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Solicitar al centro de origen la documentación del traslado"
+   },
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmucgaq1oakg71jvp"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Registrar la documentación recibida"
+   },
+   {
+    "titulo": "Revisar si tiene asignaturas pendientes",
+    "fase": "comprobar",
+    "de": [
+     "pmucgb70corz9ysts"
+    ],
+    "tareas": [
+     {
+      "texto": "Revisar si tiene materias pendientes",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Archivar en el expediente",
+    "fase": "archivar",
+    "de": [
+     "pmucge39v4lsq5kpi"
+    ],
+    "tareas": [
+     {
+      "texto": "Archivar en el expediente del alumno o alumna",
+      "accion": "",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Archivar la documentación en el expediente del alumno"
+   },
+   {
+    "titulo": "Pedir la documentación al centro de origen",
+    "fase": "pedir",
+    "de": [
+     "pmuf72d12bzwefjl5"
+    ],
+    "tareas": [
+     {
+      "texto": "Pedir la documentación al centro de origen",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Solicitud expediente académico al Centro origen"
+   },
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmuf753594wa6kaas"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Recepción del Expediente"
+   },
+   {
+    "titulo": "Añadir a la matrícula, materias pendientes, en su caso",
+    "fase": "seneca",
+    "de": [
+     "pmuf77t2cjquh8xt1"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir las materias pendientes a la matrícula en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "COMPRA": [
+   {
+    "titulo": "Comprobación validez",
+    "fase": "comprobar",
+    "de": [
+     "pmtvdh0bcg0x"
+    ],
+    "tareas": [
+     {
+      "texto": "Dice: FACTURA",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "gmvggdp6fmhmvu9qw"
+     },
+     {
+      "texto": "Tiene Número de identificación fiscal",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "gmvggdt63o4fuupu4"
+     },
+     {
+      "texto": "Tiene expresado base imponible y tipo impositivo si no es simplificada.",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "gmvgge1cbcldipkyv"
+     }
+    ]
+   },
+   {
+    "titulo": "Registro de entrada de la factura",
+    "fase": "recibir",
+    "de": [
+     "pmtvdgc4wcn2"
+    ],
+    "tareas": [
+     {
+      "texto": "¿El texto ocupa la parte superior derecha?",
+      "accion": null,
+      "tipo": "pregunta",
+      "de": "gmvggi6dqsoakyfb6"
+     },
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmvgeo4lefvhxljer"
+     },
+     {
+      "texto": "Tamponar el original y cumplimentar, en su caso, los campos correspondientes.",
+      "accion": "",
+      "tipo": null,
+      "de": "gmwaj2uedn5bwz4gt"
+     }
+    ],
+    "antes": "Registro de entrada"
+   },
+   {
+    "titulo": "Conformidad de Dirección",
+    "fase": "firma",
+    "de": [
+     "pmu56c1j9pco",
+     "pmwaj69r8k8t39z1y"
+    ],
+    "tareas": [
+     {
+      "texto": "Tamponar el original y cumplimentar, en su caso, los campos correspondientes.",
+      "accion": "",
+      "tipo": null,
+      "de": "gmwajf4vzryoc0gx7"
+     },
+     {
+      "texto": "Entregar al director para la conformidad",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Entrega del original a Secretaría.",
+    "fase": "enviar",
+    "de": [
+     "pmu56d0zhj7v"
+    ],
+    "tareas": [
+     {
+      "texto": "Entregar el original a Secretaría",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmu56e811tcl"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmvgepupa98luo4l1"
+     }
+    ],
+    "antes": "Firma digital Dirección"
+   },
+   {
+    "titulo": "Entrega copia impresa a Secretaria",
+    "fase": "enviar",
+    "de": [
+     "pmu56fknypc9"
+    ],
+    "tareas": [
+     {
+      "texto": "Entregar una copia impresa a Secretaría",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "CONFORMIDAD": [
+   {
+    "titulo": "Imprimir, firma y sello",
+    "fase": "firma",
+    "de": [
+     "pmv7x2ukcxwcs45lz"
+    ],
+    "tareas": [
+     {
+      "texto": "Imprimir, firmar y sellar",
+      "accion": "firmar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar C.C. IES Fuente Lucena",
+    "fase": "enviar",
+    "de": [
+     "pmv7x5i4pne79434r",
+     "pmv7x6gkr56lvgcot"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Enviarlo al C.C. IES Fuente Lucena",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "INFORME EDITORIAL": [
+   {
+    "titulo": "Recepción de la solicitud",
+    "fase": "recibir",
+    "de": [
+     "gmvgkymnb59gr3csu"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Solicitud"
+   },
+   {
+    "titulo": "Generación del Informe",
+    "fase": "elaborar",
+    "de": [
+     "gmvgkymnbddq46mby"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el Informe Editorial",
+      "accion": "",
+      "tipo": null,
+      "de": "gmvgla11sux8i7q2d"
+     }
+    ]
+   },
+   {
+    "titulo": "Envío del Informe",
+    "fase": "enviar",
+    "de": [
+     "gmvgkymnbzj67c70a"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el informe por mail",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmvglbihrzjn16t66"
+     }
+    ]
+   }
+  ],
+  "COMUNICACIÓN RECIBIDA": [
+   {
+    "titulo": "Descargar el documento",
+    "fase": "recibir",
+    "de": [
+     "pmu0wz4py2pd"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir el documento al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar por mail al Destinatario",
+    "fase": "enviar",
+    "de": [
+     "pmu0wzfbie1f"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviarlo por correo a quien va dirigido",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "Elecciones al Consejo Escolar": [
+   {
+    "titulo": "Constituir la Junta Electoral",
+    "fase": "elaborar",
+    "de": [
+     "pmu9zh1aevqrwn7sv"
+    ],
+    "tareas": [
+     {
+      "texto": "Comprobar quién forma la Junta Electoral",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Generar la convocatoria de constitución",
+      "accion": "generar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Celebrar la sesión y levantar acta",
+      "accion": "",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Publicar el censo",
+    "fase": "publicar",
+    "de": [
+     "pmu9zh1aeyu8pkmau"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el censo de cada sector desde Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Publicar el censo en el tablón",
+      "accion": "publicar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Recoger y resolver las reclamaciones",
+      "accion": "",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Recoger candidaturas",
+    "fase": "recibir",
+    "de": [
+     "pmu9zh1aexm0e1sxq"
+    ],
+    "tareas": [
+     {
+      "texto": "Recoger las candidaturas de cada sector",
+      "accion": "entregar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar que las personas están en el censo",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   },
+   {
+    "titulo": "Proclamar candidaturas",
+    "fase": "publicar",
+    "de": [
+     "pmu9zh1aerw2cjfyh"
+    ],
+    "tareas": [
+     {
+      "texto": "Revisar las candidaturas con la Junta Electoral",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Proclamar las candidaturas",
+      "accion": "",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Publicar la lista en el tablón",
+      "accion": "publicar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   }
+  ],
+  "Alta y actualización de datos": [
+   {
+    "titulo": "Recoger los datos",
+    "fase": "recibir",
+    "de": [
+     "pmu9zgyehhgx9sdgy"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir los documentos al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g4"
+     },
+     {
+      "texto": "documento de identidad",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r0"
+     },
+     {
+      "texto": "cuenta corriente",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r1"
+     },
+     {
+      "texto": "datos de IRPF",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r2"
+     },
+     {
+      "texto": "situación familiar",
+      "accion": null,
+      "tipo": "reunir",
+      "de": "reunir-r3"
+     }
+    ]
+   },
+   {
+    "titulo": "Grabar en Séneca",
+    "fase": "seneca",
+    "de": [
+     "pmu9zgyehfw859tqk"
+    ],
+    "tareas": [
+     {
+      "texto": "Abrir el módulo de Séneca que corresponda",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Grabar los datos del documento",
+      "accion": "seneca",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Revisar que lo grabado coincide con el papel",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Anotar en el asunto la fecha de grabación",
+      "accion": "",
+      "tipo": null,
+      "de": "g4"
+     }
+    ]
+   },
+   {
+    "titulo": "Comprobar que la nómina los recoge",
+    "fase": "comprobar",
+    "de": [
+     "pmu9zgyehcgvq98il"
+    ],
+    "tareas": [
+     {
+      "texto": "Revisar la nómina del mes siguiente",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar que recoge los datos nuevos",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Si hay errores, comunicarlos a la Delegación",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "g3"
+     }
+    ]
+   }
+  ],
+  "BAJA MEDICA": [
+   {
+    "titulo": "Parte inicial",
+    "fase": "recibir",
+    "de": [
+     "pmuwg03tklk6wqq6y"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmuwg5mdrrjc2a9u5"
+     },
+     {
+      "texto": "Copiar el documento registrado a la carpeta Ausencias",
+      "accion": "copiar",
+      "tipo": null,
+      "de": "gmuwg67kvx64tto6m"
+     }
+    ]
+   },
+   {
+    "titulo": "Partes de confirmación",
+    "fase": "recibir",
+    "de": [
+     "pmuwg1js5ak4a6py4"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmuwgc7j16v3egw98"
+     },
+     {
+      "texto": "Copiar el documento registrado a la carpeta Ausencias",
+      "accion": "copiar",
+      "tipo": null,
+      "de": "gmuwgei2rv46dtq8l"
+     }
+    ]
+   },
+   {
+    "titulo": "Parte de alta",
+    "fase": "recibir",
+    "de": [
+     "pmuwg1zapih4x4km7"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "gmw1y54mj2x8edb7i"
+     },
+     {
+      "texto": "Copiar el documento registrado a la carpeta Ausencias",
+      "accion": "copiar",
+      "tipo": null,
+      "de": "gmw1y7kvvrkk1d1w6"
+     }
+    ]
+   }
+  ],
+  "CERTIFICADO C.E": [
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmuv61yzz7t037vpa"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": "gmuwb1xltruv0b191"
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar el certificado",
+    "fase": "enviar",
+    "de": [
+     "pmuwazo2kmzy8fbcy",
+     "pmuwb0i98c9p913ke"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmuwb5etv4byyilre"
+     }
+    ]
+   }
+  ],
+  "CERTIFICADO PERSONAL": [
+   {
+    "titulo": "Generar el certificado",
+    "fase": "elaborar",
+    "de": [
+     "gmufvfkh3g6af3hvp"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el certificado",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "gmufvfkh3i4b9hrnz"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar el certificado",
+    "fase": "enviar",
+    "de": [
+     "pmugrzh6rr2btw3l1",
+     "pmugrzyjxmw2n3z59"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw4x3a55u0d3f8x9"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "Certificado de desempeño de la función tutorial": [
+   {
+    "titulo": "Recepción de la solicitud",
+    "fase": "recibir",
+    "de": [
+     "pmuwmutmv6k7icfwm"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Recepción de la Solicitud"
+   },
+   {
+    "titulo": "Generar el certificado",
+    "fase": "elaborar",
+    "de": [
+     "pmuwmvobqb78rzc73"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el certificado",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Generar el certificado de Función Tutorial"
+   },
+   {
+    "titulo": "Enviar el certificado",
+    "fase": "enviar",
+    "de": [
+     "pmuwmwnn6e2mplhcp",
+     "pmuwmx883sxztbdjv"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw4x3a57ujlzmc2i"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "FUNCIÓN TUTORIAL": [
+   {
+    "titulo": "Recibir la solicitud",
+    "fase": "recibir",
+    "de": [
+     "pmufc1xvr7ypoaucr"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": "g1"
+     },
+     {
+      "texto": "Comprobar que la pide el alumnado mayor de edad o quien ejerza la tutela legal",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g2"
+     },
+     {
+      "texto": "Comprobar el documento de identidad de quien la pide",
+      "accion": "comprobar",
+      "tipo": null,
+      "de": "g3"
+     },
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": "g4"
+     }
+    ]
+   },
+   {
+    "titulo": "Generar el certificado",
+    "fase": "elaborar",
+    "de": [
+     "pmufc56yv1hdgeoo2"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar el certificado",
+      "accion": "generar",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Confección del Certificado"
+   },
+   {
+    "titulo": "Poner a la firma",
+    "fase": "firma",
+    "de": [
+     "pmufc5lnju9yhxze0"
+    ],
+    "tareas": [
+     {
+      "texto": "Firmar un documento",
+      "accion": "firmar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar el certificado",
+    "fase": "enviar",
+    "de": [
+     "pmufc6cljlw1xc8t3",
+     "pmufc6wf3ctugg835"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": "gmw4x3a5879uhkg5s"
+     },
+     {
+      "texto": "Registrar de salida el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "JUSTIFICACION FALTAS PAS": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmu58h6wej0r"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Pasar a Jefatura de Estudios",
+    "fase": "enviar",
+    "de": [
+     "pmu58hnpgrlf",
+     "pmu58ui81ld7"
+    ],
+    "tareas": [
+     {
+      "texto": "Copiar el documento registrado a la carpeta Ausencias",
+      "accion": "copiar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Entregar el original a la Jefatura de Estudios Adjunta",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "PERMISO": [
+   {
+    "titulo": "Registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "pmuce4a97xsp8pmwb"
+    ],
+    "tareas": [
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Poner copia registrada en carpeta Jef. Estudios",
+    "fase": "enviar",
+    "de": [
+     "pmuce4o4zrjghpt3h"
+    ],
+    "tareas": [
+     {
+      "texto": "Copiar el documento registrado a la carpeta de Jefatura de Estudios",
+      "accion": "copiar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "PROY. PRÁCTICAS": [
+   {
+    "titulo": "Recepción",
+    "fase": "recibir",
+    "de": [
+     "gmv7rlqmnzuit8dxc",
+     "pmv816wg6635vv06b"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir el documento al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Enviar al profesor y a Dirección",
+    "fase": "enviar",
+    "de": [
+     "pmv818f4ab99f6ral",
+     "pmv81c921mi5cakk4"
+    ],
+    "tareas": [
+     {
+      "texto": "Enviar un correo al profesor",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Enviarlo a Dirección",
+      "accion": "comunicar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "IDENTIFICACION TUTOR LEGAL": [
+   {
+    "titulo": "Digitalización y registro de entrada",
+    "fase": "recibir",
+    "de": [
+     "gmvjdmo7v4rczq9lm",
+     "pmvv0p4lcok9liqen"
+    ],
+    "tareas": [
+     {
+      "texto": "Escanear el documento",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     },
+     {
+      "texto": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Anotar en Séneca",
+    "fase": "seneca",
+    "de": [
+     "gmvjdmo7v78uuzy3t"
+    ],
+    "tareas": [
+     {
+      "texto": "Anotarlo en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "IPASEN TUTOR LEGAL": [
+   {
+    "titulo": "Recepción de la solicitud",
+    "fase": "recibir",
+    "de": [
+     "gmvjd98vjvyqbbhj4"
+    ],
+    "tareas": [
+     {
+      "texto": "Añadir la solicitud al asunto",
+      "accion": "anadir",
+      "tipo": null,
+      "de": null
+     }
+    ],
+    "antes": "Recepción solicitud"
+   },
+   {
+    "titulo": "Generación de la credencial",
+    "fase": "seneca",
+    "de": [
+     "gmvjd98vjoomiskxw"
+    ],
+    "tareas": [
+     {
+      "texto": "Generar la credencial en Séneca",
+      "accion": "seneca",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   },
+   {
+    "titulo": "Entrega de la credencial",
+    "fase": "enviar",
+    "de": [
+     "gmvjd98vj40x7lj3v"
+    ],
+    "tareas": [
+     {
+      "texto": "Entregar la credencial",
+      "accion": "entregar",
+      "tipo": null,
+      "de": null
+     }
+    ]
+   }
+  ],
+  "CONSTITUCION JUNTA ELECTORAL": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmul46mcjm4qn898h"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmul46mcj9lvnpy5g"
+    ],
+    "tareas": []
+   }
+  ],
+  "INFORME FINAL ETAPA": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmv983fbdkvpe61p8"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmv983fbdhobc9ttu"
+    ],
+    "tareas": []
+   }
+  ],
+  "ABSENTISMO CONV. REUNIÓN": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmw0nioi3wuvtvuey"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmw0nioi32d6cmnpx"
+    ],
+    "tareas": []
+   }
+  ],
+  "ATENCIÓN DOMICILIARIA": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmuwn3aqtono8kye6"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmuwn3aqt7yozja4t"
+    ],
+    "tareas": []
+   }
+  ],
+  "AYUDA NEAE": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmvqkea1tmnnfby1h"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmvqkea1t8xuzfcqu"
+    ],
+    "tareas": []
+   }
+  ],
+  "EXPULSIÓN AULA CONVICENCIA": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmvi21cgiz3ps4l2l"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmvi21cgisffkdq3f"
+    ],
+    "tareas": []
+   }
+  ],
+  "INFORMACION PERSONAL": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmuv3b6rf92v24frp"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmuv3b6rfz8k084ce"
+    ],
+    "tareas": []
+   }
+  ],
+  "INSTANCIA DIRECTOR": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmuqpvy639ejt2q0w"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmuqpvy633urdcf5q"
+    ],
+    "tareas": []
+   }
+  ],
+  "IPASEN ALUMNADO": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmvjeenozlc525lad"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmvjeenozxvkti4o0"
+    ],
+    "tareas": []
+   }
+  ],
+  "PETICIÓN INFORME": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmuzawgnjjh93enci"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmuzawgnjpqrytkaf"
+    ],
+    "tareas": []
+   }
+  ],
+  "RECLAMACION": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmugwq9i8p68umvjx"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmugwq9i8fs48cjvg"
+    ],
+    "tareas": []
+   }
+  ],
+  "SANCION": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmugqqnaxt0793vkb"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmugqqnaxs68ghuwk"
+    ],
+    "tareas": []
+   }
+  ],
+  "ALTAS CAPACIDADES": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmufvfkf4q953o5tm"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmufvfkf41pxn4gqx"
+    ],
+    "tareas": []
+   }
+  ],
+  "PARADA TTE. ESCOLAR": [
+   {
+    "titulo": "Tramitar",
+    "fase": "?",
+    "de": [
+     "gmufvfkcfc8v6qrtk"
+    ],
+    "tareas": []
+   },
+   {
+    "titulo": "Esperar respuesta",
+    "fase": "esperar",
+    "de": [
+     "gmufvfkcffag3uytl"
+    ],
+    "tareas": []
+   }
+  ]
+ }
+}
