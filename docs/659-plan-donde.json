@@ -1,0 +1,881 @@
+{
+ "nota": "Fila 659. Una entrada por tarea común (por su texto, tras el repaso de la fila 657). donde vacío = sin sitio. documento: tipo de documento propuesto, solo si existe en el centro. antes: acción de hoy, si cambia.",
+ "sitios": [
+  {
+   "nombre": "Séneca",
+   "zonas": [
+    "Alumnado",
+    "Personal",
+    "Registro",
+    "Documentos",
+    "Ventanilla Electrónica"
+   ]
+  },
+  {
+   "nombre": "iPasen",
+   "zonas": []
+  },
+  {
+   "nombre": "Correo electrónico",
+   "zonas": []
+  },
+  {
+   "nombre": "Correo postal",
+   "zonas": []
+  },
+  {
+   "nombre": "Teléfono",
+   "zonas": []
+  },
+  {
+   "nombre": "En mano",
+   "zonas": []
+  },
+  {
+   "nombre": "Tablón",
+   "zonas": []
+  },
+  {
+   "nombre": "Expediente del alumno",
+   "zonas": []
+  },
+  {
+   "nombre": "Archivo del centro",
+   "zonas": []
+  },
+  {
+   "nombre": "En esta app",
+   "zonas": []
+  }
+ ],
+ "hitosQueSeQuitan": [
+  {
+   "guia": "PAGO AYUDA TRANSPORTE",
+   "titulo": "Archivar"
+  },
+  {
+   "guia": "PROGRAMA DE TRÁNSITO",
+   "titulo": "Archivar"
+  },
+  {
+   "guia": "PROTOCOLO CONDUCTAS SUICIDAS",
+   "titulo": "Archivar"
+  },
+  {
+   "guia": "SOLICITUD NACIONALIDAD",
+   "titulo": "Archivar"
+  }
+ ],
+ "tareas": [
+  {
+   "texto": "Abrir el módulo de Séneca que corresponda",
+   "accion": "seneca",
+   "donde": "Séneca",
+   "guias": 1
+  },
+  {
+   "texto": "Abrir la matrícula del alumno o alumna en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Abrir los datos del alumno o alumna en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Actualizar la guarda, la custodia y los datos de contacto",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Ajustar la planificación del transporte",
+   "accion": "",
+   "donde": "",
+   "guias": 1
+  },
+  {
+   "texto": "Al sobre cerrado se le une con un clip la otra copia del documento con el sello \"Devolver firmado al Centro Educativo\"",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Anotar en el asunto la fecha de grabación",
+   "accion": "",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Anotar la convalidación o la exención en el expediente académico",
+   "accion": "",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Anotarlo en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 2
+  },
+  {
+   "texto": "Anular la matrícula en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Archivar en el expediente del alumno o alumna",
+   "accion": "archivar",
+   "donde": "Expediente del alumno",
+   "antes": "",
+   "guias": 2
+  },
+  {
+   "texto": "Asignar la unidad y las optativas",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Avisar a la tutoría",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Avisar a las dos tutorías",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Avisar al equipo docente del nuevo grupo",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Añadir el documento al asunto",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 3
+  },
+  {
+   "texto": "Añadir el documento firmado al asunto",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Añadir la declaración de la familia o la diligencia de Dirección",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Añadir la resolución al asunto",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "documento": "Resolución",
+   "guias": 1
+  },
+  {
+   "texto": "Añadir la solicitud al asunto",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "documento": "Solicitud",
+   "guias": 8
+  },
+  {
+   "texto": "Añadir las materias pendientes a la matrícula en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Añadir los documentos al asunto",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Cambiar el grupo con la fecha de efectos",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Celebrar la sesión y levantar acta",
+   "accion": "",
+   "donde": "",
+   "guias": 1
+  },
+  {
+   "texto": "Cobrar el seguro escolar",
+   "accion": "cobrar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar el documento de identidad de quien la pide",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar el supuesto y quién tiene que resolver",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar las materias y el horario del nuevo grupo",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que aparece en el historial",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que el expediente está en Séneca",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que es copia auténtica o cotejarla",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que está firmada por quien corresponde",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 2
+  },
+  {
+   "texto": "Comprobar que la pide el alumnado mayor de edad o quien ejerza la tutela legal",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que las personas están en el censo",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que recoge los datos nuevos",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar que trae la documentación necesaria",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 2
+  },
+  {
+   "texto": "Comprobar quién forma la Junta Electoral",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comprobar quién la hace y el motivo",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicar a la familia la transferencia y citar para firma del recibí en Secretaría",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicar el cambio a la familia por iPasen",
+   "accion": "comunicar",
+   "donde": "iPasen",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicar la matrícula al equipo educativo",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicar la resolución a Servicios Sociales",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicar la resolución a la familia",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicarlo a Jefatura de Estudios",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Comunicarlo a la tutoría",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Confirmar el traslado en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Copiar el documento registrado a la carpeta Ausencias",
+   "accion": "copiar",
+   "donde": "En esta app",
+   "guias": 4
+  },
+  {
+   "texto": "Copiar el documento registrado a la carpeta de Jefatura de Estudios",
+   "accion": "copiar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Dar al tutor para entregar a la familia",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Decidir qué necesita saber la tutoría",
+   "accion": "",
+   "donde": "",
+   "guias": 1
+  },
+  {
+   "texto": "Descargar documentación y enviar a Secretaría para su tramitación",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 2
+  },
+  {
+   "texto": "Dice: FACTURA",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "En un sobre se mete una copia del documento con el Sello \"Copia para el Interesado\"",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entrega de la comunicación por parte de Jefatura de Estudios",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar al director para la conformidad",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar el horario",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar el original a Secretaría",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar el original a la Jefatura de Estudios Adjunta",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar la credencial",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Entregar una copia impresa a Secretaría",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar al Dpto. Orientación",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar calendario de coordinación a los colegios adscritos",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar correo electrónico a Jefatura y tutor/a del grupo",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar correo electrónico solicitanto número de cuenta para el abono de la ayuda",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar el documento al solicitante por la vía acordada",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 7
+  },
+  {
+   "texto": "Enviar el informe por mail",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar los documentos oficiales por la Ventanilla Electrónica",
+   "accion": "",
+   "donde": "Séneca · Ventanilla Electrónica",
+   "guias": 1
+  },
+  {
+   "texto": "Enviar un correo al profesor",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarla a la familia por iPasen",
+   "accion": "comunicar",
+   "donde": "iPasen",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarlo a Dirección",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarlo a la Delegación (Servicios de Transporte Escolar)",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarlo al C.C. IES Fuente Lucena",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarlo por correo a quien va dirigido",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Enviarlo por el correo del centro",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Escanear comunicación",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Escanear documentos de pago y presentación",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Escanear el documento",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 2
+  },
+  {
+   "texto": "Escanear los protocolos",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Firmar un documento",
+   "accion": "firmar",
+   "donde": "",
+   "guias": 11
+  },
+  {
+   "texto": "Generar el Informe Editorial",
+   "accion": "",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar el censo de cada sector desde Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Documentos",
+   "guias": 1
+  },
+  {
+   "texto": "Generar el certificado",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 3
+  },
+  {
+   "texto": "Generar el certificado de entrega de libros",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 2
+  },
+  {
+   "texto": "Generar el oficio",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la comunicación de la resolución",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la convocatoria de constitución",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la credencial en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Documentos",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la ficha de entrega de libros",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la resolución de baja",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar la resolución o el escrito de remisión",
+   "accion": "generar",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Generar relación de alumnado numerado y con diligencia de totales firmada por Secretaría",
+   "accion": "seneca",
+   "donde": "Séneca · Documentos",
+   "guias": 1
+  },
+  {
+   "texto": "Grabar la baja en Séneca con su fecha",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Grabar la solicitud y el resultado en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Grabar los datos del documento",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Grabar y comprobar la matrícula en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Grabarla en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Guardar en el expediente del alumno o alumna",
+   "accion": "archivar",
+   "donde": "Expediente del alumno",
+   "antes": "",
+   "guias": 1
+  },
+  {
+   "texto": "Hacer el carné de transporte",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Imprimir una copia registrada",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Imprimir, firmar y sellar",
+   "accion": "firmar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Ir a Séneca / Documentos que se pueden pedir Buscar en Certificados",
+   "accion": "seneca",
+   "donde": "Séneca · Documentos",
+   "guias": 2
+  },
+  {
+   "texto": "Notificar la matrícula",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Pasar la solicitud al departamento que corresponde",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Pedir el informe al equipo educativo",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Pedir el informe personal a la tutoría",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Pedir la documentación al centro de origen",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 2
+  },
+  {
+   "texto": "Pedir los datos de la baja",
+   "accion": "pedir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Pedir que se subsane lo que falta",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Poner el Sello Redondo sobre la firma del tutor/a",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Proclamar las candidaturas",
+   "accion": "",
+   "donde": "",
+   "guias": 1
+  },
+  {
+   "texto": "Publicar el censo en el tablón",
+   "accion": "publicar",
+   "donde": "Tablón",
+   "guias": 1
+  },
+  {
+   "texto": "Publicar la lista en el tablón",
+   "accion": "publicar",
+   "donde": "Tablón",
+   "guias": 1
+  },
+  {
+   "texto": "Recibir calendario de coordinación",
+   "accion": "anadir",
+   "donde": "En esta app",
+   "guias": 1
+  },
+  {
+   "texto": "Recoger la resolución judicial o el documento que acredite el cambio",
+   "accion": "recoger",
+   "donde": "En mano",
+   "antes": "entregar",
+   "guias": 1
+  },
+  {
+   "texto": "Recoger las candidaturas de cada sector",
+   "accion": "recoger",
+   "donde": "En mano",
+   "antes": "entregar",
+   "guias": 1
+  },
+  {
+   "texto": "Recoger y resolver las reclamaciones",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Registrar de entrada el documento",
+   "accion": "registrar",
+   "donde": "Séneca · Registro",
+   "guias": 22
+  },
+  {
+   "texto": "Registrar de salida el documento",
+   "accion": "registrar",
+   "donde": "Séneca · Registro",
+   "guias": 12
+  },
+  {
+   "texto": "Registrarlo en Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar la nómina del mes siguiente",
+   "accion": "comprobar",
+   "donde": "Séneca · Personal",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar las candidaturas con la Junta Electoral",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar los protocolos",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar que lo grabado coincide con el papel",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar quién puede recibir información y comunicaciones",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Revisar si tiene materias pendientes",
+   "accion": "comprobar",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Sacar el historial académico de Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Documentos",
+   "guias": 1
+  },
+  {
+   "texto": "Se entrega el sobre a la Jefatura de Estudios",
+   "accion": "entregar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Se envía comunicación por mail al tutor de la unidad y a los tutores legales adjuntando copia del documento.",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Si hay errores, comunicarlos a la Delegación",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Solicitud a los tutores documento de nacionalidad",
+   "accion": "comunicar",
+   "donde": "Correo electrónico",
+   "guias": 1
+  },
+  {
+   "texto": "Subir la foto a Séneca",
+   "accion": "seneca",
+   "donde": "Séneca · Alumnado",
+   "guias": 1
+  },
+  {
+   "texto": "Tamponar el original y cumplimentar, en su caso, los campos correspondientes.",
+   "accion": "",
+   "donde": "En mano",
+   "guias": 2
+  },
+  {
+   "texto": "Tiene Número de identificación fiscal",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  },
+  {
+   "texto": "Tiene expresado base imponible y tipo impositivo si no es simplificada.",
+   "accion": "comprobar",
+   "donde": "En mano",
+   "guias": 1
+  }
+ ]
+}
