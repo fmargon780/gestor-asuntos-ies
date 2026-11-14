@@ -22,4 +22,4 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
 - Un sistema de trabajo lo más completo posible, que sirva de guía también a quien no es experto: procesos fluidos, intuitivos y explicados, que pueda seguir personal no acostumbrado a ellos, como interinos o miembros del equipo directivo (Francisco, 14-nov-2026).
 
-Última reflexión: 13-nov-2026
+Última reflexión: 14-nov-2026
