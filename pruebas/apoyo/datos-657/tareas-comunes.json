@@ -1,0 +1,728 @@
+{
+  "version": 1,
+  "tareas": [
+    {
+      "id": "tcmw4x3a5hsktxywr3",
+      "nombre": "Dice: FACTURA",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5hopg3caeb",
+      "nombre": "Tiene Número de identificación fiscal",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ha7sl9kud",
+      "nombre": "Tiene expresado base imponible y tipo impositivo si no es simplificada.",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5hlazddaum",
+      "nombre": "Ajustar tamaño",
+      "accion": "",
+      "explicacion": "Pulsar \"Ajustar tamaño\" en la botonera superior del visualizador del documento"
+    },
+    {
+      "id": "tcmw4x3a5i1xjzjz5a",
+      "nombre": "Registrar de entrada el documento",
+      "accion": "registrar",
+      "receta": {
+        "sentido": "entrada"
+      },
+      "explicacion": "Con su fecha exacta."
+    },
+    {
+      "id": "tcmw4x3a5i79d4saz5",
+      "nombre": "Poner a la firma digital",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ii57fpo4i",
+      "nombre": "Una vez firmada, descargar en su carpeta",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5in0uv2wxc",
+      "nombre": "El horario de su unidad",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5imi8ywk0m",
+      "nombre": "Copiar el documento registrado a la carpeta Ausencias",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ieh19c6lm",
+      "nombre": "Enviar correo electrónico a Jefatura y tutor/a del grupo",
+      "accion": "comunicar",
+      "receta": {
+        "a": "tutoria",
+        "via": "",
+        "plantilla": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5i9t21ul4t",
+      "nombre": "Enviar el documento al solicitante por la vía acordada",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5iow8i4m5o",
+      "nombre": "Recoger el motivo de la baja",
+      "accion": "",
+      "explicacion": "Traslado, fin de escolarización u otro."
+    },
+    {
+      "id": "tcmw4x3a5iad7dqcok",
+      "nombre": "Añadir el documento que lo acredite",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5i8emkcxx1",
+      "nombre": "Anotar en el asunto el motivo y la fecha",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5icx67k5gu",
+      "nombre": "Abrir la matrícula del alumno o alumna en Séneca",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5i4qsyejx6",
+      "nombre": "Dar la baja con su fecha y su motivo",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5irecq8499",
+      "nombre": "Comprobar que la baja aparece grabada",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ifk48htgo",
+      "nombre": "Abrir el expediente académico del alumno o alumna",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5igeyruigx",
+      "nombre": "Anotar la baja con su fecha y su motivo",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5icbk39lx4",
+      "nombre": "Firmar la anotación",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5iqwfjn59k",
+      "nombre": "Comunicar a la familia la transferencia y citar para firma del recibí en Secretaría",
+      "accion": "comunicar",
+      "receta": {
+        "a": "tutoria",
+        "via": "",
+        "plantilla": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5ivvi530fl",
+      "nombre": "Anotar en el asunto la fecha de la comunicación",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5i2vjupvqx",
+      "nombre": "Indicar si hay material o libros pendientes de devolver",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jeqo3w0r4",
+      "nombre": "Recoger la resolución judicial o el documento que acredite el cambio",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5j5xnl2uaw",
+      "nombre": "Comprobar que es copia auténtica o cotejarla",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jrwig4d7i",
+      "nombre": "Añadir el documento al asunto",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5joeqs5vie",
+      "nombre": "resolución judicial o documento que acredite el cambio",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5jx0fjtlt5",
+      "nombre": "Abrir los datos del alumno o alumna en Séneca",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jvpv6g4a4",
+      "nombre": "Actualizar la guarda, la custodia y los datos de contacto",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jo76c8tp9",
+      "nombre": "Revisar quién puede recibir información y comunicaciones",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jjk7v7baf",
+      "nombre": "Decidir qué necesita saber la tutoría",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jqieu2p4v",
+      "nombre": "Comunicarlo a la tutoría",
+      "accion": "comunicar",
+      "receta": {
+        "a": "tutoria",
+        "via": "",
+        "plantilla": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5j1z2qz8wv",
+      "nombre": "Recoger el documento de identidad",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5j9wcxae5c",
+      "nombre": "Recoger la cuenta corriente",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ja3pkdkv9",
+      "nombre": "Recoger los datos de IRPF y la situación familiar",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5jjizf3til",
+      "nombre": "Añadir los documentos al asunto",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5jzcvth5dt",
+      "nombre": "documento de identidad",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5jqm8vw976",
+      "nombre": "cuenta corriente",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5kwfti1j50",
+      "nombre": "datos de IRPF",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5k5f5z169e",
+      "nombre": "situación familiar",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5k1cy74frf",
+      "nombre": "Abrir el módulo de Séneca que corresponda",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5kmdaxosz2",
+      "nombre": "Grabar los datos del documento",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5k81tnt1cy",
+      "nombre": "Revisar que lo grabado coincide con el papel",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5kdkooy6y8",
+      "nombre": "Anotar en el asunto la fecha de grabación",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5k37nvh0cr",
+      "nombre": "Revisar la nómina del mes siguiente",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5kku9xv2bh",
+      "nombre": "Comprobar que recoge los datos nuevos",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5kl7wcr3vc",
+      "nombre": "Si hay errores, comunicarlos a la Delegación",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5kbpq1i38m",
+      "nombre": "Comprobar quién forma la Junta Electoral",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5lotu35e94",
+      "nombre": "Generar la convocatoria de constitución",
+      "accion": "generar"
+    },
+    {
+      "id": "tcmw4x3a5l75cjwo8q",
+      "nombre": "Celebrar la sesión y levantar acta",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5lle4afnlw",
+      "nombre": "Generar el censo de cada sector desde Séneca",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5lupni089h",
+      "nombre": "Publicar el censo en el tablón",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5l5nllphv0",
+      "nombre": "Recoger y resolver las reclamaciones",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5l5kgcmbqo",
+      "nombre": "Recoger las candidaturas de cada sector",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5lhsyb0u9p",
+      "nombre": "Comprobar que las personas están en el censo",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5las8ry01x",
+      "nombre": "Revisar las candidaturas con la Junta Electoral",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5mgvzgei0t",
+      "nombre": "Proclamar las candidaturas",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5muvu7k7au",
+      "nombre": "Publicar la lista en el tablón",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5mus92y4fp",
+      "nombre": "Informe Personal de Traslado",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5mrj22z7us",
+      "nombre": "Expediente Académico",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": false
+    },
+    {
+      "id": "tcmw4x3a5m0vxfgrwq",
+      "nombre": "Comprobar que está firmada por quien corresponde",
+      "accion": "",
+      "explicacion": "La familia, el alumnado mayor de edad o la persona interesada."
+    },
+    {
+      "id": "tcmw4x3a5mo8dq7t2w",
+      "nombre": "Comprobar que trae la documentación necesaria",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5mn76sbjj6",
+      "nombre": "Añadir la solicitud al asunto",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5m33ee6qs3",
+      "nombre": "Solicitud firmada por la familia o por el alumnado mayor de edad",
+      "accion": "",
+      "reunir": "documento",
+      "obligatorio": true
+    },
+    {
+      "id": "tcmw4x3a5my4e1joc8",
+      "nombre": "Ir a Séneca / Documentos que se pueden pedir Buscar en Certificados",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5m47mehw42",
+      "nombre": "Firmar un documento",
+      "accion": "firmar"
+    },
+    {
+      "id": "tcmw4x3a5m2crjphjg",
+      "nombre": "Comprobar el estado de la firma hasta que esté firmado.",
+      "accion": "firmar"
+    },
+    {
+      "id": "tcmw4x3a5mhp02l6pz",
+      "nombre": "Registrar de salida el documento",
+      "accion": "registrar",
+      "receta": {
+        "sentido": "salida"
+      },
+      "explicacion": ", si se remite."
+    },
+    {
+      "id": "tcmw4x3a5ng3ml8xp3",
+      "nombre": "Comprobar quién la hace y el motivo",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5nrucig6qx",
+      "nombre": "Cambiar el grupo con la fecha de efectos",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5nwmkcke5w",
+      "nombre": "Comprobar las materias y el horario del nuevo grupo",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5nxmp2ed5e",
+      "nombre": "Comunicar el cambio a la familia por iPasen",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5nnxetjhcv",
+      "nombre": "Avisar a las dos tutorías",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5n6r4deygv",
+      "nombre": "Avisar al equipo docente del nuevo grupo",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5nfws49ko0",
+      "nombre": "Completar los campos del registro",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5nxif9u9xf",
+      "nombre": "Anotar datos del registro en el documento (automático)",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5naai8d3ef",
+      "nombre": "Enviar el documento al solicitante por la vía acordada, preferentemente Ipasen",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5n8jd41nvc",
+      "nombre": "Registrar la entrada de la solicitud con su fecha",
+      "accion": "registrar"
+    },
+    {
+      "id": "tcmw4x3a5o14d9ytb9",
+      "nombre": "Comprobar que la pide el alumnado mayor de edad o quien ejerza la tutela legal",
+      "accion": "",
+      "normativa": {
+        "cita": "Decreto 327/2010, art. 77.d)",
+        "bloque": "",
+        "clave": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5oz6c177cv",
+      "nombre": "Comprobar el documento de identidad de quien la pide",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5o746gnhjy",
+      "nombre": "Ir a BD Alumnado",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5oaciztcdb",
+      "nombre": "Generar el Informe Editorial",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5o0zw04w2j",
+      "nombre": "Enviar el informe por mail",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5on33bxxeg",
+      "nombre": "Entrega de la comunicación por parte de Jefatura de Estudios",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5ohgs3wa5e",
+      "nombre": "Poner el Sello Redondo sobre la firma del tutor/a",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5odsgjptzj",
+      "nombre": "Escanear comunicación",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5pyot3pmle",
+      "nombre": "Ajustar el tamaño desde el visualizador del documento",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5pi6y2vkpw",
+      "nombre": "Imprimir una copia registrada",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5p2dujs1uc",
+      "nombre": "En un sobre se mete una copia del documento con el Sello \"Copia para el Interesado\"",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5p2uebjc3u",
+      "nombre": "Al sobre cerrado se le une con un clip la otra copia del documento con el sello \"Devolver firmado al Centro Educativo\"",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5puj46g447",
+      "nombre": "Se envía comunicación por mail al tutor de la unidad y a los tutores legales adjuntando copia del documento.",
+      "accion": "comunicar",
+      "receta": {
+        "a": "",
+        "via": "correo",
+        "plantilla": "pl-1792064395001145"
+      }
+    },
+    {
+      "id": "tcmw4x3a5pwqw9dglg",
+      "nombre": "Se entrega el sobre a la Jefatura de Estudios",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5pzu348kmz",
+      "nombre": "Generar relación de alumnado numerado y con diligencia de totales firmada por Secretaría",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5pckhygbk8",
+      "nombre": "Imprimir a PDF",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5qrmdhpwpp",
+      "nombre": "Descargar documentación y enviar a Secretaría para su tramitación",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5qu0sw3jnt",
+      "nombre": "Escanear documentos de pago y presentación",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5q4et2bfh7",
+      "nombre": "Pasar la solicitud al departamento que corresponde",
+      "accion": "comunicar",
+      "normativa": {
+        "cita": "Orden de evaluación de ESO, art. 28.4",
+        "bloque": "",
+        "clave": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5q0srojoeh",
+      "nombre": "Comprobar el supuesto y quién tiene que resolver",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5q2khwre96",
+      "nombre": "Generar la resolución o el escrito de remisión",
+      "accion": "generar"
+    },
+    {
+      "id": "tcmw4x3a5qoqslz6xh",
+      "nombre": "Recoger la firma de la dirección",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5qub9xxt7f",
+      "nombre": "Añadir el documento firmado al asunto",
+      "accion": "anadir"
+    },
+    {
+      "id": "tcmw4x3a5rkyc98vbk",
+      "nombre": "Anotar la convalidación o la exención en el expediente académico",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5r4kgf0vl2",
+      "nombre": "Grabarla en Séneca",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5riml1eb7c",
+      "nombre": "Comprobar que aparece en el historial",
+      "accion": ""
+    },
+    {
+      "id": "tcmw4x3a5sb9ll59wt",
+      "nombre": "Generar la comunicación de la resolución",
+      "accion": "generar"
+    },
+    {
+      "id": "tcmw4x3a5sv965w5r8",
+      "nombre": "Enviarla a la familia por iPasen",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmw4x3a5syvje1rcf",
+      "nombre": "Avisar a la tutoría",
+      "accion": "comunicar",
+      "receta": {
+        "a": "tutoria",
+        "via": "",
+        "plantilla": ""
+      }
+    },
+    {
+      "id": "tcmw4x3a5s3v5ln793",
+      "nombre": "Registrar la salida si se envía en papel",
+      "accion": "registrar"
+    },
+    {
+      "id": "tcmw94g9azhworsfan",
+      "nombre": "Enviar al Dpto. Orientación",
+      "accion": "comunicar",
+      "receta": {
+        "a": "",
+        "via": "",
+        "plantilla": "pl-179422031296145"
+      }
+    },
+    {
+      "id": "tcmwahvemhrlojnjcs",
+      "nombre": "Dar al tutor para entregar a la familia",
+      "accion": ""
+    },
+    {
+      "id": "tcmwaiw5uxissty8ku",
+      "nombre": "Enviar correo electrónico solicitanto número de cuenta para el abono de la ayuda",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmwaj2uaplvfwdcy9",
+      "nombre": "Tamponar el original y cumplimentar, en su caso, los campos correspondientes.",
+      "accion": ""
+    },
+    {
+      "id": "tcmwali7lhtdutlzsw",
+      "nombre": "Solicitud a los tutores documento de nacionalidad",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmwc8pu98fgfmo24p",
+      "nombre": "Añadir la declaración de la familia o la diligencia de Dirección",
+      "accion": "anadir",
+      "explicacion": "La declaración firmada por la familia (anexo I) o la diligencia de Dirección (anexo II)."
+    },
+    {
+      "id": "tcmwc8pu99d0bo78ov",
+      "nombre": "Pedir los datos de la baja",
+      "accion": "pedir",
+      "receta": {
+        "campos": [
+          {
+            "origen": "propio",
+            "id": "pmwc8ptn76if1"
+          },
+          {
+            "origen": "propio",
+            "id": "pmwc8ptpo3rw2"
+          },
+          {
+            "origen": "propio",
+            "id": "pmwc8ptrogzy3"
+          },
+          {
+            "origen": "propio",
+            "id": "pmwc8ptu7txu4"
+          },
+          {
+            "origen": "propio",
+            "id": "pmwc8ptw4xaf5"
+          }
+        ]
+      },
+      "explicacion": "Se apuntan en el asunto y de ahí salen a la resolución y a los correos."
+    },
+    {
+      "id": "tcmwc8pu99d9kqfajk",
+      "nombre": "Generar la resolución de baja",
+      "accion": "generar",
+      "receta": {
+        "plantilla": "pd-baja-resolucion"
+      },
+      "explicacion": "Resolución de la Dirección por la que se da de baja la matrícula. Léela entera antes de ponerla a la firma."
+    },
+    {
+      "id": "tcmwc8pu9bivithb2p",
+      "nombre": "Grabar la baja en Séneca con su fecha",
+      "accion": "",
+      "explicacion": "Abrir la matrícula del alumno o alumna en Séneca y dar la baja con la fecha de efectos de la resolución."
+    },
+    {
+      "id": "tcmwc8pu9cz136g0w3",
+      "nombre": "Comunicar la resolución a la familia",
+      "accion": "comunicar",
+      "receta": {
+        "a": "tutores",
+        "via": "correo",
+        "plantilla": "pl-baja-familia"
+      }
+    },
+    {
+      "id": "tcmwc8pu9cgowy5eyj",
+      "nombre": "Comunicar la resolución a Servicios Sociales",
+      "accion": "comunicar",
+      "receta": {
+        "a": "relacionados",
+        "via": "correo",
+        "plantilla": "pl-baja-sociales"
+      }
+    },
+    {
+      "id": "tcmwda9pntwts2m14w",
+      "nombre": "Recibir calendario de coordinación",
+      "accion": ""
+    },
+    {
+      "id": "tcmwdab2snej3687m7",
+      "nombre": "Enviar calendario de coordinación a los colegios adscritos",
+      "accion": "comunicar"
+    },
+    {
+      "id": "tcmwezi08uc008d725",
+      "nombre": "Recepción de la solicitud",
+      "accion": ""
+    }
+  ],
+  "_esquema": 1
+}

@@ -191,7 +191,7 @@
   "PROTOCOLO CONDUCTAS SUICIDAS": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmw50f3wf5nmhr3os"
     ],
@@ -217,7 +217,7 @@
   "ADMISION": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmugx61h4w7r8w5m4"
     ],
@@ -725,7 +725,7 @@
   "CERTIFICADO": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmunvbtdyivu964qa"
     ],
@@ -2692,7 +2692,7 @@
   "CONSTITUCION JUNTA ELECTORAL": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmul46mcjm4qn898h"
     ],
@@ -2710,7 +2710,7 @@
   "INFORME FINAL ETAPA": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmv983fbdkvpe61p8"
     ],
@@ -2728,7 +2728,7 @@
   "ABSENTISMO CONV. REUNIÓN": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmw0nioi3wuvtvuey"
     ],
@@ -2746,7 +2746,7 @@
   "ATENCIÓN DOMICILIARIA": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmuwn3aqtono8kye6"
     ],
@@ -2764,7 +2764,7 @@
   "AYUDA NEAE": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmvqkea1tmnnfby1h"
     ],
@@ -2782,7 +2782,7 @@
   "EXPULSIÓN AULA CONVICENCIA": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmvi21cgiz3ps4l2l"
     ],
@@ -2800,7 +2800,7 @@
   "INFORMACION PERSONAL": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmuv3b6rf92v24frp"
     ],
@@ -2818,7 +2818,7 @@
   "INSTANCIA DIRECTOR": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmuqpvy639ejt2q0w"
     ],
@@ -2836,7 +2836,7 @@
   "IPASEN ALUMNADO": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmvjeenozlc525lad"
     ],
@@ -2854,7 +2854,7 @@
   "PETICIÓN INFORME": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmuzawgnjjh93enci"
     ],
@@ -2872,7 +2872,7 @@
   "RECLAMACION": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmugwq9i8p68umvjx"
     ],
@@ -2890,7 +2890,7 @@
   "SANCION": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmugqqnaxt0793vkb"
     ],
@@ -2908,7 +2908,7 @@
   "ALTAS CAPACIDADES": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmufvfkf4q953o5tm"
     ],
@@ -2926,7 +2926,7 @@
   "PARADA TTE. ESCOLAR": [
    {
     "titulo": "Tramitar",
-    "fase": "?",
+    "fase": "recibir",
     "de": [
      "gmufvfkcfc8v6qrtk"
     ],

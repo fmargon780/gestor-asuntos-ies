@@ -1,6 +1,6 @@
-# Plan del repaso de la lista común (tema 650, parte 2)
+# 657 — Plan del repaso de la lista común (tema 650, parte 2)
 
-Preparado por Claude el 14-nov-2026 con `tipos.json`, `guias.json`, `hitos-comunes.json` y `tareas-comunes.json` de `_GESTOR` (copia del 12 y 13-nov-2026). Solo los 65 tipos activos. Los datos que se aplican, uno por guía, están en `650-plan-guias.json`, al lado de este documento.
+Preparado por Claude el 14-nov-2026 con `tipos.json`, `guias.json`, `hitos-comunes.json` y `tareas-comunes.json` de `_GESTOR` (copia del 12 y 13-nov-2026). Solo los 65 tipos activos. Los datos que se aplican, uno por guía, están en `docs/657-plan-guias.json`.
 
 ## Las reglas (acordadas con Francisco el 14-nov-2026)
 
@@ -22,8 +22,9 @@ Preparado por Claude el 14-nov-2026 con `tipos.json`, `guias.json`, `hitos-comun
 
 Cada línea: el hito, sus tareas con su acción entre corchetes, y las guías que lo usan.
 
-### Recibir (19)
+### Recibir (20)
 
+- **Tramitar** — sin tareas. *Guías:* ABSENTISMO CONV. REUNIÓN, ADMISION, ALTAS CAPACIDADES, ATENCIÓN DOMICILIARIA, AYUDA NEAE, CERTIFICADO, CONSTITUCION JUNTA ELECTORAL, EXPULSIÓN AULA CONVICENCIA, INFORMACION PERSONAL, INFORME FINAL ETAPA, INSTANCIA DIRECTOR, IPASEN ALUMNADO, PARADA TTE. ESCOLAR, PETICIÓN INFORME, PROTOCOLO CONDUCTAS SUICIDAS, RECLAMACION, SANCION.
 - **Registro de entrada** — Registrar de entrada el documento [Registrar]. *Guías:* ANULACIÓN MATRÍCULA, Evaluación psicopedagógica y alumnado NEAE, INFORME VALORACIÓN EQUIPO EDUCATIVO, JUSTIFICACION FALTAS PAS, MATRICULA, PERMISO, TRANSPORTE, TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN.
 - **Recepción de la solicitud** — Añadir la solicitud al asunto [Añadir documento]. *Guías:* CERT. EXP. ESO, Certificado de desempeño de la función tutorial, INFORME EDITORIAL, IPASEN TUTOR LEGAL.
 - **Recibir el encargo de Dirección** — Añadir la declaración de la familia o la diligencia de Dirección [Añadir documento]; Pedir los datos de la baja [Pedir datos]. *Guías:* Baja de matrícula.
@@ -155,10 +156,6 @@ Cada línea: el hito, sus tareas con su acción entre corchetes, y las guías qu
 - **Archivar en el expediente** — Archivar en el expediente del alumno o alumna [Otra cosa]. *Guías:* ANULACIÓN MATRÍCULA, TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN.
 - **Abrir/Guardar en el Expediente** — Guardar en el expediente del alumno o alumna [Otra cosa]. *Guías:* MATRICULA.
 
-### Sin fase: pendiente de decidir (1)
-
-- **Tramitar** — sin tareas. *Guías:* ABSENTISMO CONV. REUNIÓN, ADMISION, ALTAS CAPACIDADES, ATENCIÓN DOMICILIARIA, AYUDA NEAE, CERTIFICADO, CONSTITUCION JUNTA ELECTORAL, EXPULSIÓN AULA CONVICENCIA, INFORMACION PERSONAL, INFORME FINAL ETAPA, INSTANCIA DIRECTOR, IPASEN ALUMNADO, PARADA TTE. ESCOLAR, PETICIÓN INFORME, PROTOCOLO CONDUCTAS SUICIDAS, RECLAMACION, SANCION.
-
 ## Lo que cambia en cada guía
 
 Solo las guías donde algo se junta, cambia de nombre o se quita.
@@ -212,11 +209,11 @@ Solo las guías donde algo se junta, cambia de nombre o se quita.
 - «Comprobar el estado de la firma hasta que esté firmado.»: la tarea «Firmar un documento» se marca sola al llegar el firmado.
 - Las tareas comunes que no usa ninguna guía activa (27).
 
-## Pendiente de decidir: «Tramitar»
+## «Tramitar» (decidido por Francisco el 14-nov-2026)
 
-- Lo llevan 17 guías activas, casi todas con solo «Tramitar · Esperar respuesta»: CONSTITUCION JUNTA ELECTORAL, INFORME FINAL ETAPA, PROTOCOLO CONDUCTAS SUICIDAS, ABSENTISMO CONV. REUNIÓN, ATENCIÓN DOMICILIARIA, AYUDA NEAE, CERTIFICADO, EXPULSIÓN AULA CONVICENCIA, INFORMACION PERSONAL, INSTANCIA DIRECTOR, IPASEN ALUMNADO, PETICIÓN INFORME, RECLAMACION, SANCION, ALTAS CAPACIDADES, PARADA TTE. ESCOLAR, ADMISION.
-- «Tramitar» es el hito donde «nos toca»; «Esperar respuesta» es donde se espera al tercero. Si se quita «Tramitar», esos asuntos nacen esperando al tercero.
-- En CONFORMIDAD y CERTIFICADO C.E sí se quita: detrás vienen hitos de verdad.
+- Se queda, con la fase «recibir», en las 17 guías activas que no tienen más que «Tramitar · Esperar respuesta»: CONSTITUCION JUNTA ELECTORAL, INFORME FINAL ETAPA, PROTOCOLO CONDUCTAS SUICIDAS, ABSENTISMO CONV. REUNIÓN, ATENCIÓN DOMICILIARIA, AYUDA NEAE, CERTIFICADO, EXPULSIÓN AULA CONVICENCIA, INFORMACION PERSONAL, INSTANCIA DIRECTOR, IPASEN ALUMNADO, PETICIÓN INFORME, RECLAMACION, SANCION, ALTAS CAPACIDADES, PARADA TTE. ESCOLAR, ADMISION.
+- Motivo: «Tramitar» es el hito donde nos toca; sin él, esos asuntos nacerían esperando al tercero. Esas guías se llenarán con el uso (parte 3).
+- En CONFORMIDAD y CERTIFICADO C.E se quita: detrás vienen hitos de verdad.
 
 ## Lo que el plan no toca y conviene mirar
 

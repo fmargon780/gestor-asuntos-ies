@@ -1,0 +1,880 @@
+[
+  {
+    "tipo": "ALUMNADO ABSENTISTA",
+    "categoria": "ADMINISTRACIONES"
+  },
+  {
+    "tipo": "Actuación del Servicio de Inspección",
+    "categoria": "ADMINISTRACIONES",
+    "nombreCorto": "INSPECCION",
+    "desactivado": true
+  },
+  {
+    "tipo": "CONSTITUCION JUNTA ELECTORAL",
+    "categoria": "ADMINISTRACIONES",
+    "nombreCorto": "JUNTA ELECTORAL",
+    "organo": "DIRECCION"
+  },
+  {
+    "tipo": "INFORME FINAL ETAPA",
+    "categoria": "ADMINISTRACIONES"
+  },
+  {
+    "tipo": "PAGO SEGURO ESCOLAR",
+    "categoria": "ADMINISTRACIONES"
+  },
+  {
+    "tipo": "PLAN DIRECTOR",
+    "categoria": "ADMINISTRACIONES"
+  },
+  {
+    "tipo": "PROGRAMA",
+    "categoria": "ADMINISTRACIONES",
+    "categorias": [
+      "ADMINISTRACIONES"
+    ]
+  },
+  {
+    "tipo": "PROGRAMA DE TRÁNSITO",
+    "categoria": "ADMINISTRACIONES",
+    "categorias": [
+      "ADMINISTRACIONES"
+    ]
+  },
+  {
+    "tipo": "PROTOCOLO CONDUCTAS SUICIDAS",
+    "categoria": "ADMINISTRACIONES",
+    "categorias": [
+      "ADMINISTRACIONES"
+    ],
+    "nombreCorto": "PROT. COND. SUICIDAS"
+  },
+  {
+    "tipo": "ABSENTISMO",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "Absentismo escolar"
+    ],
+    "desactivado": true
+  },
+  {
+    "tipo": "ABSENTISMO CONV. REUNIÓN",
+    "categoria": "ALUMNADO",
+    "categorias": [
+      "ALUMNADO"
+    ]
+  },
+  {
+    "tipo": "ACCIDENTE",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "ADMISION",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "Admisión del alumnado"
+    ]
+  },
+  {
+    "tipo": "ANULACIÓN MATRÍCULA",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "ANULACIÓN",
+      "Anulación de matrícula"
+    ]
+  },
+  {
+    "tipo": "ATENCIÓN DOMICILIARIA",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "AYUDA NEAE",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "Accidente de alumnado",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "ACCIDENTE",
+    "desactivado": true
+  },
+  {
+    "tipo": "Apertura de expediente académico de Bachillerato",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "EXP. ACADEMICO BACH",
+    "desactivado": true
+  },
+  {
+    "tipo": "Apertura de expediente académico de ESO",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "EXPTE. ACADEMICO ESO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Atención en el aula de convivencia",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "AULA CONVIVENCIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "BECA",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "Baja de matrícula",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "BAJA MATRICULA",
+    "alias": [
+      "Baja del alumnado",
+      "BAJA"
+    ]
+  },
+  {
+    "tipo": "Beca o ayuda al estudio",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "BECA",
+    "desactivado": true
+  },
+  {
+    "tipo": "CAMBIO DE GRUPO",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "CAMBIO OPTATIVA",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "CERT. EXP. BACH",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "CERT. EXP. ESO",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "CERT. MATRICULA",
+    "categoria": "ALUMNADO",
+    "palabrasClave": [
+      "Certificado escolaridad"
+    ]
+  },
+  {
+    "tipo": "CERTIFICADO",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "COBRO SEGURO ESCOLAR",
+    "categoria": "ALUMNADO",
+    "llevaSello": false,
+    "liquidar": true
+  },
+  {
+    "tipo": "CONVALIDACION MATERIA",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "CONVALIDACION"
+    ]
+  },
+  {
+    "tipo": "CONVALIDACIÓN CURSO",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CONVALIDACION CURSO",
+    "palabrasClave": [
+      "Convalidación\nExención"
+    ],
+    "alias": [
+      "Convalidación o exención"
+    ]
+  },
+  {
+    "tipo": "CUESTIONARIO AC",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "CUESTIONARIOS AC"
+    ],
+    "desactivado": true
+  },
+  {
+    "tipo": "Cambio de grupo",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CAMBIO DE GRUPO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Cambio de materia optativa",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CAMBIO OPTATIVA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Cambio en la situación familiar",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "SITUACIÓN FAMILIAR"
+  },
+  {
+    "tipo": "Certificación académica",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CERTIFICADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Certificación de matrículas en Séneca",
+    "categoria": "ALUMNADO",
+    "palabrasClave": [
+      "Certificado escolaridad"
+    ],
+    "nombreCorto": "CERT. MATRICULA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Compromiso educativo o de convivencia",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "COMPROMISO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Corrección por conducta contraria a la convivencia",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CORRECCION",
+    "desactivado": true
+  },
+  {
+    "tipo": "DOCUMENTACION",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "EXP. ACADEMICO BACH",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "EXPTE. ACADEMICO ESO",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "EXPULSIÓN AULA CONVICENCIA",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "EXPULSIÓN CASA"
+    ],
+    "nombreCorto": "EXPUL. AULA CONVICENCIA"
+  },
+  {
+    "tipo": "EXPULSIÓN CLASES",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "EXPULSIÓN DEL CENTRO",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "EXPULSIÓN DEL CENTRO",
+    "alias": []
+  },
+  {
+    "tipo": "Entrega de documentación del expediente",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "DOCUMENTACION",
+    "desactivado": true
+  },
+  {
+    "tipo": "Evaluación psicopedagógica y alumnado NEAE",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "NEAE"
+  },
+  {
+    "tipo": "Expedición de título académico",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "TITULO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Expediente de cambio de centro docente",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "CAMBIO CENTRO",
+    "desactivado": true
+  },
+  {
+    "tipo": "FICHA ENTREGA LIBROS",
+    "categoria": "ALUMNADO",
+    "categorias": [
+      "ALUMNADO"
+    ],
+    "nombreCorto": "FichaLibros",
+    "desactivado": true
+  },
+  {
+    "tipo": "IDENTIFICACION ALUMNO",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "INFORMACION PERSONAL",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "INFORME VALORACIÓN EQUIPO EDUCATIVO",
+    "categoria": "ALUMNADO",
+    "categorias": [
+      "ALUMNADO"
+    ],
+    "nombreCorto": "INF. VALORACION EQ. EDUC"
+  },
+  {
+    "tipo": "INSTANCIA DIRECTOR",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "IPASEN ALUMNADO",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "Alta y gestión de iPasen",
+      "IPASEN"
+    ]
+  },
+  {
+    "tipo": "MATRICULA",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "Matrícula del alumnado",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "MATRICULA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Mediación escolar",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "MEDIACION",
+    "desactivado": true
+  },
+  {
+    "tipo": "Medida disciplinaria por conducta gravemente perjudicial",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "SANCION",
+    "desactivado": true
+  },
+  {
+    "tipo": "PAGO AYUDA TRANSPORTE",
+    "categoria": "ALUMNADO",
+    "categorias": [
+      "ALUMNADO"
+    ]
+  },
+  {
+    "tipo": "PETICIÓN INFORME",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "Protocolo de actuación",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "PROTOCOLO",
+    "desactivado": true
+  },
+  {
+    "tipo": "RECLAMACION",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "Reclamación de calificaciones",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "RECLAMACION",
+    "desactivado": true
+  },
+  {
+    "tipo": "SANCION",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "SEGURO ESCOLAR",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "SITUACIÓN FAMILIAR",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "SOLICITUD NACIONALIDAD",
+    "categoria": "ALUMNADO",
+    "categorias": [
+      "ALUMNADO"
+    ]
+  },
+  {
+    "tipo": "Seguro escolar",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "SEGURO ESCOLAR",
+    "desactivado": true
+  },
+  {
+    "tipo": "Solicitud de acceso a datos personales",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "ACCESO A DATOS",
+    "desactivado": true
+  },
+  {
+    "tipo": "TITULO",
+    "categoria": "ALUMNADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "TRANSPORTE",
+    "categoria": "ALUMNADO"
+  },
+  {
+    "tipo": "TRAS. MATR. VIVA",
+    "categoria": "ALUMNADO",
+    "alias": [
+      "TRASLADO MATR VIVA"
+    ]
+  },
+  {
+    "tipo": "TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "TRASLADO EXPEDIENTE",
+    "alias": [
+      "TRASLADO"
+    ]
+  },
+  {
+    "tipo": "Transporte escolar",
+    "categoria": "ALUMNADO",
+    "nombreCorto": "TRANSPORTE",
+    "desactivado": true
+  },
+  {
+    "tipo": "COMPRA",
+    "categoria": "EMPRESAS"
+  },
+  {
+    "tipo": "CONFORMIDAD",
+    "categoria": "EMPRESAS"
+  },
+  {
+    "tipo": "CONTRATO",
+    "categoria": "EMPRESAS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Compra de bienes o servicios",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "COMPRA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Contrato de mantenimiento",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "MANTENIMIENTO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Contrato menor de obra",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "OBRA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Contrato menor de suministro",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "SUMINISTRO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Expediente de contrato menor",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "CONTRATO",
+    "desactivado": true
+  },
+  {
+    "tipo": "GARANTIA",
+    "categoria": "EMPRESAS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Garantía de un bien o servicio",
+    "categoria": "EMPRESAS",
+    "nombreCorto": "GARANTIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "INFORME EDITORIAL",
+    "categoria": "EMPRESAS",
+    "llevaSello": false
+  },
+  {
+    "tipo": "MANTENIMIENTO",
+    "categoria": "EMPRESAS",
+    "desactivado": true
+  },
+  {
+    "tipo": "OBRA",
+    "categoria": "EMPRESAS",
+    "desactivado": true
+  },
+  {
+    "tipo": "SUMINISTRO",
+    "categoria": "EMPRESAS",
+    "desactivado": true
+  },
+  {
+    "tipo": "ACTIVIDAD EXTRAESCOLAR",
+    "categoria": "OTROS",
+    "actividades": true,
+    "desactivado": true
+  },
+  {
+    "tipo": "ALTAS CAPACIDADES",
+    "categoria": "OTROS"
+  },
+  {
+    "tipo": "Actividad complementaria o extraescolar",
+    "categoria": "OTROS",
+    "nombreCorto": "ACTIVIDAD EXTRAESCOLAR",
+    "desactivado": true
+  },
+  {
+    "tipo": "COMUNICACIÓN RECIBIDA",
+    "categoria": "OTROS",
+    "alias": [
+      "COMUNICADO",
+      "COMUNICADO RECIBIDO"
+    ],
+    "categorias": [
+      "OTROS",
+      "ADMINISTRACIONES"
+    ]
+  },
+  {
+    "tipo": "CONSEJO ESCOLAR",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "CONVENIO",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "CORRESPONDENCIA",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Comunicado",
+    "categoria": "OTROS",
+    "nombreCorto": "COMUNICADO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Convenio con una entidad",
+    "categoria": "OTROS",
+    "nombreCorto": "CONVENIO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Correspondencia de entrada o de salida",
+    "categoria": "OTROS",
+    "nombreCorto": "CORRESPONDENCIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Cuenta de gestión y cierre del ejercicio",
+    "categoria": "OTROS",
+    "nombreCorto": "CUENTA DE GESTION",
+    "desactivado": true
+  },
+  {
+    "tipo": "DTMA (PLANIFICACION)",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Elecciones al Consejo Escolar",
+    "categoria": "OTROS",
+    "nombreCorto": "ELEC. CONSEJO ESCOLAR",
+    "candidaturas": true
+  },
+  {
+    "tipo": "INCAPACIDAD TEMPORAL",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "INSPECCION",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Inventario del centro",
+    "categoria": "OTROS",
+    "nombreCorto": "INVENTARIO",
+    "desactivado": true
+  },
+  {
+    "tipo": "PARADA TTE. ESCOLAR",
+    "categoria": "OTROS",
+    "alias": [
+      "DTMA (PLANIFICACION)"
+    ]
+  },
+  {
+    "tipo": "PROYECTO",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Parada de transporte escolar",
+    "categoria": "OTROS",
+    "alias": [
+      "DTMA (PLANIFICACION)"
+    ],
+    "nombreCorto": "PARADA TTE. ESCOLAR",
+    "desactivado": true
+  },
+  {
+    "tipo": "Presupuesto del centro",
+    "categoria": "OTROS",
+    "nombreCorto": "PRESUPUESTO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Programa de gratuidad de libros de texto",
+    "categoria": "OTROS",
+    "nombreCorto": "GRATUIDAD LIBROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Proyecto o programa educativo",
+    "categoria": "OTROS",
+    "nombreCorto": "PROYECTO",
+    "desactivado": true
+  },
+  {
+    "tipo": "Retenciones y obligaciones fiscales",
+    "categoria": "OTROS",
+    "nombreCorto": "RETENCIONES",
+    "desactivado": true
+  },
+  {
+    "tipo": "SUBVENCION",
+    "categoria": "OTROS",
+    "desactivado": true
+  },
+  {
+    "tipo": "Sesión del Consejo Escolar",
+    "categoria": "OTROS",
+    "nombreCorto": "CONSEJO ESCOLAR",
+    "desactivado": true
+  },
+  {
+    "tipo": "Subvención",
+    "categoria": "OTROS",
+    "nombreCorto": "SUBVENCION",
+    "desactivado": true
+  },
+  {
+    "tipo": "Alta y actualización de datos",
+    "categoria": "PERSONAL",
+    "nombreCorto": "DATOS PERSONAL INTERINO"
+  },
+  {
+    "tipo": "BAJA MEDICA",
+    "categoria": "PERSONAL",
+    "alias": [
+      "BAJA"
+    ]
+  },
+  {
+    "tipo": "CERTIFICADO ACTIVIDADES EXTRAESCOLARES",
+    "categoria": "PERSONAL",
+    "nombreCorto": "CertActExtra"
+  },
+  {
+    "tipo": "CERTIFICADO C.E",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "CERTIFICADO PERSONAL",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "CESE",
+    "categoria": "PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "COM. PRODUCTIVIDAD",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "Certificado a petición del personal",
+    "categoria": "PERSONAL",
+    "nombreCorto": "CERTIFICADO PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "Certificado de desempeño de la función tutorial",
+    "categoria": "PERSONAL",
+    "nombreCorto": "FUNCIÓN TUTORIAL"
+  },
+  {
+    "tipo": "Cese",
+    "categoria": "PERSONAL",
+    "nombreCorto": "CESE",
+    "desactivado": true
+  },
+  {
+    "tipo": "Complemento de productividad",
+    "categoria": "PERSONAL",
+    "nombreCorto": "COM. PRODUCTIVIDAD",
+    "desactivado": true
+  },
+  {
+    "tipo": "DATOS PERSONAL INTERINO",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "DESEMPEÑO FUNCIONES",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "Desempeño de funciones",
+    "categoria": "PERSONAL",
+    "nombreCorto": "DESEMPEÑO FUNCIONES",
+    "desactivado": true
+  },
+  {
+    "tipo": "Estadillo mensual de ausencias",
+    "categoria": "PERSONAL",
+    "nombreCorto": "ESTADILLO",
+    "desactivado": true
+  },
+  {
+    "tipo": "FLEXIBILIDAD",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "FORMACION",
+    "categoria": "PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "FUNCIÓN TUTORIAL",
+    "categoria": "PERSONAL",
+    "alias": [
+      "DESEMPEÑO FUNCIÓN TUTORIAL"
+    ]
+  },
+  {
+    "tipo": "Flexibilidad horaria",
+    "categoria": "PERSONAL",
+    "nombreCorto": "FLEXIBILIDAD",
+    "desactivado": true
+  },
+  {
+    "tipo": "Formación y perfeccionamiento",
+    "categoria": "PERSONAL",
+    "nombreCorto": "FORMACION",
+    "desactivado": true
+  },
+  {
+    "tipo": "Incapacidad temporal",
+    "categoria": "PERSONAL",
+    "nombreCorto": "BAJA MEDICA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Incidencias de nómina",
+    "categoria": "PERSONAL",
+    "nombreCorto": "NOMINA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Insuficiencia de horario y reubicación",
+    "categoria": "PERSONAL",
+    "nombreCorto": "INSUFICIENCIA HORARIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "JUSTIFICACION FALTAS PAS",
+    "categoria": "PERSONAL"
+  },
+  {
+    "tipo": "Justificación de una ausencia",
+    "categoria": "PERSONAL",
+    "nombreCorto": "AUSENCIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "LICENCIA",
+    "categoria": "PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "NOMINA",
+    "categoria": "PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "PERMISO",
+    "categoria": "PERSONAL",
+    "palabrasClave": [
+      "Permiso"
+    ]
+  },
+  {
+    "tipo": "PROY. PRÁCTICAS",
+    "categoria": "PERSONAL",
+    "alias": [
+      "PROYECTO PRÁCTICAS"
+    ]
+  },
+  {
+    "tipo": "Petición de sustitución",
+    "categoria": "PERSONAL",
+    "nombreCorto": "SUSTITUCION",
+    "desactivado": true
+  },
+  {
+    "tipo": "Solicitud de licencia",
+    "categoria": "PERSONAL",
+    "nombreCorto": "LICENCIA",
+    "desactivado": true
+  },
+  {
+    "tipo": "Solicitud de permiso",
+    "categoria": "PERSONAL",
+    "palabrasClave": [
+      "Permiso"
+    ],
+    "nombreCorto": "PERMISO",
+    "desactivado": true
+  },
+  {
+    "tipo": "TOMA POSESION",
+    "categoria": "PERSONAL",
+    "desactivado": true
+  },
+  {
+    "tipo": "Toma de posesión",
+    "categoria": "PERSONAL",
+    "nombreCorto": "TOMA POSESION",
+    "desactivado": true
+  },
+  {
+    "tipo": "CANDIDATURA C.E",
+    "categoria": "TUTORES LEGALES",
+    "desactivado": true
+  },
+  {
+    "tipo": "IDENTIFICACION TUTOR LEGAL",
+    "categoria": "TUTORES LEGALES",
+    "nombreCorto": "IDENT. TUTOR LEGAL"
+  },
+  {
+    "tipo": "IPASEN TUTOR LEGAL",
+    "categoria": "TUTORES LEGALES"
+  }
+]

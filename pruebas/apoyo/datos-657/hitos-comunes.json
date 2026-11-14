@@ -1,0 +1,902 @@
+{
+  "version": 1,
+  "hitos": [
+    {
+      "id": "hcmw4x3a5s2z5346np",
+      "nombre": "Comprobación validez",
+      "explicacion": "Si es factura, comprobamos la validez fiscal de la misma:",
+      "tareas": [
+        "tcmw4x3a5hsktxywr3",
+        "tcmw4x3a5hopg3caeb",
+        "tcmw4x3a5ha7sl9kud"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5ta8j3e5kb",
+      "nombre": "Sellar",
+      "explicacion": "Se le pone el sello de Recibido y Fdo:",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tnu6g2z40",
+      "nombre": "Entrega del original a Secretaría.",
+      "explicacion": "&nbsp;",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5ttl58mli8",
+      "nombre": "Firma digital Dirección",
+      "explicacion": "Se le pone a la firma digital a la Dirección en Séneca",
+      "tareas": [
+        "tcmw4x3a5i79d4saz5",
+        "tcmw4x3a5ii57fpo4i"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5tkobbbzao",
+      "nombre": "Entrega copia impresa a Secretaria",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tmge7atpc",
+      "nombre": "Registro de la solicitud",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tkdgvo431",
+      "nombre": "Ajuste Planificacion",
+      "explicacion": "A partir de 1 de octubre, enviar ajuste de planificación a D.T. para su alta",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5t384j0d4v",
+      "nombre": "Enviar a D.T. Servicios Transporte Escolar",
+      "explicacion": "Enviar por Cuenta Correo Corporativo Centro",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5t343qw1lz",
+      "nombre": "Resolución",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5ttpemz2e5",
+      "nombre": "Grabar la solicitud en Séneca con el resultado",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tvjrisk9o",
+      "nombre": "Expedición Carne",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tu89875kk",
+      "nombre": "Registro de entrada",
+      "explicacion": "En caso de traslado de matrícula viva, durante el curso, deberá aportar certificado de entrega de libros",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tz7viosez",
+      "nombre": "Asignación de Unidad/Optativas",
+      "explicacion": "Se pasa la matrícula a Jef. Estudio para la asignación de unidad y/o optativas",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5ttysquygp",
+      "nombre": "Grabar/Check en Séneca",
+      "explicacion": "Comprobamos si Jefatura ha grabado las asignaciones del paso anterior, si no lo ha hecho grabarlo",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tumgprqix",
+      "nombre": "Preparar Ficha libros",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5t9qvvz943",
+      "nombre": "Comunicación Equipo Educativo",
+      "explicacion": "Generar a través de plantilla comunicación de la incorporación y enviar por Gmail al Equipo<div><br></div>",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tl1agrk3x",
+      "nombre": "Entrega del horario",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5in0uv2wxc"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5tnxowfueo",
+      "nombre": "Foto para Séneca",
+      "explicacion": "Se comprueba si el alumno tiene la foto actualizada en su ficha de Séneca.<div>Si no la tiene, se le hace y se sube a la ficha.</div>",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5te4kendz7",
+      "nombre": "Abrir/Guardar en el Expediente",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tdqiozb84",
+      "nombre": "Parte inicial",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5imi8ywk0m"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5t69zn15l5",
+      "nombre": "Partes de confirmación",
+      "explicacion": "Mientras dure la baja.",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5imi8ywk0m"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5tb2zvlezt",
+      "nombre": "Parte de alta",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5imi8ywk0m"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5toc0av7km",
+      "nombre": "Enviar al Director",
+      "explicacion": "Resolución del Director",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tilr86yge",
+      "nombre": "Registrar la solicitud",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5tvfyip04p",
+      "nombre": "Anular la matrícula",
+      "explicacion": "Anular la matrícula en Séneca y desasignar unidad",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5t5o92fjcf",
+      "nombre": "Comunicar a Jefatura",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5ieh19c6lm"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5tw60v4ofv",
+      "nombre": "Certificado entrega de libros",
+      "explicacion": "De 1º a 4ª de la ESO",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5uc9p68x47",
+      "nombre": "Enviar el certificado",
+      "explicacion": "Envío por Ipasen o correo certificado de entrega de libros",
+      "tareas": [
+        "tcmw4x3a5i9t21ul4t"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5udrihlwpc",
+      "nombre": "Archivar Expediente",
+      "explicacion": "Archivar expediente en el archivo histórico",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5uzpw7o45r",
+      "nombre": "Copiar el documento registrado a la carpeta Ausencias",
+      "explicacion": "Fecha Ausencia + Tipo (Falta o Baja o Alta) + Nombre empleado",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5u2zb79itb",
+      "nombre": "Entregar original a Jef. Estudios Adj.",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5u7e5ym3ou",
+      "nombre": "Registrar la solicitud de la familia",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5u2ga6uadj",
+      "nombre": "Registrar el recibí",
+      "explicacion": "<p>Cuando llegue.</p>",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5u3vsjukbz",
+      "nombre": "Registrar el motivo de la baja",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5iow8i4m5o",
+        "tcmw4x3a5iad7dqcok",
+        "tcmw4x3a5i8emkcxx1"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5u2t5cu55j",
+      "nombre": "Dar la baja en Séneca",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5icx67k5gu",
+        "tcmw4x3a5i4qsyejx6",
+        "tcmw4x3a5irecq8499"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5u9leyxdal",
+      "nombre": "Anotar en el expediente académico",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5ifk48htgo",
+        "tcmw4x3a5igeyruigx",
+        "tcmw4x3a5icbk39lx4"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5u8nrizpm1",
+      "nombre": "Comunicar a la tutoría",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5iqwfjn59k",
+        "tcmw4x3a5ivvi530fl",
+        "tcmw4x3a5i2vjupvqx"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5uttf1nivo",
+      "nombre": "Recoger la documentación",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5jeqo3w0r4",
+        "tcmw4x3a5j5xnl2uaw",
+        "tcmw4x3a5jrwig4d7i",
+        "tcmw4x3a5joeqs5vie"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5uhh85hx95",
+      "nombre": "Actualizar los datos en Séneca",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5jx0fjtlt5",
+        "tcmw4x3a5jvpv6g4a4",
+        "tcmw4x3a5jo76c8tp9"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5ul67njt34",
+      "nombre": "Comunicar a la tutoría lo que deba saber",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5jjk7v7baf",
+        "tcmw4x3a5jqieu2p4v",
+        "tcmw4x3a5ivvi530fl"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5varyp7y0j",
+      "nombre": "Recoger los datos",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5j1z2qz8wv",
+        "tcmw4x3a5j9wcxae5c",
+        "tcmw4x3a5ja3pkdkv9",
+        "tcmw4x3a5jjizf3til",
+        "tcmw4x3a5jzcvth5dt",
+        "tcmw4x3a5jqm8vw976",
+        "tcmw4x3a5kwfti1j50",
+        "tcmw4x3a5k5f5z169e"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5vsjsxpmdo",
+      "nombre": "Grabar en Séneca",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5k1cy74frf",
+        "tcmw4x3a5kmdaxosz2",
+        "tcmw4x3a5k81tnt1cy",
+        "tcmw4x3a5kdkooy6y8"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5vv3phld96",
+      "nombre": "Comprobar que la nómina los recoge",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5k37nvh0cr",
+        "tcmw4x3a5kku9xv2bh",
+        "tcmw4x3a5kl7wcr3vc"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5vbxcpra7t",
+      "nombre": "Constituir la Junta Electoral",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5kbpq1i38m",
+        "tcmw4x3a5lotu35e94",
+        "tcmw4x3a5l75cjwo8q"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5v0jrcvmm3",
+      "nombre": "Publicar el censo",
+      "explicacion": "Y resolver las reclamaciones.",
+      "tareas": [
+        "tcmw4x3a5lle4afnlw",
+        "tcmw4x3a5lupni089h",
+        "tcmw4x3a5l5nllphv0"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5vqf9q3cc7",
+      "nombre": "Recoger candidaturas",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5l5kgcmbqo",
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5lhsyb0u9p"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5vqmjvsqw9",
+      "nombre": "Proclamar candidaturas",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5las8ry01x",
+        "tcmw4x3a5mgvzgei0t",
+        "tcmw4x3a5muvu7k7au"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5v1kaqit0g",
+      "nombre": "Poner copia registrada en carpeta Jef. Estudios",
+      "explicacion": "Se pone el pdf registrado en la carpeta de Ausencias. El nombre debe contener el nombre del empleado",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5v2yy4o91a",
+      "nombre": "No es necesario pedir nada",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5vvi9pv3x6",
+      "nombre": "Solicitar al centro de origen la documentación del traslado",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5mus92y4fp",
+        "tcmw4x3a5mrj22z7us"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5wkhijbh9e",
+      "nombre": "Registrar la documentación recibida",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5wnpp14dkd",
+      "nombre": "Revisar si tiene asignaturas pendientes",
+      "explicacion": "&nbsp;- Si hay asignaturas pendientes hay que anotarlas como pendientes en Séneca",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5wy9a9c12h",
+      "nombre": "Archivar la documentación en el expediente del alumno",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5wj9xirbjp",
+      "nombre": "Solicitud expediente académico al Centro origen",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5wm65rn551",
+      "nombre": "Recepción del Expediente",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5w6ltx2jdx",
+      "nombre": "Añadir a la matrícula, materias pendientes, en su caso",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5wb9kdwhzl",
+      "nombre": "Recoger la solicitud",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5m0vxfgrwq",
+        "tcmw4x3a5mo8dq7t2w",
+        "tcmw4x3a5mn76sbjj6",
+        "tcmw4x3a5m33ee6qs3"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5wdfes0q0m",
+      "nombre": "Emisión del certificado",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5my4e1joc8"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5wfnnbuuog",
+      "nombre": "Poner a la firma",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5m47mehw42",
+        "tcmw4x3a5m2crjphjg"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5w1hcs6brb",
+      "nombre": "Registro de salida",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5mhp02l6pz"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5xg9wkoxin",
+      "nombre": "Recoger la solicitud o la propuesta",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5ng3ml8xp3",
+        "tcmw4x3a5mn76sbjj6"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5xc2r14irt",
+      "nombre": "Modificar el grupo en Séneca",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5icx67k5gu",
+        "tcmw4x3a5nrucig6qx",
+        "tcmw4x3a5nwmkcke5w"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5x5h1ybaaa",
+      "nombre": "Comunicar a la familia, a las dos tutorías y al equipo docente",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5nxmp2ed5e",
+        "tcmw4x3a5nnxetjhcv",
+        "tcmw4x3a5n6r4deygv"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5xvswqj5xe",
+      "nombre": "Tramitar",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5x3gbud4cx",
+      "nombre": "Esperar respuesta",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5xa5u3heu0",
+      "nombre": "Generar el certificado",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5ycjhb9k8r",
+      "nombre": "Poner a la firma",
+      "explicacion": "Firma Secretaria con Visto bueno del director.",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5ycnsx0yue",
+      "nombre": "Registro de salida",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5y5igcmr9a",
+      "nombre": "Requerimiento Subsanación",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5yg1dfil8y",
+      "nombre": "Notificación matrícula",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5yk9c11ol9",
+      "nombre": "Imprimir, firma y sello",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5yz1bl2rhg",
+      "nombre": "Enviar C.C. IES Fuente Lucena",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5yf695onnj",
+      "nombre": "Cobro",
+      "explicacion": "Anotamos el cobro del seguro escolar<div>&nbsp;- Importe 1,12€</div><div>&nbsp;- De 3º de la ESO en adelante.&nbsp;</div>",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5yip74e8r2",
+      "nombre": "Poner a la firma",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5m47mehw42",
+        "tcmw4x3a5mhp02l6pz"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5z437vm7r4",
+      "nombre": "Registro de salida",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5nfws49ko0",
+        "tcmw4x3a5nxif9u9xf"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5zs0y0pq40",
+      "nombre": "Enviar el certificado",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5naai8d3ef",
+        "tcmw4x3a5i9t21ul4t"
+      ]
+    },
+    {
+      "id": "hcmw4x3a5z1xz61j4o",
+      "nombre": "Recepción de la Solicitud",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5zpavabu5r",
+      "nombre": "Generar el certificado de Función Tutorial",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5zhulgbns1",
+      "nombre": "Informe personal por traslado",
+      "explicacion": "Documentos oficiales de evaluación firma electrónica",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5zdp3q426g",
+      "nombre": "Historial Académido",
+      "explicacion": "Documentos oficiales de evaluación firma electrónica",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a5z0ijvp3lb",
+      "nombre": "Confirmación traslado",
+      "explicacion": "Desasignar unidad",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a60yft4dted",
+      "nombre": "Informar a Jefatura",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a6048wx5afg",
+      "nombre": "Certificado entrega libros de texto",
+      "explicacion": "Enviar por IPASEN o correo a los padre/madre/Tutores legales",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a60t5tut3r6",
+      "nombre": "Envío por V.E. documento oficiales",
+      "explicacion": "Enviar a centro de destino Documentos oficiales y certificado de entrega de libros",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a60jzuareas",
+      "nombre": "Recibir la solicitud",
+      "explicacion": "La pide el alumnado mayor de edad o quien ejerza la tutela legal.",
+      "tareas": [
+        "tcmw4x3a5n8jd41nvc",
+        "tcmw4x3a5o14d9ytb9",
+        "tcmw4x3a5oz6c177cv",
+        "tcmw4x3a5mn76sbjj6"
+      ]
+    },
+    {
+      "id": "hcmw4x3a60nvdj1c1e",
+      "nombre": "Confección del Certificado",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a60u3jol9yd",
+      "nombre": "Generar Oficio",
+      "explicacion": "Generar oficio junto con la relación de alumnado absentista",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a60lv715468",
+      "nombre": "Revisar y escanear protocolos",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a61lp7e5w49",
+      "nombre": "Registrar en Séneca",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a61lghibela",
+      "nombre": "Enviar por Correo Centro",
+      "explicacion": "Enviar por correo corporativo a Servicios Sociales",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a61q8ta8cii",
+      "nombre": "Solicitud",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a61w2dge8od",
+      "nombre": "Generación del Informe",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5o746gnhjy",
+        "tcmw4x3a5oaciztcdb"
+      ]
+    },
+    {
+      "id": "hcmw4x3a629x5q6ucr",
+      "nombre": "Envío del Informe",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5o0zw04w2j"
+      ]
+    },
+    {
+      "id": "hcmw4x3a62grmg37tz",
+      "nombre": "Recepción de la Comunicación de Incidente",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5on33bxxeg",
+        "tcmw4x3a5ohgs3wa5e"
+      ]
+    },
+    {
+      "id": "hcmw4x3a62jjab2bvf",
+      "nombre": "Envío de la Comunicación",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5p2dujs1uc",
+        "tcmw4x3a5p2uebjc3u",
+        "tcmw4x3a5puj46g447",
+        "tcmw4x3a5pwqw9dglg"
+      ]
+    },
+    {
+      "id": "hcmw4x3a62bopqfmx3",
+      "nombre": "Recepción solicitud",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a6217qxhmca",
+      "nombre": "Generación de la credencial",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a62ehc9omek",
+      "nombre": "Entrega de la credencial",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a63o1zmw349",
+      "nombre": "Digitalización del documento",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a63e0qrldpv",
+      "nombre": "Anotar en Séneca",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a63h4bgretm",
+      "nombre": "Generar relación alumnado",
+      "explicacion": "Generar relación de alumnado de 3º ESO en adelante, con diligencia de totales firmada por Secretería",
+      "tareas": [
+        "tcmw4x3a5pzu348kmz",
+        "tcmw4x3a5pckhygbk8",
+        "tcmw4x3a5m47mehw42"
+      ]
+    },
+    {
+      "id": "hcmw4x3a631i0d61jq",
+      "nombre": "Registro de salida",
+      "explicacion": "Registro de salida a Tesorería y envío a Secretaría para el pago",
+      "tareas": [
+        "tcmw4x3a5mhp02l6pz",
+        "tcmw4x3a5qrmdhpwpp"
+      ]
+    },
+    {
+      "id": "hcmw4x3a63w15su07j",
+      "nombre": "Justificante pago y presentación",
+      "explicacion": "Registrar salida el Recibo de Liquidación y Justificante de presentación",
+      "tareas": [
+        "tcmw4x3a5qu0sw3jnt",
+        "tcmw4x3a5i1xjzjz5a"
+      ]
+    },
+    {
+      "id": "hcmw4x3a63puikval8",
+      "nombre": "Recoger la solicitud",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5i1xjzjz5a",
+        "tcmw4x3a5m0vxfgrwq",
+        "tcmw4x3a5mo8dq7t2w",
+        "tcmw4x3a5mn76sbjj6",
+        "tcmw4x3a5m33ee6qs3",
+        "tcmw4x3a5q4et2bfh7"
+      ]
+    },
+    {
+      "id": "hcmw4x3a6479bqgdvb",
+      "nombre": "Resolver o remitir, según el supuesto",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5q0srojoeh",
+        "tcmw4x3a5q2khwre96",
+        "tcmw4x3a5qoqslz6xh",
+        "tcmw4x3a5mhp02l6pz",
+        "tcmw4x3a5qub9xxt7f"
+      ]
+    },
+    {
+      "id": "hcmw4x3a64y2b0nqqk",
+      "nombre": "Anotar en el expediente y en Séneca",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5rkyc98vbk",
+        "tcmw4x3a5r4kgf0vl2",
+        "tcmw4x3a5riml1eb7c"
+      ]
+    },
+    {
+      "id": "hcmw4x3a641abrxe3w",
+      "nombre": "Comunicar a la familia y a la tutoría",
+      "explicacion": "",
+      "tareas": [
+        "tcmw4x3a5sb9ll59wt",
+        "tcmw4x3a5sv965w5r8",
+        "tcmw4x3a5syvje1rcf",
+        "tcmw4x3a5s3v5ln793"
+      ]
+    },
+    {
+      "id": "hcmw4x3a64j6qezt5f",
+      "nombre": "Descargar el documento",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a64kj0a9gig",
+      "nombre": "Enviar por mail al Destinatario",
+      "explicacion": "En el cuerpo del mensaje hay que poner:<div><ul><li>Remitente</li><li>Registro</li><li>Lo que ponga en observaciones en el Registro de Entrada</li></ul></div>",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a65dh2l9w7d",
+      "nombre": "Recepción",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a65mvs9e37f",
+      "nombre": "Enviar correo al profesor",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw4x3a65lt0yl2ni",
+      "nombre": "Enviar a Dirección",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmw94b6toxdncncpt",
+      "nombre": "Enviar al Dpto. Orientación",
+      "explicacion": "",
+      "tareas": []
+    },
+    {
+      "id": "hcmwc8puuy3vnfpda1",
+      "nombre": "Recibir el encargo de Dirección",
+      "explicacion": "<p>Dirección pide la baja. Se reúne el documento que acredita el traslado y los datos de la baja.</p>",
+      "tareas": [
+        "tcmwc8pu98fgfmo24p",
+        "tcmwc8pu99d0bo78ov"
+      ]
+    },
+    {
+      "id": "hcmwc8puuyipua2xef",
+      "nombre": "Preparar la resolución",
+      "explicacion": "<p>Se genera la resolución con los datos del asunto.</p>",
+      "tareas": [
+        "tcmwc8pu99d9kqfajk"
+      ]
+    },
+    {
+      "id": "hcmwc8puuzjfyuzed4",
+      "nombre": "Firma de Dirección",
+      "explicacion": "<p>La Dirección firma la resolución.</p>",
+      "tareas": [
+        "tcmw4x3a5m47mehw42"
+      ]
+    },
+    {
+      "id": "hcmwc8puuzh645o9wc",
+      "nombre": "Baja en Séneca",
+      "explicacion": "<p>Se graba la baja en Séneca.</p>",
+      "tareas": [
+        "tcmwc8pu9bivithb2p"
+      ]
+    },
+    {
+      "id": "hcmwc8puv01j8wh8uz",
+      "nombre": "Comunicar",
+      "explicacion": "<p>Se envía la resolución a la familia y, si se inició el protocolo de absentismo, a Servicios Sociales.</p>",
+      "tareas": [
+        "tcmwc8pu9cz136g0w3",
+        "tcmwc8pu9cgowy5eyj"
+      ]
+    }
+  ],
+  "_esquema": 1
+}
