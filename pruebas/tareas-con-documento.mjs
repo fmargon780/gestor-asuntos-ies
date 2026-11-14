@@ -184,10 +184,10 @@ await comprobar('5. la versión existe en _Previas (no sale «ya no está»)',
 /* ===== 6. Nueva tarea con «Qué se hace»; Cambiar; Pasar a la guía ===== */
 console.log('--- 6. «Qué se hace» ---');
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();   /* fila 638: el formulario se abre con «+ Añadir tarea» */
-await pagina.locator('#guion-nueva-tarea').fill('Registrar la entrada del acuse');
-await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('registrar');
+await pagina.locator('.tcd-nueva .at-nombre').fill('Registrar la entrada del acuse');
+await pagina.locator('.hito-en-mesa .tcd-nueva .at-que').fill('Registrar · Séneca · Registro');
 await pagina.locator('.hito-en-mesa .tcd-nueva .guion-receta-sentido').selectOption('entrada');
-await pagina.locator('.hito-en-mesa .tcd-anadir').click();
+await pagina.locator('.hito-en-mesa .tcd-nueva .at-anadir').click();
 await pagina.waitForTimeout(1800);
 const nueva = () => pagina.evaluate(async () => {
   const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
@@ -198,11 +198,12 @@ const nueva = () => pagina.evaluate(async () => {
 const n1 = await nueva();
 await comprobar('6. la tarea nueva es «solo aquí», de registrar, con su dato', n1 && [n1.propio, n1.accion, n1.receta], [true, 'registrar', { sentido: 'entrada' }]);
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();
-await comprobar('6. el formulario se cerró al añadir, y al abrirlo otra vez vuelve a «Otra cosa»', pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').inputValue(), '');
+await comprobar('6. el formulario se cerró al añadir, y al abrirlo otra vez vuelve a «Otra cosa»', pagina.locator('.hito-en-mesa .tcd-nueva .at-que').inputValue(), '');
 await comprobar('6. sin elegir nada, una tarea nueva sale como siempre (sin acción)',
   (async () => {
-    await pagina.locator('#guion-nueva-tarea').fill('Llamar a la familia');
-    await pagina.locator('#guion-nueva-tarea').press('Enter');
+    await pagina.locator('.tcd-nueva .at-que').fill('Otra cosa');
+    await pagina.locator('.tcd-nueva .at-nombre').fill('Llamar a la familia');
+    await pagina.locator('.tcd-nueva .at-nombre').press('Enter');
     await pagina.waitForTimeout(1500);
     return pagina.evaluate(async () => {
       const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
@@ -221,38 +222,26 @@ await pagina.waitForTimeout(1200);
 /* Cambiar: «Qué se hace» y su dato. */
 await lineaDe(n1.id).locator('.guion-tarea-menu-boton').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar' }).first().click();
-await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .tcd-accion');
+await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .at-que');
 await comprobar('6. con «Cambiar» abierto, el documento de las otras tareas no cambia (sin «ya no está»)',
   pagina.$$eval('.hito-en-mesa .tcd', (l) => l.map((x) => /ya no está|\.docx/.test(x.innerText)).filter(Boolean).length), 0);
 await comprobar('6. «Cambiar» enseña «Qué se hace» y su dato como están', pagina.evaluate(() => {
   const c = document.querySelector('.hito-en-mesa .guion-tarea-editar');
-  return [c.querySelector('.tcd-accion').value, c.querySelector('.guion-receta-sentido').value];
-}), ['registrar', 'entrada']);
+  return [c.querySelector('.at-que').value, c.querySelector('.guion-receta-sentido').value];
+}), ['Registrar · Séneca · Registro', 'entrada']);
 await pagina.locator('.hito-en-mesa .guion-tarea-editar .guion-receta-sentido').selectOption('salida');
 await pagina.locator('.hito-en-mesa .guion-tarea-editar-guardar').click();
 await pagina.waitForTimeout(1500);
 const n2 = await nueva();
 await comprobar('6. «Cambiar» guarda el dato nuevo solo en este asunto', n2 && [n2.propio, n2.accion, n2.receta], [true, 'registrar', { sentido: 'salida' }]);
-/* Pasar a la guía. */
-await lineaDe(n1.id).locator('.guion-tarea-menu-boton').click();
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar a la guía' }).first().click();
-await pagina.waitForTimeout(2500);
-const trasPasar = await pagina.evaluate(async () => {
-  const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
-  const h = (await Hitos.hitosDe(a.nombre))[0];
-  const paso = GuiasDelCentro.pasosDe('CERTIFICADO DE NOTAS').filter((p) => p.id === h.origenGuia)[0];
-  const enGuia = paso && paso.guion.filter((g) => g.texto === 'Registrar la entrada del acuse')[0];
-  const g = Hitos.guionDe(a, h).filter((x) => x.texto === 'Registrar la entrada del acuse')[0];
-  return { guia: enGuia ? [enGuia.accion, enGuia.receta] : null, propio: g ? g.propio : null, docEnAsunto: !!(g && h.guionDocumento && h.guionDocumento[g.id]), idCambio: g ? g.id !== undefined : false };
-});
-await comprobar('6. «Pasar a la guía» lleva «Qué se hace» y su dato a la guía', trasPasar.guia, ['registrar', { sentido: 'salida' }]);
-await comprobar('6. la tarea ya no es «solo aquí» y el documento se queda en el asunto', [trasPasar.propio, trasPasar.docEnAsunto], [false, true]);
+/* (Fila 660: «Pasar a la guía» ya no existe; la tarea «solo aquí» se queda en el asunto con su documento.) */
 
 /* ===== 7. Cambiar una tarea de la guía ===== */
 console.log('--- 7. «Cambiar» de una tarea de la guía ---');
+await pagina.evaluate(async () => { await MarcaGuia.poner(Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0], true); });   /* fila 660: con la marca de la guía encendida */
 await lineaDe('g-hacer-registrar').locator('.guion-tarea-menu-boton').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar' }).first().click();
-await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .tcd-accion');
+await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .at-que');
 await pagina.locator('.hito-en-mesa .guion-tarea-editar .guion-receta-sentido').selectOption('salida');
 await pagina.locator('.hito-en-mesa .guion-tarea-editar-guardar').click();
 await pagina.waitForTimeout(2500);

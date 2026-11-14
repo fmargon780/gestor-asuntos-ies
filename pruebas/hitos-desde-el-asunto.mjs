@@ -1,19 +1,18 @@
 /* Prueba en navegador de verdad de la fila 206 de docs/COLA.md
-   (docs/HITOS-DESDE-EL-ASUNTO.md): crear, cambiar y borrar hitos desde
-   la mesa de un asunto, con «Colocar después de» y el reparto a la
+   (docs/HITOS-DESDE-EL-ASUNTO.md): cambiar y borrar hitos desde la mesa de un asunto, con «Colocar después de» y el reparto a la
    guía y a los asuntos abiertos, solo donde el hito está vacío.
 
-   A. Crear con guía: llega en su sitio a otro asunto abierto del tipo.
-   B. Crear solo en este asunto (casilla «Solo para este asunto»): no toca la guía ni el otro asunto.
+   Fila 660 (docs/660-CREAR-HITOS-Y-TAREAS-DESDE-EL-ASUNTO.md): crear un hito ya no tiene su cuadro propio («+ Añadir hito» es
+   paso a paso, js/anadir-hito.js, y lo prueba pruebas/crear-hitos-y-tareas.mjs) y a dónde va un cambio lo dice la marca de la
+   guía, que aquí está encendida. Los hitos nuevos de A y B se crean con lo que hacía el cuadro de antes (la guía del tipo / solo aquí).
+
+   A. Un hito de la guía llega en su sitio a otro asunto abierto del tipo.
+   B. Un hito solo de este asunto no toca la guía ni el otro asunto.
    C. Cambiar (con guía): se cambia y se mueve en el vacío; el que
       tiene trabajo no se toca.
    D. Borrar: apagado con trabajo; sin preguntar, se va de la guía y
       del abierto vacío, se queda en el que tiene trabajo.
-   (Fila 416: sin «¿Dónde se guarda?»; la guía manda.)
-   E. (fila 224) Crear buscando en la biblioteca: al escribir parte de
-      un título que ya existe ahí, sale para elegirlo; al elegirlo, el
-      hito nace con lo del modelo (aquí, su responsable) y también en
-      la guía. */
+   (Fila 416: sin «¿Dónde se guarda?»; la guía manda.) */
 import { chromium } from 'playwright';
 import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
@@ -130,17 +129,6 @@ async function abrirMas() {
 /* La mesa se repinta sola de vez en cuando y, con la máquina cargada, el menú se desprendía a mitad de clic:
    se pulsa de una vez, dentro de la página, y si no se abre el cuadro se vuelve a abrir el menú. */
 async function elegirDelMenu(texto) {
-  /* Fila 553: «Crear» ya no está en «Hito ▾» (los hitos nuevos salen de «+ Añadir hito»); el cuadro de siempre se abre directamente. */
-  if (texto === 'Crear') {
-    await pagina.evaluate(async () => {
-      const id = document.querySelector('.hito-en-mesa').dataset.id;
-      for (const x of App.E.listaAbiertos) {
-        if ((await Hitos.hitosDe(x.nombre)).some((h) => h.id === id)) { HitosDesdeElAsunto.abrirCrear(x, id); return; }
-      }
-    });
-    await pagina.waitForSelector('#capa:not(.oculto)');
-    return;
-  }
   for (let intento = 0; intento < 5; intento++) {
     if (intento) { await pagina.keyboard.press('Escape'); await pagina.waitForTimeout(400); }
     try { await abrirMas(); } catch (e) { continue; }
@@ -156,19 +144,24 @@ async function elegirDelMenu(texto) {
   throw new Error('No he conseguido elegir «' + texto + '» en el menú de la mesa');
 }
 
-/* ========== A. Crear con guía: en su sitio, y llega a otro abierto ========== */
+/* ========== A. Un hito de la guía: en su sitio, y llega a otro abierto ========== */
 
+/* Lo que hacía el cuadro «Crear un hito» (fila 206) con guía: el paso entra en la guía, detrás de `ancla`, y se reparte. */
+async function crearConGuia(nombreCorto, titulo, ancla) {
+  await pagina.evaluate(async ([titulo, ancla, asunto]) => {
+    const a = App.E.listaAbiertos.filter((x) => x.nombre === asunto)[0];
+    const N = HitosDesdeElAsuntoNucleo, tipo = 'CONVALIDACION';
+    const nivel = N.nivelSuperior(await Hitos.hitosDe(a.nombre));
+    const pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
+    const nuevo = Guias.normalizar([{ titulo }])[0];
+    N.colocarTrasAncla(pasos, nuevo, N.pasoAnclaDeHito(nivel, ancla));
+    await GuiasDelCentro.guardarPasos(tipo, pasos, { claveActual: a.nombre });
+  }, [titulo, ancla, ASUNTO_1]);
+  await pagina.waitForTimeout(400);
+}
+await pagina.evaluate(async (a) => { await MarcaGuia.poner(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], true); }, ASUNTO_1);
 await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('Crear');
-await pagina.fill('#hda-titulo', 'Recabar la documentación');
-await pagina.selectOption('#hda-despues', 'c1');
-/* Fila 416: sin pregunta «¿Dónde se guarda?»; solo la casilla «Solo para este asunto», desmarcada. */
-await comprobar('A. sin la pregunta «¿Dónde se guarda?» ni la casilla vieja',
-  pagina.evaluate(() => !document.querySelector('.dsg') && !document.querySelector('#hda-tambien-guia')), true);
-await comprobar('A. la casilla «Solo para este asunto» sale desmarcada',
-  pagina.evaluate(() => { const c = document.querySelector('#hda-solo-aqui'); return c ? c.checked : 'NO ESTA'; }), false);
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(400);
+await crearConGuia('Actual', 'Recabar la documentación', 'c1');
 
 const trasCrearA1 = await leerHitos(ASUNTO_1);
 await comprobar('A. el hito nuevo entra justo detrás de c1, en este asunto',
@@ -190,14 +183,12 @@ await pagina.evaluate(async ([a3, id]) => {
   await Hitos.anadirNota(a3, h.id, 'Ya he empezado a mirarlo.');
 }, [ASUNTO_3, idNuevo]);
 
-/* ========== B. Crear solo en este asunto: no toca la guía ni el otro ========== */
+/* ========== B. Un hito solo de este asunto: no toca la guía ni el otro ========== */
 
-await volver();
-await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('Crear');
-await pagina.fill('#hda-titulo', 'Nota solo mía');
-await pagina.check('#hda-solo-aqui');
-await pagina.click('#cuadro-aceptar');
+await pagina.evaluate(async (asunto) => {
+  const nuevo = Hitos.normalizarHito({ titulo: 'Nota solo mía', cuerpo: '', clase: 'paso', estado: 'pendiente' });
+  await Hitos.cambiar((d) => { HitosDesdeElAsuntoNucleo.colocarTrasAncla(d.porAsunto[asunto].hitos, nuevo, 'c1'); return d; });
+}, ASUNTO_1);
 await pagina.waitForTimeout(400);
 
 await comprobar('B. el hito solo-asunto no lleva origenGuia',
@@ -251,32 +242,6 @@ await comprobar('D. se va de este asunto', leerHitos(ASUNTO_1).then((hs) => hs.s
 await comprobar('D. se va del asunto vacío', leerHitos(ASUNTO_2).then((hs) => hs.some((h) => h.id === idNuevo)), false);
 await comprobar('D. se queda en el que tenía trabajo', leerHitos(ASUNTO_3).then((hs) => hs.some((h) => h.id === idNuevo)), true);
 await comprobar('D. se va de la guía', leerGuia().then((g) => g.some((p) => p.id === idNuevo)), false);
-
-/* ========== E. Crear buscando en la biblioteca (fila 224) ========== */
-
-await volver();
-await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('Crear');
-await pagina.fill('#hda-titulo', 'Firma');
-await pagina.waitForSelector('.hda-biblioteca-resultados:not(.oculto) .hda-biblioteca-opcion');
-await comprobar('E. sale el modelo de la biblioteca que casa con lo escrito',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.hda-biblioteca-opcion'), (b) => b.textContent)),
-  ['Firma de Secretaría']);
-await pagina.click('.hda-biblioteca-opcion');
-await comprobar('E. al elegirlo, el título del campo pasa a ser el suyo',
-  pagina.inputValue('#hda-titulo'), 'Firma de Secretaría');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(400);
-
-const trasBiblioteca = await leerHitos(ASUNTO_1);
-const nuevoDeBiblioteca = trasBiblioteca.filter((h) => h.titulo === 'Firma de Secretaría')[0];
-await comprobar('E. el hito nace con el título del modelo', Promise.resolve(!!nuevoDeBiblioteca), true);
-await comprobar('E. nace también en la guía', Promise.resolve(!!(nuevoDeBiblioteca && nuevoDeBiblioteca.origenGuia)), true);
-await comprobar('E. y con el responsable del modelo', pagina.evaluate(async (idOrigen) => {
-  const g = await Carpetas.leerJson(App.E.gestor, 'guias.json');
-  const p = g.CONVALIDACION.filter((x) => x.id === idOrigen)[0];
-  return p ? p.responsable : null;
-}, nuevoDeBiblioteca.origenGuia), 'secretaria');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await pagina.close();

@@ -191,6 +191,11 @@
     'js/sitios-guardado.js',
     'js/sitios-ventana.js',
     'js/donde-campo.js',
+    // Fila 660 (docs/660-CREAR-HITOS-Y-TAREAS-DESDE-EL-ASUNTO.md): la marca de la guía, las fases y los dos «+ Añadir».
+    'js/marca-guia.js',
+    'js/fases.js',
+    'js/anadir-tarea.js',
+    'js/anadir-hito.js',
     // Fila 531 (docs/531-TAREAS-E-HITOS-COMUNES.md): las listas comunes de tareas y de hitos.
     'js/comunes.js',
     'js/comunes-guardado.js',

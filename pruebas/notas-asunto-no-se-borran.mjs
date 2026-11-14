@@ -134,23 +134,23 @@ await pagina.waitForSelector('#ficha-guia .tcd-abrir-form');
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.click('#ficha-guia .tcd-abrir-form');
-await pagina.waitForSelector('#guion-nueva-tarea');
-await pagina.click('#guion-nueva-tarea');
+await pagina.waitForSelector('.tcd-nueva .at-nombre');
+await pagina.click('.tcd-nueva .at-nombre');
 await pagina.keyboard.type('Me lo mandan el lunes', { delay: 5 });
 await pagina.evaluate(() => {
-  document.getElementById('guion-nueva-tarea').setSelectionRange(6, 6);
+  document.querySelector('.tcd-nueva .at-nombre').setSelectionRange(6, 6);
 });
 
 await repasosAutomaticos();
 await pagina.waitForTimeout(300);
 
 await comprobar('4. lo escrito en el hito sigue ahí',
-  pagina.inputValue('#guion-nueva-tarea'), 'Me lo mandan el lunes');
+  pagina.inputValue('.tcd-nueva .at-nombre'), 'Me lo mandan el lunes');
 await comprobar('4. el campo del hito sigue teniendo el foco',
-  pagina.evaluate(() => document.activeElement === document.getElementById('guion-nueva-tarea')), true);
+  pagina.evaluate(() => document.activeElement === document.querySelector('.tcd-nueva .at-nombre')), true);
 await comprobar('4. el cursor del campo sigue donde estaba',
   pagina.evaluate(() => {
-    const c = document.getElementById('guion-nueva-tarea');
+    const c = document.querySelector('.tcd-nueva .at-nombre');
     return [c.selectionStart, c.selectionEnd];
   }), [6, 6]);
 await comprobar('4. el hito sigue desplegado',

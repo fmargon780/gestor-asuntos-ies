@@ -35,7 +35,7 @@ var ComunesGuia = (function () {
     var anadirHito = document.getElementById('guia-anadir-comun');
     if (anadirHito) anadirHito.onclick = function () {
       ComunesVentana.abrir({
-        clase: 'hito', titulo: 'Elegir un hito', tipo: ctx.nombreTipo,
+        clase: 'hito', titulo: 'Hitos de la lista', tipo: ctx.nombreTipo,
         alElegir: async function (hc) {
           try {
             var listas = await ComunesGuardado.leer();
@@ -60,7 +60,7 @@ var ComunesGuia = (function () {
       if (b.classList.contains('comunes-anadir-tarea-guia')) {
         if (isNaN(i)) return;
         ComunesVentana.abrir({
-          clase: 'tarea', titulo: 'Elegir una tarea', tipo: ctx.nombreTipo,
+          clase: 'tarea', titulo: 'Tareas de la lista', tipo: ctx.nombreTipo,
           alElegir: function (t) {
             ctx.recoger();
             var paso = ctx.nivel()[i];

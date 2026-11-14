@@ -89,7 +89,7 @@ await p.click('.tcd-abrir-form');
 const NOMBRES = ['Generar documento', 'Poner a la firma', 'Registrar', 'Enviar', 'Añadir documento', 'Rellenar datos del asunto', 'Llamar', 'Grabar o cambiar datos', 'Entregar', 'Recoger',
   'Publicar', 'Cobrar o pagar', 'Comprobar', 'Archivar', 'Otra cosa'];
 await comprobar('2a. «+ Añadir tarea»: «Qué se hace» trae los nombres nuevos en orden, con «Archivar» y «Recoger»',
-  p.evaluate(() => [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent)), NOMBRES);
+  p.evaluate(() => [...new Set(AnadirTarea.entradas([]).map((e) => e.texto.split(' · ')[0]))]), NOMBRES);
 await comprobar('2b. la lista común y la guía dicen lo mismo (con «Copiar a otra carpeta» en su sitio)', p.evaluate(() => [Comunes.HACE.map((x) => x.texto), GuiasGuion.ACCIONES.map((x) => x.texto)]),
   [[...NOMBRES.slice(0, 6), 'Copiar a otra carpeta', ...NOMBRES.slice(6)], [...NOMBRES.slice(0, 6), 'Copiar a otra carpeta', ...NOMBRES.slice(6)]]);
 await comprobar('2c. las fases dicen «Generar documento» y «Grabar o cambiar datos»', p.evaluate(() => [Comunes.textoDeFase('elaborar'), Comunes.textoDeFase('seneca'), Comunes.textoDeFase('firma')]), ['Generar documento', 'Grabar o cambiar datos', 'Poner a la firma']);
@@ -99,7 +99,8 @@ await comprobar('2d. los valores de dentro no cambian y «Recoger» y «Archivar
 
 console.log('--- 3. «Dónde se hace» ---');
 const cual = (a) => p.evaluate((a) => {
-  const s = document.querySelector('.tcd-accion'); s.value = a; s.dispatchEvent(new Event('change', { bubbles: true }));
+  const e = AnadirTarea.entradas([]).filter((x) => x.accion === a)[0];
+  const s = document.querySelector('.tcd-nueva .at-que'); s.value = e.texto; s.dispatchEvent(new Event('input', { bubbles: true }));
   const q = (c) => document.querySelector('.tcd-nueva ' + c);
   return { donde: q('.donde-sitio') ? q('.donde-sitio').value : null, documento: !!q('.donde-documento'), aQuien: !!q('.donde-a-quien') };
 }, a);
@@ -120,10 +121,10 @@ await comprobar('3c. el sitio se puede cambiar y vaciar; escribir algo que no es
   await p.fill('.tcd-nueva .donde-sitio', ''); await p.press('.tcd-nueva .donde-sitio', 'Tab');
   return [a, b, await p.inputValue('.tcd-nueva .donde-sitio')];
 })(), ['Correo postal', '', '']);
-await comprobar('3d. si el sitio se había cambiado a mano, al cambiar la acción no se pisa', (async () => {
+await comprobar('3d. al elegir otra entrada de «Qué se hace» (fila 660), se rellenan el qué y el sitio de esa entrada', (async () => {
   await cual('registrar'); await p.fill('.tcd-nueva .donde-sitio', 'Correo postal'); await p.press('.tcd-nueva .donde-sitio', 'Tab');
   return (await cual('publicar')).donde;
-})(), 'Correo postal');
+})(), 'Tablón');
 await comprobar('3e. «Qué documento» solo acepta tipos de documento de la app', (async () => {
   await cual('registrar');
   const tipos = await p.evaluate(() => App.E.tiposDocumento.slice(0, 2));
@@ -135,12 +136,12 @@ await comprobar('3e. «Qué documento» solo acepta tipos de documento de la app
 
 console.log('--- 4. «A quién» de una tarea de llamar ---');
 const NOMBRE = 'Llamar a la familia 659';
-await p.click('.tcd-cancelar-form');
+await p.click('.tcd-nueva .at-cancelar');
 await p.click('.tcd-abrir-form');
 await cual('llamar');
-await p.fill('#guion-nueva-tarea', NOMBRE);
+await p.fill('.tcd-nueva .at-nombre', NOMBRE);
 await p.fill('.tcd-nueva .donde-a-quien', 'Familia'); await p.press('.tcd-nueva .donde-a-quien', 'Tab');
-await p.click('.tcd-anadir');
+await p.click('.tcd-nueva .at-anadir');
 await p.waitForSelector('.guion-paso:has(.guion-paso-texto:text-is("' + NOMBRE + '"))');
 const tarea = (n) => p.locator('.guion-paso', { has: p.locator('.guion-paso-texto', { hasText: n }) });
 await comprobar('4a. la tarea enseña su acción y su sitio, uno junto al otro', p.evaluate((n) => {
@@ -162,10 +163,10 @@ await p.waitForTimeout(400);
 console.log('--- 5. «Enviar» según su sitio ---');
 async function anadirEnviar(nombre, sitio) {
   await p.click('.tcd-abrir-form');
-  await p.fill('#guion-nueva-tarea', nombre);
-  await p.selectOption('.tcd-accion', 'comunicar');
+  await p.fill('.tcd-nueva .at-que', 'Enviar · Correo electrónico');
+  await p.fill('.tcd-nueva .at-nombre', nombre);
   await p.fill('.tcd-nueva .donde-sitio', sitio); await p.press('.tcd-nueva .donde-sitio', 'Tab');
-  await p.click('.tcd-anadir');
+  await p.click('.tcd-nueva .at-anadir');
   await p.waitForSelector('.guion-paso:has(.guion-paso-texto:text-is("' + nombre + '"))');
 }
 const boton = (n) => p.evaluate((n) => {
@@ -186,7 +187,7 @@ await comprobar('5b. la tarea de correo postal se marca a mano', (async () => {
 
 console.log('--- 6. la ventana «Sitios» ---');
 await p.click('.tcd-abrir-form');
-await p.selectOption('.tcd-accion', 'registrar');
+await p.fill('.tcd-nueva .at-que', 'Registrar · Séneca · Registro');
 await p.click('.tcd-nueva .donde-ver-todos');
 await p.waitForSelector('.sitios-capa #sv-mapa .sitio', { timeout: 8000 });
 await comprobar('6a. el mapa: Séneca con sus cinco zonas y el resto de sitios, cada uno con su cuenta; no hay «Otro sitio»', p.evaluate(() => {
@@ -223,7 +224,7 @@ await p.click('#sv-igual').catch(() => {});   /* «Sede electrónica» se parece
 await p.waitForSelector('.sitios-capa', { state: 'detached' });
 await comprobar('6f. desde la tarea, crear una zona de Séneca la deja elegida en la tarea y en el mapa', p.evaluate(() => [document.querySelector('.tcd-nueva .donde-sitio').value,
   Sitios.opciones(Sitios.datos()).map((o) => o.texto).filter((t) => /Sede/.test(t))]), ['Séneca · Sede electrónica', ['Séneca · Sede electrónica']]);
-await p.click('.tcd-cancelar-form');
+await p.click('.tcd-nueva .at-cancelar');
 
 await comprobar('6g. cambiar el nombre de un sitio lo cambia en la tarea (van por id)', (async () => {
   await p.evaluate(() => SitiosVentana.abrir({}));

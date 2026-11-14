@@ -57,6 +57,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-membrete', donde: 'centro', otras: 'logo, cabecera, Junta, Consejería' },
     { id: 'bloque-sello', donde: 'centro', otras: 'tamaño, centímetros, sello de registro' },
     { id: 'bloque-hitos', donde: 'centro', otras: 'festivos, días no lectivos, vacaciones, responsables, plazos, hitos' },
+    { id: 'bloque-fases', donde: 'centro', otras: 'fases, hitos, recibir, pedir, comprobar, archivar, añadir hito' },   /* fila 660 */
     { id: 'bloque-sitios', donde: 'centro', otras: 'dónde se hace, sitios, zonas, Séneca, iPasen, correo, en mano, tareas' },   /* fila 659 */
     { id: 'bloque-dias-aviso', donde: 'centro', otras: 'dormidos, vencimiento, antelación, papelera, registro' },
     { id: 'bloque-copias', donde: 'centro', otras: 'copia, restaurar, recuperar, caducidad' },

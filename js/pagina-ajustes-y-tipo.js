@@ -64,6 +64,21 @@ document.write(`
         </div>
       </details>
 
+      <!-- Fila 660 (docs/660-CREAR-HITOS-Y-TAREAS-DESDE-EL-ASUNTO.md): las fases de los hitos. Las nuevas se crean solo aquí. La lista la pinta js/fases.js. -->
+      <details class="bloque-ajustes" id="bloque-fases">
+        <summary>
+          <span class="bloque-titulo">Fases</span>
+          <span class="bloque-pie">Las fases en que se agrupan los hitos al añadir uno a un asunto</span>
+        </summary>
+        <div class="bloque-cuerpo">
+          <p class="explica">Al añadir un hito a un asunto se elige primero su fase. Las fijas no se borran; aquí se crean las nuevas.</p>
+          <div id="fases-lista"></div>
+          <label class="etiqueta" for="fases-nombre">Fase nueva</label>
+          <div class="en-linea"><input id="fases-nombre" class="campo" placeholder="Por ejemplo: Reclamar" autocomplete="off"> <button type="button" class="boton" id="fases-anadir" data-solo-lectura>+ Fase nueva</button></div>
+          <div id="fases-aviso"></div>
+        </div>
+      </details>
+
       <!-- Fila 659 (docs/659-DONDE-SE-HACE-Y-NOMBRES.md): el mapa de sitios donde se hacen las tareas. La ventana
            la pinta js/sitios-ventana.js. -->
       <details class="bloque-ajustes" id="bloque-sitios">

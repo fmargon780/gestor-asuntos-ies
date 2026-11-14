@@ -128,16 +128,6 @@ async function abrirMas() {
 
 async function elegirDelMenu(texto) {
   /* Fila 553: «Crear» ya no está en «Hito ▾» (los hitos nuevos salen de «+ Añadir hito»); el cuadro de siempre se abre directamente. */
-  if (texto === 'Crear') {
-    await pagina.evaluate(async () => {
-      const id = document.querySelector('.hito-en-mesa').dataset.id;
-      for (const x of App.E.listaAbiertos) {
-        if ((await Hitos.hitosDe(x.nombre)).some((h) => h.id === id)) { HitosDesdeElAsunto.abrirCrear(x, id); return; }
-      }
-    });
-    await pagina.waitForSelector('#capa:not(.oculto)');
-    return;
-  }
   await abrirMas();
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: texto }).first().click();
   await pagina.waitForSelector('#capa:not(.oculto)');
@@ -151,6 +141,8 @@ const PONER = (html) => pagina.evaluate((h) => { document.getElementById('hda-cu
 
 /* ========== 1. «Cambiar» trae la explicación, con sus viñetas ========== */
 
+/* Fila 660: a dónde va un cambio lo dice la marca de la guía; aquí está encendida. */
+await pagina.evaluate(async (a) => { await MarcaGuia.poner(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], true); }, ASUNTO_1);
 await abrirMesaDe('Actual', 'c1');
 await comprobar('0. la mesa enseña la explicación con sus viñetas',
   pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .hito-explicacion li').length), 2);
@@ -203,41 +195,7 @@ await abrirMesaDe('Actual', 'c2');
 await comprobar('4. al volver a abrir la mesa, la explicación sigue aquí',
   pagina.evaluate(() => document.querySelector('.hito-en-mesa .hito-explicacion').textContent.indexOf('Solo aquí') === 0), true);
 
-/* ========== 5. Crear solo en este asunto ========== */
-
-await volver();
-await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('Crear');
-await comprobar('5. «Crear» lleva la caja «Explicación» vacía', pagina.evaluate(() => ({ hay: !!document.getElementById('hda-cuerpo'), t: document.getElementById('hda-cuerpo').textContent })), { hay: true, t: '' });
-await pagina.fill('#hda-titulo', 'Nota con viñetas');
-await PONER('<p>Pasos:</p><ul><li>uno</li><li>dos</li></ul>');
-await pagina.check('#hda-solo-aqui');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
-const idNota = (await leerHitos(ASUNTO_1)).filter((h) => h.titulo === 'Nota con viñetas')[0].id;
-await comprobar('5. el hito nuevo guarda su explicación con viñetas', cuerpoHito(ASUNTO_1, idNota), '<p>Pasos:</p><ul><li>uno</li><li>dos</li></ul>');
-await volver();
-await abrirMesaDe('Actual', idNota);
-await comprobar('5. y la mesa la enseña con sus viñetas', pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .hito-explicacion li').length), 2);
-
-/* ========== 6. Crear desde la biblioteca ========== */
-
-await volver();
-await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('Crear');
-await pagina.fill('#hda-titulo', 'Firma');
-await pagina.waitForSelector('.hda-biblioteca-resultados:not(.oculto) .hda-biblioteca-opcion');
-await pagina.click('.hda-biblioteca-opcion');
-await comprobar('6. al elegir el modelo, la caja se rellena con su explicación',
-  pagina.evaluate(() => document.querySelectorAll('#hda-cuerpo li').length), 2);
-await PONER('<p>Con el sello, cambiado:</p><ul><li>Sello</li></ul>');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(500);
-const firma = (await leerHitos(ASUNTO_1)).filter((h) => h.titulo === 'Firma de Secretaría')[0];
-await comprobar('6. el paso nuevo lleva el texto cambiado', cuerpoPaso(firma.origenGuia), '<p>Con el sello, cambiado:</p><ul><li>Sello</li></ul>');
-await comprobar('6. la biblioteca no se toca', pagina.evaluate(async () => {
-  const b = await Carpetas.leerJson(App.E.gestor, 'hitos-biblioteca.json'); return b.modelos[0].explicacion;
-}), '<p>Con el sello:</p><ul><li>Sello</li><li>Firma</li></ul>');
+/* (Fila 660: «Crear un hito» ya no tiene cuadro propio con «Explicación»: «+ Añadir hito» es paso a paso. Las secciones 5 y 6 de antes ya no existen.) */
 
 /* ========== 7. Vaciar la explicación ========== */
 

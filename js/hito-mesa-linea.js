@@ -79,7 +79,9 @@ var HitoMesaLinea = (function () {
     var boton = '';
     if (espera) boton = '<button type="button" class="boton boton-chico mesa-ya-llego"' + (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>Ya ha llegado</button>';
     else if (puedePonerEspera(a, h, hitos, ajustes, abierto, actual)) boton = '<button type="button" class="boton boton-chico mesa-esperando-a"' + (soloConsulta() ? ' disabled data-motivo-clave="consulta"' : '') + '>Esperando a…</button>';
+    var fase = window.Fases ? Fases.deHito(a, h) : '';
     return '<div class="mesa-linea mesa-etiquetas">' +
+      (fase ? '<span class="mesa-linea-fase">Fase: ' + esc(fase) + '</span><span class="mesa-meta-punto">·</span>' : '') +   /* fila 660 */
       (actual && window.EstadoHito ? EstadoHito.etiquetaPasoActualHTML() + '<span class="mesa-meta-punto">·</span>' : '') +
       estado + '<span class="mesa-meta-punto">·</span>' +
       '<button type="button" class="mesa-meta mesa-etq-plazo ' + plazo.clase + '">' + esc(plazo.texto) + '</button>' +

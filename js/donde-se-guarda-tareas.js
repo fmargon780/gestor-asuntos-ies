@@ -8,13 +8,12 @@
    cada tarea (js/hito-mesa-tarea-menu.js). Ya no sale ningún emergente
    «¿Dónde se guarda?»:
 
-   - «Nueva tarea…»: se guarda solo en este asunto, con su marca «solo aquí».
+   - Fila 660: lo decide la marca de la guía (js/marca-guia.js): encendida, nueva, cambiar, borrar (y subir y bajar) van a la guía
+     del tipo; apagada, se quedan solo en este asunto. Ya no existe «Pasar a la guía».
+   - «Nueva tarea…» (hasta la fila 660): se guardaba solo en este asunto, con su marca «solo aquí».
    - «Cambiar» y «Borrar» una tarea de la guía: van a la guía (la tarea
      vive en el paso, así que llega sola a todos los asuntos abiertos del
      tipo). Borrar una pregunta ya respondida en otros asuntos avisa antes.
-   - «Pasar a la guía» (la «⋮» de una tarea «solo aquí»): la lleva a la
-     guía; si el hito no está en la guía (un hito «solo aquí»), se lleva
-     entero con todas sus tareas (HitosDesdeElAsuntoGuia.llevarHitoEntero).
    - Cambiar o borrar una tarea «solo aquí»: se queda en el asunto.
    - Sin tipo, o con el hito dentro de una pregunta: solo en el asunto.
 
@@ -92,7 +91,6 @@ window.DondeSeGuardaTareas = (function () {
        antesDeTocar()   lo que se arregla en otros asuntos antes de tocar la guía
        enPaso(paso)     lo que se toca en el paso de la guía (hito en la guía)
        despues()        lo que se arregla en este asunto tras tocar la guía
-       antesLlevar()    (hito propio) lo que se cambia aquí antes de llevarlo entero
        deshacerAqui()   lo que «Deshacer» deja hecho en este asunto
        saltados         asuntos en los que no se tocará
      Devuelve true si se ha guardado. */
@@ -101,31 +99,15 @@ window.DondeSeGuardaTareas = (function () {
     var antes = await G.instantanea(ctx.tipo, a.nombre);
     var reg = { tipo: ctx.tipo, claveActual: a.nombre, antes: antes, aqui: o.deshacerAqui };
     if (o.antesDeTocar) await o.antesDeTocar();
-    if (ctx.enGuia) {
-      var hecho = await tocarPaso(a, h, ctx, o.enPaso);
-      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return false; }
-      if (o.despues) {
-        try { await o.despues(); } catch (err) { U.accesorio('Guardado en la guía, pero no he podido dejarlo así en este asunto', err); }
-      }
-    } else {
-      if (o.antesLlevar) await o.antesLlevar();
-      var r = await G.llevarHitoEntero(a, h);
-      reg.aqui = function () { return G.dejarComoEstaba(a.nombre, r.hitoAntes); };
+    var hecho = await tocarPaso(a, h, ctx, o.enPaso);
+    if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return false; }
+    if (o.despues) {
+      try { await o.despues(); } catch (err) { U.accesorio('Guardado en la guía, pero no he podido dejarlo así en este asunto', err); }
     }
     await G.avisarConDeshacer(
       G.textoGuardado(ctx.tipoCorto, DondeSeGuarda.otrosAbiertos(a).length, o.saltados || 0), reg);
     repintar();
     return true;
-  }
-
-  /* Una tarea «solo aquí» que «Deshacer» devuelve a este asunto, con su
-     marca de hecha si la tenía. */
-  async function devolverAqui(a, h, g, texto) {
-    var nuevo = await Hitos.anadirGuionPropio(a.nombre, h.id, texto);
-    var propia = nuevo && (nuevo.guionPropio || []).slice(-1)[0];
-    if (propia && (g.hecho || g.noaplica)) {
-      await Hitos.marcarGuion(a.nombre, h.id, propia.id, g.noaplica ? { noaplica: true } : { hecho: true });
-    }
   }
 
   function lineaParaLaGuia(g, texto) {
@@ -138,14 +120,33 @@ window.DondeSeGuardaTareas = (function () {
 
   /* ---------- Nueva tarea ---------- */
 
-  /* Siempre solo en este asunto, con su marca «solo aquí». `alElegir()` se
-     llama en cuanto se guarda (para vaciar la caja antes del repintado). */
+  /* La línea que entra en la guía: lo de `x` (qué se hace, dónde, qué documento, a quién…) con el texto dado. */
+  function lineaNuevaParaLaGuia(texto, x) {
+    x = x || {};
+    var l = lineaParaLaGuia({ explicacion: x.explicacion || '', accion: x.accion || '', normativa: x.normativa || null, receta: x.receta, reunir: x.reunir,
+      obligatorio: x.obligatorio, donde: x.donde, tipoDocumento: x.tipoDocumento, aQuien: x.aQuien }, texto);
+    if (x.comun) l.comun = x.comun;
+    return l;
+  }
+
+  /* Fila 660: con la marca «Los cambios en hitos y tareas van también a la guía» encendida (js/marca-guia.js) la tarea entra en la guía
+     del tipo (y la ven los próximos asuntos); apagada, o sin guía donde ponerla, se queda solo en este asunto, con su marca «solo aquí».
+     `extras`: { accion, receta, donde, tipoDocumento, aQuien, comun… }. `alElegir()` se llama en cuanto se guarda (para vaciar la caja). */
   async function nueva(a, h, texto, alElegir, extras) {
     texto = String(texto || '').trim();
     if (!texto) return false;
     try {
       if (alElegir) alElegir();
-      await Hitos.anadirGuionPropio(a.nombre, h.id, texto, extras);   /* fila 522: con «Qué se hace» y su dato, si se eligieron */
+      var ctx = window.MarcaGuia && MarcaGuia.enGuia(a) ? await contexto(a, h) : null;
+      if (ctx && ctx.tipo && ctx.enGuia) {
+        return await aLaGuia(a, h, ctx, {
+          enPaso: function (p) { p.guion = GuiasGuion.normalizar((p.guion || []).concat([lineaNuevaParaLaGuia(texto, extras)])); },
+          deshacerAqui: function () { return Promise.resolve(); }
+        });
+      }
+      var propias = extras ? Object.assign({}, extras) : extras;
+      if (propias) delete propias.comun;
+      await Hitos.anadirGuionPropio(a.nombre, h.id, texto, propias);   /* fila 522: con «Qué se hace» y su dato, si se eligieron */
       if (DondeSeGuarda.tipoDe(a)) U.aviso(SOLO_AQUI, 'bueno');
       repintar();
       return true;
@@ -176,7 +177,7 @@ window.DondeSeGuardaTareas = (function () {
       var propiaRaw = g.propio ? (h.guionPropio || []).filter(function (x) { return x.id === g.id; })[0] : null;
       var idOriginal = propiaRaw && propiaRaw.enLugarDe;
       /* Una tarea «solo aquí» de verdad, o un hito que no está en la guía: se queda en el asunto. */
-      if ((g.propio && !idOriginal) || !ctx.tipo || ctx.apagada || !ctx.enGuia) {
+      if ((g.propio && !idOriginal) || !ctx.tipo || ctx.apagada || !ctx.enGuia || !(window.MarcaGuia && MarcaGuia.enGuia(a))) {   /* fila 660: marca de la guía apagada, solo aquí */
         if (g.pregunta) { if (texto !== g.texto) await Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, texto); }
         else if (g.propio) { if (texto !== g.texto || cambioExtras) await Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto, extras); }
         else await Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto, extras);
@@ -192,6 +193,7 @@ window.DondeSeGuardaTareas = (function () {
             if (!l) return false;
             l.lista[l.i].texto = texto;
             aplicarExtras(l.lista[l.i], extras);
+            delete l.lista[l.i].comun;   /* fila 660: cambiada desde el asunto, ya no es la de la lista común */
           },
           /* Fila 405: una pregunta con texto «solo aquí» vuelve a seguir a la guía. */
           despues: g.pregunta ? function () { return Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, ''); } : null,
@@ -208,6 +210,7 @@ window.DondeSeGuardaTareas = (function () {
           if (!l) return false;
           l.lista[l.i].texto = texto;
           aplicarExtras(l.lista[l.i], extras);
+          delete l.lista[l.i].comun;
         },
         despues: function () {
           return editarAqui(a, h, function (x) {
@@ -225,29 +228,6 @@ window.DondeSeGuardaTareas = (function () {
       });
     } catch (err) {
       U.fallo('No he podido guardar el cambio', err);
-      return false;
-    }
-  }
-
-  /* ---------- Pasar a la guía ---------- */
-
-  /* «Pasar a la guía» del «⋮» de una tarea «solo aquí»: la lleva a la guía,
-     sin preguntar. Si el hito tampoco está en la guía, se lleva entero. */
-  async function pasar(a, h, g) {
-    try {
-      var ctx = await contexto(a, h);
-      if (!ctx.tipo || ctx.apagada) { U.aviso('Dentro de una pregunta no se puede pasar a la guía desde aquí.', 'ambar'); return false; }
-      var nuevoId = null;
-      return await aLaGuia(a, h, ctx, {
-        enPaso: function (p) {
-          p.guion = GuiasGuion.normalizar((p.guion || []).concat([lineaParaLaGuia(g, g.texto)]));
-          nuevoId = p.guion[p.guion.length - 1].id;
-        },
-        despues: function () { return Hitos.pasarGuionPropioAGuia(a.nombre, h.id, g.id, nuevoId); },
-        deshacerAqui: function () { return devolverAqui(a, h, g, g.texto); }
-      });
-    } catch (err) {
-      U.fallo('No he podido pasarla a la guía', err);
       return false;
     }
   }
@@ -309,7 +289,7 @@ window.DondeSeGuardaTareas = (function () {
         return true;
       }
       /* Un hito que no está en la guía, o dentro de una pregunta: solo en este asunto. */
-      if (ctx.apagada || !ctx.enGuia) {
+      if (ctx.apagada || !ctx.enGuia || !(window.MarcaGuia && MarcaGuia.enGuia(a))) {   /* fila 660: marca de la guía apagada, solo aquí */
         await Hitos.ocultarGuionDeGuia(a.nombre, h.id, g.id);
         U.aviso(ctx.apagada || SOLO_AQUI, 'bueno');
         repintar();
@@ -341,5 +321,5 @@ window.DondeSeGuardaTareas = (function () {
     }
   }
 
-  return { nueva: nueva, cambiar: cambiar, pasar: pasar, borrar: borrar, lineaEn: lineaEn };
+  return { nueva: nueva, cambiar: cambiar, borrar: borrar, lineaEn: lineaEn };
 })();

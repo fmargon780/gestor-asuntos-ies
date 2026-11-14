@@ -71,7 +71,8 @@ var Comunes = (function () {
     ((h && h.tareas) || []).forEach(function (i) { if (typeof i === 'string' && ids.indexOf(i) === -1) ids.push(i); });
     var o = { id: (h && h.id) || nuevoId('hc'), nombre: String((h && h.nombre) || '').trim(),
               explicacion: String((h && h.explicacion) || '').trim(), tareas: ids };
-    if (h && FASES.indexOf(h.fase) !== -1) o.fase = h.fase;   /* fila 657: la fase del hito común (todavía no se ve ni se elige) */
+    /* Fila 657: la fase del hito común; fila 660: las del centro llevan «fs-» (js/fases.js). */
+    if (h && (FASES.indexOf(h.fase) !== -1 || /^fs-/.test(String(h.fase || '')))) o.fase = h.fase;
     return o;
   }
 

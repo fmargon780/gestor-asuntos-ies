@@ -144,9 +144,8 @@
     /* Fila 224: las tareas de la guía escondidas en este asunto («Cambiar
        aquí» o «Borrar»), solo si hay alguna. */
     if (h && Array.isArray(h.guionOcultos) && h.guionOcultos.length) salida.guionOcultos = h.guionOcultos;
-    /* Fila 553: el orden de las tareas en este asunto (js/hitos-guion-orden.js) y el orden que se dio por bueno con «Solo en este asunto». */
+    /* Fila 553: el orden de las tareas en este asunto (js/hitos-guion-orden.js). */
     if (h && Array.isArray(h.guionOrden) && h.guionOrden.length) salida.guionOrden = h.guionOrden.map(String);
-    if (h && h.guionOrdenVisto) salida.guionOrdenVisto = String(h.guionOrdenVisto);
     /* Fila 116: la respuesta a cada pregunta del guion, solo si la hay. */
     if (h && h.guionElegido && typeof h.guionElegido === 'object' && Object.keys(h.guionElegido).length) salida.guionElegido = h.guionElegido;
     /* Fila 405: el texto de una pregunta cambiado «solo aquí», por id de pregunta. */

@@ -113,6 +113,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 
 /* 1 y 2. En «Sola Uno»: la pregunta lleva «⋮» con las cuatro opciones, sin «Pasar a la guía». */
+await pagina.evaluate(async () => { await MarcaGuia.poner(Gestor.asuntos().filter((x) => /Sola Uno/.test(x.nombre))[0], true); });   /* fila 660: marca de la guía encendida */
 await abrirMesaDe('Sola Uno', 'c1');
 await comprobar('1. la pregunta lleva sus tres puntitos', pagina.locator(Q + ' .guion-tarea-menu-boton').isVisible(), true);
 await comprobar('1. sigue sin casilla', pagina.locator(Q + ' .guion-casilla').count(), 0);

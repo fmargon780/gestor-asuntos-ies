@@ -115,6 +115,7 @@ var HitoMesa = (function () {
     if (!fila) {
       var tiraVacia = document.getElementById('ficha-tira');
       if (tiraVacia) tiraVacia.innerHTML = '';   /* fila 637: sin hito abierto, no hay fila de hitos */
+      if (window.MarcaGuia) MarcaGuia.pintar(a, abierto);   /* fila 660 */
       if (window.HitoMesaDocumentos && HitoMesaDocumentos.soltarAlHito) HitoMesaDocumentos.soltarAlHito(null);
       if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
       return;
@@ -204,20 +205,22 @@ var HitoMesa = (function () {
     /* Fila 637: la fila de hitos va a todo el ancho, debajo de la cabecera de la ficha (`#ficha-tira`,
        js/ficha-tarjetas.js), con el hito actual marcado y «+ Añadir hito» al final. */
     var tira = document.getElementById('ficha-tira');
+    if (window.MarcaGuia) MarcaGuia.pintar(a, abierto);   /* fila 660: la marca de la guía, encima de los hitos */
     if (tira) {
       tira.innerHTML = visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
-          (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') + '</button>';
+          (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') +
+          (window.Fases && Fases.deHito(a, x) ? '<small class="mesa-tira-fase">' + U.escapar(Fases.deHito(a, x)) + '</small>' : '') + '</button>';   /* fila 660: la fase, debajo */
       }).join('') +
         /* Fila 553: «+ Añadir hito», al final de la fila. */
-        (abierto && window.ComunesAsunto ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '');
+        (abierto && window.AnadirHito ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '');
       Array.prototype.forEach.call(tira.querySelectorAll('.mesa-tira-hito'), function (b) {
         b.onclick = function () { abrir(a, b.dataset.id); };
       });
       var anadirHito = tira.querySelector('.mesa-tira-anadir');
-      if (anadirHito) anadirHito.onclick = function () { ComunesAsunto.anadirHito(a); };
+      if (anadirHito) anadirHito.onclick = function () { AnadirHito.abrir(a); };
     }
     var puedeMarcar = abierto && !decision && (esElActual || h.estado === 'hecho');
     cab.innerHTML =
@@ -279,11 +282,6 @@ var HitoMesa = (function () {
       opcionesMas.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,
         title: puedeBorrar ? '' : 'Tiene trabajo: no se puede borrar',
         alPulsar: function () { HitosDesdeElAsunto.abrirBorrar(a, h); } });
-      /* Fila 416: un hito «solo aquí» (sin paso en la guía) se puede llevar entero a la guía, sin preguntar. */
-      if (HitosDesdeElAsunto.esSoloAqui(a, h) && window.HitosDesdeElAsuntoGuia &&
-          HitosDesdeElAsunto.nivelSuperior(hitos).some(function (x) { return x.id === h.id; })) {
-        opcionesMas.push({ texto: 'Pasar a la guía', clase: 'mesa-hda-pasar', alPulsar: function () { HitosDesdeElAsunto.pasarALaGuia(a, h); } });
-      }
       opcionesMas.push({ raya: true });
     }
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */

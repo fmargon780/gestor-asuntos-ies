@@ -98,7 +98,9 @@ var GuiasGuion = (function () {
     if (accion === 'comunicar') {
       out = { a: valido(A_QUIEN, String(r.a || '')), via: valido(VIAS, String(r.via || '')), plantilla: String(r.plantilla || '') };
     } else if (accion === 'generar') {
+      /* Fila 660: «Sin plantilla por ahora (se marca a mano)»: sin plantilla y sin botón. */
       out = { plantilla: String(r.plantilla || '') };
+      if (!out.plantilla && r.sinPlantilla) out.sinPlantilla = true;
     } else if (accion === 'registrar') {
       out = { sentido: valido(SENTIDOS, String(r.sentido || '')) };
     } else if (accion === 'firmar') {

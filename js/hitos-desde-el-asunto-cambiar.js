@@ -36,7 +36,8 @@
     var esNivelSuperior = nivel.some(function (x) { return x.id === h.id; });
     var tipo = tipoDe(a);
     var pasos = tipo ? GuiasDelCentro.pasosDe(tipo) : [];
-    var conGuia = !!(h.origenGuia && esNivelSuperior && pasoEsDeNivelSuperior(pasos, h.origenGuia));
+    /* Fila 660: con la marca de la guía apagada, el cambio se queda solo en este asunto. */
+    var conGuia = !!(h.origenGuia && esNivelSuperior && pasoEsDeNivelSuperior(pasos, h.origenGuia)) && !!(window.MarcaGuia && MarcaGuia.enGuia(a));
     var colocarActual = '';
     if (esNivelSuperior) {
       var i = nivel.map(function (x) { return x.id; }).indexOf(h.id);
@@ -48,7 +49,7 @@
         idPropio: h.id, nivel: esNivelSuperior ? nivel : [], colocarActual: colocarActual,
         responsables: responsables, responsable: h.responsable || '', plazo: h.plazo || null,
         variosDocumentos: !!h.variosDocumentos, sinVarios: h.clase === 'decision',
-        titulo: h.titulo, cuerpo: h.cuerpo
+        titulo: h.titulo, cuerpo: h.cuerpo, alcance: window.MarcaGuia ? MarcaGuia.alcance(a) : ''
       }), 'Guardar');
     enganchar();
     var ok = await esperar;
@@ -92,25 +93,6 @@
     if (!callado) U.aviso(mensaje || SOLO_AQUI, 'bueno');
   }
 
-  /* Fila 416: «Pasar a la guía» (menú «Hito ▾») de un hito «solo aquí»: entra
-     en la guía con todas sus tareas, sin preguntar, y llega a los demás
-     asuntos abiertos. «Deshacer» lo deja como estaba, solo aquí. */
-  async function pasarALaGuia(a, h) {
-    var tipo = tipoDe(a);
-    if (!tipo) return false;
-    try {
-      var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
-      var r = await HitosDesdeElAsuntoGuia.llevarHitoEntero(a, h);
-      await avisarGuia(tipo, a, antes, repartoDe(),
-        function () { return HitosDesdeElAsuntoGuia.dejarComoEstaba(a.nombre, r.hitoAntes); });
-      repintar();
-      return true;
-    } catch (e) {
-      U.aviso('No he podido pasarlo a la guía: ' + U.mensajeDeError(e), 'malo');
-      return false;
-    }
-  }
-
   async function cambiarConGuia(a, h, tipo, nivel, datos) {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
     var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
@@ -141,11 +123,11 @@
     if (!sinTrabajo(h, a)) return;
     var tipo = tipoDe(a);
     var pasos = tipo ? GuiasDelCentro.pasosDe(tipo) : [];
-    var conGuia = !!(h.origenGuia && pasoEsDeNivelSuperior(pasos, h.origenGuia));
+    var conGuia = !!(h.origenGuia && pasoEsDeNivelSuperior(pasos, h.origenGuia)) && !!(window.MarcaGuia && MarcaGuia.enGuia(a));   /* fila 660 */
     var esperar = U.preguntar('Borrar este hito',
       '<p><strong>' + U.escapar(h.titulo || '') + '</strong></p>' +
       (conGuia ? '<p class="suave">Se quita también de la guía de ' + U.escapar(nombreCortoDe(tipo)) +
-        ' y de los asuntos abiertos donde no esté empezado.</p>' : ''), 'Borrar');
+        ' y de los asuntos abiertos donde no esté empezado.</p>' : '<p class="suave">Se borra solo de este asunto: la guía no cambia.</p>'), 'Borrar');
     enganchar();
     var ok = await esperar;
     if (!ok) return;
@@ -173,6 +155,5 @@
 
 
   I.abrirCambiar = abrirCambiar;
-  I.pasarALaGuia = pasarALaGuia;
   I.abrirBorrar = abrirBorrar;
 })();

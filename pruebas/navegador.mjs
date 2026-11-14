@@ -478,6 +478,8 @@ await comprobar('el enlace del formulario lleva a Ajustes',
 /* ================= DOCUMENTOS ================= */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('.pestana[data-pantalla="nuevo"]');
+/* Fila 660: un tipo sin guía nace sin hitos; BECA trae la suya (la mínima de antes) para que el asunto tenga a dónde añadir el documento. */
+await pagina.evaluate(async () => { if (!GuiasDelCentro.pasosDe('BECA').length) await GuiasDelCentro.guardarPasos('BECA', EstadoHito.pasosMinimos(), {}); });
 await pagina.click('#categorias-lista .categoria-boton:nth-child(1)');
 await clicTipo('BECA');
 await pagina.fill('#buscar-tercero', 'alvaro');

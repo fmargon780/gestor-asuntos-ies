@@ -7,14 +7,14 @@
    tarjeta («+ Añadir una tarea solo para este asunto», «✎ Cambiar las
    tareas de este hito…»). Ahora cada tarea lleva su propio «⋮»:
 
-     De la guía: Anotar · Cambiar · Borrar · Abrir en la guía
-     «Solo aquí»: Anotar · Cambiar · Pasar a la guía · Borrar
+     De la guía: Subir · Bajar · Anotar · Cambiar · Borrar · Abrir en la guía
+     «Solo aquí»: Subir · Bajar · Anotar · Cambiar · Borrar
 
-   Fila 235 (docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md): «Cambiar», «Borrar»
-   (de una tarea de la guía) y «Pasar a la guía» abren, al aceptar, el
-   emergente «¿Dónde se guarda?» (js/donde-se-guarda-tareas.js); ya no
-   hay «Cambiar aquí» ni «Cambiar en la guía». «Abrir en la guía» es el
-   editor de siempre (lo que hacía «Cambiar en la guía»).
+   Fila 660: «Cambiar», «Borrar», «Subir» y «Bajar» van a la guía del tipo si
+   la marca «Los cambios en hitos y tareas van también a la guía» está encendida
+   (js/marca-guia.js) y se quedan en este asunto si está apagada
+   (js/donde-se-guarda-tareas.js). Ya no hay «Pasar a la guía». «Abrir en la guía»
+   es el editor de siempre.
 
    - «Anotar» abre una línea para escribir debajo de la tarea; la nota
      va a la libreta única del asunto (NotasHito.anadirDesdeTarea, fila
@@ -24,8 +24,6 @@
      emergente (DondeSeGuardaTareas.cambiar).
    - «Abrir en la guía»: el editor de siempre
      (HitoMesaGuion.cambiarGuionDelPaso), con la tarea ya resaltada.
-   - «Pasar a la guía»: el mismo emergente con «A la guía» marcada
-     (DondeSeGuardaTareas.pasar).
    - «Borrar»: de una tarea de la guía, el emergente; de una «solo aquí»,
      se borra como siempre (Hitos.borrarGuionPropio).
 
@@ -71,7 +69,7 @@ var HitoMesaTareaMenu = (function () {
         '<input class="campo guion-tarea-editar-texto" data-clave="tarea-editar-' + U.escapar(g.id) +
         '" value="' + U.escapar(g.texto) + '">' +
         /* Fila 522: «Qué se hace» y su dato, como en la guía (una pregunta no los lleva). */
-        (!g.pregunta && window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML({ accion: g.accion, receta: g.receta, donde: g.donde, tipoDocumento: g.tipoDocumento, aQuien: g.aQuien }) +
+        (!g.pregunta && window.AnadirTarea ? '<div class="at-hueco at-hueco-cambiar"></div><p class="suave tcd-alcance">' + U.escapar(window.MarcaGuia ? MarcaGuia.alcance(a) : '') + '</p>' +
           '<div class="tcd-botones"><button type="button" class="boton boton-chico guion-tarea-editar-guardar">Guardar</button>' +
           '<button type="button" class="enlace guion-tarea-editar-cancelar">Cancelar</button></div>' : '') +
         '<p class="nota">Intro guarda, Escape cancela.</p></div>';
@@ -95,12 +93,6 @@ var HitoMesaTareaMenu = (function () {
   }
 
   /* ---------- acciones ---------- */
-
-  function pasarALaGuia(a, h, g) {
-    return DondeSeGuardaTareas.pasar(a, h, g).then(function (ok) {
-      if (ok) delete estado[g.id];
-    });
-  }
 
   async function borrar(a, h, g) {
     if (g.propio) {
@@ -142,6 +134,10 @@ var HitoMesaTareaMenu = (function () {
     function mover(delta) {
       return function () {
         Hitos.moverGuion(a, h.id, g.clave, delta).then(function () {
+          /* Fila 660: con la marca de la guía encendida, el orden nuevo va también a la guía (sin franja ni pregunta). */
+          if (g.propio || !window.MarcaGuia || !MarcaGuia.enGuia(a) || !HitoMesaGuion.puedeAnadirALaGuia(a, h)) return null;
+          return Hitos.hitosDe(a.nombre).then(function (hitos) { return Hitos.guardarOrdenEnLaGuia(a, Hitos.buscar(hitos, h.id) || h); });
+        }).then(function () {
           if (window.HitosPanel) HitosPanel.programarRepintado();
         }).catch(function (err) { U.fallo('No he podido mover la tarea', err); });
       };
@@ -157,18 +153,9 @@ var HitoMesaTareaMenu = (function () {
     var lista = moverOpciones(a, h, g).concat([
       { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
     ]);
-    if (g.comun && window.ComunesCambiar) {   /* fila 531: una tarea de la lista común se cambia en todas las guías */
-      lista.push({ texto: 'Cambiar la tarea', clase: 'mesa-comun-cambiar', alPulsar: async function () {
-        try {
-          var t = Comunes.buscar((await ComunesGuardado.leer()).tareas, g.comun);
-          if (!t) { U.aviso('Esta tarea ya no está en la lista de tareas.', 'ambar'); return; }
-          ComunesCambiar.tarea(t, { claveActual: a.nombre });
-        } catch (err) { U.fallo('No he podido leer la lista', err); }
-      } });
-    } else lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
-    if (g.propio) {
-      lista.push({ texto: 'Pasar a la guía', alPulsar: function () { pasarALaGuia(a, h, g); } });
-    }
+    /* Fila 660: «Cambiar» es el mismo formulario para todas las tareas (js/anadir-tarea.js) y dice a dónde irá. Una tarea de la lista común que se
+       cambia aquí deja de ser la de la lista (el cambio de la lista entera se hace en Ajustes, en la guía del tipo). */
+    lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
     lista.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', alPulsar: function () { borrar(a, h, g); } });
     if (!g.propio) {
       lista.push({ texto: 'Abrir en la guía', deshabilitado: !HitoMesaGuion.puedeAnadirALaGuia(a, h),
@@ -195,11 +182,13 @@ var HitoMesaTareaMenu = (function () {
     var editar = el.querySelector('.guion-tarea-editar-texto');
     if (editar) {
       var caja = el.querySelector('.guion-tarea-editar');
-      var conForma = !g.pregunta && window.TareasConDocumentoVista && caja.querySelector('.tcd-accion');
-      if (conForma) TareasConDocumentoVista.engancharFormulario(caja);
+      /* Fila 660: «Qué se hace», «sobre qué» y «Dónde se hace», con la casilla que se busca escribiendo (js/anadir-tarea.js). */
+      var huecoForma = !g.pregunta && window.AnadirTarea ? caja.querySelector('.at-hueco-cambiar') : null;
+      var forma = huecoForma ? AnadirTarea.montar(huecoForma, { modo: 'cambiar', inicial: { accion: g.accion || '', receta: g.receta || null, donde: g.donde || Sitios.dondeDe(g) || null,
+        tipoDocumento: g.tipoDocumento, aQuien: g.aQuien, elegida: true } }) : null;
       var guardarEditado = function () {
         var texto = editar.value.trim();
-        if (texto) guardarTexto(a, h, g, texto, conForma ? TareasConDocumentoVista.leerFormulario(caja) : undefined);
+        if (texto) guardarTexto(a, h, g, texto, forma ? forma.resultado() : undefined);
       };
       var botonGuardar = caja.querySelector('.guion-tarea-editar-guardar');
       if (botonGuardar) botonGuardar.onclick = guardarEditado;

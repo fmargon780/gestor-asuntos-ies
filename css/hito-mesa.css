@@ -316,16 +316,13 @@ details.mesa-normativa > summary { cursor: pointer; }
   padding: 1px 8px; white-space: nowrap;
 }
 
-/* La franja de «Has cambiado el orden de las tareas en este asunto.» */
-.guion-orden-cambiado {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--azul-claro);
-  border: 1px solid var(--azul); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-top: 6px;
-}
-.guion-orden-cambiado > span { flex: 1 1 220px; min-width: 0; }
-
 /* «+ Añadir hito», al final de la tira de hitos. */
 .mesa-tira-anadir {
   flex: 0 0 auto; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
   border: 0; border-bottom: 3px solid transparent; padding: 5px 10px; background: #eef2f6; color: var(--azul);
 }
 .mesa-tira-anadir:hover { background: #e3eefb; }
+
+/* Fila 660: la fase del hito, debajo de su nombre en la fila de hitos y al principio de su línea. */
+.mesa-tira-fase { display: block; font-size: 11px; font-weight: 400; opacity: .75; }
+.mesa-linea-fase { font-size: 13px; }

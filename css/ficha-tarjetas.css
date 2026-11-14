@@ -102,3 +102,8 @@
 /* La barra de botones de «Documentos de la carpeta» (sin título propio: el título es el del bloque). */
 .ficha-titulo-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 14px; }
 .ficha-titulo-barra:empty { display: none; }
+
+/* Fila 660: la marca «Los cambios en hitos y tareas van también a la guía», encima de la fila de hitos. */
+.ficha-marca-guia:empty { display: none; }
+.ficha-marca-guia { margin: 0 0 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.ficha-marca-guia .marca-guia-texto { flex: 1 0 100%; margin: 0; }

@@ -85,6 +85,7 @@ var FichaTarjetas = (function () {
       return (b.id !== 'actividad' || conActividad) && (b.id !== 'candidaturas' || conCandidaturas);
     }).map(function (b) { return bloque(b, dentro[b.id]); }).join('');
     return '<div class="ficha-tarjetas" id="ficha-tarjetas" data-abierta="trabajo">' +
+      '<div class="ficha-marca-guia" id="ficha-marca-guia"></div>' +   /* fila 660: js/marca-guia.js */
       '<div class="ficha-tira-fila">' +
         '<div class="ficha-tira" id="ficha-tira"></div>' +
         '<div class="ficha-acciones" id="ficha-acciones"></div>' +

@@ -174,6 +174,7 @@ var AyudasNucleo = AyudasNucleo || {};
     'actividades-abrir': 'Abre la lista de actividades extraescolares.',
     'etiquetas-abrir': 'Abre la pantalla para imprimir etiquetas de alumnado o de personal.',
     'plantillas-abrir': 'Abre la lista de plantillas de Word y de correo.',
+    'fases-anadir': 'Crea una fase nueva para agrupar hitos. Las fases nuevas solo se crean aquí.',
     'sitios-abrir': 'Abre el mapa de sitios donde se hacen las tareas, para cambiarles el nombre, borrarlos o crear nuevos.',
     'btn-vaciar-registro': 'Borra del todo la lista de lo que se ha borrado. No se puede deshacer.',
     'copias-enlace-restaurar': 'Va al apartado donde se elige una copia de seguridad para recuperarla.',

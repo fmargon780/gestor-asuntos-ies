@@ -13,7 +13,7 @@
       comunicar se encienden.
    8. «+ Añadir tarea» abre el formulario; añadir deja la tarea en la lista sin abrir nada; «Cancelar» lo cierra.
    9. Hito sin tareas: «Este hito no tiene tareas» y «+ Añadir tarea».
-  10. Asunto sin hitos: mensaje, «+ Añadir el primer hito», «Escribir la guía de <tipo>» y la línea de aviso; sin «Comunicar»;
+  10. Asunto sin hitos: mensaje, «+ Añadir hito», «Escribir la guía de <tipo>» y la línea de aviso; sin «Comunicar»;
       «+ Añadir documento» apagado con su línea; tras crear el primer hito, se enciende.
   11. «+ Añadir documento» de la carpeta: «¿De qué tarea es?» (hito actual elegido, tarea que espera y «Tarea nueva» al final;
       al cambiar de hito cambian las tareas; «Cancelar» no añade nada); «Tarea nueva» crea una tarea hecha con el nombre del tipo.
@@ -166,19 +166,19 @@ await pagina.waitForTimeout(500);
 
 console.log('--- 8. «+ Añadir tarea» ---');
 await pagina.click('#ficha-guia .tcd-abrir-form');
-await pagina.waitForSelector('#guion-nueva-tarea');
-await comprobar('8. abre el formulario: nombre y «Qué se hace»', pagina.evaluate(() => [!!document.getElementById('guion-nueva-tarea'), !!document.querySelector('#ficha-guia .tcd-accion'), !!document.querySelector('#ficha-guia .tcd-abrir-form')]), [true, true, false]);
-await pagina.click('#ficha-guia .tcd-cancelar-form');
+await pagina.waitForSelector('.tcd-nueva .at-nombre');
+await comprobar('8. abre el formulario: nombre y «Qué se hace»', pagina.evaluate(() => [!!document.querySelector('.tcd-nueva .at-nombre'), !!document.querySelector('#ficha-guia .tcd-nueva .at-que'), !!document.querySelector('#ficha-guia .tcd-abrir-form')]), [true, true, false]);
+await pagina.click('#ficha-guia .tcd-nueva .at-cancelar');
 await pagina.waitForTimeout(400);
-await comprobar('8. «Cancelar» lo cierra', pagina.evaluate(() => [!document.getElementById('guion-nueva-tarea'), !!document.querySelector('#ficha-guia .tcd-abrir-form')]), [true, true]);
+await comprobar('8. «Cancelar» lo cierra', pagina.evaluate(() => [!document.querySelector('.tcd-nueva .at-nombre'), !!document.querySelector('#ficha-guia .tcd-abrir-form')]), [true, true]);
 await pagina.click('#ficha-guia .tcd-abrir-form');
-await pagina.fill('#guion-nueva-tarea', 'Revisar el DNI de la familia');
-await pagina.selectOption('#ficha-guia .tcd-accion', 'anadir');
-await pagina.click('#ficha-guia .tcd-anadir');
+await pagina.fill('.tcd-nueva .at-nombre', 'Revisar el DNI de la familia');
+await pagina.fill('.tcd-nueva .at-que', 'Añadir documento · En esta app');
+await pagina.click('#ficha-guia .tcd-nueva .at-anadir');
 await pagina.waitForFunction(() => Array.from(document.querySelectorAll('#ficha-guia .guion-paso-texto')).some((e) => /Revisar el DNI de la familia/.test(e.textContent)), null, { timeout: 10000 });
 await esperarRepintado();
 await comprobar('8. la tarea queda en la lista, sin abrir ninguna ventana y con el formulario cerrado',
-  pagina.evaluate(() => [document.getElementById('capa').classList.contains('oculto'), !document.getElementById('guion-nueva-tarea'),
+  pagina.evaluate(() => [document.getElementById('capa').classList.contains('oculto'), !document.querySelector('.tcd-nueva .at-nombre'),
     Array.from(document.querySelectorAll('#ficha-guia .guion-paso')).pop().querySelector('.guion-accion-tarea').textContent]), [true, true, 'Añadir documento']);
 
 /* ---------- 12: el botón «Añadir documento» de una tarea no pregunta ---------- */
@@ -281,24 +281,27 @@ await comprobar('14. cada línea dice de qué hito es', pagina.evaluate(() => {
 /* ---------- 10: un asunto sin hitos ---------- */
 console.log('--- 10. un asunto sin hitos ---');
 await abrir('Imprenta Sol');
-await comprobar('10. el mensaje, «+ Añadir el primer hito», «Escribir la guía de PEDIDO» y la línea de aviso, en ese orden',
+await comprobar('10. el mensaje, «+ Añadir hito», «Escribir la guía de PEDIDO» y la línea de aviso, en ese orden',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-guia > *')).map((e) => e.innerText.trim().replace(/\s+/g, ' ').slice(0, 26))),
-  ['Este tipo no tiene guía. P', '+ Añadir el primer hito', 'Escribir la guía de PEDIDO', 'Para generar, comunicar o ']);
+  ['Este asunto no tiene hitos', '+ Añadir hito', 'Escribir la guía de PEDIDO', 'Para generar, comunicar o ']);
 await comprobar('10. no hay fila de hitos ni «Comunicar» de arriba',
   pagina.evaluate(() => [document.getElementById('ficha-tira').children.length, Array.from(document.querySelectorAll('#ficha-acciones button')).filter((b) => b.offsetParent && /Comunicar|Generar documento/.test(b.textContent)).length]), [0, 0]);
 await pagina.locator('#ficha-plegables .plegable-cab', { hasText: 'Documentos de la carpeta' }).click();
 await pagina.waitForTimeout(500);
 await comprobar('10. «+ Añadir documento» apagado, con su línea', pagina.evaluate(() => [document.querySelector('.ficha-documentos-anadir').disabled, (document.querySelector('.ficha-documentos-sin-hito') || {}).textContent]), [true, 'Para añadir un documento, crea antes el hito.']);
-await pagina.click('#ficha-guia button:has-text("+ Añadir el primer hito")');
-await pagina.waitForSelector('#hda-titulo');
-await pagina.fill('#hda-titulo', 'Atender el pedido');
-await pagina.evaluate(() => { const c = document.getElementById('hda-solo-aqui'); if (c && !c.checked) c.click(); });
-await pagina.click('#cuadro-aceptar');
+await pagina.click('#ficha-guia button:has-text("+ Añadir hito")');
+await pagina.waitForSelector('.anadir-hito-capa .ah-fase');   /* fila 660: paso a paso, primero la fase */
+await pagina.click('.anadir-hito-capa .ah-fase:has-text("Recibir")');
+await pagina.click('.anadir-hito-capa #ah-nuevo');
+await pagina.fill('.anadir-hito-capa #ah-nombre', 'Atender el pedido');
+await pagina.fill('.anadir-hito-capa .at-que', 'Otra cosa');
+await pagina.fill('.anadir-hito-capa .at-nombre', 'Atender el pedido');
+await pagina.click('.anadir-hito-capa #ah-crear');
 await pagina.waitForSelector('#ficha-guia .hito-en-mesa', { timeout: 15000 });
 await esperarRepintado();
 await comprobar('10. tras crear el primer hito, «+ Añadir documento» se enciende y la línea se va',
   pagina.evaluate(() => [document.querySelector('.ficha-documentos-anadir').disabled, !document.querySelector('.ficha-documentos-sin-hito')]), [false, true]);
-await comprobar('10. y el hito nuevo no tiene tareas', pagina.evaluate(() => /Este hito no tiene tareas/.test(document.querySelector('#ficha-guia .hito-en-mesa').innerText)), true);
+await comprobar('10. y el hito nuevo nace con su primera tarea', pagina.evaluate(() => /Atender el pedido/.test(document.querySelector('#ficha-guia .hito-en-mesa .guion-paso') ? document.querySelector('#ficha-guia .hito-en-mesa .guion-paso').innerText : '')), true);
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);
 await navegador.close();

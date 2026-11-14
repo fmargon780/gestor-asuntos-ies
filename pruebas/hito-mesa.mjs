@@ -317,44 +317,31 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
   /* Fila 224: «Nueva tarea…» añade solo a este asunto. Fila 638: tras «+ Añadir tarea». */
   await pagina.click('.hito-en-mesa .tcd-abrir-form');
-  await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Pedir el certificado de empadronamiento');
-  await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
+  await pagina.fill('.tcd-nueva .at-que', 'Otra cosa');
+  await pagina.fill('.hito-en-mesa .tcd-nueva .at-nombre', 'Pedir el certificado de empadronamiento');
+  await pagina.press('.hito-en-mesa .tcd-nueva .at-nombre', 'Enter');
   /* Fila 416: Intro guarda solo en este asunto, sin preguntar. */
   await pagina.waitForSelector('.hito-en-mesa .guion-paso .guion-tarea-propia');
   await comprobar('9. el formulario se cierra tras Intro',
-    pagina.locator('.hito-en-mesa .guion-nueva-tarea').count(), 0);
+    pagina.locator('.hito-en-mesa .tcd-nueva .at-nombre').count(), 0);
   await comprobar('9. la tarea sale con la etiqueta «solo aquí»',
     pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
       .locator('.guion-tarea-propia').isVisible(), true);
-  const filaTarea = pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' });
-  await filaTarea.locator('.guion-tarea-menu-boton').click();
-  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar a la guía' }).click();
-  await pagina.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('.mensaje'),
-    (m) => m.textContent.indexOf('Guardado en la guía de') !== -1));
-  await pagina.waitForTimeout(500);
-  const r9 = await pagina.evaluate(async (otro) => {
+  /* Fila 660: ya no hay «Pasar a la guía»; con la marca de la guía apagada la tarea se queda solo en este asunto y la guía no cambia. */
+  const guiaLarga = () => pagina.evaluate(async () => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
-    const m1 = guias.MATRICULA.filter((p) => p.id === 'm1')[0];
-    const d = await Hitos.leer();
-    const hOtro = Hitos.buscar(d.porAsunto[otro].hitos, 'm1');
-    const enOtro = Hitos.guionDe({ nombre: otro, leido: { tipo: 'MATRICULA' }, ficha: {} }, hOtro).map((g) => g.texto);
-    return { ultima: m1.guion[m1.guion.length - 1], cuantas: m1.guion.length, enOtro };
-  }, OTRO);
-  await comprobar('9. la línea va al final del guion del paso de la guía',
-    Promise.resolve([r9.ultima.texto, r9.ultima.accion, !!r9.ultima.id]), ['Pedir el certificado de empadronamiento', '', true]);
-  await comprobar('9. y sale en el otro asunto abierto del mismo tipo',
-    Promise.resolve(r9.enOtro.indexOf('Pedir el certificado de empadronamiento') !== -1), true);
-  await comprobar('9. la línea ya no lleva «solo aquí» y sigue sin marcar',
-    pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
-      .locator('.guion-tarea-propia').count(), 0);
-  await comprobar('9. la mesa sigue abierta en el mismo hito, con la línea sin marcar',
+    return guias.MATRICULA.filter((p) => p.id === 'm1')[0].guion.length;
+  });
+  const r9 = { cuantas: await guiaLarga() };
+  await comprobar('9. la tarea queda solo aquí y sin marcar',
     pagina.locator('.hito-en-mesa[data-id="m1"] .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
       .locator('.guion-casilla').isChecked(), false);
   await pagina.click('.hito-en-mesa .tcd-abrir-form');
-  await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Solo para Ana');
-  await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
+  await pagina.fill('.tcd-nueva .at-que', 'Otra cosa');
+  await pagina.fill('.hito-en-mesa .tcd-nueva .at-nombre', 'Solo para Ana');
+  await pagina.press('.hito-en-mesa .tcd-nueva .at-nombre', 'Enter');
   await pagina.waitForTimeout(800);
-  await comprobar('9. la tarea que no se pasa no toca la guía', pagina.evaluate(async () => {
+  await comprobar('9. una segunda tarea solo aquí tampoco toca la guía', pagina.evaluate(async () => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
     const m1 = guias.MATRICULA.filter((p) => p.id === 'm1')[0];
     return m1.guion.length;

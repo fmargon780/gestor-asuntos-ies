@@ -33,6 +33,7 @@ var HitoMesaRecetas = (function () {
     return Hitos.guionDe(a, h).filter(function (g) {
       /* Fila 659: un «Enviar» a otro sitio que no sea el correo ni iPasen no envía nada: se marca a mano. */
       if (accion === 'comunicar' && window.Sitios && Sitios.canalDeSitio(g.donde) === '') return false;
+      if (accion === 'generar' && g.receta && g.receta.sinPlantilla) return false;   /* fila 660 */
       return !g.pregunta && !g.hecho && !g.noaplica && g.accion === accion;
     });
   }
@@ -147,6 +148,7 @@ var HitoMesaRecetas = (function () {
     if (!g || g.pregunta || g.hecho || g.noaplica) return '';
     o = o || {};
     var accion = accionDe(g);
+    if (accion === 'generar' && g.receta && g.receta.sinPlantilla) return '';   /* fila 660: «Sin plantilla por ahora (se marca a mano)» */
     if (accion === 'comunicar' && canalDe(a, h, g) === '') return '';   /* fila 659: «Enviar» a otro sitio: sin botón, se marca a mano */
     var texto = accion === 'comunicar' ? (canalDe(a, h, g) === 'seneca' ? 'Enviar por Séneca' : 'Enviar correo') : TEXTO[accion];
     if (!texto) return '';

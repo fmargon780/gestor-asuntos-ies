@@ -51,10 +51,10 @@ var Hitos = (function () {
   function aplicarPlazosDependientes() { return I.aplicarPlazosDependientes.apply(this, arguments); }
   function pasoAHito() { return I.pasoAHito.apply(this, arguments); }
 
-  async function pasosOMinima(tipo) {
+  async function pasosDeLaGuia(tipo) {
     var pasos = (window.GuiasDelCentro && (await window.GuiasDelCentro.ponerAlDia(), window.GuiasDelCentro.pasosDe(tipo))) || [];   /* fila 273: la guardada, no la de al arrancar */
-    if (pasos.length || !tipo || !window.EstadoHito || !EstadoHito.guiaMinima) return pasos;
-    try { return (await EstadoHito.guiaMinima(tipo)) || []; } catch (e) { return []; }
+    /* Fila 660: un tipo sin guía nace sin hitos («así obligamos a crear los correctos»): ya no recibe «Tramitar · Esperar respuesta · Archivar». */
+    return pasos;
   }
 
   /* Asunto nuevo (sección 3.1): los hitos se crean de golpe al abrirlo,
@@ -65,7 +65,7 @@ var Hitos = (function () {
   async function crearDesdeGuia(clave, tipo) {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
-    var pasos = await pasosOMinima(tipo);
+    var pasos = await pasosDeLaGuia(tipo);
     if (!pasos.length) return [];
     var resultado = null;
     var datos = await cambiar(function (d) {
@@ -104,7 +104,7 @@ var Hitos = (function () {
   async function crearDesdeGuiaImportando(clave, tipo, pasosHechos, pasosElegidos) {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
-    var pasos = await pasosOMinima(tipo);
+    var pasos = await pasosDeLaGuia(tipo);
     if (!pasos.length) return [];
     var resultado = null;
     var datos = await cambiar(function (d) {

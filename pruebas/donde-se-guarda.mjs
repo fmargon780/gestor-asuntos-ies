@@ -1,18 +1,12 @@
 /* Prueba en navegador de verdad de la fila 416 de docs/COLA.md
-   (docs/HITOS-UN-SOLO-SITIO.md, parte A; antes fila 235,
-   docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md): la guía manda, ya no hay pregunta
-   «¿Dónde se guarda?» al crear, cambiar o borrar una tarea o un hito.
+   (docs/HITOS-UN-SOLO-SITIO.md, parte A) puesta al día con la fila 660 (docs/660-CREAR-HITOS-Y-TAREAS-DESDE-EL-ASUNTO.md):
+   a dónde va un cambio lo dice la marca «Los cambios en hitos y tareas van también a la guía»; no hay pregunta
+   «¿Dónde se guarda?» ni «Pasar a la guía».
 
-   1. «Nueva tarea…» + Intro: sin emergente; se guarda solo en este asunto,
+   1. «+ Añadir tarea» con la marca apagada: sin emergente; se guarda solo en este asunto,
       con su marca «solo aquí»; la guía y el otro asunto no la tienen.
-   2. «⋮» → «Pasar a la guía»: sin pregunta; entra en la guía y llega al otro
-      asunto. El aviso lleva «Deshacer».
-   3. «Deshacer»: en este asunto la tarea sigue «solo aquí»; en la guía y en
-      el otro asunto ya no está.
-   4. «Cambiar» y «Borrar» una tarea de la guía van a la guía, sin preguntar.
-   5. «Hito ▾» → Crear con «Solo para este asunto»: el hito sale con la marca
-      «solo aquí»; «Pasar a la guía» lo lleva entero a la guía y llega al otro asunto.
-   6. «Cambiar la guía…» tras crear un hito enseña la guía previa entera. */
+   4. Con la marca encendida, «Cambiar» y «Borrar» una tarea de la guía van a la guía, sin preguntar.
+   7. Con la marca encendida, «Cambiar» un hito va a la guía y llega al otro asunto. */
 import { chromium } from 'playwright';
 import { abrirHito, verLaLista } from './apoyo/hito.mjs';
 import fs from 'fs';
@@ -113,8 +107,9 @@ async function tareasVistas(idHito) {
 
 async function escribirTarea(texto) {
   await pagina.click('.hito-en-mesa .tcd-abrir-form');   /* fila 638: el formulario se abre con «+ Añadir tarea» */
-  await pagina.fill('#guion-nueva-tarea', texto);
-  await pagina.press('#guion-nueva-tarea', 'Enter');
+  await pagina.fill('.hito-en-mesa .tcd-nueva .at-que', 'Otra cosa');   /* fila 660: «Qué se hace» se busca escribiendo */
+  await pagina.fill('.hito-en-mesa .tcd-nueva .at-nombre', texto);
+  await pagina.press('.hito-en-mesa .tcd-nueva .at-nombre', 'Enter');
   await pagina.waitForTimeout(600);
 }
 const hayEmergente = () => pagina.evaluate(() => !document.getElementById('capa').classList.contains('oculto'));
@@ -129,7 +124,7 @@ await comprobar('1. no está en la guía',
   guiaGuardada().then((g) => g.filter((p) => p.id === 'c1')[0].guion.map((x) => x.texto)),
   ['Avisar a la tutoría', 'Avisar a la familia']);
 await comprobar('1. el formulario se ha cerrado (fila 638) y queda «+ Añadir tarea»',
-  pagina.evaluate(() => [!document.getElementById('guion-nueva-tarea'), !!document.querySelector('.hito-en-mesa .tcd-abrir-form')]), [true, true]);
+  pagina.evaluate(() => [!document.querySelector('.tcd-nueva'), !!document.querySelector('.hito-en-mesa .tcd-abrir-form')]), [true, true]);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Dos', 'c1');
@@ -138,47 +133,8 @@ await comprobar('1. el otro asunto no la tiene',
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 
-/* 2. «Pasar a la guía» desde el «⋮». */
-await abrirMesaDe('Sola Uno', 'c1');
-const filaTarea = pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el libro de familia' });
-await filaTarea.locator('.guion-tarea-menu-boton').click();
-await elegirDelMenu('Pasar a la guía');
-await pagina.waitForTimeout(800);
-await comprobar('2. sin emergente', hayEmergente(), false);
-await comprobar('2. la guía tiene la tarea al final',
-  guiaGuardada().then((g) => g.filter((p) => p.id === 'c1')[0].guion.map((x) => x.texto)),
-  ['Avisar a la tutoría', 'Avisar a la familia', 'Pedir el libro de familia']);
-await comprobar('2. el aviso verde dice dónde y lleva «Deshacer»',
-  pagina.evaluate(() => {
-    const m = Array.prototype.filter.call(document.querySelectorAll('#mensajes .mensaje'), (x) => x.textContent.indexOf('Guardado en la guía') === 0)[0];
-    return m ? { texto: m.firstChild.textContent, boton: m.querySelector('.mensaje-boton').textContent } : null;
-  }), { texto: 'Guardado en la guía de CONVALIDACION y en 1 asunto abierto.', boton: 'Deshacer' });
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-await abrirMesaDe('Sola Dos', 'c1');
-await comprobar('2. el otro asunto abierto del tipo la tiene',
-  tareasVistas('c1').then((t) => t.indexOf('Pedir el libro de familia') !== -1), true);
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-
-/* 3. «Deshacer» desde el aviso. */
-await abrirMesaDe('Sola Uno', 'c1');
-await pagina.click('#mensajes .mensaje-boton');
-await pagina.waitForTimeout(800);
-await comprobar('3. la guía vuelve a como estaba',
-  guiaGuardada().then((g) => g.filter((p) => p.id === 'c1')[0].guion.map((x) => x.texto)),
-  ['Avisar a la tutoría', 'Avisar a la familia']);
-await comprobar('3. en este asunto la tarea sigue, con «solo aquí»',
-  pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el libro de familia' }).locator('.guion-tarea-propia').isVisible(), true);
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-await abrirMesaDe('Sola Dos', 'c1');
-await comprobar('3. en el otro asunto ya no está',
-  tareasVistas('c1').then((t) => t.indexOf('Pedir el libro de familia') !== -1), false);
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-
-/* 4. Cambiar y Borrar una tarea de la guía: a la guía, sin preguntar. */
+/* 4. Con la marca de la guía encendida (fila 660), cambiar y borrar una tarea de la guía van a la guía, sin preguntar. */
+await pagina.evaluate(async (c) => { await MarcaGuia.poner(Gestor.asuntos().filter((x) => x.nombre === c)[0], true); }, ASUNTO_1);
 await abrirMesaDe('Sola Uno', 'c1');
 await abrirMenuDeTarea('g1');
 await elegirDelMenu('Cambiar');
@@ -204,85 +160,21 @@ await comprobar('4. el otro asunto ve el cambio y el borrado',
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 
-/* 5. Hito «solo para este asunto»: marca visible; «Pasar a la guía» lo lleva entero. */
+/* 7. «Cambiar» un hito de la guía (marca encendida): sin pregunta, va a la guía y llega al otro asunto. */
 await abrirMesaDe('Sola Uno', 'c1');
-/* Fila 553: el hito nuevo se crea con «+ Añadir hito» de la tira (ventana «Va detrás de» / «Para»; fila 584: prueba puesta al día). */
-await pagina.click('.comunes-anadir-hito');
-await pagina.waitForSelector('.capa-campos #cv-crear');
-await pagina.selectOption('#cv-detras', 'c2');
-await pagina.selectOption('#cv-para', 'aqui');
-await pagina.click('#cv-crear');
-await pagina.fill('#cn-nombre', 'Revisión extra');
-await pagina.click('#cn-crear');
-await pagina.waitForTimeout(600);
-const idPropio = await pagina.evaluate(async (clave) => {
-  const d = await Hitos.leer();
-  return d.porAsunto[clave].hitos.filter((h) => h.titulo === 'Revisión extra')[0].id;
-}, ASUNTO_1);
-await pagina.click('#ficha-volver');
-await pagina.waitForTimeout(300);
-await abrirMesaDe('Sola Uno', idPropio);
-await comprobar('5. el hito sale con la marca «solo aquí»',
-  pagina.locator('.hito-en-mesa .mesa-titulo-fila .marca-solo-aqui').isVisible(), true);
-await comprobar('5. no está en la guía',
-  guiaGuardada().then((g) => g.map((p) => p.titulo)), ['Comunicar', 'Sin tareas', 'Resolver']);
-
-/* El fallo de «no me carga el mapa previo»: con el hito recién creado solo en este asunto,
-   «Cambiar la guía…» y el mapa del asunto enseñan la guía que ya había, entera. */
-await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });
-await comprobar('6. «Cambiar la guía…» con el hito solo-aquí: sale la guía previa entera',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#guia-pasos .paso-titulo'), (x) => x.value)),
-  ['Comunicar', 'Sin tareas', 'Resolver']);
-await pagina.keyboard.press('Escape');
-await pagina.waitForTimeout(300);
-
-await pagina.click('.hito-en-mesa .mesa-mas');
-await elegirDelMenuAbierto('Pasar a la guía');
-await pagina.waitForTimeout(800);
-await comprobar('5. «Pasar a la guía» no pregunta', hayEmergente(), false);
-await comprobar('5. la guía suma el hito, en su sitio',
-  guiaGuardada().then((g) => g.map((p) => p.titulo)), ['Comunicar', 'Sin tareas', 'Revisión extra', 'Resolver']);
-await comprobar('5. en este asunto queda enlazado, una sola vez, y ya sin la marca',
-  pagina.evaluate(async (clave) => {
-    const d = await Hitos.leer();
-    const h = d.porAsunto[clave].hitos.filter((x) => x.titulo === 'Revisión extra');
-    return { cuantos: h.length, enlazado: !!h[0].origenGuia, marca: !!document.querySelector('.hito-en-mesa .mesa-titulo-fila .marca-solo-aqui') };
-  }, ASUNTO_1), { cuantos: 1, enlazado: true, marca: false });
-await comprobar('5. llega al otro asunto abierto, una sola vez',
-  pagina.evaluate(async (clave) => {
-    const d = await Hitos.leer();
-    return d.porAsunto[clave].hitos.map((x) => x.titulo);
-  }, ASUNTO_2), ['Comunicar', 'Sin tareas', 'Revisión extra', 'Resolver']);
-
-/* 7. «Cambiar» un hito de la guía: sin pregunta, va a la guía y llega al otro asunto. */
 await pagina.click('.hito-en-mesa .mesa-mas');
 await elegirDelMenuAbierto('Cambiar');
 await pagina.waitForSelector('#capa:not(.oculto) #hda-titulo');
 await comprobar('7. «Cambiar» un hito: sin la pregunta de dónde se guarda',
   pagina.evaluate(() => !document.querySelector('.dsg') && !document.querySelector('input[name="dsg-donde"]')), true);
-await pagina.fill('#hda-titulo', 'Revisión extra bis');
+await pagina.fill('#hda-titulo', 'Comunicar bis');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(800);
 await comprobar('7. el título nuevo está en la guía',
-  guiaGuardada().then((g) => g.map((p) => p.titulo)), ['Comunicar', 'Sin tareas', 'Revisión extra bis', 'Resolver']);
+  guiaGuardada().then((g) => g.map((p) => p.titulo)[0]), 'Comunicar bis');
 await comprobar('7. y en el otro asunto, que no lo había empezado',
-  pagina.evaluate(async (clave) => (await Hitos.leer()).porAsunto[clave].hitos.map((x) => x.titulo), ASUNTO_2),
-  ['Comunicar', 'Sin tareas', 'Revisión extra bis', 'Resolver']);
-
-/* 8. «Cambiar la guía…» tras crear un hito: la guía previa se ve entera. */
-await pagina.click('.hito-en-mesa .mesa-mas');
-await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar la guía' }).first().click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.click('#cuadro-aceptar');   /* la advertencia de «Vale para todos los asuntos…» */
-await pagina.waitForSelector('#guia-pasos .paso-titulo', { state: 'attached' });
-await comprobar('8. «Cambiar la guía…» enseña todos los hitos que la guía ya tenía, más el nuevo',
-  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#guia-pasos .paso-titulo'), (x) => x.value)),
-  ['Comunicar', 'Sin tareas', 'Revisión extra bis', 'Resolver']);
-await pagina.keyboard.press('Escape');
+  pagina.evaluate(async (clave) => (await Hitos.leer()).porAsunto[clave].hitos.map((x) => x.titulo)[0], ASUNTO_2),
+  'Comunicar bis');
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);
 await pagina.close();

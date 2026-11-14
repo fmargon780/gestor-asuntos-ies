@@ -27,7 +27,7 @@ var HacerEsteHito = (function () {
 
 
   function clave(a, h) { return a.nombre + '|' + h.id; }
-  function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1 && !(g.accion === 'comunicar' && window.Sitios && Sitios.canalDeSitio(g.donde) === ''); }   /* fila 659: «Enviar» a otro sitio no envía nada */
+  function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1 && !(g.accion === 'comunicar' && window.Sitios && Sitios.canalDeSitio(g.donde) === '') && !(g.accion === 'generar' && g.receta && g.receta.sinPlantilla); }   /* fila 659: «Enviar» a otro sitio no envía nada */
   function tareasDe(a, h) { return window.Hitos && Hitos.guionDe ? Hitos.guionDe(a, h).filter(esDeCadena) : []; }
   function enCurso(a, h) { return !!(a && h && activos[clave(a, h)]); }
   function puede(h) { return !!h && h.clase !== 'decision' && h.estado !== 'hecho' && h.estado !== 'noaplica'; }

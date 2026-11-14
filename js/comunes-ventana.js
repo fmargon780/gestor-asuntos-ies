@@ -54,7 +54,7 @@ var ComunesVentana = (function () {
       detras: ctx.detras && ctx.detras.length ? ctx.detras[ctx.detras.length - 1].valor : '' };   /* fila 553: «Va detrás de», por defecto el último */
     var capa = document.createElement('div');
     capa.className = 'capa capa-campos';
-    capa.innerHTML = '<div class="cuadro cuadro-campos" role="dialog" aria-modal="true" aria-label="' + (tarea ? 'Elegir una tarea' : 'Elegir un hito') + '"></div>';
+    capa.innerHTML = '<div class="cuadro cuadro-campos" role="dialog" aria-modal="true" aria-label="' + (tarea ? 'Tareas de la lista' : 'Hitos de la lista') + '"></div>';
     document.body.appendChild(capa);
     var cuadro = capa.firstChild;
     function tecla(ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cerrar(); } }
@@ -88,7 +88,7 @@ var ComunesVentana = (function () {
       var centro = st.modo === 'nuevo' ? '<div id="cv-nuevo"></div>'
         : (visibles.length ? visibles.map(fila).join('') : '<p class="suave" style="margin:6px">No hay ' + (tarea ? 'ninguna tarea' : 'ningún hito') + ' así. Puedes crearlo abajo.</p>');
       cuadro.innerHTML =
-        '<div class="campos-elegir-cab"><div class="campos-elegir-titulo"><h3>' + esc(ctx.titulo || (tarea ? 'Elegir una tarea' : 'Elegir un hito')) + '</h3>' +
+        '<div class="campos-elegir-cab"><div class="campos-elegir-titulo"><h3>' + esc(ctx.titulo || (tarea ? 'Tareas de la lista' : 'Hitos de la lista')) + '</h3>' +
         '<button type="button" class="boton" id="cv-cerrar" style="margin-left:auto">Cerrar</button></div>' +
         (st.modo === 'lista' ? '<input type="search" id="cv-buscar" class="campo" placeholder="Buscar por nombre" aria-label="Buscar por nombre" autocomplete="off" value="' + esc(st.q) + '">' : '') + '</div>' +
         '<div class="campos-elegir-cuerpo"' + (grupos ? '' : ' style="grid-template-columns:minmax(0,1fr)"') + '>' + grupos + '<div class="campos-elegir-centro" id="cv-centro">' + centro + '</div></div>' +

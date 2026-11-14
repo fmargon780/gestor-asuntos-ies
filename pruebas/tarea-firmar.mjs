@@ -73,9 +73,9 @@ console.log('--- 1. «Firmar un documento» ---');
 await abrirMesa('Vidal Soto');
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();   /* fila 638: el formulario se abre con «+ Añadir tarea» */
 await comprobar('1. «Qué se hace» ofrece «Poner a la firma»',
-  pagina.$$eval('.hito-en-mesa .tcd-nueva .tcd-accion option', (o) => o.map((x) => x.textContent).includes('Poner a la firma')), true);
-await pagina.locator('#guion-nueva-tarea').fill('Firmar la resolución');
-await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('firmar');
+  pagina.$$eval('.hito-en-mesa .tcd-nueva datalist option', (o) => o.map((x) => x.value).includes('Poner a la firma')), true);
+await pagina.locator('.tcd-nueva .at-nombre').fill('Firmar la resolución');
+await pagina.locator('.hito-en-mesa .tcd-nueva .at-que').fill('Poner a la firma');
 await comprobar('1. sale «Firmas necesarias» con 1, 2 y 3 (por defecto 1)',
   pagina.evaluate(() => {
     const c = document.querySelector('.hito-en-mesa .tcd-nueva');
@@ -83,12 +83,12 @@ await comprobar('1. sale «Firmas necesarias» con 1, 2 y 3 (por defecto 1)',
     return [/Firmas necesarias/.test(c.innerText), s ? [...s.options].map((o) => o.value) : null, s ? s.value : null];
   }), [true, ['1', '2', '3'], '1']);
 await pagina.locator('.hito-en-mesa .tcd-nueva .guion-receta-firmas').selectOption('2');
-await pagina.locator('#guion-nueva-tarea').press('Enter');
+await pagina.locator('.tcd-nueva .at-nombre').press('Enter');
 await pagina.waitForTimeout(1500);
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();
-await pagina.locator('#guion-nueva-tarea').fill('Firmar el informe');
-await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('firmar');
-await pagina.locator('#guion-nueva-tarea').press('Enter');
+await pagina.locator('.tcd-nueva .at-nombre').fill('Firmar el informe');
+await pagina.locator('.hito-en-mesa .tcd-nueva .at-que').fill('Poner a la firma');
+await pagina.locator('.tcd-nueva .at-nombre').press('Enter');
 await pagina.waitForTimeout(1500);
 const ids = await pagina.evaluate(async () => {
   const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
@@ -114,14 +114,14 @@ await comprobar('1. «Cambiar» (⋮) enseña la acción y sus firmas',
   (async () => {
     await lineaDe(ids['Firmar la resolución'][0]).locator('.guion-tarea-menu-boton').click();
     await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar' }).first().click();
-    await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .tcd-accion');
-    const r = await pagina.evaluate(() => { const c = document.querySelector('.hito-en-mesa .guion-tarea-editar'); return [c.querySelector('.tcd-accion').value, c.querySelector('.guion-receta-firmas').value]; });
+    await pagina.waitForSelector('.hito-en-mesa .guion-tarea-editar .at-que');
+    const r = await pagina.evaluate(() => { const c = document.querySelector('.hito-en-mesa .guion-tarea-editar'); return [c.querySelector('.at-que').value, c.querySelector('.guion-receta-firmas').value]; });
     await pagina.locator('.hito-en-mesa .guion-tarea-editar .guion-receta-firmas').selectOption('3');
     await pagina.locator('.hito-en-mesa .guion-tarea-editar .guion-receta-firmas').selectOption('2');
     await pagina.locator('.hito-en-mesa .guion-tarea-editar-guardar').click();
     await pagina.waitForTimeout(1500);
     return r;
-  })(), ['firmar', '2']);
+  })(), ['Poner a la firma', '2']);
 
 /* ===== 2 y 3. Llega el firmado ===== */
 console.log('--- 2. el firmado llega ---');

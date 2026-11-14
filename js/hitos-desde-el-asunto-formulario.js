@@ -37,8 +37,7 @@
       colocarDespuesDe: ($('hda-despues') || {}).value || '',
       responsable: ($('hda-responsable') || {}).value || '',
       plazo: plazoDelFormulario(),
-      variosDocumentos: !!($('hda-varios-documentos') || {}).checked,   /* fila 414 */
-      soloAqui: !!($('hda-solo-aqui') || {}).checked   /* fila 416 */
+      variosDocumentos: !!($('hda-varios-documentos') || {}).checked   /* fila 414 */
     };
   }
 
@@ -67,9 +66,8 @@
           U.escapar(x.titulo || '(sin título)') + '</option>';
       }).join('');
     return (
-      '<label class="etiqueta">' + (opts.esCrear ? 'Título, o busca en la biblioteca' : 'Título') + '</label>' +
+      '<label class="etiqueta">' + 'Título' + '</label>' +
       '<input id="hda-titulo" class="campo" value="' + U.escapar(opts.titulo || '') + '" placeholder="Por ejemplo: Firma del director">' +
-      (opts.esCrear ? '<div id="hda-biblioteca-resultados" class="hda-biblioteca-resultados oculto"></div>' : '') +
       (window.Guias && window.GuiasBarra
         ? '<label class="etiqueta">Explicación <span class="suave">(opcional)</span></label>' + GuiasBarra.html() +
           '<div id="hda-cuerpo" class="paso-cuerpo hda-cuerpo" contenteditable="true" data-vacio="Explicación del hito">' +
@@ -97,9 +95,8 @@
         '<label class="interruptor hda-varios-documentos-fila"><input type="checkbox" id="hda-varios-documentos"' +
         (opts.variosDocumentos ? ' checked' : '') + '><span>Recibe varios documentos</span></label>' +
         '<p class="suave">Con esto, al añadir un documento al asunto no se ofrece terminar la espera; el hito se cierra a mano.</p>') +
-      /* Fila 416: solo al crear, y solo con tipo (sin tipo no hay guía). Desmarcada al abrirse. */
-      (opts.casillaSoloAqui ? '<label class="interruptor hda-solo-aqui-fila"><input type="checkbox" id="hda-solo-aqui"><span>Solo para este asunto</span></label>' +
-        '<p class="suave">Sin marcar, el hito va a la guía de ' + U.escapar(opts.casillaSoloAqui) + ' y llega a los asuntos abiertos que no lo hayan empezado.</p>' : '')
+      /* Fila 660: a dónde irá el cambio, según la marca de la guía (js/marca-guia.js). */
+      (opts.alcance ? '<p class="suave hda-alcance">' + U.escapar(opts.alcance) + '</p>' : '')
     );
   }
 
