@@ -134,7 +134,7 @@ await p.waitForSelector('.ficha-menu:not(.oculto)');
 await comprobar('5e. «Hito ▾» no tiene «Crear», sí «Cambiar» y «Borrar»', opcionesAbiertas().then((l) => [l.indexOf('Crear'), l.indexOf('Cambiar') !== -1, l.some((x) => x.indexOf('Borrar') === 0)]), [-1, true, true]);
 await p.keyboard.press('Escape');
 
-console.log('--- 6. «Cambiar la tarea» cambia también «Qué se hace» ---');
+console.log('--- 6. «Cambiar» cambia también «Qué se hace» (fila 660: el mismo formulario para todas las tareas) ---');
 const tarea = await p.evaluate(async ([tipo, paso]) => {
   const t = await ComunesGuardado.anadir('tareas', { nombre: 'Tarea común 553', accion: '', receta: null });
   await GuiasDelCentro.cambiarPasos(tipo, (pasos) => {
@@ -145,23 +145,19 @@ const tarea = await p.evaluate(async ([tipo, paso]) => {
   return t.id;
 }, [A.tipo, A.paso]);
 await p.waitForTimeout(900);
-await menuDe('tz'); await elegir('Cambiar la tarea');
-await p.waitForSelector('#cc-hace');
-await comprobar('6a. la ventana tiene Nombre y «Qué se hace»', p.evaluate(() => [!!document.querySelector('#cc-nombre'), document.querySelector('#cc-hace').value]), [true, '']);
-await p.selectOption('#cc-hace', 'comunicar');
-await comprobar('6b. al elegir comunicar sale la Plantilla, con «+ Plantilla nueva…»', p.evaluate(() => { const s = document.querySelector('#cc-pl'); return !!s && [...s.options].some((o) => o.textContent === '+ Plantilla nueva…'); }), true);
-await p.selectOption('#cc-hace', 'firmar');
-await comprobar('6c. con firmar ya no hay Plantilla', p.evaluate(() => !document.querySelector('#cc-pl')), true);
-await p.selectOption('#cc-hace', 'comunicar');
-await p.click('#cc-guardar');
+await menuDe('tz'); await elegir('Cambiar');
+await p.waitForSelector('.guion-tarea-editar .at-que');
+await comprobar('6a. el formulario tiene «Qué se hace» como casilla de búsqueda, vacío para «Otra cosa» (y no hay «Cambiar la tarea»)', p.evaluate(() => [document.querySelector('.guion-tarea-editar .at-que').value, !document.querySelector('#cc-hace')]), ['Otra cosa', true]);
+await p.fill('.guion-tarea-editar .at-que', 'Enviar · Correo electrónico');
+await comprobar('6b. al elegir enviar sale la plantilla de correo', p.evaluate(() => !!document.querySelector('.guion-tarea-editar .at-plantilla')), true);
+await p.fill('.guion-tarea-editar .at-que', 'Poner a la firma');
+await comprobar('6c. con poner a la firma ya no hay plantilla', p.evaluate(() => !document.querySelector('.guion-tarea-editar .at-plantilla')), true);
+await p.fill('.guion-tarea-editar .at-que', 'Enviar · Correo electrónico');
+await p.click('.guion-tarea-editar .guion-tarea-editar-guardar');
 await p.waitForTimeout(1500);
-await comprobar('6d. la tarea de la lista común cambia de acción', p.evaluate(async (id) => (await ComunesGuardado.leer()).tareas.filter((t) => t.id === id)[0].accion, tarea), 'comunicar');
+await comprobar('6d. con la marca de la guía encendida, la tarea cambia de acción en la guía', p.evaluate(async ([tipo, paso]) => GuiasDelCentro.pasosDe(tipo).filter((x) => x.id === paso)[0].guion.filter((g) => g.id === 'tz')[0].accion, [A.tipo, A.paso]), 'comunicar');
 await comprobar('6e. la etiqueta de la tarea dice la acción nueva', p.evaluate(() => (document.querySelector('.hito-en-mesa .guion-paso[data-id="tz"] .guion-tarea-accion') || {}).textContent), 'Enviar');
-await comprobar('6f. y el otro asunto abierto conserva la acción vieja', p.evaluate(async ([n, h]) => {
-  const a = App.E.listaAbiertos.filter((x) => x.nombre === n)[0];
-  const g = Hitos.guionDe(a, (await Hitos.hitosDe(n)).filter((k) => k.id === h)[0]).filter((x) => x.texto === 'Tarea común 553');
-  return g.map((x) => x.accion);
-}, [B.nombre, B.hito]), ['']);
+await comprobar('6f. y deja de ser la tarea de la lista común (el cambio es de esta guía)', p.evaluate(async ([tipo, paso]) => !GuiasDelCentro.pasosDe(tipo).filter((x) => x.id === paso)[0].guion.filter((g) => g.id === 'tz')[0].comun, [A.tipo, A.paso]), true);
 
 console.log('--- 7. el menú ⋮ de la última tarea no se corta ---');
 await p.setViewportSize({ width: 1500, height: 700 });
