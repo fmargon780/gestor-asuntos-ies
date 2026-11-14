@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de prueba 661 · Bandeja con hito y tarea</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 15px; color: #1c2733; background: #e9edf2; }
+  .franja { background: #7a4d00; color: #fff; padding: 6px 12px; font-size: 13px; text-align: center; }
+  .casos { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: #fff; border-bottom: 1px solid #cfd6de; }
+  .casos b { font-size: 13px; color: #55606c; margin-right: 4px; }
+  button { font: inherit; cursor: pointer; border: 1px solid #b9c2cc; background: #fff; color: #1c2733; border-radius: 8px; padding: 7px 14px; }
+  button:hover { background: #f1f4f7; }
+  button.principal { background: #1f4e79; border-color: #1f4e79; color: #fff; }
+  button.principal:hover { background: #173c5e; }
+  button.caso.puesto { background: #1f4e79; border-color: #1f4e79; color: #fff; }
+  button.chico { padding: 4px 10px; font-size: 13px; }
+  .cuadro { background: #fff; border-radius: 12px; margin: 14px; padding: 16px 20px; border: 1px solid #cfd6de; }
+  .cuadro h3 { margin: 0 0 10px; font-size: 17px; }
+  .dos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+  @media (max-width: 800px) { .dos { grid-template-columns: minmax(0, 1fr); } .visor { min-height: 90px !important; } }
+  .visor { border: 1px solid #cfd6de; border-radius: 8px; min-height: 420px; background: #f7f9fb; display: flex; align-items: center; justify-content: center; color: #7b8794; text-align: center; padding: 12px; }
+  .nota { color: #55606c; font-size: 13.5px; margin: 0 0 8px; }
+  .nuevo-texto { background: #fff6d9; }
+  label.etiqueta, .etiqueta { display: block; font-weight: 600; margin: 10px 0 4px; }
+  input[type=date], input[type=text], select { font: inherit; width: 100%; padding: 8px 10px; border: 1px solid #b9c2cc; border-radius: 8px; background: #fff; color: #1c2733; }
+  .fila2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .casilla { display: flex; align-items: center; gap: 10px; border: 1px solid #cfd6de; background: #f7f9fb; border-radius: 8px; padding: 9px 12px; margin-top: 8px; }
+  .bloque-tarea { border: 2px solid #1f4e79; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+  .bloque-tarea h4 { margin: 0 0 6px; font-size: 15px; }
+  .propuesta p { margin: 2px 0; }
+  .suave { color: #55606c; font-size: 13.5px; }
+  .hito-linea { display: flex; gap: 8px; align-items: center; }
+  .hito-linea select { flex: 1; min-width: 0; }
+  .op { display: flex; gap: 8px; align-items: flex-start; padding: 5px 2px; }
+  .op small { color: #55606c; }
+  .asi { border: 1px solid #cfd6de; background: #f7f9fb; border-radius: 8px; padding: 9px 12px; margin-top: 12px; }
+  .asi span { display: block; font-size: 11.5px; letter-spacing: .05em; color: #55606c; }
+  .asi b { font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .pie { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .aviso { margin: 10px 0 0; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+  .aviso.malo { background: #fde8e8; color: #8a1c1c; }
+  .aviso.bueno { background: #e3f4e6; color: #1d5a2a; }
+  .aviso.gris { background: #eef1f4; color: #3d4852; }
+  .capa { position: absolute; left: 0; top: 0; right: 0; min-height: 100%; background: rgba(15, 25, 40, .5); display: flex; align-items: flex-start; justify-content: center; padding: 60px 12px; }
+  .capa .cuadro { width: 100%; max-width: 520px; margin: 0; }
+  .tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 800px) { .tres { grid-template-columns: minmax(0, 1fr); } }
+  .caja { border: 1px solid #cfd6de; border-radius: 8px; padding: 10px 12px; }
+  .caja h4 { margin: 0 0 6px; font-size: 14px; color: #55606c; }
+  .caja ul { margin: 0; padding-left: 18px; }
+  .caja li { margin: 3px 0; }
+  .hecha { color: #1d5a2a; }
+  .marca { font-size: 12px; background: #fff0c2; color: #6b4a00; border-radius: 6px; padding: 1px 6px; }
+  .enlace { color: #1f4e79; text-decoration: underline; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; }
+  [hidden] { display: none !important; }
+  #raiz { position: relative; min-height: 100vh; }
+</style>
+</head>
+<body>
+<div id="raiz">
+<div class="franja">Pantalla de prueba · fila 661 · datos inventados · no guarda nada</div>
+<div class="casos">
+  <b>Casos para probar:</b>
+  <button type="button" class="caso" id="caso-suelto">Documento suelto</button>
+  <button type="button" class="caso" id="caso-sinhitos">Asunto sin hitos</button>
+  <button type="button" class="caso" id="caso-correo">Correo con dos adjuntos</button>
+</div>
+
+<div class="cuadro" id="cuadro-nombre">
+  <h3 id="titulo-asunto"></h3>
+  <div class="dos">
+    <div class="visor" id="visor"></div>
+    <div>
+      <p class="nota" id="serie" hidden></p>
+      <p class="nota"><span class="nuevo-texto">El documento entra en el asunto al pulsar «Guardar».</span><br>Fichero: <span id="fichero"></span></p>
+      <div class="fila2">
+        <div><label class="etiqueta" for="fecha">Fecha del documento</label><input type="date" id="fecha" value="2026-11-14"></div>
+        <div><label class="etiqueta" for="texto">Texto adicional <span class="suave">(opcional)</span></label><input type="text" id="texto"></div>
+      </div>
+      <label class="etiqueta" for="tipo">Tipo de documento</label>
+      <select id="tipo"></select>
+
+      <div class="bloque-tarea" id="bloque-tarea">
+        <h4>¿De qué tarea es?</h4>
+        <div class="propuesta" id="propuesta" hidden>
+          <p><span class="suave">Hito:</span> <b id="p-hito"></b></p>
+          <p><span class="suave">Tarea:</span> <b id="p-tarea"></b></p>
+          <p class="suave" id="p-nota"></p>
+          <button type="button" class="chico" id="cambiar">Cambiar</button>
+        </div>
+        <div id="amano" hidden>
+          <p class="suave" id="amano-nota"></p>
+          <label class="etiqueta" for="hito">Hito</label>
+          <div class="hito-linea">
+            <select id="hito"></select>
+            <button type="button" class="chico" id="anadir-hito">+ Añadir hito</button>
+          </div>
+          <div class="etiqueta" id="et-tarea">Tarea</div>
+          <div id="tareas"></div>
+        </div>
+      </div>
+
+      <div class="casilla"><input type="checkbox" id="seneca"><label for="seneca">Está registrado en Séneca</label></div>
+      <div class="casilla"><input type="checkbox" id="pendiente"><label for="pendiente">Pendiente de registro</label></div>
+      <div class="asi"><span>SE GUARDARÁ ASÍ</span><b id="asi"></b></div>
+      <div class="pie">
+        <button type="button" id="volver">Volver</button>
+        <button type="button" class="principal" id="guardar">Guardar</button>
+      </div>
+      <p class="aviso" id="aviso" hidden></p>
+    </div>
+  </div>
+</div>
+
+<div class="cuadro" id="resultado" hidden>
+  <h3 id="res-titulo"></h3>
+  <p class="aviso" id="res-aviso"></p>
+  <div class="tres" style="margin-top:12px">
+    <div class="caja"><h4>Hitos y tareas</h4><div id="res-hitos"></div></div>
+    <div class="caja"><h4>Documentos de la carpeta</h4><ul id="res-docs"></ul></div>
+    <div class="caja"><h4>Registro</h4><ul id="res-registro"></ul></div>
+  </div>
+  <p class="aviso gris" id="res-abrir" hidden></p>
+  <div class="pie"><button type="button" id="otra-vez">Volver a empezar este caso</button></div>
+</div>
+
+<div class="capa" id="capa-hito" hidden>
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="ch-titulo">
+    <h3 id="ch-titulo">Añadir hito</h3>
+    <p class="suave">Es la ventana paso a paso de la fila 660. Aquí va resumida.</p>
+    <div id="ch-paso1">
+      <label class="etiqueta" for="ch-fase">Paso 1 · ¿En qué fase está?</label>
+      <select id="ch-fase"></select>
+      <div class="pie"><button type="button" id="ch-cancelar1">Cancelar</button><button type="button" class="principal" id="ch-seguir">Seguir</button></div>
+    </div>
+    <div id="ch-paso2" hidden>
+      <div class="etiqueta">Paso 2 · ¿Qué hito?</div>
+      <div id="ch-hitos"></div>
+      <div class="pie"><button type="button" id="ch-atras">Atrás</button><button type="button" id="ch-cancelar2">Cancelar</button><button type="button" class="principal" id="ch-anadir">Añadir hito</button></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function () {
+  var TIPOS = ['SOLICITUD', 'FACTURA', 'CERTIFICADO', 'MATRICULA', 'RESOLUCION', 'NOTIFICACION', 'INFORME', 'ACTA', 'COMUNICACION', 'JUSTIFICANTE', 'PRESUPUESTO', 'ALBARAN', 'CONTRATO', 'RECURSO', 'ANEXO'];
+  var FASES = ['Recibir', 'Pedir', 'Comprobar', 'Generar documento', 'Poner a la firma', 'Publicar', 'Enviar o entregar', 'Hacer en Séneca', 'Cobrar o pagar', 'Esperar', 'Archivar'];
+  var HITOS_DE_FASE = {
+    'Recibir': [{ t: 'Recibir la solicitud', tareas: [{ texto: 'Recibir la solicitud', doc: 'SOLICITUD' }] }, { t: 'Recibir documentación', tareas: [{ texto: 'Recibir un documento', doc: '' }] }],
+    'Comprobar': [{ t: 'Comprobar la documentación', tareas: [] }],
+    'Generar documento': [{ t: 'Preparar el certificado', tareas: [] }]
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function asuntoMatricula() {
+    return { nombre: '261109 MATRICULA Aguilar Ponce, Pablo 2100002', actual: 'h1', hitos: [
+      { id: 'h1', t: 'Recibir la solicitud', tareas: [
+        { id: 't1', texto: 'Recibir la solicitud de matrícula', doc: 'SOLICITUD', anadir: true },
+        { id: 't2', texto: 'Recibir otra documentación', doc: '', anadir: true }] },
+      { id: 'h2', t: 'Comprobar la documentación', tareas: [
+        { id: 't3', texto: 'Recibir el justificante del seguro escolar', doc: 'JUSTIFICANTE', anadir: true },
+        { id: 't4', texto: 'Comprobar los datos', anadir: false }] },
+      { id: 'h3', t: 'Grabar la matrícula en Séneca', tareas: [{ id: 't5', texto: 'Grabar la matrícula', anadir: false }] }],
+      docs: [], registro: [] };
+  }
+  function asuntoSinHitos() {
+    return { nombre: '261112 CERTIFICADO Herrera Lozano, Diego 2100009', actual: null, hitos: [], docs: [], registro: [] };
+  }
+
+  var E = {};
+
+  function empezar(caso) {
+    E = { caso: caso, numero: 1231, cola: [], aMano: false, hitoId: '', tareaId: null, hayTarea: false };
+    if (caso === 'suelto') { E.a = asuntoMatricula(); E.cola = [{ fichero: 'justificante.pdf', tipo: 'JUSTIFICANTE' }]; }
+    if (caso === 'sinhitos') { E.a = asuntoSinHitos(); E.cola = [{ fichero: 'escaneo_0012.pdf', tipo: 'SOLICITUD' }]; }
+    if (caso === 'correo') {
+      E.a = asuntoMatricula();
+      E.correo = { de: 'Marina Ponce Ruiz', asunto: 'Matrícula de Pablo: documentación' };
+      E.cola = [{ fichero: 'solicitud firmada.pdf', tipo: 'SOLICITUD' }, { fichero: 'recibo.pdf', tipo: 'INFORME' }];
+    }
+    E.total = E.cola.length;
+    ['suelto', 'sinhitos', 'correo'].forEach(function (c) { $('caso-' + c).classList.toggle('puesto', c === caso); });
+    $('resultado').hidden = true;
+    $('cuadro-nombre').hidden = false;
+    abrirDocumento();
+  }
+
+  function abrirDocumento() {
+    var d = E.cola[0];
+    E.aMano = false; E.hitoId = ''; E.tareaId = null; E.hayTarea = false;
+    $('titulo-asunto').textContent = E.a.nombre;
+    $('fichero').textContent = d.fichero;
+    $('visor').textContent = 'Aquí se ve el documento: ' + d.fichero;
+    $('texto').value = ''; $('seneca').checked = false; $('pendiente').checked = false;
+    $('tipo').innerHTML = TIPOS.map(function (t) { return '<option' + (t === d.tipo ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+    var n = E.total - E.cola.length + 1;
+    $('serie').hidden = E.caso !== 'correo';
+    $('serie').textContent = E.caso === 'correo' ? 'Correo de ' + E.correo.de + ' · adjunto ' + n + ' de ' + E.total : '';
+    quitarAviso();
+    proponer();
+    pintarAsi();
+  }
+
+  function hito(id) { return E.a.hitos.filter(function (h) { return h.id === id; })[0] || null; }
+  function numero(h) { return E.a.hitos.indexOf(h) + 1; }
+  function nombreHito(h) { return numero(h) + '. ' + h.t + (h.id === E.a.actual ? ' (el actual)' : ''); }
+  function esperan(h) { return h.tareas.filter(function (t) { return t.anadir && !t.hecha; }); }
+
+  function proponer() {
+    if (E.aMano) { pintarAMano(); return; }
+    var tipo = $('tipo').value, hallado = null;
+    E.a.hitos.forEach(function (h) {
+      esperan(h).forEach(function (t) { if (!hallado && t.doc === tipo) hallado = { h: h, t: t }; });
+    });
+    if (hallado) {
+      E.hitoId = hallado.h.id; E.tareaId = hallado.t.id; E.hayTarea = true;
+      $('propuesta').hidden = false; $('amano').hidden = true;
+      $('p-hito').textContent = nombreHito(hallado.h);
+      $('p-tarea').textContent = hallado.t.texto;
+      $('p-nota').textContent = 'Esa tarea espera un documento de tipo ' + tipo + '. Queda hecha.';
+    } else {
+      E.hitoId = ''; E.tareaId = null; E.hayTarea = false;
+      pintarAMano();
+    }
+  }
+
+  function pintarAMano() {
+    $('propuesta').hidden = true; $('amano').hidden = false;
+    var sin = !E.a.hitos.length;
+    $('amano-nota').textContent = sin ? 'Este asunto no tiene hitos. Añade el hito del que cuelga el documento.'
+      : (E.aMano ? '' : 'Ninguna tarea espera un documento de tipo ' + $('tipo').value + '. Elige el hito y la tarea.');
+    $('amano-nota').hidden = !$('amano-nota').textContent;
+    $('hito').innerHTML = '<option value="">' + (sin ? 'No hay hitos' : 'Elige el hito…') + '</option>' +
+      E.a.hitos.map(function (h) { return '<option value="' + h.id + '"' + (h.id === E.hitoId ? ' selected' : '') + '>' + esc(nombreHito(h)) + '</option>'; }).join('');
+    $('hito').disabled = sin;
+    pintarTareas();
+  }
+
+  function pintarTareas() {
+    var h = hito(E.hitoId);
+    $('et-tarea').hidden = !h;
+    if (!h) { $('tareas').innerHTML = ''; return; }
+    var tipo = $('tipo').value;
+    var html = esperan(h).map(function (t) {
+      return '<label class="op"><input type="radio" name="tarea" value="' + t.id + '"' + (E.hayTarea && E.tareaId === t.id ? ' checked' : '') + '><span>' + esc(t.texto) +
+        '<br><small>' + (t.doc ? 'Espera un documento de tipo ' + t.doc + '.' : 'Espera un documento.') + ' Queda hecha.</small></span></label>';
+    }).join('');
+    html += '<label class="op"><input type="radio" name="tarea" value="nueva"' + (E.hayTarea && E.tareaId === 'nueva' ? ' checked' : '') + '><span>Tarea nueva: «' + esc(tipo) +
+      '»<br><small>La app la crea en ese hito y la deja hecha.</small></span></label>';
+    $('tareas').innerHTML = html;
+    Array.prototype.forEach.call($('tareas').querySelectorAll('input'), function (r) {
+      r.onchange = function () { E.tareaId = r.value; E.hayTarea = true; E.aMano = true; quitarAviso(); };
+    });
+  }
+
+  function pintarAsi() {
+    var f = $('fecha').value || '2026-11-14';
+    var aammdd = f.slice(2, 4) + f.slice(5, 7) + f.slice(8, 10);
+    E.nombreNuevo = aammdd + ' ' + $('tipo').value + ' D26-0' + E.numero + '.pdf';
+    $('asi').textContent = E.nombreNuevo;
+  }
+
+  function aviso(texto, clase) { $('aviso').textContent = texto; $('aviso').className = 'aviso ' + clase; $('aviso').hidden = false; }
+  function quitarAviso() { $('aviso').hidden = true; }
+
+  $('tipo').onchange = function () { quitarAviso(); pintarAsi(); if (E.aMano) pintarTareas(); else proponer(); };
+  $('fecha').onchange = pintarAsi;
+  $('cambiar').onclick = function () { E.aMano = true; pintarAMano(); };
+  $('hito').onchange = function () { E.hitoId = $('hito').value; E.tareaId = null; E.hayTarea = false; E.aMano = true; quitarAviso(); pintarTareas(); };
+
+  $('guardar').onclick = function () {
+    var h = hito(E.hitoId);
+    if (!h) { aviso(E.a.hitos.length ? 'Elige el hito y la tarea de los que cuelga el documento.' : 'Añade antes el hito del que cuelga el documento.', 'malo'); return; }
+    if (!E.hayTarea) { aviso('Elige la tarea de la que cuelga el documento.', 'malo'); return; }
+    var t;
+    if (E.tareaId === 'nueva') { t = { id: 'n' + E.numero, texto: $('tipo').value, doc: $('tipo').value, anadir: true, nueva: true }; h.tareas.push(t); }
+    else t = h.tareas.filter(function (x) { return x.id === E.tareaId; })[0];
+    t.hecha = true; t.colgado = E.nombreNuevo;
+    E.a.docs.push({ nombre: E.nombreNuevo });
+    E.a.registro.push('Añadido «' + E.nombreNuevo + '» en la tarea «' + t.texto + '» · hito ' + numero(h) + '. ' + h.t);
+    E.numero++;
+    E.cola.shift();
+    if (E.cola.length) { abrirDocumento(); aviso('Guardado. Ahora, el siguiente adjunto.', 'bueno'); return; }
+    terminar(true);
+  };
+
+  $('volver').onclick = function () { terminar(false); };
+
+  function terminar(guardado) {
+    $('cuadro-nombre').hidden = true; $('resultado').hidden = false; $('res-abrir').hidden = true;
+    $('res-titulo').textContent = 'Así queda el asunto ' + E.a.nombre;
+    var quedan = E.cola.length, texto, clase = 'bueno';
+    if (E.caso === 'correo') {
+      E.a.docs.unshift({ nombre: '261114 HILO Matrícula de Pablo.pdf', correo: true });
+      E.a.docs.unshift({ nombre: '261114 CORREO Matrícula de Pablo.pdf', correo: true });
+      E.a.registro.unshift({ correo: true });
+      texto = quedan ? 'El correo queda en el Registro. ' + (quedan === 1 ? 'Un adjunto no se ha guardado: sigue' : quedan + ' adjuntos no se han guardado: siguen') + ' en la bandeja, con el correo.'
+        : 'Correo guardado: queda en el Registro, y cada adjunto colgado de su tarea.';
+      if (quedan) clase = 'gris';
+    } else if (guardado) {
+      texto = 'El documento queda colgado de su tarea.';
+    } else { texto = 'No se ha guardado nada. El documento sigue en «Por clasificar».'; clase = 'gris'; }
+    $('res-aviso').textContent = texto; $('res-aviso').className = 'aviso ' + clase;
+
+    $('res-hitos').innerHTML = E.a.hitos.length ? E.a.hitos.map(function (h) {
+      return '<p style="margin:4px 0 2px"><b>' + esc(nombreHito(h)) + '</b></p><ul>' + (h.tareas.length ? h.tareas.map(function (t) {
+        return '<li' + (t.hecha ? ' class="hecha"' : '') + '>' + (t.hecha ? '✓ ' : '') + esc(t.texto) + (t.nueva ? ' <span class="suave">(nueva)</span>' : '') +
+          (t.colgado ? '<br><span class="suave">' + esc(t.colgado) + '</span>' : '') + '</li>';
+      }).join('') : '<li class="suave">Sin tareas</li>') + '</ul>';
+    }).join('') : '<p class="suave">Sin hitos</p>';
+
+    $('res-docs').innerHTML = E.a.docs.length ? E.a.docs.map(function (d) {
+      return '<li>' + esc(d.nombre) + (d.correo ? '<br><span class="suave">Del correo: sin tarea, y sin la marca «sin tarea»</span>' : '') + '</li>';
+    }).join('') : '<li class="suave">Ninguno nuevo</li>';
+
+    $('res-registro').innerHTML = E.a.registro.length ? E.a.registro.map(function (r) {
+      if (r.correo) return '<li>Correo recibido de ' + esc(E.correo.de) + ': «' + esc(E.correo.asunto) + '» · <button type="button" class="enlace" data-abre="el PDF del correo">Abrir el correo</button> · <button type="button" class="enlace" data-abre="el PDF del hilo entero">Abrir el hilo</button></li>';
+      return '<li>' + esc(r) + '</li>';
+    }).join('') : '<li class="suave">Nada nuevo</li>';
+    Array.prototype.forEach.call($('res-registro').querySelectorAll('[data-abre]'), function (b) {
+      b.onclick = function () { $('res-abrir').textContent = 'Aquí se abriría ' + b.getAttribute('data-abre') + '.'; $('res-abrir').hidden = false; };
+    });
+  }
+
+  $('otra-vez').onclick = function () { empezar(E.caso); };
+
+  /* ---------- «+ Añadir hito» (ventana de la fila 660, resumida) ---------- */
+  var elegidoEnVentana = 0;
+  $('anadir-hito').onclick = function () {
+    $('ch-fase').innerHTML = FASES.map(function (f) { return '<option>' + f + '</option>'; }).join('');
+    $('ch-paso1').hidden = false; $('ch-paso2').hidden = true;
+    $('capa-hito').hidden = false;
+    window.scrollTo(0, 0);
+  };
+  function cerrarVentana() { $('capa-hito').hidden = true; }
+  $('ch-cancelar1').onclick = cerrarVentana;
+  $('ch-cancelar2').onclick = cerrarVentana;
+  $('ch-atras').onclick = function () { $('ch-paso1').hidden = false; $('ch-paso2').hidden = true; };
+  function hitosDeFase(f) { return HITOS_DE_FASE[f] || [{ t: f, tareas: [] }]; }
+  $('ch-seguir').onclick = function () {
+    var lista = hitosDeFase($('ch-fase').value);
+    elegidoEnVentana = 0;
+    $('ch-hitos').innerHTML = lista.map(function (x, i) {
+      return '<label class="op"><input type="radio" name="ch-hito" value="' + i + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(x.t) +
+        '<br><small>' + (x.tareas.length ? 'Con ' + x.tareas.length + (x.tareas.length === 1 ? ' tarea' : ' tareas') : 'Sin tareas todavía') + '</small></span></label>';
+    }).join('');
+    Array.prototype.forEach.call($('ch-hitos').querySelectorAll('input'), function (r) { r.onchange = function () { elegidoEnVentana = Number(r.value); }; });
+    $('ch-paso1').hidden = true; $('ch-paso2').hidden = false;
+  };
+  $('ch-anadir').onclick = function () {
+    var x = hitosDeFase($('ch-fase').value)[elegidoEnVentana];
+    var id = 'hn' + (E.a.hitos.length + 1);
+    var nuevo = { id: id, t: x.t, tareas: x.tareas.map(function (t, i) { return { id: id + 't' + i, texto: t.texto, doc: t.doc, anadir: true }; }) };
+    E.a.hitos.push(nuevo);
+    if (!E.a.actual) E.a.actual = id;
+    cerrarVentana();
+    E.aMano = false;
+    proponer();
+    if (!E.hayTarea) { E.aMano = true; E.hitoId = id; pintarAMano(); }
+    quitarAviso();
+  };
+
+  $('caso-suelto').onclick = function () { empezar('suelto'); };
+  $('caso-sinhitos').onclick = function () { empezar('sinhitos'); };
+  $('caso-correo').onclick = function () { empezar('correo'); };
+  empezar('suelto');
+})();
+</script>
+</body>
+</html>
