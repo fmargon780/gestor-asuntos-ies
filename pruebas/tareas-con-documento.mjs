@@ -198,7 +198,7 @@ const nueva = () => pagina.evaluate(async () => {
 const n1 = await nueva();
 await comprobar('6. la tarea nueva es «solo aquí», de registrar, con su dato', n1 && [n1.propio, n1.accion, n1.receta], [true, 'registrar', { sentido: 'entrada' }]);
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();
-await comprobar('6. el formulario se cerró al añadir, y al abrirlo otra vez vuelve a «Sin acción»', pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').inputValue(), '');
+await comprobar('6. el formulario se cerró al añadir, y al abrirlo otra vez vuelve a «Otra cosa»', pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').inputValue(), '');
 await comprobar('6. sin elegir nada, una tarea nueva sale como siempre (sin acción)',
   (async () => {
     await pagina.locator('#guion-nueva-tarea').fill('Llamar a la familia');

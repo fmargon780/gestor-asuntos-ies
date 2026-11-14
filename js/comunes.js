@@ -26,6 +26,10 @@ var Comunes = (function () {
     { valor: 'anadir', texto: 'Añadir documento' }, { valor: 'pedir', texto: 'Pedir datos' },
     { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
     { valor: 'llamar', texto: 'Llamar por teléfono' },   /* fila 639 */
+    /* Fila 651: solo clasifican, se marcan a mano (sin botón, como «Otra cosa»). */
+    { valor: 'seneca', texto: 'En Séneca' }, { valor: 'entregar', texto: 'Entregar o recoger en mano' },
+    { valor: 'publicar', texto: 'Publicar' }, { valor: 'cobrar', texto: 'Cobrar o pagar' },
+    { valor: 'comprobar', texto: 'Comprobar' },
     { valor: '', texto: 'Otra cosa' }
   ];
 
