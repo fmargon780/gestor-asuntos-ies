@@ -231,9 +231,14 @@ function pintarMesa(){
   };
   mesa.querySelectorAll('[data-ct]').forEach(function(b){b.onclick=function(){var t=h.ta[+b.dataset.ct],fila=b.closest('.tarea');
     var comun=E.marca&&!t.aqui;
-    fila.outerHTML='<div class="form-tarea" id="ct-form"><div class="fila"><div class="campo" style="flex:2"><label>Nombre de la tarea</label><input id="ct-n" value="'+esc(t.n)+'"></div><div class="campo"><label>Dónde se hace</label><select id="ct-d">'+DONDE.map(function(d){return '<option'+(d===dTxt(t)?' selected':'')+'>'+d+'</option>'}).join('')+'</select></div></div>'+(comun?'<div class="aviso">Esta tarea es de la lista común: cambiará en todas las guías que la usan. Los asuntos abiertos siguen como estaban.</div>':'')+'<div class="fila" style="margin:0"><button class="boton primario peque" id="ct-ok">Guardar</button><button class="boton peque" id="ct-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'.</div></div>';
+    fila.outerHTML='<div class="form-tarea" id="ct-form"><div class="fila"><div class="campo"><label>Qué se hace</label><select id="ct-a">'+ACC.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===t.a?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div><div class="campo" id="ct-s-c"><label id="ct-s-et"></label><input id="ct-s" list="ct-s-dl" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="ct-s-dl"></datalist></div><div class="campo"><label>Dónde se hace</label><select id="ct-d">'+DONDE.map(function(d){return '<option'+(d===dTxt(t)?' selected':'')+'>'+d+'</option>'}).join('')+'</select></div></div><div class="fila"><div class="campo"><label>Nombre de la tarea</label><input id="ct-n" value="'+esc(t.n)+'"></div></div>'+(comun?'<div class="aviso">Esta tarea es de la lista común: cambiará en todas las guías que la usan. Los asuntos abiertos siguen como estaban.</div>':'')+'<div class="fila" style="margin:0"><button class="boton primario peque" id="ct-ok">Guardar</button><button class="boton peque" id="ct-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'.</div></div>';
+    var cs=document.getElementById('ct-s'),ca=document.getElementById('ct-a');
+    function ponSobre(v){var so=sobreDe(ca.value);document.getElementById('ct-s-c').classList.toggle('oculto',!so);if(so){document.getElementById('ct-s-et').textContent=so.et;document.getElementById('ct-s-dl').innerHTML=so.ops.map(function(o){return '<option value="'+esc(o)+'">'}).join('');cs.value=v||''}}
+    ponSobre(t.s);
+    ca.onchange=function(){ponSobre('');var d=dondeDe(ca.value);if(d)document.getElementById('ct-d').value=d};
+    cs.onfocus=function(){this.select()};
     document.getElementById('ct-no').onclick=pintarMesa;
-    document.getElementById('ct-ok').onclick=function(){t.n=document.getElementById('ct-n').value.trim()||t.n;t.d=document.getElementById('ct-d').value;pintarMesa();nota('Tarea cambiada '+alc+'.')};
+    document.getElementById('ct-ok').onclick=function(){t.n=document.getElementById('ct-n').value.trim()||t.n;t.a=ca.value;var so=sobreDe(t.a);t.s=so&&so.ops.indexOf(cs.value)>=0?cs.value:'';t.d=document.getElementById('ct-d').value;pintarMesa();nota('Tarea cambiada '+alc+'.')};
   }});
   mesa.querySelectorAll('[data-bt]').forEach(function(b){b.onclick=function(){var k=+b.dataset.bt,t=h.ta[k],fila=b.closest('.tarea');
     b.closest('details').open=false;
@@ -244,7 +249,7 @@ function pintarMesa(){
   document.getElementById('btn-anadir-tarea').onclick=function(){
     this.classList.add('oculto');
     var hueco=document.getElementById('hueco-form');
-    elegirTarea(hueco,{proponer:true,alAnadir:function(t){t.aqui=!E.marca;E.hitos[E.act].ta.push({n:t.n,a:t.a,d:t.d,aqui:t.aqui});pintar();nota('Tarea «'+t.n+'» añadida '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'))},alCancelar:function(){pintarMesa()}});
+    elegirTarea(hueco,{proponer:true,alAnadir:function(t){t.aqui=!E.marca;E.hitos[E.act].ta.push({n:t.n,a:t.a,s:t.s,d:t.d,aqui:t.aqui});pintar();nota('Tarea «'+t.n+'» añadida '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'))},alCancelar:function(){pintarMesa()}});
   };
 }
 function mover(k,d){var ta=E.hitos[E.act].ta,j=k+d;if(j<0||j>=ta.length)return;var x=ta[k];ta[k]=ta[j];ta[j]=x;pintarMesa();nota(E.marca?'Orden cambiado en el asunto y en la guía.':'Orden cambiado solo en este asunto.')}
