@@ -12,6 +12,7 @@
    6. En solo consulta no sale ningún «+ Nuevo…».
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { AYUDANTES } from './apoyo/comunes-asunto-viejo.mjs';
 import { abrirHito } from './apoyo/hito.mjs';
 import fs from 'fs';
 
@@ -262,28 +263,10 @@ await comprobar('al guardar vuelve a la tarea con la plantilla de documento eleg
   const s = document.querySelector('#guia-pasos > .paso-editor[data-paso-id="g1"] .guion-fila[data-id="t2"] .guion-receta-plantilla');
   return s && s.options[s.selectedIndex].textContent; }), 'Escrito de matrícula (MATRICULA)');
 
-console.log('--- 6. «+ Añadir un hito» del asunto y solo consulta ---');
+console.log('--- 6. «+ Añadir un hito» del asunto ---');
 await cerrarEditor();
-await pagina.evaluate(() => { window.__solo = true; });
-const abierto = await pagina.evaluate(() => typeof HitosDesdeElAsunto !== 'undefined' && typeof HitosDesdeElAsunto.abrirCrear === 'function');
-await comprobar('hay «+ Añadir un hito» en el asunto', Promise.resolve(abierto), true);
-await pagina.evaluate(async (asunto) => {
-  const a = App.E.listaAbiertos.filter((x) => x.nombre === asunto)[0] || { nombre: asunto, ficha: { tipo: 'MATRICULA' } };
-  window.__crear = HitosDesdeElAsunto.abrirCrear(a);
-}, ASUNTO);
-await pagina.waitForSelector('#hda-responsable');
-await comprobar('Responsable del hito nuevo: lo creado arriba sale aquí y la última opción es «+ Nuevo responsable…»', opciones('#hda-responsable').then((o) =>
-  [o.indexOf('Jefatura de estudios') !== -1, o.indexOf('Equipo educativo') !== -1, o[o.length - 1]]), [true, true, '+ Nuevo responsable…']);
-await pagina.selectOption('#hda-responsable', '__nuevo__');
-await pagina.fill(cuadro('#ln-nombre'), 'Claustro');
-await pagina.click(cuadro('#ln-crear'));
-await pagina.waitForSelector('.ln-capa', { state: 'detached' });
-await comprobar('desde el asunto: el nuevo queda elegido y se guarda', Promise.all([
-  pagina.locator('#hda-responsable').evaluate((s) => s.options[s.selectedIndex].textContent),
-  pagina.evaluate(async () => (await Hitos.leer()).ajustes.responsables.some((r) => r.nombre === 'Claustro'))]), ['Claustro', true]);
-await pagina.click('#cuadro-cancelar');
-await pagina.waitForTimeout(100);
-
+/* Fila 660: «+ Añadir hito» es paso a paso y ya no lleva el cuadro con «Responsable» (pruebas/crear-hitos-y-tareas.mjs); el responsable
+   se elige en «Hito ▾ → Cambiar» (sección 7). */
 /* la mesa del hito: el menú «Responsable» termina en «+ Nuevo responsable…» */
 console.log('--- 7. la mesa del hito ---');
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
@@ -308,10 +291,11 @@ await comprobar('desde la mesa: el hito queda con el responsable nuevo', pagina.
   return !!r && Hitos.buscar(d.porAsunto[asunto].hitos, 'm1').responsable === r.id; }, [ASUNTO]), true);
 
 /* «+ Añadir hito» del asunto (la ventana de la lista común): «+ Crear un hito nuevo» lleva Responsable */
-console.log('--- 8. «+ Añadir hito» del asunto ---');
+console.log('--- 8. la ventana «Hitos de la lista» ---');
+await pagina.evaluate(AYUDANTES);
 await pagina.evaluate(async (asunto) => {
   const a = App.E.listaAbiertos.filter((x) => x.nombre === asunto)[0];
-  window.__anadir = ComunesAsunto.anadirHito(a);
+  window.__anadir = window.__anadirHito(a);   /* fila 660: la ventana de la lista común ya no se abre desde el asunto; aquí, como antes */
 }, ASUNTO);
 await pagina.waitForSelector('#cv-crear');
 await pagina.click('#cv-crear');
