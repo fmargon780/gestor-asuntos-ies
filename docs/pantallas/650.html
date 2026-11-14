@@ -342,6 +342,15 @@ function abrirVentana(){
 }
 function cerrarVentana(){document.getElementById('capa').classList.add('oculto')}
 document.getElementById('cerrar').onclick=cerrarVentana;
+function yaEsta(nombre){for(var i=0;i<E.hitos.length;i++)if(E.hitos[i].t.toLowerCase()===nombre.toLowerCase())return i;return -1}
+/* Hito que ya está en el asunto: avisa y deja añadirlo otra vez (a veces hace falta, p. ej. dos esperas). */
+function meterSiNoEsta(h,hueco){
+  var i=yaEsta(h.t);
+  if(i<0||!hueco){meterHito(h);return}
+  hueco.innerHTML='<div class="aviso">«'+esc(h.t)+'» ya está en este asunto (hito '+(i+1)+'). ¿Lo añades otra vez?<div class="botones"><button class="boton primario peque" data-x="otra">Añadirlo otra vez</button><button class="boton peque" data-x="no">Cancelar</button></div></div>';
+  hueco.querySelector('[data-x="otra"]').onclick=function(){meterHito(h)};
+  hueco.querySelector('[data-x="no"]').onclick=function(){hueco.innerHTML=''};
+}
 function meterHito(h){
   var k=+document.getElementById('detras').value+1;
   h.aqui=!E.marca;h.ta.forEach(function(t){t.aqui=!E.marca});
@@ -357,7 +366,7 @@ function pintarVentana(){
     html='<div class="elegido">Fase: <b>'+esc(faseTxt(V.f))+'</b> <button class="enlace" id="v-cambiar-fase">Cambiar</button>'+(V.paso==='nuevo'?' · Hito nuevo <button class="enlace" id="v-volver">Ver los hitos de esta fase ('+l.length+')</button>':'')+'</div>';
     if(V.paso==='hitos'){
       html+='<div class="paso-tit">Hitos de esta fase, con sus tareas</div>'+
-      (l.length?l.map(function(h,k){return '<div class="hito-comun"><div class="cuerpo"><b>'+esc(h.t)+'</b>'+(h.ta.length?'<ul>'+h.ta.map(function(n){var t=T(n);return '<li>'+esc(n)+' <span class="etq">'+esc(accTxt(t.a))+' · '+esc(t.d)+'</span></li>'}).join('')+'</ul>':'<div class="vacio" style="font-size:13.5px">Sin tareas.</div>')+'</div><button class="boton peque" data-usarh="'+k+'">Añadir este</button></div>'}).join(''):'<div class="vacio">Ningún hito de esta fase todavía.</div>')+
+      (l.length?l.map(function(h,k){return '<div class="hito-comun"><div class="cuerpo"><b>'+esc(h.t)+'</b>'+(h.ta.length?'<ul>'+h.ta.map(function(n){var t=T(n);return '<li>'+esc(n)+' <span class="etq">'+esc(accTxt(t.a))+' · '+esc(t.d)+'</span></li>'}).join('')+'</ul>':'<div class="vacio" style="font-size:13.5px">Sin tareas.</div>')+(yaEsta(h.t)>=0?'<div style="margin-top:4px"><span class="etq aqui">Ya está en este asunto</span></div>':'')+'<div data-avisoh="'+k+'"></div></div><button class="boton peque" data-usarh="'+k+'">Añadir este</button></div>'}).join(''):'<div class="vacio">Ningún hito de esta fase todavía.</div>')+
       '<div style="margin-top:10px"><button class="boton" id="btn-hito-nuevo">+ Hito nuevo de esta fase</button></div>';
     } else html+='<div id="hueco-nuevo"></div>';
   }
@@ -365,7 +374,7 @@ function pintarVentana(){
   c.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){V.f=b.dataset.f;V.paso='hitos';pintarVentana()}});
   var x=document.getElementById('v-cambiar-fase');if(x)x.onclick=function(){V.paso='fase';pintarVentana()};
   x=document.getElementById('v-volver');if(x)x.onclick=function(){V.paso='hitos';pintarVentana()};
-  c.querySelectorAll('[data-usarh]').forEach(function(b){b.onclick=function(){var h=l[+b.dataset.usarh];meterHito({t:h.t,f:h.f,ta:h.ta.map(function(n){var t=T(n);return {n:t.n,a:t.a,d:t.d}})})}});
+  c.querySelectorAll('[data-usarh]').forEach(function(b){b.onclick=function(){var k=+b.dataset.usarh,h=l[k];meterSiNoEsta({t:h.t,f:h.f,ta:h.ta.map(function(n){var t=T(n);return {n:t.n,a:t.a,d:t.d}})},c.querySelector('[data-avisoh="'+k+'"]'))}});
   x=document.getElementById('btn-hito-nuevo');if(x)x.onclick=function(){V.paso='nuevo';pintarVentana()};
   if(V.paso==='nuevo')hitoNuevo(l);
 }
@@ -386,7 +395,7 @@ function hitoNuevo(l){
     var gemelo=l.filter(function(h){return h.ta.length===1&&h.ta[0]===nt})[0];
     if(gemelo&&!forzar){
       document.getElementById('nh-aviso').innerHTML='<div class="aviso">Ya hay un hito igual en esta fase: <b>«'+esc(gemelo.t)+'»</b>, con la misma tarea.<div class="botones"><button class="boton primario peque" id="nh-usar">Usar ese</button><button class="boton peque" id="nh-igual">Crear el mío igualmente</button></div></div>';
-      document.getElementById('nh-usar').onclick=function(){meterHito({t:gemelo.t,f:gemelo.f,ta:gemelo.ta.map(function(n){var x=T(n);return {n:x.n,a:x.a,d:x.d}})})};
+      document.getElementById('nh-usar').onclick=function(){meterSiNoEsta({t:gemelo.t,f:gemelo.f,ta:gemelo.ta.map(function(n){var x=T(n);return {n:x.n,a:x.a,d:x.d}})},document.getElementById('nh-aviso'))};
       document.getElementById('nh-igual').onclick=function(){crear(true)};
       return;
     }
