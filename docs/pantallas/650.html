@@ -126,8 +126,8 @@ main{padding:22px 28px}
 <script>
 var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
 var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','Grabar o cambiar datos'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
-var DONDE=['Séneca','iPasen','Correo','Teléfono','En mano','Tablón','Ventanilla Electrónica','Expediente del alumno','Archivo del centro','En esta app','Otro sitio'];
-function dondeDe(a){return {registrar:'Séneca',seneca:'Séneca',llamar:'Teléfono',entregar:'En mano',publicar:'Tablón',comunicar:'Correo',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
+var DONDE=['Séneca · Alumnado','Séneca · Personal','Séneca · Registro','Séneca · Documentos','Séneca · Ventanilla Electrónica','iPasen','Correo','Teléfono','En mano','Tablón','Expediente del alumno','Archivo del centro','En esta app','Otro sitio'];
+function dondeDe(a){return {registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',publicar:'Tablón',comunicar:'Correo',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
 var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
@@ -155,7 +155,7 @@ var TAREAS=[
  {n:'Publicar en el tablón',a:'publicar',s:''},
  {n:'Llamar a quien lo pide',a:'llamar',s:'A quien lo pide'},
  {n:'Comunicar el cambio a la familia por iPasen',a:'comunicar',s:'Aviso a la familia',d:'iPasen'},
- {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca'},
+ {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca · Alumnado'},
  {n:'Archivar en el expediente del alumno o alumna',a:'',s:'',d:'Expediente del alumno'}
 ];
 TAREAS.forEach(function(t){t.d=t.d||dondeDe(t.a)||'En mano'});
@@ -249,12 +249,14 @@ function pintarMesa(){
 function mover(k,d){var ta=E.hitos[E.act].ta,j=k+d;if(j<0||j>=ta.length)return;var x=ta[k];ta[k]=ta[j];ta[j]=x;pintarMesa();nota(E.marca?'Orden cambiado en el asunto y en la guía.':'Orden cambiado solo en este asunto.')}
 
 /* El elegidor de tarea: qué se hace → sobre qué → las comunes que hacen lo mismo → nombre. */
+var NDL=0;
 function elegirTarea(hueco,op){
+  var dl='dl'+(++NDL);
   var st={a:'-',s:'',d:'',nombre:'',tocado:false};
   hueco.innerHTML='<div class="form-tarea">'+
     '<div class="fila"><div class="campo"><label>Qué se hace</label><select data-x="acc"><option value="-">Elige…</option>'+ACC.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div>'+
-    '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><select data-x="sobre"></select></div>'+
-    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><select data-x="donde"><option value="">Elige…</option>'+DONDE.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select></div></div>'+
+    '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><input data-x="sobre" list="'+dl+'s" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'s"></datalist></div>'+
+    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><input data-x="donde" list="'+dl+'d" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'d">'+DONDE.map(function(d){return '<option value="'+esc(d)+'">'}).join('')+'</datalist></div></div>'+
     '<div class="comunes oculto" data-x="comunes"></div>'+
     '<div class="fila oculto" data-x="nombre-c"><div class="campo" style="flex:2"><label>Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label><input data-x="nombre"></div></div>'+
     '<div data-x="aviso"></div>'+
@@ -263,11 +265,12 @@ function elegirTarea(hueco,op){
   var q=function(x){return hueco.querySelector('[data-x="'+x+'"]')};
   q('acc').onchange=function(){st.a=this.value;st.s='';var so=sobreDe(st.a);
     st.d=dondeDe(st.a);q('donde').value=st.d;q('donde-c').classList.toggle('oculto',st.a==='-');
-    if(so&&st.a!=='-'){q('sobre-c').classList.remove('oculto');q('sobre-et').textContent=so.et;q('sobre').innerHTML='<option value="">Elige…</option>'+so.ops.map(function(o){return '<option>'+esc(o)+'</option>'}).join('')}
+    if(so&&st.a!=='-'){q('sobre-c').classList.remove('oculto');q('sobre-et').textContent=so.et;q('sobre').value='';hueco.querySelector('#'+dl+'s').innerHTML=so.ops.map(function(o){return '<option value="'+esc(o)+'">'}).join('')}
     else q('sobre-c').classList.add('oculto');
     refrescar()};
-  q('sobre').onchange=function(){st.s=this.value;refrescar()};
-  q('donde').onchange=function(){st.d=this.value;refrescar()};
+  q('sobre').oninput=function(){var so=sobreDe(st.a);st.s=so&&so.ops.indexOf(this.value)>=0?this.value:'';refrescar()};
+  q('sobre').onfocus=q('donde').onfocus=function(){this.select()};
+  q('donde').oninput=function(){st.d=DONDE.indexOf(this.value)>=0?this.value:'';refrescar()};
   q('nombre').oninput=function(){st.nombre=this.value;st.tocado=true;q('aviso').innerHTML='';comprobarListo()};
   if(q('cancelar'))q('cancelar').onclick=op.alCancelar;
   if(q('anadir'))q('anadir').onclick=function(){intentar()};
