@@ -99,6 +99,8 @@ await pagina.evaluate(async () => {
   await App.verAbiertos();
   const base = (await Hitos.hitosDe('261002 A26-0801 SEGURO ESCOLAR Alta Cero, Ana 7770001'))[0];
   await Hitos.cambiar((d) => { d.porAsunto[n] = { creados: '2026-10-02', hitos: [Object.assign({}, base, { id: 'otra-1', origenGuia: 'otra-1', estado: 'hecho' })], pasosConocidos: ['otra-1'] }; return d; });
+  /* Fila 660: un tipo sin guía ya no recibe la mínima solo; este tipo trae la suya para que tenga pasos que faltan. */
+  if (!GuiasDelCentro.pasosDe('SEGURO ESCOLAR').length) await GuiasDelCentro.guardarPasos('SEGURO ESCOLAR', EstadoHito.pasosMinimos(), {});
   await PorLiquidar.alCambiarTipo(n, 'FACTURA', 'SEGURO ESCOLAR');
 });
 await comprobar('3. con todos sus hitos hechos pero faltándole pasos de la guía del tipo nuevo, no pasa', estado('A26-0805'), false);

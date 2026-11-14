@@ -113,6 +113,7 @@ await comprobar('1. sin el enlace viejo de añadir a la guía',
 /* 2. «Cambiar aquí»: solo en este asunto. */
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
+await pagina.evaluate(async () => { await MarcaGuia.poner(Gestor.asuntos().filter((x) => /Sola Uno/.test(x.nombre))[0], true); });   /* fila 660: marca de la guía encendida */
 await abrirMesaDe('Sola Uno', 'c1');
 await abrirMenuDeTarea('g1');
 await comprobar('2. la tarea de la guía trae Subir/Bajar (fila 553) y Anotar/Cambiar/Borrar/Abrir en la guía',
