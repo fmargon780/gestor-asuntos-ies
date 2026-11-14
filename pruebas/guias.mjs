@@ -94,12 +94,12 @@ const textoGuia = () => pagina.locator('#ficha-guia').textContent();
 console.log('--- un tipo sin guía ni hitos todavía ---');
 await abrirLaFicha();
 
-await comprobar('dice que el tipo no tiene guía',
-  textoGuia().then(t => t.indexOf('no tiene guía') !== -1), true);
+await comprobar('dice que el asunto no tiene hitos todavía (fila 660)',
+  textoGuia().then(t => t.indexOf('no tiene hitos todavía') !== -1), true);
 await comprobar('y ya NO manda a Ajustes',
   textoGuia().then(t => t.indexOf('Ajustes') !== -1), false);
-await comprobar('ofrece añadir el primer hito a mano',
-  pagina.locator('#ficha-guia button', { hasText: 'Añadir el primer hito' }).count(), 1);
+await comprobar('ofrece «+ Añadir hito» (fila 660)',
+  pagina.locator('#ficha-guia button', { hasText: '+ Añadir hito' }).count(), 1);
 await comprobar('la nota ofrece escribir la guía del tipo',
   pagina.locator('#ficha-guia-nota button').textContent(),
   'Escribir la guía de MATRICULA');

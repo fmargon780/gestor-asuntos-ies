@@ -202,6 +202,22 @@ await comprobar('4j. con la marca apagada, subir una tarea cambia el asunto y no
     await p.$('.guion-orden-cambiado') === null];
 })(), [true, true, true]);
 
+await comprobar('4p. «Cambiar» de una tarea enseña lo mismo: qué se hace (casilla de búsqueda), sobre qué, dónde y el nombre; guardar lo cambia solo aquí (marca apagada)', (async () => {
+  const guiaAntes = await guiaTextos();
+  await p.click('.guion-paso:has(.guion-paso-texto:text-is("Preparar el escrito 660")) .guion-tarea-menu-boton');
+  await p.waitForSelector('.ficha-menu:not(.oculto)');
+  await p.click('.ficha-menu:not(.oculto) .ficha-menu-opcion:text-is("Cambiar")');
+  await p.waitForSelector('.guion-tarea-editar .at-que');
+  const vista = await p.$eval('.guion-tarea-editar', (e) => [e.querySelector('.at-que').value, e.querySelector('.donde-sitio').value, !!e.querySelector('.at-plantilla'), e.querySelector('.guion-tarea-editar-texto').value, !!e.querySelector('.at-nombre')]);
+  await p.fill('.guion-tarea-editar .at-que', 'Registrar · Séneca · Registro');
+  await p.fill('.guion-tarea-editar .donde-documento', '');
+  await p.fill('.guion-tarea-editar .guion-tarea-editar-texto', 'Registrar el escrito 660');
+  await p.click('.guion-tarea-editar .guion-tarea-editar-guardar');
+  await p.waitForSelector('.guion-paso:has(.guion-paso-texto:text-is("Registrar el escrito 660"))');
+  const etiqueta = await p.evaluate(() => { const t = [...document.querySelectorAll('.guion-paso')].filter((x) => x.querySelector('.guion-paso-texto').textContent === 'Registrar el escrito 660')[0]; return [t.querySelector('.guion-tarea-accion').textContent, t.querySelector('.guion-tarea-donde').textContent]; });
+  return [vista, etiqueta, JSON.stringify(await guiaTextos()) === JSON.stringify(guiaAntes)];
+})(), [['Generar documento · En esta app', 'En esta app', true, 'Preparar el escrito 660', false], ['Registrar', 'Séneca · Registro'], true]);
+
 console.log('--- 4c. un tipo sin guía nace sin hitos; uno con guía mínima sigue naciendo con ellos ---');
 await comprobar('4k. un asunto de un tipo sin guía no recibe hitos; uno con guía (aunque sea la mínima de antes) sí', p.evaluate(async () => {
   const sin = await Hitos.crearDesdeGuia('__asunto-sin-guia-660__', 'TIPO SIN GUIA 660');
