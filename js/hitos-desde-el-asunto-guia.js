@@ -4,14 +4,6 @@
    docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md, puntos 4 y 5; desde la fila 416
    ya no hay pregunta «¿Dónde se guarda?», la guía manda).
 
-   - `llevarHitoEntero(a, h)`: un hito que solo existe en este asunto
-     (sin paso en la guía) entra en la guía del tipo con su título,
-     plazo, responsable y TODAS sus tareas, detrás del hito anterior que
-     venga de la guía (o al principio). La guía conserva todo lo que ya
-     tenía: solo se añade. En este asunto el hito queda enlazado con el
-     paso nuevo, con los mismos ids en las tareas, así que lo marcado no
-     se pierde; a los demás abiertos del tipo llega por el camino de
-     siempre (fila 118, `GuiasDelCentro.guardarPasos`).
    - «Deshacer» (punto 5): el aviso verde de después lleva un botón que
      deja la guía y los demás asuntos como estaban antes de ese guardado
      y, en este asunto, el cambio se queda «solo aquí». Para poder hacerlo
@@ -93,66 +85,6 @@ window.HitosDesdeElAsuntoGuia = (function () {
     U.aviso(texto, 'bueno', { boton: 'Deshacer', alPulsar: function () { deshacer(reg); } });
   }
 
-  /* El hito propio `h` entra en la guía del tipo con todas sus tareas.
-     Devuelve { paso, hitoAntes } (`hitoAntes`: copia del hito como era,
-     para «Deshacer»). Si algo falla, el hito se queda como estaba. */
-  async function llevarHitoEntero(a, h) {
-    var tipo = DondeSeGuarda.tipoDe(a);
-    var D = HitosDesdeElAsunto;
-    var hitos = await Hitos.hitosDe(a.nombre);
-    var nivel = D.nivelSuperior(hitos);
-    var ids = nivel.map(function (x) { return x.id; });
-    var i = ids.indexOf(h.id);
-    if (i === -1) throw new Error('Este hito está dentro de una pregunta: en la guía se cambia desde Ajustes.');
-    var actual = nivel[i];
-    var hitoAntes = copia(actual);
-    var idAncla = D.pasoAnclaDeHito(nivel, i > 0 ? nivel[i - 1].id : '');
-    var tareas = (actual.guionPropio || []).filter(function (g) { return !g.enLugarDe; })
-      .map(function (g) { return { id: g.id, texto: g.texto }; });
-    var paso = Guias.normalizar([{
-      titulo: actual.titulo, cuerpo: actual.cuerpo || '', responsable: actual.responsable || '', plazo: actual.plazo || null,
-      toca: actual.toca, tocaA: actual.tocaA, variosDocumentos: actual.variosDocumentos, guion: tareas
-    }])[0];
-    if (!paso) throw new Error('El hito no tiene título.');
-    await GuiasDelCentro.recargar();
-    var pasos = copia(GuiasDelCentro.pasosDe(tipo));
-    D.colocarTrasAncla(pasos, paso, idAncla);
-    /* Primero se enlaza aquí, para que el reparto a los abiertos (que
-       incluye a este asunto) no le ponga un hito repetido. */
-    await Hitos.cambiar(function (d) {
-      var e = d.porAsunto[a.nombre];
-      var x = e && Hitos.buscar(e.hitos, h.id);
-      if (x) { x.origenGuia = paso.id; x.guionPropio = []; }
-      return d;
-    });
-    try {
-      await GuiasDelCentro.guardarPasos(tipo, pasos, { claveActual: a.nombre });
-    } catch (err) {
-      await dejarComoEstaba(a.nombre, hitoAntes);
-      throw err;
-    }
-    return { paso: paso, hitoAntes: hitoAntes };
-  }
-
-  /* Devuelve el hito de este asunto a la copia `hitoAntes` (mismo id). */
-  async function dejarComoEstaba(clave, hitoAntes) {
-    await Hitos.cambiar(function (d) {
-      var e = d.porAsunto[clave];
-      if (!e) return d;
-      var lista = e.hitos;
-      (function sustituir(ls) {
-        for (var i = 0; i < ls.length; i++) {
-          if (ls[i].id === hitoAntes.id) { ls[i] = copia(hitoAntes); return true; }
-          if (ls[i].clase === 'decision') {
-            for (var j = 0; j < (ls[i].opciones || []).length; j++) if (sustituir(ls[i].opciones[j].hitos || [])) return true;
-          }
-        }
-        return false;
-      })(lista);
-      return d;
-    });
-  }
-
   /* Quita el enlace con la guía de un hito de este asunto (el hito sigue
      aquí, como propio). Lo usa «Deshacer» de un hito recién creado. */
   async function desenlazar(clave, idPaso) {
@@ -174,8 +106,6 @@ window.HitosDesdeElAsuntoGuia = (function () {
     textoGuardado: textoGuardado,
     avisarConDeshacer: avisarConDeshacer,
     deshacer: deshacer,
-    llevarHitoEntero: llevarHitoEntero,
-    dejarComoEstaba: dejarComoEstaba,
     desenlazar: desenlazar
   };
 })();

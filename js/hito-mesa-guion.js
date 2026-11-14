@@ -17,7 +17,7 @@
      Intro abre «¿Dónde se guarda?» (js/donde-se-guarda-tareas.js): a la
      guía o solo a este asunto (`Hitos.anadirGuionPropio`). Cada tarea lleva
      su «⋮» (js/hito-mesa-tarea-menu.js): Anotar, Cambiar (aquí o no) y
-     Borrar o Pasar a la guía, según sea «solo aquí» o de la guía. «+
+     Borrar. «+
      Añadir una tarea a la guía del tipo» (fila 120) pasa a ser «Pasar a
      la guía» de una tarea «solo aquí»; «✎ Cambiar las tareas de este
      hito» pasa a ser «Cambiar en la guía» de una tarea de la guía,
@@ -176,31 +176,6 @@ var HitoMesaGuion = (function () {
     U.conservandoLoEscrito(caja, function () { pintarGuion(caja, fila, a, h, abierto, hitos); });
   }
 
-  /* Fila 553: si el orden de las tareas de la guía ha cambiado en este asunto, la franja con las dos salidas (js/hitos-guion-orden.js). */
-  function franjaDelOrdenHTML(a, h) {
-    if (!Hitos.ordenDeLaGuiaCambiado || !puedeAnadirALaGuia(a, h) || !Hitos.ordenDeLaGuiaCambiado(a, h)) return '';
-    return '<div class="guion-orden-cambiado"><span>Has cambiado el orden de las tareas en este asunto.</span>' +
-      '<button type="button" class="boton boton-chico boton-principal guion-orden-guia">Guardar también en la guía</button>' +
-      '<button type="button" class="boton boton-chico guion-orden-aqui">Solo en este asunto</button></div>';
-  }
-
-  function engancharFranjaDelOrden(caja, a, h) {
-    var guia = caja.querySelector('.guion-orden-guia'), aqui = caja.querySelector('.guion-orden-aqui');
-    function repintar() { if (window.HitosPanel) HitosPanel.programarRepintado(); }
-    if (guia) guia.onclick = function () {
-      U.mientrasGuarda(guia, async function () {
-        try {
-          if (await Hitos.guardarOrdenEnLaGuia(a, h)) U.aviso('Orden guardado también en la guía de ' + tipoDe(a) + '.', 'bueno');
-          else U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar');
-          repintar();
-        } catch (e) { U.fallo('No he podido guardar el orden en la guía', e); }
-      });
-    };
-    if (aqui) aqui.onclick = function () {
-      Hitos.dejarOrdenSoloAqui(a, h.id).then(repintar).catch(function (e) { U.fallo('No he podido guardar el cambio', e); });
-    };
-  }
-
   function pintarGuion(caja, fila, a, h, abierto, hitos) {
     var guion = Hitos.guionDe(a, h);
     /* Fila 145: la siguiente tarea, la primera sin hacer y sin «No aplica»
@@ -211,7 +186,6 @@ var HitoMesaGuion = (function () {
     caja.innerHTML =
       (!guion.length ? '<p class="mesa-sin-tareas">Este hito no tiene tareas.</p>' : '') +
       guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h, ctx); }).join('') + plegadasHTML(guion.plegadas) +
-      (abierto ? franjaDelOrdenHTML(a, h) : '') +
       (abierto && window.HitoMesaNuevaTarea ? HitoMesaNuevaTarea.html(a, h) : '');
 
     /* La normativa de las tareas del guion, también en la columna de consulta. */
@@ -282,7 +256,7 @@ var HitoMesaGuion = (function () {
           });
         });
       };
-      /* Fila 224: el «⋮» (Anotar, Cambiar…, Borrar/Pasar a la guía) y el
+      /* Fila 224: el «⋮» (Anotar, Cambiar…, Borrar) y el
          💬 de esta tarea. */
       var g = porId[id];
       if (g && window.HitoMesaTareaMenu) {
@@ -313,7 +287,6 @@ var HitoMesaGuion = (function () {
     if (window.Llamadas && Llamadas.enganchar) Llamadas.enganchar(caja);   /* fila 639 */
     /* Fila 638: «+ Añadir tarea» y su formulario. */
     if (window.HitoMesaNuevaTarea) HitoMesaNuevaTarea.enganchar(caja, a, h, function () { pintar(fila, a, h, abierto, hitos); });
-    engancharFranjaDelOrden(caja, a, h);
   }
 
   function tipoDe(a) {

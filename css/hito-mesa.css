@@ -316,13 +316,6 @@ details.mesa-normativa > summary { cursor: pointer; }
   padding: 1px 8px; white-space: nowrap;
 }
 
-/* La franja de «Has cambiado el orden de las tareas en este asunto.» */
-.guion-orden-cambiado {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--azul-claro);
-  border: 1px solid var(--azul); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-top: 6px;
-}
-.guion-orden-cambiado > span { flex: 1 1 220px; min-width: 0; }
-
 /* «+ Añadir hito», al final de la tira de hitos. */
 .mesa-tira-anadir {
   flex: 0 0 auto; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;

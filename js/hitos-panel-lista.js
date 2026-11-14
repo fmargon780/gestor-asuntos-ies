@@ -115,7 +115,7 @@ var HitosPanelLista = (function () {
       var mas = document.createElement('button');
       mas.type = 'button';
       mas.className = 'boton boton-ancho';
-      mas.textContent = '+ Añadir un hito';
+      mas.textContent = '+ Añadir hito';
       mas.onclick = function () { window.HitosPanel.pedirYAnadirHito(a); };
       raiz.appendChild(mas);
     }

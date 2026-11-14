@@ -4,21 +4,15 @@
 
    «Subir» y «Bajar» del «⋮» de cada tarea cambian el orden en este asunto al
    momento: el hito guarda `guionOrden` (los ids de las tareas, en su orden;
-   `Hitos.guionDe` lo respeta y lo que no esté en la lista va al final). Si el
-   orden de las tareas de la guía queda distinto del de la guía, sale una
-   franja con dos botones:
-     - «Guardar también en la guía»: la guía del tipo guarda el orden nuevo,
-       sin repartirlo a los asuntos abiertos (esos se quedan como estaban:
-       antes de tocar la guía se les fija su orden de ahora).
-     - «Solo en este asunto»: la guía no cambia y la franja se va
-       (`guionOrdenVisto`, el orden que ya se ha dado por bueno).
-   Las tareas «solo aquí» se mueven igual, pero no cuentan para la franja ni
-   van a la guía.
+   `Hitos.guionDe` lo respeta y lo que no esté en la lista va al final). Fila 660:
+   con la marca «Los cambios en hitos y tareas van también a la guía» encendida
+   (js/marca-guia.js), el orden nuevo también se guarda en la guía del tipo
+   (`Hitos.guardarOrdenEnLaGuia`: antes de tocar la guía, los otros asuntos
+   abiertos se quedan con su orden de ahora); apagada, solo en este asunto. Ya no
+   hay franja ni pregunta. Las tareas «solo aquí» se mueven igual y no van a la guía.
 
      Hitos.moverGuion(a, idHito, clave, delta)      (-1 sube, +1 baja)
      Hitos.posicionGuion(a, h, clave)               -> { indice, total }
-     Hitos.ordenDeLaGuiaCambiado(a, h)              -> true si hay que preguntar
-     Hitos.dejarOrdenSoloAqui(a, idHito)
      Hitos.guardarOrdenEnLaGuia(a, h)
    Se carga después de js/hitos-guion.js.
    ============================================================ */
@@ -42,16 +36,6 @@
       c[j] = clave;
       h.guionOrden = c;
     });
-  }
-
-  function ordenDeLaGuiaCambiado(a, h) {
-    var lista = I.guionDe(a, h), ahora = deLaGuia(lista);
-    if (ahora.join(',') === lista.ordenGuia.join(',')) return false;
-    return (h.guionOrdenVisto || '') !== ahora.join(',');
-  }
-
-  function dejarOrdenSoloAqui(a, idHito) {
-    return I.editarHito(a.nombre, idHito, function (h) { h.guionOrdenVisto = deLaGuia(I.guionDe(a, h)).join(','); });
   }
 
   /* Los otros asuntos abiertos del tipo se quedan como están: se les fija su orden de ahora (hay que llamarlo ANTES de tocar la guía). */
@@ -97,7 +81,5 @@
 
   Hitos.moverGuion = mover;
   Hitos.posicionGuion = posicion;
-  Hitos.ordenDeLaGuiaCambiado = ordenDeLaGuiaCambiado;
-  Hitos.dejarOrdenSoloAqui = dejarOrdenSoloAqui;
   Hitos.guardarOrdenEnLaGuia = guardarEnLaGuia;
 })();

@@ -373,7 +373,7 @@
   /* ---------- sin hitos todavía ----------
 
      Pasa por aquí un asunto archivado, uno con error de lectura, o uno
-     cuyo tipo no tiene guía (o cuya guía no ha terminado de cargar: el
+     cuyo tipo no tiene guía (fila 660: nace sin hitos y se le añaden con «+ Añadir hito»; o cuya guía no ha terminado de cargar: el
      próximo repintado lo reintenta, sin avisar de nada mientras
      tanto). */
   function pintarVacio(caja, a, abierto, errorLectura) {
@@ -388,8 +388,9 @@
     }
     var p = document.createElement('p');
     p.className = 'explica';
-    p.textContent = 'Este tipo no tiene guía. Puedes ir apuntando los hitos a mano.';
+    p.textContent = 'Este asunto no tiene hitos todavía.';   /* fila 660: un tipo sin guía nace sin hitos */
     caja.appendChild(p);
+    if (window.MarcaGuia) MarcaGuia.pintar(a, abierto);
     caja.appendChild(botonAnadirAMano(a));
   }
 
@@ -406,29 +407,14 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'boton boton-ancho';
-    b.textContent = '+ Añadir el primer hito';
+    b.textContent = '+ Añadir hito';
     b.onclick = function () { pedirYAnadirHito(a); };
     return b;
   }
 
-  /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): el mismo cuadro de «Crear
-     un hito» de la mesa, con «Colocar después de» ya puesto en el
-     último (`undefined`: ver HitosDesdeElAsunto.abrirCrear). */
+  /* Fila 660: el «+ Añadir hito» de siempre, paso a paso (js/anadir-hito.js): la fase, el hito y su primera tarea. */
   async function pedirYAnadirHito(a) {
-    if (window.HitosDesdeElAsunto) { await HitosDesdeElAsunto.abrirCrear(a); return; }
-    var ok = await U.preguntar('Añadir un hito',
-      '<label class="etiqueta">Título</label>' +
-      '<input id="hito-nuevo-titulo" class="campo" placeholder="Por ejemplo: Firma del director">',
-      'Añadir');
-    if (!ok) return;
-    var titulo = ($('hito-nuevo-titulo') && $('hito-nuevo-titulo').value.trim()) || '';
-    if (!titulo) return;
-    try {
-      await Hitos.anadirHito(a.nombre, titulo);
-      programarRepintado();
-    } catch (e) {
-      U.aviso('No he podido añadir el hito: ' + U.mensajeDeError(e), 'malo');
-    }
+    if (window.AnadirHito) await AnadirHito.abrir(a);
   }
 
   /* Puente hacia js/hitos-panel-lista.js: cómo se pinta cada hito por

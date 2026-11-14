@@ -185,22 +185,6 @@
     });
   }
 
-  /* «Pasar a la guía»: la línea ya se ha añadido a la guía (con `idNuevo`,
-     GuiasDelCentro.cambiarPasos); aquí se quita la propia y su marca de
-     hecha (si tenía) pasa al id nuevo, solo en este asunto. */
-  function pasarGuionPropioAGuia(clave, idHito, idPropio, idNuevo) {
-    return editarHito(clave, idHito, function (h) {
-      var estadoAntes = (h.guionHecho && h.guionHecho[idPropio]) || null;
-      h.guionPropio = (h.guionPropio || []).filter(function (g) { return g.id !== idPropio; });
-      if (h.guionHecho) delete h.guionHecho[idPropio];
-      if (window.TareasConDocumento) TareasConDocumento.mover(h, idPropio, idNuevo);   /* fila 522: el documento se queda en el asunto */
-      if (estadoAntes && (estadoAntes.hecho || estadoAntes.noaplica || estadoAntes.valor || estadoAntes.documento)) {
-        h.guionHecho = h.guionHecho || {};
-        h.guionHecho[idNuevo] = estadoAntes;
-      }
-    });
-  }
-
   /* ---------- lo que hay que reunir (fila 138, docs/UNA-SOLA-LISTA-EN-EL-HITO.md) ---------- */
 
 
@@ -215,5 +199,4 @@
   I.cambiarGuionPropioTexto = cambiarGuionPropioTexto;
   I.borrarGuionPropio = borrarGuionPropio;
   I.ocultarGuionDeGuia = ocultarGuionDeGuia;
-  I.pasarGuionPropioAGuia = pasarGuionPropioAGuia;
 })();
