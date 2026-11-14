@@ -20,7 +20,7 @@
    ============================================================ */
 window.AvisosFalta = (function () {
 
-  var CLASE = { firmar: 'Firmar', registrar: 'Registrar' };
+  var CLASE = { firmar: 'Poner a la firma', registrar: 'Registrar' };   /* fila 659: «Firmar» pasa a «Poner a la firma» */
 
   function mismo(a, b) {
     return window.TareasConDocumento ? TareasConDocumento.mismo(a, b) : (!!a && a === b);

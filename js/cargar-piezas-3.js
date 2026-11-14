@@ -186,6 +186,11 @@
     'js/campo-elegir-en-asunto.js',
     'js/datos-de-la-tarea.js',
     'js/datos-del-asunto-cuadro.js',
+    // Fila 659 (docs/659-DONDE-SE-HACE-Y-NOMBRES.md): «Dónde se hace» de una tarea (sitios y zonas).
+    'js/sitios.js',
+    'js/sitios-guardado.js',
+    'js/sitios-ventana.js',
+    'js/donde-campo.js',
     // Fila 531 (docs/531-TAREAS-E-HITOS-COMUNES.md): las listas comunes de tareas y de hitos.
     'js/comunes.js',
     'js/comunes-guardado.js',
@@ -202,6 +207,9 @@
     'js/repaso-guias.js',   // fila 657
     'js/repaso-guias-aplicar.js',
     'js/repaso-guias-pantalla.js',
+    'js/repaso-donde.js',   // fila 659
+    'js/repaso-donde-aplicar.js',
+    'js/repaso-donde-pantalla.js',
     'js/tipos-y-su-uso.js',   // fila 543
     'js/tipos-y-su-uso-enviar.js',
     'js/campos-calculados-pasos.js',

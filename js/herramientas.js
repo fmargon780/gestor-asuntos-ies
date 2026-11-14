@@ -23,6 +23,9 @@ App.pintarHerramientas = async function () {
   /* Fila 657: «Aplicar el repaso de la lista común» (js/repaso-guias-pantalla.js); sale al entrar y desaparece al aplicarlo. */
   if (window.RepasoGuiasAplicar) await RepasoGuiasAplicar.leerMarca();
   if (window.RepasoGuiasPantalla) RepasoGuiasPantalla.crear();
+  /* Fila 659: «Aplicar el repaso del dónde» (js/repaso-donde-pantalla.js); sale al entrar y desaparece al aplicarlo. */
+  if (window.RepasoDondeAplicar) await RepasoDondeAplicar.leerMarca();
+  if (window.RepasoDondePantalla) RepasoDondePantalla.crear();
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   /* Fila 344: las etiquetas también se cierran (antes de cualquier espera: se abren desde un asunto con App.ir); su botón se engancha. */

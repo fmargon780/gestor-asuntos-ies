@@ -88,7 +88,8 @@ var ComunesCambiar = (function () {
       '<label class="et" for="cc-nombre">Nombre</label><input id="cc-nombre" class="campo" value="' + esc(t.nombre) + '">' +
       '<label class="et" for="cc-hace">Qué se hace</label><select id="cc-hace" class="campo">' +
       Comunes.HACE.map(function (h) { return '<option value="' + esc(h.valor) + '"' + (h.valor === n.accion ? ' selected' : '') + '>' + esc(h.texto) + '</option>'; }).join('') + '</select>' +
-      '<div id="cc-datos">' + datosDeLaTareaHTML(n, t) + '</div>';
+      '<div id="cc-datos">' + datosDeLaTareaHTML(n, t) + '</div>' +
+      (window.DondeCampo ? '<div id="cc-donde">' + DondeCampo.html({ accion: n.accion, donde: t.donde, receta: t.receta, tipoDocumento: t.tipoDocumento, aQuien: t.aQuien }) + '</div>' : '');   /* fila 659 */
     var capa = ventana('Cambiar la tarea', cuerpo, async function (c) {
       var nombre = c.querySelector('#cc-nombre').value.trim();
       if (!nombre) return 'Ponle un nombre.';
@@ -105,6 +106,7 @@ var ComunesCambiar = (function () {
         nueva.receta = Object.keys(r0).length ? r0 : null;
       } else if (n.accion !== t.accion) nueva.receta = null;   /* la receta vieja no sirve a la acción nueva */
       if (!nueva.receta) delete nueva.receta;
+      if (window.DondeCampo) Sitios.aplicarDatos(nueva, n.accion, DondeCampo.leer(c));   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
       if (Comunes.existeIgual('tareas', d.listas.tareas, nueva, t.id)) return 'Ya hay otra tarea con ese nombre.';
       try { nueva = await ComunesGuardado.reemplazar('tareas', nueva); } catch (e) { U.fallo('No he podido guardar el cambio', e); return 'No se ha guardado.'; }
       await repartir(Comunes.cambiarTareaEnGuias(d.guias, nueva), o);
@@ -118,6 +120,7 @@ var ComunesCambiar = (function () {
     function plantillaNueva() {
       var familia = n.accion, antes = ((window.Plantillas && Plantillas.enMemoria()) ? (familia === 'comunicar' ? Plantillas.enMemoria().lista : Plantillas.enMemoria().documentos) || [] : []).map(function (p) { return p.id; });
       var borrador = Object.assign({}, t, { nombre: capa.querySelector('#cc-nombre').value, accion: n.accion });
+      if (window.DondeCampo) Sitios.aplicarDatos(borrador, n.accion, DondeCampo.leer(capa));   /* fila 659 */
       capa.parentNode.removeChild(capa);
       async function alGuardar() {
         try { await Plantillas.cargar(App.E.gestor); } catch (e) { /* se vuelve con lo que haya */ }
@@ -135,13 +138,16 @@ var ComunesCambiar = (function () {
       if (n.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(capa);   /* fila 552 */
     }
     capa.querySelector('#cc-hace').onchange = function (ev) {
+      var previa = n.accion;
       n.accion = ev.target.value;
+      if (window.DondeCampo) DondeCampo.alCambiarAccion(capa.querySelector('#cc-donde'), n.accion, previa);   /* fila 659 */
       n.plantilla = '';   /* las plantillas de otra acción no valen */
       capa.querySelector('#cc-datos').innerHTML = datosDeLaTareaHTML(n, t);
       capa.querySelector('#cc-err').innerHTML = '';
       enganchaDatos();
     };
     enganchaDatos();
+    if (window.DondeCampo) DondeCampo.enganchar(capa.querySelector('#cc-donde'), null);   /* fila 659 */
     var nm = capa.querySelector('#cc-nombre'); nm.focus(); nm.setSelectionRange(nm.value.length, nm.value.length);
   }
 

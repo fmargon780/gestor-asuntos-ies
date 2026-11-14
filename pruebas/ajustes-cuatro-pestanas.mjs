@@ -4,7 +4,7 @@
    1. Las cuatro pestañas, en su orden y con su línea gris; no existe «Mantenimiento».
    2. Cada sección de la tabla está en su sitio y solo en uno; nada queda en el sitio de paso que no se ve.
    3. «Problemas»: con el asunto sin carpeta de la demostración sale su tarjeta y el punto ámbar; al quitarlo, la tarjeta desaparece (el resto, en pruebas/problemas.mjs).
-   4. Herramientas lleva «Puesta a punto y reparaciones» con sus once secciones (la fila 531 añade «Pasar las guías a las listas comunes»; la 543, «Tipos y su uso», temporal; la 551, «Aplicar el plan de las guías», que se va al aplicarlo; la 657, «Aplicar el repaso de la lista común», que también se va al aplicarlo).
+   4. Herramientas lleva «Puesta a punto y reparaciones» con sus once secciones (la fila 531 añade «Pasar las guías a las listas comunes»; la 543, «Tipos y su uso», temporal; la 551, «Aplicar el plan de las guías», que se va al aplicarlo; la 657, «Aplicar el repaso de la lista común», que también se va al aplicarlo; la 659, «Aplicar el repaso del dónde», igual).
    5. El buscador: por título, por otra palabra, sin acentos, resultado de Herramientas, de dentro de un tipo, sin resultados, Esc.
    6. El salto común y lo recordado (pestaña y sección abierta). */
 import { chromium } from 'playwright';
@@ -49,7 +49,7 @@ await comprobar('2. «Lo de cada día»: tipos de documento, grupos y quién enc
   pagina.$$eval('#ajustes-tab-dia > details.bloque-ajustes', (e) => e.map((x) => x.id)),
   ['bloque-tipos-documento', 'bloque-grupos-personas', 'bloque-tipos-organo']);
 await comprobar('2. «El centro», en el orden del documento', titulos('#ajustes-tab-centro > details.bloque-ajustes'),
-  ['Datos del centro y firma', 'Asunto y extracto', 'Cargos del centro', 'Quién usa la aplicación', 'Membrete', 'Sello y firma en el papel', 'Calendario y responsables',
+  ['Datos del centro y firma', 'Asunto y extracto', 'Cargos del centro', 'Quién usa la aplicación', 'Membrete', 'Sello y firma en el papel', 'Calendario y responsables', 'Sitios',
     'Días de aviso', 'Copias de seguridad', 'Impresos', 'Alumnado y personal', 'Campos']);   /* fila 528: la lista de campos */   /* filas 309 y 326 (ya no hay «Buzón de soporte») */
 await comprobar('2. «Este ordenador»: las ocho', titulos('#ajustes-tab-ordenador > details.bloque-ajustes'),
   ['Carpetas de este ordenador', 'Rutas de las carpetas', 'Largo de las rutas', 'Carpeta de la base de datos de alumnado', 'Carpeta del Centro de datos', 'Bandeja de correos', 'Enviar correo', 'El ayudante de Séneca']);
@@ -85,9 +85,9 @@ await comprobar('3. quitado el asunto: la tarjeta desaparece', pagina.evaluate((
 console.log('--- 4. Herramientas ---');
 await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForTimeout(1500);
-await comprobar('4. «Puesta a punto y reparaciones» con sus trece secciones, en orden',
+await comprobar('4. «Puesta a punto y reparaciones» con sus catorce secciones, en orden',
   pagina.evaluate(() => [document.querySelector('.herramientas-puesta-titulo').textContent, [...document.querySelectorAll('#herramientas-puesta-cuerpo > details .bloque-titulo')].map((t) => t.textContent.trim())]),
-  ['Puesta a punto y reparaciones', ['Plantillas del centro', 'Cargar tipos, guías y tareas del instituto', 'Pasar las guías a las listas comunes', 'Aplicar el plan de las guías', 'Aplicar el repaso de la lista común', 'Tipos y su uso', 'Poner en orden las fichas del ARCHIVO', 'Guardar el contacto de los asuntos abiertos',
+  ['Puesta a punto y reparaciones', ['Plantillas del centro', 'Cargar tipos, guías y tareas del instituto', 'Pasar las guías a las listas comunes', 'Aplicar el plan de las guías', 'Aplicar el repaso de la lista común', 'Aplicar el repaso del dónde', 'Tipos y su uso', 'Poner en orden las fichas del ARCHIVO', 'Guardar el contacto de los asuntos abiertos',
     'Versiones previas', 'Duplicados descartados', 'Pasar a Administraciones', 'Borrados que se fusionan', 'Acortar las carpetas del archivo', 'Medidas', 'Tablas para informes']]);
 await comprobar('4. y no queda en Ajustes ninguna sección «Herramientas»', pagina.evaluate(() => [...document.querySelectorAll('#pantalla-ajustes .bloque-titulo')].some((t) => t.textContent.trim() === 'Herramientas')), false);
 

@@ -48,7 +48,8 @@
       (conPlantilla ? '<div><label class="et" for="cn-pl">Plantilla</label><select id="cn-pl" class="campo"><option value="">Sin plantilla fija</option>' +
         plantillasDe(n.accion).map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === n.plantilla ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') +
         '<option value="__nueva">Plantilla nueva…</option></select></div>' : '') + '</div>' +
-      (n.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.formularioHTML(null) : '');   /* fila 552 */
+      (n.accion === 'copiar' && window.TareaCopiarEditor ? TareaCopiarEditor.formularioHTML(null) : '') +   /* fila 552 */
+      (window.DondeCampo ? DondeCampo.html(n) : '');   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
   }
 
   function formularioHito(n, listas) {
@@ -91,7 +92,15 @@
 
     if (tarea) {
       if (n.accion === 'copiar' && window.TareaCopiarEditor) TareaCopiarEditor.enganchar(caja);   /* fila 552 */
-      caja.querySelector('#cn-hace').onchange = function (ev) { n.accion = ev.target.value; n.plantilla = ''; pintarNuevo(caja, c); };
+      if (window.DondeCampo) DondeCampo.enganchar(caja, null);
+      caja.querySelector('#cn-hace').onchange = function (ev) {
+        var previa = n.accion, leido = window.DondeCampo ? DondeCampo.leer(caja) : {};
+        n.donde = leido.donde; n.tipoDocumento = leido.tipoDocumento; n.aQuien = leido.aQuien;
+        n.accion = ev.target.value; n.plantilla = '';
+        var d = Sitios.datos(), antes = Sitios.propuesto(d, previa);   /* fila 659: el sitio pasa al que propone la acción nueva si no se había tocado */
+        if (!n.donde || (antes && Sitios.igualDonde(n.donde, antes))) n.donde = Sitios.propuesto(d, n.accion) || undefined;
+        pintarNuevo(caja, c);
+      };
       var pl = caja.querySelector('#cn-pl');
       if (pl) pl.onchange = function () {
         if (pl.value === '__nueva') { plantillaNueva(c); return; }
@@ -127,7 +136,8 @@
       boton.disabled = true;
       try {
         var elemento = tarea
-          ? { nombre: texto, accion: n.accion, receta: n.accion === 'copiar' ? copia : (n.plantilla ? { plantilla: n.plantilla } : null) }
+          ? Object.assign({ nombre: texto, accion: n.accion, receta: n.accion === 'copiar' ? copia : (n.plantilla ? { plantilla: n.plantilla } : null) },
+              Sitios.limpiarDatos(n.accion, window.DondeCampo ? DondeCampo.leer(caja) : {}))   /* fila 659 */
           : { nombre: texto, explicacion: n.explicacion, tareas: n.tareas };
         var guardado = soloAqui ? elemento : await ComunesGuardado.anadir(tarea ? 'tareas' : 'hitos', elemento);
         c.elegir(!tarea && n.responsable ? Object.assign({}, guardado, { responsable: n.responsable }) : guardado);

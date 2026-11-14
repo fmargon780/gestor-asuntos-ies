@@ -132,6 +132,7 @@ window.DondeSeGuardaTareas = (function () {
     var nueva = { texto: texto, explicacion: g.explicacion || '', accion: g.accion || '', normativa: g.normativa || null };
     if (g.reunir) { nueva.reunir = g.reunir; nueva.obligatorio = !!g.obligatorio; }
     if (g.receta) nueva.receta = g.receta;
+    if (window.Sitios) Sitios.aplicarDatos(nueva, nueva.accion, g);   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
     return nueva;
   }
 
@@ -161,13 +162,15 @@ window.DondeSeGuardaTareas = (function () {
     if (!extras) return;
     linea.accion = extras.accion || '';
     if (extras.receta) linea.receta = extras.receta; else delete linea.receta;
+    if (window.Sitios) Sitios.aplicarDatos(linea, linea.accion, extras);   /* fila 659 */
   }
 
   /* `extras` (fila 522): { accion, receta } si «Cambiar» también ha tocado «Qué se hace». */
   async function cambiar(a, h, g, texto, extras) {
     texto = String(texto || '').trim();
     if (!texto) return false;
-    var cambioExtras = !!extras && ((extras.accion || '') !== (g.accion || '') || JSON.stringify(extras.receta || null) !== JSON.stringify(g.receta || null));
+    var cambioExtras = !!extras && ((extras.accion || '') !== (g.accion || '') || JSON.stringify(extras.receta || null) !== JSON.stringify(g.receta || null) ||
+      (!!window.Sitios && JSON.stringify(Sitios.limpiarDatos(extras.accion || '', extras)) !== JSON.stringify(Sitios.limpiarDatos(g.accion || '', Object.assign({}, g, { donde: Sitios.dondeDe(g) })))));   /* fila 659 */
     try {
       var ctx = await contexto(a, h);
       var propiaRaw = g.propio ? (h.guionPropio || []).filter(function (x) { return x.id === g.id; })[0] : null;

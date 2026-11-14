@@ -39,17 +39,13 @@
       return 'Pregunta · ' + n + (n === 1 ? ' respuesta' : ' respuestas');
     }
     var r = g.receta || {};
-    if (g.accion === 'comunicar') {
-      return ['Comunicar', r.via ? textoDe(VIAS, r.via).toLowerCase() : ''].filter(Boolean).join(' · ');
-    }
-    if (g.accion === 'generar') return 'Generar un documento';
-    if (g.accion === 'firmar') return 'Firmar un documento' + (GG.firmasNecesarias(g) > 1 ? ' · ' + GG.firmasNecesarias(g) + ' firmas' : '');
-    if (g.accion === 'registrar') return 'Registrar un documento';
-    if (g.accion === 'anadir') return 'Añadir un documento';
-    if (g.accion === 'copiar') return 'Copiar a otra carpeta' + (r.carpeta ? ' · ' + r.carpeta : '');   /* fila 552 */
-    if (g.accion === 'pedir') return 'Pedir datos' + (r.campos && r.campos.length ? ' · ' + r.campos.length + (r.campos.length === 1 ? ' campo' : ' campos') : '');   /* fila 530 */
-    var nueva = ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar'].indexOf(g.accion) !== -1 ? textoDe(ACCIONES, g.accion) : '';   /* fila 651 */
-    return nueva || 'Otra cosa';
+    /* Fila 659: el nombre de lo que se hace (sin el sitio) y, aparte, dónde. */
+    var texto = textoDe(ACCIONES, g.accion || '') || 'Otra cosa';
+    if (g.accion === 'firmar' && GG.firmasNecesarias(g) > 1) texto += ' · ' + GG.firmasNecesarias(g) + ' firmas';
+    if (g.accion === 'copiar' && r.carpeta) texto += ' · ' + r.carpeta;   /* fila 552 */
+    if (g.accion === 'pedir' && r.campos && r.campos.length) texto += ' · ' + r.campos.length + (r.campos.length === 1 ? ' campo' : ' campos');   /* fila 530 */
+    var donde = window.Sitios ? Sitios.textoDe(Sitios.datos(), Sitios.dondeDe(g)) : '';
+    return texto + (donde ? ' · ' + donde : '');
   }
 
   function filaHTML(g, dentro) {
@@ -97,7 +93,8 @@
     var queSeHace = (pregunta) ? '' :
       (dentro
         ? '' :
-        '<div class="guion-fila-linea guion-linea-accion"><label class="dato"><span class="etiqueta">Qué se hace</span>' + accionSelectHTML(g) + '</label></div>');
+        '<div class="guion-fila-linea guion-linea-accion"><label class="dato"><span class="etiqueta">Qué se hace</span>' + accionSelectHTML(g) + '</label></div>' +
+        (window.DondeCampo ? DondeCampo.html(g) : ''));   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
     /* Fila 531: una tarea de la lista común lo dice y se cambia con «Cambiar la tarea» (js/comunes-guia.js); cambiar aquí su texto o su plantilla la suelta de la lista. */
     var comunHTML = (!dentro && !pregunta && g.comun)
       ? '<div class="guion-fila-linea guion-comun"><span class="suave pequeno">Tarea de la lista común. Si cambias aquí su texto o su plantilla, deja de serlo.</span>' +
@@ -120,6 +117,7 @@
           '<select class="campo guion-accion">' + ACCIONES.map(function (a) {
             return '<option value="' + a.valor + '"' + (a.valor === (g.accion || '') ? ' selected' : '') + '>' + U.escapar(a.texto) + '</option>';
           }).join('') + '</select>' + mandos + '</div>' +
+        (window.DondeCampo ? DondeCampo.html(g) : '') +   /* fila 659 */
         recetaHTML(g, true) + explicacionHTML + normaHTML + reunirHTML + '</div>';
     }
     return '<div class="guion-fila' + (pregunta ? ' guion-fila-pregunta' : '') + (abierta ? ' guion-abierta' : '') +
@@ -136,7 +134,7 @@
   }
 
   function accionSelectHTML(g) {
-    return '<select class="campo guion-accion">' + ACCIONES.map(function (a) {
+    return '<select class="campo guion-accion" data-previa="' + U.escapar(g.accion || '') + '">' + ACCIONES.map(function (a) {
       return '<option value="' + a.valor + '"' + (a.valor === (g.accion || '') ? ' selected' : '') + '>' + U.escapar(a.texto) + '</option>';
     }).join('') + '</select>';
   }
@@ -184,11 +182,14 @@
       [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
         .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
       if (receta.dataset.a && leida.a === undefined) leida.a = receta.dataset.a;   /* fila 555 */
+      if (receta.dataset.via && leida.via === undefined) leida.via = receta.dataset.via;   /* fila 659: la vía de antes se conserva, aunque ya no se elige */
       if (receta.classList.contains('guion-receta-copiar') && window.TareaCopiarEditor) Object.assign(leida, TareaCopiarEditor.leerGuia(receta));   /* fila 552 */
       if (receta.dataset.campos) { try { leida.campos = JSON.parse(receta.dataset.campos); } catch (e) { /* sin campos */ } }   /* fila 530 */
       var limpia = normalizarReceta(base.accion, leida);
       if (limpia) base.receta = limpia;
     }
+    var dondeBloque = q('.donde-campo');   /* fila 659 */
+    if (dondeBloque && window.DondeCampo) Sitios.aplicarDatos(base, base.accion, DondeCampo.leer(dondeBloque));
     /* Fila 531: sigue siendo de la lista común mientras no se cambie su texto, lo que hace ni su plantilla. */
     if (f.dataset.comun) { base.comun = f.dataset.comun; if (window.ComunesGuia && !ComunesGuia.sigueIgual(base)) delete base.comun; }
     base.normativa = (cita && cita.value.trim())
@@ -293,7 +294,19 @@
       if (window.TareaCopiarEditor) TareaCopiarEditor.guia(fila, alCambiar);   /* fila 552: «Elegir carpeta» e «Insertar campo» */
       /* Fila 164: al cambiar la acción, sale (o se va) su receta. */
       var accionSel = fila.querySelector(':scope > .guion-fila-linea .guion-accion');
-      if (accionSel) accionSel.onchange = function () { alCambiar(function () { /* solo repintar con lo leído */ }); };
+      if (accionSel) accionSel.onchange = function () {
+        var previa = accionSel.dataset.previa || '';
+        alCambiar(function (l) {
+          /* Fila 659: el sitio pasa al que propone la acción nueva (si no se había tocado) y salen o se van «Qué documento» y «A quién». */
+          var x = l[idx];
+          if (!x) return;
+          var d = Sitios.datos(), deAntes = Sitios.propuesto(d, previa);
+          var donde = x.donde;
+          if (!donde || (deAntes && Sitios.igualDonde(donde, deAntes))) donde = Sitios.propuesto(d, x.accion) || null;
+          Sitios.aplicarDatos(x, x.accion, { donde: donde, tipoDocumento: x.tipoDocumento, aQuien: x.aQuien });
+        });
+      };
+      if (window.DondeCampo) DondeCampo.enganchar(fila.querySelector(':scope > .donde-campo'), alisarLinea);   /* fila 659 */
       /* Fila 116: la casilla «Es una pregunta» y sus respuestas. */
       var marca = fila.querySelector(':scope > .guion-mas > .guion-pregunta-fila > .guion-es-pregunta');
       if (marca) marca.onchange = function () {

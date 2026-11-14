@@ -168,7 +168,8 @@ window.TareasConDocumentoVista = (function () {
     return '<div class="tcd-form"><label class="dato"><span class="etiqueta">Qué se hace</span>' +
       '<select class="campo tcd-accion">' + GuiasGuion.ACCIONES.filter(function (x) { return x.valor !== 'copiar'; }).map(function (x) {   /* fila 552: solo en la lista común */
         return '<option value="' + U.escapar(x.valor) + '"' + (x.valor === accion ? ' selected' : '') + '>' + U.escapar(x.texto) + '</option>';
-      }).join('') + '</select></label><span class="tcd-receta">' + recetaHTML(accion, g && g.receta) + '</span></div>';
+      }).join('') + '</select></label><span class="tcd-receta">' + recetaHTML(accion, g && g.receta) + '</span>' +
+      (window.DondeCampo ? DondeCampo.html({ accion: accion, donde: g && g.donde, receta: g && g.receta, tipoDocumento: g && g.tipoDocumento, aQuien: g && g.aQuien }) : '') + '</div>';   /* fila 659 */
   }
 
   /* Lo que escribe la usuaria en el formulario: { accion, receta } (receta null si no dice nada). */
@@ -178,7 +179,11 @@ window.TareasConDocumentoVista = (function () {
     var leida = {};
     [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido'], ['firmas', '.guion-receta-firmas']]
       .forEach(function (x) { var c = raiz && raiz.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
-    return { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, leida) : null };
+    var rz = raiz && raiz.querySelector('.guion-receta');   /* fila 659: la vía de antes ya no se elige; se conserva */
+    if (rz && rz.dataset.via && leida.via === undefined) leida.via = rz.dataset.via;
+    var forma = { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, leida) : null };
+    if (window.DondeCampo) Object.assign(forma, DondeCampo.leer(raiz));   /* fila 659: donde, tipoDocumento, aQuien */
+    return forma;
   }
 
   /* Al cambiar «Qué se hace», se cambian sus desplegables. `alCambiar(forma)` avisa de cualquier cambio. */
@@ -187,12 +192,17 @@ window.TareasConDocumentoVista = (function () {
     if (!sel) return;
     var zona = raiz.querySelector('.tcd-receta');
     quitarBotonPlantilla(zona);
+    var previa = sel.value;   /* fila 659: la acción de antes, para saber si el sitio propuesto se ha tocado */
+    function avisar() { if (alCambiar) alCambiar(leerFormulario(raiz)); }
     sel.onchange = function () {
       zona.innerHTML = recetaHTML(sel.value, null);
       quitarBotonPlantilla(zona);
-      if (alCambiar) alCambiar(leerFormulario(raiz));
+      if (window.DondeCampo) DondeCampo.alCambiarAccion(raiz, sel.value, previa);
+      previa = sel.value;
+      avisar();
     };
-    zona.onchange = function () { if (alCambiar) alCambiar(leerFormulario(raiz)); };
+    zona.onchange = avisar;
+    if (window.DondeCampo) DondeCampo.enganchar(raiz, avisar);
   }
 
   return { colgadoHTML: colgadoHTML, saldra: textoDeSaldra, enganchar: enganchar, formularioHTML: formularioHTML, leerFormulario: leerFormulario,

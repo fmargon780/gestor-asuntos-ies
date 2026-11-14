@@ -52,12 +52,12 @@ var LlamadasPersonas = (function () {
 
   async function personasDe(a) {
     var lista = [], vistos = {};
-    function poner(nombre, papel, tels, custodia) {
+    function poner(nombre, papel, tels, custodia, grupo) {
       (tels || []).forEach(function (t) {
         var k = norm(nombre) + '|' + digitos(t);
         if (!digitos(t) || vistos[k]) return;
         vistos[k] = true;
-        lista.push({ nombre: nombre, papel: papel, telefono: legible(t), copia: digitos(t), custodia: !!custodia });
+        lista.push({ nombre: nombre, papel: papel, telefono: legible(t), copia: digitos(t), custodia: !!custodia, grupo: grupo || '' });   /* fila 659: el grupo es lo que dice «A quién» de la tarea */
       });
     }
     var base = null;
@@ -73,13 +73,13 @@ var LlamadasPersonas = (function () {
         }
         var tels = telefonosDe(persona, base.categoria);
         if (!tels.length && base.resumen && base.resumen.telefono && base.resumen.telefono.valor && base.categoria !== 'ALUMNADO') tels = [base.resumen.telefono.valor];
-        poner(propio, papel, tels);
+        poner(propio, papel, tels, false, 'tercero');
         if (base.categoria === 'ALUMNADO' && window.Datos && Datos.tutoresDe) {
           var tutores = Datos.tutoresDe(persona);
           var custodia = conCustodia(a, persona, tutores);
           tutores.forEach(function (t) {
             var etiqueta = window.FichaTerceroAlumno && FichaTerceroAlumno.etiquetaDeTutor ? FichaTerceroAlumno.etiquetaDeTutor(t) : 'tutor legal';
-            poner(t.nombre || etiqueta, String(t.relacion || etiqueta).toLowerCase(), t.telefonos, !!custodia && t.nombre === custodia);
+            poner(t.nombre || etiqueta, String(t.relacion || etiqueta).toLowerCase(), t.telefonos, !!custodia && t.nombre === custodia, 'tutor');
           });
           /* Los teléfonos de familia que no cuelgan de ningún tutor («Teléfono del tutor» a secas): salen como «La familia». */
           var conocidos = lista.map(function (x) { return x.copia; });
@@ -87,7 +87,7 @@ var LlamadasPersonas = (function () {
             var n = norm(k), v = String(persona.campos[k] || '').trim();
             if (!/tutor|padre|madre|responsable|familia/.test(n) || !/telefono|movil/.test(n) || !digitos(v) || conocidos.indexOf(digitos(v)) !== -1) return;
             conocidos.push(digitos(v));
-            poner('La familia', 'tutores legales', [v]);
+            poner('La familia', 'tutores legales', [v], false, 'tutor');
           });
         }
       }
@@ -96,7 +96,7 @@ var LlamadasPersonas = (function () {
       var lp = a && a.ficha && a.ficha.loPide;
       if (lp && window.LoPide) {
         var c = LoPide.contactoDe(a.ficha);
-        if (c.telefono) poner(lp.nombre || 'Quien lo pide', 'quien lo pide', [c.telefono]);
+        if (c.telefono) poner(lp.nombre || 'Quien lo pide', 'quien lo pide', [c.telefono], false, 'tercero');   /* fila 659: quien pide el asunto es el tercero */
       }
     } catch (e2) { /* sin quien lo pide */ }
     try {
@@ -105,13 +105,24 @@ var LlamadasPersonas = (function () {
         var resueltos = await CorreoGrupos.resolverMiembros(rel);
         resueltos.forEach(function (m) {
           var r = rel.filter(function (x) { return x.nombre === m.nombre; })[0];
-          poner(soloElNombre(m.nombre), 'relacionado', telefonosDe(m.persona, (r && r.categoria) || 'ALUMNADO'));
+          poner(soloElNombre(m.nombre), 'relacionado', telefonosDe(m.persona, (r && r.categoria) || 'ALUMNADO'), false, 'relacionado');
         });
       }
     } catch (e3) { /* sin los relacionados */ }
     return lista;
   }
 
-  return { personasDe: personasDe, telefonosDe: telefonosDe, digitos: digitos };
+  /* Fila 659: la persona que propone «A quién» de una tarea de llamar (la clave de GuiasToca: tercero, tutor, relacionado, profesores):
+     la primera de su grupo (de la familia, la que tiene la custodia si la hay). «Sus profesores» no tienen teléfono aquí: ninguna. -1 si no hay. */
+  function proponerA(personas, aQuien) {
+    var grupo = aQuien === 'tutor' ? 'tutor' : (aQuien === 'tercero' ? 'tercero' : (aQuien === 'relacionado' ? 'relacionado' : ''));
+    if (!grupo) return -1;
+    var idx = -1;
+    personas.forEach(function (p, i) { if (idx === -1 && p.grupo === grupo && (grupo !== 'tutor' || p.custodia)) idx = i; });
+    if (idx === -1) personas.forEach(function (p, i) { if (idx === -1 && p.grupo === grupo) idx = i; });
+    return idx;
+  }
+
+  return { personasDe: personasDe, telefonosDe: telefonosDe, digitos: digitos, proponerA: proponerA };
 })();
 window.LlamadasPersonas = LlamadasPersonas;

@@ -27,7 +27,7 @@ var HacerEsteHito = (function () {
 
 
   function clave(a, h) { return a.nombre + '|' + h.id; }
-  function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1; }
+  function esDeCadena(g) { return !g.pregunta && !g.hecho && !g.noaplica && ACCIONES.indexOf(g.accion) !== -1 && !(g.accion === 'comunicar' && window.Sitios && Sitios.canalDeSitio(g.donde) === ''); }   /* fila 659: «Enviar» a otro sitio no envía nada */
   function tareasDe(a, h) { return window.Hitos && Hitos.guionDe ? Hitos.guionDe(a, h).filter(esDeCadena) : []; }
   function enCurso(a, h) { return !!(a && h && activos[clave(a, h)]); }
   function puede(h) { return !!h && h.clase !== 'decision' && h.estado !== 'hecho' && h.estado !== 'noaplica'; }
@@ -103,7 +103,7 @@ var HacerEsteHito = (function () {
       if (g.accion === 'firmar') return 'espera la firma';
       if (g.accion === 'registrar') return 'espera el registro en Séneca';
       var r = g.receta || {};
-      return (r.via === 'seneca' ? 'mensaje por Séneca' : 'correo');
+      return ((window.Sitios ? Sitios.canalDeTarea(g) : r.via) === 'seneca' ? 'mensaje por Séneca' : 'correo');
     });
     return '<div class="mesa-hacer-linea">' + U.escapar(partes.filter(Boolean).join(' → ')) + '</div>';
   }
@@ -188,7 +188,7 @@ var HacerEsteHito = (function () {
     var fuera = HitoMesaRecetas.plantillaFueraDeUso ? await HitoMesaRecetas.plantillaFueraDeUso(g) : null;
     if (fuera) { Plantillas.avisoFueraDeUso(fuera); return { sigue: false }; }
     var canales = HitosComunicar.canalesDe ? HitosComunicar.canalesDe(a, h) : ['correo'];
-    var via = receta.via || canales[0] || 'correo';
+    var via = (window.Sitios ? Sitios.canalDeTarea(g) : receta.via) || canales[0] || 'correo';   /* fila 659: el sitio de la tarea manda sobre su vía de antes */
     var op = await HitoMesaRecetas.opcionesDePaso(a, h, g, [], via);   /* fila 299: la misma regla que la mesa */
     op.cerrarTexto = 'Todavía no';
     if (via === 'correo') {

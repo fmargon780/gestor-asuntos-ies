@@ -53,7 +53,7 @@ await p.waitForSelector('.capa-campos #cv-crear');
 await comprobar('la ventana trae «Para» con las dos opciones y la lista vacía', p.evaluate(() => [
   [...document.querySelectorAll('#cv-para option')].map((o) => o.value), document.querySelectorAll('.comunes-fila').length, document.querySelector('#cv-centro').textContent.indexOf('No hay ninguna tarea') !== -1]), [['guia', 'aqui'], 0, true]);
 await comprobar('los grupos son lo que hace cada tarea, con «Otra cosa» al final', p.evaluate(() => [...document.querySelectorAll('.campos-grupo > span:first-child')].map((s) => s.textContent)),
-  ['Todas', 'Generar documento', 'Firmar', 'Registrar', 'Comunicar', 'Añadir documento', 'Pedir datos', 'Copiar a otra carpeta', 'Llamar por teléfono', 'En Séneca', 'Entregar o recoger en mano', 'Publicar', 'Cobrar o pagar', 'Comprobar', 'Otra cosa']);
+  ['Todas', 'Generar documento', 'Poner a la firma', 'Registrar', 'Enviar', 'Añadir documento', 'Rellenar datos del asunto', 'Copiar a otra carpeta', 'Llamar', 'Grabar o cambiar datos', 'Entregar', 'Recoger', 'Publicar', 'Cobrar o pagar', 'Comprobar', 'Archivar', 'Otra cosa']);
 await p.click('#cv-crear');
 await p.fill('#cn-nombre', 'Firmar por la Dirección');
 await p.selectOption('#cn-hace', 'firmar');
@@ -69,8 +69,8 @@ await comprobar('1b. la tarea sale ya en el asunto', p.evaluate(async () => (awa
 
 await p.evaluate(async () => ComunesAsunto.anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
 await p.waitForSelector('#cv-buscar');
-await comprobar('2a. la línea dice en cuántos tipos se usa; el grupo «Firmar» cuenta 1', p.evaluate(() => [document.querySelector('.comunes-fila').textContent, [...document.querySelectorAll('.campos-grupo')].filter((g) => g.textContent.indexOf('Firmar') === 0).map((g) => g.textContent)]),
-  ['Firmar por la Direcciónse usa en 1 tipo', ['Firmar1']]);
+await comprobar('2a. la línea dice en cuántos tipos se usa; el grupo «Poner a la firma» cuenta 1', p.evaluate(() => [document.querySelector('.comunes-fila').textContent, [...document.querySelectorAll('.campos-grupo')].filter((g) => g.textContent.indexOf('Poner a la firma') === 0).map((g) => g.textContent)]),
+  ['Firmar por la Direcciónse usa en 1 tipo', ['Poner a la firma1']]);
 await p.fill('#cv-buscar', 'zzz');
 await comprobar('2b. el buscador filtra por nombre', p.evaluate(() => document.querySelectorAll('.comunes-fila').length), 0);
 await p.fill('#cv-buscar', 'direcc');

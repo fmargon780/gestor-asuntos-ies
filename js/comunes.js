@@ -3,8 +3,9 @@
    solo es lógica (fila 531, docs/531-TAREAS-E-HITOS-COMUNES.md).
 
    Una tarea común: { id, nombre, accion, receta?, explicacion?, normativa? }.
-   `accion` sale de una lista fija (Generar documento, Firmar, Registrar,
-   Comunicar, Añadir documento, Pedir datos, Otra cosa = ''). Un hito común
+   `accion` sale de una lista fija (`HACE`; fila 659: Generar documento, Poner a la
+   firma, Registrar, Enviar, Añadir documento… Otra cosa = ''). Una tarea lleva además,
+   opcionales, `donde` ({ sitio, zona? }, js/sitios.js), `tipoDocumento` y `aQuien`. Un hito común
    se comparte entero: { id, nombre, explicacion, tareas: [ids de tareas
    comunes] }; el plazo y el lugar son de cada guía.
 
@@ -21,20 +22,26 @@ var Comunes = (function () {
 
   /* Lo que hace una tarea: lista fija (punto 1). '' = «Otra cosa». */
   var HACE = [
-    { valor: 'generar', texto: 'Generar documento' }, { valor: 'firmar', texto: 'Firmar' },
-    { valor: 'registrar', texto: 'Registrar' }, { valor: 'comunicar', texto: 'Comunicar' },
-    { valor: 'anadir', texto: 'Añadir documento' }, { valor: 'pedir', texto: 'Pedir datos' },
+    { valor: 'generar', texto: 'Generar documento' }, { valor: 'firmar', texto: 'Poner a la firma' },
+    { valor: 'registrar', texto: 'Registrar' }, { valor: 'comunicar', texto: 'Enviar' },
+    { valor: 'anadir', texto: 'Añadir documento' }, { valor: 'pedir', texto: 'Rellenar datos del asunto' },
     { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
-    { valor: 'llamar', texto: 'Llamar por teléfono' },   /* fila 639 */
-    /* Fila 651: solo clasifican, se marcan a mano (sin botón, como «Otra cosa»). */
-    { valor: 'seneca', texto: 'En Séneca' }, { valor: 'entregar', texto: 'Entregar o recoger en mano' },
+    { valor: 'llamar', texto: 'Llamar' },   /* fila 639; fila 659: antes «Llamar por teléfono» */
+    /* Fila 651: solo clasifican, se marcan a mano (sin botón, como «Otra cosa»). Fila 659: «En Séneca» pasa a «Grabar o cambiar datos»
+       (qué se hace, sin el sitio), «Entregar o recoger en mano» se parte en «Entregar» y «Recoger», y «Archivar» es nueva. */
+    { valor: 'seneca', texto: 'Grabar o cambiar datos' }, { valor: 'entregar', texto: 'Entregar' }, { valor: 'recoger', texto: 'Recoger' },
     { valor: 'publicar', texto: 'Publicar' }, { valor: 'cobrar', texto: 'Cobrar o pagar' },
-    { valor: 'comprobar', texto: 'Comprobar' },
+    { valor: 'comprobar', texto: 'Comprobar' }, { valor: 'archivar', texto: 'Archivar' },
     { valor: '', texto: 'Otra cosa' }
   ];
 
+
   /* Fila 657: las once fases de un hito común, en el orden en que se hacen. */
   var FASES = ['recibir', 'pedir', 'comprobar', 'elaborar', 'firma', 'publicar', 'enviar', 'seneca', 'cobrar', 'esperar', 'archivar'];
+  /* Fila 659: lo que dice cada fase donde se lea (los valores internos no cambian). */
+  var FASES_TEXTO = { recibir: 'Recibir', pedir: 'Pedir', comprobar: 'Comprobar', elaborar: 'Generar documento', firma: 'Poner a la firma', publicar: 'Publicar',
+    enviar: 'Enviar o entregar', seneca: 'Grabar o cambiar datos', cobrar: 'Cobrar o pagar', esperar: 'Esperar', archivar: 'Archivar' };
+  function textoDeFase(f) { return FASES_TEXTO[f] || ''; }
 
   function norm(t) { return (window.U && U.normalizar) ? U.normalizar(String(t || '')) : String(t || '').toLowerCase().trim(); }
   function nuevoId(p) { return (window.U && U.nuevoId) ? U.nuevoId(p) : p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -54,6 +61,7 @@ var Comunes = (function () {
     if (receta) o.receta = receta;
     if (t && String(t.explicacion || '').trim()) o.explicacion = String(t.explicacion).trim();
     if (t && t.normativa && t.normativa.cita) o.normativa = copia(t.normativa);
+    if (window.Sitios) Sitios.aplicarDatos(o, accion, t);   /* fila 659: «Dónde se hace», «Qué documento» y «A quién» */
     if (t && (t.reunir === 'documento' || t.reunir === 'dato')) { o.reunir = t.reunir; o.obligatorio = !!t.obligatorio; }
     return o;
   }
@@ -145,6 +153,7 @@ var Comunes = (function () {
     var g = { id: nuevoId('g'), comun: t.id, texto: t.nombre, explicacion: t.explicacion || '', accion: t.accion || '',
               normativa: t.normativa ? copia(t.normativa) : null };
     if (t.receta) g.receta = copia(t.receta);
+    if (window.Sitios) Sitios.aplicarDatos(g, t.accion || '', t);   /* fila 659 */
     if (t.reunir) { g.reunir = t.reunir; g.obligatorio = !!t.obligatorio; }
     return g;
   }
@@ -168,6 +177,7 @@ var Comunes = (function () {
     g.texto = t.nombre; g.explicacion = t.explicacion || ''; g.accion = t.accion || '';
     g.normativa = t.normativa ? copia(t.normativa) : null;
     if (t.receta) g.receta = copia(t.receta); else delete g.receta;
+    if (window.Sitios) Sitios.aplicarDatos(g, t.accion || '', t);   /* fila 659 */
     if (t.reunir) { g.reunir = t.reunir; g.obligatorio = !!t.obligatorio; } else { delete g.reunir; delete g.obligatorio; }
   }
 
@@ -241,7 +251,7 @@ var Comunes = (function () {
   }
 
   return {
-    HACE: HACE, FASES: FASES, textoDeHace: textoDeHace, accionValida: accionValida,
+    HACE: HACE, FASES: FASES, FASES_TEXTO: FASES_TEXTO, textoDeFase: textoDeFase, textoDeHace: textoDeHace, accionValida: accionValida,
     normalizarTarea: normalizarTarea, normalizarHito: normalizarHito, normalizarFichero: normalizarFichero,
     buscar: buscar, parecidas: parecidas, existeNombre: existeNombre, existeIgual: existeIgual,
     recorrerGuias: recorrerGuias, usos: usos, textoUsos: textoUsos,

@@ -97,16 +97,16 @@ await comprobar('«Texto de la tarea», ↑, ↓ y «Quitar» en la misma línea
       Array.from(f.querySelectorAll('.guion-linea-texto .requisito-mandos .boton')).map(b => b.textContent),
       Math.abs(y('.guion-texto') - y('.guion-subir')) < 30];
   }, F('g1')), ['Texto de la tarea', ['↑', '↓', 'Quitar'], true]);
-await comprobar('«Qué se hace» con sus nueve opciones, y para «Comunicar»: «A quién va (lo dice la plantilla)», «Por dónde» y «Plantilla de correo»',
+await comprobar('«Qué se hace» con sus nueve opciones, y para «Comunicar»: «A quién va (lo dice la plantilla)» y «Plantilla de correo» (fila 659: «Por dónde» es ahora «Dónde se hace»)',
   pagina.evaluate((s) => {
     const f = document.querySelector(s);
     return [f.querySelector('.guion-linea-accion .etiqueta').textContent,
       Array.from(f.querySelectorAll('.guion-accion option')).map(o => o.textContent),
       Array.from(f.querySelectorAll('.guion-receta .etiqueta')).map(e => e.textContent),
-      !!f.querySelector('.guion-receta-a'), f.querySelector('.guion-receta-via').value];
+      !!f.querySelector('.guion-receta-a'), !!f.querySelector('.guion-receta-via'), f.querySelector('.donde-sitio').value];
   }, F('g1')),
-  ['Qué se hace', ['Otra cosa', 'Generar un documento', 'Firmar un documento', 'Registrar un documento', 'Comunicar', 'Añadir un documento', 'Pedir datos', 'Copiar a otra carpeta', 'Llamar por teléfono', 'En Séneca', 'Entregar o recoger en mano', 'Publicar', 'Cobrar o pagar', 'Comprobar'],
-   ['Por dónde', 'Plantilla de correo', 'A quién va (lo dice la plantilla)'], false, 'correo']);
+  ['Qué se hace', ['Generar documento', 'Poner a la firma', 'Registrar', 'Enviar', 'Añadir documento', 'Rellenar datos del asunto', 'Copiar a otra carpeta', 'Llamar', 'Grabar o cambiar datos', 'Entregar', 'Recoger', 'Publicar', 'Cobrar o pagar', 'Comprobar', 'Archivar', 'Otra cosa'],
+   ['Plantilla de correo', 'A quién va (lo dice la plantilla)'], false, false, 'Correo electrónico']);
 await pagina.locator(F('g1') + ' .guion-accion').selectOption('generar');
 await comprobar('con «Generar un documento»: «Plantilla de documento»; la línea lo dice y la tarea sigue abierta',
   pagina.evaluate((s) => {
@@ -194,7 +194,8 @@ await comprobar('sin tocar nada, la guía sale igual que entró',
 await abrir();
 await pagina.click(F('g1') + ' > .guion-resumen');
 await pagina.fill(F('g1') + ' .guion-texto', 'Acusar recibo (cambiado)');
-await pagina.selectOption(F('g1') + ' .guion-receta-via', 'seneca');
+await pagina.fill(F('g1') + ' .donde-sitio', 'iPasen');
+await pagina.press(F('g1') + ' .donde-sitio', 'Tab');
 await pagina.click(F('g4') + ' > .guion-resumen');
 await pagina.click(F('g4') + ' .guion-mas-cab');
 await pagina.uncheck(F('g4') + ' .guion-obligatorio');
@@ -202,8 +203,8 @@ await pagina.click('#cuadro-aceptar');
 await comprobar('lo cambiado en las tareas se guarda, y lo demás queda igual',
   pagina.evaluate(async () => {
     const g = (await window.__guardada)[0].guion;
-    return [g[0].texto, g[0].receta, g[1], g[2].opciones.length, g[3].reunir, g[3].obligatorio];
-  }), ['Acusar recibo (cambiado)', { a: 'tutoria', via: 'seneca', plantilla: '' },
+    return [g[0].texto, g[0].receta, g[0].donde, g[1], g[2].opciones.length, g[3].reunir, g[3].obligatorio];
+  }), ['Acusar recibo (cambiado)', { a: 'tutoria', via: 'correo', plantilla: '' }, { sitio: 'st-ipasen' },
        { id: 'g2', texto: 'Sellar el parte', explicacion: 'Con el sello grande', accion: '', normativa: null }, 2, 'documento', false]);
 
 /* ================= 8 ================= */

@@ -79,7 +79,7 @@ var HitoMesaGuion = (function () {
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
        la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
     var etiquetaFirmar = (g.accion === 'firmar' && window.GuiasGuion)
-      ? '<span class="guion-tarea-clase guion-tarea-accion">' + (GuiasGuion.firmasNecesarias(g) > 1 ? 'Firmar · ' + GuiasGuion.firmasNecesarias(g) + ' firmas' : 'Firmar') + '</span>'   /* fila 523 */
+      ? '<span class="guion-tarea-clase guion-tarea-accion">' + (GuiasGuion.firmasNecesarias(g) > 1 ? 'Poner a la firma · ' + GuiasGuion.firmasNecesarias(g) + ' firmas' : 'Poner a la firma') + '</span>'   /* fila 523 */
       /* Fila 553: cada tarea con acción lleva su etiqueta, al lado del nombre. */
       : ((g.accion && window.Comunes) ? '<span class="guion-tarea-accion" data-accion="' + U.escapar(g.accion) + '">' + U.escapar(Comunes.textoDeHace(g.accion)) + '</span>' : '');
     var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" data-ayuda-clave="solo-aqui-tarea">solo aquí</span>' : '';
@@ -91,7 +91,9 @@ var HitoMesaGuion = (function () {
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
         (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" data-ayuda-clave="plantilla-fuera-de-uso">plantilla fuera de uso</span>' : '') +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar + etiquetaPropia +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar +
+        (window.DondeCampo && g.accion ? DondeCampo.etiquetaHTML(g) : '') +   /* fila 659: dónde se hace, junto a lo que se hace */
+        etiquetaPropia +
         (window.SoloSi ? SoloSi.faltaHTML(g.falta) : '') + '</label>' +   /* fila 576 */
         quienCuando + botonAccion + botonesTarea + '</div>' +
       debajoTarea +

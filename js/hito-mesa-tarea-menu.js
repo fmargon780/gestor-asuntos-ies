@@ -71,7 +71,7 @@ var HitoMesaTareaMenu = (function () {
         '<input class="campo guion-tarea-editar-texto" data-clave="tarea-editar-' + U.escapar(g.id) +
         '" value="' + U.escapar(g.texto) + '">' +
         /* Fila 522: «Qué se hace» y su dato, como en la guía (una pregunta no los lleva). */
-        (!g.pregunta && window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML({ accion: g.accion, receta: g.receta }) +
+        (!g.pregunta && window.TareasConDocumentoVista ? TareasConDocumentoVista.formularioHTML({ accion: g.accion, receta: g.receta, donde: g.donde, tipoDocumento: g.tipoDocumento, aQuien: g.aQuien }) +
           '<div class="tcd-botones"><button type="button" class="boton boton-chico guion-tarea-editar-guardar">Guardar</button>' +
           '<button type="button" class="enlace guion-tarea-editar-cancelar">Cancelar</button></div>' : '') +
         '<p class="nota">Intro guarda, Escape cancela.</p></div>';

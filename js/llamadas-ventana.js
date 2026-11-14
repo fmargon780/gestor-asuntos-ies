@@ -41,6 +41,7 @@
     try { personas = await LlamadasPersonas.personasDe(a); } catch (e) { personas = []; }
     var hitos = [];
     if (o.cabecera) { try { hitos = await hitosParaElegir(a); } catch (e2) { hitos = []; } }
+    if (!corr && S.tarea && S.tarea.g && S.tarea.g.aQuien && LlamadasPersonas.proponerA) S.persona = LlamadasPersonas.proponerA(personas, S.tarea.g.aQuien);   /* fila 659: «A quién» de la tarea */
     var ini = Llamadas.camposDe(corr ? o.corregir.cuando : new Date().toISOString());
     var otra = '';
     if (corr) {

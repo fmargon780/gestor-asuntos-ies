@@ -85,7 +85,9 @@
   function extrasDeTarea(extras) {
     if (!extras || typeof extras !== 'object' || !('accion' in extras)) return null;
     var accion = ACCIONES.indexOf(extras.accion) !== -1 ? extras.accion : '';
-    return { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, extras.receta) : null };
+    var e = { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, extras.receta) : null };
+    if (window.Sitios) Object.assign(e, Sitios.limpiarDatos(accion, extras));   /* fila 659: donde, tipoDocumento, aQuien */
+    return e;
   }
 
   function ponerExtras(g, x) {
@@ -93,6 +95,7 @@
     if (!e) return g;
     g.accion = e.accion;
     if (e.receta) g.receta = e.receta; else delete g.receta;
+    if (window.Sitios) Sitios.aplicarDatos(g, e.accion, e);   /* fila 659 */
     return g;
   }
 
@@ -119,12 +122,14 @@
       if (ocultos.indexOf(original.id) === -1) ocultos = ocultos.concat([original.id]);
       h.guionOcultos = ocultos;
       var nuevoId = U.nuevoId('gp');
-      h.guionPropio = (h.guionPropio || []).concat([ponerExtras({
+      var sustituta = {
         id: nuevoId, texto: texto, enLugarDe: original.id,
         explicacion: original.explicacion || '', accion: original.accion || '',
         normativa: original.normativa || null, reunir: original.reunir || '',
         obligatorio: !!original.obligatorio, receta: original.receta || null
-      }, extras)]);
+      };
+      if (window.Sitios) Sitios.aplicarDatos(sustituta, sustituta.accion, original);   /* fila 659: la sustituta conserva donde, tipoDocumento y aQuien */
+      h.guionPropio = (h.guionPropio || []).concat([ponerExtras(sustituta, extras)]);
       if (window.TareasConDocumento) TareasConDocumento.mover(h, original.id, nuevoId);   /* fila 522: el documento sigue a la tarea */
       h.guionHecho = h.guionHecho || {};
       if (original.hecho || original.noaplica || original.valor || original.documento) {

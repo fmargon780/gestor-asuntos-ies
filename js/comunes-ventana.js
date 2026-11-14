@@ -123,7 +123,7 @@ var ComunesVentana = (function () {
       var crear = cuadro.querySelector('#cv-crear');
       if (crear) crear.onclick = function () {
         st.modo = 'nuevo';
-        st.nuevo = tarea ? { nombre: st.q || '', accion: 'generar', plantilla: '' } : { nombre: st.q || '', explicacion: '', tareas: [] };
+        st.nuevo = tarea ? { nombre: st.q || '', accion: 'generar', plantilla: '', donde: window.Sitios ? Sitios.propuesto(Sitios.datos(), 'generar') || undefined : undefined } : { nombre: st.q || '', explicacion: '', tareas: [] };
         pintar();
       };
       if (st.modo === 'nuevo') {
