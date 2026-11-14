@@ -57,4 +57,7 @@ Eligió que las acciones nuevas entren en el tema como primera parte (opción 1)
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- (14-nov-2026, segundo revisor, en local con datos de demo) 1. coincide: «Otra cosa» donde estaba «Sin acción» y las cinco al final en orden. 2. coincide: las cinco quedan con su etiqueta, sin botón, y se marcan a mano (marcada y desmarcada a mano solo «En Séneca»; las otras cuatro, sin marcar una a una). 3. coincide: «Cambiar» y el editor de la guía ofrecen las mismas opciones. 4. coincide: la lista común enseña las cinco con su cuenta (a 0 en la demo; al crear una «Publicar» pasó a 1). 5. coincide: una tarea antigua sin acción se ve y se marca igual y su «Cambiar» dice «Otra cosa». 6. coincide: no queda «Sin acción (se marca a mano)» en ninguna pantalla. Sin errores de consola.
+- No lo ha podido ver: «+ Añadir tarea» en un hito con guía real de un asunto abierto; un guardado real en el editor de la guía; guardar un «Cambiar» a una acción nueva; cuentas distintas de 0 o 1 en la lista común.
+- De más (no pedido, coherente): la lista común también cuenta «Otra cosa»; el formulario «Tarea nueva» de esa ventana ofrece las cinco. «Copiar a otra carpeta» no sale en «+ Añadir tarea» del asunto (ya era así).
+- Aviso de compatibilidad: una versión anterior de la app que lea una guía con una de las cinco acciones la trata como «Otra cosa» y, si guarda, la pierde. Se resuelve recargando con la versión nueva en todos los ordenadores.
