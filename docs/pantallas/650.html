@@ -125,9 +125,12 @@ main{padding:22px 28px}
 
 <script>
 var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
-var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','Grabar o cambiar datos'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
-var DONDE=['Séneca · Alumnado','Séneca · Personal','Séneca · Registro','Séneca · Documentos','Séneca · Ventanilla Electrónica','iPasen','Correo','Teléfono','En mano','Tablón','Expediente del alumno','Archivo del centro','En esta app','Otro sitio'];
-function dondeDe(a){return {registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',publicar:'Tablón',comunicar:'Correo',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
+var ACC=[['generar','Elaborar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Enviar'],['anadir','Añadir documento'],['pedir','Rellenar datos del asunto'],['copiar','Copiar a otra carpeta'],['llamar','Llamar'],['seneca','Grabar o cambiar datos'],['entregar','Entregar'],['recoger','Recoger'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var DONDE=['Séneca · Alumnado','Séneca · Personal','Séneca · Registro','Séneca · Documentos','Séneca · Ventanilla Electrónica','iPasen','Correo electrónico','Correo postal','Teléfono','En mano','Tablón','Expediente del alumno','Archivo del centro','En esta app','Otro sitio'];
+function dondeDe(a){return {registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',recoger:'En mano',publicar:'Tablón',comunicar:'Correo electrónico',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
+/* «Qué se hace» se busca escribiendo, también por el sitio: cada acción con sus sitios habituales. Por dentro son dos datos. */
+var SITIOS={generar:['En esta app'],registrar:['Séneca · Registro'],comunicar:['Correo electrónico','iPasen','Correo postal','En mano'],anadir:['En esta app'],pedir:['En esta app'],copiar:['En esta app'],llamar:['Teléfono'],seneca:['Séneca · Alumnado','Séneca · Personal'],entregar:['En mano'],recoger:['En mano'],publicar:['Tablón'],cobrar:['En mano'],comprobar:['En mano','Séneca · Alumnado']};
+var QUE=[];ACC.forEach(function(x){var l=SITIOS[x[0]]||[];if(!l.length)QUE.push({t:x[1],a:x[0],d:''});l.forEach(function(d){QUE.push({t:x[1]+' · '+d,a:x[0],d:d})})});
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
 var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
@@ -260,7 +263,7 @@ function elegirTarea(hueco,op){
   var dl='dl'+(++NDL);
   var st={a:'-',s:'',d:'',nombre:'',tocado:false};
   hueco.innerHTML='<div class="form-tarea">'+
-    '<div class="fila"><div class="campo"><label>Qué se hace</label><select data-x="acc"><option value="-">Elige…</option>'+ACC.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div>'+
+    '<div class="fila"><div class="campo"><label>Qué se hace</label><input data-x="acc" list="'+dl+'a" placeholder="Escribe qué o dónde: «correo», «llamar»…" autocomplete="off"><datalist id="'+dl+'a">'+QUE.map(function(e){return '<option value="'+esc(e.t)+'">'}).join('')+'</datalist></div>'+
     '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><input data-x="sobre" list="'+dl+'s" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'s"></datalist></div>'+
     '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><input data-x="donde" list="'+dl+'d" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'d">'+DONDE.map(function(d){return '<option value="'+esc(d)+'">'}).join('')+'</datalist></div></div>'+
     '<div class="comunes oculto" data-x="comunes"></div>'+
@@ -269,8 +272,9 @@ function elegirTarea(hueco,op){
     (op.sinBotones?'':'<div class="fila" style="margin:0"><button class="boton primario peque" data-x="anadir" disabled>Añadir</button><button class="boton peque" data-x="cancelar">Cancelar</button></div><div class="donde">'+esc(dondeTxt())+'</div>')+
   '</div>';
   var q=function(x){return hueco.querySelector('[data-x="'+x+'"]')};
-  q('acc').onchange=function(){st.a=this.value;st.s='';var so=sobreDe(st.a);
-    st.d=dondeDe(st.a);q('donde').value=st.d;q('donde-c').classList.toggle('oculto',st.a==='-');
+  q('acc').onfocus=function(){this.select()};
+  q('acc').oninput=function(){var v=this.value,e=QUE.filter(function(x){return x.t===v})[0];st.a=e?e.a:'-';st.s='';var so=sobreDe(st.a);
+    st.d=e?e.d:'';q('donde').value=st.d;q('donde-c').classList.toggle('oculto',st.a==='-');
     if(so&&st.a!=='-'){q('sobre-c').classList.remove('oculto');q('sobre-et').textContent=so.et;q('sobre').value='';hueco.querySelector('#'+dl+'s').innerHTML=so.ops.map(function(o){return '<option value="'+esc(o)+'">'}).join('')}
     else q('sobre-c').classList.add('oculto');
     refrescar()};
@@ -287,7 +291,7 @@ function elegirTarea(hueco,op){
     if(st.a==='registrar') return 'Registrar '+(s?s.toLowerCase():'el documento');
     if(st.a==='anadir') return 'Añadir '+(s?s.toLowerCase():'el documento')+' al asunto';
     if(st.a==='firmar') return 'Poner a la firma '+(s?s.toLowerCase():'el documento');
-    if(st.a==='comunicar') return 'Comunicar: '+s.charAt(0).toLowerCase()+s.slice(1);
+    if(st.a==='comunicar') return 'Enviar: '+s.charAt(0).toLowerCase()+s.slice(1);
     if(st.a==='llamar') return 'Llamar: '+s;
     if(st.a==='') return '';
     return accTxt(st.a);
