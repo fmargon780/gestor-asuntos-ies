@@ -8,7 +8,7 @@
      - el original se queda donde estaba, y los dos aparecen en la lista;
      - se apunta una nota con el código del registro;
      - un documento que ya lleva registro no tiene botón Registrar;
-     - la casilla "Pendiente de registro" deja una marca ámbar que
+     - la casilla "Hay que registrarlo" (fila 670) deja una marca ámbar que
        desaparece al registrarlo, tanto desde la ficha como desde
        "Gestionar documentos";
      - si la copia sellada es un PDF con el sello de Séneca dentro, el
@@ -191,7 +191,7 @@ await comprobar('el original ya no sale como documento suelto: se ha ido a "Vers
 await comprobar('y sale plegado en «1 versión previa · ver»',
   pagina.locator('.ficha-previas summary').textContent(), '1 versión previa · ver');
 
-console.log('--- un documento con la casilla "Pendiente de registro" ---');
+console.log('--- un documento con la casilla "Hay que registrarlo" (fila 670) ---');
 /* Desde la fila 168, «+ Añadir documento» en la cabecera del bloque va
    directo al cuadro de añadir (antes «Documentos ▾» y luego «Añadir»). */
 await pagina.click('.ficha-documentos-anadir');
@@ -199,9 +199,9 @@ await pagina.waitForSelector('#doc-vista');
 await pagina.fill('#doc-fecha', '2026-09-11');
 await pagina.selectOption('#doc-tipo', 'SOLICITUD');
 await pagina.fill('#doc-curso', 'Prueba pendiente');
-await comprobar('la casilla se ofrece cuando el documento no lleva registro',
-  pagina.locator('#doc-pendiente-registro').isVisible(), true);
-await pagina.check('#doc-pendiente-registro');
+await comprobar('la casilla se ofrece cuando el documento no lleva registro, y se llama «Hay que registrarlo»',
+  pagina.evaluate(() => [document.querySelector('#doc-hay-que-registrar').offsetParent !== null, document.querySelector('#doc-fila-hay-que-registrar').innerText.trim(), document.body.innerText.indexOf('Pendiente de registro')]), [true, 'Hay que registrarlo', -1]);
+await pagina.check('#doc-hay-que-registrar');
 await pagina.waitForTimeout(100);
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(600); if (await pagina.locator('#pt-ok').count()) await pagina.click('#pt-ok');   /* fila 638: «¿De qué tarea es?» → «Tarea nueva» */
@@ -233,13 +233,15 @@ await pagina.waitForTimeout(400);
 await comprobar('al registrarlo, la marca de pendiente desaparece',
   filaDeDocumento(SOLICITUD), { pendiente: false, registrar: false });
 
-await comprobar('y se ha quitado de "pendientesRegistro" en la ficha del asunto', pagina.evaluate(async (asunto) => {
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-  const h = await g.getFileHandle('asuntos.json');
-  const j = JSON.parse(await (await h.getFile()).text());
-  const ficha = j.asuntos[asunto];
-  return (ficha && ficha.pendientesRegistro) || [];
-}, NOMBRE_ASUNTO), []);
+await comprobar('y la tarea «Registrar» de ese documento queda hecha', pagina.evaluate(async ([asunto, doc]) => {
+  const a = Gestor.asuntos().filter((x) => x.nombre === asunto)[0];
+  const salida = [];
+  for (const h of await Hitos.hitosDe(asunto)) for (const g of Hitos.guionDe(a, h)) {
+    const e = TareasConDocumento.de(h, g.id);
+    if (g.accion === 'registrar' && e && e.doc === doc) salida.push(g.hecho);
+  }
+  return salida;
+}, [NOMBRE_ASUNTO, SOLICITUD]), [true]);
 
 console.log('--- leer el sello de Séneca, del propio PDF ---');
 

@@ -141,11 +141,15 @@ await pagina.evaluate(async () => {
       requisitos: [{ id: 'r1', texto: 'Papel', clase: 'documento', hecho: true, documento: doc }] }] };
     return d;
   });
+  /* Fila 670: el aviso de lo que falta sale de una tarea «Registrar» sin hacer con el documento (la marca antigua ya no avisa). */
+  await Hitos.anadirGuionPropio(nombre, 'h1', 'Registrar', { accion: 'registrar' });
+  const gh = Hitos.guionDe({ nombre, ficha: App.E.registro.asuntos[nombre] }, (await Hitos.hitosDe(nombre))[0]).filter((g) => g.accion === 'registrar')[0];
+  await TareasConDocumento.asignar(nombre, 'h1', gh.id, doc);
   window.__a.ficha = App.E.registro.asuntos[nombre];
   window.__doc = doc;
 });
 await lanzar();
-/* Fila 524: con un documento pendiente de registro sale antes «Falta por hacer en este asunto»; se sigue «igualmente». */
+/* Fila 524: con una tarea «Registrar» sin hacer sale antes «Falta por hacer en este asunto»; se sigue «igualmente». */
 await pagina.waitForFunction(() => document.getElementById('cuadro-titulo').textContent === 'Falta por hacer en este asunto');
 await pagina.click('#cuadro-aceptar');
 const nuevoStem = sinRelleno(largo90, 20);

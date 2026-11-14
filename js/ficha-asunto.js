@@ -67,6 +67,9 @@
     if (window.Navegacion) Navegacion.apuntar();   /* fila 119: de dónde se viene */
     App.ir('asunto');
     pintar();
+    if (window.HayQueRegistrarlo && N.modoActual === 'abierto' && !(window.SoloConsulta && SoloConsulta.activo())) {
+      HayQueRegistrarlo.migrar(a).catch(function () { /* se reintenta al abrir otra vez */ });   /* fila 670: las marcas antiguas pasan a tareas «Registrar» */
+    }
     if (window.RutaCopia) RutaCopia.mirar();   /* fila 478: ¿ha llegado el registrado de Séneca encima de un documento? */
 
     /* Solo se vigila la presencia en un asunto abierto: en el ARCHIVO

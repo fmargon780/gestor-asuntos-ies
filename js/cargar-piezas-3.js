@@ -75,6 +75,7 @@
     'js/documento-a-tarea.js',
     // Fila 661: la bandeja con hito y tarea: el bloque «¿De qué tarea es?» del cuadro del nombre, la entrada al guardar y los botones del correo en el Registro.
     'js/documento-tarea-bloque.js',
+    'js/hay-que-registrarlo.js',
     'js/bandeja-a-asunto.js',
     'js/registro-abrir-pdf.js',
     'js/donde-se-guarda.js',

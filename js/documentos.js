@@ -150,8 +150,11 @@ var Documentos = (function () {
                     : 'La carpeta todavía está vacía.') + '</p>';
 
     if (lista.length) {
+      /* Fila 670: «Sin registrar» sale de las tareas «Registrar» sin hacer (y de la marca antigua de un asunto sin hitos). */
+      var hitosDoc = [];
+      try { hitosDoc = await Hitos.hitosDe(N.asuntoActual.nombre); } catch (eH) { hitosDoc = []; }
       html += '<div class="lista-documentos">' + lista.map(function (f, i) {
-        var pendiente = Registro.pendiente(N.asuntoActual, f.nombre);
+        var pendiente = window.AvisosFalta ? AvisosFalta.sinRegistrar(N.asuntoActual, hitosDoc, f.nombre) : Registro.pendiente(N.asuntoActual, f.nombre);
         var sinRegistro = !Registro.tieneRegistro(f.nombre, N.asuntoActual);
         return '<div class="fila-documento">' +
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +

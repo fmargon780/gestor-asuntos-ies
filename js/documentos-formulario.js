@@ -162,10 +162,18 @@
       valoresIniciales = rec.valores;
       curso = rec.resto;
     }
-    /* Solo se ofrece cuando ya está en la carpeta: un documento que se
-       acaba de añadir todavía no puede estar "pendiente" de nada. */
-    var pendienteInicial = opciones.modo === 'renombrar' &&
-      Registro.pendiente(N.asuntoActual, opciones.nombreActual);
+    /* Fila 670: sale ya marcada si el documento ya cuelga de una tarea «Registrar» sin hacer. */
+    var hayQueInicial = false, hitoDelDoc = '';
+    if (window.HayQueRegistrarlo && opciones.modo === 'renombrar') {
+      try {
+        hayQueInicial = await HayQueRegistrarlo.cuelga(N.asuntoActual, opciones.nombreActual);
+        hitoDelDoc = await HayQueRegistrarlo.hitoDelDocumento(N.asuntoActual, opciones.nombreActual);
+      } catch (eHq) { hayQueInicial = false; }
+    }
+    N.hitoDelDocumento = hitoDelDoc;
+    /* El desplegable «Hito» solo si no se sabe el hito: ni el del cuadro, ni el del documento, ni la bandeja, ni la pregunta de «¿De qué tarea es?». */
+    var pideHito = !opciones.desdeBandeja && !N.hitoActual && !hitoDelDoc &&
+      !(opciones.modo === 'anadir' && N.preguntarTarea && window.DocumentoATarea);
 
     /* El registro: el que ya trae el nombre manda; si no, el leído del
        sello de Séneca (misma forma que usa js/registro.js). */
@@ -221,11 +229,12 @@
         '<span>Está registrado en Séneca</span>' +
       '</label>' +
 
-      '<label class="interruptor' + (registro ? ' oculto' : '') + '" id="doc-fila-pendiente">' +
-        '<input type="checkbox" id="doc-pendiente-registro"' +
-          (pendienteInicial ? ' checked' : '') + '>' +
-        '<span>Pendiente de registro</span>' +
+      '<label class="interruptor' + (registro ? ' oculto' : '') + '" id="doc-fila-hay-que-registrar">' +
+        '<input type="checkbox" id="doc-hay-que-registrar"' +
+          (hayQueInicial ? ' checked' : '') + '>' +
+        '<span>Hay que registrarlo</span>' +
       '</label>' +
+      (pideHito && window.HayQueRegistrarlo ? HayQueRegistrarlo.html() : '') +   /* fila 670 */
 
       '<div id="doc-registro" class="' + (registro ? '' : 'oculto') + '">' +
         (registroLeido ? '<p class="aviso-bueno" id="doc-registro-leido">Leído del sello de Séneca.</p>' : '') +
@@ -293,9 +302,15 @@
     $('doc-hay-registro').onchange = function () {
       var hay = $('doc-hay-registro').checked;
       $('doc-registro').classList.toggle('oculto', !hay);
-      $('doc-fila-pendiente').classList.toggle('oculto', hay);
+      $('doc-fila-hay-que-registrar').classList.toggle('oculto', hay);
+      mostrarHitoDeRegistrar();
       N.refrescar();
     };
+    function mostrarHitoDeRegistrar() {
+      if (window.HayQueRegistrarlo) HayQueRegistrarlo.mostrar(!$('doc-hay-registro').checked && $('doc-hay-que-registrar').checked);
+    }
+    $('doc-hay-que-registrar').addEventListener('change', mostrarHitoDeRegistrar);
+    if (pideHito && window.HayQueRegistrarlo) { await HayQueRegistrarlo.montar($('doc-registrar-hito'), N.asuntoActual); mostrarHitoDeRegistrar(); }
 
     /* Esconde los campos para que el documento ocupe toda la ventana. */
     $('doc-ampliar').onclick = function () {

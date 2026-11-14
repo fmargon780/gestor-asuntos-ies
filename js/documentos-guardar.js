@@ -87,24 +87,24 @@
     if (window.DocumentoTareaBloque && N.ultimasOpciones.desdeBandeja) DocumentoTareaBloque.cambioDeTipo();   /* fila 661 */
   }
 
-  /* La lista de "pendientesRegistro" vive en la ficha del asunto, no
-     en el nombre del fichero. Un documento con registro nunca puede
-     estar pendiente: si se marca "Está registrado en Séneca" aquí
-     mismo, la casilla de pendiente queda oculta y no cuenta. Al
-     renombrar, si el documento seguía en la lista se actualiza al
-     nombre nuevo. */
-  async function actualizarPendiente(opciones, nombreNuevo) {
-    var marcado = !$('doc-hay-registro').checked &&
-      !!($('doc-pendiente-registro') && $('doc-pendiente-registro').checked);
-    var lista = (N.asuntoActual.ficha && N.asuntoActual.ficha.pendientesRegistro) || [];
-    var estabaAntes = lista.indexOf(opciones.nombreActual) !== -1;
-    if (!estabaAntes && !marcado) return;
-    /* Fila 176, punto 1: quitar el nombre antiguo y añadir el nuevo (si
-       sigue marcado), dentro de la misma pasada de la cola. */
-    await App.anotarLista(N.asuntoActual.nombre, 'pendientesRegistro', {
-      quitar: estabaAntes ? [opciones.nombreActual] : [],
-      anadir: marcado ? [nombreNuevo] : []
-    });
+  /* Fila 670: «Hay que registrarlo» (la casilla que sustituye a «Pendiente de registro»). Con la casilla marcada (y sin registro
+     escrito), al guardar el documento cuelga de la tarea «Registrar» del hito: la que ya había, o una nueva. Qué hito: el de
+     donde se llega, el elegido en la bandeja o en la pregunta, el del documento o el del desplegable «Hito». */
+  function quiereRegistrar() {
+    return !$('doc-hay-registro').checked && !!($('doc-hay-que-registrar') && $('doc-hay-que-registrar').checked);
+  }
+
+  function hitoParaRegistrar(destino) {
+    if (destino && destino.hitoId) return destino.hitoId;
+    if (N.hitoActual && N.hitoActual.id) return N.hitoActual.id;
+    if (N.hitoDelDocumento) return N.hitoDelDocumento;
+    return window.HayQueRegistrarlo ? HayQueRegistrarlo.hitoElegido() : '';
+  }
+
+  /* Un número escrito a mano: la tarea «Registrar» de ese documento queda hecha, igual que cuando la app lee el sello. */
+  function numeroEscritoAMano(opciones) {
+    var d = datosDelFormulario(opciones);
+    return !!d.codigo && !(window.Registro && Registro.tieneRegistro(opciones.nombreActual, N.asuntoActual));
   }
 
   async function guardar(opciones) {
@@ -136,6 +136,14 @@
       if (!destino) return;
     }
     var hitoDelRegistro = destino ? { id: destino.hitoId } : N.hitoActual;
+    /* Fila 670: «Hay que registrarlo» necesita un hito; sin él no se guarda nada y se dice por qué. */
+    var hitoRegistrar = '';
+    if (quiereRegistrar()) {
+      hitoRegistrar = hitoParaRegistrar(destino);
+      if (!hitoRegistrar) { U.aviso('Elige el hito en el que hay que registrar el documento.', 'malo'); return; }
+    }
+    var registroAMano = numeroEscritoAMano(opciones);
+    var hitoDelNumero = hitoRegistrar || hitoParaRegistrar(destino);
     /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
        Si otro ordenador se ha quedado el que enseñaba la vista previa, se
        guarda igual con el siguiente (fila 275) y se dice al terminar. */
@@ -207,11 +215,6 @@
       try { await DocCampos.relacionar(N.asuntoActual, N.camposDelTipo(N.tipoElegido()), N.valoresDeCampos()); }
       catch (eRel) { U.accesorio('Documento guardado, pero no he podido relacionar a la persona con el asunto', eRel); }
     }
-    try {
-      await actualizarPendiente(opciones, nombre);
-    } catch (e2) {
-      U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
-    }
     /* Fila 229: guardado en el asunto, queda su línea en el registro. */
     if (opciones.modo === 'anadir' && window.RegistroAsunto) {
       await RegistroAsunto.auto(N.asuntoActual, 'Documento guardado «' + nombre + '»', hitoDelRegistro);
@@ -254,6 +257,15 @@
       } catch (e2b) {
         U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e2b);
       }
+    }
+    /* Fila 670: «Hay que registrarlo» → la tarea «Registrar» del hito, con el documento colgado. */
+    if (hitoRegistrar && window.HayQueRegistrarlo) {
+      try {
+        await HayQueRegistrarlo.aplicar(N.asuntoActual, hitoRegistrar, nombre, tipoDelDocumento, opciones.modo === 'anadir' ? '' : opciones.nombreActual);
+        U.aviso('Queda en el hito la tarea «Registrar» con este documento.', 'bueno');
+      } catch (eReg) { U.accesorio('Documento guardado, pero no he podido crear la tarea «Registrar»', eReg); }
+    } else if (registroAMano && hitoDelNumero && Hitos.marcarGuionPorAccion) {
+      await Hitos.marcarGuionPorAccion(N.asuntoActual, hitoDelNumero, 'registrar', nombre);
     }
     /* Fila 286: «Es lo que se esperaba. Termina la espera…», si la casilla sigue marcada. */
     if (window.Esperas) await Esperas.alGuardar(N.asuntoActual, nombre, opciones);

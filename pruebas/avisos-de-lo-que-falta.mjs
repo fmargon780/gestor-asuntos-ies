@@ -57,7 +57,13 @@ const prep = await pagina.evaluate(async ([A, B, C, D, E]) => {
     x.documentos = [A, B, C, E]; y.documentos = [D];
     return d;
   });
-  await App.anotarLista(a.nombre, 'pendientesRegistro', { anadir: [C, D] });
+  /* Fila 670: los documentos «por registrar» son tareas «Registrar» (C en el primer hito, D en el segundo). */
+  await Hitos.anadirGuionPropio(a.nombre, h.id, 'Registrar C', { accion: 'registrar', receta: null });
+  await Hitos.anadirGuionPropio(a.nombre, h2.id, 'Registrar D', { accion: 'registrar', receta: null });
+  const gh = Hitos.guionDe(a, (await Hitos.hitosDe(a.nombre)).filter((x) => x.id === h.id)[0]);
+  const gh2 = Hitos.guionDe(a, (await Hitos.hitosDe(a.nombre)).filter((x) => x.id === h2.id)[0]);
+  await TareasConDocumento.asignar(a.nombre, h.id, gh.filter((x) => x.texto === 'Registrar C')[0].id, C);
+  await TareasConDocumento.asignar(a.nombre, h2.id, gh2.filter((x) => x.texto === 'Registrar D')[0].id, D);
   return { hito: h.id, hito2: h2.id, nombre: a.nombre, notaAplica: id('Registrar no aplica') };
 }, [DOC_A, DOC_B, DOC_C, DOC_D, DOC_E]);
 
@@ -72,7 +78,7 @@ console.log('--- la función ---');
 await comprobar('5-6. el hito: firmar con «falta 2 de 2», registrar, sin documento y la casilla; no salen «No aplica», «Comunicar» ni sin acción',
   falta({ tipo: 'hito' }),
   ['Poner a la firma: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C]);
-await comprobar('3. el asunto suma la casilla de otro hito',
+await comprobar('3. el asunto suma la tarea de registrar de otro hito',
   falta({ tipo: 'asunto' }),
   ['Poner a la firma: ' + DOC_A + ' (faltan 2 de 2 firmas)', 'Registrar: ' + DOC_B, 'Registrar sin documento (sin documento)', 'Registrar: ' + DOC_C, 'Registrar: ' + DOC_D]);
 await comprobar('4. los adjuntos: solo lo de esos documentos',
@@ -133,7 +139,6 @@ await pagina.evaluate(async ([idH, nombre, DOC_C, DOC_D]) => {
   const a = Gestor.asuntos().filter((x) => x.nombre === nombre)[0];
   const h = (await Hitos.hitosDe(a.nombre)).filter((x) => x.id === idH)[0];
   for (const g of Hitos.guionDe(a, h)) await Hitos.marcarGuion(a.nombre, idH, g.id, { noaplica: true });
-  await App.anotarLista(a.nombre, 'pendientesRegistro', { quitar: [DOC_C, DOC_D] });
 }, [prep.hito, prep.nombre, DOC_C, DOC_D]);
 await preparaCuadros(true);
 await marcar(true);
@@ -143,7 +148,6 @@ console.log('--- 3. archivar ---');
 await pagina.evaluate(async ([idH, nombre, C, D]) => {
   const a = Gestor.asuntos().filter((x) => x.nombre === nombre)[0];
   await Hitos.anadirGuionPropio(a.nombre, idH, 'Firmar otra vez', { accion: 'firmar', receta: null });
-  await App.anotarLista(a.nombre, 'pendientesRegistro', { anadir: [D] });
 }, [prep.hito, prep.nombre, DOC_C, DOC_D]);
 await preparaCuadros(false);
 await pagina.evaluate(async (nombre) => { const a = Gestor.asuntos().filter((x) => x.nombre === nombre)[0]; await App.cerrarAsunto(a); }, prep.nombre);

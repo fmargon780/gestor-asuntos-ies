@@ -4,15 +4,15 @@
 
    Avisa, nunca impide. Una sola función dice qué falta, con tres alcances:
      - 'hito':   las tareas del hito y sus documentos (al marcar el hito como hecho);
-     - 'asunto': las de todos los hitos y los documentos pendientes de registro del
-                 asunto (al archivar);
+     - 'asunto': las de todos los hitos (al archivar);
      - 'docs':   solo lo que cuelga de unos documentos (los adjuntos de un correo).
-   Qué cuenta: tareas de firmar o registrar sin hacer (ni «No aplica»), y los
-   documentos con la casilla «Pendiente de registro» que aún no llevan registro.
-   «Comunicar», «Generar» o una tarea sin acción no cuentan.
+   Qué cuenta: tareas de firmar o registrar sin hacer (ni «No aplica»). Desde la fila 670
+   (docs/667-HAY-QUE-REGISTRARLO.md) los documentos por registrar son tareas «Registrar»: ya no hay
+   una lista aparte. «Comunicar», «Generar» o una tarea sin acción no cuentan.
 
    También decide la marca «Sin registrar» de la mesa y de la ficha: solo en los
-   documentos con la casilla y en los que cuelgan de una tarea de registrar sin hacer.
+   documentos que cuelgan de una tarea de registrar sin hacer (y, hasta que se registren, los de
+   un asunto sin hitos que aún conservan la marca antigua).
 
    Los cuadros usan U.preguntar (un solo cuadro a la vez). Lo llaman
    js/hitos-panel-lista.js (marcar), js/asuntos-archivar.js (archivar) y
@@ -72,18 +72,10 @@ window.AvisosFalta = (function () {
     return ' (' + (faltan === 1 ? 'falta 1' : 'faltan ' + faltan) + ' de ' + necesarias + ' firmas)';
   }
 
-  function nombresDeHito(h) {
-    var lista = (h.documentos || []).slice();
-    var m = h.guionDocumento || {};
-    Object.keys(m).forEach(function (id) { if (m[id] && m[id].doc && lista.indexOf(m[id].doc) === -1) lista.push(m[id].doc); });
-    return lista;
-  }
-
   /* Pura. `hitos`: los del asunto. `alcance`: { tipo: 'hito', hito } | { tipo: 'asunto' } | { tipo: 'docs', docs: [...] }.
-     Devuelve las líneas, en este orden: las tareas (en el orden del hito) y después los documentos con la casilla. */
+     Devuelve las líneas de las tareas, en el orden del hito. */
   function queFalta(a, hitos, alcance) {
     var salida = [];
-    var vistos = [];
     var tipo = (alcance && alcance.tipo) || 'asunto';
     var enAlcance = tipo === 'hito' ? [alcance.hito] : (window.Hitos ? Hitos.visibles(hitos || []) : (hitos || []));
     var solo = tipo === 'docs' ? (alcance.docs || []) : null;
@@ -92,26 +84,11 @@ window.AvisosFalta = (function () {
     enAlcance.forEach(function (h) {
       tareasDe(a, h).forEach(function (t) {
         if (solo && !estaEnLosDocs(t.doc)) return;
-        if (t.doc) {
-          salida.push(CLASE[t.paso.accion] + ': ' + t.doc + faltanFirmas(a, t.paso, t.doc));
-          if (t.paso.accion === 'registrar') vistos.push(t.doc);
-        } else salida.push((t.paso.texto || CLASE[t.paso.accion]) + ' (sin documento)');
+        if (t.doc) salida.push(CLASE[t.paso.accion] + ': ' + t.doc + faltanFirmas(a, t.paso, t.doc));
+        else salida.push((t.paso.texto || CLASE[t.paso.accion]) + ' (sin documento)');
       });
     });
 
-    var candidatos = [];
-    if (tipo === 'docs') candidatos = solo.slice();
-    else {
-      enAlcance.forEach(function (h) { candidatos = candidatos.concat(nombresDeHito(h)); });
-      if (tipo === 'asunto') candidatos = candidatos.concat((a && a.ficha && a.ficha.pendientesRegistro) || []);
-    }
-    var yaEsta = [];
-    candidatos.forEach(function (n) {
-      if (yaEsta.some(function (x) { return mismo(x, n); })) return;
-      yaEsta.push(n);
-      if (vistos.some(function (v) { return mismo(v, n); })) return;
-      if (pendiente(a, n) && !registrado(a, n)) salida.push('Registrar: ' + n);
-    });
     return salida;
   }
 

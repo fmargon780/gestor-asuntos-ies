@@ -8,7 +8,7 @@
    se pone al día, en una búsqueda hecha en la fila 265 de quién guarda
    nombres de fichero:
 
-     - `ficha.pendientesRegistro` (la lista de «pendiente de registro»);
+     - `ficha.pendientesRegistro` (la lista antigua de «pendiente de registro», que ya solo conservan los asuntos sin hitos);
      - en `hitos.json`, para cada hito del asunto: `documentos` (los
        documentos apuntados al hito), `requisitos[].documento` (la
        casilla de «lo que hay que reunir» que se marcó con él) y
@@ -67,7 +67,7 @@ var DocumentoRenombrar = (function () {
     await Carpetas.renombrarFichero(dir, viejo, nuevo);
     if (opciones && opciones.soloFichero) return;
     try { await ponerAlDiaLaFicha(asunto, viejo, nuevo); }
-    catch (e) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido apuntar si está pendiente de registro', e); }
+    catch (e) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido poner al día su marca antigua de registro', e); }
     if (window.Candidaturas) {
       try { await Candidaturas.alRenombrar(asunto, viejo, nuevo); }   /* fila 347 */
       catch (e3) { U.accesorio('«' + nuevo + '» ya tiene su nombre nuevo, pero no he podido ponerlo al día en las candidaturas', e3); }
