@@ -81,7 +81,7 @@ existir ya.** Lo principal, en una línea cada cosa:
 
 - Asuntos con guía de hitos (cada hito y tarea con «Cuándo se hace»: «Siempre» o «Solo si» un campo de lista; sin hitos-pregunta, fila 576; «+ Nuevo…» como última opción de Responsable, «Esperamos a…», tipo de documento, «Cuándo se hace» y plantillas, fila 615), estado automático, «Qué me toca», «Cuentas», reservados y recurrentes.
 - Nuevo asunto por persona o por tipo, con tipos de una o varias clases de tercero (fila 493).
-- Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478) y reconocimiento de PDF firmados con su marca «Firmado» (fila 515); cada tarea de generar o registrar del hito lleva su documento colgado (fila 522) y la tarea «Firmar un documento» se marca sola al llegar el firmado (fila 523).
+- Documentos: plantillas, Word dentro de la app, PDF, registro y verificación, copia desde la ruta (fila 478) y reconocimiento de PDF firmados con su marca «Firmado» (fila 515); cada tarea de generar o registrar del hito lleva su documento colgado (fila 522) y la tarea «Firmar un documento» se marca sola al llegar el firmado (fila 523). Desde la bandeja (suelto o adjunto de correo) el documento entra al pulsar «Guardar» en el cuadro del nombre, con su hito y su tarea; el PDF del correo y el del hilo van al Registro, sin tarea (fila 661).
 - Correo (Gmail por script, se queda en recibidos, fila 480; «Sus profesores» por alumno o grupo desde el Centro de datos, fila 572), Séneca, Centro de datos y control del registro. Asunto general y extracto de Séneca configurables, con «Extracto» por documento y uno propio por tipo de documento (fila 627).
 - Archivo con índice por curso, papelera, solo consulta, comprobación al entrar y copia de pruebas con demo.
 - Ficha de entrega de libros de un alumno o un grupo, con su duplicado por extravío (fila 501).
@@ -105,16 +105,13 @@ existir ya.** Lo principal, en una línea cada cosa:
 - Todo código nuevo que escriba en las carpetas **de fondo** (sin que lo pida un botón) mira antes `SoloConsulta.activo()` y se salta (fila 260).
 - El repositorio es la versión buena; Vercel no publica nada solo: se publica a propósito, una vez por fila con código (`create_deployment`, `CLAUDE.md`), solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`), y pone
   sola la hora de la versión al publicar; la de `js/version.js` (hora real) es la de la copia sin internet.
-- **Permiso permanente de Francisco**: una petición de cambios hacia `main` tras la aprobación del
-  revisor la fusiona Claude Code solo, sin esperar a nadie (`CLAUDE.md`, rama de la fila).
+- **Permiso permanente de Francisco**: una petición de cambios hacia `main` tras la aprobación del revisor la fusiona Claude Code solo (`CLAUDE.md`).
 - **Una fila es HECHA solo con las dos cosas** (fila 242): su commit está en `main` (`git merge-base --is-ancestor`) y Vercel lo ha publicado (`curl` a `js/version.js`, estado «Vercel» del commit o `list_deployments`).
 - Vercel: 100 publicaciones/día para toda la cuenta; `vercel.json` lleva `git.deploymentEnabled: false` y nunca `ignoreCommand` (las canceladas también cuentan); una sola publicación por fila con código, a propósito, tras fusionar en `main`. Los proyectos `gestor-soporte`, `parroquia-conteo-colectas-ais-dev` y `diplomator` no tienen trabajo desde julio: si vuelven a tener cola, lo primero es ponerles esta misma regla.
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV. Todos los campos de las plantillas se reúnen en `CamposLista.reunir` (fila 528: Ajustes → El centro → «Campos» y la ventana de «Campo variable», `js/campos-elegir.js`); las marcas no cambian.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
-- Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar
-  si falla algo de después (`U.accesorio`); siempre `U.mensajeDeError`. `U.mientrasGuarda` solo
-  alrededor de la escritura.
+- Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar si falla algo de después (`U.accesorio`); siempre `U.mensajeDeError`. `U.mientrasGuarda` solo alrededor de la escritura.
 - Tras guardar se repinta solo lo que ha cambiado y está a la vista; todo repintado asíncrono
   lleva contador de turno (el último gana).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el

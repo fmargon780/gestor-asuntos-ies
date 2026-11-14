@@ -1,1 +1,1 @@
-Última pasada completa: 13-nov-2026 (Madrid) · 36 min · verde salvo arreglos-del-hito-demo (falla también en main; fila 645) · filas 637 y 638 en la rama claude/gestor-asuntos-filas-637-638-w763gk
+Última pasada completa: 14-nov-2026 (Madrid) · 39 min · verde salvo repintar-solo-lo-que-cambia (fallo de carga por tandas a la vez: pasa a solas) · commit 9f0a94c de main · fila 661
