@@ -126,6 +126,91 @@ await comprobar('4e. el hito nuevo entra en el asunto con su primera tarea y, co
   p.evaluate(async () => { const l = await ComunesGuardado.leer(); const h = l.hitos.filter((x) => x.nombre === 'Guardar el expediente 660')[0]; return h && [h.fase, h.tareas.length]; })]),
   [hitosAntes + 1, true, ['archivar', 1]]);
 
+const nHitos = () => p.$$eval('#ficha-tira .mesa-tira-hito', (l) => l.length);
+await p.click('#ficha-tira .mesa-tira-anadir');
+await p.waitForSelector('.anadir-hito-capa .ah-fase');
+await p.click('.anadir-hito-capa .ah-fase:has-text("Archivar")');
+await comprobar('4l. un hito de la fase que ya está en el asunto lo dice, con sus tareas a la vista', p.$eval('.anadir-hito-capa', (e) => {
+  const h = [...e.querySelectorAll('.ah-hito')].filter((x) => x.querySelector('b').textContent === 'Guardar el expediente 660')[0];
+  return [!!h, h && h.textContent.indexOf('Ya está en este asunto') !== -1, h && h.querySelectorAll('li').length];
+}), [true, true, 1]);
+const n0 = await nHitos();
+await p.locator('.anadir-hito-capa .ah-hito', { hasText: 'Guardar el expediente 660' }).locator('[data-usar]').click();
+await comprobar('4m. añadir uno que ya está pregunta «¿Lo añades otra vez?» con «Añadirlo otra vez» y «Cancelar»; cancelar no lo añade', (async () => {
+  const botones = await p.$$eval('.anadir-hito-capa .ah-hito [data-x]', (l) => l.map((b) => b.textContent));
+  const texto = await p.$eval('.anadir-hito-capa .ah-hito .aviso', (e) => e.textContent.indexOf('¿Lo añades otra vez?') !== -1);
+  await p.click('.anadir-hito-capa [data-x="no"]');
+  return [botones, texto, await nHitos() === n0];
+})(), [['Añadirlo otra vez', 'Cancelar'], true, true]);
+await p.click('.anadir-hito-capa #ah-nuevo');
+await p.fill('.anadir-hito-capa #ah-nombre', 'Guardar el expediente 660');
+await p.fill('.anadir-hito-capa .at-que', 'Archivar');
+await p.fill('.anadir-hito-capa .donde-sitio', 'Expediente del alumno'); await p.press('.anadir-hito-capa .donde-sitio', 'Tab');
+await p.click('.anadir-hito-capa #ah-crear');
+await comprobar('4n. un hito nuevo igual o parecido a uno de la fase avisa con «Usar ese» y «Crear el mío igualmente»', p.$$eval('.anadir-hito-capa #ah-aviso button', (l) => l.map((b) => b.textContent)), ['Usar ese', 'Crear el mío igualmente']);
+await p.click('.anadir-hito-capa #ah-usar-ese');
+await p.click('.anadir-hito-capa [data-x="otra"]');
+await p.waitForSelector('.anadir-hito-capa', { state: 'detached' });
+await p.waitForTimeout(1000);
+await comprobar('4o. «Añadirlo otra vez» lo añade', nHitos(), n0 + 1);
+
+console.log('--- 4b. cambiar, borrar y mover siguen la marca; ya no hay «Pasar a la guía» ---');
+const opcionesMenu = async (sel) => { await p.click(sel); await p.waitForSelector('.ficha-menu:not(.oculto) .ficha-menu-opcion'); const o = await p.$$eval('.ficha-menu:not(.oculto) .ficha-menu-opcion', (l) => l.map((x) => x.textContent.trim())); return o; };
+const cerrarMenu = () => p.keyboard.press('Escape');
+const tareaLoc = (n) => p.locator('.guion-paso', { has: p.locator('.guion-paso-texto', { hasText: n }) });
+const hOpc = await opcionesMenu('.hito-en-mesa .mesa-mas');
+await cerrarMenu();
+await comprobar('4f. el menú «Hito ▾» no trae «Pasar a la guía» y sí «Cambiar» y «Borrar»', [hOpc.indexOf('Pasar a la guía') === -1, hOpc.indexOf('Cambiar') !== -1, hOpc.indexOf('Borrar') !== -1], [true, true, true]);
+const tOpc = await opcionesMenu('.guion-paso:has(.guion-paso-texto:text-is("Preparar el escrito 660")) .guion-tarea-menu-boton');
+await cerrarMenu();
+await comprobar('4g. el «⋮» de una tarea trae Subir, Bajar y Borrar, y no «Pasar a la guía»', [tOpc.indexOf('Pasar a la guía') === -1, ['Subir', 'Bajar', 'Borrar'].every((x) => tOpc.indexOf(x) !== -1)], [true, true]);
+await comprobar('4h. con la marca encendida, «Cambiar» el hito dice a dónde irá y, al guardar, cambia la guía', (async () => {
+  const antesH = await guiaHitos();
+  await p.click('.hito-en-mesa .mesa-mas'); await p.waitForSelector('.ficha-menu:not(.oculto)');
+  await p.click('.ficha-menu:not(.oculto) .ficha-menu-opcion:text-is("Cambiar")');
+  await p.waitForSelector('#hda-titulo');
+  const alcance = await p.$eval('.hda-alcance', (e) => e.textContent.slice(0, 21));
+  const viejo = await p.inputValue('#hda-titulo');
+  await p.fill('#hda-titulo', viejo + ' (660)');
+  await p.click('#cuadro-aceptar');
+  await p.waitForTimeout(1500);
+  const despues = await guiaHitos();
+  return [alcance, despues.indexOf(viejo + ' (660)') !== -1, antesH.indexOf(viejo) !== -1];
+})(), ['Irá a este asunto y a', true, true]);
+await p.click('#ficha-marca-guia .marca-guia-casilla');
+await p.waitForTimeout(600);
+await comprobar('4i. con la marca apagada, «Cambiar» el hito dice «solo a este asunto» y la guía no cambia', (async () => {
+  const antesH = await guiaHitos();
+  await p.click('.hito-en-mesa .mesa-mas'); await p.waitForSelector('.ficha-menu:not(.oculto)');
+  await p.click('.ficha-menu:not(.oculto) .ficha-menu-opcion:text-is("Cambiar")');
+  await p.waitForSelector('#hda-titulo');
+  const alcance = await p.$eval('.hda-alcance', (e) => e.textContent.slice(0, 22));
+  const viejo = await p.inputValue('#hda-titulo');
+  await p.fill('#hda-titulo', viejo + ' aquí');
+  await p.click('#cuadro-aceptar');
+  await p.waitForTimeout(1500);
+  const despues = await guiaHitos();
+  return [alcance, JSON.stringify(despues) === JSON.stringify(antesH)];
+})(), ['Irá solo a este asunto', true]);
+await comprobar('4j. con la marca apagada, subir una tarea cambia el asunto y no la guía', (async () => {
+  const antesG = await guiaTextos();
+  await p.click('.guion-paso:has(.guion-paso-texto:text-is("Preparar el escrito 660")) .guion-tarea-menu-boton');
+  await p.waitForSelector('.ficha-menu:not(.oculto)');
+  await p.click('.ficha-menu:not(.oculto) .ficha-menu-opcion:text-is("Subir")');
+  await p.waitForTimeout(1200);
+  return [JSON.stringify(await guiaTextos()) === JSON.stringify(antesG), (await p.$$eval('.hito-en-mesa .guion-paso', (l) => l.length)) > 0,
+    await p.$('.guion-orden-cambiado') === null];
+})(), [true, true, true]);
+
+console.log('--- 4c. un tipo sin guía nace sin hitos; uno con guía mínima sigue naciendo con ellos ---');
+await comprobar('4k. un asunto de un tipo sin guía no recibe hitos; uno con guía (aunque sea la mínima de antes) sí', p.evaluate(async () => {
+  const sin = await Hitos.crearDesdeGuia('__asunto-sin-guia-660__', 'TIPO SIN GUIA 660');
+  const guiaCreada = GuiasDelCentro.pasosDe('TIPO SIN GUIA 660').length;
+  await GuiasDelCentro.guardarPasos('TIPO MINIMO 660', EstadoHito.pasosMinimos(), {});
+  const con = await Hitos.crearDesdeGuia('__asunto-con-guia-660__', 'TIPO MINIMO 660');
+  return [sin.length, guiaCreada, con.map((h) => h.titulo)];
+}), [0, 0, ['Tramitar', 'Esperar respuesta', 'Archivar']]);
+
 console.log('--- 5. Ajustes → «Fases» ---');
 await p.evaluate(() => App.ir('ajustes'));
 await p.evaluate(() => App.irASeccionDeAjustes('#bloque-fases'));
