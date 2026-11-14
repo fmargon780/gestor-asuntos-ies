@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>650 — Crear hitos y tareas desde el asunto (pantalla de prueba)</title>
+<style>
+:root{--tinta:#1b2430;--suave:#5d6b7a;--linea:#dde3ea;--fondo:#f4f6f9;--papel:#fff;--azul:#1f4e79;--azul-claro:#e8f0f8;--ambar:#fff4d6;--ambar-linea:#e0b34a;--verde:#e7f5ec;--verde-linea:#2e8b57;--radio:10px}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:15px;color:var(--tinta);background:var(--fondo)}
+button,select,input{font:inherit}
+.franja-prueba{background:#7a4b00;color:#fff;font-size:14px;padding:7px 16px;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
+.franja-prueba select{padding:2px 6px;border-radius:6px}
+main{padding:22px 28px}
+.boton{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:7px 14px;cursor:pointer;color:var(--tinta)}
+.boton:hover{border-color:#b9c4d0}
+.boton.primario{background:var(--azul);border-color:var(--azul);color:#fff}
+.boton.peque{padding:3px 10px;font-size:13px}
+.enlace{background:none;border:0;color:var(--azul);cursor:pointer;padding:0;font-size:14px}
+.cab{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.chip{border:1px solid var(--linea);border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:600;color:var(--azul);background:var(--azul-claro)}
+.chip.num{background:#fff;color:var(--suave);font-family:monospace}
+.cab h1{font-size:21px;margin:0}
+/* la marca */
+.marca-guia{display:flex;align-items:center;gap:12px;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:10px 14px;margin-bottom:10px}
+.marca-guia.on{border-color:var(--verde-linea);background:var(--verde)}
+.interruptor{position:relative;width:42px;height:24px;border-radius:999px;background:#c5ced8;border:0;cursor:pointer;flex:none;transition:.15s}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s}
+.interruptor[aria-checked="true"]{background:var(--verde-linea)}
+.interruptor[aria-checked="true"]::after{left:21px}
+.marca-guia b{font-weight:600}
+.marca-guia .suave{color:var(--suave);font-size:13.5px}
+/* tira de hitos */
+.tira{display:flex;border:1px solid var(--linea);border-radius:var(--radio);background:var(--papel);overflow:hidden;margin-bottom:12px}
+.tira .paso{flex:1;padding:9px 12px;font-size:14px;color:var(--suave);cursor:pointer;border-right:1px solid var(--linea);border-bottom:3px solid transparent}
+.tira .paso.activo{background:var(--azul-claro);color:var(--azul);font-weight:600;border-bottom-color:var(--azul)}
+.tira .paso small{display:block;font-weight:400;font-size:11.5px;color:var(--suave)}
+.tira .anadir-hito{flex:none;padding:9px 14px;color:var(--azul);font-weight:600;font-size:13.5px;background:none;border:0;cursor:pointer}
+.mesa{background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px 20px;min-height:260px}
+.mesa h2{margin:0 0 4px;font-size:19px}
+.linea-hito{color:var(--suave);font-size:13.5px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--linea)}
+.tarea{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--linea)}
+.tarea .nombre{flex:1}
+.etq{font-size:11.5px;border-radius:6px;padding:1px 7px;background:#eef1f5;color:var(--suave);white-space:nowrap}
+.etq.aqui{background:var(--ambar);color:#7a5a00}
+.flechas button{border:1px solid var(--linea);background:#fff;border-radius:6px;cursor:pointer;width:26px;height:24px;font-size:12px}
+.cab-hito{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.menu{position:relative}
+.menu summary{list-style:none;cursor:pointer;padding:2px 8px;border-radius:6px}
+.menu summary::-webkit-details-marker{display:none}
+.menu-ops{position:absolute;right:0;top:100%;background:#fff;border:1px solid var(--linea);border-radius:8px;box-shadow:0 4px 12px rgba(20,30,45,.12);z-index:5;min-width:130px;padding:4px}
+.menu-ops button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 10px;cursor:pointer;border-radius:6px}
+.menu-ops button:hover{background:var(--azul-claro)}
+.vacio{color:var(--suave);padding:6px 0}
+/* formulario de tarea */
+.form-tarea{border:1px dashed #b9c4d0;border-radius:var(--radio);padding:14px;margin-top:12px;background:#fbfcfd}
+.fila{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.campo{display:flex;flex-direction:column;gap:4px;min-width:220px;flex:1}
+.campo label{font-size:12.5px;font-weight:600;color:var(--suave)}
+.campo select,.campo input{padding:8px 10px;border:1px solid var(--linea);border-radius:8px;background:#fff}
+.comunes{margin:6px 0 12px}
+.comunes h4{margin:0 0 6px;font-size:13px;color:var(--suave);font-weight:600}
+.comun{display:flex;align-items:center;gap:10px;border:1px solid var(--linea);border-radius:8px;padding:7px 10px;margin-bottom:6px;background:#fff}
+.comun .nombre{flex:1}
+.aviso{background:var(--ambar);border:1px solid var(--ambar-linea);border-radius:8px;padding:10px 12px;margin:8px 0}
+.aviso .botones{margin-top:8px;display:flex;gap:8px}
+.donde{font-size:13px;color:var(--suave);margin-top:6px}
+/* ventana */
+.capa{position:fixed;inset:0;background:rgba(20,30,45,.45);display:flex;align-items:center;justify-content:center;z-index:50}
+.capa.oculto{display:none}
+.cuadro{background:#fff;border-radius:12px;width:min(1100px,94vw);max-height:90vh;display:flex;flex-direction:column}
+.cuadro-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--linea)}
+.cuadro-cab h3{margin:0;font-size:17px}
+.cuadro-cuerpo{padding:16px 18px;overflow:auto}
+.cuadro-pie{padding:12px 18px;border-top:1px solid var(--linea);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.fases{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:14px}
+.fase{border:1px solid var(--linea);background:#fff;border-radius:8px;padding:10px;cursor:pointer;text-align:left}
+.fase.activa{border-color:var(--azul);background:var(--azul-claro);color:var(--azul);font-weight:600}
+.hito-comun{border:1px solid var(--linea);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start}
+.hito-comun .cuerpo{flex:1}
+.hito-comun ul{margin:4px 0 0;padding-left:18px;color:var(--suave);font-size:13.5px}
+.paso-tit{font-size:13px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.03em;margin:4px 0 8px}
+.nota-ok{position:fixed;right:20px;bottom:20px;background:var(--verde);border:1px solid var(--verde-linea);border-radius:10px;padding:10px 14px;max-width:420px;z-index:60}
+.oculto{display:none!important}
+</style>
+</head>
+<body>
+<div class="franja-prueba">
+  Pantalla de prueba · datos inventados · nada se guarda
+  <label>Ver un asunto de: <select id="escenario">
+    <option value="nuevo">un tipo nuevo (guía con solo «Tramitar · Esperar respuesta»)</option>
+    <option value="hecho">un tipo con su guía hecha</option>
+  </select></label>
+  <button class="boton peque" id="reiniciar">Volver a empezar</button>
+</div>
+<main>
+  <div class="cab">
+    <button class="boton">← Volver</button>
+    <span class="chip" id="cab-tipo"></span><span class="chip num" id="cab-num"></span>
+    <h1 id="cab-tercero"></h1>
+  </div>
+
+  <div class="marca-guia" id="marca">
+    <button class="interruptor" id="interruptor" role="switch" aria-checked="false" aria-label="Los cambios van también a la guía"></button>
+    <div><b>Los cambios en hitos y tareas van también a la guía</b> <span id="marca-tipo"></span><br>
+      <span class="suave" id="marca-texto"></span></div>
+  </div>
+
+  <div class="tira" id="tira"></div>
+  <div class="mesa" id="mesa"></div>
+</main>
+
+<div class="capa oculto" id="capa">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-label="Añadir hito">
+    <div class="cuadro-cab"><h3>Añadir hito</h3><button class="boton" id="cerrar">Cerrar</button></div>
+    <div class="cuadro-cuerpo" id="vcuerpo"></div>
+    <div class="cuadro-pie">
+      <label>Va detrás de <select id="detras"></select></label>
+      <span class="donde" id="vdonde"></span>
+    </div>
+  </div>
+</div>
+<div class="nota-ok oculto" id="nota"></div>
+
+<script>
+var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
+var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','Grabar o cambiar datos'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var DONDE=['Séneca','iPasen','Correo','Teléfono','En mano','Tablón','Ventanilla Electrónica','En esta app','Otro sitio'];
+function dondeDe(a){return {registrar:'Séneca',seneca:'Séneca',llamar:'Teléfono',entregar:'En mano',publicar:'Tablón',comunicar:'Correo',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
+var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
+var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
+var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
+function sobreDe(acc){
+  if(acc==='generar') return {et:'Con qué plantilla',ops:PLANT_DOC.concat(['Sin plantilla por ahora (se marca a mano)'])};
+  if(acc==='comunicar') return {et:'Con qué plantilla de correo',ops:PLANT_CORREO};
+  if(acc==='firmar'||acc==='registrar'||acc==='anadir') return {et:'Qué documento',ops:TIPOS_DOC};
+  if(acc==='llamar') return {et:'A quién',ops:['A quien lo pide','A la familia','A la tutoría']};
+  return null;
+}
+var TAREAS=[
+ {n:'Registrar de entrada el documento',a:'registrar',s:'Solicitud'},
+ {n:'Registrar de salida el documento',a:'registrar',s:'Certificado'},
+ {n:'Añadir la solicitud al asunto',a:'anadir',s:'Solicitud'},
+ {n:'Añadir el justificante de pago',a:'anadir',s:'Justificante de pago'},
+ {n:'Generar el certificado de matrícula',a:'generar',s:'Certificado de matrícula'},
+ {n:'Firmar un documento',a:'firmar',s:'Certificado'},
+ {n:'Enviar el documento al solicitante por la vía acordada',a:'comunicar',s:'Envío de documento al solicitante'},
+ {n:'Avisar a la familia',a:'comunicar',s:'Aviso a la familia'},
+ {n:'Grabar en Séneca',a:'seneca',s:''},
+ {n:'Dar de baja en Séneca',a:'seneca',s:''},
+ {n:'Entregar el documento y recoger el acuse',a:'entregar',s:''},
+ {n:'Cobrar el importe',a:'cobrar',s:''},
+ {n:'Comprobar los requisitos',a:'comprobar',s:''},
+ {n:'Publicar en el tablón',a:'publicar',s:''},
+ {n:'Llamar a quien lo pide',a:'llamar',s:'A quien lo pide'},
+ {n:'Comunicar el cambio a la familia por iPasen',a:'comunicar',s:'Aviso a la familia',d:'iPasen'},
+ {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca'}
+];
+TAREAS.forEach(function(t){t.d=t.d||dondeDe(t.a)||'En mano'});
+function dTxt(t){return t.d||dondeDe(t.a)||''}
+function T(n){return TAREAS.filter(function(t){return t.n===n})[0]}
+var HITOS=[
+ {t:'Registro de entrada',f:'recibir',ta:['Registrar de entrada el documento']},
+ {t:'Recoger la solicitud',f:'recibir',ta:['Añadir la solicitud al asunto','Registrar de entrada el documento']},
+ {t:'Pedir la documentación que falta',f:'pedir',ta:[]},
+ {t:'Comprobar los requisitos',f:'comprobar',ta:['Comprobar los requisitos']},
+ {t:'Generar el certificado',f:'elaborar',ta:['Generar el certificado de matrícula']},
+ {t:'Poner a la firma',f:'firma',ta:['Firmar un documento']},
+ {t:'Publicar en el tablón',f:'publicar',ta:['Publicar en el tablón']},
+ {t:'Enviar el certificado',f:'enviar',ta:['Registrar de salida el documento','Enviar el documento al solicitante por la vía acordada']},
+ {t:'Entregar en mano',f:'enviar',ta:['Entregar el documento y recoger el acuse']},
+ {t:'Grabar en Séneca',f:'seneca',ta:['Grabar en Séneca']},
+ {t:'Cobro',f:'cobrar',ta:['Cobrar el importe']},
+ {t:'Esperar respuesta',f:'esperar',ta:[]},
+ {t:'Archivar',f:'archivar',ta:[]}
+];
+var E;
+function escenario(cual){
+  if(cual==='nuevo') E={tipo:'SOLICITUD TAQUILLA',num:'A26-0140',tercero:'Gómez Ruiz, Lucía 2100045',marca:true,
+    hitos:[{t:'Tramitar',f:'recibir',ta:[]},{t:'Esperar respuesta',f:'esperar',ta:[]}],act:0};
+  else E={tipo:'CERT. MATRICULA',num:'A26-0141',tercero:'Navas Pino, Hugo 2100052',marca:false,
+    hitos:[{t:'Registro de entrada',f:'recibir',ta:[{n:'Registrar de entrada el documento',a:'registrar'}]},
+           {t:'Generar el certificado',f:'elaborar',ta:[{n:'Generar el certificado de matrícula',a:'generar'}]},
+           {t:'Poner a la firma',f:'firma',ta:[{n:'Firmar un documento',a:'firmar'}]},
+           {t:'Enviar el certificado',f:'enviar',ta:[{n:'Registrar de salida el documento',a:'registrar'},{n:'Enviar el documento al solicitante por la vía acordada',a:'comunicar'}]}],act:1};
+  pintar();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function accTxt(a){var x=ACC.filter(function(z){return z[0]===a})[0];return x?x[1]:'Otra cosa'}
+function faseTxt(f){var x=FASES.filter(function(z){return z[0]===f})[0];return x?x[1]:''}
+function nota(t){var n=document.getElementById('nota');n.textContent=t;n.classList.remove('oculto');clearTimeout(nota.h);nota.h=setTimeout(function(){n.classList.add('oculto')},3500)}
+function dondeTxt(){return E.marca?'Irá a este asunto y a la guía de '+E.tipo+': lo tendrán también los próximos asuntos.':'Irá solo a este asunto: la guía de '+E.tipo+' no cambia.'}
+
+function pintar(){
+  document.getElementById('cab-tipo').textContent=E.tipo;
+  document.getElementById('cab-num').textContent=E.num;
+  document.getElementById('cab-tercero').textContent=E.tercero;
+  var m=document.getElementById('marca'),i=document.getElementById('interruptor');
+  i.setAttribute('aria-checked',E.marca?'true':'false');m.classList.toggle('on',E.marca);
+  document.getElementById('marca-tipo').textContent='de '+E.tipo;
+  document.getElementById('marca-texto').textContent=E.marca?'Encendida: lo que añadas o cambies aquí lo tendrán también los próximos asuntos de este tipo.':'Apagada: lo que añadas o cambies se queda solo en este asunto.';
+  var tira=document.getElementById('tira');
+  tira.innerHTML=E.hitos.map(function(h,k){return '<div class="paso'+(k===E.act?' activo':'')+'" data-k="'+k+'">'+(k+1)+'. '+esc(h.t)+'<small>'+esc(faseTxt(h.f))+(h.aqui?' · solo aquí':'')+'</small></div>'}).join('')+'<button class="anadir-hito" id="btn-anadir-hito">+ Añadir hito</button>';
+  tira.querySelectorAll('.paso').forEach(function(p){p.onclick=function(){E.act=+p.dataset.k;pintar()}});
+  document.getElementById('btn-anadir-hito').onclick=abrirVentana;
+  pintarMesa();
+}
+function pintarMesa(){
+  var h=E.hitos[E.act],mesa=document.getElementById('mesa');
+  var lis=h.ta.length?h.ta.map(function(t,k){return '<div class="tarea"><span class="flechas"><button data-sub="'+k+'" title="Subir">▲</button> <button data-baj="'+k+'" title="Bajar">▼</button></span><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+(dTxt(t)?' · '+esc(dTxt(t)):'')+'</span>'+(t.aqui?'<span class="etq aqui">solo aquí</span>':'')+'<details class="menu"><summary title="Más">⋮</summary><div class="menu-ops"><button data-ct="'+k+'">Cambiar…</button><button data-bt="'+k+'">Borrar</button></div></details></div>'}).join(''):'<div class="vacio">Este hito no tiene tareas.</div>';
+  mesa.innerHTML='<div class="cab-hito"><h2>'+esc(h.t)+'</h2><details class="menu"><summary class="boton peque">Hito ▾</summary><div class="menu-ops"><button id="hito-cambiar">Cambiar</button><button id="hito-borrar">Borrar</button></div></details></div><div id="hueco-hito"></div><div class="linea-hito">Fase: '+esc(faseTxt(h.f))+' · En curso · Sin plazo</div>'+lis+
+    '<div style="margin-top:10px"><button class="boton peque" id="btn-anadir-tarea">+ Añadir tarea</button></div><div id="hueco-form"></div>';
+  mesa.querySelectorAll('[data-sub]').forEach(function(b){b.onclick=function(){mover(+b.dataset.sub,-1)}});
+  mesa.querySelectorAll('[data-baj]').forEach(function(b){b.onclick=function(){mover(+b.dataset.baj,1)}});
+  var hh=document.getElementById('hueco-hito'),alc=E.marca?'en este asunto y en la guía de '+E.tipo:'solo en este asunto';
+  document.getElementById('hito-cambiar').onclick=function(){
+    this.closest('details').open=false;
+    hh.innerHTML='<div class="form-tarea"><div class="fila"><div class="campo"><label>Nombre del hito</label><input id="ch-n" value="'+esc(h.t)+'"></div><div class="campo"><label>Fase</label><select id="ch-f">'+FASES.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===h.f?' selected':'')+'>'+f[1]+'</option>'}).join('')+'</select></div></div><div class="fila" style="margin:0"><button class="boton primario peque" id="ch-ok">Guardar</button><button class="boton peque" id="ch-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'. Los demás asuntos abiertos no cambian.</div></div>';
+    document.getElementById('ch-no').onclick=pintarMesa;
+    document.getElementById('ch-ok').onclick=function(){h.t=document.getElementById('ch-n').value.trim()||h.t;h.f=document.getElementById('ch-f').value;pintar();nota('Hito cambiado '+alc+'.')};
+  };
+  document.getElementById('hito-borrar').onclick=function(){
+    this.closest('details').open=false;
+    if(E.hitos.length<2){hh.innerHTML='<div class="aviso">Es el único hito del asunto: no se puede borrar.</div>';return}
+    hh.innerHTML='<div class="aviso">¿Borrar el hito «'+esc(h.t)+'» con sus tareas? Se borra '+esc(alc)+'.<div class="botones"><button class="boton primario peque" id="bh-ok">Borrar</button><button class="boton peque" id="bh-no">Cancelar</button></div></div>';
+    document.getElementById('bh-no').onclick=pintarMesa;
+    document.getElementById('bh-ok').onclick=function(){E.hitos.splice(E.act,1);E.act=Math.max(0,E.act-1);pintar();nota('Hito borrado '+alc+'.')};
+  };
+  mesa.querySelectorAll('[data-ct]').forEach(function(b){b.onclick=function(){var t=h.ta[+b.dataset.ct],fila=b.closest('.tarea');
+    var comun=E.marca&&!t.aqui;
+    fila.outerHTML='<div class="form-tarea" id="ct-form"><div class="fila"><div class="campo" style="flex:2"><label>Nombre de la tarea</label><input id="ct-n" value="'+esc(t.n)+'"></div><div class="campo"><label>Dónde se hace</label><select id="ct-d">'+DONDE.map(function(d){return '<option'+(d===dTxt(t)?' selected':'')+'>'+d+'</option>'}).join('')+'</select></div></div>'+(comun?'<div class="aviso">Esta tarea es de la lista común: cambiará en todas las guías que la usan. Los asuntos abiertos siguen como estaban.</div>':'')+'<div class="fila" style="margin:0"><button class="boton primario peque" id="ct-ok">Guardar</button><button class="boton peque" id="ct-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'.</div></div>';
+    document.getElementById('ct-no').onclick=pintarMesa;
+    document.getElementById('ct-ok').onclick=function(){t.n=document.getElementById('ct-n').value.trim()||t.n;t.d=document.getElementById('ct-d').value;pintarMesa();nota('Tarea cambiada '+alc+'.')};
+  }});
+  mesa.querySelectorAll('[data-bt]').forEach(function(b){b.onclick=function(){var k=+b.dataset.bt,t=h.ta[k],fila=b.closest('.tarea');
+    b.closest('details').open=false;
+    fila.insertAdjacentHTML('afterend','<div class="aviso">¿Borrar la tarea «'+esc(t.n)+'»? Se borra '+esc(alc)+'.<div class="botones"><button class="boton primario peque" id="bt-ok">Borrar</button><button class="boton peque" id="bt-no">Cancelar</button></div></div>');
+    document.getElementById('bt-no').onclick=pintarMesa;
+    document.getElementById('bt-ok').onclick=function(){h.ta.splice(k,1);pintarMesa();nota('Tarea borrada '+alc+'.')};
+  }});
+  document.getElementById('btn-anadir-tarea').onclick=function(){
+    this.classList.add('oculto');
+    var hueco=document.getElementById('hueco-form');
+    elegirTarea(hueco,{proponer:true,alAnadir:function(t){t.aqui=!E.marca;E.hitos[E.act].ta.push({n:t.n,a:t.a,d:t.d,aqui:t.aqui});pintar();nota('Tarea «'+t.n+'» añadida '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'))},alCancelar:function(){pintarMesa()}});
+  };
+}
+function mover(k,d){var ta=E.hitos[E.act].ta,j=k+d;if(j<0||j>=ta.length)return;var x=ta[k];ta[k]=ta[j];ta[j]=x;pintarMesa();nota(E.marca?'Orden cambiado en el asunto y en la guía.':'Orden cambiado solo en este asunto.')}
+
+/* El elegidor de tarea: qué se hace → sobre qué → las comunes que hacen lo mismo → nombre. */
+function elegirTarea(hueco,op){
+  var st={a:'-',s:'',d:'',nombre:'',tocado:false};
+  hueco.innerHTML='<div class="form-tarea">'+
+    '<div class="fila"><div class="campo"><label>Qué se hace</label><select data-x="acc"><option value="-">Elige…</option>'+ACC.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div>'+
+    '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><select data-x="sobre"></select></div>'+
+    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><select data-x="donde"><option value="">Elige…</option>'+DONDE.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select></div></div>'+
+    '<div class="comunes oculto" data-x="comunes"></div>'+
+    '<div class="fila oculto" data-x="nombre-c"><div class="campo" style="flex:2"><label>Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label><input data-x="nombre"></div></div>'+
+    '<div data-x="aviso"></div>'+
+    (op.sinBotones?'':'<div class="fila" style="margin:0"><button class="boton primario peque" data-x="anadir" disabled>Añadir</button><button class="boton peque" data-x="cancelar">Cancelar</button></div><div class="donde">'+esc(dondeTxt())+'</div>')+
+  '</div>';
+  var q=function(x){return hueco.querySelector('[data-x="'+x+'"]')};
+  q('acc').onchange=function(){st.a=this.value;st.s='';var so=sobreDe(st.a);
+    st.d=dondeDe(st.a);q('donde').value=st.d;q('donde-c').classList.toggle('oculto',st.a==='-');
+    if(so&&st.a!=='-'){q('sobre-c').classList.remove('oculto');q('sobre-et').textContent=so.et;q('sobre').innerHTML='<option value="">Elige…</option>'+so.ops.map(function(o){return '<option>'+esc(o)+'</option>'}).join('')}
+    else q('sobre-c').classList.add('oculto');
+    refrescar()};
+  q('sobre').onchange=function(){st.s=this.value;refrescar()};
+  q('donde').onchange=function(){st.d=this.value;refrescar()};
+  q('nombre').oninput=function(){st.nombre=this.value;st.tocado=true;q('aviso').innerHTML='';comprobarListo()};
+  if(q('cancelar'))q('cancelar').onclick=op.alCancelar;
+  if(q('anadir'))q('anadir').onclick=function(){intentar()};
+  function lista(){var so=sobreDe(st.a);return TAREAS.filter(function(t){return t.a===st.a&&(!so||t.s===st.s)&&t.d===st.d})}
+  function propuesto(){
+    var s=st.s;
+    if(st.a==='generar') return s.indexOf('Sin plantilla')===0?'Generar el documento':'Generar: '+s;
+    if(st.a==='registrar') return 'Registrar '+(s?s.toLowerCase():'el documento');
+    if(st.a==='anadir') return 'Añadir '+(s?s.toLowerCase():'el documento')+' al asunto';
+    if(st.a==='firmar') return 'Poner a la firma '+(s?s.toLowerCase():'el documento');
+    if(st.a==='comunicar') return 'Comunicar: '+s.charAt(0).toLowerCase()+s.slice(1);
+    if(st.a==='llamar') return 'Llamar '+s.charAt(0).toLowerCase()+s.slice(1);
+    if(st.a==='') return '';
+    return accTxt(st.a);
+  }
+  function refrescar(){
+    q('aviso').innerHTML='';
+    var so=sobreDe(st.a),listo=st.a!=='-'&&(!so||st.s)&&st.d;
+    var c=q('comunes');
+    if(!listo){c.classList.add('oculto');q('nombre-c').classList.add('oculto');comprobarListo();return}
+    var l=lista();
+    c.classList.remove('oculto');
+    c.innerHTML='<h4>'+(l.length?'Tareas que ya hacen esto ('+l.length+'), se llamen como se llamen:':'Ninguna tarea hace esto todavía: crea la tuya abajo.')+'</h4>'+
+      l.map(function(t,k){return '<div class="comun"><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+(t.s?' · '+esc(t.s):'')+' · '+esc(t.d)+'</span><button class="boton peque" data-usar="'+k+'">'+(op.sinBotones?'Elegir esta':'Usar esta')+'</button></div>'}).join('');
+    c.querySelectorAll('[data-usar]').forEach(function(b){b.onclick=function(){var t=l[+b.dataset.usar];usar(t)}});
+    q('nombre-c').classList.remove('oculto');
+    if(!st.tocado){st.nombre=propuesto();q('nombre').value=st.nombre}
+    comprobarListo();
+  }
+  function comprobarListo(){var b=q('anadir');if(b)b.disabled=!(st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s)&&st.d);if(op.alCambiar)op.alCambiar(estado())}
+  function estado(){var ok=st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s)&&st.d;return ok?{n:st.nombre.trim(),a:st.a,s:st.s,d:st.d,igualA:igual()}:null}
+  function norm(x){return x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\b(el|la|los|las|de|del|al|a|en|un|una)\b/g,' ').replace(/\s+/g,' ').trim()}
+  function igual(){
+    var so=sobreDe(st.a),nn=norm(st.nombre);
+    var exacta=TAREAS.filter(function(t){return norm(t.n)===nn})[0];
+    if(exacta) return exacta;
+    if(so) return lista()[0]||null;  /* misma acción sobre lo mismo */
+    return lista().filter(function(t){var a=norm(t.n).split(' '),b=nn.split(' ');var com=a.filter(function(w){return w.length>3&&b.indexOf(w)>=0}).length;return com>=1})[0]||null;
+  }
+  function usar(t){op.alAnadir({n:t.n,a:t.a,s:t.s,d:t.d})}
+  function intentar(forzar){
+    var p=igual();
+    if(p&&!forzar){
+      q('aviso').innerHTML='<div class="aviso">Ya hay una tarea que hace lo mismo: <b>«'+esc(p.n)+'»</b> ('+esc(accTxt(p.a))+(p.s?' · '+esc(p.s):'')+' · '+esc(p.d)+').<div class="botones"><button class="boton primario peque" data-x="usar-esa">Usar esa</button><button class="boton peque" data-x="crear-igual">Crear la mía igualmente</button></div></div>';
+      q('usar-esa').onclick=function(){usar(p)};
+      q('crear-igual').onclick=function(){intentar(true)};
+      return;
+    }
+    op.alAnadir({n:st.nombre.trim(),a:st.a,s:st.s,d:st.d});
+  }
+  return {forzar:function(){},estado:estado,usar:usar};
+}
+
+/* La ventana «Añadir hito»: fase → hitos de esa fase con sus tareas → o hito nuevo con su primera tarea. */
+var V={f:''};
+function abrirVentana(){
+  V={f:''};
+  var d=document.getElementById('detras');
+  d.innerHTML=E.hitos.map(function(h,k){return '<option value="'+k+'"'+(k===E.hitos.length-1?' selected':'')+'>'+(k+1)+'. '+esc(h.t)+(k===E.hitos.length-1?' (al final)':'')+'</option>'}).join('');
+  document.getElementById('vdonde').textContent=dondeTxt();
+  pintarVentana();
+  document.getElementById('capa').classList.remove('oculto');
+}
+function cerrarVentana(){document.getElementById('capa').classList.add('oculto')}
+document.getElementById('cerrar').onclick=cerrarVentana;
+function meterHito(h){
+  var k=+document.getElementById('detras').value+1;
+  h.aqui=!E.marca;h.ta.forEach(function(t){t.aqui=!E.marca});
+  E.hitos.splice(k,0,h);E.act=k;cerrarVentana();pintar();
+  nota('Hito «'+h.t+'» añadido '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'));
+}
+function pintarVentana(){
+  var c=document.getElementById('vcuerpo');
+  var html='<div class="paso-tit">1. ¿En qué fase?</div><div class="fases">'+FASES.map(function(f){return '<button class="fase'+(V.f===f[0]?' activa':'')+'" data-f="'+f[0]+'">'+f[1]+'</button>'}).join('')+'</div>';
+  if(V.f){
+    var l=HITOS.filter(function(h){return h.f===V.f});
+    html+='<div class="paso-tit">2. Hitos de la fase «'+esc(faseTxt(V.f))+'», con sus tareas</div>'+
+      (l.length?l.map(function(h,k){return '<div class="hito-comun"><div class="cuerpo"><b>'+esc(h.t)+'</b>'+(h.ta.length?'<ul>'+h.ta.map(function(n){var t=T(n);return '<li>'+esc(n)+' <span class="etq">'+esc(accTxt(t.a))+' · '+esc(t.d)+'</span></li>'}).join('')+'</ul>':'<div class="vacio" style="font-size:13.5px">Sin tareas.</div>')+'</div><button class="boton peque" data-usarh="'+k+'">Añadir este</button></div>'}).join(''):'<div class="vacio">Ningún hito de esta fase todavía.</div>')+
+      '<div style="margin-top:10px"><button class="boton" id="btn-hito-nuevo">+ Hito nuevo de esta fase</button></div><div id="hueco-nuevo"></div>';
+  }
+  c.innerHTML=html;
+  c.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){V.f=b.dataset.f;pintarVentana()}});
+  if(!V.f)return;
+  var l=HITOS.filter(function(h){return h.f===V.f});
+  c.querySelectorAll('[data-usarh]').forEach(function(b){b.onclick=function(){var h=l[+b.dataset.usarh];meterHito({t:h.t,f:h.f,ta:h.ta.map(function(n){var t=T(n);return {n:t.n,a:t.a,d:t.d}})})}});
+  document.getElementById('btn-hito-nuevo').onclick=function(){this.classList.add('oculto');hitoNuevo(l)};
+}
+function hitoNuevo(l){
+  var hueco=document.getElementById('hueco-nuevo'),tarea=null;
+  hueco.innerHTML='<div class="form-tarea"><div class="fila"><div class="campo" style="flex:2"><label>Nombre del hito</label><input id="nh-nombre" value="'+esc(faseTxt(V.f))+'"></div></div>'+
+    '<div class="paso-tit" style="margin-top:6px">Su primera tarea</div><div id="nh-tarea"></div><div id="nh-aviso"></div>'+
+    '<div class="fila" style="margin:8px 0 0"><button class="boton primario peque" id="nh-crear" disabled>Crear el hito</button></div></div>';
+  var ctl=elegirTarea(document.getElementById('nh-tarea'),{sinBotones:true,alCambiar:function(e){tarea=e;document.getElementById('nh-aviso').innerHTML='';document.getElementById('nh-crear').disabled=!e},
+    alAnadir:function(t){tarea={n:t.n,a:t.a,s:t.s,d:t.d,igualA:null,elegida:true};document.getElementById('nh-crear').disabled=false;crear(false)}});
+  document.getElementById('nh-crear').onclick=function(){crear(false)};
+  function crear(forzar){
+    if(!tarea)return;
+    var nombre=document.getElementById('nh-nombre').value.trim()||faseTxt(V.f);
+    var t=tarea.igualA&&!forzar?null:null;
+    /* Hito igual: misma fase y la misma tarea como única tarea. */
+    var nt=tarea.igualA?tarea.igualA.n:tarea.n;
+    var gemelo=l.filter(function(h){return h.ta.length===1&&h.ta[0]===nt})[0];
+    if(gemelo&&!forzar){
+      document.getElementById('nh-aviso').innerHTML='<div class="aviso">Ya hay un hito igual en esta fase: <b>«'+esc(gemelo.t)+'»</b>, con la misma tarea.<div class="botones"><button class="boton primario peque" id="nh-usar">Usar ese</button><button class="boton peque" id="nh-igual">Crear el mío igualmente</button></div></div>';
+      document.getElementById('nh-usar').onclick=function(){meterHito({t:gemelo.t,f:gemelo.f,ta:gemelo.ta.map(function(n){var x=T(n);return {n:x.n,a:x.a,d:x.d}})})};
+      document.getElementById('nh-igual').onclick=function(){crear(true)};
+      return;
+    }
+    if(tarea.igualA&&!tarea.elegida&&!forzar){
+      var p=tarea.igualA;
+      document.getElementById('nh-aviso').innerHTML='<div class="aviso">Ya hay una tarea que hace lo mismo: <b>«'+esc(p.n)+'»</b>.<div class="botones"><button class="boton primario peque" id="nh-usar-t">Usar esa</button><button class="boton peque" id="nh-igual-t">Crear la mía igualmente</button></div></div>';
+      document.getElementById('nh-usar-t').onclick=function(){tarea={n:p.n,a:p.a,s:p.s,d:p.d,igualA:null,elegida:true};crear(false)};
+      document.getElementById('nh-igual-t').onclick=function(){tarea.igualA=null;tarea.elegida=true;crear(false)};
+      return;
+    }
+    meterHito({t:nombre,f:V.f,ta:[{n:tarea.n,a:tarea.a,d:tarea.d}]});
+  }
+}
+document.getElementById('interruptor').onclick=function(){E.marca=!E.marca;pintar()};
+document.getElementById('escenario').onchange=function(){escenario(this.value)};
+document.getElementById('reiniciar').onclick=function(){escenario(document.getElementById('escenario').value)};
+escenario('nuevo');
+</script>
+</body>
+</html>
