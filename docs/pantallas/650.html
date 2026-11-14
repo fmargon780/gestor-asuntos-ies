@@ -44,6 +44,13 @@ main{padding:22px 28px}
 .etq{font-size:11.5px;border-radius:6px;padding:1px 7px;background:#eef1f5;color:var(--suave);white-space:nowrap}
 .etq.aqui{background:var(--ambar);color:#7a5a00}
 .flechas button{border:1px solid var(--linea);background:#fff;border-radius:6px;cursor:pointer;width:26px;height:24px;font-size:12px}
+.cab-hito{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.menu{position:relative}
+.menu summary{list-style:none;cursor:pointer;padding:2px 8px;border-radius:6px}
+.menu summary::-webkit-details-marker{display:none}
+.menu-ops{position:absolute;right:0;top:100%;background:#fff;border:1px solid var(--linea);border-radius:8px;box-shadow:0 4px 12px rgba(20,30,45,.12);z-index:5;min-width:130px;padding:4px}
+.menu-ops button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 10px;cursor:pointer;border-radius:6px}
+.menu-ops button:hover{background:var(--azul-claro)}
 .vacio{color:var(--suave);padding:6px 0}
 /* formulario de tarea */
 .form-tarea{border:1px dashed #b9c4d0;border-radius:var(--radio);padding:14px;margin-top:12px;background:#fbfcfd}
@@ -116,8 +123,10 @@ main{padding:22px 28px}
 <div class="nota-ok oculto" id="nota"></div>
 
 <script>
-var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Hacer en Séneca'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
-var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','En Séneca'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Elaborar el documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
+var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Comunicar'],['anadir','Añadir documento'],['pedir','Pedir datos'],['copiar','Copiar a otra carpeta'],['llamar','Llamar por teléfono'],['seneca','Grabar o cambiar datos'],['entregar','Entregar o recoger en mano'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
+var DONDE=['Séneca','iPasen','Correo','Teléfono','En mano','Tablón','Ventanilla Electrónica','En esta app','Otro sitio'];
+function dondeDe(a){return {registrar:'Séneca',seneca:'Séneca',llamar:'Teléfono',entregar:'En mano',publicar:'Tablón',comunicar:'Correo',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
 var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
@@ -143,8 +152,12 @@ var TAREAS=[
  {n:'Cobrar el importe',a:'cobrar',s:''},
  {n:'Comprobar los requisitos',a:'comprobar',s:''},
  {n:'Publicar en el tablón',a:'publicar',s:''},
- {n:'Llamar a quien lo pide',a:'llamar',s:'A quien lo pide'}
+ {n:'Llamar a quien lo pide',a:'llamar',s:'A quien lo pide'},
+ {n:'Comunicar el cambio a la familia por iPasen',a:'comunicar',s:'Aviso a la familia',d:'iPasen'},
+ {n:'Comprobar que el expediente está en Séneca',a:'comprobar',s:'',d:'Séneca'}
 ];
+TAREAS.forEach(function(t){t.d=t.d||dondeDe(t.a)||'En mano'});
+function dTxt(t){return t.d||dondeDe(t.a)||''}
 function T(n){return TAREAS.filter(function(t){return t.n===n})[0]}
 var HITOS=[
  {t:'Registro de entrada',f:'recibir',ta:['Registrar de entrada el documento']},
@@ -194,25 +207,52 @@ function pintar(){
 }
 function pintarMesa(){
   var h=E.hitos[E.act],mesa=document.getElementById('mesa');
-  var lis=h.ta.length?h.ta.map(function(t,k){return '<div class="tarea"><span class="flechas"><button data-sub="'+k+'" title="Subir">▲</button> <button data-baj="'+k+'" title="Bajar">▼</button></span><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+'</span>'+(t.aqui?'<span class="etq aqui">solo aquí</span>':'')+'</div>'}).join(''):'<div class="vacio">Este hito no tiene tareas.</div>';
-  mesa.innerHTML='<h2>'+esc(h.t)+'</h2><div class="linea-hito">Fase: '+esc(faseTxt(h.f))+' · En curso · Sin plazo</div>'+lis+
+  var lis=h.ta.length?h.ta.map(function(t,k){return '<div class="tarea"><span class="flechas"><button data-sub="'+k+'" title="Subir">▲</button> <button data-baj="'+k+'" title="Bajar">▼</button></span><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+(dTxt(t)?' · '+esc(dTxt(t)):'')+'</span>'+(t.aqui?'<span class="etq aqui">solo aquí</span>':'')+'<details class="menu"><summary title="Más">⋮</summary><div class="menu-ops"><button data-ct="'+k+'">Cambiar…</button><button data-bt="'+k+'">Borrar</button></div></details></div>'}).join(''):'<div class="vacio">Este hito no tiene tareas.</div>';
+  mesa.innerHTML='<div class="cab-hito"><h2>'+esc(h.t)+'</h2><details class="menu"><summary class="boton peque">Hito ▾</summary><div class="menu-ops"><button id="hito-cambiar">Cambiar</button><button id="hito-borrar">Borrar</button></div></details></div><div id="hueco-hito"></div><div class="linea-hito">Fase: '+esc(faseTxt(h.f))+' · En curso · Sin plazo</div>'+lis+
     '<div style="margin-top:10px"><button class="boton peque" id="btn-anadir-tarea">+ Añadir tarea</button></div><div id="hueco-form"></div>';
   mesa.querySelectorAll('[data-sub]').forEach(function(b){b.onclick=function(){mover(+b.dataset.sub,-1)}});
   mesa.querySelectorAll('[data-baj]').forEach(function(b){b.onclick=function(){mover(+b.dataset.baj,1)}});
+  var hh=document.getElementById('hueco-hito'),alc=E.marca?'en este asunto y en la guía de '+E.tipo:'solo en este asunto';
+  document.getElementById('hito-cambiar').onclick=function(){
+    this.closest('details').open=false;
+    hh.innerHTML='<div class="form-tarea"><div class="fila"><div class="campo"><label>Nombre del hito</label><input id="ch-n" value="'+esc(h.t)+'"></div><div class="campo"><label>Fase</label><select id="ch-f">'+FASES.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===h.f?' selected':'')+'>'+f[1]+'</option>'}).join('')+'</select></div></div><div class="fila" style="margin:0"><button class="boton primario peque" id="ch-ok">Guardar</button><button class="boton peque" id="ch-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'. Los demás asuntos abiertos no cambian.</div></div>';
+    document.getElementById('ch-no').onclick=pintarMesa;
+    document.getElementById('ch-ok').onclick=function(){h.t=document.getElementById('ch-n').value.trim()||h.t;h.f=document.getElementById('ch-f').value;pintar();nota('Hito cambiado '+alc+'.')};
+  };
+  document.getElementById('hito-borrar').onclick=function(){
+    this.closest('details').open=false;
+    if(E.hitos.length<2){hh.innerHTML='<div class="aviso">Es el único hito del asunto: no se puede borrar.</div>';return}
+    hh.innerHTML='<div class="aviso">¿Borrar el hito «'+esc(h.t)+'» con sus tareas? Se borra '+esc(alc)+'.<div class="botones"><button class="boton primario peque" id="bh-ok">Borrar</button><button class="boton peque" id="bh-no">Cancelar</button></div></div>';
+    document.getElementById('bh-no').onclick=pintarMesa;
+    document.getElementById('bh-ok').onclick=function(){E.hitos.splice(E.act,1);E.act=Math.max(0,E.act-1);pintar();nota('Hito borrado '+alc+'.')};
+  };
+  mesa.querySelectorAll('[data-ct]').forEach(function(b){b.onclick=function(){var t=h.ta[+b.dataset.ct],fila=b.closest('.tarea');
+    var comun=E.marca&&!t.aqui;
+    fila.outerHTML='<div class="form-tarea" id="ct-form"><div class="fila"><div class="campo" style="flex:2"><label>Nombre de la tarea</label><input id="ct-n" value="'+esc(t.n)+'"></div><div class="campo"><label>Dónde se hace</label><select id="ct-d">'+DONDE.map(function(d){return '<option'+(d===dTxt(t)?' selected':'')+'>'+d+'</option>'}).join('')+'</select></div></div>'+(comun?'<div class="aviso">Esta tarea es de la lista común: cambiará en todas las guías que la usan. Los asuntos abiertos siguen como estaban.</div>':'')+'<div class="fila" style="margin:0"><button class="boton primario peque" id="ct-ok">Guardar</button><button class="boton peque" id="ct-no">Cancelar</button></div><div class="donde">Se cambia '+esc(alc)+'.</div></div>';
+    document.getElementById('ct-no').onclick=pintarMesa;
+    document.getElementById('ct-ok').onclick=function(){t.n=document.getElementById('ct-n').value.trim()||t.n;t.d=document.getElementById('ct-d').value;pintarMesa();nota('Tarea cambiada '+alc+'.')};
+  }});
+  mesa.querySelectorAll('[data-bt]').forEach(function(b){b.onclick=function(){var k=+b.dataset.bt,t=h.ta[k],fila=b.closest('.tarea');
+    b.closest('details').open=false;
+    fila.insertAdjacentHTML('afterend','<div class="aviso">¿Borrar la tarea «'+esc(t.n)+'»? Se borra '+esc(alc)+'.<div class="botones"><button class="boton primario peque" id="bt-ok">Borrar</button><button class="boton peque" id="bt-no">Cancelar</button></div></div>');
+    document.getElementById('bt-no').onclick=pintarMesa;
+    document.getElementById('bt-ok').onclick=function(){h.ta.splice(k,1);pintarMesa();nota('Tarea borrada '+alc+'.')};
+  }});
   document.getElementById('btn-anadir-tarea').onclick=function(){
     this.classList.add('oculto');
     var hueco=document.getElementById('hueco-form');
-    elegirTarea(hueco,{proponer:true,alAnadir:function(t){t.aqui=!E.marca;E.hitos[E.act].ta.push(t);pintar();nota('Tarea «'+t.n+'» añadida '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'))},alCancelar:function(){pintarMesa()}});
+    elegirTarea(hueco,{proponer:true,alAnadir:function(t){t.aqui=!E.marca;E.hitos[E.act].ta.push({n:t.n,a:t.a,d:t.d,aqui:t.aqui});pintar();nota('Tarea «'+t.n+'» añadida '+(E.marca?'al asunto y a la guía de '+E.tipo+'.':'solo a este asunto.'))},alCancelar:function(){pintarMesa()}});
   };
 }
 function mover(k,d){var ta=E.hitos[E.act].ta,j=k+d;if(j<0||j>=ta.length)return;var x=ta[k];ta[k]=ta[j];ta[j]=x;pintarMesa();nota(E.marca?'Orden cambiado en el asunto y en la guía.':'Orden cambiado solo en este asunto.')}
 
 /* El elegidor de tarea: qué se hace → sobre qué → las comunes que hacen lo mismo → nombre. */
 function elegirTarea(hueco,op){
-  var st={a:'',s:'',nombre:'',tocado:false};
+  var st={a:'-',s:'',d:'',nombre:'',tocado:false};
   hueco.innerHTML='<div class="form-tarea">'+
     '<div class="fila"><div class="campo"><label>Qué se hace</label><select data-x="acc"><option value="-">Elige…</option>'+ACC.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div>'+
-    '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><select data-x="sobre"></select></div></div>'+
+    '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><select data-x="sobre"></select></div>'+
+    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><select data-x="donde"><option value="">Elige…</option>'+DONDE.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select></div></div>'+
     '<div class="comunes oculto" data-x="comunes"></div>'+
     '<div class="fila oculto" data-x="nombre-c"><div class="campo" style="flex:2"><label>Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label><input data-x="nombre"></div></div>'+
     '<div data-x="aviso"></div>'+
@@ -220,14 +260,16 @@ function elegirTarea(hueco,op){
   '</div>';
   var q=function(x){return hueco.querySelector('[data-x="'+x+'"]')};
   q('acc').onchange=function(){st.a=this.value;st.s='';var so=sobreDe(st.a);
+    st.d=dondeDe(st.a);q('donde').value=st.d;q('donde-c').classList.toggle('oculto',st.a==='-');
     if(so&&st.a!=='-'){q('sobre-c').classList.remove('oculto');q('sobre-et').textContent=so.et;q('sobre').innerHTML='<option value="">Elige…</option>'+so.ops.map(function(o){return '<option>'+esc(o)+'</option>'}).join('')}
     else q('sobre-c').classList.add('oculto');
     refrescar()};
   q('sobre').onchange=function(){st.s=this.value;refrescar()};
+  q('donde').onchange=function(){st.d=this.value;refrescar()};
   q('nombre').oninput=function(){st.nombre=this.value;st.tocado=true;q('aviso').innerHTML='';comprobarListo()};
   if(q('cancelar'))q('cancelar').onclick=op.alCancelar;
   if(q('anadir'))q('anadir').onclick=function(){intentar()};
-  function lista(){var so=sobreDe(st.a);return TAREAS.filter(function(t){return t.a===st.a&&(!so||t.s===st.s)})}
+  function lista(){var so=sobreDe(st.a);return TAREAS.filter(function(t){return t.a===st.a&&(!so||t.s===st.s)&&t.d===st.d})}
   function propuesto(){
     var s=st.s;
     if(st.a==='generar') return s.indexOf('Sin plantilla')===0?'Generar el documento':'Generar: '+s;
@@ -241,20 +283,20 @@ function elegirTarea(hueco,op){
   }
   function refrescar(){
     q('aviso').innerHTML='';
-    var so=sobreDe(st.a),listo=st.a!=='-'&&(!so||st.s);
+    var so=sobreDe(st.a),listo=st.a!=='-'&&(!so||st.s)&&st.d;
     var c=q('comunes');
     if(!listo){c.classList.add('oculto');q('nombre-c').classList.add('oculto');comprobarListo();return}
     var l=lista();
     c.classList.remove('oculto');
     c.innerHTML='<h4>'+(l.length?'Tareas que ya hacen esto ('+l.length+'), se llamen como se llamen:':'Ninguna tarea hace esto todavía: crea la tuya abajo.')+'</h4>'+
-      l.map(function(t,k){return '<div class="comun"><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+(t.s?' · '+esc(t.s):'')+'</span><button class="boton peque" data-usar="'+k+'">'+(op.sinBotones?'Elegir esta':'Usar esta')+'</button></div>'}).join('');
+      l.map(function(t,k){return '<div class="comun"><span class="nombre">'+esc(t.n)+'</span><span class="etq">'+esc(accTxt(t.a))+(t.s?' · '+esc(t.s):'')+' · '+esc(t.d)+'</span><button class="boton peque" data-usar="'+k+'">'+(op.sinBotones?'Elegir esta':'Usar esta')+'</button></div>'}).join('');
     c.querySelectorAll('[data-usar]').forEach(function(b){b.onclick=function(){var t=l[+b.dataset.usar];usar(t)}});
     q('nombre-c').classList.remove('oculto');
     if(!st.tocado){st.nombre=propuesto();q('nombre').value=st.nombre}
     comprobarListo();
   }
-  function comprobarListo(){var b=q('anadir');if(b)b.disabled=!(st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s));if(op.alCambiar)op.alCambiar(estado())}
-  function estado(){var ok=st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s);return ok?{n:st.nombre.trim(),a:st.a,s:st.s,igualA:igual()}:null}
+  function comprobarListo(){var b=q('anadir');if(b)b.disabled=!(st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s)&&st.d);if(op.alCambiar)op.alCambiar(estado())}
+  function estado(){var ok=st.a!=='-'&&st.nombre.trim()&&(!sobreDe(st.a)||st.s)&&st.d;return ok?{n:st.nombre.trim(),a:st.a,s:st.s,d:st.d,igualA:igual()}:null}
   function norm(x){return x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\b(el|la|los|las|de|del|al|a|en|un|una)\b/g,' ').replace(/\s+/g,' ').trim()}
   function igual(){
     var so=sobreDe(st.a),nn=norm(st.nombre);
@@ -263,16 +305,16 @@ function elegirTarea(hueco,op){
     if(so) return lista()[0]||null;  /* misma acción sobre lo mismo */
     return lista().filter(function(t){var a=norm(t.n).split(' '),b=nn.split(' ');var com=a.filter(function(w){return w.length>3&&b.indexOf(w)>=0}).length;return com>=1})[0]||null;
   }
-  function usar(t){op.alAnadir({n:t.n,a:t.a,s:t.s})}
+  function usar(t){op.alAnadir({n:t.n,a:t.a,s:t.s,d:t.d})}
   function intentar(forzar){
     var p=igual();
     if(p&&!forzar){
-      q('aviso').innerHTML='<div class="aviso">Ya hay una tarea que hace lo mismo: <b>«'+esc(p.n)+'»</b> ('+esc(accTxt(p.a))+(p.s?' · '+esc(p.s):'')+').<div class="botones"><button class="boton primario peque" data-x="usar-esa">Usar esa</button><button class="boton peque" data-x="crear-igual">Crear la mía igualmente</button></div></div>';
+      q('aviso').innerHTML='<div class="aviso">Ya hay una tarea que hace lo mismo: <b>«'+esc(p.n)+'»</b> ('+esc(accTxt(p.a))+(p.s?' · '+esc(p.s):'')+' · '+esc(p.d)+').<div class="botones"><button class="boton primario peque" data-x="usar-esa">Usar esa</button><button class="boton peque" data-x="crear-igual">Crear la mía igualmente</button></div></div>';
       q('usar-esa').onclick=function(){usar(p)};
       q('crear-igual').onclick=function(){intentar(true)};
       return;
     }
-    op.alAnadir({n:st.nombre.trim(),a:st.a,s:st.s});
+    op.alAnadir({n:st.nombre.trim(),a:st.a,s:st.s,d:st.d});
   }
   return {forzar:function(){},estado:estado,usar:usar};
 }
@@ -301,14 +343,14 @@ function pintarVentana(){
   if(V.f){
     var l=HITOS.filter(function(h){return h.f===V.f});
     html+='<div class="paso-tit">2. Hitos de la fase «'+esc(faseTxt(V.f))+'», con sus tareas</div>'+
-      (l.length?l.map(function(h,k){return '<div class="hito-comun"><div class="cuerpo"><b>'+esc(h.t)+'</b>'+(h.ta.length?'<ul>'+h.ta.map(function(n){var t=T(n);return '<li>'+esc(n)+' <span class="etq">'+esc(accTxt(t.a))+'</span></li>'}).join('')+'</ul>':'<div class="vacio" style="font-size:13.5px">Sin tareas.</div>')+'</div><button class="boton peque" data-usarh="'+k+'">Añadir este</button></div>'}).join(''):'<div class="vacio">Ningún hito de esta fase todavía.</div>')+
+      (l.length?l.map(function(h,k){return '<div class="hito-comun"><div class="cuerpo"><b>'+esc(h.t)+'</b>'+(h.ta.length?'<ul>'+h.ta.map(function(n){var t=T(n);return '<li>'+esc(n)+' <span class="etq">'+esc(accTxt(t.a))+' · '+esc(t.d)+'</span></li>'}).join('')+'</ul>':'<div class="vacio" style="font-size:13.5px">Sin tareas.</div>')+'</div><button class="boton peque" data-usarh="'+k+'">Añadir este</button></div>'}).join(''):'<div class="vacio">Ningún hito de esta fase todavía.</div>')+
       '<div style="margin-top:10px"><button class="boton" id="btn-hito-nuevo">+ Hito nuevo de esta fase</button></div><div id="hueco-nuevo"></div>';
   }
   c.innerHTML=html;
   c.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){V.f=b.dataset.f;pintarVentana()}});
   if(!V.f)return;
   var l=HITOS.filter(function(h){return h.f===V.f});
-  c.querySelectorAll('[data-usarh]').forEach(function(b){b.onclick=function(){var h=l[+b.dataset.usarh];meterHito({t:h.t,f:h.f,ta:h.ta.map(function(n){var t=T(n);return {n:t.n,a:t.a}})})}});
+  c.querySelectorAll('[data-usarh]').forEach(function(b){b.onclick=function(){var h=l[+b.dataset.usarh];meterHito({t:h.t,f:h.f,ta:h.ta.map(function(n){var t=T(n);return {n:t.n,a:t.a,d:t.d}})})}});
   document.getElementById('btn-hito-nuevo').onclick=function(){this.classList.add('oculto');hitoNuevo(l)};
 }
 function hitoNuevo(l){
@@ -317,7 +359,7 @@ function hitoNuevo(l){
     '<div class="paso-tit" style="margin-top:6px">Su primera tarea</div><div id="nh-tarea"></div><div id="nh-aviso"></div>'+
     '<div class="fila" style="margin:8px 0 0"><button class="boton primario peque" id="nh-crear" disabled>Crear el hito</button></div></div>';
   var ctl=elegirTarea(document.getElementById('nh-tarea'),{sinBotones:true,alCambiar:function(e){tarea=e;document.getElementById('nh-aviso').innerHTML='';document.getElementById('nh-crear').disabled=!e},
-    alAnadir:function(t){tarea={n:t.n,a:t.a,s:t.s,igualA:null,elegida:true};document.getElementById('nh-crear').disabled=false;crear(false)}});
+    alAnadir:function(t){tarea={n:t.n,a:t.a,s:t.s,d:t.d,igualA:null,elegida:true};document.getElementById('nh-crear').disabled=false;crear(false)}});
   document.getElementById('nh-crear').onclick=function(){crear(false)};
   function crear(forzar){
     if(!tarea)return;
@@ -328,18 +370,18 @@ function hitoNuevo(l){
     var gemelo=l.filter(function(h){return h.ta.length===1&&h.ta[0]===nt})[0];
     if(gemelo&&!forzar){
       document.getElementById('nh-aviso').innerHTML='<div class="aviso">Ya hay un hito igual en esta fase: <b>«'+esc(gemelo.t)+'»</b>, con la misma tarea.<div class="botones"><button class="boton primario peque" id="nh-usar">Usar ese</button><button class="boton peque" id="nh-igual">Crear el mío igualmente</button></div></div>';
-      document.getElementById('nh-usar').onclick=function(){meterHito({t:gemelo.t,f:gemelo.f,ta:gemelo.ta.map(function(n){var x=T(n);return {n:x.n,a:x.a}})})};
+      document.getElementById('nh-usar').onclick=function(){meterHito({t:gemelo.t,f:gemelo.f,ta:gemelo.ta.map(function(n){var x=T(n);return {n:x.n,a:x.a,d:x.d}})})};
       document.getElementById('nh-igual').onclick=function(){crear(true)};
       return;
     }
     if(tarea.igualA&&!tarea.elegida&&!forzar){
       var p=tarea.igualA;
       document.getElementById('nh-aviso').innerHTML='<div class="aviso">Ya hay una tarea que hace lo mismo: <b>«'+esc(p.n)+'»</b>.<div class="botones"><button class="boton primario peque" id="nh-usar-t">Usar esa</button><button class="boton peque" id="nh-igual-t">Crear la mía igualmente</button></div></div>';
-      document.getElementById('nh-usar-t').onclick=function(){tarea={n:p.n,a:p.a,s:p.s,igualA:null,elegida:true};crear(false)};
+      document.getElementById('nh-usar-t').onclick=function(){tarea={n:p.n,a:p.a,s:p.s,d:p.d,igualA:null,elegida:true};crear(false)};
       document.getElementById('nh-igual-t').onclick=function(){tarea.igualA=null;tarea.elegida=true;crear(false)};
       return;
     }
-    meterHito({t:nombre,f:V.f,ta:[{n:tarea.n,a:tarea.a}]});
+    meterHito({t:nombre,f:V.f,ta:[{n:tarea.n,a:tarea.a,d:tarea.d}]});
   }
 }
 document.getElementById('interruptor').onclick=function(){E.marca=!E.marca;pintar()};
