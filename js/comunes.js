@@ -33,6 +33,9 @@ var Comunes = (function () {
     { valor: '', texto: 'Otra cosa' }
   ];
 
+  /* Fila 657: las once fases de un hito común, en el orden en que se hacen. */
+  var FASES = ['recibir', 'pedir', 'comprobar', 'elaborar', 'firma', 'publicar', 'enviar', 'seneca', 'cobrar', 'esperar', 'archivar'];
+
   function norm(t) { return (window.U && U.normalizar) ? U.normalizar(String(t || '')) : String(t || '').toLowerCase().trim(); }
   function nuevoId(p) { return (window.U && U.nuevoId) ? U.nuevoId(p) : p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function copia(x) { return JSON.parse(JSON.stringify(x)); }
@@ -58,8 +61,10 @@ var Comunes = (function () {
   function normalizarHito(h) {
     var ids = [];
     ((h && h.tareas) || []).forEach(function (i) { if (typeof i === 'string' && ids.indexOf(i) === -1) ids.push(i); });
-    return { id: (h && h.id) || nuevoId('hc'), nombre: String((h && h.nombre) || '').trim(),
-             explicacion: String((h && h.explicacion) || '').trim(), tareas: ids };
+    var o = { id: (h && h.id) || nuevoId('hc'), nombre: String((h && h.nombre) || '').trim(),
+              explicacion: String((h && h.explicacion) || '').trim(), tareas: ids };
+    if (h && FASES.indexOf(h.fase) !== -1) o.fase = h.fase;   /* fila 657: la fase del hito común (todavía no se ve ni se elige) */
+    return o;
   }
 
   /* `leido` es lo que trae el fichero (o nada): { version: 1, tareas|hitos: [...] }. */
@@ -236,7 +241,7 @@ var Comunes = (function () {
   }
 
   return {
-    HACE: HACE, textoDeHace: textoDeHace, accionValida: accionValida,
+    HACE: HACE, FASES: FASES, textoDeHace: textoDeHace, accionValida: accionValida,
     normalizarTarea: normalizarTarea, normalizarHito: normalizarHito, normalizarFichero: normalizarFichero,
     buscar: buscar, parecidas: parecidas, existeNombre: existeNombre, existeIgual: existeIgual,
     recorrerGuias: recorrerGuias, usos: usos, textoUsos: textoUsos,

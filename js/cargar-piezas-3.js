@@ -199,6 +199,9 @@
     'js/plan-guias-listas.js',
     'js/plan-guias-aplicar.js',
     'js/plan-guias-pantalla.js',
+    'js/repaso-guias.js',   // fila 657
+    'js/repaso-guias-aplicar.js',
+    'js/repaso-guias-pantalla.js',
     'js/tipos-y-su-uso.js',   // fila 543
     'js/tipos-y-su-uso-enviar.js',
     'js/campos-calculados-pasos.js',

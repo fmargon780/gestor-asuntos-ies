@@ -20,6 +20,9 @@ App.pintarHerramientas = async function () {
   /* Fila 551: «Aplicar el plan de las guías» (js/plan-guias-pantalla.js); sale al entrar y desaparece al aplicarlo. */
   if (window.PlanGuiasAplicar) await PlanGuiasAplicar.leerMarca();
   if (window.PlanGuiasPantalla) PlanGuiasPantalla.crear();
+  /* Fila 657: «Aplicar el repaso de la lista común» (js/repaso-guias-pantalla.js); sale al entrar y desaparece al aplicarlo. */
+  if (window.RepasoGuiasAplicar) await RepasoGuiasAplicar.leerMarca();
+  if (window.RepasoGuiasPantalla) RepasoGuiasPantalla.crear();
   /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
   if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   /* Fila 344: las etiquetas también se cierran (antes de cualquier espera: se abren desde un asunto con App.ir); su botón se engancha. */

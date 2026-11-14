@@ -76,6 +76,7 @@ var AjustesReparto = (function () {
     { id: 'bloque-cargar-biblioteca', donde: 'herramientas', otras: 'biblioteca, tipos, guías, tareas, cargar, instituto' },
     { id: 'bloque-comunes-propuesta', donde: 'herramientas', otras: 'guías, tareas, hitos, listas comunes, propuesta, pasar' },   /* fila 531 */
     { id: 'bloque-plan-guias', donde: 'herramientas', otras: 'guías, tareas, hitos, plan, aplicar, listas comunes, limpiar' },   /* fila 551 */
+    { id: 'bloque-repaso-lista', donde: 'herramientas', otras: 'guías, tareas, hitos, repaso, fases, listas comunes, aplicar, unir' },   /* fila 657 */
     { id: 'bloque-tipos-uso', donde: 'herramientas', otras: 'tipos, uso, guías, desactivar, limpiar, enviar a Claude' },   /* fila 543 */
     { id: 'bloque-fichas-archivo', donde: 'herramientas', otras: 'fichas, ARCHIVO, poner en orden' },
     { id: 'bloque-contacto-migracion', donde: 'herramientas', otras: 'contacto, teléfono, correo, abiertos' },
