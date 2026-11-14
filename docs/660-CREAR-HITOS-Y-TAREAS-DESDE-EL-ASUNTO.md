@@ -28,6 +28,12 @@ Sobre la ventana de añadir hito, enseñar todo a la vez «no te permite enfocar
 - Los demás asuntos abiertos de ese tipo no cambian.
 - «Cambiar la guía…» del menú «Hito ▾» se queda.
 
+**Un tipo sin guía nace sin hitos** (Francisco, 14-nov-2026: «casi mejor que esos nazcan sin ningún hito, así obligamos a crear los correctos»).
+- Un asunto de un tipo que no tiene guía ya no nace con «Tramitar · Esperar respuesta · Archivar»: nace sin ningún hito.
+- En el sitio de los hitos dice «Este asunto no tiene hitos todavía» y enseña «+ Añadir hito». La marca nace encendida.
+- Mientras no tiene hitos, el asunto cuenta como «nos toca».
+- Las guías que ya existen no cambian: las 17 que solo tienen «Tramitar · Esperar respuesta» siguen así (decisión de Francisco en la fila 657).
+
 **Primero el hito, después la tarea.**
 
 **«+ Añadir hito», paso a paso.**
@@ -58,6 +64,7 @@ Sobre la ventana de añadir hito, enseñar todo a la vez «no te permite enfocar
 - «Pasar a la guía» (se pierde llevar después a la guía una tarea creada con la marca apagada).
 - La franja que sale al subir o bajar una tarea.
 - La lista «Qué se hace» en desplegable.
+- Los tres hitos de relleno («Tramitar · Esperar respuesta · Archivar») con los que nacía un tipo sin guía.
 
 ## Pantalla de prueba
 
@@ -73,6 +80,7 @@ Sobre la ventana de añadir hito, enseñar todo a la vez «no te permite enfocar
 
 - Va detrás de la 659: necesita `donde`, `documento`, `aQuien` y los sitios.
 - Hoy: añadir tarea en `js/hito-mesa-guion.js`, `js/hito-mesa-nueva-tarea.js` y `js/comunes-asunto.js`; ventanas de la lista común en `js/comunes-ventana.js` y `js/comunes-ventana-nuevo.js`; añadir hito en `js/hitos-anadir.js`; «Solo para este asunto», «Pasar a la guía» y la propagación en `js/hitos-desde-el-asunto*.js`, `js/hito-mesa-tarea-menu.js` y `js/hitos-guion-marcar.js`; subir y bajar en `js/hitos-guion-orden.js`. Quitar lo que desaparece, sin dejar código muerto ni textos que lo nombren.
+- Los hitos de relleno salen de `pasosMinimos` y `guiaMinima` (`js/estado-hito.js`): un tipo sin guía deja de recibirlos. `esGuiaMinima` se queda para las guías viejas. Repasar que un asunto sin hitos no rompe el estado automático, «Qué me toca», la tira de hitos ni el panel (`js/hitos.js`, `js/hitos-arbol.js`, `js/hitos-sincronizar.js`): estado «nos toca», sin hito actual.
 - La marca se guarda en la ficha del asunto (por ejemplo `marcaGuia: true|false`); si no la tiene, se calcula con la regla de arriba. Con la marca encendida, los cambios van a la guía y a la lista común por el mismo camino que hoy usa «Cambiar la guía…».
 - «Hito común» = el de la lista común con `fase` (fila 657). Fases: `Comunes.FASES` más las del centro, en `_GESTOR` (por ejemplo `fases.json`, por `ColaGuardado`); las fijas no se borran.
 - «Hace lo mismo»: igual `accion`, igual `donde` y, si la acción tiene «sobre qué», igual plantilla, `documento` o `aQuien`. «Parecido»: nombre normalizado igual o casi igual (mismo criterio que el aviso de «Sitios» de la 659).
@@ -82,6 +90,7 @@ Sobre la ventana de añadir hito, enseñar todo a la vez «no te permite enfocar
 
 ## Cómo lo comprueba el segundo revisor
 
+- Un asunto de un tipo nuevo nace sin hitos, con «Este asunto no tiene hitos todavía» y «+ Añadir hito», sale en «Qué me toca» y no da errores. Un asunto de IPASEN ALUMNADO sigue naciendo con «Tramitar · Esperar respuesta».
 - La marca: nace encendida en un tipo con la guía vacía o solo «Tramitar · Esperar respuesta», y apagada en uno con guía; el texto de debajo cambia al pulsarla; al volver a abrir el asunto sigue como se dejó.
 - Con la marca encendida, añadir un hito y una tarea, cambiar, borrar y subir una tarea: cambia el asunto y la guía del tipo. Apagada: solo el asunto. Otro asunto abierto del mismo tipo no cambia.
 - «+ Añadir hito»: primero solo las fases; luego solo los hitos de la fase con sus tareas; luego solo el formulario, con «Ver los hitos de esta fase (n)». Se puede volver a cambiar la fase.
@@ -96,7 +105,7 @@ Sobre la ventana de añadir hito, enseñar todo a la vez «no te permite enfocar
 
 ## Qué mirar al terminar
 
-- Crea un asunto de un tipo nuevo: mira que la marca está encendida.
+- Crea un asunto de un tipo nuevo: mira que nace sin hitos y con la marca encendida.
 - «+ Añadir hito»: elige una fase y añade un hito nuevo con su tarea.
 - «+ Añadir tarea»: escribe «correo» y añade una tarea de enviar.
 - Crea otro asunto de ese tipo: mira que trae lo que añadiste.
