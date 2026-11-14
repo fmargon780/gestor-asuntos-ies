@@ -10,6 +10,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { guardarEnElHito } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -61,7 +62,7 @@ const DESTINO = await pagina.evaluate(async () => {
   return nombre;
 });
 
-/* Crea un suelto y lo guarda en el asunto; cierra el cuadro de ponerle nombre. */
+/* Crea un suelto y lo guarda en el asunto (fila 661: con su hito y su tarea, al pulsar «Guardar»). */
 async function guardar(nombreFichero, opciones) {
   await pagina.evaluate(async (n) => {
     const h = await window.__disco.abiertos.getFileHandle(n, { create: true });
@@ -69,7 +70,7 @@ async function guardar(nombreFichero, opciones) {
   }, nombreFichero);
   const hecho = pagina.evaluate(([n, d, o]) => App.llevarSueltoA({ nombre: n }, d, {}, o || undefined), [nombreFichero, DESTINO, opciones || null]);
   await pagina.waitForSelector('#capa:not(.oculto)', { timeout: 10000 });
-  await pagina.click('#cuadro-aceptar');
+  await guardarEnElHito(pagina);   /* fila 661: entra al pulsar «Guardar», con su hito y su tarea */
   await hecho;
 }
 
@@ -159,15 +160,18 @@ const intentos = await pagina.evaluate(() => {
   };
   return true;
 });
+const cuantosAntes = await pagina.evaluate(async (d) => { const dir = await window.__disco.abiertos.getDirectoryHandle(d); let n = 0; for await (const x of dir.entries()) n++; return n; }, DESTINO);
 await guardar('seis.pdf');
 await pagina.locator('#mensajes .mensaje-boton', { hasText: 'Ir al asunto' }).waitFor({ timeout: 5000 });
 await comprobar('6. se intenta dos veces', pagina.evaluate(() => window.__intentosBorrar), 2);
 await comprobar('6. sale el aviso ámbar', pagina.locator('#mensajes .mensaje.ambar', { hasText: 'ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo' }).count(), 1);
 await comprobar('6. y el aviso con «Ir al asunto» sale igual', avisosConIr(), 1);
-await comprobar('6. el documento está dentro del asunto', pagina.evaluate(async (d) => {
+/* Fila 661: entra con el nombre que le pone el cuadro (fecha, tipo y número), no con el que traía. */
+await comprobar('6. el documento está dentro del asunto', pagina.evaluate(async ([d, antes]) => {
   const dir = await window.__disco.abiertos.getDirectoryHandle(d);
-  try { await dir.getFileHandle('seis.pdf'); return true; } catch (e) { return false; }
-}, DESTINO), true);
+  let n = 0; for await (const x of dir.entries()) n++;
+  return n === antes + 1;
+}, [DESTINO, cuantosAntes]), true);
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

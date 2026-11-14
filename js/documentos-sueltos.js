@@ -266,8 +266,7 @@ App.meterSueltoEnAsunto = async function (s) {
   var elegido = await E.elegir({
     titulo: 'Guardar el documento en un asunto',
     cabecera: '<p class="explica">' + U.escapar(s.nombre) +
-              '<br><span class="suave">Se llevará a la carpeta del asunto que elijas, ' +
-              'y después se abrirá el cuadro de ponerle nombre.</span></p>',
+              '<br><span class="suave">Elige el asunto. Después le pones nombre y dices de qué tarea es.</span></p>',   /* fila 661 */
     sugeridos: sugeridos,
     crearNuevo: { texto: 'No está: crear un asunto nuevo con él',
                   alPulsar: function () { App.empezarAsuntoCon(s); } }
@@ -325,104 +324,11 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
   }
 };
 
-/* El traslado propiamente dicho. Carpetas.moverFichero ya copia,
-   comprueba que la copia pesa lo mismo y solo entonces borra: en las
-   carpetas de Dropbox el move() del navegador no vale. Si algo falla,
-   el documento se queda en "Por clasificar". */
-App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
-  var E = window.ElegirAsunto;
-  /* Se guarda antes de mover nada (fila 174, docs/POR-CLASIFICAR-USA-LO-
-     LEIDO.md, punto 1): el fichero cambia de sitio al entrar en el
-     asunto, y lo leído viaja con él hasta el cuadro de ponerle nombre. */
-  var propuesta = window.LectorDeSueltos ? LectorDeSueltos.resultadoDe(s.nombre) : null;
-
-  var destino;
-  try {
-    destino = await E.carpetaDelAsunto(nombreAsunto, ficha);
-  } catch (e) {
-    U.aviso('No encuentro la carpeta de ese asunto: ' + U.mensajeDeError(e), 'malo');
-    return;
-  }
-
-  /* Las rutas muy largas dan problemas en una carpeta sincronizada: se
-     avisa y se deja decidir, como al crear un asunto. */
-  var ruta = nombreAsunto + '/' + s.nombre;
-  if (ruta.length > App.LARGO_MAXIMO_NOMBRE) {
-    var seguir = await U.preguntar('La ruta es muy larga',
-      '<p>El documento quedaría en una ruta de ' + ruta.length + ' caracteres:</p>' +
-      '<p class="nota">' + U.escapar(ruta) + '</p>' +
-      '<p>Las rutas muy largas dan problemas en una carpeta sincronizada.</p>',
-      'Guardarlo igual');
-    if (!seguir) return;
-  }
-
-  /* Si ya hay un fichero con ese nombre en el destino, no se pisa:
-     igual que hace Documentos.guardar. */
-  var yaEsta = false;
-  try {
-    await destino.getFileHandle(s.nombre);
-    yaEsta = true;
-  } catch (e) { yaEsta = false; }
-  if (yaEsta) {
-    U.aviso('Ya hay un documento llamado "' + s.nombre + '" en ese asunto. ' +
-            'No lo he pisado: sigue en Por clasificar.', 'malo');
-    return;
-  }
-
-  var sinBorrar = false;
-  try {
-    /* Fila 449: si la copia sale bien y no se puede quitar el original de la bandeja, el documento SÍ está en el asunto. */
-    sinBorrar = (await Carpetas.moverFichero(((window.Entrada && Entrada.dir()) || App.E.abiertos), s.nombre, destino, undefined, { toleraNoBorrar: true })) === 'sin-borrar';
-  } catch (e) {
-    /* Con el motivo (fila 100): antes se callaba. */
-    U.fallo('El documento no ha podido entrar en el asunto. Sigue en Por clasificar', e);
-    return;
-  }
-
-  delete App.E.reciales[s.nombre];
-  /* Fila 119: el aviso, con «Ir al asunto», sale al cerrar el cuadro de ponerle nombre (abajo). */
-  /* Desde un hito (arreglo de la fila 103): queda apuntado a él nada
-     más entrar, con el nombre que trae, aunque luego se cierre el
-     cuadro sin ponerle otro. Si se le pone nombre, js/documentos.js
-     cambia el viejo por el nuevo en el hito. */
-  var hito = opciones && opciones.hito;
-  /* Fila 229: guardado en el asunto, queda su línea en el registro. */
-  if (window.RegistroAsunto) await RegistroAsunto.auto({ nombre: nombreAsunto }, 'Documento guardado «' + s.nombre + '»', hito);
-  if (hito && window.Hitos) {
-    try {
-      await Hitos.anadirDocumento(nombreAsunto, hito.id, s.nombre);
-      if (window.HitosRequisitos) {
-        try { await HitosRequisitos.marcarPorDocumento(nombreAsunto, hito.id, s.nombre); } catch (e4) { /* no crítico */ }
-        if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(nombreAsunto, hito.id, 'anadir');   /* fila 109 */
-      }
-    } catch (e3) {
-      U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e3);
-    }
-    if (window.HitosPanel) HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
-  }
-  try {
-    await App.verAbiertos();
-
-    /* Con el documento ya dentro, el cuadro de siempre para ponerle el
-       nombre que le toca, directo (fila 174, punto 2), con lo que se
-       haya leído del documento. */
-    await App.verDocumentos({
-      nombre: nombreAsunto, handle: destino,
-      ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
-      leido: Nombres.leer(nombreAsunto, App.E.tipos)
-    }, Object.assign({}, opciones, { ponerNombre: s.nombre, propuesta: propuesta }));
-  } catch (e2) {
-    U.accesorio('Documento guardado, pero no he podido abrir el cuadro para ponerle nombre', e2);
-  }
-  if (sinBorrar) U.accesorio('El documento ya está en el asunto, pero no he podido quitarlo de la bandeja. Bórralo de Ver todo');   /* fila 449 */
-  /* Se queda en Por clasificar (fila 119). */
-  if (window.Navegacion) Navegacion.avisoAnadido('Documento guardado en ' + nombreAsunto + '.', nombreAsunto, hito && hito.id);   /* fila 449 */
-  else U.aviso('Documento guardado en ' + nombreAsunto + '.', 'bueno');
-  /* El hito sigue desplegado al volver a la ficha. */
-  if (hito && window.HitosPanel) {
-    HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
-    HitosPanel.programarRepintado();
-  }
+/* El traslado propiamente dicho (fila 661, docs/661-BANDEJA-CON-HITO-Y-TAREA.md): ya no se mueve al elegir el asunto. Se abre el cuadro
+   del nombre con el fichero todavía en «Por clasificar», y el documento entra en el asunto, con su nombre y colgado de su tarea, al
+   pulsar «Guardar» (js/bandeja-a-asunto.js). «Volver», «Cerrar» y la ✕ no guardan nada. */
+App.llevarSueltoA = function (s, nombreAsunto, ficha, opciones) {
+  return window.BandejaAAsunto.suelto(s, nombreAsunto, ficha, opciones);
 };
 
 App.abrirSuelto = async function (s) {

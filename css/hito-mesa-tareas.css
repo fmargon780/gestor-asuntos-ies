@@ -64,3 +64,11 @@
 .pt-op:has(input:checked) { border-color: var(--azul); background: #f1f6fd; }
 .pt-op input[type="radio"] { width: auto; flex: 0 0 auto; margin: 3px 0 0; }
 .pt-op > span { flex: 1 1 auto; min-width: 0; }
+
+/* Fila 661: el bloque «¿De qué tarea es?» del cuadro del nombre, cuando el documento viene de la bandeja. */
+.bloque-tarea { border: 2px solid var(--azul); border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+.bloque-tarea h4 { margin: 0 0 6px; font-size: 15px; }
+.bloque-tarea .propuesta p { margin: 2px 0; }
+.bloque-tarea .hito-linea { display: flex; gap: 8px; align-items: center; }
+.bloque-tarea .hito-linea select { flex: 1 1 auto; min-width: 0; }
+.bloque-tarea .pt-op { margin-top: 4px; }

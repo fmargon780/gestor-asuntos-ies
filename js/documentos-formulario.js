@@ -81,7 +81,7 @@
     var visor = fichero ? N.visorDe(fichero, opciones.nombreActual)
                         : '<p class="explica">No he podido abrir el documento para verlo.</p>';
 
-    var previo = N.leerNombre(opciones.nombreActual, N.asuntoActual && N.asuntoActual.ficha);
+    var previo = N.leerNombre(opciones.nombreVista || opciones.nombreActual, N.asuntoActual && N.asuntoActual.ficha);   /* fila 661: `nombreVista`, el nombre con que se vería un adjunto de correo en la carpeta */
     /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md): un documento que ya
        tiene número lo conserva; uno que entra ahora en la carpeta
        (añadido desde el ordenador o traído de «Por clasificar») recibe el
@@ -186,11 +186,15 @@
 
       '<div class="doc-campos">' +
 
+      (opciones.serieAdjuntos && opciones.serieAdjuntos.total ? '<p class="nota">Correo de ' + U.escapar(opciones.serieAdjuntos.quien || '') +
+        ' · adjunto ' + (opciones.serieAdjuntos.total - opciones.serieAdjuntos.restantes.length) + ' de ' + opciones.serieAdjuntos.total + '</p>' : '') +   /* fila 661 */
       '<p class="explica">' +
-        (opciones.modo === 'anadir'
+        (opciones.desdeBandeja
+          ? 'El documento entra en el asunto al pulsar «Guardar».'   /* fila 661: hasta entonces sigue en «Por clasificar» */
+          : opciones.modo === 'anadir'
           ? 'Se guardará una copia en la carpeta del asunto. El original se queda donde está.'
           : 'Se le cambia el nombre al fichero que ya está en la carpeta.') +
-        '<br><span class="suave">Fichero: ' + U.escapar(opciones.nombreActual) + '</span></p>' +
+        '<br><span class="suave">Fichero: ' + U.escapar(opciones.nombreVista || opciones.nombreActual) + '</span></p>' +
 
       (window.Candidaturas ? Candidaturas.campoHTML(opciones, N.asuntoActual) : '') +   /* fila 347 */
 
@@ -210,6 +214,7 @@
       '<label class="etiqueta">Tipo de documento</label>' +
       '<select id="doc-tipo" class="campo">' + opcionesDeTipo(tipoInicial) + '</select>' +
       '<div id="doc-campos-tipo"></div>' +
+      (opciones.desdeBandeja && window.DocumentoTareaBloque ? DocumentoTareaBloque.html() : '') +   /* fila 661: «¿De qué tarea es?» */
 
       '<label class="interruptor">' +
         '<input type="checkbox" id="doc-hay-registro"' + (registro ? ' checked' : '') + '>' +
@@ -302,10 +307,15 @@
     /* Fila 347: después del repaso de arriba, que pone su `oninput` a todos los campos del cuadro. */
     if (window.Candidaturas) Candidaturas.enganchar(opciones, N.asuntoActual);
 
-    $('doc-volver').onclick = function () { N.soltarVisor(); N.pintarLista(); };
+    /* Fila 661: desde la bandeja, «Volver» no guarda nada y cierra el cuadro: el documento sigue en «Por clasificar». */
+    $('doc-volver').onclick = function () { N.soltarVisor(); if (opciones.desdeBandeja) N.cerrarCuadro(); else N.pintarLista(); };
     $('doc-guardar').onclick = function () {
       return U.mientrasGuarda($('doc-guardar'), function () { return N.guardar(opciones); });
     };
+    /* Fila 661: el bloque «¿De qué tarea es?», con el hito y la tarea de donde se llega, si se llega de uno. */
+    if (opciones.desdeBandeja && window.DocumentoTareaBloque) {
+      await DocumentoTareaBloque.montar($('doc-tarea-bloque'), N.asuntoActual, { tipo: N.tipoElegido, hito: N.hitoActual, tarea: N.tareaActual });
+    }
     /* Fila 349: un PDF que entra, con hojas grandes o de más de 5 MB. */
     if (window.DocumentosPdf) DocumentosPdf.pintar(opciones, fichero);
     N.refrescar();

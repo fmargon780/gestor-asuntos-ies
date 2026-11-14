@@ -222,12 +222,24 @@ fila 88 (21-sep-2026, ver más abajo "Sugerir un asunto ya existente"), si `js/d
 lector.js` ya tiene un resultado en caché para ese fichero, se suma sin quitar nada: +50 si el
 tercero leído es el del asunto, +10 si el tipo leído es el del asunto.
 
-El traslado (`App.llevarSueltoA`) usa `Carpetas.moverFichero`, que copia, comprueba que la copia
-pesa lo mismo y solo entonces borra: en Dropbox el `move()` del navegador no vale. Si ya hay un
-fichero con ese nombre en el destino **no se pisa**; si la ruta pasa de
-`App.LARGO_MAXIMO_NOMBRE` (180) se avisa y se deja decidir; si el traslado falla, el documento
-sigue en "Por clasificar" y se dice con una línea. Si sale bien, se abre el cuadro de ponerle
-nombre (`App.verDocumentos`), igual que al crear un asunto con un documento. Si el asunto
+**Desde la fila 661 (14-nov-2026, `docs/661-BANDEJA-CON-HITO-Y-TAREA.md`) el documento ya no se mueve al elegir el asunto.**
+`App.llevarSueltoA` llama a `BandejaAAsunto.suelto` (`js/bandeja-a-asunto.js`), que abre el cuadro del nombre
+(`Documentos.abrir` con `desdeBandeja`: el cuadro de «Añadir documento», `modo: 'anadir'`, con el fichero todavía en la bandeja) y
+el documento entra al pulsar «Guardar», con su nombre y colgado de su tarea. «Volver», «Cerrar» y la ✕ no guardan nada. El bloque
+«¿De qué tarea es?» (`js/documento-tarea-bloque.js`, `DocumentoTareaBloque`) va dentro del cuadro, debajo de «Tipo de documento»:
+propone la tarea de «Añadir documento», sin hacer, cuyo `tipoDocumento` («Qué documento», fila 659) es el tipo elegido; si no hay,
+sale vacío con «Hito», «+ Añadir hito» (`AnadirHito.abrir(a, ancla, alCerrar)`, fila 660) y las tareas del hito más «Tarea nueva»
+(`DocumentoATarea.colgar` con `conMarca`: por `DondeSeGuardaTareas.nueva`, que obedece a la marca de la guía). Sin hito y tarea no se
+guarda. Al guardar: `opciones.desdeBandeja.antes` (ruta larga), copia con el nombre nuevo (si ya existe uno igual, no se pisa),
+`despues` (quita el original de la bandeja; si no puede, aviso ámbar) y `DocumentoATarea.colgar`. Las pruebas antiguas que solo querían
+ver entrar un documento usan `pruebas/apoyo/bandeja-guardar.mjs`. Se comprueba con `pruebas/bandeja-con-hito-y-tarea.mjs`.
+
+El PDF del correo y el del hilo (`… CORREO …`, `… HILO …`) no cuelgan de ninguna tarea: `DocumentoATarea.sinTarea` los salta.
+
+Antes de la fila 661, el traslado (`App.llevarSueltoA`) usaba `Carpetas.moverFichero`, que copia, comprueba que la copia
+pesa lo mismo y solo entonces borra: en Dropbox el `move()` del navegador no vale. Si ya había un
+fichero con ese nombre en el destino **no se pisaba**; si la ruta pasaba de
+`App.LARGO_MAXIMO_NOMBRE` (180) se avisaba y se dejaba decidir (ahora lo hace `antes`). Si el asunto
 elegido está archivado se ofrece "Reabrir y meterlo aquí" (`App.reabrirAsunto`) o "Meterlo sin
 reabrir", y entonces el fichero va a la carpeta del asunto dentro del ARCHIVO.
 

@@ -34,6 +34,7 @@ window.DocumentoATarea = (function () {
   function sinTarea(hitos, nombre) {
     var cuelga = false;
     if (!window.TareasConDocumento) return false;
+    if (/^\d{6} (CORREO|HILO)(\s|\.)/.test(String(nombre || ''))) return false;   /* fila 661: el PDF del correo y el del hilo no cuelgan de ninguna tarea */
     TareasConDocumento.recorrer(hitos, function (h) {
       var m = h.guionDocumento || {};
       Object.keys(m).forEach(function (id) {
@@ -140,7 +141,7 @@ window.DocumentoATarea = (function () {
   }
 
   /* `destino`: { hitoId, tareaId } (tareaId null: tarea nueva con el nombre del tipo). `o.nuevo`: el documento acaba de
-     entrar en la carpeta («Añadido»; si no, «Colgado»). Devuelve { hito, tareaId, texto }. */
+     entrar en la carpeta («Añadido»; si no, «Colgado»). `o.conMarca` (fila 661): la «Tarea nueva» obedece a la marca de la guía. Devuelve { hito, tareaId, texto }. */
   async function colgar(a, destino, nombre, tipo, o) {
     o = o || {};
     var hitos = await Hitos.hitosDe(a.nombre);
@@ -156,6 +157,18 @@ window.DocumentoATarea = (function () {
     if (tareaId) {
       var g = Hitos.guionDe(a, h).filter(function (x) { return x.id === tareaId; })[0];
       texto = g ? g.texto : '';
+    } else if (o.conMarca && window.DondeSeGuardaTareas) {
+      /* Fila 661: «Tarea nueva» de la bandeja: obedece a la marca de la guía (fila 660), con «Añadir documento» y «Qué documento» = el tipo. */
+      texto = tipo || 'Documento';
+      var extras = { accion: 'anadir' };
+      if (tipo) extras.tipoDocumento = tipo;
+      if (!(await DondeSeGuardaTareas.nueva(a, h, texto, null, extras))) throw new Error('No he podido crear la tarea.');
+      h = Hitos.buscar(await Hitos.hitosDe(a.nombre), destino.hitoId) || h;
+      var propias = Hitos.guionDe(a, h).filter(function (x) {
+        return x.texto === texto && x.accion === 'anadir' && !x.hecho && !(window.TareasConDocumento && (TareasConDocumento.de(h, x.id) || {}).doc);
+      });
+      if (!propias.length) throw new Error('No he podido crear la tarea.');
+      tareaId = propias[propias.length - 1].id;
     } else {
       texto = tipo || 'Documento';
       var nuevo = await Hitos.anadirGuionPropio(a.nombre, h.id, texto, { accion: 'anadir' });

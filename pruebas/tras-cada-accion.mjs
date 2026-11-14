@@ -11,6 +11,7 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
+import { conUnHito, guardarEnElHito } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -166,10 +167,11 @@ await pagina.evaluate(async () => {
   const h = await window.__disco.abiertos.getFileHandle('suelto de prueba.pdf', { create: true });
   const w = await h.createWritable(); await w.write('%PDF-1.4 prueba'); await w.close();
 });
+await conUnHito(pagina, DESTINO);
 const metido = pagina.evaluate((destino) => App.llevarSueltoA({ nombre: 'suelto de prueba.pdf' }, destino, {}), DESTINO);
-/* El cuadro de ponerle nombre se abre encima: se cierra sin cambiar nada. */
+/* Fila 661: el cuadro de ponerle nombre se abre encima y el documento entra al pulsar «Guardar», con su hito y su tarea. */
 await pagina.waitForSelector('#capa:not(.oculto)', { timeout: 10000 });
-await pagina.click('#cuadro-aceptar');
+await guardarEnElHito(pagina);
 await metido;
 await pagina.locator('.mensaje-boton', { hasText: 'Ir al asunto' }).waitFor({ timeout: 5000 });
 await comprobar('5. el aviso lleva «Ir al asunto»', pagina.locator('.mensaje-boton').count().then((n) => n >= 1), true);

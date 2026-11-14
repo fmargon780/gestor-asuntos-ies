@@ -11,6 +11,7 @@
         la app funciona y no hay nada en Problemas por esto;
      D. sin señalar con `nube: "drive"` en `_GESTOR/rutas.json`: la misma frase. */
 import { chromium } from 'playwright';
+import { conUnHito, guardarEnElHito } from './apoyo/bandeja-guardar.mjs';
 import fs from 'fs';
 
 const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
@@ -78,16 +79,21 @@ const sueltos = (p) => p.locator('#lista-sueltos .tarjeta-suelto .tarjeta-nombre
   await comprobar('B. señalada, enseña los documentos de esa carpeta y no los de la raíz de abiertos',
     sueltos(p), ['Escrito de la entrada.pdf', 'Oficio de la entrada.pdf']);
 
+  await conUnHito(p, ASUNTO);   /* fila 661: el documento entra al pulsar «Guardar», colgado de un hito y una tarea */
   await p.locator('#lista-sueltos .tarjeta-suelto').filter({ hasText: 'Oficio de la entrada.pdf' })
     .getByRole('button', { name: 'Guardar en un asunto' }).click();
   await p.waitForSelector('#enlace-todos');
   await p.fill('#enlace-buscar', 'Pacheco');
   await p.waitForTimeout(300);
   await p.click('#enlace-todos .enlace-asunto');
-  await p.waitForTimeout(900);
+  await p.waitForSelector('#doc-guardar');
+  await comprobar('hasta pulsar «Guardar», el documento sigue en la entrada y no está en la carpeta del asunto',
+    p.evaluate(async (a) => { const c = await window.__disco.abiertos.getDirectoryHandle(a); const n = []; for await (const x of c.entries()) n.push(x[0]); return n; }, ASUNTO), []);
+  await guardarEnElHito(p);
+  await p.waitForTimeout(1500);
   await comprobar('clasificar uno lo lleva a la carpeta del asunto (aunque sea de otra carpeta)',
-    p.evaluate(async (a) => { const c = await window.__disco.abiertos.getDirectoryHandle(a); const n = []; for await (const x of c.entries()) n.push(x[0]); return n; }, ASUNTO),
-    ['Oficio de la entrada.pdf']);
+    p.evaluate(async (a) => { const c = await window.__disco.abiertos.getDirectoryHandle(a); const n = []; for await (const x of c.entries()) n.push(x[0]); return n.length; }, ASUNTO),
+    1);   /* con el nombre que le pone el cuadro (fecha, tipo y número) */
   await comprobar('y desaparece de la entrada',
     p.evaluate(async () => { const n = []; for await (const x of window.__entrada.entries()) n.push(x[0]); return n.sort(); }),
     ['Escrito de la entrada.pdf']);
@@ -95,8 +101,6 @@ const sueltos = (p) => p.locator('#lista-sueltos .tarjeta-suelto .tarjeta-nombre
     p.evaluate(async () => { const n = []; for await (const x of window.__disco.abiertos.entries()) if (x[1].kind === 'file') n.push(x[0]); return n; }),
     ['Solo en abiertos.pdf']);
 
-  await p.waitForSelector('#doc-guardar');
-  await p.click('#cuadro-aceptar');
   await p.waitForTimeout(500);
 
   /* Ajustes → Mantenimiento: los dos botones, y «Usar la de asuntos vivos» vuelve a lo de siempre. */

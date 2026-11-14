@@ -85,7 +85,7 @@ console.log('--- 2 y 5. señal vieja ---');
   });
   comprobar('5. el aviso desaparece sin recargar', await aviso(pagina), null);
   const correos = await pagina.evaluate(async () => { await Bandeja.mirarDeNuevo(true); return Bandeja.correos().map((c) => c.fichero).sort(); });
-  comprobar('6. latido.json no cuenta como correo', correos, ['demo-correo-1.json', 'demo-correo-2.json']);
+  comprobar('6. latido.json no cuenta como correo', correos, ['demo-correo-1.json', 'demo-correo-2.json', 'demo-correo-3.json']);
   comprobar('2. sin errores', errores, []);
   await contexto.close();
 }

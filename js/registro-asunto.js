@@ -59,7 +59,7 @@ var RegistroAsunto = (function () {
       var suelta = !!(filtro && opciones.conSueltas && !n.hito && !esAuto(n));
       if (filtro && n.hito !== filtro && !suelta) return;
       salida.push({ delAsunto: suelta, texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: n.hito || '',
-        hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, auto: esAuto(n), llamada: n.llamada || null,
+        hitoTitulo: n.hitoTitulo || '', enlace: n.enlace, enlaceTexto: n.enlaceTexto, abrir: n.abrir, auto: esAuto(n), llamada: n.llamada || null,
         propia: n, orden: i, fuente: 'asunto' });
     });
     var hitos = opciones.hitos || hitosDe(a && a.nombre);
@@ -101,7 +101,7 @@ var RegistroAsunto = (function () {
           '<span class="registro-acciones oculto"><button type="button" class="boton registro-cambiar">Cambiar</button>' +
           '<button type="button" class="boton registro-borrar">Borrar</button></span></span>' : '') +
       '</div>' +
-      '<div class="nota-texto">' + U.escapar(l.texto) + '</div>' + enlace +
+      '<div class="nota-texto">' + U.escapar(l.texto) + '</div>' + enlace + (window.RegistroAbrirPdf ? RegistroAbrirPdf.html(l, idDe(l)) : '') +   /* fila 661 */
       (l.propia && l.propia.deDirectivo && window.NotasDirectivos ? NotasDirectivos.documentosHtml(l.propia, !NotasDirectivos.activa()) : '') +
     '</div>';
   }

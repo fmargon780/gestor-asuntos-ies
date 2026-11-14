@@ -139,7 +139,7 @@
 
   async function crearSueltos() {
     await Carpetas.escribirBytes(App.E.abiertos, 'solicitud escaneada.pdf', PDF_DE_MENTIRA, 'application/pdf');
-    await Carpetas.escribirBytes(App.E.abiertos, 'justificante.pdf', PDF_DE_MENTIRA, 'application/pdf');
+    await Carpetas.escribirBytes(App.E.abiertos, 'justificante.pdf', PDF_DE_MENTIRA, 'application/pdf');    await Carpetas.escribirBytes(App.E.abiertos, 'escaneo_0012.pdf', PDF_DE_MENTIRA, 'application/pdf');   /* fila 661 */
   }
 
   /* ---------- la bandeja de correos ---------- */
@@ -161,9 +161,22 @@
       correos: ['pedidos@dobla-demo.es'],
       fecha: hace(2), fechaUltimo: hace(2), adjuntos: ['factura-septiembre.pdf']
     };
+    /* Fila 661: un correo con el PDF del correo, el del hilo y dos adjuntos (cada uno entra en su cuadro, con su hito y su tarea). */
+    var tres = {
+      id: 'demo-correo-3', asunto: 'Matrícula de Pablo: documentación',
+      texto: 'Les envío la solicitud firmada y el recibo del seguro escolar. Un saludo.',
+      de: { nombre: 'Marina Ponce Ruiz', correo: 'tutor.pablo@correo-demo.es' },
+      correos: ['tutor.pablo@correo-demo.es'],
+      fecha: hace(0), fechaUltimo: hace(0), adjuntos: ['solicitud firmada.pdf', 'recibo seguro escolar.pdf'],
+      pdf: 'demo-correo-3 - hilo.pdf', pdfMensaje: 'demo-correo-3 - mensaje.pdf'
+    };
     await Carpetas.escribirBytes(disco.bandeja, 'factura-septiembre.pdf', PDF_DE_MENTIRA, 'application/pdf');
+    for (var ia = 0; ia < tres.adjuntos.concat([tres.pdf, tres.pdfMensaje]).length; ia++) {
+      await Carpetas.escribirBytes(disco.bandeja, tres.adjuntos.concat([tres.pdf, tres.pdfMensaje])[ia], PDF_DE_MENTIRA, 'application/pdf');
+    }
     await Carpetas.guardarJson(disco.bandeja, uno.id + '.json', uno);
     await Carpetas.guardarJson(disco.bandeja, dos.id + '.json', dos);
+    await Carpetas.guardarJson(disco.bandeja, tres.id + '.json', tres);
     /* Fila 336: la señal del recolector. Sin parámetro, de hace un momento (sin aviso); `?latido=viejo`, de hace
        tres días (aviso con fecha); `?latido=ninguno`, sin fichero (aviso sin fecha). */
     var latido = new URLSearchParams(window.location.search).get('latido') || '';
