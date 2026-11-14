@@ -72,8 +72,8 @@ const DOC_OTRO = '261105 OTRO D26-09103.pdf';
 console.log('--- 1. «Firmar un documento» ---');
 await abrirMesa('Vidal Soto');
 await pagina.locator('.hito-en-mesa .tcd-abrir-form').click();   /* fila 638: el formulario se abre con «+ Añadir tarea» */
-await comprobar('1. «Qué se hace» ofrece «Firmar un documento»',
-  pagina.$$eval('.hito-en-mesa .tcd-nueva .tcd-accion option', (o) => o.map((x) => x.textContent).includes('Firmar un documento')), true);
+await comprobar('1. «Qué se hace» ofrece «Poner a la firma»',
+  pagina.$$eval('.hito-en-mesa .tcd-nueva .tcd-accion option', (o) => o.map((x) => x.textContent).includes('Poner a la firma')), true);
 await pagina.locator('#guion-nueva-tarea').fill('Firmar la resolución');
 await pagina.locator('.hito-en-mesa .tcd-nueva .tcd-accion').selectOption('firmar');
 await comprobar('1. sale «Firmas necesarias» con 1, 2 y 3 (por defecto 1)',
@@ -99,9 +99,9 @@ const ids = await pagina.evaluate(async () => {
 });
 await comprobar('1. «Firmar la resolución»: solo aquí, 2 firmas', [ids['Firmar la resolución'][1], ids['Firmar la resolución'][2]], [true, { firmas: '2' }]);
 await comprobar('1. «Firmar el informe»: solo aquí, 1 firma (no se guarda el dato)', [ids['Firmar el informe'][1], ids['Firmar el informe'][2]], [true, null]);
-await comprobar('1. la etiqueta de la tarea: «Firmar · 2 firmas» y «Firmar»',
+await comprobar('1. la etiqueta de la tarea: «Poner a la firma · 2 firmas» y «Poner a la firma»',
   pagina.evaluate((ids) => [ids[0], ids[1]].map((i) => { const c = document.querySelector('.hito-en-mesa .guion-paso[data-id="' + i + '"] .guion-tarea-clase'); return c ? c.textContent : null; }),
-    [ids['Firmar la resolución'][0], ids['Firmar el informe'][0]]), ['Firmar · 2 firmas', 'Firmar']);
+    [ids['Firmar la resolución'][0], ids['Firmar el informe'][0]]), ['Poner a la firma · 2 firmas', 'Poner a la firma']);
 await pagina.evaluate(async ([idA, idB, a, b]) => {
   const x = Gestor.asuntos().filter((y) => y.nombre.indexOf('Vidal Soto') !== -1)[0];
   const h = (await Hitos.hitosDe(x.nombre))[0];
