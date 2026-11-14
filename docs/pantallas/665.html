@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>665 · Acciones que hacen algo · pantalla de prueba</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f4f5f8; color: #1d2433; font-size: 15px; }
+  .aviso { background: #7a4f05; color: #fff; text-align: center; padding: 6px; font-size: 13px; }
+  .cab { display: flex; align-items: center; gap: 12px; padding: 14px 20px; flex-wrap: wrap; }
+  .etq { border: 1px solid #b9c3d6; border-radius: 10px; padding: 1px 8px; font-size: 12px; background: #eaf0fa; color: #1f3a66; font-weight: 600; }
+  .cab h1 { font-size: 20px; margin: 0; }
+  .cuerpo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; padding: 0 20px 20px; }
+  @media (max-width: 900px) { .cuerpo { grid-template-columns: 1fr; } }
+  .caja { background: #fff; border: 1px solid #dde1ea; border-radius: 8px; padding: 14px 16px; }
+  .hito h2 { font-size: 18px; margin: 0 0 4px; }
+  .suave { color: #5d6678; font-size: 13px; }
+  .tarea { border: 1px solid #e3e6ee; border-radius: 8px; padding: 10px 12px; margin-top: 10px; background: #fff; }
+  .tarea.hecha { background: #f3f8f3; border-color: #cfe3cf; }
+  .tarea.falta { background: #fff6f4; border-color: #f0c9bf; }
+  .fila { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .texto { font-size: 15px; }
+  .hecha .texto { color: #4b6b4b; }
+  .accion { font-size: 11px; background: #e7edf8; color: #2b4a7a; border-radius: 8px; padding: 1px 7px; font-weight: 600; }
+  .donde { font-size: 14px; color: #333; }
+  .botones { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  button { font: inherit; cursor: pointer; }
+  .boton { background: #1f4e79; color: #fff; border: 0; border-radius: 6px; padding: 5px 11px; font-size: 13px; }
+  .boton.claro { background: #fff; color: #1f4e79; border: 1px solid #1f4e79; }
+  .enlace { background: none; border: 0; color: #1f4e79; text-decoration: underline; padding: 0; font-size: 13px; }
+  .menu-b { background: none; border: 0; font-size: 18px; color: #667; padding: 0 4px; }
+  .menu { position: absolute; right: 0; top: 24px; background: #fff; border: 1px solid #ccd; border-radius: 6px; box-shadow: 0 4px 12px #0002; z-index: 5; min-width: 130px; }
+  .menu button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 12px; font-size: 14px; }
+  .menu button:hover { background: #eef2f8; }
+  .rel { position: relative; }
+  .resumen { font-size: 13px; color: #35603a; margin-top: 4px; }
+  .falta-nota { font-size: 13px; color: #9a3a1f; margin-top: 4px; }
+  .como { margin-top: 6px; font-size: 13px; }
+  .como ol { margin: 4px 0 0 18px; padding: 0; }
+  .pie { margin-top: 6px; }
+  .form { margin-top: 8px; display: grid; gap: 6px; }
+  .form label { font-size: 12px; font-weight: 600; color: #444; }
+  input, select, textarea { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid #c8cdd8; border-radius: 6px; width: 100%; }
+  textarea { min-height: 70px; }
+  .capa { position: fixed; inset: 0; background: #0006; display: none; align-items: flex-start; justify-content: center; padding-top: 8vh; z-index: 10; }
+  .capa.ver { display: flex; }
+  .ventana { background: #fff; border-radius: 10px; width: min(480px, 94vw); padding: 18px 20px; max-height: 84vh; overflow: auto; }
+  .ventana h3 { margin: 0 0 4px; font-size: 17px; }
+  .ventana .form { margin-top: 12px; }
+  .ventana .pasos { background: #f4f6fa; border-radius: 6px; padding: 8px 12px; font-size: 14px; }
+  .ventana .pasos ol { margin: 4px 0 0 18px; padding: 0; }
+  .acciones-v { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .radios { display: flex; gap: 14px; font-size: 14px; }
+  .radios label { font-weight: 400; font-size: 14px; display: flex; gap: 4px; align-items: center; }
+  .radios input { width: auto; }
+  .bloque summary { font-weight: 600; cursor: pointer; padding: 4px 0; }
+  .registro { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; }
+  .registro li { padding: 6px 0; border-top: 1px solid #eef0f4; }
+  .registro .cuando { color: #667; }
+  .nuevo { background: #fffbe6; }
+  .nota-prueba { font-size: 12px; color: #667; padding: 0 20px 20px; }
+</style>
+</head>
+<body>
+<div class="aviso">Pantalla de prueba del tema 665 · datos inventados · nada se guarda</div>
+
+<div class="cab">
+  <span class="etq">BAJA MATRICULA</span>
+  <span class="etq" style="background:#fff">A26-0041</span>
+  <h1>Ortega Ruiz, Lucía 2100153</h1>
+</div>
+
+<div class="cuerpo">
+  <div class="caja hito">
+    <h2>Tramitar la baja</h2>
+    <div class="suave">Hito actual · En curso · Sin plazo</div>
+    <div id="tareas"></div>
+    <div style="margin-top:10px"><button class="boton claro" type="button" disabled>+ Añadir tarea</button></div>
+  </div>
+
+  <div>
+    <details class="caja bloque" open>
+      <summary>📝 Registro</summary>
+      <ul class="registro" id="registro">
+        <li><span class="cuando">12-nov-2026 09:14 · Francisco</span> — Asunto creado.</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<div class="nota-prueba">Las tareas no tienen casilla: se marcan con su botón o con «No aplica». Lo que se apunta sale en el Registro de la derecha. «Cómo se hace» se escribe en «Cambiar» (menú ⋮ de la tarea).</div>
+
+<div class="capa" id="capa"><div class="ventana" id="ventana"></div></div>
+
+<script>
+var HOY = '2026-11-14';
+var USUARIO = 'Francisco';
+var A_QUIEN = ['Lucía Ortega Ruiz (la alumna)', 'Familia: Ana Ruiz Gil (madre)', 'Tutor/a: Pedro Marín', 'Dirección', 'Jefatura de Estudios', 'Secretaría'];
+var ZONAS_ARCHIVO = ['Expediente del alumno', 'Expediente del alumno · Archivador 1º Bachillerato', 'Archivo del centro', 'Archivo del centro · Armario 2', 'Archivo del centro · Sótano, estantería B'];
+
+var tareas = [
+  { id: 't1', texto: 'Grabar la baja en Séneca con su fecha', accion: 'seneca', etq: 'Grabar o cambiar datos', donde: 'Séneca · Alumnado',
+    como: 'Alumnado › Matrícula › Matriculación\nBuscar a la alumna por su NIE\nPestaña «Datos de matrícula» › «Fecha de baja»\nGuardar y comprobar que sale «Baja»' },
+  { id: 't2', texto: 'Comprobar que trae la documentación necesaria', accion: 'comprobar', etq: 'Comprobar', donde: 'En mano',
+    como: 'Solicitud firmada por quien tenga la tutela legal\nDNI de quien firma\nSi se traslada, el certificado de matrícula del nuevo centro' },
+  { id: 't3', texto: 'Recoger la solicitud firmada', accion: 'recoger', etq: 'Recoger', donde: 'En mano', quien: 'Familia: Ana Ruiz Gil (madre)', como: '' },
+  { id: 't4', texto: 'Entregar el certificado de baja', accion: 'entregar', etq: 'Entregar', donde: 'En mano', quien: 'Familia: Ana Ruiz Gil (madre)', como: '' },
+  { id: 't5', texto: 'Publicar la lista en el tablón', accion: 'publicar', etq: 'Publicar', donde: 'Tablón', como: '' },
+  { id: 't6', texto: 'Cobrar el seguro escolar', accion: 'cobrar', etq: 'Cobrar o pagar', donde: 'En mano', como: '' },
+  { id: 't7', texto: 'Archivar en el expediente del alumno o alumna', accion: 'archivar', etq: 'Archivar', donde: 'Expediente del alumno', como: '' }
+];
+
+var BOTON = { seneca: 'Grabado', entregar: 'Entregado', recoger: 'Recogido', publicar: 'Publicado', cobrar: 'Apuntar cobro o pago', archivar: 'Archivado' };
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function fecha(f) { if (!f) return ''; var m = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; var p = f.split('-'); return (+p[2]) + '-' + m[+p[1] - 1] + '-' + p[0]; }
+function pasosHTML(t) { var l = (t.como || '').split('\n').filter(function (x) { return x.trim(); }); return l.length ? '<ol>' + l.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' : ''; }
+function porId(id) { return tareas.filter(function (t) { return t.id === id; })[0]; }
+function hora() { var d = new Date(); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+function registrar(texto) {
+  var li = document.createElement('li'); li.className = 'nuevo';
+  li.innerHTML = '<span class="cuando">' + fecha(HOY) + ' ' + hora() + ' · ' + USUARIO + '</span> — ' + esc(texto);
+  document.getElementById('registro').appendChild(li);
+}
+
+function pintar() {
+  document.getElementById('tareas').innerHTML = tareas.map(function (t) {
+    var clase = 'tarea' + (t.hecho ? ' hecha' : '') + (t.noaplica ? ' hecha' : '') + (t.falta && !t.hecho ? ' falta' : '');
+    var botones = '';
+    if (!t.hecho && !t.noaplica) {
+      if (t.accion === 'comprobar') botones = '<button class="boton" data-b="bien" data-id="' + t.id + '">Está bien</button><button class="boton claro" data-b="falta" data-id="' + t.id + '">Falta algo</button>';
+      else botones = '<button class="boton" data-b="abrir" data-id="' + t.id + '">' + BOTON[t.accion] + '</button>';
+    }
+    var menu = '<span class="rel"><button class="menu-b" data-b="menu" data-id="' + t.id + '">⋮</button>' +
+      (t.menu ? '<div class="menu">' + (t.hecho || t.noaplica ? '<button data-b="deshacer" data-id="' + t.id + '">Deshacer</button>' : '') +
+      '<button data-b="anotar" data-id="' + t.id + '">Anotar</button><button data-b="cambiar" data-id="' + t.id + '">Cambiar</button><button disabled style="color:#999">Borrar</button></div>' : '') + '</span>';
+    var resumen = t.hecho ? '<div class="resumen">✔ ' + esc(t.resumen) + '</div>' : (t.noaplica ? '<div class="resumen">No aplica · ' + fecha(HOY) + ' · ' + USUARIO + '</div>' : '');
+    var falta = (!t.hecho && t.falta) ? '<div class="falta-nota">Falta: ' + esc(t.falta) + ' <span class="suave">(' + fecha(t.faltaFecha) + ' · ' + USUARIO + ')</span></div>' : '';
+    var como = t.como && !t.editando ? '<details class="como"><summary>Cómo se hace</summary>' + pasosHTML(t) + '</details>' : '';
+    var form = t.editando ? '<div class="form">' +
+      '<label>Nombre</label><input value="' + esc(t.texto) + '" disabled>' +
+      '<label>Qué se hace</label><input value="' + esc(t.etq) + '" disabled>' +
+      '<label>Dónde se hace</label><input value="' + esc(t.donde) + '" disabled>' +
+      ((t.accion === 'entregar' || t.accion === 'recoger') ? '<label>' + (t.accion === 'entregar' ? 'A quién' : 'De quién') + '</label><select id="f-quien">' + ['', 'Tercero', 'Familia', 'Relacionado', 'Tutor/a', 'Dirección', 'Jefatura de Estudios', 'Secretaría'].map(function (x) { return '<option' + ((t.quienGuia || '') === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select>' : '') +
+      '<label>Cómo se hace (un paso por línea; opcional)</label><textarea id="f-como" placeholder="Por ejemplo: Alumnado › Matrícula › Matriculación">' + esc(t.como) + '</textarea>' +
+      '<div class="acciones-v"><button class="boton" data-b="guardar-cambio" data-id="' + t.id + '">Guardar</button><button class="enlace" data-b="cancelar-cambio" data-id="' + t.id + '">Cancelar</button></div></div>' : '';
+    var pie = (!t.hecho && !t.noaplica) ? '<div class="pie"><button class="enlace" data-b="noaplica" data-id="' + t.id + '">No aplica</button></div>' : '';
+    var notas = (t.notas || []).map(function (n) { return '<div class="suave">📌 ' + esc(n) + '</div>'; }).join('');
+    return '<div class="' + clase + '"><div class="fila"><span class="texto">' + esc(t.texto) + '</span><span class="accion">' + esc(t.etq) + '</span><span class="donde">' + esc(t.donde) + '</span>' +
+      '<span class="botones">' + botones + menu + '</span></div>' + resumen + falta + notas + como + form + pie + '</div>';
+  }).join('');
+}
+
+function cerrar() { document.getElementById('capa').classList.remove('ver'); }
+function ventana(html) { document.getElementById('ventana').innerHTML = html; document.getElementById('capa').classList.add('ver'); }
+function opciones(lista, elegida) { return '<option value=""></option>' + lista.map(function (x) { return '<option' + (x === elegida ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); }
+function pie(id) { return '<div class="acciones-v"><button class="boton" data-b="confirmar" data-id="' + id + '">Guardar y marcar hecha</button><button class="enlace" data-b="cerrar">Cancelar</button></div>'; }
+
+function abrir(t) {
+  var cab = '<h3>' + esc(t.texto) + '</h3><div class="suave">' + esc(t.etq) + ' · ' + esc(t.donde) + ' · todo es opcional</div>';
+  var nota = '<label>Nota</label><input id="v-nota">';
+  var f = '<label>Fecha</label><input type="date" id="v-fecha" value="' + HOY + '">';
+  if (t.accion === 'seneca') {
+    ventana(cab + (t.como ? '<div class="form"><label>Cómo se hace</label><div class="pasos">' + pasosHTML(t) + '</div><div><button class="enlace" data-b="copiar" data-id="' + t.id + '">Copiar los pasos</button> <span class="suave" id="copiado"></span></div></div>' : '<div class="form suave">La guía no dice cómo se hace. Se puede escribir en «Cambiar».</div>') +
+      '<div class="form">' + f + nota + '</div>' + pie(t.id));
+  } else if (t.accion === 'entregar' || t.accion === 'recoger') {
+    ventana(cab + '<div class="form"><label>' + (t.accion === 'entregar' ? 'A quién se entrega' : 'De quién se recoge') + '</label><select id="v-quien">' + opciones(A_QUIEN, t.quien) + '</select>' + f + nota + '</div>' + pie(t.id));
+  } else if (t.accion === 'publicar') {
+    ventana(cab + '<div class="form"><div class="dos"><div><label>Publicado el</label><input type="date" id="v-fecha" value="' + HOY + '"></div><div><label>Expuesto hasta</label><input type="date" id="v-hasta"></div></div><div class="suave">Ese día la app avisa en Inicio.</div>' + nota + '</div>' + pie(t.id));
+  } else if (t.accion === 'cobrar') {
+    ventana(cab + '<div class="form"><div class="radios"><label><input type="radio" name="cp" value="Cobro" checked> Cobro</label><label><input type="radio" name="cp" value="Pago"> Pago</label></div>' +
+      '<div class="dos"><div><label>Importe (€)</label><input id="v-importe" inputmode="decimal" placeholder="0,00"></div><div><label>Forma</label><select id="v-forma">' + opciones(['Efectivo', 'Tarjeta', 'Transferencia']) + '</select></div></div>' + f + nota + '</div>' + pie(t.id));
+  } else if (t.accion === 'archivar') {
+    ventana(cab + '<div class="form"><label>Dónde queda el papel</label><select id="v-zona">' + opciones(ZONAS_ARCHIVO, t.donde) + '</select><div><button class="enlace" type="button" data-b="sitios">Ver todos los sitios…</button> <span class="suave" id="sitios-msg"></span></div>' +
+      '<label>Detalle</label><input id="v-detalle" placeholder="Por ejemplo: caja 2025-26">' + f + nota + '</div>' + pie(t.id));
+  }
+}
+
+function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+function confirmar(t) {
+  var fch = val('v-fecha') || HOY, nota = val('v-nota'), r = '';
+  if (t.accion === 'seneca') r = 'Grabado en Séneca';
+  if (t.accion === 'entregar') r = 'Entregado' + (val('v-quien') ? ' a ' + val('v-quien') : '');
+  if (t.accion === 'recoger') r = 'Recogido' + (val('v-quien') ? ' de ' + val('v-quien') : '');
+  if (t.accion === 'publicar') r = 'Publicado' + (val('v-hasta') ? ' hasta el ' + fecha(val('v-hasta')) + ' (aviso ese día)' : '');
+  if (t.accion === 'cobrar') { var cp = document.querySelector('input[name=cp]:checked').value; r = cp + (val('v-importe') ? ' de ' + val('v-importe') + ' €' : '') + (val('v-forma') ? ' · ' + val('v-forma') : ''); }
+  if (t.accion === 'archivar') r = 'Archivado' + (val('v-zona') ? ' en ' + val('v-zona') : '') + (val('v-detalle') ? ' · ' + val('v-detalle') : '');
+  r += ' · ' + fecha(fch) + ' · ' + USUARIO + (nota ? ' · ' + nota : '');
+  t.hecho = true; t.resumen = r;
+  registrar(t.texto + ': ' + r);
+  cerrar(); pintar();
+}
+
+document.addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-b]');
+  if (ev.target.id === 'capa') { cerrar(); return; }
+  var habia = false;
+  tareas.forEach(function (x) { if (x.menu && !(b && (b.closest('.menu') || (b.dataset.b === 'menu' && b.dataset.id === x.id)))) { x.menu = false; habia = true; } });
+  if (!b) { if (habia) pintar(); return; }
+  var t = porId(b.dataset.id), q = b.dataset.b;
+  if (q === 'menu') { t.menu = !t.menu; pintar(); return; }
+  if (t) t.menu = false;
+  if (q === 'abrir') abrir(t);
+  else if (q === 'cerrar') cerrar();
+  else if (q === 'confirmar') confirmar(t);
+  else if (q === 'copiar') {
+    var txt = (t.como || '');
+    try { navigator.clipboard.writeText(txt).then(function () { document.getElementById('copiado').textContent = 'Copiado'; }, function () { document.getElementById('copiado').textContent = 'Copiado'; }); } catch (e) { document.getElementById('copiado').textContent = 'Copiado'; }
+  }
+  else if (q === 'sitios') document.getElementById('sitios-msg').textContent = '(abre la ventana «Sitios», donde se crean las zonas del archivo)';
+  else if (q === 'bien') { t.hecho = true; t.resumen = 'Está bien · ' + fecha(HOY) + ' · ' + USUARIO; registrar(t.texto + ': está bien'); pintar(); }
+  else if (q === 'falta') {
+    ventana('<h3>' + esc(t.texto) + '</h3><div class="suave">Comprobar · la tarea sigue sin hacer</div><div class="form"><label>Qué falta o qué está mal</label><input id="v-falta" value="' + esc(t.falta || '') + '"></div>' +
+      '<div class="acciones-v"><button class="boton" data-b="guardar-falta" data-id="' + t.id + '">Guardar</button><button class="enlace" data-b="cerrar">Cancelar</button></div>');
+  }
+  else if (q === 'guardar-falta') { t.falta = val('v-falta'); t.faltaFecha = HOY; if (t.falta) registrar(t.texto + ': falta ' + t.falta); cerrar(); pintar(); }
+  else if (q === 'noaplica') { t.noaplica = true; registrar(t.texto + ': no aplica'); pintar(); }
+  else if (q === 'deshacer') { t.hecho = false; t.noaplica = false; t.resumen = ''; registrar(t.texto + ': se deshace la marca'); pintar(); }
+  else if (q === 'anotar') {
+    ventana('<h3>Anotar</h3><div class="form"><input id="v-anota"></div><div class="acciones-v"><button class="boton" data-b="guardar-anota" data-id="' + t.id + '">Guardar</button><button class="enlace" data-b="cerrar">Cancelar</button></div>');
+  }
+  else if (q === 'guardar-anota') { var n = val('v-anota'); if (n) { (t.notas = t.notas || []).push(n); } cerrar(); pintar(); }
+  else if (q === 'cambiar') { t.editando = true; pintar(); }
+  else if (q === 'cancelar-cambio') { t.editando = false; pintar(); }
+  else if (q === 'guardar-cambio') {
+    t.como = document.getElementById('f-como').value; var fq = document.getElementById('f-quien');
+    if (fq) { t.quienGuia = fq.value; var m = { 'Tercero': A_QUIEN[0], 'Familia': A_QUIEN[1], 'Tutor/a': A_QUIEN[2], 'Dirección': 'Dirección', 'Jefatura de Estudios': 'Jefatura de Estudios', 'Secretaría': 'Secretaría' }; t.quien = m[fq.value] || ''; }
+    t.editando = false; pintar();
+  }
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrar(); });
+pintar();
+</script>
+</body>
+</html>
