@@ -56,13 +56,18 @@ async function lineasDelRegistro() {
 
 console.log('--- la tarea «Llamar por teléfono» ---');
 await pagina.click('.tcd-abrir-form');
-await comprobar('«Llamar por teléfono» es la última opción de «Qué se hace» al añadir una tarea', pagina.evaluate(() => {
+await comprobar('«Llamar por teléfono» va detrás de «Copiar» en «Qué se hace» al añadir una tarea', pagina.evaluate(() => {
   const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
-  return o[o.length - 1];
-}), 'Llamar por teléfono');
+  return o[o.length - 6];
+}), 'Llamar por teléfono');   // fila 651: detrás van las cinco que solo clasifican
+await comprobar('fila 651: las cinco acciones nuevas van al final de «Qué se hace», en orden, y «Otra cosa» no sale como «Sin acción»', pagina.evaluate(() => {
+  const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
+  return [o.slice(-5), o.indexOf('Otra cosa') !== -1, o.some((x) => /Sin acción/.test(x)),
+    ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar', 'zzz'].map((v) => Comunes.accionValida(v))];
+}), [['En Séneca', 'Entregar o recoger en mano', 'Publicar', 'Cobrar o pagar', 'Comprobar'], true, false, ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar', '']]);
 await pagina.click('.tcd-cancelar-form');
-await comprobar('«Llamar por teléfono» es la última de GuiasGuion.ACCIONES y sale en las listas comunes', pagina.evaluate(() => [
-  GuiasGuion.ACCIONES[GuiasGuion.ACCIONES.length - 1].texto, Comunes.textoDeHace('llamar')]), ['Llamar por teléfono', 'Llamar por teléfono']);
+await comprobar('«Llamar por teléfono» va detrás de «Copiar» en GuiasGuion.ACCIONES y sale en las listas comunes', pagina.evaluate(() => [
+  GuiasGuion.ACCIONES[GuiasGuion.ACCIONES.length - 6].texto, Comunes.textoDeHace('llamar')]), ['Llamar por teléfono', 'Llamar por teléfono']);
 await anadirTarea(NOMBRE_TAREA);
 await comprobar('la tarea nueva: etiqueta, botón con el icono (sin texto) y «Sin llamadas todavía»', pagina.evaluate((n) => {
   const t = [...document.querySelectorAll('.guion-paso')].filter((x) => x.querySelector('.guion-paso-texto').textContent === n)[0];

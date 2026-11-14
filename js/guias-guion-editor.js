@@ -48,7 +48,8 @@
     if (g.accion === 'anadir') return 'Añadir un documento';
     if (g.accion === 'copiar') return 'Copiar a otra carpeta' + (r.carpeta ? ' · ' + r.carpeta : '');   /* fila 552 */
     if (g.accion === 'pedir') return 'Pedir datos' + (r.campos && r.campos.length ? ' · ' + r.campos.length + (r.campos.length === 1 ? ' campo' : ' campos') : '');   /* fila 530 */
-    return 'Sin acción';
+    var nueva = ['seneca', 'entregar', 'publicar', 'cobrar', 'comprobar'].indexOf(g.accion) !== -1 ? textoDe(ACCIONES, g.accion) : '';   /* fila 651 */
+    return nueva || 'Otra cosa';
   }
 
   function filaHTML(g, dentro) {

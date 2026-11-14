@@ -39,7 +39,7 @@
 var GuiasGuion = (function () {
 
   var ACCIONES = [
-    { valor: '', texto: 'Sin acción (se marca a mano)' },
+    { valor: '', texto: 'Otra cosa' },
     { valor: 'generar', texto: 'Generar un documento' },
     { valor: 'firmar', texto: 'Firmar un documento' },
     { valor: 'registrar', texto: 'Registrar un documento' },
@@ -47,7 +47,13 @@ var GuiasGuion = (function () {
     { valor: 'anadir', texto: 'Añadir un documento' },
     { valor: 'pedir', texto: 'Pedir datos' },   /* fila 530 */
     { valor: 'copiar', texto: 'Copiar a otra carpeta' },   /* fila 552 */
-    { valor: 'llamar', texto: 'Llamar por teléfono' }   /* fila 639: la última */
+    { valor: 'llamar', texto: 'Llamar por teléfono' },   /* fila 639 */
+    /* Fila 651: las cinco últimas solo clasifican; se marcan a mano. */
+    { valor: 'seneca', texto: 'En Séneca' },
+    { valor: 'entregar', texto: 'Entregar o recoger en mano' },
+    { valor: 'publicar', texto: 'Publicar' },
+    { valor: 'cobrar', texto: 'Cobrar o pagar' },
+    { valor: 'comprobar', texto: 'Comprobar' }   /* fila 651: la última */
   ];
 
   var A_QUIEN = [

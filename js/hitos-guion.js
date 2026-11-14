@@ -65,7 +65,7 @@
   var I = Hitos._guionInterno = Hitos._guionInterno || {};
   function quien() { return I.quien.apply(this, arguments); }
 
-  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir', 'copiar', 'llamar'];   /* fila 523: firmar; fila 530: pedir; fila 639: llamar */
+  var ACCIONES = ['generar', 'firmar', 'registrar', 'comunicar', 'anadir', 'pedir', 'copiar', 'llamar', 'seneca', 'entregar', 'publicar', 'cobrar', 'comprobar'];   /* fila 523: firmar; fila 530: pedir; fila 639: llamar; fila 651: las cinco que solo clasifican */
 
   function tipoDe(a) {
     return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
