@@ -2,6 +2,7 @@
    «+ Añadir hito» con su ventana, crear ahí mismo, «Para», «Cambiar», la propuesta de Mantenimiento y el editor de la guía.
    Copia de pruebas (demo), Chromium real: el disco es falso, nunca se tocan datos reales. */
 import { chromium } from 'playwright';
+import { AYUDANTES } from './apoyo/comunes-asunto-viejo.mjs';
 
 const BASE = process.env.DIRECCION || 'http://localhost:8123/index.html';
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
@@ -21,6 +22,7 @@ await p.goto(BASE + '?demo=1&auto=1');
 await p.waitForSelector('#franja-demo', { timeout: 30000 });
 await p.waitForTimeout(2500);
 
+await p.evaluate(AYUDANTES);   /* fila 660: la ventana ya no se abre desde un asunto */
 const esperar = (ms) => p.waitForTimeout(ms);
 const hay = (sel) => p.evaluate((s) => !!document.querySelector(s), sel);
 
@@ -48,7 +50,7 @@ console.log('(prueba con los tipos ' + dosTipos.join(' y ') + ')');
 
 /* ------------------------------------------------------------------ */
 console.log('--- 1. añadir una tarea de la lista, y crear una nueva ahí mismo ---');
-await p.evaluate(async () => { const a = window.__asunto('__a'); ComunesAsunto.anadirTarea(a, await window.__hito('__a')); });
+await p.evaluate(async () => { const a = window.__asunto('__a'); window.__anadirTarea(a, await window.__hito('__a')); });
 await p.waitForSelector('.capa-campos #cv-crear');
 await comprobar('la ventana trae «Para» con las dos opciones y la lista vacía', p.evaluate(() => [
   [...document.querySelectorAll('#cv-para option')].map((o) => o.value), document.querySelectorAll('.comunes-fila').length, document.querySelector('#cv-centro').textContent.indexOf('No hay ninguna tarea') !== -1]), [['guia', 'aqui'], 0, true]);
@@ -67,7 +69,7 @@ await comprobar('1a. «Crear y añadir» (para la guía) deja la tarea en la lis
 }), [[['Firmar por la Dirección', 'firmar']], true, [['Firmar por la Dirección', 'firmar']], true]);
 await comprobar('1b. la tarea sale ya en el asunto', p.evaluate(async () => (await window.__lineas('__a')).filter((x) => x[1]).map((x) => x[0])), ['Firmar por la Dirección']);
 
-await p.evaluate(async () => ComunesAsunto.anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
+await p.evaluate(async () => window.__anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
 await p.waitForSelector('#cv-buscar');
 await comprobar('2a. la línea dice en cuántos tipos se usa; el grupo «Poner a la firma» cuenta 1', p.evaluate(() => [document.querySelector('.comunes-fila').textContent, [...document.querySelectorAll('.campos-grupo')].filter((g) => g.textContent.indexOf('Poner a la firma') === 0).map((g) => g.textContent)]),
   ['Firmar por la Direcciónse usa en 1 tipo', ['Poner a la firma1']]);
@@ -104,7 +106,7 @@ await comprobar('4b. «Solo este asunto» no toca la guía y deja la tarea solo 
 /* Fila 539: lo creado «solo este asunto» ya no entra en la lista; las pruebas de abajo la necesitan, así que se añade aparte. */
 await p.evaluate(async () => { const g = (await window.__hito('__a')).guionPropio.filter((x) => x.texto === 'Generar la resolución de baja')[0]; await ComunesGuardado.anadir('tareas', { nombre: 'Generar la resolución de baja', accion: 'generar', receta: g.receta }); });
 
-await p.evaluate(async () => ComunesAsunto.anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
+await p.evaluate(async () => window.__anadirTarea(window.__asunto('__a'), await window.__hito('__a')));
 await p.waitForSelector('#cv-crear');
 await p.selectOption('#cv-para', 'aqui');
 await p.click('#cv-crear');
@@ -171,7 +173,7 @@ await comprobar('6f. sin repartir: no se ha añadido ninguna tarea extra a los a
 
 /* ------------------------------------------------------------------ */
 console.log('--- 3. añadir un hito de la lista ---');
-await p.evaluate(async () => ComunesAsunto.anadirHito(window.__asunto('__a'), await window.__hito('__a')));
+await p.evaluate(async () => window.__anadirHito(window.__asunto('__a'), await window.__hito('__a')));
 await p.waitForSelector('#cv-crear');
 await comprobar('7a. la ventana de hitos no tiene grupos y dice que no hay ninguno', p.evaluate(() => [document.querySelectorAll('.campos-grupo').length, document.querySelector('#cv-centro').textContent.indexOf('ningún hito') !== -1]), [0, true]);
 await p.click('#cv-crear');
@@ -195,7 +197,7 @@ await comprobar('7d. y llega al asunto, con sus tareas', p.evaluate(async () => 
 }), [1, ['Firmar por la Dirección del centro', 'Generar la resolución de baja']]);
 
 const guiaA = await p.evaluate(() => JSON.stringify(window.__guiaDe(window.__a.tipo)));
-await p.evaluate(async () => ComunesAsunto.anadirHito(window.__asunto('__b'), await window.__hito('__b')));
+await p.evaluate(async () => window.__anadirHito(window.__asunto('__b'), await window.__hito('__b')));
 await p.waitForSelector('.comunes-fila');
 await p.selectOption('#cv-para', 'aqui');
 await p.click('.comunes-fila');
@@ -264,7 +266,7 @@ await comprobar('11b. elegir un hito de la lista lo mete en la guía, con «Camb
 await comprobar('11c. sus tareas llevan «Cambiar la tarea» y la marca de la lista', p.evaluate(() => [!!document.querySelector('.guion-fila[data-comun]'), !!document.querySelector('.comunes-cambiar-tarea'), !!document.querySelector('.comunes-anadir-tarea-guia')]), [true, true, true]);
 await p.click('.comunes-anadir-tarea-guia:visible');
 await p.waitForSelector('.comunes-fila');
-await comprobar('11d. «+ Añadir una tarea de la lista» abre la ventana de tareas', p.evaluate(() => [document.querySelector('.capa-campos h3').textContent, document.querySelectorAll('.comunes-fila').length >= 2]), ['Elegir una tarea', true]);
+await comprobar('11d. «+ Añadir una tarea de la lista» abre la ventana de tareas', p.evaluate(() => [document.querySelector('.capa-campos h3').textContent, document.querySelectorAll('.comunes-fila').length >= 2]), ['Tareas de la lista', true]);
 await p.keyboard.press('Escape');
 await p.click('#cuadro-cancelar');
 await p.evaluate(() => window.__fin);
