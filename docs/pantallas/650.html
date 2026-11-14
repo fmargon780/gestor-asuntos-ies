@@ -82,6 +82,10 @@ main{padding:22px 28px}
 .elegido{background:var(--azul-claro);border-radius:8px;padding:8px 12px;margin-bottom:12px}
 .paso-tit{font-size:13px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.03em;margin:4px 0 8px}
 .nota-ok{position:fixed;right:20px;bottom:20px;background:var(--verde);border:1px solid var(--verde-linea);border-radius:10px;padding:10px 14px;max-width:420px;z-index:60}
+.sitios-2col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.sitio{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--linea);border-radius:8px;margin-bottom:5px;cursor:pointer;background:#fff;width:100%;text-align:left}
+.sitio.zona{margin-left:26px;width:calc(100% - 26px)}
+.sitio.activo{border-color:var(--azul);background:var(--azul-claro);font-weight:600}
 .oculto{display:none!important}
 </style>
 </head>
@@ -92,6 +96,7 @@ main{padding:22px 28px}
     <option value="nuevo">un tipo nuevo (guía con solo «Tramitar · Esperar respuesta»)</option>
     <option value="hecho">un tipo con su guía hecha</option>
   </select></label>
+  <button class="boton peque" id="aj-sitios">Ajustes → Sitios</button>
   <button class="boton peque" id="reiniciar">Volver a empezar</button>
 </div>
 <main>
@@ -121,16 +126,25 @@ main{padding:22px 28px}
     </div>
   </div>
 </div>
+<div class="capa oculto" id="capa2" style="z-index:55">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-label="Sitios">
+    <div class="cuadro-cab"><h3>Sitios: dónde se hacen las tareas</h3><button class="boton" id="s-cerrar">Cerrar</button></div>
+    <div class="cuadro-cuerpo"><div class="sitios-2col"><div id="s-mapa"></div><div id="s-panel"></div></div></div>
+  </div>
+</div>
 <div class="nota-ok oculto" id="nota"></div>
 
 <script>
 var FASES=[['recibir','Recibir'],['pedir','Pedir'],['comprobar','Comprobar'],['elaborar','Generar documento'],['firma','Poner a la firma'],['publicar','Publicar'],['enviar','Enviar o entregar'],['seneca','Grabar o cambiar datos'],['cobrar','Cobrar o pagar'],['esperar','Esperar'],['archivar','Archivar']];
 var ACC=[['generar','Generar documento'],['firmar','Poner a la firma'],['registrar','Registrar'],['comunicar','Enviar'],['anadir','Añadir documento'],['pedir','Rellenar datos del asunto'],['copiar','Copiar a otra carpeta'],['llamar','Llamar'],['seneca','Grabar o cambiar datos'],['entregar','Entregar'],['recoger','Recoger'],['publicar','Publicar'],['cobrar','Cobrar o pagar'],['comprobar','Comprobar'],['','Otra cosa']];
-var DONDE=['Séneca · Alumnado','Séneca · Personal','Séneca · Registro','Séneca · Documentos','Séneca · Ventanilla Electrónica','iPasen','Correo electrónico','Correo postal','Teléfono','En mano','Tablón','Expediente del alumno','Archivo del centro','En esta app','Otro sitio'];
-function dondeDe(a){return {registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',recoger:'En mano',publicar:'Tablón',comunicar:'Correo electrónico',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'}[a]||''}
+var MAPA=[{n:'Séneca',z:['Alumnado','Personal','Registro','Documentos','Ventanilla Electrónica']},{n:'iPasen',z:[]},{n:'Correo electrónico',z:[]},{n:'Correo postal',z:[]},{n:'Teléfono',z:[]},{n:'En mano',z:[]},{n:'Tablón',z:[]},{n:'Expediente del alumno',z:[]},{n:'Archivo del centro',z:[]},{n:'En esta app',z:[]}];
+function listaDonde(){var l=[];MAPA.forEach(function(x){l.push(x.n);x.z.forEach(function(z){l.push(x.n+' · '+z)})});return l}
+var DONDE=listaDonde();
+var DEF={registrar:'Séneca · Registro',seneca:'Séneca · Alumnado',llamar:'Teléfono',entregar:'En mano',recoger:'En mano',publicar:'Tablón',comunicar:'Correo electrónico',cobrar:'En mano',generar:'En esta app',anadir:'En esta app',pedir:'En esta app',copiar:'En esta app'};
+function dondeDe(a){return DEF[a]||''}
 /* «Qué se hace» se busca escribiendo, también por el sitio: cada acción con sus sitios habituales. Por dentro son dos datos. */
 var SITIOS={generar:['En esta app'],registrar:['Séneca · Registro'],comunicar:['Correo electrónico','iPasen','Correo postal','En mano'],anadir:['En esta app'],pedir:['En esta app'],copiar:['En esta app'],llamar:['Teléfono'],seneca:['Séneca · Alumnado','Séneca · Personal'],entregar:['En mano'],recoger:['En mano'],publicar:['Tablón'],cobrar:['En mano'],comprobar:['En mano','Séneca · Alumnado']};
-var QUE=[];ACC.forEach(function(x){var l=SITIOS[x[0]]||[];if(!l.length)QUE.push({t:x[1],a:x[0],d:''});l.forEach(function(d){QUE.push({t:x[1]+' · '+d,a:x[0],d:d})})});
+var QUE=[];function hacerQUE(){QUE=[];ACC.forEach(function(x){var l=SITIOS[x[0]]||[];if(!l.length)QUE.push({t:x[1],a:x[0],d:''});l.forEach(function(d){QUE.push({t:x[1]+' · '+d,a:x[0],d:d})})})}hacerQUE();
 var PLANT_DOC=['Certificado de matrícula','Certificado de estudios','Propuesta de resolución','Recibí de la taquilla'];
 var PLANT_CORREO=['Envío de documento al solicitante','Aviso a la familia','Petición de documentación'];
 var TIPOS_DOC=['Solicitud','Certificado','Resolución','Justificante de pago','Recibí'];
@@ -265,7 +279,7 @@ function elegirTarea(hueco,op){
   hueco.innerHTML='<div class="form-tarea">'+
     '<div class="fila"><div class="campo"><label>Qué se hace</label><input data-x="acc" list="'+dl+'a" placeholder="Escribe qué o dónde: «correo», «llamar»…" autocomplete="off"><datalist id="'+dl+'a">'+QUE.map(function(e){return '<option value="'+esc(e.t)+'">'}).join('')+'</datalist></div>'+
     '<div class="campo oculto" data-x="sobre-c"><label data-x="sobre-et"></label><input data-x="sobre" list="'+dl+'s" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'s"></datalist></div>'+
-    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><input data-x="donde" list="'+dl+'d" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'d">'+DONDE.map(function(d){return '<option value="'+esc(d)+'">'}).join('')+'</datalist></div></div>'+
+    '<div class="campo oculto" data-x="donde-c"><label>Dónde se hace</label><input data-x="donde" list="'+dl+'d" placeholder="Escribe para buscar…" autocomplete="off"><datalist id="'+dl+'d">'+DONDE.map(function(d){return '<option value="'+esc(d)+'">'}).join('')+'</datalist><button type="button" class="enlace" data-x="ver-sitios" style="text-align:left">Ver todos los sitios…</button></div></div>'+
     '<div class="comunes oculto" data-x="comunes"></div>'+
     '<div class="fila oculto" data-x="nombre-c"><div class="campo" style="flex:2"><label>Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label><input data-x="nombre"></div></div>'+
     '<div data-x="aviso"></div>'+
@@ -281,6 +295,8 @@ function elegirTarea(hueco,op){
   q('sobre').oninput=function(){var so=sobreDe(st.a);st.s=so&&so.ops.indexOf(this.value)>=0?this.value:'';refrescar()};
   q('sobre').onfocus=q('donde').onfocus=function(){this.select()};
   q('donde').oninput=function(){st.d=DONDE.indexOf(this.value)>=0?this.value:'';refrescar()};
+  function ponDl(){hueco.querySelector('#'+dl+'d').innerHTML=DONDE.map(function(o){return '<option value="'+esc(o)+'">'}).join('')}
+  q('ver-sitios').onclick=function(){abrirSitios(function(d){ponDl();q('donde').value=d;st.d=d;refrescar()},function(){ponDl();if(DONDE.indexOf(st.d)<0){st.d='';q('donde').value='';refrescar()}})};
   q('nombre').oninput=function(){st.nombre=this.value;st.tocado=true;q('aviso').innerHTML='';comprobarListo()};
   if(q('cancelar'))q('cancelar').onclick=op.alCancelar;
   if(q('anadir'))q('anadir').onclick=function(){intentar()};
@@ -411,6 +427,81 @@ function hitoNuevo(l){
       return;
     }
     meterHito({t:nombre,f:V.f,ta:[{n:tarea.n,a:tarea.a,d:tarea.d}]});
+  }
+}
+/* La ventana «Sitios»: el mapa de lo que hay (sitio y sus zonas, con cuántas tareas lo usan) y, al lado, cambiar, borrar o crear. */
+var S={};
+function normS(x){return x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim()}
+function usos(d){return TAREAS.filter(function(t){return t.d===d}).length}
+function nTareas(n){return n===0?'ninguna tarea':n===1?'1 tarea':n+' tareas'}
+function completo(i,j){return j==null?MAPA[i].n:MAPA[i].n+' · '+MAPA[i].z[j]}
+function reemplazar(v,n){TAREAS.forEach(function(t){if(t.d===v)t.d=n});E.hitos.forEach(function(h){h.ta.forEach(function(t){if(t.d===v)t.d=n})});
+  Object.keys(DEF).forEach(function(k){if(DEF[k]===v){if(n)DEF[k]=n;else delete DEF[k]}});
+  Object.keys(SITIOS).forEach(function(k){var l=[];SITIOS[k].forEach(function(x){x=x===v?n:x;if(x&&l.indexOf(x)<0)l.push(x)});SITIOS[k]=l})}
+function alDia(){DONDE=listaDonde();hacerQUE()}
+function abrirSitios(alElegir,alCerrar){S={sel:null,modo:'',alElegir:alElegir||null,alCerrar:alCerrar||null};pintarSitios();document.getElementById('capa2').classList.remove('oculto')}
+function cerrarSitios(){document.getElementById('capa2').classList.add('oculto');if(S.alCerrar)S.alCerrar();else if(!S.alElegir)pintar()}
+document.getElementById('s-cerrar').onclick=cerrarSitios;
+document.getElementById('aj-sitios').onclick=function(){abrirSitios()};
+function pintarSitios(){
+  var m=document.getElementById('s-mapa'),pn=document.getElementById('s-panel');
+  m.innerHTML='<div class="paso-tit">Lo que hay</div>'+MAPA.map(function(x,i){
+    return '<button class="sitio'+(S.modo==='ver'&&S.sel.i===i&&S.sel.j==null?' activo':'')+'" data-s="'+i+'"><span>'+esc(x.n)+'</span><span class="etq">'+nTareas(usos(x.n))+'</span></button>'+
+      x.z.map(function(z,j){return '<button class="sitio zona'+(S.modo==='ver'&&S.sel.i===i&&S.sel.j===j?' activo':'')+'" data-s="'+i+'" data-z="'+j+'"><span>'+esc(z)+'</span><span class="etq">'+nTareas(usos(completo(i,j)))+'</span></button>'}).join('')}).join('')+
+    '<div style="margin-top:10px"><button class="boton" id="s-nuevo">+ Sitio nuevo</button></div>';
+  m.querySelectorAll('.sitio').forEach(function(b){b.onclick=function(){S.sel={i:+b.dataset.s,j:b.dataset.z==null?null:+b.dataset.z};S.modo='ver';pintarSitios()}});
+  document.getElementById('s-nuevo').onclick=function(){S.modo='nuevo';pintarSitios()};
+  if(S.modo==='ver')panelVer(pn);else if(S.modo==='nuevo')panelNuevo(pn);
+  else pn.innerHTML='<div class="vacio">Pulsa un sitio para '+(S.alElegir?'usarlo en la tarea, ':'')+'cambiarle el nombre o borrarlo. Si no está el que buscas, «+ Sitio nuevo».</div>';
+}
+function panelVer(pn){
+  var i=S.sel.i,j=S.sel.j,x=MAPA[i],full=completo(i,j),esZona=j!=null;
+  var todos=esZona?[full]:[x.n].concat(x.z.map(function(z,k){return completo(i,k)}));
+  var n=todos.reduce(function(a,d){return a+usos(d)},0);
+  pn.innerHTML='<div class="paso-tit">'+(esZona?'Zona de '+esc(x.n):'Sitio')+'</div><div class="form-tarea" style="margin-top:0">'+
+    (S.alElegir?'<div class="fila"><button class="boton primario" id="s-usar">Usar «'+esc(full)+'» en la tarea</button></div>':'')+
+    '<div class="fila"><div class="campo"><label>Nombre</label><input id="s-n" value="'+esc(esZona?x.z[j]:x.n)+'"></div><button class="boton" id="s-guardar">Guardar el nombre</button></div>'+
+    '<div class="donde">Lo usa'+(n===1?'':'n')+' '+nTareas(n)+(!esZona&&x.z.length?', contando sus '+x.z.length+' zonas':'')+'. Si cambias el nombre, cambia en todas.</div>'+
+    '<div class="fila" style="margin:12px 0 0"><button class="boton peque" id="s-borrar">Borrar</button></div><div id="s-aviso"></div></div>';
+  if(S.alElegir)document.getElementById('s-usar').onclick=function(){var f=S.alElegir;f(full);cerrarSitios()};
+  document.getElementById('s-guardar').onclick=function(){
+    var nn=document.getElementById('s-n').value.trim();if(!nn)return;
+    if(esZona)x.z[j]=nn;else x.n=nn;
+    var nuevos=esZona?[completo(i,j)]:[x.n].concat(x.z.map(function(z,k){return completo(i,k)}));
+    todos.forEach(function(v,k){if(v!==nuevos[k])reemplazar(v,nuevos[k])});alDia();pintarSitios();nota('Nombre cambiado en el sitio y en '+nTareas(n)+'.')};
+  document.getElementById('s-borrar').onclick=function(){
+    var av=document.getElementById('s-aviso'),resto=DONDE.filter(function(d){return todos.indexOf(d)<0});
+    av.innerHTML='<div class="aviso">'+(n?'«'+esc(full)+'» lo usa'+(n===1?'':'n')+' '+nTareas(n)+'. Para borrarlo, pásala'+(n===1?'':'s')+' antes a: <select id="s-dest">'+resto.map(function(d){return '<option>'+esc(d)+'</option>'}).join('')+'</select>':'¿Borrar «'+esc(full)+'»? No lo usa ninguna tarea.')+
+      '<div class="botones"><button class="boton primario peque" id="s-b-ok">'+(n?'Pasar y borrar':'Borrar')+'</button><button class="boton peque" id="s-b-no">Cancelar</button></div></div>';
+    document.getElementById('s-b-no').onclick=function(){av.innerHTML=''};
+    document.getElementById('s-b-ok').onclick=function(){var dest=n?document.getElementById('s-dest').value:'';
+      todos.forEach(function(v){reemplazar(v,dest)});if(esZona)x.z.splice(j,1);else MAPA.splice(i,1);
+      alDia();S.modo='';S.sel=null;pintarSitios();nota('«'+full+'» borrado'+(n?'; sus tareas pasan a «'+dest+'».':'.'))};
+  };
+}
+function panelNuevo(pn){
+  pn.innerHTML='<div class="paso-tit">Sitio nuevo</div><div class="form-tarea" style="margin-top:0">'+
+    '<div class="fila"><label><input type="radio" name="s-tipo" value="sitio" checked> Es un sitio nuevo</label></div>'+
+    '<div class="fila"><label><input type="radio" name="s-tipo" value="zona"> Es una zona de un sitio que ya existe:</label> <select id="s-padre">'+MAPA.map(function(x,i){return '<option value="'+i+'">'+esc(x.n)+'</option>'}).join('')+'</select></div>'+
+    '<div class="fila"><div class="campo"><label>Nombre</label><input id="s-nn" placeholder="Por ejemplo: Sede electrónica"></div></div>'+
+    '<div id="s-aviso"></div><div class="fila" style="margin:0"><button class="boton primario peque" id="s-crear">Crear</button><button class="boton peque" id="s-n-no">Cancelar</button></div>'+
+    (S.alElegir?'<div class="donde">Al crearlo queda elegido en la tarea.</div>':'')+'</div>';
+  document.getElementById('s-padre').onchange=function(){pn.querySelector('[value="zona"]').checked=true};
+  document.getElementById('s-n-no').onclick=function(){S.modo='';pintarSitios()};
+  document.getElementById('s-crear').onclick=function(){crear(false)};
+  function crear(forzar){
+    var nn=document.getElementById('s-nn').value.trim();if(!nn)return;
+    var zona=pn.querySelector('[name="s-tipo"]:checked').value==='zona',pi=+document.getElementById('s-padre').value,a=normS(nn),par=null;
+    MAPA.forEach(function(x,i){var c=[[x.n,null]].concat(x.z.map(function(z,k){return [z,k]}));c.forEach(function(e){var b=normS(e[0]);if(!par&&(a===b||(a.length>3&&b.length>3&&(a.indexOf(b)>=0||b.indexOf(a)>=0))))par={i:i,j:e[1]}})});
+    if(par&&!forzar){
+      document.getElementById('s-aviso').innerHTML='<div class="aviso">Se parece a <b>«'+esc(completo(par.i,par.j))+'»</b>, que ya existe.<div class="botones"><button class="boton primario peque" id="s-ir">Ir a ese</button><button class="boton peque" id="s-igual">Crear el mío igualmente</button></div></div>';
+      document.getElementById('s-ir').onclick=function(){S.sel=par;S.modo='ver';pintarSitios()};
+      document.getElementById('s-igual').onclick=function(){crear(true)};return;
+    }
+    var sel;if(zona){MAPA[pi].z.push(nn);sel={i:pi,j:MAPA[pi].z.length-1}}else{MAPA.push({n:nn,z:[]});sel={i:MAPA.length-1,j:null}}
+    alDia();var full=completo(sel.i,sel.j);
+    if(S.alElegir){var f=S.alElegir;f(full);cerrarSitios();nota('Sitio «'+full+'» creado y elegido en la tarea.')}
+    else{S.sel=sel;S.modo='ver';pintarSitios();nota('Sitio «'+full+'» creado.')}
   }
 }
 document.getElementById('interruptor').onclick=function(){E.marca=!E.marca;pintar()};
