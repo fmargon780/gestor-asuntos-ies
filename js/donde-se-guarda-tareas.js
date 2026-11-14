@@ -193,6 +193,7 @@ window.DondeSeGuardaTareas = (function () {
             if (!l) return false;
             l.lista[l.i].texto = texto;
             aplicarExtras(l.lista[l.i], extras);
+            delete l.lista[l.i].comun;   /* fila 660: cambiada desde el asunto, ya no es la de la lista común */
           },
           /* Fila 405: una pregunta con texto «solo aquí» vuelve a seguir a la guía. */
           despues: g.pregunta ? function () { return Hitos.cambiarPreguntaAqui(a.nombre, h.id, g.id, ''); } : null,
@@ -209,6 +210,7 @@ window.DondeSeGuardaTareas = (function () {
           if (!l) return false;
           l.lista[l.i].texto = texto;
           aplicarExtras(l.lista[l.i], extras);
+          delete l.lista[l.i].comun;
         },
         despues: function () {
           return editarAqui(a, h, function (x) {

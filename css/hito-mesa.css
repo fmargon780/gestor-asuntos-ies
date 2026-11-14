@@ -322,3 +322,7 @@ details.mesa-normativa > summary { cursor: pointer; }
   border: 0; border-bottom: 3px solid transparent; padding: 5px 10px; background: #eef2f6; color: var(--azul);
 }
 .mesa-tira-anadir:hover { background: #e3eefb; }
+
+/* Fila 660: la fase del hito, debajo de su nombre en la fila de hitos y al principio de su línea. */
+.mesa-tira-fase { display: block; font-size: 11px; font-weight: 400; opacity: .75; }
+.mesa-linea-fase { font-size: 13px; }

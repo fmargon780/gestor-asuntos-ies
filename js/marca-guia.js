@@ -64,6 +64,9 @@ var MarcaGuia = (function () {
     if (!caja) return;
     if (!abierto || !aplica(a)) { caja.innerHTML = ''; return; }
     var t = tipoDe(a), on = valor(a);
+    /* «Después, cada asunto recuerda cómo la dejó quien lo usa»: el valor de nacimiento se guarda la primera vez que se ve, para que no cambie solo
+       cuando la guía cambie (por ejemplo, al crear el primer hito de un tipo nuevo). */
+    if (a && a.ficha && typeof a.ficha.marcaGuia !== 'boolean' && !(window.SoloConsulta && SoloConsulta.activo())) poner(a, on).catch(function () { /* se recalcula la próxima vez */ });
     caja.innerHTML = '<label class="interruptor marca-guia-interruptor"><input type="checkbox" class="marca-guia-casilla"' + (on ? ' checked' : '') + '>' +
       '<span>Los cambios en hitos y tareas van también a la guía</span></label>' +
       ' <span class="marca-guia-tipo suave">de ' + esc(window.DondeSeGuarda ? DondeSeGuarda.nombreCortoDe(t) : t) + '</span>' +

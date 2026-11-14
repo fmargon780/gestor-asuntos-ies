@@ -154,6 +154,18 @@ await p.waitForSelector('.anadir-hito-capa', { state: 'detached' });
 await p.waitForTimeout(1000);
 await comprobar('4o. «Añadirlo otra vez» lo añade', nHitos(), n0 + 1);
 
+const tituloAbierto = await p.$eval('.hito-en-mesa .mesa-titulo', (e) => e.textContent);
+await comprobar('4q. la fase del hito se ve debajo de su nombre en la fila de hitos y en su línea («Fase: Archivar»)', (async () => {
+  await p.waitForTimeout(800);
+  const enFila = await p.$$eval('#ficha-tira .mesa-tira-hito', (l) => l.map((b) => [b.firstChild.textContent.replace(/^\d+\.\s*/, '').trim(), (b.querySelector('.mesa-tira-fase') || {}).textContent || '']).filter((x) => x[0] === 'Guardar el expediente 660'));
+  await p.locator('#ficha-tira .mesa-tira-hito', { hasText: 'Guardar el expediente 660' }).first().click();
+  await p.waitForSelector('.hito-en-mesa .mesa-linea-fase');
+  const linea = await p.$eval('.hito-en-mesa .mesa-linea-fase', (e) => e.textContent);
+  await p.locator('#ficha-tira .mesa-tira-hito', { hasText: tituloAbierto }).first().click();
+  await p.waitForTimeout(600);
+  return [enFila[0], linea];
+})(), [['Guardar el expediente 660', 'Archivar'], 'Fase: Archivar']);
+await comprobar('4r. el valor de nacimiento de la marca se guarda la primera vez que se ve (no cambia solo con la guía)', p.evaluate(() => typeof Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1)[0].ficha.marcaGuia), 'boolean');
 console.log('--- 4b. cambiar, borrar y mover siguen la marca; ya no hay «Pasar a la guía» ---');
 const opcionesMenu = async (sel) => { await p.click(sel); await p.waitForSelector('.ficha-menu:not(.oculto) .ficha-menu-opcion'); const o = await p.$$eval('.ficha-menu:not(.oculto) .ficha-menu-opcion', (l) => l.map((x) => x.textContent.trim())); return o; };
 const cerrarMenu = () => p.keyboard.press('Escape');
@@ -163,7 +175,7 @@ await cerrarMenu();
 await comprobar('4f. el menú «Hito ▾» no trae «Pasar a la guía» y sí «Cambiar» y «Borrar»', [hOpc.indexOf('Pasar a la guía') === -1, hOpc.indexOf('Cambiar') !== -1, hOpc.indexOf('Borrar') !== -1], [true, true, true]);
 const tOpc = await opcionesMenu('.guion-paso:has(.guion-paso-texto:text-is("Preparar el escrito 660")) .guion-tarea-menu-boton');
 await cerrarMenu();
-await comprobar('4g. el «⋮» de una tarea trae Subir, Bajar y Borrar, y no «Pasar a la guía»', [tOpc.indexOf('Pasar a la guía') === -1, ['Subir', 'Bajar', 'Borrar'].every((x) => tOpc.indexOf(x) !== -1)], [true, true]);
+await comprobar('4g. el «⋮» de una tarea trae Subir, Bajar, Cambiar y Borrar, y no «Pasar a la guía» ni «Cambiar la tarea»', [tOpc.indexOf('Pasar a la guía') === -1, tOpc.indexOf('Cambiar la tarea') === -1, ['Subir', 'Bajar', 'Cambiar', 'Borrar'].every((x) => tOpc.indexOf(x) !== -1)], [true, true, true]);
 await comprobar('4h. con la marca encendida, «Cambiar» el hito dice a dónde irá y, al guardar, cambia la guía', (async () => {
   const antesH = await guiaHitos();
   await p.click('.hito-en-mesa .mesa-mas'); await p.waitForSelector('.ficha-menu:not(.oculto)');

@@ -153,15 +153,9 @@ var HitoMesaTareaMenu = (function () {
     var lista = moverOpciones(a, h, g).concat([
       { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
     ]);
-    if (g.comun && window.ComunesCambiar && window.MarcaGuia && MarcaGuia.enGuia(a)) {   /* fila 531: una tarea de la lista común se cambia en todas las guías; fila 660: con la marca de la guía apagada, solo aquí */
-      lista.push({ texto: 'Cambiar la tarea', clase: 'mesa-comun-cambiar', alPulsar: async function () {
-        try {
-          var t = Comunes.buscar((await ComunesGuardado.leer()).tareas, g.comun);
-          if (!t) { U.aviso('Esta tarea ya no está en la lista de tareas.', 'ambar'); return; }
-          ComunesCambiar.tarea(t, { claveActual: a.nombre });
-        } catch (err) { U.fallo('No he podido leer la lista', err); }
-      } });
-    } else lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
+    /* Fila 660: «Cambiar» es el mismo formulario para todas las tareas (js/anadir-tarea.js) y dice a dónde irá. Una tarea de la lista común que se
+       cambia aquí deja de ser la de la lista (el cambio de la lista entera se hace en Ajustes, en la guía del tipo). */
+    lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
     lista.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', alPulsar: function () { borrar(a, h, g); } });
     if (!g.propio) {
       lista.push({ texto: 'Abrir en la guía', deshabilitado: !HitoMesaGuion.puedeAnadirALaGuia(a, h),

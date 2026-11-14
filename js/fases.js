@@ -10,6 +10,7 @@
      Fases.todas()              [{ id, nombre, fija }] (las fijas en su orden y luego las del centro)
      Fases.texto(id)            el nombre que se ve ('' si no existe)
      Fases.existe(id)
+     Fases.deHito(asunto, hito)  la fase de un hito del asunto (la de su hito común), para la fila de hitos y la línea del hito
      Fases.parecidas(nombre)    las que se parecen (mismo nombre, o con palabras largas en común)
      Fases.cargar() / Fases.anadir(nombre)
    ============================================================ */
@@ -73,6 +74,18 @@ var Fases = (function () {
     });
   }
 
+  /* La fase de un hito del asunto: la del hito común del que viene ('' si no viene de la lista o no tiene fase). */
+  var alDiaHecho = false;
+  function deHito(a, h) {
+    if (!alDiaHecho) {   /* una vez: lee la lista y las fases del centro y repinta para que la fase salga */
+      alDiaHecho = true;
+      Promise.all([cargar(), ComunesGuardado.leer()]).then(function () { if (window.HitosPanel) HitosPanel.programarRepintado(); }).catch(function () { /* sin fase */ });
+    }
+    var id = window.ComunesAsunto ? ComunesAsunto.hitoComunDe(a, h) : '';
+    var hc = id ? Comunes.buscar(ComunesGuardado.enMemoria().hitos, id) : null;
+    return hc && hc.fase ? texto(hc.fase) : '';
+  }
+
   /* ---------- Ajustes → El centro → «Fases» ---------- */
 
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
@@ -116,6 +129,6 @@ var Fases = (function () {
     if (ev.target && ev.target.id === 'bloque-fases' && ev.target.open) alAbrirAjustes();
   }, true);
 
-  return { todas: todas, texto: texto, existe: existe, parecidas: parecidas, cargar: cargar, anadir: anadir, normalizar: normalizar, pintarAjustes: pintarAjustes };
+  return { todas: todas, texto: texto, existe: existe, deHito: deHito, parecidas: parecidas, cargar: cargar, anadir: anadir, normalizar: normalizar, pintarAjustes: pintarAjustes };
 })();
 window.Fases = Fases;

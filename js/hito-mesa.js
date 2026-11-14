@@ -211,7 +211,8 @@ var HitoMesa = (function () {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
-          (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') + '</button>';
+          (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') +
+          (window.Fases && Fases.deHito(a, x) ? '<small class="mesa-tira-fase">' + U.escapar(Fases.deHito(a, x)) + '</small>' : '') + '</button>';   /* fila 660: la fase, debajo */
       }).join('') +
         /* Fila 553: «+ Añadir hito», al final de la fila. */
         (abierto && window.AnadirHito ? '<button type="button" class="mesa-tira-anadir comunes-anadir-hito">+ Añadir hito</button>' : '');
