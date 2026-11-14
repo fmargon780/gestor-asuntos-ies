@@ -135,7 +135,8 @@ var HitoMesaTareaMenu = (function () {
       return function () {
         Hitos.moverGuion(a, h.id, g.clave, delta).then(function () {
           /* Fila 660: con la marca de la guía encendida, el orden nuevo va también a la guía (sin franja ni pregunta). */
-          if (!g.propio && window.MarcaGuia && MarcaGuia.enGuia(a) && HitoMesaGuion.puedeAnadirALaGuia(a, h)) return Hitos.guardarOrdenEnLaGuia(a, h);
+          if (g.propio || !window.MarcaGuia || !MarcaGuia.enGuia(a) || !HitoMesaGuion.puedeAnadirALaGuia(a, h)) return null;
+          return Hitos.hitosDe(a.nombre).then(function (hitos) { return Hitos.guardarOrdenEnLaGuia(a, Hitos.buscar(hitos, h.id) || h); });
         }).then(function () {
           if (window.HitosPanel) HitosPanel.programarRepintado();
         }).catch(function (err) { U.fallo('No he podido mover la tarea', err); });

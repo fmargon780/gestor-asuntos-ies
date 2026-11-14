@@ -39,9 +39,9 @@ const NOMBRE_TAREA = 'Llamar a la familia';
 const tarea = (nombre) => pagina.locator('.guion-paso', { has: pagina.locator('.guion-paso-texto', { hasText: nombre }) });
 async function anadirTarea(nombre) {
   await pagina.click('.tcd-abrir-form');
-  await pagina.fill('#guion-nueva-tarea', nombre);
-  await pagina.selectOption('.tcd-accion', 'llamar');
-  await pagina.click('.tcd-anadir');
+  await pagina.fill('.tcd-nueva .at-nombre', nombre);
+  await pagina.fill('.tcd-nueva .at-que', 'Llamar · Teléfono');
+  await pagina.click('.tcd-nueva .at-anadir');
   await pagina.waitForSelector('.guion-paso:has(.guion-paso-texto:text-is("' + nombre + '"))');
 }
 async function ventanaAbierta() { await pagina.waitForSelector('.ll-capa .ll-cuadro', { timeout: 8000 }); await pagina.waitForSelector('.ll-per', { timeout: 8000 }); }
@@ -56,16 +56,14 @@ async function lineasDelRegistro() {
 
 console.log('--- la tarea «Llamar» ---');
 await pagina.click('.tcd-abrir-form');
-await comprobar('«Llamar» va en «Qué se hace» al añadir una tarea, antes de las que solo clasifican', pagina.evaluate(() => {
-  const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
-  return o[o.indexOf('Grabar o cambiar datos') - 1];
-}), 'Llamar');   // fila 651: detrás van las que solo clasifican (fila 659: sin «Copiar», que no sale aquí)
-await comprobar('fila 651 (nombres de la 659): las acciones que solo clasifican van al final de «Qué se hace», en orden, y «Otra cosa» no sale como «Sin acción»', pagina.evaluate(() => {
-  const o = [...document.querySelectorAll('.tcd-accion option')].map((x) => x.textContent);
+await comprobar('«Llamar» sale entre las opciones de «Qué se hace» al añadir una tarea (se busca escribiendo)', pagina.evaluate(() =>
+  [...document.querySelectorAll('.tcd-nueva datalist option')].map((x) => x.value).indexOf('Llamar · Teléfono') !== -1), true);
+await comprobar('fila 651 (nombres de la 659, buscador de la 660): salen las acciones que solo clasifican, en orden, y «Otra cosa» no sale como «Sin acción»', pagina.evaluate(() => {
+  const o = [...document.querySelectorAll('.tcd-nueva datalist option')].map((x) => x.value.split(' · ')[0]).filter((x, i, l) => l.indexOf(x) === i);
   return [o.slice(-8, -1), o.indexOf('Otra cosa') !== -1, o.some((x) => /Sin acción/.test(x)),
     ['seneca', 'entregar', 'recoger', 'publicar', 'cobrar', 'comprobar', 'archivar', 'zzz'].map((v) => Comunes.accionValida(v))];
 }), [['Grabar o cambiar datos', 'Entregar', 'Recoger', 'Publicar', 'Cobrar o pagar', 'Comprobar', 'Archivar'], true, false, ['seneca', 'entregar', 'recoger', 'publicar', 'cobrar', 'comprobar', 'archivar', '']]);
-await pagina.click('.tcd-cancelar-form');
+await pagina.click('.tcd-nueva .at-cancelar');
 await comprobar('«Llamar» va detrás de «Copiar» en GuiasGuion.ACCIONES y sale en las listas comunes', pagina.evaluate(() => [
   GuiasGuion.ACCIONES[GuiasGuion.ACCIONES.map((x) => x.valor).indexOf('copiar') + 1].texto, Comunes.textoDeHace('llamar')]), ['Llamar', 'Llamar']);
 await anadirTarea(NOMBRE_TAREA);

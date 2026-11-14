@@ -65,7 +65,8 @@ var HitoMesaNuevaTarea = (function () {
     var abrir = caja.querySelector('.tcd-abrir-form');
     if (abrir) {
       if (consulta()) { abrir.disabled = true; abrir.setAttribute('data-motivo-clave', 'consulta'); }
-      abrir.onclick = function () {
+      abrir.onclick = async function () {
+        try { await ComunesGuardado.leer(); } catch (e) { /* sin la lista, sin sus tareas */ }   /* para montar el formulario sin esperas */
         abiertos[h.id] = true;
         repintar();
         var q = document.querySelector('.tcd-nueva .at-que');
@@ -74,16 +75,13 @@ var HitoMesaNuevaTarea = (function () {
     }
     var hueco = caja.querySelector('.tcd-nueva .at-hueco');
     if (hueco) {
-      ComunesGuardado.leer().then(function (listas) {
-        if (!hueco.isConnected || !abiertos[h.id]) return;
-        AnadirTarea.montar(hueco, {
-          modo: 'nueva', botones: true, comunes: listas.tareas, inicial: formas[h.id],
-          alCambiar: function (res) { formas[h.id] = res; },
-          alUsar: function (t) { usar(a, h, t).then(function (ok) { if (!ok) { abiertos[h.id] = true; repintar(); } }); },
-          alAnadir: function (res) { crear(a, h, res).then(function (ok) { if (!ok) { abiertos[h.id] = true; repintar(); } }); },
-          alCancelar: function () { cerrar(h.id, repintar); }
-        });
-      }).catch(function (e) { U.fallo('No he podido leer la lista de tareas', e); });
+      AnadirTarea.montar(hueco, {
+        modo: 'nueva', botones: true, comunes: ComunesGuardado.enMemoria().tareas, inicial: formas[h.id],
+        alCambiar: function (res) { formas[h.id] = res; },
+        alUsar: function (t) { usar(a, h, t).then(function (ok) { if (!ok) { abiertos[h.id] = true; repintar(); } }); },
+        alAnadir: function (res) { crear(a, h, res).then(function (ok) { if (!ok) { abiertos[h.id] = true; repintar(); } }); },
+        alCancelar: function () { cerrar(h.id, repintar); }
+      });
     }
     if (window.ComunesAsunto) ComunesAsunto.enganchar(caja, a, h);
   }

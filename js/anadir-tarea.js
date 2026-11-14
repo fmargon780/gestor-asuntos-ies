@@ -118,17 +118,17 @@ var AnadirTarea = (function () {
     var n = ++contador, comunes = op.comunes || [], nueva = op.modo !== 'cambiar';
     var ini = op.inicial || {};
     var st = { elegida: ini.elegida !== undefined ? !!ini.elegida : (ini.accion !== undefined), accion: ini.accion || '', receta: ini.receta || null, donde: ini.donde || null,
-      tipoDocumento: ini.tipoDocumento || '', aQuien: ini.aQuien || '', nombre: ini.nombre || '', tocado: !!ini.nombre, comun: null };
+      tipoDocumento: ini.tipoDocumento || '', aQuien: ini.aQuien || '', nombre: ini.nombre || '', tocado: ini.tocado !== undefined ? !!ini.tocado : !!ini.nombre, comun: null };
     var lista = entradas(comunes);
     var textoInicial = st.elegida ? (textoDe(st.accion) + (Sitios.dondeDe(st) ? ' · ' + Sitios.textoDe(Sitios.datos(), Sitios.dondeDe(st)) : '')) : '';
 
     hueco.innerHTML = '<div class="at-form">' +
-      '<label class="dato"><span class="etiqueta">Qué se hace</span><input type="text" class="campo at-que" list="at-que-' + n + '" value="' + esc(textoInicial) + '" ' +
+      '<label class="dato"><span class="etiqueta">Qué se hace</span><input type="text" class="campo at-que" data-clave="at-que" list="at-que-' + n + '" value="' + esc(textoInicial) + '" ' +
         'placeholder="Escribe qué o dónde: «correo», «llamar»…" autocomplete="off"></label>' +
       '<datalist id="at-que-' + n + '">' + lista.map(function (e) { return '<option value="' + esc(e.texto) + '"></option>'; }).join('') + '</datalist>' +
       '<div class="at-sobre"></div><div class="at-donde"></div>' +
       (nueva ? '<div class="at-comunes"></div><label class="dato at-nombre-fila"><span class="etiqueta">Nombre de la tarea (te lo propone la app; puedes cambiarlo)</span>' +
-        '<input type="text" class="campo at-nombre" autocomplete="off"></label><div class="at-aviso"></div>' : '') +
+        '<input type="text" class="campo at-nombre" data-clave="at-nombre" autocomplete="off"></label><div class="at-aviso"></div>' : '') +
       (op.botones ? '<div class="tcd-botones"><button type="button" class="boton boton-chico boton-principal at-anadir" disabled>Añadir</button>' +
         '<button type="button" class="boton boton-chico at-cancelar">Cancelar</button></div>' : '') +
       '</div>';
