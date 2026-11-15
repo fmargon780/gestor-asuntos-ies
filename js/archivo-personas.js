@@ -390,7 +390,7 @@ App.verAsuntosDeTercero = async function (p) {
     var nAbiertos = salida.filter(function (x) { return x.donde === 'Abierto'; }).length;
     var nArchivados = salida.length - nAbiertos;
     resumenAsuntos.textContent = salida.length
-      ? nAbiertos + (nAbiertos === 1 ? ' abierto' : ' abiertos') + ' · ' + nArchivados + (nArchivados === 1 ? ' archivado' : ' archivados')
+      ? nAbiertos + (nAbiertos === 1 ? ' abierto' : ' abiertos') + ' · ' + nArchivados + (nArchivados === 1 ? ' cerrado' : ' cerrados')
       : 'ninguno';
   }
 
