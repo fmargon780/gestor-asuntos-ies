@@ -11,12 +11,6 @@ de la fila.
 
 Lo de abajo son **solo** las reglas propias de esta app.
 
-**Qué fila se coge** (27-sep-2026, cambiado el 1-oct-2026): la primera **DEVUELTA o PENDIENTE**,
-en el orden de la cola. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o
-«todas»), la misma conversación las hace de una en una, cada una completa (EN CURSO, revisor,
-publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila nueva mira
-`docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
-
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
 sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cuenta y nivelar
@@ -73,16 +67,17 @@ ese código y lanza un agente aparte, con contexto limpio (sin ver el código ni
 por Playwright en `http://localhost:<puerto>/?demo=1&auto=1` y pasa la lista «Cómo lo comprueba el
 segundo revisor» de la instrucción (en las instrucciones antiguas, «Cómo sabemos que está bien»),
 con el guion fijo de `docs/REVISOR-GUION.md` (fila 242). Un punto
-**[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
-`docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
+que el revisor no puede ver queda «no lo he podido ver» (`docs/METODO-COMUN.md` 6.2), se copia a
+`docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. Un paso que solo puede
+dar Francisco (pegar código, dar un permiso) no va ahí: es una fila «paso de Francisco»
+(`docs/METODO-COMUN.md` 9). **APROBADA**: se
 publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
 `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; nada pasa a esperar su revisión ni existe el estado
 EN EL PAQUETE). **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
-desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
-con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El
-siguiente lanzamiento coge la primera DEVUELTA o PENDIENTE en el orden de la cola (Francisco decide el orden completo); DEVUELTA dos
-lanzamientos seguidos pasa a BLOQUEADA. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **BLOQUEADA**
+con «ATASCO PARA CLAUDE» y el informe (`docs/METODO-COMUN.md` 6.3; nunca DEVUELTA, que solo lo pone
+Francisco), `main` no se toca, y la sesión para. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 **Vercel no publica nada solo** (11-oct-2026, `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Ninguna subida a GitHub crea una
 publicación. Una tarea que cambia la app publica **una sola vez, a propósito**, cuando su código ya está en `main`: herramienta `create_deployment` de Vercel con `teamId` `team_gnCjBLTS8m8PNTFVUf7ST0uN`, `name` y `project` `gestor-de-asuntos`, `target` `production` y `gitSource` `{ type: github, org: fmargon780, repo: gestor-asuntos-ies, ref: main }`; después `get_deployment` hasta `READY` y comprobar la dirección publicada. Las subidas de solo documentos no publican y no hay nada que comprobar. Si responde 402 no se reintenta. Nunca se vuelve a encender la publicación automática ni se añade un `ignoreCommand`: las publicaciones canceladas también cuentan en el tope de 100 al día de toda la cuenta.
