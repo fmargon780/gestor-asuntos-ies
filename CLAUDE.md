@@ -68,12 +68,11 @@ que pueden correr dos tandas a la vez.
 publica nada.
 
 **El revisor** (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223): antes de tocar
-`main`, cada tarea PENDIENTE lleva su sección «Cómo sabemos que está bien» (si una fila anterior a
-la 223 no la tiene, la sesión la escribe al cogerla, a partir del propio documento). Con el cambio
-hecho en la rama de la fila, la propia sesión arranca un servidor local con ese código y lanza un
-agente aparte, con contexto limpio (sin ver el código ni el diff), que entra por Playwright en
-`http://localhost:<puerto>/?demo=1&auto=1` y pasa esa lista, con el guion fijo de
-`docs/REVISOR-GUION.md` (fila 242). Un punto
+`main`, con el cambio hecho en la rama de la fila, la propia sesión arranca un servidor local con
+ese código y lanza un agente aparte, con contexto limpio (sin ver el código ni el diff), que entra
+por Playwright en `http://localhost:<puerto>/?demo=1&auto=1` y pasa la lista «Cómo lo comprueba el
+segundo revisor» de la instrucción (en las instrucciones antiguas, «Cómo sabemos que está bien»),
+con el guion fijo de `docs/REVISOR-GUION.md` (fila 242). Un punto
 **[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
 publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
@@ -129,15 +128,13 @@ la fila en `main`, nunca HECHA, lo diga la web o no.
 2. **La hora de `App.VERSION` la pone el programa** (`node scripts/poner-version.mjs`, fila 549),
    nunca a mano ni a ojo: el 17-sep-2026 y el 6-nov-2026 salieron versiones con horas por delante
    de la real.
-3. **Antes de subir nada, vuelve a bajar `main`** (`git fetch`): marcar la fila EN CURSO no basta,
-   y subir sin releer pisa lo de otro. Hazlo justo antes de cada subida.
-4. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
+3. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
    contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se quedó
    en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más. Después de subir, vuelve a bajar
    lo subido y compruébalo.
-5. **Si delegas una fila de documentación en una sesión auxiliar**, pídele que lea el fichero
+4. **Si delegas una fila de documentación en una sesión auxiliar**, pídele que lea el fichero
    entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El 19-sep-2026 una
    sesión auxiliar retipeó tres ficheros e introdujo erratas en los tres.
-6. **Novedades visibles** (fila 248, `docs/NOVEDADES-AL-RECARGAR.md`). Al terminar una fila que
+5. **Novedades visibles** (fila 248, `docs/NOVEDADES-AL-RECARGAR.md`). Al terminar una fila que
    cambia algo que se ve en pantalla, añade su línea al principio de `js/novedades.js` en el mismo
    commit del código. Si la fila no cambia nada visible, no se añade.

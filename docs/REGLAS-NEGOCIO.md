@@ -1,7 +1,7 @@
 # Reglas del negocio del Gestor de Asuntos
 
-Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las contradiga
-(`docs/METODO-FICHA.md`, «Reglas del negocio»). Cada una con su fecha y de dónde sale.
+Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las contradiga.
+Cada una con su fecha y de dónde sale.
 
 ## Guías
 
