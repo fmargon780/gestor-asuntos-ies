@@ -11,13 +11,16 @@
    Lo apuntado vive en la tarea del asunto: `guionHecho[id].hechoCon = { fecha, aQuien, nota, texto }` (`texto`, la línea verde
    ya compuesta) y `guionHecho[id].falta = { texto, quien, cuando }`. `Hitos.guionDe` los da como `hechoCon` y `faltaAlgo`.
    Aquí, el texto, los botones, la línea bajo la tarea, «Cómo se hace» y lo que se hace al pulsar; lo guarda
-   js/hitos-guion-marcar.js. La fila 672 amplía `Comunes.ACCIONES_CON_VENTANA`.
+   js/hitos-guion-marcar.js. Fila 672 (docs/672-ACCIONES-QUE-HACEN-ALGO-2.md): también «Publicar» («Publicado»: publicado el y expuesto
+   hasta, con un aviso en Inicio ese día, js/avisos-exposicion.js), «Cobrar o pagar» («Apuntar cobro o pago»: cobro o pago, importe y
+   forma) y «Archivar» («Archivado»: dónde queda el papel, de los sitios y zonas, y un detalle). `hechoCon` gana `hasta`, `cobroPago`,
+   `importe` (número), `forma`, `donde` ({ sitio, zona } por id) y `detalle`.
    ============================================================ */
 var TareaHecha = (function () {
 
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   /* El botón de cada acción (las tres primeras abren su ventana; «Comprobar» tiene dos). */
-  var BOTON = { seneca: 'Grabado', entregar: 'Entregado', recoger: 'Recogido' };
+  var BOTON = { seneca: 'Grabado', entregar: 'Entregado', recoger: 'Recogido', publicar: 'Publicado', cobrar: 'Apuntar cobro o pago', archivar: 'Archivado' };
   var VERBO = { seneca: 'Grabado', entregar: 'Entregado', recoger: 'Recogido' };
 
   function esc(t) { return U.escapar(t == null ? '' : String(t)); }
@@ -32,9 +35,29 @@ var TareaHecha = (function () {
     return parseInt(p[2], 10) + '-' + MESES[parseInt(p[1], 10) - 1] + '-' + p[0];
   }
 
+  /* 1,12 → «1,12 €» (coma decimal, dos decimales). */
+  function importeTexto(n) { return Number(n).toFixed(2).replace('.', ',') + ' €'; }
+  /* Lo escrito («1,12», «3.5») como número; null si no es un importe. */
+  function importeDe(t) {
+    var s = String(t == null ? '' : t).replace(/€/g, '').replace(/\s+/g, '').replace(',', '.');
+    if (!s) return null;
+    var n = parseFloat(s);
+    return isNaN(n) || !isFinite(n) || n < 0 ? null : Math.round(n * 100) / 100;
+  }
+  function textoDeSitio(donde) { return window.Sitios && donde ? Sitios.textoDe(Sitios.datos(), donde) : ''; }
+
   /* Lo que se ha hecho, sin la fecha ni quién: «Entregado a Dirección», «Grabado», «Comprobado: está bien». */
   function hechoDe(accion, d) {
     if (accion === 'comprobar') return 'Comprobado: está bien';
+    if (accion === 'publicar') return d && d.hasta ? 'Publicado hasta el ' + fechaLarga(d.hasta) + ' (aviso ese día)' : 'Publicado';
+    if (accion === 'cobrar') {
+      var palabra = d && d.cobroPago === 'pago' ? 'Pago' : 'Cobro';
+      return [palabra + (d && d.importe != null ? ' de ' + importeTexto(d.importe) : ''), d && d.forma].filter(Boolean).join(' · ');
+    }
+    if (accion === 'archivar') {
+      var sitio = textoDeSitio(d && d.donde);
+      return 'Archivado' + (sitio ? ' en ' + sitio : '') + (d && d.detalle ? ' · ' + d.detalle : '');
+    }
     var base = VERBO[accion] || 'Hecho';
     return base + (d && d.aQuien ? (accion === 'recoger' ? ' de ' : ' a ') + d.aQuien : '');
   }
@@ -108,9 +131,21 @@ var TareaHecha = (function () {
       return guardada;
     }
     var d = { fecha: (r && r.fecha) || '', aQuien: (r && r.aQuien) || '', nota: String((r && r.nota) || '').trim() };
-    var hechoCon = { fecha: d.fecha, aQuien: d.aQuien, nota: d.nota, texto: textoDe(g.accion, d, quien()) };
+    /* Fila 672: lo propio de Publicar, Cobrar o pagar y Archivar (solo lo que se ha escrito). */
+    if (g.accion === 'publicar' && r && r.hasta) d.hasta = r.hasta;
+    if (g.accion === 'cobrar' && r) {
+      d.cobroPago = r.cobroPago === 'pago' ? 'pago' : 'cobro';
+      if (r.importe != null) d.importe = r.importe;
+      if (r.forma) d.forma = r.forma;
+    }
+    if (g.accion === 'archivar' && r) {
+      if (r.donde) d.donde = r.donde;
+      if (r.detalle) d.detalle = String(r.detalle).trim();
+    }
+    var hechoCon = Object.assign({}, d, { texto: textoDe(g.accion, d, quien()) });
     var h2 = await Hitos.marcarConDatos(a.nombre, h.id, g.id, hechoCon);
     await apuntarRegistro(a, h, registroDe(g, d));
+    if (window.AvisosExposicion) AvisosExposicion.pintar();   /* fila 672: el aviso de «Expuesto hasta» se pone al día */
     return h2;
   }
 
@@ -118,10 +153,11 @@ var TareaHecha = (function () {
   async function deshacer(a, h, g) {
     var h2 = await Hitos.deshacerGuion(a.nombre, h.id, g.id);
     await apuntarRegistro(a, h, 'Tarea «' + g.texto + '»: deshecha, vuelve a estar sin hacer');
+    if (window.AvisosExposicion) AvisosExposicion.pintar();   /* fila 672: «Deshacer» quita el aviso al momento */
     return h2;
   }
 
-  return { conVentana: conVentana, fechaLarga: fechaLarga, textoDe: textoDe, hechoDe: hechoDe, botonesHTML: botonesHTML, lineaHTML: lineaHTML,
+  return { conVentana: conVentana, importeTexto: importeTexto, importeDe: importeDe, fechaLarga: fechaLarga, textoDe: textoDe, hechoDe: hechoDe, botonesHTML: botonesHTML, lineaHTML: lineaHTML,
            comoHTML: comoHTML, pedir: pedir, aplicar: aplicar, deshacer: deshacer };
 })();
 window.TareaHecha = TareaHecha;

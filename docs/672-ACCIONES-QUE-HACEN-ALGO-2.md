@@ -68,4 +68,8 @@ Todo lo común de la 671 vale aquí: sin casilla, ventana con datos opcionales, 
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- 15-nov-2026, primer revisor: RECHAZADA (punto «Archivado»: la zona elegida o creada en «Sitios» no quedaba elegida en «Dónde queda el papel»). Arreglado (`alElegir` de la ventana de la tarea pone la opción al volver); prueba nueva en `pruebas/acciones-que-hacen-algo-2.mjs`.
+- 15-nov-2026, segundo revisor (nuevo, desde cero): RECHAZADA, un solo MAL: tras «Deshacer» en una tarea «Publicado» con «Expuesto hasta» hoy, el aviso «Termina la exposición de …» seguía en Inicio (no se recalculaba hasta otro repintado). Todo lo demás, BIEN: sin casilla; «Publicado» y su línea verde; el aviso sale con «Expuesto hasta» hoy; cobro y pago con coma, forma y «abc» rechazado; «Archivado» con sitio propio, zona existente y zona nueva elegidas, «Ver todos los sitios…» encima y Escape; en blanco las tres quedan hechas; Cancelar/Escape; las clases de la 671; consola; pantallas; crear y archivar un asunto.
+- Qué hace la app que el texto no pide (según el revisor): el desplegable de «Archivado» trae todos los sitios (Correo electrónico, Teléfono, En mano…), no solo los de archivo; el aviso solo se ve con la franja de avisos desplegada.
+- Después de la segunda revisión, en la rama `fila-672` (sin pasar a `main`): `TareaHecha.aplicar` y `deshacer` llaman a `AvisosExposicion.pintar()` para quitar o poner el aviso al momento, con prueba (sin recalcular a mano). Esa corrección no la ha visto ningún revisor.
+- Estado: DEVUELTA (dos rechazos). `main` no se toca. Para retomar: pasar un revisor nuevo sobre la rama `fila-672` y, si aprueba, fusionarla en `main` y publicar.
