@@ -145,6 +145,7 @@ var TareaHecha = (function () {
     var hechoCon = Object.assign({}, d, { texto: textoDe(g.accion, d, quien()) });
     var h2 = await Hitos.marcarConDatos(a.nombre, h.id, g.id, hechoCon);
     await apuntarRegistro(a, h, registroDe(g, d));
+    if (window.AvisosExposicion) AvisosExposicion.pintar();   /* fila 672: el aviso de «Expuesto hasta» se pone al día */
     return h2;
   }
 
@@ -152,6 +153,7 @@ var TareaHecha = (function () {
   async function deshacer(a, h, g) {
     var h2 = await Hitos.deshacerGuion(a.nombre, h.id, g.id);
     await apuntarRegistro(a, h, 'Tarea «' + g.texto + '»: deshecha, vuelve a estar sin hacer');
+    if (window.AvisosExposicion) AvisosExposicion.pintar();   /* fila 672: «Deshacer» quita el aviso al momento */
     return h2;
   }
 

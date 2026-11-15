@@ -77,11 +77,13 @@ await ventana();
 await pagina.fill('#th-hasta', hoy);
 await pagina.click('#th-ok');
 await ventanaCerrada();
+await pagina.waitForTimeout(1500);
+await comprobar('al marcar con «Expuesto hasta» hoy, el aviso sale solo, sin recalcular a mano', pagina.evaluate(() => { if (window.InicioPlegados) InicioPlegados.poner('avisos', false); AvisosLinea.refrescar(); return document.querySelectorAll('#avisos-linea [data-aviso="exposiciones"]').length; }), 1);
 await comprobar('con «Expuesto hasta» hoy, sale el aviso «Termina la exposición de …» con el asunto', avisoExposicion().then((l) => l.length === 1 && /Termina la exposición de «Publicar el listado» \(.*SANCION.*\)/.test(l[0])), true);
 await pagina.locator('.guion-paso', { has: pagina.locator('.guion-paso-texto', { hasText: 'Publicar el listado' }) }).locator('.guion-tarea-menu-boton').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: /^Deshacer$/ }).first().click();
-await pagina.waitForTimeout(1200);
-await comprobar('«Deshacer» quita el aviso', avisoExposicion(), []);
+await pagina.waitForTimeout(1500);
+await comprobar('«Deshacer» quita el aviso al momento, sin recalcular a mano', pagina.evaluate(() => [...document.querySelectorAll('#avisos-linea [data-aviso="exposiciones"]')].length), 0);
 
 console.log('--- 3. Cobrar o pagar ---');
 await tarea('Cobrar la tasa').locator('.guion-hecha-boton').click();
