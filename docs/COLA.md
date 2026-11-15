@@ -11,7 +11,7 @@ Claude Code nunca toca las filas IDEA ni EN DISEÑO.
 
 ## La cola
 
-Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026 se hace una sola fila por lanzamiento** (regla 0). Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
