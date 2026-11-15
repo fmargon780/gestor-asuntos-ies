@@ -87,4 +87,8 @@ Durante el diseño (14-nov-2026): «Archivar» entra también en el tema (opció
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- 15-nov-2026, revisor independiente (sin ver el código), APROBADA, sobre la copia de pruebas local:
+  - Coincide: sin casilla en Grabar, Entregar, Recoger y Comprobar, con casilla en Publicar, Cobrar, Archivar, Llamar y Otra cosa; «Grabado» (sin pasos: el aviso; en blanco la deja hecha); «Entregado» y «Recogido» con la lista de siete personas y la línea verde; «Está bien» y «Falta algo» (rojo, «Falta: …», Registro); «Deshacer» en el menú ⋮ solo en las tareas sin casilla; «Cómo se hace» plegado y numerado, escrito en «Cambiar» y ausente en «+ Añadir tarea»; «A quién» / «De quién» con siete opciones y «Llamar» con sus cuatro; la ventana propone la persona de la tarea; cancelar y Escape no marcan; consola sin errores; pantallas principales y crear/archivar un asunto, bien.
+  - No lo pudo ver el revisor, y lo comprueba la prueba `pruebas/acciones-que-hacen-algo-1.mjs` (en verde): la ventana de «Grabado» con pasos y «Copiar los pasos», el Registro de «Entregado a Dirección» con nota y «Deshacer» de las otras clases (mismo código).
+  - Lo que la app hace y el texto no pide: la línea verde de «Está bien» («✔ Comprobado: está bien · fecha · quién»); «Falta algo» pide texto (no deja guardar en blanco, porque es la propia nota); en «Cambiar» de cualquier tarea sale también «Cómo se hace» (el texto dice «en cualquier tarea»).
+- Pasada completa del día: 391 de 394; `relacionados` falla también en `main` sin este cambio (apuntada como IDEA de tropiezo); `donde-se-hace` se actualizó (Recoger ya tiene botón); las otras dos (`copiar-ruta`, `inicio-columnas`) pasan a solas.
