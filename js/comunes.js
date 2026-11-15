@@ -37,8 +37,8 @@ var Comunes = (function () {
 
 
   /* Fila 671 (tema 665): las acciones sin casilla; se marcan con su botón y una ventana de datos opcionales (js/tarea-hecha.js).
-     La fila 672 añade Publicar, Cobrar o pagar y Archivar. */
-  var ACCIONES_CON_VENTANA = ['seneca', 'entregar', 'recoger', 'comprobar'];
+     Fila 672: también Publicar, Cobrar o pagar y Archivar. */
+  var ACCIONES_CON_VENTANA = ['seneca', 'entregar', 'recoger', 'comprobar', 'publicar', 'cobrar', 'archivar'];
   function conVentana(accion) { return ACCIONES_CON_VENTANA.indexOf(accion || '') !== -1; }
 
   /* Fila 657: las once fases de un hito común, en el orden en que se hacen. */

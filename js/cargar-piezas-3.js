@@ -315,6 +315,7 @@
     'js/llamadas-vista.js',
     'js/tarea-hecha.js',   // fila 671
     'js/tarea-hecha-ventana.js',
+    'js/avisos-exposicion.js',   // fila 672 (después de js/avisos-linea.js)
     'js/por-liquidar.js',
     'js/por-liquidar-liquidar.js',
 
