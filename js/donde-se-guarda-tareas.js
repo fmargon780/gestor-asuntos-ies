@@ -124,7 +124,7 @@ window.DondeSeGuardaTareas = (function () {
   function lineaNuevaParaLaGuia(texto, x) {
     x = x || {};
     var l = lineaParaLaGuia({ explicacion: x.explicacion || '', accion: x.accion || '', normativa: x.normativa || null, receta: x.receta, reunir: x.reunir,
-      obligatorio: x.obligatorio, donde: x.donde, tipoDocumento: x.tipoDocumento, aQuien: x.aQuien }, texto);
+      obligatorio: x.obligatorio, donde: x.donde, tipoDocumento: x.tipoDocumento, aQuien: x.aQuien, como: x.como }, texto);
     if (x.comun) l.comun = x.comun;
     return l;
   }

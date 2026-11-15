@@ -68,13 +68,15 @@ var HitoMesaGuion = (function () {
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
       (g.valor ? ' · ' + g.valor : '') + (g.documento ? ' · ' + g.documento : '') : '';
     var claveAccion = accionDe(g);
+    /* Fila 671: Grabar o cambiar datos, Entregar, Recoger y Comprobar no llevan casilla: se marcan con su botón (js/tarea-hecha.js). */
+    var sinCasilla = !!(window.TareaHecha && TareaHecha.conVentana(g));
     var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" data-ayuda-clave="reunir-documento">📎</span>'
       : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" data-ayuda-clave="reunir-dato">✎</span>' : '');
     /* Fila 154: las acciones viven en la cabecera del hito; fila 410: y cada
        tarea pendiente de comunicar o de generar lleva su botón, delante del
        💬 y del «⋮». Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
     var botonAccion = (abierto && window.HitoMesaRecetas) ? HitoMesaRecetas.botonDeTareaHTML(a, h, g, { siguiente: siguiente, guion: ctx && ctx.guion }) : '';
-    var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
+    var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando) && !(sinCasilla && g.hechoCon)
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
        la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
@@ -85,11 +87,11 @@ var HitoMesaGuion = (function () {
     var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" data-ayuda-clave="solo-aqui-tarea">solo aquí</span>' : '';
     var botonesTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
     var debajoTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
-    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
+    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (sinCasilla && g.faltaAlgo ? ' con-falta' : '') + (g.reunir ? ' guion-reunir' : '') +
         (siguiente ? ' guion-siguiente' : '') + '" data-id="' +
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
-      '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
-        (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
+      '<div class="guion-paso-fila"><label class="guion-paso-linea">' + (sinCasilla ? '' : '<input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
+        (abierto ? '' : ' disabled') + '>') + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
         (window.Plantillas && Plantillas.fueraDeUsoDeLaTarea(g) ? ' ' + '<span class="guion-fuera-de-uso" data-ayuda-clave="plantilla-fuera-de-uso">plantilla fuera de uso</span>' : '') +
         (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaFirmar +
         (window.DondeCampo && g.accion ? DondeCampo.etiquetaHTML(g) : '') +   /* fila 659: dónde se hace, junto a lo que se hace */
@@ -104,6 +106,7 @@ var HitoMesaGuion = (function () {
       (window.TareasConDocumentoVista && ctx ? TareasConDocumentoVista.colgadoHTML(a, h, g, ctx) : '') +
       (window.Llamadas && Llamadas.debajoHTML ? Llamadas.debajoHTML(g, h) : '') +   /* fila 639: sus llamadas, plegadas */
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
+      (window.TareaHecha ? TareaHecha.lineaHTML(g) + TareaHecha.comoHTML(g) : '') +   /* fila 671: lo apuntado y «Cómo se hace» */
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
       (g.reunir === 'documento' && g.hecho && g.documento ? '<div class="guion-paso-explicacion guion-reunir-documento">📎 ' + U.escapar(g.documento) + '</div>' : '') +
@@ -229,7 +232,7 @@ var HitoMesaGuion = (function () {
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso:not(.guion-pregunta):not(.guion-paso-plegada)'), function (el) {
       var id = el.dataset.id;
       var casilla = el.querySelector('.guion-casilla');
-      casilla.onchange = function () {
+      if (casilla) casilla.onchange = function () {
         var hecha = casilla.checked;
         guardar(casilla, function () {
           return Hitos.marcarGuion(a.nombre, h.id, id, { hecho: hecha }).then(function (r) {
@@ -242,6 +245,16 @@ var HitoMesaGuion = (function () {
       if (accionTarea && porId[id]) accionTarea.onclick = function () {
         HitoMesaRecetas.lanzarTarea(a, h, porId[id], fila, accionTarea);
       };
+      /* Fila 671: los botones de las tareas sin casilla: primero la ventana (si la lleva) y luego se guarda. */
+      Array.prototype.forEach.call(el.querySelectorAll('.guion-hecha-boton'), function (b) {
+        b.onclick = async function () {
+          var tarea = porId[id], que = b.dataset.hecha;
+          if (!tarea) return;
+          var r = await TareaHecha.pedir(a, h, tarea, que);
+          if (!r) return;
+          guardar(b, function () { return TareaHecha.aplicar(a, h, tarea, que, r); });
+        };
+      });
       /* Fila 138: un dato se marca al escribirlo. */
       var dato = el.querySelector('.guion-dato');
       if (dato) dato.onchange = function () {

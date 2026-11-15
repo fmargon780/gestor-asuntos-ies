@@ -150,9 +150,16 @@ var HitoMesaTareaMenu = (function () {
   }
 
   function opciones(a, h, g, repintar) {
-    var lista = moverOpciones(a, h, g).concat([
-      { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
-    ]);
+    var lista = moverOpciones(a, h, g);
+    /* Fila 671: las tareas sin casilla (Grabar, Entregar, Recoger, Comprobar), hechas o con «No aplica», se deshacen desde aquí. */
+    if (window.TareaHecha && TareaHecha.conVentana(g) && (g.hecho || g.noaplica)) {
+      lista.push({ texto: 'Deshacer', clase: 'mesa-tarea-deshacer', alPulsar: function () {
+        TareaHecha.deshacer(a, h, g).then(function () {
+          if (window.HitosPanel) HitosPanel.programarRepintado();
+        }).catch(function (err) { U.fallo('No he podido deshacer la tarea', err); });
+      } });
+    }
+    lista.push({ texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } });
     /* Fila 660: «Cambiar» es el mismo formulario para todas las tareas (js/anadir-tarea.js) y dice a dónde irá. Una tarea de la lista común que se
        cambia aquí deja de ser la de la lista (el cambio de la lista entera se hace en Ajustes, en la guía del tipo). */
     lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
@@ -185,7 +192,7 @@ var HitoMesaTareaMenu = (function () {
       /* Fila 660: «Qué se hace», «sobre qué» y «Dónde se hace», con la casilla que se busca escribiendo (js/anadir-tarea.js). */
       var huecoForma = !g.pregunta && window.AnadirTarea ? caja.querySelector('.at-hueco-cambiar') : null;
       var forma = huecoForma ? AnadirTarea.montar(huecoForma, { modo: 'cambiar', inicial: { accion: g.accion || '', receta: g.receta || null, donde: g.donde || Sitios.dondeDe(g) || null,
-        tipoDocumento: g.tipoDocumento, aQuien: g.aQuien, elegida: true } }) : null;
+        tipoDocumento: g.tipoDocumento, aQuien: g.aQuien, como: g.como, elegida: true } }) : null;
       var guardarEditado = function () {
         var texto = editar.value.trim();
         if (texto) guardarTexto(a, h, g, texto, forma ? forma.resultado() : undefined);

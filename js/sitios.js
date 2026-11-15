@@ -42,7 +42,7 @@ var Sitios = (function () {
 
   /* Qué datos más lleva la tarea según su acción: «Qué documento» o «A quién». */
   var CON_DOCUMENTO = ['registrar', 'firmar', 'anadir'];
-  var CON_A_QUIEN = ['llamar'];
+  var CON_A_QUIEN = ['llamar', 'entregar', 'recoger'];   /* fila 671: Entregar («A quién») y Recoger («De quién») */
 
   function copia(x) { return JSON.parse(JSON.stringify(x)); }
   function norm(t) { return (window.U && U.normalizar) ? U.normalizar(String(t || '')) : String(t || '').toLowerCase().trim(); }
@@ -162,18 +162,29 @@ var Sitios = (function () {
   function usaDocumento(accion) { return CON_DOCUMENTO.indexOf(accion || '') !== -1; }
   function usaAQuien(accion) { return CON_A_QUIEN.indexOf(accion || '') !== -1; }
 
+  /* Fila 671: «Cómo se hace», pasos de la tarea (uno por línea) en cualquier tarea; las líneas, sin espacios de más y sin vacías. */
+  function limpiarComo(t) {
+    return String(t == null ? '' : t).split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean).join('\n');
+  }
+
   /* Lo que lleva una tarea además de su acción: `donde`, y `tipoDocumento` o `aQuien` solo si su acción los pide. */
   function limpiarDatos(accion, x) {
     var o = {}, d = normalizarDonde(x && x.donde);
     if (d) o.donde = d;
     if (usaDocumento(accion) && x && String(x.tipoDocumento || '').trim()) o.tipoDocumento = String(x.tipoDocumento).trim();
     if (usaAQuien(accion) && x && String(x.aQuien || '').trim()) o.aQuien = String(x.aQuien).trim();
+    var como = limpiarComo(x && x.como);   /* fila 671: vale para cualquier acción */
+    if (como) o.como = como;
     return o;
   }
-  /* Pone `limpiarDatos` en la línea `g` (y quita lo que no toca). */
+  /* Pone `limpiarDatos` en la línea `g` (y quita lo que no toca). Fila 671: `como` solo cambia si `x` lo trae (aunque sea vacío):
+     quien construye un `x` a medias no borra los pasos de la tarea. */
   function aplicarDatos(g, accion, x) {
-    delete g.donde; delete g.tipoDocumento; delete g.aQuien;
-    return Object.assign(g, limpiarDatos(accion, x));
+    var comoAntes = g.como;
+    delete g.donde; delete g.tipoDocumento; delete g.aQuien; delete g.como;
+    Object.assign(g, limpiarDatos(accion, x));
+    if (!(x && 'como' in x) && comoAntes) g.como = comoAntes;
+    return g;
   }
 
   /* ---------- cuántas tareas usan cada sitio ---------- */
@@ -273,7 +284,7 @@ var Sitios = (function () {
     partida: partida, normalizar: normalizar, datos: datos, poner: poner,
     normalizarDonde: normalizarDonde, igualDonde: igualDonde, textoDe: textoDe, opciones: opciones, deTexto: deTexto,
     propuesto: propuesto, canalDeSitio: canalDeSitio, canalDeTarea: canalDeTarea, deLaVia: deLaVia, dondeDe: dondeDe,
-    usaDocumento: usaDocumento, usaAQuien: usaAQuien, limpiarDatos: limpiarDatos, aplicarDatos: aplicarDatos,
+    usaDocumento: usaDocumento, usaAQuien: usaAQuien, limpiarComo: limpiarComo, limpiarDatos: limpiarDatos, aplicarDatos: aplicarDatos,
     cuentas: cuentas, renombrar: renombrar, anadir: anadir, dondesDe: dondesDe, quitar: quitar, parecidos: parecidos
   };
 })();

@@ -118,7 +118,7 @@ var AnadirTarea = (function () {
     var n = ++contador, comunes = op.comunes || [], nueva = op.modo !== 'cambiar';
     var ini = op.inicial || {};
     var st = { elegida: ini.elegida !== undefined ? !!ini.elegida : (ini.accion !== undefined), accion: ini.accion || '', receta: ini.receta || null, donde: ini.donde || null,
-      tipoDocumento: ini.tipoDocumento || '', aQuien: ini.aQuien || '', nombre: ini.nombre || '', tocado: ini.tocado !== undefined ? !!ini.tocado : !!ini.nombre, comun: null };
+      tipoDocumento: ini.tipoDocumento || '', aQuien: ini.aQuien || '', como: ini.como || '', nombre: ini.nombre || '', tocado: ini.tocado !== undefined ? !!ini.tocado : !!ini.nombre, comun: null };
     var lista = entradas(comunes);
     var textoInicial = st.elegida ? (textoDe(st.accion) + (Sitios.dondeDe(st) ? ' · ' + Sitios.textoDe(Sitios.datos(), Sitios.dondeDe(st)) : '')) : '';
 
@@ -136,12 +136,13 @@ var AnadirTarea = (function () {
 
     function leerDelDom() {
       var d = window.DondeCampo ? DondeCampo.leer(q('.at-donde')) : {};
-      st.donde = d.donde || null; st.tipoDocumento = d.tipoDocumento || ''; st.aQuien = d.aQuien || '';
+      st.donde = d.donde || null; st.tipoDocumento = d.tipoDocumento || ''; st.aQuien = d.aQuien || ''; if ('como' in d) st.como = d.como;
       st.receta = st.elegida ? recetaDe(st.accion, st.receta, q('.at-sobre')) : null;
     }
     function resultado() {
       if (!st.elegida) return null;
       var r = { accion: st.accion, receta: st.receta, donde: st.donde, tipoDocumento: st.tipoDocumento, aQuien: st.aQuien };
+      if (!nueva) r.como = st.como || '';   /* fila 671: «Cómo se hace» solo se escribe al cambiar una tarea */
       if (nueva) r.nombre = st.nombre.trim();
       return r;
     }
@@ -176,7 +177,7 @@ var AnadirTarea = (function () {
 
     function pintarSobre() {
       q('.at-sobre').innerHTML = st.elegida ? sobreHTML(st.accion, st.receta) : '';
-      q('.at-donde').innerHTML = st.elegida && window.DondeCampo ? DondeCampo.html({ accion: st.accion, donde: st.donde, receta: st.receta, tipoDocumento: st.tipoDocumento, aQuien: st.aQuien }) : '';
+      q('.at-donde').innerHTML = st.elegida && window.DondeCampo ? DondeCampo.html({ accion: st.accion, donde: st.donde, receta: st.receta, tipoDocumento: st.tipoDocumento, aQuien: st.aQuien, como: st.como, sinComo: nueva }) : '';
       q('.at-sobre').onchange = function () { refrescar(false); };
       if (window.DondeCampo && st.elegida) DondeCampo.enganchar(q('.at-donde'), function () { refrescar(false); });
     }

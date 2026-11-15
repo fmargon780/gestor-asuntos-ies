@@ -145,6 +145,7 @@ var HitoMesaRecetas = (function () {
   function botonDeTareaHTML(a, h, g, o) {
     /* Fila 639: el teléfono de una tarea de llamar sigue estando con la tarea hecha, para seguir apuntando llamadas. */
     if (g && !g.pregunta && !g.noaplica && g.accion === 'llamar' && window.Llamadas) return Llamadas.botonTareaHTML(g, !!(o && o.siguiente));
+    if (g && window.TareaHecha && TareaHecha.conVentana(g)) return TareaHecha.botonesHTML(g, !!(o && o.siguiente));   /* fila 671: Grabado, Entregado, Recogido, Está bien / Falta algo */
     if (!g || g.pregunta || g.hecho || g.noaplica) return '';
     o = o || {};
     var accion = accionDe(g);

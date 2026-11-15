@@ -38,7 +38,7 @@ var HitoMesaNuevaTarea = (function () {
   function usar(a, h, t) {
     delete formas[h.id]; delete abiertos[h.id];
     return DondeSeGuardaTareas.nueva(a, h, t.nombre, null, {
-      accion: t.accion || '', receta: t.receta || null, donde: Sitios.dondeDe(t) || undefined, tipoDocumento: t.tipoDocumento, aQuien: t.aQuien,
+      accion: t.accion || '', receta: t.receta || null, donde: Sitios.dondeDe(t) || undefined, tipoDocumento: t.tipoDocumento, aQuien: t.aQuien, como: t.como,
       explicacion: t.explicacion, normativa: t.normativa, reunir: t.reunir, obligatorio: t.obligatorio, comun: t.id
     });
   }

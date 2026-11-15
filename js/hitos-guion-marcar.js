@@ -24,7 +24,42 @@
       if ('noaplica' in cambio) { e.noaplica = !!cambio.noaplica; if (e.noaplica) e.hecho = false; }
       if (e.hecho || e.noaplica) { e.quien = quien(); e.cuando = U.ahora(); }
       else { delete e.quien; delete e.cuando; }
+      if (!e.hecho) delete e.hechoCon;   /* fila 671: lo apuntado al marcarla se va con la marca */
+      if (e.hecho) delete e.falta;
       h.guionHecho[idPaso] = e;
+    });
+  }
+
+  /* Fila 671 (js/tarea-hecha.js): la tarea con ventana, hecha con lo apuntado: `hechoCon` = { fecha, aQuien, nota, texto }. */
+  function marcarConDatos(clave, idHito, idPaso, hechoCon) {
+    return editarHito(clave, idHito, function (h) {
+      h.guionHecho = h.guionHecho || {};
+      var e = h.guionHecho[idPaso] || {};
+      e.hecho = true; e.noaplica = false; e.quien = quien(); e.cuando = U.ahora();
+      e.hechoCon = hechoCon;
+      delete e.falta;
+      h.guionHecho[idPaso] = e;
+    });
+  }
+
+  /* Fila 671: «Falta algo» de una tarea de Comprobar: sigue sin hacer, con { texto, quien, cuando }. `falta` null la quita. */
+  function apuntarFalta(clave, idHito, idPaso, falta) {
+    return editarHito(clave, idHito, function (h) {
+      h.guionHecho = h.guionHecho || {};
+      var e = h.guionHecho[idPaso] || {};
+      if (falta) { e.falta = { texto: falta.texto || '', quien: quien(), cuando: U.ahora() }; e.hecho = false; e.noaplica = false; delete e.quien; delete e.cuando; delete e.hechoCon; }
+      else delete e.falta;
+      h.guionHecho[idPaso] = e;
+    });
+  }
+
+  /* Fila 671: «Deshacer» (menú ⋮): la tarea vuelve a estar sin hacer, sin nada de lo apuntado. */
+  function deshacerGuion(clave, idHito, idPaso) {
+    return editarHito(clave, idHito, function (h) {
+      var e = (h.guionHecho || {})[idPaso];
+      if (!e) return;
+      e.hecho = false; e.noaplica = false;
+      ['quien', 'cuando', 'hechoCon', 'falta'].forEach(function (k) { delete e[k]; });
     });
   }
 
@@ -87,6 +122,7 @@
     var accion = ACCIONES.indexOf(extras.accion) !== -1 ? extras.accion : '';
     var e = { accion: accion, receta: window.GuiasGuion ? GuiasGuion.normalizarReceta(accion, extras.receta) : null };
     if (window.Sitios) Object.assign(e, Sitios.limpiarDatos(accion, extras));   /* fila 659: donde, tipoDocumento, aQuien */
+    if ('como' in extras) e.como = window.Sitios ? Sitios.limpiarComo(extras.como) : '';   /* fila 671: aunque quede vacío, para poder quitarlo */
     return e;
   }
 
@@ -132,9 +168,11 @@
       h.guionPropio = (h.guionPropio || []).concat([ponerExtras(sustituta, extras)]);
       if (window.TareasConDocumento) TareasConDocumento.mover(h, original.id, nuevoId);   /* fila 522: el documento sigue a la tarea */
       h.guionHecho = h.guionHecho || {};
-      if (original.hecho || original.noaplica || original.valor || original.documento) {
+      if (original.hecho || original.noaplica || original.valor || original.documento || original.faltaAlgo) {
         h.guionHecho[nuevoId] = { hecho: original.hecho, noaplica: original.noaplica, quien: original.quien,
           cuando: original.cuando, valor: original.valor, documento: original.documento };
+        if (original.hechoCon) h.guionHecho[nuevoId].hechoCon = original.hechoCon;   /* fila 671 */
+        if (original.faltaAlgo) h.guionHecho[nuevoId].falta = original.faltaAlgo;
       }
       delete h.guionHecho[original.id];
     });
@@ -190,6 +228,9 @@
 
   I.quien = quien;
   I.marcarGuion = marcarGuion;
+  I.marcarConDatos = marcarConDatos;
+  I.apuntarFalta = apuntarFalta;
+  I.deshacerGuion = deshacerGuion;
   I.marcarGuionPorAccion = marcarGuionPorAccion;
   I.anotarCopia = anotarCopia;
   I.elegirEnGuion = elegirEnGuion;

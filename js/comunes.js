@@ -36,6 +36,11 @@ var Comunes = (function () {
   ];
 
 
+  /* Fila 671 (tema 665): las acciones sin casilla; se marcan con su botón y una ventana de datos opcionales (js/tarea-hecha.js).
+     La fila 672 añade Publicar, Cobrar o pagar y Archivar. */
+  var ACCIONES_CON_VENTANA = ['seneca', 'entregar', 'recoger', 'comprobar'];
+  function conVentana(accion) { return ACCIONES_CON_VENTANA.indexOf(accion || '') !== -1; }
+
   /* Fila 657: las once fases de un hito común, en el orden en que se hacen. */
   var FASES = ['recibir', 'pedir', 'comprobar', 'elaborar', 'firma', 'publicar', 'enviar', 'seneca', 'cobrar', 'esperar', 'archivar'];
   /* Fila 659: lo que dice cada fase donde se lea (los valores internos no cambian). */
@@ -252,7 +257,7 @@ var Comunes = (function () {
   }
 
   return {
-    HACE: HACE, FASES: FASES, FASES_TEXTO: FASES_TEXTO, textoDeFase: textoDeFase, textoDeHace: textoDeHace, accionValida: accionValida,
+    HACE: HACE, ACCIONES_CON_VENTANA: ACCIONES_CON_VENTANA, conVentana: conVentana, FASES: FASES, FASES_TEXTO: FASES_TEXTO, textoDeFase: textoDeFase, textoDeHace: textoDeHace, accionValida: accionValida,
     normalizarTarea: normalizarTarea, normalizarHito: normalizarHito, normalizarFichero: normalizarFichero,
     buscar: buscar, parecidas: parecidas, existeNombre: existeNombre, existeIgual: existeIgual,
     recorrerGuias: recorrerGuias, usos: usos, textoUsos: textoUsos,

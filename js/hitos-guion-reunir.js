@@ -131,6 +131,9 @@
   Hitos.cuentaGuion = cuentaGuion;
   Hitos.marcarGuion = marcarGuion;
   Hitos.marcarGuionPorAccion = marcarGuionPorAccion;
+  Hitos.marcarConDatos = function () { return I.marcarConDatos.apply(this, arguments); };   /* fila 671 */
+  Hitos.apuntarFalta = function () { return I.apuntarFalta.apply(this, arguments); };
+  Hitos.deshacerGuion = function () { return I.deshacerGuion.apply(this, arguments); };
   Hitos.anotarCopia = anotarCopia;
   Hitos.anadirGuionPropio = anadirGuionPropio;
   Hitos.cambiarGuionAqui = cambiarGuionAqui;

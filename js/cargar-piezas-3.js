@@ -313,6 +313,8 @@
     'js/llamadas-personas.js',
     'js/llamadas-ventana.js',
     'js/llamadas-vista.js',
+    'js/tarea-hecha.js',   // fila 671
+    'js/tarea-hecha-ventana.js',
     'js/por-liquidar.js',
     'js/por-liquidar-liquidar.js',
 

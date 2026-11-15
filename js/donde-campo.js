@@ -12,7 +12,8 @@
    (js/comunes-cambiar.js) y en «+ Añadir tarea» y «Cambiar…» de un asunto
    (js/tareas-con-documento-vista.js).
 
-   `html(g)` pinta, `leer(raiz)` devuelve { donde, tipoDocumento, aQuien } (sin lo que no toca a la acción),
+   Fila 671: además, «Cómo se hace» (pasos, uno por línea) en cualquier tarea, y «A quién» / «De quién» también en Entregar y Recoger.
+   `html(g)` pinta, `leer(raiz)` devuelve { donde, tipoDocumento, aQuien, como } (sin lo que no toca a la acción),
    `enganchar(raiz, alCambiar)` y `alCambiarAccion(raiz, nueva, previa)` lo ponen al día,
    `etiquetaHTML(g)` es el texto que lleva la tarea en la mesa del hito.
    ============================================================ */
@@ -24,7 +25,12 @@ var DondeCampo = (function () {
   function norm(t) { return U.normalizar(String(t || '')); }
 
   function tiposDeDocumento() { return (window.App && App.E && App.E.tiposDocumento) || []; }
-  function papeles() { return window.GuiasToca ? GuiasToca.aQuien([]) : [{ id: 'tercero', nombre: 'Tercero' }, { id: 'tutor', nombre: 'Familia' }, { id: 'relacionado', nombre: 'Relacionado' }, { id: 'profesores', nombre: 'Sus profesores' }]; }
+  function papelesLlamar() { return window.GuiasToca ? GuiasToca.aQuien([]) : [{ id: 'tercero', nombre: 'Tercero' }, { id: 'tutor', nombre: 'Familia' }, { id: 'relacionado', nombre: 'Relacionado' }, { id: 'profesores', nombre: 'Sus profesores' }]; }
+  /* Fila 671: a quién se entrega o de quién se recoge. */
+  var PAPELES_ENTREGA = [{ id: 'tercero', nombre: 'Tercero' }, { id: 'tutor', nombre: 'Familia' }, { id: 'relacionado', nombre: 'Relacionado' },
+    { id: 'tutorDocente', nombre: 'Tutor/a' }, { id: 'direccion', nombre: 'Dirección' }, { id: 'jefatura', nombre: 'Jefatura de Estudios' }, { id: 'secretaria', nombre: 'Secretaría' }];
+  function papeles(accion) { return accion === 'entregar' || accion === 'recoger' ? PAPELES_ENTREGA : papelesLlamar(); }
+  function rotuloAQuien(accion) { return accion === 'recoger' ? 'De quién' : 'A quién'; }
 
   function listaHTML(id, valores) {
     return '<datalist id="' + id + '">' + valores.map(function (v) { return '<option value="' + esc(v) + '"></option>'; }).join('') + '</datalist>';
@@ -48,17 +54,22 @@ var DondeCampo = (function () {
         listaHTML('dc-doc-' + n, tiposDeDocumento());
     }
     if (Sitios.usaAQuien(accion)) {
-      var p = papeles().filter(function (x) { return x.id === (g && g.aQuien); })[0];
-      html += '<label class="dato donde-fila"><span class="etiqueta">A quién</span>' +
+      var p = papeles(accion).filter(function (x) { return x.id === (g && g.aQuien); })[0];
+      html += '<label class="dato donde-fila"><span class="etiqueta">' + rotuloAQuien(accion) + '</span>' +
         '<input type="text" class="campo donde-a-quien" list="dc-quien-' + n + '" value="' + esc(p ? p.nombre : '') + '" placeholder="Escribe para buscar…" autocomplete="off"></label>' +
-        listaHTML('dc-quien-' + n, papeles().map(function (x) { return x.nombre; }));
+        listaHTML('dc-quien-' + n, papeles(accion).map(function (x) { return x.nombre; }));
+    }
+    /* Fila 671: «Cómo se hace», pasos opcionales (uno por línea) en cualquier tarea; `sinComo` lo quita (en «+ Añadir tarea» no sale). */
+    if (!(g && g.sinComo)) {
+      html += '<label class="dato donde-fila donde-como-fila"><span class="etiqueta">Cómo se hace (opcional, un paso por línea)</span>' +
+        '<textarea class="campo donde-como" rows="3" placeholder="Los pasos, uno por línea">' + esc((g && g.como) || '') + '</textarea></label>';
     }
     return html;
   }
 
   /* El bloque entero, con la acción en `data-accion` para saber qué casillas lleva. */
   function html(g) {
-    return '<div class="guion-fila-linea donde-campo" data-accion="' + esc((g && g.accion) || '') + '">' + cuerpoHTML(g) + '</div>';
+    return '<div class="guion-fila-linea donde-campo" data-accion="' + esc((g && g.accion) || '') + '"' + (g && g.sinComo ? ' data-sin-como="1"' : '') + '>' + cuerpoHTML(g) + '</div>';
   }
 
   function leer(raiz) {
@@ -74,9 +85,11 @@ var DondeCampo = (function () {
     }
     var q = b.querySelector('.donde-a-quien');
     if (q && Sitios.usaAQuien(accion)) {
-      var p = papeles().filter(function (x) { return norm(x.nombre) === norm(q.value); })[0];
+      var p = papeles(accion).filter(function (x) { return norm(x.nombre) === norm(q.value); })[0];
       if (p) salida.aQuien = p.id;
     }
+    var como = b.querySelector('.donde-como');
+    if (como) salida.como = Sitios.limpiarComo(como.value);   /* fila 671: aunque quede vacío, para poder quitarlo */
     return salida;
   }
 
@@ -96,7 +109,9 @@ var DondeCampo = (function () {
     var d = b.querySelector('.donde-documento');
     if (d) limpiar(d, function (v) { return tiposDeDocumento().some(function (x) { return norm(x) === norm(v); }); });
     var q = b.querySelector('.donde-a-quien');
-    if (q) limpiar(q, function (v) { return papeles().some(function (x) { return norm(x.nombre) === norm(v); }); });
+    if (q) limpiar(q, function (v) { return papeles(b.dataset.accion || '').some(function (x) { return norm(x.nombre) === norm(v); }); });
+    var como = b.querySelector('.donde-como');
+    if (como) como.addEventListener('change', function () { if (alCambiar) alCambiar(leer(b)); });
     var ver = b.querySelector('.donde-ver-todos');
     if (ver) ver.onclick = function () {
       if (!window.SitiosVentana) return;
@@ -121,7 +136,9 @@ var DondeCampo = (function () {
     var sitio = b.querySelector('.donde-sitio');
     var d = actual.donde || (sitio && sitio.dataset.heredado === '1' ? Sitios.deTexto(datos, sitio.value) : null);
     if (!d || (deAntes && Sitios.igualDonde(d, deAntes))) d = Sitios.propuesto(datos, nueva) || null;
-    var g = { accion: nueva || '', donde: d, tipoDocumento: Sitios.usaDocumento(nueva) ? actual.tipoDocumento : '', aQuien: Sitios.usaAQuien(nueva) ? actual.aQuien : '' };
+    /* Fila 671: «A quién» solo se conserva si la persona sigue siendo una de las que ofrece la acción nueva. */
+    var quien = Sitios.usaAQuien(nueva) && papeles(nueva).some(function (x) { return x.id === actual.aQuien; }) ? actual.aQuien : '';
+    var g = { accion: nueva || '', donde: d, tipoDocumento: Sitios.usaDocumento(nueva) ? actual.tipoDocumento : '', aQuien: quien, como: actual.como, sinComo: b.dataset.sinComo === '1' };
     b.dataset.accion = g.accion;
     b.innerHTML = cuerpoHTML(g);
     enganchar(b, b._alCambiar);
