@@ -116,7 +116,8 @@ var TareaHechaVentana = (function () {
           if (!window.SitiosVentana) return;
           var sel = $('th-donde'), actual = sel.value !== '' && sel._ops ? sel._ops[+sel.value].donde : null, elegido = null;
           SitiosVentana.abrir({
-            alElegir: function (donde) { elegido = donde; },
+            /* «Sitios» se cierra (y avisa a `alCerrar`) antes de llamar a `alElegir`: lo elegido se pone aquí al momento. */
+            alElegir: function (donde) { elegido = donde; pintarSitios(donde); },
             alCerrar: function () { pintarSitios(elegido || actual); }
           });
         };

@@ -134,6 +134,13 @@ await comprobar('«Sitios» se abre encima de la ventana', pagina.evaluate(() =>
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('.sitios-capa', { state: 'detached', timeout: 8000 });
 await comprobar('Escape cierra solo «Sitios»; la ventana de la tarea sigue', pagina.evaluate(() => !!document.querySelector('.th-capa')), true);
+await pagina.click('#th-ver-sitios');
+await pagina.waitForSelector('.sitios-capa', { timeout: 8000 });
+await pagina.locator('.sitios-capa #sv-mapa button', { hasText: 'Alumnado' }).first().click();
+await pagina.click('#sv-usar');
+await pagina.waitForSelector('.sitios-capa', { state: 'detached', timeout: 8000 });
+await comprobar('elegir una zona en «Sitios» («Usar … en la tarea») la deja elegida en «Dónde queda el papel»', pagina.evaluate(() => { const s = document.getElementById('th-donde'); return s.options[s.selectedIndex].textContent; }), 'Séneca · Alumnado');
+await pagina.selectOption('#th-donde', { label: 'Expediente del alumno' });
 await comprobar('al volver, sigue elegido el sitio de la tarea', pagina.evaluate(() => { const s = document.getElementById('th-donde'); return s.options[s.selectedIndex].textContent; }), 'Expediente del alumno');
 await pagina.click('#th-ok');
 await ventanaCerrada();
