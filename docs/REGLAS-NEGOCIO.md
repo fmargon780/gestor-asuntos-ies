@@ -260,3 +260,22 @@ Decisiones de Francisco ya tomadas, para que ninguna conversación nueva las con
 - (15-nov-2026, tema 665) «Grabar o cambiar datos», «Entregar», «Recoger», «Comprobar», «Publicar», «Cobrar o pagar» y «Archivar» no tienen casilla: se marcan con su botón, que pide los datos de la acción, o con «No aplica» (eligió la opción 2). Todos los datos son opcionales, para que no haya «situaciones de bloqueo en los que no se pueda seguir porque no se tenga el dato». Lo apuntado va a la tarea y al Registro; «Deshacer» en el menú ⋮.
 - (15-nov-2026, tema 665) Cualquier tarea puede llevar «Cómo se hace» (pasos escritos); la ruta de Séneca va ahí. «Comprobar» tiene «Está bien» y «Falta algo»; con «Falta algo» la tarea sigue sin hacer, con la nota a la vista.
 - (15-nov-2026, tema 665) «Archivar» entra en el tema (eligió la opción 1) y pide dónde queda el papel: una zona de «Sitios» más un detalle libre. Las zonas del archivo las pone el centro: «los distintos lugares del archivo documental los podremos poner a nuestro gusto».
+
+## Cerrar un asunto
+
+- (15-nov-2026, tema 666) En la app un asunto **se cierra**, no se archiva: «archivar» queda para el
+  papel —el expediente del alumno y el archivo documental del centro—, que es la acción «Archivar» de
+  una tarea (fila 659). El botón dice «Cerrar el asunto» y la pestaña «Archivo» pasa a llamarse
+  **«Asuntos cerrados»** (eligió la opción 2).
+- (15-nov-2026, tema 666) **La carpeta ARCHIVO del disco no cambia de nombre**, ni sus rutas ni su
+  índice, y los textos que hablan de ella siguen diciendo archivo: lo que hace la app se cierra, el
+  sitio donde queda sigue siendo el ARCHIVO. En Gmail, archivar sigue siendo de Gmail.
+- (15-nov-2026, tema 666) El botón del asunto dice siempre **«Cerrar el asunto»**, nunca «Cerrar» a
+  secas, para no confundirlo con los botones que cierran ventanas.
+- (15-nov-2026, tema 666) Cerrar un asunto **no cambia de comportamiento**: sigue moviendo su carpeta
+  de «Asuntos abiertos» al ARCHIVO, dentro de la del tercero, como hasta ahora.
+- (15-nov-2026, idea 675) El **plazo de conservación** se queda como está y sigue contando desde que
+  se cierra el asunto en la app; de qué fecha debe contar se decide aparte, porque la que vale es el
+  fin real de la tramitación: «no creo que sea algo oficial el día en que un administrativo de un
+  instituto quiera dar a un botón de cierre en una app que ha montado para él mismo y su compañero.
+  Así que la fecha de fin de la tramitación debe ser otra.»
