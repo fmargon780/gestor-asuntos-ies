@@ -224,7 +224,7 @@ await pagina.click('#btn-crear');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('con tres candidatos, salen los tres',
   pagina.locator('input[name="dup-cual"]').count(), 3);
-await comprobar('el archivado lleva su marca',
+await comprobar('el cerrado lleva su marca',
   pagina.locator('#cuadro-cuerpo').textContent().then(t => t.indexOf('en el ARCHIVO') !== -1), true);
 
 await pagina.check('input[name="dup-cual"][value="2"]');
@@ -588,7 +588,7 @@ const bloquesLuis = await recuadro();
 await comprobar('163.3 y 163.4: rojo arriba el abierto del mismo tipo; el archivado a 10 días sí (el de 20 y el de otro tipo, no); el resto, en gris',
   Promise.resolve(bloquesLuis && bloquesLuis.map((b) => [b[0], b[1].map((x) => x.split(':')[0])])),
   [['Ya tiene abierto un asunto de este tipo', ['parecido-mismo-tipo']],
-   ['Archivado hace poco, del mismo tipo', ['parecido-archivado']],
+   ['Cerrado hace poco, del mismo tipo', ['parecido-archivado']],
    ['Otros asuntos abiertos de este tercero', ['parecido-otro', 'parecido-otro']]]);
 await comprobar('163.4 el archivado es el de 10 días',
   Promise.resolve(bloquesLuis && bloquesLuis[1][1][0].indexOf('260905 TRANSPORTE') > -1), true);
@@ -598,7 +598,7 @@ await comprobar('163.6 el reservado sale tapado, con candado',
 await pagina.fill('#campo-fecha', '2026-08-30');
 await pagina.waitForTimeout(500);
 await comprobar('163.5 al cambiar la fecha se recalculan los archivados (ahora los dos de agosto y septiembre)',
-  recuadro().then((b) => b && b.filter((x) => x[0].indexOf('Archivado') === 0).map((x) => x[1].length)[0]), 2);
+  recuadro().then((b) => b && b.filter((x) => x[0].indexOf('Cerrado') === 0).map((x) => x[1].length)[0]), 2);
 
 await pagina.evaluate(() => { App.E.nuevo.tipo = ''; App.refrescarVista(); });
 await pagina.waitForTimeout(500);

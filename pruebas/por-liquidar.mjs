@@ -7,7 +7,7 @@
    1. La pestaña existe, con su número; esos asuntos no están en «En Administración».
    2. Marcar: «Marcados: 3 asuntos · Total: 2,24 € (1 sin importe)»; la casilla de la
       cabecera marca y desmarca todos.
-   3. El botón de la ficha dice «Pasar a Por liquidar» (y «Archivar el asunto» en otro tipo).
+   3. El botón de la ficha dice «Pasar a Por liquidar» (y «Cerrar el asunto» en otro tipo).
    4. Dar por hecho el último hito pasa el asunto solo, con «Deshacer».
    5. «Liquidar»: el cuadro, el PDF en cada carpeta, el registro, el ARCHIVO.
    6. Reabrir uno: vuelve a abierto, sin «Por liquidar», y el PDF sigue.
@@ -108,7 +108,7 @@ await abrirFichaDe('Esteban');
 await comprobar('3. un seguro escolar: «Pasar a Por liquidar»', pagina.locator('#ficha-archivar button').textContent(), 'Pasar a Por liquidar');
 await pagina.click('#ficha-volver');
 await abrirFichaDe('Reservado');
-await comprobar('3. otro tipo: «Archivar el asunto»', pagina.locator('#ficha-archivar button').textContent(), 'Archivar el asunto');
+await comprobar('3. otro tipo: «Cerrar el asunto»', pagina.locator('#ficha-archivar button').textContent(), 'Cerrar el asunto');
 await pagina.click('#ficha-volver');
 
 /* ===== 4. Dar por hecho el último hito ===== */
@@ -124,14 +124,14 @@ await pagina.waitForTimeout(800);
 await comprobar('4. aviso verde «Pasa a Por liquidar» con «Deshacer»',
   pagina.evaluate(() => [...document.querySelectorAll('.mensaje')].map((m) => m.textContent).filter((t) => /Por liquidar/.test(t)).length > 0 && !!document.querySelector('.mensaje-boton')), true);
 await comprobar('4. el asunto está en «Por liquidar»', pagina.evaluate((c) => PorLiquidar.estaPorLiquidar(Gestor.asuntos().filter((a) => a.nombre === c)[0]), claveEsteban), true);
-await comprobar('4. en la mesa no sale «Archivar el asunto»',
-  pagina.evaluate(() => { const t = document.querySelector('.mesa-todo-hecho'); return { aviso: !!t, archivar: /Archivar el asunto/.test(document.querySelector('#ficha-guia').textContent.replace(/Archivar el asunto\s*$/, '') && (t ? t.textContent : '')) }; }),
+await comprobar('4. en la mesa no sale «Cerrar el asunto»',
+  pagina.evaluate(() => { const t = document.querySelector('.mesa-todo-hecho'); return { aviso: !!t, archivar: /Cerrar el asunto/.test(document.querySelector('#ficha-guia').textContent.replace(/Cerrar el asunto\s*$/, '') && (t ? t.textContent : '')) }; }),
   { aviso: true, archivar: false });
-await comprobar('4. y en la cabecera de la ficha: «Por liquidar», ni «Listo para archivar» ni «Archivar el asunto»',
+await comprobar('4. y en la cabecera de la ficha: «Por liquidar», ni «Listo para cerrar» ni «Cerrar el asunto»',
   pagina.evaluate(() => {
-    /* Fila 637: la marca «Hito N de M · …» ya no sale; «Por liquidar» queda en el botón de la cabecera («Ir a Por liquidar»), y no sale «Listo para archivar». */
+    /* Fila 637: la marca «Hito N de M · …» ya no sale; «Por liquidar» queda en el botón de la cabecera («Ir a Por liquidar»), y no sale «Listo para cerrar». */
     const m = [...document.querySelectorAll('#pantalla-ficha .marca-hito, #ficha-asunto-cuerpo .marca-hito, #ficha-guia .marca-hito, #ficha-estado-hito, #ficha-acciones')].map((e) => e.textContent).join(' / ') + ' ' + document.querySelector('#ficha-asunto-cuerpo .ficha-marcas').textContent + ' ' + document.querySelector('#ficha-archivar').textContent;
-    return { marca: /Por liquidar/.test(m), listo: /Listo para archivar/.test(m), boton: document.querySelector('#ficha-archivar button').textContent };
+    return { marca: /Por liquidar/.test(m), listo: /Listo para cerrar/.test(m), boton: document.querySelector('#ficha-archivar button').textContent };
   }), { marca: true, listo: false, boton: 'Ir a Por liquidar' });
 await pagina.click('.mensaje-boton');
 await pagina.waitForTimeout(800);
@@ -162,8 +162,8 @@ await comprobar('5. dice el total', pagina.locator('#cuadro-cuerpo').textContent
 await pagina.fill('#liq-nota', 'Dinero en efectivo');
 const nombresMarcados = await filas();
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForFunction(() => [...document.querySelectorAll('.mensaje')].some((m) => /Liquidados y archivados/.test(m.textContent)), null, { timeout: 30000 });
-await comprobar('5. aviso verde con el total', pagina.evaluate(() => [...document.querySelectorAll('.mensaje')].map((m) => m.textContent).filter((t) => /Liquidados/.test(t))[0].trim().slice(0, 56)), 'Liquidados y archivados 3 asuntos. Total: 2,24 €.');
+await pagina.waitForFunction(() => [...document.querySelectorAll('.mensaje')].some((m) => /Liquidados y cerrados/.test(m.textContent)), null, { timeout: 30000 });
+await comprobar('5. aviso verde con el total', pagina.evaluate(() => [...document.querySelectorAll('.mensaje')].map((m) => m.textContent).filter((t) => /Liquidados/.test(t))[0].trim().slice(0, 56)), 'Liquidados y cerrados 3 asuntos. Total: 2,24 €.');
 await pagina.waitForTimeout(500);
 await comprobar('5. «Por liquidar» queda vacía (la pestaña sigue: hay tipo)', cuentaPestana('liq'), '0');
 await comprobar('5. ya no están en Asuntos abiertos',
@@ -247,8 +247,8 @@ await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForTimeout(400);
 await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SEGURO ESCOLAR' }).locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
-const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'pasa a «Por liquidar» en vez de archivarse' }).locator('input');
-await comprobar('8. Ajustes: el tipo lleva la casilla «Al terminar, pasa a «Por liquidar» en vez de archivarse», desmarcada', casilla.isChecked(), false);
+const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'pasa a «Por liquidar» en vez de cerrarse' }).locator('input');
+await comprobar('8. Ajustes: el tipo lleva la casilla «Al terminar, pasa a «Por liquidar» en vez de cerrarse», desmarcada', casilla.isChecked(), false);
 await casilla.evaluate((el) => { el.checked = true; el.dispatchEvent(new Event('change')); });
 await pagina.waitForTimeout(500);
 await comprobar('8. al marcarla se guarda en el tipo', pagina.evaluate(() => App.E.tipos.filter((t) => t.tipo === 'SEGURO ESCOLAR')[0].liquidar), true);

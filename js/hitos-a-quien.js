@@ -151,7 +151,7 @@
      para archivar» o «Sin hitos». */
   function textoDelEstado(r) {
     if (!r || r.sinHitos) return 'Sin hitos';
-    if (r.listo) return 'Listo para archivar';
+    if (r.listo) return 'Listo para cerrar';
     return 'Hito ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
   }
 

@@ -1,5 +1,5 @@
 /* Prueba de la fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la
-   ficha de un asunto archivado vive en su propia carpeta
+   ficha de un asunto cerrado vive en su propia carpeta
    (`_ficha.json`), no para siempre en asuntos.json.
 
    Sin navegador, con el disco de mentira en memoria de
@@ -191,7 +191,7 @@ const quedaFicheroViejo = await FichaArchivo.leer(carpetaAbiertaDeNuevo);
 comprobar('el _ficha.json ha desaparecido de la carpeta', quedaFicheroViejo, null);
 
 /* ================================================================
-   4. Un asunto archivado SIN _ficha.json (archivado antes de esta
+   4. Un asunto cerrado SIN _ficha.json (archivado antes de esta
    fila) se reabre sin romper nada: ficha vacía, como hoy.
    ================================================================ */
 console.log('--- 4. compatibilidad: archivado antes de esta fila, sin _ficha.json ---');

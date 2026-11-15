@@ -3,7 +3,7 @@
    de la pantalla de un tipo (fila 274, docs/AL-TERMINAR-EL-ASUNTO.md).
 
    Dice, sin abrirlo, qué pasa con un asunto de este tipo cuando se
-   termina («se archiva» o «pasa a Por liquidar»), y lleva dentro las
+   termina («se cierra» o «pasa a Por liquidar»), y lleva dentro las
    dos casillas que antes vivían en «Datos del tipo»: la de liquidar
    (fila 249) y la de avisar a quien lo pide al cerrar (fila 195).
    Mismos campos de siempre en tipos.json (`liquidar`,
@@ -16,16 +16,16 @@
 var AjustesTipoAlTerminar = (function () {
 
   function resumen(tipo) {
-    return (tipo.liquidar ? 'pasa a Por liquidar' : 'se archiva') +
+    return (tipo.liquidar ? 'pasa a Por liquidar' : 'se cierra') +
       (tipo.avisarLoPideCierre ? ' · avisa a quien lo pide' : '');
   }
 
   function construir(tipo) {
     var b = AjustesPlegado.seccion('al-terminar', 'Al terminar el asunto', 'Qué pasa con un asunto de este tipo cuando se termina.');
 
-    /* Fila 249 (docs/POR-LIQUIDAR.md): al terminar, el asunto pasa a «Por liquidar» en vez de archivarse. */
+    /* Fila 249 (docs/POR-LIQUIDAR.md): al terminar, el asunto pasa a «Por liquidar» en vez de cerrarse. */
     var filaLiquidar = App.construirInterruptorDeTipo(tipo, 'liquidar', false,
-      'Al terminar, pasa a «Por liquidar» en vez de archivarse',
+      'Al terminar, pasa a «Por liquidar» en vez de cerrarse',
       'Los asuntos terminados de este tipo esperan en la pestaña «Por liquidar» de Inicio hasta que se liquidan.');
     /* Con el cambio, la pestaña «Por liquidar» de Inicio sale o se va sin esperar a otro repintado. */
     filaLiquidar.querySelector('input').addEventListener('change', function () {

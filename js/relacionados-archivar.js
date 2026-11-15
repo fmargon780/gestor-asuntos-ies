@@ -31,11 +31,11 @@
 
     var ok = await U.preguntar('Avisar a los relacionados',
       '<p class="explica">Este asunto tiene ' + lista.length +
-      (lista.length === 1 ? ' relacionado' : ' relacionados') + '. Al archivar, se deja una nota ' +
+      (lista.length === 1 ? ' relacionado' : ' relacionados') + '. Al cerrarlo, se deja una nota ' +
       'en su propia carpeta del archivo diciendo dónde está el asunto de verdad. ' +
       'No se copia ningún documento suyo.</p>' +
       '<div class="rel-confirmar-lista">' + filas + '</div>',
-      'Archivar el asunto');
+      'Cerrar el asunto');
     if (!ok) return null;
 
     var marcados = [];

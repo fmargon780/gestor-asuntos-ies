@@ -229,7 +229,7 @@ var FichaDocumentos = (function () {
     }
     if (window.Repartir && Repartir.puede(a)) {
       botonPdf('Repartir entre terceros',
-        'Partirlo en trozos, uno por persona, y dejar cada trozo en su propio asunto archivado', Repartir.abrir);
+        'Partirlo en trozos, uno por persona, y dejar cada trozo en su propio asunto cerrado', Repartir.abrir);
     }
     return barra;
   }

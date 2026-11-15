@@ -165,7 +165,7 @@ console.log('--- repartir ---');
 await pagina.click('#repartir-ir');
 await pagina.waitForSelector('#repartir-confirmar');
 await comprobarP('6. el resumen: 6 asuntos y el oficio que se queda', pagina.locator('#cuadro-cuerpo').textContent().then(t =>
-  t.indexOf('Se van a crear 6 asuntos de tipo INFORME FINAL DE ETAPA, ya archivados, y 1 documento se queda') !== -1), true);
+  t.indexOf('Se van a crear 6 asuntos de tipo INFORME FINAL DE ETAPA, ya cerrados, y 1 documento se queda') !== -1), true);
 await pagina.click('#repartir-confirmar');
 await esperar(() => /^Hecho/.test((document.getElementById('repartir-progreso') || {}).textContent || ''), null, 600);
 await comprobarP('6. termina sin fallos', pagina.locator('#repartir-progreso').textContent(), 'Hecho.');

@@ -372,7 +372,7 @@ var Repartir = (function () {
     var sinAsignar = E.trozos.filter(function (t) { return !t.hecho && !t.quedarse && !t.tercero; }).length;
     $('cuadro-cuerpo').innerHTML =
       '<p><strong>Se van a crear ' + aCrear.length + (aCrear.length === 1 ? ' asunto' : ' asuntos') + ' de tipo ' + esc(E.tipo || '—') +
-        ', ya archivados, y ' + quedan.length + (quedan.length === 1 ? ' documento se queda' : ' documentos se quedan') + ' en este asunto.</strong></p>' +
+        ', ya cerrados, y ' + quedan.length + (quedan.length === 1 ? ' documento se queda' : ' documentos se quedan') + ' en este asunto.</strong></p>' +
       (sinAsignar ? '<p class="aviso aviso-ambar">' + sinAsignar + (sinAsignar === 1 ? ' trozo se queda' : ' trozos se quedan') + ' sin repartir.</p>' : '') +
       sinTrozo.map(function (n) { return '<p class="aviso aviso-ambar">' + esc(n) + ' se ha quedado sin trozo.</p>'; }).join('') +
       repetidos.map(function (n) {
@@ -426,8 +426,8 @@ var Repartir = (function () {
     progreso.textContent = fallos.length
       ? 'Hecho, con fallos: ' + fallos.map(function (r) { return N.textoPaginas(r) + ' (' + (r.tercero || 'este asunto') + ')'; }).join(', ') + '. Volver a repartir este PDF reintenta solo esos.'
       : 'Hecho.';
-    if (fallos.length) U.aviso(hechos + ' asuntos creados y archivados; fallaron ' + fallos.length + '.', 'ambar');
-    else if (resultados.length) U.aviso(hechos + (hechos === 1 ? ' asunto creado y archivado.' : ' asuntos creados y archivados.'), 'bueno');
+    if (fallos.length) U.aviso(hechos + ' asuntos creados y cerrados; fallaron ' + fallos.length + '.', 'ambar');
+    else if (resultados.length) U.aviso(hechos + (hechos === 1 ? ' asunto creado y cerrado.' : ' asuntos creados y cerrados.'), 'bueno');
     if (E.alTerminar) { try { E.alTerminar(); } catch (e2) { /* solo pintar */ } }
   }
 

@@ -143,12 +143,12 @@ window.ElegirAsunto = (function () {
   function filaDeAsunto(x) {
     var pie = [
       (x.ficha.tercero || ''),
-      (estaArchivado(x.ficha) ? 'Archivado' : 'Abierto')
+      (estaArchivado(x.ficha) ? 'Cerrado' : 'Abierto')
     ].filter(Boolean).join('  ·  ');
     return '<button type="button" class="resultado enlace-asunto" data-nombre="' +
              U.escapar(x.nombre) + '">' +
              (estaArchivado(x.ficha)
-               ? '<span class="marca-tipo enlace-archivado">Archivado</span>' : '') +
+               ? '<span class="marca-tipo enlace-archivado">Cerrado</span>' : '') +
              U.escapar(x.nombre) +
              '<span class="resultado-pie">' + U.escapar(pie) + '</span>' +
            '</button>';
@@ -309,7 +309,7 @@ window.ElegirAsunto = (function () {
       function unaVez(v) { if (!resuelto) { resuelto = true; resolver(v); } }
 
       var capa = $('capa');
-      $('cuadro-titulo').textContent = 'Ese asunto está archivado';
+      $('cuadro-titulo').textContent = 'Ese asunto está cerrado';
       $('cuadro-cuerpo').innerHTML =
         '<p class="explica">' + U.escapar(elAsunto.nombre) + '</p>' +
         (o.explica || '') +

@@ -334,7 +334,7 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 /* Fila 192: "Archivar" vive en el menú de tres puntos de la fila. */
 await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
-await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro dice a dónde va',
   pagina.locator('#cuadro-cuerpo .vista-nombre').textContent(),
@@ -372,11 +372,11 @@ await comprobar('la edad sale en la cabecera, una sola vez (fila 252)',
 
 /* --- sus asuntos (fila 175: salen solos, sin pulsar nada) --- */
 await pagina.waitForSelector('#asuntos-del-tercero .resultado');
-await comprobar('ve su asunto archivado',
+await comprobar('ve su asunto cerrado',
   pagina.locator('#asuntos-del-tercero .resultado').count(), 1);
 await comprobar('y dice que está archivado',
   pagina.locator('#asuntos-del-tercero .resultado-pie').first().textContent()
-    .then(t => t.indexOf('Archivado') !== -1), true);
+    .then(t => t.indexOf('Cerrado') !== -1), true);
 
 /* --- dar de alta un solicitante que aún no está en el RegAlum --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');

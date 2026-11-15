@@ -71,9 +71,9 @@ await pagina.evaluate(async () => {
 const r1 = await pasarPorElCuadro('cerrarAsunto', '__a1', '__r1');
 await comprobar('1. no lanza ningún error', r1.ok, true);
 await comprobar('1. avisa en verde de que ya estaba archivado',
-  pagina.locator('.mensaje.bueno').filter({ hasText: 'Este asunto ya estaba archivado' }).count(), 1);
+  pagina.locator('.mensaje.bueno').filter({ hasText: 'Este asunto ya estaba cerrado' }).count(), 1);
 /* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de un
-   asunto archivado ya no se queda en asuntos.json, ni siquiera en este
+   asunto cerrado ya no se queda en asuntos.json, ni siquiera en este
    camino de "ya estaba archivado" (js/ficha-archivo.js la baja a
    _ficha.json en cuanto ve el estado "cerrado"). Se lee de ahí. */
 await comprobar('1. ya no queda en asuntos.json', pagina.evaluate(() =>

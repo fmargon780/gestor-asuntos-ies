@@ -138,8 +138,8 @@ await comprobar('5. con el visor abierto desde la mesa también sale',
   (async () => { await pagina.click('.hito-en-mesa .tcd .tcd-abrir >> visible=true'); await pagina.waitForSelector('#visor-lateral:not(.oculto) #visor-ruta .ruta-documento'); return true; })(), true);
 await pagina.click('#visor-cerrar');
 
-/* ---------- asunto archivado ---------- */
-console.log('--- asunto archivado ---');
+/* ---------- asunto cerrado ---------- */
+console.log('--- asunto cerrado ---');
 await pagina.evaluate(async ([ARCHIVADO, TERCERO]) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle(TERCERO);

@@ -290,7 +290,7 @@
         (conTiempos ? '<td>' + CuentasTiempos.celda(f.media) + '</td><td>' + CuentasTiempos.celda(f.maximo) + '</td>' : '') + '</tr>';
     }).join('');
     return '<table class="cuentas-tabla"><thead><tr><th>Categoría</th><th>Tipo de asunto</th><th>Lo encarga</th>' +
-      '<th>Cuántos</th><th>Abiertos</th><th>Archivados</th>' +
+      '<th>Cuántos</th><th>Abiertos</th><th>Cerrados</th>' +
       (conTiempos ? '<th>Media (días)</th><th>Máximo (días)</th>' : '') + '</tr></thead><tbody>' + cuerpo +
       '<tr class="cuentas-total"><td colspan="3">Total</td><td>' + total + '</td><td>' +
       totalAbiertos + '</td><td>' + totalArchivados + '</td>' + (conTiempos ? '<td></td><td></td>' : '') + '</tr></tbody></table>';
@@ -309,7 +309,7 @@
     }).join('');
     return '<h3 class="cuentas-subtitulo">Por quién lo encarga</h3>' +
       '<table class="cuentas-tabla cuentas-tabla-pequena"><thead><tr><th></th><th>Abiertos</th>' +
-      '<th>Archivados</th><th>Total</th></tr></thead><tbody>' + cuerpo + '</tbody></table>';
+      '<th>Cerrados</th><th>Total</th></tr></thead><tbody>' + cuerpo + '</tbody></table>';
   }
 
   function bloquePorMes(filas) {
@@ -333,7 +333,7 @@
   function bloqueTiempo(t) {
     if (!t.cuantos) return '';
     return '<h3 class="cuentas-subtitulo">Cuánto se tarda</h3>' +
-      '<p class="explica">De ' + t.cuantos + ' asunto' + (t.cuantos === 1 ? '' : 's') + ' archivado' +
+      '<p class="explica">De ' + t.cuantos + ' asunto' + (t.cuantos === 1 ? '' : 's') + ' cerrado' +
       (t.cuantos === 1 ? '' : 's') + ' con fecha de apertura y de cierre: una media de ' + t.media +
       ' día' + (t.media === 1 ? '' : 's') + ', y el que más tardó, ' + t.maximo + ' día' +
       (t.maximo === 1 ? '' : 's') + '.</p>';
@@ -353,7 +353,7 @@
 
     if (!ultimo.indiceOk) {
       caja.innerHTML = '<div class="vacio">El índice del ARCHIVO no está hecho: los asuntos ' +
-        'archivados no entran en las cuentas todavía. Ve a ARCHIVO y pulsa "Reconstruir el ' +
+        'cerrados no entran en las cuentas todavía. Ve a Asuntos cerrados y pulsa "Reconstruir el ' +
         'índice".</div>';
       return;
     }
@@ -376,7 +376,7 @@
     var curso = $('cuentas-curso') ? $('cuentas-curso').value : '';
     var filas = porTipo(ultimo.entradas, curso);
     var t = window.CuentasTiempos && CuentasTiempos.anadirTiempos(filas, ultimo.entradas, curso);   /* fila 140 */
-    var texto = textoParaCopiar(['Categoría', 'Tipo de asunto', 'Lo encarga', 'Cuántos', 'Abiertos', 'Archivados']
+    var texto = textoParaCopiar(['Categoría', 'Tipo de asunto', 'Lo encarga', 'Cuántos', 'Abiertos', 'Cerrados']
       .concat(t ? ['Media (días)', 'Máximo (días)'] : []), filas.map(function (f) {
       return [f.categoria, f.tipo, textoOrgano(f.tipo), f.cuantos, f.abiertos, f.archivados]
         .concat(t ? [CuentasTiempos.celda(f.media), CuentasTiempos.celda(f.maximo)] : []);

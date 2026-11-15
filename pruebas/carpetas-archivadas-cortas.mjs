@@ -111,7 +111,7 @@ await comprobar('2. sus documentos y su ficha han viajado con ella', pagina.eval
   const d = await (await cat.getDirectoryHandle(t)).getDirectoryHandle(c);
   return [...d._hijos.keys()].filter((n) => n === 'papel.txt' || n === '_ficha.json').sort();
 }, [T1, C1]), ['_ficha.json', 'papel.txt']);
-await comprobar('2. el aviso verde de siempre', pagina.evaluate(() => window.__avisos.filter((t) => t === 'Asunto archivado.').length), 1);
+await comprobar('2. el aviso verde de siempre', pagina.evaluate(() => window.__avisos.filter((t) => t === 'Asunto cerrado.').length), 1);
 await comprobar('2. el índice del ARCHIVO lo da con su persona', pagina.evaluate(async ([c, t]) => {
   await window.App.reconstruirIndiceArchivo();
   const r = await window.IndiceArchivo.leerDisco({ todos: true });

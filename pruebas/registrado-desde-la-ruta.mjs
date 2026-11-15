@@ -216,7 +216,7 @@ await comprobar('6. un PDF dentro de «_Previas» no guarda copia',
   }, [ASUNTO]).catch(() => 'x').then(() => dentro(['_copia-ruta'])), [DOC3]);
 await comprobar('6. un archivo Word no guarda copia',
   pagina.evaluate(async (a) => RutaCopia.toca(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], 'abierto', { nombre: 'x.docx', subcarpeta: '' }), ASUNTO), false);
-await comprobar('6. un asunto archivado no guarda copia',
+await comprobar('6. un asunto cerrado no guarda copia',
   pagina.evaluate(async (a) => RutaCopia.toca(App.E.listaAbiertos.filter((x) => x.nombre === a)[0], 'archivado', { nombre: 'x.pdf', subcarpeta: '' }), ASUNTO), false);
 await comprobar('6. `_copia-ruta` la ignora lo que recorre carpetas',
   pagina.evaluate(() => Carpetas.esCarpetaTemporalDeSincronizacion('_copia-ruta')), true);

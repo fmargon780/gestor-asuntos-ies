@@ -50,13 +50,13 @@ await abrir();
 await comprobar('5. dos casillas, en este orden, con la nota de la primera', pagina.evaluate((s) => {
   const d = document.querySelector(s);
   return [Array.from(d.querySelectorAll('label.interruptor')).map((l) => l.textContent.trim()), /pestaña «Por liquidar» de Inicio hasta que se liquidan/.test(d.textContent)];
-}, apartado), [['Al terminar, pasa a «Por liquidar» en vez de archivarse', 'Al cerrar el asunto, avisar a quien lo pide'], true]);
+}, apartado), [['Al terminar, pasa a «Por liquidar» en vez de cerrarse', 'Al cerrar el asunto, avisar a quien lo pide'], true]);
 await comprobar('6. la primera sale marcada en el seguro escolar', casilla().first().isChecked(), true);
 await comprobar('13. en ningún sitio queda el texto viejo', pagina.evaluate(() => document.getElementById('pantalla-tipo-asunto').textContent.indexOf('Hay que liquidarlo antes de archivar') !== -1), false);
 
 console.log('--- el otro tipo ---');
 await abrirTipo('PRUEBA SIN LIQUIDAR');
-await comprobar('4. sin abrirlo dice «se archiva»', resumen(), 'se archiva');
+await comprobar('4. sin abrirlo dice «se cierra»', resumen(), 'se cierra');
 await abrir();
 await comprobar('6. la primera sale desmarcada', casilla().first().isChecked(), false);
 await casilla().first().check();
@@ -67,14 +67,14 @@ await abrirTipo('PRUEBA SIN LIQUIDAR');
 await comprobar('7. al volver a entrar sigue marcada', [await abierto(), await casilla().first().isChecked()], [true, true]);
 await casilla().first().uncheck();
 await pagina.waitForTimeout(500);
-await comprobar('9. desmarcada, vuelve a «se archiva»', resumen(), 'se archiva');
+await comprobar('9. desmarcada, vuelve a «se cierra»', resumen(), 'se cierra');
 
 console.log('--- avisar a quien lo pide ---');
 await pagina.locator(apartado + ' .tipo-avisar-lopide-cierre').check();
 await pagina.waitForTimeout(500);
 await comprobar('10. marcada: sale la plantilla y el título acaba en « · avisa a quien lo pide»', pagina.evaluate((s) => [
   !document.querySelector(s + ' .tipo-avisar-lopide-cierre-plantilla').classList.contains('oculto')], apartado), [true]);
-await comprobar('10. el título', resumen(), 'se archiva · avisa a quien lo pide');
+await comprobar('10. el título', resumen(), 'se cierra · avisa a quien lo pide');
 await comprobar('11. la lista de comprobación pide la plantilla y su línea abre «Al terminar el asunto»', (async () => {
   await pagina.click('#pantalla-tipo-asunto details[data-seccion="al-terminar"] > summary');   /* se pliega para ver que la línea lo abre */
   await pagina.locator('#pantalla-tipo-asunto .tipo-comprobacion-linea, #pantalla-tipo-asunto [class*="comprobacion"] button, #pantalla-tipo-asunto [class*="comprobacion"] li').filter({ hasText: 'Falta la plantilla del aviso al cerrar' }).first().click();
@@ -85,7 +85,7 @@ await pagina.locator(apartado + ' .tipo-avisar-lopide-cierre').uncheck();
 await pagina.waitForTimeout(400);
 await comprobar('10. desmarcada: se esconde la plantilla y el título pierde ese trozo', pagina.evaluate((s) => [
   document.querySelector(s + ' .tipo-avisar-lopide-cierre-plantilla').classList.contains('oculto')], apartado), [true]);
-await comprobar('10. el título', resumen(), 'se archiva');
+await comprobar('10. el título', resumen(), 'se cierra');
 
 console.log('--- «Datos del tipo» ---');
 await pagina.evaluate(() => { document.querySelector('#pantalla-tipo-asunto details[data-seccion="datos"]').open = true; });

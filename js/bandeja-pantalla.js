@@ -179,7 +179,7 @@ var BandejaPantalla = (function () {
     var frase = 'Ya está en el asunto «' + U.escapar(encaje.nombre) + '»';
     if (huella.metidoPor) frase += ' · lo guardó ' + U.escapar(huella.metidoPor);
     if (huella.metidoEl) frase += ' el ' + U.escapar(window.Bandeja.fechaHoraLegible(huella.metidoEl));
-    if (archivado) frase += ' · <strong>asunto archivado</strong>';
+    if (archivado) frase += ' · <strong>asunto cerrado</strong>';
     div.innerHTML = '<span class="ya-guardado-texto">' + frase + '</span>';
 
     var acciones = document.createElement('div');
@@ -250,7 +250,7 @@ var BandejaPantalla = (function () {
     if (yaEsta) {
       linea.innerHTML = '<span class="marca-tipo">Respuesta de</span>' +
         U.escapar(yaEsta.nombre) +
-        (window.Bandeja.estaArchivado(yaEsta.ficha) ? '  ·  <strong>asunto archivado</strong>' : '');
+        (window.Bandeja.estaArchivado(yaEsta.ficha) ? '  ·  <strong>asunto cerrado</strong>' : '');
     } else {
       /* La propuesta se calcula al pintar, sin esperar: primero sale la
          tarjeta y un momento después lo que se ha reconocido. */

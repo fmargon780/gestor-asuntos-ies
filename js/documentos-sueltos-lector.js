@@ -171,7 +171,7 @@
     if (sugerencia.otroTipo || sugerencia.archivado) {
       var marca = document.createElement('span');
       marca.className = 'suave';
-      marca.textContent = '  ' + (sugerencia.archivado ? 'archivado' : 'otro tipo');
+      marca.textContent = '  ' + (sugerencia.archivado ? 'cerrado' : 'otro tipo');
       linea.appendChild(marca);
     }
 

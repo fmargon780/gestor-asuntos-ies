@@ -107,7 +107,7 @@
       { titulo: 'Quién lo pide', valor: window.LoPide ? LoPide.texto(f) : '', encargo: puedeCambiar, pide: pide.indexOf('lopide') !== -1 },
       { titulo: 'Por qué vía', valor: App.textoVia(f), encargo: puedeCambiar, pide: pide.indexOf('via') !== -1 },
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
-      { titulo: 'En el archivo', valor: a.ruta || '' }
+      { titulo: 'Cerrado', valor: a.ruta || '' }
     ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo || x.elegir || x.pide); });
     /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que

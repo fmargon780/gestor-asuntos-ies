@@ -45,14 +45,14 @@ var ProblemasTextos = (function () {
     return {
       titulo: n === 1 ? '1 asunto ha perdido su carpeta' : n + ' asuntos han perdido su carpeta',
       que: 'La app tiene apuntado el asunto, pero no encuentra su carpeta en la nube.',
-      porque: 'Alguien cambió el nombre de la carpeta o la movió a mano, o el asunto se archivó y la app no se enteró.',
+      porque: 'Alguien cambió el nombre de la carpeta o la movió a mano, o el asunto se cerró y la app no se enteró.',
       antes: 'Asunto por asunto:',
       elementos: elementos.map(function (e) {
         return {
           nombre: e.nombre, detalle: e.detalle,
           acciones: [
             { texto: 'Buscar su carpeta', normal: true,
-              explica: 'Buscas su carpeta entre todas, las abiertas y las archivadas. El asunto conserva sus hitos y sus notas.' },
+              explica: 'Buscas su carpeta entre todas, las abiertas y las cerradas. El asunto conserva sus hitos y sus notas.' },
             { texto: 'El asunto ya no existe', peligro: true,
               explica: 'Se quita de la lista. Queda en las copias de seguridad durante ' + plural(dias, 'día', 'días') + ', por si era un error.' }
           ]
@@ -272,11 +272,11 @@ var ProblemasTextos = (function () {
   function fichasArchivo(n) {
     return {
       titulo: n === 1 ? '1 ficha del ARCHIVO por poner en orden' : n + ' fichas del ARCHIVO por poner en orden',
-      que: 'La ficha de estos asuntos archivados sigue en la lista general, en vez de en su propia carpeta.',
-      porque: 'Son asuntos archivados antes de que cada uno llevara su ficha en su carpeta.',
+      que: 'La ficha de estos asuntos cerrados sigue en la lista general, en vez de en su propia carpeta.',
+      porque: 'Son asuntos cerrados antes de que cada uno llevara su ficha en su carpeta.',
       acciones: [
         { texto: 'Mover ' + plural(n, 'ficha', 'fichas'), normal: true, id: 'problema-fichas-mover',
-          explica: 'Baja a su propia carpeta la ficha de cada asunto archivado. No se pierde ningún dato: se copia tal cual.' }
+          explica: 'Baja a su propia carpeta la ficha de cada asunto cerrado. No se pierde ningún dato: se copia tal cual.' }
       ]
     };
   }

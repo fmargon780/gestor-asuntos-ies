@@ -41,10 +41,10 @@ App.pintarSelectorCursoArchivo = function (cursos, seleccionado) {
    elegido en el desplegable «Curso: … ▾»: `undefined` (todavía no se
    ha tocado) es el curso actual; `''` es «Todos los cursos». */
 App.verArchivo = async function () {
-  $('explica-archivo').textContent = 'Leyendo el archivo…';
+  $('explica-archivo').textContent = 'Leyendo los asuntos cerrados…';
 
   var progreso = function (nombreCategoria, total) {
-    $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
+    $('explica-archivo').textContent = 'Leyendo los asuntos cerrados… ' + nombreCategoria + ' · ' + total + ' asuntos';
   };
 
   var elegido = App.E.cursoArchivo;
@@ -101,7 +101,7 @@ App.verArchivo = async function () {
   if (window.Perfil) salida = salida.filter(Perfil.veAsunto);   /* fila 287 */
   App.E.listaArchivo = salida;
 
-  var partes = [salida.length + ' asuntos archivados.'];
+  var partes = [salida.length + ' asuntos cerrados.'];
   if (descolocados) {
     partes.push('Hay ' + descolocados + ' asunto' + (descolocados === 1 ? '' : 's') +
       ' colocado' + (descolocados === 1 ? '' : 's') + ' fuera de su sitio.');
@@ -131,7 +131,7 @@ App.reconstruirIndiceArchivo = async function (boton) {
   await U.mientrasGuarda(boton || null, async function () {
     try {
       var indice = await IndiceArchivo.construir(function (nombreCategoria, total) {
-        $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
+        $('explica-archivo').textContent = 'Leyendo los asuntos cerrados… ' + nombreCategoria + ' · ' + total + ' asuntos';
       });
       await IndiceArchivo.guardar(indice);
       U.aviso('Índice reconstruido.', 'bueno');
@@ -157,7 +157,7 @@ App.pintarArchivo = function () {
   caja.innerHTML = '';
   if (!lista.length) {
     var msg = palabras.length
-      ? 'Ningún asunto archivado tiene todas esas palabras.'
+      ? 'Ningún asunto cerrado tiene todas esas palabras.'
       : 'Nada que mostrar.';
     if (App.E.indiceSinHacer) msg += ' El índice no está hecho: pulsa "Reconstruir el índice".';
     caja.innerHTML = '<div class="vacio">' + U.escapar(msg) + '</div>';
@@ -368,7 +368,7 @@ App.verAsuntosDeTercero = async function (p) {
     var ter = await cat.getDirectoryHandle(texto);
     var cerradas = await Carpetas.subcarpetas(ter);
     cerradas.forEach(function (c) {
-      salida.push({ nombre: c.nombre, donde: 'Archivado', handle: c.handle });
+      salida.push({ nombre: c.nombre, donde: 'Cerrado', handle: c.handle });
     });
   } catch (e) { /* todavía no tiene carpeta en el archivo */ }
 
@@ -390,7 +390,7 @@ App.verAsuntosDeTercero = async function (p) {
     var nAbiertos = salida.filter(function (x) { return x.donde === 'Abierto'; }).length;
     var nArchivados = salida.length - nAbiertos;
     resumenAsuntos.textContent = salida.length
-      ? nAbiertos + (nAbiertos === 1 ? ' abierto' : ' abiertos') + ' · ' + nArchivados + (nArchivados === 1 ? ' archivado' : ' archivados')
+      ? nAbiertos + (nAbiertos === 1 ? ' abierto' : ' abiertos') + ' · ' + nArchivados + (nArchivados === 1 ? ' cerrado' : ' cerrados')
       : 'ninguno';
   }
 
@@ -402,7 +402,7 @@ App.verAsuntosDeTercero = async function (p) {
   function abrirFilaDeAsunto(a) {
     if (a.donde === 'Abierto') {
       var abierto = (App.E.listaAbiertos || []).filter(function (x) { return x.nombre === a.nombre; })[0];
-      if (!abierto) { U.aviso('Ya no está abierto: puede que se haya archivado desde otro ordenador.', 'malo'); return; }
+      if (!abierto) { U.aviso('Ya no está abierto: puede que se haya cerrado desde otro ordenador.', 'malo'); return; }
       App.abrirFicha(abierto, 'abierto');
       return;
     }

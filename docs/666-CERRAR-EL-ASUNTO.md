@@ -233,4 +233,9 @@ palabras, y las ve todas en estas tablas.
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code)
+- (15-nov-2026, fila 676) Primer revisor (nuevo, por navegador): RECHAZADA por dos puntos: el contador de la ficha del tercero («1 archivado») y la ayuda del plazo de conservación («Cuando un archivado lo cumpla»). El primero se corrigió; el segundo **no se cambia**: la instrucción lo deja tal cual (plazo de conservación, idea 675).
+- Segundo revisor (nuevo, desde cero): **APROBADA**. Coincide: botón «Cerrar el asunto» (ficha, mesa del hito, menú ⋮ de Inicio, diálogo), «Reabrir el asunto»; pestaña y título «Asuntos cerrados», buscador y «Leyendo los asuntos cerrados…»; «Cerrado», «asunto cerrado», «Asunto cerrado.»; contadores de Personas («1 abierto · 1 cerrado»); columnas «Cerrados» de Cuentas y «Tipos y su uso»; exportación («Incluir también los cerrados», «Situación (abierto o cerrado)», «Fecha de cierre»); Por liquidar («Liquidar y cerrar», «Liquidados y cerrados», «Listos para cerrar»); «se cierra» en Ajustes; las excepciones (ARCHIVO, Gmail, acción «Archivar», conservación, «Acortar las carpetas del archivo», histórico de novedades) siguen igual; línea nueva en «Qué hay de nuevo»; sin cambios de comportamiento.
+- No lo ha podido ver: el literal «Cerrado el <fecha>» (los datos de demostración no traen fecha de cierre).
+- A valorar por Francisco: en la ficha de un asunto cerrado, la fila de ubicación se llama «Cerrado» (así lo pedía la tabla: «En el archivo» → «Cerrado») pero su valor es la ruta de la carpeta en el ARCHIVO. Si no casa, se puede llamar «En el ARCHIVO».
+- Rótulo de la lista en «Otros asuntos de este tercero»: «Cerrados» (plural, junto a «Abiertos») en vez de «Cerrado».
+- `copiar-ruta.mjs` falla en la rama solo porque su `App.VERSION` difiere de la publicada en `main` (sale la franja de versión nueva); pasa con la versión de `main`.

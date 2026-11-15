@@ -241,7 +241,7 @@ var HitoMesa = (function () {
         (window.PorLiquidar && PorLiquidar.exige(a) && PorLiquidar.estaPorLiquidar(a)
           ? 'El asunto está en «Por liquidar».'
           : '<button type="button" class="boton boton-principal mesa-archivar-asunto">' +
-            (window.PorLiquidar ? PorLiquidar.textoDelBoton(a) : 'Archivar el asunto') + '</button>') +
+            (window.PorLiquidar ? PorLiquidar.textoDelBoton(a) : 'Cerrar el asunto') + '</button>') +
         '</div>' : '');
 
     if (abierto && window.Esperas) Esperas.enganchar(cab, a, h);

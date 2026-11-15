@@ -219,7 +219,7 @@ window.PorLiquidarLiquidar = (function () {
         App.E.archivarSinPreguntar = true;
         try { await App.cerrarAsunto(a); } finally { App.E.archivarSinPreguntar = false; }
       } catch (e) {
-        U.accesorio('No he podido archivar «' + (QueMeToca.terceroDe(a) || a.nombre) + '»', e);
+        U.accesorio('No he podido cerrar «' + (QueMeToca.terceroDe(a) || a.nombre) + '»', e);
       }
       if (await estaArchivado(a)) {
         hechos.push(a);
@@ -233,7 +233,7 @@ window.PorLiquidarLiquidar = (function () {
     if (hechos.length) {
       var s = PorLiquidar.sumar(hechos);
       var conImporte = hechos.some(function (a) { return PorLiquidar.importeDe(a); });
-      U.aviso('Liquidados y archivados ' + hechos.length + (hechos.length === 1 ? ' asunto' : ' asuntos') +
+      U.aviso('Liquidados y cerrados ' + hechos.length + (hechos.length === 1 ? ' asunto' : ' asuntos') +
         (conImporte ? '. Total: ' + PorLiquidar.euros(s.total) : '') + '.', 'bueno');
     }
     try { await App.verAbiertos(); } catch (e3) { /* solo pintar */ }
@@ -284,7 +284,7 @@ window.PorLiquidarLiquidar = (function () {
         (conImporte ? ' · Total: <strong>' + U.escapar(PorLiquidar.euros(s.total)) + '</strong>' +
           (s.sinImporte ? ' (' + s.sinImporte + ' sin importe)' : '') : '') + '</p>' +
       '<ul class="liq-lista">' + lista + '</ul>',
-      'Liquidar y archivar');
+      'Liquidar y cerrar');
     var recibeEditado = false;
     if ($('liq-recibe')) $('liq-recibe').oninput = function () { recibeEditado = true; };
     if ($('liq-fecha')) $('liq-fecha').onchange = async function () {

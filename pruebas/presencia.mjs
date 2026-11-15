@@ -108,7 +108,7 @@ await comprobar('el aviso nombra a Juan',
 await comprobar('el desplegable de estado está apagado',
   pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), true);
 await comprobar('el botón de archivar está apagado',
-  pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).isDisabled(), true);
+  pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).isDisabled(), true);
 await comprobar('pero "Volver a la lista" sigue activo',
   pagina.locator('#ficha-volver').isDisabled(), false);
 await comprobar('"Tomar el mando" está y activo',

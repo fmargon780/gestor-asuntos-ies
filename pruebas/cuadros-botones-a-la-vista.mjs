@@ -52,7 +52,7 @@ await pagina.evaluate(() => {
   window.__fin = Relacionados.confirmarRelacionadosAlArchivar({ ficha: { relacionados: lista } }).then((r) => { window.__r = r; });
 });
 await pagina.waitForSelector('.rel-confirmar-lista');
-comprobar('1. Cancelar y «Archivar el asunto» se ven y se pueden pulsar', await pie(['cuadro-cancelar', 'cuadro-aceptar']), { 'cuadro-cancelar': 'bien', 'cuadro-aceptar': 'bien' });
+comprobar('1. Cancelar y «Cerrar el asunto» se ven y se pueden pulsar', await pie(['cuadro-cancelar', 'cuadro-aceptar']), { 'cuadro-cancelar': 'bien', 'cuadro-aceptar': 'bien' });
 comprobar('1. el cuadro cabe en la pantalla', await cuadroCabe(), true);
 comprobar('1. el cuerpo se desplaza por dentro', await pagina.evaluate(() => { const c = document.getElementById('cuadro-cuerpo'); return c.scrollHeight > c.clientHeight; }), true);
 await pagina.evaluate(() => { document.getElementById('cuadro-cuerpo').scrollTop = 99999; });

@@ -114,7 +114,7 @@ var RepartirCrear = (function () {
       } catch (e) { archivado = false; }
       if (archivado) return { ok: true, asunto: nombre };
       var noCupo = window.ArchivarCabe && ArchivarCabe.noCupo(nombre);   /* fila 265 */
-      return { ok: false, asunto: nombre, motivo: noCupo ? 'creado, pero algún documento no cabe en el archivo' : 'creado, pero no se ha podido archivar' };
+      return { ok: false, asunto: nombre, motivo: noCupo ? 'creado, pero algún documento no cabe en el ARCHIVO' : 'creado, pero no se ha podido cerrar' };
     } catch (e) {
       return { ok: false, asunto: nombre, motivo: U.mensajeDeError(e) };
     }

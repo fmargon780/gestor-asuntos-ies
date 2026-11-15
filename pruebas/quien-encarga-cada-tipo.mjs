@@ -142,7 +142,7 @@ await comprobar('el filtro de verdad, sobre el montón entero',
 await pagina.selectOption('#filtro-organo', '');
 
 console.log('--- 5. Cuentas, por órgano ---');
-await comprobar('suma por órgano, abiertos y archivados, en su orden',
+await comprobar('suma por órgano, abiertos y cerrados, en su orden',
   pagina.evaluate(() => Cuentas._porOrgano([
     { tipo: 'MATRICULA', abierta: true, fecha: '260901' },
     { tipo: 'MATRICULA', abierta: false, fecha: '260902' },

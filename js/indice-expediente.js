@@ -172,7 +172,7 @@ var IndiceExpediente = (function () {
     if (d.tipo) datos.push('Tipo: ' + d.tipo);
     if (d.tercero) datos.push('Tercero: ' + d.tercero);
     if (d.abierto) datos.push('Abierto el ' + d.abierto);
-    if (d.archivado) datos.push('Archivado el ' + d.archivado);
+    if (d.archivado) datos.push('Cerrado el ' + d.archivado);
     partir(datos.join('   ·   '), normal, 9.5, ANCHO - 2 * M).forEach(function (l) { texto(l, M, y, 9.5, normal, gris); y -= 12; });
     y -= 14;
     cabeceraTabla();

@@ -124,7 +124,7 @@ const asuntos = [
 let c = ControlRegistro.clasificar(estado, asuntos);
 const codigos = (l) => l.map((x) => x.apunte.codigo);
 comprobar('por el registro de un documento (abierto) -> con asunto', c.S.con.map((x) => [x.apunte.codigo, x.nota]).filter((x) => x[0] === '26SM0674'), [['26SM0674', false]]);
-comprobar('por el registro de un asunto archivado -> con asunto', c.E.con.filter((x) => x.apunte.codigo === '26EM0427').length, 1);
+comprobar('por el registro de un asunto cerrado -> con asunto', c.E.con.filter((x) => x.apunte.codigo === '26EM0427').length, 1);
 comprobar('por el número A26-0024 del extracto, con la nota gris', c.E.con.filter((x) => x.apunte.codigo === '26EM0428').map((x) => x.nota), [true]);
 comprobar('por el nombre de la carpeta, con la nota gris', c.E.con.filter((x) => x.apunte.codigo === '26EM0430').map((x) => x.nota), [true]);
 comprobar('un apunte anulado solo sale en Anulados', [codigos(c.E.anulados), codigos(c.S.anulados), codigos(c.E.sin).includes('26EM0426')], [['26EM0426'], ['26SM0669'], false]);

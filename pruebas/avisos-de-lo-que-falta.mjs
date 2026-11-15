@@ -152,9 +152,9 @@ await pagina.evaluate(async ([idH, nombre, C, D]) => {
 await preparaCuadros(false);
 await pagina.evaluate(async (nombre) => { const a = Gestor.asuntos().filter((x) => x.nombre === nombre)[0]; await App.cerrarAsunto(a); }, prep.nombre);
 const c3 = await cuadros();
-await comprobar('3. el cuadro es el del asunto, con «Archivar igualmente» y «Volver»; «Volver» no archiva (un solo cuadro)',
+await comprobar('3. el cuadro es el del asunto, con «Cerrar igualmente» y «Volver»; «Volver» no archiva (un solo cuadro)',
   [c3.length, c3[0].titulo, c3[0].aceptar, c3[0].cancelar, c3[0].lineas.some((l) => l.indexOf(DOC_D) !== -1)],
-  [1, 'Falta por hacer en este asunto', 'Archivar igualmente', 'Volver', true]);
+  [1, 'Falta por hacer en este asunto', 'Cerrar igualmente', 'Volver', true]);
 
 console.log('--- 4. enviar ---');
 await comprobar('4. el resumen del correo con adjunto pendiente: cuadro «Falta por hacer en lo que vas a enviar» y «Enviar igualmente»',

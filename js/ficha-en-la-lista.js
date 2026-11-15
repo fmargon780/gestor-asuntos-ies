@@ -23,10 +23,10 @@
      del tipo) se hace dentro. */
   var BOTONES_DE_LA_TARJETA = ['Copiar nombre', 'Cerrar', 'Reabrir'];
 
-  /* "Cerrar" se llama Archivar, que es lo que de verdad hace: llevar
+  /* "Cerrar" se llama «Cerrar el asunto», que es lo que de verdad hace: llevar
      la carpeta al ARCHIVO. El texto se cambia aquí, donde ya se está
      tocando la tarjeta. */
-  var NOMBRES_NUEVOS = { 'Cerrar': 'Archivar' };
+  var NOMBRES_NUEVOS = { 'Cerrar': 'Cerrar el asunto' };
 
   U.envolver(App, 'App.tarjetaAsunto', 'ficha-en-la-lista.js', function (comoEra) {
     return function (a, modo) {

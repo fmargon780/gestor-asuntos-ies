@@ -169,8 +169,8 @@ var GuardadoPendiente = (function () {
       texto = 'Un cambio en el asunto ' + n + ' no se ha guardado porque otro ordenador lo unió con otro antes. ' +
         'Búscalo en el asunto resultante y repítelo si hace falta.';
     } else {
-      texto = 'Un cambio en el asunto ' + n + ' no se ha guardado porque otro ordenador lo archivó antes. ' +
-        'Ábrelo desde el Archivo y repítelo si hace falta.';
+      texto = 'Un cambio en el asunto ' + n + ' no se ha guardado porque otro ordenador lo cerró antes. ' +
+        'Ábrelo desde Asuntos cerrados y repítelo si hace falta.';
     }
     avisoConCierre(texto);
     var lista2 = esperas[ASUNTOS] || [];

@@ -119,7 +119,7 @@ await comprobar('1. se ven pulsables (cursor de mano)',
   pagina.evaluate(() => getComputedStyle(document.querySelector('#ficha-otros .otros-asunto')).cursor), 'pointer');
 await comprobar('1. salen los dos grupos, abierto y archivado',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-otros .otros-rotulo')).map((r) => r.textContent)),
-  ['Abiertos', 'En el archivo']);
+  ['Abiertos', 'Cerrados']);
 await comprobar('1. sin botón de vuelta todavía (es el asunto de partida)', botonVuelta().count(), 0);
 
 console.log('--- 2. pulsar un asunto abierto abre su ficha ---');

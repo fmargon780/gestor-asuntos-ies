@@ -55,11 +55,11 @@ var EstadoHito = (function () {
   /* La ficha de un asunto del ARCHIVO (o la del índice). */
   function textoArchivado(ficha) {
     var f = ficha || {};
-    if (f.terminado) return 'Archivado · terminado';
-    if (f.seQuedoEn) return 'Archivado · se quedó en: ' + f.seQuedoEn;
+    if (f.terminado) return 'Cerrado · terminado';
+    if (f.seQuedoEn) return 'Cerrado · se quedó en: ' + f.seQuedoEn;
     /* Archivado antes de la fila 129: su estado viejo, como dato histórico. */
-    if (f.situacion) return 'Archivado · ' + f.situacion;
-    return 'Archivado';
+    if (f.situacion) return 'Cerrado · ' + f.situacion;
+    return 'Cerrado';
   }
 
   /* El estado de un asunto abierto por su nombre, con lo último leído

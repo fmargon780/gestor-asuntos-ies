@@ -302,7 +302,7 @@ App.tarjetaAsunto = function (a, modo) {
   if (window.ArchivarFondo && ArchivarFondo.enOtroOrdenador(a.ficha)) {   /* fila 398 */
     var otro = document.createElement('p');
     otro.className = 'nota archivandose-otro';
-    otro.textContent = 'Archivándose en otro ordenador…';
+    otro.textContent = 'Cerrándose en otro ordenador…';
     div.appendChild(otro);
     div.classList.add('tarjeta-ocupada');
     Array.prototype.forEach.call(div.querySelectorAll('button, select'), function (b) { b.disabled = true; });
@@ -386,7 +386,7 @@ App.textoLeTocaA = function (a, lado) {
    - pestana 'esp': `hito` es el hito que espera a otro, `dias` los que
      lleva esperando (columna Plazo).
    - `sinHito` (fila 451, solo en 'adm'): el asunto no tiene ningún hito por
-     hacer; en la columna del hito sale «Añade un hito o archívalo» (o
+     hacer; en la columna del hito sale «Añade un hito o ciérralo» (o
      «Abre el asunto para cargar sus pasos» con `cargarPasos`).
    - Si el asunto está dormido, su nombre lleva la marca «Dormido · N días». */
 App.filaTablaAsunto = function (a, opciones) {
@@ -470,7 +470,7 @@ App.filaTablaAsunto = function (a, opciones) {
   tdHito.className = 'inicio-tabla-hito';
   if (opciones.sinHito) {   /* fila 451: nada por hacer, y aquí va lo que se puede hacer */
     tdHito.innerHTML = '<span class="suave inicio-sin-hito">' +
-      (opciones.cargarPasos ? 'Abre el asunto para cargar sus pasos' : 'Añade un hito o archívalo') + '</span>';
+      (opciones.cargarPasos ? 'Abre el asunto para cargar sus pasos' : 'Añade un hito o ciérralo') + '</span>';
     celdas.hito = tdHito;
   } else {
     tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
@@ -505,7 +505,7 @@ App.filaTablaAsunto = function (a, opciones) {
   archivar.type = 'button';
   /* Fila 249: en un tipo que hay que liquidar, «Pasar a Por liquidar». */
   var pasaAPorLiquidar = window.PorLiquidar && PorLiquidar.exige(a) && !PorLiquidar.estaPorLiquidar(a);
-  archivar.textContent = pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Archivar';
+  archivar.textContent = pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Cerrar el asunto';
   archivar.onclick = async function () {
     await U.mientrasGuarda(archivar, function () { return pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : ArchivarFondo.archivar(a); });
   };
@@ -538,7 +538,7 @@ App.filaTablaAsunto = function (a, opciones) {
   if (window.ArchivarFondo && ArchivarFondo.enOtroOrdenador(a.ficha)) {   /* fila 398 */
     var otroFila = document.createElement('small');
     otroFila.className = 'nota archivandose-otro';
-    otroFila.textContent = ' Archivándose en otro ordenador…';
+    otroFila.textContent = ' Cerrándose en otro ordenador…';
     tdTercero.appendChild(otroFila);
     tr.classList.add('inicio-tabla-fila-ocupada');
     Array.prototype.forEach.call(tr.querySelectorAll('button'), function (b) { b.disabled = true; });

@@ -87,7 +87,7 @@ async function abrirFichaYArchivar(clave) {
     App.abrirFicha(a, 'abierto');
   }, clave);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).click();
+  await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)', { timeout: 15000 });

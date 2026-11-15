@@ -8,7 +8,7 @@ document.write(`<div id="aplicacion" class="oculto">
     <button class="pestana pestana-encargo" data-pantalla="encargo-nuevo"><span>Nuevo encargo</span></button>
     <button class="pestana pestana-encargo" data-pantalla="encargos-mios"><span>Mis encargos</span></button>
     <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
-    <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
+    <button class="pestana" data-pantalla="archivo"><span>Asuntos cerrados</span></button>
     <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
     <!-- Fila 200, apartado 7 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md):
          js/barra.js inserta "Impresos" y "Cuentas" justo detrás del
@@ -312,9 +312,9 @@ document.write(`<div id="aplicacion" class="oculto">
 
     <section id="pantalla-archivo" class="pantalla oculto">
       <header class="cabecera">
-        <h2>Archivo</h2>
+        <h2>Asuntos cerrados</h2>
         <div class="acciones">
-          <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
+          <input id="buscar-archivo" class="campo" placeholder="Buscar en todos los asuntos cerrados">
           <!-- Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 1): el
                índice del ARCHIVO está partido por curso académico; este
                selector elige cuál se lee (o todos a la vez). Las
@@ -323,7 +323,7 @@ document.write(`<div id="aplicacion" class="oculto">
           <select id="selector-curso-archivo" class="campo" style="width:auto" aria-label="Curso"></select>
         </div>
       </header>
-      <p class="explica" id="explica-archivo">Leyendo el archivo…</p>
+      <p class="explica" id="explica-archivo">Leyendo los asuntos cerrados…</p>
       <div id="lista-archivo" class="lista"></div>
     </section>
 

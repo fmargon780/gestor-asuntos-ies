@@ -98,7 +98,7 @@ var OtrosDelTercero = (function () {
       }
       caja.className = 'otros-lista';
       caja.innerHTML = listaDeOtros('Abiertos', abiertos, tipo, false) +
-                       listaDeOtros('En el archivo', archivados, tipo, true);
+                       listaDeOtros('Cerrados', archivados, tipo, true);
       resumenDeOtros(caja, abiertos.length + archivados.length);
 
       Array.prototype.forEach.call(caja.querySelectorAll('.otros-asunto'), function (b) {
@@ -167,7 +167,7 @@ var OtrosDelTercero = (function () {
         abrirFicha(objeto, 'archivado');
       } else {
         var a = buscarAbierto(nombre);
-        if (!a) throw new Error('ya no está abierto: puede que se haya archivado desde otro ordenador');
+        if (!a) throw new Error('ya no está abierto: puede que se haya cerrado desde otro ordenador');
         abrirFicha(a, 'abierto');
       }
     } catch (e) {

@@ -4,7 +4,7 @@
    carpetas más lento (1 s) para poder mirar lo que pasa mientras dura.
 
    1. Dos asuntos seguidos, sin esperar: los dos salen de la lista al
-      momento, sale «Archivando…» (con los dos números), y al acabar los dos
+      momento, sale «Cerrando…» (con los dos números), y al acabar los dos
       están en el ARCHIVO, sin marca y sin aviso.
    2. El traslado falla: el asunto vuelve a la lista, aviso rojo con botón de
       cerrar y el número real, sin marca; al repetir, se archiva.
@@ -92,13 +92,13 @@ await aceptar();
 await pagina.waitForFunction((n) => window['__fin' + n] === 'liberado', N(2), { timeout: 5000 });
 await comprobar('1. los dos han salido de la lista al momento', Promise.all([enLista(1), enLista(2)]), [false, false]);
 await comprobar('1. los demás siguen en la lista', Promise.all([enLista(3), enLista(4)]), [true, true]);
-await comprobar('1. sale «Archivando…» con los dos números', pagina.locator('#archivando-fondo').innerText(), 'Archivando A26-0391, A26-0392…');
+await comprobar('1. sale «Cerrando…» con los dos números', pagina.locator('#archivando-fondo').innerText(), 'Cerrando A26-0391, A26-0392…');
 await comprobar('1. la carpeta todavía no se ha movido', enArchivo(1), false);
 await pagina.waitForSelector('#archivando-fondo', { state: 'detached', timeout: 20000 });
 await comprobar('1. los dos están en el ARCHIVO', Promise.all([enArchivo(1), enArchivo(2)]), [true, true]);
 await comprobar('1. ya no están en Asuntos abiertos', pagina.evaluate((ns) => ns.map((n) => window.__disco.abiertos._hijos.has(n)), [N(1), N(2)]), [false, false]);
 await comprobar('1. sin marca «archivándose» (la ficha bajó a su carpeta)', Promise.all([marca(1), marca(2)]), [false, false]);
-await comprobar('1. el aviso verde de siempre', pagina.evaluate(() => window.__avisos.filter((t) => t === 'Asunto archivado.').length), 2);
+await comprobar('1. el aviso verde de siempre', pagina.evaluate(() => window.__avisos.filter((t) => t === 'Asunto cerrado.').length), 2);
 await comprobar('1. no sale ningún aviso rojo', pagina.locator('.mensaje.malo').count(), 0);
 
 console.log('--- 2. el traslado falla ---');
@@ -110,13 +110,13 @@ await comprobar('2. sale de la lista al momento', enLista(3), false);
 await pagina.waitForSelector('.guardado-pendiente-cerrable', { timeout: 20000 });
 await comprobar('2. aviso rojo con el número real y sin mover nada',
   pagina.locator('.guardado-pendiente-cerrable > span').first().evaluate((e) => e.firstChild.textContent),
-  'No se ha podido archivar el asunto A26-0393. No se ha movido nada. Vuelve a pulsar Archivar.');
+  'No se ha podido cerrar el asunto A26-0393. No se ha movido nada. Vuelve a pulsar Cerrar el asunto.');
 await comprobar('2. el aviso lleva botón de cerrar', pagina.locator('.guardado-pendiente-cerrable button').count(), 1);
 await comprobar('2. el asunto vuelve a la lista', enLista(3), true);
 await comprobar('2. sigue en Asuntos abiertos y no en el archivo', Promise.all([
   pagina.evaluate((n) => window.__disco.abiertos._hijos.has(n), N(3)), enArchivo(3)]), [true, false]);
 await comprobar('2. sin marca', marca(3), false);
-await comprobar('2. ya no sale «Archivando…»', pagina.locator('#archivando-fondo').count(), 0);
+await comprobar('2. ya no sale «Cerrando…»', pagina.locator('#archivando-fondo').count(), 0);
 await pagina.click('.guardado-pendiente-cerrable button');
 await pagina.evaluate(() => { window.__fallaMover = false; });
 await pulsar(3);
@@ -131,7 +131,7 @@ await pagina.evaluate(async ([n4, n5]) => {
   await window.App.anotar(n5, { archivandose: { equipo: 'otro-equipo', por: 'Ana', desde: new Date(ahora - 2 * 3600 * 1000).toISOString(), categoria: 'ALUMNADO', tercero: 'x' } });
   await window.App.verAbiertos();
 }, [N(4), N(5)]);
-await comprobar('3. la tarjeta dice «Archivándose en otro ordenador…»', pagina.locator('.archivandose-otro').count(), 1);
+await comprobar('3. la tarjeta dice «Cerrándose en otro ordenador…»', pagina.locator('.archivandose-otro').count(), 1);
 await comprobar('3. y sus botones están apagados', pagina.evaluate((n) => {
   const t = [...document.querySelectorAll('.tarjeta-ocupada, .inicio-tabla-fila-ocupada')];
   return t.length >= 1 && t.every((x) => [...x.querySelectorAll('button')].every((b) => b.disabled));

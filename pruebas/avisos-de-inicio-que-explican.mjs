@@ -83,7 +83,7 @@ await pagina.waitForTimeout(1000);
 await comprobar('3. la lista sale con lo recordado: tipos de documento y estados con un borrado',
   pagina.evaluate(() => [...document.querySelectorAll('#tabla-borrados-fusion .fila-tipo')].map((f) => [f.querySelector('.nombre-tipo').textContent, f.querySelector('.suave').textContent])),
   [['Tipos de asunto borrados', 'Ninguno'], ['Estados borrados', '1 borrado'], ['Tipos de documento borrados', '1 borrado'],
-   ['Asuntos que se repiten, quitados', 'Ninguno'], ['Asuntos archivados, unidos o con otro nombre', 'Ninguno']]);
+   ['Asuntos que se repiten, quitados', 'Ninguno'], ['Asuntos cerrados, unidos o con otro nombre', 'Ninguno']]);
 await comprobar('3. el texto no nombra ningún fichero ni dice «json»',
   pagina.evaluate(() => /json|\.js\b|\.csv|_GESTOR|lápida/i.test(document.getElementById('bloque-borrados-fusion').textContent)), false);
 

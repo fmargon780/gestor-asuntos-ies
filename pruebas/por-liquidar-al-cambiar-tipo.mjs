@@ -115,7 +115,7 @@ await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'PRUEBA LIQ
   await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'PRUEBA LIQ' }).locator('.tarjeta-tipo-nombre').click();
 });
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
-const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'pasa a «Por liquidar» en vez de archivarse' }).locator('input');
+const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'pasa a «Por liquidar» en vez de cerrarse' }).locator('input');
 await casilla.evaluate((el) => { el.checked = true; el.dispatchEvent(new Event('change')); });
 await pagina.waitForFunction(() => ['A26-0802', 'A26-0803'].every((t) => { const a = Gestor.asuntos().filter((x) => x.nombre.indexOf(t) !== -1)[0]; return a && PorLiquidar.estaPorLiquidar(a); }), null, { timeout: 10000 }).catch(() => {});   /* espera a que pasen (no un tiempo fijo) */
 await comprobar('5. pasan los dos sin hitos por hacer y no el que tiene uno', Promise.all([estado('A26-0802'), estado('A26-0803'), estado('A26-0804')]), [true, true, false]);

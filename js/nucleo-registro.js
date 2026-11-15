@@ -87,7 +87,7 @@ App.comprobarNoCerrado = async function (clave) {
   if (window.GuardadoPendiente) GuardadoPendiente.anotaComprobada(clave);   /* fila 364: ese cambio se tira si luego resulta cerrado */
   if (!window.Borrados) return;
   if (await Borrados.estaCerrada(App.E.gestor, 'asuntos', clave)) {
-    var e = new Error('Este asunto ya está archivado en el otro ordenador. Recarga la lista.');
+    var e = new Error('Este asunto ya está cerrado en el otro ordenador. Recarga la lista.');
     e.name = 'AsuntoCerrado';
     throw e;
   }

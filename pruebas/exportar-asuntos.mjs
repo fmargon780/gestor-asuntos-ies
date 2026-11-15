@@ -97,7 +97,7 @@ async function abrirExportar(opcion) {
 }
 
 await abrirExportar('hoja');
-await comprobar('la ventana lleva «Incluir también los archivados» desmarcada', pagina.locator('#exp-archivados').isChecked(), false);
+await comprobar('la ventana lleva «Incluir también los cerrados» desmarcada', pagina.locator('#exp-archivados').isChecked(), false);
 await comprobar('la primera vez van marcadas las columnas de la tabla de Inicio',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#exp-columnas input:checked')).map((c) => c.dataset.col)),
   ['limite', 'tercero', 'tipo', 'hitoActual', 'leToca', 'inicio']);
@@ -141,13 +141,13 @@ await comprobar('el informe se abre en el visor, con título y los tres botones'
   ['Listado de asuntos', true, true, true]);
 await comprobar('lleva el membrete (imagen o, sin ella, el rótulo de la Junta)',
   pagina.locator('#exportar-visor .exportar-membrete, #exportar-visor .exportar-membrete-texto').count().then((n) => n > 0), true);
-await comprobar('sale el asunto archivado, marcado «Archivado»', (informe.match(/Archivado/g) || []).length >= 3, true);
+await comprobar('sale el asunto cerrado, marcado «Archivado»', (informe.match(/Cerrado/g) || []).length >= 3, true);
 await comprobar('y los abiertos, marcados «Abierto»', (informe.match(/Abierto/g) || []).length >= 2, true);
 await comprobar('al final, «7 asuntos»', informe.indexOf('7 asuntos') !== -1, true);
 await comprobar('y el total del importe, a la española', informe.indexOf('Total Importe: 6,72 €') !== -1, true);
 await comprobar('con «Incluir los hitos», debajo de cada asunto salen sus hitos', pagina.locator('#exportar-visor .exportar-hitos').count().then((n) => n > 0), true);
 await comprobar('la línea de filtros dice la pestaña, el tipo y que incluye los archivados',
-  pagina.locator('#exportar-visor .exportar-filtros').textContent().then((t) => t.indexOf('Tipo:') !== -1 && t.indexOf('Incluye también los archivados') !== -1), true);
+  pagina.locator('#exportar-visor .exportar-filtros').textContent().then((t) => t.indexOf('Tipo:') !== -1 && t.indexOf('Incluye también los cerrados') !== -1), true);
 await pagina.click('.exportar-cerrar');
 await comprobar('«Cerrar» cierra el visor', pagina.locator('#exportar-visor').isHidden(), true);
 

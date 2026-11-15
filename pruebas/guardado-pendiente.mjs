@@ -163,7 +163,7 @@ await pagina.evaluate(async ([n]) => {
 await pagina.waitForSelector('.guardado-pendiente-cerrable', { timeout: 30000 });
 await comprobar('5. aviso rojo cerrable con el número real y el motivo',
   pagina.locator('.guardado-pendiente-cerrable span').innerText(),
-  'Un cambio en el asunto A26-0365 no se ha guardado porque otro ordenador lo archivó antes. Ábrelo desde el Archivo y repítelo si hace falta.');
+  'Un cambio en el asunto A26-0365 no se ha guardado porque otro ordenador lo cerró antes. Ábrelo desde Asuntos cerrados y repítelo si hace falta.');
 await comprobar('5. tiene botón de cerrar', pagina.locator('.guardado-pendiente-cerrable button').count(), 1);
 await comprobar('5. el aviso fijo se ha quitado', pagina.locator('#aviso-guardado-pendiente').isVisible(), false);
 await comprobar('5. quien esperaba recibe el rechazo ya avisado (sin verde ni segundo rojo)',

@@ -88,7 +88,7 @@ const limpiarAvisos = () => pagina.evaluate(() => document.querySelectorAll('.me
 console.log('--- 1) todo cabe: el cuadro de siempre ---');
 await crearAsunto('0001', 60, [{ nombre: '260928 INFORME D26-00001.pdf' }]);
 await lanzar();
-await comprobar('1. sale «Archivar el asunto»', titulo(), 'Archivar el asunto');
+await comprobar('1. sale «Cerrar el asunto»', titulo(), 'Cerrar el asunto');
 await pagina.click('#cuadro-aceptar');
 await comprobar('1. se archiva', resultado(), 'fin');
 await comprobar('1. y el fichero está en el archivo', ficherosEnArchivo().then(l => l.filter(x => /^2609/.test(x))), ['260928 INFORME D26-00001.pdf']);
@@ -100,7 +100,7 @@ await lanzar();
 await comprobar('2. sale «No cabe en el archivo»', titulo(), 'No cabe en el archivo');
 await comprobar('2. con una sola línea', pagina.locator('.ac-fila').count(), 1);
 await comprobar('2. dice «Sobran 18»', pagina.locator('.ac-estado').first().textContent(), 'Sobran 18');
-await comprobar('2. «Acortar y archivar» apagado', pagina.evaluate(() => [document.getElementById('cuadro-aceptar').textContent, document.getElementById('cuadro-aceptar').disabled]), ['Acortar y archivar', true]);
+await comprobar('2. «Acortar y cerrar» apagado', pagina.evaluate(() => [document.getElementById('cuadro-aceptar').textContent, document.getElementById('cuadro-aceptar').disabled]), ['Acortar y cerrar', true]);
 await comprobar('2. la carpeta sigue entera en Asuntos abiertos', enAbiertos(), 1);
 await comprobar('2. el cuadro es ancho', pagina.evaluate(() => document.querySelector('#capa .cuadro').classList.contains('cuadro-ancho')), true);
 
@@ -110,7 +110,7 @@ await pagina.fill('.ac-caja', sinRelleno(largo90, 17));
 await comprobar('3. con 17 letras menos: «Sobran 1»', pagina.locator('.ac-estado').first().textContent(), 'Sobran 1');
 await pagina.fill('.ac-caja', sinRelleno(largo90, 18));
 await comprobar('3. con 18 menos: «Cabe» en verde', pagina.evaluate(() => { const e = document.querySelector('.ac-estado'); return [e.textContent, e.classList.contains('ac-cabe')]; }), ['Cabe', true]);
-await comprobar('3. «Acortar y archivar» encendido', pagina.evaluate(() => document.getElementById('cuadro-aceptar').disabled), false);
+await comprobar('3. «Acortar y cerrar» encendido', pagina.evaluate(() => document.getElementById('cuadro-aceptar').disabled), false);
 
 console.log('--- 4) un nombre que ya tiene otro documento ---');
 await pagina.fill('.ac-caja', '260928 breve D26-00002');
@@ -198,7 +198,7 @@ await crearAsunto('0004', 140, [{ nombre: '260928 breve.pdf' }]);
 await lanzar();
 await comprobar('8. el cuadro no tiene cajas', pagina.locator('.ac-fila').count(), 0);
 await comprobar('8. dice que la carpeta es demasiado larga, con cuántos le sobran', pagina.evaluate(() => document.getElementById('cuadro-cuerpo').textContent.indexOf(
-  'El nombre de la carpeta de este asunto es demasiado largo para el archivo: le sobran 12 caracteres. Cámbialo y vuelve a archivar. No se ha movido nada.') >= 0), true);
+  'El nombre de la carpeta de este asunto es demasiado largo para el archivo: le sobran 12 caracteres. Cámbialo y vuelve a cerrarlo. No se ha movido nada.') >= 0), true);
 await comprobar('8. el botón es «Cambiar el asunto»', pagina.evaluate(() => document.getElementById('cuadro-aceptar').textContent), 'Cambiar el asunto');
 await pagina.evaluate(() => { window.__cambiado = ''; App.editarAsunto = async (a) => { window.__cambiado = a.nombre; }; });
 await pagina.click('#cuadro-aceptar');
@@ -212,7 +212,7 @@ await pagina.evaluate(async () => {
 });
 await crearAsunto('0005', 86, [{ nombre: largo90 }, { nombre: '260928 breve.pdf' }]);
 await lanzar();
-await comprobar('10. sale el cuadro de siempre, sin medir', titulo(), 'Archivar el asunto');
+await comprobar('10. sale el cuadro de siempre, sin medir', titulo(), 'Cerrar el asunto');
 await pagina.click('#cuadro-cancelar');
 await resultado();
 await pagina.evaluate(async () => {
@@ -245,7 +245,7 @@ await lanzar();
 await pagina.click('#cuadro-aceptar');
 await comprobar('11. termina', resultado(), 'fin');
 await comprobar('11. el aviso rojo dice el paso, el fichero y la causa, y que no se ha movido nada', avisos('malo'),
-  ['No se ha podido archivar: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque la nube está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en Asuntos abiertos.']);
+  ['No se ha podido cerrar el asunto: ha fallado al copiar «X.pdf». Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque la nube está sincronizando esa carpeta. No se ha movido nada: la carpeta sigue en Asuntos abiertos.']);
 await comprobar('11. la carpeta sigue entera en Asuntos abiertos', enAbiertos(), 1);
 await comprobar('11. y no ha quedado copia a medias en el archivo', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
@@ -324,7 +324,7 @@ const lote = await pagina.evaluate(async (tercero) => {
 }, TERCERO);
 await comprobar('13. se archivan dos y el que no cabe se queda en Asuntos abiertos', lote, ['A26-0102']);
 await comprobar('13. sale un solo aviso ámbar', avisos('ambar'),
-  ['1 asunto(s) no se han archivado porque algún documento no cabe en el archivo: archívalos uno a uno desde su ⋮.']);
+  ['1 asunto(s) no se han cerrado porque algún documento no cabe en el ARCHIVO: ciérralos uno a uno desde su ⋮.']);
 await comprobar('13. y ningún cuadro se queda abierto', pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')), true);
 
 console.log('--- 14) ningún fichero pasa de 600 líneas ---');

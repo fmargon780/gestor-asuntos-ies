@@ -13,7 +13,7 @@
 
    1. Dos App.anotarLista seguidos sobre 'hilos' del mismo asunto dejan
       los dos hilos en el disco, y 'quitar' quita solo el suyo.
-   2. Un asunto archivado (clave borrada + lápida) no reaparece ni con
+   2. Un asunto cerrado (clave borrada + lápida) no reaparece ni con
       App.anotar (error AsuntoCerrado) ni al fusionar una copia en
       conflicto que aún lo tenía; reabrir (revivir) quita la lápida.
    3. Un asuntos.json cambiado por fuera se relee en la siguiente pasada

@@ -36,7 +36,7 @@ var AjustesBuscador = (function () {
     { titulo: 'Guía', otras: 'hitos, tareas, procedimiento' },
     { titulo: 'Campos', otras: 'campos propios, campo calculado, importe' },
     { titulo: 'Plazo', otras: 'días, vencimiento' },
-    { titulo: 'Al terminar el asunto', otras: 'por liquidar, archivar, avisar' },
+    { titulo: 'Al terminar el asunto', otras: 'por liquidar, cerrar, cerrado, archivar, avisar' },
     { titulo: 'Se repite', otras: 'recurrente, cada año, cada mes' },
     { titulo: 'Palabras clave', otras: 'buscar, correos, reconocer' }
   ];

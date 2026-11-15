@@ -217,7 +217,7 @@ var TiposYSuUso = (function () {
       '<button type="button" class="boton tu-enviar" id="tu-enviar">Enviar las guías activas a Claude</button></div>' +
       '<div id="tu-mensaje"></div><div class="tu-dos"><section class="tu-panel"><div class="tu-filtros">' +
       '<input type="search" class="campo" id="tu-buscar" placeholder="Buscar un tipo" aria-label="Buscar un tipo" style="max-width:240px"><span class="tu-filtros" id="tu-pastillas"></span></div>' +
-      '<div class="tu-caja"><table class="tu-tabla"><thead><tr><th>Desactivar</th><th>Tipo de asunto</th><th class="tu-cat">Categoría</th><th class="num">Abiertos</th><th class="num">Archivados</th><th>Último uso</th><th></th></tr></thead>' +
+      '<div class="tu-caja"><table class="tu-tabla"><thead><tr><th>Desactivar</th><th>Tipo de asunto</th><th class="tu-cat">Categoría</th><th class="num">Abiertos</th><th class="num">Cerrados</th><th>Último uso</th><th></th></tr></thead>' +
       '<tbody id="tu-filas"></tbody></table></div><div class="tu-pie"><button type="button" class="boton" id="tu-desactivar">Desactivar</button>' +
       '<button type="button" class="boton" id="tu-marcar">Marcar los que se ven</button><button type="button" class="boton" id="tu-quitar">Quitar todas las marcas</button>' +
       '<span class="tu-suave">Los tipos sin usar salen marcados. Desmarca los que sabes que llegarán.</span></div></section>' +

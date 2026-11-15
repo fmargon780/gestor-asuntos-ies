@@ -123,7 +123,7 @@ var ExportarInforme = (function () {
     var partes = [];
     if (f.pestanaTexto) partes.push('Pestaña: ' + f.pestanaTexto);
     partes = partes.concat(f.palabras || []);
-    if (incluyeArchivados) partes.push('Incluye también los archivados');
+    if (incluyeArchivados) partes.push('Incluye también los cerrados');
     if (agrupado && agrupado.niveles.length) partes.push(ExportarAgrupar.textoDeAgrupado(agrupado));   /* fila 278 */
     return partes.join(' · ');
   }

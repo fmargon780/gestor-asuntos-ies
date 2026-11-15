@@ -115,7 +115,7 @@ window.AvisosFalta = (function () {
   async function alArchivar(a) {
     var l = queFalta(a, await hitosDe(a), { tipo: 'asunto' });
     if (!l.length) return { sigue: true, hayAviso: false };
-    return { sigue: await preguntar('Falta por hacer en este asunto', l, 'Archivar igualmente'), hayAviso: true };
+    return { sigue: await preguntar('Falta por hacer en este asunto', l, 'Cerrar igualmente'), hayAviso: true };
   }
 
   /* Al enviar un correo: lo que falta de los documentos adjuntos (para el cuadro de correo, que ya es un cuadro). */

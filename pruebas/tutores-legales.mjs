@@ -119,7 +119,7 @@ const ter = await Carpetas.crear(cat, 'Prueba Inventada, Inés 234X');
 await Carpetas.crear(ter, '250910 CONSEJO ESCOLAR Prueba Inventada, Inés 234X');
 const deBeto = await TutoresLegales.asuntosDeSusTutores(hermanoB);
 comprobar('4. Beto ve el asunto abierto y el archivado de su madre', deBeto.map((a) => [a.nombre, a.donde]),
-  [['260925 RECLAMACION Prueba Inventada, Inés 234X', 'Abierto'], ['250910 CONSEJO ESCOLAR Prueba Inventada, Inés 234X', 'Archivado']]);
+  [['260925 RECLAMACION Prueba Inventada, Inés 234X', 'Abierto'], ['250910 CONSEJO ESCOLAR Prueba Inventada, Inés 234X', 'Cerrado']]);
 comprobar('4. Carla no tiene ninguno (no sale el bloque)', (await TutoresLegales.asuntosDeSusTutores(otro)).length, 0);
 comprobar('4. la ficha de Personas tiene su enganche', [typeof App.FICHAS_DE_CATEGORIA['TUTORES LEGALES'].html, App.trasPintarFicha.length], ['function', 1]);
 

@@ -75,7 +75,7 @@
             '<button type="button" class="boton" id="rel-anadir-varios">+ Añadir varios</button>' +
           '</div>'
         : (lista.length
-            ? '<p class="nota">El asunto está archivado: la lista ya no se puede cambiar.</p>'
+            ? '<p class="nota">El asunto está cerrado: la lista ya no se puede cambiar.</p>'
             : ''));
 
     Array.prototype.forEach.call(caja.querySelectorAll('.rel-copiar'), function (b) {

@@ -64,7 +64,7 @@ async function crearAsuntoAbierto(nombre, tercero) {
 }
 
 /* Abre la ficha de 'nombre' desde la lista de Abiertos (clic de verdad,
-   igual que Francisco), pulsa "Archivar el asunto" y acepta el cuadro
+   igual que Francisco), pulsa "Cerrar el asunto" y acepta el cuadro
    de confirmación. Espera al aviso verde: el archivado en sí (mover la
    carpeta) siempre sale antes que el intento de escribir _ficha.json,
    así que este aviso llega mucho antes de que los reintentos (hasta
@@ -76,12 +76,12 @@ async function archivarDesdeLaFicha(nombre) {
      ninguna celda; se busca la fila por `data-asunto`. */
   await pagina.click(`#inicio-tabla-cuerpo tr[data-asunto="${nombre}"] .nombre-pulsable`);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.click('button:has-text("Archivar el asunto")');
+  await pagina.click('#ficha-archivar button');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.click('#cuadro-aceptar');
   /* El de archivar, no otro verde cualquiera (desde la fila 129, al entrar
      puede salir también el de poner al día los asuntos de antes). */
-  await pagina.waitForSelector('.mensaje.bueno:has-text("Asunto archivado.")');
+  await pagina.waitForSelector('.mensaje.bueno:has-text("Asunto cerrado.")');
 }
 
 /* Hace que, dentro del árbol de `window.__disco.archivo` (nunca en
@@ -145,7 +145,7 @@ await crearAsuntoAbierto(NOMBRE1, 'Noventa Uno, Ana 1112223');
 await archivarDesdeLaFicha(NOMBRE1);
 
 await comprobar('1. avisa en verde de que se ha archivado',
-  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto archivado.' }).count(), 1);
+  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto cerrado.' }).count(), 1);
 await comprobar('1. no sale el aviso de "otro ordenador" (era un falso positivo: lo ha archivado este mismo)',
   pagina.locator('.mensaje.malo').filter({ hasText: 'otro ordenador' }).count(), 0);
 await comprobar('1. no queda ningún otro aviso rojo',
@@ -164,7 +164,7 @@ await archivarDesdeLaFicha(NOMBRE2);
 await pagina.waitForTimeout(2200);
 
 await comprobar('2. avisa en verde de que se ha archivado, sin más avisos',
-  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto archivado.' }).count(), 1);
+  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto cerrado.' }).count(), 1);
 await comprobar('2. ningún aviso ámbar ni rojo sobre la ficha',
   pagina.locator('.mensaje.ambar, .mensaje.malo').count(), 0);
 await comprobar('2. _ficha.json ha llegado a escribirse de verdad, tras los reintentos',
@@ -184,7 +184,7 @@ await hazQueFalleEnElArchivo('_ficha.json', 99);
 await archivarDesdeLaFicha(NOMBRE3);
 
 await comprobar('3. avisa en verde de que el asunto se ha archivado (eso sí ha salido bien)',
-  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto archivado.' }).count(), 1);
+  pagina.locator('.mensaje.bueno').filter({ hasText: 'Asunto cerrado.' }).count(), 1);
 
 /* Los tres reintentos (0,5 s + 1 s + 2 s) tardan hasta 3,5 s reales en
    agotarse antes de que salga el aviso ámbar: se espera a que salga,

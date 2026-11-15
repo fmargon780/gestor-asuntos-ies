@@ -141,7 +141,7 @@ await pagina.dispatchEvent('.repartir-tipo', 'change');
 await pagina.click('#repartir-ir');
 await pagina.waitForSelector('#repartir-confirmar');
 await comprobarP('4. el resumen: 3 asuntos y 1 fichero sin asignar, en ámbar', pagina.locator('#cuadro-cuerpo').textContent().then(t =>
-  t.indexOf('Se van a crear 3 asuntos de tipo CUESTIONARIO ALTAS CAPACIDADES, ya archivados.') !== -1 && t.indexOf('1 fichero se queda sin asignar') !== -1 && t.indexOf('escaneo raro.pdf') !== -1), true);
+  t.indexOf('Se van a crear 3 asuntos de tipo CUESTIONARIO ALTAS CAPACIDADES, ya cerrados.') !== -1 && t.indexOf('1 fichero se queda sin asignar') !== -1 && t.indexOf('escaneo raro.pdf') !== -1), true);
 await pagina.click('#repartir-confirmar');
 await esperar(() => /^Hecho/.test((document.getElementById('repartir-progreso') || {}).textContent || ''), null, 400);
 await comprobarP('5. termina sin fallos', pagina.locator('#repartir-progreso').textContent(), 'Hecho.');

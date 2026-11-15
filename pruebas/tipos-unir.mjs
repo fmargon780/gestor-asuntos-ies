@@ -213,7 +213,7 @@ await Carpetas.guardarJson(gestor, 'hitos.json', {
   }
 });
 
-/* ---------- un asunto archivado de A BIS, que no se debe tocar ---------- */
+/* ---------- un asunto cerrado de A BIS, que no se debe tocar ---------- */
 const nombreArchivado = '250101 A BIS Tres, Carlos 3333333';
 await archivo.getDirectoryHandle(nombreArchivado, { create: true });
 
