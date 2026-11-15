@@ -307,7 +307,7 @@ var TutoresLegales = (function () {
     try {
       var cat = await App.E.archivo.getDirectoryHandle(categoria);
       var ter = await cat.getDirectoryHandle(texto);
-      (await Carpetas.subcarpetas(ter)).forEach(function (c) { salida.push({ nombre: c.nombre, donde: 'Archivado' }); });
+      (await Carpetas.subcarpetas(ter)).forEach(function (c) { salida.push({ nombre: c.nombre, donde: 'Cerrado' }); });
     } catch (e) { /* todavía no tiene carpeta en el archivo */ }
     salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
     return salida;

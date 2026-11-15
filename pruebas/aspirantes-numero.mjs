@@ -87,7 +87,7 @@ await comprobar('el primer asunto se crea sin número en el nombre',
    renombrado no lo toca. Fila 192: "Archivar" vive en el menú de tres
    puntos de la fila de la tabla. */
 await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
-await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
+await pagina.locator('#inicio-tabla-cuerpo button', { hasText: 'Cerrar el asunto' }).first().click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');

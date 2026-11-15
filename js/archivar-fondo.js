@@ -83,8 +83,8 @@ var ArchivarFondo = (function () {
         caja.setAttribute('role', 'status');
         document.body.appendChild(caja);
       }
-      caja.textContent = nombres.length === 1 ? 'Archivando…'
-        : 'Archivando ' + nombres.map(numeroDe).join(', ') + '…';
+      caja.textContent = nombres.length === 1 ? 'Cerrando…'
+        : 'Cerrando ' + nombres.map(numeroDe).join(', ') + '…';
     } catch (e) { /* solo pintar */ }
   }
 
@@ -103,7 +103,7 @@ var ArchivarFondo = (function () {
     var nombre = a.nombre;
     opciones = opciones || {};
     if (en[nombre]) {
-      U.aviso('Ese asunto ya se está archivando.', 'ambar');
+      U.aviso('Ese asunto ya se está cerrando.', 'ambar');
       return Promise.resolve();
     }
     var entrada = { a: a, oculto: false, empezo: false, liberada: false, resolver: null };
@@ -116,7 +116,7 @@ var ArchivarFondo = (function () {
       }, function (e) {
         return terminar(nombre).then(function () {
           if (!entrada.liberada) { entrada.liberada = true; rechazar(e); }
-          else U.fallo('No he podido terminar de archivar el asunto ' + numeroDe(nombre), e);
+          else U.fallo('No he podido terminar de cerrar el asunto ' + numeroDe(nombre), e);
         });
       }).then(function () {
         if (opciones.sinPreguntar) App.E.archivarSinPreguntar = false;
@@ -165,10 +165,10 @@ var ArchivarFondo = (function () {
     if (!activo(a.nombre)) return false;
     var num = numeroDe(a.nombre);
     var aMedias = e && (e.limpiezaFallida || e.copiaAMedias);
-    var texto = 'No se ha podido archivar el asunto ' + num + '. ' +
+    var texto = 'No se ha podido cerrar el asunto ' + num + '. ' +
       (aMedias
-        ? 'Puede haber quedado una copia a medias en ' + dondeCopia + ' y la carpeta sigue en Asuntos abiertos. Vuelve a pulsar Archivar: se juntan.'
-        : 'No se ha movido nada. Vuelve a pulsar Archivar.');
+        ? 'Puede haber quedado una copia a medias en ' + dondeCopia + ' y la carpeta sigue en Asuntos abiertos. Vuelve a pulsar Cerrar el asunto: se juntan.'
+        : 'No se ha movido nada. Vuelve a pulsar Cerrar el asunto.');
     var detalle = (e && e.paso) ? 'Ha fallado ' + e.paso + (e.fichero ? ' «' + e.fichero + '»' : '') + '. ' + U.mensajeDeError(e)
       : U.mensajeDeError(e);
     /* Se quita ya de «en marcha» para que la lista lo vuelva a enseñar. */

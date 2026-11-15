@@ -73,7 +73,7 @@ var ControlRegistroPantalla = (function () {
     var a = x.asunto;
     var nombre = (window.Reservados ? Reservados.candadoHtml(a) + esc(Reservados.nombreParaVer(a)) : esc(a.nombre));
     return '<button type="button" class="enlace cr-asunto" data-accion="abrir-asunto" data-solo-lectura data-nombre="' + esc(a.nombre) + '">' + nombre + '</button>' +
-      (a.abierto ? '' : ' <span class="suave">(archivado)</span>') +
+      (a.abierto ? '' : ' <span class="suave">(cerrado)</span>') +
       (x.nota ? '<div class="cr-nota">el registro no está apuntado en el asunto</div>' : '');
   }
 
@@ -315,7 +315,7 @@ var ControlRegistroPantalla = (function () {
         $('cr-lista-asuntos').innerHTML = lista.length ? lista.map(function (x, i) {
           return '<button type="button" class="resultado" data-i="' + E.asuntos.indexOf(x) + '">' +
             (window.Reservados ? Reservados.candadoHtml(x) + esc(Reservados.nombreParaVer(x)) : esc(x.nombre)) +
-            '<span class="resultado-pie">' + (x.abierto ? 'Abierto' : 'Archivado') + '</span></button>';
+            '<span class="resultado-pie">' + (x.abierto ? 'Abierto' : 'Cerrado') + '</span></button>';
         }).join('') : '<div class="vacio">Ningún asunto con eso.</div>';
         Array.prototype.forEach.call($('cr-lista-asuntos').querySelectorAll('.resultado'), function (b) {
           b.onclick = function () { elegido = E.asuntos[parseInt(b.dataset.i, 10)]; document.getElementById('cuadro-aceptar').click(); };
@@ -366,7 +366,7 @@ var ControlRegistroPantalla = (function () {
     if (x.abierto) {
       var ab = (App.E.listaAbiertos || []).filter(function (a) { return a.nombre === nombre; })[0];
       if (ab) { App.abrirFicha(ab, 'abierto'); return; }
-      U.aviso('Ya no está abierto: puede que se haya archivado desde otro ordenador.', 'malo');
+      U.aviso('Ya no está abierto: puede que se haya cerrado desde otro ordenador.', 'malo');
       return;
     }
     try {

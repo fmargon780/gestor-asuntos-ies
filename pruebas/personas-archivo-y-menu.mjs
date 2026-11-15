@@ -143,7 +143,7 @@ await comprobar('2. y con ella esperando a que se elija el tipo',
 console.log('--- 3. el Archivo pinta la lista sin pulsar nada ---');
 
 await pagina.click('.pestana[data-pantalla="archivo"]');
-await pagina.waitForFunction(() => document.getElementById('explica-archivo').textContent.indexOf('asuntos archivados') !== -1);
+await pagina.waitForFunction(() => document.getElementById('explica-archivo').textContent.indexOf('asuntos cerrados') !== -1);
 await comprobar('3. la lista está pintada (sin archivados todavía, pero sin "Pulsa Actualizar")',
   pagina.locator('#explica-archivo').textContent().then(t => t.indexOf('Pulsa Actualizar') === -1), true);
 

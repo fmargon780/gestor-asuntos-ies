@@ -137,7 +137,7 @@ await comprobarP('el tipo y los tipos de documento vienen del tipo del colegio',
 await pagina.click('#repartir-ir');
 await pagina.waitForSelector('#repartir-confirmar');
 await comprobarP('el resumen, en el mismo cuadro', pagina.locator('#cuadro-cuerpo').textContent().then(t =>
-  t.indexOf('Se van a crear 3 asuntos de tipo CUESTIONARIO ALTAS CAPACIDADES, ya archivados, y 1 documento se queda') !== -1), true);
+  t.indexOf('Se van a crear 3 asuntos de tipo CUESTIONARIO ALTAS CAPACIDADES, ya cerrados, y 1 documento se queda') !== -1), true);
 await pagina.click('#repartir-confirmar');
 await esperar(() => /^Hecho/.test((document.getElementById('repartir-progreso') || {}).textContent || ''), null, 400);
 await comprobarP('termina sin fallos', pagina.locator('#repartir-progreso').textContent(), 'Hecho.');

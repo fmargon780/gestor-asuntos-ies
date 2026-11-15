@@ -362,7 +362,7 @@
     var lineas = [
       'HISTORIAL DE TRAMITACIÓN',
       clave,
-      'Archivado el ' + fechaCorta(U.hoyIso()),
+      'Cerrado el ' + fechaCorta(U.hoyIso()),
       'Hitos creados el ' + fechaCorta(creados || ''),
       ''
     ];
@@ -436,10 +436,10 @@
         }
         await quitarAsunto(clave);
         if (errorHistorial) {
-          U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', errorHistorial);
+          U.accesorio('El asunto se ha cerrado, pero no he podido guardar el historial de hitos', errorHistorial);
         }
       } catch (e) {
-        U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', e);
+        U.accesorio('El asunto se ha cerrado, pero no he podido guardar el historial de hitos', e);
       }
     };
   });

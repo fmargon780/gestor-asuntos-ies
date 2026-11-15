@@ -247,7 +247,7 @@
               '<button type="button" id="nota-anadir" class="boton boton-principal">Añadir nota</button>' +
             '</div>' +
           '</div>'
-        : '<p class="explica">Este asunto está archivado. Sus notas se leen, ' +
+        : '<p class="explica">Este asunto está cerrado. Sus notas se leen, ' +
           'pero ya no se escriben.</p>') +
       '<div id="notas-lista" class="notas-lista" data-clave="' + U.escapar(a.nombre) + '">' + pintarLista(notas, a, sePuedeEscribir) + '</div>';
 
@@ -406,7 +406,7 @@
               '<button type="button" id="ficha-nota-guardar" class="boton boton-principal">Guardar</button>' +
             '</div>' +
           '</div>'
-        : '<p class="explica">Asunto archivado: el registro se lee, pero ya no se escribe.</p>') +
+        : '<p class="explica">Asunto cerrado: el registro se lee, pero ya no se escribe.</p>') +
       '<div id="ficha-notas-lista" class="notas-lista" data-clave="' + U.escapar(a.nombre) + '">' +
         pintarLista(notas, a, abierto && !directivo) + '</div>';
 

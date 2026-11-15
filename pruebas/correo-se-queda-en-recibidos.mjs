@@ -210,7 +210,7 @@ async function archivar(nombre, hilos) {
 }
 {
   const { texto, prom } = await archivar(nombres[0], [{ id: 'HA', matriculas: [] }, { id: 'HB', matriculas: ['b@x'] }]);
-  comprobar('4. el cuadro «Archivar el asunto» lleva «Sus correos también se archivan en Gmail.»', /Sus correos también se archivan en Gmail\./.test(texto), true);
+  comprobar('4. el cuadro «Cerrar el asunto» lleva «Sus correos también se archivan en Gmail.»', /Sus correos también se archivan en Gmail\./.test(texto), true);
   comprobar('4. y va debajo de la carpeta de destino', texto.indexOf('Sus correos también') > texto.indexOf(' / '), true);
   await pagina.click('#cuadro-aceptar');
   await prom.catch(() => {});

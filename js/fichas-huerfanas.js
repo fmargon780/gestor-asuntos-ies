@@ -78,7 +78,7 @@
     var promesa = U.preguntar('Buscar su carpeta',
       '<p class="explica">El asunto <strong>' + U.escapar(clave) + '</strong> pasa a ser el de ' +
       'la carpeta que elijas. Queda como estaba, con sus hitos y sus notas.</p>' +
-      (sinIndice ? '<p class="explica" id="huerfana-sin-indice">El ARCHIVO no está leído entero: de lo archivado solo busco en la carpeta de esta persona. ' +
+      (sinIndice ? '<p class="explica" id="huerfana-sin-indice">El ARCHIVO no está leído entero: de lo cerrado solo busco en la carpeta de esta persona. ' +
         '<button type="button" class="enlace" id="huerfana-reconstruir">Reconstruir el índice</button></p>' : '') +
       '<input type="search" id="huerfana-buscar" class="campo" placeholder="Buscar entre todas las carpetas…" autocomplete="off">' +
       '<div id="huerfana-destino"></div><p id="huerfana-union" class="explica"></p>', 'Enlazar');
@@ -265,7 +265,7 @@
     var c = p.carpeta, avisos = [];
     if (c.tieneAsunto) avisos.push('Ya tiene su asunto: se unen en uno.');
     var pendientes = hitosSinHacer(p.clave);
-    if (c.donde === 'archivo' && pendientes) avisos.push('Queda archivado con ' + pendientes + (pendientes === 1 ? ' hito sin hacer.' : ' hitos sin hacer.'));
+    if (c.donde === 'archivo' && pendientes) avisos.push('Queda cerrado con ' + pendientes + (pendientes === 1 ? ' hito sin hacer.' : ' hitos sin hacer.'));
     return { clave: p.clave, nombre: p.clave, carpeta: c.nombre, donde: c.donde === 'abiertos' ? 'En asuntos abiertos' : 'En el ARCHIVO', avisos: avisos };
   }
 

@@ -83,7 +83,7 @@ await comprobar('1. dos filas, las dos con la casilla marcada',
 await comprobar('1. una dice «En asuntos abiertos» y la otra «En el ARCHIVO»',
   bloque.locator('.problema-bloque-fila').evaluateAll((fs) => fs.map((f) => /En asuntos abiertos/.test(f.textContent) ? 'abiertos' : /En el ARCHIVO/.test(f.textContent) ? 'archivo' : '?')), ['abiertos', 'archivo']);
 await comprobar('1. la del ARCHIVO enseña su carpeta con el tipo abreviado, dice que ya tiene su asunto y que queda archivado con un hito sin hacer',
-  bloque.locator('.problema-bloque-fila').nth(1).evaluate((f) => [f.textContent.includes('Su carpeta: ') && f.textContent.includes('TRAS. MATR. VIVA'), f.textContent.includes('Ya tiene su asunto: se unen en uno.'), f.textContent.includes('Queda archivado con 1 hito sin hacer.')]),
+  bloque.locator('.problema-bloque-fila').nth(1).evaluate((f) => [f.textContent.includes('Su carpeta: ') && f.textContent.includes('TRAS. MATR. VIVA'), f.textContent.includes('Ya tiene su asunto: se unen en uno.'), f.textContent.includes('Queda cerrado con 1 hito sin hacer.')]),
   [true, true, true]);
 await comprobar('1. el tercer asunto (sin carpeta en ningún sitio) no está en el bloque y sigue debajo, en «Asunto por asunto»',
   pagina.evaluate(() => [document.querySelector('[data-problema="carpetas"] .problema-bloque').textContent.includes('Rubio Luna'),
@@ -234,7 +234,7 @@ await comprobar('6. sin el índice, la carpeta de la persona se lee directamente
 await sinIndice.locator('[data-problema="carpetas"] .problema-elemento', { hasText: 'Rubio Luna' }).getByRole('button', { name: 'Buscar su carpeta (lo normal)' }).click();
 await sinIndice.waitForSelector('#huerfana-buscar');
 await comprobar('6. el cuadro dice que el ARCHIVO no está leído entero, con el botón para leerlo',
-  sinIndice.evaluate(() => [document.getElementById('huerfana-sin-indice').textContent.startsWith('El ARCHIVO no está leído entero: de lo archivado solo busco en la carpeta de esta persona.'), !!document.getElementById('huerfana-reconstruir')]),
+  sinIndice.evaluate(() => [document.getElementById('huerfana-sin-indice').textContent.startsWith('El ARCHIVO no está leído entero: de lo cerrado solo busco en la carpeta de esta persona.'), !!document.getElementById('huerfana-reconstruir')]),
   [true, true]);
 await sinIndice.fill('#huerfana-buscar', 'noelia');
 await sinIndice.waitForTimeout(400);

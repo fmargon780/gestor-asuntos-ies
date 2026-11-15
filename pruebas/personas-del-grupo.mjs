@@ -221,8 +221,8 @@ const demo4 = await pagina4.evaluate(() => App.E.listaAbiertos.filter((a) => /GR
 await pagina4.evaluate((n) => { App.cerrarAsunto(App.E.listaAbiertos.filter((x) => x.nombre === n)[0]); }, demo4);
 await pagina4.waitForSelector('#capa:not(.oculto)');
 await pagina4.evaluate(() => document.getElementById('cuadro-aceptar').click());   /* «Avisar a los relacionados» */
-/* Fila 584: según lo que quede por hacer, el segundo cuadro es «Archivar el asunto» o «Falta por hacer en este asunto» (botón «Archivar igualmente»); se acepta el que salga. */
-await pagina4.waitForFunction(() => ['Archivar el asunto', 'Falta por hacer en este asunto'].indexOf(document.getElementById('cuadro-titulo').textContent) !== -1);
+/* Fila 584: según lo que quede por hacer, el segundo cuadro es «Cerrar el asunto» o «Falta por hacer en este asunto» (botón «Cerrar igualmente»); se acepta el que salga. */
+await pagina4.waitForFunction(() => ['Cerrar el asunto', 'Falta por hacer en este asunto'].indexOf(document.getElementById('cuadro-titulo').textContent) !== -1);
 await pagina4.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina4.waitForFunction((n) => !App.E.listaAbiertos.some((a) => a.nombre === n), demo4, { timeout: 30000 });
 await pagina4.waitForTimeout(1500);
@@ -233,7 +233,7 @@ await pagina4.waitForTimeout(600);
 await pagina4.locator('#lista-personas .resultado', { hasText: 'Castro Reina' }).first().click();
 await pagina4.waitForSelector('#ficha-persona .ficha-grupo-de .pg-linea-persona', { timeout: 20000 });
 await comprobar('5. archivado: la línea sale con sus tres datos, leída de la carpeta del ARCHIVO, y dice «Archivado»',
-  pagina4.evaluate(() => { const l = document.querySelector('.ficha-grupo-de .pg-linea-persona'); return [l.children[0].textContent.indexOf('generado el') !== -1 && /registrado 26SM0412/.test(l.children[0].textContent) && /enviado el/.test(l.children[0].textContent), /Archivado$/.test(l.children[1].textContent)]; }), [true, true]);
+  pagina4.evaluate(() => { const l = document.querySelector('.ficha-grupo-de .pg-linea-persona'); return [l.children[0].textContent.indexOf('generado el') !== -1 && /registrado 26SM0412/.test(l.children[0].textContent) && /enviado el/.test(l.children[0].textContent), /Cerrado$/.test(l.children[1].textContent)]; }), [true, true]);
 
 await pagina4.close();
 

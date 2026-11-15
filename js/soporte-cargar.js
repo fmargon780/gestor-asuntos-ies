@@ -30,7 +30,7 @@
   var LARGO_ERROR = 300;
 
   var PANTALLAS = {
-    abiertos: 'Inicio', asunto: 'Ficha de un asunto', nuevo: 'Nuevo asunto', archivo: 'Archivo',
+    abiertos: 'Inicio', asunto: 'Ficha de un asunto', nuevo: 'Nuevo asunto', archivo: 'Asuntos cerrados',
     personas: 'Personas y empresas', herramientas: 'Herramientas', ajustes: 'Ajustes',
     'tipo-asunto': 'Ajustes de un tipo de asunto', impresos: 'Impresos', cuentas: 'Cuentas'
   };

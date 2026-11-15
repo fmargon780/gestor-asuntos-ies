@@ -75,7 +75,7 @@ var TerceroRenombrar = (function () {
       : '';
     var archivo = plan.archivo
       ? '<p class="explica">Su carpeta del archivo cambia de nombre. ' +
-        'Los asuntos archivados de dentro se quedan como están.</p>'
+        'Los asuntos cerrados de dentro se quedan como están.</p>'
       : '';
     var promesa = U.preguntar('Cambia el nombre de las carpetas',
       '<p class="explica">El nombre de este tercero pasa de «' + U.escapar(info.textoAntes) + '» a «' +

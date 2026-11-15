@@ -169,7 +169,7 @@ App.cerrarAsunto = async function (a) {
 
   /* Fila 141: al repartir un PDF entre terceros se archivan muchos de
      golpe, ya confirmados en su propio resumen (js/repartir-crear.js). */
-  var confirmar = (App.E.archivarSinPreguntar || yaPreguntado) ? true : await U.preguntar('Archivar el asunto',
+  var confirmar = (App.E.archivarSinPreguntar || yaPreguntado) ? true : await U.preguntar('Cerrar el asunto',
     '<p>Se llevará la carpeta a:</p>' +
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +
@@ -179,7 +179,7 @@ App.cerrarAsunto = async function (a) {
       : '') +
     avisoFusion + lineaGmail +
     '<p class="nota">Se copia primero y se comprueba que ha llegado todo. ' +
-    'Si algo falla, la carpeta se queda donde está.</p>', 'Archivar el asunto');
+    'Si algo falla, la carpeta se queda donde está.</p>', 'Cerrar el asunto');
   if (!confirmar) return;
 
   /* Fila 398: sin más preguntas. Si lo llamó ArchivarFondo.archivar, el asunto sale ya de
@@ -209,7 +209,7 @@ App.cerrarAsunto = async function (a) {
         });
         await actualizarIndiceAlArchivar(nombreEnArchivo, categoria, tercero, handleYaArchivada, a.nombre);
         App.E.recienArchivados[a.nombre] = true;
-        U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
+        U.aviso('Este asunto ya estaba cerrado. He puesto la lista al día.', 'bueno');
       } else {
         U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
           'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.', 'ambar');
@@ -236,7 +236,7 @@ App.cerrarAsunto = async function (a) {
   } catch (e) {
     if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
     if (window.ArchivarFondo && ArchivarFondo.fallo(a, e, 'el archivo')) return;
-    U.aviso(mensajeDeFallo('archivar', e, 'Asuntos abiertos', 'el archivo'), 'malo');
+    U.aviso(mensajeDeFallo('cerrar el asunto', e, 'Asuntos abiertos', 'el archivo'), 'malo');
     return;
   }
 
@@ -256,7 +256,7 @@ App.cerrarAsunto = async function (a) {
     if (window.ArchivoNombreCorto) ArchivoNombreCorto.apuntar(a.nombre, nombreEnArchivo);
     if (window.CorreoGmail && hilosGmail.length) CorreoGmail.asuntoArchivado(hilosGmail);   /* fila 480 */
     /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
-    if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');
+    if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto cerrado');
     if (window.Encargos) await Encargos.alCambiarElAsunto(a.nombre, 'archivar');   /* fila 289: sus encargos pasan a «Terminado» */
     /* Fila 648: lo que se guardó con el nombre abierto (encargos, actividades) pasa a llamarse como la carpeta del archivo. */
     if (window.ArchivoNombreCorto) await ArchivoNombreCorto.moverLoDeFuera(a.nombre, nombreEnArchivo);
@@ -273,7 +273,7 @@ App.cerrarAsunto = async function (a) {
       await IndiceExpediente.crear({ nombre: nombreEnArchivo, handle: handleArchivado, leido: a.leido,
         ficha: Object.assign({}, a.ficha, { tercero: tercero, categoria: categoria }) }, { archivadoEl: U.hoyIso() });
     } catch (e) {
-      U.accesorio('Asunto archivado, pero no he podido hacer su índice del expediente', e);
+      U.accesorio('Asunto cerrado, pero no he podido hacer su índice del expediente', e);
     }
   }
   try {
@@ -282,9 +282,9 @@ App.cerrarAsunto = async function (a) {
        de App.verAbiertos() justo abajo, sepa que este ordenador acaba de
        archivarlo y no dé el aviso de "otro ordenador" (fila 90). */
     App.E.recienArchivados[a.nombre] = true;
-    var mensaje = 'Asunto archivado.';
+    var mensaje = 'Asunto cerrado.';
     if (haciendoFusion) {
-      mensaje = 'Asunto archivado. Se ha completado un archivado anterior que se había quedado a medias.';
+      mensaje = 'Asunto cerrado. Se ha completado un cierre anterior que se había quedado a medias.';
       if (resultado.conSufijo.length) {
         mensaje += ' Hay ' + resultado.conSufijo.length + ' documento(s) guardados con un (2) ' +
           'detrás porque había otro con el mismo nombre y distinto contenido.';
@@ -293,7 +293,7 @@ App.cerrarAsunto = async function (a) {
     U.aviso(mensaje, 'bueno');
     await App.verAbiertos();
   } catch (e) {
-    U.accesorio('Asunto archivado, pero no he podido poner la lista al día. Pulsa Recargar', e);
+    U.accesorio('Asunto cerrado, pero no he podido poner la lista al día. Pulsa Recargar', e);
   }
 };
 

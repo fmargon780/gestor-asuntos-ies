@@ -1,5 +1,5 @@
 /* Prueba de la fila 73 (docs/BUSCAR-EN-LAS-NOTAS.md): buscar dentro de
-   las notas, en asuntos abiertos y archivados. Sin navegador: la
+   las notas, en asuntos abiertos y cerrados. Sin navegador: la
    lógica de verdad vive en js/notas.js (pura, sin DOM) y en
    js/archivo-indice.js (textoDeBusqueda). Lo que hace falta el
    navegador (la tarjeta pintada, con el trocito debajo) se comprueba

@@ -156,7 +156,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-const btnArchivar = pagina.getByRole('button', { name: 'Archivar el asunto', exact: true });
+const btnArchivar = pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true });
 await btnArchivar.click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');

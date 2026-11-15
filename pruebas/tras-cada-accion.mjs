@@ -150,7 +150,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.getByRole('button', { name: 'Reabrir el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
-await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).waitFor({ timeout: 10000 });
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).waitFor({ timeout: 10000 });
 await comprobar('4. sigue en la ficha', visible('asunto'), true);
 await comprobar('4. es la del asunto reabierto', nombreDeLaFicha().then((t) => t.indexOf('Vuelta Prueba') !== -1), true);
 await comprobar('4. no ha ido a la lista del ARCHIVO', visible('archivo'), false);

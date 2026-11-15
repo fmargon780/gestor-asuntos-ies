@@ -100,7 +100,7 @@ const filasMios = (p) => p.$$eval('#encargos-mios-cuerpo tr[data-encargo]', (e) 
 /* ===== 2. La jefa de estudios ===== */
 console.log('--- 2. Jefa de estudios ---');
 let pagina = await entrar(JEFA);
-await comprobar('2. el menú: Inicio, Nuevo encargo, Mis encargos y Archivo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo encargo', 'Mis encargos', 'Archivo']);
+await comprobar('2. el menú: Inicio, Nuevo encargo, Mis encargos y Archivo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo encargo', 'Mis encargos', 'Asuntos cerrados']);
 await pagina.click('.pestana[data-pantalla="encargo-nuevo"]');
 await pagina.waitForSelector('#encargo-texto', { state: 'visible' });
 await comprobar('2. «Nuevo encargo»: las cuatro cosas, sin desplazamiento',

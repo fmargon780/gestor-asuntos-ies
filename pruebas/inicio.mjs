@@ -176,8 +176,8 @@ await comprobar('D, sin fecha, sale detrás con "Sin plazo"',
   pagina.locator('#inicio-tabla-cuerpo tr[data-hito="d1"] .marca-plazo').textContent(), 'Sin plazo');
 await comprobar('D es la segunda fila (el vencido va primero)',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').nth(1).getAttribute('data-hito'), 'd1');
-await comprobar('C, sin ningún hito, va la última con «Añade un hito o archívalo»',
-  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').nth(2).locator('.inicio-sin-hito').textContent(), 'Añade un hito o archívalo');
+await comprobar('C, sin ningún hito, va la última con «Añade un hito o ciérralo»',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').nth(2).locator('.inicio-sin-hito').textContent(), 'Añade un hito o ciérralo');
 
 console.log('--- 3b. pulsar la fila abre la mesa del hito, no la ficha a secas ---');
 await pagina.click('#inicio-tabla-cuerpo tr[data-hito="a1"]');

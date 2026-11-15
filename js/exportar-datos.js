@@ -80,7 +80,7 @@ var ExportarAsuntos = (function () {
     { id: 'hitoActual', titulo: 'Hito actual', clase: 'texto', defecto: true, valor: function (r) { return r.hitoActual; } },
     { id: 'leToca', titulo: 'Le toca a', clase: 'texto', defecto: true, valor: function (r) { return r.leToca; } },
     { id: 'inicio', titulo: 'Inicio', clase: 'fecha', defecto: true, valor: function (r) { return r.inicio; } },
-    { id: 'situacion', titulo: 'Situación (abierto o archivado)', clase: 'texto', valor: function (r) { return r.situacion; } },
+    { id: 'situacion', titulo: 'Situación (abierto o cerrado)', clase: 'texto', valor: function (r) { return r.situacion; } },
     { id: 'porLiquidarDesde', titulo: 'Por liquidar desde', clase: 'fecha', valor: function (r) { return r.porLiquidarDesde || ''; } },   /* fila 249 */
     { id: 'numero', titulo: 'Número de asunto', clase: 'texto', valor: function (r) { return r.numero; } },
     { id: 'tipoLargo', titulo: 'Tipo (nombre completo)', clase: 'texto', valor: function (r) { return r.tipo; } },
@@ -89,7 +89,7 @@ var ExportarAsuntos = (function () {
     { id: 'loPide', titulo: 'Quién lo pide', clase: 'texto', oculta: RESERVADO, valor: function (r) { return r.loPide; } },
     { id: 'via', titulo: 'Vía de comunicación', clase: 'texto', valor: function (r) { return r.via; } },
     { id: 'reservado', titulo: 'Reservado', clase: 'texto', valor: function (r) { return r.reservado ? 'Sí' : 'No'; } },
-    { id: 'archivadoEl', titulo: 'Fecha de archivo', clase: 'fecha', valor: function (r) { return r.archivadoEl; } },
+    { id: 'archivadoEl', titulo: 'Fecha de cierre', clase: 'fecha', valor: function (r) { return r.archivadoEl; } },
     { id: 'carpeta', titulo: 'Nombre de la carpeta', clase: 'texto', oculta: RESERVADO, valor: function (r) { return r.carpeta; } },
     { id: 'nDocumentos', titulo: 'Número de documentos', clase: 'numero', valor: function (r) { return r.nDocumentos; } },
     { id: 'notas', titulo: 'Notas', clase: 'texto', oculta: '', valor: function (r) { return r.notas; } }
@@ -227,7 +227,7 @@ var ExportarAsuntos = (function () {
       ? Reservados.es({ nombre: e.nombre, leido: { tipo: e.tipo }, ficha: { reservado: propio } }) : !!propio;
     var cerrado = ficha.cerradoEl || e.cerradoEl || '';
     return {
-      abierto: false, situacion: 'Archivado', nombre: e.nombre, carpeta: e.nombre,
+      abierto: false, situacion: 'Cerrado', nombre: e.nombre, carpeta: e.nombre,
       numero: e.numero || ficha.numero || '',
       tipo: e.tipo || '', tipoCorto: e.tipo && window.Nombres ? Nombres.tipoParaVer(e.tipo, App.E.tipos) : (e.tipo || ''),
       organo: textoDeOrgano(e.tipo),

@@ -225,7 +225,7 @@ await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
 await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');

@@ -91,7 +91,7 @@
       if (App.E.recienArchivados[N.actual.nombre]) {
         delete App.E.recienArchivados[N.actual.nombre];
       } else {
-        U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
+        U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya cerrado o ' +
           'borrado desde el otro ordenador.', 'malo');
       }
       N.volverALaLista();

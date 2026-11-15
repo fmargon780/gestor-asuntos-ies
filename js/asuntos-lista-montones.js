@@ -176,7 +176,7 @@ App.FILTROS_MONTON = [
   { valor: 'administracion', texto: 'Nos toca' },
   { valor: 'terceros', texto: 'Esperan a terceros' },
   { valor: 'esperando', texto: 'Con «Esperando a…»' },
-  { valor: 'listo', texto: 'Listos para archivar' },
+  { valor: 'listo', texto: 'Listos para cerrar' },
   { valor: 'sinhitos', texto: 'Sin hitos' },
   { valor: 'porliquidar', texto: 'Por liquidar' },   /* fila 249 */
   { valor: 'dormidos', texto: 'Solo dormidos' }   /* fila 451 */

@@ -76,7 +76,7 @@ var DuplicadosAviso = (function () {
       var v = comoVer(n, archivado);
       return '<li><button type="button" class="enlace parecido ' + clase + '" data-nombre="' + U.escapar(n) + '"' +
         (archivado ? ' data-archivado="1"' : '') + '>' + v.candado + U.escapar(v.texto) + '</button>' +
-        (archivado ? ' <span class="parecido-etiqueta">archivado</span>' : '') + '</li>';
+        (archivado ? ' <span class="parecido-etiqueta">cerrado</span>' : '') + '</li>';
     }).join('') + '</ul>' +
     (nombres.length > MAX ? '<p class="nota">Y ' + (nombres.length - MAX) + ' más.</p>' : '');
   }
@@ -93,7 +93,7 @@ var DuplicadosAviso = (function () {
     caja.innerHTML =
       (b.rojo.length ? '<div class="parecidos-bloque parecido-mismo-tipo-bloque"><strong>Ya tiene abierto un asunto de este tipo</strong>' +
         listaHTML(b.rojo, 'parecido-mismo-tipo', false) + '</div>' : '') +
-      (b.archivados.length ? '<div class="parecidos-bloque"><strong>Archivado hace poco, del mismo tipo</strong>' +
+      (b.archivados.length ? '<div class="parecidos-bloque"><strong>Cerrado hace poco, del mismo tipo</strong>' +
         listaHTML(b.archivados, 'parecido-archivado', true) + '</div>' : '') +
       (b.gris.length ? '<div class="parecidos-bloque parecido-otros-bloque"><strong>Otros asuntos abiertos de este tercero</strong>' +
         listaHTML(b.gris, 'parecido-otro', false) + '</div>' : '') +

@@ -133,7 +133,7 @@ const carpetas = pagina.locator('[data-problema="carpetas"]');
 await comprobar('4. el título lleva el número y sin palabras del código (fila 303: tres asuntos perdidos en la demostración)', carpetas.locator('.problema-titulo').textContent(), '3 asuntos han perdido su carpeta');
 await comprobar('4. cada asunto: «Buscar su carpeta (lo normal)» y «El asunto ya no existe», cada uno con su frase',
   pagina.evaluate(() => [...document.querySelectorAll('[data-problema="carpetas"] .problema-elemento')].slice(0, 1).map((e) => [...e.querySelectorAll('.problema-accion')].map((a) => [a.querySelector('button').textContent, a.querySelector('.problema-explica').textContent]))[0]),
-  [['Buscar su carpeta (lo normal)', 'Buscas su carpeta entre todas, las abiertas y las archivadas. El asunto conserva sus hitos y sus notas.'],
+  [['Buscar su carpeta (lo normal)', 'Buscas su carpeta entre todas, las abiertas y las cerradas. El asunto conserva sus hitos y sus notas.'],
    ['El asunto ya no existe', 'Se quita de la lista. Queda en las copias de seguridad durante 90 días, por si era un error.']]);
 const nombreAsunto = await pagina.locator('[data-problema="carpetas"] .problema-nombre').first().textContent();
 

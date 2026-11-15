@@ -294,7 +294,7 @@ var RepartirFicheros = (function () {
     var repetidos = aCrear.map(function (f) { return f.tercero; }).filter(function (n) { return yaTienen[n]; });
     var sinAsignar = F.ficheros.filter(function (f) { return !f.tercero; });
     $('cuadro-cuerpo').innerHTML =
-      '<p><strong>Se van a crear ' + aCrear.length + (aCrear.length === 1 ? ' asunto' : ' asuntos') + ' de tipo ' + esc(F.tipo) + ', ya archivados.</strong></p>' +
+      '<p><strong>Se van a crear ' + aCrear.length + (aCrear.length === 1 ? ' asunto' : ' asuntos') + ' de tipo ' + esc(F.tipo) + ', ya cerrados.</strong></p>' +
       (sinAsignar.length ? '<p class="aviso aviso-ambar">' + sinAsignar.length + (sinAsignar.length === 1 ? ' fichero se queda' : ' ficheros se quedan') +
         ' sin asignar y no se reparten: ' + sinAsignar.map(function (f) { return esc(f.nombre); }).join(', ') + '.</p>' : '') +
       sinFichero.map(function (n) { return '<p class="aviso aviso-ambar">' + esc(n) + ' se ha quedado sin fichero.</p>'; }).join('') +
@@ -346,8 +346,8 @@ var RepartirFicheros = (function () {
     progreso.textContent = fallos.length
       ? 'Hecho, con fallos: ' + fallos.map(function (r) { return r.nombre + ' (' + r.tercero + ')'; }).join(', ') + '. Vuelve a abrir el cuadro: esos ficheros siguen en el asunto.'
       : 'Hecho.';
-    if (fallos.length) U.aviso(hechos + ' asuntos creados y archivados; fallaron ' + fallos.length + '.', 'ambar');
-    else if (resultados.length) U.aviso(hechos + (hechos === 1 ? ' asunto creado y archivado.' : ' asuntos creados y archivados.'), 'bueno');
+    if (fallos.length) U.aviso(hechos + ' asuntos creados y cerrados; fallaron ' + fallos.length + '.', 'ambar');
+    else if (resultados.length) U.aviso(hechos + (hechos === 1 ? ' asunto creado y cerrado.' : ' asuntos creados y cerrados.'), 'bueno');
     if (F && F.alTerminar) { try { F.alTerminar(); } catch (e2) { /* solo pintar */ } }
   }
 

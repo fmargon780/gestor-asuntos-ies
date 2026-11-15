@@ -4,7 +4,7 @@
 
    1. La jefa de estudios: la caja de la tarjeta «Notas» (única cosa encendida de la ficha), sin texto no envía, con texto y un
       documento queda en `ficha.notas` con `deDirectivo` y el documento en su carpeta de espera, por `Perfil.escribir`; sale en
-      la lista con su nombre y órgano; no se cambia ni se borra; en un asunto archivado no sale la caja.
+      la lista con su nombre y órgano; no se cambia ni se borra; en un asunto cerrado no sale la caja.
    2. Administración: el aviso cuenta las sin ver y filtra la tabla; la fila lleva la marca; la nota sale resaltada y arriba, no
       lleva la caja de directivo; «Vista» con documentos sin guardar avisa; «Guardar en el asunto» pasa por el cuadro de nombre
       y borra la carpeta de espera; «Vista» la quita del aviso sin duplicar la nota; archivar con notas sin ver pregunta.
@@ -79,7 +79,7 @@ await pagina.waitForTimeout(800);
 await comprobar('1. el documento se abre en el panel de lectura', pagina.evaluate(() => document.body.classList.contains('con-lector')), true);
 await pagina.keyboard.press('Escape');
 await comprobar('1. sin forma de cambiar ni de borrar sus notas', pagina.evaluate(() => document.querySelectorAll('#ficha-notas-lista .registro-mas').length), 0);
-await comprobar('1. en un asunto archivado no sale la caja',
+await comprobar('1. en un asunto cerrado no sale la caja',
   pagina.evaluate(async () => { await App.verArchivo(); App.abrirFicha(App.E.listaArchivo.filter((a) => a.ficha && a.ficha.categoria === 'ALUMNADO')[0], 'archivado'); FichaTarjetas.abrir('notas'); await new Promise((r) => setTimeout(r, 800)); return [!!document.getElementById('nota-directivo-texto'), !!document.getElementById('ficha-notas-lista')]; }), [false, true]);
 
 /* ===== 2. Administración (sin recargar: la nota enviada sigue en el disco de mentira) ===== */
@@ -149,8 +149,8 @@ await pagina.evaluate(() => { const b = document.getElementById('avisos-linea-pl
 await comprobar('2. el aviso vuelve a contar', sinVer(pagina), '1 nota de directivo');
 await pagina.evaluate(() => { window.__cierre = App.cerrarAsunto(Gestor.asuntos().filter((a) => a.nombre.indexOf('Aguilar Ponce, Pablo') !== -1)[0]); });
 await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('2. archivar con notas sin ver pregunta antes, con «Verlas» y «Archivar de todos modos»',
-  pagina.evaluate(() => [document.getElementById('cuadro-cuerpo').textContent, document.getElementById('cuadro-aceptar').textContent, document.getElementById('cuadro-cancelar').textContent]), ['Tiene 1 nota de directivo sin ver.', 'Archivar de todos modos', 'Verlas']);
+await comprobar('2. archivar con notas sin ver pregunta antes, con «Verlas» y «Cerrar de todos modos»',
+  pagina.evaluate(() => [document.getElementById('cuadro-cuerpo').textContent, document.getElementById('cuadro-aceptar').textContent, document.getElementById('cuadro-cancelar').textContent]), ['Tiene 1 nota de directivo sin ver.', 'Cerrar de todos modos', 'Verlas']);
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(800);
 await comprobar('2. «Verlas» abre la ficha del asunto sin archivarlo', pagina.evaluate(() => [!document.getElementById('pantalla-asunto').classList.contains('oculto'), Gestor.asuntos().some((a) => a.nombre.indexOf('Aguilar Ponce, Pablo') !== -1)]), [true, true]);

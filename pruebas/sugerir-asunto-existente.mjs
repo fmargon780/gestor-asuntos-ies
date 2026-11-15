@@ -255,7 +255,7 @@ await esperarLeido(PDF_CORDERO, 'Reformas Cordero');
 await comprobar('3. salen los dos archivados del mismo tipo, ninguno más',
   sugerenciasDe(PDF_CORDERO).count(), 2);
 await comprobar('los dos llevan la marca "archivado"',
-  sugerenciasDe(PDF_CORDERO).allTextContents().then((t) => t.every((x) => x.indexOf('archivado') !== -1)), true);
+  sugerenciasDe(PDF_CORDERO).allTextContents().then((t) => t.every((x) => x.indexOf('cerrado') !== -1)), true);
 await comprobar('el de otro tipo (CORDERO_AR_3) no sale',
   sugerenciasDe(PDF_CORDERO).allTextContents().then((t) => t.some((x) => x.indexOf(CORDERO_AR_3) !== -1)), false);
 await comprobar('el más reciente (CORDERO_AR_2) sale primero',
@@ -264,7 +264,7 @@ await comprobar('el más reciente (CORDERO_AR_2) sale primero',
 await sugerenciasDe(PDF_CORDERO).first().locator('button').first().click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('"Meter aquí" en un archivado pregunta si reabrir',
-  pagina.locator('#cuadro-titulo').textContent(), 'Ese asunto está archivado');
+  pagina.locator('#cuadro-titulo').textContent(), 'Ese asunto está cerrado');
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(200);
 await comprobar('cancelado, el documento sigue en "Por clasificar"',
@@ -282,7 +282,7 @@ await comprobar('1. una sola sugerencia, sin marca',
 await comprobar('la sugerencia es el asunto abierto de Bermejo',
   sugerenciasDe(PDF_BERMEJO).first().textContent()
     .then((t) => t.indexOf(ABIERTO_BERMEJO) !== -1 && t.indexOf('otro tipo') === -1 &&
-                 t.indexOf('archivado') === -1), true);
+                 t.indexOf('cerrado') === -1), true);
 await comprobar('6. sigue habiendo un solo botón, "Crear asunto con él"',
   tarjetaDe(PDF_BERMEJO).locator('[data-accion-suelto="crear"]').textContent(),
   'Crear asunto con él');
@@ -351,7 +351,7 @@ await comprobar('4. con abierto y archivado del mismo tercero, solo sale el abie
   sugerenciasDe(PDF_HORIZONTE).count(), 1);
 await comprobar('y es el abierto, sin la marca "archivado"',
   sugerenciasDe(PDF_HORIZONTE).first().textContent()
-    .then((t) => t.indexOf(HORIZONTE_ABIERTO) !== -1 && t.indexOf('archivado') === -1), true);
+    .then((t) => t.indexOf(HORIZONTE_ABIERTO) !== -1 && t.indexOf('cerrado') === -1), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

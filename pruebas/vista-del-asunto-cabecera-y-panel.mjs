@@ -3,7 +3,7 @@
    (?demo=1&auto=1).
 
    1. Cabecera de un asunto de alumno: una línea con «← Volver», tipo, número y «Apellidos, Nombre + identificación»;
-      a la derecha «Ruta» y «Archivar el asunto»; la carpeta no es el título.
+      a la derecha «Ruta» y «Cerrar el asunto»; la carpeta no es el título.
    2. El menú «⋯»: Cambiar el asunto, Índice del expediente, Marcar como reservado, Copiar (Asunto, NIE, Nombre) y Borrar.
    3. No salen «Hito N de M · …», «El encargo», «Elegir datos», la fila de copiar ni «Abierto el…» en la cabecera.
    4. La fila de hitos, debajo de la cabecera, con el actual marcado y «+ Añadir hito»; pulsar un hito lo enseña.
@@ -61,8 +61,8 @@ await comprobar('1. «← Volver», tipo, número y el tercero, en una línea',
     return { textos: dentro.map((e) => e.textContent.trim()), unaLinea: arriba.every((y) => Math.abs(y - arriba[0]) <= 1), alto: l.getBoundingClientRect().height < 60 };
   }), { textos: ['← Volver', 'CERTIFICADO', 'A26-0003', 'Espejo Montes, Carla 2100006'], unaLinea: true, alto: true });
 await comprobar('1. el nombre de la carpeta no es el título', pagina.evaluate(() => document.querySelector('.ficha-nombre-texto').textContent.indexOf('261024') === -1), true);
-await comprobar('1. a la derecha, «Ruta» y «Archivar el asunto»',
-  pagina.evaluate(() => [document.querySelector('#ficha-ruta button'), document.querySelector('#ficha-archivar button')].map((b) => b && b.textContent.trim())), ['Ruta', 'Archivar el asunto']);
+await comprobar('1. a la derecha, «Ruta» y «Cerrar el asunto»',
+  pagina.evaluate(() => [document.querySelector('#ficha-ruta button'), document.querySelector('#ficha-archivar button')].map((b) => b && b.textContent.trim())), ['Ruta', 'Cerrar el asunto']);
 await comprobar('1. y están a la derecha de la línea',
   pagina.evaluate(() => document.querySelector('#ficha-archivar button').getBoundingClientRect().right > window.innerWidth - 80 &&
     document.querySelector('#ficha-ruta button').getBoundingClientRect().left > document.querySelector('.ficha-nombre').getBoundingClientRect().right), true);

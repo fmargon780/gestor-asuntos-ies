@@ -7,7 +7,7 @@
       buscaba Bing). Pide la ruta en ese momento; al guardar, copia ya
       la ruta completa, en formato normal (fila 227: nunca `file:///`).
    2. Con ruta de Windows, asunto abierto: `C:\...`, con `\`.
-   3. Asunto archivado, con ruta estilo Linux: `/home/...`, con `/`.
+   3. Asunto cerrado, con ruta estilo Linux: `/home/...`, con `/`.
    4. La ruta se guarda en este ordenador (localStorage), no en _GESTOR.
    5. En modo consulta el botón sigue encendido.
    6. La ruta normal con casos difíciles: Windows con espacios, red

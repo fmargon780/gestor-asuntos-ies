@@ -1,7 +1,7 @@
 /* Prueba en navegador de verdad de la fila 136 (25-sep-2026,
    docs/PLAZO-DE-CONSERVACION.md): cuánto tiempo se guarda cada asunto.
 
-   1. Tipo con 4 años y asunto archivado hace más de 4 → sale en el aviso.
+   1. Tipo con 4 años y asunto cerrado hace más de 4 → sale en el aviso.
    2. Con `conservarHasta` en el futuro → no sale.
    3. Tipo sin plazo → nunca sale.
    4. Un archivado de antes, sin fecha de cierre: con la del nombre,

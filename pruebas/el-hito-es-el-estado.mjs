@@ -7,7 +7,7 @@
 
    Comprueba:
    1. «Hito N de M · título», sin contar los «solo informativo»;
-      «Listo para archivar» y «Sin hitos».
+      «Listo para cerrar» y «Sin hitos».
    2. La marca del paso («Nos toca» / «Esperamos a…») manda sobre el
       responsable; y llega de la guía a los hitos que ya existen.
    3. «Esperando a…» manda (Pendiente de terceros aunque el hito sea
@@ -19,7 +19,7 @@
       la guía (o la mínima).
    6. «Saltar a este hito»: da por hechos los anteriores con nota, no
       se salta una pregunta sin responder, y quita la espera.
-   7. En el ARCHIVO: «Archivado · se quedó en: …» / «· terminado».
+   7. En el ARCHIVO: «Cerrado · se quedó en: …» / «· terminado».
    8. La fila cerrada del acordeón enseña la marca («Espera: Familia»). */
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -76,7 +76,7 @@ comprobar('1. «Hito N de M · título», sin los informativos',
   'Hito 2 de 3 · Paso b');
 comprobar('1. todos terminados: listo para archivar',
   (function () { const r = estado([hito('a', { estado: 'hecho' }), hito('b', { estado: 'noaplica' })]); return [r.texto, r.lado]; })(),
-  ['Listo para archivar', 'administracion']);
+  ['Listo para cerrar', 'administracion']);
 comprobar('1. sin hitos: Administración, sin mirar ningún estado',
   (function () { const r = estado([]); return [r.texto, r.lado]; })(), ['Sin hitos', 'administracion']);
 
@@ -171,10 +171,10 @@ const conPregunta = [
 comprobar('6. no se salta una pregunta sin responder', [Hitos.situarLista(conPregunta, 'c', 'x', 'y'), conPregunta[0].estado], [-1, 'pendiente']);
 
 /* 7 */
-comprobar('7. archivado: se quedó en', EstadoHito.textoArchivado({ seQuedoEn: 'Esperar la firma' }), 'Archivado · se quedó en: Esperar la firma');
-comprobar('7. archivado: terminado', EstadoHito.textoArchivado({ terminado: true }), 'Archivado · terminado');
-comprobar('7. archivado de antes, con su estado viejo como dato histórico (fila 132)', EstadoHito.textoArchivado({ situacion: 'RESUELTO' }), 'Archivado · RESUELTO');
-comprobar('7. archivado sin nada', EstadoHito.textoArchivado({}), 'Archivado');
+comprobar('7. archivado: se quedó en', EstadoHito.textoArchivado({ seQuedoEn: 'Esperar la firma' }), 'Cerrado · se quedó en: Esperar la firma');
+comprobar('7. archivado: terminado', EstadoHito.textoArchivado({ terminado: true }), 'Cerrado · terminado');
+comprobar('7. archivado de antes, con su estado viejo como dato histórico (fila 132)', EstadoHito.textoArchivado({ situacion: 'RESUELTO' }), 'Cerrado · RESUELTO');
+comprobar('7. archivado sin nada', EstadoHito.textoArchivado({}), 'Cerrado');
 
 /* 8 */
 comprobar('8. la fila cerrada del acordeón: «Espera: Familia»',

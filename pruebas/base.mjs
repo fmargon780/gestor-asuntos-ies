@@ -245,7 +245,7 @@ await p.waitForSelector('#bloque-base', { state: 'visible' });
 await p.evaluate(() => { document.querySelector('#bloque-base').open = true; BasePantalla.pintar(); });
 await p.waitForSelector('#base-boton');
 const texto = await p.locator('#base-cuantos').innerText();
-comprobar('10. «Asuntos archivados apuntados: N de M.»', /^Asuntos archivados apuntados: \d+ de \d+\./.test(texto), true);
+comprobar('10. «Asuntos cerrados apuntados: N de M.»', /^Asuntos cerrados apuntados: \d+ de \d+\./.test(texto), true);
 await p.click('#base-boton');
 await p.waitForFunction(() => /Apuntados \d+ asunto/.test((document.getElementById('base-fin') || {}).textContent || ''), null, { timeout: 60000 });
 const igual = await p.evaluate(() => { const m = /apuntados: (\d+) de (\d+)/.exec(document.getElementById('base-cuantos').textContent); return m && m[1] === m[2]; });

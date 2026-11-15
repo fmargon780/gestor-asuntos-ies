@@ -5,7 +5,7 @@
    «Exportar ▾» da dos opciones, «Hoja de cálculo» e «Informe en PDF».
    Las dos abren la misma ventana (un solo cuadro a la vez, U.preguntar):
 
-     - «Incluir también los archivados» (desmarcada): suma a lo que se
+     - «Incluir también los cerrados» (desmarcada): suma a lo que se
        ve los asuntos del ARCHIVO que cumplen los mismos filtros.
      - Las columnas, con una casilla cada una: las del asunto y los
        campos propios de los tipos que salen. La primera vez van las de
@@ -139,7 +139,7 @@
       (destino === 'pdf'
         ? '<div class="exportar-titulo-linea"><label for="exp-titulo">Título</label>' +
           '<input type="text" id="exp-titulo" class="campo" maxlength="120" value="Listado de asuntos"></div>' : '') +
-      '<label class="exportar-casilla exportar-archivados"><input type="checkbox" id="exp-archivados"> Incluir también los archivados</label>' +
+      '<label class="exportar-casilla exportar-archivados"><input type="checkbox" id="exp-archivados"> Incluir también los cerrados</label>' +
       '<p class="nota exportar-nota oculto" id="exp-nota"></p>' +
       '<div id="exp-columnas">' + columnasHtml(marcadas, camposAbiertos, false) + '</div>' +
       (destino === 'pdf'
@@ -161,7 +161,7 @@
       if (aceptar) aceptar.disabled = !hay;
       if (aceptar) aceptar.title = hay ? '' : 'No hay asuntos que exportar con estos filtros';
       if (!nota) return;
-      if (cargando) { nota.textContent = 'Mirando los archivados…'; nota.classList.remove('oculto'); }
+      if (cargando) { nota.textContent = 'Mirando los cerrados…'; nota.classList.remove('oculto'); }
       else if (!hay) { nota.textContent = 'No hay asuntos que exportar con estos filtros'; nota.classList.remove('oculto'); }
       else nota.classList.add('oculto');
     }
@@ -179,7 +179,7 @@
       } catch (e) {
         if (miTurno !== turno) return;
         var n = $('exp-nota');
-        if (n) { n.textContent = 'No he podido leer los archivados: ' + U.mensajeDeError(e); n.classList.remove('oculto'); }
+        if (n) { n.textContent = 'No he podido leer los cerrados: ' + U.mensajeDeError(e); n.classList.remove('oculto'); }
         $('exp-archivados').checked = false;
         entradas = null;
         repintarColumnas([]);
@@ -245,7 +245,7 @@
         var entradas = o.entradas;
         if (entradas === null) entradas = await datos.entradasDeArchivados(o.filtros, function (t) { U.aviso(t); });
         var lista = datos.ordenarArchivados(entradas);
-        if (lista.length) U.aviso('Leyendo los archivados (' + lista.length + ')…');
+        if (lista.length) U.aviso('Leyendo los cerrados (' + lista.length + ')…');
         var archivados = await datos.registrosDeArchivados(lista, { conHitos: destino === 'hoja' || o.conHitos });
         registros = registros.concat(archivados);
       }

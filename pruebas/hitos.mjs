@@ -491,7 +491,7 @@ await pagina.click('#cuadro-cancelar');
 /* ================= ESCENARIO 9: al archivar ================= */
 
 console.log('--- escenario 9: al archivar, historial de tramitación ---');
-await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(600);

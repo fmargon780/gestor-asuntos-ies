@@ -32,7 +32,7 @@ var BasePantalla = (function () {
       var ultimo = BasePonerAlDia.ultimo();
       var trabajando = BasePonerAlDia.estaCorriendo();
       cuerpo.innerHTML =
-        '<p id="base-cuantos"><strong>Asuntos archivados apuntados: ' + c.apuntados + ' de ' + c.total + '.</strong>' +
+        '<p id="base-cuantos"><strong>Asuntos cerrados apuntados: ' + c.apuntados + ' de ' + c.total + '.</strong>' +
         (faltan > 0 ? ' <span class="suave">Faltan ' + faltan + '. Se apuntan solos, poco a poco.</span>' : '') + '</p>' +
         '<p class="suave" id="base-ultima">' + (ultimo ? 'Última puesta al día: ' + esc(fechaHora(ultimo.cuando)) + ', en este ordenador.' : 'Todavía no se ha puesto al día en este ordenador.') + '</p>' +
         (c.incompletos ? '<p class="suave" id="base-incompletos">' + c.incompletos + (c.incompletos === 1 ? ' asunto antiguo no tiene guardados sus hitos: se ha apuntado con lo que hay.' : ' asuntos antiguos no tienen guardados sus hitos: se han apuntado con lo que hay.') + '</p>' : '') +
@@ -68,8 +68,8 @@ var BasePantalla = (function () {
     var det = document.createElement('details');
     det.className = 'bloque-ajustes';
     det.id = 'bloque-base';
-    det.innerHTML = '<summary><span class="bloque-titulo">Tablas para informes</span><span class="bloque-pie">Los asuntos archivados, apuntados en tablas para las estadísticas que vengan</span></summary>' +
-      '<div class="bloque-cuerpo"><p class="explica">Cada asunto que se archiva queda apuntado, con sus hitos, sus personas y sus documentos, además de en su carpeta. Las carpetas no cambian.</p>' +
+    det.innerHTML = '<summary><span class="bloque-titulo">Tablas para informes</span><span class="bloque-pie">Los asuntos cerrados, apuntados en tablas para las estadísticas que vengan</span></summary>' +
+      '<div class="bloque-cuerpo"><p class="explica">Cada asunto que se cierra queda apuntado, con sus hitos, sus personas y sus documentos, además de en su carpeta. Las carpetas no cambian.</p>' +
       '<div id="base-cuerpo"></div></div>';
     puesta.appendChild(det);
     det.addEventListener('toggle', function () { if (det.open) pintar(); });

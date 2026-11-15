@@ -3,7 +3,7 @@
    En espera + Por liquidar suman siempre «Todos los abiertos»; «Dormidos» ya
    no es pestaña sino una marca «Dormido · N días» en la fila, con el filtro
    «Solo dormidos»; los asuntos sin hito por hacer van al final de «En
-   Administración» con «Añade un hito o archívalo».
+   Administración» con «Añade un hito o ciérralo».
 
    Datos (tipo TRASLADO normal y tipo LIQ, que se liquida):
      - A: hito de Administración en curso, vencido.            → En Administración
@@ -148,11 +148,11 @@ await comprobar('2. B no la lleva', pagina.locator('#inicio-tabla-cuerpo tr[data
 await irA('todos');
 await comprobar('2. en Todos los abiertos salen las dos marcas', pagina.locator('#inicio-tabla-cuerpo .marca-dormido').count(), 2);
 
-console.log('--- 3. sin hito por hacer: al final, «Añade un hito o archívalo» ---');
+console.log('--- 3. sin hito por hacer: al final, «Añade un hito o ciérralo» ---');
 await irA('adm');
 const filasAdm = await filasTras('adm');
 await comprobar('3. A primero; C y E (sin nada por hacer) después', [filasAdm[0], filasAdm.slice(1).sort()], [K.A, [K.C, K.E].sort()]);
-await comprobar('3. C dice «Añade un hito o archívalo»', pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + K.C + '"] .inicio-sin-hito').textContent(), 'Añade un hito o archívalo');
+await comprobar('3. C dice «Añade un hito o ciérralo»', pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + K.C + '"] .inicio-sin-hito').textContent(), 'Añade un hito o ciérralo');
 await comprobar('3. G (Administración «Esperando a…») está en En espera', filasTras('esp').then((f) => f.includes(K.G)), true);
 
 console.log('--- 4. «Solo dormidos» ---');

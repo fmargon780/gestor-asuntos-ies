@@ -113,10 +113,10 @@ await crearAsunto(1, 'CERTIFICADO', 'dos');   /* asunto B: López Ejemplo, Prueb
    que siempre: no sale ningún cuadro de "Avisar a los relacionados".
    Fila 192: "Archivar" vive en el menú de tres puntos de la fila. */
 await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
-await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('sin relacionados, el cuadro es directamente el de archivar',
-  pagina.locator('#cuadro-titulo').textContent(), 'Archivar el asunto');
+  pagina.locator('#cuadro-titulo').textContent(), 'Cerrar el asunto');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
@@ -230,9 +230,9 @@ await pagina.locator('.relacionado-fila').nth(2).getByRole('button', { name: 'Qu
 await pagina.waitForTimeout(200);
 await comprobar('vuelve a haber dos relacionados', pagina.locator('.relacionado-fila').count(), 2);
 
-/* 5) Archivar el asunto pregunta por los relacionados y deja la nota
+/* 5) Cerrar el asunto pregunta por los relacionados y deja la nota
    en la carpeta de cada uno, con el texto y la ruta correctos. */
-await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro es el de avisar a los relacionados',
   pagina.locator('#cuadro-titulo').textContent(), 'Avisar a los relacionados');
@@ -241,7 +241,7 @@ await comprobar('las dos casillas salen marcadas de entrada',
 await pagina.click('#cuadro-aceptar');
 /* Y detrás, el cuadro de siempre de archivar (categoría y tercero ya
    los sabe, porque el asunto se creó con la aplicación). */
-await pagina.waitForSelector('#cuadro-titulo:has-text("Archivar el asunto")');
+await pagina.waitForSelector('#cuadro-titulo:has-text("Cerrar el asunto")');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
@@ -309,7 +309,7 @@ await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
 await comprobar('la ficha de Persona Uno dice que está relacionado (archivado)',
   pagina.locator('.ficha-relacionado-de').textContent()
-    .then(t => t.indexOf(nombreCortoA) !== -1 && t.indexOf('Archivado') !== -1), true);
+    .then(t => t.indexOf(nombreCortoA) !== -1 && t.indexOf('Cerrado') !== -1), true);
 
 /* 7) Reabrir el asunto borra las dos notas, pero la lista de
    relacionados sigue en la ficha. */
@@ -359,10 +359,10 @@ await comprobar('pero la lista de relacionados sigue en la ficha del asunto', pa
    dos notas, y se reabre. */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'MATRICULA' }).locator('.fila-menu-btn').click();
-await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');   /* avisar a los relacionados, las dos marcadas */
-await pagina.waitForSelector('#cuadro-titulo:has-text("Archivar el asunto")');
+await pagina.waitForSelector('#cuadro-titulo:has-text("Cerrar el asunto")');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 

@@ -88,7 +88,7 @@ const visibles = (p, sel) => p.$$eval(sel, (e) => e.filter((x) => x.offsetParent
 /* ===== 1 y 2. Administración ===== */
 console.log('--- 1. Administración ---');
 let pagina = await entrar('');
-await comprobar('1. el menú completo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo asunto', 'Archivo', 'Personas y empresas', 'Impresos', 'Cuentas', 'Herramientas', 'Ajustes']);
+await comprobar('1. el menú completo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo asunto', 'Asuntos cerrados', 'Personas y empresas', 'Impresos', 'Cuentas', 'Herramientas', 'Ajustes']);
 await comprobar('1. sin línea de perfil y con las pestañas de Inicio', Promise.all([pagina.locator('#franja-perfil').count(), visibles(pagina, '.inicio-pestana').then((n) => n >= 4)]), [0, true]);
 await comprobar('1. «+ Nuevo asunto» y el tablón están', Promise.all([visibles(pagina, '#btn-nuevo-asunto'), visibles(pagina, '#tablon')]), [1, 1]);
 console.log('--- 2. Ajustes: quién usa la aplicación ---');
@@ -124,7 +124,7 @@ pagina = await entrar('Jefa de estudios de prueba');
 const escrituras = () => pagina.evaluate(() => Demo.escrituras());
 await comprobar('3. la línea fija de arriba', pagina.locator('#franja-perfil').textContent(), 'Entras como Jefatura de Estudios. Ves los asuntos de tu órgano.');
 await comprobar('3. sin la franja de «solo consultar»', pagina.locator('#franja-solo-consulta').count(), 0);
-await comprobar('3. el menú, solo Inicio y Archivo (y, desde la fila 289, sus dos entradas de encargos)', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo encargo', 'Mis encargos', 'Archivo']);
+await comprobar('3. el menú, solo Inicio y Archivo (y, desde la fila 289, sus dos entradas de encargos)', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo encargo', 'Mis encargos', 'Asuntos cerrados']);
 await comprobar('3. sin tablón, ni «Ha llegado», ni avisos, ni «+ Nuevo asunto», ni las otras pestañas',
   Promise.all([visibles(pagina, '#btn-nuevo-asunto, #tablon, #inicio-ha-llegado-linea, #avisos-linea, #inicio-fila-superior'), visibles(pagina, '.inicio-pestana')]), [0, 1]);
 await comprobar('3. una sola lista, solo asuntos de Jefatura (MATRICULA), con el reservado', filas(pagina).then((f) => [f.length, f.every((n) => /MATRICULA/.test(n))]), [3, true]);
@@ -137,7 +137,7 @@ await pagina.waitForTimeout(600);
 await comprobar('3. sin «Lo encarga» entre los filtros', visibles(pagina, 'label.filtro:has(#filtro-organo)'), 0);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto*="Aguilar Ponce, Marina"] .tarjeta-nombre').first().click();
 await pagina.waitForTimeout(1500);
-await comprobar('3. la ficha: sin «Tomar el mando» y sin «Archivar el asunto» encendido',
+await comprobar('3. la ficha: sin «Tomar el mando» y sin «Cerrar el asunto» encendido',
   pagina.evaluate(() => [document.querySelectorAll('.boton-presencia-tomar').length, [...document.querySelectorAll('#ficha-asunto-cuerpo button, #ficha-archivar button')].filter((b) => /Archivar/.test(b.textContent) && !b.disabled).length]), [0, 0]);
 await comprobar('3. la ficha: la zona «Suelta aquí el PDF» no se ve', visibles(pagina, '.guion-soltar'), 0);
 await pagina.click('#ficha-volver');
@@ -146,7 +146,7 @@ await pagina.waitForTimeout(2500);
 await comprobar('3. el Archivo, solo asuntos de Jefatura', pagina.$$eval('#lista-archivo [data-asunto], #lista-archivo .tarjeta-nombre', (e) => e.map((x) => (x.dataset.asunto || x.textContent))).then((l) => l.every((n) => /MATRICULA/i.test(n))), true);
 await comprobar('3. en el Archivo no hay «Reabrir» a la vista', visibles(pagina, '#lista-archivo .accion-de-administracion'), 0);
 await comprobar('3. en el menú ⋮ del Archivo, «Reconstruir el índice» no se ve', visibles(pagina, '#btn-reconstruir-indice'), 0);
-await comprobar('3. en el Archivo, un solo asunto archivado', pagina.evaluate(() => App.E.listaArchivo.length), 1);
+await comprobar('3. en el Archivo, un solo asunto cerrado', pagina.evaluate(() => App.E.listaArchivo.length), 1);
 await comprobar('3. ni una escritura al entrar ni al pasear', escrituras(), 0);
 /* 5. la puerta */
 console.log('--- 5. la puerta para escribir ---');

@@ -199,11 +199,11 @@ var AdministracionesTraer = (function () {
     cuerpo.className = '';
     cuerpo.innerHTML =
       '<p class="explica">Marca los que son organismos o centros educativos y ponles un nombre corto y estable ' +
-      '(el de la carpeta). Sus asuntos abiertos y archivados pasan con ellos, con sus hitos y notas.</p>' +
+      '(el de la carpeta). Sus asuntos abiertos y cerrados pasan con ellos, con sus hitos y notas.</p>' +
       (vistos.length ? '<div class="adm-traer-lista">' + vistos.map(function (c, i) {
         var pr = propuesta(c.tercero);
         var cuantos = [c.abiertos ? c.abiertos + ' abierto' + (c.abiertos === 1 ? '' : 's') : '',
-          c.archivados ? c.archivados + ' archivado' + (c.archivados === 1 ? '' : 's') : '',
+          c.archivados ? c.archivados + ' cerrado' + (c.archivados === 1 ? '' : 's') : '',
           c.persona ? 'dado de alta' : ''].filter(Boolean).join(' · ');
         return '<div class="adm-traer-fila" data-i="' + i + '">' +
           '<label><input type="checkbox" class="adm-traer-marca"> <strong>' + esc(c.tercero) + '</strong> ' +
@@ -237,7 +237,7 @@ var AdministracionesTraer = (function () {
     var ok = await U.preguntar('Pasar a Administraciones',
       '<p>Se van a pasar ' + marcados.length + ' tercero' + (marcados.length === 1 ? '' : 's') +
       (tipos.length ? ' y ' + tipos.length + ' tipo' + (tipos.length === 1 ? '' : 's') + ' de asunto' : '') +
-      ' a ADMINISTRACIONES, con sus asuntos abiertos y archivados.</p>', 'Adelante');
+      ' a ADMINISTRACIONES, con sus asuntos abiertos y cerrados.</p>', 'Adelante');
     if (!ok) return;
     await U.mientrasGuarda(boton, async function () {
       var progreso = $('pasar-adm-progreso');

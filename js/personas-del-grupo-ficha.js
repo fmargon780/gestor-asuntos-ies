@@ -59,7 +59,7 @@ var PersonasDelGrupoFicha = (function () {
   }
 
   async function abrirAsunto(x, d, fichero) {
-    if (!d.asunto) { U.aviso(x.archivado ? 'No he podido abrirlo: ya no está en el archivo.' : 'Ya no está abierto: puede que se haya archivado desde otro ordenador.', 'malo'); return; }
+    if (!d.asunto) { U.aviso(x.archivado ? 'No he podido abrirlo: ya no está en el archivo.' : 'Ya no está abierto: puede que se haya cerrado desde otro ordenador.', 'malo'); return; }
     App.abrirFicha(d.asunto, x.archivado ? 'archivado' : 'abierto');
     /* El documento, solo con el asunto abierto; archivado, la ficha. */
     if (fichero && !x.archivado && window.Visor) {
@@ -89,7 +89,7 @@ var PersonasDelGrupoFicha = (function () {
       var x = asuntos[i];
       var d = await datosDe(x, p);
       var que = lineasDe(d.ficha, d.ficheros, p, nombre);
-      var pie = U.escapar(x.nombre) + ' · ' + (x.archivado ? 'Archivado' : 'Abierto');
+      var pie = U.escapar(x.nombre) + ' · ' + (x.archivado ? 'Cerrado' : 'Abierto');
       if (!que.length) {
         que = [null];
       }
@@ -97,7 +97,7 @@ var PersonasDelGrupoFicha = (function () {
         var fila = document.createElement('div');
         fila.className = 'resultado' + (l ? ' pg-linea-persona' : '');
         var texto = l ? textoDeLinea(PersonasDelGrupo.nombreDeTrabajo({ clave: l.trabajo.clave, tipo: l.trabajo.tipo, fecha: '', aviso: l.trabajo.aviso }, plantillas), l.h) : x.nombre;
-        fila.innerHTML = '<div>' + U.escapar(texto) + '</div><div class="resultado-pie">' + (l ? pie : (x.archivado ? 'Archivado' : 'Abierto')) + '</div>';
+        fila.innerHTML = '<div>' + U.escapar(texto) + '</div><div class="resultado-pie">' + (l ? pie : (x.archivado ? 'Cerrado' : 'Abierto')) + '</div>';
         /* Fila 295: con el correo ya enviado, la línea abre el PDF de ese correo; si no, su documento. */
         fila.onclick = function () { abrirAsunto(x, d, l ? ((l.h.enviado && l.h.enviado.pdf) || (l.h.generado && l.h.generado.fichero) || '') : ''); };
         bloque.appendChild(fila);

@@ -102,7 +102,7 @@ await pagina.evaluate(async () => {
 await crearAsunto('talleres inventados', '2026-09-05', 0);
 /* El primero se archiva: no tiene que cambiar de nombre. */
 await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
-await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');
@@ -165,7 +165,7 @@ await comprobar('con el texto de antes y el de después',
   cuadro.indexOf('«TALLERES INVENTADOS SL B00000001»') !== -1 && cuadro.indexOf('«TALLERES INVENTADOS SL B00000002»') !== -1, true);
 await comprobar('«Asuntos abiertos (2)» con las dos carpetas',
   cuadro.indexOf('Asuntos abiertos (2)') !== -1 && deTalleres.every(n => cuadro.indexOf(n) !== -1), true);
-await comprobar('con la línea de la carpeta del archivo y sin el asunto archivado',
+await comprobar('con la línea de la carpeta del archivo y sin el asunto cerrado',
   cuadro.indexOf('Su carpeta del archivo cambia de nombre') !== -1 && archivadoAntes.every(n => cuadro.indexOf(n) === -1), true);
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(400);
@@ -208,7 +208,7 @@ await comprobar('en el archivo, la carpeta lleva el texto nuevo y ya no está la
     for await (const p of cat.entries()) n.push(p[0]);
     return n.sort();
   }), ['TALLERES INVENTADOS SL B00000002']);
-await comprobar('dentro, el asunto archivado conserva su nombre de antes',
+await comprobar('dentro, el asunto cerrado conserva su nombre de antes',
   hijos('EMPRESAS', 'TALLERES INVENTADOS SL B00000002'), archivadoAntes);
 await comprobar('el índice del archivo no apunta a la carpeta vieja',
   pagina.evaluate(async () => {
@@ -286,7 +286,7 @@ await comprobar('en la ficha de un asunto abierto sale', pagina.locator(CAMBIAR)
 /* Un asunto en modo archivado (la misma ficha, vista desde el ARCHIVO). */
 await pagina.evaluate((n) => { App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === n)[0], 'archivado'); }, libreNuevo);
 await pagina.waitForSelector('#ficha-datos-bloque button:has-text("Ver todo")');   /* fila 637: antes `#tercero-ver-todo` */
-await comprobar('en la ficha de un asunto archivado no sale', pagina.locator(CAMBIAR).count(), 0);
+await comprobar('en la ficha de un asunto cerrado no sale', pagina.locator(CAMBIAR).count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

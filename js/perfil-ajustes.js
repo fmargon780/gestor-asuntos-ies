@@ -28,7 +28,7 @@ var PerfilAjustes = (function () {
       '<div class="bloque-cuerpo">' +
         '<p class="explica">Cada nombre de la lista de entrada es de Administración (lo de siempre) o de uno de los ' +
         'órganos del centro. Quien entra con un nombre de Dirección, Secretaría o Jefatura de Estudios ve solo ' +
-        'Inicio y Archivo, con los asuntos de su órgano, y no cambia nada.</p>' +
+        'Inicio y Asuntos cerrados, con los asuntos de su órgano, y no cambia nada.</p>' +
         '<div id="tabla-perfiles" class="lista"></div>' +
         '<div class="alta-tipo">' +
           '<input id="nueva-persona-perfil" class="campo" placeholder="NOMBRE" style="max-width:260px">' +

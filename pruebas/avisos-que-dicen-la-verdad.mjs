@@ -139,7 +139,7 @@ await comprobar('la carpeta ya está en el ARCHIVO',
   }, A), true);
 await comprobar('ningún aviso rojo', Promise.resolve(a3.filter(a => a.clase === 'malo').map(a => a.texto)), []);
 await comprobar('verde de archivado y ámbar de la copia vieja',
-  Promise.resolve([a3.some(a => a.clase === 'bueno' && a.texto.indexOf('Asunto archivado') === 0),
+  Promise.resolve([a3.some(a => a.clase === 'bueno' && a.texto.indexOf('Asunto cerrado') === 0),
                    a3.some(a => a.clase === 'ambar' && a.texto.indexOf('queda una copia vieja') > -1)]), [true, true]);
 await comprobar('al terminar, ya no está ocupado', pagina.evaluate((A) => !!App.E.ocupados[A], A), false);
 

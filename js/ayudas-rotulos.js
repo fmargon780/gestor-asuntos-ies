@@ -52,7 +52,7 @@ var AyudasNucleo = AyudasNucleo || {};
     'hoja de cálculo': 'Guarda la lista en una hoja de cálculo.',
     'informe en pdf': 'Prepara un informe en PDF con la lista que ves.',
     'quitar': 'Quita esto de la lista. Lo demás no se toca.',
-    'liquidar': 'Pide la fecha y quién entrega y recibe, guarda el PDF de liquidación y archiva el asunto.',
+    'liquidar': 'Pide la fecha y quién entrega y recibe, guarda el PDF de liquidación y cierra el asunto.',
     'restablecer columnas': 'Devuelve las columnas de la tabla a su orden y anchura de siempre.',
     'ya los he visto': 'Quita el aviso de documentos nuevos: ya has mirado los que había.',
     'elegir carpeta': 'Señala en tu ordenador la carpeta de este apartado.',

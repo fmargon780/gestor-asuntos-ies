@@ -130,18 +130,18 @@ var ArchivarCabe = (function () {
     if (medida.carpeta) {
       var ok0 = await U.preguntar('No cabe en el archivo',
         '<p>El nombre de la carpeta de este asunto es demasiado largo para el archivo: le sobran ' +
-        medida.carpeta.sobran + ' caracteres. Cámbialo y vuelve a archivar. No se ha movido nada.</p>' +
+        medida.carpeta.sobran + ' caracteres. Cámbialo y vuelve a cerrarlo. No se ha movido nada.</p>' +
         destinoHtml(medida.ctx, ''), 'Cambiar el asunto');
       return { accion: ok0 ? 'cambiar' : 'cancelar' };
     }
     var n = medida.lista.length;
     cuadroEl.classList.add('cuadro-ancho');
     var esperar = U.preguntar('No cabe en el archivo',
-      '<p>Al archivar, esta carpeta queda dentro de la del tercero, y la ruta de ' + n + ' documento(s) ' +
+      '<p>Al cerrarlo, esta carpeta queda dentro de la del tercero, y la ruta de ' + n + ' documento(s) ' +
       'sale más larga de lo que admite Windows. Acorta su nombre aquí. No se ha movido nada.</p>' +
       destinoHtml(medida.ctx, avisoFusion) +
       '<div class="ac-lista' + (n > 12 ? ' ac-lista-larga' : '') + '" id="ac-lista">' +
-        medida.lista.map(filaHtml).join('') + '</div>', 'Acortar y archivar');
+        medida.lista.map(filaHtml).join('') + '</div>', 'Acortar y cerrar');
     var cajas = Array.prototype.slice.call(document.querySelectorAll('#ac-lista .ac-caja'));
     function repasar() {
       var todoBien = true;
@@ -177,7 +177,7 @@ var ArchivarCabe = (function () {
         await DocumentoRenombrar.renombrar({ nombre: a.nombre, ficha: a.ficha }, f.dir, f.nombre, nuevos[i],
           { soloFichero: f.sub.length > 0 });
       } catch (e) {
-        U.fallo('No se ha podido cambiar el nombre de «' + f.nombre + '», así que no se archiva', e);
+        U.fallo('No se ha podido cambiar el nombre de «' + f.nombre + '», así que no se cierra', e);
         return false;
       }
     }
@@ -199,8 +199,8 @@ var ArchivarCabe = (function () {
     var n = (App.E.noCabeEnArchivo || []).length;
     App.E.noCabeEnArchivo = [];
     if (!n) return 0;
-    U.aviso(n + ' asunto(s) no se han archivado porque algún documento no cabe en el archivo: ' +
-      'archívalos uno a uno desde su ⋮.', 'ambar');
+    U.aviso(n + ' asunto(s) no se han cerrado porque algún documento no cabe en el ARCHIVO: ' +
+      'ciérralos uno a uno desde su ⋮.', 'ambar');
     return n;
   }
 

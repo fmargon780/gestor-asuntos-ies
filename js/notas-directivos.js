@@ -332,7 +332,7 @@ var NotasDirectivos = (function () {
     var n = sinVer(a).length;
     if (!n) return true;
     var archivar = await U.preguntar('Notas de directivos',
-      '<p>' + U.escapar('Tiene ' + plural(n, 'nota de directivo', 'notas de directivos') + ' sin ver.') + '</p>', 'Archivar de todos modos', false, 'Verlas');
+      '<p>' + U.escapar('Tiene ' + plural(n, 'nota de directivo', 'notas de directivos') + ' sin ver.') + '</p>', 'Cerrar de todos modos', false, 'Verlas');
     if (!archivar && window.App && App.abrirFicha) { try { App.abrirFicha(a, 'abierto'); } catch (e) { /* solo mirar */ } }
     return archivar;
   }

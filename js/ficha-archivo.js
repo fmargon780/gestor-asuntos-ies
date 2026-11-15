@@ -122,12 +122,12 @@ var FichaArchivo = (function () {
              han seguido fallando: no se ha perdido nada, la clave sigue en asuntos.json
              (el borrado de arriba no ha llegado a ejecutarse), y el botón de abajo la
              recoge sola cuando se pulse. */
-          U.aviso('El asunto se ha archivado. Su ficha no se ha podido guardar todavía dentro ' +
+          U.aviso('El asunto se ha cerrado. Su ficha no se ha podido guardar todavía dentro ' +
             'de la carpeta porque la nube la estaba sincronizando. No se ha perdido nada: se ' +
             'hará sola la próxima vez que pulses «Poner en orden las fichas del ARCHIVO» en ' +
             'Ajustes → Mantenimiento.', 'ambar');
         } else {
-          U.accesorio('El asunto se ha archivado, pero no he podido guardar su ficha en la carpeta', e);
+          U.accesorio('El asunto se ha cerrado, pero no he podido guardar su ficha en la carpeta', e);
         }
       }
   }
@@ -253,9 +253,9 @@ var FichaArchivo = (function () {
         '<span class="bloque-pie" id="fichas-archivo-pie"></span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="explica">Antes de esta fila, la ficha de un asunto archivado se quedaba en ' +
+        '<p class="explica">Antes de esta fila, la ficha de un asunto cerrado se quedaba en ' +
         '<code>asuntos.json</code> para siempre, y ese fichero solo podía crecer. Este botón baja ' +
-        'a su propia carpeta la ficha de cada asunto ya archivado que todavía la tenga ahí. No se ' +
+        'a su propia carpeta la ficha de cada asunto ya cerrado que todavía la tenga ahí. No se ' +
         'pierde ningún dato: se copia tal cual, dentro de <code>_ficha.json</code>.</p>' +
         '<div id="fichas-archivo-cuerpo" class="explica">Comprobando…</div>' +
       '</div>';
@@ -273,7 +273,7 @@ var FichaArchivo = (function () {
      «Problemas» (fila 291, que no tiene caja de progreso). */
   async function mover(boton, progreso, pendientes) {
     if (!pendientes) pendientes = await pendientesDeConvertir();
-    if (!pendientes.length) { U.aviso('Todas las fichas de asuntos archivados están ya en su carpeta.', ''); return; }
+    if (!pendientes.length) { U.aviso('Todas las fichas de asuntos cerrados están ya en su carpeta.', ''); return; }
     var sinCarpeta = pendientes.filter(function (p) { return !p.handle; }).length;
     var detalle = sinCarpeta
       ? '<p class="aviso aviso-ambar">' + sinCarpeta + ' no tienen carpeta localizable: se ' +
@@ -307,7 +307,7 @@ var FichaArchivo = (function () {
     cuerpo.className = '';
     cuerpo.innerHTML = '';
     if (!pendientes.length) {
-      cuerpo.innerHTML = '<div class="vacio">Todas las fichas de asuntos archivados están ya en su carpeta.</div>';
+      cuerpo.innerHTML = '<div class="vacio">Todas las fichas de asuntos cerrados están ya en su carpeta.</div>';
       return;
     }
     var boton = document.createElement('button');
