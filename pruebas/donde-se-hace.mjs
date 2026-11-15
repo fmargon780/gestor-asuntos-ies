@@ -95,7 +95,7 @@ await comprobar('2b. la lista común y la guía dicen lo mismo (con «Copiar a o
 await comprobar('2c. las fases dicen «Generar documento» y «Grabar o cambiar datos»', p.evaluate(() => [Comunes.textoDeFase('elaborar'), Comunes.textoDeFase('seneca'), Comunes.textoDeFase('firma')]), ['Generar documento', 'Grabar o cambiar datos', 'Poner a la firma']);
 await comprobar('2d. los valores de dentro no cambian y «Recoger» y «Archivar» se tratan como acciones que se marcan a mano', p.evaluate(() => [
   ['comunicar', 'firmar', 'pedir', 'llamar', 'seneca', 'entregar', 'recoger', 'archivar'].map((v) => Comunes.accionValida(v)).join(','), Hitos._guionInterno.ACCIONES.indexOf('recoger') !== -1 && Hitos._guionInterno.ACCIONES.indexOf('archivar') !== -1,
-  HitoMesaRecetas.botonDeTareaHTML(Gestor.asuntos()[0], { id: 'h' }, { id: 'x', texto: 'T', accion: 'recoger' }, {})]), ['comunicar,firmar,pedir,llamar,seneca,entregar,recoger,archivar', true, '']);
+  HitoMesaRecetas.botonDeTareaHTML(Gestor.asuntos()[0], { id: 'h' }, { id: 'x', texto: 'T', accion: 'recoger' }, {})]), ['comunicar,firmar,pedir,llamar,seneca,entregar,recoger,archivar', true, '<button type="button" class="boton boton-chico guion-hecha-boton" data-hecha="recoger">Recogido</button>']);   /* fila 671: Recoger ya tiene su botón «Recogido» */
 
 console.log('--- 3. «Dónde se hace» ---');
 const cual = (a) => p.evaluate((a) => {
