@@ -21,6 +21,7 @@ Cada una con su fecha y de dónde sale.
 - (5-nov-2026, tema 516) **Se avisa, no se impide:** al marcar el hito, archivar o enviar, sale lo que falta por firmar o registrar y se puede seguir. Solo cuenta lo que hay que firmar o registrar.
 - (5-nov-2026, tema 516) **El hito no se cierra solo:** con todo hecho se resalta «Marcar como hecho».
 - (5-nov-2026, tema 516) Una tarea de firmar puede pedir **varias firmas**, y se marca al llegar a ese número.
+- (16-nov-2026, idea 680) **Por ahora, un documento no necesita hito ni tarea:** se puede guardar y añadir sin ellos, también en un asunto sin hitos; «Hay que registrarlo» se guarda sin hito; la tarea «Registrar» se marca con cualquier documento del hito cuando ninguna tiene el suyo. «Por ahora todas» (las cinco condiciones del listado), mientras Francisco depura el sistema nuevo. Sustituye en esto a lo de 5-nov (tema 516) y a las filas 661 y 667.
 
 - (10-nov-2026, idea 576) Hitos y tareas se condicionan con **«Solo si» un campo de lista del asunto**, no con hitos-pregunta: «lo veo mucho más natural». Todos los hitos en una sola lista que se ordena con las flechas.
 - (10-nov-2026, idea 576) Con el campo vacío salen todos en amarillo con «Falta: <campo>», como los textos condicionales; lo ya hecho no desaparece al cambiar el campo («me encaja mucho»).
