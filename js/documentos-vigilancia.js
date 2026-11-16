@@ -34,8 +34,12 @@ App.mirarLaCarpeta = async function () {
   if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
   if ($('aplicacion').classList.contains('oculto')) return;
   App.mirando = true;
+  /* Fila 677: cuánto tarda cada mirada y, dentro, solo la lectura de los nombres de la carpeta (js/medidas.js). */
+  var finMirada = window.Medidas ? Medidas.tiempo('carpeta.mirar') : function () {};
   try {
+    var finLectura = window.Medidas ? Medidas.tiempo('carpeta.leer-abiertos') : function () {};
     var hay = await Carpetas.contenido(App.E.abiertos);
+    finLectura();
 
     var antes = App.E.sueltos.map(function (f) { return f.nombre; });
     var entrada = window.Entrada ? await Entrada.leer(hay) : { ficheros: hay.ficheros };   /* fila 455 */
@@ -65,6 +69,7 @@ App.mirarLaCarpeta = async function () {
     /* Si se ha perdido el permiso sobre la carpeta, ya se verá al
        pulsar cualquier botón. Aquí no se molesta al usuario. */
   } finally {
+    finMirada();
     App.mirando = false;
   }
 };

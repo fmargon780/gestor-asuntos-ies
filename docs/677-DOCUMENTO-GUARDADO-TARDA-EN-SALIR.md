@@ -35,4 +35,9 @@ Después, el mismo día (16-nov-2026, a las 10:06), Francisco añadió en la con
 - Comprobar que Claude (con la extensión de Chrome) puede ver el cambio de tiempo en la medida; si no puede, decir qué le falta a Francisco.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (16-nov-2026, Claude Code) Causa **no** encontrada leyendo el código; no se inventa un arreglo. Lo que se ha visto:
+  - «Por clasificar»: `App.mirarLaCarpeta` lee con `Carpetas.contenido(App.E.abiertos)` la raíz entera cada 20 s y al volver a la ventana; si los nombres no cambian sale sin hacer más. La lectura es `dir.entries()` sin más, así que su tiempo depende de la carpeta (en Drive, de cuántas carpetas hay en la raíz).
+  - Carpeta del asunto vivo: la mirada periódica solo compara nombres de carpetas y sueltos de la raíz; **no relee la carpeta de un asunto abierto**. Los documentos de un asunto se leen en `FichaDocumentos.pintar` (al abrir la ficha y tras acciones de la propia app). Si un fichero guardado desde fuera se veía «casi inmediato» antes, no está claro por qué camino; hace falta ver cuánto tardan las lecturas.
+  - Medidas nuevas (`js/medidas.js`, llegan por el buzón de soporte): `carpeta.mirar` (toda la mirada), `carpeta.leer-abiertos` (solo la lectura de nombres de la raíz) y `asunto.leer-documentos` (leer los ficheros de la carpeta de un asunto). Salen con su nombre en llano en la pantalla de Medidas.
+  - Falta ver: los tiempos de `carpeta.leer-abiertos` y `asunto.leer-documentos` en el ordenador del instituto. Con ellos se decide si es Drive (lectura lenta) o la app (falta mirar la carpeta del asunto abierto).
+  - Comparación con la instrucción (tarea pequeña, sin segundo revisor): no cambia nada de lo que ve la usuaria; coincide.

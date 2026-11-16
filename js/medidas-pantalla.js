@@ -14,7 +14,9 @@ var MedidasPantalla = (function () {
     'entrar.total': 'Entrar', 'entrar.comprobar': 'Entrar: comprobar los ficheros', 'entrar.cargar': 'Entrar: cargar tipos y asuntos',
     'entrar.lista': 'Entrar: pintar Inicio', 'lista.repintar': 'Repintar Inicio', 'asunto.abrir': 'Abrir un asunto',
     'asunto.archivar': 'Cerrar el asunto', 'asunto.reabrir': 'Reabrir', 'archivo.leer-indice': 'Leer el índice del ARCHIVO',
-    'base.poner-al-dia': 'Poner al día las tablas para informes'
+    'base.poner-al-dia': 'Poner al día las tablas para informes',
+    'carpeta.mirar': 'Mirar si ha llegado algo (cada 20 s)', 'carpeta.leer-abiertos': 'Leer los nombres de la carpeta de asuntos',
+    'asunto.leer-documentos': 'Leer los documentos de la carpeta de un asunto'
   };
   var FICHEROS = { 'otro': 'otros ficheros', 'indice-por-curso': 'los índices del ARCHIVO', 'copia': 'las copias de seguridad',
     'registro-por-año': 'el control del registro', 'presencia': 'la presencia', 'medidas': 'las medidas', 'base': 'la base' };
