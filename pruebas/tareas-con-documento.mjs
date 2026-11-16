@@ -128,14 +128,16 @@ await pagina.waitForTimeout(1200);
 
 /* ===== 4. Registrar solo con su documento ===== */
 console.log('--- 4. registrar solo con su documento ---');
-await comprobar('4. con el sellado de otro documento no se marca',
+/* Fila 680: con el documento de otro, ya no se queda sin marcar: `elegirPaso` devuelve la primera «Registrar» sin hacer
+   (como antes de la fila 522). Se comprueba sin marcar nada, para que lo de después siga igual. */
+await comprobar('4. con el sellado de otro documento, la primera «Registrar» sin hacer (ya no ninguna)',
   pagina.evaluate(async () => {
     const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('Vidal Soto') !== -1)[0];
     const h = (await Hitos.hitosDe(a.nombre))[0];
-    const r = await Hitos.marcarGuionPorAccion(a, h.id, 'registrar', '261105 OTRO DOCUMENTO D26-09999.pdf');
-    const h2 = (await Hitos.hitosDe(a.nombre))[0];
-    return [r, Hitos.guionDe(a, h2).filter((g) => g.hecho).map((g) => g.id)];
-  }), [null, ['g-hacer-generar']]);
+    const cand = Hitos.guionDe(a, h).filter((g) => g.accion === 'registrar' && !g.hecho);
+    const r = TareasConDocumento.elegirPaso(h, cand, 'registrar', '261105 OTRO DOCUMENTO D26-09999.pdf');
+    return [r && r.id, cand.length];
+  }), ['g-hacer-registrar', 1]);
 /* El sellado llega: el papel con sello en la carpeta, y la pasada de fondo lo coloca sola. */
 const clave = await claveDe('Vidal Soto');
 await pagina.evaluate(async (clave) => {
