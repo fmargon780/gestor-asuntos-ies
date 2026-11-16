@@ -240,7 +240,9 @@ var FichaDocumentos = (function () {
     if (!caja) return;
     if (marcadosDeAsunto !== a.nombre) { marcadosDeAsunto = a.nombre; marcadosCarpeta = {}; }
     try {
+      var finLectura = window.Medidas ? Medidas.tiempo('asunto.leer-documentos') : function () {};   /* fila 677 */
       var lista = (await Carpetas.ficheros(a.handle)).filter(function (f) { return !Carpetas.esFicheroDeGoogle(f.nombre); });   /* fila 456 */
+      finLectura();
       /* El índice del expediente (fila 137) se ve, pero no cuenta. */
       var sinIndice = window.IndiceExpediente ? IndiceExpediente.fuera(lista) : lista;
       if (cuenta) cuenta.textContent = sinIndice.length || '';
