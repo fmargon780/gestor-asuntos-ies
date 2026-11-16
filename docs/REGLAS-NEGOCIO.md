@@ -280,3 +280,7 @@ Cada una con su fecha y de dónde sale.
   fin real de la tramitación: «no creo que sea algo oficial el día en que un administrativo de un
   instituto quiera dar a un botón de cierre en una app que ha montado para él mismo y su compañero.
   Así que la fecha de fin de la tramitación debe ser otra.»
+
+## Subir un documento
+
+- (16-nov-2026, fila 678) Al subir un documento, la ventana de Windows para elegirlo se abre siempre. Si no puede abrirse en la carpeta del asunto, se abre en otro sitio y sale el aviso «No he podido abrir la carpeta del asunto; elige el archivo.» Si no puede abrirse de ninguna forma, sale un aviso rojo con el motivo: nunca se queda en silencio. Francisco aceptó el aviso: «1».
