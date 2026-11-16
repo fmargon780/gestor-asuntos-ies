@@ -135,7 +135,22 @@
        mezclarla con cualquier fichero (`tipos` es el `types` de
        showOpenFilePicker, por ejemplo para PNG/JPG). */
     if (tipos) opciones.types = tipos;
-    var lista = await window.showOpenFilePicker(opciones);
+    var lista;
+    var t0 = Date.now();
+    try {
+      lista = await window.showOpenFilePicker(opciones);
+    } catch (e) {
+      /* Fila 678 (16-nov-2026): en Edge, empezar en la carpeta del asunto
+         podía dejar la ventana sin abrir y sin aviso. Si falla con
+         `startIn` por algo que no es cancelar, o «cancela» en menos de
+         300 ms (nadie cierra tan deprisa: es que no se abrió), se avisa y
+         se repite sin `startIn`. Si falla igual, se lanza ese error. */
+      var noSeAbrio = e && (e.name !== 'AbortError' || Date.now() - t0 < 300);
+      if (!opciones.startIn || !noSeAbrio) throw e;
+      if (window.U && U.aviso) U.aviso('No he podido abrir la carpeta del asunto; elige el archivo.', 'ambar');
+      delete opciones.startIn;
+      lista = await window.showOpenFilePicker(opciones);
+    }
     return lista[0];
   }
 

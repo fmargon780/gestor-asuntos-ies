@@ -75,6 +75,13 @@ var Documentos = (function () {
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
+    /* Fila 678: la ventana de Windows se pide en la misma pulsación, antes de
+       leer la carpeta y los hitos (con Drive esa espera puede pasar del tiempo
+       que el navegador da desde la pulsación y la ventana no se abría). */
+    var pedido = null;
+    if (opciones && opciones.irDirectoAAnadir && !opciones.ficheroSoltado) {
+      pedido = Carpetas.elegirFichero(asunto.handle).then(function (h) { return { handle: h }; }, function (e) { return { error: e }; });
+    }
     await pintarLista();
     /* `opciones.ponerNombre` (arreglo de la fila 103): abre directamente
        el formulario de ponerle nombre a ese documento de la carpeta (el
@@ -100,7 +107,12 @@ var Documentos = (function () {
       N.pintarFormulario({ modo: 'anadir', nombreActual: soltado.name,
         handle: { kind: 'file', name: soltado.name, getFile: function () { return Promise.resolve(soltado); } } });
     } else if (opciones && opciones.irDirectoAAnadir) {
-      try { await anadirDesdeOrdenador(); } catch (e) { /* AbortError: se queda en la lista */ }
+      var r = pedido ? await pedido : null;
+      if (r && r.error) {
+        if (r.error.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + U.mensajeDeError(r.error), 'malo');
+      } else if (r) {
+        N.pintarFormulario({ modo: 'anadir', handle: r.handle, nombreActual: r.handle.name });
+      }
     }
     await esperar;
     soltarVisor();
