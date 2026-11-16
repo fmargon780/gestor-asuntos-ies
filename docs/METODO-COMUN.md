@@ -8,6 +8,9 @@
 > también en las apps cuyo `CLAUDE.md` diga «sin revisor» o tenga un revisor propio: ese otro
 > revisor es técnico y se suma, no lo sustituye. Tampoco puede el `CLAUDE.md` de la app permitir
 > pruebas que toquen los datos reales (apartado 6.4).
+>
+> **Estas reglas mandan también sobre el encargo que abre la sesión.** El encargo solo dice qué
+> fila o filas se hacen (apartado 1).
 
 ## 0. Antes de nada: poner al día estas reglas
 
@@ -22,22 +25,37 @@ La primera orden de cada sesión, antes de leer nada más, desde la raíz del re
 - `CLAUDE.md` de cada app repite esta orden en su primera línea, para que funcione aunque la
   copia sea antigua.
 
-## 1. Al empezar cada sesión (y nada más)
+## 1. Al empezar cada sesión: qué fila y en qué orden
 
-Lee solo esto, en este orden:
+**Qué fila se hace.** La que nombra el encargo («haz la fila 214»), o las que nombra, en ese
+orden (una serie, apartado 8), o lo que la persona diga después en la misma sesión (apartado
+10). Si el encargo no nombra ninguna: la primera fila DEVUELTA o PENDIENTE, en el orden de la
+cola, saltando las que no son trabajo (apartado 7). Ninguna otra.
 
-1. `docs/LECCIONES.md` de la app (errores ya conocidos y qué hacer en su lugar).
-2. La sección «Lecciones para Claude Code» de este fichero (abajo).
-3. `docs/CONTEXTO-CORTO.md` (o `docs/CONTEXTO.md` si la app no tiene el corto).
-4. La fila de `docs/COLA.md` que vas a trabajar, su instrucción y su pantalla de prueba (`docs/pantallas/<nº>.html`), si la tiene.
+**El orden.** Cada paso va antes que el siguiente:
 
-**Una sola tarea a la vez.** Antes de coger una fila, baja `main` y mira la cola. Si hay una fila EN
-CURSO que no es la que te han encargado retomar, no cojas ninguna: no toques nada y dile a la
-persona qué fila está en curso y que vuelva a lanzar la suya cuando acabe. Su tarea sigue en la cola.
-Manda sobre cualquier regla de `docs/COLA.md` que diga otra cosa, como «sáltala».
+1. Poner al día estas reglas (apartado 0).
+2. Bajar `main` y mirar `docs/COLA.md`. **Una sola fila a la vez:** si hay una fila EN CURSO que
+   no es la que te han encargado retomar, no cojas ninguna, no toques nada y dile a la persona qué
+   fila está en curso y que vuelva a lanzar la suya cuando acabe. Su tarea sigue en la cola.
+3. Comprobar que la última publicación salió bien. Si está rota por nuestro código, arreglarla es
+   lo único que se hace.
+4. Marcar la fila EN CURSO y subir ese cambio a `main`, antes de leer su instrucción o el código.
+   Así se ve que hay una sesión trabajando.
+5. Si la app es de pasada larga y hoy no se ha hecho, la pasada del día (apartado 5.1).
+6. Leer solo esto: `docs/LECCIONES.md` de la app; la tabla «Lecciones para Claude Code» de este
+   fichero; `docs/CONTEXTO-CORTO.md` (o `docs/CONTEXTO.md` si la app no tiene el corto); y la
+   instrucción de la fila con su pantalla de prueba (`docs/pantallas/<nº>.html`), si la tiene.
+
+**Retomar una fila.** Si está DEVUELTA, lee su nota y retómala desde lo que quedó hecho. Si está
+EN CURSO porque la sesión anterior se paró, sube primero una nota en esa fila diciendo que la
+retomas y sigue desde lo que ya hay en `main`.
 
 Lee código solo cuando lo necesites para la tarea. No leas la historia ni documentos antiguos
 salvo que la instrucción lo pida.
+
+**Los mensajes de las subidas** empiezan por «Fila N:». Nunca por «Cola:», que es la marca de lo
+que se sube desde una conversación de diseño o desde el Centro de mando.
 
 ## 2. La instrucción manda
 
@@ -53,14 +71,13 @@ salvo que la instrucción lo pida.
    empezado y cambia lo que ve o hace la usuaria, no se programa; vuelve a IDEA para pasar por el
    recorrido nuevo (decidido por Francisco el 30-oct-2026). Si ya estaba programada (DEVUELTA o a
    medias), se termina con su ficha, y lo que esté en «Pendiente» no se programa. Una lista «Cómo
-   sabemos que está bien» sirve de guía al segundo revisor; nunca se le pide a Francisco.
-5. Las filas IDEA y EN DISEÑO no son trabajo: nunca se cogen, ni se marcan, ni se estiman, ni se
-   mueven. «La primera PENDIENTE» se cuenta saltándolas.
+   sabemos que está bien» sirve de guía al segundo revisor; nunca se le pide a la persona.
+5. Las filas que no son trabajo (apartado 7) nunca se cogen, ni se marcan, ni se mueven.
 
 ## 3. Cuándo se para la sesión
 
-**A. Pregunta para la persona** (Francisco u otra), solo en un caso: aparece algo que la
-instrucción no cubre y que **cambia lo que ve o hace la usuaria**.
+**A. Pregunta para la persona**, solo en un caso: aparece algo que la instrucción no cubre y que
+**cambia lo que ve o hace la usuaria**.
 
 Una frase de lanzamiento o una regla de la app que diga «sin preguntarme nada» significa que la
 sesión va sola: en ese caso no decide ella, deja la fila BLOQUEADA como se explica abajo.
@@ -68,51 +85,55 @@ sesión va sola: en ese caso no decide ella, deja la fila BLOQUEADA como se expl
 Cómo se pregunta: en lenguaje llano, una sola pregunta, con las opciones numeradas y sus pros y
 contras, **sin marcar ninguna como recomendada**. Si la persona está en la conversación, se le
 pregunta allí. Si la sesión va sola, la fila pasa a BLOQUEADA con
-«PREGUNTA PARA FRANCISCO: …», `main` no se toca y la sesión para. La respuesta se apunta en la
+«PREGUNTA PARA <nombre de la persona>: …» y la sesión para. La respuesta se apunta en la
 instrucción, en «Revisión y respuestas durante el trabajo».
 
 **B. Atasco técnico** (no es para la persona): si un mismo arreglo falla **dos veces**, no se
 sigue probando a ciegas.
 1. Se apunta en la nota de la fila qué se intentó y qué falló, en pocas líneas.
 2. La fila pasa a BLOQUEADA con «ATASCO PARA CLAUDE: <resumen en una línea>».
-3. `main` no se toca y la sesión para. Lo revisa Claude en la siguiente conversación.
+3. Lo revisa Claude en la siguiente conversación. Si la sesión hacía una sola fila, para; si
+   hacía una serie, sigue con las demás (apartado 8).
+
+**C. Falta un permiso.** Si falta un permiso, o el entorno niega editar `CLAUDE.md`, un fichero de
+reglas o `.github/workflows`, no se buscan rodeos ni se reintenta. El cambio que no se pudo hacer
+se deja escrito en un documento de `docs/`. La fila pasa a BLOQUEADA con «FALTA UN PERMISO:
+<cuál, y qué frase tiene que escribir la persona para darlo>». Sigue como en B.
+
+**D. Tercer arreglo del mismo fallo.** Antes de empezar una fila DEVUELTA, o una que arregla lo
+que hizo otra («de la fila N»), apartado 3 de `CUANDO-HACE-FALTA.md` (cómo se baja: final del
+apartado 5).
+
+Al bloquear una fila, el código a medias no se sube a `main`; lo único que se sube es la fila de
+`docs/COLA.md` con su estado nuevo.
 
 Las demás decisiones técnicas las toma la sesión y las deja escritas en la nota de la fila.
 
 ## 4. Aprender de los errores
 
-1. Cuando un error **se repite** o **hace perder más de 15 minutos**, se apunta una línea en
-   `docs/LECCIONES.md` de la app: qué falló · por qué, en una frase · qué hacer en su lugar.
-2. Si la lección sirve para cualquier app (una herramienta que no funciona, un permiso que no
-   existe), se apunta además en la nota de la fila con la etiqueta «LECCIÓN GENERAL», para que
-   Claude la pase al método.
+1. **Lección de la app.** Cuando un error **se repite** o **hace perder más de 15 minutos** y la
+   sesión sabe cómo evitarlo la próxima vez, apunta una línea en `docs/LECCIONES.md` de la app:
+   qué falló · por qué, en una frase · qué hacer en su lugar.
+2. **Tropiezo.** Si algo frena a la sesión, no es parte de la tarea y ella no lo puede evitar (una
+   herramienta que no funciona, un permiso que no existe, algo que vale para cualquier app), añade
+   una fila `IDEA (fecha · tropiezo)` (apartado 7) con el texto «Tropiezo (de la fila N): qué pasó
+   y qué crees que lo evitaría, en dos frases». Si ya hay una para lo mismo, no añade otra. Si nada
+   la frena, no escribe nada. Claude la resuelve en la siguiente conversación y, si vale para
+   todas las apps, la pasa a estas reglas.
 3. Si una lección ya no es cierta, se corrige o se borra esa línea, no se añade otra debajo.
 4. `docs/LECCIONES.md` no pasa de 60 líneas: si crece, se resume.
 
 ## 5. Ahorro de tiempo y de cuota
 
 1. **Pruebas parciales mientras se trabaja** (solo lo tocado, con la orden que diga `CLAUDE.md`).
-   **La pasada completa, una vez justo antes de subir; si tarda más de 10 minutos, una vez al día**
-   (norma de Francisco, 22-oct-2026):
-   - `docs/PASADA-DIARIA.md` guarda una sola línea viva, que se sustituye cada vez:
-     `Última pasada completa: <fecha y hora de Madrid> · <minutos> min · <verde | con fallos> · commit <sha corto de main>`.
-     Si no existe, la primera sesión que haga una pasada completa lo crea.
-   - **Pasada corta** (10 minutos o menos, o sin dato todavía): la completa, una vez justo antes de
-     subir. Al terminarla se apunta cuánto ha tardado.
-   - **Pasada larga** (más de 10 minutos): al empezar la sesión, si la fecha apuntada no es la de
-     hoy (hora de Madrid), lo primero es la pasada completa sobre `main` recién bajado, antes de
-     tocar la fila, y se apunta el resultado. Si una prueba falla, se repite a solas: si a solas
-     pasa, es fallo de carga, se apunta en una línea y no cuenta; si también falla, se añade la fila
-     «Arreglar la prueba <nombre>, que falla en la pasada diaria del <fecha>» encima de todas las
-     PENDIENTE y DEVUELTA, y esta sesión trabaja esa fila. Durante la fila, solo
-     las pruebas de lo tocado y las fijas que obligue `CLAUDE.md`; no se repite la pasada completa
-     antes de subir. Si la sesión hace varias filas seguidas, una sola pasada, al principio. Si en
-     el día no se lanza ninguna fila, no hay pasada.
-   - El mensaje final de la primera fila del día empieza con «Pasada completa del día: <minutos>
-     min, <en verde | con N fallos, arreglo apuntado el primero>.»; las demás no la mencionan.
-   - La frontera de 10 minutos se mira siempre con la última medida.
-   - Si en la pasada falla una prueba que no tiene que ver con el cambio y a solas pasa, se aparta,
-     se dice en una línea de la nota y se sigue. Nunca se sube con pruebas en rojo.
+   **La pasada completa, una vez justo antes de subir** (norma de Francisco, 22-oct-2026). Al
+   terminarla, se sustituye la única línea de `docs/PASADA-DIARIA.md` (si no existe, se crea):
+   `Última pasada completa: <fecha y hora de Madrid> · <minutos> min · <verde | con fallos> · commit <sha corto de main>`.
+   - **Pasada larga:** si esa línea dice más de 10 minutos, la app es de pasada larga y la pasada
+     va una vez al día, al empezar. Cómo: apartado 1 de `CUANDO-HACE-FALTA.md` (abajo). Las demás
+     apps no lo leen.
+   - Si falla una prueba que no tiene que ver con el cambio y a solas pasa, se aparta, se dice en
+     una línea de la nota y se sigue. Nunca se sube con pruebas en rojo.
 2. No se espera ni se persigue a GitHub Actions si solo pasa pruebas, salvo que la publicación
    misma vaya por ahí.
 3. Como mucho tres subidas por fila (EN CURSO, el cambio, HECHA), nunca fichero a fichero.
@@ -123,21 +144,18 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 5. **Tamaño de la cola y del resumen.** `docs/COLA.md` no pasa de 40 KB (40.000 bytes según
    `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas ni de 20 KB (20.000 bytes), porque
    lo leen todas las conversaciones de la app. Se actualizan sustituyendo la línea vieja, no
-   añadiendo otra debajo.
-   **Al marcar una fila HECHA**, en esa misma subida, la sesión los mide (`wc -c docs/COLA.md`,
-   `wc -l -c docs/CONTEXTO-CORTO.md`) y, si alguno se pasa, lo reduce:
-   - **Cola:** las filas HECHA, SUSTITUIDA y DESCARTADA salen de la cola y pasan, con su texto
-     completo, a `docs/HISTORIA.md`. Las HECHA de hoy y de ayer se quedan un día más, porque el
-     Centro de mando saca de la cola su «Terminado hoy». Las notas largas de las filas que siguen
-     vivas se dejan en una línea; el detalle va a la instrucción de la fila. El formato de la cola
-     (columnas, estados al principio, enlaces a sesiones) no cambia: el Centro de mando la lee así.
-   - **Resumen:** lo que ya es pasado va a `docs/HISTORIA.md`; el detalle largo que sigue vigente
-     va a `docs/CONTEXTO.md`, y en el resumen queda una línea que remite a él.
-   - No se pierde ningún texto. Si `docs/HISTORIA.md` o `docs/CONTEXTO.md` no existen, se crean.
-   - Si no se puede bajar del límite sin quitar algo vigente, se dice en la nota de la fila.
-6. **La cola no pierde filas.** Antes de escribir en `docs/COLA.md`, baja `main`. Después de
-   subir, comprueba que siguen todas las filas que había. Si falta alguna, la recuperas antes de
-   seguir.
+   añadiendo otra debajo. **Al marcar una fila HECHA**, en esa misma subida, la sesión los mide
+   (`wc -c docs/COLA.md`, `wc -l -c docs/CONTEXTO-CORTO.md`). Solo si alguno se pasa, lo reduce
+   como dice el apartado 2 de `CUANDO-HACE-FALTA.md` (abajo).
+6. **La cola no pierde filas y está bien escrita.** Antes de escribir en `docs/COLA.md`, baja
+   `main` y toca solo tu fila. Antes de subir el cambio, pasa el programa que comprueba la forma
+   de las filas (apartado 7) y que no falta ninguna de las que había sin cerrar:
+
+       curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/comprueba-cola.js -o /tmp/comprueba-cola.js && node /tmp/comprueba-cola.js docs/COLA.md
+
+   Lo que diga que hay que arreglar se arregla antes de subir. Si no se puede bajar o no hay
+   `node`, se sube igual y se dice en una línea en la nota de la fila. Después de subir, comprueba
+   que siguen todas las filas que había; si falta alguna, la recuperas antes de seguir.
 7. **Cómo se sube** (salvo que el `CLAUDE.md` de la app diga otra cosa, por ejemplo una rama por
    fila): directo a `main`, con `git pull --rebase origin main` y `git push origin HEAD:main`. Si
    git rechaza la subida a `main`, se sube a la rama `claude/...`, se abre una petición de cambios
@@ -147,6 +165,15 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    se queda EN CURSO y se dice en el mensaje final.
 8. Tiempo: no se estima. Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`;
    lo que tardó cada fila sale de esa hora y de la subida que la marcó EN CURSO.
+
+**`CUANDO-HACE-FALTA.md`** guarda lo que solo se necesita a veces (apartados 3.D, 5.1, 5.5 y
+10). Las apps no tienen copia: se baja cuando toca y se lee solo el apartado que se nombra.
+
+    curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/CUANDO-HACE-FALTA.md -o /tmp/CUANDO-HACE-FALTA.md
+
+Si no se puede bajar: la pasada completa va justo antes de subir, como en una app corta; la cola y
+el resumen se quedan sin reducir; un arreglo, o lo que diga la persona, se trata como una fila más.
+Se dice en una línea en la nota de la fila.
 
 ## 6. Segundo revisor, comprobar y publicar
 
@@ -163,7 +190,8 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    podido ver y por qué. Nunca da por bueno lo que no ha podido ver.
 3. Lo que no coincide se corrige y el revisor vuelve a mirarlo. Lo que hace la app sin que el
    texto lo pida se quita. Si después de dos vueltas sigue sin coincidir, la fila pasa a
-   BLOQUEADA con «ATASCO PARA CLAUDE».
+   BLOQUEADA con «ATASCO PARA CLAUDE» (apartado 3.B). El revisor nunca deja una fila DEVUELTA: ese
+   estado solo lo pone la persona.
 4. Pruebas: las que se necesiten para lo tocado, más una comprobación general de que lo que ya
    funcionaba sigue funcionando.
    **Las pruebas nunca tocan los datos reales**: no se crea, cambia ni borra nada en los datos de
@@ -176,25 +204,117 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 5. **Una fila solo es HECHA cuando está en `main`, publicada y comprobada** en la dirección real.
    Después de publicar, el revisor (o la sesión, en una tarea pequeña) mira la app publicada si
    puede entrar; si no puede, lo deja escrito. Si no se puede comprobar la publicación por una
-   causa ajena, queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, no se empieza otra
-   fila (salvo que el `CLAUDE.md` de la app diga que la cola sigue) y el mensaje final empieza con
+   causa ajena (por ejemplo, Vercel contesta 402 por el tope de publicaciones: no se reintenta),
+   queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, no se empieza otra fila (salvo en
+   una serie, o si el `CLAUDE.md` de la app dice que la cola sigue) y el mensaje final empieza con
    «AVISO: no he podido comprobar que los cambios estén publicados.» «En verde», en un mensaje a la
    persona, solo se dice si la publicación también lo está.
-6. Al empezar cada sesión, lo primero es comprobar que la última publicación salió bien. Si está
-   rota por nuestro código, arreglarla es lo único que se hace.
-7. Una publicación por tarea. Cómo se publica en esta app lo dice su `CLAUDE.md`.
-8. Si la persona dice que no ve un cambio, primero se comprueba si se publicó. Nunca se supone
+6. Una publicación por tarea, al terminar. Cómo se publica en esta app lo dice su `CLAUDE.md`.
+7. Si la persona dice que no ve un cambio, primero se comprueba si se publicó. Nunca se supone
    caché del navegador sin comprobarlo.
-9. Mensaje final para la persona: qué ha quedado hecho, en una línea; qué no se pudo ver; y lo que
+8. Mensaje final para la persona: qué ha quedado hecho, en una línea; qué no se pudo ver; y lo que
    dice «Qué mirar al terminar» de la instrucción, una cosa por línea. Si la instrucción no tiene
    ese apartado (instrucciones de antes del 7-nov-2026), la sesión lo escribe en ella a partir de
-   lo hecho, en la subida que marca HECHA.
+   lo hecho, en la subida que marca HECHA. Acaba con: «Si al mirarlo algo falla, dímelo aquí y
+   sigo en esta misma sesión.»
+
+## 7. La cola: cómo se escribe una fila y qué estados hay
+
+Es el único sitio donde está escrito. Vale igual para Claude Code, para la conversación de diseño
+y para el Centro de mando.
+
+**La fila.** `docs/COLA.md` lleva una sola tabla, con esta cabecera:
+
+    | Nº | Instrucción | Estado | Notas |
+
+- Una fila por línea. Empieza y acaba con una barra y tiene cuatro casillas, ni una más ni una
+  menos. Dentro de una casilla no se escribe ninguna barra; un salto de línea se escribe `<br>`.
+- **Nº:** el siguiente al más alto de la cola. No se cambia nunca.
+- **Instrucción:** el texto de la idea o el enlace a `docs/<nº>-<nombre>.md`. Si la fila arregla
+  lo que hizo otra, el texto lo dice: «(de la fila N)» (apartado 3.D).
+- **Estado:** empieza por el estado, en mayúsculas, y detrás su fecha entre paréntesis:
+  `PENDIENTE (15-nov-2026)`. Lo que haya que añadir va dentro del paréntesis, detrás de « · »:
+  `IDEA (15-nov-2026 · tropiezo)`. Un motivo corto va después, tras dos puntos:
+  `DESCARTADA (15-nov-2026): ya lo hace la app`.
+- **Notas:** lo demás, en una línea. El detalle va a la instrucción. Si la fila no se puede
+  programar hasta que otra esté publicada, la nota dice «Necesita la fila N»: el Centro de mando no
+  la lanza mientras la N no esté HECHA (o cerrada).
+- Una fila nueva se añade al final. Cambiar el orden es mover la línea entera.
+
+**Los estados.** Son estos y ninguno más. Una fila con otro estado, o mal escrita, sale en
+«Filas que no entiendo» del Centro de mando, y el programa del apartado 5.6 no la deja subir.
+
+| Estado | Qué quiere decir | Quién lo pone |
+|---|---|---|
+| `IDEA` | Apuntada, sin diseñar. Con `· paso de <nombre>` es algo que solo puede hacer esa persona (apartado 9); con `· tropiezo`, algo que frenó a Claude Code (apartado 4) | Cualquiera |
+| `DECIDIDA (fecha · tema)` | Un tema: varias ideas juntas, a la espera de diseño | Claude, al reflexionar |
+| `EN TEMA N` | Idea que entró en el tema N | Claude, al reflexionar |
+| `EN DISEÑO` | Se está diseñando en una conversación. En una app de dos personas, con el nombre: `EN DISEÑO (fecha, Marcos)` | Claude |
+| `PENDIENTE` | Diseñada, con su instrucción, lista para programar. Si la nota dice «no antes del <fecha>», no se coge hasta ese día | Claude |
+| `APLAZADA hasta <fecha>` | Lista, pero no se coge antes de esa fecha | Claude o la persona |
+| `ESPERA A LA IDEA M` | No puede terminarse hasta que la fila M esté HECHA (apartado 9) | Claude Code |
+| `EN CURSO` | Una sesión la está programando | Claude Code |
+| `ESPERA TU VISTAZO` | Programada y a la vista en una dirección de prueba; no se publica hasta que Claude en el chat (o la persona) la mire. Solo en las apps cuyo `CLAUDE.md` trabaja así | Claude Code |
+| `HECHA (fecha hora)` | En `main`, publicada y comprobada. Cuando Claude en el chat o la persona la mira y está bien, la nota lleva «mirada (fecha)» o «mirada (fecha, por Claude)» (botón «Bien» del Centro de mando); hasta entonces, y como mucho siete días, sale en «Para probar». Si Claude la probó y queda algo para la persona, la nota acaba en «probada por Claude (fecha) · te queda: A (motivo); B (motivo)»: sigue en «Para probar» enseñando solo eso | Claude Code |
+| `SIN PUBLICACIÓN COMPROBADA` | Terminada, pero no se pudo comprobar la publicación (apartado 6.5) | Claude Code |
+| `BLOQUEADA` | Parada. La nota empieza por «PREGUNTA PARA <nombre>», «ATASCO PARA CLAUDE» o «FALTA UN PERMISO» (apartado 3) | Claude Code |
+| `DEVUELTA` | La persona miró la app y no es lo acordado. La nota dice qué falla | La persona, o Claude en su nombre |
+| `SUSTITUIDA` | Ya no cuenta por sí sola. Un tema diseñado: `SUSTITUIDA (fecha): diseñado en las filas N a M`. Sus ideas: `SUSTITUIDA (fecha): diseñada en el tema N` | Claude |
+| `DESCARTADA (fecha): motivo` | No se hará | Claude o la persona |
+
+**No son trabajo para Claude Code:** IDEA, DECIDIDA, EN TEMA, EN DISEÑO, APLAZADA con fecha por
+llegar, PENDIENTE con «no antes del» una fecha por llegar, ESPERA A LA IDEA cuya idea no esté
+HECHA, una fila con «Necesita la fila N» y la N sin HECHA, ESPERA TU VISTAZO y todas las cerradas.
+
+## 8. Series de filas
+
+Una sesión puede hacer varias filas seguidas si el encargo las nombra (decidido por Francisco el
+5-nov-2026).
+
+1. De una en una y en el orden del encargo; nunca dos a la vez. Cada fila se marca EN CURSO, se
+   hace y se termina como cualquier otra (segundo revisor si es grande, publicada, comprobada y
+   HECHA) antes de pasar a la siguiente. No se coge ninguna fila que el encargo no nombre.
+2. **`docs/PARAR.md`.** Antes de la primera fila se escribe en él «SEGUIR · filas N, M y P», con
+   las filas del encargo en su orden, y se sube; si no existe, se crea. El Centro de mando lo lee
+   para enseñar la tanda. Antes de empezar cada fila nueva se baja `main` y se mira: si dice
+   «PARAR», se cambia a «SEGUIR · filas N, M y P» (las mismas filas), se sube y no se empieza
+   ninguna fila más. Si la serie se para por otra causa (punto 3), la línea se queda como está.
+   Solo cuando se han hecho todas las filas se deja «SEGUIR» solo.
+3. **La serie se para del todo** solo en estos casos: una fila queda BLOQUEADA con «PREGUNTA
+   PARA», hace falta algo que solo puede hacer la persona, o la publicación sale rota por nuestro
+   código. Las filas que falten siguen en la cola como estaban.
+4. **La serie sigue** si una fila queda BLOQUEADA con «ATASCO PARA CLAUDE» o «FALTA UN PERMISO»,
+   o SIN PUBLICACIÓN COMPROBADA: se deja así y se pasa a las demás, saltando sin tocarlas las que
+   necesiten esa fila.
+5. Al acabar, una sola línea: qué filas se han hecho, cuáles no y por qué se ha parado.
+
+## 9. Lo que solo puede hacer la persona
+
+Si al terminar queda algo que solo la persona puede hacer (pegar código en Apps Script, poner una
+clave, dar un permiso, decidir algo):
+
+1. Se añade una fila `IDEA (fecha · paso de <nombre>)`. Su texto empieza por «Paso de <nombre>
+   (de la fila N):» y dice en llano qué tiene que hacer, con el enlace directo a la página donde
+   tiene que hacerlo. Si las instrucciones están en un fichero del repositorio, se escribe su ruta
+   y se sube a `main`. La persona lo resolverá con Claude en una conversación aparte.
+2. No se apuntan comprobaciones («abre la app y mira que…»), ni copias entre repositorios, ni
+   nada que pueda hacer Claude. Si ya hay una fila de paso para lo mismo, no se añade otra.
+3. Si la fila no puede quedar terminada sin ese paso, queda `ESPERA A LA IDEA M (fecha)` en lugar
+   de HECHA (M es el número del paso), con todo lo demás terminado y en la nota qué falta. Lo
+   mismo con cualquier fila PENDIENTE que no pueda funcionar sin ese paso. El Centro de mando la
+   devuelve sola a las pendientes cuando la fila M está HECHA.
+
+Es el único camino: no se usan `docs/TE-TOCA.md` ni marcas en las notas.
+
+## 10. La persona contesta en la misma sesión
+
+Si después del mensaje final la persona escribe que algo falla («ya lo he probado, falla esto»), la
+sesión sigue, sin pedir una conversación nueva: apartado 4 de `CUANDO-HACE-FALTA.md` (cómo se baja:
+final del apartado 5).
 
 ## Lecciones para Claude Code (de todas las apps)
 
-Copia de las lecciones generales de `LECCIONES.md` del método que afectan a Claude Code.
-
 | Qué no funciona | Por qué | Qué hacer en su lugar |
 |---|---|---|
-| Subir ficheros de código grandes con las herramientas de ficheros de GitHub | Se cortan al subir | Subir con git. Si git no puede, dejar la fila EN CURSO y decirlo |
-| Crear repositorios desde la sesión | Las sesiones solo tienen permiso sobre sus propios repositorios | No se intenta; lo hace Claude desde la conversación (ver `LECCIONES.md` del método) |
+| Subir ficheros de código grandes con las herramientas de ficheros de GitHub | Se cortan al subir | Subir con git. Si no hay git que funcione, decirlo y parar antes de subir código; la fila se queda EN CURSO |
+| Crear repositorios desde la sesión | Las sesiones solo tienen permiso sobre sus propios repositorios | No se intenta; se apunta como paso de la persona (apartado 9) |
