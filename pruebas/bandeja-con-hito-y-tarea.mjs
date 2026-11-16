@@ -62,14 +62,11 @@ await pagina.selectOption('#doc-tipo', 'FACTURA');
 await pagina.waitForTimeout(300);
 await comprobar('1. con un tipo que nadie espera, el bloque sale vacío', bloque(),
   '¿De qué tarea es? | Ninguna tarea espera un documento de tipo FACTURA. Elige el hito y la tarea. | Hito | Elige el hito… | 1. Recibir la solicitud | 2. Comprobar la documentación (el actual) | 3. Registrar la matrícula en Séneca | + Añadir hito');
-await pagina.click('#doc-guardar');
-await pagina.waitForTimeout(600);
-await comprobar('1. «Guardar» sin hito avisa y no guarda nada', [(await avisos()).slice(-1)[0], await enAbiertos('justificante.pdf')], ['Elige el hito y la tarea de los que cuelga el documento.', true]);
+/* Fila 680: sin hito ni tarea ya no corta; el destino sale «sin tarea» (el guardado real, en documentos-sin-tarea). */
+await comprobar('1. sin hito el destino sale «sin tarea» (ya no avisa)', pagina.evaluate(() => DocumentoTareaBloque.destino()), { hitoId: '', tareaId: null, sinTarea: true });
 await pagina.selectOption('#dtb-hito', { index: 2 });
 await pagina.waitForTimeout(200);
-await pagina.click('#doc-guardar');
-await pagina.waitForTimeout(600);
-await comprobar('1. con el hito y sin tarea avisa', (await avisos()).slice(-1)[0], 'Elige la tarea de la que cuelga el documento.');
+await comprobar('1. con el hito y sin tarea tampoco avisa: sale «sin tarea»', pagina.evaluate(() => { const d = DocumentoTareaBloque.destino(); return [!!d.sinTarea, !!d.hitoId, d.tareaId]; }), [true, true, null]);
 await pagina.selectOption('#doc-tipo', 'JUSTIFICANTE');
 await pagina.waitForTimeout(300);
 await comprobar('1. lo elegido a mano no se toca al cambiar el tipo (solo el nombre de «Tarea nueva»)', pagina.evaluate(() => ({
@@ -107,9 +104,7 @@ console.log('--- 3. un asunto sin hitos ---');
 await abrirSuelto('solicitud escaneada.pdf', PEDIDO);
 await comprobar('3. el bloque pide añadir el hito y el desplegable sale apagado', [await bloque(), await pagina.$eval('#dtb-hito', (e) => e.disabled)],
   ['¿De qué tarea es? | Este asunto no tiene hitos. Añade el hito del que cuelga el documento. | Hito | No hay hitos | + Añadir hito', true]);
-await pagina.click('#doc-guardar');
-await pagina.waitForTimeout(500);
-await comprobar('3. «Guardar» avisa de que falta el hito', [(await avisos()).slice(-1)[0], await enAbiertos('solicitud escaneada.pdf')], ['Añade antes el hito del que cuelga el documento.', true]);
+await comprobar('3. sin hitos el destino sale «sin tarea» (ya no avisa)', pagina.evaluate(() => !!DocumentoTareaBloque.destino().sinTarea), true);
 await pagina.click('#dtb-anadir-hito');
 await pagina.waitForSelector('.anadir-hito-capa', { timeout: 10000 });
 await comprobar('3. «+ Añadir hito» abre la ventana de la fila 660', pagina.evaluate(() => document.querySelector('.anadir-hito-capa h3').textContent), 'Añadir hito');

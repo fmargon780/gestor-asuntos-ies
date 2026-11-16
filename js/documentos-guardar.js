@@ -127,23 +127,25 @@
     if (opciones.desdeBandeja && window.DocumentoTareaBloque) {
       /* Fila 661: desde la bandeja, el hito y la tarea ya están elegidos en el propio cuadro; sin ellos no se guarda nada. */
       var elegidoB = DocumentoTareaBloque.destino();
-      if (elegidoB.aviso) { U.aviso(elegidoB.aviso, 'malo'); return; }
-      destino = { hitoId: elegidoB.hitoId, tareaId: elegidoB.tareaId };
+      destino = { hitoId: elegidoB.hitoId, tareaId: elegidoB.tareaId, sinTarea: !!elegidoB.sinTarea };
     }
     else if (opciones.modo === 'anadir' && N.hitoActual && N.tareaActual) destino = { hitoId: N.hitoActual.id, tareaId: N.tareaActual };
     else if (opciones.modo === 'anadir' && N.preguntarTarea && window.DocumentoATarea) {
       destino = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: false });
       if (!destino) return;
     }
-    var hitoDelRegistro = destino ? { id: destino.hitoId } : N.hitoActual;
+    /* Fila 680: sin tarea (con el hito elegido, si lo hay): entra sin colgar de nada; el hito solo sirve para «Hay que registrarlo». */
+    var hitoSinTarea = '';
+    if (destino && destino.sinTarea) { hitoSinTarea = destino.hitoId || ''; destino = null; }
+    var hitoDelRegistro = destino ? { id: destino.hitoId } : (hitoSinTarea ? { id: hitoSinTarea } : N.hitoActual);
     /* Fila 670: «Hay que registrarlo» necesita un hito; sin él no se guarda nada y se dice por qué. */
     var hitoRegistrar = '';
     if (quiereRegistrar()) {
-      hitoRegistrar = hitoParaRegistrar(destino);
-      if (!hitoRegistrar) { U.aviso('Elige el hito en el que hay que registrar el documento.', 'malo'); return; }
+      hitoRegistrar = hitoParaRegistrar(destino || { hitoId: hitoSinTarea });
+      /* Fila 680: sin hito no se corta; queda la marca «Sin registrar» de antes (se pasa sola a tarea cuando haya hito). */
     }
     var registroAMano = numeroEscritoAMano(opciones);
-    var hitoDelNumero = hitoRegistrar || hitoParaRegistrar(destino);
+    var hitoDelNumero = hitoRegistrar || hitoParaRegistrar(destino || { hitoId: hitoSinTarea });
     /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
        Si otro ordenador se ha quedado el que enseñaba la vista previa, se
        guarda igual con el siguiente (fila 275) y se dice al terminar. */
@@ -264,6 +266,9 @@
         await HayQueRegistrarlo.aplicar(N.asuntoActual, hitoRegistrar, nombre, tipoDelDocumento, opciones.modo === 'anadir' ? '' : opciones.nombreActual);
         U.aviso('Queda en el hito la tarea «Registrar» con este documento.', 'bueno');
       } catch (eReg) { U.accesorio('Documento guardado, pero no he podido crear la tarea «Registrar»', eReg); }
+    } else if (quiereRegistrar() && !hitoRegistrar) {
+      try { await App.anotarLista(N.asuntoActual.nombre, 'pendientesRegistro', { anadir: [nombre] }); }
+      catch (ePend) { U.accesorio('Documento guardado, pero no he podido apuntarlo como «Sin registrar»', ePend); }
     } else if (registroAMano && hitoDelNumero && Hitos.marcarGuionPorAccion) {
       await Hitos.marcarGuionPorAccion(N.asuntoActual, hitoDelNumero, 'registrar', nombre);
     }
@@ -278,7 +283,7 @@
     if (N.colgar && opciones.modo !== 'anadir' && window.DocumentoATarea) {
       try {
         var d2 = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: true });
-        if (d2) await DocumentoATarea.colgar(N.asuntoActual, d2, nombre, tipoDelDocumento, { nuevo: false });
+        if (d2 && !d2.sinTarea) await DocumentoATarea.colgar(N.asuntoActual, d2, nombre, tipoDelDocumento, { nuevo: false });
       } catch (e2d) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2d); }
     }
     N.soltarVisor();

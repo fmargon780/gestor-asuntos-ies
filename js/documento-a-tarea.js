@@ -67,7 +67,12 @@ window.DocumentoATarea = (function () {
     var entrada = datos.porAsunto[a.nombre];
     var hitos = entrada ? entrada.hitos : [];
     var lista = hitosElegibles(hitos);
-    if (!lista.length) { U.aviso('Para añadir un documento, crea antes el hito.', 'ambar'); return null; }
+    /* Fila 680: sin hitos no hay nada que preguntar; el documento entra sin tarea. */
+    if (!lista.length) {
+      if (!o.colgar) return { sinTarea: true, hitoId: '', tareaId: null };
+      U.aviso('Para colgar un documento de una tarea, crea antes el hito.', 'ambar');
+      return null;
+    }
     var numerados = Hitos.numerados ? Hitos.numerados(hitos) : lista;
     var idActual = window.EstadoHito && EstadoHito.idActual ? EstadoHito.idActual(hitos, datos.ajustes) : null;
     var elegido = lista.filter(function (x) { return x.id === idActual; })[0] || lista[lista.length - 1];
@@ -108,6 +113,10 @@ window.DocumentoATarea = (function () {
             return '<option value="' + esc(x.id) + '"' + (x.id === elegido.id ? ' selected' : '') + '>' + (n ? n + '. ' : '') + esc(x.titulo || 'Hito') +
               (x.id === idActual ? ' (el actual)' : '') + '</option>';
           }).join('') + '</select><div class="etiqueta">Tarea</div>';
+        /* Fila 680: «Sin tarea», solo al añadir (colgar un documento de una tarea no tiene sentido sin tarea). */
+        if (!o.colgar) {
+          h += '<label class="pt-op"><input type="radio" name="pt-tarea" value="" class="pt-sin"><span>Sin tarea<br><small>Entra sin colgar de ninguna tarea.</small></span></label>';
+        }
         esperan.forEach(function (g, i) {
           h += '<label class="pt-op"><input type="radio" name="pt-tarea" value="' + esc(g.id) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(g.texto) +
             '<br><small>Espera un documento. Queda hecha.</small></span></label>';
@@ -125,6 +134,7 @@ window.DocumentoATarea = (function () {
       $('pt-cancelar').onclick = function () { cerrar(null); };
       $('pt-ok').onclick = function () {
         var r = capa.querySelector('input[name="pt-tarea"]:checked');
+        if (r && r.classList.contains('pt-sin')) { cerrar({ hitoId: elegido.id, tareaId: null, sinTarea: true }); return; }
         cerrar({ hitoId: elegido.id, tareaId: r && r.value ? r.value : null });
       };
       $('pt-hito').focus();

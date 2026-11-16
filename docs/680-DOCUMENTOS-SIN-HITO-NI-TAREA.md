@@ -48,4 +48,10 @@ Las cinco condiciones pasan a opcional. «Por ahora»: es mientras Francisco dep
 - Guarda un documento con «Hay que registrarlo» marcado y sin hito. Debe guardarse sin aviso rojo.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (16-nov-2026, Claude Code, tarea pequeña: sin segundo revisor; comparado con la instrucción)
+- coincide: bandeja «Por clasificar» sin hito o sin tarea guarda y el documento sale «sin tarea»; ya no salen los tres avisos (prueba nueva `documentos-sin-tarea`).
+- coincide: «+ Añadir documento» con hitos ofrece «Sin tarea» como primera opción; «Cancelar» sigue sin añadir nada; al colgar de una tarea, «Sin tarea» no se ofrece.
+- coincide: asunto sin hitos: «Añadir documento» no pregunta y se añade sin tarea; el botón ya no sale apagado ni con la línea «crea antes el hito» (hay que decirlo: esa línea era del botón de la ficha, no de otro sitio).
+- coincide: «Hay que registrarlo» sin hito guarda y deja la marca «Sin registrar» (`pendientesRegistro`, la de antes de la fila 667); con hito, igual que hoy.
+- coincide: `elegirPaso` devuelve la primera «Registrar» sin hacer cuando el documento no es de ninguna tarea.
+- no lo he podido ver: con un navegador real y el instituto (solo con la copia de pruebas); que la marca «Sin registrar» se pinte en un asunto con hitos y la pasada de `migrar` al crear el primero.

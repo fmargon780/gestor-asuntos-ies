@@ -83,7 +83,8 @@ window.TareasConDocumento = (function () {
     if (!documento || (accion !== 'registrar' && accion !== 'firmar')) return candidatos[0] || null;
     var suyo = candidatos.filter(function (c) { var e = de(h, c.id); return e && mismo(e.doc, documento); })[0];
     if (suyo) return suyo;
-    return candidatos.filter(function (c) { return !de(h, c.id); })[0] || null;
+    /* Fila 680: si el documento no es de ninguna tarea y todas tienen el de otro, se marca la primera (como antes de la fila 522). */
+    return candidatos.filter(function (c) { return !de(h, c.id); })[0] || candidatos[0] || null;
   }
 
   /* Tras marcar una tarea con su documento: si no lo tenía, lo guarda. */

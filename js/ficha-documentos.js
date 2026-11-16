@@ -148,8 +148,7 @@ var FichaDocumentos = (function () {
      docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md; antes «Documentos ▾», que abría
      la ventana entera): el mismo cuadro de añadir, directo al selector.
      Se pinta una sola vez por bloque: el `<h3>` no se rehace.
-     Fila 638: tras la ventana de fichero y tipo, pregunta «¿De qué tarea es?»; sin hitos sale apagado, con su línea
-     («Para añadir un documento, crea antes el hito.»); y ya no hay «Generar documento» aquí. */
+     Fila 638: tras la ventana de fichero y tipo, pregunta «¿De qué tarea es?»; sin hitos (fila 680) se añade sin tarea; y ya no hay «Generar documento» aquí. */
   function ponerBotonAnadir(bloqueEl, a, hayHitos) {
     if (!bloqueEl) return;
     var titulo = bloqueEl.querySelector('.ficha-titulo');
@@ -165,16 +164,11 @@ var FichaDocumentos = (function () {
     }
     b.onclick = alPulsar;
     var abierto = !window.FichaNucleo || FichaNucleo.modoActual === 'abierto';
-    var sinHito = abierto && !hayHitos;
-    b.disabled = sinHito;
-    if (sinHito) b.title = 'Para añadir un documento, crea antes el hito.'; else b.removeAttribute('title');
+    /* Fila 680: sin hitos ya no se apaga; el documento se añade sin tarea. */
+    b.disabled = false;
+    b.removeAttribute('title');
     var aviso = bloqueEl.querySelector('.ficha-documentos-sin-hito');
-    if (sinHito && !aviso) {
-      aviso = document.createElement('p');
-      aviso.className = 'nota ficha-documentos-sin-hito';
-      aviso.textContent = 'Para añadir un documento, crea antes el hito.';
-      titulo.insertAdjacentElement('afterend', aviso);
-    } else if (!sinHito && aviso) aviso.remove();
+    if (aviso) aviso.remove();
     async function alPulsar() {
       await App.verDocumentos(a, { irDirectoAAnadir: true, preguntarTarea: abierto });
       pintar(a);

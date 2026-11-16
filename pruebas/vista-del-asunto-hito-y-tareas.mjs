@@ -217,9 +217,9 @@ await pagina.waitForSelector('.pt-capa', { timeout: 10000 });
 await comprobar('11. pregunta «¿De qué tarea es?» con el hito actual elegido y «Tarea nueva» al final',
   pagina.evaluate(() => ({ titulo: document.querySelector('.pt-capa h3').textContent, hito: document.querySelector('#pt-hito').selectedOptions[0].textContent,
     opciones: Array.from(document.querySelectorAll('.pt-op')).map((e) => e.innerText.trim().replace(/\s+/g, ' ')), boton: document.getElementById('pt-ok').textContent })),
-  { titulo: '¿De qué tarea es?', hito: '1. Preparar y enviar el certificado (el actual)', opciones: ['Tarea nueva: «INFORME» La app la crea en ese hito y la deja hecha.'], boton: 'Añadir' });
+  { titulo: '¿De qué tarea es?', hito: '1. Preparar y enviar el certificado (el actual)', opciones: ['Sin tarea Entra sin colgar de ninguna tarea.', 'Tarea nueva: «INFORME» La app la crea en ese hito y la deja hecha.'], boton: 'Añadir' });
 await pagina.selectOption('#pt-hito', { index: 1 });
-await comprobar('11. al cambiar de hito cambian las tareas', pagina.evaluate(() => Array.from(document.querySelectorAll('.pt-op')).length), 1);
+await comprobar('11. al cambiar de hito cambian las tareas', pagina.evaluate(() => Array.from(document.querySelectorAll('.pt-op')).length), 2);
 await pagina.selectOption('#pt-hito', { index: 0 });
 await pagina.click('#pt-cancelar');
 await pagina.waitForTimeout(500);
@@ -288,7 +288,7 @@ await comprobar('10. no hay fila de hitos ni «Comunicar» de arriba',
   pagina.evaluate(() => [document.getElementById('ficha-tira').children.length, Array.from(document.querySelectorAll('#ficha-acciones button')).filter((b) => b.offsetParent && /Comunicar|Generar documento/.test(b.textContent)).length]), [0, 0]);
 await pagina.locator('#ficha-plegables .plegable-cab', { hasText: 'Documentos de la carpeta' }).click();
 await pagina.waitForTimeout(500);
-await comprobar('10. «+ Añadir documento» apagado, con su línea', pagina.evaluate(() => [document.querySelector('.ficha-documentos-anadir').disabled, (document.querySelector('.ficha-documentos-sin-hito') || {}).textContent]), [true, 'Para añadir un documento, crea antes el hito.']);
+await comprobar('10. «+ Añadir documento» sigue activo y sin línea (fila 680)', pagina.evaluate(() => [document.querySelector('.ficha-documentos-anadir').disabled, !!document.querySelector('.ficha-documentos-sin-hito')]), [false, false]);
 await pagina.click('#ficha-guia button:has-text("+ Añadir hito")');
 await pagina.waitForSelector('.anadir-hito-capa .ah-fase');   /* fila 660: paso a paso, primero la fase */
 await pagina.click('.anadir-hito-capa .ah-fase:has-text("Recibir")');

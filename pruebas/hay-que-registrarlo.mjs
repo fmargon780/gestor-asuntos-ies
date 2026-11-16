@@ -138,8 +138,13 @@ await comprobar('5. sin hito, al marcar la casilla sale «Hito» con «+ Añadir
 })(), [true, 'Hito | No hay hitos | + Añadir hito | La tarea «Registrar» va a ese hito.']);
 await pagina.click('#doc-guardar');
 await pagina.waitForTimeout(800);
-await comprobar('5. sin hito no guarda y dice por qué', [(await avisos()).slice(-1)[0], await pagina.locator('#doc-guardar').count()], ['Elige el hito en el que hay que registrar el documento.', 1]);
-await pagina.click('#doc-volver');
+/* Fila 680: sin hito ya no corta; se guarda y queda la marca antigua «Sin registrar» (la pasa a tarea `migrar` cuando haya hito). */
+await comprobar('5. sin hito se guarda sin aviso rojo y queda «Sin registrar»', pagina.evaluate(async (n) => {
+  const a = Gestor.asuntos().filter((x) => x.nombre === n)[0];
+  const lista = ((App.E.registro.asuntos[a.nombre] || a.ficha || {}).pendientesRegistro || []);
+  return [(window.__av || []).slice(-1)[0] !== 'Elige el hito en el que hay que registrar el documento.', lista.length >= 1];
+}, PEDIDO), [true, true]);
+await pagina.evaluate(() => { const v = document.getElementById('doc-volver'); if (v) v.click(); });
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => { const c = document.getElementById('cuadro-aceptar'); if (c) c.click(); });
 await pagina.waitForTimeout(300);

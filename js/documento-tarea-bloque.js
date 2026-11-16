@@ -3,7 +3,7 @@
    bandeja (14-nov-2026, fila 661, docs/661-BANDEJA-CON-HITO-Y-TAREA.md; pantalla de prueba docs/pantallas/661.html).
 
    Va dentro del cuadro de ponerle nombre, justo debajo de «Tipo de documento» (js/documentos-formulario.js). No hay
-   ventana aparte. Sin hito y sin tarea no se guarda.
+   ventana aparte. Sin hito o sin tarea se guarda igual, sin tarea (fila 680).
 
      - Con propuesta: si en algún hito del asunto hay una tarea de «Añadir documento», sin hacer, cuyo «Qué documento» es
        justo el tipo elegido, el bloque la trae puesta (la del hito actual si hay varias; si no, la primera), con «Cambiar».
@@ -168,13 +168,13 @@ window.DocumentoTareaBloque = (function () {
     pintar();
   }
 
-  /* { hitoId, tareaId } (tareaId null = tarea nueva) o { aviso }. */
+  /* { hitoId, tareaId } (tareaId null = tarea nueva) o, sin hito o sin tarea (fila 680, opcional por ahora),
+     { hitoId (el elegido, o ''), tareaId: null, sinTarea: true }: el documento entra sin colgar de ninguna tarea. */
   function destino() {
-    if (!S || !S.caja || !S.caja.isConnected) return { aviso: 'Elige el hito y la tarea de los que cuelga el documento.' };
-    if (!S.hitoId || !hitoPor(S.hitoId)) {
-      return { aviso: S.lista.length ? 'Elige el hito y la tarea de los que cuelga el documento.' : 'Añade antes el hito del que cuelga el documento.' };
-    }
-    if (!S.tareaId) return { aviso: 'Elige la tarea de la que cuelga el documento.' };
+    var sin = { hitoId: '', tareaId: null, sinTarea: true };
+    if (!S || !S.caja || !S.caja.isConnected) return sin;
+    if (!S.hitoId || !hitoPor(S.hitoId)) return sin;
+    if (!S.tareaId) { sin.hitoId = S.hitoId; return sin; }
     return { hitoId: S.hitoId, tareaId: S.tareaId === 'nueva' ? null : S.tareaId };
   }
 
