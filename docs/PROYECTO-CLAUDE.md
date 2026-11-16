@@ -11,3 +11,5 @@ Apuntado por Francisco desde el «Centro de mando» el 8-oct-2026. Con esta dire
 El Centro de mando lee estas líneas tal cual (una por dato). Se cambian aquí, no en la página.
 
 Botón de soporte: el del Centro de mando (fila 213)
+
+Copia de pruebas: https://pruebas.fmargon.com (rama «pruebas», con datos inventados)
