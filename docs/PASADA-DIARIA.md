@@ -1,1 +1,1 @@
-Última pasada completa: 14-nov-2026 (Madrid) · 39 min · verde salvo repintar-solo-lo-que-cambia (fallo de carga por tandas a la vez: pasa a solas) · commit 9f0a94c de main · fila 661
+Última pasada completa: 16-nov-2026 14:02 (Madrid) · 22 min · verde · commit b3cad33 de main · fila 686
