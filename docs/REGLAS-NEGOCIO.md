@@ -198,6 +198,7 @@ Cada una con su fecha y de dónde sale.
 - (11-nov-2026, tema 607) **Todo el Gestor pasa a Google Drive** (asuntos vivos, ARCHIVO, `_GESTOR` y la copia sin internet), nada se queda repartido: «no veo bien tener unas cosas en un lugar y otras en otro». No se comprime el ARCHIVO (ahorraría un 13 %).
 - (11-nov-2026, tema 607) En los ordenadores del instituto, Drive va en **«Replicar archivos» con la carpeta en `C:\Google Drive`**, la misma en los dos, para tener un solo marcador. El modo «Ver archivos sin descargarlos» se descartó: más lento.
 - (11-nov-2026, tema 607) **Cuando falte espacio** en la cuenta común (50 GB), que lo amplíe la Junta o, si no, el centro.
+- (16-nov-2026, idea 677) Un documento que se guarda en la carpeta de un asunto vivo, o que llega a «Por clasificar», tiene que salir en la app tan deprisa como antes del traslado a Drive: «Antes era casi inmediato.»
 
 ## Vista del asunto
 
