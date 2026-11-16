@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '686', fecha: '2026-11-16', texto: 'Ya puedes arrastrar un fichero a cualquier tarea o al cuadro de Documentos, y «Añadir documento» abre la ventana sin avisos.' },
   { id: '680', fecha: '2026-11-16', texto: 'Ya se pueden guardar documentos sin elegir hito ni tarea.' },
   { id: '678', fecha: '2026-11-16', texto: 'Al añadir un documento, la ventana de Windows para elegirlo se abre enseguida, también desde una tarea. Si no puede abrirse en la carpeta del asunto, se abre donde Windows quiera y avisa; si no se abre de ninguna forma, sale un aviso rojo con el motivo.' },
   { id: '676', fecha: '2026-11-15', texto: 'En la aplicación, el asunto ya no se «archiva», se «cierra»: el botón dice «Cerrar el asunto», la pestaña del lateral es «Asuntos cerrados» y los avisos, las columnas de Cuentas y la exportación hablan de asuntos cerrados. Solo cambian las palabras: la carpeta ARCHIVO del disco y la acción «Archivar» de una tarea se llaman igual que antes.' },

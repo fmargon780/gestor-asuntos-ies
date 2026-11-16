@@ -116,7 +116,7 @@ var HitoMesa = (function () {
       var tiraVacia = document.getElementById('ficha-tira');
       if (tiraVacia) tiraVacia.innerHTML = '';   /* fila 637: sin hito abierto, no hay fila de hitos */
       if (window.MarcaGuia) MarcaGuia.pintar(a, abierto);   /* fila 660 */
-      if (window.HitoMesaDocumentos && HitoMesaDocumentos.soltarAlHito) HitoMesaDocumentos.soltarAlHito(null);
+      if (window.SoltarDocumento) SoltarDocumento.desenganchar($('trabajo-columnas'));
       if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
       return;
     }
