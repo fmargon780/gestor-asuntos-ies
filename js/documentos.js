@@ -65,7 +65,8 @@ var Documentos = (function () {
   /* `opciones.hito`: ver arriba. `opciones.irDirectoAAnadir`: se salta
      la lista y va directa al selector de fichero, para cuando ya se
      sabe que se quiere añadir uno (el camino "Desde el ordenador" de
-     un hito); sin ella, se ve la lista de siempre. */
+     un hito); sin ella, se ve la lista de siempre. Fila 686: la ventana
+     de Windows se abre donde Windows quiera, sin carpeta de inicio y sin avisos. */
   async function abrir(asunto, opciones) {
     N.asuntoActual = asunto;
     N.hitoActual = (opciones && opciones.hito) || null;
@@ -75,12 +76,13 @@ var Documentos = (function () {
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
+    if (window.SoltarDocumento) SoltarDocumento.enganchar($('doc-cuerpo'), asunto);   /* fila 686 */
     /* Fila 678: la ventana de Windows se pide en la misma pulsación, antes de
        leer la carpeta y los hitos (con Drive esa espera puede pasar del tiempo
        que el navegador da desde la pulsación y la ventana no se abría). */
     var pedido = null;
     if (opciones && opciones.irDirectoAAnadir && !opciones.ficheroSoltado) {
-      pedido = Carpetas.elegirFichero(asunto.handle).then(function (h) { return { handle: h }; }, function (e) { return { error: e }; });
+      pedido = Carpetas.elegirFichero().then(function (h) { return { handle: h }; }, function (e) { return { error: e }; });
     }
     await pintarLista();
     /* `opciones.ponerNombre` (arreglo de la fila 103): abre directamente
@@ -253,7 +255,7 @@ var Documentos = (function () {
      Lanza lo mismo que Carpetas.elegirFichero: quien llama decide qué
      hacer con un AbortError (cancelar el selector del navegador). */
   async function anadirDesdeOrdenador() {
-    var handle = await Carpetas.elegirFichero(N.asuntoActual.handle);
+    var handle = await Carpetas.elegirFichero();   /* fila 686: sin carpeta de inicio */
     N.pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
   }
 
@@ -321,8 +323,21 @@ var Documentos = (function () {
     return !!leerNombre(nombre).fecha;
   }
 
+  /* Fila 686 (js/soltar-documento.js): un fichero soltado. Con el cuadro de Documentos abierto,
+     entra en él (si ya hay un documento a medias, avisa); si no, abre uno. Sin hito ni tarea. */
+  function soltarFichero(asunto, fichero) {
+    /* Al cerrar el cuadro su contenido se queda en la página, escondido: solo vale el que se ve. */
+    if (document.querySelector('#capa:not(.oculto) #doc-cuerpo')) {
+      if (document.querySelector('#capa:not(.oculto) #doc-guardar')) { U.aviso('Termina antes con este documento.', 'ambar'); return; }
+      N.pintarFormulario({ modo: 'anadir', nombreActual: fichero.name,
+        handle: { kind: 'file', name: fichero.name, getFile: function () { return Promise.resolve(fichero); } } });
+      return;
+    }
+    abrir(asunto, { ficheroSoltado: fichero });
+  }
+
   Object.assign(N, { pintarLista: pintarLista, soltarVisor: soltarVisor, visorDe: visorDe, leerNombre: leerNombre });
 
-  return { configurar: configurar, abrir: abrir, leerNombre: leerNombre,
+  return { configurar: configurar, abrir: abrir, soltarFichero: soltarFichero, leerNombre: leerNombre,
            pareceDeLaAplicacion: pareceDeLaAplicacion, _interno: N };
 })();

@@ -81,6 +81,7 @@
     'js/donde-se-guarda.js',
     'js/donde-se-guarda-tareas.js',
     'js/hito-mesa-tarea-menu.js',
+    'js/soltar-documento.js',   // fila 686: la usan js/hito-mesa-documentos.js, js/hito-mesa-guion.js y js/documentos.js
     'js/hito-mesa-documentos.js',
     'js/generar-para-relacionados.js',
     'js/hito-mesa-comunicar.js',

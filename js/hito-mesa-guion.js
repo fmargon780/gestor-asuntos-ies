@@ -282,20 +282,9 @@ var HitoMesaGuion = (function () {
     if (window.TareasConDocumentoVista) {
       TareasConDocumentoVista.enganchar(caja, a, h, hitos || [], abierto, function () { pintar(fila, a, h, abierto, hitos); });
     }
-    /* Fila 145: soltar un fichero en la siguiente tarea, como en la columna derecha. */
-    var soltar = caja.querySelector('.guion-soltar');
-    if (soltar) {
-      soltar.ondragover = function (ev) { ev.preventDefault(); ev.stopPropagation(); soltar.classList.add('encima'); };
-      soltar.ondragleave = function () { soltar.classList.remove('encima'); };
-      soltar.ondrop = function (ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        soltar.classList.remove('encima');
-        var ficheros = ev.dataTransfer && ev.dataTransfer.files;
-        if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287: un directivo no guarda documentos */
-        var delPaso = soltar.closest('.guion-paso');
-        if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, tarea: delPaso ? delPaso.dataset.id : '', ficheroSoltado: ficheros[0] });   /* fila 638: ya se sabe de qué tarea es */
-      };
+    /* Fila 686: soltar un fichero encima de cualquier tarea: entra sin hito ni tarea (js/soltar-documento.js). */
+    if (window.SoltarDocumento && abierto) {
+      Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso'), function (el) { SoltarDocumento.enganchar(el, a); });
     }
     if (window.Llamadas && Llamadas.enganchar) Llamadas.enganchar(caja);   /* fila 639 */
     /* Fila 638: «+ Añadir tarea» y su formulario. */

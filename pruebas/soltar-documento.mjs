@@ -1,0 +1,94 @@
+/* Fila 686 (docs/686-ANADIR-DOCUMENTO-MAS-SENCILLO.md): «Añadir documento» abre la ventana de Windows sin carpeta de inicio y sin
+   aviso naranja; un fichero soltado en el cuadro de Documentos, encima de cualquier tarea o en la zona de trabajo del hito entra
+   sin hito ni tarea y sin marcar nada; con un documento a medias avisa; un directivo no guarda. */
+import { chromium } from 'playwright';
+
+const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
+let fallos = 0;
+function comprobar(titulo, real, esperado) {
+  const ok = JSON.stringify(real) === JSON.stringify(esperado);
+  if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
+  else console.log('bien   ' + titulo);
+}
+const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+const p = await (await navegador.newContext({ viewport: { width: 1500, height: 1100 } })).newPage();
+const errores = [];
+p.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
+await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) {}");
+await p.goto(DIRECCION);
+await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
+await p.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 40000 });
+await p.waitForFunction(() => window.Demo && !Demo.montando && window.SoltarDocumento, null, { timeout: 60000 });
+await p.waitForTimeout(2500);
+await p.click('button.pestana[data-pantalla="abiertos"]');
+await p.locator('#inicio-tabla-cuerpo tr[data-asunto*="SANCION Fuentes Calvo"] .tarjeta-nombre').first().click();
+await p.waitForSelector('.hito-en-mesa .guion-paso', { timeout: 15000 });
+await p.waitForTimeout(1000);
+
+/* Suelta un fichero encima del elemento que dice el selector (el n-ésimo). */
+const soltar = (sel, n) => p.evaluate(([sel, n]) => {
+  const el = document.querySelectorAll(sel)[n || 0];
+  const dt = new DataTransfer();
+  dt.items.add(new File(['contenido de prueba'], 'prueba 686.pdf', { type: 'application/pdf' }));
+  el.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+}, [sel, n]);
+const avisos = () => p.$$eval('#mensajes .mensaje', (e) => e.map((x) => x.textContent));
+const cerrar = async () => { await p.evaluate(() => { const c = document.getElementById('cuadro-aceptar'); if (c) c.click(); }); await p.waitForTimeout(500); };
+const marcadas = () => p.$$eval('.hito-en-mesa .guion-casilla:checked', (l) => l.length);
+const contexto = () => p.evaluate(() => { const n = Documentos._interno; return [n.hitoActual, n.tareaActual, n.preguntarTarea]; });
+const pasos = await p.$$eval('.hito-en-mesa .guion-paso:not(.guion-pregunta)', (l) => l.length);
+const antes = await marcadas();
+
+/* (a) «Añadir documento» llama a la ventana sin carpeta de inicio y sin aviso */
+await p.evaluate(() => {
+  window.__llamadas = [];
+  window.showOpenFilePicker = async (o) => { window.__llamadas.push(!!(o && o.startIn)); return [{ kind: 'file', name: 'ventana.pdf', getFile: async () => new File(['x'], 'ventana.pdf', { type: 'application/pdf' }) }]; };
+  const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1)[0];
+  Documentos.abrir(a);
+});
+await p.waitForSelector('#doc-anadir');
+await p.click('#doc-anadir');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('a. «Añadir documento» pide la ventana una vez, sin carpeta de inicio', await p.evaluate(() => window.__llamadas), [false]);
+comprobar('a. y no sale ningún aviso naranja', (await avisos()).filter((t) => /carpeta del asunto/.test(t)), []);
+await cerrar();
+
+/* (c) soltar en el cuadro de Documentos vacío abre el cuadro del nombre, sin «¿De qué tarea es?» */
+await p.evaluate(() => { Documentos.abrir(Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1)[0]); });
+await p.waitForSelector('#doc-anadir');
+await soltar('#doc-cuerpo');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('c. soltar en Documentos abre el cuadro del nombre, sin hito ni tarea', await contexto(), [null, null, false]);
+/* (d) con el cuadro a medias, soltar otro avisa y no cambia nada */
+await soltar('#doc-cuerpo');
+await p.waitForTimeout(500);
+comprobar('d. con un documento a medias, soltar otro avisa', (await avisos()).filter((t) => /Termina antes con este documento/.test(t)).length > 0, true);
+comprobar('d. y el cuadro sigue siendo el mismo', await p.locator('#capa:not(.oculto) #doc-guardar').count(), 1);
+await cerrar();
+
+/* (b) soltar sobre una tarea que no es la siguiente: cuadro del nombre y «sin tarea» */
+const n = pasos > 1 ? pasos - 1 : 0;
+await soltar('.hito-en-mesa .guion-paso:not(.guion-pregunta)', n);
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('b. soltar sobre otra tarea abre el cuadro del nombre, sin hito ni tarea', await contexto(), [null, null, false]);
+await cerrar();
+comprobar('b. y no se marca ninguna tarea', await marcadas(), antes);
+
+/* (f) soltar sobre la zona de trabajo del hito no marca «Añadir documento» */
+await soltar('#trabajo-columnas');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('f. soltar en la zona del hito: sin hito ni tarea', await contexto(), [null, null, false]);
+await cerrar();
+comprobar('f. y no se marca ninguna tarea', await marcadas(), antes);
+
+/* (e) un directivo no guarda */
+await p.evaluate(() => { window.__esDirectivo = Perfil.esDirectivo; Perfil.esDirectivo = () => true; });
+await soltar('#trabajo-columnas');
+await p.waitForTimeout(800);
+comprobar('e. un directivo suelta y no pasa nada', await p.locator('#capa:not(.oculto) #doc-guardar').count(), 0);
+await p.evaluate(() => { Perfil.esDirectivo = window.__esDirectivo; });
+
+if (errores.length) { fallos++; console.log('ERRORES:\n' + errores.join('\n')); }
+await navegador.close();
+if (fallos) { console.log(fallos + ' fallos'); process.exit(1); }
+console.log('todo bien');

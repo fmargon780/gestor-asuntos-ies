@@ -317,33 +317,7 @@ var HitoMesaDocumentos = (function () {
     });
   }
 
-  /* Soltar un fichero: lo mismo que "Desde el ordenador" (js/documentos.js,
-     con el hito), con el fichero ya elegido. Fila 425: sobre cualquier parte
-     de «Trabajo» (las dos columnas) el fichero entra en el hito abierto; sin
-     hito abierto (la lista de hitos), no se hace nada. */
   var ultimaMesa = null;   /* { fila, a, h, hitos } de la mesa abierta, para la casilla de la carpeta */
-
-  function soltarAlHito(destino) {
-    var zona = document.getElementById('trabajo-columnas');
-    if (!zona) return;
-    if (!destino) {
-      zona.ondragover = zona.ondragleave = zona.ondrop = null;
-      zona.classList.remove('encima');
-      return;
-    }
-    zona.ondragover = function (ev) { ev.preventDefault(); zona.classList.add('encima'); };
-    zona.ondragleave = function (ev) { if (!ev.relatedTarget || !zona.contains(ev.relatedTarget)) zona.classList.remove('encima'); };
-    zona.ondrop = function (ev) {
-      ev.preventDefault();
-      zona.classList.remove('encima');
-      var ficheros = ev.dataTransfer && ev.dataTransfer.files;
-      if (!ficheros || !ficheros.length) return;
-      if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287: un directivo no guarda documentos */
-      if (window.Documentos && Documentos.abrir) {
-        Documentos.abrir(destino.a, { hito: destino.h, ficheroSoltado: ficheros[0] });
-      }
-    };
-  }
 
   /* Fila 425: marcar o desmarcar la casilla de un documento de la carpeta cambia la barra de lo marcado. */
   function alMarcar() {
@@ -385,12 +359,12 @@ var HitoMesaDocumentos = (function () {
     ultimaMesa = { fila: fila, a: a, h: h, hitos: hitos };
     pintarSeleccion(fila, a, h, hitos);
     pintarPlantillas(fila, a, h, abierto);
-    soltarAlHito(abierto ? { a: a, h: h } : null);
+    if (window.SoltarDocumento) SoltarDocumento[abierto ? 'enganchar' : 'desenganchar'](document.getElementById('trabajo-columnas'), a);   /* fila 686: soltar ya no marca solo ninguna tarea */
     if (abierto && window.HitoMesaComunicar) HitoMesaComunicar.pintar(fila, a, h);
   }
 
   return { filasHTML: filasHTML, datosDeLaLinea: datosDeLaLinea, enganchar: enganchar, cuentaTitulo: cuentaTitulo, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
-           moverAOtroHito: moverAOtroHito, soltarAlHito: soltarAlHito, alMarcar: alMarcar,
+           moverAOtroHito: moverAOtroHito, alMarcar: alMarcar,
            datosDeLaLinea: datosDeLaLinea, abrirEnVisor: abrirEnVisor, codigoDe: codigoDe };   /* fila 522 */
 })();
 window.HitoMesaDocumentos = HitoMesaDocumentos;
