@@ -348,6 +348,12 @@ fs.mkdirSync(dentro, { recursive: true });
 const app = path.join(dentro, 'Gestor de Asuntos - aplicación');
 fs.symlinkSync(raiz, app, 'dir');
 const erroresAntes = errores.length;
+/* Fila 678: la copia comprueba en la red si hay versión nueva y, si la de GitHub difiere de la de este
+   código (siempre, justo después de subir la versión), pinta una franja que tapa los botones. Se contesta
+   con la versión propia para que la prueba no dependa de la red ni de lo ya publicado. */
+const versionPropia = (fs.readFileSync(new URL('../js/version.js', import.meta.url), 'utf8').match(/App\.VERSION = '([^']+)'/) || [])[1];
+await pagina.route('https://raw.githubusercontent.com/**', ruta => ruta.fulfill({ contentType: 'application/json',
+  body: JSON.stringify({ version: versionPropia, ficheros: {} }) }));
 await pagina.goto('file://' + app.split('/').map(encodeURIComponent).join('/') + '/index.html');
 await pagina.evaluate(() => {
   window.__copiado = null;
