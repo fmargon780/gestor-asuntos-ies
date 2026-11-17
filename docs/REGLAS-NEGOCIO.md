@@ -292,3 +292,10 @@ Cada una con su fecha y de dónde sale.
 
 - (17-nov-2026, fila 695) Generar un documento y enviar un correo o un mensaje de Séneca no exigen crear ni elegir una tarea: hay dos botones siempre a la vista en la cabecera del asunto, y usarlos no marca nada solo. Las tareas siguen, pero no son la puerta obligada. Es un paso atrás a propósito sobre el tema 650, mientras el sistema se asienta. Francisco: «Eso de que le pide crear una tarea es lo que más le está molestando y que creo que es lo que más obstaculiza.» «Sí, por favor. Hagámoslo así.»
 - (17-nov-2026, fila 697) «Generar documento ▾» nunca se queda sin salida: tras las plantillas del tipo ofrece siempre «Otra plantilla…» (todas las del centro) y «+ Nueva plantilla…». Dicho por Francisco: «si al mostrar todas las plantillas del centro y no hay ninguna que se adecúe a la que necesito, puedo crear una plantilla nueva?». Usar una plantilla de otro tipo no la asocia al tipo del asunto.
+
+## Estructura del asunto (acordado el 17-nov-2026; sin construir)
+
+- (17-nov-2026, tema 692) «En las tareas se hace, en los hitos se informa.» El hito deja de ser una caja de tareas: pasa a ser un panel del asunto donde la app informa de por dónde va, mirando las tareas, y pide lo que no pueda saber por ellas. La explicación de cómo se hace va en la tarea.
+- (17-nov-2026, tema 692) En lo largo las tareas se agrupan con rótulos descriptivos, «para quitar la carga cognitiva de tener 30 tareas seguidas». El rótulo solo nombra: sin plazo, responsable ni marca de hecho.
+- (17-nov-2026, tema 692) Lo que es de una tarea cuelga de la tarea; lo general, del asunto. La espera no es una tarea aparte: es el estado de la tarea nuestra que la provoca.
+- (17-nov-2026, tema 692) Una guía por tipo de asunto; las variantes, con «Solo si». Mientras no esté construido, no se añade nada a hitos, fases ni hitos comunes. Detalle en `docs/notas-diseno/692.md`.

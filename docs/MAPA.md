@@ -21,6 +21,6 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Que los directivos sigan los asuntos por sí mismos, sin preguntar a Secretaría.
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
 - Un sistema de trabajo lo más completo posible, que sirva de guía también a quien no es experto: procesos fluidos, intuitivos y explicados, que pueda seguir personal no acostumbrado a ellos, como interinos o miembros del equipo directivo (Francisco, 14-nov-2026).
-- Plan en marcha desde el 17-nov-2026 (`docs/PLAN-2026-11.md`): un camino corto para el trabajo de ventanilla y los hitos solo para lo largo; que la app lleve sola sus cuentas; lo nuevo solo entra con fecha de uso.
+- Plan en marcha desde el 17-nov-2026 (`docs/PLAN-2026-11.md`): un solo molde para todo, el asunto como lista de tareas con un panel que informa («en las tareas se hace, en los hitos se informa»); una guía por tipo; trabajar y diseñar, separados. Después, sin fecha: que cada papel lleve su recorrido y que el estado salga de las pruebas.
 
 Última reflexión: 17-nov-2026
