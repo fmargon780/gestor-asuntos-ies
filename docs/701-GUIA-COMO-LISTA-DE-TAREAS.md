@@ -8,7 +8,12 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 700.
 Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del asunto.
 
 ## Lo que entendió Claude (acordado con Francisco el 17-nov-2026)
-- La guía de un tipo «sin hitos» es una lista de frases. Cada frase puede llevar **«Solo si»** un campo de lista del asunto, como hoy.
+- La guía de un tipo «sin hitos» es una lista de frases. Cada frase puede llevar un **«Solo si»**.
+- **El «Solo si»** (hablado y aprobado por Francisco el 17-nov-2026: «Me parecen bien tus propuestas»):
+  - Se escribe solo en la guía, nunca desde el asunto. Dice «Solo si» un dato de lista del asunto vale tal cosa («Solo si Motivo de la baja = Traslado al extranjero»), **o «Solo si» el tercero es de tal clase** («Solo si el tercero es Personal»). Lo de la clase de tercero es nuevo.
+  - En el asunto, la tarea sale si coincide y no sale si no coincide. Las que no salen no cuentan en «N de M tareas hechas» ni en «Tarea N de M».
+  - Con el dato vacío salen todas las que dependen de él, en amarillo, con «Falta: <dato>». **Al pulsar ese aviso se rellena el dato ahí mismo**, sin ir a «Datos». Esto es nuevo.
+  - Si en un asunto concreto sobra una tarea suelta, se borra en ese asunto con «Borrar»; no hace falta «Solo si».
 - Hay una guía por tipo de asunto y nada más. La clase de tercero no da otra guía.
 - Se escribe en el editor de guías de siempre, que para estos tipos enseña solo la lista de tareas: sin hitos, fases, responsables, plazos, «Qué se hace», «Dónde se hace» ni «A quién».
 - Un asunto nuevo de ese tipo nace con las tareas de su guía, en su orden.
@@ -18,7 +23,6 @@ Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del
 **No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - Una tarea que se añade a la guía llega también a los asuntos abiertos de ese tipo; cambiar o borrar una tarea de la guía no los toca (regla del 6-nov-2026, «añadir no es cambiar»).
 - Las tareas de la guía se ordenan con las flechas de subir y bajar, como hoy.
-- Una tarea con «Solo si» y el campo vacío sale en amarillo con «Falta: <campo>», como hoy.
 - La lista común de tareas no se usa en estas guías: la frase se escribe.
 
 ## Pantalla de prueba
@@ -38,6 +42,7 @@ Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del
 - Dónde se guarda en `guias.json`: decide la sesión, sin romper la guía con hitos guardada del tipo (fila 699).
 - Nacimiento: lo de la fila 699 copia ahora las tareas. Llegada de lo añadido a los abiertos: como `Hitos.llevarGuiaAAbiertos` y `completarAsuntoConGuia` (`js/hitos-sincronizar.js`).
 - Menú «⋯» de la cabecera: `js/ficha-menus.js`.
+- «Solo si»: `js/solo-si.js`. Hoy `SoloSi.valoresDe` solo mira campos de lista del asunto; añadir la clase del tercero del asunto como un dato más que se puede elegir (las clases, las permitidas del tipo, `js/ajustes-tipo-clases.js`). Rellenar el dato desde el aviso «Falta: …»: el mismo desplegable que usa «Datos» para un campo de lista (`js/campo-desde-el-asunto.js`), guardando por el camino de siempre. No cambiar el «Solo si» de los asuntos con hitos.
 
 ## Cómo lo comprueba el segundo revisor
 - En un tipo «sin hitos», el editor de la guía enseña solo una lista de frases con su «Solo si».
@@ -45,6 +50,9 @@ Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del
 - «⋯» › «Cambiar la guía…» avisa con ese texto y abre el editor de ese tipo.
 - Añadir una tarea a la guía la hace salir en un asunto abierto del tipo; cambiar una frase en la guía no cambia el asunto abierto.
 - Una tarea con «Solo si» sale o no según el campo, y en amarillo con el campo vacío.
+- En la guía se puede elegir «Solo si» por un dato de lista o por la clase del tercero; con un tercero de otra clase, la tarea no sale.
+- Pulsando «Falta: <dato>» en una tarea amarilla se elige el valor ahí mismo; la lista se queda con las tareas que tocan y el dato queda guardado en «Datos».
+- Las tareas que no salen no cuentan en «N de M tareas hechas».
 - El editor de una guía con hitos es el de siempre.
 
 ## Qué mirar al terminar
