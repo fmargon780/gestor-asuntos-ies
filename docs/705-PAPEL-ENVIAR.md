@@ -13,7 +13,7 @@ Eligió «1»: «enviado» sin prueba se apunta con el botón «Marcar enviado»
 - En el Registro queda una línea: «Enviado en mano a la familia · Francisco · 17-nov».
 - Con «Enviado» hecho, la tarea de papel queda hecha.
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - «Enviar correo» usa la plantilla de correo del tipo de asunto que adjunta ese tipo de documento; si hay varias, deja elegir; si no hay ninguna, abre el correo sin plantilla, con el destinatario y el adjunto puestos.
 - Si el correo se cierra sin enviar, no se apunta nada.
 - Tras enviar, en un asunto sin hitos no se ofrece «Dejar el asunto esperando a…»: si hace falta esperar respuesta, se pone desde otra tarea.
