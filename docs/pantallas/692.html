@@ -7,16 +7,18 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: Roboto, "Segoe UI", Arial, sans-serif; font-size: 15px; color: #1c2733; background: #f3f5f9; }
-  button { font: inherit; cursor: pointer; }
-  .mandos { background: #7a4a00; color: #fff; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  .mandos { background: #7a4a00; color: #fff; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
   .mandos strong { font-weight: 600; }
+  .mandos .sep { width: 1px; height: 18px; background: #fff6; }
   .mandos button { background: #fff3; color: #fff; border: 1px solid #fff8; border-radius: 14px; padding: 3px 12px; }
   .mandos button.puesto { background: #fff; color: #7a4a00; font-weight: 600; }
   .pantalla { padding: 16px 20px 8px; }
   .cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   .cabecera .boton { padding: 6px 10px; font-size: 14px; }
   .cabecera h1 { font-size: 19px; margin: 0; }
-  .cabecera .hueco { flex: 1; }
+  .hueco { flex: 1; }
   .boton { background: #fff; border: 1px solid #cfd6df; border-radius: 8px; padding: 7px 14px; color: #1c2733; }
   .boton:hover { background: #eef2f7; }
   .boton.principal { background: #1f4e79; border-color: #1f4e79; color: #fff; }
@@ -25,8 +27,8 @@
   .boton[disabled] { opacity: .45; cursor: default; }
   .chip { background: #dfe9f5; color: #1f4e79; border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
   .chip.numero { background: #fff; border: 1px solid #9aa7b5; color: #44515f; }
-  .columnas { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; margin-top: 10px; align-items: start; }
-  @media (max-width: 820px) { .columnas { grid-template-columns: 1fr; } }
+  .columnas { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 14px; margin-top: 10px; align-items: start; }
+  @media (max-width: 900px) { .columnas { grid-template-columns: 1fr; } }
   .tarjeta { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 14px 16px; }
   .panel { border-radius: 8px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; border: 1px solid; }
   .panel .texto { flex: 1; min-width: 200px; }
@@ -37,41 +39,46 @@
   .panel.listo { background: #e2f4e6; border-color: #9fd3ab; }
   .panel .cuenta { font-size: 13px; color: #44515f; white-space: nowrap; }
   .rotulo { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #5b6774; margin: 14px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #dde3ea; }
-  .rotulo:first-of-type { margin-top: 2px; }
+  .rotulo:first-child { margin-top: 2px; }
   .tarea { border: 1px solid #e3e8ee; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; position: relative; }
   .tarea.ahora { background: #fff7e0; border-color: #ecc866; }
   .tarea.hecha { background: #f6f8fa; color: #6a7683; }
   .tarea.esperando { background: #f7f1fd; border-color: #c6aee6; }
   .tarea-fila { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .tarea-fila input[type=checkbox] { width: 17px; height: 17px; margin: 0; }
+  .papel-icono { width: 17px; text-align: center; }
   .tarea-texto { font-weight: 600; }
   .tarea.hecha .tarea-texto { font-weight: 400; }
   .etq { font-size: 11px; font-weight: 700; background: #dfe9f5; color: #1f4e79; border-radius: 10px; padding: 1px 8px; }
   .etq.aqui { background: #eee; color: #555; }
-  .tarea-fila .hueco { flex: 1; }
+  .pasos { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 12px; }
+  .paso { border-radius: 10px; padding: 1px 8px; border: 1px solid #cfd6df; color: #6a7683; background: #fff; white-space: nowrap; }
+  .paso.hecho { background: #d9f0de; border-color: #9fd3ab; color: #1e6b33; font-weight: 600; }
+  .paso.ahora { background: #fff; border-color: #1f4e79; color: #1f4e79; font-weight: 700; }
+  .paso.espera { background: #e9defa; border-color: #c6aee6; color: #5a3d86; font-weight: 600; }
+  .flecha { color: #9aa7b5; }
   .quien { font-size: 12px; color: #6a7683; }
   .tarea-espera { margin: 6px 0 0 25px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: #5a3d86; }
+  .tarea-espera.vencida { color: #8a4b00; }
   .puntos { border: 0; background: none; font-size: 18px; line-height: 1; padding: 2px 8px; border-radius: 6px; color: #44515f; }
   .puntos:hover { background: #e6ebf1; }
-  .menu { position: absolute; right: 8px; top: 36px; background: #fff; border: 1px solid #cfd6df; border-radius: 8px; box-shadow: 0 6px 18px #0003; z-index: 5; min-width: 170px; padding: 4px; }
+  .menu { position: absolute; right: 8px; top: 36px; background: #fff; border: 1px solid #cfd6df; border-radius: 8px; box-shadow: 0 6px 18px #0003; z-index: 5; min-width: 190px; padding: 4px; }
   .menu button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 6px; }
   .menu button:hover { background: #eef2f7; }
   .menu button[disabled] { color: #9aa7b5; cursor: default; background: none; }
   .mas-caja { position: relative; }
   .menu.menu-cab { left: 0; right: auto; top: 38px; min-width: 210px; }
   .menu-titulo { font-size: 11px; font-weight: 700; color: #6a7683; padding: 6px 10px 2px; border-top: 1px solid #e3e8ee; margin-top: 4px; }
-  .anadir-caja { border: 1px dashed #cfd6df; border-radius: 8px; padding: 10px 12px; width: 100%; }
-  .anadir-caja label { display: block; font-size: 12px; font-weight: 700; margin: 0 0 3px; }
-  .anadir-caja input { display: block; width: 100%; max-width: 380px; margin-bottom: 8px; }
   .anadir { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .anadir input { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; font: inherit; }
+  .anadir input { flex: 1; min-width: 220px; padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; }
+  .anadir select { padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; background: #fff; }
+  .nota { font-size: 12px; color: #6a7683; margin: 6px 0 0; }
   .bloque { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; font-weight: 600; color: #44515f; }
   .bloque small { font-weight: 400; color: #6a7683; }
   .inicio { margin: 6px 20px 24px; }
   .inicio h2 { font-size: 14px; margin: 14px 0 6px; color: #44515f; }
-  .inicio table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; overflow: hidden; }
   .tabla-caja { overflow-x: auto; margin-top: 6px; }
-  .inicio table { min-width: 640px; }
+  .inicio table { width: 100%; min-width: 640px; border-collapse: collapse; background: #fff; border: 1px solid #dde3ea; }
   .inicio th { text-align: left; font-size: 11px; letter-spacing: .05em; color: #5b6774; padding: 8px 12px; border-bottom: 1px solid #dde3ea; }
   .inicio td { padding: 10px 12px; }
   .pest { display: inline-block; border-radius: 14px; padding: 3px 12px; font-size: 13px; font-weight: 600; background: #e6ebf1; color: #44515f; margin-right: 6px; }
@@ -83,23 +90,49 @@
   .capa { position: fixed; inset: 0; background: #0006; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
   .cuadro { background: #fff; border-radius: 12px; padding: 18px 20px; width: 100%; max-width: 460px; }
   .cuadro h3 { margin: 0 0 8px; }
-  .cuadro label { display: block; font-weight: 600; margin: 12px 0 4px; }
-  .cuadro select, .cuadro input { width: 100%; padding: 8px 10px; border: 1px solid #cfd6df; border-radius: 8px; font: inherit; }
-  .cuadro .pie { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-  .aviso { position: fixed; right: 16px; bottom: 16px; background: #1e6b33; color: #fff; padding: 10px 14px; border-radius: 8px; max-width: min(340px, calc(100vw - 32px)); z-index: 30; }
+  .cuadro label, .form label.tit { display: block; font-weight: 600; margin: 12px 0 4px; }
+  .cuadro select, .cuadro input { width: 100%; padding: 8px 10px; border: 1px solid #cfd6df; border-radius: 8px; }
+  .pie { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .aviso { position: fixed; right: 16px; bottom: 16px; background: #1e6b33; color: #fff; padding: 10px 14px; border-radius: 8px; max-width: min(380px, calc(100vw - 32px)); z-index: 30; }
   .oculto { display: none !important; }
+  .miga { font-size: 13px; color: #5b6774; margin: 0 0 10px; }
+  .rec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .rec { grid-template-columns: 1fr; } }
+  .tipo { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 9px 12px; margin-bottom: 6px; }
+  .tipo.elegido { border-color: #1f4e79; box-shadow: 0 0 0 1px #1f4e79; }
+  .tipo b { display: block; }
+  .tipo span { font-size: 12px; color: #6a7683; }
+  .form h2 { font-size: 17px; margin: 0 0 4px; }
+  .form select { padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; background: #fff; min-width: 260px; max-width: 100%; }
+  .form .fila { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+  .form .fila label { font-weight: 400; margin: 0; display: flex; gap: 6px; align-items: center; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  @media (max-width: 600px) { .dos { grid-template-columns: 1fr; } }
+  .vista { background: #f6f8fa; border: 1px solid #dde3ea; border-radius: 8px; padding: 10px 12px; margin-top: 14px; }
+  .vista b { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #5b6774; }
+  .vista p { margin: 6px 0 0; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <div class="mandos">
   <strong>Mandos de la prueba (no son de la app):</strong>
-  <button id="m-corto" class="puesto">Trámite corto</button>
-  <button id="m-largo">Trámite largo, con rótulos</button>
-  <button id="m-empezar">Volver a empezar</button>
+  <button id="m-asunto" class="puesto">Pantalla del asunto</button>
+  <button id="m-recorrido">Recorrido de un tipo de documento</button>
+  <span class="sep"></span>
+  <span id="mandos-asunto" style="display:contents">
+    <button id="m-corto" class="puesto">Trámite corto</button>
+    <button id="m-largo">Trámite largo, con rótulos</button>
+    <button id="m-empezar">Volver a empezar</button>
+    <span class="sep"></span>
+    <button id="m-firmado">Llega el PDF firmado</button>
+    <button id="m-sellado">Llega el PDF sellado</button>
+    <button id="m-dia">Llega el día de volver a mirar</button>
+  </span>
   <span>Datos inventados. No guarda nada.</span>
 </div>
 
+<div id="p-asunto">
 <div class="pantalla">
   <div class="cabecera">
     <button class="boton" disabled>← Volver</button>
@@ -119,7 +152,7 @@
     <button class="boton" disabled>Enviar ▾</button>
     <button class="boton" disabled>📞</button>
     <button class="boton" disabled>Ruta</button>
-    <span class="chip numero" id="c-plazo">Plazo del asunto: 24-nov</span>
+    <span class="chip numero">Plazo del asunto: 24-nov</span>
     <button class="boton principal" id="b-cerrar-arriba">Cerrar el asunto</button>
   </div>
 
@@ -152,6 +185,15 @@
     </tr></tbody>
   </table></div>
 </div>
+</div>
+
+<div id="p-recorrido" class="pantalla oculto">
+  <p class="miga">Ajustes › El centro › Tipos de documento › ⋮ de cada tipo › <b>Recorrido</b> (junto a «Campos del nombre», «Texto por defecto» y «Extracto de este tipo»)</p>
+  <div class="rec">
+    <div id="r-lista"></div>
+    <div class="tarjeta form" id="r-form"></div>
+  </div>
+</div>
 
 <div class="capa oculto" id="capa">
   <div class="cuadro">
@@ -162,8 +204,8 @@
       <option>Familia</option><option>Tercero</option><option>Dirección</option>
       <option>Jefatura</option><option>Secretaría</option><option>Tutor/a del grupo</option>
     </select>
-    <label for="e-motivo">Motivo <span style="font-weight:400">(opcional)</span></label>
-    <input id="e-motivo" placeholder="Por ejemplo: que traiga el impreso firmado">
+    <label for="e-dia">Qué día volver a mirarlo</label>
+    <input type="date" id="e-dia">
     <div class="pie">
       <button class="boton" id="e-cancelar">Cancelar</button>
       <button class="boton principal" id="e-poner">Poner en espera</button>
@@ -175,189 +217,216 @@
 
 <script>
 (function () {
-  var HOY = '17-nov';
+  var HOY = '17-nov', VOLVER = '2026-11-19';
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  var FIRMAS = ['Nadie', 'Administración', 'Secretaría', 'Secretaría, con visto bueno de Dirección', 'Dirección', 'Jefatura de Estudios'];
+  var AQUIEN = ['Familia', 'Interesado', 'Quien lo pide', 'Tutor/a del grupo', 'Personas relacionadas'];
+  var VIAS = ['Correo electrónico', 'iPasen', 'Correo postal', 'En mano', 'Tablón'];
+  var TIPOS = {
+    'COMUNICACION': { entra: false, firma: 'Jefatura de Estudios', registro: true, envia: true, aquien: 'Familia', via: 'Correo electrónico' },
+    'RESOLUCION': { entra: false, firma: 'Dirección', registro: true, envia: true, aquien: 'Familia', via: 'Correo electrónico' },
+    'CERTIFICADO': { entra: false, firma: 'Secretaría, con visto bueno de Dirección', registro: true, envia: true, aquien: 'Quien lo pide', via: 'iPasen' },
+    'SOLICITUD': { entra: true, registro: true },
+    'DNI': { entra: true, registro: false }
+  };
   var CORTO = {
     tipo: 'AULA DE CONVIVENCIA',
     tareas: [
-      { id: 't1', texto: 'Recibir el aviso de Jefatura', accion: 'Añadir documento', boton: 'Añadir documento' },
-      { id: 't2', texto: 'Generar la comunicación a la familia', accion: 'Generar documento', boton: 'Generar documento' },
-      { id: 't3', texto: 'Poner a la firma de Dirección', accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
-      { id: 't4', texto: 'Enviar la comunicación a la familia', accion: 'Enviar', boton: 'Enviar correo' }
+      { id: 't1', texto: 'Recibir el aviso de Jefatura' },
+      { id: 't2', texto: 'Comunicar la medida a la familia', papel: 'COMUNICACION' },
+      { id: 't3', texto: 'Dar la copia al tutor o tutora' }
     ]
   };
   var LARGO = {
     tipo: 'BAJA MATRICULA',
     tareas: [
-      { rotulo: 'Recibir el encargo' },
-      { id: 'l1', texto: 'Recibir el encargo de Dirección', accion: 'Añadir documento', boton: 'Añadir documento' },
-      { id: 'l2', texto: 'Comprobar los datos del alumno', accion: 'Comprobar', boton: 'Está bien' },
-      { rotulo: 'Preparar la resolución' },
-      { id: 'l3', texto: 'Generar la resolución de baja', accion: 'Generar documento', boton: 'Generar documento' },
-      { id: 'l4', texto: 'Poner a la firma de Dirección', accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
-      { id: 'l5', texto: 'Registrar la salida', accion: 'Registrar', boton: 'Registrar' },
-      { rotulo: 'Comunicar y cerrar' },
-      { id: 'l6', texto: 'Grabar la baja en Séneca', accion: 'Grabar o cambiar datos', boton: 'Grabado' },
-      { id: 'l7', texto: 'Enviar la resolución a la familia', accion: 'Enviar', boton: 'Enviar correo' },
-      { id: 'l8', texto: 'Archivar la copia en el expediente', accion: 'Archivar', boton: 'Archivado' }
+      { rotulo: 'Recibir la petición' },
+      { id: 'l1', texto: 'Recibir la solicitud de la familia', papel: 'SOLICITUD' },
+      { id: 'l2', texto: 'Recibir el DNI de quien firma', papel: 'DNI' },
+      { id: 'l3', texto: 'Apuntar los datos de la baja' },
+      { rotulo: 'Resolver' },
+      { id: 'l4', texto: 'Resolver la baja', papel: 'RESOLUCION' },
+      { id: 'l5', texto: 'Grabar la baja en Séneca' },
+      { rotulo: 'Avisar y cerrar' },
+      { id: 'l6', texto: 'Avisar al tutor o tutora del grupo' },
+      { id: 'l7', texto: 'Guardar la copia en el expediente del alumno' }
     ]
   };
 
-  var QUE = {
-    'Generar documento': { accion: 'Generar documento', boton: 'Generar documento' },
-    'Poner a la firma': { accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
-    'Registrar': { accion: 'Registrar', boton: 'Registrar' },
-    'Enviar · Correo electrónico': { accion: 'Enviar', boton: 'Enviar correo' },
-    'Enviar · Séneca': { accion: 'Enviar', boton: 'Enviar por Séneca' },
-    'Añadir documento': { accion: 'Añadir documento', boton: 'Añadir documento' },
-    'Rellenar datos del asunto': { accion: 'Rellenar datos del asunto', boton: 'Rellenar' },
-    'Copiar a otra carpeta': { accion: 'Copiar a otra carpeta', boton: '' },
-    'Llamar': { accion: 'Llamar', boton: '📞 Apuntar llamada' },
-    'Grabar o cambiar datos': { accion: 'Grabar o cambiar datos', boton: 'Grabado' },
-    'Entregar': { accion: 'Entregar', boton: 'Entregado' },
-    'Recoger': { accion: 'Recoger', boton: 'Recogido' },
-    'Publicar': { accion: 'Publicar', boton: 'Publicado' },
-    'Cobrar o pagar': { accion: 'Cobrar o pagar', boton: 'Apuntar cobro o pago' },
-    'Comprobar': { accion: 'Comprobar', boton: 'Está bien' },
-    'Archivar': { accion: 'Archivar', boton: 'Archivado' },
-    'Otra cosa': { accion: '', boton: '' }
-  };
-  var modo = 'corto', tareas = [], menuDe = null, esperaPara = null, anadiendo = false, n = 0;
+  var modo = 'corto', tareas = [], menuDe = null, esperaPara = null, n = 0, tipoElegido = 'COMUNICACION';
   function $(id) { return document.getElementById(id); }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function dia(iso) { var p = String(iso).split('-'); return p.length === 3 ? Number(p[2]) + '-' + MESES[Number(p[1]) - 1] : iso; }
+  function tarea(id) { return tareas.filter(function (x) { return x.id === id; })[0]; }
 
+  /* ---------- el recorrido de un papel ---------- */
+  function pasosDe(tipo) {
+    var r = TIPOS[tipo], p = [];
+    if (!r) return p;
+    if (r.entra) { p.push({ k: 'recibido', t: 'Recibido' }); if (r.registro) p.push({ k: 'registrado', t: 'Registrado de entrada' }); return p; }
+    p.push({ k: 'generado', t: 'Generado' });
+    if (r.firma !== 'Nadie') p.push({ k: 'firmado', t: 'Firmado' });
+    if (r.registro) p.push({ k: 'registrado', t: 'Registrado' });
+    if (r.envia) p.push({ k: 'enviado', t: 'Enviado' });
+    return p;
+  }
+  function siguiente(t) { return pasosDe(t.papel).filter(function (p) { return !(t.hechos || {})[p.k]; })[0] || null; }
+  function quienFirma(tipo) { return TIPOS[tipo].firma === 'Secretaría, con visto bueno de Dirección' ? 'Secretaría y Dirección' : TIPOS[tipo].firma.replace(' de Estudios', ''); }
+  function botonDe(t) {
+    var p = siguiente(t), r = TIPOS[t.papel];
+    if (!p) return '';
+    if (p.k === 'recibido') return 'Añadir documento';
+    if (p.k === 'generado') return 'Generar documento';
+    if (p.k === 'firmado') return 'Poner a la firma';
+    if (p.k === 'registrado') return 'Registrar';
+    return r.via === 'Correo electrónico' ? 'Enviar correo' : (r.via === 'iPasen' ? 'Enviar por iPasen' : 'Marcar enviado');
+  }
+  function marcar(t, k) {
+    t.hechos = t.hechos || {}; t.hechos[k] = true;
+    delete t.espera; delete t.pideSello;
+    if (!siguiente(t)) t.hecha = true;
+  }
+  function hacerPaso(t, aMano) {
+    var p = siguiente(t), r = TIPOS[t.papel];
+    if (!p) return;
+    if (aMano) { marcar(t, p.k); avisar('Paso «' + p.t + '» marcado a mano.'); return; }
+    if (p.k === 'firmado') {
+      t.espera = { quien: quienFirma(t.papel), desde: HOY, volver: dia(VOLVER), paso: 'firmado' };
+      avisar('En la app: el documento queda a la firma. Cuando guardes el PDF firmado en la carpeta, el paso se marca solo. Prueba el mando «Llega el PDF firmado».');
+    } else if (p.k === 'registrado') {
+      t.pideSello = true;
+      avisar('En la app: se copia la ruta para registrarlo en Séneca. Cuando guardes el PDF sellado en la carpeta, el paso se marca solo. Prueba el mando «Llega el PDF sellado».');
+    } else if (p.k === 'enviado') {
+      marcar(t, p.k);
+      avisar(r.via === 'Correo electrónico' ? 'En la app se abriría el correo a ' + r.aquien + ' con el documento adjunto. Al enviarlo, el paso se marca solo.'
+        : 'Por ' + r.via + ' la app no puede saber si ha salido: lo marcas tú, y queda apuntado con su fecha.');
+    } else {
+      marcar(t, p.k);
+      avisar(p.k === 'generado' ? 'En la app se abriría el documento ya relleno.' : 'En la app se abriría «Añadir documento».');
+    }
+  }
+
+  /* ---------- el asunto ---------- */
   function empezar() {
     var origen = modo === 'corto' ? CORTO : LARGO;
     tareas = JSON.parse(JSON.stringify(origen.tareas));
-    menuDe = null; esperaPara = null; anadiendo = false;
+    menuDe = null; esperaPara = null;
     ['c-tipo', 'c-tipo3'].forEach(function (id) { $(id).textContent = origen.tipo; });
     $('m-corto').classList.toggle('puesto', modo === 'corto');
     $('m-largo').classList.toggle('puesto', modo === 'largo');
     pintar();
   }
-
-  function soloTareas() { return tareas.filter(function (t) { return !t.rotulo; }); }
   function estado() {
-    var lista = soloTareas();
-    var hechas = lista.filter(function (t) { return t.hecha; }).length;
-    var esperando = lista.filter(function (t) { return t.espera && !t.hecha; })[0] || null;
+    var lista = tareas.filter(function (t) { return !t.rotulo; });
     var ahora = lista.filter(function (t) { return !t.hecha; })[0] || null;
-    return { total: lista.length, hechas: hechas, esperando: esperando, ahora: ahora, lista: lista };
+    var espera = !!(ahora && ahora.espera && !ahora.espera.vencida);
+    return { total: lista.length, hechas: lista.filter(function (t) { return t.hecha; }).length, ahora: ahora, espera: espera, lista: lista };
   }
-
   function avisar(texto) {
     var a = $('aviso');
     a.textContent = texto; a.classList.remove('oculto');
-    clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.classList.add('oculto'); }, 3500);
+    clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.classList.add('oculto'); }, 6000);
   }
 
   function pintarPanel(e) {
-    var p = $('panel'), html;
+    var html, t = e.ahora;
     var cuenta = '<span class="cuenta">' + e.hechas + ' de ' + e.total + ' tareas hechas</span>';
-    if (!e.ahora) {
+    if (!t) {
       html = '<div class="panel listo"><div class="texto"><b>Listo para cerrar</b><span>Todas las tareas están hechas.</span></div>' + cuenta +
         '<button class="boton principal" id="p-cerrar">Cerrar el asunto</button></div>';
-    } else if (e.esperando) {
-      var x = e.esperando.espera;
-      html = '<div class="panel espera"><div class="texto"><b>Esperando a ' + esc(x.quien) + ' desde el ' + esc(x.desde) + '</b>' +
-        '<span>' + esc(e.esperando.texto) + (x.motivo ? ' · ' + esc(x.motivo) : '') + '</span></div>' + cuenta +
-        '<button class="boton" id="p-llegado">Ya ha llegado</button></div>';
+    } else if (e.espera) {
+      html = '<div class="panel espera"><div class="texto"><b>Esperando a ' + esc(t.espera.quien) + ' · volver a mirarlo el ' + esc(t.espera.volver) + '</b>' +
+        '<span>' + esc(t.texto) + ' · desde el ' + esc(t.espera.desde) + '</span></div>' + cuenta + '</div>';
+    } else if (t.espera) {
+      html = '<div class="panel toca"><div class="texto"><b>Toca volver a mirarlo: ' + esc(t.texto) + '</b>' +
+        '<span>Se espera a ' + esc(t.espera.quien) + ' desde el ' + esc(t.espera.desde) + '. Le toca a Administración.</span></div>' + cuenta + '</div>';
     } else {
-      html = '<div class="panel toca"><div class="texto"><b>Ahora toca: ' + esc(e.ahora.texto) + '</b>' +
-        '<span>Le toca a Administración.</span></div>' + cuenta + '</div>';
+      html = '<div class="panel toca"><div class="texto"><b>Ahora toca: ' + esc(t.texto) + '</b>' +
+        '<span>' + (t.papel ? (t.pideSello ? 'Falta guardar el PDF sellado. ' : 'Siguiente paso: ' + esc(botonDe(t)) + '. ') : '') + 'Le toca a Administración.</span></div>' + cuenta + '</div>';
     }
-    p.innerHTML = html;
+    $('panel').innerHTML = html;
     if ($('p-cerrar')) $('p-cerrar').onclick = cerrar;
-    if ($('p-llegado')) $('p-llegado').onclick = function () { llegado(e.esperando.id); };
+  }
+
+  function pasosHTML(t) {
+    var sig = siguiente(t);
+    return '<span class="pasos">' + pasosDe(t.papel).map(function (p) {
+      var hecho = (t.hechos || {})[p.k], aqui = sig && sig.k === p.k;
+      var clase = hecho ? 'hecho' : (aqui ? (t.espera ? 'espera' : 'ahora') : '');
+      var texto = hecho ? '✓ ' + p.t : (aqui && t.espera ? 'A la firma' : (aqui && t.pideSello ? 'Falta el sellado' : p.t));
+      return '<span class="paso ' + clase + '">' + esc(texto) + '</span>';
+    }).join('<span class="flecha">›</span>') + '</span>';
   }
 
   function pintarTareas(e) {
     var caja = $('tareas');
     caja.innerHTML = tareas.map(function (t) {
       if (t.rotulo) return '<div class="rotulo">' + esc(t.rotulo) + '</div>';
-      var ahora = e.ahora && e.ahora.id === t.id && !t.espera;
-      var clase = 'tarea' + (t.hecha ? ' hecha' : (t.espera ? ' esperando' : (ahora ? ' ahora' : '')));
+      var ahora = e.ahora && e.ahora.id === t.id;
+      var viva = t.espera && !t.espera.vencida;
+      var clase = 'tarea' + (t.hecha ? ' hecha' : (viva ? ' esperando' : (ahora ? ' ahora' : '')));
+      var boton = t.papel ? (t.espera || t.pideSello ? '' : botonDe(t)) : '';
       return '<div class="' + clase + '" data-id="' + t.id + '">' +
         '<div class="tarea-fila">' +
-          '<input type="checkbox" class="t-casilla"' + (t.hecha ? ' checked' : '') + ' aria-label="Marcar hecha">' +
+          (t.papel ? '<span class="papel-icono" title="Tarea de papel">📄</span>'
+                   : '<input type="checkbox" class="t-casilla"' + (t.hecha ? ' checked' : '') + ' aria-label="Marcar hecha">') +
           '<span class="tarea-texto">' + esc(t.texto) + '</span>' +
-          (t.accion ? '<span class="etq">' + esc(t.accion) + '</span>' : '') +
+          (t.papel ? '<span class="etq">' + esc(t.papel) + '</span>' + pasosHTML(t) : '') +
           (t.aqui ? '<span class="etq aqui">solo aquí</span>' : '') +
           '<span class="hueco"></span>' +
           (t.hecha ? '<span class="quien">Francisco · ' + HOY + '</span>' : '') +
-          (!t.hecha && !t.espera && t.boton ? '<button class="boton principal chico t-accion">' + esc(t.boton) + '</button>' : '') +
+          (!t.hecha && boton ? '<button class="boton principal chico t-accion">' + esc(boton) + '</button>' : '') +
           '<button class="puntos t-puntos" aria-label="Más de esta tarea">⋮</button>' +
         '</div>' +
-        (t.espera && !t.hecha ? '<div class="tarea-espera">Esperando a ' + esc(t.espera.quien) + ' desde el ' + esc(t.espera.desde) +
-          (t.espera.motivo ? ' · ' + esc(t.espera.motivo) : '') +
-          ' <button class="boton chico t-llegado">Ya ha llegado</button>' +
-          '<button class="boton chico t-dejar">Dejar de esperar</button></div>' : '') +
+        (t.espera && !t.hecha ? '<div class="tarea-espera' + (t.espera.vencida ? ' vencida' : '') + '">' +
+          (t.espera.vencida ? 'Se espera a ' + esc(t.espera.quien) + ' desde el ' + esc(t.espera.desde) + '. Tocaba volver a mirarlo el ' + esc(t.espera.volver) + '.'
+                            : 'Esperando a ' + esc(t.espera.quien) + ' desde el ' + esc(t.espera.desde) + ' · volver a mirarlo el ' + esc(t.espera.volver)) +
+          (t.papel ? '' : ' <button class="boton chico t-llegado">Ya ha llegado</button>') +
+          ' <button class="boton chico t-otro-dia">' + (t.espera.vencida ? 'Seguir esperando…' : 'Cambiar el día') + '</button>' +
+          ' <button class="boton chico t-dejar">Dejar de esperar</button></div>' : '') +
         (menuDe === t.id ? '<div class="menu">' +
-          (!t.hecha && !t.espera ? '<button class="t-esperar">Esperando a…</button>' : '') +
+          (!t.hecha && !t.papel && !t.espera ? '<button class="t-esperar">Esperando a…</button>' : '') +
+          (!t.hecha && t.papel ? '<button class="t-amano">Marcar el paso a mano</button>' : '') +
           '<button disabled>Anotar</button><button disabled>Cambiar</button><button disabled>Borrar</button></div>' : '') +
       '</div>';
     }).join('');
 
     Array.prototype.forEach.call(caja.querySelectorAll('.tarea'), function (el) {
-      var id = el.dataset.id;
-      var t = tareas.filter(function (x) { return x.id === id; })[0];
-      el.querySelector('.t-casilla').onchange = function () { t.hecha = this.checked; if (t.hecha) delete t.espera; menuDe = null; pintar(); };
-      var ac = el.querySelector('.t-accion');
-      if (ac) ac.onclick = function () {
-        menuDe = null;
-        if (t.firma) { t.espera = { quien: 'Dirección', desde: HOY, motivo: 'el PDF firmado' }; avisar('En la app: el documento queda a la firma y la tarea espera sola el PDF firmado.'); }
-        else { t.hecha = true; avisar('En la app se abriría «' + t.boton + '». Aquí la tarea queda hecha.'); }
-        pintar();
-      };
-      el.querySelector('.t-puntos').onclick = function (ev) { ev.stopPropagation(); menuDe = menuDe === id ? null : id; pintar(); };
-      var es = el.querySelector('.t-esperar');
-      if (es) es.onclick = function () { menuDe = null; abrirEspera(t); };
-      var ll = el.querySelector('.t-llegado');
-      if (ll) ll.onclick = function () { llegado(id); };
-      var dj = el.querySelector('.t-dejar');
-      if (dj) dj.onclick = function () { delete t.espera; pintar(); };
+      var t = tarea(el.dataset.id);
+      function en(sel, fn) { var x = el.querySelector(sel); if (x) x.onclick = function (ev) { ev.stopPropagation(); menuDe = null; fn(); pintar(); }; }
+      var c = el.querySelector('.t-casilla');
+      if (c) c.onchange = function () { t.hecha = this.checked; delete t.espera; menuDe = null; pintar(); };
+      en('.t-accion', function () { hacerPaso(t, false); });
+      en('.t-amano', function () { hacerPaso(t, true); });
+      en('.t-esperar', function () { abrirEspera(t); });
+      en('.t-otro-dia', function () { abrirEspera(t); });
+      en('.t-llegado', function () { delete t.espera; t.hecha = true; });
+      en('.t-dejar', function () { delete t.espera; });
+      el.querySelector('.t-puntos').onclick = function (ev) { ev.stopPropagation(); menuDe = menuDe === t.id ? null : t.id; pintar(); };
     });
   }
 
   function pintarAnadir() {
-    var caja = $('anadir');
-    if (!anadiendo) {
-      caja.innerHTML = '<button class="boton chico" id="a-abrir">+ Añadir tarea</button>';
-      $('a-abrir').onclick = function () { anadiendo = true; menuDe = null; pintar(); $('a-que').focus(); };
-      return;
-    }
-    caja.innerHTML = '<div class="anadir-caja"><label for="a-que">Qué se hace</label>' +
-      '<input id="a-que" list="a-lista" placeholder="Escribe qué o dónde: «correo», «llamar»…">' +
-      '<datalist id="a-lista">' + Object.keys(QUE).map(function (k) { return '<option value="' + esc(k) + '">'; }).join('') + '</datalist>' +
-      '<label for="a-texto">Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label>' +
-      '<input id="a-texto">' +
-      '<button class="boton principal chico" id="a-ok" disabled>Añadir</button> ' +
-      '<button class="boton chico" id="a-no">Cancelar</button>' +
-      '<p class="nota">Irá solo a este asunto: la guía no cambia.</p></div>';
-    var propuesto = '';
-    function mirar() { $('a-ok').disabled = !$('a-texto').value.trim(); }
-    $('a-que').oninput = function () {
-      var k = this.value;
-      if (QUE[k] && (!$('a-texto').value.trim() || $('a-texto').value === propuesto)) { propuesto = k.split(' · ')[0]; $('a-texto').value = propuesto; }
-      mirar();
-    };
-    $('a-texto').oninput = mirar;
+    $('anadir').innerHTML = '<input id="a-texto" placeholder="+ Añadir tarea: escribe qué hay que hacer" aria-label="Tarea nueva">' +
+      '<select id="a-papel" aria-label="Papel de la tarea"><option value="">Sin papel</option>' +
+      Object.keys(TIPOS).map(function (k) { return '<option value="' + esc(k) + '">Papel: ' + esc(k) + '</option>'; }).join('') + '</select>' +
+      '<button class="boton chico" id="a-ok">Añadir</button>';
     function anadir() {
       var v = $('a-texto').value.trim();
       if (!v) { $('a-texto').focus(); return; }
-      var q = QUE[$('a-que').value] || { accion: '', boton: '' };
-      tareas.push({ id: 'n' + (++n), texto: v, accion: q.accion, boton: q.boton, firma: !!q.firma, aqui: true });
-      anadiendo = false; pintar();
+      var t = { id: 'n' + (++n), texto: v, aqui: true };
+      if ($('a-papel').value) t.papel = $('a-papel').value;
+      tareas.push(t); pintar();
     }
     $('a-ok').onclick = anadir;
     $('a-texto').onkeydown = function (ev) { if (ev.key === 'Enter') anadir(); };
-    $('a-no').onclick = function () { anadiendo = false; pintar(); };
   }
 
   function pintarInicio(e) {
-    var pest, marca, toca;
-    if (!e.ahora) { pest = 'adm'; marca = '<span class="marca listo">Listo para cerrar</span>'; toca = 'Administración'; }
-    else if (e.esperando) { pest = 'esp'; marca = '<span class="marca espera">Esperando a ' + esc(e.esperando.espera.quien) + ' · ' + esc(e.esperando.texto) + '</span>'; toca = esc(e.esperando.espera.quien); }
-    else { pest = 'adm'; marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(e.ahora) + 1) + ' de ' + e.total + ' · ' + esc(e.ahora.texto) + '</span>'; toca = 'Administración'; }
+    var pest = 'adm', marca, toca = 'Administración', t = e.ahora;
+    if (!t) marca = '<span class="marca listo">Listo para cerrar</span>';
+    else if (e.espera) { pest = 'esp'; marca = '<span class="marca espera">Esperando a ' + esc(t.espera.quien) + ' · hasta el ' + esc(t.espera.volver) + '</span>'; toca = esc(t.espera.quien); }
+    else marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(t) + 1) + ' de ' + e.total + ' · ' + esc(t.texto) + '</span>';
     $('pestanas').innerHTML = '<span class="pest' + (pest === 'adm' ? ' activa' : '') + '">En Administración</span>' +
       '<span class="pest' + (pest === 'esp' ? ' activa' : '') + '">En espera</span>';
     $('i-marca').innerHTML = marca;
@@ -366,44 +435,120 @@
 
   function pintar() {
     var e = estado();
-    pintarPanel(e); pintarTareas(e); pintarAnadir(); pintarInicio(e);
+    pintarPanel(e); pintarTareas(e); pintarInicio(e);
+    if (!$('a-texto') || document.activeElement !== $('a-texto')) pintarAnadir();
   }
 
   function abrirEspera(t) {
     esperaPara = t.id;
-    $('capa-texto').textContent = 'La tarea «' + t.texto + '» queda esperando y el asunto pasa a «En espera». Vuelve a «En Administración» cuando pulses «Ya ha llegado».';
-    $('e-quien').selectedIndex = 0; $('e-motivo').value = '';
+    $('capa-texto').textContent = 'La tarea «' + t.texto + '» queda esperando y el asunto pasa a «En espera». Ese día vuelve solo a «En Administración».';
+    if (t.espera) $('e-quien').value = t.espera.quien; else $('e-quien').selectedIndex = 0;
+    if ($('e-quien').value !== (t.espera ? t.espera.quien : $('e-quien').value)) $('e-quien').selectedIndex = 0;
+    $('e-quien').disabled = !!t.papel;
+    $('e-dia').value = VOLVER;
     $('capa').classList.remove('oculto');
   }
   function cerrarEspera() { esperaPara = null; $('capa').classList.add('oculto'); }
   $('e-cancelar').onclick = cerrarEspera;
   $('e-poner').onclick = function () {
-    var t = tareas.filter(function (x) { return x.id === esperaPara; })[0];
-    if (t) t.espera = { quien: $('e-quien').value, desde: HOY, motivo: $('e-motivo').value.trim() };
+    var t = tarea(esperaPara);
+    if (t) {
+      var antes = t.espera || {};
+      t.espera = { quien: t.papel && antes.quien ? antes.quien : $('e-quien').value, desde: antes.desde || HOY, volver: dia($('e-dia').value || VOLVER), paso: antes.paso };
+    }
     cerrarEspera(); pintar();
   };
 
-  function llegado(id) {
-    var t = tareas.filter(function (x) { return x.id === id; })[0];
-    if (!t) return;
-    delete t.espera; t.hecha = true; menuDe = null; pintar();
-  }
-
   function cerrar() {
-    var e = estado();
-    avisar(e.ahora ? 'En la app avisaría de que ' + (e.total - e.hechas === 1 ? 'queda 1 tarea' : 'quedan ' + (e.total - e.hechas) + ' tareas') + ' sin hacer y dejaría seguir.' : 'En la app, el asunto se cerraría ahora.');
+    var e = estado(), q = e.total - e.hechas;
+    avisar(e.ahora ? 'En la app avisaría de que ' + (q === 1 ? 'queda 1 tarea' : 'quedan ' + q + ' tareas') + ' sin hacer y dejaría seguir.' : 'En la app, el asunto se cerraría ahora.');
   }
   $('b-cerrar-arriba').onclick = cerrar;
-
   $('b-mas').onclick = function (ev) { ev.stopPropagation(); $('menu-cab').classList.toggle('oculto'); };
   $('b-guia').onclick = function () {
     $('menu-cab').classList.add('oculto');
     avisar('En la app avisaría: «Vale para todos los asuntos de ' + $('c-tipo').textContent + ', no solo para este», y abriría el editor de la guía.');
   };
   document.addEventListener('click', function () { $('menu-cab').classList.add('oculto'); if (menuDe) { menuDe = null; pintar(); } });
+
+  /* ---------- mandos ---------- */
   $('m-corto').onclick = function () { modo = 'corto'; empezar(); };
   $('m-largo').onclick = function () { modo = 'largo'; empezar(); };
   $('m-empezar').onclick = empezar;
+  $('m-firmado').onclick = function () {
+    var t = tareas.filter(function (x) { return x.espera && x.espera.paso === 'firmado'; })[0];
+    if (!t) { avisar('Ahora no hay ningún papel a la firma.'); return; }
+    marcar(t, 'firmado'); avisar('Ha llegado el PDF firmado de «' + t.texto + '»: la app lo ve sola y marca el paso.'); pintar();
+  };
+  $('m-sellado').onclick = function () {
+    var t = tareas.filter(function (x) { return x.pideSello; })[0];
+    if (!t) { avisar('Ahora no hay ningún papel esperando su PDF sellado.'); return; }
+    marcar(t, 'registrado'); avisar('Ha llegado el PDF sellado de «' + t.texto + '»: la app lee el sello y marca el paso.'); pintar();
+  };
+  $('m-dia').onclick = function () {
+    var lista = tareas.filter(function (x) { return x.espera && !x.espera.vencida; });
+    if (!lista.length) { avisar('Ahora no hay nada en espera.'); return; }
+    lista.forEach(function (x) { x.espera.vencida = true; });
+    avisar('Ha llegado el día: el asunto vuelve a «En Administración».'); pintar();
+  };
+  function verPantalla(cual) {
+    $('p-asunto').classList.toggle('oculto', cual !== 'asunto');
+    $('p-recorrido').classList.toggle('oculto', cual !== 'recorrido');
+    $('m-asunto').classList.toggle('puesto', cual === 'asunto');
+    $('m-recorrido').classList.toggle('puesto', cual === 'recorrido');
+    $('mandos-asunto').style.display = cual === 'asunto' ? 'contents' : 'none';
+    if (cual === 'recorrido') pintarRecorrido(); else pintar();
+  }
+  $('m-asunto').onclick = function () { verPantalla('asunto'); };
+  $('m-recorrido').onclick = function () { verPantalla('recorrido'); };
+
+  /* ---------- el recorrido de un tipo de documento ---------- */
+  function resumen(k) {
+    var r = TIPOS[k];
+    if (r.entra) return 'Nos llega' + (r.registro ? ' · se registra de entrada' : ' · no se registra');
+    return (r.firma === 'Nadie' ? 'Sin firma' : 'Firma: ' + r.firma) + (r.registro ? ' · se registra de salida' : ' · no se registra') +
+      (r.envia ? ' · a ' + r.aquien + ' por ' + r.via : ' · no se envía');
+  }
+  function opciones(lista, valor) { return lista.map(function (x) { return '<option' + (x === valor ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); }
+  function pintarRecorrido() {
+    $('r-lista').innerHTML = Object.keys(TIPOS).map(function (k) {
+      return '<button class="tipo' + (k === tipoElegido ? ' elegido' : '') + '" data-tipo="' + esc(k) + '"><b>' + esc(k) + '</b><span>' + esc(resumen(k)) + '</span></button>';
+    }).join('') + '<p class="nota">Aquí salen cinco tipos de ejemplo. En la app, todos los del centro.</p>';
+    Array.prototype.forEach.call($('r-lista').querySelectorAll('.tipo'), function (b) {
+      b.onclick = function () { tipoElegido = b.dataset.tipo; pintarRecorrido(); };
+    });
+    var r = TIPOS[tipoElegido];
+    $('r-form').innerHTML = '<h2>Recorrido de ' + esc(tipoElegido) + '</h2>' +
+      '<p class="nota">Se escribe una vez y vale para todos los documentos de este tipo, en todos los trámites.</p>' +
+      '<label class="tit">Este papel</label><div class="fila">' +
+        '<label><input type="radio" name="r-entra" value="no"' + (r.entra ? '' : ' checked') + '> Lo hacemos nosotros</label>' +
+        '<label><input type="radio" name="r-entra" value="si"' + (r.entra ? ' checked' : '') + '> Nos llega</label></div>' +
+      (r.entra
+        ? '<label class="tit">Registro en Séneca</label><div class="fila"><label><input type="checkbox" id="r-registro"' + (r.registro ? ' checked' : '') + '> Se registra de entrada</label></div>'
+        : '<div class="dos"><div><label class="tit" for="r-firma">Quién lo firma</label><select id="r-firma">' + opciones(FIRMAS, r.firma) + '</select></div>' +
+          '<div><label class="tit">Registro en Séneca</label><div class="fila"><label><input type="checkbox" id="r-registro"' + (r.registro ? ' checked' : '') + '> Se registra de salida</label></div></div></div>' +
+          '<label class="tit">Envío</label><div class="fila"><label><input type="checkbox" id="r-envia"' + (r.envia ? ' checked' : '') + '> Se envía</label></div>' +
+          (r.envia ? '<div class="dos"><div><label class="tit" for="r-aquien">A quién</label><select id="r-aquien">' + opciones(AQUIEN, r.aquien) + '</select></div>' +
+            '<div><label class="tit" for="r-via">Por dónde</label><select id="r-via">' + opciones(VIAS, r.via) + '</select></div></div>' : '')) +
+      '<div class="vista"><b>Así saldrá en la tarea</b><p><span class="pasos">' +
+        pasosDe(tipoElegido).map(function (p) { return '<span class="paso">' + esc(p.t) + '</span>'; }).join('<span class="flecha">›</span>') + '</span></p>' +
+        '<p>' + esc(resumen(tipoElegido)) + '.</p></div>' +
+      '<div class="pie"><button class="boton principal" id="r-guardar">Guardar</button></div>';
+    function cambia(id, fn) { var x = $(id); if (x) x.onchange = function () { fn(x); pintarRecorrido(); }; }
+    Array.prototype.forEach.call(document.getElementsByName('r-entra'), function (x) {
+      x.onchange = function () {
+        r.entra = x.value === 'si';
+        if (!r.entra) { r.firma = r.firma || 'Nadie'; r.aquien = r.aquien || AQUIEN[0]; r.via = r.via || VIAS[0]; }
+        pintarRecorrido();
+      };
+    });
+    cambia('r-registro', function (x) { r.registro = x.checked; });
+    cambia('r-firma', function (x) { r.firma = x.value; });
+    cambia('r-envia', function (x) { r.envia = x.checked; r.aquien = r.aquien || AQUIEN[0]; r.via = r.via || VIAS[0]; });
+    cambia('r-aquien', function (x) { r.aquien = x.value; });
+    cambia('r-via', function (x) { r.via = x.value; });
+    $('r-guardar').onclick = function () { avisar('En la app se guardaría. En esta prueba ya vale: vuelve a «Pantalla del asunto» y mira las tareas de ' + tipoElegido + '.'); };
+  }
 
   empezar();
 })();
