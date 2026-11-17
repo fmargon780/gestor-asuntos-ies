@@ -81,6 +81,7 @@
   .inicio table { width: 100%; min-width: 640px; border-collapse: collapse; background: #fff; border: 1px solid #dde3ea; }
   .inicio th { text-align: left; font-size: 11px; letter-spacing: .05em; color: #5b6774; padding: 8px 12px; border-bottom: 1px solid #dde3ea; }
   .inicio td { padding: 10px 12px; }
+  .aviso-linea { background: #fde9c8; color: #8a4b00; border: 1px solid #ecc866; border-radius: 14px; padding: 3px 12px; font-size: 13px; font-weight: 700; margin: 0 0 8px; }
   .pest { display: inline-block; border-radius: 14px; padding: 3px 12px; font-size: 13px; font-weight: 600; background: #e6ebf1; color: #44515f; margin-right: 6px; }
   .pest.activa { background: #1f4e79; color: #fff; }
   .marca { border-radius: 12px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
@@ -175,6 +176,7 @@
 
 <div class="inicio">
   <h2>Así sale este asunto en Inicio</h2>
+  <div id="i-avisos"></div>
   <div id="pestanas"></div>
   <div class="tabla-caja"><table>
     <thead><tr><th>PLAZO</th><th>TERCERO</th><th>TIPO</th><th>POR DÓNDE VA</th><th>LE TOCA A</th></tr></thead>
@@ -429,6 +431,9 @@
     else marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(t) + 1) + ' de ' + e.total + ' · ' + esc(t.texto) + '</span>';
     $('pestanas').innerHTML = '<span class="pest' + (pest === 'adm' ? ' activa' : '') + '">En Administración</span>' +
       '<span class="pest' + (pest === 'esp' ? ' activa' : '') + '">En espera</span>';
+    var porReclamar = e.lista.filter(function (x) { return !x.hecha && x.espera && x.espera.vencida; }).length;
+    $('i-avisos').innerHTML = porReclamar ? '<button class="aviso-linea" id="i-reclamar">' + (porReclamar === 1 ? '1 espera por reclamar' : porReclamar + ' esperas por reclamar') + '</button>' : '';
+    if ($('i-reclamar')) $('i-reclamar').onclick = function () { avisar('En la app, Inicio enseñaría solo los asuntos que tienen una espera por reclamar. Aquí es este.'); };
     $('i-marca').innerHTML = marca;
     $('i-toca').textContent = toca;
   }
