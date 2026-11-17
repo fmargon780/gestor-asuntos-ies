@@ -98,7 +98,7 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 699 | `docs/699-ASUNTO-SIN-HITOS-PANTALLA.md` | PENDIENTE (17-nov-2026) | Necesita la fila 698 |
 | 700 | `docs/700-ASUNTO-SIN-HITOS-EN-INICIO.md` | PENDIENTE (17-nov-2026) | Necesita la fila 699 |
 | 701 | `docs/701-GUIA-COMO-LISTA-DE-TAREAS.md` | PENDIENTE (17-nov-2026) | Necesita la fila 700 |
-| 702 | `docs/702-ESPERA-EN-LA-TAREA.md` | EN DISEÑO (17-nov-2026) | tema 692 |
+| 702 | `docs/702-ESPERA-EN-LA-TAREA.md` | PENDIENTE (17-nov-2026) | Necesita la fila 701 |
 | 703 | `docs/703-TAREA-DE-PAPEL.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 704 | `docs/704-PAPEL-FIRMA-Y-REGISTRO.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 705 | `docs/705-PAPEL-ENVIAR.md` | EN DISEÑO (17-nov-2026) | tema 692 |

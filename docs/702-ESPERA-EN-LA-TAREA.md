@@ -15,7 +15,7 @@ Idea de Francisco: un aviso en Inicio «N esperas por reclamar».
 - **Al llegar el día, el asunto vuelve solo a «En Administración».** El panel dice «Toca volver a mirarlo: <tarea>». Bajo la tarea: «Se espera a <quién> desde el <día>. Tocaba volver a mirarlo el <día>.», y «Cambiar el día» pasa a decir «Seguir esperando…». En Inicio, «Por dónde va» dice **«Reclamar a <quién> · espera desde el <día>»**.
 - **Aviso de Inicio «N esperas por reclamar»:** uno solo para todo Inicio, con su cuenta, en la línea de avisos donde hoy sale «N listos para enviar». Al pulsarlo, Inicio enseña solo esos asuntos, con «Ver todo» para volver. Sin ventana que salte ni sonido.
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - «Qué día volver a mirarlo» nace vacío y es obligatorio para poner la espera.
 - La lista de «A quién esperamos» es la misma de hoy en «Esperando a…».
 - El «Esperando a…» de la cabecera no sale en un asunto sin hitos: se espera desde la tarea.
