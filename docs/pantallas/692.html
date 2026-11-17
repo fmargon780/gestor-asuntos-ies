@@ -38,8 +38,9 @@
   .panel.espera { background: #efe6fa; border-color: #c6aee6; }
   .panel.listo { background: #e2f4e6; border-color: #9fd3ab; }
   .panel .cuenta { font-size: 13px; color: #44515f; white-space: nowrap; }
-  .rotulo { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #5b6774; margin: 14px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #dde3ea; }
+  .rotulo { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #1c2733; background: #e3e9f0; border-left: 4px solid #1f4e79; border-radius: 4px; margin: 16px 0 7px; padding: 5px 10px; }
   .rotulo:first-child { margin-top: 2px; }
+  .tarea.bajo-rotulo { margin-left: 22px; }
   .tarea { border: 1px solid #e3e8ee; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; position: relative; }
   .tarea.ahora { background: #fff7e0; border-color: #ecc866; }
   .tarea.hecha { background: #f6f8fa; color: #6a7683; }
@@ -362,11 +363,12 @@
 
   function pintarTareas(e) {
     var caja = $('tareas');
+    var hayRotulo = false;
     caja.innerHTML = tareas.map(function (t) {
-      if (t.rotulo) return '<div class="rotulo">' + esc(t.rotulo) + '</div>';
+      if (t.rotulo) { hayRotulo = true; return '<div class="rotulo">' + esc(t.rotulo) + '</div>'; }
       var ahora = e.ahora && e.ahora.id === t.id;
       var viva = t.espera && !t.espera.vencida;
-      var clase = 'tarea' + (t.hecha ? ' hecha' : (viva ? ' esperando' : (ahora ? ' ahora' : '')));
+      var clase = 'tarea' + (hayRotulo ? ' bajo-rotulo' : '') + (t.hecha ? ' hecha' : (viva ? ' esperando' : (ahora ? ' ahora' : '')));
       var boton = t.papel ? (t.espera || t.pideSello ? '' : botonDe(t)) : '';
       return '<div class="' + clase + '" data-id="' + t.id + '">' +
         '<div class="tarea-fila">' +
