@@ -261,6 +261,9 @@
     'js/ficha-campos-lista-vacia.js',
     'js/baja-matricula-guia.js',
     'js/baja-matricula.js',
+    // Fila 698: la ventana «Recorrido» del tipo de documento y la pasada que pone de acuerdo los tipos. Después de js/ajustes-centro.js y js/plantillas.js.
+    'js/recorrido-tipo-ventana.js',
+    'js/recorrido-tipo-acuerdo.js',
     // Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js.
     'js/actividades.js',
     'js/actividades-formulario.js',

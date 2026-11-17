@@ -64,6 +64,8 @@ App.pintarTiposDeDocumento = function () {
       (textoDefecto ? '<span class="suave"> · texto: ' + U.escapar(textoDefecto) + '</span>' : '') +
       (window.TiposDocumentoCortos && TiposDocumentoCortos.de(nombre)
         ? '<span class="suave"> · corto: ' + U.escapar(TiposDocumentoCortos.de(nombre)) + '</span>' : '') +
+      /* Fila 698: en gris, «sin recorrido» hasta que se guarda el suyo. */
+      (window.RecorridoTipo && !RecorridoTipo.tiene(nombre) ? '<span class="suave tarjeta-tipo-sin-recorrido"> · sin recorrido</span>' : '') +
       /* Fila 627: «Extracto propio» o «Extracto general» (js/asunto-extracto-ajustes.js). */
       (window.AsuntoExtractoAjustes && AsuntoExtractoAjustes.textoDeTarjeta(nombre)
         ? '<span class="suave tarjeta-tipo-extracto"> · ' + AsuntoExtractoAjustes.textoDeTarjeta(nombre) + '</span>' : '');
@@ -72,6 +74,7 @@ App.pintarTiposDeDocumento = function () {
       { texto: 'Campos del nombre', onclick: function () { if (window.DocCampos) DocCampos.editar(nombre); } },
       { texto: 'Texto por defecto', onclick: function () { App.editarTextoPorDefectoDocumento(nombre); } },
       { texto: 'Nombre corto', onclick: function () { if (window.TiposDocumentoCortos) TiposDocumentoCortos.editar(nombre); } },
+      { texto: 'Recorrido', onclick: function () { if (window.RecorridoTipoVentana) RecorridoTipoVentana.editar(nombre); } },   /* fila 698 */
       { texto: 'Extracto de este tipo', onclick: function () { if (window.AsuntoExtractoAjustes) AsuntoExtractoAjustes.editarDelTipo(nombre); } },
       { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));

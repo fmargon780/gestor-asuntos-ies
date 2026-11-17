@@ -481,3 +481,7 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 .texto-cond-cuadro select { width: 100%; }
 .texto-cond-botones { display: flex; gap: 8px; justify-content: flex-end; }
 .texto-cond-aviso:empty { display: none; }
+
+/* Fila 698: la ventana «Recorrido» de un tipo de documento. */
+.rt-opcion { display: inline-block; margin: 2px 14px 2px 0; }
+.rt-vista { margin-top: 12px; }

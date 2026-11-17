@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '698', fecha: '2026-11-17', texto: 'En Ajustes, en cada tipo de documento, un nuevo «Recorrido»: dices una vez si el papel lo hacemos nosotros o nos llega, quién lo firma, si se registra y si se envía (a quién y por dónde). Los tipos RESOLUCIÓN y CERTIFICACION se unen con RESOLUCION y CERTIFICADO, y se añaden ACUERDO, DILIGENCIA, CITACION, AUTORIZACION, RENUNCIA y FICHA ENTREGA LIBROS.' },
   { id: '697', fecha: '2026-11-17', texto: '«Generar documento» siempre lleva, tras las plantillas del tipo, «Otra plantilla…» (todas las del centro, buscando al escribir) y «+ Nueva plantilla…». Ya no sale el aviso de que el tipo no tiene plantillas.' },
   { id: '695', fecha: '2026-11-17', texto: 'Arriba, junto al teléfono, «Generar documento» y «Enviar» están siempre a la vista: ya no hace falta crear una tarea antes.' },
   { id: '647', fecha: '2026-11-17', texto: 'Al registrar un documento y en «Traer datos», la ventana de Windows vuelve a abrirse en su carpeta.' },
