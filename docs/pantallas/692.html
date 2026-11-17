@@ -25,9 +25,6 @@
   .boton[disabled] { opacity: .45; cursor: default; }
   .chip { background: #dfe9f5; color: #1f4e79; border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
   .chip.numero { background: #fff; border: 1px solid #9aa7b5; color: #44515f; }
-  .marca-guia { margin: 12px 0 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .marca-guia label { background: #fff; border: 1px solid #cfd6df; border-radius: 8px; padding: 8px 14px; display: inline-flex; gap: 10px; align-items: center; }
-  .marca-guia small, .nota { color: #5b6774; font-size: 13px; }
   .columnas { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; margin-top: 10px; align-items: start; }
   @media (max-width: 820px) { .columnas { grid-template-columns: 1fr; } }
   .tarjeta { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 14px 16px; }
@@ -60,6 +57,12 @@
   .menu button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 6px; }
   .menu button:hover { background: #eef2f7; }
   .menu button[disabled] { color: #9aa7b5; cursor: default; background: none; }
+  .mas-caja { position: relative; }
+  .menu.menu-cab { left: 0; right: auto; top: 38px; min-width: 210px; }
+  .menu-titulo { font-size: 11px; font-weight: 700; color: #6a7683; padding: 6px 10px 2px; border-top: 1px solid #e3e8ee; margin-top: 4px; }
+  .anadir-caja { border: 1px dashed #cfd6df; border-radius: 8px; padding: 10px 12px; width: 100%; }
+  .anadir-caja label { display: block; font-size: 12px; font-weight: 700; margin: 0 0 3px; }
+  .anadir-caja input { display: block; width: 100%; max-width: 380px; margin-bottom: 8px; }
   .anadir { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .anadir input { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; font: inherit; }
   .bloque { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; font-weight: 600; color: #44515f; }
@@ -103,6 +106,14 @@
     <span class="chip" id="c-tipo">AULA DE CONVIVENCIA</span>
     <span class="chip numero">A26-0141</span>
     <h1>Aguilar Ponce, Pablo 2100002</h1>
+    <span class="mas-caja"><button class="boton" id="b-mas" aria-label="Más del asunto">⋯</button>
+      <div class="menu menu-cab oculto" id="menu-cab">
+        <button disabled>Cambiar el asunto</button><button disabled>Índice del expediente</button><button disabled>Marcar como reservado</button>
+        <button id="b-guia">Cambiar la guía…</button>
+        <div class="menu-titulo">COPIAR</div>
+        <button disabled>Asunto</button><button disabled>NIE</button><button disabled>Nombre</button>
+        <button disabled>Borrar el asunto</button>
+      </div></span>
     <span class="hueco"></span>
     <button class="boton" disabled>Generar documento ▾</button>
     <button class="boton" disabled>Enviar ▾</button>
@@ -110,11 +121,6 @@
     <button class="boton" disabled>Ruta</button>
     <span class="chip numero" id="c-plazo">Plazo del asunto: 24-nov</span>
     <button class="boton principal" id="b-cerrar-arriba">Cerrar el asunto</button>
-  </div>
-
-  <div class="marca-guia">
-    <label><input type="checkbox" disabled> Los cambios en las tareas van también a la guía</label>
-    <small>de <span id="c-tipo2">AULA DE CONVIVENCIA</span> · Apagada: lo que añadas o cambies se queda solo en este asunto.</small>
   </div>
 
   <div class="columnas">
@@ -196,6 +202,25 @@
     ]
   };
 
+  var QUE = {
+    'Generar documento': { accion: 'Generar documento', boton: 'Generar documento' },
+    'Poner a la firma': { accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
+    'Registrar': { accion: 'Registrar', boton: 'Registrar' },
+    'Enviar · Correo electrónico': { accion: 'Enviar', boton: 'Enviar correo' },
+    'Enviar · Séneca': { accion: 'Enviar', boton: 'Enviar por Séneca' },
+    'Añadir documento': { accion: 'Añadir documento', boton: 'Añadir documento' },
+    'Rellenar datos del asunto': { accion: 'Rellenar datos del asunto', boton: 'Rellenar' },
+    'Copiar a otra carpeta': { accion: 'Copiar a otra carpeta', boton: '' },
+    'Llamar': { accion: 'Llamar', boton: '📞 Apuntar llamada' },
+    'Grabar o cambiar datos': { accion: 'Grabar o cambiar datos', boton: 'Grabado' },
+    'Entregar': { accion: 'Entregar', boton: 'Entregado' },
+    'Recoger': { accion: 'Recoger', boton: 'Recogido' },
+    'Publicar': { accion: 'Publicar', boton: 'Publicado' },
+    'Cobrar o pagar': { accion: 'Cobrar o pagar', boton: 'Apuntar cobro o pago' },
+    'Comprobar': { accion: 'Comprobar', boton: 'Está bien' },
+    'Archivar': { accion: 'Archivar', boton: 'Archivado' },
+    'Otra cosa': { accion: '', boton: '' }
+  };
   var modo = 'corto', tareas = [], menuDe = null, esperaPara = null, anadiendo = false, n = 0;
   function $(id) { return document.getElementById(id); }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -204,7 +229,7 @@
     var origen = modo === 'corto' ? CORTO : LARGO;
     tareas = JSON.parse(JSON.stringify(origen.tareas));
     menuDe = null; esperaPara = null; anadiendo = false;
-    ['c-tipo', 'c-tipo2', 'c-tipo3'].forEach(function (id) { $(id).textContent = origen.tipo; });
+    ['c-tipo', 'c-tipo3'].forEach(function (id) { $(id).textContent = origen.tipo; });
     $('m-corto').classList.toggle('puesto', modo === 'corto');
     $('m-largo').classList.toggle('puesto', modo === 'largo');
     pintar();
@@ -297,15 +322,30 @@
     var caja = $('anadir');
     if (!anadiendo) {
       caja.innerHTML = '<button class="boton chico" id="a-abrir">+ Añadir tarea</button>';
-      $('a-abrir').onclick = function () { anadiendo = true; menuDe = null; pintar(); $('a-texto').focus(); };
+      $('a-abrir').onclick = function () { anadiendo = true; menuDe = null; pintar(); $('a-que').focus(); };
       return;
     }
-    caja.innerHTML = '<input id="a-texto" placeholder="Qué hay que hacer"><button class="boton principal chico" id="a-ok">Añadir</button>' +
-      '<button class="boton chico" id="a-no">Cancelar</button>';
+    caja.innerHTML = '<div class="anadir-caja"><label for="a-que">Qué se hace</label>' +
+      '<input id="a-que" list="a-lista" placeholder="Escribe qué o dónde: «correo», «llamar»…">' +
+      '<datalist id="a-lista">' + Object.keys(QUE).map(function (k) { return '<option value="' + esc(k) + '">'; }).join('') + '</datalist>' +
+      '<label for="a-texto">Nombre de la tarea (te lo propone la app; puedes cambiarlo)</label>' +
+      '<input id="a-texto">' +
+      '<button class="boton principal chico" id="a-ok" disabled>Añadir</button> ' +
+      '<button class="boton chico" id="a-no">Cancelar</button>' +
+      '<p class="nota">Irá solo a este asunto: la guía no cambia.</p></div>';
+    var propuesto = '';
+    function mirar() { $('a-ok').disabled = !$('a-texto').value.trim(); }
+    $('a-que').oninput = function () {
+      var k = this.value;
+      if (QUE[k] && (!$('a-texto').value.trim() || $('a-texto').value === propuesto)) { propuesto = k.split(' · ')[0]; $('a-texto').value = propuesto; }
+      mirar();
+    };
+    $('a-texto').oninput = mirar;
     function anadir() {
       var v = $('a-texto').value.trim();
       if (!v) { $('a-texto').focus(); return; }
-      tareas.push({ id: 'n' + (++n), texto: v, accion: '', aqui: true });
+      var q = QUE[$('a-que').value] || { accion: '', boton: '' };
+      tareas.push({ id: 'n' + (++n), texto: v, accion: q.accion, boton: q.boton, firma: !!q.firma, aqui: true });
       anadiendo = false; pintar();
     }
     $('a-ok').onclick = anadir;
@@ -355,7 +395,12 @@
   }
   $('b-cerrar-arriba').onclick = cerrar;
 
-  document.addEventListener('click', function () { if (menuDe) { menuDe = null; pintar(); } });
+  $('b-mas').onclick = function (ev) { ev.stopPropagation(); $('menu-cab').classList.toggle('oculto'); };
+  $('b-guia').onclick = function () {
+    $('menu-cab').classList.add('oculto');
+    avisar('En la app avisaría: «Vale para todos los asuntos de ' + $('c-tipo').textContent + ', no solo para este», y abriría el editor de la guía.');
+  };
+  document.addEventListener('click', function () { $('menu-cab').classList.add('oculto'); if (menuDe) { menuDe = null; pintar(); } });
   $('m-corto').onclick = function () { modo = 'corto'; empezar(); };
   $('m-largo').onclick = function () { modo = 'largo'; empezar(); };
   $('m-empezar').onclick = empezar;
