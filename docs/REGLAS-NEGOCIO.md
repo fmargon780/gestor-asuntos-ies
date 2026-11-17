@@ -291,3 +291,4 @@ Cada una con su fecha y de dónde sale.
 ## Generar y enviar sin tarea
 
 - (17-nov-2026, fila 695) Generar un documento y enviar un correo o un mensaje de Séneca no exigen crear ni elegir una tarea: hay dos botones siempre a la vista en la cabecera del asunto, y usarlos no marca nada solo. Las tareas siguen, pero no son la puerta obligada. Es un paso atrás a propósito sobre el tema 650, mientras el sistema se asienta. Francisco: «Eso de que le pide crear una tarea es lo que más le está molestando y que creo que es lo que más obstaculiza.» «Sí, por favor. Hagámoslo así.»
+- (17-nov-2026, fila 697) «Generar documento ▾» nunca se queda sin salida: tras las plantillas del tipo ofrece siempre «Otra plantilla…» (todas las del centro) y «+ Nueva plantilla…». Dicho por Francisco: «si al mostrar todas las plantillas del centro y no hay ninguna que se adecúe a la que necesito, puedo crear una plantilla nueva?». Usar una plantilla de otro tipo no la asocia al tipo del asunto.
