@@ -50,6 +50,7 @@ Claude Code.
 Es **el gestor de asuntos del centro**: crea, nombra y archiva las carpetas de cada gestión
 administrativa, en el Dropbox del centro.
 
+**Plan en marcha (17-nov-2026): `docs/PLAN-2026-11.md`.** Lo nuevo solo entra con fecha de uso, en pequeño y de uno en uno; las reglas de hitos, tareas y documentos solo cambian en sus etapas.
 **No es** la base de datos de alumnado (proyecto aparte, `fmargon780/bd-alumnado-ies`). Solo
 comparten `RegAlum.csv` y `ALUMNADO-BD.json` (hoy lo hace esa base de datos; después, el Centro de datos: el gestor acepta el de `generado` más reciente).
 
