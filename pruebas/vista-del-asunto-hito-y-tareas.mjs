@@ -13,7 +13,7 @@
       comunicar se encienden.
    8. «+ Añadir tarea» abre el formulario; añadir deja la tarea en la lista sin abrir nada; «Cancelar» lo cierra.
    9. Hito sin tareas: «Este hito no tiene tareas» y «+ Añadir tarea».
-  10. Asunto sin hitos: mensaje, «+ Añadir hito», «Escribir la guía de <tipo>» y la línea de aviso; sin «Comunicar»;
+  10. Asunto sin hitos: mensaje, «+ Añadir hito», «Escribir la guía de <tipo>» (sin línea de aviso desde la fila 695); sin «Comunicar»;
       «+ Añadir documento» apagado con su línea; tras crear el primer hito, se enciende.
   11. «+ Añadir documento» de la carpeta: «¿De qué tarea es?» (hito actual elegido, tarea que espera y «Tarea nueva» al final;
       al cambiar de hito cambian las tareas; «Cancelar» no añade nada); «Tarea nueva» crea una tarea hecha con el nombre del tipo.
@@ -281,9 +281,9 @@ await comprobar('14. cada línea dice de qué hito es', pagina.evaluate(() => {
 /* ---------- 10: un asunto sin hitos ---------- */
 console.log('--- 10. un asunto sin hitos ---');
 await abrir('Imprenta Sol');
-await comprobar('10. el mensaje, «+ Añadir hito», «Escribir la guía de PEDIDO» y la línea de aviso, en ese orden',
+await comprobar('10. el mensaje, «+ Añadir hito», y «Escribir la guía de PEDIDO», en ese orden (fila 695: ya no sale la línea «crea antes el hito»)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-guia > *')).map((e) => e.innerText.trim().replace(/\s+/g, ' ').slice(0, 26))),
-  ['Este asunto no tiene hitos', '+ Añadir hito', 'Escribir la guía de PEDIDO', 'Para generar, comunicar o ']);
+  ['Este asunto no tiene hitos', '+ Añadir hito', 'Escribir la guía de PEDIDO']);
 await comprobar('10. no hay fila de hitos ni «Comunicar» de arriba',
   pagina.evaluate(() => [document.getElementById('ficha-tira').children.length, Array.from(document.querySelectorAll('#ficha-acciones button')).filter((b) => b.offsetParent && /Comunicar|Generar documento/.test(b.textContent)).length]), [0, 0]);
 await pagina.locator('#ficha-plegables .plegable-cab', { hasText: 'Documentos de la carpeta' }).click();
