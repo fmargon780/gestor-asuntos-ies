@@ -95,7 +95,7 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 691 | Tema: Quitar lo que estorba (etapa «Quitar» de `docs/PLAN-2026-11.md`, con su lista). Solo limpieza de pantallas y textos, sin cambiar reglas. Junta las ideas 689 y 684 (decir «vincular» y no «colgar» en lo que quede). [orden: 6 · APARCADO: sale del calendario para que quepa el papel con recorrido; después del 8-dic] | DECIDIDA (17-nov-2026 · tema) | |
 | 692 | Tema: El molde nuevo, asunto sin hitos (`docs/PLAN-2026-11.md`, `docs/notas-diseno/692.md`): el asunto es una lista de tareas y un panel, y el papel lleva su recorrido. Primer trámite: el aula de convivencia (581). [orden: 1 · AHORA: es el cimiento de lo demás] | EN DISEÑO (17-nov-2026) | instrucciones escritas (filas 698 a 706); falta que Francisco las lea |
 | 698 | `docs/698-RECORRIDO-DEL-TIPO-DE-DOCUMENTO.md` | PENDIENTE (17-nov-2026) | tema 692 |
-| 699 | `docs/699-ASUNTO-SIN-HITOS-PANTALLA.md` | EN DISEÑO (17-nov-2026) | tema 692 |
+| 699 | `docs/699-ASUNTO-SIN-HITOS-PANTALLA.md` | PENDIENTE (17-nov-2026) | Necesita la fila 698 |
 | 700 | `docs/700-ASUNTO-SIN-HITOS-EN-INICIO.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 701 | `docs/701-GUIA-COMO-LISTA-DE-TAREAS.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 702 | `docs/702-ESPERA-EN-LA-TAREA.md` | EN DISEÑO (17-nov-2026) | tema 692 |

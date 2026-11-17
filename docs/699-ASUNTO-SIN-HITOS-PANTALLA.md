@@ -22,7 +22,7 @@ De «+ Añadir tarea» en una línea: «Sí, me vale.»
 - «Cerrar el asunto» con tareas sin hacer avisa de cuántas quedan y deja seguir.
 - Desaparecen de la tarea, en estos asuntos: «Qué se hace» (las diecisiete acciones), «Dónde se hace», «A quién» y «Qué documento».
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - Al marcar la casilla en un tipo que ya tiene guía con hitos, esa guía se guarda sin usarse y vuelve si se desmarca. Los asuntos nuevos nacen con la lista de tareas vacía hasta la fila 701.
 - «Anotar» escribe una nota corta que se ve debajo de la tarea; «Cambiar» cambia la frase; «Borrar» pide confirmación.
 - Un documento se guarda o se añade en estos asuntos sin decir de qué tarea es (regla del 16-nov-2026, idea 680).
