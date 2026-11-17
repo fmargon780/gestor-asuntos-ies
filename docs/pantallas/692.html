@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba 692 · Asunto sin hitos</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Roboto, "Segoe UI", Arial, sans-serif; font-size: 15px; color: #1c2733; background: #f3f5f9; }
+  button { font: inherit; cursor: pointer; }
+  .mandos { background: #7a4a00; color: #fff; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; }
+  .mandos strong { font-weight: 600; }
+  .mandos button { background: #fff3; color: #fff; border: 1px solid #fff8; border-radius: 14px; padding: 3px 12px; }
+  .mandos button.puesto { background: #fff; color: #7a4a00; font-weight: 600; }
+  .pantalla { padding: 16px 20px 8px; }
+  .cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .cabecera .boton { padding: 6px 10px; font-size: 14px; }
+  .cabecera h1 { font-size: 19px; margin: 0; }
+  .cabecera .hueco { flex: 1; }
+  .boton { background: #fff; border: 1px solid #cfd6df; border-radius: 8px; padding: 7px 14px; color: #1c2733; }
+  .boton:hover { background: #eef2f7; }
+  .boton.principal { background: #1f4e79; border-color: #1f4e79; color: #fff; }
+  .boton.principal:hover { background: #173b5c; }
+  .boton.chico { padding: 4px 10px; font-size: 13px; }
+  .boton[disabled] { opacity: .45; cursor: default; }
+  .chip { background: #dfe9f5; color: #1f4e79; border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  .chip.numero { background: #fff; border: 1px solid #9aa7b5; color: #44515f; }
+  .marca-guia { margin: 12px 0 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .marca-guia label { background: #fff; border: 1px solid #cfd6df; border-radius: 8px; padding: 8px 14px; display: inline-flex; gap: 10px; align-items: center; }
+  .marca-guia small, .nota { color: #5b6774; font-size: 13px; }
+  .columnas { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; margin-top: 10px; align-items: start; }
+  @media (max-width: 820px) { .columnas { grid-template-columns: 1fr; } }
+  .tarjeta { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 14px 16px; }
+  .panel { border-radius: 8px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 12px; border: 1px solid; }
+  .panel .texto { flex: 1; min-width: 200px; }
+  .panel .texto b { font-size: 16px; }
+  .panel .texto span { display: block; font-size: 13px; color: #44515f; margin-top: 2px; }
+  .panel.toca { background: #e3eefb; border-color: #a9c6e8; }
+  .panel.espera { background: #efe6fa; border-color: #c6aee6; }
+  .panel.listo { background: #e2f4e6; border-color: #9fd3ab; }
+  .panel .cuenta { font-size: 13px; color: #44515f; white-space: nowrap; }
+  .rotulo { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #5b6774; margin: 14px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #dde3ea; }
+  .rotulo:first-of-type { margin-top: 2px; }
+  .tarea { border: 1px solid #e3e8ee; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; position: relative; }
+  .tarea.ahora { background: #fff7e0; border-color: #ecc866; }
+  .tarea.hecha { background: #f6f8fa; color: #6a7683; }
+  .tarea.esperando { background: #f7f1fd; border-color: #c6aee6; }
+  .tarea-fila { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tarea-fila input[type=checkbox] { width: 17px; height: 17px; margin: 0; }
+  .tarea-texto { font-weight: 600; }
+  .tarea.hecha .tarea-texto { font-weight: 400; }
+  .etq { font-size: 11px; font-weight: 700; background: #dfe9f5; color: #1f4e79; border-radius: 10px; padding: 1px 8px; }
+  .etq.aqui { background: #eee; color: #555; }
+  .tarea-fila .hueco { flex: 1; }
+  .quien { font-size: 12px; color: #6a7683; }
+  .tarea-espera { margin: 6px 0 0 25px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: #5a3d86; }
+  .puntos { border: 0; background: none; font-size: 18px; line-height: 1; padding: 2px 8px; border-radius: 6px; color: #44515f; }
+  .puntos:hover { background: #e6ebf1; }
+  .menu { position: absolute; right: 8px; top: 36px; background: #fff; border: 1px solid #cfd6df; border-radius: 8px; box-shadow: 0 6px 18px #0003; z-index: 5; min-width: 170px; padding: 4px; }
+  .menu button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 6px; }
+  .menu button:hover { background: #eef2f7; }
+  .menu button[disabled] { color: #9aa7b5; cursor: default; background: none; }
+  .anadir { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .anadir input { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid #cfd6df; border-radius: 8px; font: inherit; }
+  .bloque { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; font-weight: 600; color: #44515f; }
+  .bloque small { font-weight: 400; color: #6a7683; }
+  .inicio { margin: 6px 20px 24px; }
+  .inicio h2 { font-size: 14px; margin: 14px 0 6px; color: #44515f; }
+  .inicio table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; overflow: hidden; }
+  .tabla-caja { overflow-x: auto; margin-top: 6px; }
+  .inicio table { min-width: 640px; }
+  .inicio th { text-align: left; font-size: 11px; letter-spacing: .05em; color: #5b6774; padding: 8px 12px; border-bottom: 1px solid #dde3ea; }
+  .inicio td { padding: 10px 12px; }
+  .pest { display: inline-block; border-radius: 14px; padding: 3px 12px; font-size: 13px; font-weight: 600; background: #e6ebf1; color: #44515f; margin-right: 6px; }
+  .pest.activa { background: #1f4e79; color: #fff; }
+  .marca { border-radius: 12px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+  .marca.toca { background: #dfe9f5; color: #1f4e79; }
+  .marca.espera { background: #e9defa; color: #5a3d86; }
+  .marca.listo { background: #d9f0de; color: #1e6b33; }
+  .capa { position: fixed; inset: 0; background: #0006; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .cuadro { background: #fff; border-radius: 12px; padding: 18px 20px; width: 100%; max-width: 460px; }
+  .cuadro h3 { margin: 0 0 8px; }
+  .cuadro label { display: block; font-weight: 600; margin: 12px 0 4px; }
+  .cuadro select, .cuadro input { width: 100%; padding: 8px 10px; border: 1px solid #cfd6df; border-radius: 8px; font: inherit; }
+  .cuadro .pie { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .aviso { position: fixed; right: 16px; bottom: 16px; background: #1e6b33; color: #fff; padding: 10px 14px; border-radius: 8px; max-width: min(340px, calc(100vw - 32px)); z-index: 30; }
+  .oculto { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="mandos">
+  <strong>Mandos de la prueba (no son de la app):</strong>
+  <button id="m-corto" class="puesto">Trámite corto</button>
+  <button id="m-largo">Trámite largo, con rótulos</button>
+  <button id="m-empezar">Volver a empezar</button>
+  <span>Datos inventados. No guarda nada.</span>
+</div>
+
+<div class="pantalla">
+  <div class="cabecera">
+    <button class="boton" disabled>← Volver</button>
+    <span class="chip" id="c-tipo">AULA DE CONVIVENCIA</span>
+    <span class="chip numero">A26-0141</span>
+    <h1>Aguilar Ponce, Pablo 2100002</h1>
+    <span class="hueco"></span>
+    <button class="boton" disabled>Generar documento ▾</button>
+    <button class="boton" disabled>Enviar ▾</button>
+    <button class="boton" disabled>📞</button>
+    <button class="boton" disabled>Ruta</button>
+    <span class="chip numero" id="c-plazo">Plazo del asunto: 24-nov</span>
+    <button class="boton principal" id="b-cerrar-arriba">Cerrar el asunto</button>
+  </div>
+
+  <div class="marca-guia">
+    <label><input type="checkbox" disabled> Los cambios en las tareas van también a la guía</label>
+    <small>de <span id="c-tipo2">AULA DE CONVIVENCIA</span> · Apagada: lo que añadas o cambies se queda solo en este asunto.</small>
+  </div>
+
+  <div class="columnas">
+    <div class="tarjeta">
+      <div id="panel"></div>
+      <div id="tareas"></div>
+      <div class="anadir" id="anadir"></div>
+    </div>
+    <div>
+      <div class="bloque">▸ 📋 Datos <small>NIE 2100002 · 2º de E.S.O. · Unidad 2º B</small></div>
+      <div class="bloque">▸ 👥 Personas y entidades relacionadas</div>
+      <div class="bloque">▸ 📁 Documentos de la carpeta</div>
+      <div class="bloque">▸ 📝 Registro</div>
+      <div class="bloque">▸ 🗂️ Otros asuntos de este tercero</div>
+      <p class="nota">Estos cinco bloques siguen como hoy. Aquí no se abren.</p>
+    </div>
+  </div>
+</div>
+
+<div class="inicio">
+  <h2>Así sale este asunto en Inicio</h2>
+  <div id="pestanas"></div>
+  <div class="tabla-caja"><table>
+    <thead><tr><th>PLAZO</th><th>TERCERO</th><th>TIPO</th><th>POR DÓNDE VA</th><th>LE TOCA A</th></tr></thead>
+    <tbody><tr>
+      <td>24-nov</td><td><b>Aguilar Ponce, Pablo 2100002</b></td>
+      <td><span class="chip" id="c-tipo3">AULA DE CONVIVENCIA</span></td>
+      <td id="i-marca"></td><td id="i-toca"></td>
+    </tr></tbody>
+  </table></div>
+</div>
+
+<div class="capa oculto" id="capa">
+  <div class="cuadro">
+    <h3>Esperando a…</h3>
+    <p class="nota" id="capa-texto"></p>
+    <label for="e-quien">A quién esperamos</label>
+    <select id="e-quien">
+      <option>Familia</option><option>Tercero</option><option>Dirección</option>
+      <option>Jefatura</option><option>Secretaría</option><option>Tutor/a del grupo</option>
+    </select>
+    <label for="e-motivo">Motivo <span style="font-weight:400">(opcional)</span></label>
+    <input id="e-motivo" placeholder="Por ejemplo: que traiga el impreso firmado">
+    <div class="pie">
+      <button class="boton" id="e-cancelar">Cancelar</button>
+      <button class="boton principal" id="e-poner">Poner en espera</button>
+    </div>
+  </div>
+</div>
+
+<div class="aviso oculto" id="aviso"></div>
+
+<script>
+(function () {
+  var HOY = '17-nov';
+  var CORTO = {
+    tipo: 'AULA DE CONVIVENCIA',
+    tareas: [
+      { id: 't1', texto: 'Recibir el aviso de Jefatura', accion: 'Añadir documento', boton: 'Añadir documento' },
+      { id: 't2', texto: 'Generar la comunicación a la familia', accion: 'Generar documento', boton: 'Generar documento' },
+      { id: 't3', texto: 'Poner a la firma de Dirección', accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
+      { id: 't4', texto: 'Enviar la comunicación a la familia', accion: 'Enviar', boton: 'Enviar correo' }
+    ]
+  };
+  var LARGO = {
+    tipo: 'BAJA MATRICULA',
+    tareas: [
+      { rotulo: 'Recibir el encargo' },
+      { id: 'l1', texto: 'Recibir el encargo de Dirección', accion: 'Añadir documento', boton: 'Añadir documento' },
+      { id: 'l2', texto: 'Comprobar los datos del alumno', accion: 'Comprobar', boton: 'Está bien' },
+      { rotulo: 'Preparar la resolución' },
+      { id: 'l3', texto: 'Generar la resolución de baja', accion: 'Generar documento', boton: 'Generar documento' },
+      { id: 'l4', texto: 'Poner a la firma de Dirección', accion: 'Poner a la firma', boton: 'Poner a la firma', firma: true },
+      { id: 'l5', texto: 'Registrar la salida', accion: 'Registrar', boton: 'Registrar' },
+      { rotulo: 'Comunicar y cerrar' },
+      { id: 'l6', texto: 'Grabar la baja en Séneca', accion: 'Grabar o cambiar datos', boton: 'Grabado' },
+      { id: 'l7', texto: 'Enviar la resolución a la familia', accion: 'Enviar', boton: 'Enviar correo' },
+      { id: 'l8', texto: 'Archivar la copia en el expediente', accion: 'Archivar', boton: 'Archivado' }
+    ]
+  };
+
+  var modo = 'corto', tareas = [], menuDe = null, esperaPara = null, anadiendo = false, n = 0;
+  function $(id) { return document.getElementById(id); }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function empezar() {
+    var origen = modo === 'corto' ? CORTO : LARGO;
+    tareas = JSON.parse(JSON.stringify(origen.tareas));
+    menuDe = null; esperaPara = null; anadiendo = false;
+    ['c-tipo', 'c-tipo2', 'c-tipo3'].forEach(function (id) { $(id).textContent = origen.tipo; });
+    $('m-corto').classList.toggle('puesto', modo === 'corto');
+    $('m-largo').classList.toggle('puesto', modo === 'largo');
+    pintar();
+  }
+
+  function soloTareas() { return tareas.filter(function (t) { return !t.rotulo; }); }
+  function estado() {
+    var lista = soloTareas();
+    var hechas = lista.filter(function (t) { return t.hecha; }).length;
+    var esperando = lista.filter(function (t) { return t.espera && !t.hecha; })[0] || null;
+    var ahora = lista.filter(function (t) { return !t.hecha; })[0] || null;
+    return { total: lista.length, hechas: hechas, esperando: esperando, ahora: ahora, lista: lista };
+  }
+
+  function avisar(texto) {
+    var a = $('aviso');
+    a.textContent = texto; a.classList.remove('oculto');
+    clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.classList.add('oculto'); }, 3500);
+  }
+
+  function pintarPanel(e) {
+    var p = $('panel'), html;
+    var cuenta = '<span class="cuenta">' + e.hechas + ' de ' + e.total + ' tareas hechas</span>';
+    if (!e.ahora) {
+      html = '<div class="panel listo"><div class="texto"><b>Listo para cerrar</b><span>Todas las tareas están hechas.</span></div>' + cuenta +
+        '<button class="boton principal" id="p-cerrar">Cerrar el asunto</button></div>';
+    } else if (e.esperando) {
+      var x = e.esperando.espera;
+      html = '<div class="panel espera"><div class="texto"><b>Esperando a ' + esc(x.quien) + ' desde el ' + esc(x.desde) + '</b>' +
+        '<span>' + esc(e.esperando.texto) + (x.motivo ? ' · ' + esc(x.motivo) : '') + '</span></div>' + cuenta +
+        '<button class="boton" id="p-llegado">Ya ha llegado</button></div>';
+    } else {
+      html = '<div class="panel toca"><div class="texto"><b>Ahora toca: ' + esc(e.ahora.texto) + '</b>' +
+        '<span>Le toca a Administración.</span></div>' + cuenta + '</div>';
+    }
+    p.innerHTML = html;
+    if ($('p-cerrar')) $('p-cerrar').onclick = cerrar;
+    if ($('p-llegado')) $('p-llegado').onclick = function () { llegado(e.esperando.id); };
+  }
+
+  function pintarTareas(e) {
+    var caja = $('tareas');
+    caja.innerHTML = tareas.map(function (t) {
+      if (t.rotulo) return '<div class="rotulo">' + esc(t.rotulo) + '</div>';
+      var ahora = e.ahora && e.ahora.id === t.id && !t.espera;
+      var clase = 'tarea' + (t.hecha ? ' hecha' : (t.espera ? ' esperando' : (ahora ? ' ahora' : '')));
+      return '<div class="' + clase + '" data-id="' + t.id + '">' +
+        '<div class="tarea-fila">' +
+          '<input type="checkbox" class="t-casilla"' + (t.hecha ? ' checked' : '') + ' aria-label="Marcar hecha">' +
+          '<span class="tarea-texto">' + esc(t.texto) + '</span>' +
+          (t.accion ? '<span class="etq">' + esc(t.accion) + '</span>' : '') +
+          (t.aqui ? '<span class="etq aqui">solo aquí</span>' : '') +
+          '<span class="hueco"></span>' +
+          (t.hecha ? '<span class="quien">Francisco · ' + HOY + '</span>' : '') +
+          (!t.hecha && !t.espera && t.boton ? '<button class="boton principal chico t-accion">' + esc(t.boton) + '</button>' : '') +
+          '<button class="puntos t-puntos" aria-label="Más de esta tarea">⋮</button>' +
+        '</div>' +
+        (t.espera && !t.hecha ? '<div class="tarea-espera">Esperando a ' + esc(t.espera.quien) + ' desde el ' + esc(t.espera.desde) +
+          (t.espera.motivo ? ' · ' + esc(t.espera.motivo) : '') +
+          ' <button class="boton chico t-llegado">Ya ha llegado</button>' +
+          '<button class="boton chico t-dejar">Dejar de esperar</button></div>' : '') +
+        (menuDe === t.id ? '<div class="menu">' +
+          (!t.hecha && !t.espera ? '<button class="t-esperar">Esperando a…</button>' : '') +
+          '<button disabled>Anotar</button><button disabled>Cambiar</button><button disabled>Borrar</button></div>' : '') +
+      '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call(caja.querySelectorAll('.tarea'), function (el) {
+      var id = el.dataset.id;
+      var t = tareas.filter(function (x) { return x.id === id; })[0];
+      el.querySelector('.t-casilla').onchange = function () { t.hecha = this.checked; if (t.hecha) delete t.espera; menuDe = null; pintar(); };
+      var ac = el.querySelector('.t-accion');
+      if (ac) ac.onclick = function () {
+        menuDe = null;
+        if (t.firma) { t.espera = { quien: 'Dirección', desde: HOY, motivo: 'el PDF firmado' }; avisar('En la app: el documento queda a la firma y la tarea espera sola el PDF firmado.'); }
+        else { t.hecha = true; avisar('En la app se abriría «' + t.boton + '». Aquí la tarea queda hecha.'); }
+        pintar();
+      };
+      el.querySelector('.t-puntos').onclick = function (ev) { ev.stopPropagation(); menuDe = menuDe === id ? null : id; pintar(); };
+      var es = el.querySelector('.t-esperar');
+      if (es) es.onclick = function () { menuDe = null; abrirEspera(t); };
+      var ll = el.querySelector('.t-llegado');
+      if (ll) ll.onclick = function () { llegado(id); };
+      var dj = el.querySelector('.t-dejar');
+      if (dj) dj.onclick = function () { delete t.espera; pintar(); };
+    });
+  }
+
+  function pintarAnadir() {
+    var caja = $('anadir');
+    if (!anadiendo) {
+      caja.innerHTML = '<button class="boton chico" id="a-abrir">+ Añadir tarea</button>';
+      $('a-abrir').onclick = function () { anadiendo = true; menuDe = null; pintar(); $('a-texto').focus(); };
+      return;
+    }
+    caja.innerHTML = '<input id="a-texto" placeholder="Qué hay que hacer"><button class="boton principal chico" id="a-ok">Añadir</button>' +
+      '<button class="boton chico" id="a-no">Cancelar</button>';
+    function anadir() {
+      var v = $('a-texto').value.trim();
+      if (!v) { $('a-texto').focus(); return; }
+      tareas.push({ id: 'n' + (++n), texto: v, accion: '', aqui: true });
+      anadiendo = false; pintar();
+    }
+    $('a-ok').onclick = anadir;
+    $('a-texto').onkeydown = function (ev) { if (ev.key === 'Enter') anadir(); };
+    $('a-no').onclick = function () { anadiendo = false; pintar(); };
+  }
+
+  function pintarInicio(e) {
+    var pest, marca, toca;
+    if (!e.ahora) { pest = 'adm'; marca = '<span class="marca listo">Listo para cerrar</span>'; toca = 'Administración'; }
+    else if (e.esperando) { pest = 'esp'; marca = '<span class="marca espera">Esperando a ' + esc(e.esperando.espera.quien) + ' · ' + esc(e.esperando.texto) + '</span>'; toca = esc(e.esperando.espera.quien); }
+    else { pest = 'adm'; marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(e.ahora) + 1) + ' de ' + e.total + ' · ' + esc(e.ahora.texto) + '</span>'; toca = 'Administración'; }
+    $('pestanas').innerHTML = '<span class="pest' + (pest === 'adm' ? ' activa' : '') + '">En Administración</span>' +
+      '<span class="pest' + (pest === 'esp' ? ' activa' : '') + '">En espera</span>';
+    $('i-marca').innerHTML = marca;
+    $('i-toca').textContent = toca;
+  }
+
+  function pintar() {
+    var e = estado();
+    pintarPanel(e); pintarTareas(e); pintarAnadir(); pintarInicio(e);
+  }
+
+  function abrirEspera(t) {
+    esperaPara = t.id;
+    $('capa-texto').textContent = 'La tarea «' + t.texto + '» queda esperando y el asunto pasa a «En espera». Vuelve a «En Administración» cuando pulses «Ya ha llegado».';
+    $('e-quien').selectedIndex = 0; $('e-motivo').value = '';
+    $('capa').classList.remove('oculto');
+  }
+  function cerrarEspera() { esperaPara = null; $('capa').classList.add('oculto'); }
+  $('e-cancelar').onclick = cerrarEspera;
+  $('e-poner').onclick = function () {
+    var t = tareas.filter(function (x) { return x.id === esperaPara; })[0];
+    if (t) t.espera = { quien: $('e-quien').value, desde: HOY, motivo: $('e-motivo').value.trim() };
+    cerrarEspera(); pintar();
+  };
+
+  function llegado(id) {
+    var t = tareas.filter(function (x) { return x.id === id; })[0];
+    if (!t) return;
+    delete t.espera; t.hecha = true; menuDe = null; pintar();
+  }
+
+  function cerrar() {
+    var e = estado();
+    avisar(e.ahora ? 'En la app avisaría de que ' + (e.total - e.hechas === 1 ? 'queda 1 tarea' : 'quedan ' + (e.total - e.hechas) + ' tareas') + ' sin hacer y dejaría seguir.' : 'En la app, el asunto se cerraría ahora.');
+  }
+  $('b-cerrar-arriba').onclick = cerrar;
+
+  document.addEventListener('click', function () { if (menuDe) { menuDe = null; pintar(); } });
+  $('m-corto').onclick = function () { modo = 'corto'; empezar(); };
+  $('m-largo').onclick = function () { modo = 'largo'; empezar(); };
+  $('m-empezar').onclick = empezar;
+
+  empezar();
+})();
+</script>
+</body>
+</html>
