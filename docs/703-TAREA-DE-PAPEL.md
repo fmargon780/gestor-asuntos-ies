@@ -19,7 +19,7 @@ Eligió «1»: si la plantilla de documento dice una firma distinta de la de su 
 - **Si la plantilla de documento dice una firma distinta de la de su tipo, manda la plantilla.** Si no dice nada, vale la del tipo.
 - Lo que solo se mira no es un papel: «Comprobar el DNI de quien firma» es una tarea sin papel, con casilla. Hay papel solo si algo se guarda en la carpeta.
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - «Generar documento»: si el tipo de asunto tiene una sola plantilla de ese tipo de documento, la abre; si tiene varias, deja elegir; si no tiene ninguna, ofrece «Otra plantilla…» y «+ Nueva plantilla…», como el botón de la cabecera.
 - Un documento de ese tipo que llega al asunto por otro camino (la cabecera, la bandeja, la carpeta) se une solo a la tarea de papel si hay una sola de ese tipo sin documento; si hay varias, se queda sin tarea.
 - Cuántas firmas hacen falta: una, o dos con «Secretaría, con visto bueno de Dirección».
