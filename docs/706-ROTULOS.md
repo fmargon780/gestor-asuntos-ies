@@ -13,7 +13,7 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 705.
 - **El rótulo solo nombra.** No tiene casilla, plazo, responsable, espera ni marca de hecho, y no cuenta en «N de M tareas hechas».
 - Corto y largo son el mismo molde, con o sin rótulos.
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - En el editor de la guía, «+ Añadir rótulo» está junto a «+ Añadir tarea», y el rótulo se sube y se baja con las flechas, como una tarea.
 - Los rótulos se ponen solo en la guía, no desde el asunto. Una tarea añadida en el asunto va al final.
 - Un rótulo sin ninguna tarea a la vista debajo (por «Solo si») tampoco sale.
