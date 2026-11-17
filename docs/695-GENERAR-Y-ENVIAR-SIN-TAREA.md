@@ -48,4 +48,10 @@
 - Envía un correo desde ahí: sale el cuadro de siempre y, al enviar, queda en el Registro.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (17-nov-2026), APROBADA a la primera:
+  - Cabecera con los dos botones, con hitos y sin hitos, sin el texto «crea antes el hito y su tarea»: coincide.
+  - Generar sin tarea (documento «sin tarea» en la carpeta, nota en el Registro, hitos sin cambios): coincide.
+  - Enviar → Correo y Séneca se abren; Séneca queda en el Registro sin marcar tareas: coincide. El envío real de un correo: no lo he podido ver (el script de Gmail de la demo es antiguo).
+  - Tarea «Enviar correo» de un hito sigue con su botón: coincide. Una tarea «Generar documento»: no lo he podido ver (no había ninguna en la demo).
+  - «Solo consultar»: los dos botones no salen: coincide. A 1366 px no se solapan: coincide (la sesión ajustó el tamaño tras ver que tapaban el «⋯» del nombre).
+  - Lo que hace la app sin pedirlo: nada nuevo. Sobre la idea 689: el texto «crea antes el hito y su tarea» de un asunto sin hitos ya no existe; el de «colgar un documento» (tema 691) sigue.

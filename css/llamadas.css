@@ -60,3 +60,9 @@ summary.ll-cuenta { cursor: pointer; }
 .ficha-llamada .boton { padding: 6px 8px; }
 .ficha-linea1 { flex-wrap: nowrap; }
 .ficha-linea1 .ficha-marcas { flex: 0 0 auto; }
+
+/* Fila 695: «Generar documento ▾» y «Enviar ▾» de la cabecera, junto al teléfono. */
+.ficha-generar-enviar { display: inline-flex; gap: 6px; }
+.ficha-generar-enviar { gap: 4px; }
+.ficha-generar-enviar .boton { padding: 6px 8px; font-size: 13px; white-space: nowrap; }
+.ficha-linea1 .ficha-volver-fila { flex: 0 1 auto; min-width: 0; }

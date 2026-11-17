@@ -314,6 +314,7 @@
     'js/llamadas-personas.js',
     'js/llamadas-ventana.js',
     'js/llamadas-vista.js',
+    'js/generar-enviar-cabecera.js',   // fila 695: «Generar documento ▾» y «Enviar ▾» de la cabecera del asunto (después de js/ficha-menus.js)
     'js/tarea-hecha.js',   // fila 671
     'js/tarea-hecha-ventana.js',
     'js/avisos-exposicion.js',   // fila 672 (después de js/avisos-linea.js)
