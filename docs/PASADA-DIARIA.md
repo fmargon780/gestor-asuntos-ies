@@ -1,1 +1,1 @@
-Última pasada completa: 17-nov-2026 11:00 (Madrid) · 36 min · con fallos (exportar-asuntos, ya fallaba en main; fila 696) · commit 5cc3da5
+Última pasada completa: 17-nov-2026 (Madrid) · 33 min · verde (402 de 402; `navegador` falló en la pasada por la fila 698, se adaptó y pasa) · commit de la rama fila 698
