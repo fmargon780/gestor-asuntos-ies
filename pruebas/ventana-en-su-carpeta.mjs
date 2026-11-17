@@ -30,7 +30,7 @@ const r = await pagina.evaluate(async () => {
     return [fichero];
   };
   // (a) envuelta por las fechas de Drive
-  FechasOrigen.fijar({});
+  FechasOrigen.fijar({ 'x.pdf': { c: 1, f: 1 } });
   const envuelta = FechasOrigen.envolver(verdadera, '');
   sal.distinta = envuelta !== verdadera;
   sal.a = { h: (await Carpetas.elegirFichero(envuelta)) === fichero, llamadas: llamadas.slice(), avisos: avisos.slice() };
@@ -43,6 +43,8 @@ const r = await pagina.evaluate(async () => {
   // (c) «Traer datos»
   llamadas = []; avisos.length = 0;
   App.E.datos = doble;
+  // el cuadro se cierra sin elegir (si no, «Traer datos» pregunta qué es el fichero y espera)
+  window.showOpenFilePicker = async o => { llamadas.push(o.startIn === verdadera); const e = new Error('x'); e.name = 'AbortError'; throw e; };
   await TraerDatos.traer();
   sal.c = { llamadas: llamadas.slice() };
   SoloConsulta.guardar(false);
