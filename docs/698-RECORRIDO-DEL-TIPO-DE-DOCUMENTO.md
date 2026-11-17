@@ -55,4 +55,12 @@ De la pantalla «Recorrido de un tipo de documento»: «Lo veo completo.»
 - Mirar que RESOLUCION y CERTIFICADO salen una sola vez.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (17-nov-2026, agente nuevo, por navegador en local): APROBADA a la primera.
+  - «Recorrido» en el ⋮ junto a los otros: coincide.
+  - Preguntas de la ventana, con las palabras de la pantalla de prueba, cambiando según «Lo hacemos nosotros» / «Nos llega»: coincide.
+  - «Así saldrá en la tarea» cambia al momento: coincide.
+  - Tras guardar y recargar sigue ahí: no lo he podido ver (la copia de pruebas se reinicia al recargar); sin recargar, sí. Prueba `recorrido-del-tipo` lo comprueba en disco y recargando el módulo.
+  - Un solo RESOLUCION y un solo CERTIFICADO y los seis añadidos: coincide.
+  - «sin recorrido» en gris y se quita al guardar: coincide (el gris no se miró con detalle).
+  - Nada más ha cambiado; consola sin errores. Lo que hace la app y el texto no pide: nada.
+- Decisión de Claude Code: la unión de tipos mueve las plantillas de documento, el extracto propio y el recorrido; no mueve los campos del nombre ni el texto por defecto de un tipo unido (si RESOLUCIÓN o CERTIFICACION los tenían, hay que repasarlos en Ajustes). La pasada ordena la lista de tipos al guardarla; `pruebas/navegador.mjs` elige ahora SOLICITUD a mano.

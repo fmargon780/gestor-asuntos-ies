@@ -58,6 +58,8 @@
     // tipos. Van aquí: los usan nombres.js y nombres-topes.js al montar.
     'js/numeros.js',
     'js/tipos-cortos.js',
+    // Fila 698: el recorrido de cada tipo de documento (solo se guarda).
+    'js/recorrido-tipo.js',
     'js/fecha-de-registro.js',   // fila 573
     'js/fecha-de-registro-plazos.js',
     'js/documentos-datos.js',

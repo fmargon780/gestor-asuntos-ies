@@ -514,6 +514,7 @@ await comprobar('y es un PDF, así que se enseña en un marco',
    10-sep-2026 y no depende de la fecha: se escribe a mano. Y la fecha
    de partida es la de HOY, no una fija, así que aquí se ponen las dos
    a un valor conocido antes de comprobar el nombre. */
+await pagina.selectOption('#doc-tipo', 'SOLICITUD');   /* fila 698: la pasada de tipos guarda la lista ordenada, ya no sale SOLICITUD la primera */
 await pagina.fill('#doc-fecha', '2026-09-07');
 await pagina.fill('#doc-curso', '26-27');
 await pagina.waitForTimeout(100);
