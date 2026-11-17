@@ -27,7 +27,41 @@ var GenerarEnviarCabecera = (function () {
     } catch (e) { U.fallo('No he podido generar el documento', e); }
   }
 
-  /* El menú de plantillas se monta cuando están leídas; si el asunto ya no es el de la ficha, no se toca nada. */
+  /* «Otra plantilla…» (fila 697): todas las plantillas de documento del centro que están en uso, con el buscador de
+     siempre (js/plantilla-buscar.js), en el cuadro compartido #capa. Generar con una de otro tipo no la asocia a este. */
+  function otraPlantilla(a, b) {
+    var capa = document.getElementById('capa');
+    if (!capa || !window.PlantillaBuscar || !capa.classList.contains('oculto')) return;   /* un solo cuadro a la vez */
+    var aceptar = document.getElementById('cuadro-aceptar');
+    document.getElementById('cuadro-titulo').textContent = 'Otra plantilla';
+    document.getElementById('cuadro-cuerpo').innerHTML = '<p class="explica">Busca entre todas las plantillas del centro.</p><div id="pd-otra-caja" class="pd-buscar-caja"></div>';
+    aceptar.classList.add('oculto');
+    var cancelar = document.getElementById('cuadro-cancelar');
+    cancelar.textContent = 'Cancelar';
+    cancelar.classList.remove('oculto');   /* un cuadro anterior sin «Cancelar» lo deja escondido */
+    capa.classList.remove('oculto');
+    function cerrar() {
+      capa.classList.add('oculto');
+      aceptar.classList.remove('oculto');
+      document.getElementById('cuadro-cancelar').onclick = null;
+    }
+    document.getElementById('cuadro-cancelar').onclick = cerrar;
+    PlantillaBuscar.montar(document.getElementById('pd-otra-caja'), function (p) { cerrar(); generar(a, p, b); });
+  }
+
+  /* «+ Nueva plantilla…» (fila 697): el editor de plantillas de documento de siempre, con el tipo del asunto. Al
+     guardar, el menú se vuelve a montar y la nueva sale entre las del tipo. */
+  function nuevaPlantilla(a, b) {
+    var tipo = PlantillasDocumento.tipoDelAsunto ? PlantillasDocumento.tipoDelAsunto(a) : '';
+    var preset = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === tipo; })[0] || null;
+    PlantillasDocumento.abrirCuadroDePlantillaDoc(null, preset, function () {
+      if (window.Plantillas && Plantillas.olvidar) Plantillas.olvidar();
+      if (b.isConnected) montarGenerar(a, b, ++turno);
+    }).catch(function (e) { U.fallo('No he podido abrir el editor de plantillas', e); });
+  }
+
+  /* El menú de plantillas se monta cuando están leídas; si el asunto ya no es el de la ficha, no se toca nada.
+     Siempre lleva, tras las del tipo, «Otra plantilla…» y «+ Nueva plantilla…» (fila 697). */
   async function montarGenerar(a, b, mio) {
     var lista = [];
     try { lista = await PlantillasDocumento.plantillasDelAsunto(a); } catch (e) { lista = []; }
@@ -35,7 +69,13 @@ var GenerarEnviarCabecera = (function () {
     var opciones = lista.map(function (p) {
       return { texto: p.nombre, alPulsar: function () { generar(a, p, b); } };
     });
-    if (!opciones.length) opciones = [{ texto: 'Este tipo de asunto no tiene plantillas de documento', deshabilitado: true }];
+    opciones.push({ texto: 'Otra plantilla…', alPulsar: function () { otraPlantilla(a, b); } });
+    opciones.push({ texto: '+ Nueva plantilla…', alPulsar: function () { nuevaPlantilla(a, b); } });
+    var viejo = b.parentNode;   /* al volver a montar (tras «+ Nueva plantilla…») se quita el menú anterior */
+    if (viejo && viejo.classList && viejo.classList.contains('ficha-menu-envoltorio')) {
+      viejo.parentNode.insertBefore(b, viejo);
+      viejo.parentNode.removeChild(viejo);
+    }
     FichaMenus.montar(b, opciones);
   }
 

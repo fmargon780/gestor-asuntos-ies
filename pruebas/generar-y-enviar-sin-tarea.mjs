@@ -101,7 +101,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(200);
 
 await pagina.click('#ficha-generar-enviar .ficha-generar-cab');
-await comprobarQue('«Generar documento ▾» abre su menú (plantillas del tipo, o el aviso de que no hay)',
+await comprobarQue('«Generar documento ▾» abre su menú',
   pagina.evaluate(() => document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion').length >= 1));
 await pagina.keyboard.press('Escape');
 
