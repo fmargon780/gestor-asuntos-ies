@@ -18,7 +18,7 @@ De la pantalla «Recorrido de un tipo de documento»: «Lo veo completo.»
 - **Los tipos se ponen de acuerdo, una vez y sin preguntar:** RESOLUCIÓN (con tilde) se une con RESOLUCION y CERTIFICACION con CERTIFICADO, también en las plantillas que los usan; ACUERDO, DILIGENCIA, CITACION, AUTORIZACION, RENUNCIA y FICHA ENTREGA LIBROS se añaden a la lista del centro.
 - Esta fila solo guarda el recorrido. No cambia nada más de la app: lo usan las filas siguientes.
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - Un tipo que nunca ha tenido recorrido sale como «Nos llega · no se registra», y en la lista de tipos lleva al lado, en gris, «sin recorrido» hasta que se guarda el suyo.
 - La app no rellena sola ningún recorrido a partir de las plantillas.
 
