@@ -15,7 +15,7 @@ Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del
 - En el asunto, el menú **«⋯» de la cabecera** lleva **«Cambiar la guía…»**. Avisa: «Vale para todos los asuntos de <tipo>, no solo para este», y abre el editor de la guía.
 - Las tareas que vienen de la guía no llevan marca; las añadidas en el asunto llevan «solo aquí».
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - Una tarea que se añade a la guía llega también a los asuntos abiertos de ese tipo; cambiar o borrar una tarea de la guía no los toca (regla del 6-nov-2026, «añadir no es cambiar»).
 - Las tareas de la guía se ordenan con las flechas de subir y bajar, como hoy.
 - Una tarea con «Solo si» y el campo vacío sale en amarillo con «Falta: <campo>», como hoy.
