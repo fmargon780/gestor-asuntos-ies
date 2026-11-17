@@ -218,7 +218,7 @@
 
 <script>
 (function () {
-  var HOY = '17-nov', VOLVER = '2026-11-19';
+  var HOY = '17-nov', VOLVER = '2026-11-19', FIRMA = '2026-11-18';
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   var FIRMAS = ['Nadie', 'Administración', 'Secretaría', 'Secretaría, con visto bueno de Dirección', 'Dirección', 'Jefatura de Estudios'];
   var AQUIEN = ['Familia', 'Interesado', 'Quien lo pide', 'Tutor/a del grupo', 'Personas relacionadas'];
@@ -293,8 +293,8 @@
     if (!p) return;
     if (aMano) { marcar(t, p.k); avisar('Paso «' + p.t + '» marcado a mano.'); return; }
     if (p.k === 'firmado') {
-      t.espera = { quien: quienFirma(t.papel), desde: HOY, volver: dia(VOLVER), paso: 'firmado' };
-      avisar('En la app: el documento queda a la firma. Cuando guardes el PDF firmado en la carpeta, el paso se marca solo. Prueba el mando «Llega el PDF firmado».');
+      t.espera = { quien: quienFirma(t.papel), desde: HOY, volver: dia(FIRMA), paso: 'firmado' };
+      avisar('En la app: el documento queda a la firma, y la app propone volver a mirarlo 1 día hábil después (ese número se cambia en Ajustes). Cuando guardes el PDF firmado en la carpeta, el paso se marca solo. Prueba el mando «Llega el PDF firmado».');
     } else if (p.k === 'registrado') {
       t.pideSello = true;
       avisar('En la app: se copia la ruta para registrarlo en Séneca. Cuando guardes el PDF sellado en la carpeta, el paso se marca solo. Prueba el mando «Llega el PDF sellado».');
@@ -470,7 +470,7 @@
     if (t.espera) $('e-quien').value = t.espera.quien; else $('e-quien').selectedIndex = 0;
     if ($('e-quien').value !== (t.espera ? t.espera.quien : $('e-quien').value)) $('e-quien').selectedIndex = 0;
     $('e-quien').disabled = !!t.papel;
-    $('e-dia').value = VOLVER;
+    $('e-dia').value = t.papel ? FIRMA : VOLVER;
     $('capa').classList.remove('oculto');
   }
   function cerrarEspera() { esperaPara = null; $('capa').classList.add('oculto'); }
