@@ -72,7 +72,8 @@
       multiple: true,
       types: [{ description: 'Ficheros CSV de Séneca', accept: { 'text/csv': ['.csv'] } }]
     };
-    if (carpetaInicio) opciones.startIn = carpetaInicio;
+    /* Fila 647: la carpeta de verdad, sin los envoltorios de Drive / solo consultar. */
+    if (carpetaInicio) opciones.startIn = Carpetas.carpetaDeVerdad(carpetaInicio);
     return window.showOpenFilePicker(opciones);
   }
 
@@ -205,7 +206,7 @@
     vigilarElAviso();
   }
 
-  window.TraerDatos = { copiarUno: copiarUno, repasar: repasarLaPantalla };
+  window.TraerDatos = { copiarUno: copiarUno, repasar: repasarLaPantalla, traer: traer };
 
   arrancar();
   if (!document.getElementById('btn-traer-datos')) {

@@ -128,9 +128,24 @@
      se abre el explorador (17-sep-2026, fila 20): la del asunto cuando
      se está en un asunto, y así. Sin ella, se abre donde el navegador
      quiera, como siempre. */
+  /* Fila 647 (17-nov-2026): las carpetas llegan envueltas (fechas de
+     origen de Drive, «solo consultar») y `showOpenFilePicker` solo acepta
+     en `startIn` la carpeta de verdad: con la envuelta da «not a valid
+     enum value of type WellKnownDirectory». Quita los envoltorios, uno
+     tras otro, hasta que no cambie. */
+  function carpetaDeVerdad(h) {
+    for (var i = 0; h && i < 5; i++) {
+      var antes = h;
+      if (window.FechasOrigen && FechasOrigen.crudo) h = FechasOrigen.crudo(h);
+      if (window.SoloConsulta && SoloConsulta.crudo) h = SoloConsulta.crudo(h);
+      if (h === antes) break;
+    }
+    return h;
+  }
+
   async function elegirFichero(carpetaInicio, tipos) {
     var opciones = { multiple: false };
-    if (carpetaInicio) opciones.startIn = carpetaInicio;
+    if (carpetaInicio) opciones.startIn = carpetaDeVerdad(carpetaInicio);
     /* 20-sep-2026, fila 81: para elegir la imagen del membrete, sin
        mezclarla con cualquier fichero (`tipos` es el `types` de
        showOpenFilePicker, por ejemplo para PNG/JPG). */
@@ -173,5 +188,6 @@
   I.avisarEscritura = avisarEscritura;
   I.moverFichero = moverFichero;
   I.elegirFichero = elegirFichero;
+  I.carpetaDeVerdad = carpetaDeVerdad;
   I.copiarFicheroEn = copiarFicheroEn;
 })();
