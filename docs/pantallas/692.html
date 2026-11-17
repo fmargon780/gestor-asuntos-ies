@@ -86,6 +86,10 @@
   .marca { border-radius: 12px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
   .marca.toca { background: #dfe9f5; color: #1f4e79; }
   .marca.espera { background: #e9defa; color: #5a3d86; }
+  .marca.reclamar { background: #fde9c8; color: #8a4b00; }
+  tr.propia td { background: #fbfcfe; }
+  .inicio td { border-bottom: 1px solid #eef1f5; }
+  button.pest { border: 0; }
   .marca.listo { background: #d9f0de; color: #1e6b33; }
   .capa { position: fixed; inset: 0; background: #0006; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
   .cuadro { background: #fff; border-radius: 12px; padding: 18px 20px; width: 100%; max-width: 460px; }
@@ -174,16 +178,12 @@
 </div>
 
 <div class="inicio">
-  <h2>Así sale este asunto en Inicio</h2>
+  <h2>Así sale en Inicio (con otros tres asuntos inventados)</h2>
   <div id="i-avisos"></div>
   <div id="pestanas"></div>
   <div class="tabla-caja"><table>
     <thead><tr><th>PLAZO</th><th>TERCERO</th><th>TIPO</th><th>POR DÓNDE VA</th><th>LE TOCA A</th></tr></thead>
-    <tbody><tr>
-      <td>24-nov</td><td><b>Aguilar Ponce, Pablo 2100002</b></td>
-      <td><span class="chip" id="c-tipo3">AULA DE CONVIVENCIA</span></td>
-      <td id="i-marca"></td><td id="i-toca"></td>
-    </tr></tbody>
+    <tbody id="i-cuerpo"></tbody>
   </table></div>
 </div>
 </div>
@@ -313,7 +313,7 @@
     var origen = modo === 'corto' ? CORTO : LARGO;
     tareas = JSON.parse(JSON.stringify(origen.tareas));
     menuDe = null; esperaPara = null;
-    ['c-tipo', 'c-tipo3'].forEach(function (id) { $(id).textContent = origen.tipo; });
+    $('c-tipo').textContent = origen.tipo;
     $('m-corto').classList.toggle('puesto', modo === 'corto');
     $('m-largo').classList.toggle('puesto', modo === 'largo');
     pintar();
@@ -424,18 +424,38 @@
     $('a-texto').onkeydown = function (ev) { if (ev.key === 'Enter') anadir(); };
   }
 
+  var OTRAS = [
+    { plazo: '20-nov', tercero: 'Benítez Ruiz, Carla 2100017', tipo: 'CERT. MATRICULA', lado: 'adm', vencida: true, marca: '<span class="marca reclamar">Reclamar a Secretaría y Dirección · espera desde el 12-nov</span>', toca: 'Administración' },
+    { plazo: '28-nov', tercero: 'Papelería Lucena S.L. B29000000', tipo: 'COMPRA', lado: 'adm', marca: '<span class="marca toca">Tarea 1 de 4 · Recibir la factura</span>', toca: 'Administración' },
+    { plazo: '2-dic', tercero: 'Cano Mérida, Luis 2100040', tipo: 'BECA', lado: 'esp', marca: '<span class="marca espera">Esperando a Familia · hasta el 25-nov</span>', toca: 'Familia' }
+  ];
+  var pestana = 'adm', ladoPropio = 'adm', soloReclamar = false;
   function pintarInicio(e) {
-    var pest = 'adm', marca, toca = 'Administración', t = e.ahora;
-    if (!t) marca = '<span class="marca listo">Listo para cerrar</span>';
-    else if (e.espera) { pest = 'esp'; marca = '<span class="marca espera">Esperando a ' + esc(t.espera.quien) + ' · hasta el ' + esc(t.espera.volver) + '</span>'; toca = esc(t.espera.quien); }
-    else marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(t) + 1) + ' de ' + e.total + ' · ' + esc(t.texto) + '</span>';
-    $('pestanas').innerHTML = '<span class="pest' + (pest === 'adm' ? ' activa' : '') + '">En Administración</span>' +
-      '<span class="pest' + (pest === 'esp' ? ' activa' : '') + '">En espera</span>';
-    var porReclamar = e.lista.filter(function (x) { return !x.hecha && x.espera && x.espera.vencida; }).length;
-    $('i-avisos').innerHTML = porReclamar ? '<button class="aviso-linea" id="i-reclamar">' + (porReclamar === 1 ? '1 espera por reclamar' : porReclamar + ' esperas por reclamar') + '</button>' : '';
-    if ($('i-reclamar')) $('i-reclamar').onclick = function () { avisar('En la app, Inicio enseñaría solo los asuntos que tienen una espera por reclamar. Aquí es este.'); };
-    $('i-marca').innerHTML = marca;
-    $('i-toca').textContent = toca;
+    var t = e.ahora, propia = { plazo: '24-nov', tercero: 'Aguilar Ponce, Pablo 2100002', tipo: $('c-tipo').textContent, lado: 'adm', toca: 'Administración', propia: true };
+    if (!t) propia.marca = '<span class="marca listo">Listo para cerrar</span>';
+    else if (e.espera) { propia.lado = 'esp'; propia.marca = '<span class="marca espera">Esperando a ' + esc(t.espera.quien) + ' · hasta el ' + esc(t.espera.volver) + '</span>'; propia.toca = t.espera.quien; }
+    else if (t.espera) { propia.vencida = true; propia.marca = '<span class="marca reclamar">Reclamar a ' + esc(t.espera.quien) + ' · espera desde el ' + esc(t.espera.desde) + '</span>'; }
+    else propia.marca = '<span class="marca toca">Tarea ' + (e.lista.indexOf(t) + 1) + ' de ' + e.total + ' · ' + esc(t.texto) + '</span>';
+    if (propia.lado !== ladoPropio) { ladoPropio = propia.lado; pestana = propia.lado; }
+    var filas = [propia].concat(OTRAS);
+    var vencidas = filas.filter(function (f) { return f.vencida; });
+    if (!vencidas.length) soloReclamar = false;
+    function cuantas(l) { return filas.filter(function (f) { return f.lado === l; }).length; }
+    $('i-avisos').innerHTML = vencidas.length && !soloReclamar ? '<button class="aviso-linea" id="i-reclamar">' + (vencidas.length === 1 ? '1 espera por reclamar' : vencidas.length + ' esperas por reclamar') + '</button>' : '';
+    $('pestanas').innerHTML = soloReclamar
+      ? '<span class="pest activa">Solo las esperas por reclamar (' + vencidas.length + ')</span><button class="boton chico" id="i-todo">Ver todo</button>'
+      : '<button class="pest' + (pestana === 'adm' ? ' activa' : '') + '" id="i-adm">En Administración (' + cuantas('adm') + ')</button>' +
+        '<button class="pest' + (pestana === 'esp' ? ' activa' : '') + '" id="i-esp">En espera (' + cuantas('esp') + ')</button>';
+    var visibles = soloReclamar ? vencidas : filas.filter(function (f) { return f.lado === pestana; });
+    $('i-cuerpo').innerHTML = visibles.map(function (f) {
+      return '<tr' + (f.propia ? ' class="propia"' : '') + '><td>' + f.plazo + '</td><td><b>' + esc(f.tercero) + '</b>' + (f.propia ? ' <span class="etq aqui">el asunto de arriba</span>' : '') +
+        '</td><td><span class="chip">' + esc(f.tipo) + '</span></td><td' + (f.propia ? ' id="i-marca"' : '') + '>' + f.marca + '</td><td>' + esc(f.toca) + '</td></tr>';
+    }).join('') || '<tr><td colspan="5" class="quien">No hay ninguno.</td></tr>';
+    function en(id, fn) { if ($(id)) $(id).onclick = function (ev) { ev.stopPropagation(); fn(); pintarInicio(estado()); }; }
+    en('i-reclamar', function () { soloReclamar = true; });
+    en('i-todo', function () { soloReclamar = false; });
+    en('i-adm', function () { pestana = 'adm'; });
+    en('i-esp', function () { pestana = 'esp'; });
   }
 
   function pintar() {
@@ -479,7 +499,7 @@
   /* ---------- mandos ---------- */
   $('m-corto').onclick = function () { modo = 'corto'; empezar(); };
   $('m-largo').onclick = function () { modo = 'largo'; empezar(); };
-  $('m-empezar').onclick = function () { TIPOS = JSON.parse(TIPOS0); n = 0; empezar(); avisar('Todo vuelve a como estaba al abrir la prueba, también los recorridos.'); };
+  $('m-empezar').onclick = function () { TIPOS = JSON.parse(TIPOS0); n = 0; soloReclamar = false; empezar(); avisar('Todo vuelve a como estaba al abrir la prueba, también los recorridos.'); };
   $('m-firmado').onclick = function () {
     var t = tareas.filter(function (x) { return x.espera && x.espera.paso === 'firmado'; })[0];
     if (!t) { avisar('Ahora no hay ningún papel a la firma.'); return; }
