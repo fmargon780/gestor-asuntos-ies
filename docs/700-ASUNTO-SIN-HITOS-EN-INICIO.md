@@ -13,7 +13,7 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 699.
 - La columna Plazo y el número rojo de vencidos usan el plazo del asunto.
 - **Ningún texto dice «hito» en un asunto sin hitos.** Se repasan todos: «Hito N de M» y «Sin hitos» (Inicio y filtro «Situación»), «Hito N» en los documentos de la carpeta, las líneas del Registro, el cuadro de guardar desde la bandeja, «Este asunto no tiene hitos todavía» y «N de M hitos hechos».
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - Un asunto sin ninguna tarea dice «Sin tareas» y va en «En Administración».
 - En el cuadro de guardar un documento desde la bandeja, para un asunto sin hitos no se pregunta hito ni tarea.
 
