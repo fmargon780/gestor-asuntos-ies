@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '695', fecha: '2026-11-17', texto: 'Arriba, junto al teléfono, «Generar documento» y «Enviar» están siempre a la vista: ya no hace falta crear una tarea antes.' },
   { id: '647', fecha: '2026-11-17', texto: 'Al registrar un documento y en «Traer datos», la ventana de Windows vuelve a abrirse en su carpeta.' },
   { id: '686', fecha: '2026-11-16', texto: 'Ya puedes arrastrar un fichero a cualquier tarea o al cuadro de Documentos, y «Añadir documento» abre la ventana sin avisos.' },
   { id: '680', fecha: '2026-11-16', texto: 'Ya se pueden guardar documentos sin elegir hito ni tarea.' },
