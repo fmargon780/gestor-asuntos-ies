@@ -13,7 +13,7 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 703.
 - Cuando se guarda el PDF sellado en la carpeta, la app lee el sello y marca el paso sola.
 - En la espera de una firma no se puede cambiar a quién se espera, y no hay «Ya ha llegado»: llega con el PDF o con «Marcar el paso a mano».
 
-**No se habló y no está en la pantalla de prueba; lo propone Claude y lo aprueba Francisco al leer esto:**
+**No estaba en la pantalla de prueba; lo propuso Claude y Francisco lo aprobó el 17-nov-2026 («1»):**
 - El número está en Ajustes › El centro › «Calendario y responsables», con el texto «Días hábiles para volver a mirar un documento puesto a la firma».
 - Un asunto puede tener dos papeles a la firma o esperando su sello a la vez: cada PDF que llega va a su documento. Si la app no puede saber de cuál es, pregunta, como hoy.
 

@@ -100,7 +100,7 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 701 | `docs/701-GUIA-COMO-LISTA-DE-TAREAS.md` | PENDIENTE (17-nov-2026) | Necesita la fila 700 |
 | 702 | `docs/702-ESPERA-EN-LA-TAREA.md` | PENDIENTE (17-nov-2026) | Necesita la fila 701 |
 | 703 | `docs/703-TAREA-DE-PAPEL.md` | PENDIENTE (17-nov-2026) | Necesita la fila 702 |
-| 704 | `docs/704-PAPEL-FIRMA-Y-REGISTRO.md` | EN DISEÑO (17-nov-2026) | tema 692 |
+| 704 | `docs/704-PAPEL-FIRMA-Y-REGISTRO.md` | PENDIENTE (17-nov-2026) | Necesita la fila 703 |
 | 705 | `docs/705-PAPEL-ENVIAR.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 706 | `docs/706-ROTULOS.md` | EN DISEÑO (17-nov-2026) | tema 692 |
 | 693 | Tema: Hecho, una sola regla (`docs/PLAN-2026-11.md`). Lo que se hace con la app se marca solo; lo que la app no ve, con un botón; el hito se cierra solo con «Deshacer»; el papel que entra se vincula solo o se queda sin marca. Revisa la decisión del 16-nov-2026 de marcar a mano. Junta la idea 682. [orden: 7 · APARCADO: «el papel con su recorrido» ya va dentro del tema 692; lo demás espera] | DECIDIDA (17-nov-2026 · tema) | |
