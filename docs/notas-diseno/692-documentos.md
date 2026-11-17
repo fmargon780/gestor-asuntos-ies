@@ -7,23 +7,21 @@ Código leído en `main`, commit `31cf71b`.
 
 `docs/contexto/DOCUMENTOS.md`, `js/plantillas-documento.js`, `js/hacer-este-hito.js`,
 `js/hacer-este-hito-sello.js`, `js/tarea-firmar.js`, `js/tareas-con-documento.js`,
-`js/documento-a-tarea.js`, `js/ficha-firmas.js`, `js/documentos-tipo-nuevo.js`.
+`js/documento-a-tarea.js`, `js/ficha-firmas.js`, `js/documentos-tipo-nuevo.js`,
+`js/documentos-datos.js`, `js/correo-rastro.js`, `js/hitos-comunicar.js`, `js/sitios.js`.
 
-**Sin leer** (hay que leerlo antes de la instrucción): el envío (`js/correo-enviar.js`,
-`js/correo-rastro.js`, `js/correo-enviado-pdf.js`, `js/seneca-*.js`, `js/sitios.js`,
-`js/hitos-comunicar.js`), `js/registro-sellado.js`, `js/ruta-copia.js`,
-`js/documentos-firmados.js`, `js/documentos-datos.js`, `js/membrete.js` (firmantes). No sé todavía
-si el envío de un documento queda apuntado en el propio documento.
+**Sin leer** (no hace falta para la pantalla de prueba; sí antes de escribir la instrucción):
+`js/correo-enviar.js`, `js/correo-enviado-pdf.js`, `js/seneca-*.js`, `js/registro-sellado.js`,
+`js/ruta-copia.js`, `js/documentos-firmados.js`, `js/membrete.js` (firmantes).
 
 ## Lo que ya existe y sirve para el papel con recorrido
 
 - **El documento ya tiene ficha propia.** `ficha.documentos[<número D26-…>]` guarda tipo, fecha,
   `registros` (código, fecha, fuente «sello» o «listado»), `firmas`, campos, texto e hito
   (`DocumentosDatos.anotar`). Los documentos de antes de la fila 239, sin número, no la tienen.
-- **Dos de las cuatro pruebas ya se leen solas.** Firmado: se cuentan las firmas del PDF
-  (`DocumentosFirmados`, fila 515). Registrado: se lee el sello del PDF y manda el listado de
-  Séneca (`RegistroSellado`, `FechaDeRegistro`, fila 573). Generado: lo hace la app. Enviado: sin
-  mirar.
+- **Tres de los cuatro pasos ya dejan su prueba en esa ficha.** Generado: lo hace la app.
+  Firmado: se cuentan las firmas del PDF (`DocumentosFirmados`, fila 515). Registrado: se lee el
+  sello del PDF y manda el listado de Séneca (`RegistroSellado`, `FechaDeRegistro`, fila 573).
 - **El recorrido existe, pero colgado del hito.** «Hacer este hito» (`js/hacer-este-hito.js`)
   encadena generar → firmar → registrar → enviar. Dónde está parado se guarda en `h.cadena`
   (`esperando-firma`, `esperando-sello`, `listo-para-enviar`): uno solo por hito. La llegada del
@@ -34,6 +32,22 @@ si el envío de un documento queda apuntado en el propio documento.
   y `vistoBueno` (visto en `plantillas.json`). Al generar, el documento recibe su número.
 - **La plantilla de correo ya dice a quién va y qué adjunta:** `para` (familia, interesado, tutor,
   quien lo pide, relacionados, un grupo), `copia`, `oculta` y `adjuntar` (un tipo de documento).
+- **«Por dónde» ya es una lista del centro:** `_GESTOR/sitios.json` (`js/sitios.js`): Correo
+  electrónico, iPasen, Correo postal, En mano, Tablón, Teléfono, Séneca con sus zonas… Solo Correo
+  e iPasen abren un cuadro de envío; los demás se marcan a mano. Vale tal cual para el recorrido.
+
+## El envío (lo que faltaba por mirar)
+
+- **El documento no guarda que se ha enviado.** Al enviar queda una frase en el Registro
+  («Correo enviado a X · con 1 documento: …», `js/correo-rastro.js`) y se marca la tarea de
+  enviar. En `ficha.documentos` no se apunta nada: ni a quién, ni cuándo, ni por dónde.
+- El aviso «listo para enviar» sale de `h.cadena`, no del documento.
+- Para que la tarea de papel diga «enviado» por una prueba, hay que añadir ese dato a la ficha del
+  documento: lo escribe la app cuando el correo sale de verdad; por iPasen, postal o en mano no
+  hay prueba posible y lo marca la persona (con su fecha).
+- Tras enviar, la app ya ofrece «Dejar el asunto esperando a la familia / el tercero»
+  (`EstadoHito.ponerEsperando`): es la espera del molde nuevo, hoy colgada del hito y sin día para
+  volver a mirar.
 
 ## Lo que no existe
 
@@ -45,6 +59,7 @@ si el envío de un documento queda apuntado en el propio documento.
   (cuántas firmas `receta.firmas`, entrada o salida `receta.sentido`, a quién y por dónde
   `receta.a`, `receta.via`, `receta.plantilla`, `donde`).
 - **El estado del papel como una sola cosa.** Se deduce de varias tareas y de `h.cadena`.
+- **«Enviado» como dato del documento** (arriba).
 - La pasada de fondo del sello solo decide sola con **un** hito esperando y **un** papel sellado en
   la carpeta. Con dos papeles en marcha a la vez en un asunto, hoy pregunta.
 
@@ -83,11 +98,11 @@ los asuntos con nombres de alumnado y de personal.
 
 ## Qué significa para el tamaño
 
-- No se parte de cero: las pruebas de firma y de sello, la ficha del documento, el encadenado y
-  quién firma ya están. El trabajo es **cambiar de dueño**: el recorrido pasa de las tareas y las
-  plantillas al tipo de documento, y la parada pasa del hito (`h.cadena`) al documento.
+- No se parte de cero: las pruebas de firma y de sello, la ficha del documento, el encadenado,
+  quién firma y la lista de «por dónde» ya están. El trabajo es **cambiar de dueño**: el recorrido
+  pasa de las tareas y las plantillas al tipo de documento, y la parada pasa del hito (`h.cadena`)
+  al documento.
 - Sobre las cinco o seis filas de `692.md`, el papel con recorrido añade, a ojo, tres: (a) el
   recorrido escrito en el tipo de documento, con los tipos de las plantillas puestos de acuerdo;
-  (b) la tarea de papel en una línea, con su estado sacado de la ficha del documento; (c) la espera
-  con varios papeles a la vez.
-- Estimación sin haber leído el envío. Se afina al leerlo.
+  (b) la tarea de papel en una línea, con su estado sacado de la ficha del documento, y «enviado»
+  apuntado en ella; (c) la espera con varios papeles a la vez.
