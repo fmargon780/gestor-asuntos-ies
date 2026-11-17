@@ -32,6 +32,7 @@ var Carpetas = (function () {
   function avisarEscritura() { return I.avisarEscritura.apply(this, arguments); }
   function moverFichero() { return I.moverFichero.apply(this, arguments); }
   function elegirFichero() { return I.elegirFichero.apply(this, arguments); }
+  function carpetaDeVerdad() { return I.carpetaDeVerdad.apply(this, arguments); }
   function copiarFicheroEn() { return I.copiarFicheroEn.apply(this, arguments); }
 
   /* ---------- ficheros de texto ---------- */
@@ -135,7 +136,7 @@ var Carpetas = (function () {
     fusionarEn: fusionarEnOcupado, contarFicheros: contarFicheros,
     existeFichero: existeFichero, fechaFichero: fechaFichero, nombreLibreConSufijo: nombreLibreConSufijo,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
-    elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
+    elegirFichero: elegirFichero, carpetaDeVerdad: carpetaDeVerdad, copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto, escribirBytes: escribirBytes,
     leerJson: leerJson, guardarJson: guardarJson
   };
