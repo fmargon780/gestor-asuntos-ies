@@ -12,8 +12,8 @@ Código leído en `main`, commit `31cf71b`.
 **Sin leer** (hay que leerlo antes de la instrucción): el envío (`js/correo-enviar.js`,
 `js/correo-rastro.js`, `js/correo-enviado-pdf.js`, `js/seneca-*.js`, `js/sitios.js`,
 `js/hitos-comunicar.js`), `js/registro-sellado.js`, `js/ruta-copia.js`,
-`js/documentos-firmados.js`, `js/documentos-datos.js`. No sé todavía si el envío de un documento
-queda apuntado en el propio documento.
+`js/documentos-firmados.js`, `js/documentos-datos.js`, `js/membrete.js` (firmantes). No sé todavía
+si el envío de un documento queda apuntado en el propio documento.
 
 ## Lo que ya existe y sirve para el papel con recorrido
 
@@ -30,45 +30,64 @@ queda apuntado en el propio documento.
   firmado o del sellado lo hace avanzar (`TareaFirmar.alLlegar`, `HacerEsteHitoSello.resolver`).
 - **Cada tarea señala su documento:** `h.guionDocumento[<tarea>] = { doc, version }`
   (`TareasConDocumento`), también dentro del hito.
-- **La plantilla ya dice de qué tipo de documento es** (`plantillaDoc.tipoDocumento`), y al generar
-  el documento recibe su número.
+- **La plantilla ya dice de qué tipo de documento es y quién firma:** `tipoDocumento`, `firmante`
+  y `vistoBueno` (visto en `plantillas.json`). Al generar, el documento recibe su número.
+- **La plantilla de correo ya dice a quién va y qué adjunta:** `para` (familia, interesado, tutor,
+  quien lo pide, relacionados, un grupo), `copia`, `oculta` y `adjuntar` (un tipo de documento).
 
 ## Lo que no existe
 
 - **Un sitio donde escribir el recorrido de un tipo de documento.** `tipos-documento.json` es una
   lista de nombres. Lo demás del tipo está repartido: campos y texto por defecto en `campos.json`
   (`porTipoDocumento`, `textoPorTipoDocumento`), extracto en `plantillas.json` (`extractosPorTipo`).
-- Hoy el recorrido está escrito a trozos en cada tarea de cada guía: cuántas firmas
-  (`receta.firmas`), entrada o salida (`receta.sentido`), a quién, por dónde y con qué plantilla
-  (`receta.a`, `receta.via`, `receta.plantilla`, `donde`).
+- Hoy el recorrido está escrito a trozos, en tres sitios: en la plantilla de documento (quién
+  firma), en la plantilla de correo (a quién va, qué adjunta) y en cada tarea de cada guía
+  (cuántas firmas `receta.firmas`, entrada o salida `receta.sentido`, a quién y por dónde
+  `receta.a`, `receta.via`, `receta.plantilla`, `donde`).
 - **El estado del papel como una sola cosa.** Se deduce de varias tareas y de `h.cadena`.
 - La pasada de fondo del sello solo decide sola con **un** hito esperando y **un** papel sellado en
   la carpeta. Con dos papeles en marcha a la vez en un asunto, hoy pregunta.
 
-## Lo visto en los datos reales
+## Lo visto en los datos reales (cuenta común, 17-nov-2026)
 
-- `tareas-comunes.json` de la cuenta común (17-nov-2026, 13:31), leído entero. Los recorridos que
-  salen en las tareas escritas por Francisco y Diego:
+Leídos enteros `tareas-comunes.json`, `tipos.json`, `tipos-documento.json`, `campos.json` y
+`plantillas.json`. Los tres últimos los compartió Claude ese día con la cuenta personal de
+Francisco, solo como lector, a petición suya. La carpeta `_GESTOR` entera no se compartió: lleva
+los asuntos con nombres de alumnado y de personal.
+
+- **Tipos de documento: unos sesenta.** La mayoría son papeles que **entran** y no llevan
+  recorrido propio (DNI, LIBRO FAMILIA, SENTENCIA, FACTURA, PRESUPUESTO, PARTE INICIAL…). Los que
+  **produce** el centro son pocos: CERTIFICADO, RESOLUCION, OFICIO, COMUNICACION, NOTIFICACION,
+  CONVOCATORIA, JUSTIFICANTE, REQUERIMIENTO, ESCRITO DE RESPUESTA, CREDENCIAL IPASEN, PEDIDO.
+- **Quién firma, según las 52 plantillas de documento** (contadas a ojo):
+  - Secretaría con el visto bueno de Dirección: los certificados (la gran mayoría).
+  - Dirección sola: resoluciones, oficios, diligencias, autorizaciones, informes.
+  - Jefatura de Estudios: citaciones y la comunicación de una reclamación.
+  - Secretaría sola: pedido, requerimiento, petición de historial.
+  - Administración: justificante de entrega. Nadie: ficha de libros, anexo I.
+  Es decir, cuatro o cinco recorridos de firma distintos, no uno por tipo.
+- **Tipos escritos en las plantillas que no están en la lista del centro:** ACUERDO, CERTIFICACION,
+  DILIGENCIA, CITACION, AUTORIZACION, RENUNCIA, FICHA ENTREGA LIBROS y RESOLUCIÓN con tilde (la
+  lista dice RESOLUCION). Hay que ponerlos de acuerdo antes de colgar el recorrido del tipo.
+- **El mismo tipo no siempre firma igual:** JUSTIFICANTE lo firma Dirección en una plantilla y
+  Administración en otra; CERTIFICADO, Secretaría con visto bueno casi siempre y Dirección sola en
+  una. El recorrido del tipo tiene que ser el de siempre, y la plantilla poder decir otra cosa.
+- **Nadie ha usado lo que ya se puede escribir por tipo de documento:** `extractosPorTipo` está
+  vacío y solo JUSTIFICANTE tiene un campo propio.
+- Recorridos que salen en las tareas escritas por Francisco y Diego (`tareas-comunes.json`):
   - Sale del centro: generar → poner a la firma digital → descargar el firmado → registrar de
     salida («si se remite») → enviar por iPasen o correo, o entregar en mano.
   - Entra en el centro: recibir → comprobar → añadir → registrar de entrada.
   - Papel con sello de tinta: sello redondo, escanear, ajustar tamaño, copia para el interesado.
-  - Acciones usadas: comunicar, añadir, registrar, generar, firmar, pedir, entregar.
-- `tipos.json` de la cuenta común (17-nov-2026, 13:10), leído entero: más de la mitad de los tipos
-  de asunto están desactivados.
-- **Los tipos de documento reales del centro no los he podido ver.** La cuenta común solo comparte
-  `guias.json`, `tareas-comunes.json`, `tipos.json` e `hitos-comunes.json`. Lo único encontrado es
-  una copia del 9-sep-2026 en la cuenta de Francisco, con quince nombres (SOLICITUD, FACTURA,
-  CERTIFICADO, MATRICULA, RESOLUCION, NOTIFICACION, INFORME, ACTA, COMUNICACION, JUSTIFICANTE,
-  PRESUPUESTO, ALBARAN, CONTRATO, RECURSO, ANEXO). Faltan por compartir: `tipos-documento.json`,
-  `campos.json` y `plantillas.json`.
+- `tipos.json`: más de la mitad de los tipos de asunto están desactivados.
 
 ## Qué significa para el tamaño
 
-- No se parte de cero: las pruebas de firma y de sello, la ficha del documento y el encadenado ya
-  están. El trabajo es **cambiar de dueño**: el recorrido pasa de las tareas al tipo de documento,
-  y la parada pasa del hito (`h.cadena`) al documento.
+- No se parte de cero: las pruebas de firma y de sello, la ficha del documento, el encadenado y
+  quién firma ya están. El trabajo es **cambiar de dueño**: el recorrido pasa de las tareas y las
+  plantillas al tipo de documento, y la parada pasa del hito (`h.cadena`) al documento.
 - Sobre las cinco o seis filas de `692.md`, el papel con recorrido añade, a ojo, tres: (a) el
-  recorrido escrito en el tipo de documento; (b) la tarea de papel en una línea, con su estado
-  sacado de la ficha del documento; (c) la espera con varios papeles a la vez.
+  recorrido escrito en el tipo de documento, con los tipos de las plantillas puestos de acuerdo;
+  (b) la tarea de papel en una línea, con su estado sacado de la ficha del documento; (c) la espera
+  con varios papeles a la vez.
 - Estimación sin haber leído el envío. Se afina al leerlo.
