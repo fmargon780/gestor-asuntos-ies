@@ -36,6 +36,9 @@ var GenerarEnviarCabecera = (function () {
     document.getElementById('cuadro-titulo').textContent = 'Otra plantilla';
     document.getElementById('cuadro-cuerpo').innerHTML = '<p class="explica">Busca entre todas las plantillas del centro.</p><div id="pd-otra-caja" class="pd-buscar-caja"></div>';
     aceptar.classList.add('oculto');
+    var cancelar = document.getElementById('cuadro-cancelar');
+    cancelar.textContent = 'Cancelar';
+    cancelar.classList.remove('oculto');   /* un cuadro anterior sin «Cancelar» lo deja escondido */
     capa.classList.remove('oculto');
     function cerrar() {
       capa.classList.add('oculto');

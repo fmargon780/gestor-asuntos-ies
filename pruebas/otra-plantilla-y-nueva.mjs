@@ -86,6 +86,13 @@ await pagina.evaluate(async () => {
 await abrirFicha(MINIMO);
 await pagina.click('#ficha-generar-enviar .ficha-generar-cab');
 await comprobar('tipo sin plantillas: «Otra plantilla…» y «+ Nueva plantilla…», y sin el aviso de antes', opciones(), ['Otra plantilla…', '+ Nueva plantilla…']);
+await pagina.evaluate(() => document.getElementById('cuadro-cancelar').classList.add('oculto'));   /* como lo deja un cuadro sin «Cancelar» */
+await pagina.click('.ficha-menu:not(.oculto) .ficha-menu-opcion >> text=Otra plantilla…');
+await pagina.waitForSelector('.plantilla-buscar-opcion');
+await comprobarQue('el cuadro tiene su botón «Cancelar» a la vista', pagina.evaluate(() => { const c = document.getElementById('cuadro-cancelar'); return !c.classList.contains('oculto') && c.textContent === 'Cancelar'; }));
+await pagina.click('#cuadro-cancelar');
+await comprobarQue('«Cancelar» cierra el cuadro sin generar nada', pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto') && window.__generadas.length === 0));
+await pagina.click('#ficha-generar-enviar .ficha-generar-cab');
 await pagina.click('.ficha-menu:not(.oculto) .ficha-menu-opcion >> text=Otra plantilla…');
 await pagina.waitForSelector('.plantilla-buscar-opcion');
 await comprobar('«Otra plantilla…» enseña las del centro en uso (no las fuera de uso)',
