@@ -8,6 +8,9 @@
    se hace» (js/guias-cuando.js): «Siempre» o «Solo si» un dato de lista del asunto vale tal cosa o el
    tercero es de tal clase.
 
+   Fila 707 (docs/707-COMO-SE-HACE.md): cada tarea puede llevar «Cómo se hace», un texto libre de varias líneas
+   (`comoSeHace`), opcional; el asunto lo enseña desplegable junto a la tarea (js/asunto-sin-hitos.js).
+
    Se guarda como UN paso de la guía del tipo (`listaDeTareas: true`, sus frases en `guion`). Los demás
    pasos que el tipo tuviera (una guía con hitos de antes de marcar la casilla) se dejan como están,
    sin usarse. Lo reparte a los asuntos js/asunto-sin-hitos-guia.js.
@@ -44,6 +47,8 @@ var GuiaSinHitos = (function () {
         var g = tareas[parseInt(fila.dataset.pos, 10)];
         if (!g) return;
         g.texto = fila.querySelector('.gsh-texto').value.trim();
+        var como = fila.querySelector('.gsh-como').value.trim();   /* fila 707 */
+        if (como) g.comoSeHace = como; else delete g.comoSeHace;
         var si = window.GuiasCuando && window.SoloSi ? SoloSi.normalizar(GuiasCuando.leer(fila)) : null;
         if (si) g.soloSi = si; else delete g.soloSi;
       });
@@ -60,7 +65,8 @@ var GuiaSinHitos = (function () {
         fila.dataset.pos = i;
         fila.innerHTML = '<div class="gsh-linea"><span class="gsh-num">' + (i + 1) + '</span>' +
           '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe la tarea" aria-label="Tarea ' + (i + 1) + '">' +
-          '<span class="gsh-mandos"></span></div>';
+          '<span class="gsh-mandos"></span></div>' +
+          '<textarea class="campo gsh-como" rows="2" placeholder="Cómo se hace (opcional): explicación, pasos, ruta de Séneca o normativa" aria-label="Cómo se hace la tarea ' + (i + 1) + '">' + esc(g.comoSeHace) + '</textarea>';
         var mandos = fila.querySelector('.gsh-mandos');
         function boton(texto, titulo, hacer, clase, apagado) {
           var b = document.createElement('button');

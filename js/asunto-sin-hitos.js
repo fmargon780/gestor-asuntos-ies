@@ -118,7 +118,17 @@ var AsuntoSinHitos = (function () {
     return '';
   }
 
+  /* Fila 707: «Cómo se hace» de una tarea que viene de la guía. Se lee de la guía al pintar, no se copia al asunto. */
+  function comoDe(a, g) {
+    if (!g || !g.origenGuia || !window.GuiasDelCentro || !window.AsuntoSinHitosGuia) return '';
+    var pasos = GuiasDelCentro.pasosDe(tipoDe(a)) || [];
+    var t = AsuntoSinHitosGuia.tareasDe(pasos).filter(function (x) { return x.id === g.origenGuia; })[0];
+    return (t && t.comoSeHace) || '';
+  }
+
   function tareaHTML(g, a, abierto, ahora) {
+    var como = comoDe(a, g);
+    var comoAbierto = !!(como && e(g.id).comoAbierto);
     var puede = abierto && !soloLectura();
     var notas = notasDe(a, g);
     var quien = g.hecho && (g.quien || g.cuando) ? [g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ') : '';
@@ -128,9 +138,10 @@ var AsuntoSinHitos = (function () {
         (g.propio && !g.deGuia ? '<span class="ash-etq">solo aquí</span>' : '') +   /* fila 701: las que vienen de la guía no llevan marca */
         (window.AsuntoSinHitosFalta ? AsuntoSinHitosFalta.etiquetaHTML(g) : '') +
         (quien ? '<span class="ash-quien">' + esc(quien) + '</span>' : '') +
+        (como ? '<button type="button" class="ash-como-boton" aria-expanded="' + comoAbierto + '" aria-label="Cómo se hace" title="Cómo se hace">ⓘ</button>' : '') +
         (notas.length ? '<button type="button" class="ash-notas-boton">💬' + (notas.length > 1 ? ' ' + notas.length : '') + '</button>' : '') +
         (puede ? '<button type="button" class="ash-menu-boton" aria-label="Más de esta tarea">⋮</button>' : '') +
-      '</div>' + debajoHTML(g, a) + '</div>';
+      '</div>' + (comoAbierto ? '<div class="ash-como">' + esc(como) + '</div>' : '') + debajoHTML(g, a) + '</div>';
   }
 
   function anadirHTML(abierto) {
@@ -212,6 +223,8 @@ var AsuntoSinHitos = (function () {
           });
         });
       };
+      var comoBoton = el.querySelector('.ash-como-boton');
+      if (comoBoton) comoBoton.onclick = function () { e(g.id).comoAbierto = !e(g.id).comoAbierto; repintar(); };
       var notasBoton = el.querySelector('.ash-notas-boton');
       if (notasBoton) notasBoton.onclick = function () { e(g.id).notasAbiertas = !e(g.id).notasAbiertas; repintar(); };
       var menu = el.querySelector('.ash-menu-boton');

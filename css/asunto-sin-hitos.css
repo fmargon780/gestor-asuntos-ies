@@ -42,3 +42,9 @@
 .gsh-cuenta { margin: 0 0 4px; }
 .gsh-vista { margin: 0; padding-left: 22px; }
 .gsh-vista li { margin: 2px 0; }
+
+/* Fila 707: «Cómo se hace» de una tarea */
+.ash-como-boton { border: 0; background: none; font-size: 16px; line-height: 1; padding: 2px 8px; border-radius: 6px; cursor: pointer; color: #1f5fa8; }
+.ash-como-boton:hover { background: #e6ebf1; }
+.ash-como { font-size: 13px; margin: 4px 0 0 28px; padding: 8px 12px; background: #f3f6fa; border-left: 3px solid #a9c6e8; border-radius: 4px; white-space: pre-line; }
+.gsh-como { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; resize: vertical; }
