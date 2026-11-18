@@ -60,4 +60,7 @@ Eligió «2»: «Cambiar la guía…» va en el menú «⋯» de la cabecera del
 - Desde ese asunto, «⋯» › «Cambiar la guía…».
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026) Código en la rama `claude/cola-fila-701-ybp5rp` (no en `main`). Prueba nueva `guia-como-lista-de-tareas`; pasada completa 405/407 (fallaban `palabras-prohibidas`, ya arreglada, y `titulos-de-la-tabla-fijos`, que a solas pasa).
+- Revisor 1: puntos 1 a 9 coinciden; RECHAZADA por «3 hitos» en Ajustes › Guía y en «Nuevo asunto». Arreglado.
+- Revisor 2 (nuevo): puntos 1 a 9 coinciden; RECHAZADA por el punto 10: en Ajustes › Guía de un tipo sin hitos sale «1 hito», la tarjeta «1 · Tareas», el texto «con sus preguntas y bifurcaciones» y, al marcar la casilla en un tipo con guía de hitos, el hito antiguo con «Ver mapa» hasta volver a entrar; «Nuevo asunto» de un tipo sin guía dice «Sin guía: el asunto se crea sin hitos»; la nota de «Solo si el tercero es…» habla de «campo».
+- Pendiente para retomarla: pintar en Ajustes › Guía las tareas (no la tarjeta «Tareas») con su etiqueta «N tareas» y repintar al marcar la casilla; cambiar esos dos textos y la nota; decidir con Francisco qué pasa con los hitos antiguos de un tipo al marcar «Sin hitos» (hoy se quedan guardados, sin usar ni enseñarse).
