@@ -31,6 +31,7 @@ var AsuntoSinHitosGuia = (function () {
   function copia(g) {
     var c = { id: U.nuevoId('gp'), texto: g.texto, deGuia: true, origenGuia: g.id };
     if (g.soloSi) c.soloSi = JSON.parse(JSON.stringify(g.soloSi));
+    if (g.papel) c.papel = g.papel;   /* fila 703: la tarea de papel de la guía */
     return c;
   }
 
