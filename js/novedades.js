@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '700', fecha: '2026-11-18', texto: 'Los asuntos que son una lista de tareas salen en Inicio, en «En Administración», con «Tarea 2 de 5 · lo que toca» o «Listo para cerrar», y con el plazo del asunto. En ellos ya no se lee «hito» en ninguna parte.' },
   { id: '677', fecha: '2026-11-18', texto: 'Un documento que guardas en la carpeta del asunto que tienes abierto sale solo en Documentos, sin salir y volver a entrar.' },
   { id: '699', fecha: '2026-11-18', texto: 'En Ajustes, cada tipo de asunto tiene la casilla «Sin hitos: el asunto es una lista de tareas». Los asuntos nuevos de ese tipo enseñan un panel («Ahora toca…», «Listo para cerrar») y su lista de tareas, con «+ Añadir tarea» en una línea.' },
   { id: '690', fecha: '2026-11-18', texto: '«Traer datos» ya no se queda callado si la ventana de Windows no se abre en su carpeta: se abre donde Windows quiera y avisa, y si no se abre de ninguna forma sale un aviso rojo con el motivo.' },

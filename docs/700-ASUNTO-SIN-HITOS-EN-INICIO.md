@@ -46,4 +46,7 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 699.
 - Marcar todas sus tareas y volver a Inicio: «Listo para cerrar».
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026) Segundo revisor (nuevo, por navegador, contexto limpio): APROBADA a la primera. Puntos 1 a 6 y las tres fijas, BIEN.
+- Textos mirados (`[Hh]ito` en `js/`): cambiados «Hito N de M»/«Sin hitos» (`Hitos.textoDelEstado`: «Tarea N de M · frase», «Listo para cerrar», «Sin tareas»), «Hito N» de los documentos de la carpeta (`ficha-documentos.js`), etiqueta del hito en las líneas del Registro (`registro-asunto.js`), «Mis encargos» (`encargos.js`), cuadro de guardar desde la bandeja (`documento-tarea-bloque.js`) y «Hay que registrarlo» (`hay-que-registrarlo.js`), y el aviso de colgar (`documento-a-tarea.js`). Ya no salían en un asunto sin hitos: «Este asunto no tiene hitos todavía» y «N de M hitos hechos» (la ficha no pinta ese panel).
+- Decidido por la sesión: el filtro «Situación» conserva su opción «Sin hitos» (asuntos sin ningún hito); un asunto lista de tareas no entra en ella. La cabecera de columna «Hito actual» es común a todos los asuntos y no se toca.
+- Sin ver: nada con datos reales del instituto.
