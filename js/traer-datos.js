@@ -67,14 +67,26 @@
      sirve igual para no empezar siempre en la misma carpeta de
      Windows. Sin ella, se abre donde el navegador quiera, como
      siempre. */
-  function elegirFicheros(carpetaInicio) {
+  async function elegirFicheros(carpetaInicio) {
     var opciones = {
       multiple: true,
       types: [{ description: 'Ficheros CSV de Séneca', accept: { 'text/csv': ['.csv'] } }]
     };
     /* Fila 647: la carpeta de verdad, sin los envoltorios de Drive / solo consultar. */
     if (carpetaInicio) opciones.startIn = Carpetas.carpetaDeVerdad(carpetaInicio);
-    return window.showOpenFilePicker(opciones);
+    /* Fila 690 (18-nov-2026), igual que `elegirFichero` (fila 678): si falla con `startIn`
+       por algo que no es cancelar, o «cancela» en menos de 300 ms (no se abrió), se avisa y
+       se repite sin `startIn`. Si falla igual, se lanza ese error. */
+    var t0 = Date.now();
+    try {
+      return await window.showOpenFilePicker(opciones);
+    } catch (e) {
+      var noSeAbrio = e && (e.name !== 'AbortError' || Date.now() - t0 < 300);
+      if (!opciones.startIn || !noSeAbrio) throw e;
+      U.aviso('No he podido abrir la carpeta; elige el archivo.', 'ambar');
+      delete opciones.startIn;
+      return window.showOpenFilePicker(opciones);
+    }
   }
 
   /* Después de traer ficheros, lo leído antes ya no vale y el aviso de
@@ -120,7 +132,9 @@
     try {
       elegidos = await elegirFicheros(datos);
     } catch (e) {
-      return;   /* ha cerrado el cuadro: no hay nada que decir */
+      /* Cerrar el cuadro no dice nada; si no se pudo abrir de ninguna forma, aviso rojo (fila 690). */
+      if (!e || e.name !== 'AbortError') U.aviso('No he podido abrir la ventana para elegir los ficheros: ' + U.mensajeDeError(e), 'malo');
+      return;
     }
 
     var traidos = [];
