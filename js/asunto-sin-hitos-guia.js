@@ -74,6 +74,11 @@ var AsuntoSinHitosGuia = (function () {
   }
 
   /* Después de guardar la guía de un tipo «sin hitos»: reparte las tareas nuevas y devuelve la frase verde de después. */
+  /* Lo que se enseña de la guía de un tipo: en uno «sin hitos», solo la lista de tareas (los hitos de antes se quedan sin usar). */
+  function pasosVisibles(tipo, pasos) {
+    return esLista(tipo) ? (pasos || []).filter(function (p) { return p && p.listaDeTareas; }) : (pasos || []);
+  }
+
   function esLista(tipo) { return !!(window.AsuntoSinHitos && window.GuiaSinHitos && AsuntoSinHitos.tipoSinHitos(tipo)); }
 
   async function alGuardar(tipo, pasos) {
@@ -105,6 +110,6 @@ var AsuntoSinHitosGuia = (function () {
     return datos.porAsunto[clave] ? datos.porAsunto[clave].hitos : null;
   }
 
-  return { pasoLista: pasoLista, tareasDe: tareasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, completar: completar };
+  return { pasoLista: pasoLista, tareasDe: tareasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, pasosVisibles: pasosVisibles, completar: completar };
 })();
 window.AsuntoSinHitosGuia = AsuntoSinHitosGuia;

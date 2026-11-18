@@ -72,6 +72,12 @@ await comprobar('4. se guarda como un paso de lista de tareas con sus frases y s
   return p && p.guion.map((g) => [g.texto, g.soloSi ? SoloSi.etiqueta(g.soloSi) : '']);
 }, TIPO), [['Pedir el certificado', ''], ['Enviar la carta', ''], ['Avisar al personal', 'Solo si el tercero es ' + CLASE]]);
 
+await comprobar('4. «Nuevo asunto» y Ajustes hablan de tareas, no de hitos', pagina.evaluate((t) => {
+  const tipo = App.E.tipos.filter((x) => x.tipo === t)[0];
+  const comp = (window.AjustesTipoComprobacion && AjustesTipoComprobacion.calcular ? AjustesTipoComprobacion.calcular(tipo) : []).filter((i) => i.id === 'guia').map((i) => i.texto);
+  return [/3 tareas/.test(Guias.resumenDeTipo(tipo).texto), /hito/.test(Guias.resumenDeTipo(tipo).texto), comp.every((x) => !/hito/.test(x))];
+}, TIPO), [true, false, true]);
+
 console.log('--- el asunto nuevo ---');
 await pagina.evaluate(async ([k, t]) => {   /* como un asunto recién nacido: sin hitos todavía, y nace al crearlos */
   await Hitos.cambiar((d) => { delete d.porAsunto[k]; return d; });

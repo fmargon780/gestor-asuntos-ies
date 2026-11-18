@@ -419,6 +419,8 @@ function construirSeccionPasos(tipo) {
 
   function repintar() {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
+    if (window.AsuntoSinHitosGuia) pasos = AsuntoSinHitosGuia.pasosVisibles(tipo.tipo, pasos);   /* fila 701: un tipo «sin hitos» enseña solo su lista de tareas */
+    var deTareas = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo);
     b.cuerpo.innerHTML = pasos.length
       ? Guias.vista(pasos, [], false)
       : '<div class="vacio">Todavía no hay guía para este tipo.</div>';
@@ -435,7 +437,7 @@ function construirSeccionPasos(tipo) {
     /* «Ver mapa» (fila 113, js/guias-mapa.js): la guía entera de un
        vistazo; pulsar un paso abre el cuadro de escribirla en ese paso. */
     var mapa = null;
-    if (pasos.length && window.GuiasMapa) {
+    if (pasos.length && window.GuiasMapa && !deTareas) {
       mapa = document.createElement('button');
       mapa.type = 'button';
       mapa.className = 'boton';

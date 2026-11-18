@@ -55,6 +55,8 @@ var ListaComprobacionTipo = (function () {
   function calcular(tipo) {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
     var items = [];
+    var deTareas = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo);   /* fila 701 */
+    if (deTareas) pasos = AsuntoSinHitosGuia.pasosVisibles(tipo.tipo, pasos);
 
     /* Nombre corto: el tipo siempre tiene nombre (con o sin nombre
        corto explícito: sin él, se usa el de arriba), así que esta
@@ -64,8 +66,8 @@ var ListaComprobacionTipo = (function () {
     items.push({ id: 'organo', texto: 'Quién lo encarga',
       marcado: !!(window.TiposOrgano && TiposOrgano.deTipo(tipo)), seccion: 'datos' });
 
-    items.push({ id: 'guia', texto: 'Guía (' + plural(pasos.length, 'hito', 'hitos') + ')',
-      marcado: pasos.length > 0, seccion: 'pasos' });
+    items.push({ id: 'guia', texto: 'Guía (' + (deTareas ? plural(AsuntoSinHitosGuia.tareasDe(pasos).length, 'tarea', 'tareas') : plural(pasos.length, 'hito', 'hitos')) + ')',
+      marcado: deTareas ? AsuntoSinHitosGuia.tareasDe(pasos).length > 0 : pasos.length > 0, seccion: 'pasos' });
 
     /* Plantilla de documento: solo si algún hito tiene «Generar un
        documento». */
