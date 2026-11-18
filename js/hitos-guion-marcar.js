@@ -25,7 +25,7 @@
       if (e.hecho || e.noaplica) { e.quien = quien(); e.cuando = U.ahora(); }
       else { delete e.quien; delete e.cuando; }
       if (!e.hecho) delete e.hechoCon;   /* fila 671: lo apuntado al marcarla se va con la marca */
-      if (e.hecho) delete e.falta;
+      if (e.hecho) { delete e.falta; delete e.espera; }   /* fila 702: una tarea hecha ya no espera */
       h.guionHecho[idPaso] = e;
     });
   }
@@ -37,7 +37,7 @@
       var e = h.guionHecho[idPaso] || {};
       e.hecho = true; e.noaplica = false; e.quien = quien(); e.cuando = U.ahora();
       e.hechoCon = hechoCon;
-      delete e.falta;
+      delete e.falta; delete e.espera;
       h.guionHecho[idPaso] = e;
     });
   }

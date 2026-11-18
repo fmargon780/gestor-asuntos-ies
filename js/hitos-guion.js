@@ -117,6 +117,7 @@
                obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '',
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
                receta: g.receta || null,
+               espera: (!x.hecho && x.espera) || null,   /* fila 702: la espera de la tarea { quien, desde, volver } (js/tarea-espera.js) */
                copia: x.copia || null,   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
                soloSi: ((!propio || g.deGuia) && g.soloSi) || null,
                origenGuia: g.origenGuia || '',   /* fila 707: la frase de la guía de la que viene (para leer su «Cómo se hace») */

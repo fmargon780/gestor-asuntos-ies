@@ -57,7 +57,7 @@
   var ORDEN = ['vencidos', 'proximos', 'recurrentes', 'duplicados',
     'papelera-vieja', 'frescura', 'problemas', 'aspirantes',   /* fila 291: «N problemas por resolver» sustituye a «N fichas sin carpeta» */
    
-    'registro-sin-asunto', 'registro-atrasado', 'tipos-parecidos', 'listos-para-enviar', 'envios-pendientes', 'recogida-correos', 'notas-directivos', 'exposiciones'];   /* fila 672: «Termina la exposición de …» */   /* fila 336 */   /* fila 290 */   /* fila 285 */   /* filas 259 y 277 */
+    'registro-sin-asunto', 'registro-atrasado', 'tipos-parecidos', 'listos-para-enviar', 'esperas-por-reclamar', 'envios-pendientes', 'recogida-correos', 'notas-directivos', 'exposiciones'];   /* fila 672: «Termina la exposición de …» */   /* fila 336 */   /* fila 290 */   /* fila 285 */   /* filas 259 y 277 */
 
   var piezas = {};   /* id -> { texto, urgente, alPulsar } */
 
