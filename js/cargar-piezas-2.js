@@ -118,6 +118,7 @@
     // window.FichaDocumentos.pintar.
     'js/ficha-documentos-fila.js',   // fila 560: la fila de cada documento, movida de js/ficha-documentos.js
     'js/ficha-documentos.js',
+    'js/ficha-carpeta-vigilar.js',   // fila 677
     // "Datos y contacto" del tercero, la línea resumen y la ventana "Ver
     // todo" (fila 37, 17-sep-2026): para no engordar js/ficha-asunto.js,
     // igual que js/ficha-documentos.js. Se habla con él por
