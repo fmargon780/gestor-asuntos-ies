@@ -227,6 +227,8 @@ var Guias = (function () {
       if (p && p.variosDocumentos && !salida.opciones.length) salida.variosDocumentos = true;
       /* Fila 531: viene de la lista común de hitos (js/comunes.js); un hito pregunta nunca. */
       if (p && p.comun && !salida.opciones.length) salida.comun = String(p.comun);
+      /* Fila 701: el paso donde vive la lista de tareas de un tipo «sin hitos» (js/guia-sin-hitos.js). */
+      if (p && p.listaDeTareas && !salida.opciones.length) salida.listaDeTareas = true;
       return salida;
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;

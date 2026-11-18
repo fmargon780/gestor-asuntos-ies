@@ -393,6 +393,10 @@
      nada por estar ya empezados, y en cuántos ha llegado algo (`tocados`;
      `otros`, sin contar `claveActual`). */
   async function llevarAAbiertos(tipo, pasos, pasosAntes, claveActual) {
+    /* Fila 701: el paso de la lista de tareas de un tipo «sin hitos» no es un hito (js/asunto-sin-hitos-guia.js lo reparte aparte). */
+    function noEsLista(p) { return !(p && p.listaDeTareas); }
+    pasos = (pasos || []).filter(noEsLista);
+    if (Array.isArray(pasosAntes)) pasosAntes = pasosAntes.filter(noEsLista);
     var conOrden = Array.isArray(pasosAntes);
     var vacio = conOrden ? { llegados: 0, recolocados: 0, cambiados: 0, quitados: 0, saltados: 0, tocados: 0, otros: 0 } : 0;
     if (!tipo || !window.Gestor || typeof Gestor.asuntos !== 'function') return vacio;
@@ -471,7 +475,11 @@
   async function completarAsunto(clave, entradaLeida, pasos) {
     if (!entradaLeida || !(entradaLeida.hitos || []).length || !(pasos || []).length) return null;
     if (tieneTipoUnido(clave)) return null;
-    if (esListaDeTareas(entradaLeida)) return null;   /* fila 699 */
+    if (esListaDeTareas(entradaLeida)) {   /* fila 699; fila 701: le llegan las tareas nuevas de la guía */
+      return window.AsuntoSinHitosGuia ? AsuntoSinHitosGuia.completar(clave, entradaLeida, pasos) : null;
+    }
+    pasos = pasos.filter(function (p) { return !(p && p.listaDeTareas); });
+    if (!pasos.length) return null;
     var previa = pasosQueFaltan(entradaLeida.hitos, pasos, entradaLeida.pasosConocidos);
     if (!previa.anadidos && !previa.retocados) return null;
     var resultado = null, anadidos = 0;

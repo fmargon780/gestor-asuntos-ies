@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '701', fecha: '2026-11-18', texto: 'La guía de un tipo «sin hitos» es una lista de frases, cada una con «Cuándo se hace» (siempre, solo si un dato vale tal cosa, o solo si el tercero es de tal clase). Los asuntos nuevos de ese tipo nacen con esas tareas, y en el menú «⋯» del asunto está «Cambiar la guía…». Una tarea que falta de un dato sale en amarillo con «Falta: …» y se rellena ahí mismo.' },
   { id: '700', fecha: '2026-11-18', texto: 'Los asuntos que son una lista de tareas salen en Inicio, en «En Administración», con «Tarea 2 de 5 · lo que toca» o «Listo para cerrar», y con el plazo del asunto. En ellos ya no se lee «hito» en ninguna parte.' },
   { id: '677', fecha: '2026-11-18', texto: 'Un documento que guardas en la carpeta del asunto que tienes abierto sale solo en Documentos, sin salir y volver a entrar.' },
   { id: '699', fecha: '2026-11-18', texto: 'En Ajustes, cada tipo de asunto tiene la casilla «Sin hitos: el asunto es una lista de tareas». Los asuntos nuevos de ese tipo enseñan un panel («Ahora toca…», «Listo para cerrar») y su lista de tareas, con «+ Añadir tarea» en una línea.' },

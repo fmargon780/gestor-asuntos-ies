@@ -27,6 +27,8 @@
   /* `opciones.irA` (fila 113): el id de un hito; el cuadro se abre ya en
      su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
   function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
+    /* Fila 701: un tipo «sin hitos» se escribe como una lista de tareas (js/guia-sin-hitos.js). */
+    if (window.GuiaSinHitos && window.AsuntoSinHitos && AsuntoSinHitos.tipoSinHitos(nombreTipo)) return GuiaSinHitos.editar(nombreTipo, lista, opciones);
     var pasos = G.normalizar(lista);
     var tipoInfo = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === nombreTipo; })[0];
     return G.convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')

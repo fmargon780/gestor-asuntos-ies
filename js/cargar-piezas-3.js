@@ -319,6 +319,9 @@
     'js/llamadas-ventana.js',
     'js/llamadas-vista.js',
     'js/asunto-sin-hitos.js',   // fila 699: el asunto como lista de tareas y un panel (usa Hitos y HitoMesa; se carga antes de que se pinte nada)
+    'js/asunto-sin-hitos-guia.js',   // fila 701: las tareas de la guía de un tipo «sin hitos» llegan al asunto
+    'js/asunto-sin-hitos-falta.js',   // fila 701: «Falta: <dato>» en una tarea, que se rellena ahí mismo
+    'js/guia-sin-hitos.js',   // fila 701: el editor de la guía como lista de tareas (usa Guias, GuiasCuando y GuiasGuion)
     'js/generar-enviar-cabecera.js',   // fila 695: «Generar documento ▾» y «Enviar ▾» de la cabecera del asunto (después de js/ficha-menus.js)
     'js/tarea-hecha.js',   // fila 671
     'js/tarea-hecha-ventana.js',
