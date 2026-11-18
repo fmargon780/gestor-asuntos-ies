@@ -359,7 +359,10 @@
 
   /* Aplica pasosQueFaltan a una entrada de `porAsunto` ya leída (dentro
      de un Hitos.cambiar). Devuelve lo mismo que pasosQueFaltan. */
+  function esListaDeTareas(entrada) { return !!(entrada && (entrada.hitos || []).some(function (h) { return h && h.listaDeTareas; })); }   /* fila 699: no recibe pasos de la guía */
+
   function completarEntrada(entrada, pasos) {
+    if (esListaDeTareas(entrada)) return { hitos: entrada.hitos, conocidos: entrada.pasosConocidos, anadidos: 0, retocados: 0, enCurso: null };
     var r = pasosQueFaltan(entrada.hitos, pasos, entrada.pasosConocidos);
     if (r.anadidos || r.retocados) entrada.hitos = r.hitos;
     entrada.pasosConocidos = r.conocidos;
@@ -408,6 +411,7 @@
       claves.forEach(function (clave) {
         var entrada = d.porAsunto[clave];
         if (!entrada || !(entrada.hitos || []).length) return;   /* se crearán enteros al abrirlo */
+        if (esListaDeTareas(entrada)) return;   /* fila 699 */
         var conocidosAntes = pasosConocidosDe(entrada, entrada.hitos);
         var c = completarEntrada(entrada, pasos);
         var tocado = false;
@@ -467,6 +471,7 @@
   async function completarAsunto(clave, entradaLeida, pasos) {
     if (!entradaLeida || !(entradaLeida.hitos || []).length || !(pasos || []).length) return null;
     if (tieneTipoUnido(clave)) return null;
+    if (esListaDeTareas(entradaLeida)) return null;   /* fila 699 */
     var previa = pasosQueFaltan(entradaLeida.hitos, pasos, entradaLeida.pasosConocidos);
     if (!previa.anadidos && !previa.retocados) return null;
     var resultado = null, anadidos = 0;

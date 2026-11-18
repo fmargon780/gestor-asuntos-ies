@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '699', fecha: '2026-11-18', texto: 'En Ajustes, cada tipo de asunto tiene la casilla «Sin hitos: el asunto es una lista de tareas». Los asuntos nuevos de ese tipo enseñan un panel («Ahora toca…», «Listo para cerrar») y su lista de tareas, con «+ Añadir tarea» en una línea.' },
   { id: '690', fecha: '2026-11-18', texto: '«Traer datos» ya no se queda callado si la ventana de Windows no se abre en su carpeta: se abre donde Windows quiera y avisa, y si no se abre de ninguna forma sale un aviso rojo con el motivo.' },
   { id: '687', fecha: '2026-11-18', texto: 'Si en un ordenador falta señalar la carpeta de entrada de los documentos sueltos, ahora sale un aviso ámbar con «Señalar la carpeta» en Inicio y en «Por clasificar», y la comprobación al entrar lo marca como «Falta».' },
   { id: '698', fecha: '2026-11-17', texto: 'En Ajustes, en cada tipo de documento, un nuevo «Recorrido»: dices una vez si el papel lo hacemos nosotros o nos llega, quién lo firma, si se registra y si se envía (a quién y por dónde). Los tipos RESOLUCIÓN y CERTIFICACION se unen con RESOLUCION y CERTIFICADO, y se añaden ACUERDO, DILIGENCIA, CITACION, AUTORIZACION, RENUNCIA y FICHA ENTREGA LIBROS.' },

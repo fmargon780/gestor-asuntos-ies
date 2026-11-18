@@ -92,6 +92,12 @@ App.cerrarAsunto = async function (a) {
      Con el cuadro de aviso ya contestado, el de «Archivar el asunto» no se repite (`yaPreguntado`). Archivar varios de golpe, como hoy. */
   var avisoFalta = (window.AvisosFalta && !App.E.archivarSinPreguntar) ? await AvisosFalta.alArchivar(a) : { sigue: true, hayAviso: false };
   if (!avisoFalta.sigue) return;
+  /* Fila 699: un asunto «lista de tareas» con tareas sin hacer avisa de cuántas quedan y deja seguir. */
+  if (window.AsuntoSinHitos && !App.E.archivarSinPreguntar) {
+    var avisoTareas = await AsuntoSinHitos.avisoAlCerrar(a);
+    if (!avisoTareas.sigue) return;
+    avisoFalta.hayAviso = avisoFalta.hayAviso || avisoTareas.hayAviso;
+  }
   var categoria = a.ficha.categoria || a.leido.categoria || '';
   var tercero = a.ficha.tercero || '';
   /* Fila 480: los hilos de correo del asunto, copiados antes de que la ficha baje a la carpeta. En Gmail se

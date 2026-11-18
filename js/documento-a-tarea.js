@@ -46,7 +46,7 @@ window.DocumentoATarea = (function () {
 
   /* Los hitos a los que se puede colgar: los que se ven y no son una pregunta. */
   function hitosElegibles(hitos) {
-    return Hitos.visibles(hitos).filter(function (x) { return x.clase !== 'decision' && x.estado !== 'noaplica' && !x.delTipoAnterior; });
+    return Hitos.visibles(hitos).filter(function (x) { return x.clase !== 'decision' && x.estado !== 'noaplica' && !x.delTipoAnterior && !x.listaDeTareas; });   /* fila 699: el hito oculto de un asunto «lista de tareas» no se ofrece */
   }
 
   /* Las tareas de ese hito que esperan un documento: «Añadir documento», sin hacer y sin documento colgado. */

@@ -318,6 +318,7 @@
     'js/llamadas-personas.js',
     'js/llamadas-ventana.js',
     'js/llamadas-vista.js',
+    'js/asunto-sin-hitos.js',   // fila 699: el asunto como lista de tareas y un panel (usa Hitos y HitoMesa; se carga antes de que se pinte nada)
     'js/generar-enviar-cabecera.js',   // fila 695: «Generar documento ▾» y «Enviar ▾» de la cabecera del asunto (después de js/ficha-menus.js)
     'js/tarea-hecha.js',   // fila 671
     'js/tarea-hecha-ventana.js',

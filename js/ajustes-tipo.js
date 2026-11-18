@@ -175,6 +175,10 @@ function construirSeccionDatos(tipo) {
     'Lleva el sello de registro de Séneca', 'Deja libre la banda de arriba al preparar el documento.'));
   interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaFirma', false,
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
+  /* Fila 699: los asuntos nuevos de este tipo nacen sin hitos, con una lista de tareas y un panel (js/asunto-sin-hitos.js). */
+  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'sinHitos', false,
+    'Sin hitos: el asunto es una lista de tareas',
+    'Solo cambia los asuntos que se creen después. Si el tipo ya tiene guía con hitos, se guarda sin usarse y vuelve si desmarcas la casilla.'));
   b.cuerpo.appendChild(interruptores);
 
   /* La casilla de liquidar (fila 249) y «avisar a quien lo pide al cerrar» (fila 195)

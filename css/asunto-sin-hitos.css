@@ -1,0 +1,29 @@
+/* ============================================================
+   asunto-sin-hitos.css — el panel y la lista de tareas de un asunto sin hitos
+   (fila 699, js/asunto-sin-hitos.js). Colores y botones, los de la app.
+   ============================================================ */
+.ash { display: block; }
+.ash-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; border: 1px solid; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.ash-panel-texto { flex: 1; min-width: 200px; }
+.ash-panel-texto b { font-size: 16px; }
+.ash-panel-texto span { display: block; font-size: 13px; opacity: .8; margin-top: 2px; }
+.ash-toca { background: #e3eefb; border-color: #a9c6e8; }
+.ash-listo { background: #e2f4e6; border-color: #9fd3ab; }
+.ash-cuenta { font-size: 13px; white-space: nowrap; opacity: .8; }
+.ash-tarea { border: 1px solid #e3e8ee; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; background: #fff; }
+.ash-tarea.ahora { background: #fff7e0; border-color: #ecc866; }
+.ash-tarea.hecha { background: #f6f8fa; color: #6a7683; }
+.ash-tarea.noaplica .ash-texto-tarea { text-decoration: line-through; }
+.ash-fila { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ash-linea { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 160px; cursor: pointer; }
+.ash-texto-tarea { font-weight: 600; }
+.ash-tarea.hecha .ash-texto-tarea { font-weight: 400; text-decoration: line-through; }
+.ash-etq { font-size: 11px; font-weight: 700; background: #eee; color: #555; border-radius: 10px; padding: 1px 8px; }
+.ash-quien { font-size: 12px; color: #6a7683; }
+.ash-menu-boton, .ash-notas-boton { border: 0; background: none; font-size: 18px; line-height: 1; padding: 2px 8px; border-radius: 6px; cursor: pointer; color: inherit; }
+.ash-menu-boton:hover, .ash-notas-boton:hover { background: #e6ebf1; }
+.ash-editar, .ash-anadir { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.ash-editar-texto, .ash-anadir-texto { flex: 1; min-width: 220px; }
+.ash-anotar { margin-top: 8px; }
+.ash-notas { margin-top: 6px; }
+.ash-nota { font-size: 13px; margin-top: 4px; }
