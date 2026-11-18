@@ -176,9 +176,20 @@ function construirSeccionDatos(tipo) {
   interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaFirma', false,
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
   /* Fila 699: los asuntos nuevos de este tipo nacen sin hitos, con una lista de tareas y un panel (js/asunto-sin-hitos.js). */
-  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'sinHitos', false,
+  var casillaSinHitos = App.construirInterruptorDeTipo(tipo, 'sinHitos', false,
     'Sin hitos: el asunto es una lista de tareas',
-    'Solo cambia los asuntos que se creen después. Si el tipo ya tiene guía con hitos, se guarda sin usarse y vuelve si desmarcas la casilla.'));
+    'Solo cambia los asuntos que se creen después. Si el tipo ya tiene guía con hitos, se guarda sin usarse y vuelve si desmarcas la casilla.');
+  /* Fila 701: al marcarla o desmarcarla, la sección «Guía» y los resúmenes cambian al momento. */
+  var cSH = casillaSinHitos.querySelector('input'), guardarSH = cSH.onchange;
+  cSH.onchange = async function () {
+    await guardarSH.call(cSH);
+    var sec = document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"]');
+    if (sec && sec.repintarGuia) sec.repintarGuia();
+    var secC = document.querySelector('#pantalla-tipo-asunto details[data-seccion="campos"]');
+    if (secC && secC.repintarCampos) secC.repintarCampos();
+    if (window.AjustesPlegado) AjustesPlegado.resumirTipo();
+  };
+  interruptores.appendChild(casillaSinHitos);
   b.cuerpo.appendChild(interruptores);
 
   /* La casilla de liquidar (fila 249) y «avisar a quien lo pide al cerrar» (fila 195)
@@ -265,7 +276,7 @@ async function construirSeccionCampos(tipo) {
         '</span><span class="suave">' + textoOrigen(c) + '</span>';
 
       /* Fila 255: el hito del campo («Ninguno» = un campo del asunto). */
-      var pasosGuia = window.CamposDeHito ? CamposDeHito.pasosDeLaGuia(tipo.tipo) : [];
+      var pasosGuia = (window.CamposDeHito && !(window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo))) ? CamposDeHito.pasosDeLaGuia(tipo.tipo) : [];   /* fila 701: un tipo «sin hitos» no elige hito */
       if (pasosGuia.length) {
         var selH = document.createElement('select');
         selH.className = 'campo campo-hito-select';
@@ -282,7 +293,7 @@ async function construirSeccionCampos(tipo) {
       }
 
       var oblig = document.createElement('label');
-      oblig.className = 'interruptor interruptor-fila' + (c.hito ? ' oculto' : '');
+      oblig.className = 'interruptor interruptor-fila' + (c.hito && pasosGuia.length ? ' oculto' : '');
       var cOblig = document.createElement('input');
       cOblig.type = 'checkbox';
       cOblig.checked = !!c.obligatorio;
@@ -408,6 +419,7 @@ async function construirSeccionCampos(tipo) {
     }
   }
 
+  b.sec.repintarCampos = function () { if ($('campos-puestos')) pintarPuestos(); };   /* fila 701: la casilla «Sin hitos» quita o pone el hito de cada campo */
   pintarListado();
   return b.sec;
 }
@@ -419,7 +431,11 @@ function construirSeccionPasos(tipo) {
 
   function repintar() {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
-    b.cuerpo.innerHTML = pasos.length
+    if (window.AsuntoSinHitosGuia) pasos = AsuntoSinHitosGuia.pasosVisibles(tipo.tipo, pasos);   /* fila 701: un tipo «sin hitos» enseña solo su lista de tareas */
+    var deTareas = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo);
+    var pie = b.sec.querySelector(':scope > summary > .bloque-pie');   /* fila 701 */
+    if (pie) pie.textContent = deTareas ? 'La guía del tipo: la lista de tareas de sus asuntos.' : 'La guía del tipo, con sus preguntas y bifurcaciones.';
+    b.cuerpo.innerHTML = deTareas ? AsuntoSinHitosGuia.vistaHTML(pasos) : pasos.length
       ? Guias.vista(pasos, [], false)
       : '<div class="vacio">Todavía no hay guía para este tipo.</div>';
     var boton = document.createElement('button');
@@ -435,7 +451,7 @@ function construirSeccionPasos(tipo) {
     /* «Ver mapa» (fila 113, js/guias-mapa.js): la guía entera de un
        vistazo; pulsar un paso abre el cuadro de escribirla en ese paso. */
     var mapa = null;
-    if (pasos.length && window.GuiasMapa) {
+    if (pasos.length && window.GuiasMapa && !deTareas) {
       mapa = document.createElement('button');
       mapa.type = 'button';
       mapa.className = 'boton';
@@ -452,6 +468,7 @@ function construirSeccionPasos(tipo) {
     b.cuerpo.appendChild(boton);
     if (mapa) b.cuerpo.appendChild(mapa);
   }
+  b.sec.repintarGuia = repintar;   /* fila 701: la casilla «Sin hitos» la repinta al cambiar */
   repintar();
   return b.sec;
 }

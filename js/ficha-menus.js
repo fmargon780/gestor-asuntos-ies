@@ -75,7 +75,7 @@ var FichaMenus = (function () {
       item.textContent = o.texto;
       item.disabled = !!o.deshabilitado;
       if (o.oculto) item.hidden = true;   /* fila 637: se enseña luego con `item(clave).hidden = false` */
-      if (o.clave) porClave[o.clave] = item;
+      if (o.clave) { porClave[o.clave] = item; item.dataset.clave = o.clave; }   /* fila 701: para enseñar «Cambiar la guía…» solo en un asunto sin hitos */
       if (o.soloLectura) item.setAttribute('data-solo-lectura', '');   /* fila 637: copiar sigue encendido en solo consulta */
       if (o.title) item.title = o.title;   /* fila 206: el motivo de una opción apagada */
       item.onclick = function () {

@@ -45,15 +45,17 @@ var AsuntoSinHitos = (function () {
 
   function es(hitos) { return !!hitoDe(hitos); }
 
-  /* Asunto nuevo de un tipo «sin hitos»: nace con el hito oculto y ninguna tarea. */
-  async function crear(clave) {
+  /* Asunto nuevo de un tipo «sin hitos»: nace con el hito oculto y, fila 701, con las tareas de la guía de su tipo, en su orden. */
+  async function crear(clave, tipo) {
     var previos = await Hitos.hitosDe(clave);
     if (previos.length) return previos;
+    var tareas = (tipo && window.AsuntoSinHitosGuia) ? await AsuntoSinHitosGuia.deLaGuia(tipo) : [];
     var resultado = null;
     var datos = await Hitos.cambiar(function (d) {
       var h = Hitos.pasoAHito({ id: Hitos.nuevoId(), titulo: 'Tareas' });
       h.origenGuia = null;
       h.listaDeTareas = true;
+      if (tareas.length) AsuntoSinHitosGuia.darTareas(h, tareas);
       var lista = [h];
       resultado = Hitos.recomputeEnCurso(lista);
       d.porAsunto[clave] = { creados: U.hoyIso(), hitos: lista };
@@ -97,6 +99,7 @@ var AsuntoSinHitos = (function () {
 
   function debajoHTML(g, a) {
     var st = e(g.id);
+    if (window.AsuntoSinHitosFalta) { var rel = AsuntoSinHitosFalta.debajoHTML(g, a); if (rel) return rel; }
     if (st.editando) {
       return '<div class="ash-editar"><input class="campo ash-editar-texto" data-clave="ash-editar-' + esc(g.id) + '" value="' + esc(g.texto) + '">' +
         '<button type="button" class="boton boton-chico ash-editar-guardar">Guardar</button>' +
@@ -119,10 +122,11 @@ var AsuntoSinHitos = (function () {
     var puede = abierto && !soloLectura();
     var notas = notasDe(a, g);
     var quien = g.hecho && (g.quien || g.cuando) ? [g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ') : '';
-    return '<div class="ash-tarea' + (g.hecho ? ' hecha' : '') + (g.noaplica ? ' noaplica' : '') + (ahora ? ' ahora' : '') + '" data-id="' + esc(g.id) + '">' +
+    return '<div class="ash-tarea' + (g.falta ? ' falta' : '') + (g.hecho ? ' hecha' : '') + (g.noaplica ? ' noaplica' : '') + (ahora ? ' ahora' : '') + '" data-id="' + esc(g.id) + '">' +
       '<div class="ash-fila"><label class="ash-linea"><input type="checkbox" class="ash-casilla"' + (g.hecho ? ' checked' : '') + (puede ? '' : ' disabled') + '>' +
         '<span class="ash-texto-tarea">' + esc(g.texto) + '</span></label>' +
-        (g.propio ? '<span class="ash-etq">solo aquí</span>' : '') +
+        (g.propio && !g.deGuia ? '<span class="ash-etq">solo aquí</span>' : '') +   /* fila 701: las que vienen de la guía no llevan marca */
+        (window.AsuntoSinHitosFalta ? AsuntoSinHitosFalta.etiquetaHTML(g) : '') +
         (quien ? '<span class="ash-quien">' + esc(quien) + '</span>' : '') +
         (notas.length ? '<button type="button" class="ash-notas-boton">💬' + (notas.length > 1 ? ' ' + notas.length : '') + '</button>' : '') +
         (puede ? '<button type="button" class="ash-menu-boton" aria-label="Más de esta tarea">⋮</button>' : '') +
@@ -152,6 +156,7 @@ var AsuntoSinHitos = (function () {
     if (!caja || !h) return false;
     ultimo = { caja: caja, a: a, hitos: hitos, ajustes: ajustes, abierto: abierto };
     limpiarLoDeLosHitos(a, abierto);
+    revelarMenu();
     caja.classList.remove('con-mesa');
     U.conservandoLoEscrito(caja, function () {
       var lista = tareasDe(a, h);
@@ -197,6 +202,7 @@ var AsuntoSinHitos = (function () {
     Array.prototype.forEach.call(caja.querySelectorAll('.ash-tarea'), function (el) {
       var g = porId[el.dataset.id];
       if (!g) return;
+      if (window.AsuntoSinHitosFalta) AsuntoSinHitosFalta.enganchar(el, a, g, repintar);
       var casilla = el.querySelector('.ash-casilla');
       if (casilla && puede) casilla.onchange = function () {
         var hecha = casilla.checked;
@@ -284,6 +290,22 @@ var AsuntoSinHitos = (function () {
     return { sigue: !!ok, hayAviso: true };
   }
 
-  return { es: es, hitoDe: hitoDe, tipoSinHitos: tipoSinHitos, crear: crear, pintar: pintar, avisoAlCerrar: avisoAlCerrar };
+  /* Fila 701: «Cambiar la guía…» del menú «⋯» de la cabecera: avisa de que vale para todos los asuntos del tipo y abre el editor. */
+  async function cambiarLaGuia(a) {
+    var tipo = tipoDe(a);
+    if (!tipo || !window.GuiasDelCentro) return;
+    try { await GuiasDelCentro.escribir(tipo, { aviso: 'Vale para todos los asuntos de ' + tipo + ', no solo para este.' }); }
+    catch (err) { U.fallo('No he podido abrir la guía', err); return; }
+    if (window.HitosPanel) HitosPanel.programarRepintado(); else repintar();
+  }
+
+  /* «Cambiar la guía…» está en el menú desde el principio, escondido: se enseña si el asunto que se ve es una lista de tareas y está abierto. */
+  function revelarMenu() {
+    var it = document.querySelector('.ficha-nombre [data-clave="cambiar-guia"]');
+    if (it) it.hidden = !(ultimo && ultimo.abierto && !soloLectura());
+  }
+
+  return { es: es, hitoDe: hitoDe, tipoSinHitos: tipoSinHitos, crear: crear, pintar: pintar, avisoAlCerrar: avisoAlCerrar,
+           cambiarLaGuia: cambiarLaGuia, revelarMenu: revelarMenu, repintar: repintar };
 })();
 window.AsuntoSinHitos = AsuntoSinHitos;

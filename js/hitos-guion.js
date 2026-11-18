@@ -118,7 +118,8 @@
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
                receta: g.receta || null,
                copia: x.copia || null,   /* fila 552: lo copiado o lo pendiente (js/tarea-copiar.js) */
-               soloSi: (!propio && g.soloSi) || null,   /* fila 576: «Cuándo se hace» (js/solo-si.js) */
+               soloSi: ((!propio || g.deGuia) && g.soloSi) || null,
+               deGuia: !!g.deGuia,   /* fila 701: copiada de la guía de un tipo «sin hitos» al nacer el asunto */   /* fila 576: «Cuándo se hace» (js/solo-si.js) */
                hechoCon: x.hechoCon || null,   /* fila 671: lo apuntado al marcarla con su botón (js/tarea-hecha.js) */
                faltaAlgo: (!x.hecho && !x.noaplica && x.falta) || null,   /* fila 671: «Falta algo» de una tarea de Comprobar */
                como: '' };   /* fila 671: «Cómo se hace» (lo pone Sitios.aplicarDatos) */

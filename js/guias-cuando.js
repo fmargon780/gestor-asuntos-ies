@@ -18,7 +18,9 @@ var GuiasCuando = (function () {
   var tipo = '';
   var contador = 0;
 
-  function ponerTipo(t) { tipo = String(t || ''); }
+  var conClase = false;   /* fila 701: solo la guía de un tipo «sin hitos» ofrece «Solo si el tercero es…» */
+
+  function ponerTipo(t, opciones) { tipo = String(t || ''); conClase = !!(opciones && opciones.conClase); }
   function tipoActual() { return tipo; }
 
   /* Fila 615: «+ Nuevo campo de lista…» solo con un tipo de asunto de verdad (no en un modelo de la biblioteca). */
@@ -27,7 +29,13 @@ var GuiasCuando = (function () {
   }
 
   function camposDelTipo() {
-    return window.TextoCondicional ? TextoCondicional.camposDeLista(tipo) : [];
+    var lista = window.TextoCondicional ? TextoCondicional.camposDeLista(tipo) : [];
+    if (conClase && window.SoloSi) lista = lista.concat([{ nombre: SoloSi.CAMPO_TERCERO, valores: SoloSi.clasesDelTipo(tipo) }]);   /* fila 701 */
+    return lista;
+  }
+
+  function textoDeOpcion(n) {
+    return window.SoloSi && n === SoloSi.CAMPO_TERCERO ? 'Solo si el tercero es…' : 'Solo si el campo «' + U.escapar(n) + '» vale…';
   }
 
   function opcionesDe(campo, soloSi) {
@@ -48,7 +56,7 @@ var GuiasCuando = (function () {
     if (actual && !nombres.some(function (n) { return U.normalizar(n) === U.normalizar(actual); })) nombres.push(actual);
     var opts = '<option value="">Siempre</option>' + nombres.map(function (n) {
       return '<option value="' + U.escapar(n) + '"' + (actual && U.normalizar(n) === U.normalizar(actual) ? ' selected' : '') +
-        '>Solo si el campo «' + U.escapar(n) + '» vale…</option>';
+        '>' + textoDeOpcion(n) + '</option>';
     }).join('');
     if (tipoReal() && window.ListaNuevo) opts += ListaNuevo.opcionHTML('+ Nuevo campo de lista…');   /* fila 615 */
     var html = '<div class="cuando-linea"><label class="etiqueta" for="' + id + '">Cuándo se hace</label>' +
@@ -59,7 +67,7 @@ var GuiasCuando = (function () {
         return '<label class="cuando-valor-et"><input type="checkbox" class="cuando-valor" value="' + U.escapar(v) + '"' +
           (marcados.indexOf(U.normalizar(v)) !== -1 ? ' checked' : '') + '> ' + U.escapar(v) + '</label>';
       }).join('') + '</div>' +
-        '<p class="nota cuando-nota">En el asunto, si el campo tiene otro valor, esto no sale.</p>' +
+        '<p class="nota cuando-nota">' + (window.SoloSi && actual === SoloSi.CAMPO_TERCERO ? 'En el asunto, si el tercero es de otra clase, esto no sale.' : 'En el asunto, si el campo tiene otro valor, esto no sale.') + '</p>' +   /* fila 701 */
         ((soloSi.valores || []).length ? '' : '<p class="nota cuando-nota">Marca al menos un valor; si no, se guardará como «Siempre».</p>') +
         ((soloSi.ademas || []).length ? '<p class="nota cuando-nota">Además, solo si ' + soloSi.ademas.map(function (x) { return U.escapar(x.campo + ': ' + x.valores.join(' o ')); }).join(' y ') + '.</p>' : '');
     }

@@ -54,7 +54,7 @@ var Hitos = (function () {
   async function pasosDeLaGuia(tipo) {
     var pasos = (window.GuiasDelCentro && (await window.GuiasDelCentro.ponerAlDia(), window.GuiasDelCentro.pasosDe(tipo))) || [];   /* fila 273: la guardada, no la de al arrancar */
     /* Fila 660: un tipo sin guía nace sin hitos («así obligamos a crear los correctos»): ya no recibe «Tramitar · Esperar respuesta · Archivar». */
-    return pasos;
+    return pasos.filter(function (p) { return !(p && p.listaDeTareas); });   /* fila 701: el paso de la lista de tareas no es un hito */
   }
 
   /* Asunto nuevo (sección 3.1): los hitos se crean de golpe al abrirlo,
@@ -66,7 +66,7 @@ var Hitos = (function () {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
     /* Fila 699: un tipo con la casilla «Sin hitos» nace con su lista de tareas vacía; su guía se queda guardada sin usarse. */
-    if (window.AsuntoSinHitos && AsuntoSinHitos.tipoSinHitos(tipo)) return AsuntoSinHitos.crear(clave);
+    if (window.AsuntoSinHitos && AsuntoSinHitos.tipoSinHitos(tipo)) return AsuntoSinHitos.crear(clave, tipo);
     var pasos = await pasosDeLaGuia(tipo);
     if (!pasos.length) return [];
     var resultado = null;

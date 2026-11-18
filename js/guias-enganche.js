@@ -177,12 +177,13 @@
 
       deEsta.forEach(function (tipo) {
         var pasos = pasosDe(tipo.tipo);
+        var esLista = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo); if (window.AsuntoSinHitosGuia) pasos = esLista ? AsuntoSinHitosGuia.tareasDe(pasos) : AsuntoSinHitosGuia.pasosVisibles(tipo.tipo, pasos);   /* fila 701: su guía es una lista de tareas */
         var f = document.createElement('div');
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
           '<span class="suave" style="flex:1">' +
           (pasos.length
-            ? (pasos.length === 1 ? '1 hito' : pasos.length + ' hitos')
+            ? pasos.length + (esLista ? ' tarea' : ' hito') + (pasos.length === 1 ? '' : 's')
             : 'sin guía todavía') + '</span>';
 
         var b = document.createElement('button');
@@ -242,16 +243,16 @@
       U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
-    var res = await llevarAAbiertos(nombreTipo, pasos, pasosAntes);
+    var res = await llevarAAbiertos(nombreTipo, pasos, pasosAntes), avisoLista = window.AsuntoSinHitosGuia ? await AsuntoSinHitosGuia.alGuardar(nombreTipo, pasos) : '';   /* fila 701 */
     try {
       pintarTabla();
       pintarGuiaNuevo();
       await window.Gestor.recargar();
       /* Fila 416: a cuántos asuntos ha llegado cada cosa y en cuántos no se ha tocado por tener ya trabajo. */
-      U.aviso(pasos.length
-        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' hitos.' +
+      U.aviso(avisoLista || (pasos.length
+        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.filter(function (p) { return !p.listaDeTareas; }).length + ' hitos.' +
           (textoDelReparto(res) ? ' ' + textoDelReparto(res) : '')
-        : nombreTipo + ' se queda sin guía.', 'bueno');
+        : nombreTipo + ' se queda sin guía.'), 'bueno');
       return true;
     } catch (e) {
       U.accesorio('Guía guardada, pero no he podido repintar la pantalla', e);
@@ -274,7 +275,7 @@
   async function guardarPasos(nombreTipo, pasosNuevos, opciones) {
     opciones = opciones || {};
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
-    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
+    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo))); if (window.AsuntoSinHitosGuia) pasosNuevos = AsuntoSinHitosGuia.conservarLista(nombreTipo, pasosNuevos, pasosAntes);   /* fila 701 */
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
     await guardarTipo(nombreTipo, pasosNuevos);
     /* Fila 255: los campos de un paso que ya no está pasan a ser del asunto. */
@@ -353,7 +354,7 @@
      dos copias se quedarían distintas. */
   window.GuiasDelCentro = {
     escribir: escribirGuia,
-    pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
+    pasosDe: function (tipo) { var p = pasosDe(tipo).slice(); return (window.AsuntoSinHitosGuia && !AsuntoSinHitosGuia.esLista(tipo)) ? AsuntoSinHitosGuia.pasosVisibles(tipo, p) : p; },   /* fila 701: un tipo con hitos no ve su lista de tareas guardada */
     todas: function () { return JSON.parse(JSON.stringify(guias || {})); },   /* fila 417: el buscador «Traer un hito de otro tipo» */
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,

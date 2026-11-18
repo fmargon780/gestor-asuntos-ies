@@ -264,12 +264,15 @@
      si lo tiene, `.organo`). */
   function resumenDeTipo(t) {
     var pasos = G.normalizar((window.GuiasDelCentro && GuiasDelCentro.pasosDe(t.tipo)) || []);
+    var deTareas = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(t.tipo);   /* fila 701: un tipo «sin hitos» habla de tareas */
+    if (deTareas) pasos = AsuntoSinHitosGuia.pasosVisibles(t.tipo, pasos);
     if (!pasos.length) {
-      return { pasos: pasos, texto: 'Sin guía: el asunto se crea sin hitos.' };
+      return { pasos: pasos, texto: deTareas ? 'Sin guía: el asunto se crea con la lista de tareas vacía.' : 'Sin guía: el asunto se crea sin hitos.' };
     }
     var documentos = 0;
     pasos.forEach(function (p) { documentos += (p.plantillasDocumento || []).length; });
-    var trozos = [pasos.length + (pasos.length === 1 ? ' hito' : ' hitos')];
+    var n = deTareas ? AsuntoSinHitosGuia.tareasDe(pasos).length : pasos.length;
+    var trozos = [n + (deTareas ? (n === 1 ? ' tarea' : ' tareas') : (n === 1 ? ' hito' : ' hitos'))];
     if (documentos) trozos.push(documentos + (documentos === 1 ? ' documento' : ' documentos'));
     var dias = window.App && App.plazoDeTipo ? App.plazoDeTipo(t.tipo) : null;
     if (dias) trozos.push('plazo de ' + dias + (dias === 1 ? ' día' : ' días'));

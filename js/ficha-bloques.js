@@ -316,7 +316,7 @@
     var aviso = document.createElement('span');
     aviso.className = 'suave';
     aviso.style.marginLeft = '8px';
-    aviso.textContent = 'Vale para todos los asuntos ' + tipo + ', no solo para este.';
+    aviso.textContent = 'Vale para todos los asuntos de ' + tipo + ', no solo para este.';
     fila.appendChild(aviso);
 
     caja.appendChild(fila);

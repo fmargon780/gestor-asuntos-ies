@@ -27,11 +27,14 @@
   /* `opciones.irA` (fila 113): el id de un hito; el cuadro se abre ya en
      su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
   function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
+    /* Fila 701: un tipo «sin hitos» se escribe como una lista de tareas (js/guia-sin-hitos.js). */
+    if (window.GuiaSinHitos && window.AsuntoSinHitos && AsuntoSinHitos.tipoSinHitos(nombreTipo)) return GuiaSinHitos.editar(nombreTipo, lista, opciones);
+    var oculta = (lista || []).filter(function (p) { return p && p.listaDeTareas; }); lista = (lista || []).filter(function (p) { return !(p && p.listaDeTareas); });   /* fila 701 */
     var pasos = G.normalizar(lista);
     var tipoInfo = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === nombreTipo; })[0];
     return G.convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')
       .catch(function () { /* sin poder convertir ahora, se abre el editor igual */ })
-      .then(function () { return abrirCuadro(); });
+      .then(function () { return abrirCuadro(); }).then(function (r) { return Array.isArray(r) ? r.concat(oculta) : r; });
 
     function abrirCuadro() {
     /* Fila 95 (docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md): el nivel que

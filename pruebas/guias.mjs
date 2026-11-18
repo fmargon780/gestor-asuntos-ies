@@ -104,7 +104,7 @@ await comprobar('la nota ofrece escribir la guía del tipo',
   pagina.locator('#ficha-guia-nota button').textContent(),
   'Escribir la guía de MATRICULA');
 await comprobar('y avisa de que vale para todos',
-  pagina.locator('#ficha-guia-nota').textContent().then(t => t.indexOf('todos los asuntos MATRICULA') !== -1), true);
+  pagina.locator('#ficha-guia-nota').textContent().then(t => t.indexOf('todos los asuntos de MATRICULA') !== -1), true);
 
 console.log('--- escribiéndola desde aquí ---');
 await pagina.locator('#ficha-guia-nota button').click();

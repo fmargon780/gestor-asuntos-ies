@@ -120,6 +120,7 @@
       opciones: [], elegida: null
     };
     if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
+    if (h && h.listaDeTareas && Array.isArray(h.tareasConocidas)) salida.tareasConocidas = h.tareasConocidas.map(String);   /* fila 701: las tareas de la guía que ya han llegado a este asunto */
     if (h && h.listaDeTareas) salida.listaDeTareas = true;   /* fila 699: el hito oculto donde vive la lista de tareas de un asunto «sin hitos» (js/asunto-sin-hitos.js) */
     /* Fila 205: una Administración como responsable (`adm:…`) lleva una copia de su nombre; en los demás hitos, nada. */
     if (h && window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) salida.responsableNombre = ResponsableOrganismo.copia(h.responsable, h.responsableNombre);

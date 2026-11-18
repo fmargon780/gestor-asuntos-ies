@@ -175,6 +175,10 @@ var AjustesPlegado = (function () {
 
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
     var textoPasos = pasos.length ? plural(pasos.length, 'hito', 'hitos') : 'sin guía';
+    if (window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo)) {   /* fila 701: un tipo «sin hitos» cuenta tareas */
+      var nt = AsuntoSinHitosGuia.tareasDe(pasos).length;
+      textoPasos = nt ? plural(nt, 'tarea', 'tareas') : 'sin tareas';
+    }
     var secPasos = seccionDelTipo('pasos');
     ponerResumen(secPasos, textoPasos);
 

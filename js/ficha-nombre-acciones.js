@@ -102,6 +102,10 @@
         }
       });
     }
+    /* Fila 701: «Cambiar la guía…» solo sale en un asunto sin hitos (lo enseña js/asunto-sin-hitos.js al pintar la lista). */
+    if (abierto && window.AsuntoSinHitos) {
+      lista.push({ texto: 'Cambiar la guía…', clave: 'cambiar-guia', oculto: true, alPulsar: function () { AsuntoSinHitos.cambiarLaGuia(a); } });
+    }
     /* Fila 137: «Índice del expediente», abierto o archivado. */
     if (window.IndiceExpediente) lista.push(IndiceExpediente.opcionDelMenu(a));
     /* Fila 135: «Marcar como reservado» / «Quitar la reserva». */
@@ -131,6 +135,7 @@
         h2.appendChild(boton);
         var menu = FichaMenus.montar(boton, opciones);
         revelarDatosDelTercero(viendo, menu);
+        if (window.AsuntoSinHitos && AsuntoSinHitos.revelarMenu) AsuntoSinHitos.revelarMenu();   /* fila 701 */
       }
     }
   }

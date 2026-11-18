@@ -19,6 +19,23 @@
    ============================================================ */
 var SoloSi = (function () {
 
+  /* Fila 701: «Solo si el tercero es de tal clase». Es un dato más que se puede elegir, solo en la guía de un tipo «sin hitos»:
+     el «campo» se llama así y sus valores son las clases de tercero del tipo (con el nombre de la lista de Ajustes). */
+  var CAMPO_TERCERO = 'Clase del tercero';
+
+  function clasesDelTipo(tipo) {
+    var t = ((window.App && App.E && App.E.tipos) || []).filter(function (x) { return x.tipo === tipo; })[0];
+    if (!t || !window.Nombres) return [];
+    return Nombres.categoriasDe(t).map(function (c) { return Nombres.textoCategoria(c, 'lista'); });
+  }
+
+  function claseDelAsunto(a, tipo) {
+    var cat = (a && a.ficha && a.ficha.categoria) || (a && a.leido && a.leido.categoria) || '';
+    if (cat && window.Nombres) return Nombres.textoCategoria(cat, 'lista');
+    var clases = clasesDelTipo(tipo);
+    return clases.length === 1 ? clases[0] : '';
+  }
+
   function igual(a, b) {
     if (window.TextoCondicional) return TextoCondicional.igual(a, b);
     return String(a === undefined || a === null ? '' : a).trim().toLowerCase() === String(b === undefined || b === null ? '' : b).trim().toLowerCase();
@@ -90,6 +107,7 @@ var SoloSi = (function () {
   function etiqueta(c) {
     c = normalizar(c);
     if (!c) return '';
+    if (c.campo === CAMPO_TERCERO && !(c.ademas || []).length) return 'Solo si el tercero es ' + c.valores.join(' o ');   /* fila 701 */
     return 'Solo si ' + [c].concat(c.ademas || []).map(function (x) { return x.campo + ': ' + x.valores.join(' o '); }).join(' y ');
   }
 
@@ -119,7 +137,11 @@ var SoloSi = (function () {
       var g = guardados[Campos.claveDeCampo(cfg)];
       if (g && g.valor) campos[Campos.nombreDeCampo(cfg, App.E.campos)] = String(g.valor);
     });
-    return { campos: campos, camposLista: TextoCondicional.listasPorNombre(tipo, a.ficha) };
+    var listas = TextoCondicional.listasPorNombre(tipo, a.ficha);
+    listas[CAMPO_TERCERO] = clasesDelTipo(tipo);   /* fila 701 */
+    var clase = claseDelAsunto(a, tipo);
+    if (clase) campos[CAMPO_TERCERO] = clase;
+    return { campos: campos, camposLista: listas };
   }
 
   function asuntoDeClave(clave) {
@@ -149,6 +171,7 @@ var SoloSi = (function () {
     Object.keys(datos.porAsunto).forEach(function (clave) {
       var entrada = datos.porAsunto[clave];
       if (!entrada || !(entrada.hitos || []).length) return;
+      entrada.hitos.forEach(function (h) { if (h && h.listaDeTareas) h.claveAsunto = clave; });   /* fila 701: para contar sus tareas con «Solo si» (js/hitos-a-quien.js) */
       var hay = false;
       (function ver(ls) { (ls || []).forEach(function (h) { if (h && h.soloSi) hay = true; if (h && h.clase === 'decision') (h.opciones || []).forEach(function (o) { ver(o.hitos); }); }); })(entrada.hitos);
       if (!hay) return;
@@ -193,6 +216,7 @@ var SoloSi = (function () {
   function fuera(x) { return !!x && x.cond === 'quita' && x.estado !== 'hecho'; }
 
   return {
+    CAMPO_TERCERO: CAMPO_TERCERO, clasesDelTipo: clasesDelTipo,
     normalizar: normalizar, sumar: sumar, estado: estado, detalle: detalle, etiqueta: etiqueta, igual: igual, faltaHTML: faltaHTML,
     tipoDe: tipoDe, valoresDe: valoresDe, asuntoDeClave: asuntoDeClave, marcarLista: marcarLista, marcarTodo: marcarTodo, fuera: fuera, ajustarEnCurso: ajustarEnCurso, recorrer: recorrer
   };
