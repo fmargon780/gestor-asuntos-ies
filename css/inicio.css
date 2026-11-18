@@ -535,3 +535,13 @@ button.avisos-linea-trozo:hover {
   z-index: 40;
   pointer-events: none;
 }
+
+/* ---------- Aviso «falta señalar la carpeta de entrada» (fila 687, js/entrada-aviso.js) ---------- */
+.aviso-sin-entrada {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13.5px; color: #8a5a00;
+  background: var(--ambar, #fff4d6); border: 1px solid var(--ambar-linea, #e0b34a);
+  border-radius: 6px; padding: 4px 10px;
+}
+#aviso-sin-entrada-clasificar { margin: 0 0 10px; }
+.aviso-sin-entrada.oculto, .aviso-sin-entrada .oculto { display: none; }
