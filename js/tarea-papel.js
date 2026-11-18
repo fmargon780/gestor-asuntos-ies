@@ -56,17 +56,21 @@ var TareaPapel = (function () {
   /* El estado de la tarea de papel: { pasos: [{ k, t, hecho, aMano, quien, cuando }], toca: índice del que toca o -1, todos }. */
   function estado(a, g) {
     var rec = recorridoDe(g), est = g.papelDoc || {}, manual = est.manual || {}, doc = docDe(a, est.numero);
+    var enFirma = !!(g.espera && g.espera.paso === 'firmado');   /* fila 704: puesto a la firma, a la espera del PDF firmado */
     var pasos = RecorridoTipo.pasosDe(rec).map(function (p) {
       var prueba = false;
       if (p.k === 'generado' || p.k === 'recibido') prueba = !!est.numero;
       else if (p.k === 'firmado') prueba = !!doc && (Number(doc.firmas) || 0) >= firmasNecesarias(rec, est);
       else if (p.k === 'registrado') prueba = !!doc && (doc.registros || []).length > 0;
       var m = manual[p.k];
-      return { k: p.k, t: p.t, hecho: prueba || !!m, aMano: !prueba && !!m, quien: (m && m.quien) || '', cuando: (m && m.cuando) || '' };
+      var texto = p.t;
+      if (!(prueba || m) && p.k === 'firmado' && enFirma) texto = 'A la firma';
+      if (!(prueba || m) && p.k === 'registrado' && est.pideSello) texto = 'Falta el sellado';
+      return { k: p.k, t: texto, hecho: prueba || !!m, aMano: !prueba && !!m, quien: (m && m.quien) || '', cuando: (m && m.cuando) || '' };
     });
     var toca = -1;
     pasos.forEach(function (p, i) { if (toca === -1 && !p.hecho) toca = i; });
-    return { pasos: pasos, toca: toca, todos: toca === -1 };
+    return { pasos: pasos, toca: toca, todos: toca === -1, enFirma: enFirma, pideSello: !!est.pideSello };
   }
 
   /* El botón del paso que toca (en esta fila, solo los de generar y añadir): { k, texto } o null. */
@@ -75,6 +79,8 @@ var TareaPapel = (function () {
     if (!p) return null;
     if (p.k === 'generado') return { k: 'generar', texto: 'Generar documento' };
     if (p.k === 'recibido') return { k: 'anadir', texto: 'Añadir documento' };
+    if (p.k === 'firmado' && !est.enFirma) return { k: 'firmar', texto: 'Poner a la firma' };   /* fila 704 */
+    if (p.k === 'registrado' && !est.pideSello) return { k: 'registrar', texto: 'Registrar' };
     return null;
   }
 
@@ -105,6 +111,7 @@ var TareaPapel = (function () {
       p.numero = String(datos.numero || '');
       p.nombre = String(datos.nombre || '');
       if (Number(datos.firmas) > 0) p.firmas = Number(datos.firmas); else delete p.firmas;
+      if (datos.quienFirma) p.quienFirma = String(datos.quienFirma); else delete p.quienFirma;
     });
   }
 
@@ -114,7 +121,7 @@ var TareaPapel = (function () {
     await editar(a, h, function (hito) {
       var p = papelDocDe(hito, g.id);
       if (numero) p.soltados = (p.soltados || []).concat([numero]);
-      delete p.numero; delete p.nombre; delete p.firmas;
+      delete p.numero; delete p.nombre; delete p.firmas; delete p.quienFirma; delete p.pideSello;
       if (p.manual) { delete p.manual.generado; delete p.manual.recibido; }
     });
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Documento quitado de la tarea: ' + g.texto);
@@ -128,8 +135,44 @@ var TareaPapel = (function () {
       var d = papelDocDe(hito, g.id);
       d.manual = d.manual || {};
       d.manual[p.k] = { quien: quien(), cuando: U.ahora() };
+      if (p.k === 'firmado') delete (hito.guionHecho[g.id] || {}).espera;   /* fila 704: marcado a mano, deja de esperar la firma */
     });
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Paso «' + p.t + '» marcado a mano: ' + g.texto);
+  }
+
+  /* ---------- fila 704: poner a la firma y registrar ---------- */
+
+  /* Quién firma, escrito para la espera: lo que dijo la plantilla o, si no, el recorrido del tipo. */
+  function quienFirma(g) {
+    var est = g.papelDoc || {};
+    if (est.quienFirma) return est.quienFirma;
+    var f = recorridoDe(g).firma;
+    return /visto bueno/i.test(f) ? f.replace(/^(.*?),\s*con visto bueno de\s*/i, '$1 y ') : (f === 'Nadie' ? 'Dirección' : f);
+  }
+
+  /* Hoy más los días hábiles de Ajustes (uno para todo el centro; nace en 1), con los festivos y días no lectivos. */
+  function diaPropuesto() {
+    var d = window.Hitos && Hitos.ultimosLeidos ? Hitos.ultimosLeidos() : null;
+    var aj = (d && d.ajustes) || {};
+    return Plazos.sumarPlazo(U.hoyIso(), aj.diasFirma || 1, 'habiles', aj.festivos, aj.noLectivos);
+  }
+
+  /* «Poner a la firma»: la tarea queda esperando a quien firma, con el día propuesto. */
+  async function ponerAFirma(a, h, g) {
+    var nombre = quienFirma(g), dia = diaPropuesto();
+    await editar(a, h, function (hito) {
+      hito.guionHecho = hito.guionHecho || {};
+      var e = hito.guionHecho[g.id] = hito.guionHecho[g.id] || {};
+      e.espera = { quien: 'firma', nombre: nombre, paso: 'firmado', desde: U.hoyIso(), volver: dia };
+    });
+    if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Documento puesto a la firma de ' + nombre + ': ' + g.texto);
+    if (window.TareaEspera) await TareaEspera.avisar();
+  }
+
+  /* «Registrar»: la tarea queda con «Falta el sellado» hasta que llegue el PDF sellado. */
+  async function pedirSello(a, h, g) {
+    await editar(a, h, function (hito) { papelDocDe(hito, g.id).pideSello = true; });
+    if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Documento llevado a registrar; falta el sellado: ' + g.texto);
   }
 
   /* Los números de documento del asunto cuyo tipo es `papel`. */
@@ -164,6 +207,19 @@ var TareaPapel = (function () {
     return cambios.length;
   }
 
+  /* Llegado el PDF firmado, la tarea deja de esperar. Devuelve cuántas ha cambiado. */
+  async function acabarEsperasDeFirma(a, h) {
+    var n = 0;
+    var lista = Hitos.guionDe(a, h).filter(function (g) { return g.papel && g.espera && g.espera.paso === 'firmado'; });
+    for (var i = 0; i < lista.length; i++) {
+      var st = estado(a, lista[i]).pasos.filter(function (p) { return p.k === 'firmado'; })[0];
+      if (!st || !st.hecho) continue;
+      await editar(a, h, function (hito) { var e = (hito.guionHecho || {})[lista[i].id]; if (e) delete e.espera; });
+      n++;
+    }
+    return n;
+  }
+
   /* Pone la tarea hecha cuando todos sus pasos lo están (y sin hacer cuando deja de estarlo). Devuelve cuántas ha cambiado. */
   async function ponerHechas(a, h) {
     var n = 0;
@@ -187,6 +243,7 @@ var TareaPapel = (function () {
       if (!Hitos.guionDe(a, fresco).some(function (g) { return g.papel; })) return false;
       if (await unirSueltos(a, fresco, preferida)) cambio = true;
       var de = Hitos.buscar(await Hitos.hitosDe(a.nombre), h.id) || fresco;
+      if (await acabarEsperasDeFirma(a, de)) { cambio = true; de = Hitos.buscar(await Hitos.hitosDe(a.nombre), h.id) || de; }
       if (await ponerHechas(a, de)) cambio = true;
       return cambio;
     } catch (e) {
@@ -196,6 +253,6 @@ var TareaPapel = (function () {
   }
 
   return { estado: estado, botonDe: botonDe, firmasDePlantilla: firmasDePlantilla, firmasNecesarias: firmasNecesarias, anadir: anadir, asignar: asignar,
-           quitarDocumento: quitarDocumento, marcarAMano: marcarAMano, sincronizar: sincronizar, documentosDeTipo: documentosDeTipo };
+           quitarDocumento: quitarDocumento, ponerAFirma: ponerAFirma, pedirSello: pedirSello, diaPropuesto: diaPropuesto, quienFirma: quienFirma, marcarAMano: marcarAMano, sincronizar: sincronizar, documentosDeTipo: documentosDeTipo };
 })();
 window.TareaPapel = TareaPapel;

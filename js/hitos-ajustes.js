@@ -65,6 +65,11 @@
         'placeholder="12/10/2026&#10;08/12/2026"></textarea>' +
         '<button id="btn-guardar-festivos" class="boton" style="margin-top:8px">Guardar festivos</button>' +
         '<div id="aviso-festivos" class="aviso-en-vivo"></div>' +
+        '<h4 class="hitos-subtitulo">Documentos a la firma</h4>' +
+        '<p class="explica">Al poner un documento a la firma, la tarea propone volver a mirarlo pasados estos días hábiles. Vale para todo el centro; en cada espera se puede cambiar el día.</p>' +
+        '<label class="etiqueta" for="hitos-dias-firma">Días hábiles para volver a mirar un documento puesto a la firma</label>' +
+        '<input id="hitos-dias-firma" class="campo" type="number" min="1" max="30" step="1" style="max-width:100px">' +
+        '<button id="btn-guardar-dias-firma" class="boton" style="margin-left:8px">Guardar</button>' +
         '<h4 class="hitos-subtitulo">Días no lectivos</h4>' +
         '<p class="explica">Una fecha por línea (DD/MM/AAAA, o como te resulte cómodo). Vacaciones y ' +
         'días sin clase del calendario escolar. Solo cuentan para los plazos en días lectivos. Un ' +
@@ -80,6 +85,10 @@
     $('nuevo-responsable').onkeydown = function (ev) { if (ev.key === 'Enter') anadirResponsable(); };
     $('btn-guardar-no-lectivos').onclick = guardarNoLectivos;
     $('btn-guardar-festivos').onclick = guardarFestivos;
+    $('btn-guardar-dias-firma').onclick = async function () {   /* fila 704 */
+      try { await Hitos.guardarDiasFirma($('hitos-dias-firma').value); U.aviso('Días guardados.', 'bueno'); pintar(); }
+      catch (e) { U.fallo('No he podido guardarlo', e); }
+    };
     return d;
   }
 
@@ -252,6 +261,8 @@
     if (caja2 && document.activeElement !== caja2) {
       caja2.value = datos.ajustes.noLectivos.map(function (iso) { return Plazos.legible(iso); }).join('\n');
     }
+    var cajaDias = $('hitos-dias-firma');
+    if (cajaDias && document.activeElement !== cajaDias) cajaDias.value = String(datos.ajustes.diasFirma || 1);
     var caja3 = $('hitos-festivos');
     if (caja3 && document.activeElement !== caja3) {
       caja3.value = (datos.ajustes.festivos || []).map(function (iso) { return Plazos.legible(iso); }).join('\n');
