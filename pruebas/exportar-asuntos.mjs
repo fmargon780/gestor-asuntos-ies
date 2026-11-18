@@ -76,7 +76,8 @@ await pagina.click('#btn-filtros');
 await comprobar('el filtro «Fechas» está en «Filtros», con Desde y Hasta', pagina.locator('#filtro-fecha-desde, #filtro-fecha-hasta').count(), 2);
 await pagina.fill('#filtro-fecha-desde', isoHaceDias(6));
 await pagina.fill('#filtro-fecha-hasta', isoHaceDias(1));
-await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length < n, cuentaTodos);
+/* Fila 696: se espera al número esperado, no a que «baje»: con solo «Desde» ya baja (19) y se leía antes de aplicarse «Hasta» (9). */
+await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === n, esperadosEnFechas);
 await comprobar('con Desde y Hasta solo salen los asuntos iniciados entre esos días (los dos extremos entran)',
   pagina.locator('#inicio-tabla-cuerpo tr[data-asunto]').count(), esperadosEnFechas);
 await comprobar('«Filtros (1)» cuenta Fechas como uno', pagina.locator('#btn-filtros').textContent(), 'Filtros (1)');
