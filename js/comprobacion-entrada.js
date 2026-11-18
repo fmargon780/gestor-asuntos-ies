@@ -258,6 +258,8 @@
     var T = 'Carpeta de entrada de documentos sueltos';
     var arreglar = llevarA('#entrada-ajustes');
     var h = window.Entrada ? Entrada.carpetaSenalada() : null;
+    /* Fila 687: con las carpetas en Drive y sin señalar, «Por clasificar» no ve nada: falta, no está bien. */
+    if (!h && window.EntradaAviso && EntradaAviso.falta()) return resultado('entrada', T, 'falta', EntradaAviso.FRASE, arreglar);
     if (!h) return resultado('entrada', T, 'bien', 'Sin señalar: se usa la de asuntos vivos.');
     if (enDemo() && !(Demo.permisosSimulados && Demo.permisosSimulados())) return resultado('entrada', T, 'bien', 'Señalada.');
     if (!(await Carpetas.permiso(h, false))) {

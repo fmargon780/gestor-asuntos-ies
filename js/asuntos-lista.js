@@ -65,6 +65,7 @@ App.verAbiertosPorTurno = async function (yaLeido) {
   var entrada = window.Entrada ? await Entrada.leer(hay) : { ficheros: hay.ficheros, noEsta: false };
   if (turno !== App.turnoVerAbiertos) return App.promesaVerAbiertos;
   App.E.entradaNoEsta = !!entrada.noEsta;
+  if (window.EntradaAviso) EntradaAviso.pintar();   /* fila 687: falta señalar la carpeta de entrada */
   App.E.sueltos = entrada.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
 
   /* Un documento que ya se ha metido en su carpeta deja de estar recién

@@ -45,6 +45,7 @@
     // Fila 204 (docs/COMPROBACION-AL-ENTRAR.md): las cosas que se configuran una vez, revisadas al entrar.
     'js/permisos-carpetas.js',
     'js/entrada-ajustes.js',
+    'js/entrada-aviso.js',   // fila 687
     'js/pasar-a-drive-ajustes.js',
     'js/datos-que-tengo.js',
     'js/datos-que-tengo-ver.js',
