@@ -25,4 +25,4 @@ Nada: es un tropiezo de Claude Code (de la fila 671). Francisco dijo que sí a d
 - Nada: no cambia lo que se ve.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026, Claude Code) Tarea pequeña, comparada con la instrucción: coincide. Era la prueba (el cuadro de cerrar seguía tapando «Crear»); no se toca la app. 6 pasadas seguidas sin segundo intento.

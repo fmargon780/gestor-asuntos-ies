@@ -9,3 +9,5 @@ Máximo 60 líneas. Si una lección deja de ser cierta, se corrige o se borra.
 - (5-nov-2026, tema 518) Poner un ejemplo con varias expulsiones dentro de un mismo asunto. Un asunto es un solo hecho, no un contenedor en el tiempo: cada expulsión es un asunto distinto, aunque sea del mismo alumno y tipo. En su lugar: diseñar con un valor de cada dato por asunto.
 
 Las lecciones de diseño generales que estaban aquí (ideas 460 y 544, temas 518 y 540) pasaron a `LECCIONES.md` del método el 7-nov-2026, o ya son regla.
+
+- (18-nov-2026, fila 673) Una prueba que acepta un cuadro y espera «a que haya filas» sigue de frente con el cuadro aún tapando · la lista ya estaba pintada antes de que se cerrara · esperar a `#capa.oculto` antes de pulsar lo siguiente.

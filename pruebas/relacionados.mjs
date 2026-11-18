@@ -93,6 +93,10 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 /* ---------- asunto B: sin relacionados, para el escenario 1 ---------- */
 
 async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
+  /* Fila 673: el cuadro de la acción anterior (cerrar el asunto…) puede seguir
+     tapando la pantalla un momento después de aceptarlo; el clic de «Crear»
+     chocaba con él. Se espera a que se haya ido, no una pausa fija. */
+  await pagina.waitForSelector('#capa.oculto', { state: 'attached' });
   await pagina.click('.pestana[data-pantalla="nuevo"]');
   await pagina.click('#categorias-lista .categoria-boton:nth-child(' + categoriaIndice + ')');
   await pagina.getByRole('button', { name: botonTipo, exact: true }).click();
