@@ -59,7 +59,7 @@ var GuiaSinHitos = (function () {
         fila.className = 'gsh-fila';
         fila.dataset.pos = i;
         fila.innerHTML = '<div class="gsh-linea"><span class="gsh-num">' + (i + 1) + '</span>' +
-          '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Qué hay que hacer" aria-label="Tarea ' + (i + 1) + '">' +
+          '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe la tarea" aria-label="Tarea ' + (i + 1) + '">' +
           '<span class="gsh-mandos"></span></div>';
         var mandos = fila.querySelector('.gsh-mandos');
         function boton(texto, titulo, hacer, clase, apagado) {
