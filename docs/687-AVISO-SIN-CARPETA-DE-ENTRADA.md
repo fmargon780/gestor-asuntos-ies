@@ -29,4 +29,9 @@ No lo escribió él: es una idea de Claude salida de la fila 677 (`docs/notas-di
 - En el tuyo, con la carpeta ya señalada: no sale ningún aviso.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026, tarea pequeña, comparada por la sesión con la prueba `aviso-sin-carpeta-de-entrada.mjs`)
+- Aviso ámbar con la frase pedida y «Señalar la carpeta», en Inicio y arriba de «Por clasificar»: coincide.
+- Al señalarla, desaparece el aviso y salen los documentos: coincide.
+- Comprobación al entrar: «Falta» con «Arreglarlo» (lleva a Ajustes, donde está «Señalar»): coincide.
+- Con la carpeta señalada o fuera de Drive no cambia nada; en solo consultar sale el texto sin botón: coincide.
+- No lo he podido ver en un ordenador real con Drive (solo en el navegador de pruebas con disco de mentira).
