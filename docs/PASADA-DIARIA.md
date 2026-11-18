@@ -1,1 +1,1 @@
-Última pasada completa: 17-nov-2026 (Madrid) · 33 min · verde (402 de 402; `navegador` falló en la pasada por la fila 698, se adaptó y pasa) · commit de la rama fila 698
+Última pasada completa: 18-nov-2026 (Madrid) · 32 min · con fallos (401 de 402; `pasar-a-drive` falló en la tanda y pasa a solas) · commit de la rama fila 696
