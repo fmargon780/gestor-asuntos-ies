@@ -76,7 +76,15 @@ var AsuntoSinHitosGuia = (function () {
   /* Después de guardar la guía de un tipo «sin hitos»: reparte las tareas nuevas y devuelve la frase verde de después. */
   /* Lo que se enseña de la guía de un tipo: en uno «sin hitos», solo la lista de tareas (los hitos de antes se quedan sin usar). */
   function pasosVisibles(tipo, pasos) {
-    return esLista(tipo) ? (pasos || []).filter(function (p) { return p && p.listaDeTareas; }) : (pasos || []);
+    var lista = esLista(tipo);
+    return (pasos || []).filter(function (p) { return p && !!p.listaDeTareas === lista; });
+  }
+
+  /* Al guardar la guía de un tipo con hitos: la lista de tareas guardada (de cuando tuvo la casilla «Sin hitos») no se pierde. */
+  function conservarLista(tipo, nuevos, antes) {
+    if (esLista(tipo) || pasoLista(nuevos)) return nuevos;
+    var p = pasoLista(antes);
+    return p ? (nuevos || []).concat([p]) : nuevos;
   }
 
   function esLista(tipo) { return !!(window.AsuntoSinHitos && window.GuiaSinHitos && AsuntoSinHitos.tipoSinHitos(tipo)); }
@@ -110,6 +118,17 @@ var AsuntoSinHitosGuia = (function () {
     return datos.porAsunto[clave] ? datos.porAsunto[clave].hitos : null;
   }
 
-  return { pasoLista: pasoLista, tareasDe: tareasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, pasosVisibles: pasosVisibles, completar: completar };
+  /* Ajustes › Guía de un tipo «sin hitos»: «N tareas» y las frases en su orden, con su «Solo si». */
+  function vistaHTML(pasos) {
+    var tareas = tareasDe(pasos);
+    if (!tareas.length) return '<div class="vacio">Todavía no hay tareas en la guía de este tipo.</div>';
+    return '<p class="suave gsh-cuenta">' + (tareas.length === 1 ? '1 tarea' : tareas.length + ' tareas') + '</p>' +
+      '<ol class="gsh-vista">' + tareas.map(function (g) {
+        var cuando = window.SoloSi && g.soloSi ? SoloSi.etiqueta(g.soloSi) : '';
+        return '<li>' + U.escapar(g.texto) + (cuando ? ' <span class="suave">· ' + U.escapar(cuando) + '</span>' : '') + '</li>';
+      }).join('') + '</ol>';
+  }
+
+  return { conservarLista: conservarLista, vistaHTML: vistaHTML, pasoLista: pasoLista, tareasDe: tareasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, pasosVisibles: pasosVisibles, completar: completar };
 })();
 window.AsuntoSinHitosGuia = AsuntoSinHitosGuia;

@@ -177,7 +177,7 @@
 
       deEsta.forEach(function (tipo) {
         var pasos = pasosDe(tipo.tipo);
-        var esLista = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo); if (esLista) pasos = AsuntoSinHitosGuia.tareasDe(pasos);   /* fila 701: su guía es una lista de tareas */
+        var esLista = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(tipo.tipo); if (window.AsuntoSinHitosGuia) pasos = esLista ? AsuntoSinHitosGuia.tareasDe(pasos) : AsuntoSinHitosGuia.pasosVisibles(tipo.tipo, pasos);   /* fila 701: su guía es una lista de tareas */
         var f = document.createElement('div');
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
@@ -250,7 +250,7 @@
       await window.Gestor.recargar();
       /* Fila 416: a cuántos asuntos ha llegado cada cosa y en cuántos no se ha tocado por tener ya trabajo. */
       U.aviso(avisoLista || (pasos.length
-        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' hitos.' +
+        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.filter(function (p) { return !p.listaDeTareas; }).length + ' hitos.' +
           (textoDelReparto(res) ? ' ' + textoDelReparto(res) : '')
         : nombreTipo + ' se queda sin guía.'), 'bueno');
       return true;
@@ -275,7 +275,7 @@
   async function guardarPasos(nombreTipo, pasosNuevos, opciones) {
     opciones = opciones || {};
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
-    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
+    var pasosAntes = JSON.parse(JSON.stringify(pasosDe(nombreTipo))); if (window.AsuntoSinHitosGuia) pasosNuevos = AsuntoSinHitosGuia.conservarLista(nombreTipo, pasosNuevos, pasosAntes);   /* fila 701 */
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
     await guardarTipo(nombreTipo, pasosNuevos);
     /* Fila 255: los campos de un paso que ya no está pasan a ser del asunto. */
@@ -354,7 +354,7 @@
      dos copias se quedarían distintas. */
   window.GuiasDelCentro = {
     escribir: escribirGuia,
-    pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
+    pasosDe: function (tipo) { var p = pasosDe(tipo).slice(); return (window.AsuntoSinHitosGuia && !AsuntoSinHitosGuia.esLista(tipo)) ? AsuntoSinHitosGuia.pasosVisibles(tipo, p) : p; },   /* fila 701: un tipo con hitos no ve su lista de tareas guardada */
     todas: function () { return JSON.parse(JSON.stringify(guias || {})); },   /* fila 417: el buscador «Traer un hito de otro tipo» */
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,

@@ -126,8 +126,9 @@
      Administración. `n` y `m` cuentan las tareas que aplican; `titulo` es la frase de la primera sin hacer; sin tareas,
      `sinTareas`; con todas hechas, `listo` (y sin `hito`, como un asunto con todos sus hitos hechos). */
   function deLasTareas(h) {
+    var v = (h.claveAsunto && window.SoloSi) ? SoloSi.valoresDe(SoloSi.asuntoDeClave(h.claveAsunto)) : null;   /* fila 701: con «Solo si», las que no salen no cuentan */
     var lista = (typeof Hitos.guionDe === 'function' ? Hitos.guionDe(null, h) : [])
-      .filter(function (g) { return !g.pregunta && !g.noaplica; });
+      .filter(function (g) { return !g.pregunta && !g.noaplica && !(v && g.soloSi && SoloSi.estado(g.soloSi, v) === 'quita'); });
     var r = { lado: 'administracion', quien: '', hito: h.id, desde: h.desde || '', titulo: '', n: 0, m: lista.length,
               esperando: null, listaDeTareas: true };
     if (!lista.length) { r.sinTareas = true; return r; }

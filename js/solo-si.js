@@ -171,6 +171,7 @@ var SoloSi = (function () {
     Object.keys(datos.porAsunto).forEach(function (clave) {
       var entrada = datos.porAsunto[clave];
       if (!entrada || !(entrada.hitos || []).length) return;
+      entrada.hitos.forEach(function (h) { if (h && h.listaDeTareas) h.claveAsunto = clave; });   /* fila 701: para contar sus tareas con «Solo si» (js/hitos-a-quien.js) */
       var hay = false;
       (function ver(ls) { (ls || []).forEach(function (h) { if (h && h.soloSi) hay = true; if (h && h.clase === 'decision') (h.opciones || []).forEach(function (o) { ver(o.hitos); }); }); })(entrada.hitos);
       if (!hay) return;

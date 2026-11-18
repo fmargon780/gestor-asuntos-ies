@@ -67,7 +67,7 @@ var GuiasCuando = (function () {
         return '<label class="cuando-valor-et"><input type="checkbox" class="cuando-valor" value="' + U.escapar(v) + '"' +
           (marcados.indexOf(U.normalizar(v)) !== -1 ? ' checked' : '') + '> ' + U.escapar(v) + '</label>';
       }).join('') + '</div>' +
-        '<p class="nota cuando-nota">En el asunto, si el campo tiene otro valor, esto no sale.</p>' +
+        '<p class="nota cuando-nota">' + (window.SoloSi && actual === SoloSi.CAMPO_TERCERO ? 'En el asunto, si el tercero es de otra clase, esto no sale.' : 'En el asunto, si el campo tiene otro valor, esto no sale.') + '</p>' +   /* fila 701 */
         ((soloSi.valores || []).length ? '' : '<p class="nota cuando-nota">Marca al menos un valor; si no, se guardará como «Siempre».</p>') +
         ((soloSi.ademas || []).length ? '<p class="nota cuando-nota">Además, solo si ' + soloSi.ademas.map(function (x) { return U.escapar(x.campo + ': ' + x.valores.join(' o ')); }).join(' y ') + '.</p>' : '');
     }

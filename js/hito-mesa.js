@@ -306,7 +306,7 @@ var HitoMesa = (function () {
     var tipo = tipoDe(a);
     if (!tipo) return;
     var ok = await U.preguntar('Cambiar la guía',
-      '<p>Vale para todos los asuntos ' + U.escapar(tipo) + ', no solo para este.</p>', 'Cambiar la guía');
+      '<p>Vale para todos los asuntos de ' + U.escapar(tipo) + ', no solo para este.</p>', 'Cambiar la guía');
     if (!ok) return;
     var hecho = await GuiasDelCentro.escribir(tipo);
     if (hecho && window.HitosPanel) HitosPanel.programarRepintado();

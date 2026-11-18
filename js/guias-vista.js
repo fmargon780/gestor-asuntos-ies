@@ -267,7 +267,7 @@
     var deTareas = !!window.AsuntoSinHitosGuia && AsuntoSinHitosGuia.esLista(t.tipo);   /* fila 701: un tipo «sin hitos» habla de tareas */
     if (deTareas) pasos = AsuntoSinHitosGuia.pasosVisibles(t.tipo, pasos);
     if (!pasos.length) {
-      return { pasos: pasos, texto: 'Sin guía: el asunto se crea sin hitos.' };
+      return { pasos: pasos, texto: deTareas ? 'Sin guía: el asunto se crea con la lista de tareas vacía.' : 'Sin guía: el asunto se crea sin hitos.' };
     }
     var documentos = 0;
     pasos.forEach(function (p) { documentos += (p.plantillasDocumento || []).length; });

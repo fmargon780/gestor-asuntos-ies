@@ -142,12 +142,49 @@ await comprobar('9. al elegir «Otro» la tarea que no toca desaparece y no cuen
   [['Pedir el certificado', 'Enviar la carta', 'Avisar al personal'], '0 de 3 tareas hechas']);
 await comprobar('9. el dato queda guardado en «Datos» del asunto', pagina.evaluate((k) => JSON.stringify(App.E.registro.asuntos[k].campos || {}).indexOf('Otro') !== -1, NUEVO), true);
 
+await comprobar('9. en Inicio tampoco cuentan las que no salen', pagina.evaluate((k) => Hitos.ladoDeAsunto(Gestor.asuntos().filter((x) => x.nombre === k)[0]).texto, NUEVO), 'Tarea 1 de 3 · Pedir el certificado');
+
+console.log('--- Ajustes › Guía de un tipo sin hitos ---');
+await pagina.evaluate((t) => App.abrirTipoDeAsunto(App.E.tipos.filter((x) => x.tipo === t)[0]), TIPO);
+await pagina.waitForSelector('#pantalla-tipo-asunto details[data-seccion="pasos"] .gsh-vista', { state: 'attached' });
+const textoGuia = () => pagina.evaluate(() => { const d = document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"]'); return d.textContent; });
+const sinHito = () => pagina.evaluate(() => {
+  const d = document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"]');
+  const comp = document.querySelector('#pantalla-tipo-asunto').textContent;
+  return [/hito|bifurcaci/i.test(d.textContent), /Guía \(\d+ hitos?\)/.test(comp), /5 tareas/.test(d.querySelector('summary').textContent), !!d.querySelector('.guia-vista, .tarjeta-paso'), !!Array.prototype.some.call(d.querySelectorAll('button'), (b) => b.textContent === 'Ver mapa')];
+});
+await comprobar('11. Ajustes › Guía enseña las tareas y habla solo de tareas', sinHito(), [false, false, true, false, false]);
+await comprobar('11. las frases salen en su orden, con su «Solo si»', pagina.locator('#pantalla-tipo-asunto .gsh-vista li').allTextContents(),
+  ['Pedir el certificado de notas', 'Enviar la carta', 'Avisar al personal · Solo si el tercero es ' + CLASE, 'Archivar la copia', 'Pedir el traslado · Solo si Motivo 701: Traslado']);
+pagina.evaluate((t) => GuiasDelCentro.escribir(t), TIPO);
+await pagina.waitForSelector('#capa:not(.oculto) #gsh-lista');
+await comprobar('11. la nota de «Solo si el tercero es…» habla del tercero', pagina.locator('#gsh-lista .gsh-fila').nth(2).locator('.cuando-nota').first().innerText(), 'En el asunto, si el tercero es de otra clase, esto no sale.');
+await pagina.click('#cuadro-cancelar');
+await pagina.waitForTimeout(300);
+await comprobar('11. «Nuevo asunto» de un tipo sin hitos y sin guía no habla de hitos', pagina.evaluate(() => {
+  const t = { tipo: 'PRUEBA 701 SIN GUIA', categoria: App.E.tipos[0].categoria, sinHitos: true };
+  App.E.tipos.push(t); const r = Guias.resumenDeTipo(t).texto; App.E.tipos.pop(); return r;
+}), 'Sin guía: el asunto se crea con la lista de tareas vacía.');
+await pagina.locator('#pantalla-tipo-asunto details[data-seccion="datos"]').evaluate((d) => { d.open = true; });
+await pagina.locator('#pantalla-tipo-asunto label', { hasText: 'Sin hitos: el asunto es una lista de tareas' }).locator('input').uncheck();
+await pagina.waitForFunction(() => !document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"] .gsh-vista'), null, { timeout: 8000 });
+await comprobar('11. al desmarcar la casilla, la Guía vuelve a la de hitos sin volver a entrar', pagina.evaluate(() => /bifurcaciones/.test(document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"] summary').textContent)), true);
+await comprobar('11. al desmarcar, la lista de tareas guardada no sale como un hito', pagina.evaluate((t) => [GuiasDelCentro.pasosDe(t).some((p) => p.listaDeTareas), /Tareas/.test(document.querySelector('#pantalla-tipo-asunto details[data-seccion="pasos"] .bloque-cuerpo').textContent)], TIPO), [false, false]);
+await pagina.locator('#pantalla-tipo-asunto label', { hasText: 'Sin hitos: el asunto es una lista de tareas' }).locator('input').check();
+await pagina.waitForSelector('#pantalla-tipo-asunto details[data-seccion="pasos"] .gsh-vista', { state: 'attached', timeout: 8000 });
+await comprobar('11. al marcarla, vuelve la lista de tareas sin volver a entrar', sinHito(), [false, false, true, false, false]);
+await comprobar('11. en «Campos» de un tipo sin hitos no se elige hito', pagina.locator('#pantalla-tipo-asunto details[data-seccion="campos"] .campo-hito-select').count(), 0);
+await pagina.evaluate(() => App.cerrarTipoDeAsunto());
+
 console.log('--- sin cambios en los demás ---');
 await pagina.evaluate(async (t) => { App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = false; await App.guardarTipos(); }, TIPO);
 pagina.evaluate((t) => GuiasDelCentro.escribir(t), TIPO);
 await pagina.waitForSelector('#capa:not(.oculto) #cuadro-cuerpo .guia-dos-col');
 await comprobar('10. un tipo sin la casilla se edita con el editor de siempre', pagina.evaluate(() => [!!document.getElementById('gsh-lista'), !!document.getElementById('guia-anadir')]), [false, true]);
-await pagina.click('#cuadro-cancelar');
+await comprobar('10. y no enseña la lista de tareas guardada como un hito', pagina.evaluate(() => /Tareas/.test(Array.prototype.map.call(document.querySelectorAll('#cuadro-cuerpo .paso-titulo, #cuadro-cuerpo input.paso-titulo'), (x) => x.value || x.textContent).join('|'))), false);
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(800);
+await comprobar('10. al guardar la guía de hitos, la lista de tareas guardada se conserva', pagina.evaluate(async (t) => { await GuiasDelCentro.ponerAlDia(); App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = true; const n = AsuntoSinHitosGuia.tareasDe(GuiasDelCentro.pasosDe(t)).length; App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = false; return n; }, TIPO), 5);
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
