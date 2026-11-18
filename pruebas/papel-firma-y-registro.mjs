@@ -75,6 +75,7 @@ await pagina.evaluate(async (k) => {
   for (const n of ['D26-91001', 'D26-91002']) await DocumentosDatos.anotar(k, n, { tipo: 'COMUNICACION', fecha: U.hoyIso(), registros: [], campos: [], texto: '' });
 }, A);
 await abrirFicha(A);
+await pagina.waitForSelector('#ficha-guia .tp-boton', { timeout: 15000 });
 await comprobar('1. con el documento generado, el botón es «Poner a la firma»', tareas().nth(0).locator('.tp-boton').innerText(), 'Poner a la firma');
 await comprobar('2. el día propuesto es hoy más los días hábiles de Ajustes (1) y el número nace en 1', pagina.evaluate(async () => [(await Hitos.leer()).ajustes.diasFirma, TareaPapel.diaPropuesto() === Plazos.sumarPlazo(U.hoyIso(), 1, 'habiles', (await Hitos.leer()).ajustes.festivos, (await Hitos.leer()).ajustes.noLectivos)]), [1, true]);
 await comprobar('3. el día propuesto salta fin de semana y festivos', pagina.evaluate(() => [Plazos.sumarPlazo('2026-11-20', 1, 'habiles', [], []), Plazos.sumarPlazo('2026-11-20', 1, 'habiles', ['2026-11-23'], [])]), ['2026-11-23', '2026-11-24']);
@@ -108,6 +109,7 @@ await comprobar('11. y no en «En Administración»', textoFila('adm'), null);
 console.log('--- llega el PDF firmado ---');
 await pagina.evaluate((k) => DocumentosDatos.anotar(k, 'D26-91002', { tipo: 'COMUNICACION', fecha: U.hoyIso(), firmas: 2, registros: [], campos: [], texto: '' }), A);
 await abrirFicha(A);
+await pagina.waitForFunction(() => /Carta dos/.test(document.body.innerText) && document.querySelectorAll('#ficha-guia .ash-tarea').length === 2, null, { timeout: 15000 });
 await pagina.waitForTimeout(800);
 await comprobar('12. con dos papeles, el firmado de uno no toca al otro: la espera de «Carta uno» sigue', espera().then((l) => [!!l[0], !!l[1]]), [true, false]);
 await comprobar('13. «Carta dos» marca «Firmado» con su documento', linea(1), 'COMUNICACION ✓ Generado › ✓ Firmado › Registrado › Enviado');
@@ -124,6 +126,7 @@ await pagina.evaluate(() => {
   RutaCarpetas.botonDocumento = (a, modo, doc) => ({ click: () => window.__rutas.push(doc.nombre) });
 });
 await abrirFicha(A);
+await pagina.waitForFunction(() => /Registrar/.test((document.querySelector('#ficha-guia .tp-boton') || {}).textContent || ''), null, { timeout: 15000 });
 await comprobar('16. el botón del paso que toca es «Registrar»', tareas().nth(0).locator('.tp-boton').innerText(), 'Registrar');
 await tareas().nth(0).locator('.tp-boton').click();
 await pagina.waitForFunction(() => document.querySelector('#ficha-guia .tp-paso.toca') && /Falta el sellado/.test(document.querySelector('#ficha-guia .tp-paso.toca').innerText), null, { timeout: 8000 });
