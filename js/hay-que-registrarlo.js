@@ -89,10 +89,12 @@ window.HayQueRegistrarlo = (function () {
     var entrada = datos.porAsunto[S.a.nombre];
     var hitos = entrada ? entrada.hitos : [];
     S.lista = elegibles(hitos);
+    S.listaDeTareas = hitos.some(function (h) { return h && h.listaDeTareas; });   /* fila 700 */
     S.numerados = Hitos.numerados ? Hitos.numerados(hitos) : S.lista;
   }
 
   function pintar() {
+    if (S.listaDeTareas) { S.caja.innerHTML = ''; return; }   /* fila 700: sin hitos no se pregunta a qué hito va la tarea «Registrar» */
     var n = S.lista.length;
     S.caja.innerHTML = '<label class="etiqueta" for="doc-registrar-hito-sel">Hito</label><div class="hito-linea">' +
       '<select id="doc-registrar-hito-sel" class="campo"' + (n ? '' : ' disabled') + '><option value="">' + (n ? 'Elige el hito…' : 'No hay hitos') + '</option>' +

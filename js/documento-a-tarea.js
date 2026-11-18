@@ -70,7 +70,7 @@ window.DocumentoATarea = (function () {
     /* Fila 680: sin hitos no hay nada que preguntar; el documento entra sin tarea. */
     if (!lista.length) {
       if (!o.colgar) return { sinTarea: true, hitoId: '', tareaId: null };
-      U.aviso('Para colgar un documento de una tarea, crea antes el hito.', 'ambar');
+      U.aviso(hitos.some(function (x) { return x && x.listaDeTareas; }) ? 'Los documentos de este asunto no se cuelgan de ninguna tarea.' : 'Para colgar un documento de una tarea, crea antes el hito.', 'ambar');
       return null;
     }
     var numerados = Hitos.numerados ? Hitos.numerados(hitos) : lista;

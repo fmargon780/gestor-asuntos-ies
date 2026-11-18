@@ -156,6 +156,12 @@
     catch (e) { U.accesorio('No he podido mirar qué asuntos pasan a Por liquidar', e); }
   }
 
+  /* Fila 700: los días hasta el plazo de una fila de «En Administración»: el del hito, o el del asunto si es una lista de tareas. */
+  function diasDelPlazo(entry) {
+    if (entry.listaDeTareas) { var p = App.plazoDe(entry.asunto); return p ? p.dias : null; }
+    return Plazos.diasHasta(entry.hito.fecha);
+  }
+
   async function calcular(texto) {
     var datos = await QueMeToca.reunir();
     var abiertos = (App.E.listaAbiertos || []).filter(function (a) { return coincideAsunto(a, texto); });
@@ -182,7 +188,8 @@
       var hito = r.hito ? Hitos.buscar(hitos, r.hito) : null;
       if (r.lado === 'terceros' && hito) { esp.push({ asunto: a, hito: hito }); return; }
       var item = { asunto: a, hito: hito };
-      if (!hito) {
+      if (r.listaDeTareas) item.listaDeTareas = true;   /* fila 700: su plazo es el del asunto y «Listo para cerrar» no pide añadir un hito */
+      else if (!hito) {
         item.sinHito = true;
         item.cargarPasos = !!(window.PorLiquidar && PorLiquidar.pasosPorCargar(a, datos));
       }
@@ -193,7 +200,7 @@
        después; y los que no tienen ningún hito por hacer, los últimos. */
     adm.sort(function (x, y) {
       if (!x.hito || !y.hito) return !x.hito && !y.hito ? 0 : (!x.hito ? 1 : -1);
-      var dx = Plazos.diasHasta(x.hito.fecha), dy = Plazos.diasHasta(y.hito.fecha);
+      var dx = diasDelPlazo(x), dy = diasDelPlazo(y);
       if (dx === null) return dy === null ? 0 : 1;
       if (dy === null) return -1;
       return dx - dy;
@@ -227,6 +234,7 @@
     if ((pestana === 'adm' || pestana === 'esp') && entry.hito) opciones.hito = entry.hito;
     if (pestana === 'esp') opciones.dias = QueMeToca.diasParado(entry.hito);
     if (entry.sinHito) { opciones.sinHito = true; opciones.cargarPasos = entry.cargarPasos; }   /* fila 451 */
+    if (entry.listaDeTareas) opciones.listaDeTareas = true;   /* fila 700 */
     return App.filaTablaAsunto(entry.asunto, opciones);
   }
 

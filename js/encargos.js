@@ -244,6 +244,10 @@ var Encargos = (function () {
     if (!entrada) return null;
     var vis = Hitos.visibles(entrada.hitos || []);
     if (!vis.length) return null;
+    if (vis.some(function (h) { return h.listaDeTareas; })) {   /* fila 700: un asunto «lista de tareas» dice su estado con tareas, no con hitos */
+      var r = Hitos.aQuienLeToca(entrada.hitos);
+      return { n: r.n, m: r.m, titulo: r.titulo, texto: Hitos.textoDelEstado(r) };
+    }
     var i = -1;
     vis.forEach(function (h, k) { if (i === -1 && h.estado === 'encurso') i = k; });
     if (i === -1) vis.forEach(function (h, k) { if (i === -1 && h.estado === 'pendiente') i = k; });

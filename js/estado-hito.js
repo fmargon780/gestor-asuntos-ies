@@ -86,7 +86,7 @@ var EstadoHito = (function () {
     if (l.listo && window.PorLiquidar && PorLiquidar.estaPorLiquidar(a)) texto = 'Por liquidar';
     var html = sinHito ? '' : l.hito
       ? '<button type="button" class="marca-hito' + clase + '" data-hito="' + esc(l.hito) +
-        '" data-ayuda-clave="abrir-este-hito">' + esc(texto) + '</button>'
+        '"' + (l.listaDeTareas ? '' : ' data-ayuda-clave="abrir-este-hito"') + '>' + esc(texto) + '</button>'
       : '<span class="marca-hito' + clase + '">' + esc(texto) + '</span>';
     if (l.esperando) {
       html += '<span class="marca-esperando' + (l.esperando.auto ? ' marca-esperando-auto' : '') + '" title="' +

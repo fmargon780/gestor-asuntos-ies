@@ -91,6 +91,8 @@
      listo, sinHitos }. */
   function aQuienLeToca(hitos, ajustes, contexto) {
     if (!hitos || !hitos.length) return { lado: null, quien: '', hito: null, sinHitos: true, esperando: null };
+    var listaDeTareas = hitos.filter(function (x) { return x && x.listaDeTareas; })[0];
+    if (listaDeTareas) return deLasTareas(listaDeTareas);   /* fila 700 */
     var cuentan = contables(hitos);
     var abiertos = Hitos.visibles(hitos).filter(function (h) {
       if (h.estado === 'hecho' || h.estado === 'noaplica') return false;
@@ -117,6 +119,24 @@
       m: cuentan.length,
       esperando: esperando
     };
+  }
+
+  /* Fila 700 (docs/700-ASUNTO-SIN-HITOS-EN-INICIO.md): un asunto «lista de tareas» (js/asunto-sin-hitos.js) no tiene hitos a la
+     vista: su estado sale de sus tareas, con el mismo objeto que da `aQuienLeToca` para los demás. Siempre le toca a
+     Administración. `n` y `m` cuentan las tareas que aplican; `titulo` es la frase de la primera sin hacer; sin tareas,
+     `sinTareas`; con todas hechas, `listo` (y sin `hito`, como un asunto con todos sus hitos hechos). */
+  function deLasTareas(h) {
+    var lista = (typeof Hitos.guionDe === 'function' ? Hitos.guionDe(null, h) : [])
+      .filter(function (g) { return !g.pregunta && !g.noaplica; });
+    var r = { lado: 'administracion', quien: '', hito: h.id, desde: h.desde || '', titulo: '', n: 0, m: lista.length,
+              esperando: null, listaDeTareas: true };
+    if (!lista.length) { r.sinTareas = true; return r; }
+    var i = -1;
+    lista.forEach(function (g, k) { if (i === -1 && !g.hecho) i = k; });
+    if (i === -1) { r.hito = null; r.listo = true; r.n = lista.length; return r; }
+    r.n = i + 1;
+    r.titulo = lista[i].texto || '';
+    return r;
   }
 
   /* Fila 162: «Esperando a <responsable>» sale solo cuando el hito es de
@@ -152,6 +172,10 @@
   function textoDelEstado(r) {
     if (!r || r.sinHitos) return 'Sin hitos';
     if (r.listo) return 'Listo para cerrar';
+    if (r.listaDeTareas) {   /* fila 700: «Tarea N de M · la frase» o «Sin tareas»; nunca «hito» */
+      if (r.sinTareas) return 'Sin tareas';
+      return 'Tarea ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
+    }
     return 'Hito ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
   }
 

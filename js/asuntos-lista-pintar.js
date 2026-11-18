@@ -404,7 +404,11 @@ App.filaTablaAsunto = function (a, opciones) {
   /* ---------- Plazo ---------- */
   var celdas = {};   /* fila 368: se colocan al final, en el orden de columnas de esta persona (js/inicio-columnas.js) */
   var tdPlazo = document.createElement('td');
-  if (pestana === 'adm' && opciones.hito) {
+  var deTareas = !!(opciones.listaDeTareas || (opciones.hito && opciones.hito.listaDeTareas));   /* fila 700: asunto «lista de tareas»: su plazo es el del asunto */
+  if (deTareas) {
+    var pt = App.plazoDe(a);
+    tdPlazo.innerHTML = pt ? '<span class="marca-plazo ' + pt.clase + '">' + U.escapar(pt.texto) + '</span>' : (pestana === 'adm' ? '<span class="marca-plazo">Sin plazo</span>' : '');
+  } else if (pestana === 'adm' && opciones.hito) {
     var pm = Plazos.etiquetaMeToca(opciones.hito.fecha);
     var textoPlazo = pm.clase ? pm.texto : 'Sin plazo';   /* "Sin fecha" → "Sin plazo" */
     tdPlazo.innerHTML = '<span class="marca-plazo' + (pm.clase ? ' ' + pm.clase : '') + '">' +
@@ -430,7 +434,7 @@ App.filaTablaAsunto = function (a, opciones) {
      nueva) por compatibilidad: es como muchas pruebas de pruebas/
      encuentran y pulsan el asunto abierto, sin acotar por columna. */
   spanTercero.className = 'nombre-pulsable tarjeta-nombre';
-  spanTercero.title = pestana === 'adm' ? 'Abrir este hito' : 'Abrir la ficha de este asunto';
+  spanTercero.title = pestana === 'adm' && !deTareas ? 'Abrir este hito' : 'Abrir la ficha de este asunto';
   /* El candado se enseña siempre que el asunto sea reservado
      (Reservados.es), tapado o no; lo que cambia con `tapado` es si se
      enseña también el tercero de verdad o el texto genérico. */
@@ -528,7 +532,7 @@ App.filaTablaAsunto = function (a, opciones) {
      comprobación, así que no abren nada por debajo. */
   tr.onclick = function (ev) {
     if (ev.target.closest('button, .inicio-tabla-menu, a, input, select, textarea')) return;
-    if (pestana === 'adm' && opciones.hito) QueMeToca.abrirMesaDelHito(a, opciones.hito);
+    if (pestana === 'adm' && opciones.hito && !deTareas) QueMeToca.abrirMesaDelHito(a, opciones.hito);
     else App.abrirFicha(a, 'abierto');
   };
 
