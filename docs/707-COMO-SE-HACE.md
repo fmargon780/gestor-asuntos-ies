@@ -47,4 +47,7 @@ Preguntado si iba en el molde o aparte, eligió «2»: en el molde. A la propues
 - Abrir un asunto de ese tipo y pulsar la marca de esa tarea.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026) Segundo revisor: los 7 puntos coinciden; texto escapado; sin errores de consola. Menores sin tocar: un botón «Cambiar la guía» bajo la lista justo al crear el asunto (ya existía) y el cuadro del editor muestra 2 líneas.
+
+## Qué mirar al terminar (hecho)
+- Escribir «Cómo se hace» en una tarea de la guía y pulsar ⓘ en un asunto de ese tipo.
