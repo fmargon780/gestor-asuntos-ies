@@ -70,4 +70,4 @@ De «+ Añadir tarea» en una línea: «Sí, me vale.»
 - Abrir un asunto con hitos y ver que está como siempre.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- Segundo revisor (18-nov-2026): APROBADA a la primera. Los 11 puntos coinciden. Hace de más, sin pedirlo: «Cambiar la guía» sale bajo «+ Añadir tarea» (fila 701); la cuenta dice «0 de 1 tareas hechas»; el selector de tipo al crear sigue diciendo «2 hitos…»; cada cambio de tarea suma una línea al Registro.

@@ -65,6 +65,8 @@ var Hitos = (function () {
   async function crearDesdeGuia(clave, tipo) {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
+    /* Fila 699: un tipo con la casilla «Sin hitos» nace con su lista de tareas vacía; su guía se queda guardada sin usarse. */
+    if (window.AsuntoSinHitos && AsuntoSinHitos.tipoSinHitos(tipo)) return AsuntoSinHitos.crear(clave);
     var pasos = await pasosDeLaGuia(tipo);
     if (!pasos.length) return [];
     var resultado = null;

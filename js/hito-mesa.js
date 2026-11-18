@@ -92,6 +92,13 @@ var HitoMesa = (function () {
   function aplicar(caja, a, hitos, ajustes, abierto) {
     if (!caja) return;
     ultimo = { caja: caja, a: a, hitos: hitos, ajustes: ajustes, abierto: abierto };
+    /* Fila 699: un asunto «lista de tareas» no tiene mesa de hito: el panel y la lista de tareas (js/asunto-sin-hitos.js). */
+    if (window.AsuntoSinHitos && AsuntoSinHitos.es(hitos)) {
+      abierta = null;
+      AsuntoSinHitos.pintar(caja, a, hitos, ajustes, abierto);
+      if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
+      return;
+    }
     /* Fila 425: sin hito pedido, el actual (el primero sin hacer); con todos hechos, la lista. */
     if (a && (!abierta || abierta.clave !== a.nombre) && listaElegida !== a.nombre && window.EstadoHito && EstadoHito.idActual) {
       var porDefecto = EstadoHito.idActual(hitos, ajustes);

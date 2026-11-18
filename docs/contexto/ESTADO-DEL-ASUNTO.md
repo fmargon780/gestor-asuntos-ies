@@ -129,3 +129,5 @@ de guías va en línea para no cerrar el editor. Si el organismo tiene departame
   son responsables de algún hito abierto (`ResponsableOrganismo.usadosEn`).
 - Las listas fijas (`Hitos.RESPONSABLES_DEFECTO`, `Hitos.PAPELES`) y Ajustes › Hitos no cambian.
   Prueba: `pruebas/responsable-organismo.mjs`.
+
+- **Asunto «lista de tareas»** (fila 699, `js/asunto-sin-hitos.js`, `css/asunto-sin-hitos.css`): un tipo con `tipo.sinHitos` (casilla en Ajustes del tipo) da asuntos nuevos con UN hito oculto (`h.listaDeTareas`, «Tareas») que solo guarda las tareas (`guionPropio`, `guionHecho`); `HitoMesa.aplicar` pinta en su lugar el panel («Ahora toca…», «Listo para cerrar») y la lista, sin fila de hitos ni casilla de la guía. Se reconoce por llevar ese hito, no por el tipo: los asuntos de antes no cambian. La guía del tipo se guarda sin usarse y la sincronización de guías se salta estos asuntos. `DocumentoATarea.hitosElegibles` no ofrece el hito oculto (los documentos entran sin tarea). `App.cerrarAsunto` avisa de las tareas sin hacer y deja seguir. Inicio aún dice «Hito 1 de 1 · Tareas» hasta la fila 700. Prueba: `pruebas/asunto-sin-hitos.mjs`.
