@@ -105,3 +105,4 @@ cambios uno detrás de otro, un fichero por asunto abierto) y la sección 7 de
 | 704 | `docs/704-PAPEL-FIRMA-Y-REGISTRO.md` | PENDIENTE (17-nov-2026) | Necesita la fila 703 |
 | 705 | `docs/705-PAPEL-ENVIAR.md` | PENDIENTE (17-nov-2026) | Necesita la fila 704 |
 | 706 | `docs/706-ROTULOS.md` | PENDIENTE (17-nov-2026) | Necesita la fila 705 |
+| 708 | Tropiezo (de la fila 702): un asunto «lista de tareas» de un tipo que se liquida (SEGURO ESCOLAR) pasa a «Por liquidar» pero sigue saliendo en «En Administración» como «Tarea 1 de 3», sin el chip «Por liquidar», y «Liquidar» no hace nada visible; visto por el revisor en la copia de pruebas, sin ninguna espera de por medio. Mirar cómo se llevan `Por liquidar` y el asunto «lista de tareas». | IDEA (18-nov-2026 · tropiezo) | |
