@@ -50,7 +50,7 @@ await pagina.locator('#gsh-lista .gsh-como').first().fill('Entra en Séneca.\nVe
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 await pagina.waitForTimeout(400);
-await comprobar('2. se guarda con la tarea y solo la que lo tiene', pagina.evaluate((t) => GuiasDelCentro.pasosDe(t).filter((x) => x.listaDeTareas)[0].guion.map((g) => g.como || ''), TIPO),
+await comprobar('2. se guarda con la tarea y solo la que lo tiene', pagina.evaluate((t) => GuiasDelCentro.pasosDe(t).filter((x) => x.listaDeTareas)[0].guion.map((g) => g.comoSeHace || ''), TIPO),
   ['Entra en Séneca.\nVe a Alumnado › Certificados.\nImprime el certificado.', '']);
 
 console.log('--- el asunto ---');
@@ -77,8 +77,8 @@ console.log('--- se corrige en la guía ---');
 await pagina.evaluate(async (t) => {
   const pasos = GuiasDelCentro.pasosDe(t);
   const g = pasos.filter((p) => p.listaDeTareas)[0].guion;
-  g[0].como = 'Texto corregido';
-  g[1].como = 'Ahora también esta';
+  g[0].comoSeHace = 'Texto corregido';
+  g[1].comoSeHace = 'Ahora también esta';
   await GuiasDelCentro.guardarPasos(t, pasos);
 }, TIPO);
 await abrirFicha(NUEVO);

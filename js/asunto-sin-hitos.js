@@ -123,7 +123,7 @@ var AsuntoSinHitos = (function () {
     if (!g || !g.origenGuia || !window.GuiasDelCentro || !window.AsuntoSinHitosGuia) return '';
     var pasos = GuiasDelCentro.pasosDe(tipoDe(a)) || [];
     var t = AsuntoSinHitosGuia.tareasDe(pasos).filter(function (x) { return x.id === g.origenGuia; })[0];
-    return (t && t.como) || '';
+    return (t && t.comoSeHace) || '';
   }
 
   function tareaHTML(g, a, abierto, ahora) {

@@ -251,8 +251,8 @@ var GuiasGuion = (function () {
       var soloSi = window.SoloSi ? SoloSi.normalizar(g && g.soloSi) : null;
       if (soloSi) base.soloSi = soloSi;
       /* Fila 707: «Cómo se hace» de una tarea de la guía de un tipo «sin hitos» (js/guia-sin-hitos.js): texto libre de varias líneas. */
-      var como = String((g && g.como) || '').replace(/\r\n?/g, '\n').trim();
-      if (como) base.como = como;
+      var comoSeHace = String((g && g.comoSeHace) || '').replace(/\r\n?/g, '\n').trim();
+      if (comoSeHace) base.comoSeHace = comoSeHace;
       if (g && g.comun) base.comun = String(g.comun);   /* fila 531: viene de la lista común de tareas (js/comunes.js) */
       /* Fila 138: algo que hay que reunir. */
       if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {

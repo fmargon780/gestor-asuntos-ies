@@ -9,7 +9,7 @@
    tercero es de tal clase.
 
    Fila 707 (docs/707-COMO-SE-HACE.md): cada tarea puede llevar «Cómo se hace», un texto libre de varias líneas
-   (`como`), opcional; el asunto lo enseña desplegable junto a la tarea (js/asunto-sin-hitos.js).
+   (`comoSeHace`), opcional; el asunto lo enseña desplegable junto a la tarea (js/asunto-sin-hitos.js).
 
    Se guarda como UN paso de la guía del tipo (`listaDeTareas: true`, sus frases en `guion`). Los demás
    pasos que el tipo tuviera (una guía con hitos de antes de marcar la casilla) se dejan como están,
@@ -48,7 +48,7 @@ var GuiaSinHitos = (function () {
         if (!g) return;
         g.texto = fila.querySelector('.gsh-texto').value.trim();
         var como = fila.querySelector('.gsh-como').value.trim();   /* fila 707 */
-        if (como) g.como = como; else delete g.como;
+        if (como) g.comoSeHace = como; else delete g.comoSeHace;
         var si = window.GuiasCuando && window.SoloSi ? SoloSi.normalizar(GuiasCuando.leer(fila)) : null;
         if (si) g.soloSi = si; else delete g.soloSi;
       });
@@ -66,7 +66,7 @@ var GuiaSinHitos = (function () {
         fila.innerHTML = '<div class="gsh-linea"><span class="gsh-num">' + (i + 1) + '</span>' +
           '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe la tarea" aria-label="Tarea ' + (i + 1) + '">' +
           '<span class="gsh-mandos"></span></div>' +
-          '<textarea class="campo gsh-como" rows="2" placeholder="Cómo se hace (opcional): explicación, pasos, ruta de Séneca o normativa" aria-label="Cómo se hace la tarea ' + (i + 1) + '">' + esc(g.como) + '</textarea>';
+          '<textarea class="campo gsh-como" rows="2" placeholder="Cómo se hace (opcional): explicación, pasos, ruta de Séneca o normativa" aria-label="Cómo se hace la tarea ' + (i + 1) + '">' + esc(g.comoSeHace) + '</textarea>';
         var mandos = fila.querySelector('.gsh-mandos');
         function boton(texto, titulo, hacer, clase, apagado) {
           var b = document.createElement('button');
