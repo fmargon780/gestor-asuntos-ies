@@ -23,4 +23,4 @@ Nada: es un tropiezo de Claude Code (de la fila 678). Francisco dijo que sí a d
 - Nada: no cambia lo que se ve.
 
 ## Revisión y respuestas durante el trabajo
-- (las apunta Claude Code)
+- (18-nov-2026, Claude Code) Ya arreglada por la fila 696 (la prueba espera al número esperado de filas). Comprobado: 4 pasadas seguidas sin fallo. Fila DESCARTADA como duplicada; no se toca nada.
