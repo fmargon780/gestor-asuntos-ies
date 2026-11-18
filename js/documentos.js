@@ -329,6 +329,9 @@ var Documentos = (function () {
     /* Al cerrar el cuadro su contenido se queda en la página, escondido: solo vale el que se ve. */
     if (document.querySelector('#capa:not(.oculto) #doc-cuerpo')) {
       if (document.querySelector('#capa:not(.oculto) #doc-guardar')) { U.aviso('Termina antes con este documento.', 'ambar'); return; }
+      /* Devuelta por Francisco (16-nov-2026): soltar un fichero nunca marca ninguna tarea. Si el cuadro se abrió desde una tarea
+         o un hito, ese hito y esa tarea no valen para lo soltado: entra sin hito ni tarea, como en un cuadro nuevo. */
+      N.hitoActual = null; N.tareaActual = null; N.preguntarTarea = false; N.colgar = false;
       N.pintarFormulario({ modo: 'anadir', nombreActual: fichero.name,
         handle: { kind: 'file', name: fichero.name, getFile: function () { return Promise.resolve(fichero); } } });
       return;
