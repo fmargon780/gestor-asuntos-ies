@@ -15,6 +15,7 @@
        hechas» y «Cerrar el asunto»;
      - la lista de tareas (casilla, frase, quién y cuándo, «solo aquí», «⋮» con Anotar, Cambiar y Borrar);
      - «+ Añadir tarea», en una línea.
+   Fila 702: una tarea puede estar esperando (js/tarea-espera.js): «Esperando a…» en su ⋮, la línea y los tres botones bajo ella y el panel.
    Nada de «Qué se hace», «Dónde se hace», «A quién» ni «Qué documento» (fila 703 en adelante).
    Sin casilla «los cambios van a la guía»: lo que se hace aquí se queda en el asunto.
 
@@ -91,6 +92,8 @@ var AsuntoSinHitos = (function () {
         '<span>Todas las tareas están hechas.</span></div>' + cuenta +
         (abierto ? '<button type="button" class="boton boton-principal ash-cerrar">Cerrar el asunto</button>' : '') + '</div>';
     }
+    var espera = window.TareaEspera ? TareaEspera.panelDe(siguiente) : null;   /* fila 702: la primera tarea sin hacer espera */
+    if (espera) return '<div class="ash-panel ' + espera.clase + '"><div class="ash-panel-texto"><b>' + esc(espera.titulo) + '</b><span>' + esc(espera.sub) + '</span></div>' + cuenta + '</div>';
     return '<div class="ash-panel ash-toca"><div class="ash-panel-texto"><b>Ahora toca: ' + esc(siguiente.texto) + '</b>' +
       '<span>Le toca a Administración.</span></div>' + cuenta + '</div>';
   }
@@ -141,7 +144,8 @@ var AsuntoSinHitos = (function () {
         (como ? '<button type="button" class="ash-como-boton" aria-expanded="' + comoAbierto + '" aria-label="Cómo se hace" title="Cómo se hace">ⓘ</button>' : '') +
         (notas.length ? '<button type="button" class="ash-notas-boton">💬' + (notas.length > 1 ? ' ' + notas.length : '') + '</button>' : '') +
         (puede ? '<button type="button" class="ash-menu-boton" aria-label="Más de esta tarea">⋮</button>' : '') +
-      '</div>' + (comoAbierto ? '<div class="ash-como">' + esc(como) + '</div>' : '') + debajoHTML(g, a) + '</div>';
+      '</div>' + (comoAbierto ? '<div class="ash-como">' + esc(como) + '</div>' : '') + debajoHTML(g, a) +
+      (window.TareaEspera ? TareaEspera.debajoHTML(g, puede) : '') + '</div>';   /* fila 702: la espera de la tarea */
   }
 
   function anadirHTML(abierto) {
@@ -228,11 +232,16 @@ var AsuntoSinHitos = (function () {
       var notasBoton = el.querySelector('.ash-notas-boton');
       if (notasBoton) notasBoton.onclick = function () { e(g.id).notasAbiertas = !e(g.id).notasAbiertas; repintar(); };
       var menu = el.querySelector('.ash-menu-boton');
-      if (menu && window.FichaMenus) FichaMenus.montar(menu, [
-        { texto: 'Anotar', clase: 'ash-anotar-opcion', alPulsar: function () { e(g.id).anotando = true; e(g.id).editando = false; repintar(); } },
-        { texto: 'Cambiar', clase: 'ash-cambiar-opcion', alPulsar: function () { e(g.id).editando = true; e(g.id).anotando = false; repintar(); } },
-        { texto: 'Borrar', clase: 'ficha-menu-peligro ash-borrar-opcion', alPulsar: function () { guardar(menu, 'borrar la tarea', function () { return borrar(a, h, g); }); } }
-      ]);
+      if (menu && window.FichaMenus) {
+        var opciones = [
+          { texto: 'Anotar', clase: 'ash-anotar-opcion', alPulsar: function () { e(g.id).anotando = true; e(g.id).editando = false; repintar(); } },
+          { texto: 'Cambiar', clase: 'ash-cambiar-opcion', alPulsar: function () { e(g.id).editando = true; e(g.id).anotando = false; repintar(); } },
+          { texto: 'Borrar', clase: 'ficha-menu-peligro ash-borrar-opcion', alPulsar: function () { guardar(menu, 'borrar la tarea', function () { return borrar(a, h, g); }); } }
+        ];
+        if (window.TareaEspera && !g.hecho && !g.espera) opciones.splice(2, 0, TareaEspera.opcionMenu(a, h, g, guardar, menu));   /* fila 702: «Esperando a…» */
+        FichaMenus.montar(menu, opciones);
+      }
+      if (window.TareaEspera && g.espera) TareaEspera.enganchar(el, a, h, g, guardar);   /* fila 702 */
 
       var editar = el.querySelector('.ash-editar-texto');
       if (editar) {

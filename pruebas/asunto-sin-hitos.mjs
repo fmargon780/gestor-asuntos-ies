@@ -96,7 +96,7 @@ await comprobar('4. se puede desmarcar', cuenta(), '0 de 2 tareas hechas');
 
 console.log('--- el ⋮ ---');
 await pagina.locator('.ash-tarea').nth(1).locator('.ash-menu-boton').click();
-await comprobar('5. ofrece Anotar, Cambiar y Borrar', pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')).map((b) => b.textContent.trim())), ['Anotar', 'Cambiar', 'Borrar']);
+await comprobar('5. ofrece Anotar, Cambiar, Esperando a… (fila 702) y Borrar', pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')).map((b) => b.textContent.trim())), ['Anotar', 'Cambiar', 'Esperando a…', 'Borrar']);
 await pagina.click('.ficha-menu:not(.oculto) .ficha-menu-opcion >> text=Cambiar');
 await pagina.fill('.ash-editar-texto', 'Enviar la carta certificada');
 await pagina.keyboard.press('Enter');

@@ -92,7 +92,7 @@
   function aQuienLeToca(hitos, ajustes, contexto) {
     if (!hitos || !hitos.length) return { lado: null, quien: '', hito: null, sinHitos: true, esperando: null };
     var listaDeTareas = hitos.filter(function (x) { return x && x.listaDeTareas; })[0];
-    if (listaDeTareas) return deLasTareas(listaDeTareas);   /* fila 700 */
+    if (listaDeTareas) return deLasTareas(listaDeTareas, ajustes, contexto);   /* fila 700 */
     var cuentan = contables(hitos);
     var abiertos = Hitos.visibles(hitos).filter(function (h) {
       if (h.estado === 'hecho' || h.estado === 'noaplica') return false;
@@ -125,7 +125,7 @@
      vista: su estado sale de sus tareas, con el mismo objeto que da `aQuienLeToca` para los demás. Siempre le toca a
      Administración. `n` y `m` cuentan las tareas que aplican; `titulo` es la frase de la primera sin hacer; sin tareas,
      `sinTareas`; con todas hechas, `listo` (y sin `hito`, como un asunto con todos sus hitos hechos). */
-  function deLasTareas(h) {
+  function deLasTareas(h, ajustes, contexto) {
     var v = (h.claveAsunto && window.SoloSi) ? SoloSi.valoresDe(SoloSi.asuntoDeClave(h.claveAsunto)) : null;   /* fila 701: con «Solo si», las que no salen no cuentan */
     var lista = (typeof Hitos.guionDe === 'function' ? Hitos.guionDe(null, h) : [])
       .filter(function (g) { return !g.pregunta && !g.noaplica && !(v && g.soloSi && SoloSi.estado(g.soloSi, v) === 'quita'); });
@@ -137,6 +137,12 @@
     if (i === -1) { r.hito = null; r.listo = true; r.n = lista.length; return r; }
     r.n = i + 1;
     r.titulo = lista[i].texto || '';
+    var espera = lista[i].espera;   /* fila 702: la primera tarea sin hacer espera (js/tarea-espera.js) */
+    if (espera && window.TareaEspera) {
+      var st = TareaEspera.estadoDe(espera, nombreVisible(espera.quien, ajustes, contexto));
+      if (st.esperando) { r.lado = 'terceros'; r.quien = st.esperando.nombre; r.esperando = st.esperando; r.desde = espera.desde || r.desde; }
+      else r.reclamar = st.reclamar;
+    }
     return r;
   }
 
@@ -175,6 +181,7 @@
     if (r.listo) return 'Listo para cerrar';
     if (r.listaDeTareas) {   /* fila 700: «Tarea N de M · la frase» o «Sin tareas»; nunca «hito» */
       if (r.sinTareas) return 'Sin tareas';
+      if ((r.esperando || r.reclamar) && window.TareaEspera) return TareaEspera.textoEstado(r);   /* fila 702 */
       return 'Tarea ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
     }
     return 'Hito ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');

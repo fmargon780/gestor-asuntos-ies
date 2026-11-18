@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '702', fecha: '2026-11-18', texto: 'En un asunto que es una lista de tareas, una tarea puede ponerse «Esperando a…» (en su ⋮): eliges a quién esperas y qué día volver a mirarlo. Bajo la tarea sale cuánto llevas esperando, con «Ya ha llegado», «Cambiar el día» y «Dejar de esperar». El asunto sale en «En espera» y, al llegar el día, vuelve a «En Administración» con «Reclamar a…»; en Inicio, un aviso cuenta cuántas esperas hay por reclamar.' },
   { id: '707', fecha: '2026-11-18', texto: 'En la guía de un tipo «sin hitos», cada tarea puede llevar «Cómo se hace» (explicación, pasos, ruta de Séneca o normativa). En el asunto, esa tarea lleva una marca ⓘ junto a la frase: al pulsarla se despliega el texto debajo, y al pulsarla otra vez se pliega.' },
   { id: '701', fecha: '2026-11-18', texto: 'La guía de un tipo «sin hitos» es una lista de frases, cada una con «Cuándo se hace» (siempre, solo si un dato vale tal cosa, o solo si el tercero es de tal clase). Los asuntos nuevos de ese tipo nacen con esas tareas, y en el menú «⋯» del asunto está «Cambiar la guía…». Una tarea que falta de un dato sale en amarillo con «Falta: …» y se rellena ahí mismo.' },
   { id: '700', fecha: '2026-11-18', texto: 'Los asuntos que son una lista de tareas salen en Inicio, en «En Administración», con «Tarea 2 de 5 · lo que toca» o «Listo para cerrar», y con el plazo del asunto. En ellos ya no se lee «hito» en ninguna parte.' },

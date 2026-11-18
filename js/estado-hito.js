@@ -88,7 +88,7 @@ var EstadoHito = (function () {
       ? '<button type="button" class="marca-hito' + clase + '" data-hito="' + esc(l.hito) +
         '"' + (l.listaDeTareas ? '' : ' data-ayuda-clave="abrir-este-hito"') + '>' + esc(texto) + '</button>'
       : '<span class="marca-hito' + clase + '">' + esc(texto) + '</span>';
-    if (l.esperando) {
+    if (l.esperando && !l.listaDeTareas) {   /* fila 702: en un asunto «lista de tareas» la espera ya va en el texto de la marca */
       html += '<span class="marca-esperando' + (l.esperando.auto ? ' marca-esperando-auto' : '') + '" title="' +
         esc(l.esperando.motivo || 'Puesto a mano con «Esperando a…»') + '">' +
         esc(textoEsperando(l.esperando)) + '</span>';
