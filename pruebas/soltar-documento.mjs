@@ -81,6 +81,22 @@ comprobar('f. soltar en la zona del hito: sin hito ni tarea', await contexto(), 
 await cerrar();
 comprobar('f. y no se marca ninguna tarea', await marcadas(), antes);
 
+/* (g) devuelta por Francisco: el cuadro se abrió desde una tarea (con su hito y su tarea); soltar un fichero ahí no marca nada */
+await p.evaluate(async () => {
+  const a = Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1)[0];
+  const hs = await Hitos.hitosDe(a.nombre);
+  const h = hs.filter((x) => x.estado !== 'hecho')[0] || hs[0];
+  Documentos.abrir(a, { hito: h, tarea: Hitos.guionDe(a, h)[0].id });
+});
+await p.waitForSelector('#doc-anadir');
+await soltar('#doc-cuerpo');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('g. soltar en un cuadro abierto desde una tarea: sin hito ni tarea', await contexto(), [null, null, false]);
+await p.click('#doc-guardar');
+await p.waitForTimeout(2500);
+comprobar('g. al guardar no se marca ninguna tarea', await marcadas(), antes);
+await cerrar();
+
 /* (e) un directivo no guarda */
 await p.evaluate(() => { window.__esDirectivo = Perfil.esDirectivo; Perfil.esDirectivo = () => true; });
 await soltar('#trabajo-columnas');
