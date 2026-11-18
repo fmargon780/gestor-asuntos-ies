@@ -44,9 +44,24 @@ const r = await pagina.evaluate(async () => {
   llamadas = []; avisos.length = 0;
   App.E.datos = doble;
   // el cuadro se cierra sin elegir (si no, «Traer datos» pregunta qué es el fichero y espera)
-  window.showOpenFilePicker = async o => { llamadas.push(o.startIn === verdadera); const e = new Error('x'); e.name = 'AbortError'; throw e; };
+  window.showOpenFilePicker = async o => { llamadas.push(o.startIn === verdadera); await new Promise(r => setTimeout(r, 400)); const e = new Error('x'); e.name = 'AbortError'; throw e; };   // cancelar de verdad tarda más de 300 ms
   await TraerDatos.traer();
   sal.c = { llamadas: llamadas.slice() };
+  // (d) «Traer datos»: la carpeta se rechaza -> se repite sin carpeta, con aviso ámbar
+  llamadas = []; avisos.length = 0;
+  window.showOpenFilePicker = async o => {
+    llamadas.push(!!o.startIn);
+    if (o.startIn) throw new TypeError('carpeta rechazada');
+    await new Promise(r => setTimeout(r, 400));
+    const e = new Error('x'); e.name = 'AbortError'; throw e;   // y ahí cierra el cuadro: sin más avisos
+  };
+  await TraerDatos.traer();
+  sal.d = { llamadas: llamadas.slice(), avisos: avisos.slice() };
+  // (e) no se abre de ninguna forma -> aviso rojo
+  llamadas = []; avisos.length = 0;
+  window.showOpenFilePicker = async o => { llamadas.push(!!o.startIn); throw new TypeError('no hay ventana'); };
+  await TraerDatos.traer();
+  sal.e = { llamadas: llamadas.slice(), avisos: avisos.slice() };
   SoloConsulta.guardar(false);
   return sal;
 });
@@ -58,6 +73,10 @@ comprobarQue('(b) lo mismo con «solo consultar»',
   r.b.h && JSON.stringify(r.b.llamadas) === '[true]' && r.b.avisos.length === 0, JSON.stringify(r.b));
 comprobarQue('(c) «Traer datos» pide la ventana con la carpeta de verdad', JSON.stringify(r.c.llamadas) === '[true]', JSON.stringify(r.c));
 
+comprobarQue('(d) «Traer datos» con la carpeta rechazada: repite sin carpeta y avisa en ámbar',
+  JSON.stringify(r.d.llamadas) === '[true,false]' && r.d.avisos.length === 1 && r.d.avisos[0].startsWith('ambar:No he podido abrir la carpeta'), JSON.stringify(r.d));
+comprobarQue('(e) «Traer datos» sin poder abrir la ventana: aviso rojo con el motivo',
+  JSON.stringify(r.e.llamadas) === '[true,false]' && r.e.avisos.length === 2 && r.e.avisos[1].startsWith('malo:No he podido abrir la ventana') , JSON.stringify(r.e));
 await navegador.close();
 if (fallos) { console.log(fallos + ' fallos'); process.exit(1); }
 console.log('todo bien');
