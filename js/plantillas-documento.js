@@ -263,7 +263,7 @@
       /* Fila 285 («Hacer este hito»): quien lo pide hace algo con el visor ya pintado (guardar el PDF solo). */
       if (opciones && opciones.alAbrirVisor) await opciones.alAbrirVisor(nombreDoc, abierto);
     }
-    return { nombre: nombreDoc };
+    return { nombre: nombreDoc, numero: numeroDoc, plantilla: plantillaDoc };   /* fila 703: la tarea de papel guarda el número */
   }
 
   async function elegirYGenerar(asunto, modo, lista) {

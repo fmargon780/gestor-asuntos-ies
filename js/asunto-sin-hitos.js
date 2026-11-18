@@ -16,7 +16,8 @@
      - la lista de tareas (casilla, frase, quién y cuándo, «solo aquí», «⋮» con Anotar, Cambiar y Borrar);
      - «+ Añadir tarea», en una línea.
    Fila 702: una tarea puede estar esperando (js/tarea-espera.js): «Esperando a…» en su ⋮, la línea y los tres botones bajo ella y el panel.
-   Nada de «Qué se hace», «Dónde se hace», «A quién» ni «Qué documento» (fila 703 en adelante).
+   Fila 703: una tarea puede llevar un papel (js/tarea-papel.js, js/tarea-papel-pintar.js): sin casilla, con los pasos de su recorrido.
+   Nada de «Qué se hace», «Dónde se hace», «A quién» ni «Qué documento».
    Sin casilla «los cambios van a la guía»: lo que se hace aquí se queda en el asunto.
 
    `avisoAlCerrar(a)` (lo llama App.cerrarAsunto): con tareas sin hacer, avisa de cuántas quedan y
@@ -79,7 +80,7 @@ var AsuntoSinHitos = (function () {
 
   /* ---------- el panel ---------- */
 
-  function panelHTML(lista, abierto) {
+  function panelHTML(lista, abierto, a) {
     var c = Hitos.cuentaGuion(lista);
     var cuenta = '<span class="ash-cuenta">' + c.hechos + ' de ' + c.total + ' tareas hechas</span>';
     var siguiente = lista.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
@@ -94,8 +95,9 @@ var AsuntoSinHitos = (function () {
     }
     var espera = window.TareaEspera ? TareaEspera.panelDe(siguiente) : null;   /* fila 702: la primera tarea sin hacer espera */
     if (espera) return '<div class="ash-panel ' + espera.clase + '"><div class="ash-panel-texto"><b>' + esc(espera.titulo) + '</b><span>' + esc(espera.sub) + '</span></div>' + cuenta + '</div>';
+    var sub = (siguiente.papel && window.TareaPapelPintar && a) ? TareaPapelPintar.siguienteTexto(siguiente, a) : '';   /* fila 703: «Siguiente paso: <botón>.» */
     return '<div class="ash-panel ash-toca"><div class="ash-panel-texto"><b>Ahora toca: ' + esc(siguiente.texto) + '</b>' +
-      '<span>Le toca a Administración.</span></div>' + cuenta + '</div>';
+      '<span>' + esc(sub || 'Le toca a Administración.') + '</span></div>' + cuenta + '</div>';
   }
 
   /* ---------- las tareas ---------- */
@@ -136,11 +138,13 @@ var AsuntoSinHitos = (function () {
     var notas = notasDe(a, g);
     var quien = g.hecho && (g.quien || g.cuando) ? [g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ') : '';
     return '<div class="ash-tarea' + (g.falta ? ' falta' : '') + (g.hecho ? ' hecha' : '') + (g.noaplica ? ' noaplica' : '') + (ahora ? ' ahora' : '') + '" data-id="' + esc(g.id) + '">' +
-      '<div class="ash-fila"><label class="ash-linea"><input type="checkbox" class="ash-casilla"' + (g.hecho ? ' checked' : '') + (puede ? '' : ' disabled') + '>' +
-        '<span class="ash-texto-tarea">' + esc(g.texto) + '</span></label>' +
+      '<div class="ash-fila">' + ((g.papel && window.TareaPapelPintar) ? TareaPapelPintar.centroHTML(g, a) :   /* fila 703: la tarea de papel no lleva casilla */
+        '<label class="ash-linea"><input type="checkbox" class="ash-casilla"' + (g.hecho ? ' checked' : '') + (puede ? '' : ' disabled') + '>' +
+        '<span class="ash-texto-tarea">' + esc(g.texto) + '</span></label>') +
         (g.propio && !g.deGuia ? '<span class="ash-etq">solo aquí</span>' : '') +   /* fila 701: las que vienen de la guía no llevan marca */
         (window.AsuntoSinHitosFalta ? AsuntoSinHitosFalta.etiquetaHTML(g) : '') +
         (quien ? '<span class="ash-quien">' + esc(quien) + '</span>' : '') +
+        ((g.papel && window.TareaPapelPintar) ? TareaPapelPintar.botonHTML(g, a, puede) : '') +
         (como ? '<button type="button" class="ash-como-boton" aria-expanded="' + comoAbierto + '" aria-label="Cómo se hace" title="Cómo se hace">ⓘ</button>' : '') +
         (notas.length ? '<button type="button" class="ash-notas-boton">💬' + (notas.length > 1 ? ' ' + notas.length : '') + '</button>' : '') +
         (puede ? '<button type="button" class="ash-menu-boton" aria-label="Más de esta tarea">⋮</button>' : '') +
@@ -151,6 +155,7 @@ var AsuntoSinHitos = (function () {
   function anadirHTML(abierto) {
     if (!abierto || soloLectura()) return '';
     return '<div class="ash-anadir"><input class="campo ash-anadir-texto" data-clave="ash-anadir" placeholder="+ Añadir tarea: escribe qué hay que hacer" aria-label="Tarea nueva">' +
+      (window.TareaPapelPintar ? TareaPapelPintar.selectorHTML('ash-anadir-papel', '') : '') +   /* fila 703 */
       '<button type="button" class="boton boton-chico ash-anadir-boton">Añadir</button></div>';
   }
 
@@ -176,11 +181,15 @@ var AsuntoSinHitos = (function () {
     U.conservandoLoEscrito(caja, function () {
       var lista = tareasDe(a, h);
       var siguiente = lista.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
-      caja.innerHTML = '<div class="ash">' + panelHTML(lista, abierto) +
+      caja.innerHTML = '<div class="ash">' + panelHTML(lista, abierto, a) +
         '<div class="ash-lista">' + lista.map(function (g) { return tareaHTML(g, a, abierto, g === siguiente); }).join('') + '</div>' +
         anadirHTML(abierto) + '</div>';
       enganchar(caja, a, h, lista, abierto);
     });
+    /* Fila 703: los papeles que han llegado por otro camino se unen solos y las tareas de papel completas quedan hechas. */
+    if (window.TareaPapel && abierto && tareasDe(a, h).some(function (g) { return g.papel; })) {
+      TareaPapel.sincronizar(a, h).then(function (cambio) { if (cambio && window.HitosPanel) HitosPanel.programarRepintado(); });
+    }
     return true;
   }
 
@@ -239,9 +248,11 @@ var AsuntoSinHitos = (function () {
           { texto: 'Borrar', clase: 'ficha-menu-peligro ash-borrar-opcion', alPulsar: function () { guardar(menu, 'borrar la tarea', function () { return borrar(a, h, g); }); } }
         ];
         if (window.TareaEspera && !g.hecho && !g.espera) opciones.splice(2, 0, TareaEspera.opcionMenu(a, h, g, guardar, menu));   /* fila 702: «Esperando a…» */
+        if (g.papel && window.TareaPapelPintar) TareaPapelPintar.opcionesMenu(a, h, g, guardar, menu).forEach(function (o, k) { opciones.splice(k, 0, o); });   /* fila 703 */
         FichaMenus.montar(menu, opciones);
       }
       if (window.TareaEspera && g.espera) TareaEspera.enganchar(el, a, h, g, guardar);   /* fila 702 */
+      if (g.papel && window.TareaPapelPintar) TareaPapelPintar.enganchar(el, a, h, g, guardar);   /* fila 703: el botón del paso que toca */
 
       var editar = el.querySelector('.ash-editar-texto');
       if (editar) {
@@ -283,7 +294,11 @@ var AsuntoSinHitos = (function () {
       var anadir = function () {
         var v = texto.value.trim();
         if (!v) { texto.focus(); return; }
-        guardar(boton, 'añadir la tarea', function () { return Hitos.anadirGuionPropio(a.nombre, h.id, v).then(function () { texto.value = ''; }); });
+        var papel = caja.querySelector('.ash-anadir-papel');   /* fila 703: «Sin papel» o «Papel: <tipo>» */
+        guardar(boton, 'añadir la tarea', function () {
+          var puesta = papel && papel.value && window.TareaPapel ? TareaPapel.anadir(a, h, v, papel.value) : Hitos.anadirGuionPropio(a.nombre, h.id, v);
+          return puesta.then(function () { texto.value = ''; });
+        });
       };
       boton.onclick = anadir;
       texto.onkeydown = function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); anadir(); } };

@@ -71,6 +71,7 @@ var Documentos = (function () {
     N.asuntoActual = asunto;
     N.hitoActual = (opciones && opciones.hito) || null;
     N.tareaActual = (opciones && opciones.tarea) || null;
+    N.tipoPropuesto = (opciones && opciones.tipoDocumento) || '';   /* fila 703 */
     N.preguntarTarea = !!(opciones && opciones.preguntarTarea);
     N.colgar = !!(opciones && opciones.colgar);
     var cuadro = document.querySelector('#capa .cuadro');
@@ -121,6 +122,7 @@ var Documentos = (function () {
     cuadro.classList.remove('cuadro-ancho');
     N.hitoActual = null;
     N.tareaActual = null;
+    N.tipoPropuesto = '';
     N.preguntarTarea = false;
     N.colgar = false;
   }

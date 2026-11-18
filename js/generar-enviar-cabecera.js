@@ -29,7 +29,7 @@ var GenerarEnviarCabecera = (function () {
 
   /* «Otra plantilla…» (fila 697): todas las plantillas de documento del centro que están en uso, con el buscador de
      siempre (js/plantilla-buscar.js), en el cuadro compartido #capa. Generar con una de otro tipo no la asocia a este. */
-  function otraPlantilla(a, b) {
+  function otraPlantilla(a, b, hacer) {
     var capa = document.getElementById('capa');
     if (!capa || !window.PlantillaBuscar || !capa.classList.contains('oculto')) return;   /* un solo cuadro a la vez */
     var aceptar = document.getElementById('cuadro-aceptar');
@@ -46,17 +46,18 @@ var GenerarEnviarCabecera = (function () {
       document.getElementById('cuadro-cancelar').onclick = null;
     }
     document.getElementById('cuadro-cancelar').onclick = cerrar;
-    PlantillaBuscar.montar(document.getElementById('pd-otra-caja'), function (p) { cerrar(); generar(a, p, b); });
+    PlantillaBuscar.montar(document.getElementById('pd-otra-caja'), function (p) { cerrar(); (hacer || generar)(a, p, b); });
   }
 
   /* «+ Nueva plantilla…» (fila 697): el editor de plantillas de documento de siempre, con el tipo del asunto. Al
      guardar, el menú se vuelve a montar y la nueva sale entre las del tipo. */
-  function nuevaPlantilla(a, b) {
+  function nuevaPlantilla(a, b, alGuardar) {
     var tipo = PlantillasDocumento.tipoDelAsunto ? PlantillasDocumento.tipoDelAsunto(a) : '';
     var preset = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === tipo; })[0] || null;
     PlantillasDocumento.abrirCuadroDePlantillaDoc(null, preset, function () {
       if (window.Plantillas && Plantillas.olvidar) Plantillas.olvidar();
-      if (b.isConnected) montarGenerar(a, b, ++turno);
+      if (alGuardar) alGuardar();   /* fila 703: la tarea de papel vuelve a pintar su botón */
+      else if (b.isConnected) montarGenerar(a, b, ++turno);
     }).catch(function (e) { U.fallo('No he podido abrir el editor de plantillas', e); });
   }
 
@@ -98,6 +99,6 @@ var GenerarEnviarCabecera = (function () {
     if (window.FichaMenus && window.CorreoNucleo) montarEnviar(a, e);
   }
 
-  return { pintar: pintar };
+  return { pintar: pintar, otraPlantilla: otraPlantilla, nuevaPlantilla: nuevaPlantilla };
 })();
 window.GenerarEnviarCabecera = GenerarEnviarCabecera;

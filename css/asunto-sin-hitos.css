@@ -56,3 +56,15 @@
 .ash-espera-texto { flex: 1; min-width: 200px; }
 .ash-espera-botones { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .te-aviso { color: #a33; }
+/* Fila 703: la tarea de papel (js/tarea-papel-pintar.js). */
+.ash-tarea .ash-fila { align-items: center; }
+.tp-icono { font-size: 18px; line-height: 1; }
+.tp-centro { flex: 1; min-width: 200px; }
+.tp-recorrido { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; margin-top: 3px; font-size: 13px; }
+.tp-tipo { font-size: 11px; font-weight: 700; background: #e6ebf1; color: #455; border-radius: 10px; padding: 1px 8px; margin-right: 8px; }
+.tp-paso { color: #6a7683; }
+.tp-paso.hecho { color: #1d7a3a; }
+.tp-paso.toca { font-weight: 700; color: #1f5fa8; background: #e3eefb; border-radius: 4px; padding: 0 6px; }
+.tp-flecha { color: #9aa5b1; white-space: pre; }
+.gsh-linea .gsh-papel { max-width: 220px; }
+.ash-anadir .ash-anadir-papel { max-width: 240px; }
