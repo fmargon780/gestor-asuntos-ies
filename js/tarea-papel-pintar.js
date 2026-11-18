@@ -83,7 +83,7 @@ var TareaPapelPintar = (function () {
     if (boton.dataset.paso === 'generar') montarGenerar(el, a, h, g, boton, guardar);
     else boton.onclick = function () {
       guardar(boton, 'abrir la ventana', async function () {
-        await Documentos.abrir(a, { irDirectoAAnadir: true });
+        await Documentos.abrir(a, { irDirectoAAnadir: true, tipoDocumento: g.papel });   /* propone el tipo de la tarea */
         await TareaPapel.sincronizar(a, h, g.id);
       });
     };

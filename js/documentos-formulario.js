@@ -122,7 +122,7 @@
     if (window.Candidaturas) await Candidaturas.preparar(opciones, N.asuntoActual);
     var tipoInicial = N.propuestaDesdeHito({
       delNombre: previo.tipo,
-      delHito: hito ? hito.tipoDocumento : '',
+      delHito: hito ? hito.tipoDocumento : (N.tipoPropuesto || ''),   /* fila 703: «Añadir documento» de una tarea de papel propone su tipo */
       delTipo: (window.Candidaturas && Candidaturas.tipoPorDefecto(opciones, N.asuntoActual)) || ultimoTipoDocumento(tipoAsunto)
     });
     /* El texto adicional del nombre (fila 201, apartado 4): el que ya

@@ -28,7 +28,7 @@ const A = await pagina.evaluate(() => App.E.listaAbiertos[0].nombre);
 await pagina.evaluate(async ([tipo, a]) => {
   App.E.tipos.push({ tipo: tipo, categoria: 'ALUMNADO', sinHitos: true });
   await App.guardarTipos();
-  if (!App.E.tiposDocumento.some((t) => t === 'COMUNICACION')) App.E.tiposDocumento.push('COMUNICACION');
+  for (const t of ['COMUNICACION', 'DNI']) if (App.E.tiposDocumento.indexOf(t) === -1) App.E.tiposDocumento.push(t);
   /* COMUNICACION: lo hacemos, firma Secretaría con visto bueno de Dirección, se registra y se envía por iPasen. */
   await RecorridoTipo.poner('COMUNICACION', { entra: false, firma: 'Secretaría, con visto bueno de Dirección', registro: true, envia: true, aquien: 'Familia', via: 'iPasen' });
   await RecorridoTipo.poner('DNI', { entra: true, registro: false });
@@ -144,7 +144,7 @@ await comprobar('27. un asunto nuevo recibe el papel de la tarea de la guía', p
 await pagina.evaluate(async (k) => {
   const h = (await Hitos.hitosDe(k))[0];
   await TareaPapel.anadir({ nombre: k }, h, 'Recibir el DNI', 'DNI');
-  window.__abierto = null; Documentos.abrir = async (a, o) => { window.__abierto = o; };
+  window.__abierto = null; window.__abrirReal = Documentos.abrir; Documentos.abrir = async (a, o) => { window.__abierto = o; };
 }, A);
 await repintar();
 await comprobar('28. una tarea de papel que nos llega pide «Recibido» y su botón es «Añadir documento»', (async () => {
@@ -155,8 +155,8 @@ await comprobar('29. «Añadir documento» abre la ventana de Windows directamen
   const i = (await hito()).findIndex((g) => g.texto === 'Recibir el DNI');
   await tareas().nth(i).locator('.tp-boton').click();
   await pagina.waitForTimeout(500);
-  return pagina.evaluate(() => window.__abierto && window.__abierto.irDirectoAAnadir);
-})(), true);
+  return pagina.evaluate(() => window.__abierto && [window.__abierto.irDirectoAAnadir, window.__abierto.tipoDocumento]);
+})(), [true, 'DNI']);
 
 console.log('--- «Generar documento» con una sola plantilla del tipo ---');
 await pagina.evaluate(async (k) => {
@@ -177,6 +177,12 @@ await tareas().nth(iOtra).locator('.tp-boton').click();
 await pagina.waitForTimeout(1200);
 await comprobar('33. genera con esa plantilla, sin hito ni tarea de por medio', pagina.evaluate(() => window.__generadas), [['pl1', 0]]);
 await comprobar('34. el documento queda en la tarea que se pulsó, con la firma de la plantilla (1)', pagina.evaluate(async (k) => { const h = (await Hitos.hitosDe(k))[0]; const g = Hitos.guionDe(null, h).filter((x) => x.texto === 'Tercera')[0]; return [g.papelDoc.numero, g.papelDoc.firmas]; }, A), ['D26-90005', 1]);
+
+await comprobar('35. el cuadro de añadir propone el tipo de la tarea (DNI), no el primero de la lista', (async () => {
+  await pagina.evaluate((k) => { Documentos.abrir = window.__abrirReal; const a = App.E.listaAbiertos.filter((x) => x.nombre === k)[0]; Documentos.abrir(a, { ficheroSoltado: new File(['x'], 'escaneo.pdf', { type: 'application/pdf' }), tipoDocumento: 'DNI' }); }, A);
+  await pagina.waitForSelector('#doc-tipo', { timeout: 8000 });
+  return pagina.evaluate(() => document.getElementById('doc-tipo').value);
+})(), 'DNI');
 
 console.log('--- lo de siempre ---');
 await comprobar('30. un asunto con hitos no cambia', pagina.evaluate(async () => { const d = await Hitos.leer(); const k = Object.keys(d.porAsunto).filter((n) => !(d.porAsunto[n].hitos || []).some((h) => h.listaDeTareas))[0]; return !k || !JSON.stringify(d.porAsunto[k]).includes('papelDoc'); }), true);
