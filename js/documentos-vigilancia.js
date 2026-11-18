@@ -24,6 +24,10 @@ App.vigilarLaCarpeta = function () {
   function mirarCopiasDeRuta() { if (window.RutaCopia) RutaCopia.mirar(); }
   setInterval(mirarCopiasDeRuta, App.SEGUNDOS_ENTRE_MIRADAS * 1000);
   window.addEventListener('focus', mirarCopiasDeRuta);
+  /* Fila 677: la carpeta del asunto que está a la vista (js/ficha-carpeta-vigilar.js), igual. */
+  function mirarCarpetaDelAsunto() { if (window.FichaCarpetaVigilar) FichaCarpetaVigilar.mirar(); }
+  setInterval(mirarCarpetaDelAsunto, App.SEGUNDOS_ENTRE_MIRADAS * 1000);
+  window.addEventListener('focus', mirarCarpetaDelAsunto);
 };
 
 App.mirarLaCarpeta = async function () {
