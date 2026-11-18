@@ -106,6 +106,8 @@
 
   function vencidos(items) {
     return items.filter(function (it) {
+      /* Fila 700: un asunto «lista de tareas» cuenta con el plazo del asunto, con tareas por hacer o listo para cerrar. */
+      if (it.listaDeTareas || (it.hito && it.hito.listaDeTareas)) { var pa = window.App && App.plazoDe ? App.plazoDe(it.asunto) : null; return !!pa && pa.clase === 'plazo-vencido'; }
       var p = it.hito && it.hito.fecha ? Plazos.de(it.hito.fecha) : null;
       return p && p.clase === 'plazo-vencido';
     }).length;

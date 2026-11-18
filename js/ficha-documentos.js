@@ -73,6 +73,7 @@ var FichaDocumentos = (function () {
     var caja = $('ficha-documentos');
     if (!caja || !window.Hitos) return;
     var h = enMesa.idHito ? Hitos.buscar(enMesa.hitos, enMesa.idHito) : null;
+    if (h && h.listaDeTareas) h = null;   /* fila 700: el hito oculto de un asunto «lista de tareas» no marca documentos con «Hito» */
     var n = h && Hitos.numerados ? Hitos.numerados(enMesa.hitos).indexOf(h) + 1 : 0;
     var suyos = h ? (h.documentos || []) : [];
     var conCasillas = !!(h && enMesa.editable);

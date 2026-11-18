@@ -28,6 +28,7 @@ window.DocumentoTareaBloque = (function () {
     var entrada = datos.porAsunto[S.a.nombre];
     var hitos = entrada ? entrada.hitos : [];
     S.lista = DocumentoATarea.hitosElegibles(hitos);
+    S.listaDeTareas = hitos.some(function (h) { return h && h.listaDeTareas; });   /* fila 700 */
     S.numerados = Hitos.numerados ? Hitos.numerados(hitos) : S.lista;
     S.idActual = window.EstadoHito && EstadoHito.idActual ? EstadoHito.idActual(hitos, datos.ajustes) : null;
   }
@@ -68,6 +69,7 @@ window.DocumentoTareaBloque = (function () {
   }
 
   function pintar() {
+    if (S.listaDeTareas) { S.caja.innerHTML = ''; return; }   /* fila 700: un asunto «lista de tareas» no pregunta hito ni tarea: el documento entra sin tarea */
     var tipo = S.tipo(), h = hitoPor(S.hitoId), sinHitos = !S.lista.length, t = '<h4>¿De qué tarea es?</h4>';
     var g = S.propuesta && !S.aMano && h ? tareaPor(h, S.tareaId) : null;
     if (g) {

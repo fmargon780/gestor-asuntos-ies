@@ -63,12 +63,15 @@ var RegistroAsunto = (function () {
         propia: n, orden: i, fuente: 'asunto' });
     });
     var hitos = opciones.hitos || hitosDe(a && a.nombre);
+    var ocultos = {};   /* fila 700: el hito oculto de un asunto «lista de tareas» no se nombra en ninguna línea */
+    hitos.forEach(function (h) { if (h.listaDeTareas) ocultos[h.id] = true; });
+    salida.forEach(function (l) { if (l.hito && ocultos[l.hito]) l.hitoOculto = true; });
     hitos.forEach(function (h, k) {
       if (filtro && h.id !== filtro) return;
       (h.notas || []).forEach(function (n, i) {
         if (!n || !String(n.texto || '').trim()) return;
         salida.push({ texto: n.texto, quien: (window.NotasDirectivos && NotasDirectivos.quien(n)) || n.quien || '', cuando: n.cuando || '', hito: h.id,
-          hitoTitulo: h.titulo || '', auto: true, llamada: n.llamada || null, propia: null, orden: 100000 + k * 1000 + i, fuente: 'hito' });
+          hitoTitulo: h.titulo || '', hitoOculto: !!h.listaDeTareas, auto: true, llamada: n.llamada || null, propia: null, orden: 100000 + k * 1000 + i, fuente: 'hito' });
       });
     });
     salida.sort(function (x, y) {
@@ -82,7 +85,7 @@ var RegistroAsunto = (function () {
 
   function lineaHtml(l, o) {
     var editable = !!(o.editable && !l.auto && l.fuente === 'asunto' && !(l.propia && l.propia.deDirectivo));   /* fila 290 */
-    var hito = (o.conEtiqueta !== false && l.hito && window.NotasHito)
+    var hito = (o.conEtiqueta !== false && l.hito && !l.hitoOculto && window.NotasHito)
       ? NotasHito.etiquetaHtml({ hito: l.hito, hitoTitulo: l.hitoTitulo }) : '';
     var enlace = '';
     if (l.enlace && /^https?:\/\//i.test(String(l.enlace))) {

@@ -81,7 +81,7 @@
     } else if (e.estado === 'asunto') {
       var a = Encargos.asuntoDe(e);
       var h = a ? Encargos.hitoDe(a.nombre) : null;
-      var texto = Encargos.TEXTO_ESTADO.asunto + (h ? ' · Hito ' + h.n + ' de ' + h.m + (h.titulo ? ' · ' + h.titulo : '') : '');
+      var texto = Encargos.TEXTO_ESTADO.asunto + (h ? ' · ' + (h.texto || 'Hito ' + h.n + ' de ' + h.m + (h.titulo ? ' · ' + h.titulo : '')) : '');
       if (a && a.abierto) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'enlace'; b.textContent = texto; b.setAttribute('data-puerta-perfil', '1');
