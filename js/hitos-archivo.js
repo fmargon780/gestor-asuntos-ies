@@ -280,6 +280,14 @@
     })).ajustes;
   }
 
+  /* Fila 704: los días hábiles para volver a mirar un documento puesto a la firma. */
+  async function guardarDiasFirma(dias) {
+    return (await cambiar(function (d) {
+      d.ajustes.diasFirma = Hitos.normalizarAjustes({ diasFirma: dias }).diasFirma;
+      return d;
+    })).ajustes;
+  }
+
   async function guardarNoLectivos(lista) {
     return (await cambiar(function (d) {
       d.ajustes.noLectivos = Hitos.normalizarAjustes({ noLectivos: lista }).noLectivos;
@@ -481,7 +489,7 @@
     elegirOpcion: elegirOpcion, cambiarRama: cambiarRama,
     resolverResponsable: resolverResponsable,
     anadirResponsable: anadirResponsable, renombrarResponsable: renombrarResponsable,
-    quitarResponsable: quitarResponsable, guardarNoLectivos: guardarNoLectivos, guardarFestivos: guardarFestivos,
+    quitarResponsable: quitarResponsable, guardarNoLectivos: guardarNoLectivos, guardarFestivos: guardarFestivos, guardarDiasFirma: guardarDiasFirma,
     NOMBRE_HISTORIAL: NOMBRE_HISTORIAL,
     /* para las pruebas */
     _textoHistorial: textoHistorial, leerHitosDeHistorial: leerHitosDeHistorial, _leerHitosDeHistorial: leerHitosDeHistorial

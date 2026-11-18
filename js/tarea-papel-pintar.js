@@ -47,6 +47,7 @@ var TareaPapelPintar = (function () {
   function siguienteTexto(g, a) {
     var est = TareaPapel.estado(a, g), b = TareaPapel.botonDe(est);
     if (b) return 'Siguiente paso: ' + b.texto + '.';
+    if (est.pideSello && est.toca !== -1 && est.pasos[est.toca].k === 'registrado') return 'Falta guardar el PDF sellado.';   /* fila 704 */
     var p = est.toca === -1 ? null : est.pasos[est.toca];
     return p ? 'Falta: ' + p.t.toLowerCase() + '.' : '';
   }
@@ -56,7 +57,7 @@ var TareaPapelPintar = (function () {
   async function generarCon(a, h, g, p, boton, guardar) {
     guardar(boton, 'generar el documento', async function () {
       var r = await PlantillasDocumento.generar(a, p, 'abierto', {});
-      if (r && r.numero) await TareaPapel.asignar(a, h, g, { numero: r.numero, nombre: r.nombre, firmas: TareaPapel.firmasDePlantilla(p) });
+      if (r && r.numero) await TareaPapel.asignar(a, h, g, { numero: r.numero, nombre: r.nombre, firmas: TareaPapel.firmasDePlantilla(p), quienFirma: [p.firmante, p.vistoBueno].map(function (x) { return String(x || '').trim(); }).filter(Boolean).join(' y ') });
       await TareaPapel.sincronizar(a, h, g.id);
     });
   }
@@ -77,10 +78,27 @@ var TareaPapelPintar = (function () {
     if (window.FichaMenus) FichaMenus.montar(boton, opciones);
   }
 
+  /* «Registrar» (fila 704): copia la ruta del documento, como el botón «Ruta», y deja la tarea con «Falta el sellado». */
+  async function registrar(a, h, g, boton, guardar) {
+    var numero = (g.papelDoc && g.papelDoc.numero) || '', nombre = '';
+    try {
+      var ficheros = await Carpetas.ficheros(a.handle);
+      var suyos = ficheros.filter(function (f) { return numero && f.nombre.indexOf(numero) !== -1; });
+      var pdf = suyos.filter(function (f) { return /\.pdf$/i.test(f.nombre); })[0];
+      nombre = (pdf || suyos[0] || {}).nombre || '';
+    } catch (e) { nombre = ''; }
+    if (!nombre) { U.aviso('No encuentro el documento en la carpeta del asunto.', 'ambar'); return; }
+    var copiar = RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: nombre });
+    copiar.click();   /* la misma ruta que «Ruta» (pide la carpeta si falta) y la copia de seguridad del PDF */
+    guardar(boton, 'apuntar que falta el sellado', function () { return TareaPapel.pedirSello(a, h, g); });
+  }
+
   function enganchar(el, a, h, g, guardar) {
     var boton = el.querySelector('.tp-boton');
     if (!boton) return;
     if (boton.dataset.paso === 'generar') montarGenerar(el, a, h, g, boton, guardar);
+    else if (boton.dataset.paso === 'firmar') boton.onclick = function () { guardar(boton, 'poner el documento a la firma', function () { return TareaPapel.ponerAFirma(a, h, g); }); };   /* fila 704 */
+    else if (boton.dataset.paso === 'registrar') boton.onclick = function () { registrar(a, h, g, boton, guardar); };
     else boton.onclick = function () {
       guardar(boton, 'abrir la ventana', async function () {
         await Documentos.abrir(a, { irDirectoAAnadir: true, tipoDocumento: g.papel });   /* propone el tipo de la tarea */

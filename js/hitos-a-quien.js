@@ -139,7 +139,7 @@
     r.titulo = lista[i].texto || '';
     var espera = lista[i].espera;   /* fila 702: la primera tarea sin hacer espera (js/tarea-espera.js) */
     if (espera && window.TareaEspera) {
-      var st = TareaEspera.estadoDe(espera, nombreVisible(espera.quien, ajustes, contexto));
+      var st = TareaEspera.estadoDe(espera, (espera.paso === 'firmado' && espera.nombre) ? espera.nombre : nombreVisible(espera.quien, ajustes, contexto));   /* fila 704: la firma lleva su nombre */
       if (st.esperando) { r.lado = 'terceros'; r.quien = st.esperando.nombre; r.esperando = st.esperando; r.desde = espera.desde || r.desde; }
       else r.reclamar = st.reclamar;
     }

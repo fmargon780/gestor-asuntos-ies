@@ -86,7 +86,7 @@ await pagina.evaluate(async ([k, n]) => {
 await anotarDoc('D26-90001', 'COMUNICACION');
 await repintar();
 await comprobar('9. con el documento, «Generado» sale con ✓ y toca «Firmado»', Promise.all([linea(0), tareas().nth(0).locator('.tp-paso.toca').innerText()]), ['COMUNICACION ✓ Generado › Firmado › Registrado › Enviado', 'Firmado']);
-await comprobar('10. el botón de generar ya no está (no hay botón de firmar en esta fila)', tareas().nth(0).locator('.tp-boton').count(), 0);
+await comprobar('10. el botón del paso que toca es ahora «Poner a la firma» (fila 704)', tareas().nth(0).locator('.tp-boton').innerText(), 'Poner a la firma');
 await comprobar('11. el panel dice qué falta', panel().then((t) => /Siguiente paso|Falta: firmado\./.test(t)), true);
 await anotarDoc('D26-90001', 'COMUNICACION', { firmas: 1 });
 await repintar();

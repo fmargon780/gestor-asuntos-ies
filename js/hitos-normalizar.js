@@ -203,7 +203,10 @@
     /* Fila 131: los festivos, aparte (cuentan para todos los plazos). */
     var festivos = (Array.isArray(a && a.festivos) ? a.festivos : [])
       .map(String).filter(function (f) { return /^\d{4}-\d{2}-\d{2}$/.test(f); }).sort();
-    return { responsables: responsables, noLectivos: noLectivos, festivos: festivos };
+    /* Fila 704: los días hábiles para volver a mirar un documento puesto a la firma (uno para todo el centro; nace en 1). */
+    var diasFirma = parseInt(a && a.diasFirma, 10);
+    if (!(diasFirma >= 1 && diasFirma <= 30)) diasFirma = 1;
+    return { responsables: responsables, noLectivos: noLectivos, festivos: festivos, diasFirma: diasFirma };
   }
 
   function normalizar(leido) {

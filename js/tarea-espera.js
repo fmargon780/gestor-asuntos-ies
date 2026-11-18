@@ -55,6 +55,8 @@ var TareaEspera = (function () {
   function nombreDe(quien, ajustes) {
     return (window.Hitos && Hitos.nombreDeEspera) ? Hitos.nombreDeEspera(quien, ajustes) : quien;
   }
+  /* Fila 704: la espera de una firma (`paso: 'firmado'`) lleva el nombre de quien firma escrito en ella. */
+  function nombreDeEspera(es, ajustes) { return (es && es.paso === 'firmado' && es.nombre) ? es.nombre : nombreDe(es && es.quien, ajustes); }
 
   function ajustesDe() {
     var d = window.Hitos && Hitos.ultimosLeidos ? Hitos.ultimosLeidos() : null;
@@ -66,12 +68,16 @@ var TareaEspera = (function () {
   function debajoHTML(g, abierto) {
     var es = g.espera;
     if (!es || g.hecho) return '';
-    var nombre = esc(nombreDe(es.quien, ajustesDe()));
-    var texto = vencida(es)
+    var nombre = esc(nombreDeEspera(es, ajustesDe()));
+    var firma = es.paso === 'firmado';   /* fila 704: a la firma; sin «Ya ha llegado»: llega con el PDF firmado o con «Marcar el paso a mano» */
+    var texto = firma ? (vencida(es)
+      ? 'A la firma de ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + '. Tocaba volver a mirarlo el ' + esc(diaCorto(es.volver)) + '.'
+      : 'A la firma de ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + ' · volver a mirarlo el ' + esc(diaCorto(es.volver)))
+      : vencida(es)
       ? 'Se espera a ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + '. Tocaba volver a mirarlo el ' + esc(diaCorto(es.volver)) + '.'
       : 'Esperando a ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + ' · volver a mirarlo el ' + esc(diaCorto(es.volver));
     return '<div class="ash-espera' + (vencida(es) ? ' vencida' : '') + '"><span class="ash-espera-texto">' + texto + '</span>' +
-      (abierto ? '<span class="ash-espera-botones"><button type="button" class="boton boton-chico ash-espera-llegado">Ya ha llegado</button>' +
+      (abierto ? '<span class="ash-espera-botones">' + (firma ? '' : '<button type="button" class="boton boton-chico ash-espera-llegado">Ya ha llegado</button>') +
         '<button type="button" class="boton boton-chico ash-espera-dia">' + (vencida(es) ? 'Seguir esperando…' : 'Cambiar el día') + '</button>' +
         '<button type="button" class="enlace ash-espera-dejar">Dejar de esperar</button></span>' : '') + '</div>';
   }
@@ -193,7 +199,11 @@ var TareaEspera = (function () {
   function panelDe(g) {
     var es = g && g.espera;
     if (!es) return null;
-    var nombre = nombreDe(es.quien, ajustesDe());
+    var nombre = nombreDeEspera(es, ajustesDe());
+    if (es.paso === 'firmado') {   /* fila 704 */
+      if (vencida(es)) return { clase: 'ash-vuelve', titulo: 'Toca volver a mirar la firma: ' + g.texto, sub: 'Se espera la firma de ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + '.' };
+      return { clase: 'ash-espera-panel', titulo: 'A la firma de ' + nombre + ' · volver a mirarlo el ' + diaCorto(es.volver), sub: 'Le toca a ' + nombre + '.' };
+    }
     if (vencida(es)) return { clase: 'ash-vuelve', titulo: 'Toca volver a mirarlo: ' + g.texto, sub: 'Se espera a ' + nombre + (diaCorto(es.desde) ? ' desde el ' + diaCorto(es.desde) : '') + '.' };
     return { clase: 'ash-espera-panel', titulo: 'Esperando a ' + nombre + ' · volver a mirarlo el ' + diaCorto(es.volver), sub: 'Le toca a ' + nombre + '.' };
   }
@@ -215,7 +225,7 @@ var TareaEspera = (function () {
   }
   if (window.Gestor && Gestor.alRefrescar) Gestor.alRefrescar.push(avisar);
 
-  return { diaCorto: diaCorto, vencida: vencida, estadoDe: estadoDe, textoEstado: textoEstado, debajoHTML: debajoHTML, enganchar: enganchar,
+  return { nombreDeEspera: nombreDeEspera, diaCorto: diaCorto, vencida: vencida, estadoDe: estadoDe, textoEstado: textoEstado, debajoHTML: debajoHTML, enganchar: enganchar,
            opcionMenu: opcionMenu, panelDe: panelDe, avisar: avisar, abrirVentana: abrirVentana };
 })();
 window.TareaEspera = TareaEspera;
