@@ -28,8 +28,7 @@ La primera orden de cada sesión, antes de leer nada más, desde la raíz del re
 ## 1. Al empezar cada sesión: qué fila y en qué orden
 
 **Qué fila se hace.** La que nombra el encargo («haz la fila 214»), o las que nombra, en ese
-orden (una serie, apartado 8), o lo que la persona diga después en la misma sesión (apartado
-10). Si el encargo no nombra ninguna: la primera fila DEVUELTA o PENDIENTE, en el orden de la
+orden (una serie, apartado 8). Si el encargo no nombra ninguna: la primera fila DEVUELTA o PENDIENTE, en el orden de la
 cola, saltando las que no son trabajo (apartado 7). Ninguna otra.
 
 **El orden.** Cada paso va antes que el siguiente:
@@ -79,13 +78,11 @@ que se sube desde una conversación de diseño o desde el Centro de mando.
 **A. Pregunta para la persona**, solo en un caso: aparece algo que la instrucción no cubre y que
 **cambia lo que ve o hace la usuaria**.
 
-Una frase de lanzamiento o una regla de la app que diga «sin preguntarme nada» significa que la
-sesión va sola: en ese caso no decide ella, deja la fila BLOQUEADA como se explica abajo.
-
-Cómo se pregunta: en lenguaje llano, una sola pregunta, con las opciones numeradas y sus pros y
-contras, **sin marcar ninguna como recomendada**. Si la persona está en la conversación, se le
-pregunta allí. Si la sesión va sola, la fila pasa a BLOQUEADA con
-«PREGUNTA PARA <nombre de la persona>: …» y la sesión para. La respuesta se apunta en la
+**La sesión nunca pregunta en su conversación**, esté o no la persona en la ventana (decidido por
+Francisco el 18-nov-2026): la pregunta la escribe para Claude, que se la hace a la persona en
+llano. La fila pasa a BLOQUEADA con «PREGUNTA PARA <nombre de la persona>: …» y la sesión para.
+En la nota o en la instrucción: una sola pregunta, las opciones numeradas con sus pros y contras,
+y cuál elegiría la sesión y por qué. La respuesta se apunta en la
 instrucción, en «Revisión y respuestas durante el trabajo».
 
 **B. Atasco técnico** (no es para la persona): si un mismo arreglo falla **dos veces**, no se
@@ -166,13 +163,12 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
 8. Tiempo: no se estima. Al marcar HECHA se escribe la hora de Madrid: `HECHA (26-oct-2026 14:05)`;
    lo que tardó cada fila sale de esa hora y de la subida que la marcó EN CURSO.
 
-**`CUANDO-HACE-FALTA.md`** guarda lo que solo se necesita a veces (apartados 3.D, 5.1, 5.5 y
-10). Las apps no tienen copia: se baja cuando toca y se lee solo el apartado que se nombra.
+**`CUANDO-HACE-FALTA.md`** guarda lo que solo se necesita a veces (apartados 3.D, 5.1 y 5.5). Las apps no tienen copia: se baja cuando toca y se lee solo el apartado que se nombra.
 
     curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/CUANDO-HACE-FALTA.md -o /tmp/CUANDO-HACE-FALTA.md
 
 Si no se puede bajar: la pasada completa va justo antes de subir, como en una app corta; la cola y
-el resumen se quedan sin reducir; un arreglo, o lo que diga la persona, se trata como una fila más.
+el resumen se quedan sin reducir; un arreglo se trata como una fila más.
 Se dice en una línea en la nota de la fila.
 
 ## 6. Segundo revisor, comprobar y publicar
@@ -205,18 +201,18 @@ Se dice en una línea en la nota de la fila.
    Después de publicar, el revisor (o la sesión, en una tarea pequeña) mira la app publicada si
    puede entrar; si no puede, lo deja escrito. Si no se puede comprobar la publicación por una
    causa ajena (por ejemplo, Vercel contesta 402 por el tope de publicaciones: no se reintenta),
-   queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, no se empieza otra fila (salvo en
-   una serie, o si el `CLAUDE.md` de la app dice que la cola sigue) y el mensaje final empieza con
-   «AVISO: no he podido comprobar que los cambios estén publicados.» «En verde», en un mensaje a la
-   persona, solo se dice si la publicación también lo está.
+   queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, y no se empieza otra fila (salvo en
+   una serie, o si el `CLAUDE.md` de la app dice que la cola sigue). «En verde», en lo que se deja
+   escrito, solo se dice si la publicación también lo está.
 6. Una publicación por tarea, al terminar. Cómo se publica en esta app lo dice su `CLAUDE.md`.
 7. Si la persona dice que no ve un cambio, primero se comprueba si se publicó. Nunca se supone
    caché del navegador sin comprobarlo.
-8. Mensaje final para la persona: qué ha quedado hecho, en una línea; qué no se pudo ver; y lo que
-   dice «Qué mirar al terminar» de la instrucción, una cosa por línea. Si la instrucción no tiene
-   ese apartado (instrucciones de antes del 7-nov-2026), la sesión lo escribe en ella a partir de
-   lo hecho, en la subida que marca HECHA. Acaba con: «Si al mirarlo algo falla, dímelo aquí y
-   sigo en esta misma sesión.»
+8. **Mensaje final: siempre el mismo,** «He terminado. Vuelve al Centro de mando.» (decidido por
+   Francisco el 18-nov-2026). La sesión no le habla a la persona: informa a Claude, por escrito.
+   Lo que ha quedado hecho, lo que no se pudo ver y cualquier aviso (por ejemplo, el de 6.5) van
+   en la nota de la fila y en «Revisión y respuestas durante el trabajo» de la instrucción. Si la
+   instrucción no tiene «Qué mirar al terminar» (instrucciones de antes del 7-nov-2026), la sesión
+   lo escribe en ella a partir de lo hecho, en la subida que marca HECHA.
 
 ## 7. La cola: cómo se escribe una fila y qué estados hay
 
@@ -255,12 +251,24 @@ y para el Centro de mando.
 | `ESPERA A LA IDEA M` | No puede terminarse hasta que la fila M esté HECHA (apartado 9) | Claude Code |
 | `EN CURSO` | Una sesión la está programando | Claude Code |
 | `ESPERA TU VISTAZO` | Programada y a la vista en una dirección de prueba; no se publica hasta que Claude en el chat (o la persona) la mire. Solo en las apps cuyo `CLAUDE.md` trabaja así | Claude Code |
-| `HECHA (fecha hora)` | En `main`, publicada y comprobada. Cuando Claude en el chat o la persona la mira y está bien, la nota lleva «mirada (fecha)» o «mirada (fecha, por Claude)» (botón «Bien» del Centro de mando); hasta entonces, y como mucho siete días, sale en «Para probar». Si Claude la probó y queda algo para la persona, la nota acaba en «probada por Claude (fecha) · te queda: A (motivo); B (motivo)»: sigue en «Para probar» enseñando solo eso | Claude Code |
+| `HECHA (fecha hora)` | En `main`, publicada y comprobada por la sesión. Cuando Claude en el chat la comprueba (o la persona, con él) y está bien, la nota lleva «mirada (fecha, por Claude)» o «mirada (fecha)»; hasta entonces, y como mucho siete días, el Centro de mando la enseña como «falta comprobarla». Si queda algo para la persona, la nota acaba en «probada por Claude (fecha) · te queda: A (motivo); B (motivo)» | Claude Code |
 | `SIN PUBLICACIÓN COMPROBADA` | Terminada, pero no se pudo comprobar la publicación (apartado 6.5) | Claude Code |
 | `BLOQUEADA` | Parada. La nota empieza por «PREGUNTA PARA <nombre>», «ATASCO PARA CLAUDE» o «FALTA UN PERMISO» (apartado 3) | Claude Code |
 | `DEVUELTA` | La persona miró la app y no es lo acordado. La nota dice qué falla | La persona, o Claude en su nombre |
 | `SUSTITUIDA` | Ya no cuenta por sí sola. Un tema diseñado: `SUSTITUIDA (fecha): diseñado en las filas N a M`. Sus ideas: `SUSTITUIDA (fecha): diseñada en el tema N` | Claude |
 | `DESCARTADA (fecha): motivo` | No se hará | Claude o la persona |
+
+**Lo que el Centro de mando lee de una fila** (lo escribe Claude en el chat, en llano; Claude Code
+no lo toca, salvo las marcas que ya mandan estas reglas):
+- **Un tema:** «Tema: <título llano>. Para qué: <una o dos frases>. [orden: N · motivo]». Si se deja
+  para más adelante, además `[aparcado: <hasta cuándo>]`. Diseñado, queda `SUSTITUIDA (fecha):
+  diseñado en las filas N a M`.
+- **Una parte de un tema:** la nota empieza por «parte de N · «<título llano>»». Una tarea
+  diseñada sola: la nota empieza por ««<título llano>» · para qué: <frase>».
+- **Un arreglo de una parte** dice «(de la fila N)» en su texto (apartado 3.D); sin eso y sin tema,
+  es un arreglo suelto.
+- **Lo que se le pide a la persona:** en la nota, «te pido: <frase llana>» y, si solo se puede en
+  un sitio, `[solo en: <sitio>]`. También cuentan «te queda:» y una IDEA «paso de <nombre>».
 
 **No son trabajo para Claude Code:** IDEA, DECIDIDA, EN TEMA, EN DISEÑO, APLAZADA con fecha por
 llegar, PENDIENTE con «no antes del» una fecha por llegar, ESPERA A LA IDEA cuya idea no esté
@@ -282,11 +290,13 @@ Una sesión puede hacer varias filas seguidas si el encargo las nombra (decidido
    Solo cuando se han hecho todas las filas se deja «SEGUIR» solo.
 3. **La serie se para del todo** solo en estos casos: una fila queda BLOQUEADA con «PREGUNTA
    PARA», hace falta algo que solo puede hacer la persona, o la publicación sale rota por nuestro
-   código. Las filas que falten siguen en la cola como estaban.
+   código. Las filas que falten siguen en la cola como estaban. La sesión no le pregunta nada a la
+   persona: lo deja escrito (apartado 3.A).
 4. **La serie sigue** si una fila queda BLOQUEADA con «ATASCO PARA CLAUDE» o «FALTA UN PERMISO»,
    o SIN PUBLICACIÓN COMPROBADA: se deja así y se pasa a las demás, saltando sin tocarlas las que
    necesiten esa fila.
-5. Al acabar, una sola línea: qué filas se han hecho, cuáles no y por qué se ha parado.
+5. Al acabar, qué filas se han hecho, cuáles no y por qué se ha parado se escribe en la nota de
+   cada fila. El mensaje final es el mismo de 6.8.
 
 ## 9. Lo que solo puede hacer la persona
 
@@ -306,11 +316,13 @@ clave, dar un permiso, decidir algo):
 
 Es el único camino: no se usan `docs/TE-TOCA.md` ni marcas en las notas.
 
-## 10. La persona contesta en la misma sesión
+## 10. Si la persona escribe en la sesión
 
-Si después del mensaje final la persona escribe que algo falla («ya lo he probado, falla esto»), la
-sesión sigue, sin pedir una conversación nueva: apartado 4 de `CUANDO-HACE-FALTA.md` (cómo se baja:
-final del apartado 5).
+La persona no habla con la sesión: le cuenta a Claude lo que vea (decidido por Francisco el
+18-nov-2026). Si aun así escribe después del mensaje final, la sesión no programa nada más:
+1. Apunta lo que dijo, tal cual, en la nota de la fila. Si es que falla algo de lo que hizo la
+   fila, la pasa a DEVUELTA con esa frase.
+2. Sube solo ese cambio de `docs/COLA.md` y contesta: «Lo he apuntado. Vuelve al Centro de mando.»
 
 ## Lecciones para Claude Code (de todas las apps)
 
