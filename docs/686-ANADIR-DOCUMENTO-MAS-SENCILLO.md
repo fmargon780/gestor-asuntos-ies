@@ -68,4 +68,7 @@ Decidido con él en el tema 683 (16-nov-2026): «Añadir documento» abre direct
 - Qué hacer: arreglar 1 y 2 con una sola pieza que enganche la zona y el cuadro en todas las fichas (también las «sin hitos»), en vez de enganches sueltos. De 3, 4 y 5 comprobar primero si pasan igual en `main`: si pasan, no son de esta fila (apuntar una IDEA «tropiezo» si hace falta y no arreglarlas aquí).
 - `npm test` completo salió verde salvo `pasar-a-drive`, que falla en la tanda y pasa a solas y en `main` (ajena).
 - Sin ver todavía: Edge real y arrastre real desde el Explorador de Windows (va a «Qué mirar al terminar»).
+- (Claude Code, 19-nov-2026, tercer intento) Arreglado: 1 (asuntos sin hitos y sin guía: `js/hitos-panel.js` no enganchaba la zona) y 2 (se engancha el cuadro entero, no solo `#doc-cuerpo`; se desengancha al cerrar). 3, 4 y 5 no se tocan: no se han comprobado en `main`. Pruebas nuevas h2 e i en `pruebas/soltar-documento.mjs`.
+- Segundo revisor nuevo: **APROBADA**. Puntos 1 a 9 y a, b, c: coincide. Menor: el fondo oscuro de detrás del cuadro no recibe la suelta. Ajeno: en MATRICULA el botón de la 2.ª tarea también marca la 1.ª (es la tarea de «reunir»); el contador del panel de la carpeta no se refresca en demostración.
+- Sin ver: Edge real y arrastre real desde el Explorador de Windows (va a «Qué mirar al terminar»).
 - (las apunta Claude Code)
