@@ -41,6 +41,7 @@ jobs:
             --exclude '/_sitio' --exclude '/.git' --exclude '/node_modules' \
             --exclude '/docs' --exclude '/pruebas' --exclude '/plantilla' \
             --exclude '/apps-script' --exclude '/herramientas' --exclude '/.github' \
+            --exclude '/CLAUDE.md' --exclude '/.claude' --exclude '/.gitignore' --exclude '/.vercelignore' --exclude '/vercel.json' \
             --exclude '/README.md' --exclude '/package.json' --exclude '/package-lock.json' \
             ./ _sitio/
           touch _sitio/.nojekyll

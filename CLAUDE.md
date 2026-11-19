@@ -13,7 +13,7 @@ Lo de abajo son **solo** las reglas propias de esta app.
 
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
-sesiones no entran en `pruebas.fmargon.com` (salvo la publicación a propósito de una fila grande aprobada, filas 710 y 713, apartado «La dirección de prueba»), el tope de Vercel es de toda la cuenta y nivelar
+sesiones no entran en la dirección de prueba (salvo la publicación a propósito de una fila grande aprobada, filas 710 y 713, apartado «La dirección de prueba»), el tope de Vercel es de toda la cuenta y nivelar
 `pruebas` a la fuerza perdió trabajo):
 
 1. Cada fila trabaja en su propia rama `fila-<nº>`, creada desde `main` al empezar (o en la rama
