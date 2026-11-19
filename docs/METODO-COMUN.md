@@ -92,10 +92,12 @@ sigue probando a ciegas.
 3. Lo revisa Claude en la siguiente conversación. Si la sesión hacía una sola fila, para; si
    hacía una serie, sigue con las demás (apartado 8).
 
-**C. Falta un permiso.** Si falta un permiso, o el entorno niega editar `CLAUDE.md`, un fichero de
-reglas o `.github/workflows`, no se buscan rodeos ni se reintenta. El cambio que no se pudo hacer
-se deja escrito en un documento de `docs/`. La fila pasa a BLOQUEADA con «FALTA UN PERMISO:
-<cuál, y qué frase tiene que escribir la persona para darlo>». Sigue como en B.
+**C. Falta un permiso.** Si falta un permiso, o el sistema niega cualquier acción (editar
+`CLAUDE.md`, un fichero de reglas o `.github/workflows`, arrancar un programa, abrir una dirección),
+no se buscan rodeos ni se reintenta. **Tampoco se pregunta en la ventana de la sesión**, aunque la
+persona esté: lo que se negó se deja escrito en un documento de `docs/` si es un cambio, y la fila
+pasa a BLOQUEADA con «FALTA UN PERMISO: <qué se negó, y qué frase tiene que escribir la persona
+para darlo>». La sesión acaba con el mensaje de 6.8. Sigue como en B.
 
 **D. Tercer arreglo del mismo fallo.** Antes de empezar una fila DEVUELTA, o una que arregla lo
 que hizo otra («de la fila N»), apartado 3 de `CUANDO-HACE-FALTA.md` (cómo se baja: final del
@@ -213,8 +215,10 @@ Se dice en una línea en la nota de la fila.
 6. Una publicación por tarea, al terminar. Cómo se publica en esta app lo dice su `CLAUDE.md`.
 7. Si la persona dice que no ve un cambio, primero se comprueba si se publicó. Nunca se supone
    caché del navegador sin comprobarlo.
-8. **Mensaje final: siempre el mismo,** «He terminado. Vuelve al Centro de mando.» (decidido por
-   Francisco el 18-nov-2026). La sesión no le habla a la persona: informa a Claude, por escrito.
+8. **Mensaje final: solo la frase** «He terminado. Vuelve al Centro de mando.», sin nada escrito
+   delante ni detrás: ni resumen, ni informe, ni lista de lo hecho (decidido por Francisco el
+   18-nov-2026; aclarado el 19-nov-2026). La sesión no le habla a la persona: informa a Claude, por
+   escrito.
    Lo que ha quedado hecho, lo que no se pudo ver y cualquier aviso (por ejemplo, el de 6.5) van
    en la nota de la fila y en «Revisión y respuestas durante el trabajo» de la instrucción. Si la
    instrucción no tiene «Qué mirar al terminar» (instrucciones de antes del 7-nov-2026), la sesión
@@ -331,6 +335,9 @@ La persona no habla con la sesión: le cuenta a Claude lo que vea (decidido por 
 1. Apunta lo que dijo, tal cual, en la nota de la fila. Si es que falla algo de lo que hizo la
    fila, la pasa a DEVUELTA con esa frase.
 2. Sube solo ese cambio de `docs/COLA.md` y contesta: «Lo he apuntado. Vuelve al Centro de mando.»
+
+Lo que llegue después de acabar y no sea de la persona (avisos de GitHub, notificaciones de
+publicación o de revisión) no se contesta con texto ni se apunta: la sesión ya terminó.
 
 ## Lecciones para Claude Code (de todas las apps)
 
