@@ -57,4 +57,15 @@ Decidido con él en el tema 683 (16-nov-2026): «Añadir documento» abre direct
 - Si algo falla o sale un aviso rojo, cópialo aquí tal cual: la fila pasa a DEVUELTA con ese texto.
 
 ## Revisión y respuestas durante el trabajo
+- (Claude, 19-nov-2026) **Tercer intento.** El código de los dos intentos está en la rama `claude/wonderful-carson-au9y10` (b8d5178): se parte de ahí, no de cero. Antes de empezar, mirar que no haya otra sesión viva en esa rama (otra marcó la fila «retomada (sesión nueva)», 6b32876). Es el tercer arreglo de lo mismo: leer el apartado 3 de `CUANDO-HACE-FALTA.md` (METODO-COMUN 3.D).
+- Ya arreglado antes: soltar en un cuadro abierto desde una tarea heredaba hito y tarea (PR 348); la misma suelta repetida (mismo fichero) ya no avisa; en asuntos sin hito abierto (SEGURO ESCOLAR A26-0006/7/8) soltar en la zona entre funciona.
+- El segundo revisor (nuevo, con 37 asuntos) la RECHAZÓ por esto:
+  1. En asuntos «sin hitos» (FACTURAS Ferreteria, PEDIDO Imprenta Sol, COMPRA Taller Ruiz) soltar en la zona de trabajo no hace nada.
+  2. En el cuadro «Los documentos guardados en esta carpeta» solo entra el fichero soltado sobre un botón de fila o «Añadir documento»; no sobre el título, el fondo ni la franja.
+  3. A26-0011 pide «de quién es la candidatura» al guardar (¿es lo normal de ese tipo?).
+  4. «Añadir documento» de una tarea, tras guardar otro desde la ficha, lo deja «sin tarea» (quizá ya pasaba antes).
+  5. Tras fallar o cancelar la ventana queda abierto el cuadro (quizá ya pasaba antes).
+- Qué hacer: arreglar 1 y 2 con una sola pieza que enganche la zona y el cuadro en todas las fichas (también las «sin hitos»), en vez de enganches sueltos. De 3, 4 y 5 comprobar primero si pasan igual en `main`: si pasan, no son de esta fila (apuntar una IDEA «tropiezo» si hace falta y no arreglarlas aquí).
+- `npm test` completo salió verde salvo `pasar-a-drive`, que falla en la tanda y pasa a solas y en `main` (ajena).
+- Sin ver todavía: Edge real y arrastre real desde el Explorador de Windows (va a «Qué mirar al terminar»).
 - (las apunta Claude Code)
