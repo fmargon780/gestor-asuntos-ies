@@ -62,6 +62,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   function plantillaInicial(a) {
     var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
     var pedida = (n()._interno || {}).plantillaPedida;
+    if (pedida === '__ninguna__') { I.S.plantillaElegida = ''; n()._interno.plantillaPedida = ''; pedida = ''; }   /* fila 705: sin plantilla, aunque el tipo tenga */
     if (pedida && opciones.some(function (p) { return p.id === pedida; })) { I.S.plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
     var antes = (n()._interno || {}).restaurar;
     if (antes && antes.plantilla !== undefined) I.S.plantillaElegida = antes.plantilla;

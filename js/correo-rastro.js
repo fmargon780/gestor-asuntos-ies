@@ -144,6 +144,8 @@
       return;
     }
     try {
+      /* Fila 705: en un asunto que es una lista de tareas no se ofrece dejarlo esperando (la espera es de la tarea). */
+      try { I.sinHitos = !!(window.AsuntoSinHitos && window.Hitos && AsuntoSinHitos.es(await Hitos.hitosDe(a.nombre))); } catch (e) { I.sinHitos = false; }
       var texto = textoDeLaNota();
       /* Fila 229: al hito si viene de uno (su historia), si no, al asunto. */
       if (!(I.comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function')) await window.Notas.anadirAuto(a, texto);
@@ -163,6 +165,10 @@
           }
           if (window.HitosPanel) window.HitosPanel.programarRepintado();
         } catch (e) { /* no crítico */ }
+      }
+      /* Fila 705: el correo ha salido de verdad con documentos: cada uno queda «enviado» en su ficha (js/papel-enviado.js). */
+      if (I.envioRealizado && !I.porSeneca && window.PapelEnviado && window.CorreoCuadro) {
+        try { await PapelEnviado.alEnviar(a, CorreoCuadro.documentosAdjuntados(), quienHaRecibidoElEnvio()); } catch (e) { /* no crítico */ }
       }
       I.algoCambiado = true;
       pintarRastro(a, 'Apuntado en las notas del asunto.');
@@ -184,7 +190,7 @@
     }
 
     var espera = esperaTrasCorreo(a);
-    var puedeEsperar = I.modoDelAsunto !== 'archivado' && window.EstadoHito && !yaEsperando(a);
+    var puedeEsperar = I.modoDelAsunto !== 'archivado' && window.EstadoHito && !yaEsperando(a) && !I.sinHitos;
 
     /* El recordatorio de guardar el PDF del hilo solo hace falta
        cuando el correo NO ha salido por aquí (fila 115): un envío real

@@ -264,7 +264,8 @@
     I.tutorDelGrupo = (extra && extra.tutorDelGrupo) || null;
     I.restaurar = (extra && extra.restaurar) || null;   /* fila 555: el cuadro se reabre tras relacionar a alguien */
     /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
-    I.plantillaPedida = (extra && extra.plantilla) || '';
+    I.plantillaPedida = (extra && extra.plantilla) || ((extra && extra.sinPlantilla) ? '__ninguna__' : '');   /* fila 705: «sin plantilla» a propósito */
+    I.papelesPara = (extra && extra.papelesPara) || null;   /* fila 705: a quién va (papeles de js/correo-para.js), manda sobre la plantilla */
     I.avisoActividad = (extra && extra.avisoActividad) || null;   /* fila 309: al enviarse, se apunta el aviso en el asunto */
     I.grupoInicial = (extra && extra.grupoInicial) || '';   /* fila 309: el id de un grupo propio, ya en la copia oculta */
     I.personasCopiaOculta = (extra && extra.personasCopiaOculta) || null;   /* fila 352: personas [{nombre, persona}] ya en la copia oculta */
@@ -283,6 +284,7 @@
     I.yaApuntado = false;
     I.algoCambiado = false;
     I.envioRealizado = false;
+    I.sinHitos = false;   /* fila 705 */
     /* El cuadro de Séneca ocupa más ancho que el de Correo (fila 53,
        docs/SENECA-CUADRO-ANCHO.md): mismo patrón que .cuadro-ancho en
        js/documentos.js, con su propia clase y un tope menor. Correo

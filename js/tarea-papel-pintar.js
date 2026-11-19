@@ -6,7 +6,7 @@
    («Generado › Firmado › Registrado › Enviado»; con ✓ los hechos, resaltado el que toca). A la derecha, el botón del
    paso que toca: «Generar documento» (con una plantilla del tipo la abre; con varias deja elegir; con ninguna ofrece
    «Otra plantilla…» y «+ Nueva plantilla…») o «Añadir documento» (la ventana de Windows). En el ⋮: «Marcar el paso a
-   mano» y «Quitar el documento».
+   mano», «Quitar el documento» y, con el envío apuntado, «Corregir el envío» (fila 705: «Enviar correo» / «Marcar enviado»).
    ============================================================ */
 var TareaPapelPintar = (function () {
 
@@ -99,6 +99,8 @@ var TareaPapelPintar = (function () {
     if (boton.dataset.paso === 'generar') montarGenerar(el, a, h, g, boton, guardar);
     else if (boton.dataset.paso === 'firmar') boton.onclick = function () { guardar(boton, 'poner el documento a la firma', function () { return TareaPapel.ponerAFirma(a, h, g); }); };   /* fila 704 */
     else if (boton.dataset.paso === 'registrar') boton.onclick = function () { registrar(a, h, g, boton, guardar); };
+    else if (boton.dataset.paso === 'marcarenviado') boton.onclick = function () { guardar(boton, 'apuntar el envío', async function () { await PapelEnviado.marcarEnviado(a, h, g); await TareaPapel.sincronizar(a, h); }); };   /* fila 705 */
+    else if (boton.dataset.paso === 'enviarcorreo') PapelEnviado.montarEnviarCorreo(a, h, g, boton);   /* fila 705 */
     else boton.onclick = function () {
       guardar(boton, 'abrir la ventana', async function () {
         await Documentos.abrir(a, { irDirectoAAnadir: true, tipoDocumento: g.papel });   /* propone el tipo de la tarea */
@@ -116,6 +118,8 @@ var TareaPapelPintar = (function () {
     if (g.papelDoc && g.papelDoc.numero) lista.push({ texto: 'Quitar el documento', clase: 'tp-quitar-opcion', alPulsar: function () {
       guardar(menu, 'quitar el documento', async function () { await TareaPapel.quitarDocumento(a, h, g); await TareaPapel.sincronizar(a, h); });
     } });
+    var corregir = window.PapelEnviado ? PapelEnviado.opcionMenu(a, h, g, guardar, menu) : null;   /* fila 705 */
+    if (corregir) lista.push(corregir);
     return lista;
   }
 

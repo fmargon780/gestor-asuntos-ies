@@ -28,6 +28,8 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
         if (plantillaDeEntrada) CorreoPara.aplicarPapeles({ para: plantillaDeEntrada.para, copia: plantillaDeEntrada.copia, oculta: plantillaDeEntrada.oculta });
         var preferente = (n().destinatarioPreferente && n().destinatarioPreferente()) || '';
         if (preferente) CorreoPara.ponerDirecciones('para', String(preferente).match(Destinatarios.RE_CORREO) || []);
+        var papelesPara = (n()._interno || {}).papelesPara;   /* fila 705: el correo de un papel va a quien dice su recorrido */
+        if (papelesPara && papelesPara.length) { CorreoPara.vaciar(); CorreoPara.aplicarPapeles({ para: papelesPara }); }
       }
     }
 

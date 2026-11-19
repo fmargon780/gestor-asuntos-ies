@@ -79,6 +79,12 @@ var CorreoAdjuntoPlantilla = (function () {
     var p = plantillaPorId(a, id);
     var tipo = p && p.adjuntar;
     if (!tipo) return;
+    /* Fila 705: si el cuadro ya se abrió con un documento de ese tipo marcado (el de una tarea de papel), no se marca otro. */
+    var yaMarcado = Array.prototype.some.call(document.querySelectorAll('#correo-formulario .adjunto-marca'), function (c) {
+      var l = c.checked && window.Documentos ? (Documentos.leerNombre(c.value) || {}) : {};
+      return !!l.tipo && U.normalizar(String(l.tipo)).trim() === U.normalizar(String(tipo)).trim();
+    });
+    if (yaMarcado) return;
     var nombre = elegirDocumento(await nombresDelAsunto(a), tipo);
     if (!nombre) { ponerAviso('Esta plantilla adjunta el documento ' + tipo + ', y en este asunto todavía no hay ninguno.'); return; }
     var c = casilla(nombre);
