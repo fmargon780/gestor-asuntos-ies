@@ -125,6 +125,7 @@ var Documentos = (function () {
     N.tipoPropuesto = '';
     N.preguntarTarea = false;
     N.colgar = false;
+    N.marcaSoltada = '';
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se
@@ -328,6 +329,11 @@ var Documentos = (function () {
   /* Fila 686 (js/soltar-documento.js): un fichero soltado. Con el cuadro de Documentos abierto,
      entra en él (si ya hay un documento a medias, avisa); si no, abre uno. Sin hito ni tarea. */
   function soltarFichero(asunto, fichero) {
+    /* Devuelta (19-nov-2026): la misma suelta llegada otra vez (mismo fichero que el del cuadro del nombre ya abierto) no avisa ni cambia nada. */
+    var marca = fichero.name + '|' + fichero.size + '|' + fichero.lastModified;
+    var abierto = !!document.querySelector('#capa:not(.oculto) #doc-cuerpo');
+    if (abierto && N.marcaSoltada === marca) return;
+    N.marcaSoltada = marca;
     /* Al cerrar el cuadro su contenido se queda en la página, escondido: solo vale el que se ve. */
     if (document.querySelector('#capa:not(.oculto) #doc-cuerpo')) {
       if (document.querySelector('#capa:not(.oculto) #doc-guardar')) { U.aviso('Termina antes con este documento.', 'ambar'); return; }

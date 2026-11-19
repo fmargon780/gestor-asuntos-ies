@@ -33,6 +33,8 @@ var SoltarDocumento = (function () {
       ev.preventDefault();
       ev.stopPropagation();
       zona.classList.remove('encima');
+      if (ev.__soltado) return;   /* fila 686: una suelta, una llamada, aunque el suceso llegue a dos zonas */
+      ev.__soltado = true;
       var ficheros = ev.dataTransfer && ev.dataTransfer.files;
       if (!ficheros || !ficheros.length) return;
       if (window.Perfil && Perfil.esDirectivo()) return;   /* fila 287 */
