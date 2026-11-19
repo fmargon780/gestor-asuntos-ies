@@ -62,6 +62,7 @@
     App.E.tipos = [];
     await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, []);
     await escribirDatos();
+    if (window.Demo.grande) await Demo.grande.escribirPersonas();   /* fila 711: `grande=1` */
     /* Fila 375: el teléfono y el correo del centro, como si ya vinieran del Centro de datos (sin señalar su carpeta). */
     try {
       if (window.CentroDeDatos) await CentroDeDatos.apuntarConfiguracion({ actualizado: '', actualizadoPor: '', tomadoEl: new Date().toISOString(), vienen: [], telefono: '958000000', direccionDelCentro: 'secretaria@centro-demo.es', web: '' });
@@ -86,6 +87,7 @@
     if (window.Demo.orden) await Demo.orden.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 300 */
     if (window.Demo.soloSi) await Demo.soloSi.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 576 */
     if (window.Demo.baja) await Demo.baja.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 592 */
+    if (window.Demo.grande) Demo.grande.resumen = await Demo.grande.construirAsuntos({ tipos: tipos, crearAsunto: crearAsunto, archivar: I.archivarDeMentira, hace: hace });   /* fila 711 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */
     if (window.Demo.problemas) await Demo.problemas.construir(tipos, sinCarpeta);   /* fila 291: y más (js/demo/datos-problemas.js) */
     await crearTablon();

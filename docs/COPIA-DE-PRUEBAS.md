@@ -11,6 +11,9 @@ primera de las dos filas del método nuevo «purgar los fallos antes de producci
 > última fila grande aprobada (`CLAUDE.md`, «La dirección de prueba»), entra sola en demostración aunque falte
 > `?demo=1&auto=1` y no ofrece señalar carpetas de verdad (`js/demo/franja.js`).
 
+> Fila 711 (19-nov-2026): `?demo=1&auto=1&grande=1` añade un juego grande de datos inventados (`js/demo/datos-grande-personas.js` y
+> `js/demo/datos-grande-asuntos.js`, solo se cargan con `grande=1`) y `docs/CASOS-DE-PRUEBA.md` lista los casos raros y cómo verlos.
+
 ## Qué quiere Francisco
 
 Una dirección aparte, **https://pruebas.fmargon.com**, donde vive la versión que se está
