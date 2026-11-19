@@ -45,3 +45,4 @@ Parte del tema 692 (el molde nuevo). Va detrás de la fila 705.
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code)
+- (19-nov-2026) Segundo revisor: APROBADA a la primera. Coincide: «+ Añadir rótulo» junto a «+ Añadir una tarea», el rótulo se cambia, sube, baja y quita; el asunto nuevo lo enseña en banda con las tareas metidas; sin rótulos nada se mete; sin casilla ni ⋮ y sin contar en «N de M» ni en Inicio; desde el asunto no se añaden; un grupo cuyas tareas están ocultas por «Solo si» no sale. Detalle menor que se deja: las flechas del rótulo dicen «Subir/Bajar esta tarea». Decisión técnica: en el asunto cada tarea copia el rótulo de encima (`grupo`) en vez de guardar el rótulo como línea.

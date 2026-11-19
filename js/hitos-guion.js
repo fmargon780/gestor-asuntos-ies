@@ -124,6 +124,7 @@
                deGuia: !!g.deGuia,   /* fila 701: copiada de la guía de un tipo «sin hitos» al nacer el asunto */   /* fila 576: «Cuándo se hace» (js/solo-si.js) */
                hechoCon: x.hechoCon || null,   /* fila 671: lo apuntado al marcarla con su botón (js/tarea-hecha.js) */
                faltaAlgo: (!x.hecho && !x.noaplica && x.falta) || null,   /* fila 671: «Falta algo» de una tarea de Comprobar */
+               grupo: g.grupo || '',   /* fila 706: el rótulo bajo el que va (copiado de la guía; js/asunto-sin-hitos.js lo pinta) */
                papel: x.papel || '',   /* fila 703: el tipo de documento de una tarea de papel (js/tarea-papel.js) */
                papelDoc: x.papelDoc || null,   /* fila 703: su documento y lo marcado a mano, de `guionHecho` */
                como: '' };   /* fila 671: «Cómo se hace» (lo pone Sitios.aplicarDatos) */

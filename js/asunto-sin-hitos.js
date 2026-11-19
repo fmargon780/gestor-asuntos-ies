@@ -131,13 +131,20 @@ var AsuntoSinHitos = (function () {
     return (t && t.comoSeHace) || '';
   }
 
+  /* Fila 706: la banda del rótulo, delante de la primera tarea a la vista de su grupo (sin tareas a la vista, no sale). */
+  function rotuloHTML(g, previo) {
+    var r = g.grupo && g.grupo !== previo.v ? '<div class="ash-rotulo">' + esc(g.grupo) + '</div>' : '';
+    previo.v = g.grupo || '';
+    return r;
+  }
+
   function tareaHTML(g, a, abierto, ahora) {
     var como = comoDe(a, g);
     var comoAbierto = !!(como && e(g.id).comoAbierto);
     var puede = abierto && !soloLectura();
     var notas = notasDe(a, g);
     var quien = g.hecho && (g.quien || g.cuando) ? [g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ') : '';
-    return '<div class="ash-tarea' + (g.falta ? ' falta' : '') + (g.hecho ? ' hecha' : '') + (g.noaplica ? ' noaplica' : '') + (ahora ? ' ahora' : '') + '" data-id="' + esc(g.id) + '">' +
+    return '<div class="ash-tarea' + (g.falta ? ' falta' : '') + (g.hecho ? ' hecha' : '') + (g.noaplica ? ' noaplica' : '') + (ahora ? ' ahora' : '') + (g.grupo ? ' bajo-rotulo' : '') + '" data-id="' + esc(g.id) + '">' +
       '<div class="ash-fila">' + ((g.papel && window.TareaPapelPintar) ? TareaPapelPintar.centroHTML(g, a) :   /* fila 703: la tarea de papel no lleva casilla */
         '<label class="ash-linea"><input type="checkbox" class="ash-casilla"' + (g.hecho ? ' checked' : '') + (puede ? '' : ' disabled') + '>' +
         '<span class="ash-texto-tarea">' + esc(g.texto) + '</span></label>') +
@@ -181,8 +188,9 @@ var AsuntoSinHitos = (function () {
     U.conservandoLoEscrito(caja, function () {
       var lista = tareasDe(a, h);
       var siguiente = lista.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
+      var previoGrupo = { v: '' };
       caja.innerHTML = '<div class="ash">' + panelHTML(lista, abierto, a) +
-        '<div class="ash-lista">' + lista.map(function (g) { return tareaHTML(g, a, abierto, g === siguiente); }).join('') + '</div>' +
+        '<div class="ash-lista">' + lista.map(function (g) { return rotuloHTML(g, previoGrupo) + tareaHTML(g, a, abierto, g === siguiente); }).join('') + '</div>' +
         anadirHTML(abierto) + '</div>';
       enganchar(caja, a, h, lista, abierto);
     });

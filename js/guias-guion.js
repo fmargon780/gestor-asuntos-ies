@@ -233,6 +233,7 @@ var GuiasGuion = (function () {
         texto: String((g && g.texto) || '').trim(),
         explicacion: String((g && g.explicacion) || '').trim()
       };
+      if (!dentro && g && g.rotulo) { base.rotulo = true; base.explicacion = ''; return base; }   /* fila 706: un rótulo solo nombra (js/guia-sin-hitos.js) */
       if (!dentro && g && g.pregunta) {
         base.pregunta = true;
         base.opciones = (Array.isArray(g.opciones) ? g.opciones : []).map(function (o) {
