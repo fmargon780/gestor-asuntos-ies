@@ -30,6 +30,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
         if (preferente) CorreoPara.ponerDirecciones('para', String(preferente).match(Destinatarios.RE_CORREO) || []);
         var papelesPara = (n()._interno || {}).papelesPara;   /* fila 705: el correo de un papel va a quien dice su recorrido */
         if (papelesPara && papelesPara.length) { CorreoPara.vaciar(); CorreoPara.aplicarPapeles({ para: papelesPara }); }
+        else if (!preferente && CorreoPara.ponerLaAdministracion) CorreoPara.ponerLaAdministracion();   /* fila 717 */
       }
     }
 

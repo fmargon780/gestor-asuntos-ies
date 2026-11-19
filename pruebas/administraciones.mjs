@@ -138,7 +138,7 @@ await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#correo-para');
-await comprobar('3. en Correo el departamento se puede elegir (sale al buscarlo) y no va puesto solo', pagina.evaluate(() => [CorreoPara.texto('para'), CorreoPara.candidatos().some((c) => c.dirs.indexOf('escolarizacion@ejemplo.es') !== -1)]), ['', true]);
+await comprobar('3. en Correo el correo del departamento va ya puesto en «Para» (fila 717) y se puede elegir al buscarlo', pagina.evaluate(() => [CorreoPara.texto('para'), CorreoPara.candidatos().some((c) => c.dirs.indexOf('escolarizacion@ejemplo.es') !== -1)]), ['escolarizacion@ejemplo.es', true]);
 await comprobar('3. los huecos nuevos', pagina.evaluate(async (n) => {
   const a = App.E.listaAbiertos.find((x) => x.nombre === n);
   const v = await Plantillas.valoresDeAsunto(a);
