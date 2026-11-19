@@ -80,7 +80,16 @@ var CorreoPara = (function () {
         });
       });
     }
-    if (tercero) lista.push(nuevo('interesado', soloElNombre(tercero), 'El interesado', propios, { papel: 'interesado', buscar: 'interesado alumno alumna' }));
+    /* Fila 717: si el tercero es una administración, su correo es el del departamento del asunto o, si no, el general; es la única que sale en «Para». */
+    var categoriaA = (a && ((a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria))) || '';
+    if (categoriaA === 'ADMINISTRACIONES' && window.Administraciones && Administraciones.correoDelAsunto) {
+      var deLaAdmin = '';
+      try { deLaAdmin = Administraciones.correoDelAsunto(a) || ''; } catch (e) { deLaAdmin = ''; }
+      (deLaAdmin.match(Destinatarios.RE_CORREO) || []).slice(0, 1).forEach(function (d) {
+        propios = [d];   /* una sola dirección: la del departamento o, si no, la general */
+      });
+    }
+    if (tercero) lista.push(nuevo('interesado', soloElNombre(tercero), 'El interesado', propios, { papel: 'interesado', administracion: categoriaA === 'ADMINISTRACIONES', buscar: 'interesado alumno alumna' }));
 
     /* Los tutores legales, con la custodia. Los correos de familia que no cuelgan de ningún tutor («Correo del tutor» a secas) se
        reparten: con un solo tutor sin correo, son suyos; si no, salen como «La familia». */
@@ -212,6 +221,13 @@ var CorreoPara = (function () {
     });
   }
 
+  /* Fila 717: en un asunto de una administración, si «Para» ha quedado vacío al abrir el cuadro, va su correo (el del departamento o el general). */
+  function ponerLaAdministracion() {
+    if (!S.a || S.dest.para.length) return;
+    var c = buscarCandidato('interesado');
+    if (c && c.administracion && !c.sinCorreo) poner('para', c);
+  }
+
   function vaciar() { CAMPOS.forEach(function (c) { S.dest[c] = []; }); }
 
   /* Lo puesto ahora, para volver a ponerlo si el cuadro se cierra y se reabre (relacionar a alguien desde el correo). */
@@ -306,7 +322,7 @@ var CorreoPara = (function () {
 
   return {
     CAMPOS: CAMPOS, ROTULOS: ROTULOS, preparar: preparar, custodiaDe: custodiaDe,
-    aplicarPapeles: aplicarPapeles, ponerDirecciones: ponerDirecciones, poner: poner, ponerElegido: ponerElegido, quitar: quitar,
+    aplicarPapeles: aplicarPapeles, ponerLaAdministracion: ponerLaAdministracion, ponerDirecciones: ponerDirecciones, poner: poner, ponerElegido: ponerElegido, quitar: quitar,
     vaciar: vaciar, instantanea: instantanea, restaurar: restaurar, actualizarCorreo: actualizarCorreo, direcciones: direcciones, texto: texto, nombres: nombres, todosLosNombres: todosLosNombres,
     html: html, enganchar: enganchar, repintar: repintarTodos, candidatos: candidatos, estado: estado, campoDe: campoDe
   };
