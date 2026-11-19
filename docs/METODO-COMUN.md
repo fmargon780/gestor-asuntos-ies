@@ -142,13 +142,19 @@ Las demás decisiones técnicas las toma la sesión y las deja escritas en la no
    `wc -c`) y `docs/CONTEXTO-CORTO.md` no pasa de 160 líneas ni de 20 KB (20.000 bytes), porque
    lo leen todas las conversaciones de la app. Se actualizan sustituyendo la línea vieja, no
    añadiendo otra debajo. **Al marcar una fila HECHA**, en esa misma subida, la sesión los mide
-   (`wc -c docs/COLA.md`, `wc -l -c docs/CONTEXTO-CORTO.md`). Solo si alguno se pasa, lo reduce
-   como dice el apartado 2 de `CUANDO-HACE-FALTA.md` (abajo).
+   (`wc -c docs/COLA.md`, `wc -l -c docs/CONTEXTO-CORTO.md`). **La cola se mide también cada vez
+   que una conversación del chat escribe en ella** (decidido por Francisco el 19-nov-2026: la
+   encontró en 44 KB). Solo si alguno se pasa, lo reduce como dice el apartado 2 de
+   `CUANDO-HACE-FALTA.md` (abajo).
 6. **La cola no pierde filas y está bien escrita.** Antes de escribir en `docs/COLA.md`, baja
    `main` y toca solo tu fila. Antes de subir el cambio, pasa el programa que comprueba la forma
-   de las filas (apartado 7) y que no falta ninguna de las que había sin cerrar:
+   de las filas (apartado 7) y que no falta ninguna de las que había sin cerrar. **En dos órdenes
+   separadas, una detrás de otra, sin mezclar nada más** (el sistema bloquea la orden larga que baja
+   y ejecuta de golpe, 19-nov-2026):
 
-       curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/comprueba-cola.js -o /tmp/comprueba-cola.js && node /tmp/comprueba-cola.js docs/COLA.md
+       curl -fsSL https://raw.githubusercontent.com/fmargon780/metodo-reglas/main/comprueba-cola.js -o /tmp/comprueba-cola.js
+
+       node /tmp/comprueba-cola.js docs/COLA.md
 
    Lo que diga que hay que arreglar se arregla antes de subir. Si no se puede bajar o no hay
    `node`, se sube igual y se dice en una línea en la nota de la fila. Después de subir, comprueba
@@ -236,6 +242,8 @@ y para el Centro de mando.
   programar hasta que otra esté publicada, la nota dice «Necesita la fila N»: el Centro de mando no
   la lanza mientras la N no esté HECHA (o cerrada).
 - Una fila nueva se añade al final. Cambiar el orden es mover la línea entera.
+- **Tamaño:** quien escribe en la cola, también desde el chat, mide `wc -c docs/COLA.md` en esa
+  subida; si pasa de 40 KB, la reduce ahí mismo (apartado 5.5).
 
 **Los estados.** Son estos y ninguno más. Una fila con otro estado, o mal escrita, sale en
 «Filas que no entiendo» del Centro de mando, y el programa del apartado 5.6 no la deja subir.
