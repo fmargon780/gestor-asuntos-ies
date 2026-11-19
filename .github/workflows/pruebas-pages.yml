@@ -1,0 +1,56 @@
+name: Dirección de prueba en GitHub Pages
+
+# Fila 713 (docs/713-DIRECCION-DE-PRUEBA-EN-GITHUB.md): la dirección de prueba es
+# https://fmargon780.github.io/gestor-asuntos-ies/ y enseña una sola versión a la vez, la de la rama
+# que se le diga. Solo se lanza a mano (`gh workflow run pruebas-pages.yml -f rama=fila-<nº>`); no se
+# dispara con ninguna subida. Publica solo la app: lo mismo que deja fuera `.vercelignore`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rama:
+        description: 'Rama que se publica (por ejemplo fila-713)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pruebas-pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Clonar la rama pedida
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.rama }}
+
+      - name: Dejar solo la app
+        run: |
+          mkdir _sitio
+          rsync -a \
+            --exclude '/_sitio' --exclude '/.git' --exclude '/node_modules' \
+            --exclude '/docs' --exclude '/pruebas' --exclude '/plantilla' \
+            --exclude '/apps-script' --exclude '/herramientas' --exclude '/.github' \
+            --exclude '/README.md' --exclude '/package.json' --exclude '/package-lock.json' \
+            ./ _sitio/
+          touch _sitio/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _sitio
+
+      - name: Publicar en Pages
+        id: despliegue
+        uses: actions/deploy-pages@v4

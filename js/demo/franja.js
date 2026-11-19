@@ -8,7 +8,7 @@
    Con `?demo=1&auto=1` entra sola, sin pulsar nada: es lo que usa el
    revisor con Playwright.
 
-   En `pruebas.fmargon.com` entra siempre sola (fila 710), aunque falte `?demo=1&auto=1`.
+   En `fmargon780.github.io` (fila 713; antes `pruebas.fmargon.com`, fila 710) entra siempre sola, aunque falte `?demo=1&auto=1`.
 
    Después de entrar, pone la franja fija de arriba en todas las
    pantallas, con «Volver a empezar» (recarga con el disco vacío).
@@ -26,7 +26,7 @@
      carpetas de verdad: una versión sin aprobar nunca puede escribir en los datos reales. */
   function soloEnPruebas() {
     var h = location.hostname;
-    return h === 'pruebas.fmargon.com' || h.indexOf('-git-pruebas-') !== -1;
+    return h === 'pruebas.fmargon.com' || h.indexOf('-git-pruebas-') !== -1 || h === 'fmargon780.github.io';   /* fila 713: la dirección de prueba es ahora la de GitHub Pages */
   }
 
   /* ---------- entrar ---------- */
