@@ -80,6 +80,9 @@ var CorreoPara = (function () {
         });
       });
     }
+    /* Fila 717: si el tercero es una administración, su correo es el del departamento del asunto o, si no, el general. */
+    var deLaAdmin = window.Administraciones && Administraciones.organismoDelAsunto && Administraciones.organismoDelAsunto(a) ? Administraciones.correoDelAsunto(a) : '';
+    if (deLaAdmin) propios = (String(deLaAdmin).match(Destinatarios.RE_CORREO) || []).slice(0, 1);
     if (tercero) lista.push(nuevo('interesado', soloElNombre(tercero), 'El interesado', propios, { papel: 'interesado', buscar: 'interesado alumno alumna' }));
 
     /* Los tutores legales, con la custodia. Los correos de familia que no cuelgan de ningún tutor («Correo del tutor» a secas) se
@@ -207,7 +210,13 @@ var CorreoPara = (function () {
   function aplicarPapeles(papeles) {
     CAMPOS.forEach(function (campo) {
       ((papeles && papeles[campo]) || []).forEach(function (papel) {
-        candidatosDePapel(papel).forEach(function (c) { if (!c.sinCorreo) poner(campo, c); });
+        candidatosDePapel(papel).forEach(function (c) {
+          /* Fila 717: la misma dirección no sale dos veces en un campo (el correo de la administración es el del interesado y el de quien lo pide). */
+          var repetida = c.dirs.length && c.dirs.every(function (d) {
+            return S.dest[campo].some(function (p) { return p.dirs.some(function (x) { return x.toLowerCase() === d.toLowerCase(); }); });
+          });
+          if (!c.sinCorreo && !repetida) poner(campo, c);
+        });
       });
     });
   }
