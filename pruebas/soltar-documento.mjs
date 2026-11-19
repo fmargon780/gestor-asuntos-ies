@@ -121,6 +121,29 @@ await p.waitForSelector('#doc-guardar', { timeout: 15000 });
 comprobar('h. sin hito abierto: soltar en la zona abre el cuadro del nombre', await contexto(), [null, null, false]);
 await cerrar();
 
+/* (h2) asunto sin hitos y sin guía (PEDIDO Imprenta Sol, su tipo no está en la lista): soltar en la zona de trabajo y sobre una tarea también entra */
+for (const donde of ['#trabajo-columnas']) {
+  await p.click('button.pestana[data-pantalla="abiertos"]');
+  const numPedido = await p.evaluate(() => { const a = Gestor.asuntos().filter((x) => /PEDIDO Imprenta Sol/.test(x.nombre))[0]; return (a.nombre.match(/A\d\d-\d{4}/) || [a.nombre])[0]; });
+  await p.locator('#inicio-tabla-cuerpo tr[data-asunto*="' + numPedido + '"] .nombre-pulsable').first().click();
+  await p.waitForSelector('#trabajo-columnas', { timeout: 15000 });
+  await p.waitForTimeout(1500);
+  await soltar(donde);
+  await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+  comprobar('h2. asunto sin hitos: soltar sobre ' + donde + ' abre el cuadro del nombre', await contexto(), [null, null, false]);
+  await cerrar();
+}
+
+/* (i) devuelta por el revisor: se suelta en todo el cuadro de Documentos (título y fondo), no solo en su cuerpo */
+for (const sel of ['#capa .cuadro', '#capa .cuadro > :first-child']) {
+  await p.evaluate(() => { Documentos.abrir(Gestor.asuntos().filter((x) => x.nombre.indexOf('SANCION Fuentes Calvo') !== -1)[0]); });
+  await p.waitForSelector('#doc-anadir');
+  await soltar(sel);
+  await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+  comprobar('i. soltar sobre ' + sel + ' abre el cuadro del nombre', await contexto(), [null, null, false]);
+  await cerrar();
+}
+
 /* (e) un directivo no guarda */
 await p.evaluate(() => { window.__esDirectivo = Perfil.esDirectivo; Perfil.esDirectivo = () => true; });
 await soltar('#trabajo-columnas');

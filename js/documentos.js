@@ -77,7 +77,8 @@ var Documentos = (function () {
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
-    if (window.SoltarDocumento) SoltarDocumento.enganchar($('doc-cuerpo'), asunto);   /* fila 686 */
+    /* Fila 686 (devuelta, 19-nov-2026): se suelta en todo el cuadro (título, fondo, franja), no solo en el cuerpo. */
+    if (window.SoltarDocumento) SoltarDocumento.enganchar(cuadro, asunto);
     /* Fila 678: la ventana de Windows se pide en la misma pulsación, antes de
        leer la carpeta y los hitos (con Drive esa espera puede pasar del tiempo
        que el navegador da desde la pulsación y la ventana no se abría). */
@@ -118,6 +119,7 @@ var Documentos = (function () {
       }
     }
     await esperar;
+    if (window.SoltarDocumento) SoltarDocumento.desenganchar(cuadro);   /* fila 686: el cuadro se reutiliza en otros diálogos */
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
     N.hitoActual = null;

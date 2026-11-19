@@ -377,6 +377,8 @@
      tanto). */
   function pintarVacio(caja, a, abierto, errorLectura) {
     caja.className = 'explica';
+    /* Fila 686 (devuelta, 19-nov-2026): sin hitos (tipo sin guía) también se puede soltar un fichero en la zona del asunto. */
+    if (window.SoltarDocumento) SoltarDocumento[abierto && !errorLectura ? 'enganchar' : 'desenganchar'](document.getElementById('trabajo-columnas'), a);
     if (errorLectura) {
       caja.textContent = 'No he podido leer los hitos: ' + U.mensajeDeError(errorLectura);
       return;
