@@ -68,7 +68,7 @@ por Playwright en `http://localhost:<puerto>/?demo=1&auto=1` y pasa la lista «C
 segundo revisor» de la instrucción (en las instrucciones antiguas, «Cómo sabemos que está bien»),
 con el guion fijo de `docs/REVISOR-GUION.md` (fila 242). Un punto
 que el revisor no puede ver queda «no lo he podido ver» (`docs/METODO-COMUN.md` 6.2), se copia a
-`docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. Un paso que solo puede
+`docs/COMPROBAR-A-MANO.md` y se dice en la nota de la fila. Un paso que solo puede
 dar Francisco (pegar código, dar un permiso) no va ahí: es una fila «paso de Francisco»
 (`docs/METODO-COMUN.md` 9). **APROBADA**: en una fila **pequeña**, se
 publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA, sin esperar a nadie. En una fila **grande** (la que lleva segundo revisor) pasa antes por la dirección de prueba (19-nov-2026, fila 710, `docs/710-PROBAR-ANTES-DE-PRODUCCION.md`): con la APROBADA y **antes de fusionar en `main`**, se publica la rama `fila-<nº>` en `https://pruebas.fmargon.com` (apartado «La dirección de prueba»), la fila pasa a `ESPERA TU VISTAZO` y su nota lleva la dirección, el número de la fila y la `App.VERSION` publicada. La sesión **no espera** el vistazo: sigue con la serie si la hay (menos otra fila grande) o termina. Una sola fila grande espera a la vez: mientras haya una en `ESPERA TU VISTAZO`, no se empieza otra fila grande (las pequeñas siguen). Claude, desde el chat con la extensión de Chrome, o Francisco, la miran con datos inventados. Está bien → Claude pasa la fila a `PENDIENTE` con «vista (fecha, por Claude)» al principio de la nota. Falla algo → `DEVUELTA` con lo que falla, y la rama `fila-<nº>` se conserva para retomarla. «Fila grande» es la que lleva segundo revisor; si una fila aprobada deja de ser grande por decisión de Francisco, sigue el camino de las pequeñas. Para actualizar la rama con `main` se fusiona `main` en ella (nunca a la fuerza). **Una fila `PENDIENTE` cuya nota empieza por «vista (» no se programa: se fusiona su rama en `main` (si `main` ha cambiado, se actualiza la rama y se repiten las pruebas de lo tocado), se publica en producción una sola vez como siempre y se marca HECHA.** (1-oct-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; el estado EN EL PAQUETE no existe.) **RECHAZADA** la primera vez:
@@ -104,8 +104,7 @@ La regla general está en `docs/METODO-COMUN.md`, apartado 6. Lo propio de esta 
 3. **Si no puedes comprobarlo por una causa ajena:** la fila no se marca HECHA. Se deja como
    **SIN PUBLICACIÓN COMPROBADA**, con el motivo y el SHA de `main` en una línea, y la sesión
    termina con normalidad (para, y el siguiente lanzamiento coge la siguiente PENDIENTE). El tope de Vercel
-   **no para la cola**. Tu mensaje final empieza exactamente con: «AVISO: no he podido comprobar
-   que los cambios estén publicados.» **Un `create_deployment` por fila con código** (es el camino normal, ya no el de emergencia); si
+   **no para la cola**. El mensaje final es el de `docs/METODO-COMUN.md` 6.8. **Un `create_deployment` por fila con código** (es el camino normal, ya no el de emergencia); si
    responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
    `docs/PUBLICAR-SIN-PARAR.md`).
 

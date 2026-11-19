@@ -26,17 +26,14 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
 - Dirección de prueba con datos inventados (filas 222 y 710): **https://pruebas.fmargon.com**, dominio normal del proyecto (ya no hay rama `pruebas`). Solo entra en demostración, sola y sin señalar carpetas; nada se guarda y producción nunca la carga. Una fila grande aprobada por el segundo revisor se publica ahí desde su rama `fila-<nº>` y queda `ESPERA TU VISTAZO` hasta que Claude (chat) o Francisco la miran (`CLAUDE.md`, «La dirección de prueba»). `?demo=1&auto=1` sigue valiendo en cualquier dirección.
 
-## 2. Quién es Francisco, y cómo escribirle
+## 2. Francisco y los textos de la app
 
-Auxiliar administrativo del IES Fuente Lucena (Alhaurín el Grande, Málaga). No es programador:
-propone, prueba y dice si el resultado sirve. El diseño y la comprobación del código son de
-Claude Code.
+Francisco no es programador: diseña la app con Claude en el chat. Claude Code no habla con él:
+lo que tenga que contarle va en la nota de la fila (`docs/METODO-COMUN.md` 3.A y 6.8).
 
-- Pocas frases, una idea por frase, sin jerga.
-- Una sola pregunta o decisión por mensaje. Esperar su respuesta.
-- Si hay que elegir, opciones numeradas con sus pros y contras, sin recomendación.
-- No pedirle permiso para cambiar código: aplicarlo. Verificar el propio trabajo.
-- Guiarlo por la interfaz paso a paso, diciendo dónde está cada botón.
+Auxiliar administrativo del IES Fuente Lucena (Alhaurín el Grande, Málaga).
+
+- Textos de pantalla en lenguaje llano, sin jerga informática.
 - Nada de tareas manuales suyas: si se puede hacer desde la app, se hace desde la app.
 - Trabaja en un Chromebook Plus, en el navegador. En el trabajo tiene un monitor ancho.
 - No trabaja solo: su compañero administrativo también usa la aplicación.
