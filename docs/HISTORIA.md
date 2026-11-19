@@ -5778,3 +5778,11 @@ Cerradas, pasadas aquí con su texto completo para que la cola no pase de 40 KB 
 
 - (19-nov-2026, fila 710) La rama `pruebas` se retira: `pruebas.fmargon.com` enseña la rama de la última fila grande aprobada y la fila espera en `ESPERA TU VISTAZO`; ahí la app solo entra en demostración (`js/demo/franja.js`).
 - (19-nov-2026, fila 711) Juego grande de datos inventados (`grande=1`): 700 alumnos, unos 50 abiertos y 400 cerrados; se bajó de los 150 y 1.500 pensados porque entraba en más de 25 s. Casos raros en `docs/CASOS-DE-PRUEBA.md`.
+
+## Filas sacadas de `docs/COLA.md` el 19-nov-2026 (cola al límite de 40 KB)
+
+| Nº | Instrucción | Estado | Notas |
+|---|---|---|---|
+| 470 | Tema: copia de prueba del Gestor. Junta la idea 496: que la copia de pruebas del Gestor trabaje con una copia de los datos reales, con los datos personales cambiados por inventados. Nota (15-nov-2026): la casilla «copia de prueba» por app del Centro de mando (idea 467) pasa a la cola de metodo-apps (fila 2); este tema se queda con lo del Gestor. [orden: 9 · APARCADO: no cabe antes del 8-dic] | SUSTITUIDA (19-nov-2026): diseñado en las filas 710 y 711 | Francisco decidió el 19-nov-2026 no usar datos reales: se prueba solo con datos inventados y se prueba antes de pasar a producción (`docs/710-PROBAR-ANTES-DE-PRODUCCION.md` y `docs/711-DATOS-INVENTADOS-GRANDES.md`) |
+| 496 | Copia de pruebas (rama `pruebas`): que trabaje con una copia de los datos reales, sacada al probar, con los nombres y datos personales cambiados por inventados y cifras y fechas como están, en vez de datos 100 % inventados. Regla del método del 30-oct-2026 (`docs/METODO-COMUN.md` 6.4) | DESCARTADA (19-nov-2026): se prueba solo con datos inventados | decidido por Francisco en el proyecto «Método de desarrollo de apps»; pasa por el recorrido normal · descartada por Francisco el 19-nov-2026 (tema 470): «Yo no necesito que tú veas datos reales» |
+| 709 | Aviso de Francisco (19-nov-2026): «El script de Gmail es más antiguo que la aplicación» en Envío de correo, tras pasar las carpetas al Drive de Administración. | DESCARTADA (19-nov-2026): resuelto sin tocar la app | Claude pegó el script nuevo en «Gestor - Correos» (cuenta del centro) y sacó la versión 9 en la misma implementación; Francisco recargó: el aviso desapareció |
