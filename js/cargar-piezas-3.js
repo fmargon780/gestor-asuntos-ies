@@ -322,6 +322,7 @@
     'js/asunto-sin-hitos-guia.js',   // fila 701: las tareas de la guía de un tipo «sin hitos» llegan al asunto
     'js/tarea-papel.js',   // fila 703: la tarea de papel (antes de js/asunto-sin-hitos-falta.js)
     'js/tarea-papel-pintar.js',   // fila 703: lo que se ve de una tarea de papel
+    'js/papel-enviado.js',   // fila 705: «Enviar correo» y «Marcar enviado» (usa TareaPapel y DocumentosDatos)
     'js/tarea-espera.js',   // fila 702: la espera es de la tarea, con su día para volver a mirar (antes de js/asunto-sin-hitos-falta.js)
     'js/asunto-sin-hitos-falta.js',   // fila 701: «Falta: <dato>» en una tarea, que se rellena ahí mismo
     'js/guia-sin-hitos.js',   // fila 701: el editor de la guía como lista de tareas (usa Guias, GuiasCuando y GuiasGuion)

@@ -50,3 +50,5 @@ Eligió «1»: «enviado» sin prueba se apunta con el botón «Marcar enviado»
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code)
+- (19-nov-2026) Segundo revisor 1: RECHAZADA («a el tutor» en el Registro; corregido a «al tutor»). Revisor nuevo: APROBADA. Coincide: botón «Marcar enviado» sin ventana en mano, postal, tablón e iPasen; «Enviar correo» con vía Correo electrónico (Para = el interesado, documento adjunto); cerrar el correo sin enviar no apunta nada; «Corregir el envío» en el ⋮; línea del Registro con vía, a quién, quién y día; tarea hecha y «Listo para cerrar». No lo he podido ver: el envío real del correo (la demo no tiene carpeta ni Gmail) y el ✓ automático tras enviarlo; probado solo simulando el envío en la prueba `papel-enviar`.
+- Lo que el revisor anotó y se deja: tras corregir el día, la fila de la tarea sigue mostrando el día en que se marcó el paso, no el del envío (el día corregido está en el Registro y en la ventana de corrección).

@@ -9,7 +9,7 @@
      - Generado / Recibido: la tarea ya tiene su documento;
      - Firmado: la ficha del documento trae las firmas que hacen falta (`firmas`, fila 515);
      - Registrado: la ficha trae un registro (el sello o el listado de Séneca, filas 573 y 239);
-     - Enviado: solo a mano (fila 705).
+     - Enviado: la ficha del documento trae `enviado` (fila 705: lo apunta la app cuando el correo sale de verdad, o «Marcar enviado»).
    Con todos los pasos hechos, la tarea queda hecha.
 
    Qué se guarda, en `guionHecho[<id de la tarea>].papelDoc` del hito oculto: { numero, nombre, firmas, manual, soltados }
@@ -53,6 +53,13 @@ var TareaPapel = (function () {
     return rec;
   }
 
+  /* Función pura. ¿La vía de envío del recorrido es el correo electrónico? (fila 705: abre el correo; las demás se marcan a mano) */
+  function viaEsCorreo(via) {
+    var d = window.Sitios && Sitios.datos ? Sitios.datos() : null, hallada = null;
+    ((d && d.sitios) || []).forEach(function (s) { if (norm(s.nombre) === norm(via)) hallada = s; });
+    return hallada ? hallada.id === 'st-correo' : norm(via) === 'correo electronico';
+  }
+
   /* El estado de la tarea de papel: { pasos: [{ k, t, hecho, aMano, quien, cuando }], toca: índice del que toca o -1, todos }. */
   function estado(a, g) {
     var rec = recorridoDe(g), est = g.papelDoc || {}, manual = est.manual || {}, doc = docDe(a, est.numero);
@@ -62,15 +69,19 @@ var TareaPapel = (function () {
       if (p.k === 'generado' || p.k === 'recibido') prueba = !!est.numero;
       else if (p.k === 'firmado') prueba = !!doc && (Number(doc.firmas) || 0) >= firmasNecesarias(rec, est);
       else if (p.k === 'registrado') prueba = !!doc && (doc.registros || []).length > 0;
+      else if (p.k === 'enviado') prueba = !!doc && !!doc.enviado;   /* fila 705 */
       var m = manual[p.k];
       var texto = p.t;
       if (!(prueba || m) && p.k === 'firmado' && enFirma) texto = 'A la firma';
       if (!(prueba || m) && p.k === 'registrado' && est.pideSello) texto = 'Falta el sellado';
+      var env = (p.k === 'enviado' && prueba && doc.enviado) || null;   /* fila 705: lo marcado con «Marcar enviado» también es «a mano» */
+      if (env) return { k: p.k, t: texto, hecho: true, aMano: !!env.aMano, quien: env.quien || '', cuando: env.cuando || '' };
       return { k: p.k, t: texto, hecho: prueba || !!m, aMano: !prueba && !!m, quien: (m && m.quien) || '', cuando: (m && m.cuando) || '' };
     });
     var toca = -1;
     pasos.forEach(function (p, i) { if (toca === -1 && !p.hecho) toca = i; });
-    return { pasos: pasos, toca: toca, todos: toca === -1, enFirma: enFirma, pideSello: !!est.pideSello };
+    var envio = rec.envia ? { via: rec.via, aquien: rec.aquien, correo: viaEsCorreo(rec.via) } : null;   /* fila 705 */
+    return { pasos: pasos, toca: toca, todos: toca === -1, enFirma: enFirma, pideSello: !!est.pideSello, envio: envio };
   }
 
   /* El botón del paso que toca (en esta fila, solo los de generar y añadir): { k, texto } o null. */
@@ -81,6 +92,7 @@ var TareaPapel = (function () {
     if (p.k === 'recibido') return { k: 'anadir', texto: 'Añadir documento' };
     if (p.k === 'firmado' && !est.enFirma) return { k: 'firmar', texto: 'Poner a la firma' };   /* fila 704 */
     if (p.k === 'registrado' && !est.pideSello) return { k: 'registrar', texto: 'Registrar' };
+    if (p.k === 'enviado' && est.envio) return est.envio.correo ? { k: 'enviarcorreo', texto: 'Enviar correo' } : { k: 'marcarenviado', texto: 'Marcar enviado' };   /* fila 705 */
     return null;
   }
 
@@ -252,7 +264,7 @@ var TareaPapel = (function () {
     } finally { enMarcha = false; }
   }
 
-  return { estado: estado, botonDe: botonDe, firmasDePlantilla: firmasDePlantilla, firmasNecesarias: firmasNecesarias, anadir: anadir, asignar: asignar,
+  return { estado: estado, botonDe: botonDe, viaEsCorreo: viaEsCorreo, fichaDe: fichaDe, firmasDePlantilla: firmasDePlantilla, firmasNecesarias: firmasNecesarias, anadir: anadir, asignar: asignar,
            quitarDocumento: quitarDocumento, ponerAFirma: ponerAFirma, pedirSello: pedirSello, diaPropuesto: diaPropuesto, quienFirma: quienFirma, marcarAMano: marcarAMano, sincronizar: sincronizar, documentosDeTipo: documentosDeTipo };
 })();
 window.TareaPapel = TareaPapel;
