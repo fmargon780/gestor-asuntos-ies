@@ -24,7 +24,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
-- Dirección de prueba con datos inventados (filas 222 y 710): **https://pruebas.fmargon.com**, dominio normal del proyecto (ya no hay rama `pruebas`). Solo entra en demostración, sola y sin señalar carpetas; nada se guarda y producción nunca la carga. Una fila grande aprobada por el segundo revisor se publica ahí desde su rama `fila-<nº>` y queda `ESPERA TU VISTAZO` hasta que Claude (chat) o Francisco la miran (`CLAUDE.md`, «La dirección de prueba»). `?demo=1&auto=1` sigue valiendo en cualquier dirección.
+- Dirección de prueba con datos inventados (filas 222, 710 y 713): **https://fmargon780.github.io/gestor-asuntos-ies/** (GitHub Pages, abre en el instituto; la publica la acción `pruebas-pages.yml` a mano, sin gastar Vercel; ya no hay rama `pruebas`). Solo entra en demostración, sola y sin señalar carpetas; nada se guarda y producción nunca la carga. Una fila grande aprobada por el segundo revisor se publica ahí desde su rama `fila-<nº>` y queda `ESPERA TU VISTAZO` hasta que Claude (chat) o Francisco la miran (`CLAUDE.md`, «La dirección de prueba»). `?demo=1&auto=1` sigue valiendo en cualquier dirección.
 
 ## 2. Francisco y los textos de la app
 

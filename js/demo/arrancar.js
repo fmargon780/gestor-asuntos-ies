@@ -29,7 +29,7 @@
 (function () {
   'use strict';
   var h = location.hostname;
-  var esDemo = h.indexOf('-git-pruebas-') !== -1 || h === 'pruebas.fmargon.com' ||
+  var esDemo = h.indexOf('-git-pruebas-') !== -1 || h === 'pruebas.fmargon.com' || h === 'fmargon780.github.io' ||
     /(^|[?&])demo=1(&|$)/.test(location.search);
   if (!esDemo) return;
 

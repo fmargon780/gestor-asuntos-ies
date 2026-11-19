@@ -86,7 +86,7 @@ await comprobar('sin errores de consola', Promise.resolve(errores), []);
 const local = new URL(process.env.DIRECCION || 'http://localhost:8123/index.html');
 const navegadorNombres = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
-  args: ['--host-resolver-rules=MAP pruebas.fmargon.com 127.0.0.1, MAP asuntos.fmargon.com 127.0.0.1']
+  args: ['--host-resolver-rules=MAP pruebas.fmargon.com 127.0.0.1, MAP fmargon780.github.io 127.0.0.1, MAP asuntos.fmargon.com 127.0.0.1']
 });
 async function conNombre(nombre) {
   const ctx = await navegadorNombres.newContext();
@@ -106,6 +106,16 @@ await comprobar('en pruebas.fmargon.com, sin ?demo=1, entra sola en demostració
 await comprobar('en pruebas.fmargon.com no queda a la vista ningún botón de señalar carpetas',
   enPruebas.p.locator('#btn-abiertos, #btn-archivo').evaluateAll((bs) => bs.every((b) => b.offsetParent === null)), true);
 await enPruebas.ctx.close();
+
+/* Fila 713: la dirección de prueba es ahora la de GitHub Pages; se comporta igual. */
+const enPages = await conNombre('fmargon780.github.io');
+await enPages.p.waitForSelector('#franja-demo', { timeout: 90000 });
+await enPages.p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 90000 });
+await comprobar('en fmargon780.github.io, sin ?demo=1, entra sola en demostración',
+  enPages.p.locator('#franja-demo').count(), 1);
+await comprobar('en fmargon780.github.io no queda a la vista ningún botón de señalar carpetas',
+  enPages.p.locator('#btn-abiertos, #btn-archivo').evaluateAll((bs) => bs.every((b) => b.offsetParent === null)), true);
+await enPages.ctx.close();
 
 const enProduccion = await conNombre('asuntos.fmargon.com');
 await enProduccion.p.waitForLoadState('load', { timeout: 90000 });
