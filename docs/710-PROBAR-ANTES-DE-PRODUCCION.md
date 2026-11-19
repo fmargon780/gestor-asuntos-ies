@@ -67,3 +67,4 @@ Eligió la opción «1»: producción espera a la mirada de Claude solo en las f
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- 19-nov-2026 (cierre): coincide · `CLAUDE.md` describe el camino nuevo y la fila `PENDIENTE` con «vista (» · coincide · la dirección de prueba ya no es `pruebas.fmargon.com` sino `fmargon780.github.io/gestor-asuntos-ies` (fila 713): entra sola en demostración, con franja y sin botones de carpetas visibles · coincide · `asuntos.fmargon.com` sin franja ni `window.Demo` · no lo he podido ver · una fila grande pasando de verdad por `ESPERA TU VISTAZO`.
