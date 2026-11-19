@@ -5830,3 +5830,10 @@ Tarea pequeña, sin segundo revisor. Pasada completa 403/403. Publicada: la web 
 
 - Fila 611, nota: no es fallo de la app: el Chrome del ordenador de Diego no pregunta por el permiso de la carpeta (descartados cuenta, normas, versión, ajustes experimentales y carpetas); Diego trabaja con Edge.
 - Fila 685, instrucción: tras «las candidaturas…»: «Las de este año se hicieron en el chat; el modelo, sin nombres, está en el documento.»
+
+## Notas completas de filas vivas (movidas de `docs/COLA.md` el 19-nov-2026, para bajar de 40 KB)
+
+- Fila 583, nota: Plan (`docs/PLAN-2026-11.md`): primera fase, una lista compartida de lo que hace falta (apuntan Diego y Francisco; se tacha lo pedido), sin existencias ni presupuesto. Idea que entra: 561 (aviso de Francisco). Si al diseñarla crece (existencias, presupuesto por departamento, inventario), se vuelve a valorar si va aparte.
+- Fila 581, nota: dejado a medias el 11-nov-2026 para diseñar la 609. Ideas que entran: 579 y 580. Al diseñarlo: con la fila 576 HECHA; la custodia va en la fila 578; hará falta ver un correo real.
+- Fila 686, nota: parte de 683 · «Añadir documento más sencillo» · tercer intento (cuento dos arreglos hechos, el de la DEVUELTA y el de la sesión bloqueada; sigo): el código está en la rama `claude/wonderful-carson-au9y10` (b8d5178), no empezar de cero; lo que arreglar, en la instrucción («Revisión y respuestas durante el trabajo»)
+- Fila 611, nota: no es fallo de la app: el Chrome del ordenador de Diego no pregunta por el permiso de la carpeta (nota completa en docs/HISTORIA.md). Lo probado y lo que queda por probar: `docs/notas-diseno/611.md` · enviada por un usuario desde el botón de soporte
