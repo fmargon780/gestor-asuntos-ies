@@ -6,7 +6,7 @@ casos (vencido, dormido, esperando a un tercero o a una Administración, reserva
 Administración con varios departamentos, nombre de pila de más de 40 caracteres, hilo registrado…) siguen donde estaban (`docs/COPIA-DE-PRUEBAS.md`).
 
 Tamaño (constante `Demo.grande.TAM` en `js/demo/datos-grande-personas.js`): 700 alumnos, 55 personas de personal, unos 50 asuntos abiertos y 400 cerrados en
-tres cursos. Se dejó por debajo de lo pensado (150 y 1.500) porque con ese tamaño la demostración tardaba más de 25 s en entrar.
+tres cursos (el Archivo suma además los cursos de siempre de la demostración). Los asuntos grandes se montan en segundo plano: Inicio los va sumando durante unos segundos tras entrar. Se dejó por debajo de lo pensado (150 y 1.500) porque con ese tamaño la demostración tardaba más de 25 s en entrar.
 
 **Las filas siguientes añaden aquí sus propios casos** (una línea cada uno) y a los datos, cuando su instrucción lo pida.
 
@@ -33,6 +33,8 @@ tres cursos. Se dejó por debajo de lo pensado (150 y 1.500) porque con ese tama
 | NIF repetido | esas dos empresas comparten el NIF `B20000001` |
 
 ## Asuntos
+La descripción «CASO …» solo se ve en «⋯» → «Cambiar el asunto»; el buscador de Inicio no busca por ella: localiza el asunto por su tercero.
+
 | Caso | Cómo verlo |
 |---|---|
 | Muchos del mismo tercero | ocho «CERTIFICADO» abiertos de «Homónimo Primero, Antonio» |
