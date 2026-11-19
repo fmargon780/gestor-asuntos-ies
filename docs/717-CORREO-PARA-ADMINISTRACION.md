@@ -39,3 +39,4 @@
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (19-nov-2026, sesión de la fila 717) Hecho en la rama `claude/kind-mccarthy-bl5w2s` (ac52f18): `js/correo-para.js` (la pastilla «El interesado» de una administración lleva solo el correo del departamento o, si no, el general; `ponerLaAdministracion` lo pone en «Para» si queda vacío), `js/correo-cuadro-cuerpo.js`, línea 717 en `js/novedades.js`, prueba nueva `correo-para-administracion` y `administraciones.mjs` actualizada (antes esperaba «Para» vacío). Pasada completa 414 de 415: `carpetas-perdidas` falló en la tanda y una vez a solas, y pasa 2 veces a solas y sin el cambio. No lo he podido ver: el revisor en el navegador (el sistema negó arrancar el servidor local), así que no se ha fusionado ni publicado.
