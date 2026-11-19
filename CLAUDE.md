@@ -30,7 +30,7 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    hablar con Francisco») y sigue.
 4. Con la aprobación del revisor, la rama de la fila se fusiona en `main` (avance limpio o fusión
    normal; sin `git push`, petición de cambios fusionada al momento) y se publica a propósito, una
-   sola vez (`create_deployment`, regla de abajo): es la única publicación de la fila. La rama `pruebas` ya no existe ni se nivela.
+   sola vez (`create_deployment`, regla de abajo): es la única publicación **en producción** de la fila. Una fila grande hace antes la parada en la dirección de prueba (apartado «El revisor»). La rama `pruebas` ya no existe ni se nivela.
 
 **Pruebas** (cuándo se pasa cada tanda: `docs/METODO-COMUN.md` 5.1):
 
@@ -70,14 +70,14 @@ con el guion fijo de `docs/REVISOR-GUION.md` (fila 242). Un punto
 que el revisor no puede ver queda «no lo he podido ver» (`docs/METODO-COMUN.md` 6.2), se copia a
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. Un paso que solo puede
 dar Francisco (pegar código, dar un permiso) no va ahí: es una fila «paso de Francisco»
-(`docs/METODO-COMUN.md` 9). **APROBADA**: se
-publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
-`docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; nada pasa a esperar su revisión ni existe el estado
-EN EL PAQUETE). **RECHAZADA** la primera vez:
+(`docs/METODO-COMUN.md` 9). **APROBADA**: en una fila **pequeña**, se
+publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA, sin esperar a nadie. En una fila **grande** (la que lleva segundo revisor) pasa antes por la dirección de prueba (19-nov-2026, fila 710, `docs/710-PROBAR-ANTES-DE-PRODUCCION.md`): con la APROBADA y **antes de fusionar en `main`**, se publica la rama `fila-<nº>` en `https://pruebas.fmargon.com` (apartado «La dirección de prueba»), la fila pasa a `ESPERA TU VISTAZO` y su nota lleva la dirección, el número de la fila y la `App.VERSION` publicada. La sesión **no espera** el vistazo: sigue con la serie si la hay (menos otra fila grande) o termina. Una sola fila grande espera a la vez: mientras haya una en `ESPERA TU VISTAZO`, no se empieza otra fila grande (las pequeñas siguen). Claude, desde el chat con la extensión de Chrome, o Francisco, la miran con datos inventados. Está bien → Claude pasa la fila a `PENDIENTE` con «vista (fecha, por Claude)» al principio de la nota. Falla algo → `DEVUELTA` con lo que falla. **Una fila `PENDIENTE` cuya nota empieza por «vista (» no se programa: se fusiona su rama en `main` (si `main` ha cambiado, se actualiza la rama y se repiten las pruebas de lo tocado), se publica en producción una sola vez como siempre y se marca HECHA.** (1-oct-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; el estado EN EL PAQUETE no existe.) **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **BLOQUEADA**
 con «ATASCO PARA CLAUDE» y el informe (`docs/METODO-COMUN.md` 6.3; nunca DEVUELTA, que solo lo pone
 Francisco), `main` no se toca, y la sesión para. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+
+**La dirección de prueba** (19-nov-2026, fila 710). `pruebas.fmargon.com` es un dominio normal del proyecto `gestor-de-asuntos` (sin rama atada y fuera del login de Vercel). Para publicar en ella una fila grande aprobada: `create_deployment` con `teamId` `team_gnCjBLTS8m8PNTFVUf7ST0uN`, `name` y `project` `gestor-de-asuntos`, **sin** `target: production` y `gitSource` `{ type: github, org: fmargon780, repo: gestor-asuntos-ies, ref: fila-<nº> }`; `get_deployment` hasta `READY`; `assign_alias` de `pruebas.fmargon.com` a esa publicación; y comprobar con `curl` que `https://pruebas.fmargon.com/js/version.js?v=<algo>` sirve la `App.VERSION` de la rama. Cuesta una publicación más por fila grande: si responde 402, no se reintenta; la fila sigue el camino de siempre (fusionar y publicar) y su nota dice «sin vistazo previo: tope de Vercel». En esa dirección la app **solo entra en demostración**, sola y sin ofrecer señalar carpetas de verdad (`js/demo/franja.js`); ya no existe la rama `pruebas`.
 
 **Vercel no publica nada solo** (11-oct-2026, `docs/PUBLICAR-SOLO-AL-TERMINAR.md`). Ninguna subida a GitHub crea una
 publicación. Una tarea que cambia la app publica **una sola vez, a propósito**, cuando su código ya está en `main`: herramienta `create_deployment` de Vercel con `teamId` `team_gnCjBLTS8m8PNTFVUf7ST0uN`, `name` y `project` `gestor-de-asuntos`, `target` `production` y `gitSource` `{ type: github, org: fmargon780, repo: gestor-asuntos-ies, ref: main }`; después `get_deployment` hasta `READY` y comprobar la dirección publicada. Las subidas de solo documentos no publican y no hay nada que comprobar. Si responde 402 no se reintenta. Nunca se vuelve a encender la publicación automática ni se añade un `ignoreCommand`: las publicaciones canceladas también cuentan en el tope de 100 al día de toda la cuenta.

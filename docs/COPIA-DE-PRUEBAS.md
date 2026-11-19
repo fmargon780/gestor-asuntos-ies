@@ -7,6 +7,10 @@ primera de las dos filas del método nuevo «purgar los fallos antes de producci
 > Fila 242 (30-sep-2026): la copia en internet ya no es un paso de la cola; se nivela con `main` después
 > de cada publicación, para que Francisco la mire si quiere (`docs/REVISOR-EN-LOCAL.md`).
 
+> Fila 710 (19-nov-2026): la rama `pruebas` ya no existe. `pruebas.fmargon.com` enseña la rama `fila-<nº>` de la
+> última fila grande aprobada (`CLAUDE.md`, «La dirección de prueba»), entra sola en demostración aunque falte
+> `?demo=1&auto=1` y no ofrece señalar carpetas de verdad (`js/demo/franja.js`).
+
 ## Qué quiere Francisco
 
 Una dirección aparte, **https://pruebas.fmargon.com**, donde vive la versión que se está

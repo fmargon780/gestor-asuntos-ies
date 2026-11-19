@@ -24,10 +24,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
-- Copia de pruebas con datos inventados (fila 222; no es un paso de la cola desde la 242): rama `pruebas`, dirección
-  **https://pruebas.fmargon.com** (dominio ya asignado a esa rama en Vercel). «Entrar con datos
-  de demostración», o `?demo=1&auto=1` directo: sin señalar ninguna carpeta, nada se guarda, y
-  producción nunca la carga.
+- Dirección de prueba con datos inventados (filas 222 y 710): **https://pruebas.fmargon.com**, dominio normal del proyecto (ya no hay rama `pruebas`). Solo entra en demostración, sola y sin señalar carpetas; nada se guarda y producción nunca la carga. Una fila grande aprobada por el segundo revisor se publica ahí desde su rama `fila-<nº>` y queda `ESPERA TU VISTAZO` hasta que Claude (chat) o Francisco la miran (`CLAUDE.md`, «La dirección de prueba»). `?demo=1&auto=1` sigue valiendo en cualquier dirección.
 
 ## 2. Quién es Francisco, y cómo escribirle
 

@@ -80,6 +80,44 @@ await comprobar('tras "Volver a empezar" hay los mismos asuntos de partida que l
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 
+/* Fila 710: la dirección de pruebas entra SIEMPRE en demostración, aunque falte `?demo=1&auto=1`, y no ofrece
+   señalar carpetas de verdad; producción no carga nada de `js/demo/`. El nombre de la dirección se simula con una
+   regla de resolución de nombres de Chromium que lo lleva al servidor local. */
+const local = new URL(process.env.DIRECCION || 'http://localhost:8123/index.html');
+const navegadorNombres = await chromium.launch({
+  executablePath: process.env.CHROMIUM_PATH || undefined,
+  args: ['--host-resolver-rules=MAP pruebas.fmargon.com 127.0.0.1, MAP asuntos.fmargon.com 127.0.0.1']
+});
+async function conNombre(nombre) {
+  const ctx = await navegadorNombres.newContext();
+  const p = await ctx.newPage();
+  const peticionesDemo = [];
+  p.on('request', (r) => { if (r.url().indexOf('/js/demo/') !== -1) peticionesDemo.push(r.url()); });
+  await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) { /* sin almacenamiento */ }");
+  await p.goto('http://' + nombre + ':' + local.port + '/index.html', { waitUntil: 'commit' });
+  return { ctx, p, peticionesDemo };
+}
+
+const enPruebas = await conNombre('pruebas.fmargon.com');
+await enPruebas.p.waitForSelector('#franja-demo', { timeout: 90000 });
+await enPruebas.p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 90000 });
+await comprobar('en pruebas.fmargon.com, sin ?demo=1, entra sola en demostración',
+  enPruebas.p.locator('#franja-demo').count(), 1);
+await comprobar('en pruebas.fmargon.com no queda a la vista ningún botón de señalar carpetas',
+  enPruebas.p.locator('#btn-abiertos, #btn-archivo').evaluateAll((bs) => bs.every((b) => b.offsetParent === null)), true);
+await enPruebas.ctx.close();
+
+const enProduccion = await conNombre('asuntos.fmargon.com');
+await enProduccion.p.waitForLoadState('load', { timeout: 90000 });
+await enProduccion.p.waitForSelector('#arranque', { timeout: 20000 });
+await enProduccion.p.waitForTimeout(800);
+await comprobar('en asuntos.fmargon.com no existe window.Demo', enProduccion.p.evaluate(() => typeof window.Demo), 'undefined');
+await comprobar('en asuntos.fmargon.com no hay franja ni botón de demostración',
+  enProduccion.p.locator('#franja-demo, #btn-demo-entrar').count(), 0);
+await comprobar('en asuntos.fmargon.com no se pide nada de js/demo/', Promise.resolve(enProduccion.peticionesDemo.filter((u) => !/arrancar\.js$/.test(u))), []);
+await enProduccion.ctx.close();
+
+await navegadorNombres.close();
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' PRUEBAS FALLAN' : '\nTodas las pruebas de la copia de pruebas pasan.');
 process.exit(fallos ? 1 : 0);

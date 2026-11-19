@@ -8,6 +8,8 @@
    Con `?demo=1&auto=1` entra sola, sin pulsar nada: es lo que usa el
    revisor con Playwright.
 
+   En `pruebas.fmargon.com` entra siempre sola (fila 710), aunque falte `?demo=1&auto=1`.
+
    Después de entrar, pone la franja fija de arriba en todas las
    pantallas, con «Volver a empezar» (recarga con el disco vacío).
    ============================================================ */
@@ -18,6 +20,13 @@
 
   function autoPedido() {
     return /(^|[?&])auto=1(&|$)/.test(location.search);
+  }
+
+  /* Fila 710: en la dirección de pruebas la app solo entra en demostración, sola y sin ofrecer señalar
+     carpetas de verdad: una versión sin aprobar nunca puede escribir en los datos reales. */
+  function soloEnPruebas() {
+    var h = location.hostname;
+    return h === 'pruebas.fmargon.com' || h.indexOf('-git-pruebas-') !== -1;
   }
 
   /* ---------- entrar ---------- */
@@ -155,5 +164,5 @@
      `showDirectoryPicker` AHORA MISMO, de forma síncrona, antes de que
      `js/inicio.js` (el siguiente <script>) llame a `App.arrancar()`. */
   Demo.activar();
-  if (autoPedido()) entrar(null); else ponerBoton();
+  if (autoPedido() || soloEnPruebas()) entrar(null); else ponerBoton();
 })();
