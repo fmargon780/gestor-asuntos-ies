@@ -123,7 +123,8 @@ var HitoMesa = (function () {
       var tiraVacia = document.getElementById('ficha-tira');
       if (tiraVacia) tiraVacia.innerHTML = '';   /* fila 637: sin hito abierto, no hay fila de hitos */
       if (window.MarcaGuia) MarcaGuia.pintar(a, abierto);   /* fila 660 */
-      if (window.SoltarDocumento) SoltarDocumento.desenganchar($('trabajo-columnas'));
+      /* Fila 686 (devuelta, 19-nov-2026): sin hito abierto también se puede soltar un fichero en la zona del asunto. */
+      if (window.SoltarDocumento) SoltarDocumento[abierto ? 'enganchar' : 'desenganchar']($('trabajo-columnas'), a);
       if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
       return;
     }

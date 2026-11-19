@@ -26,12 +26,12 @@ await p.waitForSelector('.hito-en-mesa .guion-paso', { timeout: 15000 });
 await p.waitForTimeout(1000);
 
 /* Suelta un fichero encima del elemento que dice el selector (el n-ésimo). */
-const soltar = (sel, n) => p.evaluate(([sel, n]) => {
+const soltar = (sel, n, nombre) => p.evaluate(([sel, n, nombre]) => {
   const el = document.querySelectorAll(sel)[n || 0];
   const dt = new DataTransfer();
-  dt.items.add(new File(['contenido de prueba'], 'prueba 686.pdf', { type: 'application/pdf' }));
+  dt.items.add(new File(['contenido de prueba'], nombre || 'prueba 686.pdf', { type: 'application/pdf', lastModified: 1700000000000 }));
   el.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
-}, [sel, n]);
+}, [sel, n, nombre]);
 const avisos = () => p.$$eval('#mensajes .mensaje', (e) => e.map((x) => x.textContent));
 const cerrar = async () => { await p.evaluate(() => { const c = document.getElementById('cuadro-aceptar'); if (c) c.click(); }); await p.waitForTimeout(500); };
 const marcadas = () => p.$$eval('.hito-en-mesa .guion-casilla:checked', (l) => l.length);
@@ -59,8 +59,21 @@ await p.waitForSelector('#doc-anadir');
 await soltar('#doc-cuerpo');
 await p.waitForSelector('#doc-guardar', { timeout: 15000 });
 comprobar('c. soltar en Documentos abre el cuadro del nombre, sin hito ni tarea', await contexto(), [null, null, false]);
-/* (d) con el cuadro a medias, soltar otro avisa y no cambia nada */
-await soltar('#doc-cuerpo');
+await p.waitForTimeout(600);
+comprobar('c. y no sale el aviso «Termina antes con este documento.» (una suelta, una llamada)', (await avisos()).filter((t) => /Termina antes con este documento/.test(t)), []);
+/* (c2) la misma suelta llegada otra vez, aunque sea tarde y con otro objeto File, no avisa ni cambia nada */
+await p.evaluate(() => {
+  const el = document.getElementById('doc-cuerpo');
+  const hacer = () => { const dt = new DataTransfer(); dt.items.add(new File(['contenido de prueba'], 'prueba 686.pdf', { type: 'application/pdf', lastModified: 1700000000000 })); el.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true })); };
+  hacer(); window.__otraVez = () => hacer();
+});
+await p.waitForTimeout(800);
+await p.evaluate(() => window.__otraVez());
+await p.waitForTimeout(600);
+comprobar('c2. la misma suelta repetida no avisa', (await avisos()).filter((t) => /Termina antes con este documento/.test(t)), []);
+comprobar('c2. y el cuadro sigue siendo el mismo', await p.locator('#capa:not(.oculto) #doc-guardar').count(), 1);
+/* (d) con el cuadro a medias, soltar OTRO fichero avisa y no cambia nada */
+await soltar('#doc-cuerpo', 0, 'otro 686.pdf');
 await p.waitForTimeout(500);
 comprobar('d. con un documento a medias, soltar otro avisa', (await avisos()).filter((t) => /Termina antes con este documento/.test(t)).length > 0, true);
 comprobar('d. y el cuadro sigue siendo el mismo', await p.locator('#capa:not(.oculto) #doc-guardar').count(), 1);
@@ -95,6 +108,17 @@ comprobar('g. soltar en un cuadro abierto desde una tarea: sin hito ni tarea', a
 await p.click('#doc-guardar');
 await p.waitForTimeout(2500);
 comprobar('g. al guardar no se marca ninguna tarea', await marcadas(), antes);
+await cerrar();
+
+/* (h) devuelta por el revisor: en un asunto sin hito abierto (SEGURO ESCOLAR A26-0006) soltar también entra en la zona del asunto */
+await p.evaluate(() => { const a = Gestor.asuntos().filter((x) => /SEGURO ESCOLAR/.test(x.nombre))[0]; window.__sh = a.nombre; });
+await p.click('button.pestana[data-pantalla="abiertos"]');
+await p.locator('#inicio-tabla-cuerpo tr[data-asunto*="A26-0006"] .nombre-pulsable').first().click();
+await p.waitForSelector('#trabajo-columnas', { timeout: 15000 });
+await p.waitForTimeout(1500);
+await soltar('#trabajo-columnas');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('h. sin hito abierto: soltar en la zona abre el cuadro del nombre', await contexto(), [null, null, false]);
 await cerrar();
 
 /* (e) un directivo no guarda */
