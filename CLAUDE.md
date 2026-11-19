@@ -13,7 +13,7 @@ Lo de abajo son **solo** las reglas propias de esta app.
 
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
-sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cuenta y nivelar
+sesiones no entran en `pruebas.fmargon.com` (salvo la publicación a propósito de una fila grande aprobada, fila 710, apartado «La dirección de prueba»), el tope de Vercel es de toda la cuenta y nivelar
 `pruebas` a la fuerza perdió trabajo):
 
 1. Cada fila trabaja en su propia rama `fila-<nº>`, creada desde `main` al empezar (o en la rama
@@ -21,7 +21,7 @@ sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cue
    commits que no están en `main`. La rama de una fila no se borra hasta que su trabajo está en
    `main`. Las subidas que solo tocan `docs/` (EN CURSO, HECHA) van directas a
    `main`: no publican nada (Vercel ya no publica solo, ver «Vercel no publica nada solo» abajo).
-2. Nada se sube a `pruebas` para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
+2. Nada se sube a la antigua rama `pruebas` (ya no existe) para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
    la subida a tu rama, vale lo de `docs/METODO-COMUN.md` 5.7 (rama `claude/...` y petición de
    cambios fusionada al momento; nunca código con las herramientas de ficheros de GitHub).
 3. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
@@ -71,7 +71,7 @@ que el revisor no puede ver queda «no lo he podido ver» (`docs/METODO-COMUN.md
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. Un paso que solo puede
 dar Francisco (pegar código, dar un permiso) no va ahí: es una fila «paso de Francisco»
 (`docs/METODO-COMUN.md` 9). **APROBADA**: en una fila **pequeña**, se
-publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA, sin esperar a nadie. En una fila **grande** (la que lleva segundo revisor) pasa antes por la dirección de prueba (19-nov-2026, fila 710, `docs/710-PROBAR-ANTES-DE-PRODUCCION.md`): con la APROBADA y **antes de fusionar en `main`**, se publica la rama `fila-<nº>` en `https://pruebas.fmargon.com` (apartado «La dirección de prueba»), la fila pasa a `ESPERA TU VISTAZO` y su nota lleva la dirección, el número de la fila y la `App.VERSION` publicada. La sesión **no espera** el vistazo: sigue con la serie si la hay (menos otra fila grande) o termina. Una sola fila grande espera a la vez: mientras haya una en `ESPERA TU VISTAZO`, no se empieza otra fila grande (las pequeñas siguen). Claude, desde el chat con la extensión de Chrome, o Francisco, la miran con datos inventados. Está bien → Claude pasa la fila a `PENDIENTE` con «vista (fecha, por Claude)» al principio de la nota. Falla algo → `DEVUELTA` con lo que falla. **Una fila `PENDIENTE` cuya nota empieza por «vista (» no se programa: se fusiona su rama en `main` (si `main` ha cambiado, se actualiza la rama y se repiten las pruebas de lo tocado), se publica en producción una sola vez como siempre y se marca HECHA.** (1-oct-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; el estado EN EL PAQUETE no existe.) **RECHAZADA** la primera vez:
+publica en `main` (apartado «Cómo se publica y se comprueba aquí») y la fila se marca HECHA, sin esperar a nadie. En una fila **grande** (la que lleva segundo revisor) pasa antes por la dirección de prueba (19-nov-2026, fila 710, `docs/710-PROBAR-ANTES-DE-PRODUCCION.md`): con la APROBADA y **antes de fusionar en `main`**, se publica la rama `fila-<nº>` en `https://pruebas.fmargon.com` (apartado «La dirección de prueba»), la fila pasa a `ESPERA TU VISTAZO` y su nota lleva la dirección, el número de la fila y la `App.VERSION` publicada. La sesión **no espera** el vistazo: sigue con la serie si la hay (menos otra fila grande) o termina. Una sola fila grande espera a la vez: mientras haya una en `ESPERA TU VISTAZO`, no se empieza otra fila grande (las pequeñas siguen). Claude, desde el chat con la extensión de Chrome, o Francisco, la miran con datos inventados. Está bien → Claude pasa la fila a `PENDIENTE` con «vista (fecha, por Claude)» al principio de la nota. Falla algo → `DEVUELTA` con lo que falla, y la rama `fila-<nº>` se conserva para retomarla. «Fila grande» es la que lleva segundo revisor; si una fila aprobada deja de ser grande por decisión de Francisco, sigue el camino de las pequeñas. Para actualizar la rama con `main` se fusiona `main` en ella (nunca a la fuerza). **Una fila `PENDIENTE` cuya nota empieza por «vista (» no se programa: se fusiona su rama en `main` (si `main` ha cambiado, se actualiza la rama y se repiten las pruebas de lo tocado), se publica en producción una sola vez como siempre y se marca HECHA.** (1-oct-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; el estado EN EL PAQUETE no existe.) **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **BLOQUEADA**
 con «ATASCO PARA CLAUDE» y el informe (`docs/METODO-COMUN.md` 6.3; nunca DEVUELTA, que solo lo pone
