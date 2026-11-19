@@ -51,7 +51,15 @@ var SoltarDocumento = (function () {
     return !t || Array.prototype.indexOf.call(t, 'Files') !== -1;
   }
 
+  /* Devuelta por Francisco (19-nov-2026): al soltar en el cuadro vacío salía además «Termina antes con este documento.»,
+     como si una misma suelta llegara dos veces. Si el fichero que llega es el mismo que ya tiene abierto el cuadro del
+     nombre, no es otro documento: se ignora sin avisar. El aviso queda para un fichero distinto. */
+  var ultima = '';
   function soltado(a, fichero) {
+    var clave = [fichero.name, fichero.size, fichero.lastModified].join('|');
+    var abierto = !!document.querySelector('#capa:not(.oculto) #doc-guardar');
+    if (abierto && clave === ultima) return;
+    ultima = clave;
     if (window.Documentos && Documentos.soltarFichero) Documentos.soltarFichero(a, fichero);
   }
 
