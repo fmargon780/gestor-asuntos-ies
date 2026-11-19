@@ -39,3 +39,5 @@
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (19-nov-2026, Claude Code, comparación propia, tarea pequeña) Reproducido en la prueba nueva `correo-para-administracion` (`npm test -- correo-para`): sin el arreglo, «Para» sale vacío con administración (departamento con correo, o solo correo general). Coincide: con departamento con correo sale el del departamento; sin departamento, el general; sin ninguno, vacío; la dirección no se repite en «Para»; con un alumno no cambia. No lo he visto con el cuadro real abierto (sin revisor local): no lo he podido ver.
+- Pasada completa: 414 de 415 bien; `grupo-generar` falló en la tanda y pasa a solas (52 s); `papel-firma-y-registro` pasó al segundo intento. Ninguna toca el correo.
