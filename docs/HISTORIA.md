@@ -5777,3 +5777,4 @@ Cerradas, pasadas aquí con su texto completo para que la cola no pase de 40 KB 
 | 679 | `docs/679-PRUEBA-EXPORTAR-ASUNTOS.md` (tarea pequeña; tropiezo de la fila 678): que la prueba `exportar-asuntos` no dependa del día en que se pasa. Solo prueba, no se publica | DESCARTADA (18-nov-2026): ya lo arregló la fila 696 | Mismo fallo que la 696, ya arreglado. Comprobado: 4 pasadas sin fallo. |
 
 - (19-nov-2026, fila 710) La rama `pruebas` se retira: `pruebas.fmargon.com` enseña la rama de la última fila grande aprobada y la fila espera en `ESPERA TU VISTAZO`; ahí la app solo entra en demostración (`js/demo/franja.js`).
+- (19-nov-2026, fila 711) Juego grande de datos inventados (`grande=1`): 700 alumnos, unos 50 abiertos y 400 cerrados; se bajó de los 150 y 1.500 pensados porque entraba en más de 25 s. Casos raros en `docs/CASOS-DE-PRUEBA.md`.
