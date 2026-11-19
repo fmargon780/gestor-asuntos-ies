@@ -110,6 +110,17 @@ await p.waitForTimeout(2500);
 comprobar('g. al guardar no se marca ninguna tarea', await marcadas(), antes);
 await cerrar();
 
+/* (h) devuelta por el revisor: en un asunto sin hito abierto (SEGURO ESCOLAR A26-0006) soltar también entra en la zona del asunto */
+await p.evaluate(() => { const a = Gestor.asuntos().filter((x) => /SEGURO ESCOLAR/.test(x.nombre))[0]; window.__sh = a.nombre; });
+await p.click('button.pestana[data-pantalla="abiertos"]');
+await p.locator('#inicio-tabla-cuerpo tr[data-asunto*="A26-0006"] .nombre-pulsable').first().click();
+await p.waitForSelector('#trabajo-columnas', { timeout: 15000 });
+await p.waitForTimeout(1500);
+await soltar('#trabajo-columnas');
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+comprobar('h. sin hito abierto: soltar en la zona abre el cuadro del nombre', await contexto(), [null, null, false]);
+await cerrar();
+
 /* (e) un directivo no guarda */
 await p.evaluate(() => { window.__esDirectivo = Perfil.esDirectivo; Perfil.esDirectivo = () => true; });
 await soltar('#trabajo-columnas');
