@@ -8,6 +8,9 @@
    se hace» (js/guias-cuando.js): «Siempre» o «Solo si» un dato de lista del asunto vale tal cosa o el
    tercero es de tal clase.
 
+   Fila 706 (docs/706-ROTULOS.md): entre las tareas se pueden poner rótulos (`rotulo: true`): una línea que solo nombra el
+   grupo de tareas de debajo. Se suben, bajan y quitan como una tarea; no llevan papel, «Cómo se hace» ni «Cuándo se hace».
+
    Fila 707 (docs/707-COMO-SE-HACE.md): cada tarea puede llevar «Cómo se hace», un texto libre de varias líneas
    (`comoSeHace`), opcional; el asunto lo enseña desplegable junto a la tarea (js/asunto-sin-hitos.js).
 
@@ -34,9 +37,10 @@ var GuiaSinHitos = (function () {
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
       (opciones.aviso ? '<p class="nota guia-aviso">' + esc(opciones.aviso) + '</p>' : '') +
-      '<p class="nota">Una frase por tarea, en el orden en que salen en el asunto. Las que añadas aquí llegan también a los asuntos abiertos de este tipo; cambiar o borrar una frase no los toca.</p>' +
+      '<p class="nota">Una frase por tarea, en el orden en que salen en el asunto. Un rótulo nombra el grupo de tareas que tiene debajo. Las que añadas aquí llegan también a los asuntos abiertos de este tipo; cambiar o borrar una frase no los toca.</p>' +
       '<div id="gsh-lista" class="gsh-lista"></div>' +
-      '<button type="button" class="boton boton-ancho" id="gsh-anadir">+ Añadir una tarea</button>',
+      '<button type="button" class="boton boton-ancho" id="gsh-anadir">+ Añadir una tarea</button>' +
+      '<button type="button" class="boton boton-ancho" id="gsh-anadir-rotulo">+ Añadir rótulo</button>',   /* fila 706 */
       'Guardar');
 
     function $(id) { return document.getElementById(id); }
@@ -47,6 +51,7 @@ var GuiaSinHitos = (function () {
         var g = tareas[parseInt(fila.dataset.pos, 10)];
         if (!g) return;
         g.texto = fila.querySelector('.gsh-texto').value.trim();
+        if (g.rotulo) return;   /* fila 706: un rótulo solo lleva su texto */
         var como = fila.querySelector('.gsh-como').value.trim();   /* fila 707 */
         if (como) g.comoSeHace = como; else delete g.comoSeHace;
         var si = window.GuiasCuando && window.SoloSi ? SoloSi.normalizar(GuiasCuando.leer(fila)) : null;
@@ -61,12 +66,18 @@ var GuiaSinHitos = (function () {
       if (!caja) return;
       caja.innerHTML = '';
       if (!tareas.length) caja.innerHTML = '<p class="vacio">Todavía no hay tareas. Añade la primera.</p>';
+      var numero = 0;
       tareas.forEach(function (g, i) {
         var fila = document.createElement('div');
-        fila.className = 'gsh-fila';
+        fila.className = 'gsh-fila' + (g.rotulo ? ' gsh-rotulo' : '');
         fila.dataset.pos = i;
-        fila.innerHTML = '<div class="gsh-linea"><span class="gsh-num">' + (i + 1) + '</span>' +
-          '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe la tarea" aria-label="Tarea ' + (i + 1) + '">' +
+        if (!g.rotulo) numero++;
+        fila.innerHTML = g.rotulo
+          ? '<div class="gsh-linea"><span class="gsh-num" aria-hidden="true">▌</span>' +
+            '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe el rótulo" aria-label="Rótulo">' +
+            '<span class="gsh-mandos"></span></div>'
+          : '<div class="gsh-linea"><span class="gsh-num">' + numero + '</span>' +
+          '<input class="campo gsh-texto" value="' + esc(g.texto) + '" placeholder="Escribe la tarea" aria-label="Tarea ' + numero + '">' +
           (window.TareaPapelPintar ? TareaPapelPintar.selectorHTML('gsh-papel', g.papel, 'Papel de la tarea ' + (i + 1)) : '') +
           '<span class="gsh-mandos"></span></div>' +
           '<textarea class="campo gsh-como" rows="2" placeholder="Cómo se hace (opcional): explicación, pasos, ruta de Séneca o normativa" aria-label="Cómo se hace la tarea ' + (i + 1) + '">' + esc(g.comoSeHace) + '</textarea>';
@@ -80,8 +91,8 @@ var GuiaSinHitos = (function () {
         }
         boton('↑', 'Subir esta tarea', function () { recoger(); var x = tareas[i - 1]; tareas[i - 1] = tareas[i]; tareas[i] = x; pintar(); }, '', i === 0);
         boton('↓', 'Bajar esta tarea', function () { recoger(); var x = tareas[i + 1]; tareas[i + 1] = tareas[i]; tareas[i] = x; pintar(); }, '', i === tareas.length - 1);
-        boton('Quitar', 'Quitar esta tarea', function () { recoger(); tareas.splice(i, 1); pintar(); }, 'boton-peligro');
-        if (window.GuiasCuando) fila.appendChild(GuiasCuando.bloque(g.soloSi, 'gsh-cuando'));
+        boton('Quitar', g.rotulo ? 'Quitar este rótulo' : 'Quitar esta tarea', function () { recoger(); tareas.splice(i, 1); pintar(); }, 'boton-peligro');
+        if (window.GuiasCuando && !g.rotulo) fila.appendChild(GuiasCuando.bloque(g.soloSi, 'gsh-cuando'));
         caja.appendChild(fila);
       });
     }
@@ -89,6 +100,13 @@ var GuiaSinHitos = (function () {
     $('gsh-anadir').onclick = function () {
       recoger();
       tareas.push({ id: GuiasGuion.nuevoId(), texto: '' });
+      pintar();
+      var cajas = document.querySelectorAll('#gsh-lista .gsh-texto');
+      if (cajas.length) cajas[cajas.length - 1].focus();
+    };
+    $('gsh-anadir-rotulo').onclick = function () {   /* fila 706 */
+      recoger();
+      tareas.push({ id: GuiasGuion.nuevoId(), texto: '', rotulo: true });
       pintar();
       var cajas = document.querySelectorAll('#gsh-lista .gsh-texto');
       if (cajas.length) cajas[cajas.length - 1].focus();

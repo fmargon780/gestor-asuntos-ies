@@ -68,3 +68,9 @@
 .tp-flecha { color: #9aa5b1; white-space: pre; }
 .gsh-linea .gsh-papel { max-width: 220px; }
 .ash-anadir .ash-anadir-papel { max-width: 240px; }
+
+/* Fila 706: rótulos que agrupan las tareas de un trámite largo. */
+.ash-rotulo { margin: 12px 0 6px; padding: 6px 10px; border-left: 4px solid #3b6ea5; background: #e8f0f9; border-radius: 0 6px 6px 0; font-weight: 700; color: #1f3d5f; }
+.ash-tarea.bajo-rotulo { margin-left: 14px; }
+.gsh-rotulo { border-left: 4px solid #3b6ea5; background: #e8f0f9; }
+.gsh-vista-rotulo { list-style: none; margin-left: -18px; color: #1f3d5f; }

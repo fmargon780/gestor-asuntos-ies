@@ -15,10 +15,22 @@ var AsuntoSinHitosGuia = (function () {
 
   function pasoLista(pasos) { return (pasos || []).filter(function (p) { return p && p.listaDeTareas; })[0] || null; }
 
-  /* Las frases de la guía, en su orden. */
-  function tareasDe(pasos) {
+  /* Las líneas de la guía en su orden, rótulos incluidos (fila 706). */
+  function lineasDe(pasos) {
     var p = pasoLista(pasos);
     return p ? (p.guion || []).filter(function (g) { return g && !g.pregunta && g.texto; }) : [];
+  }
+
+  /* Las tareas de la guía, en su orden. Fila 706: cada una lleva `grupo`, el texto del último rótulo que tiene encima
+     (sin rótulo, nada); los rótulos no son tareas y no salen aquí. */
+  function tareasDe(pasos) {
+    var grupo = '';
+    var salida = [];
+    lineasDe(pasos).forEach(function (g) {
+      if (g.rotulo) { grupo = g.texto; return; }
+      salida.push(grupo ? Object.assign({}, g, { grupo: grupo }) : g);
+    });
+    return salida;
   }
 
   /* Las tareas de la guía de un tipo, ya puesta al día con el disco. */
@@ -32,6 +44,7 @@ var AsuntoSinHitosGuia = (function () {
     var c = { id: U.nuevoId('gp'), texto: g.texto, deGuia: true, origenGuia: g.id };
     if (g.soloSi) c.soloSi = JSON.parse(JSON.stringify(g.soloSi));
     if (g.papel) c.papel = g.papel;   /* fila 703: la tarea de papel de la guía */
+    if (g.grupo) c.grupo = g.grupo;   /* fila 706: el rótulo bajo el que va */
     return c;
   }
 
@@ -124,12 +137,13 @@ var AsuntoSinHitosGuia = (function () {
     var tareas = tareasDe(pasos);
     if (!tareas.length) return '<div class="vacio">Todavía no hay tareas en la guía de este tipo.</div>';
     return '<p class="suave gsh-cuenta">' + (tareas.length === 1 ? '1 tarea' : tareas.length + ' tareas') + '</p>' +
-      '<ol class="gsh-vista">' + tareas.map(function (g) {
+      '<ol class="gsh-vista">' + lineasDe(pasos).map(function (g) {
+        if (g.rotulo) return '<li class="gsh-vista-rotulo"><b>' + U.escapar(g.texto) + '</b></li>';   /* fila 706 */
         var cuando = window.SoloSi && g.soloSi ? SoloSi.etiqueta(g.soloSi) : '';
         return '<li>' + U.escapar(g.texto) + (cuando ? ' <span class="suave">· ' + U.escapar(cuando) + '</span>' : '') + '</li>';
       }).join('') + '</ol>';
   }
 
-  return { conservarLista: conservarLista, vistaHTML: vistaHTML, pasoLista: pasoLista, tareasDe: tareasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, pasosVisibles: pasosVisibles, completar: completar };
+  return { conservarLista: conservarLista, vistaHTML: vistaHTML, pasoLista: pasoLista, tareasDe: tareasDe, lineasDe: lineasDe, deLaGuia: deLaGuia, darTareas: darTareas, llevar: llevar, alGuardar: alGuardar, esLista: esLista, pasosVisibles: pasosVisibles, completar: completar };
 })();
 window.AsuntoSinHitosGuia = AsuntoSinHitosGuia;
