@@ -144,6 +144,28 @@ for (const sel of ['#capa .cuadro', '#capa .cuadro > :first-child']) {
   await cerrar();
 }
 
+/* (j) cuarto arreglo (20-nov-2026): sin ningún cuadro abierto antes, una suelta sobre la zona de trabajo no deja ningún aviso,
+   ni siquiera si el mismo suceso llega dos veces con objetos File distintos (otra «última modificación») */
+await p.click('button.pestana[data-pantalla="abiertos"]');
+await p.locator('#inicio-tabla-cuerpo tr[data-asunto*="SANCION Fuentes Calvo"] .tarjeta-nombre').first().click();
+await p.waitForSelector('#trabajo-columnas', { timeout: 15000 });
+await p.waitForTimeout(1500);
+await p.evaluate(() => { document.getElementById('mensajes').innerHTML = ''; });
+comprobar('j. antes de soltar no hay ningún cuadro abierto', await p.locator('#capa:not(.oculto) #doc-cuerpo').count(), 0);
+const sueltaJ = (i) => p.evaluate((i) => {
+  const dt = new DataTransfer();
+  dt.items.add(new File(['contenido de prueba'], 'prueba 686 j.pdf', { type: 'application/pdf', lastModified: 1700000000000 + i }));
+  document.getElementById('trabajo-columnas').dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+}, i);
+await sueltaJ(0);
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+await sueltaJ(1);   /* el mismo suceso llegado otra vez, con otro objeto File */
+await p.waitForSelector('#doc-guardar', { timeout: 15000 });
+await p.waitForTimeout(800);
+comprobar('j. soltar sobre la zona sin cuadro previo no deja ningún aviso', await avisos(), []);
+comprobar('j. y hay un solo cuadro del nombre', await p.locator('#capa:not(.oculto) #doc-guardar').count(), 1);
+await cerrar();
+
 /* (e) un directivo no guarda */
 await p.evaluate(() => { window.__esDirectivo = Perfil.esDirectivo; Perfil.esDirectivo = () => true; });
 await soltar('#trabajo-columnas');

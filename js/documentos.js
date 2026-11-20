@@ -332,7 +332,9 @@ var Documentos = (function () {
      entra en él (si ya hay un documento a medias, avisa); si no, abre uno. Sin hito ni tarea. */
   function soltarFichero(asunto, fichero) {
     /* Devuelta (19-nov-2026): la misma suelta llegada otra vez (mismo fichero que el del cuadro del nombre ya abierto) no avisa ni cambia nada. */
-    var marca = fichero.name + '|' + fichero.size + '|' + fichero.lastModified;
+    /* Cuarto arreglo (20-nov-2026): sin la fecha de modificación. La misma suelta llegada otra vez trae otro objeto File
+       con otra fecha y avisaba «Termina antes» sin motivo; mismo nombre y tamaño = mismo fichero. */
+    var marca = fichero.name + '|' + fichero.size;
     var abierto = !!document.querySelector('#capa:not(.oculto) #doc-cuerpo');
     if (abierto && N.marcaSoltada === marca) return;
     N.marcaSoltada = marca;
