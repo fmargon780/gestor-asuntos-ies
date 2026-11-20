@@ -41,7 +41,12 @@ async function abrir(extra) {
   }, null, { timeout: 60000 });
   await pagina.waitForFunction(() => window.Problemas && Problemas.ids().includes('conflictos'), null, { timeout: 60000 });
   /* fila 701: y a que el acuerdo de los tipos de documento (js/recorrido-tipo-acuerdo.js) haya escrito su marca: si no, tipos-documento.json cambia a mitad del traslado */
-  await pagina.waitForFunction(async () => !!(await Carpetas.leerJson(App.E.gestor, 'recorridos-tipos-acuerdo.json')), null, { timeout: 60000 });
+  /* (fila 736: antes era un `waitForFunction` con función `async`, que devuelve una promesa —siempre «verdadera»— y no esperaba a nada) */
+  for (let i = 0, hay = false; !hay; i++) {
+    if (i > 120) throw new Error('El acuerdo de los tipos de documento no ha escrito su marca.');
+    hay = await pagina.evaluate(async () => !!(await Carpetas.leerJson(App.E.gestor, 'recorridos-tipos-acuerdo.json')));
+    if (!hay) await pagina.waitForTimeout(500);
+  }
   /* y a que deje de escribir (asuntos.json, hitos.json y los PDF de la demostración): la misma huella dos veces seguidas */
   let huella = '', iguales = 0;
   for (let i = 0; i < 40 && iguales < 3; i++) {
