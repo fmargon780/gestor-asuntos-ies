@@ -66,3 +66,6 @@ Aviso completo, con su captura: https://drive.google.com/file/d/17OkmORav9u1zCxL
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- 20-nov-2026, segundo revisor (agente nuevo, servidor local, demostración): APROBADA. Coincide: las tres pestañas en orden; selección compartida; etiqueta con dos tutores, «Tutores de…» y dirección; hermanos Aguilar en una etiqueta con los tutores una vez; «Sin tutores» ámbar y cuenta en el pie; «Copias por familia» con copias seguidas; diseño propio para tutores solo en su pestaña; recuerda pestaña y selección; PDF con las hojas del pie; Alumnado y Personal como antes; consola sin errores. «Archivar» no existe como botón: el asunto de prueba se cerró con «Liquidar y cerrar». Hace sin pedirlo: nada.
+- Aviso: el vocabulario dice «familia» y no «tutores» para los tutores legales como grupo; aquí se han usado los textos que pedía la instrucción («Tutores legales», «Tutores de…», «Sin tutores»).
+- Dos tutores se cuentan una sola vez por documento o, si no hay, por nombre; en una familia de más de dos tutores salen «A, B y C».
