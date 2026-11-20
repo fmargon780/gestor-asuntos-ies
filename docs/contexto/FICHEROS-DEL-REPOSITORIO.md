@@ -74,6 +74,7 @@ de `App` va después del fichero que lo define.
 | `js/etiquetas-modelos.js` | Las hojas de etiquetas (Avery A4, con medidas contrastadas; las propias con su tamaño de hoja) y su geometría (filas 344 y 346) |
 | `js/etiquetas-datos.js` | Qué datos puede llevar una etiqueta, la dirección y las familias de hermanos (fila 344) |
 | `js/etiquetas-disenos.js` | Los diseños Sobre, Alumno y Profesor, los propios y el ajuste de la letra (fila 344) |
+| `js/etiquetas-tutores.js` | Valores de la etiqueta de una familia para sus tutores legales y qué datos valen en esos diseños (fila 721) |
 | `js/etiquetas-hoja.js` | De las personas a las hojas: orden, familias, copias, casillas gastadas y vista previa (fila 344) |
 | `js/etiquetas-pdf.js` | El PDF de las etiquetas a tamaño real, con pdf-lib (fila 344) |
 | `js/etiquetas-guardado.js` | `_GESTOR/etiquetas.json`: modelos y diseños propios (fila 344) |

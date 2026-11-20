@@ -276,6 +276,7 @@
     'js/etiquetas-modelos.js',
     'js/etiquetas-datos.js',
     'js/etiquetas-disenos.js',
+    'js/etiquetas-tutores.js',   // fila 721
     'js/etiquetas-hoja.js',
     'js/etiquetas-pdf.js',
     'js/etiquetas-guardado.js',

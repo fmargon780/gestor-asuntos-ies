@@ -11,7 +11,8 @@
    7. Un diseño propio de dos renglones se guarda en _GESTOR/etiquetas.json y sale en la vista previa.
    8. «Guardar PDF»: A4 con las hojas que dice el pie, y la letra a tamaño real.
    9. (Fila 584: pasó a etiquetas-desde-el-grupo.mjs, apartada con la idea 593.)
-   10. Pestaña Personal con el diseño «Profesor». */
+   10. Pestaña Personal con el diseño «Profesor».
+   11. (Fila 721) Pestaña «Tutores legales»: misma selección, diseño «Tutores», una etiqueta por familia, «Sin tutores». */
 import { chromium } from 'playwright';
 import { tarjetasSolas } from './apoyo/etiquetas-tarjetas.mjs';
 import fs from 'node:fs';
@@ -190,6 +191,72 @@ await comprobar('10. el diseño Profesor lleva apellidos, nombre y departamento 
   ['Cabello Ruiz, Esperanza | Inglés', 'Otero Campos, Marta | Matemáticas', 'Reyes Palma, Fernando | Lengua', 'Uceda Molina, Patricia | Jefatura de Estudios', 'Vidal Cano, Ramón | Ordenanza']);
 await poner('et-pdepto', 'Matemáticas');
 await comprobar('10. el filtro por departamento', pagina.locator('#et-resumen').textContent(), '1 persona · 1 etiqueta');
+
+console.log('--- 11. tutores legales (fila 721) ---');
+const abrirEtiquetas = async () => {
+  await pagina.evaluate(() => App.ir('herramientas'));
+  await pagina.evaluate(() => { document.getElementById('bloque-etiquetas').open = true; });
+  await pagina.click('#etiquetas-abrir');
+  await esperarVista();
+};
+await abrirEtiquetas();
+await comprobar('11. «A quién» tiene tres pestañas, en este orden', pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.et-pestana'), (b) => b.textContent)), ['Alumnado', 'Tutores legales', 'Personal']);
+await pagina.click('[data-clase="alumnado"]');
+await pagina.evaluate(() => { document.querySelector('.et-pegar').open = true; });
+await pagina.fill('#et-pegado', 'Aguilar Ponce, Marina\nAguilar Ponce, Pablo\nGallardo Reyes, Vera\nKlein Soto, Ana');
+await pagina.click('#et-pegar-usar');
+await pagina.waitForTimeout(300);
+const resumenAlumnado = await pagina.locator('#et-resumen').textContent();
+await pagina.click('[data-clase="tutores"]');
+await pagina.waitForTimeout(300);
+await comprobar('11. la selección es la misma al pasar de «Alumnado» a «Tutores legales»', pagina.locator('#et-resumen').textContent(), resumenAlumnado.replace(/ · \d+ etiquetas?$/, '') + ' · 3 etiquetas');
+await pagina.asegurar('#et-diseno');
+await comprobar('11. solo hay diseños para tutores, y el elegido es «Tutores»', pagina.evaluate(() => {
+  const s = document.getElementById('et-diseno'); return [s.value, Array.prototype.map.call(s.options, (o) => o.textContent)]; }), ['tutores', ['Tutores']]);
+await comprobar('11. la casilla dice «Copias por familia»', pagina.evaluate(() => document.querySelector('label[class="etiqueta"] #et-copias').parentElement.textContent.trim()), 'Copias por familia');
+const tut = (await textos()).filter((x) => x.length);
+await comprobar('11. los hermanos Aguilar, una sola etiqueta con sus dos tutores una sola vez, «Tutores de» y la dirección de casa',
+  tut.filter((x) => /Ponce Duarte/.test(x[0])),
+  [['Rocío Ponce Duarte y Joaquín Aguilar Reyes', 'Tutores de Marina y Pablo Aguilar Ponce', 'Calle Mayor 4', '14900 Lucena', 'Córdoba']]);
+await comprobar('11. con un solo tutor, «Tutor de…»', tut.filter((x) => /^Tutor de /.test(x[1] || '')).map((x) => x.slice(0, 2)), [['Elena Soto Mora', 'Tutor de Ana Klein Soto']]);
+await comprobar('11. sin tutores sale igual, con el aviso ámbar y la cuenta en el pie', pagina.evaluate(() => [
+  Array.prototype.map.call(document.querySelectorAll('.et-casilla:has(.et-aviso-tutores) .et-linea'), (l) => l.textContent),
+  document.querySelectorAll('.et-aviso-tutores').length, document.querySelector('.et-aviso-tutores').textContent, /1 familia sin tutores/.test(document.querySelector('.et-pie').textContent)]),
+  [['Tutores de Vera Gallardo Reyes'], 1, 'Sin tutores', true]);
+await pagina.fill('#et-copias', '2');
+await pagina.waitForTimeout(300);
+const rep = (await textos()).filter((x) => x.length);
+await comprobar('11. dos copias por familia, seguidas', [rep.length, JSON.stringify(rep[0]) === JSON.stringify(rep[1]), JSON.stringify(rep[1]) !== JSON.stringify(rep[2])], [6, true, true]);
+await pagina.fill('#et-copias', '1');
+await pagina.waitForTimeout(200);
+await pagina.click('#et-diseno-nuevo');
+await pagina.fill('#ed-nombre', 'Cartas a las familias');
+await comprobar('11. un diseño nuevo desde esta pestaña vale para «Tutores legales», una por familia', pagina.evaluate(() => [
+  document.getElementById('ed-para').value, document.getElementById('ed-familia').checked, document.getElementById('ed-familia').disabled]), ['tutores', true, true]);
+await comprobar('11. y ofrece los datos de los tutores', pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.et-renglon[data-i="0"] [data-r="dato"] option'), (o) => o.value).filter((v) => /^tutores/.test(v))), ['tutoresNombres', 'tutoresDe']);
+await pagina.selectOption('.et-renglon[data-i="0"] [data-r="dato"]', 'tutoresNombres');
+await pagina.click('#ed-guardar');
+await pagina.waitForSelector('#et-diseno');
+await pagina.waitForTimeout(300);
+await pagina.asegurar('#et-diseno');
+await comprobar('11. el diseño para tutores sale en esta pestaña', pagina.evaluate(() => Array.prototype.map.call(document.getElementById('et-diseno').options, (o) => o.textContent)), ['Tutores', 'Cartas a las familias (propio)']);
+await pagina.click('[data-clase="alumnado"]');
+await pagina.waitForTimeout(300);
+await pagina.asegurar('#et-diseno');
+await comprobar('11. en «Alumnado» siguen los de antes y no sale el de tutores', pagina.evaluate(() => Array.prototype.map.call(document.getElementById('et-diseno').options, (o) => o.textContent)), ['Sobre', 'Alumno', 'Examen (propio)']);
+await comprobar('11. la selección sigue al volver a «Alumnado»', pagina.locator('#et-resumen').textContent(), resumenAlumnado);
+await pagina.click('[data-clase="tutores"]');
+await pagina.waitForTimeout(600);
+await abrirEtiquetas();
+await comprobar('11. al dejar la pantalla y volver, sigue en «Tutores legales» y con lo elegido', pagina.evaluate(() => [
+  document.querySelector('.et-pestana.et-activa').textContent, document.getElementById('et-resumen').textContent]), ['Tutores legales', resumenAlumnado.replace(/ · \d+ etiquetas?$/, '') + ' · 3 etiquetas']);
+const cuentaTut = await pie();
+const [descargaTut] = await Promise.all([pagina.waitForEvent('download'), pagina.click('#et-guardar-pdf')]);
+const infoTut = await pagina.evaluate(async (b64) => {
+  const L = await PdfHerramientas.cargarPdfLib();
+  return (await L.PDFDocument.load(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)))).getPageCount();
+}, fs.readFileSync(await descargaTut.path()).toString('base64'));
+await comprobar('11. el PDF tiene las hojas que dice el pie (' + cuentaTut + ')', infoTut, parseInt(cuentaTut, 10));
 
 await comprobar('sin errores en la consola', errores, []);
 await navegador.close();

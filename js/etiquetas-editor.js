@@ -46,14 +46,14 @@ var EtiquetasEditor = (function () {
   }
 
   function htmlDiseno(e) {
-    var d = e.diseno, campos = EtiquetasDatos.CAMPOS.filter(function (c) { return d.para === 'ambos' || c.para === 'ambos' || c.para === d.para; });
+    var d = e.diseno, campos = EtiquetasDatos.CAMPOS.filter(function (c) { return EtiquetasTutores.valeCampo(c, d.para); });
     function opcion(valor, texto, actual) { return '<option value="' + esc(valor) + '"' + (valor === actual ? ' selected' : '') + '>' + esc(texto) + '</option>'; }
     function alinear(a, x) { return '<button type="button" class="boton boton-mini" data-alinea-todo="' + a + '">' + x + '</button>'; }
     return '<div class="et-editor" id="et-editor"><h4>' + esc(e.titulo) + '</h4>' + aviso(e) +
       '<label class="etiqueta">Nombre <input class="campo" id="ed-nombre" value="' + esc(d.nombre) + '" maxlength="60"></label>' +
       '<div class="et-fila"><label class="etiqueta">Vale para <select class="campo" id="ed-para">' +
-        opcion('alumnado', 'Alumnado', d.para) + opcion('personal', 'Personal', d.para) + opcion('ambos', 'Los dos', d.para) + '</select></label>' +
-      '<label class="et-casilla-texto"><input type="checkbox" id="ed-familia"' + (d.unaPorFamilia ? ' checked' : '') + (d.para === 'personal' ? ' disabled' : '') + '> Una por familia (los hermanos salen en una sola)</label></div>' +
+        opcion('alumnado', 'Alumnado', d.para) + opcion('tutores', 'Tutores legales', d.para) + opcion('personal', 'Personal', d.para) + opcion('ambos', 'Los dos', d.para) + '</select></label>' +
+      '<label class="et-casilla-texto"><input type="checkbox" id="ed-familia"' + (d.unaPorFamilia || d.para === 'tutores' ? ' checked' : '') + (d.para === 'personal' || d.para === 'tutores' ? ' disabled' : '') + '> Una por familia (los hermanos salen en una sola)</label></div>' +
       '<div class="et-fila et-alinear-todo"><span class="et-casilla-texto">Alinear todo:</span>' +
         alinear('izq', 'A la izquierda') + alinear('centro', 'Centrado') + alinear('der', 'A la derecha') + '</div>' +
       '<div class="et-fila et-colocar"><span class="et-casilla-texto">Colocar el texto:</span>' +
@@ -114,11 +114,12 @@ var EtiquetasEditor = (function () {
     q('ed-para').onchange = function () {
       d.para = this.value;
       if (d.para === 'personal') d.unaPorFamilia = false;
+      if (d.para === 'tutores') d.unaPorFamilia = true;
       /* un renglón con un dato que ya no vale para esta clase de persona vuelve al primero que sí */
       d.renglones.forEach(function (x) {
         if (x.dato === 'texto') return;
         var c = EtiquetasDatos.CAMPOS.filter(function (k) { return k.clave === x.dato; })[0];
-        if (c && d.para !== 'ambos' && c.para !== 'ambos' && c.para !== d.para) x.dato = d.para === 'personal' ? 'departamento' : 'unidad';
+        if (c && !EtiquetasTutores.valeCampo(c, d.para)) x.dato = d.para === 'personal' ? 'departamento' : (d.para === 'tutores' ? 'tutoresNombres' : 'unidad');
       });
       cb.repintar();
     };
