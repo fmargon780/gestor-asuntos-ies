@@ -93,4 +93,7 @@ Enviado el 27/10/2026 12:16:48 por Apellidos, Nombre
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (20-nov-2026, Claude Code) Revisor APROBADA a la primera, con datos inventados de la demostración (los avisos usan alumnos de la copia de pruebas: Navarro Gil, Ortega Paz y Pardo Luna, grupo «2º B»). Coinciden los diez puntos de «Cómo lo comprueba el segundo revisor», más consola, pantallas y crear/archivar un asunto.
+- Lo que hace la pantalla y el texto no pide: al elegir entre las dos fechas que no cuadran, cambian a la vez el primer día y los días de la fila (viernes 6 → 4 días); avisa con un mensaje por asunto creado además del resumen; con el grupo del aviso distinto del del alumno sale amarillo con «Es este alumno, seguir». Lo primero es lo acordado («se elige cuál vale»); lo demás es pequeño, dime si lo quitas.
+- No lo he podido ver: los avisos reales de la intranet (nombres reales no se guardan); el formato del grupo real («1º ESO B») frente al de la demostración («2º B») se compara por curso y letra (1º ESO B y 1º B dan lo mismo); eso no está probado con un grupo escrito así, solo con «2º B».
+- Aviso del revisor que no es de esta fila: la ficha de un asunto nuevo dice «Siguiente paso: Generar documento.» (el vocabulario pide «hito» o «tarea»).
