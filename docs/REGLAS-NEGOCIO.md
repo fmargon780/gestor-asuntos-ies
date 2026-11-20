@@ -334,3 +334,8 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 
 - (20-nov-2026, tema 624) En Etiquetas, «A quién» tiene una pestaña **«Tutores legales»** entre Alumnado y Personal: se elige al alumnado como siempre y la etiqueta va a sus tutores, **una por familia** (los hermanos con los mismos tutores y dirección, juntos), con los nombres de los dos tutores, «Tutores de…» y la dirección de casa del alumno. Origen: aviso de Diego del 11-nov-2026 («añadir en A quien los tutores o representantes legales del alumno o alumna»). Francisco: «Sí, está bien.»
 - (20-nov-2026, fila 721) Salen siempre los dos tutores, tenga o no la custodia; sin tutores, la etiqueta sale con el aviso «Sin tutores»; no hay un sobre aparte para cada tutor. Francisco, a la instrucción: «Está bien».
+
+## Documentos y correos para varias personas (tema 393, 20-nov-2026)
+
+- (20-nov-2026, tema 393) Un asunto de grupo hace, para cada persona, **su documento (plantilla de documento) y su correo (plantilla de correo) con ese documento adjunto**, y vale para cualquier tipo de asunto, no solo para uno. Francisco: «no quisiera desarrollar algo concreto, útil solo para estos casos, si no algo general».
+- (20-nov-2026, fila 722) **Un dato distinto para cada persona viene de las columnas de la lista que se pega para formar el grupo** (con cabecera en la primera línea); se guardan en el asunto y se usan como cualquier otro dato en el documento y en el correo. Francisco: «Es posible que esos datos estuvieran en algún listado relativo al asunto que podríamos incorporar»; eligió hacerlo en este tema («1»). «Un valor por dato y asunto» sigue valiendo; en un asunto de grupo se añade un valor por persona.
