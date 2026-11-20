@@ -41,6 +41,7 @@ La descripción «CASO …» solo se ve en «⋯» → «Cambiar el asunto»; el
 | Uno con 50 documentos | asunto de «de la Cruz del Río, Mª Carmen» con la descripción «CASO 50 DOCUMENTOS» |
 | Uno del curso anterior | descripción «CASO CURSO ANTERIOR», de «Muñoz Peña, Ñusta Núñez», todavía abierto |
 | Uno vencido | descripción «CASO VENCIDO», de «Custodia Dudosa, Vera», abierto hace más de un año |
+| Grupo con datos de la lista (fila 722) | asunto «GRUPO 2ºB»: la columna «Número de título» (`{campo:Número de título}`) tiene un valor para cada una (T-26-101…) menos Vera Gallardo, que sale vacía; sin pantalla de prueba |
 | Mucha gente y mucho archivo | Inicio con decenas de asuntos; «Archivo» con tres cursos |
 
 ## Todavía sin caso (se añadirán cuando una fila los necesite)

@@ -95,10 +95,12 @@ var AsuntoDeGrupo = (function () {
     /* Fila 306: un grupo que es una actividad extraescolar se cambia en su propio formulario. */
     if (actual && actual.actividad && window.ActividadesFormulario) return ActividadesFormulario.cambiarDesdeNuevo();
     var atajos = actual ? actual.atajos.slice() : [];
+    var datosLista = actual && actual.datosLista ? actual.datosLista : null;   /* fila 722: las columnas de la lista pegada */
     var marcados = await Relacionados.elegirVarios({
       titulo: 'Un grupo de personas', marcadosIniciales: actual ? actual.marcados : null, minimo: 2,
       textoBoton: function (n) { return 'Usar los ' + n + ' señalados'; },
-      alSenalar: function (tipo, valor, lista) {
+      alSenalar: function (tipo, valor, lista, datos) {
+        if (datos && datos.columnas && datos.columnas.length && window.DatosDeLista) datosLista = DatosDeLista.unirPegadas(datosLista, datos);
         atajos.push({ tipo: tipo, valor: valor, lista: (lista || []).map(function (m) {
           return { categoria: m.categoria || 'ALUMNADO', nombre: m.campos ? App.textoTercero(m) : m.nombre, unidad: m.unidad, curso: m.curso };
         }) });
@@ -109,7 +111,7 @@ var AsuntoDeGrupo = (function () {
     var sugerido = d.nombre || (actual && actual.nombre) || '';
     var nombre = await pedirNombre(sugerido);
     if (!nombre) return;
-    fijar({ nombre: nombre, origen: d.origen, marcados: marcados, atajos: atajos });
+    fijar({ nombre: nombre, origen: d.origen, marcados: marcados, atajos: atajos, datosLista: datosLista });
   }
 
   function fijar(g) {

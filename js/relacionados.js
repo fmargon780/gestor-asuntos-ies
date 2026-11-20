@@ -348,7 +348,10 @@ var Relacionados = (function () {
   }
 
   async function agregarVarios(a) {
-    var marcados = await abrirAnadirRelacionados();
+    var datosLista = null;   /* fila 722: las columnas de una lista pegada, para un asunto de grupo */
+    var marcados = await abrirAnadirRelacionados({ alSenalar: function (tipo, valor, lista, datos) {
+      if (datos && datos.columnas && datos.columnas.length && window.DatosDeLista) datosLista = DatosDeLista.unirPegadas(datosLista, datos);
+    } });
     if (!marcados || !marcados.length) return false;
 
     var categoriaPrincipal = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
@@ -356,9 +359,15 @@ var Relacionados = (function () {
     var actuales = (a.ficha && a.ficha.relacionados) || [];
     var resultado = combinarRelacionados(actuales, categoriaPrincipal, terceroPrincipal, marcados);
 
+    /* Fila 722: volver a pegar la lista pone al día los datos de esas personas aunque ya estuvieran en el grupo. */
+    var datosPuestos = false;
+    if (datosLista) {
+      try { datosPuestos = await DatosDeLista.poner(a.nombre, DatosDeLista.soloDe(datosLista, marcados)); }
+      catch (e5) { U.accesorio('No he podido guardar las columnas de la lista', e5); }
+    }
     if (!resultado.anadidos) {
-      U.aviso('Nadie nuevo que añadir: ya estaban todos en la lista.', 'malo');
-      return false;
+      U.aviso(datosPuestos ? 'Nadie nuevo que añadir: ya estaban todos en el grupo. Sus datos de la lista están al día.' : 'Nadie nuevo que añadir: ya estaban todos en la lista.', datosPuestos ? 'bueno' : 'malo');
+      return datosPuestos;
     }
 
     try {

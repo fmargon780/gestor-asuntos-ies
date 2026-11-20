@@ -150,6 +150,7 @@ var TerceroRenombrar = (function () {
           { quitar: [{ categoria: cat, nombre: viejo }], anadir: [{ categoria: cat, nombre: nuevo }] });
         /* Fila 293: lo que se le hizo (`generadoDe` de sus documentos) sigue siendo suyo. */
         if (window.PersonasDelGrupo) await PersonasDelGrupo.alRenombrar(abiertas[i], cat, viejo, nuevo);
+        if (window.DatosDeLista) await DatosDeLista.alRenombrarPersona(abiertas[i], cat, viejo, nuevo);   /* fila 722: sus datos de la lista */
       }
     } catch (e) { resultado.fallos.push('los relacionados de otros asuntos: ' + U.mensajeDeError(e)); }
     if (window.Actividades) await Actividades.alRenombrarPersona(cat, viejo, nuevo);   /* fila 306: su nombre en el profesorado de las actividades */

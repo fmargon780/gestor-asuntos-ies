@@ -93,6 +93,7 @@ var AsuntoRenombrar = (function () {
 
     if (window.Encargos) await Encargos.alMoverAsunto(claveVieja, claveNueva);   /* fila 289: el nombre guardado en sus encargos */
     if (window.Actividades) await Actividades.alMoverAsunto(claveVieja, claveNueva);   /* fila 306 */
+    if (window.DatosDeLista) await DatosDeLista.alMoverAsunto(claveVieja, claveNueva);   /* fila 722: las columnas de su lista pegada */
     var nota = await moverHitosYPresencia(claveVieja, claveNueva);
     if (nota && window.Notas) {
       try { await Notas.anadirAuto({ nombre: claveNueva }, nota); } catch (e) { /* no crítico */ }

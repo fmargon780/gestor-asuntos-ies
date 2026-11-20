@@ -60,6 +60,12 @@ var CamposElegir = (function () {
     /* Fila 627: campos que no se ofrecen (el asunto de un correo no lleva los del documento). */
     if (ctx.ocultar && ctx.ocultar.length) lista = lista.filter(function (c) { return ctx.ocultar.indexOf(c.id) === -1; });
     if (ctx.soloGuardables) lista = lista.filter(function (c) { return c.propioId || c.calculadoId || c.escritoAMano || c.id.indexOf('f:') === 0; });
+    /* Fila 722: las columnas de la lista pegada de los asuntos de grupo de este tipo, en su grupo «De la lista del asunto». */
+    if (window.DatosDeLista && tipo && !ctx.soloGuardables) {
+      try { await DatosDeLista.preparar(); } catch (e) { /* sin lista, sin grupo */ }
+      lista = lista.concat(CamposLista.deLista(DatosDeLista.columnasDeTipo(tipo)));
+    }
+    var hayLista = lista.some(function (c) { return c.grupo === CamposLista.GRUPO_LISTA; });
     var personas = await CamposListaDatos.personas(categoria === 'PERSONAL' ? 'PERSONAL' : 'ALUMNADO');
     var persona = personas[0];
     var usados = masUsados(lista, entrada.textos, tipo);
@@ -114,7 +120,7 @@ var CamposElegir = (function () {
         '<div class="campos-elegir-usados"><span class="suave pequeno">Los más usados en este tipo:</span> ' +
         (usados.length ? usados.map(function (c) { return '<button type="button" class="campos-pastilla" data-id="' + esc(c.id) + '">' + esc(c.nombre) + '</button>'; }).join('') : '<span class="suave pequeno">todavía ninguno</span>') + '</div></div>' +
         '<div class="campos-elegir-cuerpo"><div class="campos-elegir-grupos">' +
-        CamposLista.GRUPOS.map(function (g) {
+        CamposLista.GRUPOS.concat(hayLista ? [CamposLista.GRUPO_LISTA] : []).map(function (g) {
           var n = lista.filter(function (c) { return c.grupo === g && CamposLista.sirveParaClase(c, categoria); }).length;
           return '<button type="button" class="campos-grupo' + (!q && st.g === g && st.modo === 'lista' ? ' on' : '') + '" data-g="' + esc(g) + '"><span>' + esc(g) + '</span><span>' + n + '</span></button>';
         }).join('') + '</div><div class="campos-elegir-centro" id="ce-centro">' + centro + '</div></div>' +

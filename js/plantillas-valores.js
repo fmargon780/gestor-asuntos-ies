@@ -141,6 +141,10 @@
       var g = guardados[Campos.claveDeCampo(cfg)];
       if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = Campos.mostrarValor(Campos.claseDeCampo(cfg, App.E.campos), g.valor);   /* fila 244: ya con su clase (1.234,50 €, 01/10/2026) */
     });
+    /* Fila 722: las columnas de la lista del grupo, con el valor de esta persona; un campo del asunto con ese nombre manda. */
+    var propios = {};
+    Object.keys(salida).forEach(function (k) { propios[U.normalizar(k)] = true; });
+    Object.keys(a.datosDeLista || {}).forEach(function (k) { if (!propios[U.normalizar(k)]) salida[k] = a.datosDeLista[k]; });
     return salida;
   }
 
@@ -459,10 +463,14 @@
     delete ficha.contacto;
     var leido = Object.assign({}, a.leido || {}, { categoria: relacionado.categoria });
     if (!leido.tipo && a.ficha && a.ficha.tipo) leido.tipo = a.ficha.tipo;
-    return Object.assign({}, a, { ficha: ficha, leido: leido });
+    var copia = Object.assign({}, a, { ficha: ficha, leido: leido });
+    /* Fila 722: lo que la lista pegada del asunto dice de esta persona (js/datos-de-lista.js, ya leído). */
+    if (window.DatosDeLista && a.nombre) copia.datosDeLista = DatosDeLista.de(a.nombre, relacionado.categoria, relacionado.nombre);
+    return copia;
   }
 
-  function valoresDePersona(asunto, relacionado, opciones) {
+  async function valoresDePersona(asunto, relacionado, opciones) {
+    if (window.DatosDeLista) { try { await DatosDeLista.preparar(); } catch (e) { /* sin lista, todo como antes */ } }
     return valoresDeAsunto(asuntoParaPersona(asunto, relacionado), opciones);
   }
 

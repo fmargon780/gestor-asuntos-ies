@@ -100,6 +100,8 @@ var CamposListaDatos = (function () {
         v = filas.length && filas[0].celdas ? filas[0].celdas[campo.columna] : '';
       } else if (campo.calculadoId) {
         v = Campos.valorInicial({ origen: 'calculado', id: campo.calculadoId }, p.persona, App.E.campos);
+      } else if (campo.id.indexOf('l:') === 0) {
+        v = 'un valor para cada persona';   /* fila 722: sale de la lista pegada */
       } else if (campo.origen === 'Manual') {
         v = ((await valoresDe(p)).campos || {})[campo.nombre];
       }

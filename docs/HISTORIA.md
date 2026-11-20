@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-nov-2026 — Fila 722: datos propios de cada persona, desde la lista pegada
+
+La lista pegada para formar un grupo ya no tira sus columnas: con cabecera se guardan por persona en `_GESTOR/datos-de-lista.json` (no en `asuntos.json`: un grupo de 600 pesa; ni en la carpeta del asunto: saldría como documento) y llegan a `{campo:Columna}`. La casilla «Estos documentos se registran en Séneca» no se pudo reproducir mal: con un clic normal se desmarca y se queda (prueba nueva).
+
 ## 14-nov-2026 — Filas HECHAS y SUSTITUIDAS del 12-nov pasadas desde la cola (fila 661)
 
 | 460 | Paso de Francisco (de la fila 458, `docs/PASAR-A-DRIVE.md`; puesto al día en el tema 607): en los dos ordenadores del instituto, Google Drive para ordenadores con la cuenta común, en «Replicar archivos» y con la carpeta elegida en `C:\Google Drive` (Preferencias → Google Drive → «Seleccionar carpeta»); esperar a que sincronice. Después, en el instituto, pulsar «Pasar a Drive» en Ajustes con Diego fuera de la app y señalar `C:\Google Drive`. Lo visto: `docs/612-LO-VISTO-EN-EL-INSTITUTO.md`. En cada ordenador donde Drive cambie de sitio hay que señalar otra vez la carpeta de correos: Ajustes → «Este ordenador» → «Bandeja de correos» → «Cambiar la carpeta» → `C:\Google Drive\GESTOR-BANDEJA` (fila 618; en «Propietario» ya está hecho el 12-nov-2026). | HECHA (12-nov-2026) · traslado a Drive hecho en el instituto (4.153 documentos, no falta ninguno), Drive en `C:\Google Drive` en los dos ordenadores, correo de prueba llegado en los dos; sin cambio de código, no hay nada que publicar. Lo que queda por mirar está en `docs/COMPROBAR-A-MANO.md` (fila 459 y 460) · lo ocurrido: `docs/notas-diseno/460.md` |
