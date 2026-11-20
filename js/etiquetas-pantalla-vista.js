@@ -63,10 +63,11 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
     var escala = Math.max(1.2, Math.min(3, ancho / 210));
     cont.innerHTML = EtiquetasHoja.vistaHtml(E.pag, E.modelo, E.prep, escala) +
       (E.personasN ? '' : '<p class="explica et-vacio">Elige un grupo, busca personas o pega una lista.</p>');
-    var sinDir = 0, cortas = 0;
+    var sinDir = 0, sinTut = 0, cortas = 0;
     E.items.forEach(function (it, i) {
       if (E.items.indexOf(it) !== i) return;
       if (it.sinDireccion) sinDir++;
+      if (it.sinTutores) sinTut++;
       if (E.prep.get(it).corto) cortas++;
     });
     var res = $('et-resumen');
@@ -74,6 +75,7 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
     var lista = $('et-lista');
     if (lista) { lista.innerHTML = htmlLista(); engancharLista(); }
     var avisos = (sinDir ? '<span class="et-aviso-pie">' + sinDir + (sinDir === 1 ? ' familia sin dirección' : ' familias sin dirección') + '</span>' : '') +
+      (sinTut ? '<span class="et-aviso-pie">' + sinTut + (sinTut === 1 ? ' familia sin tutores' : ' familias sin tutores') + '</span>' : '') +
       (cortas ? '<span class="et-aviso-pie">' + cortas + (cortas === 1 ? ' etiqueta con el texto cortado' : ' etiquetas con el texto cortado') + '</span>' : '');
     $('et-pie').innerHTML =
       '<span class="et-pie-cuenta" id="et-cuenta">' + E.pag.hojas.length + (E.pag.hojas.length === 1 ? ' hoja' : ' hojas') + ' · ' + E.items.length + (E.items.length === 1 ? ' etiqueta' : ' etiquetas') + '</span>' + avisos +
@@ -302,7 +304,7 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
     cambiarModelo: function () { abrirEditorModelo(modeloActual()); },
     borrarModelo: function () { borrarModelo(modeloActual()); },
     nuevoDiseno: function () {
-      E.editor = { tipo: 'diseno', titulo: 'Nuevo diseño', diseno: { nombre: '', para: E.clase, unaPorFamilia: false, renglones: [EtiquetasDisenos.nuevoRenglon()] } };
+      E.editor = { tipo: 'diseno', titulo: 'Nuevo diseño', diseno: { nombre: '', para: E.tutores ? 'tutores' : E.clase, unaPorFamilia: !!E.tutores, renglones: [EtiquetasDisenos.nuevoRenglon()] } };
       pintar();
     },
     duplicarDiseno: function () {

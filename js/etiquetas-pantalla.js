@@ -8,7 +8,7 @@
    solo guardar un modelo o un diseño.
 
    Fila 450 (docs/ETIQUETAS-RECUERDA-TU-TRABAJO.md): el trabajo a medias se recuerda solo en este ordenador
-   (`EtiquetasGuardado.trabajo()`), cada pestaña (Alumnado, Personal) con lo suyo: `E.pest[clase]` guarda sus
+   (`EtiquetasGuardado.trabajo()`), cada pestaña (Alumnado, Personal; «Tutores legales», fila 721, comparte la de Alumnado) con lo suyo: `E.pest[clase]` guarda sus
    huecos, desmarcadas, añadidas, lista pegada y el orden en que entraron las personas; E.gastadas, E.quitadas,
    E.anadidas, E.entrada y E.pegado son los de la pestaña que se ve. Sin grupo, clase, departamento, lista pegada
    ni nadie buscado, no hay nadie elegido y la hoja sale vacía.
@@ -47,7 +47,12 @@ var EtiquetasPantalla = (function () {
     if (E.filtro && c === 'alumnado') { E.filtro.desmarcadas = E.quitadas; E.filtro.cache = null; E.filtro.cacheMarcadas = null; }
   }
 
+  /* Fila 721: «Tutores legales» es la pestaña del alumnado vista con los diseños para tutores: comparte con
+     «Alumnado» toda la selección. */
   function cambiarPestana(c) {
+    var tutores = c === 'tutores';
+    if (tutores) c = 'alumnado';
+    E.tutores = tutores;
     if (c === E.clase) return;
     guardarEnPestana();
     cargarPestana(c);
@@ -78,7 +83,7 @@ var EtiquetasPantalla = (function () {
   function guardarTrabajo() {
     if (!E.listo) return;
     guardarEnPestana();
-    var t = { v: 1, clase: E.clase, copias: E.copias };
+    var t = { v: 1, clase: E.clase, copias: E.copias, tutores: E.clase === 'alumnado' && !!E.tutores };
     CLASES.forEach(function (c) {
       var P = E.pest[c];
       t[c] = { anadidas: claves(P.anadidas), quitadas: claves(P.quitadas), entrada: P.entrada.slice(), gastadas: claves(P.gastadas), pegado: P.pegado ? P.pegado.texto : null };
@@ -122,6 +127,7 @@ var EtiquetasPantalla = (function () {
     E.personal.todo = !!pe.todo && !E.personal.clase;
     if (typeof t.copias === 'number') E.copias = Math.max(1, Math.min(50, Math.round(t.copias) || 1));
     if (t.clase === 'personal') E.clase = 'personal';
+    else E.tutores = t.tutores === true;   /* fila 721: la pestaña «Tutores legales» */
   }
 
   /* ---------- PDF e imprimir ---------- */
@@ -186,7 +192,7 @@ var EtiquetasPantalla = (function () {
     var l = $('herramientas-lista'), vista = $('etiquetas-vista');
     if (!vista) return;
     E.abierta = true; E.volverA = op.asunto ? { asunto: op.asunto, modo: op.modo || 'abierto' } : null;
-    E.listo = false; E.editor = null; E.copias = 1; E.tarjeta = ''; E.personal = { clase: '', depto: '', todo: false, lista: [] };
+    E.listo = false; E.editor = null; E.tutores = false; E.copias = 1; E.tarjeta = ''; E.personal = { clase: '', depto: '', todo: false, lista: [] };
     nuevoTrabajo(); cargarPestana('alumnado');
     var ult = EtiquetasGuardado.ultimo();
     E.modeloId = ult.modelo || null; E.disenoId = ult.diseno || null;

@@ -26,8 +26,10 @@ sin pasar por Word ni por una hoja de cálculo.
   `RepartirFiltro`, fila 342): varios criterios a la vez (todos deben cumplirse), atajos de
   unidad, nivel y enseñanza, «Pegar una lista» y la casilla de incluir antiguos. Se reutiliza; no se
   copia. Si hace falta, se expone lo necesario sin cambiar cómo funciona en el reparto.
-- Pestañas para la clase de persona: **Alumnado** (por defecto) y **Personal** (docente y no
-  docente, desde `Datos.cargarPersonal`; filtro por clase de personal y departamento).
+- Pestañas para la clase de persona: **Alumnado** (por defecto), **Tutores legales** (fila 721) y **Personal** (docente y no
+  docente, desde `Datos.cargarPersonal`; filtro por clase de personal y departamento). «Tutores legales»
+  elige al alumnado igual que «Alumnado» (misma selección, no se pierde al cambiar de pestaña) y saca una
+  etiqueta por familia dirigida a sus tutores; solo ofrece los diseños «para tutores legales».
 - Junto al filtro, «N personas · N etiquetas» (las etiquetas cuentan copias y la unión de hermanos).
 - Desde un asunto de grupo, la lista llega con sus personas; el filtro se puede seguir usando
   encima.
@@ -52,7 +54,7 @@ sin pasar por Word ni por una hoja de cálculo.
 
 ### 4. Qué lleva cada etiqueta (diseños)
 
-- La app trae tres diseños hechos:
+- La app trae cuatro diseños hechos (el cuarto, «Tutores», fila 721, va aparte, al final de esta lista):
   - **«Sobre»**: «Familia de <nombres de pila> <apellidos>» y la dirección de la casa (calle,
     número, código postal, localidad, provincia), de los datos del RegAlum. Si a la familia le falta
     la dirección, la etiqueta sale con un aviso en ámbar en la vista previa («Sin dirección») y se
@@ -69,7 +71,14 @@ sin pasar por Word ni por una hoja de cálculo.
 - Los diseños propios se guardan en `_GESTOR/etiquetas.json`, se pueden cambiar, duplicar y borrar.
   Los tres que trae la app se pueden duplicar para retocarlos, no borrar.
 
-### 5. Familias con hermanos (solo en «Sobre» y diseños marcados «Una por familia»)
+- **«Tutores»** (fila 721, solo en la pestaña «Tutores legales»): los nombres de los tutores en negrita
+  (unidos con «y»), «Tutores de Ana y Luis Pérez García» («Tutor de…» con uno solo) y la dirección de casa.
+  Salen siempre los tutores que traiga el RegAlum, tengan o no la custodia, una sola vez por familia. Sin
+  ningún tutor, la etiqueta sale igual con el aviso ámbar «Sin tutores» y el pie lo cuenta. Un diseño propio
+  puede marcarse «Tutores legales» en «Vale para» (siempre una por familia); solo sale en esa pestaña, y
+  los de «Alumnado» y «Personal» no salen en ella. Código: `js/etiquetas-tutores.js`.
+
+### 5. Familias con hermanos (solo en «Sobre», «Tutores» y diseños marcados «Una por familia»)
 
 - Con el diseño «Sobre», los hermanos que estén en la lista salen en **una sola etiqueta por
   familia**: «Familia de Ana y Luis Pérez García», con la dirección de la casa. Dos alumnos son de
@@ -81,7 +90,7 @@ sin pasar por Word ni por una hoja de cálculo.
 
 ### 6. Copias por persona
 
-- Casilla numérica «Copias por persona», 1 por defecto. Con 3, cada persona (o familia) sale tres
+- Casilla numérica «Copias por persona» («Copias por familia» en «Tutores legales»), 1 por defecto. Con 3, cada persona (o familia) sale tres
   veces seguidas.
 
 ### 7. Orden

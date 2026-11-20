@@ -8,6 +8,8 @@
    - familias(personas, indice) → grupos de hermanos (misma persona tutora y misma dirección), cada uno
      en el sitio de su primer miembro; con `indice` = PersonasFamilias.indice(lista).
    - valoresDeFamilia(grupo, ctx) → los valores de una etiqueta «por familia».
+   - Fila 721: los datos con `para: 'tutores'` y los que llevan `tutores: true` valen en los diseños para tutores
+     legales (js/etiquetas-tutores.js).
    ============================================================ */
 var EtiquetasDatos = (function () {
 
@@ -16,17 +18,19 @@ var EtiquetasDatos = (function () {
     { clave: 'nombreCompleto', texto: 'Nombre y apellidos', para: 'ambos' },
     { clave: 'nombre', texto: 'Nombre', para: 'ambos' },
     { clave: 'apellidos', texto: 'Apellidos', para: 'ambos' },
-    { clave: 'familia', texto: 'Familia de… (nombres y apellidos)', para: 'alumnado' },
-    { clave: 'unidad', texto: 'Unidad', para: 'alumnado' },
+    { clave: 'familia', texto: 'Familia de… (nombres y apellidos)', para: 'alumnado', tutores: true },
+    { clave: 'unidad', texto: 'Unidad', para: 'alumnado', tutores: true },
     { clave: 'nivel', texto: 'Nivel', para: 'alumnado' },
     { clave: 'ensenanza', texto: 'Enseñanza', para: 'alumnado' },
     { clave: 'escolar', texto: 'Nº de identificación escolar', para: 'alumnado' },
     { clave: 'nacimiento', texto: 'Fecha de nacimiento', para: 'alumnado' },
     { clave: 'tutores', texto: 'Tutores legales', para: 'alumnado' },
-    { clave: 'direccion', texto: 'Dirección (en un renglón)', para: 'alumnado' },
-    { clave: 'domicilio', texto: 'Calle y número', para: 'alumnado' },
-    { clave: 'cpLocalidad', texto: 'Código postal y localidad', para: 'alumnado' },
-    { clave: 'provincia', texto: 'Provincia', para: 'alumnado' },
+    { clave: 'tutoresNombres', texto: 'Nombres de los tutores legales', para: 'tutores' },
+    { clave: 'tutoresDe', texto: 'Tutores de… (nombres y apellidos del alumnado)', para: 'tutores' },
+    { clave: 'direccion', texto: 'Dirección (en un renglón)', para: 'alumnado', tutores: true },
+    { clave: 'domicilio', texto: 'Calle y número', para: 'alumnado', tutores: true },
+    { clave: 'cpLocalidad', texto: 'Código postal y localidad', para: 'alumnado', tutores: true },
+    { clave: 'provincia', texto: 'Provincia', para: 'alumnado', tutores: true },
     { clave: 'departamento', texto: 'Departamento (o puesto)', para: 'personal' },
     { clave: 'puesto', texto: 'Puesto', para: 'personal' },
     { clave: 'dni', texto: 'DNI', para: 'ambos' },

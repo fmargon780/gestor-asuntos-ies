@@ -2,7 +2,7 @@
    etiquetas-hoja.js — de las personas a las hojas (fila 344, docs/ETIQUETAS.md).
 
    Sin pintar nada en la pantalla salvo `vistaHtml`, que devuelve el dibujo de las hojas.
-   - construir(personas, clase, diseno, op) → [{ valores, sinDireccion, personas }]: una por persona, o una por
+   - construir(personas, clase, diseno, op) → [{ valores, sinDireccion, sinTutores, personas }]: una por persona, o una por
      familia (diseño «Una por familia»), ordenadas y con las copias seguidas. `op`: { copias, indice
      (PersonasFamilias.indice), ctx: { centro, curso }, orden, rango }. `orden` (fila 450): 'grupo' (alumnado: unidad y
      apellidos; personal: apellidos; el de siempre), 'apellidos', 'nombre' o 'marcado' (`rango(persona)` →
@@ -49,12 +49,13 @@ var EtiquetasHoja = (function () {
     var copias = Math.max(1, Math.min(50, parseInt(op.copias, 10) || 1));
     var ordenadas = personas.slice().sort(comparador(clase, op.orden, op.rango));
     var grupos;
-    if (diseno.unaPorFamilia && clase === 'alumnado' && op.indice) grupos = EtiquetasDatos.familias(ordenadas, op.indice);
+    var paraTutores = diseno.para === 'tutores';   /* fila 721: una etiqueta por familia, con los tutores */
+    if ((diseno.unaPorFamilia || paraTutores) && clase === 'alumnado' && op.indice) grupos = EtiquetasDatos.familias(ordenadas, op.indice);
     else grupos = ordenadas.map(function (p) { return [p]; });
     var items = [];
     grupos.forEach(function (g) {
-      var v = g.length > 1 ? EtiquetasDatos.valoresDeFamilia(g, clase, op.ctx) : EtiquetasDatos.valores(g[0], clase, op.ctx);
-      var it = { valores: v, sinDireccion: !!v._sinDireccion && diseno.renglones.some(function (x) { return /domicilio|direccion|cpLocalidad/.test(x.dato); }), personas: g };
+      var v = paraTutores ? EtiquetasTutores.valores(g, op.ctx) : (g.length > 1 ? EtiquetasDatos.valoresDeFamilia(g, clase, op.ctx) : EtiquetasDatos.valores(g[0], clase, op.ctx));
+      var it = { sinTutores: paraTutores && !!v._sinTutores, valores: v, sinDireccion: !!v._sinDireccion && diseno.renglones.some(function (x) { return /domicilio|direccion|cpLocalidad/.test(x.dato); }), personas: g };
       for (var k = 0; k < copias; k++) items.push(it);
     });
     return items;
@@ -106,7 +107,7 @@ var EtiquetasHoja = (function () {
           return '<div class="et-casilla et-gastada" data-casilla="' + c.i + '" style="' + estilo + '" data-ayuda-clave="casilla-gastada"></div>';
         }
         var p = c.item ? preparadas.get(c.item) : null;
-        var clases = 'et-casilla' + (c.item ? '' : ' et-libre') + (c.item && c.item.sinDireccion ? ' et-sin-direccion' : '') + (p && p.corto ? ' et-corta' : '');
+        var clases = 'et-casilla' + (c.item ? '' : ' et-libre') + (c.item && (c.item.sinDireccion || c.item.sinTutores) ? ' et-sin-direccion' : '') + (p && p.corto ? ' et-corta' : '');
         var dentro = '';
         if (p) {
           var alto = p.lineas.reduce(function (s, l) { return s + l.pt * 1.2; }, 0) * pxPt;
@@ -115,6 +116,7 @@ var EtiquetasHoja = (function () {
               return '<div class="et-linea" style="font-size:' + (l.pt * pxPt).toFixed(2) + 'px;text-align:' + (l.alinea === 'centro' ? 'center' : (l.alinea === 'der' ? 'right' : 'left')) + ';font-weight:' + (l.negrita ? 700 : 400) + '">' + esc(l.texto) + '</div>';
             }).join('') + '</div>';
           if (c.item.sinDireccion) dentro += '<span class="et-aviso">Sin dirección</span>';
+          if (c.item.sinTutores) dentro += '<span class="et-aviso et-aviso-tutores">Sin tutores</span>';
           if (p.corto) dentro += '<span class="et-aviso et-aviso-corto">No cabe</span>';
         }
         return '<div class="' + clases + '" data-casilla="' + c.i + '" style="' + estilo + '">' + dentro + '</div>';

@@ -1,11 +1,11 @@
 /* ============================================================
    etiquetas-disenos.js — qué lleva cada etiqueta (fila 344, docs/ETIQUETAS.md).
 
-   Un diseño es { id, nombre, para: 'alumnado'|'personal'|'ambos', unaPorFamilia, renglones: [renglon] }, con
+   Un diseño es { id, nombre, para: 'alumnado'|'personal'|'ambos'|'tutores', unaPorFamilia, renglones: [renglon] }, con
    renglon = { dato: <clave de EtiquetasDatos.CAMPOS> | 'texto', texto?, negrita, tamano: 'pequeno'|'normal'|'grande',
    alinea: 'izq'|'centro'|'der' }. Los tres primeros los trae la app (`integrado`): se duplican, no se borran.
 
-   - integrados() → los tres diseños de la app.   - nuevoRenglon(), limpiar(d) → un diseño propio bien formado.
+   - integrados() → los cuatro diseños de la app (fila 721: «Tutores», `para: 'tutores'`, siempre una por familia).   - nuevoRenglon(), limpiar(d) → un diseño propio bien formado.
    - Fila 350: `vertical` ('arriba' | 'centro' | 'abajo'; sin él, 'centro' como siempre) coloca el bloque de renglones entero
      dentro de la etiqueta: `inicioY(vertical, alto, total, relleno)` da dónde empieza (mismas unidades que los tres números).
    - lineas(diseno, valores) → [{ texto, negrita, pt, alinea }] sin los renglones vacíos.
@@ -29,7 +29,9 @@ var EtiquetasDisenos = (function () {
       { id: 'alumno', nombre: 'Alumno', para: 'alumnado', unaPorFamilia: false, integrado: true,
         renglones: [r('apellidosNombre', true, 'grande'), r('unidad'), r('escolar', false, 'pequeno')] },
       { id: 'profesor', nombre: 'Profesor', para: 'personal', unaPorFamilia: false, integrado: true,
-        renglones: [r('apellidosNombre', true, 'grande'), r('departamento')] }
+        renglones: [r('apellidosNombre', true, 'grande'), r('departamento')] },
+      { id: 'tutores', nombre: 'Tutores', para: 'tutores', unaPorFamilia: true, integrado: true,   /* fila 721 */
+        renglones: [r('tutoresNombres', true, 'normal'), r('tutoresDe'), r('domicilio'), r('cpLocalidad'), r('provincia')] }
     ];
   }
 
@@ -45,10 +47,10 @@ var EtiquetasDisenos = (function () {
   function nuevoRenglon() { return r('apellidosNombre', false, 'normal', 'izq'); }
 
   function limpiar(d) {
-    var para = ['alumnado', 'personal', 'ambos'].indexOf(d.para) !== -1 ? d.para : 'ambos';
+    var para = ['alumnado', 'personal', 'ambos', 'tutores'].indexOf(d.para) !== -1 ? d.para : 'ambos';
     var salida = {
       id: d.id, nombre: String(d.nombre || '').trim(), para: para,
-      unaPorFamilia: !!d.unaPorFamilia && para !== 'personal',
+      unaPorFamilia: para === 'tutores' || (!!d.unaPorFamilia && para !== 'personal'),
       renglones: (d.renglones || []).map(function (x) {
         var o = r(x.dato || 'texto', x.negrita, PT[x.tamano] ? x.tamano : 'normal', x.alinea === 'centro' || x.alinea === 'der' ? x.alinea : 'izq');
         if (o.dato === 'texto') o.texto = String(x.texto || '');

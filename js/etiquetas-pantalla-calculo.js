@@ -11,7 +11,7 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
   function pegar() { return I.pegar.apply(this, arguments); }
   function entrar() { return I.entrar.apply(this, arguments); }
 
-  var E = { abierta: false, listo: false, turno: 0, clase: 'alumnado', copias: 1, gastadas: {}, quitadas: {}, anadidas: {}, entrada: [], vistas: {}, pegado: null,
+  var E = { abierta: false, listo: false, turno: 0, clase: 'alumnado', tutores: false, copias: 1, gastadas: {}, quitadas: {}, anadidas: {}, entrada: [], vistas: {}, pegado: null,
             personal: { clase: '', depto: '', todo: false }, pest: null, orden: 'grupo', tarjeta: '',
             guardado: { modelos: [], disenos: [] }, editor: null, base: null, volverA: null, listaAbierta: false, medir: null };
   var CLASES = ['alumnado', 'personal'];
@@ -35,11 +35,13 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
     var l = modelos();
     return l.filter(function (m) { return m.id === E.modeloId; })[0] || l.filter(function (m) { return m.id === 'avery-L7160'; })[0] || l[0];
   }
-  function vale(d) { return d.para === 'ambos' || d.para === E.clase; }
+  /* Fila 721: la pestaña «Tutores legales» es la clase alumnado con los diseños para tutores (`para: 'tutores'`). */
+  function vale(d) { return E.tutores ? d.para === 'tutores' : (d.para === 'ambos' || d.para === E.clase); }
+  function disenoPorDefecto() { return E.tutores ? 'tutores' : (E.clase === 'personal' ? 'profesor' : 'alumno'); }
   function disenoActual() {
     if (E.editor && E.editor.tipo === 'diseno') return EtiquetasDisenos.limpiar(E.editor.diseno);
     var l = disenos().filter(vale);
-    return l.filter(function (d) { return d.id === E.disenoId; })[0] || l.filter(function (d) { return d.id === (E.clase === 'personal' ? 'profesor' : 'alumno'); })[0] || l[0];
+    return l.filter(function (d) { return d.id === E.disenoId; })[0] || l.filter(function (d) { return d.id === disenoPorDefecto(); })[0] || l[0];
   }
 
   /* ---------- a quién ---------- */
@@ -191,8 +193,9 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
 
   function htmlAQuien() {
     var h = '<div class="et-pestanas">' +
-      ['alumnado', 'personal'].map(function (c) {
-        return '<button type="button" class="boton et-pestana' + (E.clase === c ? ' et-activa' : '') + '" data-clase="' + c + '" data-solo-lectura>' + (c === 'alumnado' ? 'Alumnado' : 'Personal') + '</button>';
+      ['alumnado', 'tutores', 'personal'].map(function (c) {
+        var activa = c === 'tutores' ? E.tutores : (E.clase === c && !E.tutores);
+        return '<button type="button" class="boton et-pestana' + (activa ? ' et-activa' : '') + '" data-clase="' + c + '" data-solo-lectura>' + (c === 'alumnado' ? 'Alumnado' : (c === 'tutores' ? 'Tutores legales' : 'Personal')) + '</button>';
       }).join('') + '</div>';
     /* Fila 350: el buscador de personas, a partir de 3 letras, según la clase elegida. */
     h += '<div class="et-buscar-persona">' + CajaConSugerencias.html('et-buscar-persona', { placeholder: 'Buscar a una persona…' }) +
@@ -218,7 +221,7 @@ var EtiquetasPantallaNucleo = EtiquetasPantallaNucleo || {};
   function htmlPanel() {
     return '<section class="et-seccion"><h4>A quién</h4>' + htmlAQuien() + '</section>' +
       '<section class="et-seccion"><h4>Copias y hoja empezada</h4>' +
-        '<label class="etiqueta">Copias por persona <input class="campo et-copias" id="et-copias" type="number" min="1" max="50" value="' + E.copias + '" data-solo-lectura></label>' +
+        '<label class="etiqueta">Copias por ' + (E.tutores ? 'familia' : 'persona') + ' <input class="campo et-copias" id="et-copias" type="number" min="1" max="50" value="' + E.copias + '" data-solo-lectura></label>' +
         '<p class="explica">Pulsa o arrastra sobre las etiquetas ya gastadas de cualquier hoja.</p>' +
         '<button type="button" class="boton" id="et-hoja-nueva" data-solo-lectura>Quitar todos los huecos</button></section>';
   }
