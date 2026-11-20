@@ -77,7 +77,8 @@ var Documentos = (function () {
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
-    if (window.SoltarDocumento) SoltarDocumento.enganchar($('doc-cuerpo'), asunto);   /* fila 686 */
+    /* Fila 686 (devuelta, 19-nov-2026): se suelta en todo el cuadro (título, fondo, franja), no solo en el cuerpo. */
+    if (window.SoltarDocumento) SoltarDocumento.enganchar(cuadro, asunto);
     /* Fila 678: la ventana de Windows se pide en la misma pulsación, antes de
        leer la carpeta y los hitos (con Drive esa espera puede pasar del tiempo
        que el navegador da desde la pulsación y la ventana no se abría). */
@@ -118,6 +119,7 @@ var Documentos = (function () {
       }
     }
     await esperar;
+    if (window.SoltarDocumento) SoltarDocumento.desenganchar(cuadro);   /* fila 686: el cuadro se reutiliza en otros diálogos */
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
     N.hitoActual = null;
@@ -125,6 +127,7 @@ var Documentos = (function () {
     N.tipoPropuesto = '';
     N.preguntarTarea = false;
     N.colgar = false;
+    N.marcaSoltada = '';
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se
@@ -328,6 +331,13 @@ var Documentos = (function () {
   /* Fila 686 (js/soltar-documento.js): un fichero soltado. Con el cuadro de Documentos abierto,
      entra en él (si ya hay un documento a medias, avisa); si no, abre uno. Sin hito ni tarea. */
   function soltarFichero(asunto, fichero) {
+    /* Devuelta (19-nov-2026): la misma suelta llegada otra vez (mismo fichero que el del cuadro del nombre ya abierto) no avisa ni cambia nada. */
+    /* Cuarto arreglo (20-nov-2026): sin la fecha de modificación. La misma suelta llegada otra vez trae otro objeto File
+       con otra fecha y avisaba «Termina antes» sin motivo; mismo nombre y tamaño = mismo fichero. */
+    var marca = fichero.name + '|' + fichero.size;
+    var abierto = !!document.querySelector('#capa:not(.oculto) #doc-cuerpo');
+    if (abierto && N.marcaSoltada === marca) return;
+    N.marcaSoltada = marca;
     /* Al cerrar el cuadro su contenido se queda en la página, escondido: solo vale el que se ve. */
     if (document.querySelector('#capa:not(.oculto) #doc-cuerpo')) {
       if (document.querySelector('#capa:not(.oculto) #doc-guardar')) { U.aviso('Termina antes con este documento.', 'ambar'); return; }

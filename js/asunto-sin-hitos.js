@@ -175,6 +175,8 @@ var AsuntoSinHitos = (function () {
     if (marca) marca.innerHTML = '';   /* sin casilla «los cambios van también a la guía» */
     var columnas = document.getElementById('trabajo-columnas');
     if (columnas) columnas.classList.remove('con-hito');
+    /* Fila 686 (devuelta, 19-nov-2026): también en un asunto de lista de tareas se puede soltar un fichero (js/soltar-documento.js). */
+    if (window.SoltarDocumento) SoltarDocumento[abierto ? 'enganchar' : 'desenganchar'](columnas, a);
     if (window.FichaDocumentos && FichaDocumentos.marcarHito) FichaDocumentos.marcarHito(a, [], null, !!abierto);
   }
 
@@ -193,6 +195,7 @@ var AsuntoSinHitos = (function () {
         '<div class="ash-lista">' + lista.map(function (g) { return rotuloHTML(g, previoGrupo) + tareaHTML(g, a, abierto, g === siguiente); }).join('') + '</div>' +
         anadirHTML(abierto) + '</div>';
       enganchar(caja, a, h, lista, abierto);
+      if (window.SoltarDocumento && abierto) Array.prototype.forEach.call(caja.querySelectorAll('.ash-tarea'), function (el) { SoltarDocumento.enganchar(el, a); });   /* fila 686 */
     });
     /* Fila 703: los papeles que han llegado por otro camino se unen solos y las tareas de papel completas quedan hechas. */
     if (window.TareaPapel && abierto && tareasDe(a, h).some(function (g) { return g.papel; })) {

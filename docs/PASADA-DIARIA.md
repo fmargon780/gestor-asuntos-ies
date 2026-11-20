@@ -1,1 +1,1 @@
-Última pasada completa: 18-nov-2026 · 30 min · verde · commit a504654
+Última pasada completa: 19-nov-2026 23:00 · 33 min · con fallos (414 de 415; titulos-de-la-tabla-fijos falla en tanda y pasa a solas) · commit a36c90e
