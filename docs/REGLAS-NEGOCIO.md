@@ -325,3 +325,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (19-nov-2026, tema 470) **Las pruebas se hacen solo con datos inventados y casos inventados**, no con una copia de los datos reales con los nombres cambiados: «Yo no necesito que tú veas datos reales. ¿Podemos hacerlo todo con datos inventados y casos inventados?» Claude no ve nunca datos reales. Descarta la idea 496. La demostración crece (fila 711).
 - (19-nov-2026, tema 470) **Se prueba antes de pasar a producción:** «Lo que sí creo que es interesante es probar antes de pasar a la versión de producción.» Cada fila grande se publica en una dirección de prueba y espera la mirada de Claude con la extensión de Chrome (eligió «1», solo las filas grandes); las pequeñas siguen como hoy (fila 710). Es un paso atrás sobre lo del 1-oct-2026 (nada espera a su visto bueno), a propósito y solo para las filas grandes.
 - (19-nov-2026, tema 470) En la dirección de prueba la app **solo entra en demostración**: no ofrece señalar carpetas de verdad, para que una versión sin aprobar no pueda escribir en los datos reales.
+
+## Coger de «Por clasificar» desde la tarea (fila 646, 20-nov-2026)
+
+- (20-nov-2026, fila 646) En una tarea de añadir documento, además de soltar el PDF, se puede **coger un documento suelto de «Por clasificar»**: «Debería dejarme también coger el documento de la bandeja Por Clasificar.» (aviso de Francisco, 13-nov-2026). Entra en el asunto al pulsar «Guardar», como en la fila 661.
