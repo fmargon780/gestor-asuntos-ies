@@ -5877,3 +5877,8 @@ Tarea pequeña, sin segundo revisor. Pasada completa 403/403. Publicada: la web 
 | 692 | Tema: El molde nuevo del asunto sin hitos. Para qué: que un asunto sin hitos sea una lista de tareas con su panel, y que cada papel lleve su recorrido (quién lo firma, cómo se registra y cómo se envía), empezando por el primer trámite, el aula de convivencia. [orden: 1 · AHORA: es el cimiento de lo demás] | SUSTITUIDA (17-nov-2026): diseñado en las filas 698 a 707 | Plan: `docs/PLAN-2026-11.md` y `docs/notas-diseno/692.md`. Fila puesta de nuevo en la cola (19-nov-2026) porque sus partes siguen en marcha; su texto de antes está en `docs/HISTORIA.md`. |
 | 714 | Idea de Francisco (19-nov-2026, apartada de la fila 713): mudar también producción a GitHub (Pages), para abrir la app por la web en el instituto | SUSTITUIDA (20-nov-2026): diseñada en el tema 718 | apartada de la fila 713 |
 | 718 | Tema: Abrir la app desde la web de GitHub. Para qué: que la app de verdad se abra por una sola dirección, también en el instituto, para acabar con las confusiones entre direcciones y copias, tener siempre la misma versión y trabajar igual desde casa y desde el centro. [orden: 5] | SUSTITUIDA (20-nov-2026): diseñado en las filas 729 a 732 | instrucción: `docs/718-ABRIR-LA-APP-DESDE-GITHUB.md` |
+
+## Filas SUSTITUIDA sacadas de la cola (20-nov-2026, fila 736)
+
+| 371 | Aviso de usuario: mejora en «Herramientas» | SUSTITUIDA (20-nov-2026): diseñada en el tema 393 | |
+| 614 | Aviso de usuario: mejora en «Herramientas» | SUSTITUIDA (20-nov-2026): diseñada en el tema 624 | enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/17OkmORav9u1zCxL1upNDdA_kJ-iSgrWC/view?usp=drivesdk |
