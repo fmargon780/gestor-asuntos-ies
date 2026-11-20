@@ -257,6 +257,8 @@ var GuiasGuion = (function () {
       /* Fila 703: el papel de la tarea (un tipo de documento), solo en la lista de tareas de un tipo «sin hitos». */
       var papel = String((g && g.papel) || '').trim();
       if (papel) base.papel = papel;
+      /* Fila 723: una tarea de papel que nos llega queda esperando a la familia cuando se envía otro papel del asunto (js/aula-convivencia-espera.js). */
+      if (papel && g && g.esperaAlEnviar) base.esperaAlEnviar = true;
       if (g && g.comun) base.comun = String(g.comun);   /* fila 531: viene de la lista común de tareas (js/comunes.js) */
       /* Fila 138: algo que hay que reunir. */
       if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {

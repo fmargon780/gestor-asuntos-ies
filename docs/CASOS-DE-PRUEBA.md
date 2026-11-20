@@ -42,6 +42,7 @@ La descripción «CASO …» solo se ve en «⋯» → «Cambiar el asunto»; el
 | Uno del curso anterior | descripción «CASO CURSO ANTERIOR», de «Muñoz Peña, Ñusta Núñez», todavía abierto |
 | Uno vencido | descripción «CASO VENCIDO», de «Custodia Dudosa, Vera», abierto hace más de un año |
 | Grupo con datos de la lista (fila 722) | asunto «GRUPO 2ºB»: la columna «Número de título» (`{campo:Número de título}`) tiene un valor para cada una (T-26-101…) menos Vera Gallardo, que sale vacía; sin pantalla de prueba |
+| Expulsión al aula de convivencia, con su nota (fila 723) | solo con `?demo=1&auto=1&aula=1`: el tipo «EXPULSIÓN AULA CONVICENCIA» pasa a «Sin hitos» con su lista de tres tareas; «Soto Lara, Daniel» es un asunto de antes, con sus hitos; «Rubio Vega, Marina» nace con la lista, con «Primer día» (23-nov-2026) y «Días lectivos» (3) ya puestos; «Lara Pardo, Hugo» nace con los dos datos vacíos |
 | Mucha gente y mucho archivo | Inicio con decenas de asuntos; «Archivo» con tres cursos |
 
 ## Todavía sin caso (se añadirán cuando una fila los necesite)

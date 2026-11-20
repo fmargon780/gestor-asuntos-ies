@@ -95,4 +95,13 @@ Lo que Claude ha tenido que poner para que se pueda programar. No vale hasta que
 
 ## Revisión y respuestas durante el trabajo
 
-- (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- Segundo revisor (20-nov-2026, agente nuevo, navegador en local, `?demo=1&auto=1&aula=1`): APROBADA a la primera.
+  - Tipo con su lista de tres tareas y asunto viejo con sus hitos: coincide (Ajustes dice «Guía (3 tareas)», no el rótulo «Sin hitos»).
+  - «Nuevo asunto» pide «Primer día» y «Días lectivos», y salen en «Datos»: coincide.
+  - Tres tareas en su orden, sin rótulos: coincide. Nota completa con las dos hojas, sin marcas sueltas, «3 días lectivos», «lunes 23 de noviembre», «1 día lectivo» y «comenzará»: coincide.
+  - Correo a los tutores legales con la plantilla y el documento adjunto: coincide, con reservas: no pudo ver dos tutores (la demo trae un correo) y lo adjunto es el Word, no un PDF (en la demo no hay PDF sellado).
+  - Tras enviar, «Recibir la parte firmada» queda «Esperando a Familia · volver a mirarlo el 23-nov»: coincide. «Grabar en Séneca» a mano con quién y día: coincide. Consola sin errores: coincide.
+- **No se hace (no cabe en los mecanismos actuales):** la tarea «Nota a la familia» en amarillo con «Falta: Primer día» y «Falta: Días lectivos». Hoy esos datos salen en «Faltan datos» al generar la nota. Hacerlo pide un mecanismo nuevo (datos de fecha y número rellenables desde la tarea): idea aparte.
+- **Para Claude, lo que hizo la app sin pedirlo el texto:** la espera de «Recibir…» al enviar la nota usa un flag `esperaAlEnviar` en la tarea de la guía (`js/papel-espera-recibir.js`), sin pantalla para ponerlo: solo lo lleva esta guía. El generador de `.docx` admite `===` (salto de página) y las plantillas de correo `adjuntar`.
+- Observaciones del revisor: el compromiso lleva «Alhaurín el Grande» fijo (como en el escaneo; la primera hoja usa el lugar del centro); «Poner a la firma» dice «jefatura-estudios» en la demo porque no hay cargo puesto (con el cargo de verdad sale su nombre); «Registrar» y el envío real quedan para el instituto (`docs/COMPROBAR-A-MANO.md`). Con un tutor sin nombre en los datos, «D./Dña. ___» queda en blanco y la app avisa.
+- Pasada completa: 417 de 417. `plantillas/indice.json` se editó a mano (solo las dos entradas nuevas): regenerarlo con `scripts/hacer-plantillas.mjs` cambiaría `CERTIFICADO`→`CERTIFICACION` en una plantilla vieja (de la fila 698), pendiente de revisar.

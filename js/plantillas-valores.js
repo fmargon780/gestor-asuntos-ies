@@ -305,6 +305,7 @@
     valores['tipo de documento'] = docOp.tipo || '';
     valores['fecha del documento'] = /^\d{4}-\d{2}-\d{2}$/.test(docOp.fecha || '') ? U.fechaLegible(U.aAaMmDd(docOp.fecha)) : '';
     valores['numero del documento'] = docOp.numero || '';
+    if (window.AulaConvivenciaTexto) AulaConvivenciaTexto.poner(valores);   /* fila 723: {{PRIMER DÍA}}, {{DURACIÓN}} y {{COMENZARÁN}} */
     /* Fila 238: sin documento en el tercero, el campo «DNI para el certificado». */
     if (!valores.dni) {
       Object.keys(valores.campos || {}).forEach(function (k) {

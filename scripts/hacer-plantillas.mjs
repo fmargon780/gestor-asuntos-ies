@@ -203,6 +203,8 @@ function parrafoLineaGruesa() {
    su propio párrafo. */
 function parrafosDeBloque(bloque) {
   if (bloque.trim() === '---') return parrafoLineaGruesa();
+  /* Fila 723: `===` solo en su bloque = salto de página (la nota del aula de convivencia lleva el compromiso en la segunda hoja). */
+  if (bloque.trim() === '===') return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
   /* Fila 124: un bloque que solo lleva `~` es un párrafo vacío, para
      dejar aire entre dos apartados sin tocar el estilo de las demás. */
   if (bloque.trim() === '~') return '<w:p/>';
@@ -245,7 +247,7 @@ function documentoXmlDe(cuerpoMd) {
 function textoPlanoDe(cuerpoMd) {
   const bloques = cuerpoMd.replace(/\r\n/g, '\n').split(/\n\s*\n+/).map((b) => b.trim()).filter(Boolean);
   return bloques.map((bloque) => {
-    if (bloque.trim() === '---' || bloque.trim() === '~') return '';
+    if (bloque.trim() === '---' || bloque.trim() === '~' || bloque.trim() === '===') return '';
     return bloque.split('\n').map((l) => l.trim())
       .map((l) => l.replace(/^#{1,2}\s+/, '').replace(/^-\s+/, '• ').replace(/^>\s?/, '').replace(/\*\*|\^\^/g, ''))
       .filter(Boolean).join('\n');
@@ -345,6 +347,7 @@ async function main() {
       if (datos.id) entrada.id = datos.id;   /* fila 592: un id fijo también en el correo, para que una tarea de comunicar lo cite */
       if (datos.para) entrada.para = datos.para.split(',').map((x) => x.trim()).filter(Boolean);   /* fila 592: a quién propone (papeles de la fila 555) */
       if (datos.saludo) entrada.saludo = datos.saludo;
+      if (datos.adjuntar) entrada.adjuntar = datos.adjuntar;   /* fila 723: «Adjuntar solo» este tipo de documento (js/plantilla-adjuntar.js) */
       entrada.cuerpo = textoPlanoDe(partes[0]);
       if (partes.length > 1 && partes.slice(1).join('\n').trim()) {
         entrada.cuerpoSeneca = textoPlanoDe(partes.slice(1).join('\n'));

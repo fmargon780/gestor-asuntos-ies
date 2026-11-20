@@ -731,5 +731,29 @@
     "texto": "peticion historial",
     "firmante": "secretaria",
     "vistoBueno": ""
+  },
+  {
+    "nombre": "Nota a la familia sobre el aula de convivencia",
+    "categoria": "ALUMNADO",
+    "tipo": "EXPULSIÓN AULA CONVICENCIA",
+    "clase": "documento",
+    "id": "pd-aula-nota",
+    "fichero": "nota-aula-convivencia.docx",
+    "tipoDocumento": "NOTA AULA CONVIVENCIA",
+    "texto": "nota",
+    "firmante": "jefatura-estudios",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Nota a la familia sobre el aula de convivencia (correo)",
+    "categoria": "ALUMNADO",
+    "tipo": "EXPULSIÓN AULA CONVICENCIA",
+    "clase": "correo",
+    "id": "pl-aula-nota-correo",
+    "para": [
+      "legales"
+    ],
+    "adjuntar": "NOTA AULA CONVIVENCIA",
+    "cuerpo": "Les enviamos la nota informativa del instituto sobre la atención de {{NOMBRE NATURAL}} en el aula de convivencia, junto con el compromiso de seguimiento.\n\nLes pedimos que devuelvan firmada la parte inferior de la nota, y el compromiso, en Jefatura de Estudios."
   }
 ]

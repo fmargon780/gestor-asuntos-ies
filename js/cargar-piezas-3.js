@@ -265,6 +265,10 @@
     // Fila 698: la ventana «Recorrido» del tipo de documento y la pasada que pone de acuerdo los tipos. Después de js/ajustes-centro.js y js/plantillas.js.
     'js/recorrido-tipo-ventana.js',
     'js/recorrido-tipo-acuerdo.js',
+    // Fila 723: la guía de «EXPULSIÓN AULA CONVICENCIA» (nota a la familia y su seguimiento) y la espera tras enviar un papel. Después de js/baja-matricula.js, js/recorrido-tipo.js y js/tarea-papel.js.
+    'js/aula-convivencia-texto.js',
+    'js/aula-convivencia.js',
+    'js/papel-espera-recibir.js',
     // Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js.
     'js/actividades.js',
     'js/actividades-formulario.js',

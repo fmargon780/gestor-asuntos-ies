@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '723', fecha: '2026-11-20', texto: 'Los asuntos nuevos de «Expulsión al aula de convivencia» llevan ya su lista de tareas: preparar la nota a la familia (con el primer día y los días lectivos que se piden al crear el asunto), recibir la parte firmada y el compromiso, y grabar la medida en Séneca. Al enviar la nota, la tarea de recibirla queda esperando a la familia y te avisa el día de volver a mirarla.' },
   { id: '722', fecha: '2026-11-20', texto: 'Al pegar la lista para formar un grupo, si lleva cabecera, las demás columnas (un número, una fecha, una nota) se guardan en el asunto: el cuadro dice cuáles, y en las plantillas de documento y de correo aparecen en el grupo «De la lista del asunto», con un valor distinto para cada persona.' },
   { id: '721', fecha: '2026-11-20', texto: 'En Etiquetas, la nueva pestaña «Tutores legales» saca una etiqueta por familia con los nombres de los tutores y la dirección de casa; si un alumno no tiene tutores, sale con el aviso «Sin tutores».' },
   { id: '717', fecha: '2026-11-19', texto: 'Al enviar un correo desde un asunto cuyo tercero es una administración, «Para» sale ya con su correo: el del departamento del asunto o, si no tiene, el general de la administración.' },

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "fuente": "docs/723-AULA-CONVIVENCIA-NOTA-Y-SEGUIMIENTO.md (20-nov-2026). Lo pone al día js/aula-convivencia.js una vez, al entrar; los textos de las plantillas están en plantillas/*.md (tipo «EXPULSIÓN AULA CONVICENCIA»).",
+  "tipo": { "nombre": "EXPULSIÓN AULA CONVICENCIA", "alias": ["EXPULSIÓN CASA"], "categoria": "ALUMNADO", "indice": "EXPULSIÓN AULA CONVICENCIA" },
+  "campos": [
+    { "nombre": "Primer día", "clase": "fecha", "valores": [] },
+    { "nombre": "Días lectivos", "clase": "numero", "valores": [] }
+  ],
+  "tiposDocumento": [
+    { "nombre": "NOTA AULA CONVIVENCIA", "recorrido": { "entra": false, "firma": "Jefatura de Estudios", "registro": true, "envia": true, "aquien": "Familia", "via": "Correo electrónico" } },
+    { "nombre": "FIRMADO AULA CONVIVENCIA", "recorrido": { "entra": true, "registro": false } }
+  ],
+  "tareas": [
+    { "id": "ac-nota", "texto": "Nota a la familia", "papel": "NOTA AULA CONVIVENCIA",
+      "comoSeHace": "Se genera con los dos datos del asunto (primer día y días lectivos). La firma Jefatura de Estudios, en papel y con sello; se escanea, se registra de salida y se envía por correo a los tutores legales con el PDF registrado." },
+    { "id": "ac-recibir", "texto": "Recibir la parte firmada y el compromiso", "papel": "FIRMADO AULA CONVIVENCIA", "esperaAlEnviar": true,
+      "comoSeHace": "La familia devuelve en Jefatura de Estudios la parte de abajo de la nota firmada y el compromiso. Al enviar la nota, la tarea queda esperando a la familia; cuando llegue el día, el asunto vuelve a «En Administración»." },
+    { "id": "ac-seneca", "texto": "Grabar en Séneca la medida, con los días y las fechas",
+      "comoSeHace": "Se marca a mano. Francisco aún está averiguando qué se graba." }
+  ]
+}

@@ -589,6 +589,8 @@ formulario: no es el mismo muro, y no se ha tocado.
 
 Se comprueba con `pruebas/plantillas-huecos.mjs`, en navegador de verdad.
 
+- (20-nov-2026, fila 723) Huecos nuevos `{{PRIMER DÍA}}`, `{{DURACIÓN}}` y `{{COMENZARÁN}}` (`js/aula-convivencia-texto.js`, llamado desde `valoresDeAsunto`): salen de los datos «Primer día» y «Días lectivos» del tipo «EXPULSIÓN AULA CONVICENCIA» («lunes 23 de noviembre», «3 días lectivos» / «1 día lectivo», «comenzarán» / «comenzará»); sin dato, vacíos y «Faltan datos» los nombra. Una plantilla de correo puede llevar `adjuntar:` (el tipo de documento) en su frontmatter y en `plantillas/indice.json`, y `scripts/hacer-plantillas.mjs` admite `===` solo en un bloque como salto de página.
+
 ### Leer los adjuntos de un correo de la bandeja (18-sep-2026, fila 49,
 ### docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md)
 

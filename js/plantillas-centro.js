@@ -83,6 +83,7 @@
         if (e.cuerpoSeneca) nuevo.textoSeneca = e.cuerpoSeneca;
         if (e.para && e.para.length) nuevo.para = e.para.slice();   /* fila 592 (papeles, fila 555) */
         if (e.saludo) nuevo.saludo = e.saludo;
+        if (e.adjuntar) nuevo.adjuntar = e.adjuntar;   /* fila 723: «Adjuntar solo» este tipo de documento */
         nuevosCorreo.push(nuevo);
       }
     }
