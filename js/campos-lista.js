@@ -29,6 +29,7 @@
 var CamposLista = (function () {
 
   var GRUPOS = ['Persona', 'Tutores', 'Asunto', 'Centro', 'Firmantes'];
+  var GRUPO_LISTA = 'De la lista del asunto';   /* fila 722: las columnas de la lista pegada para formar el grupo */
   var ORIGENES = ['Centro de datos', 'El asunto', 'Ajustes del centro', 'Tabla de datos', 'Calculado', 'Manual'];
   var CLASES_PERSONA = { ALUMNADO: 'alumnado', PERSONAL: 'personal', EMPRESAS: 'empresas', OTROS: 'otros' };
   var AL = ['ALUMNADO'];
@@ -244,6 +245,14 @@ var CamposLista = (function () {
 
   function sirveParaClase(c, categoria) { return !c.clases.length || !categoria || c.clases.indexOf(categoria) !== -1; }
 
+  /* Fila 722: un campo por cada columna guardada de la lista de un asunto de grupo (`{campo:Columna}`). */
+  function deLista(columnas) {
+    return (columnas || []).map(function (c) {
+      return { id: 'l:' + c, nombre: c, grupo: GRUPO_LISTA, origen: 'El asunto', tabla: 'Lista pegada del grupo', columna: c,
+        marca: marcaDeCampo(c), clases: [], usos: [], dondeSePide: [], dondeDetalle: [], enTipos: 0 };
+    });
+  }
+
   function buscar(lista, texto, grupo, origenOTabla) {
     var q = norm(texto);
     return lista.filter(function (c) {
@@ -254,7 +263,7 @@ var CamposLista = (function () {
   }
 
   return {
-    GRUPOS: GRUPOS, ORIGENES: ORIGENES, CLASES_PERSONA: CLASES_PERSONA,
+    GRUPOS: GRUPOS, GRUPO_LISTA: GRUPO_LISTA, deLista: deLista, ORIGENES: ORIGENES, CLASES_PERSONA: CLASES_PERSONA,
     reunir: reunir, textoDonde: textoDonde, sePuedeQuitar: sePuedeQuitar, dondeSePide: dondeSePide, camino: camino, rutaCorta: rutaCorta,
     sirveParaClase: sirveParaClase, buscar: buscar, marcaDeCampo: marcaDeCampo
   };

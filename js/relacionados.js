@@ -348,7 +348,10 @@ var Relacionados = (function () {
   }
 
   async function agregarVarios(a) {
-    var marcados = await abrirAnadirRelacionados();
+    var datosLista = null;   /* fila 722: las columnas de una lista pegada, para un asunto de grupo */
+    var marcados = await abrirAnadirRelacionados({ alSenalar: function (tipo, valor, lista, datos) {
+      if (datos && datos.columnas && datos.columnas.length && window.DatosDeLista) datosLista = DatosDeLista.unirPegadas(datosLista, datos);
+    } });
     if (!marcados || !marcados.length) return false;
 
     var categoriaPrincipal = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
@@ -368,6 +371,10 @@ var Relacionados = (function () {
       return false;
     }
 
+    if (datosLista) {
+      try { await DatosDeLista.poner(a.nombre, DatosDeLista.soloDe(datosLista, marcados)); }
+      catch (e5) { U.accesorio('Las personas están añadidas, pero no he podido guardar las columnas de la lista', e5); }
+    }
     var partes = [resultado.anadidos + (resultado.anadidos === 1 ? ' añadido' : ' añadidos')];
     if (resultado.yaEstaban) partes.push(resultado.yaEstaban + ' ya estaban');
     if (resultado.esPropio) partes.push(resultado.esPropio + ' era el propio tercero');

@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '722', fecha: '2026-11-20', texto: 'Al pegar la lista para formar un grupo, si lleva cabecera, las demás columnas (un número, una fecha, una nota) se guardan en el asunto: el cuadro dice cuáles, y en las plantillas de documento y de correo aparecen en el grupo «De la lista del asunto», con un valor distinto para cada persona.' },
   { id: '721', fecha: '2026-11-20', texto: 'En Etiquetas, la nueva pestaña «Tutores legales» saca una etiqueta por familia con los nombres de los tutores y la dirección de casa; si un alumno no tiene tutores, sale con el aviso «Sin tutores».' },
   { id: '717', fecha: '2026-11-19', texto: 'Al enviar un correo desde un asunto cuyo tercero es una administración, «Para» sale ya con su correo: el del departamento del asunto o, si no tiene, el general de la administración.' },
   { id: '706', fecha: '2026-11-19', texto: 'En la guía de un tipo que es una lista de tareas hay un botón «+ Añadir rótulo»: una línea que nombra el grupo de tareas que tiene debajo («Recibir la petición», «Resolver», «Avisar y cerrar»). Se sube, se baja y se quita como una tarea. En el asunto, el rótulo sale en una banda de color con una raya a la izquierda y las tareas de debajo van un poco metidas; no tiene casilla ni cuenta como tarea. Los rótulos se ponen solo en la guía.' },

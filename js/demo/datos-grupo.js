@@ -7,6 +7,7 @@
    carpeta: el de la tercera persona (Bruno) trae su «Ref.» escrita y se coloca solo; el otro no trae ninguna y sale en
    «PDF sellados sin colocar».
    Fila 295: y dos personas más (Sara y Vera) con su PDF registrado y sin enviar; con Bruno, tres sin enviar, y una (Vera) sin correo.
+   Fila 722: con una columna de la lista pegada, «Número de título» (`{campo:Número de título}`), para todas menos Vera.
    Todo inventado. Lo llama js/demo/datos.js al montar los asuntos.
    ============================================================ */
 (function () {
@@ -30,6 +31,11 @@
       abiertoEl: o.hace(8) + 'T09:00:00.000Z',
       datos: { grupo: { nombre: nombreGrupo, origen: 'unidad', creado: o.hace(8) + 'T09:00:00.000Z' }, relacionados: personas, registroPorPersona: true }
     });
+    /* Fila 722: una columna de la lista pegada, «Número de título», con su valor para cada una menos Vera (así se ve el hueco). */
+    if (window.DatosDeLista) {
+      var delaLista = { columnas: ['Número de título'], personas: personas.slice(0, -1).map(function (p, k) { return { categoria: p.categoria, nombre: p.nombre, datos: { 'Número de título': 'T-26-' + String(101 + k) } }; }) };
+      await DatosDeLista.poner(clave, delaLista);
+    }
     var datosPlantillas = await Plantillas.cargar(App.E.gestor);
     var plantilla = (datosPlantillas.documentos || []).filter(function (d) { return d.nombre === 'Certificado de notas'; })[0];
     if (!plantilla) return;

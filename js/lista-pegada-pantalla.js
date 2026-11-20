@@ -34,6 +34,21 @@
     return LP.deFilas(Datos.aTabla(texto).filas);
   };
 
+  /* Fila 722: lo que el cuadro dice de las columnas de la cabecera. */
+  LP.textoDeColumnas = function (m) {
+    if (!m.cabecera) return 'Sin cabecera no se guardan columnas.';
+    if (!m.columnas.length) return 'La cabecera no trae columnas de datos que guardar.';
+    return 'Se guardan estas columnas: ' + m.columnas.join(', ') + '.' +
+      (m.repetidas.length ? ' Repetida' + (m.repetidas.length === 1 ? '' : 's') + ', se ignora' + (m.repetidas.length === 1 ? '' : 'n') + ': ' + m.repetidas.join(', ') + '.' : '');
+  };
+
+  /* Lo que se manda a quien forma el grupo: las columnas y, de cada persona señalada, sus valores. */
+  LP.datosParaGuardar = function (columnas, elegidas) {
+    return { columnas: (columnas || []).slice(), personas: (columnas || []).length ? elegidas.map(function (e) {
+      return { categoria: e.categoria, nombre: e.nombre, datos: e.datos || {} };
+    }) : [] };
+  };
+
   function opcionesDeCategoria(actual) {
     return Nombres.CATEGORIAS.map(function (c) {
       return '<option value="' + U.escapar(c) + '"' + (c === actual ? ' selected' : '') + '>' + U.escapar(c) + '</option>';
@@ -99,7 +114,7 @@
       var r = LP.reconocer(texto.value, await personasDe(categoria), categoria);
       modelo = {
         enc: r.encontradas.map(function (e) { return Object.assign({ marcada: true }, e); }),
-        dud: r.dudosas, no: r.noEncontradas.slice(), cabecera: r.cabecera
+        dud: r.dudosas, no: r.noEncontradas.slice(), cabecera: r.cabecera, columnas: r.columnas || [], repetidas: r.repetidas || []
       };
       sustituir = null;
       pintar();
@@ -110,7 +125,7 @@
     function elegir(i, c) {
       var d = modelo.dud.splice(i, 1)[0];
       if (c && !modelo.enc.some(function (e) { return e.persona === c.persona; })) {
-        modelo.enc.push({ marcada: true, linea: d.linea, categoria: c.categoria, nombre: c.nombre, persona: c.persona });
+        modelo.enc.push({ marcada: true, linea: d.linea, categoria: c.categoria, nombre: c.nombre, persona: c.persona, datos: d.datos || {} });
       }
       if (!c) modelo.no.push(d.linea);
       pintar();
@@ -121,6 +136,7 @@
       var h = '';
       if (modelo.cabecera) h += '<p class="nota">La primera línea («' + U.escapar(modelo.cabecera) + '») es una cabecera: no cuenta.</p>';
 
+      h += '<p class="nota lp-columnas">' + U.escapar(LP.textoDeColumnas(modelo)) + '</p>';   /* fila 722 */
       h += '<div class="lp-apartado lp-ok"><h4>Reconocidas (' + modelo.enc.length + ')</h4>';
       h += modelo.enc.map(function (e, i) {
         return '<label class="lp-fila-persona"><input type="checkbox" class="lp-marca" data-i="' + i + '"' + (e.marcada ? ' checked' : '') + '>' +
@@ -204,7 +220,7 @@
         catch (e) { U.aviso('No he podido guardar el grupo: ' + U.mensajeDeError(e), 'malo'); return; }
         if (window.App && App.pintarGruposPersonas) { try { App.pintarGruposPersonas(); } catch (e2) { /* Ajustes aún no está pintado */ } }
       }
-      if (o.alSenalar) o.alSenalar('lista', nombreGrupo, elegidas.map(function (e) { return e.persona; }));
+      if (o.alSenalar) o.alSenalar('lista', nombreGrupo, elegidas.map(function (e) { return e.persona; }), LP.datosParaGuardar(modelo.columnas, elegidas));
       o.marcar(elegidas.map(function (e) { return { categoria: e.categoria, nombre: e.nombre, persona: e.persona }; }));
       if (modelo.dud.length) U.aviso((modelo.dud.length === 1 ? 'Una se ha quedado fuera' : modelo.dud.length + ' se han quedado fuera') + ': había que elegir.', 'malo');
       cerrar();

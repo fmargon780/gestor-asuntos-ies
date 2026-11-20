@@ -17,13 +17,16 @@
 
    Se monta un índice por número, por documento y por nombre una sola
    vez por llamada: nada de recorrer la lista entera por cada línea.
-   Lo pegado no se guarda ni se apunta en ningún sitio. El cuadro con
+   Fila 722: con cabecera, `columnas` (las de datos, sin la que reconoce a la persona) y, en cada
+   encontrada o dudosa, `datos` ({ columna: valor }). El guardado está en js/datos-de-lista.js.
+   Lo pegado no se guarda ni se apunta aquí. El cuadro con
    sus tres apartados está en js/lista-pegada-pantalla.js.
    ============================================================ */
 var ListaPegada = (function () {
 
   var MAX_CANDIDATAS = 5;
   var RE_CABECERA = /nombre|alumn|apellid|\bdni\b|\bnie\b|\bnif\b|document|identific|escolar|\bid\b|^n[º°o.]?$|^num/;
+  var RE_RECONOCE = /nombre|alumn|apellid|\bdni\b|\bnie\b|\bnif\b|document|identific|escolar|\bid\b|^n[º°o.]?$/;   /* fila 722: las columnas que sirven para reconocer a la persona, no son datos */
   var RE_COLUMNA_DOC = /(^|\s)(dni|nie|nif|documento)/;
   var RE_DE_TUTOR = /tutor|padre|madre|responsable/;
 
@@ -41,7 +44,8 @@ var ListaPegada = (function () {
     else if (lineas.some(function (l) { return l.indexOf(';') !== -1; })) sep = ';';
     return lineas.map(function (l) {
       var celdas = (sep ? l.split(sep) : [l]).map(sinComillas);
-      return { linea: l.replace(/\t+/g, ' · ').trim(), celdas: celdas.filter(function (c) { return c; }) };
+      /* `crudas`: las celdas en su sitio, con las vacías (fila 722: cada valor va bajo su columna). */
+      return { linea: l.replace(/\t+/g, ' · ').trim(), celdas: celdas.filter(function (c) { return c; }), crudas: celdas };
     }).filter(function (f) { return f.celdas.length; });
   }
 
@@ -152,6 +156,32 @@ var ListaPegada = (function () {
     return celdas.some(function (c) { return RE_CABECERA.test(U.normalizar(c)); });
   }
 
+  /* Fila 722: las columnas de datos de la cabecera. No cuentan las que sirven para reconocer a la persona (nombre,
+     Nº escolar, DNI…) ni las vacías; si un nombre se repite (sin tildes ni mayúsculas) vale la primera y la otra
+     va a `repetidas`. Devuelve [{ indice, nombre }] y las repetidas. */
+  function columnasDe(crudas) {
+    var columnas = [], repetidas = [], vistas = {};
+    (crudas || []).forEach(function (c, i) {
+      var nombre = String(c || '').trim();
+      if (!nombre || RE_RECONOCE.test(U.normalizar(nombre))) return;
+      var k = U.normalizar(nombre);
+      if (vistas[k]) { repetidas.push(nombre); return; }
+      vistas[k] = true;
+      columnas.push({ indice: i, nombre: nombre });
+    });
+    return { columnas: columnas, repetidas: repetidas };
+  }
+
+  /* Lo que lleva una línea bajo cada columna (solo lo que no está vacío). */
+  function datosDe(fila, columnas) {
+    var datos = {};
+    columnas.forEach(function (c) {
+      var v = String((fila.crudas || [])[c.indice] || '').trim();
+      if (v) datos[c.nombre] = v;
+    });
+    return datos;
+  }
+
   function categoriasDe(personasPorCategoria, categoria) {
     if (categoria && categoria !== 'TODAS') return [categoria];
     return Object.keys(personasPorCategoria || {});
@@ -160,8 +190,14 @@ var ListaPegada = (function () {
   function reconocer(texto, personasPorCategoria, categoria) {
     var ix = indexar(personasPorCategoria, categoriasDe(personasPorCategoria, categoria));
     var filas = partir(texto);
-    var salida = { encontradas: [], dudosas: [], noEncontradas: [], cabecera: '' };
+    var salida = { encontradas: [], dudosas: [], noEncontradas: [], cabecera: '', columnas: [], repetidas: [] };
     var vistas = [];
+    var columnas = [];
+    if (filas.length && esCabecera(filas[0].celdas) && !pasos(filas[0].celdas, ix).some(function (e) { var r = e(); return r.vivos.length || r.antiguos.length; })) {
+      var c = columnasDe(filas[0].crudas);
+      columnas = c.columnas; salida.repetidas = c.repetidas;
+      salida.columnas = columnas.map(function (x) { return x.nombre; });
+    }
     filas.forEach(function (fila, n) {
       var unica = null, ambiguas = null, antiguas = null;
       var etapas = pasos(fila.celdas, ix);
@@ -174,12 +210,12 @@ var ListaPegada = (function () {
       if (unica) {
         if (vistas.indexOf(unica) !== -1) return;   /* repetida: entra una sola vez */
         vistas.push(unica);
-        salida.encontradas.push({ linea: fila.linea, categoria: unica.categoria, nombre: textoDe(unica), persona: unica });
+        salida.encontradas.push({ linea: fila.linea, categoria: unica.categoria, nombre: textoDe(unica), persona: unica, datos: datosDe(fila, columnas) });
       } else if (ambiguas) {
-        salida.dudosas.push({ linea: fila.linea, motivo: 'Hay más de una con ese dato.',
+        salida.dudosas.push({ linea: fila.linea, motivo: 'Hay más de una con ese dato.', datos: datosDe(fila, columnas),
           candidatas: ambiguas.slice(0, MAX_CANDIDATAS).map(candidata) });
       } else if (antiguas) {
-        salida.dudosas.push({ linea: fila.linea, motivo: 'No está matriculada este curso.',
+        salida.dudosas.push({ linea: fila.linea, motivo: 'No está matriculada este curso.', datos: datosDe(fila, columnas),
           candidatas: antiguas.slice(0, MAX_CANDIDATAS).map(candidata) });
       } else if (n === 0 && esCabecera(fila.celdas)) {
         salida.cabecera = fila.linea;   /* la primera línea es una cabecera: ni persona ni «no encontrada» */

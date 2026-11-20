@@ -146,6 +146,7 @@
     'js/relacionados-ficha.js',
     'js/relacionados-archivar.js',
     'js/asunto-de-grupo.js',
+    'js/datos-de-lista.js',   // fila 722: las columnas de la lista pegada, por persona (después de js/puente.js)
     'js/personas-del-grupo.js',
     'js/personas-del-grupo-ficha.js',
     'js/grupo-generar.js',   // fila 294
