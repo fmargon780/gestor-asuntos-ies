@@ -329,3 +329,8 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## Coger de «Por clasificar» desde la tarea (fila 646, 20-nov-2026)
 
 - (20-nov-2026, fila 646) En una tarea de añadir documento, además de soltar el PDF, se puede **coger un documento suelto de «Por clasificar»**: «Debería dejarme también coger el documento de la bandeja Por Clasificar.» (aviso de Francisco, 13-nov-2026). Entra en el asunto al pulsar «Guardar», como en la fila 661.
+
+## Etiquetas para los tutores legales (tema 624, 20-nov-2026)
+
+- (20-nov-2026, tema 624) En Etiquetas, «A quién» tiene una pestaña **«Tutores legales»** entre Alumnado y Personal: se elige al alumnado como siempre y la etiqueta va a sus tutores, **una por familia** (los hermanos con los mismos tutores y dirección, juntos), con los nombres de los dos tutores, «Tutores de…» y la dirección de casa del alumno. Origen: aviso de Diego del 11-nov-2026 («añadir en A quien los tutores o representantes legales del alumno o alumna»). Francisco: «Sí, está bien.»
+- (20-nov-2026, fila 721) Salen siempre los dos tutores, tenga o no la custodia; sin tutores, la etiqueta sale con el aviso «Sin tutores»; no hay un sobre aparte para cada tutor. Francisco, a la instrucción: «Está bien».
