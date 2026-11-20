@@ -339,3 +339,9 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 
 - (20-nov-2026, tema 393) Un asunto de grupo hace, para cada persona, **su documento (plantilla de documento) y su correo (plantilla de correo) con ese documento adjunto**, y vale para cualquier tipo de asunto, no solo para uno. Francisco: «no quisiera desarrollar algo concreto, útil solo para estos casos, si no algo general».
 - (20-nov-2026, fila 722) **Un dato distinto para cada persona viene de las columnas de la lista que se pega para formar el grupo** (con cabecera en la primera línea); se guardan en el asunto y se usan como cualquier otro dato en el documento y en el correo. Francisco: «Es posible que esos datos estuvieran en algún listado relativo al asunto que podríamos incorporar»; eligió hacerlo en este tema («1»). «Un valor por dato y asunto» sigue valiendo; en un asunto de grupo se añade un valor por persona.
+
+## Aula de convivencia (tema 581, 20-nov-2026)
+
+- (20-nov-2026, tema 581) **La nota a la familia del aula de convivencia la prepara Administración con la app** (nota y compromiso en un Word); la firma el Jefe de Estudios, se registra de salida y se envía por correo a los tutores legales. La parte de abajo y el compromiso vuelven firmados a Jefatura de Estudios.
+- (20-nov-2026, tema 581) **Cada alumno expulsado al aula de convivencia tiene su propio asunto** (no un asunto de grupo), creados todos de una vez pegando el aviso de la intranet. Los alumnos y las fechas salen del aviso de la intranet, no del correo que avisa.
+- (20-nov-2026, tema 581) **Grabar la medida en Séneca** es una tarea de la guía, a mano; Francisco averiguará qué hay que grabar.
