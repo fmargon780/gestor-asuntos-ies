@@ -17,10 +17,11 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 
 - Llegar a ser el sistema de gestión de Secretaría: cualquier trámite cabe en la app, y cada dato se escribe una sola vez y se usa en todas partes. Más adelante, quizá abierta al claustro.
 - No depender de una nube concreta: preparada para cambiar de Dropbox a otra.
+- Una sola dirección para abrir la app, también en el instituto, y la misma versión en casa y en el centro (Francisco, 20-nov-2026).
 - Menos trabajo a mano: la app reconoce lo que llega y propone dónde va.
 - Que los directivos sigan los asuntos por sí mismos, sin preguntar a Secretaría.
 - Rápida y fiable: lo de cada día va al momento, y nada de lo que se guarda se pierde.
 - Un sistema de trabajo lo más completo posible, que sirva de guía también a quien no es experto: procesos fluidos, intuitivos y explicados, que pueda seguir personal no acostumbrado a ellos, como interinos o miembros del equipo directivo (Francisco, 14-nov-2026).
 - Plan en marcha desde el 17-nov-2026 (`docs/PLAN-2026-11.md`): un solo molde para todo, el asunto como lista de tareas con un panel que informa («en las tareas se hace, en los hitos se informa»); una guía por tipo; trabajar y diseñar, separados. Después, sin fecha: que cada papel lleve su recorrido y que el estado salga de las pruebas.
 
-Última reflexión: 19-nov-2026
+Última reflexión: 20-nov-2026
