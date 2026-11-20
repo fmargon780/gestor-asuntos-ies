@@ -1,0 +1,14 @@
+/* Fila 724: «Crear varios desde una lista» (js/aula-aviso-pantalla.js). */
+.aa-sitio { margin: 0 0 12px; }
+.aa-cuadro { margin-top: 10px; }
+.aa-fila { border: 1px solid var(--linea); border-radius: var(--radio); padding: 8px 10px; margin-top: 8px; }
+.aa-fila.aa-amarilla { background: var(--ambar); border-color: var(--ambar-linea); }
+.aa-fila.aa-gris { background: #f1f1f1; color: var(--tinta-suave); }
+.aa-cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.aa-quien { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.aa-ya { font-weight: 600; font-size: 13px; }
+.aa-datos { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 6px; align-items: center; }
+.aa-datos label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.aa-aviso { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 13px; }
+.aa-buscar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.aa-buscar .campo { flex: 1 1 180px; }

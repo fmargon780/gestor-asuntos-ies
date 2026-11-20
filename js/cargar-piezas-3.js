@@ -268,6 +268,9 @@
     // Fila 723: la guía de «EXPULSIÓN AULA CONVICENCIA» (nota a la familia y su seguimiento) y la espera tras enviar un papel. Después de js/baja-matricula.js, js/recorrido-tipo.js y js/tarea-papel.js.
     'js/aula-convivencia-texto.js',
     'js/aula-convivencia.js',
+    // Fila 724: «Crear varios desde una lista» con el aviso de la intranet. Después de js/aula-convivencia.js y de js/asuntos-nuevo-crear.js.
+    'js/aula-aviso-leer.js',
+    'js/aula-aviso-pantalla.js',
     'js/papel-espera-recibir.js',
     // Fila 306: las actividades extraescolares. Después de js/encargos.js, js/asunto-de-grupo.js, js/personas-del-grupo.js y js/ficha-tarjetas.js.
     'js/actividades.js',
