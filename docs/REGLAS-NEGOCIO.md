@@ -345,3 +345,10 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (20-nov-2026, tema 581) **La nota a la familia del aula de convivencia la prepara Administración con la app** (nota y compromiso en un Word); la firma el Jefe de Estudios, se registra de salida y se envía por correo a los tutores legales. La parte de abajo y el compromiso vuelven firmados a Jefatura de Estudios.
 - (20-nov-2026, tema 581) **Cada alumno expulsado al aula de convivencia tiene su propio asunto** (no un asunto de grupo), creados todos de una vez pegando el aviso de la intranet. Los alumnos y las fechas salen del aviso de la intranet, no del correo que avisa.
 - (20-nov-2026, tema 581) **Grabar la medida en Séneca** es una tarea de la guía, a mano; Francisco averiguará qué hay que grabar.
+
+## Abrir la app desde la web de GitHub (tema 718, 20-nov-2026)
+
+- (20-nov-2026, tema 718) **La app de verdad se abre también en `https://gestor-asuntos-ies.github.io`**, una dirección de GitHub que abre en la red del instituto (comprobado por Francisco el 20-nov-2026). Se publica a la vez en `asuntos.fmargon.com`; no se quita nada hasta que todos hayan pasado.
+- (20-nov-2026, tema 718) **En cada ordenador hay que señalar las carpetas de nuevo** en la dirección nueva (el navegador guarda los permisos por dirección). La app lo guía, carpeta por carpeta y por su nombre, desde un botón «Pasar a la dirección nueva».
+- (20-nov-2026, tema 718) **Orden de la mudanza:** un ordenador del instituto con Edge; después los demás; Diego el último. Al final `asuntos.fmargon.com` solo dice que la app se ha mudado. La copia sin internet se queda como plan B.
+- (20-nov-2026, tema 718) **La dirección de prueba no cambia** y sigue en demostración: no comparte permisos con la de verdad.
