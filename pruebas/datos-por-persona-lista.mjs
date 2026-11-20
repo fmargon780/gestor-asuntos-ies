@@ -98,6 +98,18 @@ await comprobar('4. «De la lista del asunto» ofrece las columnas del tipo',
   }, demo), ['De la lista del asunto: {campo:Número de título}', 'De la lista del asunto: {campo:Título nº}', 'De la lista del asunto: {campo:Recogida}']);
 
 console.log('--- 5. volver a pegar, cambiar de nombre ---');
+/* Con el cuadro, a personas que ya estaban en el grupo: nadie nuevo, pero sus datos se ponen al día. */
+const ya = await pagina.evaluate((n) => { const r = App.E.registro.asuntos[n].relacionados[0]; return { id: null, nombre: r.nombre }; }, demo);
+await pagina.click('.pg-anadir');
+await pagina.click('#rel-pegar');
+await pagina.fill('#lp-texto', 'Nº escolar\tNúmero de título\n' + (ya.nombre.match(/\d{5,}/) || [''])[0] + '\tT-99-999');
+await pagina.click('#lp-reconocer');
+await pagina.click('#lp-senalar');
+await pagina.click('#rel-marcados-anadir');
+await pagina.waitForTimeout(1500);
+const otroAntes = await pagina.evaluate(([n, a]) => { const o = App.E.registro.asuntos[n].relacionados.filter((r) => r.nombre !== a && DatosDeLista.de(n, r.categoria, r.nombre)['Número de título'])[0]; return { nombre: o.nombre, valor: DatosDeLista.de(n, o.categoria, o.nombre)['Número de título'] }; }, [demo, ya.nombre]);
+await comprobar('5. volver a pegar a quien ya estaba cambia su dato, y solo el suyo',
+  pagina.evaluate(([n, a, b]) => [DatosDeLista.de(n, 'ALUMNADO', a)['Número de título'], DatosDeLista.de(n, 'ALUMNADO', b)['Número de título']], [demo, ya.nombre, otroAntes.nombre]), ['T-99-999', otroAntes.valor]);
 await pagina.evaluate(async ([n, nuevos]) => {
   await DatosDeLista.poner(n, { columnas: ['Título nº'], personas: [{ categoria: 'ALUMNADO', nombre: nuevos[0].nombre, datos: { 'Título nº': 'T-9' } }] });
 }, [demo, dos.nuevos]);
