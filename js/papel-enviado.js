@@ -51,6 +51,13 @@ var PapelEnviado = (function () {
     } else {
       await TareaPapel.marcarAMano(a, h, g);   /* sin documento no hay ficha donde apuntarlo: queda como paso marcado a mano */
     }
+    await esperarLoQueVuelve(a);
+  }
+
+  /* Fila 723: tras enviar, la tarea de papel que nos llega y lo pide su guía queda esperando (js/papel-espera-recibir.js). */
+  async function esperarLoQueVuelve(a) {
+    if (!window.PapelEsperaRecibir) return;
+    try { await PapelEsperaRecibir.alEnviar(a); } catch (e) { if (U.accesorio) U.accesorio('El papel está enviado, pero no he podido poner en espera la tarea de recibirlo', e); }
   }
 
   /* ---------- corregir el día y la vía (⋮) ---------- */
@@ -137,6 +144,7 @@ var PapelEnviado = (function () {
       hechos[n] = true;
       await DocumentosDatos.anotar(a.nombre, n, { enviado: datos });
     }
+    if (Object.keys(hechos).length) await esperarLoQueVuelve(a);
   }
 
   return { linea: linea, quienTexto: quienTexto, viaTexto: viaTexto, diaCorto: diaCorto, marcarEnviado: marcarEnviado, corregir: corregir, opcionMenu: opcionMenu,

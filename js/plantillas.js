@@ -84,6 +84,10 @@ var Plantillas = (function () {
     { clave: 'hoy', etiqueta: 'Fecha de hoy' },
     { clave: 'hoyLargo', etiqueta: 'Fecha de hoy, en letra' },
     { clave: 'lugarYFecha', etiqueta: 'Lugar y fecha, en letra' },
+    /* Fila 723 (js/aula-convivencia-texto.js): del tipo «EXPULSIÓN AULA CONVICENCIA»; salen de sus datos «Primer día» y «Días lectivos». */
+    { clave: 'primer día', etiqueta: 'Primer día' },
+    { clave: 'duración', etiqueta: 'Días lectivos' },
+    { clave: 'comenzarán', etiqueta: 'El verbo «comenzará» o «comenzarán», según los días lectivos' },
     { clave: 'limite', etiqueta: 'Fecha límite' },
     { clave: 'usuario', etiqueta: 'Quien firma' },
     { clave: 'centro', etiqueta: 'Nombre del centro' },
@@ -371,7 +375,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['tipo de documento', 'fecha del documento', 'numero del documento', 'telefono del centro', 'correo del centro', 'hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
+  var SIN_FALTA = ['comenzarán', 'tipo de documento', 'fecha del documento', 'numero del documento', 'telefono del centro', 'correo del centro', 'hito', 'plazo del hito', 'hiton', 'hitosm', 'actividad salida', 'actividad regreso', 'actividades periodo'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que
