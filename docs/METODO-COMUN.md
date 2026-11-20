@@ -53,6 +53,16 @@ retomas y sigue desde lo que ya hay en `main`.
 Lee código solo cuando lo necesites para la tarea. No leas la historia ni documentos antiguos
 salvo que la instrucción lo pida.
 
+**Dos apps en una sesión.** Si el encargo nombra dos repositorios, la primera es la app de la
+tarea y la segunda es solo la que la instrucción dice que se toca.
+- La cola, la fila, su «EN CURSO» y su «HECHA», las reglas (apartado 0) y las lecciones son las de
+  la primera app. En la segunda solo se escribe lo que la instrucción nombre; su cola no se toca.
+- Si la segunda app no está disponible en la sesión, o se niega escribir en ella, la fila pasa a
+  BLOQUEADA con «FALTA UN PERMISO: <qué falta y qué frase tiene que escribir la persona>» (apartado
+  3.C), sin buscar rodeos.
+- La marca `[toca a: <repositorio>]` de la fila dice cuál es la segunda app; solo la lleva una tarea
+  que escribe en ella.
+
 **Los mensajes de las subidas** empiezan por «Fila N:». Nunca por «Cola:», que es la marca de lo
 que se sube desde una conversación de diseño o desde el Centro de mando.
 
