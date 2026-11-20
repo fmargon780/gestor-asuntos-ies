@@ -42,7 +42,7 @@ Auxiliar administrativo del IES Fuente Lucena (Alhaurín el Grande, Málaga).
 ## 3. Qué es esto, y qué no
 
 Es **el gestor de asuntos del centro**: crea, nombra y archiva las carpetas de cada gestión
-administrativa, en el Dropbox del centro.
+administrativa, en el Drive de la cuenta común de Administración (desde el 12-nov-2026; antes, en el Dropbox del centro).
 
 **Plan en marcha (17-nov-2026, cuarta versión): `docs/PLAN-2026-11.md`.** Un solo molde: el asunto es una lista de tareas y un panel, y el papel lleva su recorrido (tema 692, `docs/notas-diseno/692.md`). Nada nuevo sobre hitos; lo nuevo se añade, no sustituye; cada cambio lo usa Francisco en un trámite real antes del siguiente.
 **No es** la base de datos de alumnado (proyecto aparte, `fmargon780/bd-alumnado-ies`). Solo
