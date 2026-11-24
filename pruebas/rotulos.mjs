@@ -41,7 +41,7 @@ const { NUEVO, TIPO } = await pagina.evaluate(async () => {
 });
 const guia = () => pagina.evaluate((t) => GuiasDelCentro.pasosDe(t).filter((x) => x.listaDeTareas)[0].guion.map((g) => (g.rotulo ? '# ' : '') + g.texto), TIPO);
 const abrirGuia = async () => { pagina.evaluate((t) => GuiasDelCentro.escribir(t, {}), TIPO); await pagina.waitForSelector('#capa:not(.oculto) #gsh-lista'); };
-const guardarGuia = async () => { await pagina.click('#cuadro-aceptar'); await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto')); await pagina.waitForTimeout(400); };
+const guardarGuia = async () => { await pagina.evaluate(() => (document.getElementById('gsh-guardar') || document.getElementById('cuadro-aceptar')).click()); await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto')); await pagina.waitForTimeout(400); };
 
 console.log('--- la guía ---');
 await abrirGuia();
@@ -53,11 +53,18 @@ await pagina.locator('#gsh-lista .gsh-texto').last().fill('Avisar y cerrar');
 await pagina.click('#gsh-anadir');
 await pagina.locator('#gsh-lista .gsh-texto').last().fill('Archivar');
 await comprobar('1. «+ Añadir rótulo» está junto a «+ Añadir una tarea»', pagina.locator('#capa button').evaluateAll((l) => l.map((b) => b.textContent).filter((t) => /^\+ Añadir/.test(t))), ['+ Añadir una tarea', '+ Añadir rótulo']);
-await comprobar('2. un rótulo no lleva papel, «Cómo se hace» ni «Cuándo se hace»; una tarea sí', pagina.locator('#gsh-lista .gsh-fila').evaluateAll((l) => l.map((f) => [f.classList.contains('gsh-rotulo'), !!f.querySelector('.gsh-papel'), !!f.querySelector('.gsh-como')])), [[true, false, false], [false, true, true], [false, true, true], [true, false, false], [false, true, true]]);
-await comprobar('3. las tareas se numeran sin contar los rótulos', pagina.locator('#gsh-lista .gsh-num').allTextContents(), ['▌', '1', '2', '▌', '3']);
-await pagina.locator('#gsh-lista .gsh-fila').nth(3).locator('button', { hasText: '↑' }).click();
+const aDerecha = [];
+for (let i = 0; i < 5; i++) {   /* fila 737: lo de cada tarea está a la derecha, al elegirla */
+  await pagina.locator('#gsh-lista .gsh-fila').nth(i).click();
+  aDerecha.push(await pagina.evaluate(() => [document.querySelector('#gsh-lista .gsh-fila.elegida').classList.contains('gsh-rotulo'), !!document.querySelector('#gsh-der .gsh-papel'), !!document.querySelector('#gsh-der .gsh-como'), !!document.querySelector('#gsh-der .cuando-bloque')]));
+}
+await comprobar('2. un rótulo no lleva papel, «Cómo se hace» ni «Cuándo se hace»; una tarea sí', aDerecha, [[true, false, false, false], [false, true, true, true], [false, true, true, true], [true, false, false, false], [false, true, true, true]]);
+await comprobar('3. las tareas se numeran sin contar los rótulos', pagina.locator('#gsh-lista .gsh-num').allTextContents(), ['', '1', '2', '', '3']);
+await pagina.locator('#gsh-lista .gsh-fila').nth(3).click();
+await pagina.click('#gsh-subir');
 await comprobar('4. el rótulo se sube con la flecha como una tarea', pagina.locator('#gsh-lista .gsh-texto').evaluateAll((l) => l.map((x) => x.value)), ['Recibir la petición', 'Pedir el certificado', 'Avisar y cerrar', 'Enviar la carta', 'Archivar']);
-await pagina.locator('#gsh-lista .gsh-fila').nth(2).locator('button', { hasText: '↓' }).click();
+await pagina.locator('#gsh-lista .gsh-fila').nth(2).click();
+await pagina.click('#gsh-bajar');
 await pagina.locator('#gsh-lista .gsh-fila').nth(0).locator('.gsh-texto').fill('Recibir la petición del interesado');
 await comprobar('5. se baja con la flecha y se cambia el texto', pagina.locator('#gsh-lista .gsh-texto').evaluateAll((l) => l.map((x) => x.value)), ['Recibir la petición del interesado', 'Pedir el certificado', 'Enviar la carta', 'Avisar y cerrar', 'Archivar']);
 await comprobar('6. el rótulo bajado queda entre las dos tareas últimas', pagina.locator('#gsh-lista .gsh-fila').evaluateAll((l) => l.map((f) => f.classList.contains('gsh-rotulo'))), [true, false, false, true, false]);

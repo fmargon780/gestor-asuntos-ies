@@ -32,13 +32,7 @@
 .ash-falta { cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; }
 .ash-falta:disabled { cursor: default; }
 .ash-rellenar { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
-/* Fila 701: el editor de la guía de un tipo «sin hitos» (js/guia-sin-hitos.js). */
-.gsh-fila { border: 1px solid #e3e8ee; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; background: #fff; }
-.gsh-linea { display: flex; gap: 8px; align-items: center; }
-.gsh-num { min-width: 22px; font-weight: 700; color: #6a7683; }
-.gsh-texto { flex: 1 1 auto; }
-.gsh-mandos { display: flex; gap: 4px; }
-.gsh-cuando { margin-top: 6px; }
+/* Fila 701: la lista de tareas de la guía en la pantalla del tipo (el editor, a toda la pantalla, está en css/guia-sin-hitos.css, fila 737). */
 .gsh-cuenta { margin: 0 0 4px; }
 .gsh-vista { margin: 0; padding-left: 22px; }
 .gsh-vista li { margin: 2px 0; }
@@ -47,7 +41,6 @@
 .ash-como-boton { border: 0; background: none; font-size: 16px; line-height: 1; padding: 2px 8px; border-radius: 6px; cursor: pointer; color: #1f5fa8; }
 .ash-como-boton:hover { background: #e6ebf1; }
 .ash-como { font-size: 13px; margin: 4px 0 0 28px; padding: 8px 12px; background: #f3f6fa; border-left: 3px solid #a9c6e8; border-radius: 4px; white-space: pre-line; }
-.gsh-como { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; resize: vertical; }
 /* Fila 702: la espera de una tarea (js/tarea-espera.js). */
 .ash-espera-panel { background: #fff3dc; border-color: #ecc866; }
 .ash-vuelve { background: #fdeaea; border-color: #e3a3a3; }
@@ -66,11 +59,9 @@
 .tp-paso.hecho { color: #1d7a3a; }
 .tp-paso.toca { font-weight: 700; color: #1f5fa8; background: #e3eefb; border-radius: 4px; padding: 0 6px; }
 .tp-flecha { color: #9aa5b1; white-space: pre; }
-.gsh-linea .gsh-papel { max-width: 220px; }
 .ash-anadir .ash-anadir-papel { max-width: 240px; }
 
 /* Fila 706: rótulos que agrupan las tareas de un trámite largo. */
 .ash-rotulo { margin: 12px 0 6px; padding: 6px 10px; border-left: 4px solid #3b6ea5; background: #e8f0f9; border-radius: 0 6px 6px 0; font-weight: 700; color: #1f3d5f; }
 .ash-tarea.bajo-rotulo { margin-left: 14px; }
-.gsh-rotulo { border-left: 4px solid #3b6ea5; background: #e8f0f9; }
 .gsh-vista-rotulo { list-style: none; margin-left: -18px; color: #1f3d5f; }

@@ -127,6 +127,9 @@ var GuiasCuando = (function () {
   /* La frase gris del resumen de un hito o tarea: '' si es «Siempre». */
   function etiqueta(soloSi) { return window.SoloSi ? SoloSi.etiqueta(soloSi) : ''; }
 
-  return { ponerTipo: ponerTipo, tipoActual: tipoActual, bloque: bloque, html: html, enganchar: enganchar, leer: leer, etiqueta: etiqueta };
+  /* Fila 737: los datos que ofrece ahora el desplegable, [{ nombre, valores }] (para «Ver la guía para»). */
+  function campos() { return camposDelTipo(); }
+
+  return { ponerTipo: ponerTipo, tipoActual: tipoActual, campos: campos, bloque: bloque, html: html, enganchar: enganchar, leer: leer, etiqueta: etiqueta };
 })();
 window.GuiasCuando = GuiasCuando;

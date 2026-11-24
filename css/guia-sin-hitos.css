@@ -1,0 +1,72 @@
+/* ============================================================
+   El editor de la guía de un tipo «sin hitos», a toda la pantalla
+   (fila 737, docs/737-GUIA-A-TODA-LA-PANTALLA.md; js/guia-sin-hitos.js y js/guia-sin-hitos-mapa.js).
+   Cabecera arriba (título, nota, Cancelar y Guardar), la guía de un vistazo a la izquierda y la tarea
+   elegida en grande a la derecha. Cada columna se desplaza por su cuenta; la ventana no.
+   ============================================================ */
+
+.cuadro.cuadro-gsh { max-width: none; width: 100%; height: calc(100vh - 40px); height: calc(100dvh - 40px); }
+.capa > .cuadro.cuadro-gsh > h3 { display: none; }   /* el título visible va en .gsh-cab */
+.capa > .cuadro.cuadro-gsh > .cuadro-botones { display: none; }   /* Cancelar y Guardar van arriba, en la cabecera */
+.capa > .cuadro.cuadro-gsh > #cuadro-cuerpo { overflow: hidden; display: flex; flex-direction: column; }
+.cuadro-gsh .guia-aviso { flex: 0 0 auto; margin: 0 0 8px; }
+
+.gsh-cab { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; margin-bottom: 12px; flex-wrap: wrap; }
+.gsh-cab-titulo { margin: 0; font-size: 19px; flex: 0 0 auto; }
+.gsh-cab-nota { flex: 1 1 280px; margin: 0; }
+.gsh-cab-herr { display: flex; gap: 8px; margin-left: auto; }
+
+.gsh-dos { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(280px, 46%) minmax(0, 1fr); gap: 18px; }
+.gsh-izq, .gsh-der { min-height: 0; overflow-y: auto; padding-right: 4px; }
+.gsh-der { padding: 4px 8px 16px 4px; }
+@media (max-width: 760px) { .gsh-dos { grid-template-columns: minmax(0, 1fr); overflow-y: auto; } .gsh-izq, .gsh-der { overflow: visible; } }
+
+/* La guía de un vistazo. */
+.gsh-fila { position: relative; display: flex; align-items: flex-start; gap: 8px; padding: 7px 8px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
+.gsh-fila:hover { background: var(--fondo, #f5f8fb); }
+.gsh-fila.elegida { background: var(--azul-claro, #e8f0f8); border-color: var(--azul, #1f4e79); }
+.gsh-fila.arrastrando { opacity: .4; }
+.gsh-fila.encima-antes { box-shadow: 0 -3px 0 var(--azul, #1f4e79); }
+.gsh-fila.encima-despues { box-shadow: 0 3px 0 var(--azul, #1f4e79); }
+.gsh-asa { cursor: grab; color: #9aa5b1; padding-top: 6px; user-select: none; }
+.gsh-num { min-width: 20px; font-weight: 700; color: #6a7683; padding-top: 6px; text-align: right; }
+.gsh-cuerpo { flex: 1 1 auto; min-width: 0; }
+.gsh-fila .gsh-texto { width: 100%; border-color: transparent; background: transparent; padding: 3px 5px; }
+.gsh-fila .gsh-texto:focus { border-color: var(--azul, #1f4e79); background: #fff; outline: none; }
+.gsh-fila.gsh-rotulo { margin-top: 10px; border-bottom: 1px solid #d5dde6; border-radius: 0; }
+.gsh-fila.gsh-rotulo .gsh-texto { font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #34475c; }
+.gsh-marcas { display: flex; flex-wrap: wrap; gap: 5px; padding: 2px 5px 0; }
+.gsh-marca { font-size: 12px; background: #eef2f6; border-radius: 10px; padding: 1px 8px; color: #44515e; }
+.gsh-marca-papel { background: #fdf0dc; }
+.gsh-marca-solo-si { background: #e9e3f6; }
+.gsh-meter { position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); z-index: 2; display: none; width: 22px; height: 22px; padding: 0;
+  border-radius: 50%; border: 1px solid var(--azul, #1f4e79); background: #fff; color: var(--azul, #1f4e79); font-weight: 700; line-height: 18px; text-align: center; cursor: pointer; }
+.gsh-fila:hover .gsh-meter { display: block; }
+.gsh-anadir { display: flex; gap: 8px; margin-top: 12px; }
+.gsh-anadir .boton { flex: 1 1 0; }
+.gsh-fila.no-sale .gsh-texto { text-decoration: line-through; color: #9aa5b1; }
+.gsh-fila.no-sale .gsh-marca { opacity: .5; }
+.gsh-fila.no-sale .gsh-num { color: #c3cad2; }
+
+/* «Ver la guía para:» */
+.gsh-ver { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 10px; margin-bottom: 10px; background: #f5f8fb; border: 1px solid #e3e8ee; border-radius: 6px; }
+.gsh-ver.oculto { display: none; }
+.gsh-ver .etiqueta { margin: 0; }
+.gsh-ver label { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.gsh-ver select { font: inherit; font-size: 14px; padding: 4px 6px; border: 1px solid #c9d1da; border-radius: 5px; }
+
+/* La tarea elegida, en grande. */
+.gsh-der-titulo { margin: 0 0 14px; font-size: 16px; color: #5b6774; font-weight: 600; }
+.gsh-grupo { margin-bottom: 16px; }
+.gsh-grupo .etiqueta { display: block; font-weight: 600; margin-bottom: 5px; }
+.gsh-grupo .campo { width: 100%; box-sizing: border-box; }
+.gsh-dos-grupos { display: flex; gap: 16px; flex-wrap: wrap; }
+.gsh-dos-grupos > .gsh-grupo { flex: 1 1 260px; min-width: 0; }
+.gsh-dos-grupos .cuando-bloque { margin: 0; }
+.gsh-opcional { font-weight: 400; color: #6a7683; }
+textarea.gsh-como { min-height: 40vh; resize: vertical; line-height: 1.45; display: block; }
+.gsh-recorrido { margin-top: 8px; padding: 8px 10px; background: #fdf7ec; border: 1px solid #f0dfbf; border-radius: 6px; font-size: 14px; }
+.gsh-rec-pasos { font-weight: 600; }
+.gsh-rec-resumen { color: #5b6774; margin-top: 2px; }
+.gsh-mandos { display: flex; gap: 8px; border-top: 1px solid #e3e8ee; padding-top: 14px; }
+.gsh-mandos .boton-peligro { margin-left: auto; }

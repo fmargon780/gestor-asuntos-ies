@@ -31,7 +31,7 @@ async function abrirFicha(clave) {
   await pagina.waitForSelector('#ficha-guia .ash', { timeout: 10000 });
   await pagina.waitForTimeout(400);
 }
-async function aceptarEditor() { await pagina.click('#cuadro-aceptar'); await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto')); await pagina.waitForTimeout(400); }
+async function aceptarEditor() { await pagina.evaluate(() => (document.getElementById('gsh-guardar') || document.getElementById('cuadro-aceptar')).click()); await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto')); await pagina.waitForTimeout(400); }
 
 console.log('--- el tipo ---');
 /* El asunto de la demostración y su tipo pasan a ser «sin hitos»; la clase del tercero es la suya. */
@@ -60,11 +60,13 @@ for (const t of ['Pedir el certificado', 'Avisar al personal', 'Enviar la carta'
   await pagina.locator('#gsh-lista .gsh-texto').last().fill(t);
 }
 const fila = (n) => pagina.locator('#gsh-lista .gsh-fila').nth(n);
-await comprobar('3. «Cuándo se hace» ofrece «Siempre» y «Solo si el tercero es…»', fila(1).locator('.cuando-campo option').allTextContents().then((l) => l.slice(0, 2)), ['Siempre', 'Solo si el tercero es…']);
-await fila(1).locator('.cuando-campo').selectOption({ label: 'Solo si el tercero es…' });
-await comprobar('3. salen las clases de tercero del tipo', fila(1).locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await pagina.evaluate((t) => SoloSi.clasesDelTipo(t), TIPO));
-await fila(1).locator('.cuando-valor[value="' + CLASE + '"]').check();   /* «Avisar al personal»: solo si el tercero es de su clase (sale) */
-await fila(2).locator('button', { hasText: '↑' }).click();
+const der = pagina.locator('#gsh-der');   /* fila 737: la tarea elegida, a la derecha */
+await comprobar('3. «Cuándo se hace» ofrece «Siempre» y «Solo si el tercero es…»', fila(1).click().then(() => der.locator('.cuando-campo option').allTextContents()).then((l) => l.slice(0, 2)), ['Siempre', 'Solo si el tercero es…']);
+await der.locator('.cuando-campo').selectOption({ label: 'Solo si el tercero es…' });
+await comprobar('3. salen las clases de tercero del tipo', der.locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await pagina.evaluate((t) => SoloSi.clasesDelTipo(t), TIPO));
+await der.locator('.cuando-valor[value="' + CLASE + '"]').check();   /* «Avisar al personal»: solo si el tercero es de su clase (sale) */
+await fila(2).click();
+await pagina.click('#gsh-subir');
 await comprobar('3. ↑ sube una tarea', pagina.locator('#gsh-lista .gsh-texto').evaluateAll((l) => l.map((x) => x.value)), ['Pedir el certificado', 'Enviar la carta', 'Avisar al personal']);
 await aceptarEditor();
 await comprobar('4. se guarda como un paso de lista de tareas con sus frases y su «Solo si»', pagina.evaluate((t) => {
@@ -158,8 +160,9 @@ await comprobar('11. las frases salen en su orden, con su «Solo si»', pagina.l
   ['Pedir el certificado de notas', 'Enviar la carta', 'Avisar al personal · Solo si el tercero es ' + CLASE, 'Archivar la copia', 'Pedir el traslado · Solo si Motivo 701: Traslado']);
 pagina.evaluate((t) => GuiasDelCentro.escribir(t), TIPO);
 await pagina.waitForSelector('#capa:not(.oculto) #gsh-lista');
-await comprobar('11. la nota de «Solo si el tercero es…» habla del tercero', pagina.locator('#gsh-lista .gsh-fila').nth(2).locator('.cuando-nota').first().innerText(), 'En el asunto, si el tercero es de otra clase, esto no sale.');
-await pagina.click('#cuadro-cancelar');
+await pagina.locator('#gsh-lista .gsh-fila').nth(2).click();
+await comprobar('11. la nota de «Solo si el tercero es…» habla del tercero', pagina.locator('#gsh-der .cuando-nota').first().innerText(), 'En el asunto, si el tercero es de otra clase, esto no sale.');
+await pagina.click('#gsh-cancelar');
 await pagina.waitForTimeout(300);
 await comprobar('11. «Nuevo asunto» de un tipo sin hitos y sin guía no habla de hitos', pagina.evaluate(() => {
   const t = { tipo: 'PRUEBA 701 SIN GUIA', categoria: App.E.tipos[0].categoria, sinHitos: true };
