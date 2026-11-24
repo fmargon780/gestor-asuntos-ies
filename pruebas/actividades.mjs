@@ -13,6 +13,9 @@
 import { chromium } from 'playwright';
 
 const DIRECCION = (process.env.DIRECCION || 'http://localhost:8123/index.html') + '?demo=1&auto=1';
+/* Siempre en el año que viene: con una fecha fija, un día la actividad pasa a «Realizada» y la prueba falla (fila 739). */
+const ANIO = new Date().getFullYear() + 1;
+const FECHA = ANIO + '-11-20';
 let fallos = 0;
 async function comprobar(titulo, promesa, esperado) {
   const real = await promesa;
@@ -84,8 +87,8 @@ await comprobar('3. la ventana trae todos los campos',
 await comprobar('3. «Seguir» está apagado', pagina.evaluate(() => [document.getElementById('cuadro-aceptar').textContent, document.getElementById('cuadro-aceptar').disabled]), ['Seguir', true]);
 await pagina.fill('#act-nombre', 'Visita al Museo de la Ciencia');
 await comprobar('3. escribir el nombre rellena el nombre corto', pagina.evaluate(() => [document.getElementById('act-corto').value, document.getElementById('act-corto').value === U.limpiarNombre('Visita al Museo de la Ciencia').slice(0, 40)]), ['Visita al Museo de la Ciencia', true]);
-await pagina.fill('#act-inicio', '2026-11-20');
-await comprobar('3. poner la fecha de inicio pone la de fin igual', pagina.inputValue('#act-fin'), '2026-11-20');
+await pagina.fill('#act-inicio', FECHA);
+await comprobar('3. poner la fecha de inicio pone la de fin igual', pagina.inputValue('#act-fin'), FECHA);
 await pagina.fill('#act-lugar', 'Granada');
 await pagina.fill('#act-depto', 'Ciencias');
 await pagina.fill('#act-salida', '08:30');
@@ -130,14 +133,14 @@ console.log('--- 4. seguir y cambiar ---');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(600);
 await comprobar('4. «Nuevo asunto» dice «Grupo <nombre corto> · 9 personas»', pagina.locator('#tercero-elegido strong').textContent(), 'Grupo Visita al Museo de la Ciencia · 9 personas');
-await comprobar('4. la fecha límite es la de la actividad', pagina.inputValue('#campo-limite'), '2026-11-20');
+await comprobar('4. la fecha límite es la de la actividad', pagina.inputValue('#campo-limite'), FECHA);
 await comprobar('4. el tipo sigue elegido', pagina.evaluate(() => App.E.nuevo.tipo), 'ACTIVIDAD EXTRAESCOLAR');
 await pagina.click('#btn-cambiar-tercero');
 await pagina.waitForSelector('#act-nombre');
 await comprobar('4. «Cambiar» vuelve al formulario con todo lo puesto',
   pagina.evaluate(() => [document.getElementById('act-nombre').value, document.getElementById('act-inicio').value, document.getElementById('act-lugar').value,
     document.getElementById('act-cuenta').textContent, [...document.querySelectorAll('.act-bloque h4')].map((h) => h.textContent), [...document.querySelectorAll('.act-papel')].map((s) => s.value)]),
-  ['Visita al Museo de la Ciencia', '2026-11-20', 'Granada', 'Van 9 alumnos/as · 3 profesores/as', ['2º B · van 5 de 6', '3º A · van 4 de 4'], ['organiza', 'acompana', 'acompana']]);
+  ['Visita al Museo de la Ciencia', FECHA, 'Granada', 'Van 9 alumnos/as · 3 profesores/as', ['2º B · van 5 de 6', '3º A · van 4 de 4'], ['organiza', 'acompana', 'acompana']]);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 
@@ -153,7 +156,7 @@ await comprobar('5. `ficha.actividad` y `ficha.grupo` guardados, con nueve relac
   [['id'], true, 'actividad', 'Visita al Museo de la Ciencia', 9, 'OTROS']);
 await comprobar('5. el registro tiene la actividad con su asunto, fechas, unidades y profesorado',
   pagina.evaluate(async (n) => { await Actividades.releer(); const a = Actividades.porAsunto(n); return [a.nombre, a.inicio, a.fin, a.salida, a.regreso, a.lugar, a.departamento, a.horas, a.alumnado, a.unidades.map((u) => u.unidad + ':' + u.van + '/' + u.de), a.profesorado.map((p) => p.papel), !!a.profesorado[0].clave, a.asunto.numero.length > 0]; }, nombre),
-  ['Visita al Museo de la Ciencia', '2026-11-20', '2026-11-20', '08:30', '15:00', 'Granada', 'Ciencias', 6, 9, ['2º B:5/6', '3º A:4/4'], ['organiza', 'acompana', 'acompana'], true, true]);
+  ['Visita al Museo de la Ciencia', FECHA, FECHA, '08:30', '15:00', 'Granada', 'Ciencias', 6, 9, ['2º B:5/6', '3º A:4/4'], ['organiza', 'acompana', 'acompana'], true, true]);
 await comprobar('5. el fichero del disco lleva la marca y la actividad', pagina.evaluate(async () => { const d = await Carpetas.leerJson(App.E.gestor, 'actividades.json'); return [d.tipoMarcado, d.actividades.length]; }), [true, 6]);
 
 /* ================= 6. LA TARJETA ================= */
@@ -165,7 +168,7 @@ await comprobar('6. el bloque va el primero de la columna derecha y se llama «L
 await pagina.evaluate(() => FichaTarjetas.abrir('actividad'));
 await pagina.waitForTimeout(500);
 await comprobar('6. abierta: las unidades con «van N de M» y el profesorado separado',
-  pagina.evaluate(() => { const c = document.getElementById('ficha-actividad'); const cols = c.querySelectorAll('.act-ficha-col'); return [c.textContent.indexOf('del 20 de noviembre') === -1 && c.textContent.indexOf('20 de noviembre de 2026') !== -1, [...cols[1].querySelectorAll('li')].map((l) => l.textContent), [...cols[2].querySelectorAll('li')].map((l) => l.textContent.length > 0), cols[2].querySelectorAll('h4')[0].textContent, cols[2].querySelectorAll('h4')[1].textContent, cols[2].querySelectorAll('ul')[0].children.length, cols[2].querySelectorAll('ul')[1].children.length, c.querySelector('.act-situacion').textContent]; }),
+  pagina.evaluate((ANIO) => { const c = document.getElementById('ficha-actividad'); const cols = c.querySelectorAll('.act-ficha-col'); return [c.textContent.indexOf('del 20 de noviembre') === -1 && c.textContent.indexOf('20 de noviembre de ' + ANIO) !== -1, [...cols[1].querySelectorAll('li')].map((l) => l.textContent), [...cols[2].querySelectorAll('li')].map((l) => l.textContent.length > 0), cols[2].querySelectorAll('h4')[0].textContent, cols[2].querySelectorAll('h4')[1].textContent, cols[2].querySelectorAll('ul')[0].children.length, cols[2].querySelectorAll('ul')[1].children.length, c.querySelector('.act-situacion').textContent]; }, ANIO),
   [true, ['2º B · van 5 de 6', '3º A · van 4 de 4'], [true, true, true], 'Organiza', 'Acompaña', 1, 2, 'Prevista']);
 await comprobar('6. ocupa todo el ancho de la columna',
   pagina.evaluate(() => { const t = document.querySelector('.ficha-tarjeta[data-tarjeta="actividad"]').getBoundingClientRect(), r = document.getElementById('ficha-plegables').getBoundingClientRect(); return Math.abs(t.width - r.width) < 4; }), true);
