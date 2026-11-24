@@ -55,11 +55,21 @@
   .nota-chica { font-size: 13px; color: #5b6774; margin: 6px 0 0; }
   .mandos { display: flex; gap: 8px; border-top: 1px solid #e3e8ee; padding-top: 14px; }
   .mandos .boton-peligro { margin-left: auto; }
+  .ver-para { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 10px; margin-bottom: 10px; background: #f5f8fb; border: 1px solid #e3e8ee; border-radius: 6px; }
+  .ver-para .etiqueta { margin: 0; }
+  .ver-para label { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  .ver-para select { font: inherit; font-size: 14px; padding: 4px 6px; border: 1px solid #c9d1da; border-radius: 5px; }
+  .linea.no-sale .frase { text-decoration: line-through; color: #9aa5b1; }
+  .linea.no-sale .marca { opacity: .5; }
+  .linea.no-sale .num { color: #c3cad2; }
+  .recorrido { margin-top: 8px; padding: 8px 10px; background: #fdf7ec; border: 1px solid #f0dfbf; border-radius: 6px; font-size: 14px; }
+  .recorrido .pasos { font-weight: 600; }
+  .recorrido .resumen { color: #5b6774; margin-top: 2px; }
   .aviso { position: fixed; right: 20px; bottom: 20px; background: #1f4e79; color: #fff; padding: 10px 16px; border-radius: 6px; display: none; }
 </style>
 </head>
 <body>
-<div class="franja-prueba">Pantalla de prueba de la fila 737 · datos inventados a partir de tu captura · no se guarda nada</div>
+<div class="franja-prueba">Pantalla de prueba de la fila 737 · datos inventados a partir de tu captura (las tareas 2, 4 y 5, con «Solo si», son inventadas para ver el mapa) · no se guarda nada</div>
 
 <div class="editor">
   <div class="cabecera">
@@ -70,6 +80,7 @@
   </div>
   <div class="cuerpo">
     <div class="lista">
+      <div class="ver-para" id="ver-para"></div>
       <div id="lineas"></div>
       <div class="anadir">
         <button type="button" class="boton" id="anadir-tarea">+ Añadir una tarea</button>
@@ -84,10 +95,51 @@
 <script>
 var PAPELES = ['CREDENCIAL IPASEN', 'SOLICITUD', 'JUSTIFICANTE'];
 var CAMPOS = { 'Clase del tercero': ['Alumnado', 'Tutor legal'], 'Cómo la quiere': ['En persona', 'Por correo', 'Por iPasen'] };
+var RECORRIDOS = {
+  'CREDENCIAL IPASEN': { entra: false, firma: 'Nadie', registro: false, envia: true, aquien: 'Interesado', via: 'iPasen' },
+  'SOLICITUD': { entra: true, registro: true },
+  'JUSTIFICANTE': null
+};
+var verPara = {};
+function pasosDe(r) {
+  if (r.entra) return ['Recibido'].concat(r.registro ? ['Registrado de entrada'] : []);
+  var p = ['Generado']; if (r.firma !== 'Nadie') p.push('Firmado'); if (r.registro) p.push('Registrado'); if (r.envia) p.push('Enviado'); return p;
+}
+function resumenDe(r) {
+  if (r.entra) return 'Nos llega' + (r.registro ? ' · se registra de entrada' : ' · no se registra');
+  return (r.firma === 'Nadie' ? 'Sin firma' : 'Firma: ' + r.firma) + (r.registro ? ' · se registra de salida' : ' · no se registra') + (r.envia ? ' · a ' + r.aquien + ' por ' + r.via : ' · no se envía');
+}
+function recorridoHTML(papel) {
+  if (!papel) return '';
+  var r = RECORRIDOS[papel];
+  if (!r) return '<div class="recorrido"><div class="pasos">Este tipo de documento todavía no tiene recorrido.</div><div class="resumen">Se pone en Ajustes › El centro › Tipos de documento › «Recorrido».</div></div>';
+  return '<div class="recorrido"><div>Así saldrá en la tarea: <span class="pasos">' + pasosDe(r).join(' › ') + '</span></div><div class="resumen">' + resumenDe(r) + '</div></div>';
+}
+function sale(g) {
+  if (!g.soloSi || !g.soloSi.valores.length) return true;
+  var v = verPara[g.soloSi.campo];
+  return !v || g.soloSi.valores.indexOf(v) !== -1;
+}
+function pintarVerPara() {
+  var caja = $('ver-para'), usados = [];
+  tareas.forEach(function (g) { if (g.soloSi && g.soloSi.valores.length && usados.indexOf(g.soloSi.campo) === -1) usados.push(g.soloSi.campo); });
+  Object.keys(verPara).forEach(function (c) { if (usados.indexOf(c) === -1) delete verPara[c]; });
+  if (!usados.length) { caja.style.display = 'none'; caja.innerHTML = ''; return; }
+  caja.style.display = '';
+  caja.innerHTML = '<span class="etiqueta">Ver la guía para:</span>' + usados.map(function (c) {
+    return '<label>' + esc(c) + ' <select data-campo="' + esc(c) + '"><option value="">Todos los casos</option>' +
+      CAMPOS[c].map(function (v) { return '<option' + (verPara[c] === v ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('') + '</select></label>';
+  }).join('');
+  Array.prototype.forEach.call(caja.querySelectorAll('select'), function (s) {
+    s.addEventListener('change', function () { if (s.value) verPara[s.dataset.campo] = s.value; else delete verPara[s.dataset.campo]; pintarLista(); });
+  });
+}
 var tareas = [
   { texto: 'Comprobar quién la pide', papel: '', como: 'En persona: si es el alumno, comprueba su foto en Séneca. Si es un tutor legal, pídele un documento oficial de identidad. Si es otra persona, no se le da: rechaza la solicitud y apúntalo con «Anotar».', soloSi: null },
+  { texto: 'Guardar la solicitud firmada del tutor legal', papel: 'SOLICITUD', como: '', soloSi: { campo: 'Clase del tercero', valores: ['Tutor legal'] } },
   { texto: 'Guardar aquí la credencial', papel: 'CREDENCIAL IPASEN', como: 'En Séneca, con el perfil Gestor PASEN, genera la credencial de la unidad del alumno. Guarda aquí el documento con «Añadir documento». No se registra de salida.', soloSi: null },
-  { texto: 'Entregar o enviar la credencial', papel: '', como: 'En persona: imprímela y entrégala solo a quien se comprobó. Por correo o iPasen: envíala desde «Enviar ▾», sin imprimir.', soloSi: null }
+  { texto: 'Entregar la credencial en mano', papel: '', como: 'Imprímela y entrégala solo a quien se comprobó.', soloSi: { campo: 'Cómo la quiere', valores: ['En persona'] } },
+  { texto: 'Enviar la credencial', papel: '', como: 'Envíala desde «Enviar ▾», sin imprimir.', soloSi: { campo: 'Cómo la quiere', valores: ['Por correo', 'Por iPasen'] } }
 ];
 var elegida = 0, arrastrada = null;
 
@@ -105,6 +157,7 @@ function marcasHTML(g) {
 }
 
 function pintarLista(foco) {
+  pintarVerPara();
   var caja = $('lineas');
   caja.innerHTML = '';
   if (!tareas.length) { caja.innerHTML = '<p class="vacio">Todavía no hay tareas. Escribe la primera.</p>'; }
@@ -112,7 +165,8 @@ function pintarLista(foco) {
   tareas.forEach(function (g, i) {
     if (!g.rotulo) n++;
     var d = document.createElement('div');
-    d.className = 'linea' + (g.rotulo ? ' rotulo' : '') + (i === elegida ? ' elegida' : '');
+    d.className = 'linea' + (g.rotulo ? ' rotulo' : '') + (i === elegida ? ' elegida' : '') + (!g.rotulo && !sale(g) ? ' no-sale' : '');
+    if (!g.rotulo && !sale(g)) d.title = 'En este caso, esta tarea no sale en el asunto';
     d.dataset.pos = i;
     d.draggable = true;
     d.innerHTML = '<span class="asa" title="Arrastra para cambiarla de sitio">⠿</span>' +
@@ -174,7 +228,7 @@ function pintarDetalle() {
     var campoSi = g.soloSi ? g.soloSi.campo : '';
     h += '<div class="dos">' +
       '<div class="grupo"><label class="etiqueta" for="d-papel">Papel</label><select class="campo" id="d-papel"><option value="">Sin papel</option>' +
-        PAPELES.map(function (p) { return '<option value="' + esc(p) + '"' + (p === g.papel ? ' selected' : '') + '>Papel: ' + esc(p) + '</option>'; }).join('') + '</select></div>' +
+        PAPELES.map(function (p) { return '<option value="' + esc(p) + '"' + (p === g.papel ? ' selected' : '') + '>Papel: ' + esc(p) + '</option>'; }).join('') + '</select>' + recorridoHTML(g.papel) + '</div>' +
       '<div class="grupo"><label class="etiqueta" for="d-cuando">Cuándo se hace</label><select class="campo" id="d-cuando"><option value="">Siempre</option>' +
         Object.keys(CAMPOS).map(function (c) { return '<option value="' + esc(c) + '"' + (c === campoSi ? ' selected' : '') + '>Solo si ' + esc(c) + ' es…</option>'; }).join('') +
         '<option value="__nuevo">+ Nuevo campo de lista…</option></select>' +
@@ -191,7 +245,7 @@ function pintarDetalle() {
 
   $('d-frase').addEventListener('input', function () { g.texto = this.value; var c = document.querySelectorAll('.frase')[elegida]; if (c) c.value = this.value; });
   if (!g.rotulo) {
-    $('d-papel').addEventListener('change', function () { g.papel = this.value; pintarLista(); });
+    $('d-papel').addEventListener('change', function () { g.papel = this.value; pintarLista(); pintarDetalle(); });
     $('d-cuando').addEventListener('change', function () {
       if (this.value === '__nuevo') { avisar('Aquí se abre la ventana de crear un campo de lista, como hoy.'); this.value = g.soloSi ? g.soloSi.campo : ''; return; }
       g.soloSi = this.value ? { campo: this.value, valores: [] } : null; pintarLista(); pintarDetalle();
