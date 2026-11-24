@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de prueba 737 · Editor de la guía</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; color: #1f2a37; background: #eef1f4; }
+  .franja-prueba { background: #fff6d6; border-bottom: 1px solid #e8d48a; padding: 6px 16px; font-size: 13px; }
+  .editor { position: fixed; inset: 31px 0 0 0; display: flex; flex-direction: column; background: #fff; }
+  .cabecera { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #e3e8ee; }
+  .cabecera h1 { margin: 0; font-size: 19px; flex: 0 0 auto; }
+  .cabecera .nota { flex: 1 1 auto; margin: 0; color: #5b6774; font-size: 13px; }
+  .boton { border: 1px solid #c9d1da; background: #fff; border-radius: 6px; padding: 7px 14px; font: inherit; cursor: pointer; }
+  .boton:hover { background: #f3f6f9; }
+  .boton:disabled { opacity: .4; cursor: default; }
+  .boton-primario { background: #1f4e79; border-color: #1f4e79; color: #fff; }
+  .boton-primario:hover { background: #183f62; }
+  .boton-peligro { color: #b3261e; border-color: #e0a9a5; }
+  .cuerpo { flex: 1 1 auto; display: flex; min-height: 0; }
+  .lista { flex: 0 0 46%; border-right: 1px solid #e3e8ee; overflow-y: auto; padding: 14px 16px 20px; }
+  .detalle { flex: 1 1 auto; overflow-y: auto; padding: 18px 24px 24px; }
+  .linea { position: relative; display: flex; align-items: flex-start; gap: 8px; padding: 7px 8px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
+  .linea:hover { background: #f5f8fb; }
+  .linea.elegida { background: #e8f0f8; border-color: #9fbbd6; }
+  .linea.arrastrando { opacity: .4; }
+  .linea.encima-antes { box-shadow: 0 -3px 0 #1f4e79; }
+  .linea.encima-despues { box-shadow: 0 3px 0 #1f4e79; }
+  .asa { cursor: grab; color: #9aa5b1; padding-top: 3px; user-select: none; }
+  .num { min-width: 20px; font-weight: 700; color: #6a7683; padding-top: 3px; text-align: right; }
+  .frase-y-marcas { flex: 1 1 auto; min-width: 0; }
+  .frase { width: 100%; border: 1px solid transparent; background: transparent; font: inherit; padding: 3px 5px; border-radius: 4px; }
+  .frase:focus { border-color: #9fbbd6; background: #fff; outline: none; }
+  .rotulo .frase { font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #34475c; }
+  .rotulo { margin-top: 10px; border-bottom: 1px solid #d5dde6; border-radius: 0; }
+  .marcas { display: flex; flex-wrap: wrap; gap: 5px; padding: 2px 5px 0; }
+  .marca { font-size: 12px; background: #eef2f6; border-radius: 10px; padding: 1px 8px; color: #44515e; }
+  .marca.papel { background: #fdf0dc; }
+  .marca.solo-si { background: #e9e3f6; }
+  .meter { position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); z-index: 2; display: none;
+           width: 22px; height: 22px; border-radius: 50%; border: 1px solid #9fbbd6; background: #fff; color: #1f4e79; font-weight: 700; line-height: 18px; text-align: center; cursor: pointer; padding: 0; }
+  .linea:hover .meter { display: block; }
+  .anadir { display: flex; gap: 8px; margin-top: 12px; }
+  .anadir .boton { flex: 1 1 0; }
+  .vacio { color: #6a7683; font-style: italic; }
+  .detalle h2 { margin: 0 0 14px; font-size: 16px; color: #5b6774; font-weight: 600; }
+  .grupo { margin-bottom: 16px; }
+  .etiqueta { display: block; font-weight: 600; margin-bottom: 5px; }
+  .campo { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid #c9d1da; border-radius: 6px; background: #fff; }
+  textarea.campo { min-height: 45vh; resize: vertical; line-height: 1.45; }
+  .dos { display: flex; gap: 16px; }
+  .dos > .grupo { flex: 1 1 0; }
+  .valores { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+  .nota-chica { font-size: 13px; color: #5b6774; margin: 6px 0 0; }
+  .mandos { display: flex; gap: 8px; border-top: 1px solid #e3e8ee; padding-top: 14px; }
+  .mandos .boton-peligro { margin-left: auto; }
+  .aviso { position: fixed; right: 20px; bottom: 20px; background: #1f4e79; color: #fff; padding: 10px 16px; border-radius: 6px; display: none; }
+</style>
+</head>
+<body>
+<div class="franja-prueba">Pantalla de prueba de la fila 737 · datos inventados a partir de tu captura · no se guarda nada</div>
+
+<div class="editor">
+  <div class="cabecera">
+    <h1>Guía de IPASEN ALUMNADO</h1>
+    <p class="nota">Una frase por tarea, en el orden en que salen en el asunto. Las que añadas aquí llegan también a los asuntos abiertos de este tipo; cambiar o borrar una frase no los toca.</p>
+    <button type="button" class="boton" id="cancelar">Cancelar</button>
+    <button type="button" class="boton boton-primario" id="guardar">Guardar</button>
+  </div>
+  <div class="cuerpo">
+    <div class="lista">
+      <div id="lineas"></div>
+      <div class="anadir">
+        <button type="button" class="boton" id="anadir-tarea">+ Añadir una tarea</button>
+        <button type="button" class="boton" id="anadir-rotulo">+ Añadir rótulo</button>
+      </div>
+    </div>
+    <div class="detalle" id="detalle"></div>
+  </div>
+</div>
+<div class="aviso" id="aviso"></div>
+
+<script>
+var PAPELES = ['CREDENCIAL IPASEN', 'SOLICITUD', 'JUSTIFICANTE'];
+var CAMPOS = { 'Clase del tercero': ['Alumnado', 'Tutor legal'], 'Cómo la quiere': ['En persona', 'Por correo', 'Por iPasen'] };
+var tareas = [
+  { texto: 'Comprobar quién la pide', papel: '', como: 'En persona: si es el alumno, comprueba su foto en Séneca. Si es un tutor legal, pídele un documento oficial de identidad. Si es otra persona, no se le da: rechaza la solicitud y apúntalo con «Anotar».', soloSi: null },
+  { texto: 'Guardar aquí la credencial', papel: 'CREDENCIAL IPASEN', como: 'En Séneca, con el perfil Gestor PASEN, genera la credencial de la unidad del alumno. Guarda aquí el documento con «Añadir documento». No se registra de salida.', soloSi: null },
+  { texto: 'Entregar o enviar la credencial', papel: '', como: 'En persona: imprímela y entrégala solo a quien se comprobó. Por correo o iPasen: envíala desde «Enviar ▾», sin imprimir.', soloSi: null }
+];
+var elegida = 0, arrastrada = null;
+
+function $(id) { return document.getElementById(id); }
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function avisar(t) { var a = $('aviso'); a.textContent = t; a.style.display = 'block'; clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.style.display = 'none'; }, 2600); }
+
+function marcasHTML(g) {
+  if (g.rotulo) return '';
+  var m = [];
+  if (g.papel) m.push('<span class="marca papel">📄 ' + esc(g.papel) + '</span>');
+  if (g.soloSi && g.soloSi.valores.length) m.push('<span class="marca solo-si">Solo si ' + esc(g.soloSi.campo) + ': ' + esc(g.soloSi.valores.join(' o ')) + '</span>');
+  if (g.como) m.push('<span class="marca">Cómo se hace</span>');
+  return m.length ? '<div class="marcas">' + m.join('') + '</div>' : '';
+}
+
+function pintarLista(foco) {
+  var caja = $('lineas');
+  caja.innerHTML = '';
+  if (!tareas.length) { caja.innerHTML = '<p class="vacio">Todavía no hay tareas. Escribe la primera.</p>'; }
+  var n = 0;
+  tareas.forEach(function (g, i) {
+    if (!g.rotulo) n++;
+    var d = document.createElement('div');
+    d.className = 'linea' + (g.rotulo ? ' rotulo' : '') + (i === elegida ? ' elegida' : '');
+    d.dataset.pos = i;
+    d.draggable = true;
+    d.innerHTML = '<span class="asa" title="Arrastra para cambiarla de sitio">⠿</span>' +
+      '<span class="num">' + (g.rotulo ? '' : n) + '</span>' +
+      '<div class="frase-y-marcas"><input class="frase" value="' + esc(g.texto) + '" placeholder="' + (g.rotulo ? 'Escribe el rótulo' : 'Escribe la tarea') + '">' + marcasHTML(g) + '</div>' +
+      '<button type="button" class="meter" title="Meter una tarea aquí debajo">+</button>';
+    var inp = d.querySelector('.frase');
+    d.addEventListener('click', function (e) { if (e.target.classList.contains('meter')) return; if (elegida !== i) { elegida = i; marcarElegida(); pintarDetalle(); } });
+    inp.addEventListener('input', function () { g.texto = inp.value; var f = $('d-frase'); if (f && elegida === i) f.value = inp.value; });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); meter(i + 1, false); }
+      if (e.key === 'Backspace' && !inp.value && tareas.length > 1) { e.preventDefault(); tareas.splice(i, 1); elegida = Math.max(0, i - 1); pintarTodo(elegida); }
+    });
+    d.querySelector('.meter').addEventListener('click', function (e) { e.stopPropagation(); meter(i + 1, false); });
+    d.addEventListener('dragstart', function (e) { arrastrada = i; d.classList.add('arrastrando'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); });
+    d.addEventListener('dragend', function () { arrastrada = null; pintarLista(); });
+    d.addEventListener('dragover', function (e) {
+      if (arrastrada === null) return; e.preventDefault();
+      var r = d.getBoundingClientRect(), antes = e.clientY < r.top + r.height / 2;
+      d.classList.toggle('encima-antes', antes); d.classList.toggle('encima-despues', !antes);
+    });
+    d.addEventListener('dragleave', function () { d.classList.remove('encima-antes', 'encima-despues'); });
+    d.addEventListener('drop', function (e) {
+      e.preventDefault(); if (arrastrada === null) return;
+      var r = d.getBoundingClientRect(), destino = i + (e.clientY < r.top + r.height / 2 ? 0 : 1);
+      mover(arrastrada, destino);
+    });
+    caja.appendChild(d);
+  });
+  if (foco != null) { var c = caja.querySelectorAll('.frase')[foco]; if (c) c.focus(); }
+}
+
+function marcarElegida() {
+  Array.prototype.forEach.call(document.querySelectorAll('.linea'), function (d) { d.classList.toggle('elegida', +d.dataset.pos === elegida); });
+}
+
+function mover(desde, destino) {
+  var g = tareas.splice(desde, 1)[0];
+  if (destino > desde) destino--;
+  tareas.splice(destino, 0, g);
+  elegida = destino;
+  pintarTodo();
+}
+
+function meter(pos, rotulo) {
+  tareas.splice(pos, 0, rotulo ? { texto: '', rotulo: true } : { texto: '', papel: '', como: '', soloSi: null });
+  elegida = pos;
+  pintarTodo(pos);
+}
+
+function pintarDetalle() {
+  var caja = $('detalle');
+  var g = tareas[elegida];
+  if (!g) { caja.innerHTML = '<p class="vacio">Elige una tarea de la lista para verla entera.</p>'; return; }
+  var num = 0; for (var k = 0; k <= elegida; k++) if (!tareas[k].rotulo) num++;
+  var h = '<h2>' + (g.rotulo ? 'Rótulo' : 'Tarea ' + num) + '</h2>' +
+    '<div class="grupo"><label class="etiqueta" for="d-frase">' + (g.rotulo ? 'Rótulo' : 'Frase') + '</label><input class="campo" id="d-frase" value="' + esc(g.texto) + '"></div>';
+  if (!g.rotulo) {
+    var campoSi = g.soloSi ? g.soloSi.campo : '';
+    h += '<div class="dos">' +
+      '<div class="grupo"><label class="etiqueta" for="d-papel">Papel</label><select class="campo" id="d-papel"><option value="">Sin papel</option>' +
+        PAPELES.map(function (p) { return '<option value="' + esc(p) + '"' + (p === g.papel ? ' selected' : '') + '>Papel: ' + esc(p) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="grupo"><label class="etiqueta" for="d-cuando">Cuándo se hace</label><select class="campo" id="d-cuando"><option value="">Siempre</option>' +
+        Object.keys(CAMPOS).map(function (c) { return '<option value="' + esc(c) + '"' + (c === campoSi ? ' selected' : '') + '>Solo si ' + esc(c) + ' es…</option>'; }).join('') +
+        '<option value="__nuevo">+ Nuevo campo de lista…</option></select>' +
+        (campoSi ? '<div class="valores">' + CAMPOS[campoSi].map(function (v) { return '<label><input type="checkbox" class="d-valor" value="' + esc(v) + '"' + (g.soloSi.valores.indexOf(v) !== -1 ? ' checked' : '') + '> ' + esc(v) + '</label>'; }).join('') + '</div>' +
+          '<p class="nota-chica">En el asunto, si el campo tiene otro valor, esta tarea no sale.' + (g.soloSi.valores.length ? '' : ' Marca al menos un valor; si no, se guardará como «Siempre».') + '</p>' : '') +
+      '</div></div>' +
+      '<div class="grupo"><label class="etiqueta" for="d-como">Cómo se hace <span style="font-weight:400;color:#6a7683">(opcional)</span></label>' +
+        '<textarea class="campo" id="d-como" placeholder="Explicación, pasos, ruta de Séneca o normativa">' + esc(g.como) + '</textarea></div>';
+  }
+  h += '<div class="mandos"><button type="button" class="boton" id="d-subir"' + (elegida === 0 ? ' disabled' : '') + '>↑ Subir</button>' +
+    '<button type="button" class="boton" id="d-bajar"' + (elegida === tareas.length - 1 ? ' disabled' : '') + '>↓ Bajar</button>' +
+    '<button type="button" class="boton boton-peligro" id="d-quitar">' + (g.rotulo ? 'Quitar este rótulo' : 'Quitar esta tarea') + '</button></div>';
+  caja.innerHTML = h;
+
+  $('d-frase').addEventListener('input', function () { g.texto = this.value; var c = document.querySelectorAll('.frase')[elegida]; if (c) c.value = this.value; });
+  if (!g.rotulo) {
+    $('d-papel').addEventListener('change', function () { g.papel = this.value; pintarLista(); });
+    $('d-cuando').addEventListener('change', function () {
+      if (this.value === '__nuevo') { avisar('Aquí se abre la ventana de crear un campo de lista, como hoy.'); this.value = g.soloSi ? g.soloSi.campo : ''; return; }
+      g.soloSi = this.value ? { campo: this.value, valores: [] } : null; pintarLista(); pintarDetalle();
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.d-valor'), function (c) {
+      c.addEventListener('change', function () {
+        var v = this.value, l = g.soloSi.valores, p = l.indexOf(v);
+        if (this.checked && p === -1) l.push(v); if (!this.checked && p !== -1) l.splice(p, 1);
+        pintarLista(); pintarDetalle();
+      });
+    });
+    $('d-como').addEventListener('input', function () { var tenia = !!g.como; g.como = this.value; if (tenia !== !!g.como) pintarLista(); });
+  }
+  $('d-subir').addEventListener('click', function () { mover(elegida, elegida - 1); });
+  $('d-bajar').addEventListener('click', function () { mover(elegida, elegida + 2); });
+  $('d-quitar').addEventListener('click', function () { tareas.splice(elegida, 1); elegida = Math.min(elegida, tareas.length - 1); pintarTodo(); });
+}
+
+function pintarTodo(foco) { pintarLista(foco); pintarDetalle(); }
+
+$('anadir-tarea').addEventListener('click', function () { meter(tareas.length, false); });
+$('anadir-rotulo').addEventListener('click', function () { meter(tareas.length, true); });
+$('guardar').addEventListener('click', function () { avisar('En la app se guarda la guía y se cierra. Aquí no se guarda nada.'); });
+$('cancelar').addEventListener('click', function () { avisar('En la app se cierra sin guardar. Aquí no se cierra.'); });
+pintarTodo();
+</script>
+</body>
+</html>
