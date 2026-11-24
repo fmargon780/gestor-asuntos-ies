@@ -27,6 +27,9 @@ Cada una con su fecha y de dónde sale.
 - (10-nov-2026, idea 576) Con el campo vacío salen todos en amarillo con «Falta: <campo>», como los textos condicionales; lo ya hecho no desaparece al cambiar el campo («me encaja mucho»).
 - (10-nov-2026, idea 576) Las guías con preguntas las pasa la app sola: cada pregunta a campo de lista y sus hitos con «Solo si»; en los asuntos abiertos el campo queda con la respuesta elegida («me encaja»).
 
+- (24-nov-2026, fila 737) **La guía se edita a toda la pantalla:** a la izquierda la lista entera, una línea por tarea, que se escribe con Intro y se ordena arrastrando; a la derecha la tarea elegida en grande («Me parece bien tu propuesta»; «Sí, es mucho más cómodo»). Sin botón de quitar en cada línea: se quita desde la derecha («Ok. Estupendo.»).
+- (24-nov-2026, fila 737) En el editor de la guía, **«Ver la guía para»** tacha en gris las tareas que no saldrían en el caso elegido, para ver el mapa del proceso con sus «Solo si»; y bajo el papel sale **su recorrido** («lo veo bien»).
+
 ## Plantillas
 
 - (4-nov-2026, fila 510) Las variantes de un documento se resuelven con **textos condicionales**
