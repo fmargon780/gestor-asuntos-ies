@@ -106,6 +106,8 @@ App.pintarCamposEditar = function (tipo, guardados, ficha, nombreAsunto) {
   var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
   /* Fila 245: más los «solo aquí» de la ficha del asunto. */
   config = Campos.camposDeAsunto(config, ficha);
+  /* Fila 747: «Una persona del asunto» no se cambia aquí (un desplegable vacío borraría la elección): se elige al generar el documento. */
+  config = config.filter(function (c) { return Campos.claseDeCampo(c, App.E.campos) !== 'personaAsunto'; });
   if (!config.length) return { html: '', items: [] };
 
   var items = config.map(function (cfg) {
@@ -398,6 +400,11 @@ async function abrirCuadroDeEdicion(a, p, base) {
   var camposGuardados = {};
   itemsCampos.forEach(function (item, i) {
     camposGuardados[item.clave] = { valor: valorEditado(item, i), enNombre: enNombreEditado(i) };
+  });
+  /* Fila 747: la persona elegida de «Una persona del asunto» no se toca aquí: se conserva tal cual. */
+  var delRegistro = (App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[a.nombre] && App.E.registro.asuntos[a.nombre].campos) || (a.ficha && a.ficha.campos) || {};
+  Object.keys(Array.isArray(delRegistro) ? {} : delRegistro).forEach(function (k) {
+    if (delRegistro[k] && delRegistro[k].persona && !camposGuardados[k]) camposGuardados[k] = delRegistro[k];
   });
 
   var datos = {

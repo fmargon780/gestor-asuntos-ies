@@ -70,8 +70,10 @@ App.pintarCamposDelTipo = function () {
   /* Fila 255: los campos de un hito no se piden al crear (se rellenan cuando llega su
      hito); solo se guarda su valor de partida, si lo tiene (de fichero o calculado). */
   /* Fila 530: lo mismo con «sin pedirlo al crear» (`sinPedirAlCrear`): el campo es del asunto, pero no se pide aquí. */
-  var lista = todos.filter(function (c) { return !c.hito && !c.sinPedirAlCrear; });
-  App.E.nuevo.camposDeHito = todos.filter(function (c) { return c.hito || c.sinPedirAlCrear; }).map(function (cfg) {
+  /* Fila 747: «Una persona del asunto» tampoco se pide al crear (las personas aún no están): se elige al generar el documento. */
+  function esPersona(c) { return Campos.claseDeCampo(c, App.E.campos) === 'personaAsunto'; }
+  var lista = todos.filter(function (c) { return !c.hito && !c.sinPedirAlCrear && !esPersona(c); });
+  App.E.nuevo.camposDeHito = todos.filter(function (c) { return c.hito || c.sinPedirAlCrear || esPersona(c); }).map(function (cfg) {
     return { clave: Campos.claveDeCampo(cfg), nombre: Campos.nombreDeCampo(cfg, App.E.campos),
              valor: String(Campos.valorInicial(cfg, persona, App.E.campos) || '') };
   });

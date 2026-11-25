@@ -95,6 +95,14 @@ await comprobar('9. «Tutor con custodia» sigue igual', p.evaluate(() => {
   return [dos || '', DatosDelAsunto.infoDe('Tutor con custodia', App.E.listaAbiertos[0], { tutor1: 'Ana', tutor2: 'Luis' }).valores];
 }), ['', ['Ana', 'Luis']]);
 
+await comprobar('9b. «Cambiar el asunto» no enseña la persona (un desplegable vacío la borraría)', p.evaluate(() => {
+  const a = App.E.listaAbiertos[0];
+  const tipo = DatosDelAsunto.tipoDe(a);
+  const ficha = Object.assign({}, App.E.registro.asuntos[a.nombre], { camposPropiosDelAsunto: [{ origen: 'propio', id: 'pq747' }] });
+  const r = App.pintarCamposEditar(tipo, {}, ficha, a.nombre);
+  return r.items.some((i) => i.nombre === 'Quién recibe');
+}), false);
+
 await comprobar('10. no hay errores en la consola', Promise.resolve(errores), []);
 await navegador.close();
 if (fallos) { console.log(fallos + ' fallos'); process.exit(1); }
