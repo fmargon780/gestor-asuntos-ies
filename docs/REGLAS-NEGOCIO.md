@@ -359,3 +359,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## Campo «Una persona del asunto» (tema 745, 25-nov-2026)
 
 - (25-nov-2026, tema 745) **Una plantilla puede preguntar «¿Quién?» entre las personas que ya están en el asunto** (tercero, quien lo pide, terceros relacionados y, si el tercero es alumno, sus tutores), sin reglas de edad, de padre o madre ni de tutor. Se elige a quien se quiera y se corrige con «Cambiar». Francisco: «¿No sería más completo que… te deje elegir una de las personas relacionadas en el asunto, sin entrar a ver si es mayor o menor de edad, padre o madre, tutor o lo que sea?»
+
+## Descargar el Word de una plantilla (idea 748, 25-nov-2026)
+
+- (25-nov-2026, idea 748) **Las plantillas de Word se pueden descargar** desde Herramientas → Plantillas («⋮» › «Descargar el Word»), para cambiarles el formato en Word y devolverlas con «Sustituir el fichero…». Francisco: «Lo que busco con esto es poder hacer cambios de formato en los documentos que no puedo hacer en la app.» Las plantillas de correo no se descargan: el correo es solo texto (idea 749 para darle formato).

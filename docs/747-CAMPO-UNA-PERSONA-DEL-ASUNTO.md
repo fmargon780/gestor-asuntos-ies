@@ -50,3 +50,20 @@ No se pidió. Lo que verá la usuaria es lo de arriba.
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (25-nov-2026, sesión de Claude Code) Código en la rama `fila-747` (también en `claude/amazing-dijkstra-c0qgwa`), sin fusionar en `main` ni publicar. Nuevo: `js/persona-del-asunto.js`, clase de dato `personaAsunto` en `js/campos-clases.js`, y enganches en `js/datos-del-asunto.js`, `js/plantillas-valores.js`, `js/plantillas.js`, `js/word-faltan.js`, `js/asuntos-editar.js`, `js/asuntos-nuevo-campos.js`. Prueba nueva `pruebas/persona-del-asunto.mjs` (11 comprobaciones); `campos-importe-numero-fecha` actualizada (seis clases). La pasada completa dio 423 de 425; los dos fallos son los de arriba (uno a solas pasó, el otro era la cuenta de clases).
+- **Revisor 1: RECHAZADA.** Punto 3: «Cambiar el asunto» enseñaba el campo con el desplegable vacío y al guardar borraba la elección. Arreglado (el cuadro no enseña el campo y conserva la persona).
+- **Revisor 2 (desde cero): RECHAZADA** — ATASCO PARA CLAUDE. Lo que dijo:
+  - Punto 3 MAL: no encontró un «Cambiar» para la persona elegida (ni en la tarjeta «Campos de este asunto», ni en «Cambiar el asunto», ni en otra pantalla). Sí vio que no vuelve a preguntar y que «Guardar» en «Cambiar el asunto» ya no la borra. Duda mía: el «Cambiar» de la fila 738 vive en la lista de datos de la tarea/plantilla (`js/datos-del-asunto-vista.js`, solo si el dato ya está guardado); el revisor no llegó a esa pantalla. Habría que decidir con Francisco dónde se cambia la persona.
+  - Punto 4 MAL: el nombre de relacionados y tutores sale mal en el Word: «Otero Campos, Marta 344A» (lleva el código de referencia pegado) y apellidos primero («Ponce, Rocío»), frente al tercero «Iván Esteban Roca». Pendiente: limpiar el código y decidir el orden del nombre (probable: usar `Plantillas.nombreNaturalDe`).
+  - Punto 5 MAL «probable»: «Custodia · Persona» del selector no se rellena solo; el revisor no pudo compararlo con antes. No es de esta fila (probablemente ya era así).
+  - Defectos menores: el relacionado sale sin rol; no se vio el caso «Otra persona…» ni «Tutor con custodia» con dos tutores sin custodia.
+  - Duda del punto (c), sin relación con la fila: un asunto liquidado no aparece en «Asuntos cerrados» de la copia.
+- Para retomar: arreglar el nombre (4), decidir dónde está el «Cambiar» (3, pregunta para Francisco si cambia lo que ve la usuaria) y volver a pasar un revisor nuevo.
+
+
+## Decisiones tras la revisión (25-nov-2026, Francisco con Claude)
+- Punto 3: la tarjeta «Campos de este asunto» enseña a la persona elegida con un «Cambiar» al lado, como los demás datos (el de la fila 738). Al cambiarla se guarda con `DatosDelAsunto.guardar` y se repinta la tarjeta. Nada desaparece de la app.
+- Punto 4 (técnico, decide Claude): el nombre de relacionados y tutores en el Word va como el del tercero: nombre y apellidos en orden natural (`Plantillas.nombreNaturalDe`) y sin el código de referencia pegado.
+- Punto 5: no es de esta fila; no se toca.
+- Menor: poner el rol del relacionado si lo hay.
+- Después: una sola tanda de pruebas y un revisor nuevo. Partir de la rama `claude/amazing-dijkstra-c0qgwa`.
