@@ -60,3 +60,10 @@ No se pidió. Lo que verá la usuaria es lo de arriba.
   - Duda del punto (c), sin relación con la fila: un asunto liquidado no aparece en «Asuntos cerrados» de la copia.
 - Para retomar: arreglar el nombre (4), decidir dónde está el «Cambiar» (3, pregunta para Francisco si cambia lo que ve la usuaria) y volver a pasar un revisor nuevo.
 
+
+## Decisiones tras la revisión (25-nov-2026, Francisco con Claude)
+- Punto 3: la tarjeta «Campos de este asunto» enseña a la persona elegida con un «Cambiar» al lado, como los demás datos (el de la fila 738). Al cambiarla se guarda con `DatosDelAsunto.guardar` y se repinta la tarjeta. Nada desaparece de la app.
+- Punto 4 (técnico, decide Claude): el nombre de relacionados y tutores en el Word va como el del tercero: nombre y apellidos en orden natural (`Plantillas.nombreNaturalDe`) y sin el código de referencia pegado.
+- Punto 5: no es de esta fila; no se toca.
+- Menor: poner el rol del relacionado si lo hay.
+- Después: una sola tanda de pruebas y un revisor nuevo. Partir de la rama `claude/amazing-dijkstra-c0qgwa`.
