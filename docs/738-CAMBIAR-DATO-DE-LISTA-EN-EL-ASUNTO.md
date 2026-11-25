@@ -30,3 +30,7 @@ Probó la guía en la app real: con «¿Quién hace la solicitud?» = Otra perso
 - El registro del asunto lleva la línea del cambio.
 - En un asunto cerrado o de archivo no hay «Cambiar».
 - Un dato vacío sigue con su desplegable «Elegir…» de siempre.
+
+- (25-nov-2026, Claude Code) Segundo revisor (agente aparte, contexto limpio, servidor local, copia de pruebas con «Baja de matrícula»): **APROBADA a la primera**. Coincide: «Cambiar» en un dato de lista con valor; el desplegable abre con el valor de ahora; se guarda al momento y queda al reabrir; el registro lleva «<dato>: de <antes> a <ahora>»; las tareas con «Solo si» salen y se quitan (la ya hecha se queda); en un asunto cerrado no hay «Cambiar»; el dato vacío sigue con «Elegir…»; soltar sin elegir lo deja como estaba; consola sin errores; pantallas principales abren.
+- Observaciones del revisor, sin tocar: al dar el primer valor a un dato vacío no se anota línea en el registro (solo el cambio, como pide la instrucción); en un asunto cerrado los datos vacíos conservan su desplegable «Elegir…» (ya era así).
+- No visto: probar con la guía real de IPASEN ALUMNADO (solo en el instituto).
