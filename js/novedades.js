@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '746', fecha: '2026-11-25', texto: 'En «Asunto que se repite», el tercero ya no se escribe: se busca escribiendo unas letras y se elige entre los de las clases que admite el tipo; si no está, se da de alta ahí mismo sin perder lo que habías puesto.' },
   { id: '731', fecha: '2026-11-25', texto: 'En la pantalla de entrada de asuntos.fmargon.com hay un botón «Pasar a la dirección nueva»: te lleva a la dirección que abre también en el instituto, donde la aplicación te dice qué carpetas señalar de nuevo, una por una, con su nombre.' },
   { id: '740', fecha: '2026-11-25', texto: 'Al pulsar «Entrar», bajo el botón sale en qué paso está la aplicación; si tarda, lo dice, y si algo falla, un cuadro rojo se queda con lo que ha pasado.' },
   { id: '738', fecha: '2026-11-25', texto: 'En «Campos del asunto» de un asunto abierto, un dato de lista que ya tiene valor lleva ahora «Cambiar»: lo cambias al momento y las tareas que dependen de él se ajustan solas.' },

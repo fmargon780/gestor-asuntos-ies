@@ -14,6 +14,7 @@
     // Conflictos._interno.
     'js/conflictos-datos.js',
     'js/conflictos-diferencias.js',
+    'js/recurrentes-tercero.js',
     'js/recurrentes.js',
     'js/guias-enganche.js',
     // El modelo de los hitos de un asunto: después de js/guias.js y de

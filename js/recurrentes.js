@@ -415,7 +415,8 @@
      tener que buscarlo en el desplegable. `alGuardar` se llama además
      de `pintarTabla`/`pintarPanel` cuando se guarda, para que esa
      sección se repinte con la fila nueva. */
-  async function alta(tipoPreset, alGuardar) {
+  async function alta(tipoPreset, alGuardar, previo) {
+    previo = previo || {};
     /* Fila 422: sin los desactivados, salvo el que llega ya elegido desde su pantalla de Ajustes. */
     var tipos = window.Gestor.tipos().filter(function (t) { return !t.desactivado || t.tipo === tipoPreset; });
     if (!tipos.length) {
@@ -443,7 +444,7 @@
       '<label class="etiqueta">Tipo de asunto</label>' +
       '<select id="rec-tipo" class="campo">' + opciones + '</select>' +
       '<label class="etiqueta">Tercero</label>' +
-      '<input id="rec-tercero" class="campo" placeholder="Tal cual va al final del nombre">' +
+      '<div id="rec-tercero-sitio"></div>' +   /* fila 746: se elige, ya no se escribe */
       '<label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>' +
       '<input id="rec-descripcion" class="campo">' +
       '<div class="dos-columnas">' +
@@ -466,12 +467,28 @@
         '<div id="rec-vista" class="vista-nombre"></div>' +
       '</div>', 'Guardar');
 
+    /* Fila 746: el tercero elegido. Con el tipo se cambian las clases que se pueden elegir. */
+    var elegido = previo.elegido || null;
+    var pedidoAlta = null;
+    function pintarTercero() {
+      var t = tipos.filter(function (x) { return x.tipo === $('rec-tipo').value; })[0];
+      elegido = RecurrenteTercero.montar($('rec-tercero-sitio'), {
+        tipo: t, elegido: elegido,
+        alCambiar: function (e) { elegido = e; refrescar(); },
+        alPedirAlta: function (categoria, texto) {
+          /* Un solo cuadro a la vez: se cierra este, se da de alta y se vuelve a abrir como estaba. */
+          pedidoAlta = { categoria: categoria, texto: texto };
+          $('cuadro-cancelar').click();
+        }
+      });
+    }
+
     function refrescar() {
       var esAnual = $('rec-periodo').value === 'anual';
       $('rec-bloque-mes').classList.toggle('oculto', !esAnual);
       $('rec-vista').textContent = nombreDe({
         tipo: $('rec-tipo').value,
-        tercero: $('rec-tercero').value.trim(),
+        tercero: elegido ? elegido.tercero : '',
         descripcion: $('rec-descripcion').value.trim()
       }, U.hoyIso());
     }
@@ -480,15 +497,35 @@
       $('rec-tipo').value = tipoPreset;
     }
 
-    ['rec-tipo', 'rec-tercero', 'rec-descripcion', 'rec-periodo']
+    ['rec-tipo', 'rec-descripcion', 'rec-periodo']
       .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
+    $('rec-tipo').onchange = function () { pintarTercero(); refrescar(); };
+    if (previo.descripcion) $('rec-descripcion').value = previo.descripcion;
+    if (previo.periodo) $('rec-periodo').value = previo.periodo;
+    if (previo.dia) $('rec-dia').value = previo.dia;
+    if (previo.mes) $('rec-mes').value = previo.mes;
+    if (previo.plazo) $('rec-plazo').value = previo.plazo;
+    pintarTercero();
     refrescar();
 
-    var ok = await promesa;
-    if (!ok) return;
+    /* Con el cuadro cerrado, se guarda lo escrito, se da de alta y se vuelve a abrir. */
+    function conLoEscrito() {
+      return { tipo: $('rec-tipo').value, descripcion: $('rec-descripcion').value, periodo: $('rec-periodo').value,
+               dia: $('rec-dia').value, mes: $('rec-mes').value, plazo: $('rec-plazo').value };
+    }
+    var escrito = null;
+    $('cuadro-cancelar').addEventListener('click', function () { if (pedidoAlta) escrito = conLoEscrito(); }, { once: true });
 
-    var tercero = U.limpiarNombre($('rec-tercero').value);
-    if (!tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
+    var ok = await promesa;
+    if (!ok) {
+      if (!pedidoAlta) return;
+      var nuevo = await RecurrenteTercero.darDeAlta(pedidoAlta.categoria, pedidoAlta.texto);
+      escrito.elegido = nuevo || elegido;
+      return alta(escrito.tipo, alGuardar, escrito);
+    }
+
+    if (!elegido) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
+    var tercero = elegido.tercero;
 
     var tipo = $('rec-tipo').value;
     var plazo = parseInt($('rec-plazo').value, 10);
@@ -496,7 +533,7 @@
     lista.push({
       id: 'r' + Date.now(),
       tipo: tipo,
-      categoria: Nombres.categoriaDeTipo(tipos, tipo),
+      categoria: elegido.categoria,
       tercero: tercero,
       descripcion: $('rec-descripcion').value.trim(),
       periodo: $('rec-periodo').value,
