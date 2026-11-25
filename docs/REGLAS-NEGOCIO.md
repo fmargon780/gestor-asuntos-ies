@@ -363,3 +363,12 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## Descargar el Word de una plantilla (idea 748, 25-nov-2026)
 
 - (25-nov-2026, idea 748) **Las plantillas de Word se pueden descargar** desde Herramientas → Plantillas («⋮» › «Descargar el Word»), para cambiarles el formato en Word y devolverlas con «Sustituir el fichero…». Francisco: «Lo que busco con esto es poder hacer cambios de formato en los documentos que no puedo hacer en la app.» Las plantillas de correo no se descargan: el correo es solo texto (idea 749 para darle formato).
+
+## Compras de material de oficina (tema 583, 25-nov-2026)
+
+- (25-nov-2026, tema 583) **Material de oficina dentro del Gestor:** catálogo por categorías con sus características, lista común de lo que falta, precios por proveedor, pedidos y cotejo de pedido, albarán y factura. Francisco: «es importante tener bien categorizado el material, ya que a veces lo que cambian son formatos, medidas, gramages». Sin existencias, inventario ni presupuesto por departamento.
+- (25-nov-2026, tema 583) **Cada característica tiene su lista de valores** («+ Nuevo valor…»), para que lo mismo se escriba siempre igual.
+- (25-nov-2026, tema 583) **Se pide a quien conviene, no siempre al más barato:** «a veces hay que hacer pedidos a proveedores para que los gastos de transporte sean gratis. O por diversificar y que nos puedan mantener descuentos.» Cada línea se asigna a un proveedor y una línea se puede partir entre dos.
+- (25-nov-2026, tema 583) **Cada pedido es un asunto COMPRA nuevo** con su documento de pedido; un pedido ya enviado no se amplía. Una factura puede juntar varios pedidos del mismo proveedor.
+- (25-nov-2026, tema 583) **Precios sin IVA; IVA al 21 %.** Tope del contrato menor de suministros que vigila la app: 15.000 € sin IVA por proveedor y año natural (aviso desde el 80 %).
+- (25-nov-2026, tema 583) La factura se sigue metiendo en Séneca: la app no lo sustituye.
