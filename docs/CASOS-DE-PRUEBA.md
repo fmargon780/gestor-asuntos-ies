@@ -43,6 +43,7 @@ La descripción «CASO …» solo se ve en «⋯» → «Cambiar el asunto»; el
 | Uno vencido | descripción «CASO VENCIDO», de «Custodia Dudosa, Vera», abierto hace más de un año |
 | Grupo con datos de la lista (fila 722) | asunto «GRUPO 2ºB»: la columna «Número de título» (`{campo:Número de título}`) tiene un valor para cada una (T-26-101…) menos Vera Gallardo, que sale vacía; sin pantalla de prueba |
 | Expulsión al aula de convivencia, con su nota (fila 723) | solo con `?demo=1&auto=1&aula=1`: el tipo «EXPULSIÓN AULA CONVICENCIA» pasa a «Sin hitos» con su lista de tres tareas; «Soto Lara, Daniel» es un asunto de antes, con sus hitos; «Rubio Vega, Marina» nace con la lista, con «Primer día» (23-nov-2026) y «Días lectivos» (3) ya puestos; «Lara Pardo, Hugo» nace con los dos datos vacíos |
+| Crear varios desde el aviso del aula de convivencia (fila 724) | con `?demo=1&auto=1&aula=1`, «Nuevo asunto» con el tipo «EXPULSIÓN AULA CONVICENCIA» → «Crear varios desde una lista». Aviso 1: «Navarro Gil, Lucía (2º B) 3 días, del 18 al 20 de noviembre.» + «Enviado el 14/11/2026 …». Aviso 2: «Ortega Paz , Darío (2º B) 4 días, del martes 3 al viernes 6 de noviembre.» y «Pardo Luna, Nerea (2º B) 3 días, del martes 3 al viernes 5 de noviembre.» (la segunda línea no cuadra: el 5 de noviembre de 2026 es jueves) + «Enviado el 27/10/2026 …». Todo inventado |
 | Mucha gente y mucho archivo | Inicio con decenas de asuntos; «Archivo» con tres cursos |
 
 ## Todavía sin caso (se añadirán cuando una fila los necesite)
