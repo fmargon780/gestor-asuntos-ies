@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '746', fecha: '2026-11-25', texto: 'En «Asunto que se repite», el tercero ya no se escribe: se busca escribiendo unas letras y se elige entre los de las clases que admite el tipo; si no está, se da de alta ahí mismo sin perder lo que habías puesto.' },
   { id: '740', fecha: '2026-11-25', texto: 'Al pulsar «Entrar», bajo el botón sale en qué paso está la aplicación; si tarda, lo dice, y si algo falla, un cuadro rojo se queda con lo que ha pasado.' },
   { id: '738', fecha: '2026-11-25', texto: 'En «Campos del asunto» de un asunto abierto, un dato de lista que ya tiene valor lleva ahora «Cambiar»: lo cambias al momento y las tareas que dependen de él se ajustan solas.' },
   { id: '737', fecha: '2026-11-24', texto: 'La guía de un tipo que es una lista de tareas se edita ahora a toda la pantalla: a la izquierda, el proceso entero de un vistazo (con Intro creas la tarea siguiente, borrando una frase vacía la quitas y arrastrando las cambias de sitio); a la derecha, la tarea elegida en grande, con el recorrido de su papel. Arriba, «Ver la guía para:» enseña qué tareas saldrían en cada caso, y Cancelar y Guardar están a la vista.' },
