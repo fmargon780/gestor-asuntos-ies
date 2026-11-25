@@ -355,3 +355,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (20-nov-2026, tema 718) **En cada ordenador hay que señalar las carpetas de nuevo** en la dirección nueva (el navegador guarda los permisos por dirección). La app lo guía, carpeta por carpeta y por su nombre, desde un botón «Pasar a la dirección nueva».
 - (20-nov-2026, tema 718) **Orden de la mudanza:** un ordenador del instituto con Edge; después los demás; Diego el último. Al final `asuntos.fmargon.com` solo dice que la app se ha mudado. La copia sin internet se queda como plan B.
 - (20-nov-2026, tema 718) **La dirección de prueba no cambia** y sigue en demostración: no comparte permisos con la de verdad.
+
+## Campo «Una persona del asunto» (tema 745, 25-nov-2026)
+
+- (25-nov-2026, tema 745) **Una plantilla puede preguntar «¿Quién?» entre las personas que ya están en el asunto** (tercero, quien lo pide, terceros relacionados y, si el tercero es alumno, sus tutores), sin reglas de edad, de padre o madre ni de tutor. Se elige a quien se quiera y se corrige con «Cambiar». Francisco: «¿No sería más completo que… te deje elegir una de las personas relacionadas en el asunto, sin entrar a ver si es mayor o menor de edad, padre o madre, tutor o lo que sea?»
