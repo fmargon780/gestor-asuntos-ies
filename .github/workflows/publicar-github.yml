@@ -1,0 +1,73 @@
+name: Publicar la app en gestor-asuntos-ies.github.io
+
+# Fila 730 (docs/718-ABRIR-LA-APP-DESDE-GITHUB.md, parte 1): cada publicación en producción llega también a
+# https://gestor-asuntos-ies.github.io, sin quitar asuntos.fmargon.com. Solo se lanza a mano, desde `main`
+# (`mcp__github__actions_run_trigger`, flujo `publicar-github.yml`, ref `main`); no se dispara con ninguna subida.
+# Deja en el repositorio gestor-asuntos-ies/gestor-asuntos-ies.github.io solo la app (lo mismo que
+# deja fuera `.vercelignore`), con la hora de la versión puesta y cada pieza pedida con `?v=<versión>`.
+# Necesita el secreto PAGES_TOKEN (fila 729): clave con permiso Contents de lectura y escritura sobre ese repositorio.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-github
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Montar la copia, con la versión y sin mezclar piezas
+        run: |
+          mkdir _sitio
+          rsync -a \
+            --exclude '/_sitio' --exclude '/.git' --exclude '/node_modules' \
+            --exclude '/docs' --exclude '/pruebas' --exclude '/plantilla' \
+            --exclude '/apps-script' --exclude '/herramientas' --exclude '/.github' \
+            --exclude '/CLAUDE.md' --exclude '/.claude' --exclude '/.gitignore' --exclude '/.vercelignore' --exclude '/vercel.json' \
+            --exclude '/README.md' --exclude '/package.json' --exclude '/package-lock.json' \
+            ./ _sitio/
+          # Pages no pasa por Vercel: la hora de la versión la pone el mismo programa, sobre la copia.
+          node _sitio/scripts/version-al-publicar.mjs
+          node _sitio/scripts/versionar-copia.mjs _sitio
+          rm -rf _sitio/scripts
+          touch _sitio/.nojekyll
+          grep -n "App.VERSION" _sitio/js/version.js
+
+      - name: Clonar la dirección nueva
+        env:
+          PAGES_TOKEN: ${{ secrets.PAGES_TOKEN }}
+        run: |
+          if [ -z "$PAGES_TOKEN" ]; then echo "Falta el secreto PAGES_TOKEN (fila 729)."; exit 1; fi
+          git clone --depth 1 "https://x-access-token:${PAGES_TOKEN}@github.com/gestor-asuntos-ies/gestor-asuntos-ies.github.io.git" destino
+
+      - name: Sustituir todos sus ficheros y subir
+        run: |
+          rsync -a --delete --exclude '/.git' _sitio/ destino/
+          cd destino
+          git config user.name "publicar-github"
+          git config user.email "publicar-github@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Sin cambios que subir."; exit 0; fi
+          git commit -m "Versión $(sed -n "s/^App.VERSION = '\(.*\)';$/\1/p" js/version.js) (de ${GITHUB_SHA::7})"
+          git push origin HEAD:main
+
+      - name: Esperar a que la dirección nueva sirva esa versión
+        run: |
+          esperada=$(sed -n "s/^App.VERSION = '\(.*\)';$/\1/p" _sitio/js/version.js)
+          for i in $(seq 1 40); do
+            servida=$(curl -fsS "https://gestor-asuntos-ies.github.io/js/version.js?v=$RANDOM$i" | sed -n "s/^App.VERSION = '\(.*\)';$/\1/p" || true)
+            echo "intento $i: sirve «$servida», se espera «$esperada»"
+            if [ "$servida" = "$esperada" ]; then exit 0; fi
+            sleep 30
+          done
+          echo "La dirección nueva no sirve la versión esperada tras 20 minutos."; exit 1
