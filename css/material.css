@@ -1,0 +1,34 @@
+/* La pantalla «Material» (fila 750, docs/583-COMPRAS-DE-MATERIAL.md). Usa las variables de estilos.css. */
+#pantalla-material .cabecera { flex-wrap: wrap; gap: 10px; }
+.material-pestanas { display: flex; gap: 4px; flex-wrap: wrap; }
+.material-pestana { border: 1px solid var(--linea); background: #fff; border-radius: 6px; padding: 6px 12px; cursor: pointer; font: inherit; color: var(--tinta); }
+.material-pestana.activa { background: var(--azul); border-color: var(--azul); color: #fff; }
+.material-tabla { border-collapse: collapse; width: 100%; font-size: 14px; }
+.material-tabla th { font-size: 12px; color: var(--tinta-suave); text-align: left; font-weight: 600; border-bottom: 1px solid var(--linea); padding: 6px 8px; }
+.material-tabla td { border-bottom: 1px solid var(--linea); padding: 7px 8px; vertical-align: top; }
+.material-tabla tr.elegida td { background: var(--azul-claro); }
+.material-num { white-space: nowrap; }
+.material-cuando { white-space: nowrap; }
+.material-cantidad { width: 64px; }
+.material-chip { display: inline-block; font-size: 11px; background: #eef1f5; border-radius: 10px; padding: 1px 8px; color: #445; white-space: nowrap; }
+.material-apuntar { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 210px 90px auto; gap: 8px; align-items: center; margin: 14px 0 8px; }
+.material-sug { position: absolute; top: 40px; left: 0; width: min(560px, 55%); background: #fff; border: 1px solid var(--linea); border-radius: 6px; box-shadow: 0 6px 18px rgba(0, 0, 0, .15); z-index: 5; max-height: 320px; overflow: auto; }
+.material-sug-fila { padding: 7px 10px; cursor: pointer; }
+.material-sug-fila.activa, .material-sug-fila:hover { background: var(--azul-claro); }
+.material-sug-nuevo { border-top: 1px solid var(--linea); color: var(--azul); }
+.material-acciones { display: flex; gap: 8px; align-items: center; margin: 4px 0 10px; flex-wrap: wrap; }
+.material-catalogo { display: grid; grid-template-columns: 190px minmax(0, 1fr) minmax(0, 1.1fr); gap: 16px; margin-top: 12px; }
+.material-caja { border: 1px solid var(--linea); border-radius: 8px; padding: 10px; background: #fff; min-width: 0; }
+.material-caja h3 { font-size: 14px; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+.material-cat { padding: 6px 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }
+.material-cat.activa { background: var(--azul); color: #fff; }
+.material-fila { cursor: pointer; }
+.material-fila-campo { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px; align-items: center; margin-bottom: 8px; }
+.material-lista { display: flex; gap: 6px; min-width: 0; }
+.material-lista select { flex: 1; min-width: 0; }
+.material-casilla { display: block; font-size: 13px; line-height: 1.4; }
+@media (max-width: 1100px) {
+  .material-catalogo { grid-template-columns: 1fr; }
+  .material-apuntar { grid-template-columns: 1fr 1fr; }
+}
+.material-caja .boton-enlace, .material-acciones .boton-enlace { border: 0; background: none; color: var(--azul); padding: 2px 4px; text-decoration: underline; cursor: pointer; font: inherit; }
