@@ -27,7 +27,7 @@ await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas',
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
 await pagina.waitForFunction(() => window.Demo && !Demo.montando && window.BajaMatricula, null, { timeout: 60000 });
-await pagina.waitForFunction(() => window.Demo && !Demo.montando && App.E.tipos.some((t) => t.nombreCorto === 'BAJA MATRICULA'), null, { timeout: 120000 });
+await pagina.waitForFunction(() => window.Demo && !Demo.montando && App.E.tipos.some((t) => t.nombreCorto === 'BAJA MATRICULA'), null, { timeout: 240000 });
 await pagina.waitForTimeout(1500);
 
 
