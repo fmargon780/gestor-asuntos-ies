@@ -67,3 +67,5 @@ No se pidió. Lo que verá la usuaria es lo de arriba.
 - Punto 5: no es de esta fila; no se toca.
 - Menor: poner el rol del relacionado si lo hay.
 - Después: una sola tanda de pruebas y un revisor nuevo. Partir de la rama `claude/amazing-dijkstra-c0qgwa`.
+
+- (25-nov-2026, sesión retomada) Hecho lo decidido tras la revisión: «Cambiar» de la persona elegida en «Campos de este asunto» (`js/ficha-campos-lista-vacia.js`, `js/ficha-bloques.js`, `js/ficha-asunto.js`; también en un campo «solo aquí»); nombre de relacionados y tutores en orden natural y sin el código pegado (`js/persona-del-asunto.js`, con `Plantillas.nombreNaturalDe`; el DNI se busca con el nombre original). Los relacionados solo guardan categoría y nombre: no hay rol que poner, el rol sale si algún día se guarda (`rol` o `relacion`). Prueba: `pruebas/persona-del-asunto.mjs` (11 puntos, con el «Cambiar»).

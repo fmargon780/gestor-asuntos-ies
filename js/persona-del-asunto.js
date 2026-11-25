@@ -71,9 +71,12 @@ var PersonaDelAsunto = (function () {
     var f = fichaDe(a), v = valores || {}, lista = [];
     var categoria = f.categoria || (a && a.leido && a.leido.categoria) || '';
     var esGrupo = !!(window.AsuntoDeGrupo && a && AsuntoDeGrupo.esGrupo(a));
+    /* El nombre va como el del tercero: nombre y apellidos, sin el código pegado (`Plantillas.nombreNaturalDe`).
+       `busca` guarda el de los datos del centro, para encontrar su DNI. */
     function poner(p) {
+      if (p.nombre && window.Plantillas && Plantillas.nombreNaturalDe) { p.busca = p.nombre; p.nombre = Plantillas.nombreNaturalDe(p.nombre, p.categoria); }
       if (!p.nombre || lista.some(function (x) { return norm(x.nombre) === norm(p.nombre); })) return;
-      lista.push(Object.assign({ relacion: '', categoria: '', dni: '', telefono: '', correo: '', custodia: false }, p));
+      lista.push(Object.assign({ relacion: '', categoria: '', busca: '', dni: '', telefono: '', correo: '', custodia: false }, p));
     }
     if (!esGrupo && (v.nombreNatural || v.nombre)) {
       poner({ nombre: v.nombreNatural || v.nombre, relacion: 'el tercero', categoria: categoria, dni: v.dni, telefono: v.telefono, correo: v.correo });
@@ -84,7 +87,7 @@ var PersonaDelAsunto = (function () {
         telefono: d.telefono, correo: d.correo });
     }
     (f.relacionados || []).forEach(function (r) {
-      if (r && r.nombre && norm(r.nombre) !== norm(f.tercero)) poner({ nombre: r.nombre, relacion: '', categoria: r.categoria || '' });
+      if (r && r.nombre && norm(r.nombre) !== norm(f.tercero)) poner({ nombre: r.nombre, relacion: r.rol || r.relacion || '', categoria: r.categoria || '' });
     });
     if (categoria === 'ALUMNADO' && !esGrupo) {
       [1, 2].forEach(function (n) {
@@ -92,7 +95,7 @@ var PersonaDelAsunto = (function () {
         if (!nombre) return;
         poner({ nombre: nombre, relacion: 'Tutor legal ' + n, categoria: 'TUTORES LEGALES', dni: v['tutor' + n + 'dni'],
           telefono: v['tutor' + n + 'telefono'], correo: v['tutor' + n + 'correo'],
-          custodia: !!v.custodiaDeSeneca && v.custodiaDeSeneca === nombre });
+          custodia: !!v.custodiaDeSeneca && norm(v.custodiaDeSeneca) === norm(nombre) });
       });
     }
     return lista;
@@ -110,8 +113,10 @@ var PersonaDelAsunto = (function () {
     if ((r.dni && r.telefono && r.correo) || !p.categoria || !window.Datos || !App.E.datos) return r;
     try {
       var fuente = await Datos.cargar(App.E.datos, p.categoria);
-      var l = Datos.buscar(fuente.lista, p.nombre, 1);
-      if (!l.length) l = Datos.buscar(fuente.lista, p.nombre.replace(/[\s\d]+$/, ''), 1);
+      var busca = p.busca || p.nombre;
+      var l = Datos.buscar(fuente.lista, busca, 1);
+      if (!l.length) l = Datos.buscar(fuente.lista, busca.replace(/[\s\d]+$/, ''), 1);
+      if (!l.length && busca !== p.nombre) l = Datos.buscar(fuente.lista, p.nombre, 1);
       var x = l[0];
       if (!x) return r;
       if (!r.dni) r.dni = (p.categoria === 'ALUMNADO' && window.Dni ? (Dni.de(x) || '') : limpiarDni(x.documento));

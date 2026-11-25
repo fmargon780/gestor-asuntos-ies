@@ -170,7 +170,9 @@
       if (f.soloAqui) {
         return '<div class="ficha-dato ficha-dato-aqui"><span>' + U.escapar(f.titulo) +
           ' <span class="marca-solo-aqui">solo aquí</span></span><span>' +
-          (f.valor ? (f.ambar ? '<span class="ficha-valor-ambar" title="' + U.escapar(f.ayuda || '') + '">' + U.escapar(f.valor) + '</span>' : U.escapar(f.valor)) : '<span class="suave">sin valor</span>') +
+          (f.personaCambiar && window.FichaCamposListaVacia
+            ? '<span class="ficha-dato-valor-lista">' + U.escapar(f.valor) + FichaCamposListaVacia.cambiarPersonaHtml(f) + '</span>'   /* fila 747 */
+            : (f.valor ? (f.ambar ? '<span class="ficha-valor-ambar" title="' + U.escapar(f.ayuda || '') + '">' + U.escapar(f.valor) + '</span>' : U.escapar(f.valor)) : '<span class="suave">sin valor</span>')) +
           ' <button type="button" class="campo-aqui-menu" data-clave="' + U.escapar(f.clave || '') +
           '" data-nombre="' + U.escapar(f.titulo) + '" data-ayuda-clave="mas-opciones">⋮</button></span></div>';
       }

@@ -34,7 +34,7 @@ await comprobar('2. la lista: tercero, quien lo pide, relacionados y tutores, co
   const f = { categoria: 'ALUMNADO', tercero: 'Alumna Uno', loPide: { nombre: 'Abuela Pérez', relacion: 'abuela' }, relacionados: [{ categoria: 'PERSONAL', nombre: 'Profe Ana' }] };
   const b = { nombre: 'sin-ficha-en-el-registro', ficha: f, leido: {} };
   return PersonaDelAsunto.etiquetas(b, v);
-}, [VALORES]), ['Alumna Uno · el tercero', 'Abuela Pérez · abuela, quien lo pide', 'Profe Ana', 'Tutor, Uno · Tutor legal 1', 'Tutor, Dos · Tutor legal 2 · tiene la custodia']);
+}, [VALORES]), ['Alumna Uno · el tercero', 'Abuela Pérez · abuela, quien lo pide', 'Profe Ana', 'Uno Tutor · Tutor legal 1', 'Dos Tutor · Tutor legal 2 · tiene la custodia']);
 
 await comprobar('3. el desplegable de «Faltan datos» ofrece esas personas, sin reglas de edad', p.evaluate(([v]) => {
   const a = App.E.listaAbiertos[0];
@@ -102,6 +102,31 @@ await comprobar('9b. «Cambiar el asunto» no enseña la persona (un desplegable
   const r = App.pintarCamposEditar(tipo, {}, ficha, a.nombre);
   return r.items.some((i) => i.nombre === 'Quién recibe');
 }), false);
+
+await comprobar('9c. la persona elegida sale en «Campos de este asunto» con «Cambiar», que ofrece las personas y guarda la nueva', (async () => {
+  const antes = await p.evaluate(async () => {
+    const a = App.E.listaAbiertos[0];
+    await DatosDelAsunto.guardar(a, 'Quién recibe', 'Vecina Sin Dni');
+    FichaNucleo.modoActual = 'abierto';
+    const caja = document.createElement('div');
+    caja.id = 'prueba-747';
+    caja.innerHTML = FichaNucleo.datosDelAsunto(a) || '';
+    document.body.appendChild(caja);
+    window.CampoDesdeElAsunto.alPintar(caja, a);
+    const b = caja.querySelector('.ficha-dato-cambiar[data-persona]');
+    if (!b) return { hay: false };
+    b.click();
+    await new Promise((r) => setTimeout(r, 600));
+    const sel = caja.querySelector('select.ficha-dato-elegir');
+    const opciones = sel ? Array.from(sel.options).map((o) => o.value) : [];
+    sel.value = opciones[1];
+    sel.dispatchEvent(new Event('change'));
+    await new Promise((r) => setTimeout(r, 800));
+    const v = await Plantillas.valoresDeAsunto(a);
+    return { hay: true, opciones, cambiada: v.campos['Quién recibe (nombre)'] };
+  });
+  return [antes.hay, antes.opciones && antes.opciones.length > 1, antes.cambiada && antes.cambiada !== 'Vecina Sin Dni'];
+})(), [true, true, true]);
 
 await comprobar('10. no hay errores en la consola', Promise.resolve(errores), []);
 await navegador.close();
