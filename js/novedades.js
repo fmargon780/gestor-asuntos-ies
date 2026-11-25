@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '646', fecha: '2026-11-25', texto: 'En una tarea de añadir documento, junto a «Suelta aquí el PDF» hay un botón «Coger de Por clasificar»: eliges uno de los documentos sueltos, sale el cuadro del nombre con la tarea ya puesta y el documento entra en el asunto al pulsar «Guardar».' },
   { id: '747', fecha: '2026-11-25', texto: 'En una plantilla se puede poner un campo «Una persona del asunto» (al crear un campo manual, en «Clase de dato»). Al generar el documento pregunta «¿Quién?» y deja elegir entre las personas del asunto: el tercero, quien lo pide, los relacionados y los tutores, sin reglas de edad. El documento lleva su nombre y su DNI; si no se tiene, lo pide y lo guarda. Se cambia con «Cambiar», y sirve para varias plantillas.' },
   { id: '748', fecha: '2026-11-25', texto: 'Plantillas de Word: ya puedes descargar el Word de una plantilla (⋮ › Descargar el Word) para cambiarle el formato y devolverlo con «Sustituir el fichero…».' },
   { id: '746', fecha: '2026-11-25', texto: 'En «Asunto que se repite», el tercero ya no se escribe: se busca escribiendo unas letras y se elige entre los de las clases que admite el tipo; si no está, se da de alta ahí mismo sin perder lo que habías puesto.' },

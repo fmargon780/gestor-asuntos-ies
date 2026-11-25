@@ -110,7 +110,7 @@ var HitoMesaGuion = (function () {
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
       (g.reunir === 'documento' && g.hecho && g.documento ? '<div class="guion-paso-explicacion guion-reunir-documento">📎 ' + U.escapar(g.documento) + '</div>' : '') +
-      (abierto && siguiente && claveAccion === 'anadir' ? '<div class="guion-soltar">Suelta aquí el PDF</div>' : '') +
+      (abierto && siguiente && claveAccion === 'anadir' ? '<div class="guion-soltar">Suelta aquí el PDF</div>' + (window.TareaCogerDeBandeja ? TareaCogerDeBandeja.botonHTML() : '') : '') +   /* fila 646 */
       '<div class="guion-paso-botones">' +
         enlaceNormativa(g.normativa) +
         (abierto ? '<button type="button" class="enlace guion-noaplica">' + (g.noaplica ? 'Sí aplica' : 'No aplica') + '</button>' : '') +
@@ -286,6 +286,7 @@ var HitoMesaGuion = (function () {
     if (window.SoltarDocumento && abierto) {
       Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso'), function (el) { SoltarDocumento.enganchar(el, a); });
     }
+    if (window.TareaCogerDeBandeja && abierto) TareaCogerDeBandeja.enganchar(caja, a, h, porId);   /* fila 646: «Coger de Por clasificar» */
     if (window.Llamadas && Llamadas.enganchar) Llamadas.enganchar(caja);   /* fila 639 */
     /* Fila 638: «+ Añadir tarea» y su formulario. */
     if (window.HitoMesaNuevaTarea) HitoMesaNuevaTarea.enganchar(caja, a, h, function () { pintar(fila, a, h, abierto, hitos); });
