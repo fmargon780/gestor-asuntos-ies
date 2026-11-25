@@ -20,7 +20,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
   también `vercel.app` y, desde la fila 89, `asuntos.fmargon.com` (de ahí la copia sin internet,
   `docs/COPIA-SIN-INTERNET.md`). `gestor-de-asuntos.vercel.app` sigue viva, para `curl` desde fuera.
 - El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
-- Dirección nueva (fila 730, `docs/718-ABRIR-LA-APP-DESDE-GITHUB.md`): **https://gestor-asuntos-ies.github.io**, abre en el instituto; la sube a mano la acción `publicar-github.yml` (tras cada publicación en producción), con cada pieza pedida con `?v=<versión>`. No entra en demostración. `asuntos.fmargon.com` sigue igual.
+- Dirección nueva (fila 730, `docs/718-ABRIR-LA-APP-DESDE-GITHUB.md`): **https://gestor-asuntos-ies.github.io**, abre en el instituto; la sube a mano la acción `publicar-github.yml` (tras cada publicación en producción), con cada pieza pedida con `?v=<versión>`. No entra en demostración. `asuntos.fmargon.com` sigue igual, con el botón «Pasar a la dirección nueva» (fila 731, `js/pasar-a-direccion-nueva.js`): lleva el identificador del ordenador y los nombres de las carpetas; la nueva enseña «Carpetas por señalar» y no deja entrar hasta señalar abiertos y ARCHIVO.
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, público.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a

@@ -76,3 +76,6 @@
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- Parte 1 (fila 730), revisor: coincide todo (copia solo con la app, hora de versión puesta, `?v=` en todas las piezas, sin demostración y con botón de señalar carpetas en la dirección nueva, Content-Security-Policy en `<meta>`, `asuntos.fmargon.com` igual). No visto: la acción en GitHub (después sí: run 45626308501 bien) y abrir la dirección real con Edge. Aviso: la copia lleva también `js/demo/`, que no se usa.
+- Parte 2 (fila 731), revisor: coincide todo (botón con identificador y solo nombres; no sale en la nueva, la de prueba ni en local; lista «Carpetas por señalar» que marca al señalar, avisa de otro nombre, bloquea «Entrar» hasta señalar abiertos y ARCHIVO; «Quitar la lista»; cargas mal formadas ignoradas). Menor: «Hasta señalar las dos primeras» no dice cuáles, pero la lista las numera. No visto: las direcciones reales, `gestor-de-asuntos.vercel.app`, carpetas reales. Las carpetas de entrada, bandeja, alumnado, Centro de datos y copia sin internet no bloquean: se señalan ya dentro.
+- No se pudo mirar el repositorio de la organización desde la sesión (permiso denegado a `add_repo`).
