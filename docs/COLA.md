@@ -20,6 +20,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 388 | Aviso de usuario: mejora en «Ficha de un asunto» | EN TEMA 395 (21-oct-2026) | aviso completo: https://drive.google.com/file/d/1P_ls-gktufMCnwJ-YDoU4S9p97-8voX_/view?usp=drivesdk |
 | 395 | Tema: Documentos del centro tal como son. Para qué: que al convertir un documento del centro en plantilla salga igual que el original, con sus tablas y cuadros, y que se puedan dar de alta los impresos propios del centro, como las actas de la mesa electoral. [orden: 14 · al final del plan] | DECIDIDA (21-oct-2026 · tema) | Ideas que entran: 388, 474 y 685 (actas de la mesa electoral, `docs/685-ACTAS-MESA-ELECTORAL.md`). Idea 474 sumada el 27-oct-2026. |
 | 716 | Estudiar la posibilidad de que los datos de contacto de un tercero "beban" de los contactos de la cuenta de administración | IDEA (19-nov-2026) | Apuntada por Francisco desde el Centro de mando · reflexión 20-nov-2026: se queda como idea; la fila 717 ya pone el correo de las administraciones al enviar |
+| 748 | ¿Se puede exportar una plantilla de la app a word? | IDEA (25-nov-2026) | Apuntada por Francisco desde el Centro de mando |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
