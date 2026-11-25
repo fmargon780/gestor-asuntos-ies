@@ -148,6 +148,11 @@ var PersonaDelAsunto = (function () {
       valor: p.nombre, persona: { dni: c.dni, telefono: c.telefono, correo: c.correo, relacion: p.relacion },
       anadir: r.delAsunto ? undefined : r.entrada
     });
+    /* Un DNI escrito a mano era de la persona de antes: al cambiar de persona se quita. */
+    var campoNombre = Campos.nombreDeCampo(r.entrada, App.E.campos);
+    if (anterior && norm(anterior) !== norm(p.nombre)) {
+      try { await DatosDelAsunto.guardar(a, 'DNI de ' + campoNombre, ''); } catch (e) { /* no había */ }
+    }
     return { ok: true, valor: p.nombre, clave: clave, sinDni: !c.dni, paraDocumento: textoDe(p.nombre, c.dni) };
   }
 

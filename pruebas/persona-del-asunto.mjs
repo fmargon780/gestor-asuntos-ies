@@ -90,6 +90,15 @@ await comprobar('8. «DNI de Quién recibe» guardado en el asunto: ya no se pid
   return [r.ok, t.faltan, t.texto];
 }), [true, [], 'Vecina Sin Dni, con DNI 33333333P']);
 
+await comprobar('8b. al cambiar de persona, el DNI escrito a mano de la anterior no se arrastra', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const v0 = await Plantillas.valoresDeAsunto(a);
+  const lista = PersonaDelAsunto.personas(a, v0);
+  await DatosDelAsunto.guardar(a, 'Quién recibe', PersonaDelAsunto.etiqueta(lista[0]));
+  const v = await Plantillas.valoresDeAsunto(a);
+  return v.campos['Quién recibe (DNI)'] !== '33333333P';
+}), true);
+
 await comprobar('9. «Tutor con custodia» sigue igual', p.evaluate(() => {
   const dos = DatosDelAsunto.completar({ tutor1: 'Ana', tutor2: 'Luis', campos: {} }).campos['Tutor con custodia'];
   return [dos || '', DatosDelAsunto.infoDe('Tutor con custodia', App.E.listaAbiertos[0], { tutor1: 'Ana', tutor2: 'Luis' }).valores];
@@ -106,7 +115,7 @@ await comprobar('9b. «Cambiar el asunto» no enseña la persona (un desplegable
 await comprobar('9c. la persona elegida sale en «Campos de este asunto» con «Cambiar», que ofrece las personas y guarda la nueva', (async () => {
   const antes = await p.evaluate(async () => {
     const a = App.E.listaAbiertos[0];
-    await DatosDelAsunto.guardar(a, 'Quién recibe', 'Vecina Sin Dni');
+    await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, Campos.claveDeCampo({ origen: 'propio', id: 'pq747' }), { valor: 'Vecina Sin Dni', persona: { dni: '', telefono: '', correo: '', relacion: '' }, anadir: { origen: 'propio', id: 'pq747' } });
     FichaNucleo.modoActual = 'abierto';
     const caja = document.createElement('div');
     caja.id = 'prueba-747';
