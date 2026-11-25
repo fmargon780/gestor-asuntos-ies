@@ -34,6 +34,7 @@ var AyudasNucleo = AyudasNucleo || {};
     'personas y empresas': 'Alumnado, personal, empresas y Administraciones, con todos los asuntos de cada una.',
     'impresos': 'Los impresos de la Junta y del centro, para rellenarlos con los datos de una persona.',
     'cuentas': 'Recuentos para la memoria de fin de curso: asuntos por tipo, por mes y tiempo que llevan.',
+    'material': 'El material de oficina: lo que falta, y el catálogo con sus categorías y características.',
     'herramientas': 'Papelera, alumnado, tablas de datos, plantillas, etiquetas, actividades y copias de seguridad.',
     'ajustes': 'Tipos de asunto, datos del centro, plazos, copias y todo lo que se configura.',
     'salir': 'Cierra la sesión y vuelve a la pantalla de entrada.',
