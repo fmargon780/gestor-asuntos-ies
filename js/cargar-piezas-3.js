@@ -333,6 +333,7 @@
     'js/papel-enviado.js',   // fila 705: «Enviar correo» y «Marcar enviado» (usa TareaPapel y DocumentosDatos)
     'js/tarea-espera.js',   // fila 702: la espera es de la tarea, con su día para volver a mirar (antes de js/asunto-sin-hitos-falta.js)
     'js/asunto-sin-hitos-falta.js',   // fila 701: «Falta: <dato>» en una tarea, que se rellena ahí mismo
+    'js/guia-sin-hitos-mapa.js',   // fila 737: el recorrido del papel y «Ver la guía para»
     'js/guia-sin-hitos.js',   // fila 701: el editor de la guía como lista de tareas (usa Guias, GuiasCuando y GuiasGuion)
     'js/generar-enviar-cabecera.js',   // fila 695: «Generar documento ▾» y «Enviar ▾» de la cabecera del asunto (después de js/ficha-menus.js)
     'js/tarea-hecha.js',   // fila 671

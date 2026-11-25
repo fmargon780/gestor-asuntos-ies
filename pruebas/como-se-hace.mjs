@@ -45,9 +45,15 @@ for (const t of ['Pedir el certificado', 'Enviar la carta']) {
   await pagina.click('#gsh-anadir');
   await pagina.locator('#gsh-lista .gsh-texto').last().fill(t);
 }
-await comprobar('1. cada tarea tiene su cuadro «Cómo se hace», vacío y opcional', pagina.locator('#gsh-lista .gsh-como').evaluateAll((l) => l.map((x) => [x.tagName, x.value])), [['TEXTAREA', ''], ['TEXTAREA', '']]);
-await pagina.locator('#gsh-lista .gsh-como').first().fill('Entra en Séneca.\nVe a Alumnado › Certificados.\nImprime el certificado.');
-await pagina.click('#cuadro-aceptar');
+const cuadros = [];
+for (let i = 0; i < 2; i++) {   /* fila 737: el cuadro está a la derecha, al elegir la tarea */
+  await pagina.locator('#gsh-lista .gsh-fila').nth(i).click();
+  cuadros.push(await pagina.locator('#gsh-der .gsh-como').evaluate((x) => [x.tagName, x.value]));
+}
+await comprobar('1. cada tarea tiene su cuadro «Cómo se hace», vacío y opcional', cuadros, [['TEXTAREA', ''], ['TEXTAREA', '']]);
+await pagina.locator('#gsh-lista .gsh-fila').nth(0).click();
+await pagina.locator('#gsh-der .gsh-como').fill('Entra en Séneca.\nVe a Alumnado › Certificados.\nImprime el certificado.');
+await pagina.evaluate(() => (document.getElementById('gsh-guardar') || document.getElementById('cuadro-aceptar')).click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 await pagina.waitForTimeout(400);
 await comprobar('2. se guarda con la tarea y solo la que lo tiene', pagina.evaluate((t) => GuiasDelCentro.pasosDe(t).filter((x) => x.listaDeTareas)[0].guion.map((g) => g.comoSeHace || ''), TIPO),
