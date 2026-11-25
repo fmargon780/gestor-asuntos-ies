@@ -309,6 +309,7 @@
     'js/plantillas-documento-ajustes.js',
     'js/plantillas-uso.js',
     'js/plantillas-fichero.js',
+    'js/plantillas-descargar.js',   // fila 748
     'js/plantillas-fuera-de-uso.js',
     'js/plantillas-pantalla.js',
     // Fila 280, «Convertir en plantilla»: detrás de js/plantillas-documento-ajustes.js; js/plantilla-de-lo-escrito.js y js/genero.js ya están cargados.
