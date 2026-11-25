@@ -24,7 +24,7 @@ const SELECTOR = "window.showDirectoryPicker = async function () { return { kind
   "try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) {}";
 
 async function abrir(nombre, ruta, antes) {
-  const ctx = await navegador.newContext();
+  const ctx = await navegador.newContext({ ignoreHTTPSErrors: true });
   const p = await ctx.newPage();
   const errores = [];
   p.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
@@ -38,8 +38,9 @@ async function abrir(nombre, ruta, antes) {
 
 /* ---------- 1. el botón, en la dirección de siempre ---------- */
 {
-  const v = await abrir('asuntos.fmargon.com', '/index.html', "try { localStorage.setItem('gestor-ordenador', 'abc123'); } catch (e) {}" +
-    "window.__abiertas = []; window.open = function (u) { window.__abiertas.push(u); return {}; };");
+  const v = await abrir('asuntos.fmargon.com', '/index.html', "try { localStorage.setItem('gestor-ordenador', 'abc123'); } catch (e) {}");
+  /* La dirección nueva de verdad no se abre desde aquí: se contesta con una página vacía para ver adónde lleva el botón. */
+  await v.ctx.route('https://gestor-asuntos-ies.github.io/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>nueva</body></html>' }));
   await v.p.evaluate(async () => {
     await Almacen.guardar('abiertos', { kind: 'directory', name: 'ASUNTOS ABIERTOS' });
     await Almacen.guardar('archivo', { kind: 'directory', name: 'ARCHIVO' });
@@ -47,8 +48,8 @@ async function abrir(nombre, ruta, antes) {
   });
   comprobar('en asuntos.fmargon.com hay botón «Pasar a la dirección nueva»', await v.p.locator('#btn-pasar-direccion').textContent(), 'Pasar a la dirección nueva');
   await v.p.click('#btn-pasar-direccion');
-  await v.p.waitForFunction(() => window.__abiertas.length === 1);
-  const url = await v.p.evaluate(() => window.__abiertas[0]);
+  await v.p.waitForEvent('framenavigated', { predicate: (f) => f.url().indexOf('https://gestor-asuntos-ies.github.io/') === 0, timeout: 15000 }).catch(() => null);
+  const url = v.p.url();
   comprobar('lleva a la dirección nueva con #pasar=', url.indexOf('https://gestor-asuntos-ies.github.io/#pasar='), 0);
   const datos = JSON.parse(decodeURIComponent(url.split('#pasar=')[1]));
   comprobar('el enlace lleva el identificador y solo los nombres de las carpetas',

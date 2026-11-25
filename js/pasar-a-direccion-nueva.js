@@ -59,11 +59,9 @@
     return 'https://' + NUEVA + '/#pasar=' + encodeURIComponent(JSON.stringify(datos));
   }
 
+  /* En la misma pestaña: `window.open` con `noopener` devuelve siempre null y abriría dos. */
   async function pasar() {
-    var url = await enlaceNuevo();
-    var ventana = null;
-    try { ventana = window.open(url, '_blank', 'noopener'); } catch (e) { ventana = null; }
-    if (!ventana) window.location.href = url;
+    window.location.href = await enlaceNuevo();
   }
 
   function ponerBoton() {
