@@ -86,7 +86,7 @@ await comprobar('sin errores de consola', Promise.resolve(errores), []);
 const local = new URL(process.env.DIRECCION || 'http://localhost:8123/index.html');
 const navegadorNombres = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
-  args: ['--host-resolver-rules=MAP pruebas.fmargon.com 127.0.0.1, MAP fmargon780.github.io 127.0.0.1, MAP asuntos.fmargon.com 127.0.0.1']
+  args: ['--host-resolver-rules=MAP pruebas.fmargon.com 127.0.0.1, MAP fmargon780.github.io 127.0.0.1, MAP asuntos.fmargon.com 127.0.0.1, MAP gestor-asuntos-ies.github.io 127.0.0.1']
 });
 async function conNombre(nombre) {
   const ctx = await navegadorNombres.newContext();
@@ -116,6 +116,19 @@ await comprobar('en fmargon780.github.io, sin ?demo=1, entra sola en demostraci�
 await comprobar('en fmargon780.github.io no queda a la vista ningún botón de señalar carpetas',
   enPages.p.locator('#btn-abiertos, #btn-archivo').evaluateAll((bs) => bs.every((b) => b.offsetParent === null)), true);
 await enPages.ctx.close();
+
+/* Fila 730: la dirección nueva de la app de verdad NO es de pruebas: no entra en demostración y ofrece señalar carpetas. */
+const enNueva = await conNombre('gestor-asuntos-ies.github.io');
+await enNueva.p.waitForLoadState('load', { timeout: 90000 });
+await enNueva.p.waitForSelector('#arranque', { timeout: 20000 });
+await enNueva.p.waitForTimeout(800);
+await comprobar('en gestor-asuntos-ies.github.io no existe window.Demo', enNueva.p.evaluate(() => typeof window.Demo), 'undefined');
+await comprobar('en gestor-asuntos-ies.github.io no hay franja ni botón de demostración',
+  enNueva.p.locator('#franja-demo, #btn-demo-entrar').count(), 0);
+await comprobar('en gestor-asuntos-ies.github.io hay botón para señalar carpetas',
+  enNueva.p.locator('#btn-abiertos, #btn-archivo').count(), 2);
+await comprobar('en gestor-asuntos-ies.github.io no se pide nada de js/demo/', Promise.resolve(enNueva.peticionesDemo.filter((u) => !/arrancar\.js$/.test(u))), []);
+await enNueva.ctx.close();
 
 const enProduccion = await conNombre('asuntos.fmargon.com');
 await enProduccion.p.waitForLoadState('load', { timeout: 90000 });
