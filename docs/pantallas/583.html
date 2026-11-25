@@ -258,14 +258,17 @@ function cuadroPedir(){
  const nPed=tot.filter(z=>z.n).length,sinAsig=lin.filter(x=>asig[x.id]==null).length;
  const portes=z=>{const d=portesDe[z.p];if(d==null)return `<br><button class="b l" data-portes="${z.p}">portes gratis: sin apuntar</button>`;
   return `<br><button class="b l" data-portes="${z.p}">portes gratis desde ${eur(d)}</button>`+(z.n?(z.t>=d?'<br><small style="color:#17663a">✓ portes gratis</small>':`<br><small style="color:#9a5b00">te faltan ${eur(d-z.t)}</small>`):'')};
- const cuerpo=`<p class="ayuda" style="margin-top:0">Cada línea va al proveedor de la casilla marcada; pulsa otra casilla para cambiarla. De entrada, al más barato. En verde, el más barato de cada artículo; en gris, precios de hace más de seis meses. Una casilla sin precio: al pulsarla escribes el precio.</p>
+ const cuerpo=`<p class="ayuda" style="margin-top:0">Cada línea va al proveedor de la casilla marcada; pulsa otra casilla para cambiarla. De entrada, al más barato. En verde, el más barato de cada artículo; en gris, precios de hace más de seis meses. Una casilla sin precio: al pulsarla escribes el precio. Si bajas una cantidad, lo que queda pasa a otra fila debajo, para asignarlo a otro proveedor.</p>
   <table><thead><tr><th>Artículo</th><th class="n">Cantidad</th>${usados.map(p=>`<th class="prov n">${esc(provs[p].split(',')[0])}</th>`).join('')}<th class="prov n"><button class="b l" id="otro">+ Otro proveedor</button></th></tr></thead><tbody>
   ${lin.map(x=>{const zs=usados.map(p=>ult(x.a,p)),vals=zs.filter(z=>z&&meses(z.f)<=6).map(z=>z.pr),mn=Math.min(...vals);
-   return `<tr><td>${esc(nom(x.a))}${asig[x.id]==null?'<br><small style="color:#9a5b00">sin asignar: se queda en «Lo que falta»</small>':''}</td><td class="n">${x.c} × ${esc(artDe(x.a).u)}</td>${zs.map((z,i)=>{const p=usados[i],el=asig[x.id]===p;
+   return `<tr><td>${esc(nom(x.a))}${asig[x.id]==null?'<br><small style="color:#9a5b00">sin asignar: se queda en «Lo que falta»</small>':''}</td><td class="n" style="white-space:nowrap"><input type="number" min="1" value="${x.c}" data-q="${x.id}" style="width:60px"> × ${esc(artDe(x.a).u)}</td>${zs.map((z,i)=>{const p=usados[i],el=asig[x.id]===p;
     return `<td class="n celda ${el?'asig':''} ${z&&meses(z.f)<=6&&z.pr===mn?'barato':''} ${z&&meses(z.f)>6?'viejo':''}" data-l="${x.id}" data-a="${x.a}" data-p="${p}">${el?'✓ ':''}${z?`${eur(z.pr*x.c)}<br><small>${eur(z.pr)} · ${fecha(z.f)}</small>`:'<span class="viejo">sin precio</span>'}${el&&z?`<br><button class="b l" data-cambiar="1">Cambiar precio</button>`:''}</td>`}).join('')}<td></td></tr>`}).join('')}
   <tr><td colspan="2"><b>Lo asignado, sin IVA</b></td>${tot.map(z=>`<td class="n"><b>${z.n?eur(z.t):'—'}</b>${z.n?`<br><small>${z.n} línea${z.n>1?'s':''} · con IVA ${eur(z.t*1.21)}</small>`:''}${portes(z)}</td>`).join('')}<td></td></tr></tbody></table>`;
  cuadro(`Pedir ${lin.length} artículo${lin.length>1?'s':''}`,cuerpo,`<span class="ayuda" style="margin:0 auto 0 0">Cada proveedor con líneas asignadas tendrá su asunto COMPRA con su documento de pedido.${sinAsig?` ${sinAsig} sin asignar se quedan en «Lo que falta».`:''}</span><button class="b" id="x">Cancelar</button><button class="b p" id="ok" ${nPed?'':'disabled'}>${nPed>1?`Hacer ${nPed} pedidos`:nPed?`Pedir a ${esc(provs[tot.find(z=>z.n).p].split(',')[0])}`:'Pedir'}</button>`);
  const vuelve=()=>cuadroPedir();
+ capa.querySelectorAll('[data-q]').forEach(inp=>inp.onchange=()=>{const x=falta.find(z=>z.id===+inp.dataset.q),n=Math.max(1,Math.floor(+inp.value||1));
+  if(n<x.c){const resto={id:sigF++,a:x.a,c:x.c-n,q:x.q,f:x.f};x.c=n;falta.splice(falta.indexOf(x)+1,0,resto);(cuadroPedir.partidas=cuadroPedir.partidas||[]).push([x.id,resto.id]);marc.add(resto.id);aviso(`Partida: ${n} aquí y ${resto.c} en la fila de debajo, sin asignar.`)}else x.c=n;
+  cuadroPedir()});
  capa.querySelectorAll('.celda').forEach(td=>td.onclick=e=>{const l=+td.dataset.l,p=+td.dataset.p,a=td.dataset.a;
   if(e.target.dataset.cambiar){cuadroPrecio(a,p,vuelve);return}
   if(!ult(a,p)){cuadroPrecio(a,p,()=>{if(ult(a,p))asig[l]=p;cuadroPedir()});return}
@@ -277,8 +280,8 @@ function cuadroPedir(){
    cuadro('Otro proveedor',`<div class="fila"><label>Proveedor</label>${provSelect('op')}</div><p class="ayuda">Sale como una columna más, sin precios; pulsa sus casillas para escribirlos.</p>`,`<button class="b" id="x2">Cancelar</button><button class="b p" id="ok2">Añadir</button>`,true);
    const op=document.getElementById('op');op.onchange=()=>{if(op.value==='nuevo'){aviso('En la app se abre aquí el alta de empresa de «Personas y empresas».');op.value='0'}};
    document.getElementById('x2').onclick=vuelve;document.getElementById('ok2').onclick=()=>{cuadroPedir.extra.push(+op.value);cuadroPedir()}};
- const limpiar=()=>{cuadroPedir.extra=[];cuadroPedir.asig=null};
- document.getElementById('x').onclick=()=>{limpiar();cerrar()};
+ const limpiar=()=>{cuadroPedir.extra=[];cuadroPedir.asig=null;cuadroPedir.partidas=[]};
+ document.getElementById('x').onclick=()=>{(cuadroPedir.partidas||[]).reverse().forEach(([o,r])=>{const a=falta.find(z=>z.id===o),b=falta.find(z=>z.id===r);if(a&&b){a.c+=b.c;falta=falta.filter(z=>z!==b);marc.delete(r)}});limpiar();cerrar();pintar()};
  document.getElementById('ok').onclick=()=>{const hechos=[];
   tot.filter(z=>z.n).forEach(z=>{const l=lin.filter(x=>asig[x.id]===z.p).map(x=>({a:x.a,c:x.c,pr:ult(x.a,z.p).pr}));
    const n='A26-0'+(sigN++);pedidos.push({n,p:z.p,f:HOY,l,doc:'261125 PEDIDO D26-00'+(sigD++)+'.pdf'});hechos.push(n)});
@@ -305,7 +308,7 @@ main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[d
  if(t.dataset.v){vista=t.dataset.v;pintar()}
  else if(t.dataset.s)elegir(t.dataset.s)
  else if(t.id==='apuntar')apuntar()
- else if(t.id==='pedir'){cuadroPedir.asig=null;cuadroPedir.extra=[];cuadroPedir()}
+ else if(t.id==='pedir'){cuadroPedir.asig=null;cuadroPedir.extra=[];cuadroPedir.partidas=[];cuadroPedir()}
  else if(t.id==='quitar'){const n=marc.size;falta=falta.filter(x=>!marc.has(x.id));marc.clear();pintar();aviso(`Quitado${n>1?'s':''} ${n} de la lista.`)}
  else if(t.id==='todas'){marc=t.checked?new Set(falta.map(x=>x.id)):new Set();pintar()}
  else if(t.dataset.m){const id=+t.dataset.m;t.checked?marc.add(id):marc.delete(id);pintar()}
