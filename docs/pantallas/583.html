@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Material — prueba</title>
+<style>
+/* Pantalla de prueba del tema 583 del Gestor de Asuntos: copia el aspecto de la app real
+   (barra azul a la izquierda, página blanca, título a la izquierda y botones arriba a la derecha). */
+:root{color-scheme:light;--azul:#1f3a5f;--azul2:#2c5d8f;--borde:#e3e7ee;--gris:#6b7280;--verde:#e7f6ec;--verdet:#17663a;--ambar:#fff4d6}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif;color:#1d2430;background:#fff}
+.franja{background:#7a5a12;color:#fff;text-align:center;font-size:12px;padding:4px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 24px)}
+nav{background:var(--azul);color:#dfe8f3;padding:14px 10px}
+nav b{display:block;color:#fff;font-size:15px;margin:8px 8px 18px}
+nav a{display:block;padding:8px 10px;border-radius:6px;color:#dfe8f3;text-decoration:none;margin-bottom:2px}
+nav a.on{background:var(--azul2);color:#fff;font-weight:600}
+nav hr{border:0;border-top:1px solid #3b5679;margin:10px 0}
+main{padding:18px 26px}
+.cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cab h1{font-size:22px;margin:0 14px 0 0}
+.pest{display:flex;gap:4px}
+.pest button{border:1px solid var(--borde);background:#f6f8fb;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+.pest button.on{background:var(--azul);color:#fff;border-color:var(--azul)}
+.esp{flex:1}
+button,select,input{font:inherit}
+.b{border:1px solid #cfd6e0;background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.b.p{background:var(--azul);color:#fff;border-color:var(--azul)}
+.b:disabled{opacity:.45;cursor:default}
+.b.l{border:0;background:none;color:var(--azul2);padding:2px 4px;text-decoration:underline}
+input[type=text],input[type=number],input[type=date],select{border:1px solid #cfd6e0;border-radius:6px;padding:6px 8px;background:#fff}
+.ayuda{color:var(--gris);font-size:13px;margin:6px 0 12px}
+table{border-collapse:collapse;width:100%}
+th{font-size:12px;color:var(--gris);text-align:left;font-weight:600;border-bottom:1px solid var(--borde);padding:6px 8px;white-space:nowrap}
+td{border-bottom:1px solid var(--borde);padding:7px 8px;vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.sel td{background:#eef4fb}
+.viejo{color:#9aa1ab}
+.chip{display:inline-block;font-size:11px;background:#eef1f5;border-radius:10px;padding:1px 8px;color:#445}
+.barato{background:var(--verde);color:var(--verdet);font-weight:600}
+.apuntar{display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:8px;align-items:center;max-width:none;position:relative;margin:14px 0 8px}
+.sug{position:absolute;top:38px;left:0;right:220px;background:#fff;border:1px solid #cfd6e0;border-radius:6px;box-shadow:0 6px 18px #0002;z-index:5;max-height:300px;overflow:auto}
+.sug div{padding:7px 10px;cursor:pointer}.sug div:hover,.sug div.act{background:#eef4fb}
+.sug .nuevo{border-top:1px solid var(--borde);color:var(--azul2)}
+.acc{display:flex;gap:8px;align-items:center;margin:4px 0 8px}
+.cat3{display:grid;grid-template-columns:180px minmax(0,1fr) minmax(0,1.15fr);gap:16px;margin-top:14px}
+.caja{border:1px solid var(--borde);border-radius:8px;padding:10px}
+.caja h3{font-size:14px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.lc div{padding:6px 8px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between}
+.lc div.on{background:var(--azul);color:#fff}
+.capa{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center;z-index:20}
+.cuadro{background:#fff;border-radius:10px;width:min(1100px,94vw);max-height:90vh;display:flex;flex-direction:column}
+.cuadro.chico{width:min(520px,94vw)}
+.cuadro h2{font-size:17px;margin:0;padding:14px 18px;border-bottom:1px solid var(--borde)}
+.cuadro .cu{padding:14px 18px;overflow:auto}
+.cuadro .pie{padding:10px 18px;border-top:1px solid var(--borde);display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.fila{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;align-items:center;margin-bottom:8px}
+.celda{cursor:pointer}.celda:hover{outline:1px dashed var(--azul2)}
+.edit{display:flex;gap:4px;flex-wrap:wrap}.edit input{width:80px}
+.aviso{position:fixed;right:18px;bottom:18px;background:#17663a;color:#fff;padding:10px 14px;border-radius:8px;max-width:420px;z-index:30;box-shadow:0 6px 18px #0003}
+.ped{border:1px solid var(--borde);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.ped h3{margin:0 0 6px;font-size:14px}
+th.prov{min-width:150px}
+.cuadro td:first-child{min-width:220px}
+@media(max-width:900px){.app{grid-template-columns:1fr}nav{display:none}.cat3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="franja">Pantalla de prueba del tema «Compras de material de oficina» · datos inventados · nada se guarda</div>
+<div class="app">
+<nav><b>Gestor de Asuntos</b>
+<a>Inicio</a><a>Nuevo asunto</a><a>Asuntos cerrados</a><a>Personas y empresas</a><a>Impresos</a><a>Cuentas</a>
+<a class="on">Material</a><a>Herramientas</a><hr><a>Ajustes</a></nav>
+<main id="main"></main>
+</div>
+<div id="capa"></div>
+<div id="aviso" class="aviso" hidden></div>
+<script>
+{
+const HOY='2026-11-25', YO='Francisco';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=n=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const fecha=f=>{const [a,m,d]=f.split('-');return `${+d}-${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]}-${a}`};
+const meses=f=>{const a=new Date(f),b=new Date(HOY);return (b-a)/864e5/30.4};
+let cats=[
+ {id:'c1',nombre:'Papel',car:['Formato','Gramaje','Color']},
+ {id:'c2',nombre:'Sobres',car:['Medida','Ventana']},
+ {id:'c3',nombre:'Escritura',car:['Tipo','Color']},
+ {id:'c4',nombre:'Tóner y tinta',car:['Impresora','Color']},
+ {id:'c5',nombre:'Archivo',car:['Tipo','Formato'],sin:true},
+ {id:'c6',nombre:'Pequeño material',car:['Tipo','Medida'],sin:true}];
+let arts=[
+ {id:'a1',cat:'c1',v:['A4','80 g','Blanco'],u:'paquete de 500 hojas'},
+ {id:'a2',cat:'c1',v:['A3','80 g','Blanco'],u:'paquete de 500 hojas'},
+ {id:'a3',cat:'c1',v:['A4','160 g','Blanco'],u:'paquete de 250 hojas'},
+ {id:'a4',cat:'c1',v:['A4','80 g','Amarillo'],u:'paquete de 500 hojas'},
+ {id:'a5',cat:'c2',v:['DL 110×220','Con ventana'],u:'caja de 500'},
+ {id:'a6',cat:'c2',v:['C4 229×324','Sin ventana'],u:'caja de 250'},
+ {id:'a7',cat:'c3',v:['Bolígrafo','Azul'],u:'caja de 50'},
+ {id:'a8',cat:'c3',v:['Rotulador de pizarra','Negro'],u:'caja de 12'},
+ {id:'a9',cat:'c4',v:['Brother HL-L5100','Negro'],u:'unidad'},
+ {id:'a10',cat:'c5',v:['Archivador AZ','Folio'],u:'unidad'},
+ {id:'a11',cat:'c6',v:['Grapas','24/6'],u:'caja de 1000'}];
+let provs=['Papelería Central, S.L. B29123456','Suministros Escolares Dobla, S.L. B12345678','Imprenta Sol 22334455C','Ofiprix Andalucía, S.L. B93111222'];
+let precios=[
+ {a:'a1',p:0,pr:3.95,f:'2026-10-14',o:'Presupuesto · 261014 PRESUPUESTO D26-00412.pdf'},
+ {a:'a1',p:1,pr:3.80,f:'2026-03-02',o:'Llamada'},
+ {a:'a1',p:2,pr:4.20,f:'2026-11-03',o:'Correo'},
+ {a:'a2',p:0,pr:8.10,f:'2026-10-14',o:'Presupuesto · 261014 PRESUPUESTO D26-00412.pdf'},
+ {a:'a2',p:2,pr:7.90,f:'2026-11-03',o:'Correo'},
+ {a:'a5',p:1,pr:14.50,f:'2026-09-20',o:'Correo'},
+ {a:'a5',p:0,pr:15.20,f:'2026-10-14',o:'Presupuesto · 261014 PRESUPUESTO D26-00412.pdf'},
+ {a:'a7',p:0,pr:9.00,f:'2026-10-14',o:'Presupuesto · 261014 PRESUPUESTO D26-00412.pdf'},
+ {a:'a7',p:1,pr:8.40,f:'2026-11-10',o:'Llamada'},
+ {a:'a9',p:1,pr:62.00,f:'2026-06-01',o:'Correo'}];
+let falta=[
+ {id:1,a:'a1',c:20,q:'Diego',f:'2026-11-18'},
+ {id:2,a:'a5',c:2,q:'Francisco',f:'2026-11-20'},
+ {id:3,a:'a7',c:1,q:'Diego',f:'2026-11-21'},
+ {id:4,a:'a2',c:3,q:'Francisco',f:'2026-11-24'},
+ {id:5,a:'a9',c:2,q:'Diego',f:'2026-11-24'}];
+let pedidos=[{n:'A26-0131',p:1,f:'2026-11-12',l:[{a:'a8',c:2,pr:11.30},{a:'a10',c:10,pr:2.15}]}];
+let vista='falta', marc=new Set(), catSel='c1', artSel='a1', sigN=142, sigF=6;
+const nom=a=>{const x=arts.find(z=>z.id===a);const c=cats.find(z=>z.id===x.cat);return (c.sin?'':c.nombre+' ')+x.v.filter(Boolean).join(' ')};
+const artDe=id=>arts.find(z=>z.id===id);
+const catDe=id=>cats.find(z=>z.id===id);
+const preciosDe=a=>precios.filter(z=>z.a===a);
+function mejor(a){const v=preciosDe(a).filter(z=>meses(z.f)<=6);if(!v.length)return null;return v.reduce((m,z)=>z.pr<m.pr?z:m)}
+function aviso(t){const e=document.getElementById('aviso');e.textContent=t;e.hidden=false;clearTimeout(aviso.t);aviso.t=setTimeout(()=>e.hidden=true,4500)}
+const main=document.getElementById('main'), capa=document.getElementById('capa');
+function cabecera(){return `<div class="cab"><h1>Material</h1><div class="pest">
+ <button data-v="falta" class="${vista==='falta'?'on':''}">Lo que falta (${falta.length})</button>
+ <button data-v="pedidos" class="${vista==='pedidos'?'on':''}">Pedidos (${pedidos.length})</button>
+ <button data-v="catalogo" class="${vista==='catalogo'?'on':''}">Catálogo (${arts.length})</button></div><div class="esp"></div></div>`}
+function pintar(){main.innerHTML=cabecera()+(vista==='falta'?vFalta():vista==='pedidos'?vPedidos():vCatalogo())}
+function vFalta(){
+ const filas=falta.map(x=>{const a=artDe(x.a),m=mejor(x.a);
+  return `<tr class="${marc.has(x.id)?'sel':''}"><td><input type="checkbox" data-m="${x.id}" ${marc.has(x.id)?'checked':''}></td>
+  <td>${esc(nom(x.a))}</td><td><span class="chip">${esc(catDe(a.cat).nombre)}</span></td>
+  <td class="n"><input type="number" min="1" value="${x.c}" data-c="${x.id}" style="width:64px"> ${esc(a.u)}</td>
+  <td>${m?`${eur(m.pr)} · ${esc(provs[m.p].split(',')[0])} <span class="viejo">(${fecha(m.f)})</span>`:'<span class="viejo">Sin precio reciente</span>'}</td>
+  <td>${esc(x.q)}</td><td>${fecha(x.f)}</td></tr>`}).join('');
+ return `<p class="ayuda">Lo que hace falta en la oficina. Lo apuntáis los dos; al pedirlo pasa a «Pedidos».</p>
+ <div class="apuntar"><input type="text" id="busca" placeholder="Apuntar: escribe qué hace falta (papel A4, sobres, tóner…)" autocomplete="off">
+ <input type="number" id="cant" min="1" value="1" title="Cantidad"><button class="b p" id="apuntar" disabled>Apuntar</button><div class="sug" id="sug" hidden></div></div>
+ <div class="acc"><button class="b p" id="pedir" ${marc.size?'':'disabled'}>Pedir lo marcado${marc.size?` (${marc.size})`:''}…</button>
+ <button class="b" id="quitar" ${marc.size?'':'disabled'}>Quitar de la lista</button></div>
+ ${falta.length?`<table><thead><tr><th><input type="checkbox" id="todas" ${marc.size&&marc.size===falta.length?'checked':''}></th><th>Artículo</th><th>Categoría</th><th class="n">Cantidad</th><th>Mejor precio de los últimos seis meses (sin IVA)</th><th>Apuntado por</th><th>Cuándo</th></tr></thead><tbody>${filas}</tbody></table>`:'<p class="ayuda">No falta nada.</p>'}`}
+function vPedidos(){
+ if(!pedidos.length)return '<p class="ayuda">No hay pedidos sin archivar.</p>';
+ return `<p class="ayuda">Lo pedido y todavía sin archivar. Cada pedido es un asunto COMPRA; al archivar el asunto, sale de aquí.</p>`+pedidos.map(p=>{
+  const t=p.l.reduce((s,l)=>s+l.c*l.pr,0);
+  return `<div class="ped"><h3><button class="b l" data-abrir="${p.n}">${p.n} COMPRA ${esc(provs[p.p])}</button> <span class="viejo">· pedido el ${fecha(p.f)}</span></h3>
+  <table><thead><tr><th>Artículo</th><th class="n">Cantidad</th><th class="n">Precio</th><th class="n">Importe</th></tr></thead><tbody>
+  ${p.l.map(l=>`<tr><td>${esc(nom(l.a))}</td><td class="n">${l.c} × ${esc(artDe(l.a).u)}</td><td class="n">${eur(l.pr)}</td><td class="n">${eur(l.c*l.pr)}</td></tr>`).join('')}
+  <tr><td colspan="3" class="n"><b>Total sin IVA · con IVA (21 %)</b></td><td class="n"><b>${eur(t)} · ${eur(t*1.21)}</b></td></tr></tbody></table></div>`}).join('')}
+function vCatalogo(){
+ const c=catDe(catSel), lista=arts.filter(a=>a.cat===catSel), a=artDe(artSel)&&artDe(artSel).cat===catSel?artDe(artSel):lista[0];
+ artSel=a?a.id:null;
+ return `<div class="cat3">
+ <div class="caja lc"><h3>Categorías <button class="b l" id="ncat">+ Nueva</button></h3>${cats.map(k=>`<div data-cat="${k.id}" class="${k.id===catSel?'on':''}"><span>${esc(k.nombre)}</span><span>${arts.filter(z=>z.cat===k.id).length}</span></div>`).join('')}</div>
+ <div class="caja"><h3><span>${esc(c.nombre)} <span class="viejo" style="font-weight:400">· características: ${esc(c.car.join(' · '))}</span> <button class="b l" id="ccar">Cambiar</button></span><button class="b" id="nart">+ Nuevo artículo</button></h3>
+ ${lista.length?`<table><thead><tr>${c.car.map(k=>`<th>${esc(k)}</th>`).join('')}<th>Se compra por</th><th>Mejor precio</th></tr></thead><tbody>
+ ${lista.map(x=>{const m=mejor(x.id);return `<tr data-art="${x.id}" class="${x.id===artSel?'sel':''}" style="cursor:pointer">${c.car.map((k,i)=>`<td>${esc(x.v[i]||'')}</td>`).join('')}<td>${esc(x.u)}</td><td>${m?eur(m.pr):'<span class="viejo">—</span>'}</td></tr>`}).join('')}</tbody></table>`:'<p class="ayuda">Esta categoría no tiene artículos.</p>'}</div>
+ <div class="caja">${a?detalle(a):'<p class="ayuda">Elige un artículo.</p>'}</div></div>`}
+function detalle(a){
+ const ps=preciosDe(a.id).sort((x,y)=>x.pr-y.pr), m=mejor(a.id);
+ return `<h3>${esc(nom(a.id))}</h3><p class="ayuda" style="margin-top:0">Se compra por ${esc(a.u)}. Precios sin IVA, por ${esc(a.u)}.</p>
+ <table><thead><tr><th>Proveedor</th><th class="n">Precio</th><th>Fecha</th><th>De dónde</th></tr></thead><tbody>
+ ${ps.map(p=>{const v=meses(p.f)>6;return `<tr><td>${esc(provs[p.p])}</td><td class="n ${m&&p===m?'barato':''} ${v?'viejo':''}">${eur(p.pr)}</td><td class="${v?'viejo':''}" style="white-space:nowrap">${fecha(p.f)}</td><td>${p.o.startsWith('Presupuesto')?`<button class="b l" data-doc="1">Presupuesto ${esc((p.o.match(/D26-\d+/)||[''])[0])}</button>`:esc(p.o)}</td></tr>`}).join('')||'<tr><td colspan="4" class="viejo">Sin precios todavía.</td></tr>'}
+ </tbody></table><p><button class="b" id="nprecio">+ Añadir precio</button></p>
+ <p class="ayuda">En gris, los precios de hace más de seis meses: se ven, pero no cuentan como «mejor precio».</p>`}
+/* ---- cuadros ---- */
+function cerrar(){capa.innerHTML=''}
+function cuadro(t,cuerpo,pie,chico){capa.innerHTML=`<div class="capa"><div class="cuadro ${chico?'chico':''}"><h2>${t}</h2><div class="cu">${cuerpo}</div><div class="pie">${pie}</div></div></div>`}
+function provSelect(id){return `<select id="${id}">${provs.map((p,i)=>`<option value="${i}">${esc(p)}</option>`).join('')}<option value="nuevo">+ Nueva empresa…</option></select>`}
+function cuadroPrecio(aId,pFijo,vuelta){
+ const a=artDe(aId);
+ cuadro('Añadir precio',`<p class="ayuda" style="margin-top:0">${esc(nom(aId))} · por ${esc(a.u)}</p>
+ <div class="fila"><label>Proveedor</label>${pFijo!=null?`<span>${esc(provs[pFijo])}</span>`:provSelect('pp')}</div>
+ <div class="fila"><label>Precio sin IVA</label><input type="number" step="0.01" min="0" id="ppr" style="width:120px"></div>
+ <div class="fila"><label>Fecha</label><input type="date" id="pf" value="${HOY}"></div>
+ <div class="fila"><label>De dónde sale</label><select id="po"><option>Llamada</option><option>Correo</option><option>Presupuesto</option></select></div>
+ <div class="fila" id="pdoc" hidden><label>Documento</label><select id="pd"><option>261014 PRESUPUESTO D26-00412.pdf</option><option>261103 PRESUPUESTO D26-00455.pdf</option></select></div>`,
+ `<button class="b" id="x">Cancelar</button><button class="b p" id="ok">Guardar</button>`,true);
+ const po=document.getElementById('po');po.onchange=()=>document.getElementById('pdoc').hidden=po.value!=='Presupuesto';
+ const pp=document.getElementById('pp');if(pp)pp.onchange=()=>{if(pp.value==='nuevo'){aviso('En la app se abre aquí el alta de empresa de «Personas y empresas».');pp.value='0'}};
+ document.getElementById('x').onclick=()=>vuelta?vuelta():cerrar();
+ document.getElementById('ok').onclick=()=>{const pr=parseFloat(document.getElementById('ppr').value);if(!(pr>0)){aviso('Escribe el precio.');return}
+  const p=pFijo!=null?pFijo:+pp.value;let o=po.value;if(o==='Presupuesto')o+=' · '+document.getElementById('pd').value;
+  precios=precios.filter(z=>!(z.a===aId&&z.p===p&&z.f===document.getElementById('pf').value));
+  precios.push({a:aId,p,pr,f:document.getElementById('pf').value,o});aviso('Precio guardado.');vuelta?vuelta():(cerrar(),pintar())};
+}
+function cuadroArticulo(inicial,alGuardar,desdeCatalogo){
+ let cId=desdeCatalogo?catSel:'';
+ const pinta=()=>{const c=catDe(cId);
+  const sel=`<div class="fila"><label>Categoría</label><select id="ac">${cId?'':'<option value="">Elige la categoría…</option>'}${cats.map(k=>`<option value="${k.id}" ${k.id===cId?'selected':''}>${esc(k.nombre)}</option>`).join('')}<option value="nueva">+ Nueva categoría…</option></select></div>`;
+  const busc=inicial?`<p class="ayuda" style="margin-top:0">Has buscado «${esc(inicial)}» y no está en el catálogo.</p>`:'';
+  const alCambiar=()=>{document.getElementById('ac').onchange=e=>{if(e.target.value==='nueva')cuadroCategoria(false,id=>{cId=id;pinta()},pinta);else{cId=e.target.value;pinta()}}};
+  if(!c){cuadro('Nuevo artículo',busc+sel,`<button class="b" id="x">Cancelar</button><button class="b p" disabled>Guardar</button>`,true);alCambiar();document.getElementById('x').onclick=cerrar;return}
+  cuadro('Nuevo artículo',busc+sel+`
+  ${c.car.map((k,i)=>{const vs=[...new Set(arts.filter(z=>z.cat===cId).map(z=>z.v[i]).filter(Boolean))];
+   return `<div class="fila"><label>${esc(k)}</label><input type="text" data-i="${i}" list="dl${i}"><datalist id="dl${i}">${vs.map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>`}).join('')}
+  <div class="fila"><label>Se compra por</label><input type="text" id="au" list="dlu" placeholder="paquete de 500 hojas, caja de 50, unidad…"><datalist id="dlu">${[...new Set(arts.map(z=>z.u))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
+  <p class="ayuda">Se llamará: <b id="anom"></b></p>`,`<button class="b" id="x">Cancelar</button><button class="b p" id="ok">Guardar</button>`,true);
+  const ins=[...capa.querySelectorAll('[data-i]')],an=document.getElementById('anom');
+  const nombre=()=>(c.sin?'':c.nombre+' ')+ins.map(e=>e.value.trim()).filter(Boolean).join(' ');
+  ins.forEach(e=>e.oninput=()=>an.textContent=nombre());an.textContent=nombre();
+  alCambiar();
+  document.getElementById('x').onclick=cerrar;
+  document.getElementById('ok').onclick=()=>{const v=ins.map(e=>e.value.trim()),u=document.getElementById('au').value.trim();
+   if(!v.some(Boolean)||!u){aviso('Rellena las características y cómo se compra.');return}
+   const igual=arts.find(z=>z.cat===cId&&z.v.join('|').toLowerCase()===v.join('|').toLowerCase());
+   if(igual){aviso('Ese artículo ya existe: '+nom(igual.id));return}
+   const id='a'+(arts.length+1)+'x';arts.push({id,cat:cId,v,u});cerrar();aviso('Artículo nuevo: '+nom(id));alGuardar(id)};
+ };pinta();
+}
+function cuadroCategoria(edit,alCrear,alCancelar){
+ const c=edit?catDe(catSel):null;
+ cuadro(edit?'Características de '+esc(c.nombre):'Nueva categoría',`${edit?'':`<div class="fila"><label>Nombre</label><input type="text" id="cn"></div>`}
+ <div class="fila"><label>Características</label><input type="text" id="cc" value="${edit?esc(c.car.join(', ')):''}" placeholder="Formato, Gramaje, Color"></div>
+ <p class="ayuda">Separadas por comas, en el orden en que forman el nombre del artículo.${edit?' Los artículos que ya hay conservan sus datos.':''}</p>
+ <label><input type="checkbox" id="cdel" ${!edit||!c.sin?'checked':''}> El nombre del artículo empieza por el de la categoría («Papel A4 80 g Blanco»). Quítalo si no hace falta («Grapas 24/6»).</label>`,
+ `<button class="b" id="x">Cancelar</button><button class="b p" id="ok">Guardar</button>`,true);
+ document.getElementById('x').onclick=()=>alCancelar?alCancelar():cerrar();
+ document.getElementById('ok').onclick=()=>{const car=document.getElementById('cc').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!car.length){aviso('Escribe al menos una característica.');return}
+  const sin=!document.getElementById('cdel').checked;
+  if(edit){c.car=car;c.sin=sin}else{const n=document.getElementById('cn').value.trim();if(!n){aviso('Escribe el nombre.');return}const id='c'+(cats.length+1);cats.push({id,nombre:n,car,sin});if(alCrear){alCrear(id);return}catSel=id}
+  cerrar();pintar()};
+}
+function cuadroPedir(){
+ const lin=falta.filter(x=>marc.has(x.id));
+ cuadroPedir.extra=cuadroPedir.extra||[];const usados=[...new Set([...lin.flatMap(x=>preciosDe(x.a).map(p=>p.p)),...cuadroPedir.extra])].sort();
+ const pr=(a,p)=>precios.filter(z=>z.a===a&&z.p===p).sort((x,y)=>y.f.localeCompare(x.f))[0];
+ const tot=usados.map(p=>{let t=0,falt=0,vie=0;lin.forEach(x=>{const z=pr(x.a,p);if(!z)falt++;else{t+=z.pr*x.c;if(meses(z.f)>6)vie++}});return {p,t,falt,vie}});
+ let comp=tot.filter(z=>!z.falt&&!z.vie);if(!comp.length)comp=tot.filter(z=>!z.falt);let elegido=cuadroPedir.e!=null&&usados.includes(cuadroPedir.e)?cuadroPedir.e:(comp.length?comp.reduce((m,z)=>z.t<m.t?z:m).p:usados[0]);
+ const pinta=()=>{
+  const cuerpo=`<p class="ayuda" style="margin-top:0">Importe de cada línea (precio sin IVA × cantidad). En verde, el más barato de cada artículo; en gris, precios de hace más de seis meses. Pulsa una casilla para escribir un precio nuevo.</p>
+  <table><thead><tr><th>Artículo</th><th class="n">Cantidad</th>${usados.map(p=>`<th class="prov n"><label><input type="radio" name="pv" value="${p}" ${p===elegido?'checked':''}> ${esc(provs[p].split(',')[0])}</label></th>`).join('')}<th class="prov n"><button class="b l" id="otro">+ Otro proveedor</button></th></tr></thead><tbody>
+  ${lin.map(x=>{const zs=usados.map(p=>pr(x.a,p)),vals=zs.filter(z=>z&&meses(z.f)<=6).map(z=>z.pr),mn=Math.min(...vals);
+   return `<tr><td>${esc(nom(x.a))}</td><td class="n">${x.c} × ${esc(artDe(x.a).u)}</td>${zs.map((z,i)=>`<td class="n celda ${z&&meses(z.f)<=6&&z.pr===mn?'barato':''} ${z&&meses(z.f)>6?'viejo':''}" data-a="${x.a}" data-p="${usados[i]}">${z?`${eur(z.pr*x.c)}<br><small>${eur(z.pr)} · ${fecha(z.f)}</small>`:'<span class="viejo">sin precio</span>'}</td>`).join('')}<td></td></tr>`}).join('')}
+  <tr><td colspan="2"><b>Total sin IVA</b></td>${tot.map(z=>z.falt===lin.length?`<td class="n viejo">—</td>`:`<td class="n"><b>${eur(z.t)}</b>${z.falt?`<br><small class="viejo">faltan ${z.falt} precio${z.falt>1?'s':''}</small>`:''}${z.vie?`<br><small class="viejo">${z.vie} precio${z.vie>1?'s':''} antiguo${z.vie>1?'s':''}</small>`:''}</td>`).join('')}<td></td></tr>
+  <tr><td colspan="2">Con IVA (21 %)</td>${tot.map(z=>`<td class="n">${z.falt===lin.length?'':eur(z.t*1.21)}</td>`).join('')}<td></td></tr></tbody></table>`;
+  cuadro(`Pedir ${lin.length} artículo${lin.length>1?'s':''}`,cuerpo,`<span class="ayuda" style="margin:0 auto 0 0">Lo que pidas a este proveedor sale de «Lo que falta» y pasa a «Pedidos».</span><button class="b" id="x">Cancelar</button><button class="b p" id="ok">Pedir a ${esc(provs[elegido].split(',')[0])}</button>`);
+  capa.querySelectorAll('[name=pv]').forEach(r=>r.onchange=()=>{elegido=+r.value;pinta()});
+  capa.querySelectorAll('.celda').forEach(td=>td.onclick=()=>{cuadroPedir.e=elegido;cuadroPrecio(td.dataset.a,+td.dataset.p,()=>cuadroPedir())});
+  document.getElementById('otro').onclick=()=>{cuadroPedir.e=elegido;
+   cuadro('Otro proveedor',`<div class="fila"><label>Proveedor</label>${provSelect('op')}</div><p class="ayuda">Sale como una columna más, sin precios; pulsa sus casillas para escribirlos.</p>`,`<button class="b" id="x2">Cancelar</button><button class="b p" id="ok2">Añadir</button>`,true);
+   const op=document.getElementById('op');op.onchange=()=>{if(op.value==='nuevo'){aviso('En la app se abre aquí el alta de empresa de «Personas y empresas».');op.value='0'}};
+   document.getElementById('x2').onclick=()=>cuadroPedir();
+   document.getElementById('ok2').onclick=()=>{cuadroPedir.extra.push(+op.value);cuadroPedir()}};
+  document.getElementById('x').onclick=()=>{cuadroPedir.e=null;cuadroPedir.extra=[];cerrar()};
+  document.getElementById('ok').onclick=()=>{const p=elegido;
+   const l=lin.map(x=>{const z=pr(x.a,p);return {a:x.a,c:x.c,pr:z?z.pr:0}});
+   const n='A26-0'+(sigN++);pedidos.push({n,p,f:HOY,l});
+   falta=falta.filter(x=>!marc.has(x.id));marc.clear();cuadroPedir.e=null;cuadroPedir.extra=[];cerrar();vista='pedidos';pintar();
+   aviso(`Asunto nuevo ${n} COMPRA ${provs[p]}, con ${l.length} artículo${l.length>1?'s':''}.`)};
+ };pinta();
+}
+/* ---- apuntar ---- */
+let sugAct=0,elegidoArt=null;
+function sugerir(){const q=document.getElementById('busca').value.trim().toLowerCase(),s=document.getElementById('sug');
+ elegidoArt=null;document.getElementById('apuntar').disabled=true;
+ if(!q){s.hidden=true;return}
+ const pal=q.split(/\s+/),r=arts.filter(a=>{const t=(nom(a.id)+' '+a.u).toLowerCase();return pal.every(p=>t.includes(p))});
+ s.innerHTML=r.map((a,i)=>`<div data-s="${a.id}" class="${i===sugAct?'act':''}">${esc(nom(a.id))} <span class="viejo">· ${esc(a.u)}</span></div>`).join('')+`<div class="nuevo" data-s="nuevo">+ Nuevo artículo…</div>`;s.hidden=false}
+function elegir(id){const s=document.getElementById('sug');s.hidden=true;
+ if(id==='nuevo'){cuadroArticulo(document.getElementById('busca').value.trim(),nid=>{pintar();ponerBusca(nid)});return}
+ ponerBusca(id)}
+function ponerBusca(id){const b=document.getElementById('busca');b.value=nom(id);elegidoArt=id;document.getElementById('apuntar').disabled=false;const c=document.getElementById('cant');c.focus();c.select()}
+function apuntar(){if(!elegidoArt)return;const c=Math.max(1,+document.getElementById('cant').value||1);
+ const ya=falta.find(x=>x.a===elegidoArt);
+ if(ya){ya.c+=c;aviso(`Ya estaba apuntado: ahora ${ya.c} × ${artDe(elegidoArt).u}.`)}else{falta.push({id:sigF++,a:elegidoArt,c,q:YO,f:HOY});aviso('Apuntado.')}
+ elegidoArt=null;pintar();document.getElementById('busca').focus()}
+/* ---- eventos ---- */
+main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[data-art],[data-s],input[type=checkbox]');if(!t)return;
+ if(t.dataset.v){vista=t.dataset.v;pintar()}
+ else if(t.dataset.s)elegir(t.dataset.s)
+ else if(t.id==='apuntar')apuntar()
+ else if(t.id==='pedir'){cuadroPedir.e=null;cuadroPedir()}
+ else if(t.id==='quitar'){const n=marc.size;falta=falta.filter(x=>!marc.has(x.id));marc.clear();pintar();aviso(`Quitado${n>1?'s':''} ${n} de la lista.`)}
+ else if(t.id==='todas'){marc=t.checked?new Set(falta.map(x=>x.id)):new Set();pintar()}
+ else if(t.dataset.m){const id=+t.dataset.m;t.checked?marc.add(id):marc.delete(id);pintar()}
+ else if(t.dataset.cat){catSel=t.dataset.cat;artSel=null;pintar()}
+ else if(t.dataset.art){artSel=t.dataset.art;pintar()}
+ else if(t.id==='ncat')cuadroCategoria(false)
+ else if(t.id==='ccar')cuadroCategoria(true)
+ else if(t.id==='nart')cuadroArticulo('',id=>{artSel=id;catSel=artDe(id).cat;pintar()},true)
+ else if(t.id==='nprecio')cuadroPrecio(artSel,null)
+ else if(t.dataset.doc)aviso('En la app se abre el presupuesto, dentro de su asunto.')
+ else if(t.dataset.abrir)aviso('En la app se abre el asunto '+t.dataset.abrir+'.')
+});
+main.addEventListener('input',e=>{if(e.target.id==='busca'){sugAct=0;sugerir()}});
+main.addEventListener('change',e=>{if(e.target.dataset.c){const x=falta.find(z=>z.id===+e.target.dataset.c);x.c=Math.max(1,+e.target.value||1);pintar()}});
+main.addEventListener('keydown',e=>{if(e.target.id==='busca'){const s=document.getElementById('sug'),it=[...s.querySelectorAll('[data-s]')];
+  if(e.key==='ArrowDown'&&!s.hidden){sugAct=Math.min(sugAct+1,it.length-1);it.forEach((d,i)=>d.classList.toggle('act',i===sugAct));e.preventDefault()}
+  else if(e.key==='ArrowUp'&&!s.hidden){sugAct=Math.max(sugAct-1,0);it.forEach((d,i)=>d.classList.toggle('act',i===sugAct));e.preventDefault()}
+  else if(e.key==='Enter'&&!s.hidden&&it[sugAct]){elegir(it[sugAct].dataset.s);e.preventDefault()}}
+ else if(e.target.id==='cant'&&e.key==='Enter')apuntar()});
+pintar();
+}
+</script>
+</body>
+</html>
