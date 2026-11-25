@@ -106,6 +106,8 @@ var DatosDelAsunto = (function () {
       var primero = valores && valores.custodiaDeSeneca;
       if (primero && info.valores.indexOf(primero) > 0) info.valores = [primero].concat(info.valores.filter(function (x) { return x !== primero; }));
     }
+    /* Fila 747: «Una persona del asunto» se elige en un desplegable con las personas del asunto. */
+    if (info.clase === 'personaAsunto' && window.PersonaDelAsunto) { info.clase = 'lista'; info.valores = PersonaDelAsunto.etiquetas(a, valores); info.persona = true; }
     if (!info.valores && window.TextoCondicional) {
       var ops = TextoCondicional.opcionesDeFalta(nombre);
       var delTipo = valores && valores.camposLista ? valores.camposLista[Object.keys(valores.camposLista).filter(function (k) { return norm(k) === norm(nombre); })[0]] : null;
@@ -166,6 +168,11 @@ var DatosDelAsunto = (function () {
     var info = infoDe(nombre, a, null);
     var r = await entradaDe(nombre, a, opciones);
     var clase = Campos.claseDeCampo(r.entrada, App.E.campos);
+    if (clase === 'personaAsunto' && window.PersonaDelAsunto) {   /* fila 747 */
+      var rp = await PersonaDelAsunto.guardar(a, r, texto);
+      if (rp.ok && !rp.sinCambio) rp.nuevo = !r.delAsunto && !info.delAsunto;
+      return rp;
+    }
     var leido = CamposClases.leer(clase, texto);
     if (!leido.ok) return { ok: false, aviso: 'Revisa «' + nombre + '»: ' + CamposClases.avisoDeAmbar(clase) + '.' };
     var clave = Campos.claveDeCampo(r.entrada);

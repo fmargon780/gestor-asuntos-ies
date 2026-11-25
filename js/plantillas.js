@@ -414,6 +414,13 @@ var Plantillas = (function () {
     if (/^campo\s*:/i.test(clave)) {
       var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
       var valorCampo = buscarCampo(valores.campos, nombreCampo);
+      /* Fila 747: «Una persona del asunto» sin DNI: se pide «DNI de <campo>». */
+      var sinDni = valorCampo && valores.campos && valores.campos.sinDni && valores.campos.sinDni[U.normalizar(nombreCampo)];
+      if (sinDni) {
+        var dniAMano = escritoAMano('DNI de ' + sinDni, valores);
+        if (dniAMano !== null) valorCampo = valorCampo + ', con DNI ' + dniAMano.trim();
+        else faltan.push('DNI de ' + sinDni);
+      }
       if (!valorCampo) faltan.push(nombreCampo);
       return { encontrado: true, valor: valorCampo || '' };
     }

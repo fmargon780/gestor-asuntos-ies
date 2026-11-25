@@ -139,8 +139,11 @@
     var salida = {};
     Campos.camposDeAsunto(config, a.ficha).forEach(function (cfg) {   /* fila 245: con los «solo aquí» */
       var g = guardados[Campos.claveDeCampo(cfg)];
-      if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = Campos.mostrarValor(Campos.claseDeCampo(cfg, App.E.campos), g.valor);   /* fila 244: ya con su clase (1.234,50 €, 01/10/2026) */
+      var claseDelCampo = Campos.claseDeCampo(cfg, App.E.campos);
+      if (g && g.valor && claseDelCampo === 'personaAsunto' && window.PersonaDelAsunto) PersonaDelAsunto.alDocumento(salida, Campos.nombreDeCampo(cfg, App.E.campos), g);   /* fila 747 */
+      else if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = Campos.mostrarValor(claseDelCampo, g.valor);   /* fila 244: ya con su clase (1.234,50 €, 01/10/2026) */
     });
+    if (window.PersonaDelAsunto) PersonaDelAsunto.cerrar(salida);   /* fila 747: nombre con DNI y campos hermanos */
     /* Fila 722: las columnas de la lista del grupo, con el valor de esta persona; un campo del asunto con ese nombre manda. */
     var propios = {};
     Object.keys(salida).forEach(function (k) { propios[U.normalizar(k)] = true; });
@@ -429,6 +432,7 @@
       var t2 = datosDeTutor(persona.campos, 2);
       valores.tutor1 = t1.nombre; valores.tutor1telefono = t1.telefono; valores.tutor1correo = t1.correo;
       valores.tutor2 = t2.nombre; valores.tutor2telefono = t2.telefono; valores.tutor2correo = t2.correo;
+      if (window.PersonaDelAsunto) PersonaDelAsunto.tutores(valores, persona);   /* fila 747 */
     }
     /* Fila 530: «Tutor con custodia» cae solo si el alumno tiene un solo tutor (js/datos-del-asunto.js). */
     if (window.DatosDelAsunto) DatosDelAsunto.completar(valores, categoria === 'ALUMNADO' ? persona : null);
