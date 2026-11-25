@@ -1,1 +1,1 @@
-SEGUIR · filas 724, 737, 738 y 740
+SEGUIR · filas 730 y 731

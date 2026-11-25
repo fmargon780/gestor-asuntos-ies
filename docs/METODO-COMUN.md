@@ -282,8 +282,8 @@ y para el Centro de mando.
 
 **Lo que el Centro de mando lee de una fila** (lo escribe Claude en el chat, en llano; Claude Code
 no lo toca, salvo las marcas que ya mandan estas reglas):
-- **Un tema:** «Tema: <título llano>. Para qué: <una o dos frases>. [orden: N · motivo]». Si se deja
-  para más adelante, además `[aparcado: <hasta cuándo>]`. Diseñado, queda `SUSTITUIDA (fecha):
+- **Un tema:** «Tema: <título llano>. Para qué: <una o dos frases>. [orden: N · motivo]». Ningún
+  tema se aparca. Diseñado, queda `SUSTITUIDA (fecha):
   diseñado en las filas N a M`.
 - **Una parte de un tema:** la nota empieza por «parte de N · «<título llano>»». Una tarea
   diseñada sola: la nota empieza por ««<título llano>» · para qué: <frase>».
