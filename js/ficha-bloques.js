@@ -52,7 +52,11 @@
       var ayuda = ambar ? CamposClases.ayudaDeAmbar(clase) : '';
       if (cfg.soloAqui) {
         salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
-      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
+      } else if (g && g.valor) {
+        /* Fila 738: un dato de lista con valor sale con su «Cambiar». */
+        var conValor = window.FichaCamposListaVacia ? FichaCamposListaVacia.fila(cfg, a, g.valor) : null;
+        salida.push(conValor || { titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
+      }
       else if (window.FichaCamposListaVacia) {   /* fila 592: un dato de lista vacío sale con su desplegable */
         var vacia = FichaCamposListaVacia.fila(cfg, a);
         if (vacia) salida.push(vacia);
