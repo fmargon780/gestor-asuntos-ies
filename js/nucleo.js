@@ -219,26 +219,36 @@ $('btn-archivo').onclick = function () {
 
 $('btn-entrar').onclick = async function () {
   var M = window.Medidas ? Medidas.tiempo : function () { return function () {}; };   /* fila 332: cuánto tarda entrar */
+  var paso = function (t) { if (window.EntrarPasos) EntrarPasos.paso(t); };   /* fila 740: dice en qué se ha quedado */
+  if (window.EntrarPasos) EntrarPasos.empezar();
   try {
     /* Fila 287 (docs/PERFIL-DIRECTIVO.md): el perfil se lee ANTES de proteger nada y sin crear nada. */
+    paso('Leyendo quién eres…');
     if (window.Perfil) await Perfil.leerAntes(App.E.abiertos, $('campo-usuario').value.trim());
     /* Fila 260: en solo consulta, las dos carpetas van protegidas (js/solo-consulta.js). */
     if (window.SoloConsulta) {
       App.E.abiertos = SoloConsulta.proteger(App.E.abiertos);
       App.E.archivo = SoloConsulta.proteger(App.E.archivo);
     }
+    paso('Pidiendo permiso para la carpeta de asuntos abiertos…');
     var ok1 = await Carpetas.permiso(App.E.abiertos, true);
+    paso('Pidiendo permiso para la carpeta del archivo…');
     var ok2 = await Carpetas.permiso(App.E.archivo, true);
     if (!ok1 || !ok2) {
       U.aviso('Sin permiso sobre alguna de las dos carpetas. Vuelve a elegirla.', 'malo');
+      if (window.EntrarPasos) EntrarPasos.fallo('Sin permiso sobre alguna de las dos carpetas (' + (ok1 ? '' : 'asuntos abiertos') + (!ok1 && !ok2 ? ' y ' : '') + (ok2 ? '' : 'archivo') + '). Vuelve a elegirla.');
       return;
     }
     /* Fila 459 (docs/PASAR-A-DRIVE.md): antes de crear nada, ¿las carpetas se pasaron a Drive desde otro ordenador, o esta
        es la copia sin internet vieja? Sale una franja y la entrada se para hasta señalar las de Drive. */
+    paso('Mirando si las carpetas están en Drive…');
     if (window.CarpetasEnDrive && await CarpetasEnDrive.alEntrar(App.E.abiertos)) return;
+    paso('Pidiendo permiso para las carpetas recordadas…');
     if (window.PermisosCarpetas) await PermisosCarpetas.pedirAlEntrar();   /* fila 318: el permiso de las carpetas recordadas */
+    paso('Mirando si hay versión nueva…');
     if (window.ActualizarCopia && ActualizarCopia.alEntrar && await ActualizarCopia.alEntrar()) return;   /* fila 325 */
     /* Fila 458 (docs/PASAR-A-DRIVE.md): si otro ordenador está pasando las carpetas a Drive, aquí solo se consulta. */
+    paso('Mirando si otro ordenador está pasando las carpetas a Drive…');
     if (window.PasarADrive && await PasarADrive.alEntrar(App.E.abiertos) && window.SoloConsulta) {
       App.E.abiertos = SoloConsulta.proteger(App.E.abiertos);
       App.E.archivo = SoloConsulta.proteger(App.E.archivo);
@@ -247,6 +257,7 @@ $('btn-entrar').onclick = async function () {
     App.E.usuario = $('campo-usuario').value.trim();
     await Almacen.guardar('usuario', App.E.usuario);
 
+    paso('Abriendo la carpeta de datos del centro…');
     App.E.gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR);
     App.E.datos = await Carpetas.crear(App.E.gestor, 'datos');
 
@@ -267,6 +278,7 @@ $('btn-entrar').onclick = async function () {
     if (window.RutaCarpetas) RutaCarpetas.cargarComun().catch(function () { /* se queda con los topes fijos */ });
 
     var finComprobar = M('entrar.comprobar');
+    paso('Comprobando los ficheros de datos…');
     var rotos = await Copias.comprobarTodos(App.E.gestor);
     finComprobar();
     if (rotos.length) {
@@ -283,6 +295,7 @@ $('btn-entrar').onclick = async function () {
     if (window.Usuarios && !(window.SoloConsulta && SoloConsulta.activo())) await Usuarios.anadirSiHaceFalta(App.E.gestor, App.E.usuario);   /* fila 260: en solo consulta no se apunta el nombre */
 
     var finCargar = M('entrar.cargar');
+    paso('Leyendo los datos del centro…');
     await App.cargarTipos();
     await App.cargarTiposDocumento();
     if (window.TiposDocumentoCortos) await TiposDocumentoCortos.cargar();   /* fila 239 */
@@ -307,6 +320,7 @@ $('btn-entrar').onclick = async function () {
       }
     });
 
+    if (window.EntrarPasos) EntrarPasos.fin();
     $('arranque').classList.add('oculto');
     $('aplicacion').classList.remove('oculto');
     $('usuario-pie').textContent = (App.E.usuario ? 'Sesión de ' + App.E.usuario + '  ·  ' : '') +
@@ -327,5 +341,8 @@ $('btn-entrar').onclick = async function () {
     }
   } catch (e) {
     U.aviso('No he podido entrar: ' + U.mensajeDeError(e), 'malo');
+    if (window.EntrarPasos) EntrarPasos.fallo('No he podido entrar: ' + U.mensajeDeError(e));
+  } finally {
+    if (window.EntrarPasos) EntrarPasos.fin();
   }
 };

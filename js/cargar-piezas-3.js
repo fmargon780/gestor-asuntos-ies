@@ -356,6 +356,8 @@
     'js/base-pantalla.js',
     'js/medidas-enganches.js',
     'js/envolturas-esperadas.js',
+    // Fila 740: la línea y el cuadro rojo de «Entrar» (docs/740-ENTRAR-DICE-DONDE-SE-QUEDA.md). Lo llama js/nucleo.js.
+    'js/entrar-pasos.js',
   ];
   document.write(piezas.map(function (f) { return '<script src="' + f + '"><\/script>'; }).join('\n') + '\n');
 }());
