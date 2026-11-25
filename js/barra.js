@@ -176,6 +176,30 @@
     referencia.parentNode.insertBefore(b, referencia.nextSibling);
   }
 
+  /* ---------- la entrada de «Material» (fila 750, docs/583-COMPRAS-DE-MATERIAL.md) ----------
+
+     Entre «Cuentas» y «Herramientas»: se cuelga justo detrás de «Cuentas» (o de «Impresos» /
+     «Personas y empresas» si «Cuentas» aún no existe). */
+
+  function ponerLaEntradaDeMaterial() {
+    if ($('pestana-material')) return;
+    var referencia = $('pestana-cuentas') || $('pestana-formularios') ||
+      document.querySelector('.pestana[data-pantalla="personas"]');
+    if (!referencia || !referencia.parentNode) return;
+
+    var b = document.createElement('button');
+    b.id = 'pestana-material';
+    b.className = 'pestana';
+    b.type = 'button';
+    b.dataset.pantalla = 'material';
+    b.innerHTML = '<span>Material</span>';
+    b.onclick = function () { if (window.Material && Material.abrir) Material.abrir(); };
+    b.addEventListener('click', function () {
+      if (comoEstaba() === 'plegada') poner('plegada');
+    });
+    referencia.parentNode.insertBefore(b, referencia.nextSibling);
+  }
+
   /* ---------- el botón grande de Nuevo asunto ---------- */
 
   function ponerElDeNuevoAsunto() {
@@ -229,6 +253,7 @@
     ponerElBotonDeAjustes();
     ponerLaEntradaDeFormularios();
     ponerLaEntradaDeCuentas();
+    ponerLaEntradaDeMaterial();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
     vigilarPaneles();

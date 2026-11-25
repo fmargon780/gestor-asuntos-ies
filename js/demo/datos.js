@@ -88,6 +88,7 @@
     if (window.Demo.soloSi) await Demo.soloSi.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 576 */
     if (window.Demo.baja) await Demo.baja.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 592 */
     if (window.Demo.aula) await Demo.aula.construir({ crearTipoConGuia: crearTipoConGuia, crearAsunto: crearAsunto, hace: hace });   /* fila 723 */
+    if (window.Demo.material) { try { await Demo.material.construir(); } catch (e) { /* sin material de demostración */ } }   /* fila 750: «Material» */
     if (window.Demo.guiaSinHitos) await Demo.guiaSinHitos.construir({ crearTipoConGuia: crearTipoConGuia });   /* fila 737: «IPASEN ALUMNADO», sin hitos, para el editor de la guía a toda la pantalla */
     if (window.Demo.grande) Demo.grande.resumen = await Demo.grande.construirAsuntos({ tipos: tipos, crearAsunto: crearAsunto, archivar: I.archivarDeMentira, hace: hace });   /* fila 711 */
     var sinCarpeta = await crearFichaSinCarpeta(tipos);   /* fila 288: «Problemas» tiene algo que enseñar */

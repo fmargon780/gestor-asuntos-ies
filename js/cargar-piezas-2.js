@@ -47,6 +47,12 @@
     // apartado 4): "Preparar informe para dirección". Después de
     // js/cuentas.js (usa Cuentas.cargar/_porOrgano/_tiempoDeTramite).
     'js/cuentas-informe.js',
+    // Fila 750 (docs/583-COMPRAS-DE-MATERIAL.md): «Material», catálogo y lo que falta. Los datos primero; las pestañas se registran en la pantalla.
+    'js/material-datos.js',
+    'js/material-pantalla.js',
+    'js/material-cuadros.js',
+    'js/material-catalogo.js',
+    'js/material-falta.js',
     'js/notas.js',
     // Fila 89, docs/COPIA-SIN-INTERNET.md: leer un dato estático (JSON o
     // binario) tanto por http(s) (fetch) como abierto desde el disco
