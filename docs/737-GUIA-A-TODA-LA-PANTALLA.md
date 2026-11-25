@@ -65,3 +65,6 @@ Durante el debate (24-nov-2026):
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- 24-nov-2026, segundo revisor (contexto limpio, en local): **APROBADA a la primera.** Los nueve puntos de «Cómo lo comprueba el segundo revisor» coinciden, y las tres comprobaciones fijas (consola, pantallas principales, crear/abrir/cerrar un asunto) también; sin errores de consola.
+- Lo que hace la app que el texto no pide (aviso del revisor, no se quita): sale el aviso «Guía de X guardada: N tareas.» al guardar (ya lo hacía antes); quitar una tarea no pide confirmación pero se deshace con «Cancelar»; el texto de un rótulo sale en mayúsculas.
+- No lo he podido ver: la guía de IPASEN ALUMNADO real con datos del centro (la demostración lleva un tipo inventado con ese nombre). `npm test`: 417 de 418 en la pasada; la que fallaba (`actividades`) falla igual en `main` y se arregló aparte en la fila 739 (ya en `main`).
