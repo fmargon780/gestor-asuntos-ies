@@ -3,7 +3,7 @@
    euros, Número y Fecha, y cambiar la clase de un campo ya creado.
 
    0. Las funciones puras (js/campos-clases.js).
-   1. El desplegable «Clase» trae las cinco clases.
+   1. El desplegable «Clase» trae las seis clases (la sexta, de la fila 747).
    2. Un campo de importe: `1234,5` → `1.234,50 €` al salir de la caja; `-80`
       → `-80,00 €`; `hola` → ámbar con su aviso, y no se guarda. Número y Fecha.
    3. En la ficha se ve ya formateado; el valor se guarda como número/ISO.
@@ -144,9 +144,9 @@ await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
 await pagina.waitForSelector('#campos-mios-lista .fila-tipo');
 await pagina.locator('#campos-mios-lista .fila-tipo', { hasText: 'Cantidad' }).getByRole('button', { name: 'Cambiar' }).click();
 await pagina.waitForSelector('#propio-clase');
-await comprobar('1. el desplegable «Clase» trae las cinco clases',
+await comprobar('1. el desplegable «Clase» trae las seis clases',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#propio-clase option')).map((o) => o.textContent)),
-  ['Texto libre', 'Lista cerrada', 'Importe en euros', 'Número', 'Fecha']);
+  ['Texto libre', 'Lista cerrada', 'Importe en euros', 'Número', 'Fecha', 'Una persona del asunto']);
 await pagina.selectOption('#propio-clase', 'importe');
 await pagina.click('#propio-crear');
 await pagina.waitForSelector('#capa:not(.oculto) #cuadro-cuerpo p');

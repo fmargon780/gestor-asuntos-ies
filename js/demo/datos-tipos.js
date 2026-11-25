@@ -88,6 +88,8 @@
     await Campos.guardarPropios(App.E.gestor, function (lista) {
       lista.push({ id: 'p-importe-factura', nombre: 'Importe de la factura', clase: 'texto', valores: [] });
       lista.push({ id: 'p-fecha-factura', nombre: 'Fecha de la factura', clase: 'fecha', valores: [] });
+      /* Fila 747: «Una persona del asunto», para probar quién recibe un documento. */
+      lista.push({ id: 'p-quien-recibe-demo', nombre: 'Quién recibe el documento', clase: 'personaAsunto', valores: [] });
       return lista;
     });
     await Campos.guardarConfigDeTipo(App.E.gestor, 'FACTURA', [

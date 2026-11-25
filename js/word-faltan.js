@@ -40,6 +40,13 @@ var WordFaltan = (function () {
       try {
         var r = await DatosDelAsunto.guardar(asunto, nombres[i], aMano[nombres[i]], opciones);
         if (!r.ok) U.aviso(r.aviso + ' No se ha guardado en el asunto.', 'ambar');
+        else if (r.paraDocumento) {   /* fila 747: una persona del asunto: el documento lleva su nombre y su DNI */
+          aMano[nombres[i]] = r.paraDocumento;
+          if (r.sinDni) {
+            var dni = await PersonaDelAsunto.pedirDni(asunto, nombres[i], r.valor);
+            if (dni) aMano[nombres[i]] = PersonaDelAsunto.textoDe(r.valor, dni);
+          }
+        }
       } catch (e) { U.accesorio('Lo escrito vale para este documento, pero no he podido guardar «' + nombres[i] + '» en el asunto', e); }
     }
   }

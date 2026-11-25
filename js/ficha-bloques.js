@@ -51,7 +51,8 @@
       var ambar = !!(g && g.valor && window.CamposClases && CamposClases.noEncaja(clase, g.valor));
       var ayuda = ambar ? CamposClases.ayudaDeAmbar(clase) : '';
       if (cfg.soloAqui) {
-        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
+        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda, hito: cfg.hito,
+          personaCambiar: clase === 'personaAsunto' && !!visto });   /* fila 747: la persona elegida lleva «Cambiar» */
       } else if (g && g.valor) {
         /* Fila 738: un dato de lista con valor sale con su «Cambiar». */
         var conValor = window.FichaCamposListaVacia ? FichaCamposListaVacia.fila(cfg, a, g.valor) : null;

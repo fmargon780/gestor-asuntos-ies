@@ -25,7 +25,8 @@ var CamposClases = (function () {
     { id: 'lista', nombre: 'Lista cerrada' },
     { id: 'importe', nombre: 'Importe en euros' },
     { id: 'numero', nombre: 'Número' },
-    { id: 'fecha', nombre: 'Fecha' }
+    { id: 'fecha', nombre: 'Fecha' },
+    { id: 'personaAsunto', nombre: 'Una persona del asunto' }   /* fila 747, js/persona-del-asunto.js */
   ];
 
   function esValida(clase) { return CLASES.some(function (c) { return c.id === clase; }); }
@@ -133,7 +134,7 @@ var CamposClases = (function () {
      caja con teclado numérico; texto → caja. `valor`: lo guardado. */
   function htmlControl(id, clase, valores, valor) {
     var t = String(valor === null || valor === undefined ? '' : valor);
-    if (clase === 'lista') {
+    if (clase === 'lista' || clase === 'personaAsunto') {
       return '<select id="' + id + '" class="campo"><option value="">Sin elegir</option>' +
         (valores || []).map(function (v) {
           return '<option value="' + U.escapar(v) + '"' + (v === t ? ' selected' : '') + '>' + U.escapar(v) + '</option>';

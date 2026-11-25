@@ -61,7 +61,10 @@ window.CampoDesdeElAsuntoEscribir = (function () {
       var ficha = registro.asuntos[a.nombre] || (registro.asuntos[a.nombre] = {});
       var campos = (ficha.campos && !Array.isArray(ficha.campos)) ? Object.assign({}, ficha.campos) : {};
       if (o.borrarValor) delete campos[clave];
-      else if (o.valor !== undefined) campos[clave] = { valor: o.valor, enNombre: false };
+      else if (o.valor !== undefined) {
+        campos[clave] = { valor: o.valor, enNombre: false };
+        if (o.persona) campos[clave].persona = o.persona;   /* fila 747: «Una persona del asunto» */
+      }
       ficha.campos = campos;
       /* Fila 255: guardar solo un valor no toca la lista de «solo aquí». */
       if (o.anadir || o.quitar) {
