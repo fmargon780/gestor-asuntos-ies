@@ -57,7 +57,7 @@ tr.sel td{background:#eef4fb}
 .cuadro .cu{padding:14px 18px;overflow:auto}
 .cuadro .pie{padding:10px 18px;border-top:1px solid var(--borde);display:flex;gap:8px;justify-content:flex-end;align-items:center}
 .fila{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;align-items:center;margin-bottom:8px}
-.celda{cursor:pointer}.celda.asig{outline:2px solid #2c5d8f;outline-offset:-2px;font-weight:600}.celda:hover{outline:1px dashed var(--azul2)}
+.difer{background:#fde8e8}.celda{cursor:pointer}.celda.asig{outline:2px solid #2c5d8f;outline-offset:-2px;font-weight:600}.celda:hover{outline:1px dashed var(--azul2)}
 .edit{display:flex;gap:4px;flex-wrap:wrap}.edit input{width:80px}
 .aviso{position:fixed;right:18px;bottom:18px;background:#17663a;color:#fff;padding:10px 14px;border-radius:8px;max-width:420px;z-index:30;box-shadow:0 6px 18px #0003}
 .ped{border:1px solid var(--borde);border-radius:8px;padding:10px 12px;margin-bottom:12px}
@@ -146,7 +146,41 @@ function cabecera(){return `<div class="cab"><h1>Material</h1><div class="pest">
  <button data-v="falta" class="${vista==='falta'?'on':''}">Lo que falta (${falta.length})</button>
  <button data-v="pedidos" class="${vista==='pedidos'?'on':''}">Pedidos (${pedidos.length})</button>
  <button data-v="catalogo" class="${vista==='catalogo'?'on':''}">Catálogo (${arts.length})</button></div><div class="esp"></div></div>`}
-function pintar(){main.innerHTML=cabecera()+(vista==='falta'?vFalta():vista==='pedidos'?vPedidos():vCatalogo())}
+function pintar(){if(vista==='asunto'){main.innerHTML=vAsunto();return}main.innerHTML=cabecera()+(vista==='falta'?vFalta():vista==='pedidos'?vPedidos():vCatalogo())}
+let pedSel=null;
+function vAsunto(){const p=pedidos.find(z=>z.n===pedSel);
+ p.rec=p.rec||p.l.map(l=>l.c);p.fac=p.fac||p.l.map(()=>({c:'',pr:''}));p.fra=p.fra||{num:'',f:'',base:'',iva:'',tot:''};
+ const fac=p.fac,rec=p.rec,F=p.fra,num=v=>v===''?null:+v;
+ let sumF=0,dif=0,falta=0;
+ const filas=p.l.map((l,i)=>{const fc=num(fac[i].c),fp=num(fac[i].pr),imp=fc!=null&&fp!=null?fc*fp:null;if(imp!=null)sumF+=imp;
+  const dRec=rec[i]!==l.c,dC=fc!=null&&fc!==rec[i],dP=fp!=null&&Math.abs(fp-l.pr)>0.004;if(dRec||dC||dP)dif++;if(fc==null||fp==null)falta++;
+  const est=fc==null||fp==null?'<span class="viejo">falta la factura</span>':(dRec||dC||dP)?`<span style="color:#b42318">${[dRec?`recibido ${rec[i]} de ${l.c}`:'',dC?`facturado ${fc}, recibido ${rec[i]}`:'',dP?`precio ${eur(fp)} en vez de ${eur(l.pr)}`:''].filter(Boolean).join(' · ')}</span>`:'<span style="color:#17663a">✓ cuadra</span>';
+  return `<tr><td>${esc(nom(l.a))}</td><td class="n">${l.c} × ${eur(l.pr)}<br><small>${eur(l.c*l.pr)}</small></td>
+  <td class="n ${dRec?'difer':''}"><input type="number" min="0" value="${rec[i]}" data-rec="${i}" style="width:64px"></td>
+  <td class="n ${dC?'difer':''}"><input type="number" min="0" value="${fac[i].c}" data-fc="${i}" style="width:64px"></td>
+  <td class="n ${dP?'difer':''}"><input type="number" step="0.01" min="0" value="${fac[i].pr}" data-fp="${i}" style="width:84px"></td>
+  <td class="n">${imp!=null?eur(imp):''}</td><td>${est}</td></tr>`}).join('');
+ const base=num(F.base),iva=num(F.iva),tot=num(F.tot);
+ const chk=[];if(base!=null&&!falta)chk.push(Math.abs(base-sumF)<0.01?`<span style="color:#17663a">✓ Las líneas suman ${eur(sumF)}, igual que la base imponible.</span>`:`<span style="color:#b42318">Las líneas suman ${eur(sumF)} y la base imponible es ${eur(base)}.</span>`);
+ if(base!=null&&iva!=null)chk.push(Math.abs(base*0.21-iva)<0.01?'<span style="color:#17663a">✓ IVA al 21 %.</span>':`<span style="color:#b42318">El IVA no es el 21 % de la base (sería ${eur(base*0.21)}).</span>`);
+ if(base!=null&&iva!=null&&tot!=null)chk.push(Math.abs(base+iva-tot)<0.01?'<span style="color:#17663a">✓ Base más IVA da el total.</span>':`<span style="color:#b42318">Base más IVA da ${eur(base+iva)}, no ${eur(tot)}.</span>`);
+ const conforme=!falta&&!dif&&base!=null&&iva!=null&&tot!=null&&chk.every(c=>c.includes('✓'));
+ const pend=p.l.reduce((n,l,i)=>n+(rec[i]<l.c?1:0),0);
+ return `<div class="cab"><h1 style="font-size:19px">${p.n} COMPRA ${esc(provs[p.p])}</h1><div class="esp"></div><button class="b" id="volver">← Volver a Material</button></div>
+ <p class="ayuda">Así se verá el bloque «Pedido» dentro del asunto COMPRA (el resto del asunto, tareas y documentos, no se pinta aquí). Documento de pedido: <button class="b l" data-doc="1">${esc(p.doc||'')}</button></p>
+ <div class="caja"><h3>Pedido <span class="viejo" style="font-weight:400">· hecho el ${fecha(p.f)}</span></h3>
+ <table><thead><tr><th>Artículo</th><th class="n">Pedido</th><th class="n">Recibido</th><th class="n">Facturado: cantidad</th><th class="n">Facturado: precio sin IVA</th><th class="n">Importe facturado</th><th style="width:30%">Comparación</th></tr></thead><tbody>${filas}</tbody></table>
+ <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px;align-items:end">
+ <label>Nº de factura<br><input type="text" value="${esc(F.num)}" data-fra="num" style="width:100%"></label>
+ <label>Fecha de la factura<br><input type="date" value="${F.f}" data-fra="f" style="width:100%"></label>
+ <label>Base imponible<br><input type="number" step="0.01" value="${F.base}" data-fra="base" style="width:100%"></label>
+ <label>IVA<br><input type="number" step="0.01" value="${F.iva}" data-fra="iva" style="width:100%"></label>
+ <label>Total<br><input type="number" step="0.01" value="${F.tot}" data-fra="tot" style="width:100%"></label></div>
+ <p>${chk.join('<br>')||'<span class="viejo">Cuando llegue la factura, escribe lo que pone en cada línea y abajo sus importes.</span>'}</p>
+ <p style="font-size:16px">${conforme?'<b style="color:#17663a">✓ Factura conforme</b> con el pedido y lo recibido.':falta?'':`<b style="color:#b42318">Factura con diferencias</b>: revisa lo marcado en rojo.`}</p>
+ <div class="acc"><button class="b" id="devolver" ${pend&&!p.devuelto?'':'disabled'}>Devolver lo no recibido a «Lo que falta»${pend?` (${pend})`:''}</button>
+ <button class="b p" id="preciosfra" ${!falta&&F.f?'':'disabled'}>Pasar los precios facturados al catálogo</button></div></div>`}
+
 function vFalta(){
  const filas=falta.map(x=>{const a=artDe(x.a),m=mejor(x.a);
   return `<tr class="${marc.has(x.id)?'sel':''}"><td><input type="checkbox" data-m="${x.id}" ${marc.has(x.id)?'checked':''}></td>
@@ -164,7 +198,7 @@ function vPedidos(){
  if(!pedidos.length)return '<p class="ayuda">No hay pedidos sin archivar.</p>';
  return `<p class="ayuda">Lo pedido y todavía sin archivar. Cada pedido es un asunto COMPRA; al archivar el asunto, sale de aquí.</p>`+pedidos.map(p=>{
   const t=p.l.reduce((s,l)=>s+l.c*l.pr,0);
-  return `<div class="ped"><h3><button class="b l" data-abrir="${p.n}">${p.n} COMPRA ${esc(provs[p.p])}</button> <span class="viejo">· pedido el ${fecha(p.f)} ·</span> <button class="b l" data-doc="1">${esc(p.doc)}</button> <span class="viejo">(documento de pedido, para enviar desde el asunto)</span></h3>
+  return `<div class="ped"><h3><button class="b l" data-abrir="${p.n}">${p.n} COMPRA ${esc(provs[p.p])}</button> <span class="viejo">· pedido el ${fecha(p.f)} ·</span> <button class="b l" data-doc="1">${esc(p.doc)}</button> <span class="viejo">(documento de pedido, para enviar desde el asunto)</span> · <button class="b l" data-abrir="${p.n}">Comprobar recibido y factura</button></h3>
   <table><thead><tr><th>Artículo</th><th class="n">Cantidad</th><th class="n">Precio</th><th class="n">Importe</th></tr></thead><tbody>
   ${p.l.map(l=>`<tr><td>${esc(nom(l.a))}</td><td class="n">${l.c} × ${esc(artDe(l.a).u)}</td><td class="n">${eur(l.pr)}</td><td class="n">${eur(l.c*l.pr)}</td></tr>`).join('')}
   <tr><td colspan="3" class="n"><b>Total sin IVA · con IVA (21 %)</b></td><td class="n"><b>${eur(t)} · ${eur(t*1.21)}</b></td></tr></tbody></table></div>`}).join('')}
@@ -319,10 +353,19 @@ main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[d
  else if(t.id==='nart')cuadroArticulo('',id=>{artSel=id;catSel=artDe(id).cat;pintar()},true)
  else if(t.id==='nprecio')cuadroPrecio(artSel,null)
  else if(t.dataset.doc)aviso('En la app se abre el documento, dentro de su asunto.')
- else if(t.dataset.abrir)aviso('En la app se abre el asunto '+t.dataset.abrir+'.')
+ else if(t.dataset.abrir){pedSel=t.dataset.abrir;vista='asunto';pintar()}
+ else if(t.id==='volver'){vista='pedidos';pintar()}
+ else if(t.id==='devolver'){const p=pedidos.find(z=>z.n===pedSel);let n=0;p.l.forEach((l,i)=>{const r=l.c-p.rec[i];if(r>0){falta.push({id:sigF++,a:l.a,c:r,q:YO,f:HOY});n++}});p.devuelto=true;pintar();aviso(`${n} línea${n>1?'s':''} de vuelta en «Lo que falta».`)}
+ else if(t.id==='preciosfra'){const p=pedidos.find(z=>z.n===pedSel);p.l.forEach((l,i)=>{const pr=+p.fac[i].pr;precios=precios.filter(z=>!(z.a===l.a&&z.p===p.p&&z.f===p.fra.f));precios.push({a:l.a,p:p.p,pr,f:p.fra.f,o:'Factura '+(p.fra.num||'')})});aviso('Precios de la factura pasados al catálogo, con su fecha.')}
 });
+main.addEventListener('focusout',e=>{const d=e.target.dataset;if(d.fra&&vista==='asunto'){const p=pedidos.find(z=>z.n===pedSel);if(p.fra[d.fra]!==e.target.value){p.fra[d.fra]=e.target.value;setTimeout(pintar,0)}}});
 main.addEventListener('input',e=>{if(e.target.id==='busca'){sugAct=0;sugerir()}});
-main.addEventListener('change',e=>{if(e.target.dataset.c){const x=falta.find(z=>z.id===+e.target.dataset.c);x.c=Math.max(1,+e.target.value||1);pintar()}});
+main.addEventListener('change',e=>{const d=e.target.dataset,p=pedidos.find(z=>z.n===pedSel);
+ if(d.rec!=null){p.rec[+d.rec]=Math.max(0,+e.target.value||0);pintar();return}
+ if(d.fc!=null){p.fac[+d.fc].c=e.target.value;pintar();return}
+ if(d.fp!=null){p.fac[+d.fp].pr=e.target.value;pintar();return}
+ if(d.fra)return;
+ if(e.target.dataset.c){const x=falta.find(z=>z.id===+e.target.dataset.c);x.c=Math.max(1,+e.target.value||1);pintar()}});
 main.addEventListener('keydown',e=>{if(e.target.id==='busca'){const s=document.getElementById('sug'),it=[...s.querySelectorAll('[data-s]')];
   if(e.key==='ArrowDown'&&!s.hidden){sugAct=Math.min(sugAct+1,it.length-1);it.forEach((d,i)=>d.classList.toggle('act',i===sugAct));e.preventDefault()}
   else if(e.key==='ArrowUp'&&!s.hidden){sugAct=Math.max(sugAct-1,0);it.forEach((d,i)=>d.classList.toggle('act',i===sugAct));e.preventDefault()}
