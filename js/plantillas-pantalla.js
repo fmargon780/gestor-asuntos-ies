@@ -120,7 +120,8 @@ var PlantillasPantalla = (function () {
   function acciones(p) {
     var off = soloConsulta() ? ' disabled' : '';
     var deLaApp = esDeLaApp(p);
-    var menu = (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="sustituir"' + off + '>Sustituir el fichero…</button>' : '') +
+    var menu = (E.pestana === 'word' ? '<button type="button" class="boton" data-accion="descargar" data-solo-lectura>Descargar el Word</button>' +
+      '<button type="button" class="boton" data-accion="sustituir"' + off + '>Sustituir el fichero…</button>' : '') +
       (enUso(p)
         ? '<button type="button" class="boton" data-accion="fuera"' + (deLaApp ? ' disabled data-motivo-clave="plantilla-de-la-app-fuera"' : off) + '>Dejar fuera de uso…</button>'
         : '<button type="button" class="boton" data-accion="activar"' + off + '>Volver a activar</button>') +
@@ -243,6 +244,7 @@ var PlantillasPantalla = (function () {
     if (accion === 'ver') return ver(p);
     if (accion === 'retocar') return PlantillaRetocarPantalla.abrir(p, recargar);
     if (accion === 'cambiar') return cambiar(p);
+    if (accion === 'descargar') return PlantillasDescargar.descargar(p, function () { E.falta[p.id] = true; pintarCuerpo(); });
     if (accion === 'sustituir') return PlantillasFichero.sustituir(p, recargar);
     if (accion === 'fuera') return PlantillasFueraDeUso.dejar(p, E.pestana === 'word' ? 'documento' : 'correo', usos(p), recargar);
     if (accion === 'activar') return PlantillasFueraDeUso.volverAActivar(p, E.pestana === 'word' ? 'documento' : 'correo', recargar);
