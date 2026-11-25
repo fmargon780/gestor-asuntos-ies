@@ -1,0 +1,3 @@
+/* Fila 740: la línea de «Entrar» y su cuadro rojo fijo (js/entrar-pasos.js). */
+.entrar-paso { margin: 8px 0 0; font-size: 14px; color: var(--texto-suave, #555); }
+.entrar-fallo { margin: 8px 0 0; padding: 10px 12px; border-radius: var(--radio, 6px); background: var(--rojo, #fdecea); border: 1px solid #f0b7b1; font-size: 14px; }

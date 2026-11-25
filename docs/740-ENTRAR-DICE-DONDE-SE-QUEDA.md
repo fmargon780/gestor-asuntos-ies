@@ -51,3 +51,5 @@ Acordó («1», 25-nov-2026) que se apunte en la cola «un arreglo pequeño para
 ## Revisión y respuestas durante el trabajo
 
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (25-nov-2026, Claude Code, tarea pequeña: comparado con la instrucción) Coincide: debajo de «Entrar» sale una línea fija con el paso (leer quién eres, permiso de las carpetas, Drive, versión nueva, datos del centro, comprobar ficheros, leer datos) que cambia y desaparece al entrar; a los 15 s del mismo paso añade «Sigue esperando: <paso>. Si Chrome o Edge te pide permiso, pulsa «Permitir».»; un fallo (también el «Sin permiso sobre alguna de las dos carpetas») deja un cuadro rojo fijo con lo que dijo el navegador, que solo se quita al volver a pulsar «Entrar»; el botón no cambia ni se apaga; cada paso se apunta además en la consola («Entrar: …»). Prueba nueva `pruebas/entrar-dice-donde-se-queda.mjs`.
+- No visto: el caso real de la copia sin internet en el instituto (Francisco: si vuelve a quedarse esperando, apuntar qué línea sale). El aviso pasajero de siempre se mantiene además del cuadro rojo.
