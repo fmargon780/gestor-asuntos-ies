@@ -90,7 +90,8 @@ let cats=[
  {id:'c3',nombre:'Escritura',car:['Tipo','Color']},
  {id:'c4',nombre:'Tóner y tinta',car:['Impresora','Color']},
  {id:'c5',nombre:'Archivo',car:['Tipo','Formato'],sin:true},
- {id:'c6',nombre:'Pequeño material',car:['Tipo','Medida'],sin:true}];
+ {id:'c6',nombre:'Pequeño material',car:['Tipo','Medida'],sin:true},
+ {id:'c7',nombre:'Cartulina',car:['Formato','Color','Acabado','Gramaje']}];
 let arts=[
  {id:'a1',cat:'c1',v:['A4','80 g','Blanco'],u:'paquete de 500 hojas'},
  {id:'a2',cat:'c1',v:['A3','80 g','Blanco'],u:'paquete de 500 hojas'},
@@ -102,7 +103,10 @@ let arts=[
  {id:'a8',cat:'c3',v:['Rotulador de pizarra','Negro'],u:'caja de 12'},
  {id:'a9',cat:'c4',v:['Brother HL-L5100','Negro'],u:'unidad'},
  {id:'a10',cat:'c5',v:['Archivador AZ','Folio'],u:'unidad'},
- {id:'a11',cat:'c6',v:['Grapas','24/6'],u:'caja de 1000'}];
+ {id:'a11',cat:'c6',v:['Grapas','24/6'],u:'caja de 1000'},
+ {id:'a12',cat:'c7',v:['A3','Azul','Satinado','180 g'],u:'paquete de 50'},
+ {id:'a13',cat:'c7',v:['A4','Azul','Mate','180 g'],u:'paquete de 100'},
+ {id:'a14',cat:'c7',v:['A4','Rojo','Mate','180 g'],u:'paquete de 100'}];
 let provs=['Papelería Central, S.L. B29123456','Suministros Escolares Dobla, S.L. B12345678','Imprenta Sol 22334455C','Ofiprix Andalucía, S.L. B93111222'];
 let precios=[
  {a:'a1',p:0,pr:3.95,f:'2026-10-14',o:'Presupuesto · 261014 PRESUPUESTO D26-00412.pdf'},
@@ -122,6 +126,13 @@ let falta=[
  {id:4,a:'a2',c:3,q:'Francisco',f:'2026-11-24'},
  {id:5,a:'a9',c:2,q:'Diego',f:'2026-11-24'}];
 let pedidos=[{n:'A26-0131',p:1,f:'2026-11-12',l:[{a:'a8',c:2,pr:11.30},{a:'a10',c:10,pr:2.15}]}];
+cats.forEach(c=>{c.vals={};c.car.forEach((k,i)=>c.vals[k]=[...new Set(arts.filter(z=>z.cat===c.id).map(z=>z.v[i]).filter(Boolean))].sort())});
+let unidades=[...new Set(arts.map(z=>z.u))].sort();
+const lista=(attr,vals)=>`<span style="display:flex;gap:6px"><select ${attr}><option value="">—</option>${vals.map(v=>`<option>${esc(v)}</option>`).join('')}<option value="__nuevo">+ Nuevo valor…</option></select><input type="text" data-nv hidden placeholder="Escribe el valor nuevo"></span>`;
+const valorDe=sel=>sel.value==='__nuevo'?sel.nextElementSibling.value.trim():sel.value;
+const engancharLista=(sel,alCambiar)=>{const nv=sel.nextElementSibling;sel.onchange=()=>{nv.hidden=sel.value!=='__nuevo';if(!nv.hidden)nv.focus();alCambiar()};nv.onchange=()=>{const v=nv.value.trim().toLowerCase(),o=[...sel.options].find(o=>o.value!==''&&o.value!=='__nuevo'&&o.value.toLowerCase()===v);
+  if(o){sel.value=o.value;nv.hidden=true;nv.value='';aviso('Ya estaba en la lista: '+o.value+'. Elegido.')}alCambiar()};nv.oninput=alCambiar};
+const igualA=(vals,v)=>vals.find(x=>x.toLowerCase()===v.toLowerCase());
 let vista='falta', marc=new Set(), catSel='c1', artSel='a1', sigN=142, sigF=6;
 const nom=a=>{const x=arts.find(z=>z.id===a);const c=cats.find(z=>z.id===x.cat);return (c.sin?'':c.nombre+' ')+x.v.filter(Boolean).join(' ')};
 const artDe=id=>arts.find(z=>z.id===id);
@@ -201,19 +212,21 @@ function cuadroArticulo(inicial,alGuardar,desdeCatalogo){
   const alCambiar=()=>{document.getElementById('ac').onchange=e=>{if(e.target.value==='nueva')cuadroCategoria(false,id=>{cId=id;pinta()},pinta);else{cId=e.target.value;pinta()}}};
   if(!c){cuadro('Nuevo artículo',busc+sel,`<button class="b" id="x">Cancelar</button><button class="b p" disabled>Guardar</button>`,true);alCambiar();document.getElementById('x').onclick=cerrar;return}
   cuadro('Nuevo artículo',busc+sel+`
-  ${c.car.map((k,i)=>{const vs=[...new Set(arts.filter(z=>z.cat===cId).map(z=>z.v[i]).filter(Boolean))];
-   return `<div class="fila"><label>${esc(k)}</label><input type="text" data-i="${i}" list="dl${i}"><datalist id="dl${i}">${vs.map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>`}).join('')}
-  <div class="fila"><label>Se compra por</label><input type="text" id="au" list="dlu" placeholder="paquete de 500 hojas, caja de 50, unidad…"><datalist id="dlu">${[...new Set(arts.map(z=>z.u))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
+  ${c.car.map((k,i)=>`<div class="fila"><label>${esc(k)}</label>${lista(`data-i="${i}"`,c.vals[k]||[])}</div>`).join('')}
+  <div class="fila"><label>Se compra por</label>${lista('id="au"',unidades)}</div>
+  <p class="ayuda">Elige cada valor de su lista. Si no está, «+ Nuevo valor…»: queda en la lista para la próxima vez.</p>
   <p class="ayuda">Se llamará: <b id="anom"></b></p>`,`<button class="b" id="x">Cancelar</button><button class="b p" id="ok">Guardar</button>`,true);
   const ins=[...capa.querySelectorAll('[data-i]')],an=document.getElementById('anom');
-  const nombre=()=>(c.sin?'':c.nombre+' ')+ins.map(e=>e.value.trim()).filter(Boolean).join(' ');
-  ins.forEach(e=>e.oninput=()=>an.textContent=nombre());an.textContent=nombre();
+  const nombre=()=>(c.sin?'':c.nombre+' ')+ins.map(e=>valorDe(e)).filter(Boolean).join(' ');
+  ins.forEach(e=>engancharLista(e,()=>an.textContent=nombre()));engancharLista(document.getElementById('au'),()=>{});an.textContent=nombre();
   alCambiar();
   document.getElementById('x').onclick=cerrar;
-  document.getElementById('ok').onclick=()=>{const v=ins.map(e=>e.value.trim()),u=document.getElementById('au').value.trim();
+  document.getElementById('ok').onclick=()=>{const v=ins.map((e,i)=>{const x=valorDe(e);return x&&e.value==='__nuevo'?(igualA(c.vals[c.car[i]],x)||x):x});
+   let u=valorDe(document.getElementById('au'));if(u&&document.getElementById('au').value==='__nuevo')u=igualA(unidades,u)||u;
    if(!v.some(Boolean)||!u){aviso('Rellena las características y cómo se compra.');return}
    const igual=arts.find(z=>z.cat===cId&&z.v.join('|').toLowerCase()===v.join('|').toLowerCase());
    if(igual){aviso('Ese artículo ya existe: '+nom(igual.id));return}
+   v.forEach((x,i)=>{const L=c.vals[c.car[i]]=c.vals[c.car[i]]||[];if(x&&!L.includes(x)){L.push(x);L.sort()}});if(!unidades.includes(u)){unidades.push(u);unidades.sort()}
    const id='a'+(arts.length+1)+'x';arts.push({id,cat:cId,v,u});cerrar();aviso('Artículo nuevo: '+nom(id));alGuardar(id)};
  };pinta();
 }
@@ -222,13 +235,14 @@ function cuadroCategoria(edit,alCrear,alCancelar){
  cuadro(edit?'Características de '+esc(c.nombre):'Nueva categoría',`${edit?'':`<div class="fila"><label>Nombre</label><input type="text" id="cn"></div>`}
  <div class="fila"><label>Características</label><input type="text" id="cc" value="${edit?esc(c.car.join(', ')):''}" placeholder="Formato, Gramaje, Color"></div>
  <p class="ayuda">Separadas por comas, en el orden en que forman el nombre del artículo.${edit?' Los artículos que ya hay conservan sus datos.':''}</p>
+${edit?`<p class="ayuda">Valores de cada lista: ${c.car.map(k=>`<b>${esc(k)}</b>: ${esc((c.vals[k]||[]).join(', ')||'—')}`).join(' · ')}</p>`:''}
  <label><input type="checkbox" id="cdel" ${!edit||!c.sin?'checked':''}> El nombre del artículo empieza por el de la categoría («Papel A4 80 g Blanco»). Quítalo si no hace falta («Grapas 24/6»).</label>`,
  `<button class="b" id="x">Cancelar</button><button class="b p" id="ok">Guardar</button>`,true);
  document.getElementById('x').onclick=()=>alCancelar?alCancelar():cerrar();
  document.getElementById('ok').onclick=()=>{const car=document.getElementById('cc').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(!car.length){aviso('Escribe al menos una característica.');return}
   const sin=!document.getElementById('cdel').checked;
-  if(edit){c.car=car;c.sin=sin}else{const n=document.getElementById('cn').value.trim();if(!n){aviso('Escribe el nombre.');return}const id='c'+(cats.length+1);cats.push({id,nombre:n,car,sin});if(alCrear){alCrear(id);return}catSel=id}
+  if(edit){arts.filter(z=>z.cat===c.id).forEach(z=>{const m={};c.car.forEach((k,i)=>m[k]=z.v[i]);z.v=car.map(k=>m[k]||'')});c.car.forEach((k,i)=>{if(!car.includes(k))delete c.vals[k]});car.forEach(k=>c.vals[k]=c.vals[k]||[]);c.car=car;c.sin=sin}else{const n=document.getElementById('cn').value.trim();if(!n){aviso('Escribe el nombre.');return}const id='c'+(cats.length+1);cats.push({id,nombre:n,car,sin,vals:Object.fromEntries(car.map(k=>[k,[]]))});if(alCrear){alCrear(id);return}catSel=id}
   cerrar();pintar()};
 }
 function cuadroPedir(){
