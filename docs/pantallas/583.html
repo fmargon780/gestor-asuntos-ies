@@ -38,10 +38,10 @@ td{border-bottom:1px solid var(--borde);padding:7px 8px;vertical-align:top}
 td.n,th.n{text-align:right;white-space:nowrap}
 tr.sel td{background:#eef4fb}
 .viejo{color:#9aa1ab}
-.chip{display:inline-block;font-size:11px;background:#eef1f5;border-radius:10px;padding:1px 8px;color:#445}
+.chip{white-space:nowrap;display:inline-block;font-size:11px;background:#eef1f5;border-radius:10px;padding:1px 8px;color:#445}
 .barato{background:var(--verde);color:var(--verdet);font-weight:600}
-.apuntar{display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:8px;align-items:center;max-width:none;position:relative;margin:14px 0 8px}
-.sug{position:absolute;top:38px;left:0;right:220px;background:#fff;border:1px solid #cfd6e0;border-radius:6px;box-shadow:0 6px 18px #0002;z-index:5;max-height:300px;overflow:auto}
+.apuntar{display:grid;grid-template-columns:minmax(0,1fr) 210px 90px auto;gap:8px;align-items:center;max-width:none;position:relative;margin:14px 0 8px}
+.sug{position:absolute;top:38px;left:0;right:420px;background:#fff;border:1px solid #cfd6e0;border-radius:6px;box-shadow:0 6px 18px #0002;z-index:5;max-height:300px;overflow:auto}
 .sug div{padding:7px 10px;cursor:pointer}.sug div:hover,.sug div.act{background:#eef4fb}
 .sug .nuevo{border-top:1px solid var(--borde);color:var(--azul2)}
 .acc{display:flex;gap:8px;align-items:center;margin:4px 0 8px}
@@ -51,7 +51,7 @@ tr.sel td{background:#eef4fb}
 .lc div{padding:6px 8px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between}
 .lc div.on{background:var(--azul);color:#fff}
 .capa{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center;z-index:20}
-.cuadro{background:#fff;border-radius:10px;width:min(1100px,94vw);max-height:90vh;display:flex;flex-direction:column}
+.cuadro{background:#fff;border-radius:10px;width:min(1340px,96vw);max-height:90vh;display:flex;flex-direction:column}
 .cuadro.chico{width:min(520px,94vw)}
 .cuadro h2{font-size:17px;margin:0;padding:14px 18px;border-bottom:1px solid var(--borde)}
 .cuadro .cu{padding:14px 18px;overflow:auto}
@@ -81,7 +81,7 @@ th.prov{min-width:120px}
 {
 const HOY='2026-11-25', YO='Francisco';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const eur=n=>n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const eur=n=>{const [e,d]=Math.abs(n).toFixed(2).split('.');return (n<0?'−':'')+e.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+','+d+' €'};
 const fecha=f=>{const [a,m,d]=f.split('-');return `${+d}-${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m-1]}-${a}`};
 const meses=f=>{const a=new Date(f),b=new Date(HOY);return (b-a)/864e5/30.4};
 let cats=[
@@ -120,12 +120,12 @@ let precios=[
  {a:'a7',p:1,pr:8.40,f:'2026-11-10',o:'Llamada'},
  {a:'a9',p:1,pr:62.00,f:'2026-06-01',o:'Correo'}];
 let falta=[
- {id:1,a:'a1',c:20,q:'Diego',f:'2026-11-18'},
- {id:2,a:'a5',c:2,q:'Francisco',f:'2026-11-20'},
- {id:3,a:'a7',c:1,q:'Diego',f:'2026-11-21'},
- {id:4,a:'a2',c:3,q:'Francisco',f:'2026-11-24'},
- {id:5,a:'a9',c:2,q:'Diego',f:'2026-11-24'}];
-let pedidos=[{n:'A26-0131',p:1,f:'2026-11-12',doc:'261112 PEDIDO D26-00431.pdf',l:[{a:'a8',c:2,pr:11.30},{a:'a10',c:10,pr:2.15}]}];
+ {id:1,a:'a1',c:20,q:'Diego',f:'2026-11-18',para:'Administración'},
+ {id:2,a:'a5',c:2,q:'Francisco',f:'2026-11-20',para:'Administración'},
+ {id:3,a:'a7',c:1,q:'Diego',f:'2026-11-21',para:'Dpto. de Lengua'},
+ {id:4,a:'a2',c:3,q:'Francisco',f:'2026-11-24',para:'Jefatura de estudios'},
+ {id:5,a:'a9',c:2,q:'Diego',f:'2026-11-24',para:'Administración'}];
+let pedidos=[{n:'A26-0128',p:1,f:'2026-11-05',doc:'261105 PEDIDO D26-00418.pdf',l:[{a:'a3',c:4,pr:6.90,para:'Jefatura de estudios'}]},{n:'A26-0131',p:1,f:'2026-11-12',doc:'261112 PEDIDO D26-00431.pdf',l:[{a:'a8',c:2,pr:11.30,para:'Administración'},{a:'a10',c:10,pr:2.15,para:'Administración'}]}];
 cats.forEach(c=>{c.vals={};c.car.forEach((k,i)=>c.vals[k]=[...new Set(arts.filter(z=>z.cat===c.id).map(z=>z.v[i]).filter(Boolean))].sort())});
 let unidades=[...new Set(arts.map(z=>z.u))].sort();
 const lista=(attr,vals)=>`<span style="display:flex;gap:6px"><select ${attr}><option value="">—</option>${vals.map(v=>`<option>${esc(v)}</option>`).join('')}<option value="__nuevo">+ Nuevo valor…</option></select><input type="text" data-nv hidden placeholder="Escribe el valor nuevo"></span>`;
@@ -133,7 +133,8 @@ const valorDe=sel=>sel.value==='__nuevo'?sel.nextElementSibling.value.trim():sel
 const engancharLista=(sel,alCambiar)=>{const nv=sel.nextElementSibling;sel.onchange=()=>{nv.hidden=sel.value!=='__nuevo';if(!nv.hidden)nv.focus();alCambiar()};nv.onchange=()=>{const v=nv.value.trim().toLowerCase(),o=[...sel.options].find(o=>o.value!==''&&o.value!=='__nuevo'&&o.value.toLowerCase()===v);
   if(o){sel.value=o.value;nv.hidden=true;nv.value='';aviso('Ya estaba en la lista: '+o.value+'. Elegido.')}alCambiar()};nv.oninput=alCambiar};
 const igualA=(vals,v)=>vals.find(x=>x.toLowerCase()===v.toLowerCase());
-let portesDe={0:60,1:100};let sigD=470;
+let portesDe={0:60,1:100};let correos=['pedidos@papeleriacentral.es','ventas@dobla.es','imprentasol@gmail.com','comercial@ofiprix.es'];let gasto={0:3120.40,1:13250.00,2:860.00,3:0};const TOPE=15000;
+let destinos=['Administración','Dirección','Jefatura de estudios','Conserjería','Dpto. de Lengua','Dpto. de Matemáticas'];let sigD=470;
 let vista='falta', marc=new Set(), catSel='c1', artSel='a1', sigN=142, sigF=6;
 const nom=a=>{const x=arts.find(z=>z.id===a);const c=cats.find(z=>z.id===x.cat);return (c.sin?'':c.nombre+' ')+x.v.filter(Boolean).join(' ')};
 const artDe=id=>arts.find(z=>z.id===id);
@@ -145,55 +146,79 @@ const main=document.getElementById('main'), capa=document.getElementById('capa')
 function cabecera(){return `<div class="cab"><h1>Material</h1><div class="pest">
  <button data-v="falta" class="${vista==='falta'?'on':''}">Lo que falta (${falta.length})</button>
  <button data-v="pedidos" class="${vista==='pedidos'?'on':''}">Pedidos (${pedidos.length})</button>
- <button data-v="catalogo" class="${vista==='catalogo'?'on':''}">Catálogo (${arts.length})</button></div><div class="esp"></div></div>`}
-function pintar(){if(vista==='asunto'){main.innerHTML=vAsunto();return}main.innerHTML=cabecera()+(vista==='falta'?vFalta():vista==='pedidos'?vPedidos():vCatalogo())}
+ <button data-v="catalogo" class="${vista==='catalogo'?'on':''}">Catálogo (${arts.length})</button>
+ <button data-v="proveedores" class="${vista==='proveedores'?'on':''}">Proveedores (${provs.length})</button></div><div class="esp"></div></div>`}
+function pintar(){if(vista==='asunto'){main.innerHTML=vAsunto();return}main.innerHTML=cabecera()+(vista==='falta'?vFalta():vista==='pedidos'?vPedidos():vista==='proveedores'?vProveedores():vCatalogo())}
 let pedSel=null;
-function vAsunto(){const p=pedidos.find(z=>z.n===pedSel);
- p.rec=p.rec||p.l.map(l=>l.c);p.fac=p.fac||p.l.map(()=>({c:'',pr:''}));p.fra=p.fra||{num:'',f:'',base:'',iva:'',tot:''};
- const fac=p.fac,rec=p.rec,F=p.fra,num=v=>v===''?null:+v;
- let sumF=0,dif=0,falta=0;
- const filas=p.l.map((l,i)=>{const fc=num(fac[i].c),fp=num(fac[i].pr),imp=fc!=null&&fp!=null?fc*fp:null;if(imp!=null)sumF+=imp;
-  const dRec=rec[i]!==l.c,dC=fc!=null&&fc!==rec[i],dP=fp!=null&&Math.abs(fp-l.pr)>0.004;if(dRec||dC||dP)dif++;if(fc==null||fp==null)falta++;
-  const est=fc==null||fp==null?'<span class="viejo">falta la factura</span>':(dRec||dC||dP)?`<span style="color:#b42318">${[dRec?`recibido ${rec[i]} de ${l.c}`:'',dC?`facturado ${fc}, recibido ${rec[i]}`:'',dP?`precio ${eur(fp)} en vez de ${eur(l.pr)}`:''].filter(Boolean).join(' · ')}</span>`:'<span style="color:#17663a">✓ cuadra</span>';
-  return `<tr><td>${esc(nom(l.a))}</td><td class="n">${l.c} × ${eur(l.pr)}<br><small>${eur(l.c*l.pr)}</small></td>
-  <td class="n ${dRec?'difer':''}"><input type="number" min="0" value="${rec[i]}" data-rec="${i}" style="width:64px"></td>
-  <td class="n ${dC?'difer':''}"><input type="number" min="0" value="${fac[i].c}" data-fc="${i}" style="width:64px"></td>
-  <td class="n ${dP?'difer':''}"><input type="number" step="0.01" min="0" value="${fac[i].pr}" data-fp="${i}" style="width:84px"></td>
-  <td class="n">${imp!=null?eur(imp):''}</td><td>${est}</td></tr>`}).join('');
- const base=num(F.base),iva=num(F.iva),tot=num(F.tot);
- const chk=[];if(base!=null&&!falta)chk.push(Math.abs(base-sumF)<0.01?`<span style="color:#17663a">✓ Las líneas suman ${eur(sumF)}, igual que la base imponible.</span>`:`<span style="color:#b42318">Las líneas suman ${eur(sumF)} y la base imponible es ${eur(base)}.</span>`);
- if(base!=null&&iva!=null)chk.push(Math.abs(base*0.21-iva)<0.01?'<span style="color:#17663a">✓ IVA al 21 %.</span>':`<span style="color:#b42318">El IVA no es el 21 % de la base (sería ${eur(base*0.21)}).</span>`);
- if(base!=null&&iva!=null&&tot!=null)chk.push(Math.abs(base+iva-tot)<0.01?'<span style="color:#17663a">✓ Base más IVA da el total.</span>':`<span style="color:#b42318">Base más IVA da ${eur(base+iva)}, no ${eur(tot)}.</span>`);
- const conforme=!falta&&!dif&&base!=null&&iva!=null&&tot!=null&&chk.every(c=>c.includes('✓'));
- const pend=p.l.reduce((n,l,i)=>n+(rec[i]<l.c?1:0),0);
+function pendDe(pi){return pedidos.filter(z=>z.p===pi&&!(z.fra&&z.fra.base)).reduce((t,z)=>t+z.l.reduce((u,l)=>u+l.c*l.pr,0),0)}
+function vProveedores(){return `<p class="ayuda">Lo de cada proveedor en el año natural, sin IVA. El tope del contrato menor de suministros es ${eur(TOPE)}. «Facturado» suma las facturas; «pedido sin facturar», los pedidos aún sin factura.</p>
+ <table><thead><tr><th>Proveedor</th><th>Correo</th><th>Portes gratis desde</th><th class="n">Facturado en 2026</th><th class="n">Pedido sin facturar</th><th style="width:28%">Hacia el tope de ${eur(TOPE)}</th></tr></thead><tbody>
+ ${provs.map((pr,i)=>{const f=gasto[i]||0,pd=pendDe(i),t=f+pd,pc=Math.min(100,t/TOPE*100),col=t>=TOPE?'#b42318':t>=TOPE*0.8?'#d97706':'#2c5d8f';
+  return `<tr><td>${esc(pr)}</td><td>${esc(correos[i]||'')}</td><td><button class="b l" data-portes2="${i}">${portesDe[i]!=null?eur(portesDe[i]):'sin apuntar'}</button></td><td class="n">${eur(f)}</td><td class="n">${eur(pd)}</td>
+  <td><div style="background:#eef1f5;border-radius:4px;height:10px"><div style="width:${pc}%;background:${col};height:10px;border-radius:4px"></div></div><small style="color:${col}">${eur(t)} · ${Math.round(t/TOPE*100)} %${t>=TOPE?' · pasado del tope':t>=TOPE*0.8?' · cerca del tope':''}</small></td></tr>`}).join('')}</tbody></table>`}
+function cuadroPresu(){const lin=falta.filter(x=>marc.has(x.id));let el=new Set();
+ const pinta=()=>{cuadro('Pedir precios',`<p class="ayuda" style="margin-top:0">Se manda un correo a cada proveedor marcado, desde la cuenta de Administración, con esta lista. Cuando contesten, escribes sus precios en el catálogo o en el cuadro «Pedir».</p>
+ <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px"><div>${provs.map((pr,i)=>`<label style="display:block;margin-bottom:6px"><input type="checkbox" data-pv="${i}" ${el.has(i)?'checked':''}> ${esc(pr)}<br><small class="viejo" style="margin-left:22px">${esc(correos[i])}</small></label>`).join('')}</div>
+ <div class="caja" style="font-size:13px"><b>Asunto:</b> Petición de precios · IES Fuente Lucena<br><br>Buenos días:<br>Les rogamos nos indiquen precio sin IVA y plazo de entrega de:<ul style="margin:6px 0">${lin.map(x=>`<li>${esc(nom(x.a))}: ${x.c} × ${esc(artDe(x.a).u)}</li>`).join('')}</ul>Un saludo.<br>Administración</div></div>`,
+ `<button class="b" id="x">Cancelar</button><button class="b p" id="ok" ${el.size?'':'disabled'}>Enviar ${el.size||''} correo${el.size===1?'':'s'}</button>`);
+ capa.querySelectorAll('[data-pv]').forEach(c=>c.onchange=()=>{c.checked?el.add(+c.dataset.pv):el.delete(+c.dataset.pv);pinta()});
+ document.getElementById('x').onclick=cerrar;
+ document.getElementById('ok').onclick=()=>{lin.forEach(x=>x.presu={f:HOY,n:el.size});cerrar();pintar();aviso(`${el.size} correo${el.size>1?'s':''} de petición de precios (en la prueba no sale ninguno).`)}};pinta()}
+function prepara(p){p.rec=p.rec||p.l.map(l=>l.c);p.dev=p.dev||p.l.map(()=>0);p.fac=p.fac||p.l.map(()=>({c:'',pr:''}));p.fra=p.fra||{num:'',f:'',base:'',iva:'',tot:''};p.rec2=p.rec2||{num:'',f:'',base:'',iva:'',tot:''};p.junto=p.junto||[];return p}
+function vAsunto(){const p=prepara(pedidos.find(z=>z.n===pedSel)),F=p.fra,R=p.rec2,num=v=>v===''||v==null?null:+v;
+ const grupo=[p,...p.junto.map(n=>prepara(pedidos.find(z=>z.n===n)))];
+ let sumF=0,dif=0,falta=0,abono=0,nDev=0,pend=0;
+ const filas=grupo.map(g=>`<tr><td colspan="9" style="background:#f6f8fb"><b>Pedido ${g.n}</b> <span class="viejo">· ${fecha(g.f)}</span>${g!==p?` <button class="b l" data-quitarj="${g.n}">quitar de esta factura</button>`:''}</td></tr>`+g.l.map((l,i)=>{
+  const fc=num(g.fac[i].c),fp=num(g.fac[i].pr),imp=fc!=null&&fp!=null?fc*fp:null;if(imp!=null)sumF+=imp;
+  const rc=g.rec[i],dv=g.dev[i];if(dv>0){nDev++;abono+=dv*(fp??l.pr)}if(rc<l.c||dv>0)pend++;
+  const dRec=rc!==l.c,dC=fc!=null&&fc!==rc,dP=fp!=null&&Math.abs(fp-l.pr)>0.004;if(dRec||dC||dP)dif++;if(fc==null||fp==null)falta++;
+  const est=fc==null||fp==null?'<span class="viejo">falta la factura</span>':(dRec||dC||dP)?`<span style="color:#b42318">${[dRec?`recibido ${rc} de ${l.c}`:'',dC?`facturado ${fc}, recibido ${rc}`:'',dP?`precio ${eur(fp)} en vez de ${eur(l.pr)}`:''].filter(Boolean).join(' · ')}</span>`:'<span style="color:#17663a">✓ cuadra</span>';
+  const k=`${g.n}|${i}`;
+  return `<tr><td>${esc(nom(l.a))}${l.para?`<br><small class="viejo">para ${esc(l.para)}</small>`:''}</td><td class="n">${l.c} × ${eur(l.pr)}<br><small>${eur(l.c*l.pr)}</small></td>
+  <td class="n ${dRec?'difer':''}"><input type="number" min="0" value="${rc}" data-rec="${k}" style="width:60px"></td>
+  <td class="n ${dv>0?'difer':''}"><input type="number" min="0" value="${dv}" data-dev="${k}" style="width:60px"></td>
+  <td class="n ${dC?'difer':''}"><input type="number" min="0" value="${g.fac[i].c}" data-fc="${k}" style="width:60px"></td>
+  <td class="n ${dP?'difer':''}"><input type="number" step="0.01" min="0" value="${g.fac[i].pr}" data-fp="${k}" style="width:80px"></td>
+  <td class="n">${imp!=null?eur(imp):''}</td><td>${est}${dv>0?`<br><span style="color:#9a5b00">devuelto ${dv}: abono de ${eur(dv*(fp??l.pr))}</span>`:''}</td></tr>`}).join('')).join('');
+ const comprobar=(X,esperado,quien)=>{const base=num(X.base),iva=num(X.iva),tot=num(X.tot),c=[];
+  if(base!=null)c.push(Math.abs(Math.abs(base)-esperado)<0.01?`<span style="color:#17663a">✓ ${quien} ${eur(esperado)}, igual que la base imponible.</span>`:`<span style="color:#b42318">${quien} ${eur(esperado)} y la base imponible es ${eur(base)}.</span>`);
+  if(base!=null&&iva!=null)c.push(Math.abs(base*0.21-iva)<0.01?'<span style="color:#17663a">✓ IVA al 21 %.</span>':`<span style="color:#b42318">El IVA no es el 21 % de la base (sería ${eur(base*0.21)}).</span>`);
+  if(base!=null&&iva!=null&&tot!=null)c.push(Math.abs(base+iva-tot)<0.01?'<span style="color:#17663a">✓ Base más IVA da el total.</span>':`<span style="color:#b42318">Base más IVA da ${eur(base+iva)}, no ${eur(tot)}.</span>`);
+  return {c,ok:base!=null&&iva!=null&&tot!=null&&c.every(x=>x.includes('✓'))}};
+ const cF=falta?{c:[],ok:false}:comprobar(F,sumF,'Las líneas suman'),cR=nDev?comprobar(R,abono,'Lo devuelto suma'):{c:[],ok:true};
+ const campos=(X,nm)=>`<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:end">
+ <label>Nº<br><input type="text" value="${esc(X.num)}" data-${nm}="num" style="width:100%"></label>
+ <label>Fecha<br><input type="date" value="${X.f}" data-${nm}="f" style="width:100%"></label>
+ <label>Base imponible<br><input type="number" step="0.01" value="${X.base}" data-${nm}="base" style="width:100%"></label>
+ <label>IVA<br><input type="number" step="0.01" value="${X.iva}" data-${nm}="iva" style="width:100%"></label>
+ <label>Total<br><input type="number" step="0.01" value="${X.tot}" data-${nm}="tot" style="width:100%"></label></div>`;
+ const otros=pedidos.filter(z=>z.p===p.p&&z!==p&&!p.junto.includes(z.n)&&!pedidos.some(o=>o.junto&&o.junto.includes(z.n)));
+ const conforme=!falta&&!dif&&cF.ok&&cR.ok;
  return `<div class="cab"><h1 style="font-size:19px">${p.n} COMPRA ${esc(provs[p.p])}</h1><div class="esp"></div><button class="b" id="volver">← Volver a Material</button></div>
  <p class="ayuda">Así se verá el bloque «Pedido» dentro del asunto COMPRA (el resto del asunto, tareas y documentos, no se pinta aquí). Documento de pedido: <button class="b l" data-doc="1">${esc(p.doc||'')}</button></p>
- <div class="caja"><h3>Pedido <span class="viejo" style="font-weight:400">· hecho el ${fecha(p.f)}</span></h3>
- <table><thead><tr><th>Artículo</th><th class="n">Pedido</th><th class="n">Recibido</th><th class="n">Facturado: cantidad</th><th class="n">Facturado: precio sin IVA</th><th class="n">Importe facturado</th><th style="width:30%">Comparación</th></tr></thead><tbody>${filas}</tbody></table>
- <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px;align-items:end">
- <label>Nº de factura<br><input type="text" value="${esc(F.num)}" data-fra="num" style="width:100%"></label>
- <label>Fecha de la factura<br><input type="date" value="${F.f}" data-fra="f" style="width:100%"></label>
- <label>Base imponible<br><input type="number" step="0.01" value="${F.base}" data-fra="base" style="width:100%"></label>
- <label>IVA<br><input type="number" step="0.01" value="${F.iva}" data-fra="iva" style="width:100%"></label>
- <label>Total<br><input type="number" step="0.01" value="${F.tot}" data-fra="tot" style="width:100%"></label></div>
- <p>${chk.join('<br>')||'<span class="viejo">Cuando llegue la factura, escribe lo que pone en cada línea y abajo sus importes.</span>'}</p>
- <p style="font-size:16px">${conforme?'<b style="color:#17663a">✓ Factura conforme</b> con el pedido y lo recibido.':falta?'':`<b style="color:#b42318">Factura con diferencias</b>: revisa lo marcado en rojo.`}</p>
- <div class="acc"><button class="b" id="devolver" ${pend&&!p.devuelto?'':'disabled'}>Devolver lo no recibido a «Lo que falta»${pend?` (${pend})`:''}</button>
+ <div class="caja"><h3>Pedido y factura</h3>
+ <p style="margin:0 0 8px">${otros.length?`Esta factura incluye también otro pedido de este proveedor: <select id="juntar"><option value="">Elige el pedido…</option>${otros.map(o=>`<option>${o.n}</option>`).join('')}</select>`:(p.junto.length?`<span class="viejo">Esta factura junta ${p.junto.length+1} pedidos de este proveedor.</span>`:'<span class="viejo">No hay otros pedidos abiertos de este proveedor para juntar en esta factura.</span>')}</p>
+ <table><thead><tr><th>Artículo</th><th class="n">Pedido</th><th class="n">Recibido</th><th class="n">Devuelto</th><th class="n">Facturado: cantidad</th><th class="n">Facturado: precio sin IVA</th><th class="n">Importe facturado</th><th style="width:28%">Comparación</th></tr></thead><tbody>${filas}</tbody></table>
+ <h3 style="margin-top:14px">Factura</h3>${campos(F,'fra')}
+ <p>${cF.c.join('<br>')||'<span class="viejo">Cuando llegue la factura, escribe lo que pone en cada línea y aquí sus importes.</span>'}</p>
+ ${nDev?`<h3 style="margin-top:14px">Factura rectificativa (abono de lo devuelto: ${eur(abono)} sin IVA)</h3>${campos(R,'rect')}<p>${cR.c.join('<br>')||'<span class="viejo">Cuando llegue la rectificativa, escribe aquí sus importes (en negativo o en positivo, da igual).</span>'}</p>`:''}
+ <p style="font-size:16px">${conforme?`<b style="color:#17663a">✓ Factura conforme</b> con ${grupo.length>1?'los pedidos':'el pedido'} y lo recibido${nDev?', y el abono cuadra':''}.`:falta?'':`<b style="color:#b42318">Con diferencias</b>: revisa lo marcado en rojo.`}</p>
+ <div class="acc"><button class="b" id="devolver" ${pend&&!p.devuelto?'':'disabled'}>Volver a pedir lo no recibido o devuelto${pend?` (${pend})`:''}</button>
  <button class="b p" id="preciosfra" ${!falta&&F.f?'':'disabled'}>Pasar los precios facturados al catálogo</button></div></div>`}
-
 function vFalta(){
  const filas=falta.map(x=>{const a=artDe(x.a),m=mejor(x.a);
   return `<tr class="${marc.has(x.id)?'sel':''}"><td><input type="checkbox" data-m="${x.id}" ${marc.has(x.id)?'checked':''}></td>
-  <td>${esc(nom(x.a))}</td><td><span class="chip">${esc(catDe(a.cat).nombre)}</span></td>
+  <td>${esc(nom(x.a))}</td><td><span class="chip">${esc(catDe(a.cat).nombre)}</span></td><td>${esc(x.para||'')}</td>
   <td class="n"><input type="number" min="1" value="${x.c}" data-c="${x.id}" style="width:64px"> ${esc(a.u)}</td>
-  <td>${m?`${eur(m.pr)} · ${esc(provs[m.p].split(',')[0])} <span class="viejo">(${fecha(m.f)})</span>`:'<span class="viejo">Sin precio reciente</span>'}</td>
-  <td>${esc(x.q)}</td><td>${fecha(x.f)}</td></tr>`}).join('');
+  <td>${m?`${eur(m.pr)} · ${esc(provs[m.p].split(',')[0])} <span class="viejo">(${fecha(m.f)})</span>`:'<span class="viejo">Sin precio reciente</span>'}${x.presu?`<br><small style="color:#9a5b00">precios pedidos el ${fecha(x.presu.f)} a ${x.presu.n} proveedor${x.presu.n>1?'es':''}</small>`:''}</td>
+  <td>${esc(x.q)}</td><td style="white-space:nowrap">${fecha(x.f)}</td></tr>`}).join('');
  return `<p class="ayuda">Lo que hace falta en la oficina. Lo apuntáis los dos; al pedirlo pasa a «Pedidos».</p>
  <div class="apuntar"><input type="text" id="busca" placeholder="Apuntar: escribe qué hace falta (papel A4, sobres, tóner…)" autocomplete="off">
- <input type="number" id="cant" min="1" value="1" title="Cantidad"><button class="b p" id="apuntar" disabled>Apuntar</button><div class="sug" id="sug" hidden></div></div>
+ <select id="para" title="Para quién">${destinos.map(d=>`<option ${d===paraSel?'selected':''}>${esc(d)}</option>`).join('')}<option value="__nuevo">+ Nuevo…</option></select><input type="number" id="cant" min="1" value="1" title="Cantidad"><button class="b p" id="apuntar" disabled>Apuntar</button><div class="sug" id="sug" hidden></div></div>
  <div class="acc"><button class="b p" id="pedir" ${marc.size?'':'disabled'}>Pedir lo marcado${marc.size?` (${marc.size})`:''}…</button>
+ <button class="b" id="presu" ${marc.size?'':'disabled'}>Pedir precios de lo marcado…</button>
  <button class="b" id="quitar" ${marc.size?'':'disabled'}>Quitar de la lista</button></div>
- ${falta.length?`<table><thead><tr><th><input type="checkbox" id="todas" ${marc.size&&marc.size===falta.length?'checked':''}></th><th>Artículo</th><th>Categoría</th><th class="n">Cantidad</th><th>Mejor precio de los últimos seis meses (sin IVA)</th><th>Apuntado por</th><th>Cuándo</th></tr></thead><tbody>${filas}</tbody></table>`:'<p class="ayuda">No falta nada.</p>'}`}
+ ${falta.length?`<table><thead><tr><th><input type="checkbox" id="todas" ${marc.size&&marc.size===falta.length?'checked':''}></th><th>Artículo</th><th>Categoría</th><th>Para</th><th class="n">Cantidad</th><th>Mejor precio de los últimos seis meses (sin IVA)</th><th>Apuntado por</th><th>Cuándo</th></tr></thead><tbody>${filas}</tbody></table>`:'<p class="ayuda">No falta nada.</p>'}`}
 function vPedidos(){
  if(!pedidos.length)return '<p class="ayuda">No hay pedidos sin archivar.</p>';
  return `<p class="ayuda">Lo pedido y todavía sin archivar. Cada pedido es un asunto COMPRA; al archivar el asunto, sale de aquí.</p>`+pedidos.map(p=>{
@@ -292,16 +317,17 @@ function cuadroPedir(){
  const nPed=tot.filter(z=>z.n).length,sinAsig=lin.filter(x=>asig[x.id]==null).length;
  const portes=z=>{const d=portesDe[z.p];if(d==null)return `<br><button class="b l" data-portes="${z.p}">portes gratis: sin apuntar</button>`;
   return `<br><button class="b l" data-portes="${z.p}">portes gratis desde ${eur(d)}</button>`+(z.n?(z.t>=d?'<br><small style="color:#17663a">✓ portes gratis</small>':`<br><small style="color:#9a5b00">te faltan ${eur(d-z.t)}</small>`):'')};
+ const anual=z=>{const ya=gasto[z.p]+pendDe(z.p),tras=ya+z.t;return `<br><small class="${tras>=TOPE?'':'viejo'}" style="${tras>=TOPE?'color:#b42318;font-weight:600':tras>=TOPE*0.8?'color:#9a5b00':''}">este año: ${eur(tras)} de ${eur(TOPE)}${tras>=TOPE?' · se pasa del tope':tras>=TOPE*0.8?' · cerca del tope':''}</small>`};
  const cuerpo=`<p class="ayuda" style="margin-top:0">Cada línea va al proveedor de la casilla marcada; pulsa otra casilla para cambiarla. De entrada, al más barato. En verde, el más barato de cada artículo; en gris, precios de hace más de seis meses. Una casilla sin precio: al pulsarla escribes el precio. Si bajas una cantidad, lo que queda pasa a otra fila debajo, para asignarlo a otro proveedor.</p>
   <table><thead><tr><th>Artículo</th><th class="n">Cantidad</th>${usados.map(p=>`<th class="prov n">${esc(provs[p].split(',')[0])}</th>`).join('')}<th class="prov n"><button class="b l" id="otro">+ Otro proveedor</button></th></tr></thead><tbody>
   ${lin.map(x=>{const zs=usados.map(p=>ult(x.a,p)),vals=zs.filter(z=>z&&meses(z.f)<=6).map(z=>z.pr),mn=Math.min(...vals);
    return `<tr><td>${esc(nom(x.a))}${asig[x.id]==null?'<br><small style="color:#9a5b00">sin asignar: se queda en «Lo que falta»</small>':''}</td><td class="n" style="white-space:nowrap"><input type="number" min="1" value="${x.c}" data-q="${x.id}" style="width:60px"> × ${esc(artDe(x.a).u)}</td>${zs.map((z,i)=>{const p=usados[i],el=asig[x.id]===p;
     return `<td class="n celda ${el?'asig':''} ${z&&meses(z.f)<=6&&z.pr===mn?'barato':''} ${z&&meses(z.f)>6?'viejo':''}" data-l="${x.id}" data-a="${x.a}" data-p="${p}">${el?'✓ ':''}${z?`${eur(z.pr*x.c)}<br><small>${eur(z.pr)} · ${fecha(z.f)}</small>`:'<span class="viejo">sin precio</span>'}${el&&z?`<br><button class="b l" data-cambiar="1">Cambiar precio</button>`:''}</td>`}).join('')}<td></td></tr>`}).join('')}
-  <tr><td colspan="2"><b>Lo asignado, sin IVA</b></td>${tot.map(z=>`<td class="n"><b>${z.n?eur(z.t):'—'}</b>${z.n?`<br><small>${z.n} línea${z.n>1?'s':''} · con IVA ${eur(z.t*1.21)}</small>`:''}${portes(z)}</td>`).join('')}<td></td></tr></tbody></table>`;
+  <tr><td colspan="2"><b>Lo asignado, sin IVA</b></td>${tot.map(z=>`<td class="n"><b>${z.n?eur(z.t):'—'}</b>${z.n?`<br><small>${z.n} línea${z.n>1?'s':''} · con IVA ${eur(z.t*1.21)}</small>`:''}${portes(z)}${anual(z)}</td>`).join('')}<td></td></tr></tbody></table>`;
  cuadro(`Pedir ${lin.length} artículo${lin.length>1?'s':''}`,cuerpo,`<span class="ayuda" style="margin:0 auto 0 0">Cada proveedor con líneas asignadas tendrá su asunto COMPRA con su documento de pedido.${sinAsig?` ${sinAsig} sin asignar se quedan en «Lo que falta».`:''}</span><button class="b" id="x">Cancelar</button><button class="b p" id="ok" ${nPed?'':'disabled'}>${nPed>1?`Hacer ${nPed} pedidos`:nPed?`Pedir a ${esc(provs[tot.find(z=>z.n).p].split(',')[0])}`:'Pedir'}</button>`);
  const vuelve=()=>cuadroPedir();
  capa.querySelectorAll('[data-q]').forEach(inp=>inp.onchange=()=>{const x=falta.find(z=>z.id===+inp.dataset.q),n=Math.max(1,Math.floor(+inp.value||1));
-  if(n<x.c){const resto={id:sigF++,a:x.a,c:x.c-n,q:x.q,f:x.f};x.c=n;falta.splice(falta.indexOf(x)+1,0,resto);(cuadroPedir.partidas=cuadroPedir.partidas||[]).push([x.id,resto.id]);marc.add(resto.id);aviso(`Partida: ${n} aquí y ${resto.c} en la fila de debajo, sin asignar.`)}else x.c=n;
+  if(n<x.c){const resto={id:sigF++,a:x.a,c:x.c-n,q:x.q,f:x.f,para:x.para};x.c=n;falta.splice(falta.indexOf(x)+1,0,resto);(cuadroPedir.partidas=cuadroPedir.partidas||[]).push([x.id,resto.id]);marc.add(resto.id);aviso(`Partida: ${n} aquí y ${resto.c} en la fila de debajo, sin asignar.`)}else x.c=n;
   cuadroPedir()});
  capa.querySelectorAll('.celda').forEach(td=>td.onclick=e=>{const l=+td.dataset.l,p=+td.dataset.p,a=td.dataset.a;
   if(e.target.dataset.cambiar){cuadroPrecio(a,p,vuelve);return}
@@ -317,13 +343,13 @@ function cuadroPedir(){
  const limpiar=()=>{cuadroPedir.extra=[];cuadroPedir.asig=null;cuadroPedir.partidas=[]};
  document.getElementById('x').onclick=()=>{(cuadroPedir.partidas||[]).reverse().forEach(([o,r])=>{const a=falta.find(z=>z.id===o),b=falta.find(z=>z.id===r);if(a&&b){a.c+=b.c;falta=falta.filter(z=>z!==b);marc.delete(r)}});limpiar();cerrar();pintar()};
  document.getElementById('ok').onclick=()=>{const hechos=[];
-  tot.filter(z=>z.n).forEach(z=>{const l=lin.filter(x=>asig[x.id]===z.p).map(x=>({a:x.a,c:x.c,pr:ult(x.a,z.p).pr}));
+  tot.filter(z=>z.n).forEach(z=>{const l=lin.filter(x=>asig[x.id]===z.p).map(x=>({a:x.a,c:x.c,pr:ult(x.a,z.p).pr,para:x.para}));
    const n='A26-0'+(sigN++);pedidos.push({n,p:z.p,f:HOY,l,doc:'261125 PEDIDO D26-00'+(sigD++)+'.pdf'});hechos.push(n)});
   falta=falta.filter(x=>!(marc.has(x.id)&&asig[x.id]!=null));marc.clear();limpiar();cerrar();vista='pedidos';pintar();
   aviso(hechos.length>1?`${hechos.length} asuntos COMPRA nuevos: ${hechos.join(' y ')}, cada uno con su documento de pedido.`:`Asunto nuevo ${hechos[0]} COMPRA, con su documento de pedido.`)};
 }
 /* ---- apuntar ---- */
-let sugAct=0,elegidoArt=null;
+let sugAct=0,elegidoArt=null,paraSel='Administración';
 function sugerir(){const q=document.getElementById('busca').value.trim().toLowerCase(),s=document.getElementById('sug');
  elegidoArt=null;document.getElementById('apuntar').disabled=true;
  if(!q){s.hidden=true;return}
@@ -333,9 +359,9 @@ function elegir(id){const s=document.getElementById('sug');s.hidden=true;
  if(id==='nuevo'){cuadroArticulo(document.getElementById('busca').value.trim(),nid=>{pintar();ponerBusca(nid)});return}
  ponerBusca(id)}
 function ponerBusca(id){const b=document.getElementById('busca');b.value=nom(id);elegidoArt=id;document.getElementById('apuntar').disabled=false;const c=document.getElementById('cant');c.focus();c.select()}
-function apuntar(){if(!elegidoArt)return;const c=Math.max(1,+document.getElementById('cant').value||1);
- const ya=falta.find(x=>x.a===elegidoArt);
- if(ya){ya.c+=c;aviso(`Ya estaba apuntado: ahora ${ya.c} × ${artDe(elegidoArt).u}.`)}else{falta.push({id:sigF++,a:elegidoArt,c,q:YO,f:HOY});aviso('Apuntado.')}
+function apuntar(){if(!elegidoArt)return;const c=Math.max(1,+document.getElementById('cant').value||1);paraSel=document.getElementById('para').value;
+ const ya=falta.find(x=>x.a===elegidoArt&&x.para===paraSel);
+ if(ya){ya.c+=c;aviso(`Ya estaba apuntado para ${paraSel}: ahora ${ya.c} × ${artDe(elegidoArt).u}.`)}else{falta.push({id:sigF++,a:elegidoArt,c,q:YO,f:HOY,para:paraSel});aviso('Apuntado.')}
  elegidoArt=null;pintar();document.getElementById('busca').focus()}
 /* ---- eventos ---- */
 main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[data-art],[data-s],input[type=checkbox]');if(!t)return;
@@ -343,6 +369,9 @@ main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[d
  else if(t.dataset.s)elegir(t.dataset.s)
  else if(t.id==='apuntar')apuntar()
  else if(t.id==='pedir'){cuadroPedir.asig=null;cuadroPedir.extra=[];cuadroPedir.partidas=[];cuadroPedir()}
+ else if(t.id==='presu')cuadroPresu()
+ else if(t.dataset.portes2!=null){const p=+t.dataset.portes2;cuadro('Portes gratis',`<p class="ayuda" style="margin-top:0">${esc(provs[p])}</p><div class="fila"><label>Portes gratis desde</label><input type="number" step="0.01" min="0" id="pg" value="${portesDe[p]??''}" style="width:120px"></div><p class="ayuda">Importe sin IVA. Vacío si no tiene.</p>`,`<button class="b" id="x2">Cancelar</button><button class="b p" id="ok2">Guardar</button>`,true);
+  document.getElementById('x2').onclick=cerrar;document.getElementById('ok2').onclick=()=>{const v=parseFloat(document.getElementById('pg').value);if(v>0)portesDe[p]=v;else delete portesDe[p];cerrar();pintar()}}
  else if(t.id==='quitar'){const n=marc.size;falta=falta.filter(x=>!marc.has(x.id));marc.clear();pintar();aviso(`Quitado${n>1?'s':''} ${n} de la lista.`)}
  else if(t.id==='todas'){marc=t.checked?new Set(falta.map(x=>x.id)):new Set();pintar()}
  else if(t.dataset.m){const id=+t.dataset.m;t.checked?marc.add(id):marc.delete(id);pintar()}
@@ -355,16 +384,22 @@ main.addEventListener('click',e=>{const t=e.target.closest('button,[data-cat],[d
  else if(t.dataset.doc)aviso('En la app se abre el documento, dentro de su asunto.')
  else if(t.dataset.abrir){pedSel=t.dataset.abrir;vista='asunto';pintar()}
  else if(t.id==='volver'){vista='pedidos';pintar()}
- else if(t.id==='devolver'){const p=pedidos.find(z=>z.n===pedSel);let n=0;p.l.forEach((l,i)=>{const r=l.c-p.rec[i];if(r>0){falta.push({id:sigF++,a:l.a,c:r,q:YO,f:HOY});n++}});p.devuelto=true;pintar();aviso(`${n} línea${n>1?'s':''} de vuelta en «Lo que falta».`)}
- else if(t.id==='preciosfra'){const p=pedidos.find(z=>z.n===pedSel);p.l.forEach((l,i)=>{const pr=+p.fac[i].pr;precios=precios.filter(z=>!(z.a===l.a&&z.p===p.p&&z.f===p.fra.f));precios.push({a:l.a,p:p.p,pr,f:p.fra.f,o:'Factura '+(p.fra.num||'')})});aviso('Precios de la factura pasados al catálogo, con su fecha.')}
+ else if(t.id==='devolver'){const p=pedidos.find(z=>z.n===pedSel);let n=0;[p,...p.junto.map(x=>pedidos.find(z=>z.n===x))].forEach(g=>g.l.forEach((l,i)=>{const r=l.c-g.rec[i]+g.dev[i];if(r>0){falta.push({id:sigF++,a:l.a,c:r,q:YO,f:HOY,para:l.para});n++}}));p.devuelto=true;pintar();aviso(`${n} línea${n>1?'s':''} de vuelta en «Lo que falta».`)}
+ else if(t.dataset.quitarj){const p=pedidos.find(z=>z.n===pedSel);p.junto=p.junto.filter(x=>x!==t.dataset.quitarj);pintar()}
+ else if(t.id==='preciosfra'){const p=pedidos.find(z=>z.n===pedSel);[p,...p.junto.map(x=>pedidos.find(z=>z.n===x))].forEach(g=>g.l.forEach((l,i)=>{const pr=+g.fac[i].pr;precios=precios.filter(z=>!(z.a===l.a&&z.p===p.p&&z.f===p.fra.f));precios.push({a:l.a,p:p.p,pr,f:p.fra.f,o:'Factura '+(p.fra.num||'')})}));aviso('Precios de la factura pasados al catálogo, con su fecha.')}
 });
-main.addEventListener('focusout',e=>{const d=e.target.dataset;if(d.fra&&vista==='asunto'){const p=pedidos.find(z=>z.n===pedSel);if(p.fra[d.fra]!==e.target.value){p.fra[d.fra]=e.target.value;setTimeout(pintar,0)}}});
+main.addEventListener('focusout',e=>{const d=e.target.dataset;if((d.fra||d.rect)&&vista==='asunto'){const p=pedidos.find(z=>z.n===pedSel),X=d.fra?p.fra:p.rec2,k=d.fra||d.rect;const sig=e.relatedTarget&&e.relatedTarget.dataset;if(X[k]!==e.target.value){X[k]=e.target.value;X._sucio=true}if(X._sucio&&!(sig&&(sig.fra||sig.rect))){X._sucio=false;setTimeout(pintar,0)}}});
 main.addEventListener('input',e=>{if(e.target.id==='busca'){sugAct=0;sugerir()}});
-main.addEventListener('change',e=>{const d=e.target.dataset,p=pedidos.find(z=>z.n===pedSel);
- if(d.rec!=null){p.rec[+d.rec]=Math.max(0,+e.target.value||0);pintar();return}
- if(d.fc!=null){p.fac[+d.fc].c=e.target.value;pintar();return}
- if(d.fp!=null){p.fac[+d.fp].pr=e.target.value;pintar();return}
- if(d.fra)return;
+main.addEventListener('change',e=>{const d=e.target.dataset;
+ const gl=k=>{const [n,i]=k.split('|');return [pedidos.find(z=>z.n===n),+i]};
+ if(d.rec!=null){const [g,i]=gl(d.rec);g.rec[i]=Math.max(0,+e.target.value||0);pintar();return}
+ if(d.dev!=null){const [g,i]=gl(d.dev);g.dev[i]=Math.max(0,+e.target.value||0);pintar();return}
+ if(d.fc!=null){const [g,i]=gl(d.fc);g.fac[i].c=e.target.value;pintar();return}
+ if(d.fp!=null){const [g,i]=gl(d.fp);g.fac[i].pr=e.target.value;pintar();return}
+ if(e.target.id==='para'&&e.target.value==='__nuevo'){cuadro('Nuevo destino',`<div class="fila"><label>Para quién</label><input type="text" id="nd" placeholder="Dpto. de Inglés, Orientación…"></div>`,`<button class="b" id="x2">Cancelar</button><button class="b p" id="ok2">Añadir</button>`,true);
+  document.getElementById('x2').onclick=()=>{cerrar();e.target.value=paraSel};document.getElementById('ok2').onclick=()=>{const v=document.getElementById('nd').value.trim();if(!v){aviso('Escribe el nombre.');return}const ya=destinos.find(d=>d.toLowerCase()===v.toLowerCase());if(!ya)destinos.push(v);paraSel=ya||v;const b=document.getElementById('busca').value,ea=elegidoArt;cerrar();pintar();if(ea){ponerBusca(ea)}else document.getElementById('busca').value=b};return}
+ if(e.target.id==='juntar'&&e.target.value){const p=pedidos.find(z=>z.n===pedSel);p.junto.push(e.target.value);pintar();return}
+ if(d.fra||d.rect)return;
  if(e.target.dataset.c){const x=falta.find(z=>z.id===+e.target.dataset.c);x.c=Math.max(1,+e.target.value||1);pintar()}});
 main.addEventListener('keydown',e=>{if(e.target.id==='busca'){const s=document.getElementById('sug'),it=[...s.querySelectorAll('[data-s]')];
   if(e.key==='ArrowDown'&&!s.hidden){sugAct=Math.min(sugAct+1,it.length-1);it.forEach((d,i)=>d.classList.toggle('act',i===sugAct));e.preventDefault()}
