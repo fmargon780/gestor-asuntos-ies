@@ -113,6 +113,7 @@ Cada una con su fecha y de dónde sale.
 
 - (12-nov-2026, tema 623) **El asunto de correos y mensajes de Séneca lo compone la app**, ya no es el nombre de la carpeta (sustituye a la fila 55): hay un asunto general del centro y cada plantilla puede llevar el suyo («Me parece buena idea tener un asunto general que pueda ser personalizable para las plantillas de correo y de Séneca»). Se sigue pudiendo retocar antes de enviar.
 - (12-nov-2026, tema 623) **El número del asunto va siempre** en el asunto y en el extracto; si el modelo no lo lleva, la app lo añade al final (elegido «al final en los dos», sabiendo que en un asunto largo puede quedar cortado a la vista). Los asuntos de antes, sin número, siguen con el nombre de la carpeta.
+- (26-nov-2026, tema 759) **Un documento de «Por clasificar» con el número de un asunto**, en el nombre o en su texto, propone guardarse en ese asunto («El correo recibido dice el número de asunto, sin embargo la aplicación no propone guardarlo en el de mismo número»). Nunca se guarda sin pulsar.
 
 ## Registro de Séneca
 
