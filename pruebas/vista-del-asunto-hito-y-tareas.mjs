@@ -251,23 +251,23 @@ await pagina.evaluate(async () => {
   await FichaDocumentos.pintar(a);
 });
 await pagina.waitForTimeout(800);
-await comprobar('13. sale con «sin tarea» y «Colgar de una tarea»; los que cuelgan de una tarea, no',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((f) => [f.dataset.doc.slice(0, 11), !!f.querySelector('.marca-sin-tarea'), !!f.querySelector('.ficha-documento-colgar')]).sort()),
-  await pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((f) => [f.dataset.doc.slice(0, 11), /escaneo/.test(f.dataset.doc), /escaneo/.test(f.dataset.doc)]).sort()));
-await comprobar('13. y solo ese está sin tarea', pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .marca-sin-tarea')).map((e) => e.closest('.ficha-documento-fila').dataset.doc)), ['escaneo0012.pdf']);
-await pagina.click('#ficha-documentos .ficha-documento-colgar');
+await comprobar('13. solo el fichero suelto lleva «Vincular a una tarea» en su ⋮ (fila 775), y ninguno lleva «sin tarea» a la vista',
+  pagina.evaluate(() => [Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-vincular')).map((e) => e.closest('.ficha-documento-fila').dataset.doc),
+    document.querySelectorAll('#ficha-documentos .marca-sin-tarea').length]), [['escaneo0012.pdf'], 0]);
+await pagina.click('#ficha-documentos .ficha-documento-fila[data-doc="escaneo0012.pdf"] .fila-menu-btn');
+await pagina.click('#ficha-documentos .ficha-documento-vincular');
 await pagina.waitForSelector('#doc-tipo', { timeout: 10000 });
 await comprobar('13. sin tipo ni nombre según la norma, abre antes «Cambiar el nombre»', pagina.evaluate(() => !!document.getElementById('doc-guardar') && !document.querySelector('.pt-capa')), true);
 await pagina.selectOption('#doc-tipo', { label: 'SOLICITUD' });
 await pagina.click('#doc-guardar');
 await pagina.waitForSelector('.pt-capa', { timeout: 10000 });
-await comprobar('13. después, la pregunta, con «Colgar»', pagina.evaluate(() => [document.getElementById('pt-ok').textContent, /Tarea nueva: «SOLICITUD»/.test(document.querySelector('.pt-capa').innerText)]), ['Colgar', true]);
+await comprobar('13. después, la pregunta, con «Vincular»', pagina.evaluate(() => [document.getElementById('pt-ok').textContent, /Tarea nueva: «SOLICITUD»/.test(document.querySelector('.pt-capa').innerText)]), ['Vincular', true]);
 await pagina.click('#pt-ok');
 await pagina.waitForTimeout(2500);
 await pagina.evaluate(() => { const c = document.getElementById('cuadro-aceptar'); if (!document.getElementById('capa').classList.contains('oculto') && c) c.click(); });
 await esperarRepintado();
-await comprobar('13. la marca «sin tarea» desaparece y la tarea nueva lleva el nombre del tipo (no el del fichero)',
-  pagina.evaluate(() => [document.querySelectorAll('#ficha-documentos .marca-sin-tarea').length, Array.from(document.querySelectorAll('#ficha-guia .guion-paso-texto')).pop().textContent.trim()]), [0, 'SOLICITUD']);
+await comprobar('13. «Vincular a una tarea» desaparece y la tarea nueva lleva el nombre del tipo (no el del fichero)',
+  pagina.evaluate(() => [document.querySelectorAll('#ficha-documentos .ficha-documento-vincular').length, Array.from(document.querySelectorAll('#ficha-guia .guion-paso-texto')).pop().textContent.trim()]), [0, 'SOLICITUD']);
 
 /* ---------- el registro del asunto ---------- */
 console.log('--- 14. el registro del asunto ---');
