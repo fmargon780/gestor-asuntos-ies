@@ -104,7 +104,7 @@
       await Carpetas.escribirTexto(carpetaNueva, 'Factura 4471.txt', 'Factura de la ferretería.');
       /* Una carpeta que no encaja con nada, para ver que sale debajo. */
       var otro = Nombres.montarAsunto({
-        fecha: hace(25), tipo: 'COMPRA', categoria: 'EMPRESAS',
+        fecha: hace(25), tipo: 'SUMINISTRO', categoria: 'EMPRESAS',
         curso: '', grupo: '', campos: [], descripcion: '', tercero: Nombres.terceroEmpresa({ nombre: 'Taller Ruiz', nif: '99887766X' }), numero: ''
       }).nombre;
       var carpetaOtra = await Carpetas.crear(App.E.abiertos, otro);
