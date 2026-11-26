@@ -377,3 +377,10 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## La app desde un Chromebook (tema 757, 26-nov-2026)
 
 - (26-nov-2026, tema 757) **Solo en un Chromebook,** «Ruta» copia solo el nombre de la carpeta o del documento, para pegarlo en la lupa de la ventana «Abrir archivo» (Francisco comprobó que esa lupa encuentra las carpetas de Drive por su número de asunto). En la ficha del asunto hay un botón nuevo, «Abrir en Drive», que busca la carpeta en otra pestaña con la cuenta común. En «Comprobación al entrar» no sale la línea «Ruta de la nube en este ordenador». En Windows no cambia nada. Francisco: «Está bien así».
+
+## Correos con formato (tema 758, 26-nov-2026)
+
+- (26-nov-2026, tema 758) **La plantilla de correo se escribe como un correo nuevo:** ventana a toda la pantalla, el correo a la izquierda en el orden en que se lee y «Así le llega» a la derecha. Francisco (aviso del 25-nov-2026): «Mejorar la usabilidad de esta pantalla de creación de plantillas de correo.» A la propuesta: «Me vale. Adelante.»
+- (26-nov-2026, tema 758) **El texto del correo admite negrita, cursiva, subrayado, listas y tablas**, en la plantilla y al enviar; pegar desde Word conserva solo eso. Sustituye a «el correo es solo texto» de la idea 748; las plantillas de correo siguen sin descargarse. Francisco (idea 749): «poder dar formato (negrita, tablas) al cuerpo de los correos que manda la app».
+- (26-nov-2026, tema 758) **Séneca sigue en texto sencillo:** la app quita el formato y cada fila de una tabla va en una línea. Saludo y firma, sin formato.
+- (26-nov-2026, tema 758) **Sin el script de Gmail actualizado, el correo sale sin formato** y la app lo avisa en ámbar; el envío nunca falla por eso.
