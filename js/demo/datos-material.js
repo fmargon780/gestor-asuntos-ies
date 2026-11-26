@@ -14,6 +14,8 @@
 
   async function construir() {
     if (!window.Material || !App.E || !App.E.gestor) return;
+    /* Fila 752: el tipo COMPRA (de EMPRESAS), el de los asuntos que crea «Pedir lo marcado», sin guía. */
+    if (!(App.E.tipos || []).some(function (t) { return t.tipo === 'COMPRA'; })) await App.crearTipo({ nombre: 'COMPRA', categoria: 'EMPRESAS' });
     var cats = [
       categoria('cpapel', 'Papel', ['Formato', 'Gramaje', 'Color']),
       categoria('csobres', 'Sobres', ['Medida', 'Ventana']),

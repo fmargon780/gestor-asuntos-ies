@@ -173,7 +173,7 @@
   async function leerEmpresas() {
     try {
       var em = await Datos.cargar(App.E.datos, 'EMPRESAS');
-      return em.lista.map(function (p) { return { nombre: p.nombre, correo: (p.campos && p.campos['Correo']) || '', comercial: p.comercial || '' }; });
+      return em.lista.map(function (p) { return { nombre: p.nombre, correo: (p.campos && p.campos['Correo']) || '', comercial: p.comercial || '', nif: p.nif || '', persona: p }; });
     } catch (e) { return []; }
   }
 

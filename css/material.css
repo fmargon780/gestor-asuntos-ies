@@ -43,3 +43,21 @@
 .material-barra-pasado > span { background: #c0392b; }
 .material-barra-texto { font-size: 12px; color: var(--tinta-suave); margin-top: 3px; }
 .material-barra-texto b { color: inherit; }
+/* Fila 752: el cuadro «Pedir N artículos» y la pestaña «Pedidos». */
+.mp-envuelve { overflow-x: auto; }
+.mp-tabla { table-layout: auto; }
+.mp-prov { min-width: 150px; }
+.mp-casilla { cursor: pointer; border: 2px solid transparent; line-height: 1.35; }
+.mp-casilla:hover { background: var(--azul-claro); }
+.mp-casilla.mp-mejor { background: #e6f4ea; }
+.mp-casilla.mp-viejo { color: #8a8f98; }
+.mp-casilla.mp-sin { color: var(--tinta-suave); font-style: italic; }
+.mp-casilla.mp-elegida { border: 2px solid var(--azul); }
+.mp-marca { color: var(--azul); font-weight: 700; }
+.mp-sin-asignar { font-size: 12px; color: #9a6b00; }
+.mp-fila-pie td { background: #f7f8fa; font-size: 13px; vertical-align: top; }
+.mp-tope-cerca { color: #9a6b00; }
+.mp-tope-pasado { color: #b3261e; }
+.mp-bien { color: #2e7d46; }
+.mp-otro { margin-top: 10px; max-width: 280px; }
+.mp-pedido { margin-bottom: 14px; }

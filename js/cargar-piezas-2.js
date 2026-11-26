@@ -51,12 +51,17 @@
     'js/material-datos.js',
     // Fila 751 (parte 2): precios y proveedores; antes de la pantalla (el estado los lleva).
     'js/material-precios.js',
+    // Fila 752 (parte 3): pedir comparando proveedores. Lógica pura y creación del asunto y su documento, antes de la pantalla.
+    'js/material-pedido-datos.js',
+    'js/material-pedido-crear.js',
     'js/material-pantalla.js',
     'js/material-cuadros.js',
     'js/material-catalogo.js',
     'js/material-falta.js',
     'js/material-precios-ui.js',
     'js/material-proveedores.js',
+    'js/material-pedir.js',
+    'js/material-pedidos.js',
     'js/notas.js',
     // Fila 89, docs/COPIA-SIN-INTERNET.md: leer un dato estático (JSON o
     // binario) tanto por http(s) (fetch) como abierto desde el disco
