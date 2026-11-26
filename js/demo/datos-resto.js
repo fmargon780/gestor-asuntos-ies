@@ -161,6 +161,7 @@
     var numero = Numeros.delNombreDeAsunto(archivado);
     await App.anotar(archivado, { estado: 'cerrado', tipo: 'CERTIFICADO', categoria: 'ALUMNADO', tercero: tercero, numero: numero,
       abiertoEl: fecha + 'T09:00:00.000Z', cerradoEl: fecha + 'T09:05:00.000Z' });
+    if (window.IndiceArchivo) await IndiceArchivo.guardar(await IndiceArchivo.construir());
     await Carpetas.escribirBytes(App.E.abiertos, 'Recibido ' + numero + ' certificado.pdf', PDF_DE_MENTIRA, 'application/pdf');
   }
 
