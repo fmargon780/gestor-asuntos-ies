@@ -5924,3 +5924,9 @@ Filas cerradas (SUSTITUIDA y HECHA ya mirada), con su texto completo:
 | 742 | Aviso de usuario: mejora en «Ficha de un asunto» | DESCARTADA (26-nov-2026): ya sale en Datos del asunto, desplegándolo; no se deja siempre a la vista para no exponer datos personales | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ZO3_6gBP9X4ZA7u-6s5Kdhu7Hn89yTWs/view?usp=drivesdk |
 | 743 | Aviso de usuario: error en «Nuevo asunto» | DESCARTADA (25-nov-2026): descartada por Francisco desde el Centro de mando | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1PX68nxtyHW8zvaJb_7wmgNmMRyA9p0v-/view?usp=drivesdk |
 | 744 | Aviso de usuario: mejora en «Ficha de un asunto» | SUSTITUIDA (25-nov-2026): diseñada en el tema 745 | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1uRB79OB_jKer_EHTSPTvBiQFqqaMlyq-/view?usp=drivesdk |
+
+## Filas sacadas de `docs/COLA.md` el 26-nov-2026 (tema 759)
+
+| Nº | Instrucción | Estado | Notas |
+|---|---|---|---|
+| 759 | Tema: El correo que entra va a su asunto. Para qué: que si un correo que llega dice el número de un asunto, la app proponga guardarlo en ese asunto. [orden: 3 · es «menos trabajo a mano», como dice el mapa, y es corto] | SUSTITUIDA (26-nov-2026): diseñado en las filas 760 a 760 | |
