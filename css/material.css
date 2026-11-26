@@ -32,3 +32,14 @@
   .material-apuntar { grid-template-columns: 1fr 1fr; }
 }
 .material-caja .boton-enlace, .material-acciones .boton-enlace { border: 0; background: none; color: var(--azul); padding: 2px 4px; text-decoration: underline; cursor: pointer; font: inherit; }
+/* Fila 751: precios de los proveedores y pestaña «Proveedores». */
+.material-precios-tabla tr.material-precio-mejor td { background: #e6f4ea; font-weight: 600; }
+.material-precios-tabla tr.material-precio-viejo td { color: #8a8f98; }
+.material-precio-abre { cursor: pointer; }
+.material-precio-abre:hover td { text-decoration: underline; }
+.material-barra { height: 10px; background: #e8ebf0; border-radius: 5px; overflow: hidden; min-width: 120px; }
+.material-barra > span { display: block; height: 100%; background: #3a8f55; }
+.material-barra-cerca > span { background: #e0a526; }
+.material-barra-pasado > span { background: #c0392b; }
+.material-barra-texto { font-size: 12px; color: var(--tinta-suave); margin-top: 3px; }
+.material-barra-texto b { color: inherit; }
