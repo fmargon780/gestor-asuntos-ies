@@ -140,6 +140,15 @@
   async function crearSueltos() {
     await Carpetas.escribirBytes(App.E.abiertos, 'solicitud escaneada.pdf', PDF_DE_MENTIRA, 'application/pdf');
     await Carpetas.escribirBytes(App.E.abiertos, 'justificante.pdf', PDF_DE_MENTIRA, 'application/pdf');    await Carpetas.escribirBytes(App.E.abiertos, 'escaneo_0012.pdf', PDF_DE_MENTIRA, 'application/pdf');   /* fila 661 */
+    await crearSueltosConNumero();
+  }
+
+  /* Fila 760: un suelto con el número de un asunto abierto (el de Pablo) en el nombre, para ver «Es de» y «Guardar en ese asunto». */
+  async function crearSueltosConNumero() {
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var pablo = Object.keys(registro).filter(function (k) { return /MATRICULA Aguilar Ponce, Pablo/.test(k); })[0];
+    var numeroPablo = pablo && (registro[pablo].numero || Numeros.delNombreDeAsunto(pablo));
+    if (numeroPablo) await Carpetas.escribirBytes(App.E.abiertos, 'Correo de Secretaría · ' + numeroPablo + '.pdf', PDF_DE_MENTIRA, 'application/pdf');
   }
 
   /* ---------- la bandeja de correos ---------- */
