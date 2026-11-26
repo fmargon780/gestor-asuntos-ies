@@ -4,7 +4,7 @@
    Un recuadro por asunto COMPRA abierto con líneas de pedido (`ficha.pedido`, que escribe js/material-pedido-crear.js):
    número y nombre (abre el asunto), «pedido el <fecha>», el documento de pedido (se abre) y, cuando exista la
    parte 5, «Comprobar recibido y factura»; debajo, la tabla Artículo, Cantidad, Precio, Importe y
-   «Total sin IVA · con IVA (21 %)». Sale de aquí cuando se archiva el asunto.
+   «Total sin IVA · con IVA (21 %)». Sale de aquí cuando se cierra el asunto.
 
    También da a las demás pestañas lo que ahora ya existe: `Material.proveedoresConPedido()` (los proveedores
    con algún pedido abierto) y `Material.cifrasDeProveedor(clave)` (lo de partida más el «pedido sin facturar»
@@ -64,7 +64,7 @@
   function pintar(caja) {
     var lista = abiertos();
     caja.innerHTML = '<p class="explica">Los pedidos que se han hecho desde «Lo que falta», uno por proveedor. Cada uno es un asunto COMPRA: ábrelo para ver su documento de pedido. ' +
-      'Sale de aquí cuando se archiva el asunto.</p>' +
+      'Sale de aquí cuando se cierra el asunto.</p>' +
       (lista.length ? lista.map(recuadro).join('') : '<p class="explica">No hay pedidos abiertos. Se hacen marcando líneas en «Lo que falta» y pulsando «Pedir lo marcado».</p>');
     Array.prototype.forEach.call(caja.querySelectorAll('[data-abre]'), function (b) {
       b.onclick = function () {
