@@ -1,1 +1,1 @@
-SEGUIR · filas 750, 751, 752, 753, 754 y 755
+SEGUIR · filas 752, 754 y 755
