@@ -5931,3 +5931,7 @@ Filas cerradas (SUSTITUIDA y HECHA ya mirada), con su texto completo:
 |---|---|---|---|
 | 759 | Tema: El correo que entra va a su asunto. Para qué: que si un correo que llega dice el número de un asunto, la app proponga guardarlo en ese asunto. [orden: 3 · es «menos trabajo a mano», como dice el mapa, y es corto] | SUSTITUIDA (26-nov-2026): diseñado en las filas 760 a 760 | |
 | 726 | Aviso de usuario: mejora en «Inicio» | SUSTITUIDA (26-nov-2026): diseñada en el tema 759 | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1dxAsjxvoMSfa9qoTkqfnmxyVxlgBEp7A/view?usp=drivesdk |
+
+## 26-nov-2026 · texto recortado de la cola (fila 753, para bajar de 40 KB)
+- Fila 720: «Duda sin comprobar: si el script puede escribir los ficheros grandes de la copia sin quedarse sin tiempo».
+- Fila 756: «(`js/copiar-ruta.js`, `js/comprobacion-entrada.js`); sin probar cómo se comporta el botón en un Chromebook, solo leído el código».
