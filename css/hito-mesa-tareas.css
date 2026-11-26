@@ -43,14 +43,7 @@
 .tcd-nueva .guion-nueva-tarea { flex: 1 1 100%; }
 .tcd-nueva .tcd-botones { flex: 1 1 100%; margin-top: 0; }
 
-/* «Documentos de la carpeta»: la marca «sin tarea» y «Colgar de una tarea». */
-.marca-sin-tarea {
-  flex: 0 0 auto; font-size: 11.5px; font-weight: 700; color: #7a4b00; background: var(--ambar, #fff7e0);
-  border: 1px solid var(--ambar-linea, #e6b84a); border-radius: 9px; padding: 0 7px; white-space: nowrap;
-}
-.ficha-documento-fila > .ficha-documento-colgar { flex: 0 0 auto; }
 .ficha-documentos-sin-hito { margin: 4px 0 8px; }
-.trabajo-carpeta .ficha-documento-fila > .marca-sin-tarea { margin-left: 4px; }
 
 /* La pregunta «¿De qué tarea es?» (js/documento-a-tarea.js): la capa va encima de la ventana de siempre. */
 .capa.pt-capa { z-index: 56; }

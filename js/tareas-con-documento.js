@@ -117,7 +117,7 @@ window.TareasConDocumento = (function () {
         return d;
       });
     } catch (e2) {
-      if (window.U && U.accesorio) U.accesorio('Documento generado, pero no he podido colgarlo de las tareas', e2);
+      if (window.U && U.accesorio) U.accesorio('Documento generado, pero no he podido vincularlo a las tareas', e2);
     }
   }
 

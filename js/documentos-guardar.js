@@ -236,7 +236,7 @@
     if (destino && window.DocumentoATarea) {
       /* Fila 638: apuntado al hito, colgado de su tarea (o de la «Tarea nueva»), tarea hecha y su línea en el registro. */
       try { await DocumentoATarea.colgar(N.asuntoActual, destino, nombre, tipoDelDocumento, { nuevo: true, conMarca: !!opciones.desdeBandeja }); }
-      catch (e2c) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2c); }
+      catch (e2c) { U.accesorio('Documento guardado, pero no he podido vincularlo a la tarea', e2c); }
       if (window.HitosPanel && N.hitoActual) window.HitosPanel.desplegarAlAbrir(N.asuntoActual.nombre, N.hitoActual.id);
     } else if (N.hitoActual) {
       try {
@@ -284,7 +284,7 @@
       try {
         var d2 = await DocumentoATarea.preguntar(N.asuntoActual, { nombre: nombre, tipo: tipoDelDocumento, colgar: true });
         if (d2 && !d2.sinTarea) await DocumentoATarea.colgar(N.asuntoActual, d2, nombre, tipoDelDocumento, { nuevo: false });
-      } catch (e2d) { U.accesorio('Documento guardado, pero no he podido colgarlo de la tarea', e2d); }
+      } catch (e2d) { U.accesorio('Documento guardado, pero no he podido vincularlo a la tarea', e2d); }
     }
     N.soltarVisor();
     /* Abierto directo para ponerle nombre (opciones.ponerNombre, fila

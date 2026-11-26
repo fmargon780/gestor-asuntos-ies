@@ -286,7 +286,9 @@
         } else {
           pintarVacio(caja, a, abierto, errorLectura);
         }
-        if (nota) caja.appendChild(nota);
+        /* Fila 775: en un asunto «lista de tareas» no hay botón «Cambiar la guía» debajo de la lista (está en «⋯» › «Cambiar la guía…»). */
+        var listaDeTareas = !errorLectura && hitos.length && window.AsuntoSinHitos && AsuntoSinHitos.es(hitos);
+        if (nota && !listaDeTareas) caja.appendChild(nota);
       }, claveDeCampoDeHito);
       /* Fila 638: la lista de «Documentos de la carpeta» depende de los hitos («sin tarea», «+ Añadir documento»). */
       if (!errorLectura && window.FichaDocumentos && FichaDocumentos.alCambiarLosHitos) FichaDocumentos.alCambiarLosHitos(a, hitos);

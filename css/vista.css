@@ -22,7 +22,7 @@
    asunto y los textos de Ajustes. Una línea de mil quinientos píxeles
    se lee mal. */
 .contenido { max-width: none; }
-#pantalla-nuevo .formulario { max-width: 940px; }
+/* Fila 776: Nuevo asunto ocupa todo el ancho, sin hueco a la derecha (antes, tope de 940px). */
 /* Ajustes, más ancho que antes (11-sep-2026): con muchos tipos, 1040px
    solo dejaba ver una o dos columnas de la rejilla. Nuevo asunto sigue
    con su 940, que es texto seguido y se lee peor más ancho. */
