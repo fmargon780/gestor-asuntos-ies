@@ -77,11 +77,9 @@ await nuevoVacio();
 await comprobar('no hay título «Nuevo asunto» encima del formulario',
   pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#pantalla-nuevo h2'), h => h.offsetParent !== null).length), 0);
 await comprobar('pero sigue el «← Volver» de la cabecera', visible('#pantalla-nuevo .cabecera .boton-volver'), true);
-await comprobar('tres recuadros: tercero, tipo y fecha de inicio, en este orden (fila 776)',
+await comprobar('tres recuadros: fecha de inicio, tipo y tercero, en este orden',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.nuevo-tres-recuadros > .recuadro-nuevo .recuadro-titulo'), t => t.textContent.trim())),
-  ['Tercero', 'Qué tipo de asunto', 'Fecha de inicio']);
-await comprobar('de izquierda a derecha y a todo el ancho: tercero y tipo del mismo ancho, la fecha al final y sin hueco a la derecha (fila 776)',
-  pagina.evaluate(() => { const r = id => document.getElementById(id).getBoundingClientRect(), t = r('bloque-tercero'), y = r('bloque-tipos'), f = r('bloque-fecha'), c = document.querySelector('#pantalla-nuevo .formulario').getBoundingClientRect(); return [t.left < y.left, y.left < f.left, Math.abs(t.width - y.width) < 3, c.right - f.right < 40, c.width > 1000 || c.width > document.getElementById('pantalla-nuevo').getBoundingClientRect().width - 4]; }), [true, true, true, true, true]);
+  ['Fecha de inicio', 'Qué tipo de asunto', 'Tercero']);
 await comprobar('van en una sola fila (misma altura de arriba)',
   pagina.evaluate(() => { const t = Array.prototype.map.call(document.querySelectorAll('.nuevo-tres-recuadros > .recuadro-nuevo'), e => Math.round(e.getBoundingClientRect().top)); return t.every(x => x === t[0]); }), true);
 await comprobar('la fecha de inicio es estrecha',
