@@ -140,6 +140,28 @@
   async function crearSueltos() {
     await Carpetas.escribirBytes(App.E.abiertos, 'solicitud escaneada.pdf', PDF_DE_MENTIRA, 'application/pdf');
     await Carpetas.escribirBytes(App.E.abiertos, 'justificante.pdf', PDF_DE_MENTIRA, 'application/pdf');    await Carpetas.escribirBytes(App.E.abiertos, 'escaneo_0012.pdf', PDF_DE_MENTIRA, 'application/pdf');   /* fila 661 */
+    await crearSueltosConNumero();
+  }
+
+  /* Fila 760: dos sueltos con el número de un asunto en el nombre: uno de Pablo (abierto) y otro de un asunto archivado a propósito
+     (en asuntos.json, con su carpeta en el ARCHIVO), para ver «Es de», «Guardar en ese asunto» y «Reabrir y guardar aquí». */
+  async function crearSueltosConNumero() {
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var pablo = Object.keys(registro).filter(function (k) { return /MATRICULA Aguilar Ponce, Pablo/.test(k); })[0];
+    var numeroPablo = pablo && (registro[pablo].numero || Numeros.delNombreDeAsunto(pablo));
+    if (numeroPablo) await Carpetas.escribirBytes(App.E.abiertos, 'Correo de Secretaría · ' + numeroPablo + '.pdf', PDF_DE_MENTIRA, 'application/pdf');
+    var tipos = {}; (App.E.tipos || []).forEach(function (t) { tipos[t.tipo] = t; });
+    if (!tipos.CERTIFICADO) return;
+    var tercero = Nombres.terceroAlumno({ nombre: 'Bravo Lozano, Hugo', id: '2100031' });
+    var fecha = hace(40);
+    var archivado = await archivarDeMentira(tipos.CERTIFICADO, 'ALUMNADO', tercero, fecha, true, {
+      estado: 'cerrado', tipo: 'CERTIFICADO', categoria: 'ALUMNADO', tercero: tercero,
+      abiertoEl: fecha + 'T09:00:00.000Z', cerradoEl: fecha + 'T09:05:00.000Z'
+    });
+    var numero = Numeros.delNombreDeAsunto(archivado);
+    await App.anotar(archivado, { estado: 'cerrado', tipo: 'CERTIFICADO', categoria: 'ALUMNADO', tercero: tercero, numero: numero,
+      abiertoEl: fecha + 'T09:00:00.000Z', cerradoEl: fecha + 'T09:05:00.000Z' });
+    await Carpetas.escribirBytes(App.E.abiertos, 'Recibido ' + numero + ' certificado.pdf', PDF_DE_MENTIRA, 'application/pdf');
   }
 
   /* ---------- la bandeja de correos ---------- */

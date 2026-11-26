@@ -83,6 +83,7 @@
     'js/contexto-documentos.js',
     'js/documentos-sueltos-sugerencias.js',
     'js/documentos-sueltos-lector.js',
+    'js/documentos-sueltos-numero.js',   // fila 760: «Es de» en «Por clasificar»; va después del lector
     'js/verificacion.js',
     'js/registro.js',
     'js/registro-sellado.js',
