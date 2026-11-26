@@ -63,6 +63,25 @@
       quitadas: [],
       destinos: ['Dpto. de Lengua']
     });
+
+    /* Fila 751: precios de proveedores (recientes y uno de hace más de seis meses) y, para ver la barra del tope,
+       unas cifras de partida (la parte 5 las calculará de verdad de los pedidos y las facturas). */
+    var P = [
+      ['a1', 'Papelería La Esquina, S.L.', 2.35, 12, 'Llamada'], ['a1', 'Suministros Escolares Dobla, S.L.', 2.15, 30, 'Correo'],
+      ['a1', 'Copistería Central', 1.9, 300, 'Llamada'], ['a2', 'Papelería La Esquina, S.L.', 4.8, 12, 'Llamada'],
+      ['a2', 'Suministros Escolares Dobla, S.L.', 4.6, 30, 'Correo'], ['a5', 'Suministros Escolares Dobla, S.L.', 18.5, 20, 'Correo'],
+      ['a7', 'Papelería La Esquina, S.L.', 14.9, 45, 'Llamada'], ['a12', 'Suministros Escolares Dobla, S.L.', 9.2, 10, 'Correo'],
+      ['a13', 'Papelería La Esquina, S.L.', 8.1, 10, 'Llamada']
+    ].map(function (q, i) { return { id: 'p' + i, a: q[0], p: q[1], i: q[2], f: dia(q[3]), o: q[4] }; });
+    await Copias.guardar(App.E.gestor, 'material-precios.json', {
+      precios: P,
+      portes: { 'suministros escolares dobla, s.l.': 150 },
+      cifras: {
+        'suministros escolares dobla, s.l.': { facturado: 11800, sinFacturar: 1200 },
+        'papeleria la esquina, s.l.': { facturado: 15600, sinFacturar: 0 },
+        'copisteria central': { facturado: 900, sinFacturar: 0 }
+      }
+    });
   }
 
   window.Demo = window.Demo || {};

@@ -8,7 +8,7 @@
    pestaña que aún no está registrada no sale. Orden fijo del tema:
    Lo que falta (10) · Pedidos (20) · Catálogo (30) · Proveedores (40).
 
-   `Material.estado` = { cat, falta }, lo último leído del disco.
+   `Material.estado` = { cat, falta, precios, empresas }, lo último leído del disco.
    `Material.recargar()` lo vuelve a leer y repinta lo que se ve; todo
    guardado de las pestañas termina llamándola (el último repintado gana).
    ============================================================ */
@@ -23,7 +23,8 @@
   var turno = 0;
   var construida = false;
 
-  Material.estado = { cat: Material.normalizarCatalogo(null), falta: Material.normalizarFalta(null) };
+  Material.estado = { cat: Material.normalizarCatalogo(null), falta: Material.normalizarFalta(null),
+    precios: Material.normalizarPrecios ? Material.normalizarPrecios(null) : null, empresas: [] };
 
   Material.registrarPestana = function (p) {
     pestanas = pestanas.filter(function (x) { return x.id !== p.id; }).concat([p])
@@ -73,8 +74,10 @@
     try {
       var cat = await Material.leerCatalogo();
       var falta = await Material.leerFalta();
+      var precios = Material.leerPrecios ? await Material.leerPrecios() : null;      /* fila 751 */
+      var empresas = Material.leerEmpresas ? await Material.leerEmpresas() : [];
       if (mio !== turno) return;
-      Material.estado = { cat: cat, falta: falta };
+      Material.estado = { cat: cat, falta: falta, precios: precios, empresas: empresas };
     } catch (e) {
       if (mio === turno) U.fallo('No he podido leer el material', e);
     }

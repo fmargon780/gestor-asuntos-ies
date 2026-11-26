@@ -29,7 +29,7 @@ await comprobar('1a. «Material» está entre «Cuentas» y «Herramientas»',
   ['Cuentas', 'Material', 'Herramientas']);
 await p.click('#pestana-material');
 await p.waitForSelector('#material-busca');
-await comprobar('1b. solo salen las pestañas de las partes hechas, con su número', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (4) Catálogo (14)');
+await comprobar('1b. solo salen las pestañas de las partes hechas, con su número', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (4) Catálogo (14) Proveedores (3)');
 await comprobar('1c. se abre en «Lo que falta» con las líneas de la demostración', filasFalta(), 4);
 
 console.log('--- 2. el catálogo ---');
@@ -38,7 +38,7 @@ await p.waitForSelector('.material-catalogo');
 await comprobar('2a. las categorías salen con su número de artículos', p.locator('.material-cat').first().innerText().then((t) => t.replace(/\s+/g, ' ')), 'Papel 4');
 await p.locator('.material-cat', { hasText: 'Cartulina' }).click();
 await comprobar('2b. la cartulina A3 azul satinado y la A4 azul mate son dos filas', p.locator('.material-fila').count(), 3);
-await comprobar('2c. una columna por característica y «Se compra por»', p.locator('.material-tabla th').allInnerTexts(), ['Formato', 'Color', 'Acabado', 'Gramaje', 'Se compra por', 'Mejor precio']);
+await comprobar('2c. una columna por característica y «Se compra por»', p.locator('.material-catalogo > .material-caja:nth-child(2) .material-tabla th').allInnerTexts(), ['Formato', 'Color', 'Acabado', 'Gramaje', 'Se compra por', 'Mejor precio']);
 
 console.log('--- 3. una categoría nueva y un artículo con valores en lista ---');
 await p.click('#material-nueva-cat');
@@ -76,7 +76,7 @@ await p.click('#material-cambiar-car');
 await p.fill('#material-cc', 'Color, Medida');
 await p.click('#cuadro-aceptar');
 await esperarCuadroCerrado();
-await comprobar('4a. el orden nuevo reordena las columnas y los datos siguen', p.locator('.material-fila').first().innerText().then((t) => t.replace(/\s+/g, ' ').trim()), 'Blanco 70×37 caja de 100 hojas');
+await comprobar('4a. el orden nuevo reordena las columnas y los datos siguen', p.locator('.material-fila').first().innerText().then((t) => t.replace(/\s+/g, ' ').trim()), 'Blanco 70×37 caja de 100 hojas Sin precio reciente');
 
 console.log('--- 5. apuntar lo que falta ---');
 await p.click('[data-pestana=falta]');
@@ -135,7 +135,7 @@ await comprobar('7c. lo marcado se quita', filasFalta(), 4);
 await comprobar('7d. la casilla de la cabecera marca todas', (async () => { await p.check('#material-todas'); return p.locator('[data-marca]:checked').count(); })(), 4);
 await p.click('#material-quitar');
 await p.waitForSelector('text=No falta nada.');
-await comprobar('7e. sin líneas, «No falta nada.»', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (0) Catálogo (15)');
+await comprobar('7e. sin líneas, «No falta nada.»', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (0) Catálogo (15) Proveedores (3)');
 
 console.log('--- 8. un destino nuevo ---');
 await p.selectOption('#material-para', '__nuevo');
