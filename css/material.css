@@ -61,3 +61,14 @@
 .mp-bien { color: #2e7d46; }
 .mp-otro { margin-top: 10px; max-width: 280px; }
 .mp-pedido { margin-bottom: 14px; }
+
+/* Fila 754: el bloque «Pedido y factura» del asunto COMPRA (js/material-factura.js). */
+.mf-bloque .mf-tabla td.mf-dif { background: #fdecea; }
+.mf-bloque .mf-pedido td { background: #f6f8fb; }
+.mf-bien { color: #17663a; }
+.mf-mal { color: #b42318; }
+.mf-titulo { margin: 14px 0 6px; font-size: 14px; }
+.mf-factura { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.mf-checks { margin: 8px 0; }
+.mf-veredicto { font-size: 16px; margin: 6px 0 10px; }
+.mf-juntar { margin: 0 0 8px; }

@@ -32,6 +32,7 @@ var FichaTarjetas = (function () {
   var BLOQUES = [
     { id: 'actividad', titulo: 'La actividad', icono: '🎯' },        /* fila 306: solo en un asunto de actividad extraescolar */
     { id: 'candidaturas', titulo: 'Candidaturas', icono: '🗳️' },    /* fila 347: solo en el asunto de unas elecciones */
+    { id: 'pedido', titulo: 'Pedido y factura', icono: '🧾' },      /* fila 754: solo en un asunto COMPRA con pedido */
     { id: 'datos', titulo: 'Datos', icono: '📋' },
     { id: 'relacionados', titulo: 'Personas y entidades relacionadas', icono: '👥', cuenta: true },
     { id: 'documentos', titulo: 'Documentos de la carpeta', icono: '📁', cuentaId: 'ficha-cuenta-docs' },
@@ -71,9 +72,11 @@ var FichaTarjetas = (function () {
   function html(tramite, a) {
     var conActividad = !!(window.Actividades && Actividades.tarjetaAplica(a));   /* fila 306 */
     var conCandidaturas = !!(window.Candidaturas && Candidaturas.aplica(a));   /* fila 347 */
+    var conPedido = !!(window.FacturaFicha && FacturaFicha.aplica(a));   /* fila 754 */
     var dentro = {
       actividad: '<div id="ficha-actividad" class="explica">Leyendo…</div>',
       candidaturas: '<div id="ficha-candidaturas" class="explica">Leyendo…</div>',
+      pedido: '<div id="ficha-pedido" class="explica">Leyendo…</div>',
       datos: '<div id="ficha-datos-bloque" class="datos-bloque"><p class="explica">Leyendo…</p></div>',
       relacionados: '<div id="ficha-relacionados" class="explica">Leyendo…</div>',
       /* El hueco lleva su propia barra de botones («+ Añadir documento», «Generar documento»…) que pinta js/ficha-documentos.js. */
@@ -82,7 +85,7 @@ var FichaTarjetas = (function () {
       otros: '<div id="ficha-otros" class="explica">Buscando…</div>'
     };
     var plegables = BLOQUES.filter(function (b) {
-      return (b.id !== 'actividad' || conActividad) && (b.id !== 'candidaturas' || conCandidaturas);
+      return (b.id !== 'actividad' || conActividad) && (b.id !== 'candidaturas' || conCandidaturas) && (b.id !== 'pedido' || conPedido);
     }).map(function (b) { return bloque(b, dentro[b.id]); }).join('');
     return '<div class="ficha-tarjetas" id="ficha-tarjetas" data-abierta="trabajo">' +
       '<div class="ficha-marca-guia" id="ficha-marca-guia"></div>' +   /* fila 660: js/marca-guia.js */

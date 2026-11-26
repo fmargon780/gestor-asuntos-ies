@@ -12,7 +12,7 @@
     return { id: id, nombre: nombre, car: car, sin: !!sin, vals: {} };
   }
 
-  async function construir() {
+  async function construir(o) {
     if (!window.Material || !App.E || !App.E.gestor) return;
     /* Fila 752: el tipo COMPRA (de EMPRESAS), el de los asuntos que crea «Pedir lo marcado», sin guía. */
     if (!(App.E.tipos || []).some(function (t) { return t.tipo === 'COMPRA'; })) await App.crearTipo({ nombre: 'COMPRA', categoria: 'EMPRESAS' });
@@ -84,8 +84,31 @@
         'copisteria central': { facturado: 900, sinFacturar: 0 }
       }
     });
+    await pedidos(o);
+  }
+
+  /* Fila 754: tres asuntos COMPRA con su pedido (sin documento), para ver «Pedido y factura»: dos del mismo proveedor
+     (para juntar en una factura) y uno de otro. Cada línea: [artículo, nombre, unidad, cantidad, precio, para]. */
+  async function pedidos(o) {
+    if (!o || !o.crearAsunto) return;
+    var tipo = (App.E.tipos || []).filter(function (t) { return t.tipo === 'COMPRA'; })[0];
+    if (!tipo) return;
+    var DOBLA = 'Suministros Escolares Dobla, S.L.', ESQUINA = 'Papelería La Esquina, S.L.';
+    var lotes = [
+      [DOBLA, 'B12345678', 12, [['a1', 'Papel A4 80 g Blanco', 'paquete de 500 hojas', 20, 2.15, 'Administración'], ['a5', 'Sobres DL 110×220 Con ventana', 'caja de 500', 2, 18.5, 'Administración']]],
+      [ESQUINA, 'B87654321', 8, [['a7', 'Escritura Bolígrafo Azul', 'caja de 50', 1, 14.9, 'Conserjería'], ['a13', 'Cartulina A4 Azul Mate 180 g', 'paquete de 100', 5, 8.1, 'Jefatura de estudios']]],
+      [DOBLA, 'B12345678', 5, [['a2', 'Papel A3 80 g Blanco', 'paquete de 500 hojas', 3, 4.6, 'Jefatura de estudios'], ['a12', 'Cartulina A3 Azul Satinado 180 g', 'paquete de 50', 4, 9.2, 'Dpto. de Lengua']]]
+    ];
+    for (var k = 0; k < lotes.length; k++) {
+      var lote = lotes[k];
+      var lineas = lote[3].map(function (l) { return { a: l[0], n: l[1], u: l[2], c: l[3], i: l[4], para: l[5] }; });
+      var sin = Math.round(lineas.reduce(function (t, l) { return t + l.c * l.i; }, 0) * 100) / 100;
+      await o.crearAsunto(tipo, 'EMPRESAS', Nombres.terceroEmpresa({ nombre: lote[0], nif: lote[1] }), o.hace(lote[2]), {
+        datos: { pedido: { proveedor: lote[0], fecha: o.hace(lote[2]), doc: '', sinIva: sin, lineas: lineas } }
+      });
+    }
   }
 
   window.Demo = window.Demo || {};
-  window.Demo.material = { construir: construir };
+  window.Demo.material = { construir: construir, pedidos: pedidos };
 })();

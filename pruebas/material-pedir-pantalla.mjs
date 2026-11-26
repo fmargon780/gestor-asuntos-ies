@@ -57,7 +57,7 @@ console.log('--- 2. pie de cada proveedor ---');
 const pies = await pie();
 await comprobar('2a. Dobla: lo asignado sin IVA (20 × 2,15 + 2 × 18,50 + 3 × 4,60 = 93,80) y con IVA', pies[2].includes('93,80 €') && pies[2].includes('113,50 €'), true);
 await comprobar('2b. Dobla: «te faltan 56,20 €» para los 150 € de portes gratis', pies[2].includes('te faltan 56,20 €'), true);
-await comprobar('2c. Dobla: «este año» suma lo facturado, lo pedido sin facturar y este pedido, y avisa «cerca del tope»', pies[2].includes('este año: 13.093,80 € de 15.000,00 €') && pies[2].includes('cerca del tope'), true);
+await comprobar('2c. Dobla: «este año» suma lo facturado, lo pedido sin facturar y este pedido, y avisa «cerca del tope»', pies[2].includes('este año: 13.224,40 € de 15.000,00 €') && pies[2].includes('cerca del tope'), true);
 await comprobar('2d. sin portes apuntados, lo dice', pies[1].includes('sin apuntar'), true);
 
 console.log('--- 3. cambiar de proveedor ---');
@@ -98,15 +98,15 @@ await comprobar('7a. el botón cuenta los proveedores con líneas', p.locator('#
 await p.click('#cuadro-aceptar');
 await cuadroCerrado();
 await p.waitForSelector('.mp-pedido', { timeout: 15000 });
-await comprobar('7b. se pasa a «Pedidos», con un recuadro por proveedor', p.locator('.mp-pedido').count(), 2);
-await comprobar('7c. cada recuadro lleva su asunto COMPRA con número y su documento de pedido', p.evaluate(() => [...document.querySelectorAll('.mp-pedido h3')].map((h) => /A26-\d+ · /.test(h.textContent) && /PEDIDO D26-/.test(h.textContent))), [true, true]);
-await comprobar('7d. la pestaña «Pedidos» cuenta 2', p.locator('[data-pestana=pedidos]').innerText(), 'Pedidos (2)');
+await comprobar('7b. se pasa a «Pedidos», con un recuadro por proveedor', p.locator('.mp-pedido').count(), 5);   /* los dos nuevos y los tres de demostración de la fila 754 */
+await comprobar('7c. cada recuadro lleva su asunto COMPRA con número y su documento de pedido', p.evaluate(() => [...document.querySelectorAll('.mp-pedido h3')].map((h) => /A26-\d+ · /.test(h.textContent) && /PEDIDO D26-/.test(h.textContent))), [true, true, false, false, false]);   /* los tres de demostración no llevan documento */
+await comprobar('7d. la pestaña «Pedidos» cuenta 5', p.locator('[data-pestana=pedidos]').innerText(), 'Pedidos (5)');
 const totales = await p.evaluate(() => [...document.querySelectorAll('.mp-pedido tbody tr:last-child td:last-child')].map((t) => t.textContent.trim()));
 await comprobar('7e. cada recuadro termina en «total sin IVA · con IVA»', totales.every((t) => /^\d[\d.]*,\d\d € · \d[\d.]*,\d\d €$/.test(t)), true);
 await p.click('[data-pestana=falta]');
 await p.waitForSelector('#material-busca');
 await comprobar('7f. en «Lo que falta» se queda lo no asignado: 8 del papel A4 80 g que se partió', p.evaluate(() => [...document.querySelectorAll('#material-cuerpo table tbody tr')].map((r) => [r.children[1].textContent.trim(), r.querySelector('[data-cant]').value])), [['Papel A4 80 g Blanco', '8']]);
-await comprobar('7g. «Pedidos» sigue en la pestaña con sus 2 recuadros al volver', (async () => { await p.click('[data-pestana=pedidos]'); return p.locator('.mp-pedido').count(); })(), 2);
+await comprobar('7g. «Pedidos» sigue en la pestaña con sus 5 recuadros al volver', (async () => { await p.click('[data-pestana=pedidos]'); return p.locator('.mp-pedido').count(); })(), 5);
 await comprobar('7h. «Proveedores» ya cuenta el pedido sin facturar de este año', (async () => {
   await p.click('[data-pestana=proveedores]');
   return p.evaluate(() => [...document.querySelectorAll('#material-cuerpo tbody tr')].map((r) => r.children[4].textContent.trim()).some((t) => t !== '0,00 €' && t !== '1.200,00 €'));

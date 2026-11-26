@@ -285,6 +285,7 @@
     N.pintarRelacionados(a, abierto);
     if (window.ActividadesFicha) ActividadesFicha.pintar(a);   /* fila 306: la tarjeta «La actividad» */
     if (window.CandidaturasFicha) CandidaturasFicha.pintar(a);   /* fila 347: la tarjeta «Candidaturas» */
+    if (window.FacturaFicha) FacturaFicha.pintar(a);   /* fila 754: la tarjeta «Pedido y factura» de un asunto COMPRA */
     N.pintarPresencia();
     N.pintarSellos(a);
     if (N.pintarFirmas) N.pintarFirmas(a);   /* fila 515: firmado con otro nombre y pregunta del firmado */

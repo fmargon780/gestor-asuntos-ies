@@ -62,6 +62,10 @@
     'js/material-proveedores.js',
     'js/material-pedir.js',
     'js/material-pedidos.js',
+    // Fila 754 (parte 5): comprobar lo recibido y la factura. El bloque «Pedido y factura» lo pinta js/ficha-tarjetas.js.
+    'js/material-factura-datos.js',
+    'js/material-factura.js',
+    'js/material-factura-guardar.js',
     'js/notas.js',
     // Fila 89, docs/COPIA-SIN-INTERNET.md: leer un dato estático (JSON o
     // binario) tanto por http(s) (fetch) como abierto desde el disco

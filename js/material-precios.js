@@ -15,7 +15,8 @@
    comprueba sin navegador en pruebas/material-precios.mjs. Los importes se redondean a céntimos.
 
    Puntos para las partes siguientes: `Material.cifrasDeProveedor(clave)` -> { facturado, sinFacturar }
-   (la parte 5 lo sustituye) y `Material.proveedoresConPedido()` -> [nombres] (la parte 3 lo sustituye).
+   (la parte 5, js/material-pedidos.js, lo sustituye) y `Material.proveedoresConPedido()` -> [nombres] (la parte 3 lo sustituye).
+       facturas: [{ id: asunto COMPRA, p: proveedor, f: fecha de la factura, base }] (parte 5, fila 754).
    ============================================================ */
 (function () {
 
@@ -46,7 +47,11 @@
         return r;
       }),
       portes: portes,
-      cifras: cifras
+      cifras: cifras,
+      /* Fila 754: lo facturado de cada asunto COMPRA con base imponible (sigue contando cuando el asunto se cierra). */
+      facturas: lista(d.facturas).filter(function (x) { return x && texto(x.id) && Number(x.base) > 0; }).map(function (x) {
+        return { id: texto(x.id), p: texto(x.p), f: texto(x.f), base: centimos(x.base) };
+      })
     };
   }
 

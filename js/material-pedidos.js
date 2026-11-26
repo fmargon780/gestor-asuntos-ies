@@ -7,8 +7,8 @@
    «Total sin IVA · con IVA (21 %)». Sale de aquí cuando se cierra el asunto.
 
    También da a las demás pestañas lo que ahora ya existe: `Material.proveedoresConPedido()` (los proveedores
-   con algún pedido abierto) y `Material.cifrasDeProveedor(clave)` (lo de partida más el «pedido sin facturar»
-   de este año natural; el «facturado» llega con la parte 5).
+   con algún pedido abierto) y `Material.cifrasDeProveedor(clave)` (lo de partida, el «pedido sin facturar» y, desde
+   la parte 5, el «facturado» de este año natural).
    ============================================================ */
 (function () {
 
@@ -29,14 +29,25 @@
 
   Material.proveedoresConPedido = function () { return abiertos().map(function (p) { return p.pedido.proveedor; }); };
 
-  /* Lo de partida de ese proveedor (`cifras` de material-precios.json) más el pedido sin facturar de este año. */
+  /* Lo de partida de ese proveedor (`cifras` de material-precios.json) más lo real (fila 754):
+     - facturado: las facturas con base imponible de este año natural (`facturas` de material-precios.json, que sigue
+       contando cuando el asunto se cierra);
+     - sin facturar: lo de los pedidos abiertos de este año que aún no tienen factura con base (ni van juntados en una). */
   Material.cifrasDeProveedor = function (k) {
-    var base = (Material.estado.precios && Material.estado.precios.cifras && Material.estado.precios.cifras[k]) || { facturado: 0, sinFacturar: 0 };
-    var anio = String(Material.hoyIso()).slice(0, 4), extra = 0;
-    abiertos().forEach(function (p) {
-      if (Material.clave(p.pedido.proveedor) === k && String(p.pedido.fecha).slice(0, 4) === anio && !(p.pedido.factura && p.pedido.factura.base)) extra += Number(p.pedido.sinIva) || 0;
+    var datos = Material.estado.precios || {};
+    var base = (datos.cifras && datos.cifras[k]) || { facturado: 0, sinFacturar: 0 };
+    var anio = String(Material.hoyIso()).slice(0, 4), extra = 0, facturado = 0;
+    var facturas = datos.facturas || [], ids = {};
+    facturas.forEach(function (f) {
+      ids[f.id] = true;
+      if (Material.clave(f.p) === k && String(f.f).slice(0, 4) === anio) facturado += Number(f.base) || 0;
     });
-    return { facturado: base.facturado || 0, sinFacturar: centimos((base.sinFacturar || 0) + extra) };
+    var lista = abiertos();
+    lista.forEach(function (p) { if (ids[p.nombre]) (p.pedido.junto || []).forEach(function (n) { ids[n] = true; }); });
+    lista.forEach(function (p) {
+      if (Material.clave(p.pedido.proveedor) === k && String(p.pedido.fecha).slice(0, 4) === anio && !ids[p.nombre]) extra += Number(p.pedido.sinIva) || 0;
+    });
+    return { facturado: centimos((base.facturado || 0) + facturado), sinFacturar: centimos((base.sinFacturar || 0) + extra) };
   };
 
   async function abrirDocumento(p) {

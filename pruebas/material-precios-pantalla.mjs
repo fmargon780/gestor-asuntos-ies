@@ -123,7 +123,7 @@ await comprobar('4a. un proveedor por cada uno con precio, con su correo', p.eva
   [['Copistería Central', 'info@copicentral-demo.es'], ['Papelería La Esquina, S.L.', 'esquina@papeleria-demo.es'], ['Suministros Escolares Dobla, S.L.', 'pedidos@dobla-demo.es']]);
 await comprobar('4b. barra verde, roja al pasar y ámbar desde el 80 %', p.evaluate(() => [...document.querySelectorAll('.material-barra')].map((b) => b.className.replace('material-barra material-barra-', ''))), ['bien', 'pasado', 'cerca']);
 await comprobar('4c. la barra dice «N € · N %» y la etiqueta', p.evaluate(() => [...document.querySelectorAll('.material-barra-texto')].map((b) => b.textContent.replace(/\s+/g, ' '))),
-  ['900,00 € · 6 %', '15.600,00 € · 104 % · pasado del tope', '13.000,00 € · 87 % · cerca del tope']);
+  ['900,00 € · 6 %', '15.655,40 € · 104 % · pasado del tope', '13.130,60 € · 88 % · cerca del tope']);   /* con los tres pedidos de demostración de la fila 754 */
 await comprobar('4d. portes: «sin apuntar» o el importe', p.evaluate(() => [...document.querySelectorAll('[data-portes]')].map((b) => b.textContent)), ['sin apuntar', 'sin apuntar', '150,00 €']);
 await p.locator('[data-portes="Copistería Central"]').click();
 await p.waitForSelector('#material-portes');
