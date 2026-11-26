@@ -57,3 +57,7 @@ Con `window.__ES_CHROMEBOOK__ = false`:
 ## Revisión y respuestas durante el trabajo
 
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (26-nov-2026) Hecho en la rama `claude/awesome-allen-vix865` (commit 968e8cb): `js/ruta-chromebook.js` nuevo (copiar-ruta.js ya pasaba de 400 líneas) y enganches pequeños en `js/copiar-ruta.js`, `js/comprobacion-entrada.js`, `js/ficha-asunto.js` y `js/cargar-piezas-2.js`; prueba nueva `pruebas/ruta-chromebook.mjs`; línea en `js/novedades.js`. `npm test` completo en verde.
+- Segundo revisor (agente aparte, en local, `?demo=1&auto=1`): APROBADA. Puntos 1 a 7 de la lista y las tres fijas, todos coinciden: «Ruta» copia solo el nombre (ficha abierta y cerrada, documento, cuadros de Correo y de Séneca) con el aviso pedido y sin pedir ruta; «Abrir en Drive» sale junto a «Ruta» y intenta abrir `drive.google.com/drive/search?q=<nombre>&authuser=<cuenta común>` (sin seguirla: no hay red hacia Google); «Comprobación al entrar» no lleva la línea de la ruta; sin Chromebook todo sigue como antes. La app no hace nada que el texto no pida.
+- No lo he podido ver: el efecto real en un Chromebook (que la lupa de «Abrir archivo» encuentre la carpeta y que Drive enseñe la búsqueda): pasa a `docs/COMPROBAR-A-MANO.md`.
+- Fila grande: publicada la rama en la dirección de prueba (versión «26-nov-2026 · 20:19»); espera vistazo antes de fusionar en `main`.

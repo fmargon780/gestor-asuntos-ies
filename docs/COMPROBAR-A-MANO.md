@@ -399,3 +399,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - (Fila 723) En el instituto, con datos reales: crear un asunto «EXPULSIÓN AULA CONVICENCIA» con un alumno y un tutor legal (o dos), poner el primer día y los días lectivos, generar la nota y leerla entera (las dos hojas, con el membrete y el firmante de Jefatura de Estudios), ponerla a la firma, registrarla y enviarla por el correo real; mirar que «Recibir la parte firmada» queda esperando a la familia con su día. Lo de grabar en Séneca sigue por averiguar (Francisco).
 
 - (fila 646, 25-nov-2026) «Coger de Por clasificar»: comprobar la ✕ del cuadro del nombre al venir de la lista, y la tarea de añadir documento en un asunto con el hito cerrado de verdad (no debe salir el botón).
+
+- (Fila 770) Solo en el Chromebook de Francisco: pulsar «Ruta» en un asunto, abrir «Adjuntar» en Séneca o en Gmail, pegar en la lupa y ver que sale la carpeta; pulsar «Abrir en Drive» y ver que Drive enseña la carpeta del asunto. [solo en: tu Chromebook]
