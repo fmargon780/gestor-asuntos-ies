@@ -108,3 +108,7 @@ Común a todas las partes:
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- Parte 2 (fila 751, 26-nov-2026), revisor con contexto limpio en local con `?demo=1&auto=1`: APROBADA a la primera. Coincide: tabla de precios por proveedor de barato a caro; verde el más barato de seis meses y gris el antiguo; «+ Añadir precio» con «+ Nueva empresa…»; mismo proveedor y día sustituye; presupuesto con documento (pide asunto y luego documento, se abre al pulsar); «Mejor precio» en catálogo y «Lo que falta»; pestaña «Proveedores» con barra ámbar (87 %) y roja (104 %); portes que se cambian y se vacían; sin pestaña «Pedidos» ni «Pedir lo marcado»; consola sin errores; pantallas principales abren; crear y cerrar un asunto bien.
+- No lo he podido ver: la app con datos reales (la prueba fue solo con demostración). «Facturado» y «Pedido sin facturar» van a cero en datos reales; solo la demostración trae cifras de partida (`cifras` de `material-precios.json`) para ver la barra.
+- Decisión técnica: los portes gratis van en `material-precios.json` (por proveedor) y no en la columna nueva de `empresas.csv` que decían las notas: ese fichero lo comparte el Centro de datos y no se toca. El correo sí se lee de `empresas.csv`.
+- Aviso menor visto por el revisor (no es de esta fila): en el buscador de asuntos, cada fila repite el NIF del tercero pegado al nombre.
