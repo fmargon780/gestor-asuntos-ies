@@ -5930,3 +5930,4 @@ Filas cerradas (SUSTITUIDA y HECHA ya mirada), con su texto completo:
 | Nº | Instrucción | Estado | Notas |
 |---|---|---|---|
 | 759 | Tema: El correo que entra va a su asunto. Para qué: que si un correo que llega dice el número de un asunto, la app proponga guardarlo en ese asunto. [orden: 3 · es «menos trabajo a mano», como dice el mapa, y es corto] | SUSTITUIDA (26-nov-2026): diseñado en las filas 760 a 760 | |
+| 726 | Aviso de usuario: mejora en «Inicio» | SUSTITUIDA (26-nov-2026): diseñada en el tema 759 | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1dxAsjxvoMSfa9qoTkqfnmxyVxlgBEp7A/view?usp=drivesdk |
