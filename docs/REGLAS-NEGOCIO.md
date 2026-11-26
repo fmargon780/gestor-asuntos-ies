@@ -387,3 +387,9 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (26-nov-2026, tema 758) **El texto del correo admite negrita, cursiva, subrayado, listas y tablas**, en la plantilla y al enviar; pegar desde Word conserva solo eso. Sustituye a «el correo es solo texto» de la idea 748; las plantillas de correo siguen sin descargarse. Francisco (idea 749): «poder dar formato (negrita, tablas) al cuerpo de los correos que manda la app».
 - (26-nov-2026, tema 758) **Séneca sigue en texto sencillo:** la app quita el formato y cada fila de una tabla va en una línea. Saludo y firma, sin formato.
 - (26-nov-2026, tema 758) **Sin el script de Gmail actualizado, el correo sale sin formato** y la app lo avisa en ámbar; el envío nunca falla por eso.
+
+## Quitar lo que estorba (tema 691, 26-nov-2026)
+
+- (26-nov-2026, tema 691) **Solo se limpia lo que se queda:** el asunto «lista de tareas» y lo que comparten los dos moldes. Lo que solo tienen los asuntos con hitos no se cambia de sitio: desaparecerá cuando lo largo pase al molde nuevo (Francisco: «Creo que este diseño habría que analizar como "casa" con el nuevo molde»; «Me parece bien»).
+- (26-nov-2026, tema 691) **Un documento se «vincula» a una tarea**, no se «cuelga». En un asunto «lista de tareas», un papel entra en su tarea desde los botones de la tarea; no hay «Vincular a una tarea» en la carpeta.
+- (26-nov-2026, tema 691) **Sin fecha límite, la cabecera del asunto no enseña nada;** el plazo se pone desde «⋯» › «Poner plazo…».
