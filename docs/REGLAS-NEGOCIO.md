@@ -361,6 +361,9 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 
 - (25-nov-2026, tema 745) **Una plantilla puede preguntar «¿Quién?» entre las personas que ya están en el asunto** (tercero, quien lo pide, terceros relacionados y, si el tercero es alumno, sus tutores), sin reglas de edad, de padre o madre ni de tutor. Se elige a quien se quiera y se corrige con «Cambiar». Francisco: «¿No sería más completo que… te deje elegir una de las personas relacionadas en el asunto, sin entrar a ver si es mayor o menor de edad, padre o madre, tutor o lo que sea?»
 
+- (26-nov-2026, tema 765) **La persona elegida sirve también por partes:** una plantilla que solo lleva `(nombre)`, `(DNI)`, `(teléfono)`, `(correo)` o `(en calidad de)` de una persona del asunto pregunta «¿Quién?» igual que con el campo entero.
+- (26-nov-2026, tema 765) **«En calidad de» lo pone la app y se puede cambiar:** un tutor es «padre» o «madre» según su sexo en Séneca («Si es hombre convendremos que es el padre, si mujer, la madre. Existe la posibilidad de que no fuera (cambio de género o tutoría legal). Por este motivo, sería un valor por defecto que se debería poder cambiar»); quien lo pide, su relación; el resto, su clase. Se cambia en «Campos de este asunto».
+
 ## Descargar el Word de una plantilla (idea 748, 25-nov-2026)
 
 - (25-nov-2026, idea 748) **Las plantillas de Word se pueden descargar** desde Herramientas → Plantillas («⋮» › «Descargar el Word»), para cambiarles el formato en Word y devolverlas con «Sustituir el fichero…». Francisco: «Lo que busco con esto es poder hacer cambios de formato en los documentos que no puedo hacer en la app.» Las plantillas de correo no se descargan: el correo es solo texto (idea 749 para darle formato).
