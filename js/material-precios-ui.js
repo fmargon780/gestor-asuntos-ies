@@ -122,7 +122,7 @@
         return '';
       });
       if (ok && guardado) {
-        U.aviso(guardado.sustituye ? 'Precio de ' + guardado.proveedor + ' de ese día sustituido.' : 'Precio apuntado: ' + guardado.proveedor + '.');
+        U.aviso(guardado.sustituye ? 'Precio de ' + guardado.proveedor + ' de ese día sustituido.' : 'Precio apuntado: ' + guardado.proveedor.replace(/\.$/, '') + '.');
         await Material.recargar();
         return true;
       }
