@@ -300,7 +300,7 @@ await pagina.waitForSelector('.ficha-documento-fila .extracto-documento', { stat
 await comprobar('6. «Extracto» es la primera entrada del menú ⋮ de cada documento de la carpeta, y no sale a la vista (fila 775)',
   pagina.evaluate(() => [...document.querySelectorAll('.ficha-documento-fila')].map((f) => { const m = f.querySelector('.fila-menu'); const e = m && m.firstElementChild;
     return !!e && e.classList.contains('extracto-documento') && e.textContent.trim() === 'Extracto' && !f.querySelector(':scope > .extracto-documento'); })), [true, true]);
-const abrirMenuDe = async (n) => { await pagina.click('.ficha-documento-fila[data-doc="' + n + '"] .fila-menu-btn'); };
+const abrirMenuDe = async (n) => { await pagina.waitForFunction(() => !document.querySelector('.ficha-documento-fila .fila-menu:not(.oculto)'), null, { timeout: 10000 }); await pagina.click('.ficha-documento-fila[data-doc="' + n + '"] .fila-menu-btn'); };
 const filaDe = (n) => '.ficha-documento-fila[data-doc="' + n + '"] .extracto-documento';
 await comprobar('6. copia el extracto propio de su tipo de documento, con los datos del documento, sus líneas y el número al final',
   pegado(async () => { await abrirMenuDe(DOC_RESOLUCION); await pagina.click(filaDe(DOC_RESOLUCION)); }), 'Resolución de CONVALIDACION\nEspejo Montes, Carla · 09/11/2026 · A26-0003');
