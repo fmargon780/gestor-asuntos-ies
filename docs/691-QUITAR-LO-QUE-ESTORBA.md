@@ -155,3 +155,11 @@ Parte 2 (fila 776):
 - Abrir Nuevo asunto: la persona, a la izquierda, y la pantalla llena de lado a lado.
 
 ## Revisión y respuestas durante el trabajo
+
+### Parte 1 (fila 775) · 26-nov-2026 · revisor aparte, contexto limpio, en local (`http://localhost:8300/?demo=1&auto=1`)
+
+APROBADA. Los ocho puntos de «Parte 1» coinciden: sin «Sin plazo» y con «Poner plazo…» en «⋯»; sin «Cambiar la guía» bajo la lista de
+tareas (sí en «⋯»); «Escribir la guía de …» se queda en un asunto con hitos sin hitos; documentos con nombre entero, «Ruta» y ⋮; «Extracto»
+primera del ⋮ y copia; «Vincular a una tarea» solo en un asunto con hitos y documento sin tarea; ninguno en «lista de tareas»; sin «colgar» en
+pantalla. Consola sin errores, pantallas principales abren, crear/abrir/cerrar un asunto bien. Observación: algunas filas llevan una etiqueta
+de apoyo recortada con «…» (el hito vinculado, «Registro…»); no es el nombre del documento. Sin ver: datos reales.
