@@ -373,3 +373,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (25-nov-2026, tema 583) **Cada pedido es un asunto COMPRA nuevo** con su documento de pedido; un pedido ya enviado no se amplía. Una factura puede juntar varios pedidos del mismo proveedor.
 - (25-nov-2026, tema 583) **Precios sin IVA; IVA al 21 %.** Tope del contrato menor de suministros que vigila la app: 15.000 € sin IVA por proveedor y año natural (aviso desde el 80 %).
 - (25-nov-2026, tema 583) La factura se sigue metiendo en Séneca: la app no lo sustituye.
+
+## La app desde un Chromebook (tema 757, 26-nov-2026)
+
+- (26-nov-2026, tema 757) **Solo en un Chromebook,** «Ruta» copia solo el nombre de la carpeta o del documento, para pegarlo en la lupa de la ventana «Abrir archivo» (Francisco comprobó que esa lupa encuentra las carpetas de Drive por su número de asunto). En la ficha del asunto hay un botón nuevo, «Abrir en Drive», que busca la carpeta en otra pestaña con la cuenta común. En «Comprobación al entrar» no sale la línea «Ruta de la nube en este ordenador». En Windows no cambia nada. Francisco: «Está bien así».

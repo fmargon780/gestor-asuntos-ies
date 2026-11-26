@@ -1,11 +1,11 @@
-# 757 — La app desde un Chromebook
+# 770 — La app desde un Chromebook
 
 **Título llano:** «Ruta» y «Abrir en Drive» en el Chromebook
 **Para qué:** que desde un Chromebook se pueda encontrar la carpeta o el documento de un asunto (para adjuntarlo en Séneca o en el correo, o para verlo en Drive) y que al entrar no salga un aviso rojo de la ruta que no se puede arreglar.
 
 ## Lo que escribió Francisco
 
-Idea de la fila 756 (26-nov-2026): «el botón «Ruta» no sirve en un Chromebook. Hoy la app pide la ruta de la nube escrita como en Windows (por ejemplo `G:\Mi unidad`) y la copia así, y la ventana «Abrir archivo» del Chromebook no la entiende. Estudiar qué haría falta para abrir o enseñar la carpeta de un asunto desde un Chromebook con Drive, y mientras tanto no enseñar el aviso rojo «Ruta de la nube en este ordenador» en Comprobación al entrar.»
+Idea de la fila 756 (26-nov-2026, tema 757): «el botón «Ruta» no sirve en un Chromebook. Hoy la app pide la ruta de la nube escrita como en Windows (por ejemplo `G:\Mi unidad`) y la copia así, y la ventana «Abrir archivo» del Chromebook no la entiende. Estudiar qué haría falta para abrir o enseñar la carpeta de un asunto desde un Chromebook con Drive, y mientras tanto no enseñar el aviso rojo «Ruta de la nube en este ordenador» en Comprobación al entrar.»
 
 ## Lo que entendió Claude (acordado con Francisco el 26-nov-2026)
 
