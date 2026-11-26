@@ -425,6 +425,11 @@ window.RutaCarpetas = (function () {
     b.onclick = async function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
+      if (window.RutaChromebook && RutaChromebook.activo()) {   /* fila 770: solo el nombre */
+        await RutaChromebook.copiar(a, doc, b);
+        await copiaDelDocumento(a, modo, doc);
+        return;
+      }
       await cargarComun();
       var r = de(a, modo, doc);
       if (!r.completa) { pedirRutaConPreguntar(a, modo, b, doc); return; }
@@ -471,6 +476,7 @@ window.RutaCarpetas = (function () {
     b.onclick = async function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
+      if (window.RutaChromebook && RutaChromebook.activo()) { RutaChromebook.copiar(a, null, b); return; }   /* fila 770 */
       await cargarComun();
       var r = de(a, modo);
       if (!r.completa) {
