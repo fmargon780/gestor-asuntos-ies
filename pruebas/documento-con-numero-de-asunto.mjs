@@ -18,7 +18,7 @@ p.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
 await p.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); localStorage.setItem('gestor-inicio-pestana', 'todos'); } catch (e) {}");
 await p.goto(DIRECCION);
 await p.waitForSelector('#aplicacion:not(.oculto)', { timeout: 40000 });
-await p.waitForFunction(() => window.Demo && !Demo.montando && window.SueltoConNumero && App.E.sueltos.length >= 6, null, { timeout: 60000 });
+await p.waitForFunction(() => window.Demo && !Demo.montando && window.SueltoConNumero && App.E.sueltos.length >= 5, null, { timeout: 60000 });
 await p.waitForTimeout(2000);
 
 /* Un tercer asunto abierto (A26-0035) cuyo número solo sale dentro del texto de un PDF de verdad. */
@@ -29,6 +29,16 @@ const NUMERO_EN_TEXTO = await p.evaluate(async () => {
   doc.addPage([595, 842]).drawText('Referencia del expediente ' + numero + ' del alumnado', { x: 50, y: 700, size: 14 });
   await Carpetas.escribirBytes(App.E.abiertos, 'Informe de la Consejería.pdf', await doc.save(), 'application/pdf');
   return numero;
+});
+/* Un asunto archivado en asuntos.json (como los de antes de pasar las fichas al ARCHIVO), con su suelto: no va en la demostración porque
+   «Problemas» lo contaría como una ficha por poner en orden. */
+await p.evaluate(async () => {
+  const t = Nombres.terceroAlumno({ nombre: 'Bravo Lozano, Hugo', id: '2100031' });
+  const numero = (await Numeros.reservar('asuntos', '')).numero;
+  const nombre = Nombres.montarAsunto({ fecha: '2026-10-17', tipo: 'CERTIFICADO', categoria: 'ALUMNADO', curso: '', grupo: '', campos: [], descripcion: '', tercero: t, numero }).nombre;
+  await App.anotar(nombre, { estado: 'cerrado', tipo: 'CERTIFICADO', categoria: 'ALUMNADO', tercero: t, numero, abiertoEl: '2026-10-17T09:00:00.000Z', cerradoEl: '2026-10-17T09:05:00.000Z' });
+  await Carpetas.crear(await Carpetas.bajar(App.E.archivo, ['ALUMNADO', t], true), nombre);   /* su carpeta en el ARCHIVO, para poder reabrir */
+  await Carpetas.escribirBytes(App.E.abiertos, 'Recibido ' + numero + ' certificado.pdf', 'x', 'application/pdf');
 });
 const ABIERTO = await p.evaluate(() => Object.keys(App.E.registro.asuntos).filter((x) => /MATRICULA Aguilar Ponce, Pablo/.test(x))[0]);
 const ARCHIVADO = await p.evaluate(() => Object.keys(App.E.registro.asuntos).filter((x) => /CERTIFICADO Bravo Lozano, Hugo/.test(x))[0]);

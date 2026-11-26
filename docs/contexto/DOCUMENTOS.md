@@ -204,8 +204,7 @@ suelto), o el **texto del PDF** que ya lee `js/documentos-sueltos-lector.js` (gu
 la tarjeta añade la línea «Es de <asunto>» (`.propuesta-numero`) y botones delante: «Guardar en ese asunto» (principal; asunto abierto) o
 «Reabrir y guardar aquí» + «Guardar sin reabrir» (cerrado), que llaman a `App.meterSueltoEnAsuntoElegido(s, elegido, opciones, decision)`
 (4.º parámetro `'reabrir'`/`'guardar'`: no pregunta). «Crear asunto con él» baja a discreto y, con número, no se calculan las sugerencias por
-tercero. Nunca guarda sin pulsar. Demo: `crearSueltosConNumero` en `js/demo/datos-resto.js` (suelto de Pablo A26-0002 y uno de un asunto
-archivado a propósito). Prueba `pruebas/documento-con-numero-de-asunto.mjs`.
+tercero. Nunca guarda sin pulsar. Demo: `crearSueltosConNumero` en `js/demo/datos-resto.js` (suelto de Pablo A26-0002; el caso archivado solo está en la prueba, porque un archivado en asuntos.json sale en «Problemas»). Límite: el número solo se busca en `App.E.registro.asuntos` (igual que en los correos): un archivado cuya ficha ya está solo en el ARCHIVO no se encuentra. Prueba `pruebas/documento-con-numero-de-asunto.mjs`.
 
 ### El cuadro de elegir asunto, y "Por clasificar"
 
