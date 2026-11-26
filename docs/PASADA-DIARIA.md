@@ -1,1 +1,1 @@
-Última pasada completa: 20-nov-2026 15:13 (Madrid) · 34 min · verde · commit 536cc53
+Última pasada completa: 26-nov-2026 20:40 (Madrid) · 36 min · verde (434 de 434; tres pasaron al segundo intento) · commit 065e6d6
