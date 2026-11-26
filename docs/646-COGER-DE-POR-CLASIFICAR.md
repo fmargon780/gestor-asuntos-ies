@@ -58,3 +58,12 @@ La captura (`2026-11-13 094510 error.jpg`) enseña el asunto A26-0624, el hito �
 ## Revisión y respuestas durante el trabajo
 
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (25-nov-2026) Revisor (agente aparte, sin ver el código) **APROBADA a la primera**, en `?demo=1&auto=1&latido=hoy`:
+  - Botón junto al recuadro, solo en la siguiente tarea de añadir documento con el hito abierto: coincide (en un hito ya hecho no sale).
+  - Lista con nombre y fecha, el más reciente arriba; sin sueltos dice «No hay documentos en «Por clasificar».»: coincide.
+  - Elegir uno: cuadro del nombre con hito y tarea puestos y el fichero aún en «Por clasificar»; «Volver», «Cerrar» y Escape no guardan nada: coincide.
+  - «Guardar»: el documento entra con su nombre, sale de «Por clasificar», la tarea queda hecha y el Registro lleva su línea: coincide.
+  - Directivo no ve el botón; soltar un PDF y «Guardar aquí» siguen como antes; consola sin errores; a 1500 y 800 de ancho se ve bien: coincide.
+  - No lo he podido ver: la ✕ del cuadro del nombre (no la encontró) y un asunto con el hito cerrado de verdad (probó con un hito ya hecho). Van a `docs/COMPROBAR-A-MANO.md`.
+  - Lo que hace y no se pedía (no estorba): el botón sale como enlace subrayado; Escape no cierra la lista (solo «Volver»); el nombre lo pone el cuadro de siempre (fecha de hoy y tipo por defecto).
+- `npm test` completo en verde; prueba nueva `pruebas/coger-de-por-clasificar.mjs`.

@@ -78,6 +78,7 @@
     'js/documento-tarea-bloque.js',
     'js/hay-que-registrarlo.js',
     'js/bandeja-a-asunto.js',
+    'js/tarea-coger-de-bandeja.js',   // fila 646: la usa js/hito-mesa-guion.js
     'js/registro-abrir-pdf.js',
     'js/donde-se-guarda.js',
     'js/donde-se-guarda-tareas.js',

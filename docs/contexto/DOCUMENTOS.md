@@ -187,6 +187,15 @@ una dirección que lleve el código dentro) y **nada se guarda** en ningún fich
 Se comprueba con `pruebas/verificacion.mjs`, sin PDF ni navegador (`leerDelTexto` no toca ninguno
 de los dos): mismo patrón que `pruebas/logica.mjs`, cargando el fichero con `vm` de Node.
 
+### «Coger de Por clasificar» desde la tarea (fila 646)
+
+Junto al recuadro «Suelta aquí el PDF» de la siguiente tarea de añadir documento (hito abierto) sale `Coger de Por clasificar`
+(`js/tarea-coger-de-bandeja.js`, `window.TareaCogerDeBandeja`; `js/hito-mesa-guion.js` solo pinta `botonHTML()` y llama a `enganchar`).
+La lista sale de `App.E.sueltos` con `App.fechaDeSuelto` (más reciente arriba; solo documentos sueltos, no correos) y se abre con `U.preguntar`.
+Al elegir: `App.llevarSueltoA(s, a.nombre, a.ficha, { hito, tarea: g.id })` (fila 661): cuadro del nombre con hito y tarea puestos, y el fichero
+entra al pulsar «Guardar». El directivo no lo ve (`body.perfil-directivo .guion-coger`). Prueba `pruebas/coger-de-por-clasificar.mjs`.
+En la copia de pruebas, los sueltos salen con `?demo=1&auto=1&latido=hoy` o `&entrada=1`; sin ellos, la lista dice que no hay.
+
 ### El cuadro de elegir asunto, y "Por clasificar"
 
 El cuadro para escoger un asunto a mano vive en **`js/elegir-asunto.js`** (`window.ElegirAsunto`)
