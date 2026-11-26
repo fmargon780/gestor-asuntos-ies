@@ -604,7 +604,7 @@ body.solo-consulta.demo-activo { padding-top: calc(var(--franja-demo-alto, 0px) 
 /* Fila 287: la línea fija de un directivo (sin botón) y lo que no ve. */
 #franja-perfil { background: #e8eef5; border-bottom-color: #9db3cc; }
 body.perfil-directivo .pestana[data-pantalla="nuevo"], body.perfil-directivo .pestana[data-pantalla="personas"], body.perfil-directivo .pestana[data-pantalla="formularios"],
-body.perfil-directivo .pestana[data-pantalla="cuentas"], body.perfil-directivo .pestana[data-pantalla="herramientas"], body.perfil-directivo .pestana[data-pantalla="ajustes"],
+body.perfil-directivo .pestana[data-pantalla="cuentas"], body.perfil-directivo .pestana[data-pantalla="material"], body.perfil-directivo .pestana[data-pantalla="herramientas"], body.perfil-directivo .pestana[data-pantalla="ajustes"],
 body.perfil-directivo #btn-nuevo-asunto, body.perfil-directivo #inicio-tablon-hueco, body.perfil-directivo #tablon, body.perfil-directivo #inicio-fila-superior,
 body.perfil-directivo .accion-de-administracion, body.perfil-directivo .guion-soltar, body.perfil-directivo .guion-coger, body.perfil-directivo #comprobacion-marca, body.perfil-directivo .inicio-pestana:not([data-pestana="todos"]), body.perfil-directivo label.filtro:has(#filtro-organo) { display: none !important; }
 body.solo-consulta .lateral { top: var(--franja-consulta-alto); height: calc(100vh - var(--franja-consulta-alto)); }

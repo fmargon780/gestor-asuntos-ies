@@ -88,7 +88,7 @@ const visibles = (p, sel) => p.$$eval(sel, (e) => e.filter((x) => x.offsetParent
 /* ===== 1 y 2. Administración ===== */
 console.log('--- 1. Administración ---');
 let pagina = await entrar('');
-await comprobar('1. el menú completo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo asunto', 'Asuntos cerrados', 'Personas y empresas', 'Impresos', 'Cuentas', 'Herramientas', 'Ajustes']);
+await comprobar('1. el menú completo', menu(pagina).then((m) => m.filter((x) => x !== 'Salir')), ['Inicio', 'Nuevo asunto', 'Asuntos cerrados', 'Personas y empresas', 'Impresos', 'Cuentas', 'Material', 'Herramientas', 'Ajustes']);
 await comprobar('1. sin línea de perfil y con las pestañas de Inicio', Promise.all([pagina.locator('#franja-perfil').count(), visibles(pagina, '.inicio-pestana').then((n) => n >= 4)]), [0, true]);
 await comprobar('1. «+ Nuevo asunto» y el tablón están', Promise.all([visibles(pagina, '#btn-nuevo-asunto'), visibles(pagina, '#tablon')]), [1, 1]);
 console.log('--- 2. Ajustes: quién usa la aplicación ---');
