@@ -217,7 +217,7 @@ await pagina.waitForSelector('.pt-capa', { timeout: 10000 });
 await comprobar('11. pregunta «¿De qué tarea es?» con el hito actual elegido y «Tarea nueva» al final',
   pagina.evaluate(() => ({ titulo: document.querySelector('.pt-capa h3').textContent, hito: document.querySelector('#pt-hito').selectedOptions[0].textContent,
     opciones: Array.from(document.querySelectorAll('.pt-op')).map((e) => e.innerText.trim().replace(/\s+/g, ' ')), boton: document.getElementById('pt-ok').textContent })),
-  { titulo: '¿De qué tarea es?', hito: '1. Preparar y enviar el certificado (el actual)', opciones: ['Sin tarea Entra sin colgar de ninguna tarea.', 'Tarea nueva: «INFORME» La app la crea en ese hito y la deja hecha.'], boton: 'Añadir' });
+  { titulo: '¿De qué tarea es?', hito: '1. Preparar y enviar el certificado (el actual)', opciones: ['Sin tarea Entra sin vincular a ninguna tarea.', 'Tarea nueva: «INFORME» La app la crea en ese hito y la deja hecha.'], boton: 'Añadir' });
 await pagina.selectOption('#pt-hito', { index: 1 });
 await comprobar('11. al cambiar de hito cambian las tareas', pagina.evaluate(() => Array.from(document.querySelectorAll('.pt-op')).length), 2);
 await pagina.selectOption('#pt-hito', { index: 0 });

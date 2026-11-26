@@ -103,7 +103,7 @@ await comprobar('2. la tarea nueva se crea en el hito, hecha', (await tareas(PAB
 console.log('--- 3. un asunto sin hitos ---');
 await abrirSuelto('solicitud escaneada.pdf', PEDIDO);
 await comprobar('3. el bloque pide añadir el hito y el desplegable sale apagado', [await bloque(), await pagina.$eval('#dtb-hito', (e) => e.disabled)],
-  ['¿De qué tarea es? | Este asunto no tiene hitos. Añade el hito del que cuelga el documento. | Hito | No hay hitos | + Añadir hito', true]);
+  ['¿De qué tarea es? | Este asunto no tiene hitos. Añade el hito al que se vincula el documento. | Hito | No hay hitos | + Añadir hito', true]);
 await comprobar('3. sin hitos el destino sale «sin tarea» (ya no avisa)', pagina.evaluate(() => !!DocumentoTareaBloque.destino().sinTarea), true);
 await pagina.click('#dtb-anadir-hito');
 await pagina.waitForSelector('.anadir-hito-capa', { timeout: 10000 });

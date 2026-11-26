@@ -59,8 +59,9 @@ await comprobar('1. cada documento de la carpeta mide un solo renglón y no llev
   Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento-fila')).map((f) => [f.getBoundingClientRect().height < 56,
     Array.from(f.children).every((c) => c.getBoundingClientRect().bottom <= f.getBoundingClientRect().bottom + 1)]).flat().every(Boolean)), true);
 /* Fila 638: un documento que no cuelga de ninguna tarea lleva además «sin tarea» (marca, no botón) y «Colgar de una tarea». */
-await comprobar('1. a la vista solo hay «Colgar de una tarea» (fila 638, solo si no cuelga de una tarea), «Ruta» y «Extracto» (fila 627) y el ⋮; ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
-  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Colgar de una tarea', 'Ruta', 'Extracto', '⋮']);
+await comprobar('1. a la vista solo hay «Ruta» y el ⋮ (fila 775: ni «sin tarea», ni «Colgar de una tarea», ni «Extracto»); ni ⧉, ni Registrar, ni Cambiar el nombre, ni Asociar sueltos', fila(UNO).evaluate((f) =>
+  Array.from(f.querySelectorAll(':scope > button, :scope > .fila-menu-envoltorio > button')).filter((b) => b.offsetParent && !b.classList.contains('ficha-documento')).map((b) => b.textContent.trim())), ['Ruta', '⋮']);
+await comprobar('1. ningún documento lleva «sin tarea» ni «Colgar» a la vista (fila 775)', pagina.evaluate(() => document.querySelectorAll('#ficha-documentos .marca-sin-tarea, #ficha-documentos .ficha-documento-colgar').length), 0);
 await comprobar('1. el orden: nombre, «Ruta», datos y ⋮', fila(UNO).evaluate((f) => {
   const orden = Array.from(f.children).filter((c) => c.offsetParent || c.matches('.doc-datos')).map((c) =>
     c.matches('.ficha-documento') ? 'nombre' : c.matches('.ruta-documento') ? 'ruta' : c.matches('.doc-datos') ? 'datos' : c.matches('.fila-menu-envoltorio') ? 'menu' : '');

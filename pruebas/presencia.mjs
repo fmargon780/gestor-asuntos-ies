@@ -86,7 +86,7 @@ await comprobar('el fichero de Ana lleva su propia señal',
 await comprobar('no sale ningún aviso: el asunto es solo suyo',
   pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado está activo',
-  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
+  pagina.locator('#ficha-archivar button').isDisabled(), false);
 
 console.log('--- 2) al volver a la lista, se quita la propia señal ---');
 await pagina.click('#ficha-volver');
@@ -106,7 +106,7 @@ await comprobar('el aviso nombra a Juan',
   pagina.locator('.aviso-presencia').textContent().then(t => t.indexOf('Juan') !== -1 &&
     t.indexOf('no puedes modificar') !== -1), true);
 await comprobar('el desplegable de estado está apagado',
-  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), true);
+  pagina.locator('#ficha-archivar button').isDisabled(), true);
 await comprobar('el botón de archivar está apagado',
   pagina.getByRole('button', { name: 'Cerrar el asunto', exact: true }).isDisabled(), true);
 await comprobar('pero "Volver a la lista" sigue activo',
@@ -123,7 +123,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(200);
 await comprobar('el aviso desaparece', pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado vuelve a estar activo',
-  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
+  pagina.locator('#ficha-archivar button').isDisabled(), false);
 await comprobar('el fichero de Ana ahora tiene la señal (tomó el mando)',
   leerPresenciaDe('Ana').then(p => !!(p && p.asuntos['260901 MATRICULA 26-27 Alguien 1140233'])), true);
 
@@ -141,7 +141,7 @@ await pagina.waitForTimeout(200);
 await comprobar('no sale ningún aviso: la señal ya había caducado',
   pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado está activo',
-  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
+  pagina.locator('#ficha-archivar button').isDisabled(), false);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 

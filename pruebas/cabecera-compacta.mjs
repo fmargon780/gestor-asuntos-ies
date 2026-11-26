@@ -112,6 +112,9 @@ async function abrirMesa(pagina) {
   const n = await alto(pagina, '.ficha-nombre');
   const r = await alto(pagina, '#ficha-ruta button');
   const tira = await alto(pagina, '#ficha-tira');
+  /* Fila 775: sin fecha límite la cabecera no enseña el plazo; se le pone una para medirlo. */
+  await pagina.evaluate(async (n) => { await App.anotar(n, { limite: '2027-03-01' }); App.repintarAccionesFicha(); }, ASUNTO);
+  await pagina.waitForSelector('#ficha-acciones .boton-vencimiento');
   const plazo = await alto(pagina, '#ficha-acciones .boton-vencimiento');
   await comprobar('1. «← Volver», nombre y «Archivar», en la misma línea',
     Promise.resolve([Math.abs(v.top - a.top) < 12, Math.abs(v.top - n.top) < 12, Math.abs(v.top - r.top) < 12]), [true, true, true]);

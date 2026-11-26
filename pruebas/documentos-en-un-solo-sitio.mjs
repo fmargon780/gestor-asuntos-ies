@@ -91,7 +91,7 @@ await comprobar('a la vista, «Ruta» pegado al nombre; ni ⧉ ni «Registrar» 
 await filaDe(PDF).locator('.fila-menu-btn').click();
 await comprobar('el menú ⋮ trae, en orden, copiar el nombre, Registrar, Cambiar el nombre, «Convertir en plantilla» (fila 280: en un PDF sin Word sale apagada), «Pasar a versiones previas» y «Borrar»',
   filaDe(PDF).locator('.fila-menu button').allTextContents().then(ts => ts.map(t => t.trim()).filter(t => !/^(Asociar a un hito|Traer a este hito)$/.test(t))),
-  ['Copiar el nombre', 'Registrar', 'Cambiar el nombre', 'Convertir en plantilla', 'Pasar a versiones previas', 'Borrar']);
+  ['Extracto', 'Copiar el nombre', 'Registrar', 'Cambiar el nombre', 'Convertir en plantilla', 'Pasar a versiones previas', 'Borrar']);
 await filaDe(PDF).locator('.fila-menu-btn').click();
 
 console.log('--- el título del bloque ---');
