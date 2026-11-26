@@ -3,12 +3,14 @@
    «Proveedores» (fila 751, docs/583-COMPRAS-DE-MATERIAL.md, parte 2).
 
    Un fichero nuevo en `_GESTOR`, siempre por `ColaGuardado` y releído antes de escribir:
-   - `material-precios.json`: { precios, portes, cifras }
+   - `material-precios.json`: { precios, portes, cifras, peticiones }
        precio: { id, a: id de artículo, p: razón social del proveedor, i: precio sin IVA, f: fecha ISO,
                  o: «Llamada» | «Correo» | «Presupuesto» | «Factura …», d: { asunto, doc } si viene de un documento }
        portes: { <proveedor en minúsculas y sin tildes>: importe desde el que son gratis }
        cifras: { <proveedor…>: { facturado, sinFacturar } } SOLO de partida (la copia de demostración las
                usa hasta que la parte 5 las calcule de los pedidos y las facturas; en datos reales no hay).
+       peticiones: [{ id, l: lote del envío, a: id de artículo, p: proveedor al que se le pidió, f: fecha ISO }]
+               (fila 753: los correos «Pedir precios»; las escribe js/material-peticiones.js).
    Los precios no se borran: un precio del mismo artículo, proveedor y día sustituye al anterior.
 
    La lógica (`anadirPrecio`, `renglones`, `mejorPrecio`, `filaDeProveedor`…) es pura, sin DOM ni disco: se
@@ -40,6 +42,9 @@
       cifras[k] = { facturado: centimos(c.facturado) || 0, sinFacturar: centimos(c.sinFacturar) || 0 };
     });
     return {
+      peticiones: lista(d.peticiones).filter(function (q) { return q && texto(q.a) && texto(q.p) && texto(q.f); }).map(function (q) {
+        return { id: texto(q.id) || idNuevo(), l: texto(q.l), a: texto(q.a), p: texto(q.p), f: texto(q.f) };
+      }),
       precios: lista(d.precios).filter(function (p) { return p && texto(p.id) && texto(p.a) && texto(p.p) && Number(p.i) > 0; }).map(function (p) {
         var r = { id: texto(p.id), a: texto(p.a), p: texto(p.p), i: centimos(p.i), f: texto(p.f), o: texto(p.o) };
         if (p.d && texto(p.d.asunto) && texto(p.d.doc)) r.d = { asunto: texto(p.d.asunto), doc: texto(p.d.doc) };

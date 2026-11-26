@@ -29,7 +29,7 @@ await comprobar('1a. «Material» está entre «Cuentas» y «Herramientas»',
   ['Cuentas', 'Material', 'Herramientas']);
 await p.click('#pestana-material');
 await p.waitForSelector('#material-busca');
-await comprobar('1b. solo salen las pestañas de las partes hechas, con su número', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (4) Catálogo (14) Proveedores (3)');
+await comprobar('1b. solo salen las pestañas de las partes hechas, con su número', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (4) Catálogo (14) Proveedores (4)');
 await comprobar('1c. se abre en «Lo que falta» con las líneas de la demostración', filasFalta(), 4);
 
 console.log('--- 2. el catálogo ---');
@@ -135,7 +135,7 @@ await comprobar('7c. lo marcado se quita', filasFalta(), 4);
 await comprobar('7d. la casilla de la cabecera marca todas', (async () => { await p.check('#material-todas'); return p.locator('[data-marca]:checked').count(); })(), 4);
 await p.click('#material-quitar');
 await p.waitForSelector('text=No falta nada.');
-await comprobar('7e. sin líneas, «No falta nada.»', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (0) Catálogo (15) Proveedores (3)');
+await comprobar('7e. sin líneas, «No falta nada.»', p.locator('#material-pestanas').innerText().then((t) => t.replace(/\s+/g, ' ')), 'Lo que falta (0) Catálogo (15) Proveedores (4)');
 
 console.log('--- 8. un destino nuevo ---');
 await p.selectOption('#material-para', '__nuevo');

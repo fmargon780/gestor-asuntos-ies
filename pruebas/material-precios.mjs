@@ -42,7 +42,7 @@ comprobar('2b. el de hace más de seis meses no es reciente y no puede ser el me
 comprobar('2c. el mejor precio es el más barato de los recientes', M.mejorPrecioDe(e, 'a1', HOY).texto, '2,30 € · Esquina (1-oct-2026)');
 comprobar('2d. sin precio reciente', [M.mejorPrecioDe(e, 'a1', '2027-06-01').texto, M.mejorPrecioDe(e, 'otro', HOY).texto], ['Sin precio reciente', 'Sin precio reciente']);
 comprobar('2e. el límite de seis meses', [M.limiteReciente('2026-11-26'), M.limiteReciente('2026-08-31')], ['2026-05-26', '2026-03-03']);
-comprobar('2f. un fichero roto no rompe la lectura', M.normalizarPrecios({ precios: [null, { id: 'x' }, { id: 'p', a: 'a', p: 'P', i: -1 }], portes: 'x', cifras: 3 }), { precios: [], portes: {}, cifras: {} });
+comprobar('2f. un fichero roto no rompe la lectura', M.normalizarPrecios({ precios: [null, { id: 'x' }, { id: 'p', a: 'a', p: 'P', i: -1 }], portes: 'x', cifras: 3 }), { peticiones: [], precios: [], portes: {}, cifras: {} });
 
 console.log('--- portes y tope ---');
 comprobar('3a. portes gratis desde 150 (con coma)', [M.ponerPortes(e, 'Dobla', '150,50').importe, e.portes.dobla], [150.5, 150.5]);

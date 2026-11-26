@@ -57,6 +57,7 @@
     'js/material-falta.js',
     'js/material-precios-ui.js',
     'js/material-proveedores.js',
+    'js/material-peticiones.js',
     'js/notas.js',
     // Fila 89, docs/COPIA-SIN-INTERNET.md: leer un dato estático (JSON o
     // binario) tanto por http(s) (fetch) como abierto desde el disco

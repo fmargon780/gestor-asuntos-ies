@@ -62,7 +62,8 @@
         '<td>' + (c ? '<span class="material-chip">' + esc(c.nombre) + '</span>' : '') + '</td>' +
         '<td>' + esc(l.para) + '</td>' +
         '<td class="material-num"><input type="number" class="campo material-cantidad" min="1" step="1" value="' + l.c + '" data-cant="' + esc(l.id) + '"> ' + esc(a ? a.u : '') + '</td>' +
-        '<td>' + (m ? esc(m.texto) : '') + '</td>' +
+        '<td>' + (m ? esc(m.texto) : '') + (Material.notaDePeticion && Material.notaDePeticion(l.a)
+          ? '<br><small class="material-pedidos-precios">' + esc(Material.notaDePeticion(l.a)) + '</small>' : '') + '</td>' +
         '<td>' + esc(l.q) + '</td><td class="material-cuando">' + esc(fechaCorta(l.f)) + '</td></tr>';
     }).join('');
     return '<table class="material-tabla"><thead><tr><th><input type="checkbox" id="material-todas"' +

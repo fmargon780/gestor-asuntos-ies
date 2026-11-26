@@ -43,3 +43,11 @@
 .material-barra-pasado > span { background: #c0392b; }
 .material-barra-texto { font-size: 12px; color: var(--tinta-suave); margin-top: 3px; }
 .material-barra-texto b { color: inherit; }
+/* Fila 753: «Pedir precios de lo marcado…». */
+.material-pedidos-precios { color: #9a5b00; }
+.material-peticion { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; }
+.material-peticion-prov { display: block; margin-bottom: 8px; }
+.material-peticion-prov.sin-correo { color: #8a8f98; }
+.material-peticion-correo { font-size: 13px; border: 1px solid var(--linea); border-radius: 6px; padding: 10px; background: #fafbfc; }
+.material-peticion-correo ul { margin: 6px 0; padding-left: 20px; }
+@media (max-width: 900px) { .material-peticion { grid-template-columns: 1fr; } }
