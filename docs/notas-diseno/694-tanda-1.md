@@ -64,7 +64,7 @@ Recorrido de INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO: lo hacemos · fir
 - ~~ANULACIÓN: el orden de registrar y enviar al director~~ Resuelta el 27-nov-2026 (arriba, tarea 1 y 2).
 - ~~ANULACIÓN: el certificado solo en ESO~~ Resuelta el 27-nov-2026: «Solo si» mirará también la enseñanza del alumno, sacada sola de su unidad (Centro de datos), igual que mira la clase del tercero; sin unidad, la tarea sale y se marca «No aplica». Es una tarea pequeña de este tema, antes de aplicar las guías (Francisco: «Sí»).
 - ~~ABSENTISTA: quién firma el oficio~~ Resuelta el 27-nov-2026: el tipo OFICIO lleva «Secretaría, con visto bueno de Dirección»; elegir quién firma en cada caso es la idea 778 («Vale»).
-- TRAS. MATR. VIVA: el envío por Ventanilla Electrónica, arriba (pendiente de que Francisco lo vea).
+- ~~TRAS. MATR. VIVA: el envío por Ventanilla Electrónica~~ Resuelta el 27-nov-2026 (arriba; «Ok. Adelante»).
 - Comprobado en el código: el oficio con «Secretaría, con visto bueno de Dirección» pide dos firmas y se marca firmado al llegar el PDF con las dos.
 - Por mirar: si el «certificado de entrega de libros» es la ficha de entrega de libros que ya genera la app (fila 501, tipo FICHA ENTREGA LIBROS).
 - El recorrido de cada tipo de documento (quién firma, si se registra, cómo se envía) no lo he podido mirar: ese dato no está entre los ficheros compartidos.
