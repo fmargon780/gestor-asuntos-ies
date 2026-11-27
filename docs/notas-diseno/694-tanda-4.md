@@ -31,7 +31,7 @@ kilómetros reconocidos.
 1. Pedir a la familia el número de cuenta · sin papel · con «Enviar ▾», correo «Abono ayuda transporte escolar» · al enviarlo, queda «Esperando a la familia».
 2. Pasar la documentación recibida a Secretaría para que haga la transferencia · Cómo se hace: descargar lo que manda la familia y enviárselo a Secretaría.
 3. Avisar a la familia de la transferencia y citarla a firmar el recibí en Secretaría · sin papel · con «Enviar ▾», correo «Ayuda Individualizada para el Transporte Escolar (AITE) – Firma de recibí».
-4. Guardar el recibí firmado · Papel: AITE - RECIBÍ GENÉRICO (ver duda 2).
+4. Guardar el recibí firmado · Papel: AITE - RECIBÍ GENÉRICO · Cómo se hace: se imprime con la plantilla, lo firma en Secretaría quien viene, se escanea y se registra de entrada.
 
 («Archivar» desaparece.)
 
@@ -60,12 +60,12 @@ salida «si se remite» y «dar al tutor para entregar a la familia»). Sin dato
 |---|---|
 | SOLICITUD, INFORME | Ya tienen o no necesitan recorrido nuevo: SOLICITUD es «nos llega · se registra de entrada» (tanda 1); INFORME se queda sin recorrido (= nos llega · no se registra), porque lo usan también INFORME EDITORIAL y CERTIFICADO PERSONAL. |
 | RECEPCIÓN | Nos llega · se registra de entrada (si Francisco confirma la duda 3) |
-| AITE - RECIBÍ GENÉRICO | Pendiente de la duda 2 |
+| AITE - RECIBÍ GENÉRICO | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
 1. ~~Ayuda de transporte: a quién va el aviso~~ Resuelta el 27-nov-2026: solo a la familia («1»). La tarea 3 se queda como está.
-2. Ayuda de transporte, tarea 4: ¿el recibí es un papel que generamos, imprimimos y firma la familia en Secretaría, y luego lo escaneamos? Si es así, se guarda como papel que nos llega firmado por la familia (sin registro). Mirado en el código (`js/recorrido-tipo.js`): las firmas posibles son Nadie, Administración, Secretaría, Secretaría con visto bueno de Dirección, Dirección y Jefatura de Estudios; la familia no es una firma. Por eso el recibí firmado entraría como «nos llega · no se registra».
+2. ~~Ayuda de transporte: el recibí~~ Resuelta el 27-nov-2026: se imprime con la plantilla, lo firma en Secretaría quien viene y se registra de entrada (Francisco: «prefiero registrarlo de entrada»). Elegir en la ventanilla quién firma (tutor 1, tutor 2 o el alumno si es mayor de edad) es un desarrollo que Francisco lleva aparte; esta guía no depende de él.
 3. NEAE, tarea 3: ¿el recibí de Orientación es un documento que ya conoces con otro nombre? Hoy hay «RECEPCIÓN» y «REGISTRO ENTREGA» entre los tipos de documento; propongo RECEPCIÓN.
 4. Informe del equipo educativo: ¿quién lo pide y a quién va cuando sale del centro (por ejemplo, a un médico o a Servicios Sociales)? Con eso se decide si la tarea 3 se parte en dos según el caso.
 5. Aparte, sin pedirlo: el correo «Abono ayuda transporte escolar» lleva escrito a mano «curso 2024/2025». Propongo que use el dato «Curso Abono AITE», como ya hace el otro correo. ¿En este tema o aparte?
