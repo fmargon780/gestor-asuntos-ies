@@ -24,4 +24,4 @@ Gestionar cada trámite administrativo del instituto como un «asunto»: su carp
 - Un sistema de trabajo lo más completo posible, que sirva de guía también a quien no es experto: procesos fluidos, intuitivos y explicados, que pueda seguir personal no acostumbrado a ellos, como interinos o miembros del equipo directivo (Francisco, 14-nov-2026).
 - Plan en marcha desde el 17-nov-2026 (`docs/PLAN-2026-11.md`): un solo molde para todo, el asunto como lista de tareas con un panel que informa («en las tareas se hace, en los hitos se informa»); una guía por tipo; trabajar y diseñar, separados. Después, sin fecha: que cada papel lleve su recorrido y que el estado salga de las pruebas.
 
-Última reflexión: 26-nov-2026
+Última reflexión: 27-nov-2026
