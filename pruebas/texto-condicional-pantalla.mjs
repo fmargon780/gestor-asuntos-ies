@@ -64,7 +64,7 @@ await comprobar('A. el recuadro «Insertar» con sus dos botones', p.evaluate(()
 await comprobar('A. el texto para Séneca también tiene «Texto condicional»', p.locator('#pl-texto-seneca-condicional').count(), 1);
 
 await p.fill('#pl-texto', 'Hola.\n\nPrimer párrafo.\n\nSegundo párrafo.');
-await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); t.setSelectionRange(10, 10); });
+await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.data.indexOf('Primer') !== -1) break; const r = document.createRange(); r.setStart(n, 4); r.collapse(true); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });   /* fila 772: el cursor en el segundo párrafo */
 await p.click('#pl-texto-condicional');
 await p.waitForSelector('#texto-cond-cuadro');
 await comprobar('A. el cuadro ofrece el campo de lista del tipo y sus valores', p.evaluate(() => [
@@ -74,19 +74,19 @@ await comprobar('A. el cuadro ofrece el campo de lista del tipo y sus valores', 
 await p.keyboard.press('Escape');
 await comprobar('A. Escape cierra el cuadro y deja el de la plantilla', [await p.locator('#texto-cond-cuadro').count(), await p.locator('#capa:not(.oculto) #pl-texto').count()], [0, 1]);
 
-await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); t.setSelectionRange(10, 10); });
+await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.data.indexOf('Primer') !== -1) break; const r = document.createRange(); r.setStart(n, 4); r.collapse(true); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });   /* fila 772: el cursor en el segundo párrafo */
 await p.click('#pl-texto-condicional');
 await p.waitForSelector('#texto-cond-cuadro');
 await p.selectOption('#tc-valor', 'No');
 await p.click('#tc-poner');
-await comprobar('A. la marca va al principio del párrafo del cursor', p.inputValue('#pl-texto'), 'Hola.\n\n{si:' + PROT + '=No} Primer párrafo.\n\nSegundo párrafo.');
+await comprobar('A. la marca va al principio del párrafo del cursor', p.$eval('#pl-texto', (e) => e.value), 'Hola.\n\n{si:' + PROT + '=No} Primer párrafo.\n\nSegundo párrafo.');
 await comprobar('A. y se dice debajo', p.textContent('#pl-texto-cond-aviso'), 'Marca puesta: el párrafo solo saldrá si «' + PROT + '» es «No».');
-await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); t.setSelectionRange(12, 12); });
+await p.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.data.indexOf('Primer') !== -1) break; const r = document.createRange(); r.setStart(n, 4); r.collapse(true); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });   /* fila 772: el cursor en el segundo párrafo */
 await p.click('#pl-texto-condicional');
 await p.waitForSelector('#texto-cond-cuadro');
 await p.selectOption('#tc-valor', 'Sí');
 await p.click('#tc-poner');
-await comprobar('A. una segunda vez cambia la marca, no añade otra', p.inputValue('#pl-texto'), 'Hola.\n\n{si:' + PROT + '=Sí} Primer párrafo.\n\nSegundo párrafo.');
+await comprobar('A. una segunda vez cambia la marca, no añade otra', p.$eval('#pl-texto', (e) => e.value), 'Hola.\n\n{si:' + PROT + '=Sí} Primer párrafo.\n\nSegundo párrafo.');
 await comprobar('A. «Campo variable» abre la ventana de elegir un campo (fila 528)', (async () => {
   await p.click('#pl-insertar-hueco'); await p.waitForSelector('.capa-campos #ce-buscar');
   const r = await p.evaluate(() => document.getElementById('ce-buscar').placeholder);

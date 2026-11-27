@@ -92,7 +92,7 @@ await pagina.waitForTimeout(150);
 await pagina.keyboard.press('Enter');
 await pagina.waitForTimeout(150);
 await comprobarQue('2. se ha insertado el hueco {nombre} en el texto',
-  pagina.locator('#pl2-texto').inputValue().then((v) => v.indexOf('{nombre}') !== -1));
+  pagina.locator('#pl2-texto').evaluate((e) => e.value).then((v) => v.indexOf('{nombre}') !== -1));
 await comprobarQue('2. la vista previa sale con los datos del asunto en el que se está (no vacía)',
   pagina.evaluate(() => {
     const t = document.getElementById('pl2-previa').textContent;
@@ -119,7 +119,7 @@ await pagina.fill('#seneca-cuerpo-texto', 'Un texto escrito a mano, distinto del
 await pagina.click('#seneca-plantilla-editar');
 await pagina.waitForSelector('#seneca-plantilla-editor:not(.oculto) #pl2-nombre');
 await comprobar('4. el editor trae el texto de la plantilla existente',
-  pagina.locator('#pl2-texto').inputValue().then((v) => v.indexOf('{nombre}') !== -1), true);
+  pagina.locator('#pl2-texto').evaluate((e) => e.value).then((v) => v.indexOf('{nombre}') !== -1), true);
 await pagina.fill('#pl2-texto', 'Le informamos, de nuevo, sobre {nombre}.');
 await pagina.click('#pl2-guardar');
 await pagina.waitForSelector('#seneca-formulario:not(.oculto)');
@@ -163,7 +163,7 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForTimeout(200);
 
 await comprobarQue('5. el correo sigue con el texto de siempre, no el de Séneca (fila 170)',
-  pagina.locator('#correo-cuerpo-texto').inputValue().then((v) => v.indexOf('de nuevo') !== -1 && v.indexOf('Solo para Séneca') === -1));
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value).then((v) => v.indexOf('de nuevo') !== -1 && v.indexOf('Solo para Séneca') === -1));
 await comprobarQue('5. con plantilla ya creada, «Editar plantilla» también en el cuadro de Correo',
   pagina.evaluate(() => !!document.getElementById('correo-plantilla-editar')));
 await pagina.evaluate((d) => { CorreoPara.ponerDirecciones('para', [d]); CorreoPara.repintar(); }, 'alguien@example.com');

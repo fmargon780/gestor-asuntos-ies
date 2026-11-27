@@ -106,7 +106,7 @@ await abrirCorreoDe(CON_PLANTILLA);
 await comprobar('sin plantillas.json no sale el desplegable',
   pagina.locator('#correo-plantilla').count(), 0);
 await comprobar('sale la firma de siempre',
-  pagina.locator('#correo-cuerpo-texto').inputValue()
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value)
     .then(t => t.indexOf('Un saludo.\nFrancisco\nIES Fuente Lucena') !== -1), true);
 await cerrarCuadro();
 
@@ -139,7 +139,7 @@ await comprobar('el desplegable trae las dos plantillas más "Sin plantilla"',
 await comprobar('sale puesta la primera',
   pagina.locator('#correo-plantilla').inputValue(), 'pl-1');
 
-const cuerpo1 = await pagina.locator('#correo-cuerpo-texto').inputValue();
+const cuerpo1 = await pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value);
 await comprobar('el hueco del nombre está relleno', cuerpo1.indexOf('Perez Lopez, Ana') !== -1, true);
 await comprobar('el hueco del grupo está relleno', cuerpo1.indexOf('2ºA') !== -1, true);
 await comprobar('el hueco sin dato se queda vacío', cuerpo1.indexOf('{limite}') !== -1, false);
@@ -154,7 +154,7 @@ await comprobar('avisa de que falta la fecha límite',
    ======================================================== */
 await pagina.selectOption('#correo-plantilla', 'pl-2');
 await pagina.waitForTimeout(200);
-const cuerpo2 = await pagina.locator('#correo-cuerpo-texto').inputValue();
+const cuerpo2 = await pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value);
 await comprobar('el cuerpo cambia con la segunda plantilla',
   cuerpo2.indexOf('comunicamos formalmente') !== -1, true);
 await comprobar('ya no queda nada de la primera',
@@ -164,25 +164,25 @@ await comprobar('ya no queda nada de la primera',
    4 · con algo escrito a mano, cambiar de plantilla pregunta antes
    ======================================================== */
 await pagina.fill('#correo-cuerpo-texto',
-  (await pagina.locator('#correo-cuerpo-texto').inputValue()) + '\n\nAñadido a mano.');
+  (await pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value)) + '\n\nAñadido a mano.');
 await pagina.selectOption('#correo-plantilla', 'pl-1');
 await pagina.waitForSelector('#correo-plantilla-confirmar:has-text("se perderá")');
 
 await comprobar('lo escrito a mano no se pierde solo',
-  pagina.locator('#correo-cuerpo-texto').inputValue().then(t => t.indexOf('Añadido a mano.') !== -1), true);
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value).then(t => t.indexOf('Añadido a mano.') !== -1), true);
 
 await pagina.click('#correo-plantilla-confirmar >> text=Seguir con lo escrito');
 await comprobar('al no confirmar, el desplegable vuelve a la de antes',
   pagina.locator('#correo-plantilla').inputValue(), 'pl-2');
 await comprobar('y el texto sigue siendo el escrito a mano',
-  pagina.locator('#correo-cuerpo-texto').inputValue().then(t => t.indexOf('Añadido a mano.') !== -1), true);
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value).then(t => t.indexOf('Añadido a mano.') !== -1), true);
 
 await pagina.selectOption('#correo-plantilla', 'pl-1');
 await pagina.waitForSelector('#correo-plantilla-confirmar:has-text("se perderá")');
 await pagina.click('#correo-plantilla-confirmar >> text=Cambiar de todas formas');
 await pagina.waitForTimeout(200);
 await comprobar('confirmando, el cuerpo se reescribe con la nueva plantilla',
-  pagina.locator('#correo-cuerpo-texto').inputValue()
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value)
     .then(t => t.indexOf('de una sanción') !== -1 && t.indexOf('Añadido a mano.') === -1), true);
 
 await cerrarCuadro();
@@ -194,7 +194,7 @@ await abrirCorreoDe(SIN_PLANTILLA);
 await comprobar('un tipo sin plantillas no trae desplegable',
   pagina.locator('#correo-plantilla').count(), 0);
 await comprobar('el cuerpo sale en blanco, con el saludo y la firma de siempre',
-  pagina.locator('#correo-cuerpo-texto').inputValue()
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value)
     .then(t => t.indexOf('Buenos días:') === 0 && t.indexOf('Atentamente,') !== -1), true);
 await cerrarCuadro();
 

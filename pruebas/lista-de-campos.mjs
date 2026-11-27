@@ -107,6 +107,7 @@ await pagina.waitForSelector('#tipo-plantillas-nueva');
 await pagina.click('#tipo-plantillas-nueva');
 await pagina.waitForSelector('#pl-texto');
 await pagina.fill('#pl-texto', 'Hola ');
+await pagina.evaluate(() => { const c = document.getElementById('pl-texto'); c.focus(); const r = document.createRange(); r.selectNodeContents(c); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); c.dispatchEvent(new Event('keyup', { bubbles: true })); });   /* fila 772: el Texto es un recuadro con formato */
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.capa-campos #ce-buscar');
 await comprobar('4. los cinco grupos a la izquierda, ninguno «Calculados» ni «Manuales»', pagina.$$eval('.campos-elegir-grupos .campos-grupo', (g) => g.map((x) => x.firstChild.textContent)), ['Persona', 'Tutores', 'Asunto', 'Centro', 'Firmantes']);
@@ -124,7 +125,7 @@ await pagina.fill('#cmn-nombre', 'Fecha de la visita');
 await pagina.selectOption('#cmn-clase', 'fecha');
 await pagina.click('#cmn-crear');
 await pagina.waitForSelector('.capa-campos', { state: 'detached', timeout: 10000 });
-await comprobar('5. queda insertado en la plantilla', pagina.inputValue('#pl-texto'), 'Hola {campo:Fecha de la visita}');
+await comprobar('5. queda insertado en la plantilla', pagina.$eval('#pl-texto', (e) => e.value), 'Hola {campo:Fecha de la visita}');
 await comprobar('5. y queda en la lista para siempre, con origen Manual', pagina.evaluate(async () => { const l = await CamposListaDatos.lista(); const c = l.find((x) => x.nombre === 'Fecha de la visita'); return c ? [c.origen, c.clase] : null; }), ['Manual', 'fecha']);
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.capa-campos #ce-buscar');

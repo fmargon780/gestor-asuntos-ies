@@ -114,9 +114,9 @@ await comprobar('el botón de cerrar dice "Esta vez no"',
 await comprobar('el correo de quien lo pide sale en «Para» (sin correo de Séneca)',
   pagina.evaluate(() => CorreoPara.texto('para')), 'ana.pide@ejemplo.com');
 await comprobar('el cuerpo trae el título del hito',
-  pagina.inputValue('#correo-cuerpo-texto').then(t => t.indexOf('Confirmar la plaza') !== -1), true);
+  pagina.$eval('#correo-cuerpo-texto', (e) => e.value).then(t => t.indexOf('Confirmar la plaza') !== -1), true);
 await comprobar('el cuerpo dice "el hito 2 de 2"',
-  pagina.inputValue('#correo-cuerpo-texto').then(t => t.indexOf('hito 2 de 2') !== -1), true);
+  pagina.$eval('#correo-cuerpo-texto', (e) => e.value).then(t => t.indexOf('hito 2 de 2') !== -1), true);
 
 /* ================= 2. "ESTA VEZ NO": NO VUELVE A PREGUNTAR ================= */
 console.log('--- 2. "Esta vez no" cierra, y no vuelve a preguntar por ese hito ---');

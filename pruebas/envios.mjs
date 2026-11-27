@@ -201,7 +201,7 @@ await pagina.waitForSelector('#correo-formulario:not(.oculto)');
 await comprobar('"Volver" conserva el correo escrito a mano',
   pagina.evaluate(() => CorreoPara.texto('para')), 'proveedor@correo.es');
 await comprobar('"Volver" conserva el cuerpo escrito a mano',
-  pagina.locator('#correo-cuerpo-texto').inputValue(), 'Le adjunto los documentos del contrato.\nUn saludo.');
+  pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value), 'Le adjunto los documentos del contrato.\n\nUn saludo.');   /* fila 772: un Intro, un párrafo */
 await comprobar('"Volver" conserva los documentos marcados',
   pagina.locator('.adjunto-marca:checked').count(), 2);
 await comprobar('todavía ninguna llamada a la aplicación web', llamadas.length, 0);

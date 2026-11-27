@@ -58,11 +58,12 @@ var CorreoFormatoEditor = (function () {
     var el = document.getElementById(id);
     if (!el || el.esRico) return el || null;
     var caja = el.parentNode, barra = caja.querySelector('.cfe-barra'), nueva = caja.querySelector('.cfe-nueva');
-    var rango = null;
+    var rango = null, desenfocado = false;   /* `desenfocado`: el foco se fue (un cuadro, un campo) y puede haber vuelto con el cursor al principio */
     el.esRico = true;
 
     function dentro(n) { return !!n && el.contains(n); }
-    function guardar() {
+    function guardar(ev) {
+      if (ev && (ev.type === 'keyup' || ev.type === 'mouseup' || ev.type === 'input')) desenfocado = false;   /* lo que hace quien escribe manda sobre lo recordado */
       var s = window.getSelection();
       if (s && s.rangeCount && dentro(s.anchorNode)) rango = s.getRangeAt(0).cloneRange();
       repintarBarra();
@@ -70,8 +71,11 @@ var CorreoFormatoEditor = (function () {
     function restaurar() {
       var s = window.getSelection();
       if (!s) return;
-      if (document.activeElement === el && s.rangeCount && dentro(s.anchorNode)) return;   /* el cursor ya está donde estaba: no se toca */
+      if (!desenfocado && document.activeElement === el && s.rangeCount && dentro(s.anchorNode)) return;   /* el cursor ya está donde estaba: no se toca */
+      desenfocado = false;
+      var recordado = rango;   /* al volver el foco, `guardar` apunta el cursor del principio: se usa el de antes */
       el.focus();
+      rango = recordado;
       if (!rango) { rango = document.createRange(); rango.selectNodeContents(el); rango.collapse(false); }
       s.removeAllRanges();
       s.addRange(rango);
@@ -220,7 +224,7 @@ var CorreoFormatoEditor = (function () {
     /* ---------- escribir y pegar ---------- */
     ['keyup', 'mouseup', 'focus', 'input'].forEach(function (ev) { el.addEventListener(ev, guardar); });
     el.addEventListener('input', pieDeTabla);
-    el.addEventListener('blur', function () { guardar(); });
+    el.addEventListener('blur', function () { guardar(); desenfocado = true; });
     document.addEventListener('selectionchange', function f() {
       if (!el.isConnected) { document.removeEventListener('selectionchange', f); return; }
       if (document.activeElement === el) guardar();

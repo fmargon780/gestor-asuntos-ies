@@ -93,14 +93,14 @@ async function recorrido(p, nombreNueva, tipo) {
   await pagina.waitForTimeout(150);
   const escrito = await pagina.evaluate(([p, frase]) => {
     const c = document.getElementById(p + '-cuerpo-texto');
-    c.value = c.value.replace('\n\n\n\n', '\n\n' + frase + '\n\n');
+    c.value = c.value.indexOf('\n\n\n\n') !== -1 ? c.value.replace('\n\n\n\n', '\n\n' + frase + '\n\n') : c.value.replace('\n\n', '\n\n' + frase + '\n\n');   /* fila 772: en el recuadro con formato el hueco entre saludo y firma no suma líneas */
     return c.value;
   }, [p, FRASE]);
   await pagina.click('#' + p + '-plantilla-desde-escrito');
   await pagina.waitForSelector('#' + p + '-plantilla-editor:not(.oculto) #pl2-nombre');
   await comprobar(p + ' · el editor se abre dentro del cuadro con el nombre vacío y el foco', pagina.evaluate(() =>
     [document.getElementById('pl2-nombre').value, document.activeElement.id]), ['', 'pl2-nombre']);
-  const texto = await pagina.locator('#pl2-texto').inputValue();
+  const texto = await pagina.locator('#pl2-texto').evaluate((e) => e.value);
   await comprobar(p + ' · sin saludo ni firma y con tres huecos', [/Estimados|Buenos días|Hola/.test(texto), texto],
     [false, 'Le informamos de que la solicitud de {nombreNatural}, del grupo {grupo}, está lista. Puede recogerla hasta el {limite}.']);
   await comprobar(p + ' · tres líneas con «Deshacer» y sin la nota del saludo y la firma (fila 555)', pagina.evaluate((p) => [
@@ -161,7 +161,7 @@ const antes = await pagina.evaluate(() => document.querySelectorAll('#correo-pla
 await pagina.selectOption('#correo-plantilla', '');
 await pagina.waitForTimeout(150);
 await pagina.evaluate(() => { const c = document.getElementById('correo-cuerpo-texto'); c.value = c.value.replace('\n\n\n\n', '\n\nOtra frase distinta.\n\n'); });
-const escrito2 = await pagina.locator('#correo-cuerpo-texto').inputValue();
+const escrito2 = await pagina.locator('#correo-cuerpo-texto').evaluate((e) => e.value);
 await pagina.click('#correo-plantilla-desde-escrito');
 await pagina.waitForSelector('#correo-plantilla-editor:not(.oculto) #pl2-nombre');
 await pagina.click('#pl2-cancelar');

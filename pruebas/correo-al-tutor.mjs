@@ -221,7 +221,7 @@ await esperarCuadro();
 await pagina.click('#correo-plantilla-desde-escrito');
 await pagina.waitForSelector('#pl2-texto');
 await comprobar('12b. el editor de la plantilla nueva no lleva el saludo «Buenas:» ni la firma',
-  pagina.inputValue('#pl2-texto').then((t) => [/^Buenas/.test(t), /Un saludo/.test(t), /^Jefatura de Estudios entregará/.test(t)]), [false, false, true]);
+  pagina.$eval('#pl2-texto', (e) => e.value).then((t) => [/^Buenas/.test(t), /Un saludo/.test(t), /^Jefatura de Estudios entregará/.test(t)]), [false, false, true]);
 await pagina.click('#pl2-cancelar');
 await cerrarCuadro();
 await abrirComunicar();

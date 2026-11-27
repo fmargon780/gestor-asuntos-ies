@@ -115,7 +115,7 @@ await comprobar('3. el informe está entre los adjuntos y marcado',
   pagina.evaluate((f) => [...document.querySelectorAll('#adjuntos-lista .correo-fila')].filter((r) => r.textContent.indexOf(f) !== -1).map((r) => r.querySelector('.adjunto-marca').checked), informes1[0]), [true]);
 await comprobar('3. la plantilla elegida es «Aviso de actividad extraescolar»',
   pagina.evaluate(() => document.getElementById('correo-plantilla').selectedOptions[0].textContent), 'Aviso de actividad extraescolar');
-const cuerpo = await pagina.inputValue('#correo-cuerpo-texto');
+const cuerpo = await pagina.$eval('#correo-cuerpo-texto', (e) => e.value);
 await comprobar('3. el texto nombra la actividad, su fecha y su lugar, empieza por «Buenas:» y no deja huecos',
   [cuerpo.indexOf('Visita a la Alhambra y al Albaicín') !== -1, /celebra .*\d{4} en Granada/.test(cuerpo), /^Buenas:/.test(cuerpo), /[{}]/.test(cuerpo)], [true, true, true, false]);
 await comprobar('3. el asunto del correo', pagina.inputValue('#correo-asunto').then((s) => /^Actividad extraescolar: Visita a la Alhambra y al Albaicín \(.*\d{4}\)$/.test(s)), true);
@@ -186,7 +186,7 @@ await pagina.waitForSelector('#adjuntos-lista .correo-fila');
 await pagina.waitForTimeout(1200);
 const informes2 = await informes(pagina, asunto);
 const nuevoInforme = informes2.filter((n) => informes1.indexOf(n) === -1);
-const cuerpo2 = await pagina.inputValue('#correo-cuerpo-texto');
+const cuerpo2 = await pagina.$eval('#correo-cuerpo-texto', (e) => e.value);
 await comprobar('6. el texto empieza por «Este aviso sustituye al enviado el …»', cuerpo2.indexOf('Este aviso sustituye al enviado el ' + hoyCorto + '.') === 0, true);
 await comprobar('6. el informe marcado es uno nuevo, sin la persona que ya no va',
   Promise.all([pagina.evaluate((f) => [...document.querySelectorAll('#adjuntos-lista .correo-fila')].filter((r) => r.querySelector('.adjunto-marca').checked).map((r) => r.textContent.indexOf(f) !== -1), nuevoInforme[0]), nuevoInforme.length, textoPdf(pagina, asunto, nuevoInforme[0]).then((x) => x.indexOf('Alumnado que va: 7') !== -1)]),

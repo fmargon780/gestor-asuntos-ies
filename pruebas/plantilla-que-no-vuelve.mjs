@@ -134,7 +134,7 @@ for (const cuadro of [
     await comprobar(cuadro.medio + ': se queda «' + (id || 'Sin plantilla') + '»',
       pagina.locator(cuadro.desplegable).inputValue(), id);
     await comprobar(cuadro.medio + ': el texto cambia con «' + (id || 'Sin plantilla') + '»',
-      pagina.locator(cuadro.texto).inputValue().then(t => id === 'av-1' ? t.indexOf('Aviso de avance') !== -1
+      pagina.locator(cuadro.texto).evaluate((e) => e.value).then(t => id === 'av-1' ? t.indexOf('Aviso de avance') !== -1
         : id === 'av-2' ? t.indexOf('Aviso de cierre') !== -1 : t.indexOf('Aviso de') === -1), true);
   }
   await cerrarCuadro();

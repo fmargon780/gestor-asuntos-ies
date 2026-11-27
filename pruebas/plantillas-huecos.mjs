@@ -147,20 +147,25 @@ await comprobar('Escape cierra la ventana de elegir un campo',
 await comprobar('y el cuadro de la plantilla sigue abierto',
   pagina.locator('#capa').evaluate(e => e.classList.contains('oculto')), false);
 await comprobar('y no ha insertado nada',
-  pagina.locator('#pl-texto').inputValue(), 'Buenos días.');
+  pagina.locator('#pl-texto').evaluate((e) => e.value), 'Buenos días.');
 
 /* ========================================================
    3 · el hueco entra donde está el cursor, no al final
    ======================================================== */
 console.log('--- 3. donde está el cursor ---');
-await pagina.fill('#pl-texto', 'Hola , buenos días.');
-/* El cursor, justo detrás de "Hola " (posición 5). */
-await pagina.evaluate(() => {
+/* Fila 772: el Texto de la plantilla es un recuadro con formato: el texto y el cursor (por posiciones del texto de un solo párrafo) se ponen así. */
+const ponerEnTexto = (texto, ini, fin) => pagina.evaluate(([t, i, f]) => {
   const c = document.getElementById('pl-texto');
+  c.ponerHtml(CorreoFormato.deTexto(t));
   c.focus();
-  c.selectionStart = c.selectionEnd = 5;
+  const bloque = c.querySelector('div, p'), n = bloque.firstChild && bloque.firstChild.nodeType === 3 ? bloque.firstChild : null;
+  const r = document.createRange();
+  if (n) { r.setStart(n, i); r.setEnd(n, f); } else { r.setStart(bloque, 0); r.collapse(true); }
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
   c.dispatchEvent(new Event('keyup', { bubbles: true }));
-});
+}, [texto, ini, fin]);
+/* El cursor, justo detrás de "Hola " (posición 5). */
+await ponerEnTexto('Hola , buenos días.', 5, 5);
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.capa-campos #ce-buscar');
 await pagina.fill('#ce-buscar', 'nombre del tercero');
@@ -169,26 +174,20 @@ await pagina.click('.campos-fila-campo[data-id="h:nombre"]');
 await pagina.waitForTimeout(150);
 
 await comprobar('el hueco entra donde estaba el cursor',
-  pagina.locator('#pl-texto').inputValue(), 'Hola {nombre}, buenos días.');
+  pagina.locator('#pl-texto').evaluate((e) => e.value), 'Hola {nombre}, buenos días.');
 await comprobar('la ventana se cierra al elegir',
   pagina.locator('.capa-campos').count(), 0);
 await comprobar('el cursor vuelve al texto, detrás de lo insertado',
   pagina.evaluate(() => {
     const c = document.getElementById('pl-texto');
-    return [document.activeElement === c, c.selectionStart];
+    return [document.activeElement === c, getSelection().anchorOffset];
   }), [true, 13]);
 await comprobar('la vista previa se ha enterado',
   pagina.locator('#pl-previa').textContent().then(t => t.indexOf('Hola ') === 0 &&
     t.indexOf('{nombre}') === -1), true);
 
 /* con texto seleccionado, el hueco lo sustituye */
-await pagina.evaluate(() => {
-  const c = document.getElementById('pl-texto');
-  c.value = 'Hola AQUI, buenos días.';
-  c.focus();
-  c.selectionStart = 5; c.selectionEnd = 9;
-  c.dispatchEvent(new Event('keyup', { bubbles: true }));
-});
+await ponerEnTexto('Hola AQUI, buenos días.', 5, 9);
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.capa-campos #ce-buscar');
 await pagina.fill('#ce-buscar', 'grupo');
@@ -196,15 +195,10 @@ await pagina.waitForSelector('.campos-fila-campo[data-id="h:grupo"]');
 await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('con texto seleccionado, el hueco lo sustituye',
-  pagina.locator('#pl-texto').inputValue(), 'Hola {grupo}, buenos días.');
+  pagina.locator('#pl-texto').evaluate((e) => e.value), 'Hola {grupo}, buenos días.');
 
 /* las flechas eligen otro de la lista */
-await pagina.evaluate(() => {
-  const c = document.getElementById('pl-texto');
-  c.value = ''; c.focus();
-  c.selectionStart = c.selectionEnd = 0;
-  c.dispatchEvent(new Event('keyup', { bubbles: true }));
-});
+await ponerEnTexto('', 0, 0);
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.capa-campos #ce-buscar');
 await pagina.fill('#ce-buscar', 'tutor');
@@ -213,7 +207,7 @@ await pagina.press('#ce-buscar', 'ArrowDown');
 await pagina.press('#ce-buscar', 'Enter');
 await pagina.waitForTimeout(150);
 await comprobar('las flechas bajan por la lista y Enter elige',
-  pagina.locator('#pl-texto').inputValue(), '{tutor1telefono}');
+  pagina.locator('#pl-texto').evaluate((e) => e.value), '{tutor1telefono}');
 
 /* ========================================================
    4 · con dos campos, el hueco entra en el que tuvo el foco

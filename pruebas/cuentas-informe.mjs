@@ -104,7 +104,7 @@ await comprobar('sin destinatario de partida',
 await comprobar('el asunto es "Informe de asuntos · <fecha>"',
   pagina.inputValue('#correo-asunto').then(t => t.indexOf('Informe de asuntos · ') === 0), true);
 
-const cuerpo = await pagina.inputValue('#correo-cuerpo-texto');
+const cuerpo = await pagina.$eval('#correo-cuerpo-texto', (e) => e.value);
 await comprobar('1. por quién lo encarga', cuerpo.indexOf('Secretaría') !== -1, true);
 await comprobar('2. vencidos', cuerpo.indexOf('Vencidos') !== -1, true);
 await comprobar('2. con el asunto vencido', cuerpo.indexOf('Uno Reves') !== -1, true);
