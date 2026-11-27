@@ -84,6 +84,19 @@ var CorreoFormato = (function () {
       return;
     }
     if (et === 'TABLE') { cerrarParrafo(estado); tabla(n, destino); return; }
+    if (et === 'P' && /mso-list\s*:\s*(?!none)/i.test(n.getAttribute('style') || '')) {   /* un elemento de lista de Word: un párrafo con su marca escrita */
+      var marca = n.querySelector('[style*="mso-list:Ignore" i], [style*="mso-list: Ignore" i]');
+      var textoMarca = marca ? marca.textContent.replace(/[\s\u00a0]+/g, '') : '';
+      if (marca) marca.parentNode.removeChild(marca);
+      var clase = /^\(?(\d+|[a-zA-Z]{1,3})[.)]$/.test(textoMarca) ? 'ol' : 'ul';
+      cerrarParrafo(estado);
+      var ultima = destino.lastChild;
+      if (!(ultima && ultima.nodeName.toLowerCase() === clase && ultima.deWord)) { ultima = document.createElement(clase); ultima.deWord = true; destino.appendChild(ultima); }
+      var elemento = document.createElement('li');
+      ultima.appendChild(elemento);
+      volcarEnLinea(n, elemento, { p: null });
+      return;
+    }
     if (et === 'P' || BLOQUES[et]) {
       cerrarParrafo(estado);
       var interno = { p: null };

@@ -87,7 +87,8 @@ var CorreoFormatoEditor = (function () {
     }
     function cambio() { pieDeTabla(); el.dispatchEvent(new Event('input', { bubbles: true })); }
     function casillaActual() {
-      var n = rango ? rango.startContainer : null;
+      var vivo = window.getSelection();
+      var n = document.activeElement === el && vivo && vivo.rangeCount && dentro(vivo.anchorNode) ? vivo.anchorNode : (rango ? rango.startContainer : null);
       if (n && n.nodeType === 3) n = n.parentNode;
       var c = n && n.closest ? n.closest('td,th') : null;
       return c && dentro(c) ? c : null;
@@ -242,8 +243,9 @@ var CorreoFormatoEditor = (function () {
       var c = casillaActual();
       if (!c) return;
       var todas = Array.prototype.slice.call(c.closest('table').querySelectorAll('td,th')), i = todas.indexOf(c) + (ev.shiftKey ? -1 : 1);
-      if (i < 0 || i >= todas.length) return;
+      if (i < 0) return;
       ev.preventDefault();
+      if (i >= todas.length) { operarTabla('fila-mas'); return; }   /* el Tabulador en la última casilla añade una fila, como en Word */
       ponerEnCasilla(todas[i]);
     });
 

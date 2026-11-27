@@ -292,6 +292,13 @@ await pagina.waitForTimeout(300);
 
 console.log('--- lo de dentro ---');
 await comprobar('14. limpiar: solo lo admitido', pagina.evaluate(() => CorreoFormato.limpiar('<div class="x" style="color:red" onclick="a()"><span style="font-weight:700">Hola</span> <img src=x onerror=a()><script>a()</script><a href="http://x">enlace</a></div>')), '<p><b>Hola</b> enlace</p>');
+await comprobar('14. una lista de Word (párrafos con mso-list y su marca escrita) se vuelve lista de verdad', pagina.evaluate(() => CorreoFormato.limpiar(
+  '<p class=MsoNormal>Antes</p>' +
+  '<p class=MsoListParagraphCxSpFirst style="mso-list:l0 level1 lfo1"><span style="mso-list:Ignore">·<span style="font:7.0pt">&nbsp;&nbsp;</span></span>Uno</p>' +
+  '<p class=MsoListParagraphCxSpLast style="mso-list:l0 level1 lfo1"><span style="mso-list:Ignore">·<span>&nbsp;</span></span>Dos <b>negrita</b></p>' +
+  '<p class=MsoListParagraphCxSpFirst style="mso-list:l1 level1 lfo2"><span style="mso-list:Ignore">1.<span>&nbsp;</span></span>Primero</p>' +
+  '<p class=MsoListParagraphCxSpLast style="mso-list:l1 level1 lfo2"><span style="mso-list:Ignore">2.<span>&nbsp;</span></span>Segundo</p>')),
+'<p>Antes</p><ul><li>Uno</li><li>Dos <b>negrita</b></li></ul><ol><li>Primero</li><li>Segundo</li></ol>');
 await comprobar('14. rellenar: un valor con < y & no mete etiquetas', pagina.evaluate(() => {
   const r = CorreoFormato.rellenar('<p>Hola {nombre}</p><table><tbody><tr><td>{nombre}</td></tr></tbody></table>', { nombre: 'A <b>&</b> B' });
   return [r.html, r.faltan];
