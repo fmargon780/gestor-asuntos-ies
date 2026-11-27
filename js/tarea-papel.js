@@ -69,7 +69,7 @@ var TareaPapel = (function () {
       if (p.k === 'generado' || p.k === 'recibido') prueba = !!est.numero;
       else if (p.k === 'firmado') prueba = !!doc && (Number(doc.firmas) || 0) >= firmasNecesarias(rec, est);
       else if (p.k === 'registrado') prueba = !!doc && (doc.registros || []).length > 0;
-      else if (p.k === 'enviado') prueba = !!doc && !!doc.enviado;   /* fila 705 */
+      else if (p.k === 'enviado') prueba = !!doc && (!!doc.enviado || (!rec.entra && RecorridoTipo.viaEsVentanilla(rec.via) && (doc.registros || []).length > 0));   /* filas 705 y 782: por la Ventanilla, el registro de salida ya es el envío */
       var m = manual[p.k];
       var texto = p.t;
       if (!(prueba || m) && p.k === 'firmado' && enFirma) texto = 'A la firma';
@@ -237,8 +237,14 @@ var TareaPapel = (function () {
     var n = 0;
     var lista = Hitos.guionDe(a, h).filter(function (g) { return g.papel && !g.noaplica; });
     for (var i = 0; i < lista.length; i++) {
-      var g = lista[i], todos = estado(a, g).todos;
-      if (todos && !g.hecho) { await Hitos.marcarGuion(a.nombre, h.id, g.id, { hecho: true }); n++; }
+      var g = lista[i], est = estado(a, g), todos = est.todos;
+      if (todos && !g.hecho) {
+        await Hitos.marcarGuion(a.nombre, h.id, g.id, { hecho: true }); n++;
+        /* Fila 782: enviado solo, por la Ventanilla, al llegar el registro de salida: la tarea que espera lo que vuelve salta igual que con «Marcar enviado». */
+        if (est.envio && RecorridoTipo.viaEsVentanilla(est.envio.via) && window.PapelEsperaRecibir && est.pasos.some(function (p) { return p.k === 'enviado' && p.hecho && !p.aMano && !p.quien; })) {
+          try { await PapelEsperaRecibir.alEnviar(a); } catch (e) { if (U.accesorio) U.accesorio('El papel está enviado, pero no he podido poner en espera la tarea de recibirlo', e); }
+        }
+      }
       else if (!todos && g.hecho) { await Hitos.deshacerGuion(a.nombre, h.id, g.id); n++; }
     }
     return n;

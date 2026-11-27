@@ -15,8 +15,8 @@ var PapelEnviado = (function () {
 
   /* El papel con el que el correo entiende a quién va (js/correo-para.js) y cómo se dice en el Registro. */
   var PAPEL = { 'Familia': 'legales', 'Interesado': 'interesado', 'Quien lo pide': 'pide', 'Tutor/a del grupo': 'tutor', 'Personas relacionadas': 'relac' };
-  var A_QUIEN = { 'Familia': 'la familia', 'Interesado': 'el interesado', 'Quien lo pide': 'quien lo pide', 'Tutor/a del grupo': 'el tutor o tutora del grupo', 'Personas relacionadas': 'las personas relacionadas' };
-  var POR = { 'en mano': 'en mano', 'correo postal': 'por correo postal', 'tablon': 'en el tablón', 'ipasen': 'por iPasen', 'correo electronico': 'por correo electrónico' };
+  var A_QUIEN = { 'Familia': 'la familia', 'Interesado': 'el interesado', 'Quien lo pide': 'quien lo pide', 'Tutor/a del grupo': 'el tutor o tutora del grupo', 'Personas relacionadas': 'las personas relacionadas', 'Otro centro u organismo': 'otro centro u organismo' };
+  var POR = { 'en mano': 'en mano', 'correo postal': 'por correo postal', 'tablon': 'en el tablón', 'ipasen': 'por iPasen', 'correo electronico': 'por correo electrónico', 'ventanilla electronica': 'por la Ventanilla Electrónica' };
   var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
   function esc(t) { return U.escapar(String(t == null ? '' : t)); }
