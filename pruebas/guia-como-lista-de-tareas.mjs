@@ -64,6 +64,10 @@ const der = pagina.locator('#gsh-der');   /* fila 737: la tarea elegida, a la de
 await comprobar('3. «Cuándo se hace» ofrece «Siempre» y «Solo si el tercero es…»', fila(1).click().then(() => der.locator('.cuando-campo option').allTextContents()).then((l) => l.slice(0, 2)), ['Siempre', 'Solo si el tercero es…']);
 await der.locator('.cuando-campo').selectOption({ label: 'Solo si el tercero es…' });
 await comprobar('3. salen las clases de tercero del tipo', der.locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await pagina.evaluate((t) => SoloSi.clasesDelTipo(t), TIPO));
+await der.locator('.cuando-campo').selectOption({ label: 'Solo si el alumno es de…' });
+await comprobar('3. «Solo si el alumno es de…» ofrece las tres enseñanzas y su nota', [await der.locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await der.locator('.cuando-nota').first().innerText()],
+  [['E.S.O.', 'Bachillerato', 'Formación Profesional'], 'En el asunto, si el alumno es de otra enseñanza, esto no sale.']);
+await der.locator('.cuando-campo').selectOption({ label: 'Solo si el tercero es…' });
 await der.locator('.cuando-valor[value="' + CLASE + '"]').check();   /* «Avisar al personal»: solo si el tercero es de su clase (sale) */
 await fila(2).click();
 await pagina.click('#gsh-subir');
@@ -123,6 +127,21 @@ await comprobar('8. con un tercero de otra clase la tarea no sale; con la suya, 
   const v = (valor) => ({ campos: { [SoloSi.CAMPO_TERCERO]: valor }, camposLista: { [SoloSi.CAMPO_TERCERO]: [c, otra] } });
   return [SoloSi.estado(si, v(c)), SoloSi.estado(si, v(otra)), SoloSi.estado(si, { campos: {}, camposLista: v(c).camposLista }), SoloSi.etiqueta(si)];
 }, [CLASE, OTRA]), ['sale', 'quita', 'falta', 'Solo si el tercero es ' + CLASE]);
+
+console.log('--- «Solo si»: la enseñanza del alumno (fila 781) ---');
+await comprobar('8b. con un alumno de ESO sale, de Bachillerato no, sin unidad «falta», y la etiqueta', pagina.evaluate(() => {
+  const si = SoloSi.normalizar({ campo: SoloSi.CAMPO_ENSENANZA, valores: ['E.S.O.'] });
+  const v = (valor) => ({ campos: valor ? { [SoloSi.CAMPO_ENSENANZA]: valor } : {}, camposLista: { [SoloSi.CAMPO_ENSENANZA]: SoloSi.ENSENANZAS } });
+  return [SoloSi.estado(si, v('E.S.O.')), SoloSi.estado(si, v('Bachillerato')), SoloSi.estado(si, v('')), SoloSi.etiqueta(si)];
+}), ['sale', 'quita', 'falta', 'Solo si el alumno es de E.S.O.']);
+await comprobar('8b. la enseñanza sale de la unidad (la Diversificación cuenta como E.S.O.)', pagina.evaluate(() =>
+  ['3º ESO A', '1º Bachillerato B', '2º FP Básica', '2º PMAR', 'sin número', ''].map((u) => SoloSi.ensenanzaDeUnidad(u))),
+  ['E.S.O.', 'Bachillerato', 'Formación Profesional', 'E.S.O.', '', '']);
+await comprobar('8b. en un asunto, la enseñanza de la unidad de su ficha', pagina.evaluate((k) => {
+  const a = SoloSi.asuntoDeClave(k);
+  const con = (g) => { a.ficha = Object.assign({}, a.ficha, { grupo: g }); const v = SoloSi.valoresDe(a); return [v.campos[SoloSi.CAMPO_ENSENANZA] || '', v.camposLista[SoloSi.CAMPO_ENSENANZA].length]; };
+  return [con('3º ESO A'), con('1º Bachillerato B')];
+}, NUEVO), [['E.S.O.', 3], ['Bachillerato', 3]]);
 
 console.log('--- «Solo si» con un dato de lista: «Falta: …» se rellena ahí mismo ---');
 await pagina.evaluate(async (t) => {
