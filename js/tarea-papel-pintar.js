@@ -68,14 +68,25 @@ var TareaPapelPintar = (function () {
     catch (e) { lista = []; }
     if (!boton.isConnected) return;
     var con = function (p) { generarCon(a, h, g, p, boton, guardar); };
-    if (lista.length === 1) { boton.onclick = function () { con(lista[0]); }; return; }
     boton.textContent = 'Generar documento ▾';
     var opciones = lista.map(function (p) { return { texto: p.nombre, alPulsar: function () { con(p); } }; });
     if (window.GenerarEnviarCabecera) {
       opciones.push({ texto: 'Otra plantilla…', alPulsar: function () { GenerarEnviarCabecera.otraPlantilla(a, boton, function (_a, p) { con(p); }); } });
+      opciones.push(unoYaHecho(a, h, g, boton, guardar));   /* fila 786 */
       opciones.push({ texto: '+ Nueva plantilla…', alPulsar: function () { GenerarEnviarCabecera.nuevaPlantilla(a, boton, function () { if (window.HitosPanel) HitosPanel.programarRepintado(); }); } });
     }
+    else opciones.push(unoYaHecho(a, h, g, boton, guardar));
     if (window.FichaMenus) FichaMenus.montar(boton, opciones);
+  }
+
+  /* Fila 786: «Añadir uno ya hecho…»: un documento que no sale de una plantilla de la app (el de Séneca, o el de otra persona del centro). */
+  function unoYaHecho(a, h, g, boton, guardar) {
+    return { texto: 'Añadir uno ya hecho…', clase: 'tp-ya-hecho-opcion', alPulsar: function () {
+      guardar(boton, 'abrir la ventana', async function () {
+        await Documentos.abrir(a, { irDirectoAAnadir: true, tipoDocumento: g.papel });   /* el tipo de la tarea ya puesto */
+        await TareaPapel.sincronizar(a, h, g.id);
+      });
+    } };
   }
 
   /* «Registrar» (fila 704): copia la ruta del documento, como el botón «Ruta», y deja la tarea con «Falta el sellado». */
