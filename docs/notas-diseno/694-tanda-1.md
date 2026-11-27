@@ -18,10 +18,10 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 
 ## ANULACIÓN MATRÍCULA (7 hitos → 6 tareas)
 
-1. Recibir la solicitud · Papel: SOLICITUD
-2. Resolución del director · Papel: RESOLUCION
+1. Recibir la solicitud · Papel: SOLICITUD-RESOLUCIÓN (se registra de entrada)
+2. Firma del director, registro de salida y envío · sin papel, se marca a mano · Cómo se hace: es el mismo documento de la tarea 1, ya resuelto. (Acordado con Francisco el 27-nov-2026: la solicitud y la resolución son un solo papel, que se registra de entrada y de salida en dos momentos. Mientras el recorrido no sepa hacerlo, idea 777, la segunda parte va a mano.)
 3. Anular la matrícula en Séneca y quitarle la unidad
-4. Avisar a Jefatura y a la tutoría del grupo
+4. Avisar a Jefatura y a la tutoría del grupo · con el correo «Comunicación baja matrícula»
 5. Certificado de entrega de libros · Papel: CERTIFICADO · Cómo se hace: de 1.º a 4.º de ESO; se envía por iPasen o por correo. (Junta «Certificado entrega de libros» y «Enviar el certificado».)
 6. Guardar el expediente en el archivo histórico
 
@@ -55,7 +55,7 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
-- ANULACIÓN: el hito «Enviar al Director» iba antes de registrar la solicitud. Lo he puesto después.
+- ~~ANULACIÓN: el orden de registrar y enviar al director~~ Resuelta el 27-nov-2026 (arriba, tarea 1 y 2).
 - ANULACIÓN: el certificado es «de 1.º a 4.º de ESO». Para que salga solo en ESO haría falta un «Solo si» con un dato de lista del asunto; de momento va en «Cómo se hace».
 - ABSENTISTA: el oficio lleva dos firmas (secretaria y visto bueno del director). El recorrido del tipo OFICIO tiene que decirlo.
 - TRAS. MATR. VIVA: el informe y el historial van al centro de destino. ¿Es su envío (recorrido del papel) o una tarea aparte como la 6?
