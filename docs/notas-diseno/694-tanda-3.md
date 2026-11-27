@@ -67,7 +67,6 @@ la de FUNCIÓN TUTORIAL, en el grupo D2.
 
 1. ~~El envío de CERTIFICADO~~ Resuelta el 27-nov-2026: el recorrido pasa a «a quien lo pide por correo electrónico», para alumnado y personal; lo que se mande por iPasen se marca con «Marcar enviado» («1»). Cambiado también en la tabla de `694-tanda-1.md`.
 2. ~~Copiar a la carpeta de Ausencias~~ Resuelta el 27-nov-2026: tarea pequeña de este tema, antes de aplicar las guías: «Copiar a otra carpeta» salta también en el molde nuevo cuando el papel de la tarea queda registrado («1»).
-3. Permiso: ¿se comunica la resolución al empleado (hay plantilla de correo), y entonces es una
-   tarea más?
+3. ~~Permiso: comunicar la resolución~~ Resuelta el 27-nov-2026: no se comunica, «al menos, de momento» («2»). No hay tarea; la plantilla no se borra.
 4. Prácticas: ¿qué hace Dirección con el proyecto (firmarlo, darle el visto bueno, solo saberlo)?
 5. Función tutorial: unir los dos tipos.
