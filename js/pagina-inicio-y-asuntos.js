@@ -235,11 +235,19 @@ document.write(`<div id="aplicacion" class="oculto">
       <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
 
       <div class="formulario">
-        <!-- Fila 629: fijos solo la fecha de inicio, el tipo y el tercero, en una fila de tres recuadros. -->
+        <!-- Fila 629 y 776: fijos solo el tercero, el tipo y la fecha de inicio, en una fila de tres recuadros, a todo el ancho. -->
         <div class="nuevo-tres-recuadros">
-          <div id="bloque-fecha" class="recuadro-nuevo recuadro-fecha">
-            <label class="recuadro-titulo" for="campo-fecha">Fecha de inicio</label>
-            <div class="recuadro-cuerpo"><input id="campo-fecha" type="date" class="campo"></div>
+          <div id="bloque-tercero" class="recuadro-nuevo">
+            <div class="recuadro-titulo" id="etiqueta-tercero">Tercero</div>
+            <div class="recuadro-cuerpo">
+              <p class="nota oculto" id="categorias-admite"></p>   <!-- fila 493: «TIPO admite: Otros · Administraciones.» -->
+              <div class="categorias" id="categorias-lista"></div>
+              <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
+              <button type="button" class="enlace" id="btn-grupo-nuevo">Es para un grupo de personas</button>   <!-- fila 293: js/asunto-de-grupo.js -->
+              <div id="actividad-nuevo-caja" class="oculto"></div>   <!-- fila 306: js/actividades-formulario.js -->
+              <div id="resultados-tercero" class="resultados"></div>
+              <div id="tercero-elegido" class="elegido oculto"></div>
+            </div>
           </div>
 
           <div id="bloque-tipos" class="recuadro-nuevo">
@@ -256,17 +264,9 @@ document.write(`<div id="aplicacion" class="oculto">
             </div>
           </div>
 
-          <div id="bloque-tercero" class="recuadro-nuevo">
-            <div class="recuadro-titulo" id="etiqueta-tercero">Tercero</div>
-            <div class="recuadro-cuerpo">
-              <p class="nota oculto" id="categorias-admite"></p>   <!-- fila 493: «TIPO admite: Otros · Administraciones.» -->
-              <div class="categorias" id="categorias-lista"></div>
-              <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
-              <button type="button" class="enlace" id="btn-grupo-nuevo">Es para un grupo de personas</button>   <!-- fila 293: js/asunto-de-grupo.js -->
-              <div id="actividad-nuevo-caja" class="oculto"></div>   <!-- fila 306: js/actividades-formulario.js -->
-              <div id="resultados-tercero" class="resultados"></div>
-              <div id="tercero-elegido" class="elegido oculto"></div>
-            </div>
+          <div id="bloque-fecha" class="recuadro-nuevo recuadro-fecha">
+            <label class="recuadro-titulo" for="campo-fecha">Fecha de inicio</label>
+            <div class="recuadro-cuerpo"><input id="campo-fecha" type="date" class="campo"></div>
           </div>
         </div>
 

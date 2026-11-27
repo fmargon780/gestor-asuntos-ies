@@ -1,15 +1,15 @@
 /* ============================================================
    nuevo-asunto-simple.css — «Nuevo asunto» más simple (fila 629,
    docs/629-NUEVO-ASUNTO-MAS-SIMPLE.md; pantalla de prueba
-   docs/pantallas/602.html): una fila de tres recuadros (fecha de
-   inicio, tipo, tercero) con el título sombreado, y «Datos del asunto»
+   docs/pantallas/602.html): una fila de tres recuadros (tercero,
+   tipo, fecha de inicio; fila 776) con el título sombreado, y «Datos del asunto»
    a todo el ancho debajo.
    ============================================================ */
 
 .cabecera-nuevo .titulo-escondido { display: none; }
 
 .nuevo-tres-recuadros {
-  display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: stretch; margin-bottom: 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 14px; align-items: stretch; margin-bottom: 14px;
 }
 @media (max-width: 900px) { .nuevo-tres-recuadros { grid-template-columns: 1fr; } }
 
