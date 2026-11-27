@@ -75,8 +75,17 @@ await comprobar('8. sin plantilla del tipo, el botón abre «Otra plantilla…»
   await pagina.waitForTimeout(300);
   const t = await pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')).map((x) => x.textContent));
   await pagina.keyboard.press('Escape');
-  return ['Otra plantilla…', '+ Nueva plantilla…'].every((x) => t.indexOf(x) !== -1);
+  return ['Otra plantilla…', 'Añadir uno ya hecho…', '+ Nueva plantilla…'].every((x) => t.indexOf(x) !== -1) && t.indexOf('Añadir uno ya hecho…') === t.indexOf('Otra plantilla…') + 1;
 })(), true);
+await comprobar('8b. «Añadir uno ya hecho…» abre la ventana de añadir con el tipo de la tarea puesto', (async () => {
+  await pagina.evaluate(() => { window.__abierto786 = null; window.__abrir786 = Documentos.abrir; Documentos.abrir = async (a, o) => { window.__abierto786 = o; }; });
+  await tareas().nth(0).locator('.tp-boton').click();
+  await pagina.waitForTimeout(300);
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Añadir uno ya hecho…' }).click();
+  await pagina.waitForTimeout(500);
+  const o = await pagina.evaluate(() => { const r = window.__abierto786; Documentos.abrir = window.__abrir786; return r; });
+  return o;
+})(), { irDirectoAAnadir: true, tipoDocumento: 'COMUNICACION' });
 
 console.log('--- los pasos se marcan solos con su prueba ---');
 await pagina.evaluate(async ([k, n]) => {
@@ -187,8 +196,14 @@ await pagina.evaluate(async (k) => {   /* el documento suelto D26-90003 se lo qu
 }, A);
 await repintar();
 const iOtra = (await hito()).findIndex((g) => g.texto === 'Tercera');
-await comprobar('32. con una sola plantilla del tipo, el botón la abre directamente (sin menú)', tareas().nth(iOtra).locator('.tp-boton').innerText(), 'Generar documento');
-await tareas().nth(iOtra).locator('.tp-boton').click();
+await comprobar('32. con una sola plantilla del tipo, el botón es un menú con esa plantilla la primera (fila 786)', (async () => {
+  const t = await tareas().nth(iOtra).locator('.tp-boton').innerText();
+  await tareas().nth(iOtra).locator('.tp-boton').click();
+  await pagina.waitForTimeout(300);
+  const o = await pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion')).map((x) => x.textContent));
+  return [t, o[0] !== 'Otra plantilla…' && o.indexOf('Añadir uno ya hecho…') !== -1];
+})(), ['Generar documento ▾', true]);
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').first().click();
 await pagina.waitForTimeout(1200);
 await comprobar('33. genera con esa plantilla, sin hito ni tarea de por medio', pagina.evaluate(() => window.__generadas), [['pl1', 0]]);
 await comprobar('34. el documento queda en la tarea que se pulsó, con la firma de la plantilla (1)', pagina.evaluate(async (k) => { const h = (await Hitos.hitosDe(k))[0]; const g = Hitos.guionDe(null, h).filter((x) => x.texto === 'Tercera')[0]; return [g.papelDoc.numero, g.papelDoc.firmas]; }, A), ['D26-90005', 1]);
