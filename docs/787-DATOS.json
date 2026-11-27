@@ -1,0 +1,704 @@
+{
+ "version": 1,
+ "fuente": "docs/787-PASAR-LOS-TIPOS-AL-MOLDE-NUEVO.md. Hecho por Claude el 27-nov-2026 con las cinco tandas (docs/notas-diseno/694-tanda-1.md a -5.md) y su repaso (694-repaso.md) contra _GESTOR de la cuenta común del 26-nov-2026. Los tipos se buscan por su nombre exacto.",
+ "unirTipos": [
+  {
+   "desaparece": "Certificado de desempeño de la función tutorial",
+   "seQueda": "FUNCIÓN TUTORIAL"
+  }
+ ],
+ "unirTiposDocumento": [
+  {
+   "desaparece": "CALENDARIO DE COORDINACIÓN",
+   "seQueda": "CALENDARIO COORDINACIÓN"
+  }
+ ],
+ "tiposDocumentoNuevos": [
+  "EXPEDIENTE DE TRASLADO",
+  "INFORME VALORACIÓN",
+  "CONFORMIDAD SERVICIO"
+ ],
+ "recorridos": {
+  "MATRICULA": {
+   "entra": true,
+   "registro": true
+  },
+  "SOLICITUD": {
+   "entra": true,
+   "registro": true
+  },
+  "SOLICITUD-RESOLUCIÓN": {
+   "entra": true,
+   "registro": true
+  },
+  "RESOLUCION": {
+   "entra": true,
+   "registro": true
+  },
+  "OFICIO": {
+   "entra": false,
+   "firma": "Secretaría, con visto bueno de Dirección",
+   "registro": true,
+   "envia": true,
+   "aquien": "Otro centro u organismo",
+   "via": "Correo electrónico"
+  },
+  "CERTIFICADO": {
+   "entra": false,
+   "firma": "Secretaría, con visto bueno de Dirección",
+   "registro": true,
+   "envia": true,
+   "aquien": "Quien lo pide",
+   "via": "Correo electrónico"
+  },
+  "AJUSTE PLANIFICACIÓN": {
+   "entra": false,
+   "firma": "Nadie",
+   "registro": false,
+   "envia": true,
+   "aquien": "Otro centro u organismo",
+   "via": "Correo electrónico"
+  },
+  "INFORME PERSONAL TRASLADO": {
+   "entra": false,
+   "firma": "Dirección",
+   "registro": true,
+   "envia": true,
+   "aquien": "Otro centro u organismo",
+   "via": "Ventanilla Electrónica"
+  },
+  "HISTORIAL ACADÉMICO": {
+   "entra": false,
+   "firma": "Dirección",
+   "registro": true,
+   "envia": true,
+   "aquien": "Otro centro u organismo",
+   "via": "Ventanilla Electrónica"
+  },
+  "FICHA ENTREGA LIBROS": {
+   "entra": false,
+   "firma": "Nadie",
+   "registro": false,
+   "envia": false,
+   "aquien": "",
+   "via": ""
+  },
+  "EXPEDIENTE DE TRASLADO": {
+   "entra": true,
+   "registro": true
+  },
+  "DNI": {
+   "entra": true,
+   "registro": false
+  },
+  "REQUERIMIENTO": {
+   "entra": false,
+   "firma": "Secretaría",
+   "registro": true,
+   "envia": true,
+   "aquien": "Familia",
+   "via": "iPasen"
+  },
+  "JUSTIFICACION": {
+   "entra": true,
+   "registro": true
+  },
+  "SOLICITUD PERMISOS": {
+   "entra": true,
+   "registro": true
+  },
+  "PROY. PRÁCTICAS": {
+   "entra": true,
+   "registro": true
+  },
+  "INFORME VALORACIÓN": {
+   "entra": false,
+   "firma": "Nadie",
+   "registro": true,
+   "envia": false,
+   "aquien": "",
+   "via": ""
+  },
+  "RECEPCIÓN": {
+   "entra": true,
+   "registro": true
+  },
+  "AITE - RECIBÍ GENÉRICO": {
+   "entra": true,
+   "registro": true
+  },
+  "CALENDARIO COORDINACIÓN": {
+   "entra": true,
+   "registro": false
+  },
+  "CONVOCATORIA": {
+   "entra": true,
+   "registro": true
+  },
+  "CONFORMIDAD SERVICIO": {
+   "entra": false,
+   "firma": "Secretaría",
+   "registro": true,
+   "envia": true,
+   "aquien": "Interesado",
+   "via": "Correo electrónico"
+  }
+ },
+ "sinRecorridoAProposito": [
+  "COMUNICACION",
+  "INFORME",
+  "CREDENCIAL IPASEN"
+ ],
+ "aQuienSeEspera": [
+  "Familia",
+  "Jefatura de Estudios",
+  "Centro de origen",
+  "Orientación",
+  "Equipo educativo"
+ ],
+ "campos": [
+  {
+   "nombre": "¿Hay que subsanar?",
+   "clase": "lista",
+   "valores": [
+    "Sí",
+    "No"
+   ],
+   "tipos": [
+    "ADMISION"
+   ]
+  },
+  {
+   "nombre": "Fecha de la ausencia",
+   "clase": "fecha",
+   "valores": [],
+   "tipos": [
+    "JUSTIFICACION FALTAS PAS"
+   ]
+  },
+  {
+   "nombre": "Tipo de ausencia",
+   "clase": "lista",
+   "valores": [
+    "Falta",
+    "Baja",
+    "Alta"
+   ],
+   "tipos": [
+    "JUSTIFICACION FALTAS PAS"
+   ]
+  },
+  {
+   "nombre": "Estado de los libros",
+   "deLaPlantilla": "plantillas/devolucion-libros.md",
+   "tipos": [
+    "ANULACIÓN MATRÍCULA",
+    "TRAS. MATR. VIVA"
+   ]
+  },
+  {
+   "nombre": "¿A quién va el informe?",
+   "clase": "lista",
+   "valores": [
+    "A la familia, por el tutor",
+    "Fuera del centro"
+   ],
+   "tipos": [
+    "INFORME VALORACIÓN EQUIPO EDUCATIVO"
+   ]
+  },
+  {
+   "nombre": "Mes del servicio",
+   "clase": "texto",
+   "valores": [],
+   "tipos": [
+    "CONFORMIDAD"
+   ]
+  },
+  {
+   "nombre": "Cómo llega la petición",
+   "yaExiste": true,
+   "obligatorio": true,
+   "tipos": [
+    "IPASEN TUTOR LEGAL"
+   ]
+  },
+  {
+   "nombre": "Curso Abono AITE",
+   "yaExiste": true,
+   "obligatorio": true,
+   "tipos": [
+    "PAGO AYUDA TRANSPORTE"
+   ]
+  }
+ ],
+ "guias": {
+  "MATRICULA": [
+   {
+    "texto": "Recibir la matrícula",
+    "papel": "MATRICULA",
+    "comoSeHace": "En un traslado de matrícula viva, durante el curso, tiene que traer el certificado de entrega de libros."
+   },
+   {
+    "texto": "Pasar la matrícula a Jefatura para asignar unidad y optativas",
+    "esperaA": "Jefatura de Estudios"
+   },
+   {
+    "texto": "Comprobar en Séneca la unidad y las optativas",
+    "comoSeHace": "Si Jefatura no las ha grabado, grabarlas."
+   },
+   {
+    "texto": "Preparar la ficha de entrega de libros",
+    "papel": "FICHA ENTREGA LIBROS"
+   },
+   {
+    "texto": "Comunicar la incorporación al equipo educativo",
+    "comoSeHace": "Con «Enviar ▾», por correo; se marca a mano."
+   },
+   {
+    "texto": "Entregar el horario de su unidad"
+   },
+   {
+    "texto": "Comprobar la foto en Séneca",
+    "comoSeHace": "Si no la tiene, hacerla y subirla a su ficha."
+   },
+   {
+    "texto": "Guardar la matrícula en el expediente"
+   }
+  ],
+  "ANULACIÓN MATRÍCULA": [
+   {
+    "texto": "Recibir la solicitud",
+    "papel": "SOLICITUD-RESOLUCIÓN"
+   },
+   {
+    "texto": "Firma del director, registro de salida y envío",
+    "comoSeHace": "Es el mismo documento de la tarea anterior, ya resuelto: lo firma el director, se registra de salida y se envía. Se marca a mano."
+   },
+   {
+    "texto": "Anular la matrícula en Séneca y quitarle la unidad"
+   },
+   {
+    "texto": "Avisar a Jefatura y a la tutoría del grupo",
+    "comoSeHace": "Con «Enviar ▾», el correo «Comunicación baja matrícula»; se marca a mano."
+   },
+   {
+    "texto": "Certificado de devolución de libros",
+    "papel": "CERTIFICADO",
+    "soloSi": {
+     "campo": "Enseñanza del alumno",
+     "valores": [
+      "E.S.O."
+     ]
+    },
+    "comoSeHace": "Con la plantilla «Devolución de libros de gratuidad». Se envía por iPasen o por correo."
+   },
+   {
+    "texto": "Guardar el expediente en el archivo histórico"
+   }
+  ],
+  "TRANSPORTE": [
+   {
+    "texto": "Recibir la solicitud",
+    "papel": "SOLICITUD"
+   },
+   {
+    "texto": "Ajuste de planificación a la Delegación",
+    "papel": "AJUSTE PLANIFICACIÓN",
+    "comoSeHace": "A partir del 1 de octubre; por el correo corporativo del centro."
+   },
+   {
+    "texto": "Recibir la resolución",
+    "papel": "RESOLUCION"
+   },
+   {
+    "texto": "Grabar en Séneca la solicitud con su resultado"
+   },
+   {
+    "texto": "Hacer el carné de transporte"
+   }
+  ],
+  "ALUMNADO ABSENTISTA": [
+   {
+    "texto": "Revisar y escanear los protocolos"
+   },
+   {
+    "texto": "Oficio a Servicios Sociales con la relación de alumnado absentista",
+    "papel": "OFICIO",
+    "comoSeHace": "Firma la secretaria con el visto bueno del director; se envía por el correo corporativo."
+   }
+  ],
+  "TRAS. MATR. VIVA": [
+   {
+    "texto": "Informe personal por traslado",
+    "papel": "INFORME PERSONAL TRASLADO",
+    "comoSeHace": "Sale de Séneca. «Poner a la firma» es subirlo a la Ventanilla Electrónica y pasarlo a la firma del director; al llegar el PDF de la Ventanilla, queda firmado, registrado y enviado."
+   },
+   {
+    "texto": "Historial académico",
+    "papel": "HISTORIAL ACADÉMICO",
+    "comoSeHace": "Igual que el informe personal."
+   },
+   {
+    "texto": "Confirmar el traslado en Séneca y quitarle la unidad"
+   },
+   {
+    "texto": "Avisar a Jefatura"
+   },
+   {
+    "texto": "Certificado de devolución de libros",
+    "papel": "CERTIFICADO",
+    "soloSi": {
+     "campo": "Enseñanza del alumno",
+     "valores": [
+      "E.S.O."
+     ]
+    },
+    "comoSeHace": "Con la plantilla «Devolución de libros de gratuidad». A la familia, por iPasen o por correo; también va al centro de destino."
+   }
+  ],
+  "ADMISION": [
+   {
+    "texto": "Recibir la solicitud de admisión",
+    "papel": "SOLICITUD"
+   },
+   {
+    "texto": "Requerir que subsane",
+    "papel": "REQUERIMIENTO",
+    "soloSi": {
+     "campo": "¿Hay que subsanar?",
+     "valores": [
+      "Sí"
+     ]
+    },
+    "esperaA": "Familia"
+   },
+   {
+    "texto": "Avisar a la familia de que ha sido admitido y tiene que formalizar la matrícula, en 2 días hábiles",
+    "comoSeHace": "Con «Enviar ▾», por correo o iPasen; se marca a mano."
+   }
+  ],
+  "IDENTIFICACION ALUMNO": [
+   {
+    "texto": "Guardar el documento de identidad",
+    "papel": "DNI",
+    "comoSeHace": "Si es pasaporte o NIE, se guarda igual."
+   },
+   {
+    "texto": "Anotar el documento en Séneca"
+   }
+  ],
+  "IDENTIFICACION TUTOR LEGAL": [
+   {
+    "texto": "Guardar el documento de identidad",
+    "papel": "DNI",
+    "comoSeHace": "Si es pasaporte o NIE, se guarda igual."
+   },
+   {
+    "texto": "Anotar el documento en Séneca"
+   }
+  ],
+  "TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN": [
+   {
+    "texto": "Pedir al centro de origen el informe personal y el historial",
+    "papel": "OFICIO",
+    "soloSi": {
+     "campo": "¿El Expediente Académico del Alumno está en Séneca?",
+     "valores": [
+      "No"
+     ]
+    },
+    "comoSeHace": "Con la plantilla «Petición del historial al centro de procedencia»."
+   },
+   {
+    "texto": "Recibir la documentación del centro de origen",
+    "papel": "EXPEDIENTE DE TRASLADO",
+    "soloSi": {
+     "campo": "¿El Expediente Académico del Alumno está en Séneca?",
+     "valores": [
+      "No"
+     ]
+    },
+    "esperaA": "Centro de origen",
+    "comoSeHace": "Llega por correo postal o por la Bandeja del registro de entrada; trae el informe personal y el historial. Si llega por la bandeja, se añade desde esta tarea."
+   },
+   {
+    "texto": "Anotar en Séneca las asignaturas pendientes",
+    "comoSeHace": "Si las tiene, anotarlas como pendientes en su matrícula."
+   },
+   {
+    "texto": "Pedir al centro de origen el expediente en papel",
+    "papel": "OFICIO",
+    "comoSeHace": "Con la plantilla «Petición del historial al centro de procedencia»."
+   },
+   {
+    "texto": "Recibir el expediente en papel",
+    "papel": "EXPEDIENTE DE TRASLADO",
+    "esperaA": "Centro de origen",
+    "comoSeHace": "Si llega por la bandeja, se añade desde esta tarea."
+   },
+   {
+    "texto": "Guardar la documentación en el expediente del alumno"
+   }
+  ],
+  "CERTIFICADO PERSONAL": [
+   {
+    "texto": "Hacer el certificado",
+    "papel": "CERTIFICADO",
+    "comoSeHace": "Elige la plantilla según lo que pide: servicios prestados, asistencia de septiembre, funciones y horario, actividad extraescolar, texto libre…"
+   }
+  ],
+  "JUSTIFICACION FALTAS PAS": [
+   {
+    "texto": "Recibir la justificación",
+    "papel": "JUSTIFICACION"
+   },
+   {
+    "texto": "Copiar el justificante registrado a la carpeta de Ausencias",
+    "copiar": {
+     "nombre": "{campo:Fecha de la ausencia} {campo:Tipo de ausencia} {nombre}"
+    }
+   },
+   {
+    "texto": "Entregar el original a Jefatura de Estudios Adjunta"
+   }
+  ],
+  "PERMISO": [
+   {
+    "texto": "Recibir la solicitud de permiso",
+    "papel": "SOLICITUD PERMISOS"
+   },
+   {
+    "texto": "Copiar la solicitud registrada a la carpeta de Ausencias",
+    "copiar": {
+     "nombre": "{tipo} {nombre}"
+    }
+   }
+  ],
+  "PROY. PRÁCTICAS": [
+   {
+    "texto": "Recibir el proyecto de prácticas",
+    "papel": "PROY. PRÁCTICAS"
+   },
+   {
+    "texto": "Enviarlo por correo al profesor",
+    "comoSeHace": "Con «Enviar ▾» de la cabecera; se marca a mano."
+   },
+   {
+    "texto": "Enviárselo a Dirección para que lo sepa",
+    "comoSeHace": "Con «Enviar ▾» de la cabecera; se marca a mano."
+   }
+  ],
+  "COBRO SEGURO ESCOLAR": [
+   {
+    "texto": "Anotar el cobro del seguro escolar",
+    "comoSeHace": "Importe 1,12 €; se cobra de 3.º de la ESO en adelante."
+   }
+  ],
+  "PAGO AYUDA TRANSPORTE": [
+   {
+    "texto": "Pedir a la familia el número de cuenta",
+    "esperaA": "Familia",
+    "comoSeHace": "Con «Enviar ▾», el correo «Abono ayuda transporte escolar»."
+   },
+   {
+    "texto": "Pasar la documentación recibida a Secretaría para que haga la transferencia",
+    "comoSeHace": "Descargar lo que manda la familia y enviárselo a Secretaría."
+   },
+   {
+    "texto": "Avisar a la familia de la transferencia y citarla a firmar el recibí en Secretaría",
+    "comoSeHace": "Con «Enviar ▾», el correo «Ayuda Individualizada para el Transporte Escolar (AITE) – Firma de recibí»; se marca a mano."
+   },
+   {
+    "texto": "Guardar el recibí firmado",
+    "papel": "AITE - RECIBÍ GENÉRICO",
+    "comoSeHace": "Se imprime con la plantilla (al generarlo, la tarea ya dice «Recibido»); lo firma en Secretaría quien viene, se escanea y se registra de entrada."
+   }
+  ],
+  "Evaluación psicopedagógica y alumnado NEAE": [
+   {
+    "texto": "Registrar la solicitud de la familia",
+    "papel": "SOLICITUD"
+   },
+   {
+    "texto": "Enviar al Departamento de Orientación el registro de la documentación entregada",
+    "comoSeHace": "Con «Enviar ▾», el correo «Envío del Registro de Entrada de Documentación por los padres»; se marca a mano."
+   },
+   {
+    "texto": "Registrar el recibí de Orientación",
+    "papel": "RECEPCIÓN",
+    "esperaA": "Orientación",
+    "comoSeHace": "Cuando llegue, con su fecha exacta."
+   }
+  ],
+  "INFORME VALORACIÓN EQUIPO EDUCATIVO": [
+   {
+    "texto": "Recibir la solicitud del informe",
+    "papel": "SOLICITUD"
+   },
+   {
+    "texto": "Recoger el informe del equipo educativo",
+    "papel": "INFORME VALORACIÓN",
+    "esperaA": "Equipo educativo",
+    "comoSeHace": "Lo escribe el equipo educativo: cuando llegue, se añade aquí con «Añadir uno ya hecho…». Se registra de salida siempre."
+   },
+   {
+    "texto": "Dar el informe al tutor para que lo entregue a la familia",
+    "soloSi": {
+     "campo": "¿A quién va el informe?",
+     "valores": [
+      "A la familia, por el tutor"
+     ]
+    }
+   },
+   {
+    "texto": "Enviar el informe",
+    "soloSi": {
+     "campo": "¿A quién va el informe?",
+     "valores": [
+      "Fuera del centro"
+     ]
+    },
+    "comoSeHace": "Con «Enviar ▾» de la cabecera; se marca a mano."
+   }
+  ],
+  "COMUNICACIÓN RECIBIDA": [
+   {
+    "texto": "Descargar la comunicación de la Bandeja Electrónica y guardarla",
+    "papel": "COMUNICACION",
+    "comoSeHace": "Apuntar su asunto en el dato «Asunto Comunicado»."
+   },
+   {
+    "texto": "Reenviarla a quien va dirigida",
+    "comoSeHace": "Con «Enviar ▾», el correo «Comunicaciones recibidas por Bandeja Electrónica»; añadir lo que ponga en observaciones del registro de entrada. Se marca a mano."
+   }
+  ],
+  "CONFORMIDAD": [
+   {
+    "texto": "Dar la conformidad del mes a la empresa de limpieza",
+    "papel": "CONFORMIDAD SERVICIO",
+    "comoSeHace": "El correo lleva copia al correo del centro."
+   }
+  ],
+  "INFORME EDITORIAL": [
+   {
+    "texto": "Sacar el informe en BD Alumnado y guardarlo",
+    "papel": "INFORME",
+    "comoSeHace": "En BD Alumnado, «Informe Editorial»."
+   },
+   {
+    "texto": "Enviar el informe a la editorial",
+    "comoSeHace": "Con «Enviar ▾», el correo «Informe Editoriales»; se marca a mano."
+   }
+  ],
+  "PROGRAMA DE TRÁNSITO": [
+   {
+    "texto": "Recibir de Jefatura de Estudios el calendario de coordinación",
+    "papel": "CALENDARIO COORDINACIÓN"
+   },
+   {
+    "texto": "Enviarlo a los colegios adscritos",
+    "comoSeHace": "Con «Enviar ▾», el correo «Envío del calendario de coordinación del Programa de Tránsito»; se marca a mano."
+   }
+  ],
+  "REUNIÓN C.M. ABSENTISMO ESCOLAR": [
+   {
+    "texto": "Registrar la convocatoria de la Comisión Municipal de Absentismo",
+    "papel": "CONVOCATORIA"
+   },
+   {
+    "texto": "Enviársela a Dirección",
+    "comoSeHace": "Con «Enviar ▾» de la cabecera; se marca a mano."
+   }
+  ],
+  "SOLICITUD NACIONALIDAD": [
+   {
+    "texto": "Pedir a los tutores el documento de nacionalidad"
+   }
+  ]
+ },
+ "guiaCopiada": [
+  {
+   "tipo": "IPASEN TUTOR LEGAL",
+   "de": "IPASEN ALUMNADO",
+   "sinLasQueMiran": "¿Quién hace la solicitud?",
+   "nota": "De la lista de tareas de IPASEN ALUMNADO que haya en el centro: se quita la tarea cuyo «Solo si» es «¿Quién hace la solicitud?: Otra persona»; a las demás se les quita el «Solo si» de ese dato (quedan «Siempre») y se conserva el de «Cómo llega la petición», el papel y «Cómo se hace»."
+  }
+ ],
+ "guiasVacias": [
+  "PLAN DIRECTOR",
+  "PROGRAMA",
+  "ADAPTACIÓN PAU",
+  "BECA",
+  "CAMBIO OPTATIVA",
+  "CERT. EXP. BACH",
+  "CONVALIDACION MATERIA",
+  "DOCUMENTACION",
+  "INFORME URGENCIAS",
+  "PEDIDO",
+  "CERTIFICADO ACTIVIDADES EXTRAESCOLARES",
+  "COM. PRODUCTIVIDAD",
+  "DATOS PERSONAL INTERINO",
+  "DESEMPEÑO FUNCIONES",
+  "FLEXIBILIDAD",
+  "INFORME UNGENCIAS",
+  "CONSTITUCION JUNTA ELECTORAL",
+  "INFORME FINAL ETAPA",
+  "PROTOCOLO CONDUCTAS SUICIDAS",
+  "ABSENTISMO CONV. REUNIÓN",
+  "ATENCIÓN DOMICILIARIA",
+  "AYUDA NEAE",
+  "CERTIFICADO",
+  "INFORMACION PERSONAL",
+  "INSTANCIA DIRECTOR",
+  "PETICIÓN INFORME",
+  "RECLAMACION",
+  "SANCION",
+  "ALTAS CAPACIDADES",
+  "PARADA TTE. ESCOLAR"
+ ],
+ "correos": [
+  {
+   "tipo": "PAGO AYUDA TRANSPORTE",
+   "nombre": "Abono ayuda transporte escolar",
+   "cambiar": [
+    [
+     "correspondiente al curso 2024/2025",
+     "correspondiente al curso {campo:Curso Abono AITE}"
+    ]
+   ]
+  },
+  {
+   "tipo": "COMUNICACIÓN RECIBIDA",
+   "nombre": "Comunicaciones recibidas por Bandeja Electrónica",
+   "cambiar": [
+    [
+     "Asunto: ",
+     "Asunto: {campo:Asunto Comunicado}"
+    ]
+   ],
+   "adjuntar": "COMUNICACION"
+  },
+  {
+   "tipo": "PROGRAMA DE TRÁNSITO",
+   "nombre": "Envío del calendario de coordinación del Programa de Tránsito",
+   "cambiar": [
+    [
+     "el {hito} de coordinación",
+     "el calendario de coordinación"
+    ]
+   ]
+  },
+  {
+   "tipo": "CONFORMIDAD",
+   "nuevo": true,
+   "nombre": "Conformidad con el servicio",
+   "texto": "Adjunto le enviamos la conformidad con el servicio de limpieza del mes de {campo:Mes del servicio}.",
+   "adjuntar": "CONFORMIDAD SERVICIO",
+   "para": [
+    "interesado"
+   ],
+   "copia": "el correo del centro"
+  }
+ ]
+}
