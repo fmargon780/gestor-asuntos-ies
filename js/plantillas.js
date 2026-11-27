@@ -414,6 +414,12 @@ var Plantillas = (function () {
     if (/^campo\s*:/i.test(clave)) {
       var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
       var valorCampo = buscarCampo(valores.campos, nombreCampo);
+      /* Fila 773: `{campo:Quién (DNI)}` y hermanos valen sin el campo entero: se pide la persona (una vez) y su DNI o «en calidad de». */
+      var hermano = window.PersonaDelAsunto ? PersonaDelAsunto.hermano(nombreCampo) : null;
+      if (hermano) {
+        var delHermano = PersonaDelAsunto.resolverHermano(hermano, valorCampo, nombreCampo, valores, faltan);
+        if (delHermano !== null) return { encontrado: true, valor: delHermano };
+      }
       /* Fila 747: «Una persona del asunto» sin DNI: se pide «DNI de <campo>». */
       var sinDni = valorCampo && valores.campos && valores.campos.sinDni && valores.campos.sinDni[U.normalizar(nombreCampo)];
       if (sinDni) {

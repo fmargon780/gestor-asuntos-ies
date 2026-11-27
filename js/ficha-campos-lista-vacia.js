@@ -63,6 +63,7 @@ var FichaCamposListaVacia = (function () {
 
   function alPintar(caja, a) {
     engancharCambiar(caja, a);
+    if (window.PersonaCalidad) PersonaCalidad.enganchar(caja, a);   /* fila 773: «En calidad de» */
     Array.prototype.forEach.call(caja.querySelectorAll('.ficha-dato-elegir'), function (el) {
       el.onchange = async function () {
         if (el.dataset.guardando || !el.value) return;

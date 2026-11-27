@@ -12,7 +12,13 @@
    y `persona` lleva su DNI, teléfono y correo) y se cambia como cualquier otro
    dato (`DatosDelAsunto.guardar`, el «Cambiar» de la fila 738). El documento lleva
    «Nombre, con DNI X»; el resto queda en campos hermanos para otras plantillas:
-   `{campo:Quién recibe (nombre)}`, `(DNI)`, `(teléfono)` y `(correo)`.
+   `{campo:Quién recibe (nombre)}`, `(DNI)`, `(teléfono)`, `(correo)` y `(en calidad de)`.
+
+   Fila 773 (docs/773-PERSONA-ELEGIDA-COMPLETA.md): esos campos hermanos valen
+   solos, sin el campo entero (`hermano`, `resolverHermano`: la plantilla pregunta
+   «¿Quién?» una vez), y «en calidad de» (padre, madre, alumna…) lo propone la app
+   según de dónde sale la persona (`calidadPorClase`) y se cambia con el dato
+   «En calidad de <campo>» (js/persona-del-asunto-calidad.js).
 
    De una persona sin DNI en los datos del centro (escrita a mano en «Quién lo
    pide»), el documento pide «DNI de <campo>» como cualquier dato que falta y lo
@@ -63,6 +69,17 @@ var PersonaDelAsunto = (function () {
     [1, 2].forEach(function (n) { valores['tutor' + n + 'dni'] = persona ? dniDeTutor(persona.campos, n) : ''; });
   }
 
+  /* Fila 773: «en calidad de» por defecto, según la clase de la persona y su sexo (`H`, `M` o nada). */
+  function calidadPorClase(categoria, sexo) {
+    var c = String(categoria || '').toUpperCase();
+    if (c === 'ALUMNADO') return sexo === 'H' ? 'alumno' : (sexo === 'M' ? 'alumna' : 'alumno/a');
+    if (c === 'TUTORES LEGALES') return sexo === 'H' ? 'padre' : (sexo === 'M' ? 'madre' : 'tutor/a legal');
+    if (c === 'PERSONAL') return 'personal del centro';
+    return '';
+  }
+
+  function sexoDe(v, quien) { return (v && v.sexos && v.sexos[quien]) || ''; }
+
   function fichaDe(a) { return (window.DatosDelAsunto ? DatosDelAsunto.fichaDe(a) : (a && a.ficha)) || {}; }
 
   /* Las personas del asunto, en este orden: el tercero, quien lo pide, los relacionados y los tutores.
@@ -76,18 +93,19 @@ var PersonaDelAsunto = (function () {
     function poner(p) {
       if (p.nombre && window.Plantillas && Plantillas.nombreNaturalDe) { p.busca = p.nombre; p.nombre = Plantillas.nombreNaturalDe(p.nombre, p.categoria); }
       if (!p.nombre || lista.some(function (x) { return norm(x.nombre) === norm(p.nombre); })) return;
-      lista.push(Object.assign({ relacion: '', categoria: '', busca: '', dni: '', telefono: '', correo: '', custodia: false }, p));
+      lista.push(Object.assign({ relacion: '', categoria: '', busca: '', dni: '', telefono: '', correo: '', custodia: false, calidad: '' }, p));
     }
     if (!esGrupo && (v.nombreNatural || v.nombre)) {
-      poner({ nombre: v.nombreNatural || v.nombre, relacion: 'el tercero', categoria: categoria, dni: v.dni, telefono: v.telefono, correo: v.correo });
+      poner({ nombre: v.nombreNatural || v.nombre, relacion: 'el tercero', categoria: categoria, dni: v.dni, telefono: v.telefono, correo: v.correo,
+        calidad: calidadPorClase(categoria, sexoDe(v, 'tercero')) });
     }
     var d = f.loPide;
     if (d && d.nombre && norm(d.relacion) !== norm('El propio interesado')) {
       poner({ nombre: d.nombre, relacion: (d.relacion ? d.relacion + ', ' : '') + 'quien lo pide', categoria: d.categoria || '',
-        telefono: d.telefono, correo: d.correo });
+        telefono: d.telefono, correo: d.correo, calidad: String(d.relacion || '').trim().toLowerCase() || calidadPorClase(d.categoria || '', '') });
     }
     (f.relacionados || []).forEach(function (r) {
-      if (r && r.nombre && norm(r.nombre) !== norm(f.tercero)) poner({ nombre: r.nombre, relacion: r.rol || r.relacion || '', categoria: r.categoria || '' });
+      if (r && r.nombre && norm(r.nombre) !== norm(f.tercero)) poner({ nombre: r.nombre, relacion: r.rol || r.relacion || '', categoria: r.categoria || '', calidad: calidadPorClase(r.categoria || '', '') });
     });
     if (categoria === 'ALUMNADO' && !esGrupo) {
       [1, 2].forEach(function (n) {
@@ -95,7 +113,7 @@ var PersonaDelAsunto = (function () {
         if (!nombre) return;
         poner({ nombre: nombre, relacion: 'Tutor legal ' + n, categoria: 'TUTORES LEGALES', dni: v['tutor' + n + 'dni'],
           telefono: v['tutor' + n + 'telefono'], correo: v['tutor' + n + 'correo'],
-          custodia: !!v.custodiaDeSeneca && norm(v.custodiaDeSeneca) === norm(nombre) });
+          custodia: !!v.custodiaDeSeneca && norm(v.custodiaDeSeneca) === norm(nombre), calidad: calidadPorClase('TUTORES LEGALES', sexoDe(v, 'tutor' + n)) });
       });
     }
     return lista;
@@ -145,15 +163,17 @@ var PersonaDelAsunto = (function () {
     if (!p) return { ok: false, aviso: 'Elige una de las personas de la lista.' };
     var c = await delCentro(p);
     await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, clave, {
-      valor: p.nombre, persona: { dni: c.dni, telefono: c.telefono, correo: c.correo, relacion: p.relacion },
+      valor: p.nombre, persona: { dni: c.dni, telefono: c.telefono, correo: c.correo, relacion: p.relacion, calidad: p.calidad },
       anadir: r.delAsunto ? undefined : r.entrada
     });
     /* Un DNI escrito a mano era de la persona de antes: al cambiar de persona se quita. */
     var campoNombre = Campos.nombreDeCampo(r.entrada, App.E.campos);
     if (anterior && norm(anterior) !== norm(p.nombre)) {
       try { await DatosDelAsunto.guardar(a, 'DNI de ' + campoNombre, ''); } catch (e) { /* no había */ }
+      try { await DatosDelAsunto.guardar(a, 'En calidad de ' + campoNombre, ''); } catch (e) { /* no había */ }   /* fila 773 */
     }
-    return { ok: true, valor: p.nombre, clave: clave, sinDni: !c.dni, paraDocumento: textoDe(p.nombre, c.dni) };
+    return { ok: true, valor: p.nombre, clave: clave, sinDni: !c.dni, sinCalidad: !p.calidad, paraDocumento: textoDe(p.nombre, c.dni),
+      hermanos: { nombre: p.nombre, dni: c.dni, telefono: c.telefono, correo: c.correo, calidad: p.calidad } };
   }
 
   /* ---------- lo que lleva el documento (js/plantillas-valores.js, `camposDelAsuntoDe`) ---------- */
@@ -172,7 +192,7 @@ var PersonaDelAsunto = (function () {
      (`salida.sinDni`, que el documento usa para pedir «DNI de …»). */
   function cerrar(salida) {
     if (!salida.personas) return;
-    var sinDni = {};
+    var sinDni = {}, sinCalidad = {};
     Object.keys(salida.personas).forEach(function (nombre) {
       var g = salida.personas[nombre], pe = g.persona || {};
       var dni = pe.dni || limpiarDni(buscar(salida, 'DNI de ' + nombre));
@@ -181,30 +201,101 @@ var PersonaDelAsunto = (function () {
       salida[nombre + ' (DNI)'] = dni;
       salida[nombre + ' (teléfono)'] = pe.telefono || '';
       salida[nombre + ' (correo)'] = pe.correo || '';
+      var calidad = buscar(salida, 'En calidad de ' + nombre) || pe.calidad || '';   /* lo escrito a mano manda (fila 773) */
+      salida[nombre + ' (en calidad de)'] = calidad;
       if (!dni) sinDni[norm(nombre)] = nombre;
+      if (!calidad) sinCalidad[norm(nombre)] = nombre;
     });
     Object.defineProperty(salida, 'sinDni', { value: sinDni, enumerable: false });
+    Object.defineProperty(salida, 'sinCalidad', { value: sinCalidad, enumerable: false });
   }
 
-  /* El cuadro que pide el DNI de una persona recién elegida que no lo tiene; lo guarda como «DNI de <campo>» en el asunto. */
-  async function pedirDni(a, campo, nombre) {
-    var espera = U.preguntar('DNI de ' + nombre,
-      '<label class="etiqueta" for="persona-dni">DNI de ' + U.escapar(nombre) + ' (para «' + U.escapar(campo) + '»)</label>' +
-      '<input id="persona-dni" class="campo" autocomplete="off">', 'Guardar');
-    var caja = document.getElementById('persona-dni');
+  /* ---------- los campos hermanos sin el campo entero (fila 773) ---------- */
+
+  var HERMANOS = ['nombre', 'dni', 'telefono', 'correo', 'en calidad de'];
+
+  function esCampo(nombre) {
+    return ((window.App && App.E && App.E.campos && App.E.campos.propios) || []).some(function (c) { return c.clase === CLASE && norm(c.nombre) === norm(nombre); });
+  }
+
+  /* `Quién recibe (DNI)` → { base: 'Quién recibe', sufijo: 'dni' } si la base es un campo «Una persona del asunto». */
+  function hermano(nombreCampo) {
+    var m = /^(.*\S)\s*\(([^()]+)\)\s*$/.exec(String(nombreCampo || '').trim());
+    if (!m) return null;
+    var sufijo = norm(m[2]);
+    return HERMANOS.indexOf(sufijo) !== -1 && esCampo(m[1]) ? { base: m[1].trim(), sufijo: sufijo } : null;
+  }
+
+  function aManoDe(valores, nombre, aunVacio) {
+    var aMano = (valores && valores.aMano) || {};
+    var k = Object.keys(aMano).filter(function (x) { return norm(x) === norm(nombre) && (aunVacio || String(aMano[x]).trim()); })[0];
+    return k === undefined ? null : String(aMano[k]).trim();
+  }
+
+  /* El valor de un campo hermano en `Plantillas.rellenar` (`valorCampo`: el que ya había). Con la persona sin elegir, pide la base
+     (el desplegable de siempre, una sola vez); con ella elegida y sin DNI o sin «en calidad de», pide ese dato como el DNI de hoy.
+     Devuelve el texto, o `null` si no hay nada especial que hacer. */
+  function resolverHermano(h, valorCampo, nombreCampo, valores, faltan) {
+    function pedir(t) { if (faltan.indexOf(t) === -1) faltan.push(t); return ''; }
+    var campos = (valores && valores.campos) || {};
+    var elegidas = campos.personas || {};
+    var base = Object.keys(elegidas).filter(function (k) { return norm(k) === norm(h.base); })[0];
+    var ahora = aManoDe(valores, h.base) !== null;   /* elegida en «Faltan datos», con este documento a medias */
+    if (base === undefined && !ahora) {   /* sin elegir: el hermano se pide por su campo entero */
+      return valorCampo || pedir(h.base);
+    }
+    if (valorCampo) return valorCampo;
+    if (base === undefined) {   /* elegida ahora: sus hermanos van en `aMano` (`hermanosAMano`); «en calidad de» falta si no se escribió */
+      var mano = aManoDe(valores, nombreCampo, true);
+      if (mano !== null) return mano;
+      base = h.base;
+    }
+    if (h.sufijo === 'dni') {
+      var d = aManoDe(valores, 'DNI de ' + base);
+      return d !== null ? limpiarDni(d) : pedir('DNI de ' + base);
+    }
+    if (h.sufijo === 'en calidad de') {
+      var c = aManoDe(valores, 'En calidad de ' + base);
+      return c !== null ? c : pedir('En calidad de ' + base);
+    }
+    return null;
+  }
+
+  /* Lo que se acaba de guardar de una persona recién elegida (`guardar().hermanos`), para `aMano`: el documento que se está
+     generando aún lleva los valores de antes de elegir. */
+  function hermanosAMano(aMano, campo, hm) {
+    aMano[campo + ' (nombre)'] = hm.nombre || '';
+    aMano[campo + ' (DNI)'] = hm.dni || '';
+    aMano[campo + ' (teléfono)'] = hm.telefono || '';
+    aMano[campo + ' (correo)'] = hm.correo || '';
+    if (hm.calidad) aMano[campo + ' (en calidad de)'] = hm.calidad;   /* sin valor, no se pone: el documento lo pide aparte */
+  }
+
+  /* El cuadro que pide un dato de una persona recién elegida; lo guarda como «<dato> <campo>» en el asunto. */
+  async function pedirDato(a, rotulo, nombreDato, limpiar) {
+    var espera = U.preguntar(rotulo,
+      '<label class="etiqueta" for="persona-dato">' + U.escapar(rotulo) + '</label>' +
+      '<input id="persona-dato" class="campo" autocomplete="off">', 'Guardar');
+    var caja = document.getElementById('persona-dato');
     if (caja) caja.focus();
     var aceptar = document.getElementById('cuadro-aceptar');
-    var dni = '';
-    function recoger() { dni = caja ? limpiarDni(caja.value) : ''; }
+    var texto = '';
+    function recoger() { texto = caja ? limpiar(caja.value) : ''; }
     if (aceptar) aceptar.addEventListener('click', recoger, true);
     var ok = await espera;
     if (aceptar) aceptar.removeEventListener('click', recoger, true);
-    if (!ok || !dni) return '';
-    var r = await DatosDelAsunto.guardar(a, 'DNI de ' + campo, dni);
-    return r.ok ? dni : '';
+    if (!ok || !texto) return '';
+    var r = await DatosDelAsunto.guardar(a, nombreDato, texto);
+    return r.ok ? texto : '';
+  }
+
+  /* El DNI de una persona recién elegida que no lo tiene. */
+  function pedirDni(a, campo, nombre) {
+    return pedirDato(a, 'DNI de ' + nombre + ' (para «' + campo + '»)', 'DNI de ' + campo, limpiarDni);
   }
 
   return { CLASE: CLASE, personas: personas, etiqueta: etiqueta, etiquetas: etiquetas, guardar: guardar, textoDe: textoDe,
-    alDocumento: alDocumento, cerrar: cerrar, tutores: tutores, pedirDni: pedirDni, limpiarDni: limpiarDni };
+    alDocumento: alDocumento, cerrar: cerrar, tutores: tutores, pedirDni: pedirDni, limpiarDni: limpiarDni,
+    hermano: hermano, resolverHermano: resolverHermano, hermanosAMano: hermanosAMano, calidadPorClase: calidadPorClase, esCampo: esCampo };
 })();
 window.PersonaDelAsunto = PersonaDelAsunto;
