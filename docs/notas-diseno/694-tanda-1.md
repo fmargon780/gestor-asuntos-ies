@@ -22,7 +22,7 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 2. Firma del director, registro de salida y envío · sin papel, se marca a mano · Cómo se hace: es el mismo documento de la tarea 1, ya resuelto. (Acordado con Francisco el 27-nov-2026: la solicitud y la resolución son un solo papel, que se registra de entrada y de salida en dos momentos. Mientras el recorrido no sepa hacerlo, idea 777, la segunda parte va a mano.)
 3. Anular la matrícula en Séneca y quitarle la unidad
 4. Avisar a Jefatura y a la tutoría del grupo · con el correo «Comunicación baja matrícula»
-5. Certificado de entrega de libros · Papel: CERTIFICADO · Cómo se hace: de 1.º a 4.º de ESO; se envía por iPasen o por correo. (Junta «Certificado entrega de libros» y «Enviar el certificado».)
+5. Certificado de entrega de libros · Papel: CERTIFICADO · Solo si: enseñanza ESO · Cómo se hace: se envía por iPasen o por correo. (Junta «Certificado entrega de libros» y «Enviar el certificado».)
 6. Guardar el expediente en el archivo histórico
 
 ## TRANSPORTE (6 hitos → 5 tareas)
@@ -44,7 +44,7 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 2. Historial académico · Papel: HISTORIAL ACADÉMICO · Cómo se hace: firma electrónica.
 3. Confirmar el traslado en Séneca y quitarle la unidad
 4. Avisar a Jefatura
-5. Certificado de entrega de libros · Papel: CERTIFICADO · Cómo se hace: a la familia, por iPasen o por correo.
+5. Certificado de entrega de libros · Papel: CERTIFICADO · Solo si: enseñanza ESO · Cómo se hace: a la familia, por iPasen o por correo.
 6. Enviar al centro de destino, por Ventanilla Electrónica, los documentos oficiales y el certificado de libros
 
 ## Plantillas (mirado en `plantillas.json`, 27-nov-2026)
@@ -56,7 +56,7 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 ## Dudas de Claude (las dice Francisco al repasar)
 
 - ~~ANULACIÓN: el orden de registrar y enviar al director~~ Resuelta el 27-nov-2026 (arriba, tarea 1 y 2).
-- ANULACIÓN: el certificado es «de 1.º a 4.º de ESO». Para que salga solo en ESO haría falta un «Solo si» con un dato de lista del asunto; de momento va en «Cómo se hace».
+- ~~ANULACIÓN: el certificado solo en ESO~~ Resuelta el 27-nov-2026: «Solo si» mirará también la enseñanza del alumno, sacada sola de su unidad (Centro de datos), igual que mira la clase del tercero; sin unidad, la tarea sale y se marca «No aplica». Es una tarea pequeña de este tema, antes de aplicar las guías (Francisco: «Sí»).
 - ABSENTISTA: el oficio lleva dos firmas (secretaria y visto bueno del director). El recorrido del tipo OFICIO tiene que decirlo.
 - TRAS. MATR. VIVA: el informe y el historial van al centro de destino. ¿Es su envío (recorrido del papel) o una tarea aparte como la 6?
 - El recorrido de cada tipo de documento (quién firma, si se registra, cómo se envía) no lo he podido mirar: ese dato no está entre los ficheros compartidos.
