@@ -137,6 +137,109 @@ await comprobar('9c. la persona elegida sale en «Campos de este asunto» con «
   return [antes.hay, antes.opciones && antes.opciones.length > 1, antes.cambiada && antes.cambiada !== 'Vecina Sin Dni'];
 })(), [true, true, true]);
 
+/* ---------- fila 773: la persona elegida, completa en las plantillas ---------- */
+
+await comprobar('11. «en calidad de» por defecto: alumna, padre, madre, la relación de quien lo pide y personal del centro', p.evaluate(() => {
+  const f = { categoria: 'ALUMNADO', tercero: 'Alumna Uno', loPide: { nombre: 'Abuela Pérez', relacion: 'Abuela' }, relacionados: [{ categoria: 'PERSONAL', nombre: 'Profe Ana' }] };
+  const b = { nombre: 'sin-ficha-en-el-registro', ficha: f, leido: {} };
+  const v = { nombreNatural: 'Alumna Uno', tutor1: 'Tutor, Uno', tutor2: 'Tutor, Dos', sexos: { tercero: 'M', tutor1: 'H', tutor2: 'M' } };
+  const sin = { nombreNatural: 'Alumna Uno', tutor1: 'Tutor, Uno', sexos: { tercero: '', tutor1: '' } };
+  return [PersonaDelAsunto.personas(b, v).map((x) => x.calidad), PersonaDelAsunto.personas(b, sin).map((x) => x.calidad)];
+}), [['alumna', 'abuela', 'personal del centro', 'padre', 'madre'], ['alumno/a', 'abuela', 'personal del centro', 'tutor/a legal']]);
+
+const SOLO_HERMANOS = 'Nombre: {campo:Quién recibe (Nombre)} · DNI: {campo:Quién recibe (DNI)} · Tel: {campo:Quién recibe (teléfono)} · Como: {campo:Quién recibe (en calidad de)}.';
+
+await comprobar('12. una plantilla con solo campos hermanos (sin el campo entero) pregunta la persona, una sola vez', p.evaluate(async ([t]) => {
+  const a = App.E.listaAbiertos[0];
+  const clave = Campos.claveDeCampo({ origen: 'propio', id: 'pq747' });
+  await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, clave, { valor: '', anadir: undefined });
+  const v = await Plantillas.valoresDeAsunto(a);
+  return Plantillas.rellenar(t, v).faltan;
+}, [SOLO_HERMANOS]), ['Quién recibe']);
+
+await comprobar('13. elegida la persona, sale su nombre, DNI, teléfono y «en calidad de»; mayúsculas y tildes dan igual', p.evaluate(async ([t]) => {
+  const a = App.E.listaAbiertos[0];
+  const clave = Campos.claveDeCampo({ origen: 'propio', id: 'pq747' });
+  await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, clave, { valor: 'Padre Ejemplo', persona: { dni: '55555555B', telefono: '600111222', correo: '', relacion: 'Tutor legal 1', calidad: 'padre' }, anadir: { origen: 'propio', id: 'pq747' } });
+  const v = await Plantillas.valoresDeAsunto(a);
+  const r = Plantillas.rellenar(t, v);
+  const minus = Plantillas.rellenar('{campo:QUIEN RECIBE (NOMBRE)} {campo:quién recibe (En Calidad De)}', v);
+  return [r.texto, minus.texto, r.faltan, minus.faltan];
+}, [SOLO_HERMANOS]), ['Nombre: Padre Ejemplo · DNI: 55555555B · Tel: 600111222 · Como: padre.', 'Padre Ejemplo padre', [], []]);
+
+await comprobar('14. una persona sin «en calidad de» por defecto: la plantilla lo pide («En calidad de Quién recibe») y escrito lo lleva', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const clave = Campos.claveDeCampo({ origen: 'propio', id: 'pq747' });
+  await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, clave, { valor: 'Vecina Sin Calidad', persona: { dni: '44444444A', telefono: '', correo: '', relacion: '' }, anadir: { origen: 'propio', id: 'pq747' } });
+  let v = await Plantillas.valoresDeAsunto(a);
+  const antes = Plantillas.rellenar('{campo:Quién recibe (en calidad de)}', v);
+  v.aMano = { 'En calidad de Quién recibe': 'tutora legal' };
+  const mano = Plantillas.rellenar('{campo:Quién recibe (en calidad de)}', v).texto;
+  const g = await DatosDelAsunto.guardar(a, 'En calidad de Quién recibe', 'tutora legal');
+  v = await Plantillas.valoresDeAsunto(a);
+  const despues = Plantillas.rellenar('{campo:Quién recibe (en calidad de)} / {campo:Quién recibe}', v);
+  return [antes.faltan, mano, g.ok, despues.faltan, despues.texto];
+}), [['En calidad de Quién recibe'], 'tutora legal', true, [], 'tutora legal / Vecina Sin Calidad, con DNI 44444444A']);
+
+await comprobar('15. al cambiar de persona, el «en calidad de» escrito a mano de la anterior no se arrastra', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const v0 = await Plantillas.valoresDeAsunto(a);
+  const lista = PersonaDelAsunto.personas(a, v0);
+  await DatosDelAsunto.guardar(a, 'Quién recibe', PersonaDelAsunto.etiqueta(lista[0]));
+  const v = await Plantillas.valoresDeAsunto(a);
+  return [v.campos['Quién recibe (en calidad de)'], lista[0].calidad];
+}).then(([real, defecto]) => [real === defecto, real !== 'tutora legal']), [true, true]);
+
+await comprobar('16. el campo entero {campo:Quién recibe} sigue igual', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const v = await Plantillas.valoresDeAsunto(a);
+  const r = Plantillas.rellenar('Recibe {campo:Quién recibe}.', v);
+  return [r.faltan.filter((x) => x === 'Quién recibe').length, r.texto.indexOf('Recibe ') === 0];
+}), [0, true]);
+
+await comprobar('17. «En calidad de» sale en la ficha debajo de la persona, con «Cambiar», sin repetir el dato suelto', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  await DatosDelAsunto.guardar(a, 'En calidad de Quién recibe', 'tutora legal');
+  FichaNucleo.modoActual = 'abierto';
+  const caja = document.createElement('div');
+  caja.id = 'prueba-773';
+  caja.innerHTML = FichaNucleo.datosDelAsunto(a) || '';
+  document.body.appendChild(caja);
+  window.CampoDesdeElAsunto.alPintar(caja, a);
+  const fila = caja.querySelector('.ficha-dato-calidad');
+  const suelto = Array.from(caja.querySelectorAll('.ficha-dato > span:first-child')).filter((x) => /^En calidad de /.test(x.textContent)).length;
+  return [!!fila, fila ? fila.textContent.indexOf('tutora legal') !== -1 : false, !!(fila && fila.querySelector('.ficha-calidad-cambiar')), suelto];
+}), [true, true, true, 0]);
+
+await comprobar('18. «Cambiar» de «En calidad de» guarda lo escrito, y vacío vuelve al valor de la app', p.evaluate(async () => {
+  const a = App.E.listaAbiertos[0];
+  const caja = document.getElementById('prueba-773');
+  caja.querySelector('.ficha-calidad-cambiar').click();
+  await new Promise((r) => setTimeout(r, 400));
+  const entrada = document.getElementById('persona-calidad');
+  entrada.value = 'madre de la alumna';
+  document.getElementById('cuadro-aceptar').click();
+  await new Promise((r) => setTimeout(r, 800));
+  let v = await Plantillas.valoresDeAsunto(a);
+  const escrito = v.campos['Quién recibe (en calidad de)'];
+  await DatosDelAsunto.guardar(a, 'En calidad de Quién recibe', '');
+  v = await Plantillas.valoresDeAsunto(a);
+  return [escrito, v.campos['Quién recibe (en calidad de)'] !== 'madre de la alumna'];
+}), ['madre de la alumna', true]);
+
+await comprobar('19. elegida en «Faltan datos» con el documento a medias: los hermanos salen de lo escrito y «en calidad de» vacío se pide aparte', p.evaluate(async ([t]) => {
+  const a = App.E.listaAbiertos[0];
+  const clave = Campos.claveDeCampo({ origen: 'propio', id: 'pq747' });
+  await CampoDesdeElAsuntoEscribir.escribirEnAsunto(a, clave, { valor: '', anadir: undefined });
+  const v = await Plantillas.valoresDeAsunto(a);
+  const aMano = { 'Quién recibe': 'Ana Gil, con DNI 66666666C' };
+  PersonaDelAsunto.hermanosAMano(aMano, 'Quién recibe', { nombre: 'Ana Gil', dni: '66666666C', telefono: '', correo: '', calidad: '' });
+  const sin = Plantillas.rellenar(t, Object.assign({}, v, { aMano: aMano }));
+  aMano['En calidad de Quién recibe'] = 'tutora legal';
+  const con = Plantillas.rellenar(t, Object.assign({}, v, { aMano: aMano }));
+  return [sin.faltan, con.faltan, con.texto];
+}, [SOLO_HERMANOS]), [['En calidad de Quién recibe'], [], 'Nombre: Ana Gil · DNI: 66666666C · Tel:  · Como: tutora legal.']);
+
 await comprobar('10. no hay errores en la consola', Promise.resolve(errores), []);
 await navegador.close();
 if (fallos) { console.log(fallos + ' fallos'); process.exit(1); }

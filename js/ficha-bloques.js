@@ -62,7 +62,10 @@
         var vacia = FichaCamposListaVacia.fila(cfg, a);
         if (vacia) salida.push(vacia);
       }
+      /* Fila 773: debajo de la persona elegida, «En calidad de» con su «Cambiar». */
+      if (clase === 'personaAsunto' && g && g.valor && window.PersonaCalidad) salida.push(PersonaCalidad.fila(a, Campos.nombreDeCampo(cfg, App.E.campos), g, cfg.hito));
     });
+    if (window.PersonaCalidad) salida = PersonaCalidad.sinDato(salida);
     Object.keys(guardados).forEach(function (clave) {
       if (vistos[clave]) return;
       var g = guardados[clave];

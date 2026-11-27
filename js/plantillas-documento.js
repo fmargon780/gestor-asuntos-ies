@@ -181,7 +181,16 @@
       if (preguntar.length && window.WordFaltan && !desdeTarea) {
         var r = await WordFaltan.preguntar(preguntar, { asunto: asunto });
         if (r.accion === 'cancelar') { U.aviso('No se ha generado nada.', 'ambar'); return; }
-        if (r.accion === 'generar' && Object.keys(r.aMano).length) resultado = await rellenarCon(Object.assign({}, valores, { aMano: r.aMano }));
+        if (r.accion === 'generar' && Object.keys(r.aMano).length) {
+          resultado = await rellenarCon(Object.assign({}, valores, { aMano: r.aMano }));
+          /* Fila 773: la persona recién elegida sin «en calidad de» por defecto: se pide ahora, y solo si la plantilla lo usa. */
+          var deCalidad = resultado.faltan.filter(function (f) { return /^En calidad de /i.test(f) && preguntar.indexOf(f) === -1; });
+          if (deCalidad.length) {
+            var r2 = await WordFaltan.preguntar(deCalidad, { asunto: asunto });
+            if (r2.accion === 'cancelar') { U.aviso('No se ha generado nada.', 'ambar'); return; }
+            if (r2.accion === 'generar' && Object.keys(r2.aMano).length) resultado = await rellenarCon(Object.assign({}, valores, { aMano: Object.assign({}, r.aMano, r2.aMano) }));
+          }
+        }
       }
     } catch (e) {
       U.aviso('No he podido rellenar el documento: ' + U.mensajeDeError(e), 'malo');

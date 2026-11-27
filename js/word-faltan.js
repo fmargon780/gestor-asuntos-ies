@@ -35,6 +35,7 @@ var WordFaltan = (function () {
   /* Guarda lo escrito en el asunto (accesorio: si algo falla, ámbar, y el documento sigue con lo escrito). */
   async function guardarEnElAsunto(asunto, aMano) {
     var nombres = Object.keys(aMano).filter(function (n) { return !/^hecho\s*:/i.test(n); });
+    var extra = [];
     for (var i = 0; i < nombres.length; i++) {
       var opciones = window.TextoCondicional ? TextoCondicional.opcionesDeFalta(nombres[i]) : null;
       try {
@@ -42,13 +43,17 @@ var WordFaltan = (function () {
         if (!r.ok) U.aviso(r.aviso + ' No se ha guardado en el asunto.', 'ambar');
         else if (r.paraDocumento) {   /* fila 747: una persona del asunto: el documento lleva su nombre y su DNI */
           aMano[nombres[i]] = r.paraDocumento;
+          var hm = r.hermanos || {};
           if (r.sinDni) {
             var dni = await PersonaDelAsunto.pedirDni(asunto, nombres[i], r.valor);
-            if (dni) aMano[nombres[i]] = PersonaDelAsunto.textoDe(r.valor, dni);
+            if (dni) { aMano[nombres[i]] = PersonaDelAsunto.textoDe(r.valor, dni); hm.dni = dni; }
           }
+          extra.push([nombres[i], hm]);   /* «en calidad de» sin valor por defecto: se pide en una segunda vuelta, solo si la plantilla lo usa (js/plantillas-documento.js) */
         }
       } catch (e) { U.accesorio('Lo escrito vale para este documento, pero no he podido guardar «' + nombres[i] + '» en el asunto', e); }
     }
+    /* Fila 773: de la persona elegida aquí, sus campos hermanos para este documento. */
+    extra.forEach(function (x) { PersonaDelAsunto.hermanosAMano(aMano, x[0], x[1]); });
   }
 
   async function preguntar(faltan, opciones) {

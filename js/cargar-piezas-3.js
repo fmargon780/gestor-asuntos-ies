@@ -186,6 +186,7 @@
     'js/campos-de-hito.js',
     'js/campo-desde-el-asunto-escribir.js',   // fila 530
     'js/persona-del-asunto.js',               // fila 747
+    'js/persona-del-asunto-calidad.js',       // fila 773
     'js/campo-desde-el-asunto.js',
     // Fila 530 (docs/530-DATOS-EN-EL-ASUNTO.md): los datos que piden las plantillas se escriben en el asunto.
     'js/datos-del-asunto.js',
