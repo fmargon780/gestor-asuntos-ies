@@ -70,3 +70,5 @@ textarea.gsh-como { min-height: 40vh; resize: vertical; line-height: 1.45; displ
 .gsh-rec-resumen { color: #5b6774; margin-top: 2px; }
 .gsh-mandos { display: flex; gap: 8px; border-top: 1px solid #e3e8ee; padding-top: 14px; }
 .gsh-mandos .boton-peligro { margin-left: auto; }
+.gsh-marca-copiar { background: #e1f1e6; }
+.gsh-marca-aviso { background: #fff3cd; }

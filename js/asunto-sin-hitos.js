@@ -105,6 +105,7 @@ var AsuntoSinHitos = (function () {
   function debajoHTML(g, a) {
     var st = e(g.id);
     if (window.AsuntoSinHitosFalta) { var rel = AsuntoSinHitosFalta.debajoHTML(g, a); if (rel) return rel; }
+    if (g.accion === 'copiar' && window.TareaCopiar && !st.editando && !st.anotando && !st.notasAbiertas) { var cop = TareaCopiar.vistaHTML(g, a, hitoDe(ultimo && ultimo.hitos)); if (cop) return cop; }   /* fila 783 */
     if (st.editando) {
       return '<div class="ash-editar"><input class="campo ash-editar-texto" data-clave="ash-editar-' + esc(g.id) + '" value="' + esc(g.texto) + '">' +
         '<button type="button" class="boton boton-chico ash-editar-guardar">Guardar</button>' +

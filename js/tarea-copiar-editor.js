@@ -16,13 +16,13 @@ window.TareaCopiarEditor = (function () {
   var QUE_COPIA = 'El documento de la tarea de registrar de este hito, cuando llega registrado.';
 
   /* El formulario. `r`: la receta que se ve al empezar. */
-  function formularioHTML(r) {
+  function formularioHTML(r, que) {   /* `que`: lo que copia, si no es lo de un hito (fila 783: el papel de la tarea de encima) */
     r = r || {};
     return '<div class="tcp-form" data-carpeta="' + esc(r.carpeta || '') + '" data-carpetaid="' + esc(r.carpetaId || '') + '">' +
       '<div class="dato"><span class="etiqueta">Carpeta</span> <span class="tcp-carpeta">' +
         (r.carpeta ? esc(r.carpeta) : '<span class="suave">Ninguna elegida</span>') + '</span> ' +
         '<button type="button" class="boton boton-chico tcp-elegir">Elegir carpeta</button></div>' +
-      '<div class="dato"><span class="etiqueta">Qué copia</span> <span class="suave">' + QUE_COPIA + '</span></div>' +
+      '<div class="dato"><span class="etiqueta">Qué copia</span> <span class="suave">' + esc(que || QUE_COPIA) + '</span></div>' +
       '<div class="dato"><label class="etiqueta" for="tcp-patron">Nombre del fichero copiado</label>' +
         '<span class="en-linea"><input id="tcp-patron" class="campo tcp-patron" value="' + esc(r.patron || '') +
         '" placeholder="Sin nada: el mismo nombre del documento" autocomplete="off">' +
