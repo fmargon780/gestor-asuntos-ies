@@ -83,6 +83,8 @@ Directiva» por correo). Sin datos ni plantillas.
 3. ~~REUNIÓN C.M. ABSENTISMO: qué vuelve de Dirección~~ Resuelta el 27-nov-2026: nada; con enviársela al director termina el asunto («Termina el asunto»). Las dos tareas se quedan como están.
 4. ~~INFORME EDITORIAL: registrar la petición~~ Resuelta el 27-nov-2026: no se registra («No es necesario»).
 
+Corregido el 27-nov-2026, en el repaso: CONFORMIDAD SERVICIO no se crea; es el tipo PARTE DE CONFORMIDAD, que ya existe (Francisco: «1»), con el mismo recorrido.
+
 Tanda 5 repasada entera el 27-nov-2026, con sus recorridos aprobados («Sí»).
 
 ## Mirado en el código (27-nov-2026)

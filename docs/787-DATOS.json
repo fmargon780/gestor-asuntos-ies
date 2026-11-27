@@ -15,8 +15,7 @@
  ],
  "tiposDocumentoNuevos": [
   "EXPEDIENTE DE TRASLADO",
-  "INFORME VALORACIÓN",
-  "CONFORMIDAD SERVICIO"
+  "INFORME VALORACIÓN"
  ],
  "recorridos": {
   "MATRICULA": {
@@ -135,7 +134,7 @@
    "entra": true,
    "registro": true
   },
-  "CONFORMIDAD SERVICIO": {
+  "PARTE DE CONFORMIDAD": {
    "entra": false,
    "firma": "Secretaría",
    "registro": true,
@@ -576,7 +575,7 @@
   "CONFORMIDAD": [
    {
     "texto": "Dar la conformidad del mes a la empresa de limpieza",
-    "papel": "CONFORMIDAD SERVICIO",
+    "papel": "PARTE DE CONFORMIDAD",
     "comoSeHace": "El correo lleva copia al correo del centro."
    }
   ],
@@ -694,7 +693,7 @@
    "nuevo": true,
    "nombre": "Conformidad con el servicio",
    "texto": "Adjunto le enviamos la conformidad con el servicio de limpieza del mes de {campo:Mes del servicio}.",
-   "adjuntar": "CONFORMIDAD SERVICIO",
+   "adjuntar": "PARTE DE CONFORMIDAD",
    "para": [
     "interesado"
    ],

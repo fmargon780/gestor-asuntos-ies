@@ -78,7 +78,6 @@ y `js/tipos-unir.js`.
   tiene «PETICIÓN INFORME» de nombre corto: sus carpetas se llaman igual); DATOS PERSONAL INTERINO y
   «Alta y actualización de datos» (mismo caso); INFORME UNGENCIAS (personal) e INFORME URGENCIAS
   (alumnado).
-- Ya hay un tipo de documento PARTE DE CONFORMIDAD. ¿Es el mismo papel que el nuevo CONFORMIDAD
-  SERVICIO?
+- ~~PARTE DE CONFORMIDAD~~ Resuelto el 27-nov-2026: es el mismo papel que CONFORMIDAD SERVICIO («1»); no se crea el tipo nuevo.
 - La plantilla «Acuerdo del Consejo Escolar o del Claustro» (tipo CONSEJO ESCOLAR, desactivado) tiene
   por fichero «AITE - RECIBÍ GENÉRICO (13).docx»: parece un fichero equivocado.

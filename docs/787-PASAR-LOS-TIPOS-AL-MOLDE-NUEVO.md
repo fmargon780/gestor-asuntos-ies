@@ -46,6 +46,7 @@ Lo que cambia respecto a las tandas, por el repaso contra el código (`docs/nota
   bandeja se añade desde su tarea. Lo dice «Cómo se hace».
 - El recibí de la ayuda de transporte dice «Recibido» al generarlo para imprimir; queda bien al
   llegar el sellado. Lo dice «Cómo se hace».
+- **La conformidad de limpieza usa el tipo de documento PARTE DE CONFORMIDAD**, que ya existe (Francisco, 27-nov-2026: «1»); no se crea CONFORMIDAD SERVICIO. Lleva el recorrido aprobado: lo firma la secretaria, se registra de salida y va a la empresa por correo.
 - Correo nuevo de la conformidad: «Adjunto le enviamos la conformidad con el servicio de limpieza
   del mes de {Mes del servicio}.», a la empresa, con copia al correo del centro.
 
@@ -55,7 +56,7 @@ Lo que cambia respecto a las tandas, por el repaso contra el código (`docs/nota
 
 ## Qué NO se hace en esta tarea
 - Los 14 tipos largos (se diseñan uno a uno, después).
-- Unir otros tipos repetidos, ni revisar PARTE DE CONFORMIDAD (apuntado en el repaso).
+- Unir otros tipos de asunto repetidos (apuntado en el repaso).
 - El recorrido «nos llega y lo devolvemos resuelto» (idea 777), elegir quién firma (778), los tipos
   de informe (780) y la conformidad creada sola cada mes (784).
 
