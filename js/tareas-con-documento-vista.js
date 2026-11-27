@@ -128,7 +128,7 @@ window.TareasConDocumentoVista = (function () {
         delete eligiendo[id];
         T().asignar(a.nombre, h.id, id, elegido).then(function () {
           if (window.HitosPanel) HitosPanel.programarRepintado();
-        }).catch(function (err) { U.fallo('No he podido colgar el documento de la tarea', err); repintar(); });
+        }).catch(function (err) { U.fallo('No he podido vincular el documento a la tarea', err); repintar(); });
       };
     });
     comprobarQueEstan(caja, a);

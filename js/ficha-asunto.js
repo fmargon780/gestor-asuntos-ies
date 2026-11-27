@@ -319,18 +319,21 @@
          línea del hito (js/hito-mesa-linea.js); aquí solo queda el vencimiento del asunto. */
       if (window.EstadoHito) EstadoHito.alAbrirFicha(a);
 
+      /* Fila 775: sin fecha límite no se enseña nada (el plazo se pone desde «⋯» › «Poner plazo…»). */
       var et = Plazos.etiquetaVencimiento(a.ficha.limite);
-      var bplazo = document.createElement('button');
-      bplazo.type = 'button';
-      bplazo.className = 'boton-vencimiento' + (et.clase ? ' ' + et.clase : '');
-      bplazo.textContent = et.texto;
-      bplazo.setAttribute('data-ayuda-clave', 'poner-o-cambiar-la-fecha-limite');
-      bplazo.onclick = async function (ev) {
-        try { await App.editarPlazo(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
-      };
-      caja.appendChild(bplazo);
-
+      var bplazo = a.ficha.limite ? document.createElement('button') : null;
+      if (bplazo) {
+        bplazo.type = 'button';
+        bplazo.className = 'boton-vencimiento' + (et.clase ? ' ' + et.clase : '');
+        bplazo.textContent = et.texto;
+        bplazo.setAttribute('data-ayuda-clave', 'poner-o-cambiar-la-fecha-limite');
+        bplazo.onclick = async function (ev) {
+          try { await App.editarPlazo(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
+        };
+        caja.appendChild(bplazo);
+      }
     }
+    if (App.revelarPonerPlazo) App.revelarPonerPlazo(a, abierto);
 
     /* "Comunicar" (js/correo.js) entra aquí, y "Archivar"/"Reabrir" se
        queda el último, pegado al borde derecho. */

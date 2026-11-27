@@ -74,6 +74,12 @@ async function abrirFicha(nombre) {
   await pagina.waitForTimeout(300);
 }
 
+/* Fila 775: sin fecha límite la cabecera no enseña el plazo; las pruebas del botón le ponen una. */
+async function ponerLimite(nombre, limite) {
+  await pagina.evaluate(async ([n, l]) => { await App.anotar(n, { limite: l }); App.repintarAccionesFicha(); }, [nombre, limite]);
+  await pagina.waitForTimeout(200);
+}
+
 function elementosDeAcciones() {
   /* Desde la fila 112 «Archivar» va en la primera línea (#ficha-archivar). */
   return pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-acciones > *'))
@@ -92,6 +98,9 @@ function elementosDeAcciones() {
    ============================================================ */
 console.log('--- 1 y 2. la barra de acciones ---');
 await abrirFicha(RICO);
+await comprobar('1. sin fecha límite la cabecera no enseña «Sin plazo» (fila 775)', pagina.locator('#ficha-acciones .boton-vencimiento').count(), 0);
+await comprobar('1. y «⋯» trae «Poner plazo…» (fila 775)', pagina.evaluate(() => { const b = document.querySelector('.ficha-nombre [data-clave="poner-plazo"]'); return !!b && !b.hidden && b.textContent.trim() === 'Poner plazo…'; }), true);
+await ponerLimite(RICO, '2027-03-01');
 
 /* Fila 637: «El encargo» ya no es un botón de la barra (se abre con «Cambiar» en «Quién lo pide», bloque «Datos»).
    Fila 638: «Esperando a…» / «Ya ha llegado» (el elemento «estado») ya no está aquí: van en la línea del hito. */

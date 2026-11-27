@@ -106,6 +106,13 @@
     if (abierto && window.AsuntoSinHitos) {
       lista.push({ texto: 'Cambiar la guía…', clave: 'cambiar-guia', oculto: true, alPulsar: function () { AsuntoSinHitos.cambiarLaGuia(a); } });
     }
+    /* Fila 775: sin fecha límite la cabecera no enseña «Sin plazo»; el plazo se pone desde aquí (se enseña solo si no hay fecha límite). */
+    if (abierto) {
+      lista.push({ texto: 'Poner plazo…', clave: 'poner-plazo', oculto: true, alPulsar: async function () {
+        try { await App.editarPlazo(a, document.querySelector('.ficha-nombre-menu-boton')); }
+        finally { if (App.repintarAccionesFicha) App.repintarAccionesFicha(); }
+      } });
+    }
     /* Fila 137: «Índice del expediente», abierto o archivado. */
     if (window.IndiceExpediente) lista.push(IndiceExpediente.opcionDelMenu(a));
     /* Fila 135: «Marcar como reservado» / «Quitar la reserva». */
@@ -136,6 +143,7 @@
         var menu = FichaMenus.montar(boton, opciones);
         revelarDatosDelTercero(viendo, menu);
         if (window.AsuntoSinHitos && AsuntoSinHitos.revelarMenu) AsuntoSinHitos.revelarMenu();   /* fila 701 */
+        revelarPlazo(viendo, modoDelAsunto === 'abierto');   /* fila 775 */
       }
     }
   }
@@ -152,6 +160,13 @@
       if (d && bd) { documentoDe[a.nombre] = d; bd.hidden = false; }
     });
   }
+
+  /* Fila 775: «Poner plazo…» solo sale en un asunto abierto y sin fecha límite. */
+  function revelarPlazo(a, abierto) {
+    var it = document.querySelector('.ficha-nombre [data-clave="poner-plazo"]');
+    if (it) it.hidden = !(abierto && a && a.ficha && !a.ficha.limite);
+  }
+  App.revelarPonerPlazo = revelarPlazo;
 
   var pantalla = document.getElementById('pantalla-asunto');
   if (pantalla && window.MutationObserver) {

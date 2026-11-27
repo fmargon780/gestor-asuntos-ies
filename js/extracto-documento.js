@@ -35,6 +35,18 @@ var ExtractoDocumento = (function () {
     return b;
   }
 
+  /* Fila 775: «Extracto» como entrada del menú ⋮ de «Documentos de la carpeta» (hace lo mismo que el botón). */
+  function entradaDeMenu(a, nombre) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'extracto-documento';
+    b.textContent = 'Extracto';
+    b.title = 'Copiar el extracto de este documento para el registro de Séneca';
+    b.setAttribute('data-ayuda-clave', 'copiar-el-extracto-de-este-documento');
+    b.onclick = function (ev) { ev.stopPropagation(); copiar(a, nombre, b); };
+    return b;
+  }
+
   function huecoHTML(nombre) {
     return '<span class="extracto-documento-lugar" data-doc="' + U.escapar(nombre) + '"></span>';
   }
@@ -47,6 +59,6 @@ var ExtractoDocumento = (function () {
     });
   }
 
-  return { boton: boton, huecoHTML: huecoHTML, enganchar: enganchar };
+  return { boton: boton, entradaDeMenu: entradaDeMenu, huecoHTML: huecoHTML, enganchar: enganchar };
 })();
 window.ExtractoDocumento = ExtractoDocumento;
