@@ -401,3 +401,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## Pasar los tipos al molde nuevo (tema 694, 27-nov-2026)
 
 - (27-nov-2026, tema 694) **El certificado de que el alumno ha devuelto los libros no es la ficha de entrega de libros** (la ficha dice que la familia los recibe). Anulación de matrícula y traslado de matrícula viva usan **una sola plantilla**, «Devolución de libros de gratuidad», con un texto que vale para los dos (eligió «1»).
+- (27-nov-2026, tema 694) **«Solo si» puede mirar la enseñanza del alumno** (E.S.O., Bachillerato, Formación Profesional), sacada de su unidad; la Diversificación cuenta como E.S.O. Francisco: «Sí». Fila 781.
+- (27-nov-2026, tema 694) **Un papel puede ir a «Otro centro u organismo» por la Ventanilla Electrónica**; por esa vía, «Enviado» se marca solo al llegar el registro de salida, porque la Ventanilla envía al firmar. Fila 782.
+- (27-nov-2026, tema 694) **«Copiar a otra carpeta» funciona también en los asuntos de lista de tareas**: copia el papel de la tarea de justo encima cuando queda registrado («1»). Fila 783.
+- (27-nov-2026, tema 694) **Los tipos se pasan al molde nuevo de una vez**, con un botón de un solo uso que enseña antes lo que cambia; los asuntos abiertos no cambian («Sí»). Su instrucción se repasa antes con Fable.
