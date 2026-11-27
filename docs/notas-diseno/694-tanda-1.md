@@ -57,6 +57,6 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 
 - ~~ANULACIÓN: el orden de registrar y enviar al director~~ Resuelta el 27-nov-2026 (arriba, tarea 1 y 2).
 - ~~ANULACIÓN: el certificado solo en ESO~~ Resuelta el 27-nov-2026: «Solo si» mirará también la enseñanza del alumno, sacada sola de su unidad (Centro de datos), igual que mira la clase del tercero; sin unidad, la tarea sale y se marca «No aplica». Es una tarea pequeña de este tema, antes de aplicar las guías (Francisco: «Sí»).
-- ABSENTISTA: el oficio lleva dos firmas (secretaria y visto bueno del director). El recorrido del tipo OFICIO tiene que decirlo.
+- ~~ABSENTISTA: quién firma el oficio~~ Resuelta el 27-nov-2026: el tipo OFICIO lleva «Secretaría, con visto bueno de Dirección»; elegir quién firma en cada caso es la idea 778 («Vale»).
 - TRAS. MATR. VIVA: el informe y el historial van al centro de destino. ¿Es su envío (recorrido del papel) o una tarea aparte como la 6?
 - El recorrido de cada tipo de documento (quién firma, si se registra, cómo se envía) no lo he podido mirar: ese dato no está entre los ficheros compartidos.
