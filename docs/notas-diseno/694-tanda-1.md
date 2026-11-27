@@ -11,7 +11,7 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 2. Pasar la matrícula a Jefatura para asignar unidad y optativas · se queda «Esperando a Jefatura».
 3. Comprobar en Séneca la unidad y las optativas · Cómo se hace: si Jefatura no las ha grabado, grabarlas.
 4. Preparar la ficha de entrega de libros · Papel: FICHA ENTREGA LIBROS
-5. Comunicar la incorporación al equipo educativo · Papel: COMUNICACION · Cómo se hace: con su plantilla, por correo.
+5. Comunicar la incorporación al equipo educativo · Cómo se hace: con «Enviar ▾», por correo.
 6. Entregar el horario de su unidad
 7. Comprobar la foto en Séneca · Cómo se hace: si no la tiene, hacerla y subirla a su ficha.
 8. Guardar la matrícula en el expediente
@@ -67,4 +67,24 @@ Recorrido de INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO: lo hacemos · fir
 - ~~TRAS. MATR. VIVA: el envío por Ventanilla Electrónica~~ Resuelta el 27-nov-2026 (arriba; «Ok. Adelante»).
 - Comprobado en el código: el oficio con «Secretaría, con visto bueno de Dirección» pide dos firmas y se marca firmado al llegar el PDF con las dos.
 - Por mirar: si el «certificado de entrega de libros» es la ficha de entrega de libros que ya genera la app (fila 501, tipo FICHA ENTREGA LIBROS).
-- El recorrido de cada tipo de documento (quién firma, si se registra, cómo se envía) no lo he podido mirar: ese dato no está entre los ficheros compartidos.
+- ~~El recorrido de cada tipo~~ Mirado el 27-nov-2026 (`recorridos-tipos.json`, compartido ese día): solo tienen recorrido NOTA AULA CONVIVENCIA y FIRMADO AULA CONVIVENCIA. Propuesta abajo.
+
+## Recorridos que faltan (propuesta de Claude, 27-nov-2026, sin aprobar)
+
+Hoy, un tipo sin recorrido se porta como «Nos llega · no se registra». El recorrido vale para ese tipo en todos los trámites.
+
+| Tipo de documento | Propuesta |
+|---|---|
+| MATRICULA | Nos llega · se registra de entrada |
+| SOLICITUD | Nos llega · se registra de entrada |
+| SOLICITUD-RESOLUCIÓN | Nos llega · se registra de entrada (la salida, a mano hasta la idea 777) |
+| RESOLUCION | Nos llega · se registra de entrada |
+| OFICIO | Lo hacemos · Secretaría, con visto bueno de Dirección · se registra de salida · a otro centro u organismo por correo electrónico |
+| CERTIFICADO | Lo hacemos · Secretaría, con visto bueno de Dirección · se registra de salida · a la familia por iPasen |
+| AJUSTE PLANIFICACIÓN | Lo hacemos · sin firma · no se registra · a otro centro u organismo por correo electrónico |
+| INFORME PERSONAL TRASLADO | Lo hacemos · Dirección · se registra de salida · a otro centro u organismo por Ventanilla Electrónica |
+| HISTORIAL ACADÉMICO | Igual que el anterior |
+| FICHA ENTREGA LIBROS | Lo hacemos · sin firma · no se registra · no se envía |
+
+- «Otro centro u organismo» y «Ventanilla Electrónica» llegan con la tarea pequeña de este tema; hasta entonces, OFICIO, AJUSTE PLANIFICACIÓN y los dos del traslado se guardan sin envío.
+- Cambio en MATRICULA, tarea 5: la comunicación al equipo educativo va **sin papel** (se envía con «Enviar ▾» y se marca a mano): COMUNICACION se usa en muchos trámites y no puede llevar un recorrido solo para este.
