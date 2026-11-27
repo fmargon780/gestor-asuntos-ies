@@ -1,4 +1,4 @@
-# 694 — Quinta tanda: los cinco últimos tipos de D1, pasados al molde nuevo (en repaso con Francisco desde el 27-nov-2026)
+# 694 — Quinta tanda: los cinco últimos tipos de D1, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
 
 Borrador de Claude, 27-nov-2026. Datos leídos ese día de `_GESTOR` de la cuenta común:
 `guias.json` (26-nov-2026), `tipos.json`, `campos.json`, `tipos-documento.json`,
@@ -81,7 +81,9 @@ Directiva» por correo). Sin datos ni plantillas.
 1. ~~CONFORMIDAD: qué papel es~~ Resuelta el 27-nov-2026: la conformidad mensual al servicio de limpieza; la firma la secretaria («La secretaria»).
 2. ~~COMUNICACIÓN RECIBIDA: el registro~~ Resuelta el 27-nov-2026: llega con el registro puesto (Francisco: «llega con el registro puesto»). La app lee el sello de Séneca del PDF al guardarlo (`js/registro-lector.js`, `js/registro-sellado.js`), así que `{registro}` sale relleno sin registrar nada. Por comprobar con la primera comunicación real: que el sello de la Bandeja Electrónica tenga la forma que la app reconoce. La tarea 1 se queda como está.
 3. ~~REUNIÓN C.M. ABSENTISMO: qué vuelve de Dirección~~ Resuelta el 27-nov-2026: nada; con enviársela al director termina el asunto («Termina el asunto»). Las dos tareas se quedan como están.
-4. INFORME EDITORIAL: la petición de la editorial, ¿se registra de entrada? Propuesta: no (es un correo comercial).
+4. ~~INFORME EDITORIAL: registrar la petición~~ Resuelta el 27-nov-2026: no se registra («No es necesario»).
+
+Tanda 5 repasada entera el 27-nov-2026, con sus recorridos aprobados («Sí»).
 
 ## Mirado en el código (27-nov-2026)
 
