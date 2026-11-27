@@ -1,1 +1,1 @@
-SEGUIR · filas 790, 770, 771 y 776
+SEGUIR
