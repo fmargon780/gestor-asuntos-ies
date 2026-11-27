@@ -111,7 +111,10 @@ var SoloSi = (function () {
     }
     var kc = claveDe(v.campos, nombre);
     var valor = kc === undefined ? '' : String(v.campos[kc] === undefined || v.campos[kc] === null ? '' : v.campos[kc]).trim();
-    if (!valor) return 'falta';
+    if (!valor) {
+      if (c.campo === CAMPO_ENSENANZA && v.clave) pedirEnsenanza(v.clave);   /* fila 781: la unidad del Centro de datos llega aparte */
+      return 'falta';
+    }
     return c.valores.some(function (x) { return igual(x, valor); }) ? 'sale' : 'quita';
   }
 
@@ -158,7 +161,7 @@ var SoloSi = (function () {
     var unidadFicha = a.ficha && typeof a.ficha.grupo === 'string' ? a.ficha.grupo : '';
     var ensenanza = ensenanzaDeUnidad(unidadFicha) || ensenanzas[a.nombre] || '';
     if (ensenanza) campos[CAMPO_ENSENANZA] = ensenanza;
-    return { campos: campos, camposLista: listas };
+    return { campos: campos, camposLista: listas, clave: a.nombre };
   }
 
   function asuntoDeClave(clave) {
@@ -180,6 +183,18 @@ var SoloSi = (function () {
       if (d.estado === 'falta') h.faltaCampo = d.campo;
       if (h.clase === 'decision') (h.opciones || []).forEach(function (o) { marcarLista(o.hitos, v); });
     });
+  }
+
+  /* Fila 781: un asunto que pide la enseñanza y aún no la sabe (por ejemplo, recién creado) la busca una sola vez
+     en el Centro de datos y, al llegar, vuelve a leer los hitos para que se repinte. */
+  var pedidas = {};
+  async function pedirEnsenanza(clave) {
+    if (pedidas[clave] || ensenanzas[clave] || !window.Plantillas || typeof Plantillas.valoresDeAsunto !== 'function') return;
+    pedidas[clave] = true;
+    var a = asuntoDeClave(clave);
+    if (!a) { pedidas[clave] = false; return; }
+    try { ensenanzas[clave] = ensenanzaDeUnidad((await Plantillas.valoresDeAsunto(a)).grupo) || ''; } catch (e) { return; }
+    if (ensenanzas[clave] && window.Hitos && typeof Hitos.leer === 'function') { try { Hitos.leer(); } catch (e) { /* se verá al volver a entrar */ } }
   }
 
   function usaEnsenanza(c) {

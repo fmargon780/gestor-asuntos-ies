@@ -208,6 +208,17 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(800);
 await comprobar('10. al guardar la guía de hitos, la lista de tareas guardada se conserva', pagina.evaluate(async (t) => { await GuiasDelCentro.ponerAlDia(); App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = true; const n = AsuntoSinHitosGuia.tareasDe(GuiasDelCentro.pasosDe(t)).length; App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = false; return n; }, TIPO), 5);
 
+console.log('--- «Solo si» por enseñanza, con la unidad que da el Centro de datos (fila 781) ---');
+await comprobar('8c. un tercero que no es alumno sigue con «Falta» (sin unidad)', pagina.evaluate(() => SoloSi.estado(SoloSi.normalizar({ campo: SoloSi.CAMPO_ENSENANZA, valores: ['E.S.O.'] }), SoloSi.valoresDe(SoloSi.asuntoDeClave(App.E.listaAbiertos[0].nombre)))), 'falta');
+await comprobar('8c. un alumno recién abierto lo pide al Centro de datos y la enseñanza llega sola', pagina.evaluate(async () => {
+  const a = Gestor.asuntos().filter((x) => /Jimenez Rubio/i.test(x.nombre))[0];
+  const si = SoloSi.normalizar({ campo: SoloSi.CAMPO_ENSENANZA, valores: ['E.S.O.'] });
+  const antes = SoloSi.estado(si, SoloSi.valoresDe(SoloSi.asuntoDeClave(a.nombre)));
+  let despues = antes;
+  for (let i = 0; i < 40 && despues === 'falta'; i++) { await new Promise((r) => setTimeout(r, 100)); despues = SoloSi.estado(si, SoloSi.valoresDe(SoloSi.asuntoDeClave(a.nombre))); }
+  return [antes, despues];
+}), ['falta', 'sale']);
+
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();
