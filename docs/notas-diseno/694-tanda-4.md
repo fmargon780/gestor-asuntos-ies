@@ -45,14 +45,19 @@ de Orientación) y «Registrar el recibí» («Cuando llegue»).
 2. Enviar al Departamento de Orientación el registro de la documentación entregada · sin papel · con «Enviar ▾», el correo que ya existe · al enviarlo, queda «Esperando a Orientación».
 3. Registrar el recibí de Orientación · Papel: RECEPCIÓN · Cómo se hace: cuando llegue, con su fecha exacta.
 
-## INFORME VALORACIÓN EQUIPO EDUCATIVO (3 hitos → 3 tareas)
+## INFORME VALORACIÓN EQUIPO EDUCATIVO (3 hitos → 4 tareas)
 
 Hoy: «Solicitud» (registrar de entrada), «Emisión» (espera, sin tarea) y «Envío» (registrar de
 salida «si se remite» y «dar al tutor para entregar a la familia»). Sin datos ni plantillas.
 
+Dato nuevo: «¿A quién va el informe?» (lista: «A la familia, por el tutor» / «Fuera del centro»).
+
 1. Recibir la solicitud del informe · Papel: SOLICITUD.
 2. Recoger el informe del equipo educativo · Papel: INFORME · queda «Esperando al equipo educativo» hasta que llegue.
-3. Entregar el informe · sin papel · Cómo se hace: si se manda fuera del centro, registrarlo de salida y enviarlo con «Enviar ▾»; si no, dárselo al tutor para que lo entregue a la familia. (Ver duda 4.)
+3. Dar el informe al tutor para que lo entregue a la familia · sin papel, se marca a mano · Solo si: «¿A quién va el informe?» = A la familia, por el tutor.
+4. Registrar de salida el informe y enviarlo · sin papel, se marca a mano · Solo si: = Fuera del centro · Cómo se hace: el registro de salida va en la ficha del informe de la tarea 2; se envía con «Enviar ▾».
+
+(Tareas 3 y 4 sin papel: INFORME lo usan también otros trámites y no puede llevar un recorrido solo para este; el recorrido es uno por tipo de documento, `js/tarea-papel.js`.)
 
 ## Recorridos que faltan
 
@@ -67,10 +72,10 @@ salida «si se remite» y «dar al tutor para entregar a la familia»). Sin dato
 1. ~~Ayuda de transporte: a quién va el aviso~~ Resuelta el 27-nov-2026: solo a la familia («1»). La tarea 3 se queda como está.
 2. ~~Ayuda de transporte: el recibí~~ Resuelta el 27-nov-2026: se imprime con la plantilla, lo firma en Secretaría quien viene y se registra de entrada (Francisco: «prefiero registrarlo de entrada»). Elegir en la ventanilla quién firma (tutor 1, tutor 2 o el alumno si es mayor de edad) es un desarrollo que Francisco lleva aparte; esta guía no depende de él.
 3. ~~NEAE: tipo del recibí de Orientación~~ Resuelta el 27-nov-2026: RECEPCIÓN («1»).
-4. Informe del equipo educativo: ¿quién lo pide y a quién va cuando sale del centro (por ejemplo, a un médico o a Servicios Sociales)? Con eso se decide si la tarea 3 se parte en dos según el caso.
+4. ~~Informe del equipo educativo: a quién va~~ Resuelta el 27-nov-2026: a menudo va fuera del centro; dos tareas, cada una con su «Solo si» («2»).
 5. Aparte, sin pedirlo: el correo «Abono ayuda transporte escolar» lleva escrito a mano «curso 2024/2025». Propongo que use el dato «Curso Abono AITE», como ya hace el otro correo. ¿En este tema o aparte?
 
 ## Por mirar en el código antes de aplicar (no se ha mirado todavía)
 
-- Si existe «registrar de salida» sin papel (tarea 3 del informe). (Las firmas posibles ya están miradas, duda 2.)
+- Mirado: el recorrido es uno por tipo de documento (`js/tarea-papel.js`), por eso las tareas 3 y 4 del informe van sin papel.
 - De dónde sale `{registro}` en el correo de COMUNICACIÓN RECIBIDA (tanda 5).
