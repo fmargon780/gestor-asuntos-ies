@@ -16,7 +16,7 @@ Hoy: «Tramitar · Esperar respuesta» (el relleno de siempre) más «Requerimie
 
 1. Recibir la solicitud de admisión · Papel: SOLICITUD (recorrido aprobado: nos llega, se registra de entrada)
 2. Requerir que subsane · Papel: REQUERIMIENTO · Solo si: «¿Hay que subsanar?» = Sí (dato nuevo de lista, Sí / No) · al enviarlo, queda «Esperando a la familia».
-3. Notificar la matrícula · plazo: 2 días hábiles (el que ya tenía el hito).
+3. Avisar a la familia de que ha sido admitido y tiene que formalizar la matrícula · plazo: 2 días hábiles · sin papel, se marca a mano · Cómo se hace: con «Enviar ▾», por correo o iPasen. (Francisco, 27-nov-2026: «1».)
 
 ## IDENTIFICACION ALUMNO (2 hitos → 2 tareas)
 
@@ -71,7 +71,7 @@ Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 
 1. ~~El expediente que llega~~ Resuelta el 27-nov-2026. Francisco: unas veces llega por correo postal y otras por la Bandeja del registro de entrada (el centro de origen lo manda por la Ventanilla Electrónica). Se crea el tipo de documento EXPEDIENTE DE TRASLADO, «nos llega · se registra de entrada», para cualquier vía; INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO se quedan para el alumno que se va («1»).
 2. ~~Traslado: los dos hitos sin «Solo si»~~ Resuelta el 27-nov-2026: son el expediente en papel, que se pide siempre (tareas 4 y 5; la 6 pasa a «siempre»).
-3. Admisión: «Notificación matrícula», ¿qué se notifica y a quién, y es un papel?
+3. ~~Admisión: «Notificación matrícula»~~ Resuelta el 27-nov-2026: es avisar a la familia de que ha sido admitido y tiene que formalizar la matrícula, en 2 días hábiles (tarea 3).
 4. IPASEN TUTOR LEGAL: ¿se queda como tipo propio, o se desactiva y se usa IPASEN ALUMNADO, que ya
    tiene «Tutor/a legal»?
 5. La plantilla «Devolución de libros de gratuidad por traslado» cuelga hoy de TRASLADO, que es
