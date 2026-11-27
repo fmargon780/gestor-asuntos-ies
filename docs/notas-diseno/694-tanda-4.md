@@ -1,4 +1,4 @@
-# 694 — Cuarta tanda: cuatro tipos de alumnado con guía de hitos, pasados al molde nuevo (borrador del 27-nov-2026)
+# 694 — Cuarta tanda: cuatro tipos de alumnado con guía de hitos, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
 
 Borrador de Claude (Sonnet), 27-nov-2026. Datos leídos ese día de `_GESTOR` de la cuenta común:
 `guias.json` (26-nov-2026), `tipos.json`, `campos.json`, `tipos-documento.json`,
@@ -51,19 +51,19 @@ Hoy: «Solicitud» (registrar de entrada), «Emisión» (espera, sin tarea) y «
 salida «si se remite» y «dar al tutor para entregar a la familia»). Sin datos ni plantillas.
 
 Dato nuevo: «¿A quién va el informe?» (lista: «A la familia, por el tutor» / «Fuera del centro»).
+Tipo de documento nuevo: INFORME VALORACIÓN (aprobado el 27-nov-2026, «Sí»).
 
 1. Recibir la solicitud del informe · Papel: SOLICITUD.
-2. Recoger el informe del equipo educativo · Papel: INFORME · queda «Esperando al equipo educativo» hasta que llegue.
+2. Recoger el informe del equipo educativo · Papel: INFORME VALORACIÓN · queda «Esperando al equipo educativo» hasta que llegue · se registra de salida siempre (Francisco: también el que va a la familia); «Registrado» se marca solo al llegar el sello.
 3. Dar el informe al tutor para que lo entregue a la familia · sin papel, se marca a mano · Solo si: «¿A quién va el informe?» = A la familia, por el tutor.
-4. Registrar de salida el informe y enviarlo · sin papel, se marca a mano · Solo si: = Fuera del centro · Cómo se hace: el registro de salida va en la ficha del informe de la tarea 2; se envía con «Enviar ▾».
-
-(Tareas 3 y 4 sin papel: INFORME lo usan también otros trámites y no puede llevar un recorrido solo para este; el recorrido es uno por tipo de documento, `js/tarea-papel.js`.)
+4. Enviar el informe · sin papel, con «Enviar ▾», se marca a mano · Solo si: = Fuera del centro.
 
 ## Recorridos que faltan
 
 | Tipo de documento | Propuesta |
 |---|---|
-| SOLICITUD, INFORME | Ya tienen o no necesitan recorrido nuevo: SOLICITUD es «nos llega · se registra de entrada» (tanda 1); INFORME se queda sin recorrido (= nos llega · no se registra), porque lo usan también INFORME EDITORIAL y CERTIFICADO PERSONAL. |
+| SOLICITUD | Ya aprobado en la tanda 1: nos llega · se registra de entrada |
+| INFORME VALORACIÓN (nuevo) | Lo hacemos · sin firma · se registra de salida · no se envía (lo entregan las tareas 3 y 4) · aprobado el 27-nov-2026 |
 | RECEPCIÓN | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
 | AITE - RECIBÍ GENÉRICO | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
 
@@ -74,7 +74,9 @@ Dato nuevo: «¿A quién va el informe?» (lista: «A la familia, por el tutor»
 3. ~~NEAE: tipo del recibí de Orientación~~ Resuelta el 27-nov-2026: RECEPCIÓN («1»).
 4. ~~Informe del equipo educativo: a quién va~~ Resuelta el 27-nov-2026: a menudo va fuera del centro; dos tareas, cada una con su «Solo si» («2»).
 5. ~~El curso escrito a mano en el correo de la ayuda~~ Resuelta el 27-nov-2026: en este tema («1»). La herramienta de aplicar cambia en «Abono ayuda transporte escolar» «curso 2024/2025» por «curso {campo:Curso Abono AITE}», y el tipo PAGO AYUDA TRANSPORTE pide ese dato antes de la tarea 1.
-6. Informe del equipo educativo: Francisco, 27-nov-2026: «daría registro de salida incluso al informe que se le da al tutor». Propuesta de Claude, sin aprobar: tipo de documento nuevo INFORME VALORACIÓN, con recorrido «lo hacemos · sin firma · se registra de salida · no se envía», en la tarea 2; así el registro se marca solo al llegar el sello y las tareas 3 y 4 quedan solo para entregarlo.
+6. ~~Informe del equipo educativo: registro de salida siempre~~ Resuelta el 27-nov-2026: tipo de documento nuevo INFORME VALORACIÓN, «lo hacemos · sin firma · se registra de salida · no se envía» («Sí»). Repasar el tipo INFORME (uno por clase de informe, con su «apellido») va aparte: idea 780.
+
+Tanda 4 repasada entera el 27-nov-2026.
 
 ## Por mirar en el código antes de aplicar (no se ha mirado todavía)
 
