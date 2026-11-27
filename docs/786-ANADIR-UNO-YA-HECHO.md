@@ -6,9 +6,9 @@
 ## Lo que escribió Francisco
 No lo pidió. Sale del repaso del tema 694 (`docs/notas-diseno/694-repaso.md`, punto 3), 27-nov-2026:
 los informes y el historial del traslado salen de Séneca; el informe de valoración lo escribe el
-equipo educativo; muchos certificados se firman en Séneca. Propuesta de Claude, pendiente de su «sí».
+equipo educativo; muchos certificados se firman en Séneca. Propuesta de Claude; Francisco, 27-nov-2026: «1» (está bien todo).
 
-## Lo que entendió Claude (pendiente de acordar con Francisco)
+## Lo que entendió Claude (acordado con Francisco el 27-nov-2026)
 - En un asunto de lista de tareas, la tarea de un papel que hacemos nosotros enseña «Generar documento ▾».
   En ese menú, detrás de las plantillas y de «Otra plantilla…», sale **«Añadir uno ya hecho…»**.
 - Abre la misma ventana de añadir documento de siempre, con el tipo de la tarea ya puesto. El
