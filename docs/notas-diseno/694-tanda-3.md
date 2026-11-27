@@ -1,4 +1,4 @@
-# 694 — Tercera tanda: cinco tipos del personal, pasados al molde nuevo (borrador, 27-nov-2026)
+# 694 — Tercera tanda: cinco tipos del personal, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
 
 Borrador de Claude (Opus), 27-nov-2026, con los mismos datos de `_GESTOR` que la segunda tanda.
 Sin aprobar. Misma forma que las anteriores.
@@ -69,4 +69,4 @@ la de FUNCIÓN TUTORIAL, en el grupo D2.
 2. ~~Copiar a la carpeta de Ausencias~~ Resuelta el 27-nov-2026: tarea pequeña de este tema, antes de aplicar las guías: «Copiar a otra carpeta» salta también en el molde nuevo cuando el papel de la tarea queda registrado («1»).
 3. ~~Permiso: comunicar la resolución~~ Resuelta el 27-nov-2026: no se comunica, «al menos, de momento» («2»). No hay tarea; la plantilla no se borra.
 4. ~~Prácticas: qué hace Dirección~~ Resuelta el 27-nov-2026: solo tiene que saberlo; la tarea es enviárselo («2»).
-5. Función tutorial: unir los dos tipos.
+5. ~~Función tutorial: unir los dos tipos~~ Resuelta el 27-nov-2026: se unen en FUNCIÓN TUTORIAL con la unión de la app («1»); la herramienta de aplicar lo hace antes de poner las guías.

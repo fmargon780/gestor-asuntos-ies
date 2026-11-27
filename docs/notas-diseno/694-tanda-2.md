@@ -1,4 +1,4 @@
-# 694 — Segunda tanda: cinco tipos con guía de hitos, pasados al molde nuevo (borrador, 27-nov-2026)
+# 694 — Segunda tanda: cinco tipos con guía de hitos, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
 
 Borrador de Claude (Opus), 27-nov-2026. Datos leídos ese día de `_GESTOR` de la cuenta común:
 `guias.json` y `tipos.json` (26-nov-2026), `campos.json`, `tipos-documento.json`,
