@@ -276,6 +276,7 @@
     if (sitioLlamada && window.Llamadas && Llamadas.botonCabecera) sitioLlamada.appendChild(Llamadas.botonCabecera());   /* fila 639: «Apuntar llamada», antes de «Ruta» */
     var sitioRuta = $('ficha-ruta');
     if (sitioRuta && window.RutaCarpetas) sitioRuta.appendChild(RutaCarpetas.boton(a, N.modoActual));   /* fila 637: a la vista, junto a «Archivar» */
+    if (sitioRuta && window.RutaChromebook && RutaChromebook.activo()) sitioRuta.appendChild(RutaChromebook.botonDrive(a));   /* fila 770 */
     pintarAcciones(a, abierto);
     N.pintarNotas(a, abierto);
     N.pintarAvisoDeTipo(a, tipo);
