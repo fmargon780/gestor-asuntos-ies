@@ -64,7 +64,7 @@ salida «si se remite» y «dar al tutor para entregar a la familia»). Sin dato
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
-1. Ayuda de transporte, tarea 3: el hito decía «comunicar a la tutoría», pero la frase y el correo hablan de avisar **a la familia**. Propuesta: el aviso va a la familia (el correo ya está hecho para los tutores legales). ¿Se avisa también a la tutoría?
+1. ~~Ayuda de transporte: a quién va el aviso~~ Resuelta el 27-nov-2026: solo a la familia («1»). La tarea 3 se queda como está.
 2. Ayuda de transporte, tarea 4: ¿el recibí es un papel que generamos, imprimimos y firma la familia en Secretaría, y luego lo escaneamos? Si es así, se guarda como papel que nos llega firmado por la familia (sin registro). Mirado en el código (`js/recorrido-tipo.js`): las firmas posibles son Nadie, Administración, Secretaría, Secretaría con visto bueno de Dirección, Dirección y Jefatura de Estudios; la familia no es una firma. Por eso el recibí firmado entraría como «nos llega · no se registra».
 3. NEAE, tarea 3: ¿el recibí de Orientación es un documento que ya conoces con otro nombre? Hoy hay «RECEPCIÓN» y «REGISTRO ENTREGA» entre los tipos de documento; propongo RECEPCIÓN.
 4. Informe del equipo educativo: ¿quién lo pide y a quién va cuando sale del centro (por ejemplo, a un médico o a Servicios Sociales)? Con eso se decide si la tarea 3 se parte en dos según el caso.
