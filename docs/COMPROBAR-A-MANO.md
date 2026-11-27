@@ -401,3 +401,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - (fila 646, 25-nov-2026) «Coger de Por clasificar»: comprobar la ✕ del cuadro del nombre al venir de la lista, y la tarea de añadir documento en un asunto con el hito cerrado de verdad (no debe salir el botón).
 
 - (Fila 770) Solo en el Chromebook de Francisco: pulsar «Ruta» en un asunto, abrir «Adjuntar» en Séneca o en Gmail, pegar en la lupa y ver que sale la carpeta; pulsar «Abrir en Drive» y ver que Drive enseña la carpeta del asunto. [solo en: tu Chromebook]
+
+- (Fila 772) Con el script de Gmail actualizado (fila 799): enviar un correo con negrita, una lista y una tabla y ver cómo llega a la bandeja; abrir el PDF CORREO que queda en el asunto y mirar que lleva la negrita y la tabla con sus líneas; «Copiar Cuerpo» y pegar en Gmail. [solo en: la app real]
