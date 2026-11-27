@@ -397,3 +397,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 ## Hecho, una sola regla (tema 693, 27-nov-2026)
 
 - (27-nov-2026, tema 693) **El tema queda cerrado con lo que ya hay:** el molde nuevo marca solo lo que se hace con la app y con un gesto lo que no ve, y el papel suelto se queda sin marca en los dos moldes (fila 775). Cerrar el hito sigue siendo a mano hasta que se retiren los hitos: no se añade nada sobre ellos. El interruptor para volver a hacer obligatorio vincular (682) se descarta. Francisco: «Está bien».
+
+## Pasar los tipos al molde nuevo (tema 694, 27-nov-2026)
+
+- (27-nov-2026, tema 694) **El certificado de que el alumno ha devuelto los libros no es la ficha de entrega de libros** (la ficha dice que la familia los recibe). Anulación de matrícula y traslado de matrícula viva usan **una sola plantilla**, «Devolución de libros de gratuidad», con un texto que vale para los dos (eligió «1»).
