@@ -393,3 +393,7 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (26-nov-2026, tema 691) **Solo se limpia lo que se queda:** el asunto «lista de tareas» y lo que comparten los dos moldes. Lo que solo tienen los asuntos con hitos no se cambia de sitio: desaparecerá cuando lo largo pase al molde nuevo (Francisco: «Creo que este diseño habría que analizar como "casa" con el nuevo molde»; «Me parece bien»).
 - (26-nov-2026, tema 691) **Un documento se «vincula» a una tarea**, no se «cuelga». En un asunto «lista de tareas», un papel entra en su tarea desde los botones de la tarea; no hay «Vincular a una tarea» en la carpeta.
 - (26-nov-2026, tema 691) **Sin fecha límite, la cabecera del asunto no enseña nada;** el plazo se pone desde «⋯» › «Poner plazo…».
+
+## Hecho, una sola regla (tema 693, 27-nov-2026)
+
+- (27-nov-2026, tema 693) **El tema queda cerrado con lo que ya hay:** el molde nuevo marca solo lo que se hace con la app y con un gesto lo que no ve, y el papel suelto se queda sin marca en los dos moldes (fila 775). Cerrar el hito sigue siendo a mano hasta que se retiren los hitos: no se añade nada sobre ellos. El interruptor para volver a hacer obligatorio vincular (682) se descarta. Francisco: «Está bien».
