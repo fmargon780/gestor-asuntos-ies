@@ -20,12 +20,17 @@ Electrónica»: «Remite: {nombre} / Registro: {registro} / Asunto: », sin dest
 Cambios del correo (los hace la herramienta de aplicar): «Asunto: {campo:Asunto Comunicado}» y
 adjuntar la COMUNICACION.
 
-## CONFORMIDAD (4 hitos → por decidir)
+## CONFORMIDAD (4 hitos → 1 tarea)
 
 Hoy: «Tramitar», «Imprimir, firma y sello», «Registro de salida» y «Enviar C.C. IES Fuente Lucena».
-Sin datos, plantillas ni tipo de documento. Tercero: empresa.
+Sin datos, plantillas ni tipo de documento. Tercero: empresa. Es la conformidad mensual al servicio
+de la empresa de limpieza (Francisco, 27-nov-2026).
 
-Pendiente de la duda 1.
+Dato nuevo: «Mes del servicio». Tipo de documento nuevo: CONFORMIDAD SERVICIO.
+
+1. Dar la conformidad del mes a la empresa de limpieza · Papel: CONFORMIDAD SERVICIO · el correo lleva copia al correo del centro («C.C. IES Fuente Lucena»).
+
+Esto no lo pidió: que la app cree este asunto sola cada mes (ya sabe hacer asuntos que se repiten). Va aparte, como idea.
 
 ## INFORME EDITORIAL (3 hitos → 2 tareas)
 
@@ -69,10 +74,11 @@ Directiva» por correo). Sin datos ni plantillas.
 | INFORME | Sin recorrido por ahora (lo de cada clase de informe es la idea 780); sale «Nos llega · no se registra» |
 | CALENDARIO COORDINACIÓN | Nos llega · no se registra |
 | CONVOCATORIA | Nos llega · se registra de entrada |
+| CONFORMIDAD SERVICIO (nuevo) | Lo hacemos · Secretaría · se registra de salida · al interesado (la empresa) por correo electrónico; la herramienta de aplicar crea su correo con copia al correo del centro (aprobado el 27-nov-2026: «La secretaria») |
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
-1. CONFORMIDAD: qué papel es, quién lo pide y qué quiere decir «Enviar C.C. IES Fuente Lucena». Lo que deduce Claude, sin confirmar: un escrito nuestro de conformidad para una empresa, firmado y sellado, registrado de salida y enviado por correo a la empresa con copia al correo del centro.
+1. ~~CONFORMIDAD: qué papel es~~ Resuelta el 27-nov-2026: la conformidad mensual al servicio de limpieza; la firma la secretaria («La secretaria»).
 2. COMUNICACIÓN RECIBIDA: ¿la comunicación de la Bandeja Electrónica la registramos de entrada nosotros? El correo pone su registro, y la app solo lo sabe si el documento del asunto lo tiene (sello o listado de Séneca). COMUNICACION no puede llevar recorrido propio.
 3. REUNIÓN C.M. ABSENTISMO: «Resolución del Director», ¿quiere decir que Dirección decide quién va a la reunión, o hay un papel que vuelve? Propuesta: solo se le envía, y con eso termina.
 4. INFORME EDITORIAL: la petición de la editorial, ¿se registra de entrada? Propuesta: no (es un correo comercial).
