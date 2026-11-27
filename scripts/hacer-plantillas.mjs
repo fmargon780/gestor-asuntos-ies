@@ -338,6 +338,8 @@ async function main() {
       entrada.texto = datos.texto || '';
       entrada.firmante = datos.firmante || '';
       entrada.vistoBueno = datos.vistoBueno || '';
+      /* Fila 779: `antes` es el nombre que tuvo la plantilla (se pasa al nuevo al cargar). */
+      if (datos.antes) entrada.antes = datos.antes;
       console.log('escrito  ' + nombreDocx);
     } else {
       /* Fila 170: una línea `=== SÉNECA ===` parte el cuerpo en dos: arriba
@@ -355,6 +357,10 @@ async function main() {
     }
 
     indice.push(entrada);
+    /* Fila 779: `tambien: TIPO A; TIPO B` cuelga la misma plantilla (mismo nombre y fichero) de más tipos. */
+    if (esDocumento && datos.tambien) {
+      datos.tambien.split(';').map((x) => x.trim()).filter(Boolean).forEach((t) => indice.push(Object.assign({}, entrada, { tipo: t })));
+    }
   }
 
   if (errores.length) {

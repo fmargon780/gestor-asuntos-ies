@@ -189,8 +189,10 @@ var TiposNombre = (function () {
 
   /* ---------- plantillas de documento repetidas ---------- */
 
-  /* Pura: los grupos de repetidas (mismo nombre y fichero), cada uno con
-     la que se queda (la unida a algún paso; si no, la primera). */
+  /* Los grupos de repetidas (mismo nombre y fichero), cada uno con la que se queda (la unida a algún paso;
+     si no, la primera). Fila 779: la misma plantilla en dos tipos que existen (la devolución de libros, en
+     anulación y en traslado de matrícula viva) no es repetida: sobra la de un tipo que ya no existe y la
+     segunda del mismo tipo (con su nombre corto o un alias). */
   function repetidas(documentos, idsUnidos) {
     var grupos = {};
     (documentos || []).forEach(function (d) {
@@ -198,12 +200,25 @@ var TiposNombre = (function () {
       var k = n(d.nombre) + '|' + d.fichero;
       (grupos[k] = grupos[k] || []).push(d);
     });
-    return Object.keys(grupos).map(function (k) { return grupos[k]; })
-      .filter(function (g) { return g.length > 1; })
-      .map(function (g) {
-        var queda = g.filter(function (d) { return idsUnidos[d.id]; })[0] || g[0];
-        return { queda: queda, sobran: g.filter(function (d) { return d !== queda; }) };
+    var salida = [];
+    Object.keys(grupos).forEach(function (k) {
+      var g = grupos[k];
+      if (g.length < 2) return;
+      var primero = function (lista) { return lista.filter(function (d) { return idsUnidos[d.id]; })[0] || lista[0]; };
+      var porTipo = {}, sinTipo = [];
+      g.forEach(function (d) {
+        var tp = tipoPorNombre(d.tipo || '');
+        if (!tp) { sinTipo.push(d); return; }
+        (porTipo[n(tp.tipo)] = porTipo[n(tp.tipo)] || []).push(d);
       });
+      var claves = Object.keys(porTipo);
+      var quedan = claves.map(function (c) { return primero(porTipo[c]); });
+      if (!quedan.length) quedan = [primero(sinTipo)];
+      else if (sinTipo.some(function (d) { return idsUnidos[d.id]; }) && claves.length === 1) quedan = [primero(g)];
+      var sobran = g.filter(function (d) { return quedan.indexOf(d) === -1; });
+      if (sobran.length) salida.push({ queda: quedan[0], sobran: sobran });
+    });
+    return salida;
   }
 
   function idsUnidosEnGuias(guias) {

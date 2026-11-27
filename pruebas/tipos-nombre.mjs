@@ -24,7 +24,10 @@ const LARGO = 'CERTIFICADO DE TUTORIA DE PRUEBA';
 const TIPOS = [
   { tipo: LARGO, nombreCorto: 'TUTORIA PRUEBA', categoria: 'PERSONAL' },
   { tipo: 'BECA', categoria: 'ALUMNADO' },
-  { tipo: 'MATRICULA', categoria: 'ALUMNADO' }
+  { tipo: 'MATRICULA', categoria: 'ALUMNADO' },
+  { tipo: 'ANULACIÓN MATRÍCULA', categoria: 'ALUMNADO' },
+  { tipo: 'TRAS. MATR. VIVA', categoria: 'ALUMNADO' },
+  { tipo: 'TRASLADO', categoria: 'ALUMNADO' }
 ];
 const GUIAS = {
   'TUTORIA PRUEBA': [{ id: 't1', titulo: 'Confección del Certificado', opciones: [], plantillasDocumento: ['pd-tut'] }],
@@ -146,6 +149,35 @@ const r3 = await pagina.evaluate(async () => {
   return [d.length, d[0].id, d[0].tipo === e.tipo];
 });
 await comprobar('3. una sola, la de antes, con el tipo del índice', Promise.resolve(r3), [1, 'pd-vieja', true]);
+
+/* ---------- 3b. fila 779: la devolución de libros cuelga de anulación y de traslado de matrícula viva ---------- */
+console.log('--- 3b. devolución de libros en dos tipos ---');
+const r3b = await pagina.evaluate(async () => {
+  const lib = async () => (await Plantillas.cargar(App.E.gestor)).documentos.filter(x => x.fichero === 'devolucion-libros.docx')
+    .map(x => x.tipo + '|' + x.nombre).sort();
+  await Plantillas.guardar(App.E.gestor, function (a) {
+    a.documentos = a.documentos.filter(x => x.fichero !== 'devolucion-libros.docx');
+    a.documentos.push({ id: 'pd-libros-vieja', tipo: 'TRASLADO', categoria: 'ALUMNADO', nombre: 'Devolución de libros de gratuidad por traslado',
+      fichero: 'devolucion-libros.docx', tipoDocumento: 'CERTIFICADO', texto: 'libros' });
+    return a;
+  });
+  await PlantillasCentro.cargar();
+  const primera = await lib();
+  const idVieja = (await Plantillas.cargar(App.E.gestor)).documentos.filter(x => x.id === 'pd-libros-vieja').map(x => x.tipo)[0];
+  await PlantillasCentro.cargar();
+  const segunda = await lib();
+  /* cargadas por tipo, una detrás de otra, no se llevan la plantilla de uno a otro */
+  await Plantillas.guardar(App.E.gestor, function (a) { a.documentos = a.documentos.filter(x => x.fichero !== 'devolucion-libros.docx'); return a; });
+  await PlantillasCentro.cargar({ soloTipo: 'ANULACIÓN MATRÍCULA', tipoReal: 'ANULACIÓN MATRÍCULA' });
+  await PlantillasCentro.cargar({ soloTipo: 'TRAS. MATR. VIVA', tipoReal: 'TRAS. MATR. VIVA' });
+  const porTipo = await lib();
+  return { primera, idVieja, segunda, porTipo };
+});
+const DOS = ['ANULACIÓN MATRÍCULA|Devolución de libros de gratuidad', 'TRAS. MATR. VIVA|Devolución de libros de gratuidad'];
+await comprobar('3b. cargar: una en cada tipo, ninguna en TRASLADO', Promise.resolve(r3b.primera), DOS);
+await comprobar('3b. la de antes (en TRASLADO) es la que pasa a anulación', Promise.resolve(r3b.idVieja), 'ANULACIÓN MATRÍCULA');
+await comprobar('3b. pulsar otra vez no añade nada', Promise.resolve(r3b.segunda), DOS);
+await comprobar('3b. cargadas por tipo, quedan las dos', Promise.resolve(r3b.porTipo), DOS);
 
 /* ---------- 4. «Buscar otra plantilla…» ---------- */
 console.log('--- 4. buscar otra plantilla ---');
