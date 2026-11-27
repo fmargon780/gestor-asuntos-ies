@@ -34,7 +34,19 @@
   /* `inicial` (fila 270, js/plantilla-de-lo-escrito.js): { texto, cambios } de
      «Guardar como plantilla nueva»: el texto de partida, la lista de datos
      cambiados por su hueco y la nota de que el saludo y la firma no entran. */
-  function cuerpoEditorEnLineaHTML(existente, inicial) {
+  function cuerpoEditorEnLineaHTML(existente, inicial, tipo) {
+    /* Fila 771: a toda la pantalla, con el correo en su orden y «Así le llega» a la derecha (js/plantilla-correo-pantalla.js). */
+    if (window.PlantillaCorreoPantalla) {
+      return PlantillaCorreoPantalla.cuerpoHTML({
+        p: 'pl2', existente: existente, titulo: existente ? 'Cambiar plantilla' : 'Nueva plantilla', texto: inicial ? inicial.texto : null,
+        linea: '<div class="pcp-nombre"><label class="etiqueta" for="pl2-nombre">Nombre de la plantilla</label>' +
+          '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '"></div>' +
+          '<div><span class="etiqueta">Tipo de asunto</span><span class="pcp-tipo">' + U.escapar(tipo || '') + '</span></div>',
+        herramientas: '<button type="button" class="boton" id="pl2-cancelar">Cancelar</button>' +
+          '<button type="button" class="boton boton-principal" id="pl2-guardar">Guardar</button>',
+        cambiosHTML: inicial ? '<div id="pl2-cambios"></div>' : ''
+      });
+    }
     return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
       '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       campoAsuntoHTML('pl2-asunto', existente) +
@@ -107,13 +119,17 @@
   }
 
   function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar, inicial) {
-    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente, inicial);
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente, inicial, tipo);
+    var aPantalla = !!window.PlantillaCorreoPantalla && !!$('pl2-llega');
+    contenedor.classList.toggle('pcp-pantalla', aPantalla);   /* fila 771: el editor ocupa toda la pantalla */
     function tipoDelAsunto() { return tipo; }
     /* Fila 627: «Así sale» con los datos reales del asunto en el que se está (si tiene número del asunto). */
-    engancharAsunto('pl2-asunto', tipoDelAsunto, function () {
+    var llega = null;   /* fila 771: se crea más abajo; «Así sale» usa los mismos valores que «Así le llega» */
+    var asuntoCampo = engancharAsunto('pl2-asunto', tipoDelAsunto, function () {
       var v = window.CorreoNucleo && CorreoNucleo.valoresDelCuadro ? CorreoNucleo.valoresDelCuadro() : null;
+      if (!(v && v['numero del asunto']) && llega) v = llega.ultimos();
       return v && v['numero del asunto'] ? v : null;
     });
     engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', window.PlantillaPapeles ? PlantillaPapeles.camposDeTexto('pl2') : [], tipoDelAsunto);
@@ -128,10 +144,21 @@
         if ($('pl2-previa')) $('pl2-previa').textContent = r.texto || '(vacío)';
       }).catch(function () { if ($('pl2-previa')) $('pl2-previa').textContent = '(vacío)'; });
     }
-    var alCambiarTexto = pintarPrevia;
-    if (inicial) alCambiarTexto = montarCambios(inicial.cambios, pintarPrevia);
+    /* Fila 771: «Así le llega» con el correo entero (asunto, saludo, texto y firma) y los datos reales del asunto. */
+    llega = aPantalla ? PlantillaCorreoPantalla.enganchar({
+      p: 'pl2', nombreAsunto: a.nombre,
+      alTenerValores: function () { if (asuntoCampo) asuntoCampo.pintar(); },
+      valores: function () { return Plantillas.valoresDeAsunto(a, hitoDelCuadro ? { hito: hitoDelCuadro } : undefined); },
+      asuntoModelo: function () { return AsuntoExtracto.modeloGeneralDeAsunto(Plantillas.enMemoria()); },
+      saludoDeSiempre: function () { return window.CorreoNucleo ? CorreoNucleo.saludoDe(a) : ''; },
+      firmaGeneral: function (v) { return v.firma || (window.CorreoNucleo ? CorreoNucleo.firmaDe() : ''); }
+    }) : null;
+    var repintar = llega ? function () { if (asuntoCampo) asuntoCampo.pintar(); llega.pintar(); } : pintarPrevia;
+    var alCambiarTexto = repintar;
+    if (inicial) alCambiarTexto = montarCambios(inicial.cambios, repintar);
     $('pl2-texto').oninput = alCambiarTexto;
-    pintarPrevia();
+    repintar();
+    if (llega) llega.crecer();
     if (inicial) $('pl2-nombre').focus();
 
     $('pl2-cancelar').onclick = function () { if (typeof alCancelar === 'function') alCancelar(); };

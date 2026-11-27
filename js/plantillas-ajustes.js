@@ -178,8 +178,8 @@
     }) : '';
   }
   function engancharAsunto(id, tipoDeLaPlantilla, valoresDelAsunto) {
-    if (!window.AsuntoExtractoCampo || !$(id)) return;
-    AsuntoExtractoCampo.enganchar(id, {
+    if (!window.AsuntoExtractoCampo || !$(id)) return null;
+    return AsuntoExtractoCampo.enganchar(id, {
       unaLinea: true, ocultar: AsuntoExtracto.SOLO_DEL_DOCUMENTO, tipo: tipoDeLaPlantilla, valores: valoresDelAsunto,
       general: function () { return AsuntoExtracto.modeloGeneralDeAsunto(Plantillas.enMemoria()); },
       deQuien: { propio: '(el de esta plantilla)', general: '(el general del centro)' }
@@ -257,6 +257,21 @@
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
   }
 
+  /* Fila 771: la ventana de «Nueva plantilla» / «Cambiar plantilla» a toda la pantalla (js/plantilla-correo-pantalla.js):
+     el mismo contenido y los mismos identificadores, con otra disposición. */
+  function pantallaHTML(existente, tipoPreset) {
+    var categorias = Nombres.CATEGORIAS;
+    var categoriaInicial = esGeneral(existente) ? '' : ((existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0]);
+    var linea =
+      '<div><label class="etiqueta" for="pl-categoria">Categoría</label><select id="pl-categoria" class="campo">' +
+        (esGeneral(existente) ? '<option value="" selected>(todas)</option>' : '') +
+        categorias.map(function (c) { return '<option value="' + c + '"' + (c === categoriaInicial ? ' selected' : '') + '>' + c + '</option>'; }).join('') +
+      '</select></div>' +
+      '<div><label class="etiqueta" for="pl-tipo">Tipo de asunto</label><select id="pl-tipo" class="campo">' + opcionesTiposDe(categoriaInicial, existente, tipoPreset) + '</select></div>' +
+      '<div class="pcp-nombre"><label class="etiqueta" for="pl-nombre">Nombre de la plantilla</label><input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '"></div>';
+    return PlantillaCorreoPantalla.cuerpoHTML({ p: 'pl', existente: existente, linea: linea });
+  }
+
   /* El catálogo de huecos ya no se pinta entero encima del texto:
      un solo botón abre el buscador de js/huecos-buscador.js
      (17-sep-2026, docs/HUECOS-INSERTAR.md). `campos` va en el orden
@@ -266,12 +281,26 @@
      insertar se lanza un evento `input`. */
   function engancharCuadro(existente, tipoPreset) {
     function tipoElegido() { return ($('pl-tipo') || {}).value || ''; }
-    engancharAsunto('pl-asunto', tipoElegido);
+    function muestraElegida() { return PlantillaCorreoPantalla.muestra(($('pl-categoria') || {}).value || '', tipoElegido()); }
+    var enPantalla = !!window.PlantillaCorreoPantalla && !!$('pl-llega');   /* fila 771: la ventana a toda la pantalla */
+    /* Fila 771: «Así sale» y «Así le llega» usan el mismo asunto de ejemplo, el del tipo elegido. */
+    var asunto = engancharAsunto('pl-asunto', tipoElegido, window.PlantillaCorreoPantalla ? muestraElegida : undefined);
     engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', window.PlantillaPapeles ? PlantillaPapeles.camposDeTexto('pl') : [], tipoElegido);
     if (window.PlantillaPapeles) PlantillaPapeles.enganchar('pl');
     engancharCampoDeTexto('pl-texto-seneca', 'pl-insertar-hueco-seneca', [], tipoElegido);
 
+    var llega = enPantalla ? PlantillaCorreoPantalla.enganchar({
+      p: 'pl', valores: muestraElegida,
+      asuntoModelo: function () { return AsuntoExtracto.modeloGeneralDeAsunto(Plantillas.enMemoria()); },
+      saludoDeSiempre: function (v) {
+        return window.CorreoNucleo ? CorreoNucleo.saludoDe({ ficha: { categoria: $('pl-categoria').value, tercero: v.nombre } }) : '';
+      },
+      firmaGeneral: function (v) { return Plantillas.rellenar((Centro.datos() && Centro.datos().firma) || Plantillas.POR_DEFECTO_FIRMA, v).texto; }
+    }) : null;
+
     function pintarPrevia() {
+      if (asunto) asunto.pintar();
+      if (llega) { llega.pintar(); return; }
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);
       var r = Plantillas.rellenar($('pl-texto').value, muestra);
       $('pl-previa').textContent = r.texto || '(vacío)';
@@ -282,7 +311,7 @@
       pintarPrevia();
     };
     $('pl-tipo').onchange = pintarPrevia;
-    $('pl-texto').oninput = pintarPrevia;
+    if (!llega) $('pl-texto').oninput = pintarPrevia;
     pintarPrevia();
   }
 
@@ -321,10 +350,15 @@
   }
 
   function abrirCuadroDePlantilla(existente, tipoPreset, alGuardar) {
-    var promesa = U.preguntar(existente ? 'Cambiar plantilla' : 'Nueva plantilla', cuerpoDelCuadroHTML(existente, tipoPreset),
-      existente ? 'Guardar' : 'Crear');
+    var titulo = existente ? 'Cambiar plantilla' : 'Nueva plantilla';
+    var boton = existente ? 'Guardar' : 'Crear';
+    var aPantalla = !!window.PlantillaCorreoPantalla;   /* fila 771 */
+    var promesa = U.preguntar(titulo, aPantalla ? pantallaHTML(existente, tipoPreset) : cuerpoDelCuadroHTML(existente, tipoPreset), boton);
+    var cuadro = document.querySelector('#capa .cuadro');
+    if (aPantalla && cuadro) cuadro.classList.add('cuadro-pcp');
     engancharCuadro(existente, tipoPreset);
     promesa.then(function (ok) {
+      if (cuadro) cuadro.classList.remove('cuadro-pcp');
       if (!ok) return;
       return guardarCuadro(existente, alGuardar);
     });
@@ -360,7 +394,7 @@
     campoDeTextoHTML: campoDeTextoHTML,
     engancharCampoDeTexto: engancharCampoDeTexto,
     /* Fila 560: lo que necesita js/plantillas-ajustes-editor.js, que cuelga aquí `montarEditorEnLinea` (fila 151). */
-    _interno: { campoSenecaHTML: campoSenecaHTML, filaDePlantilla: filaDePlantilla, campoAsuntoHTML: campoAsuntoHTML, engancharAsunto: engancharAsunto }
+    _interno: { campoSenecaHTML: campoSenecaHTML, filaDePlantilla: filaDePlantilla, campoAsuntoHTML: campoAsuntoHTML, engancharAsunto: engancharAsunto, datosDeMuestra: datosDeMuestra }
   };
 
 })();

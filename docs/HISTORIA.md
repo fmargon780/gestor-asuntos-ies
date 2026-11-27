@@ -6014,3 +6014,6 @@ Para dejar la cola por debajo de 40 KB (`docs/METODO-COMUN.md` 5.5). Texto compl
 |---|---|---|---|
 | 724 | `docs/724-CREAR-VARIOS-DESDE-EL-AVISO.md` (parte de 581 · «Crear de una vez los asuntos del aula de convivencia pegando el aviso de la intranet») | HECHA (25-nov-2026 10:00) | vista (20-nov-2026, por Claude, con Chrome, en la dirección de prueba, versión 20-nov-2026 · 12:21) · revisor APROBADA a la primera · fusionada en `main` (PR … (detalle en `docs/HISTORIA.md`) |
 | 737 | [docs/737-GUIA-A-TODA-LA-PANTALLA.md](737-GUIA-A-TODA-LA-PANTALLA.md) | HECHA (25-nov-2026 11:00) | vista (25-nov-2026, por Claude, con Chrome, en la dirección de prueba, versión 24-nov-2026 · 11:53) · revisor APROBADA a la primera · fusionada en `main` (PR … (detalle en `docs/HISTORIA.md`) |
+## 27-nov-2026 · fila 771 (parte 1 del tema 758, «Correos más cómodos»)
+La ventana de la plantilla de correo (Ajustes) y su editor en línea (cuadro de Correo y de Séneca) pasan a toda la pantalla: el correo en el orden en que se lee a la izquierda y «Así le llega» a la derecha. Por qué: el aviso de soporte del 25-nov-2026 (fila 741) pedía mejorar la usabilidad de la ventana estrecha. De paso, «Así sale» del Asunto usaba un asunto de ejemplo de otro tipo: ahora los dos usan el mismo. Lo que se guarda no cambia. La parte 2 (negrita y tablas, fila 772) necesita esta publicada.
+

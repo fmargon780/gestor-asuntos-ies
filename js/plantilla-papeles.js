@@ -90,17 +90,27 @@ var PlantillaPapeles = (function () {
       '<p class="nota">Vacío: sale el saludo de siempre, según la persona del asunto.</p>';
   }
 
-  function despuesDelTextoHTML(prefijo, existente) {
+  /* Fila 771: la firma y los tres campos de a quién va, por separado: la ventana de la plantilla de correo los pone en
+     su sitio (Para, Copia y Copia oculta arriba, la firma abajo). `despuesDelTextoHTML` los sigue juntando para el editor de la guía. */
+  function firmaHTML(prefijo, existente) {
+    return areaHTML(prefijo + '-firma', 'Firma', existente && existente.firma, 3) +
+      '<p class="nota">Vacía: sale la firma general de Ajustes.</p>';
+  }
+
+  function destinatariosHTML(prefijo, existente) {
     estado[prefijo] = {
       para: ((existente && existente.para) || []).slice(),
       copia: ((existente && existente.copia) || []).slice(),
       oculta: ((existente && existente.oculta) || []).slice()
     };
-    return areaHTML(prefijo + '-firma', 'Firma', existente && existente.firma, 3) +
-      '<p class="nota">Vacía: sale la firma general de Ajustes.</p>' +
-      '<div class="plantilla-papeles">' + CAMPOS.map(function (c) { return CampoDestinatarios.html(prefijo + '-' + c, ROTULOS[c]); }).join('') +
+    return '<div class="plantilla-papeles">' + CAMPOS.map(function (c) { return CampoDestinatarios.html(prefijo + '-' + c, ROTULOS[c]); }).join('') +
       '<p class="nota">Escribe lo que es: tutor, tutores legales, sus profesores, quien lo pide, relacionados, el interesado, o el nombre de una lista del personal ' +
       '(director, secretaría…). Al preparar el correo con esta plantilla, salen ya puestos y se pueden cambiar. Si no pones a nadie, se eligen al enviar.</p></div>';
+  }
+
+  function despuesDelTextoHTML(prefijo, existente) {
+    var destinatarios = destinatariosHTML(prefijo, existente);   /* primero: es quien prepara `estado` */
+    return firmaHTML(prefijo, existente) + destinatarios;
   }
 
   /* Los campos de saludo y firma, para que «Campo variable» entre también ahí. */
@@ -176,7 +186,7 @@ var PlantillaPapeles = (function () {
   }
 
   return { resumenDe: resumenDe, BASE: BASE, CAMPOS: CAMPOS, ROTULOS: ROTULOS, papeles: papeles, nombreDe: nombreDe, deVaA: deVaA, migrar: migrar, sinSaludo: sinSaludo,
-           antesDelTextoHTML: antesDelTextoHTML, despuesDelTextoHTML: despuesDelTextoHTML, camposDeTexto: camposDeTexto,
+           antesDelTextoHTML: antesDelTextoHTML, despuesDelTextoHTML: despuesDelTextoHTML, firmaHTML: firmaHTML, destinatariosHTML: destinatariosHTML, camposDeTexto: camposDeTexto,
            enganchar: enganchar, leer: leer, aFila: aFila };
 })();
 window.PlantillaPapeles = PlantillaPapeles;
