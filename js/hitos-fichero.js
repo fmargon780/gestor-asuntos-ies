@@ -26,7 +26,9 @@
     var g = gestor();
     if (!g) return vacio();
     var hacerlo = async function () {
-      var leido = marcar(normalizar(await Carpetas.leerJson(g, FICHERO)));
+      var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
+      if (window.SoloSi && SoloSi.cargarEnsenanzas) await SoloSi.cargarEnsenanzas(leido);   /* fila 781 */
+      leido = marcar(leido);
       var n = Object.keys(leido.porAsunto).length;
       if (n) vistosConDatos = n;
       ultimos = leido;

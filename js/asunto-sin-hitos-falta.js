@@ -16,7 +16,7 @@ var AsuntoSinHitosFalta = (function () {
 
   function etiquetaHTML(g) {
     if (!g.falta) return '';
-    var rellenable = !(window.SoloSi && g.falta === SoloSi.CAMPO_TERCERO);
+    var rellenable = !(window.SoloSi && (g.falta === SoloSi.CAMPO_TERCERO || g.falta === SoloSi.CAMPO_ENSENANZA));   /* filas 701 y 781: salen solos */
     return '<button type="button" class="solo-si-etiqueta ash-falta" data-campo="' + esc(g.falta) + '"' + (rellenable ? '' : ' disabled') + '>Falta: ' + esc(g.falta) + '</button>';
   }
 

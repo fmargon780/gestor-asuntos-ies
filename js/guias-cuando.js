@@ -31,10 +31,12 @@ var GuiasCuando = (function () {
   function camposDelTipo() {
     var lista = window.TextoCondicional ? TextoCondicional.camposDeLista(tipo) : [];
     if (conClase && window.SoloSi) lista = lista.concat([{ nombre: SoloSi.CAMPO_TERCERO, valores: SoloSi.clasesDelTipo(tipo) }]);   /* fila 701 */
+    if (conClase && window.SoloSi) lista = lista.concat([{ nombre: SoloSi.CAMPO_ENSENANZA, valores: SoloSi.ENSENANZAS.slice() }]);   /* fila 781 */
     return lista;
   }
 
   function textoDeOpcion(n) {
+    if (window.SoloSi && n === SoloSi.CAMPO_ENSENANZA) return 'Solo si el alumno es de…';   /* fila 781 */
     return window.SoloSi && n === SoloSi.CAMPO_TERCERO ? 'Solo si el tercero es…' : 'Solo si el campo «' + U.escapar(n) + '» vale…';
   }
 
@@ -67,7 +69,7 @@ var GuiasCuando = (function () {
         return '<label class="cuando-valor-et"><input type="checkbox" class="cuando-valor" value="' + U.escapar(v) + '"' +
           (marcados.indexOf(U.normalizar(v)) !== -1 ? ' checked' : '') + '> ' + U.escapar(v) + '</label>';
       }).join('') + '</div>' +
-        '<p class="nota cuando-nota">' + (window.SoloSi && actual === SoloSi.CAMPO_TERCERO ? 'En el asunto, si el tercero es de otra clase, esto no sale.' : 'En el asunto, si el campo tiene otro valor, esto no sale.') + '</p>' +   /* fila 701 */
+        '<p class="nota cuando-nota">' + (window.SoloSi && actual === SoloSi.CAMPO_TERCERO ? 'En el asunto, si el tercero es de otra clase, esto no sale.' : (window.SoloSi && actual === SoloSi.CAMPO_ENSENANZA ? 'En el asunto, si el alumno es de otra enseñanza, esto no sale.' : 'En el asunto, si el campo tiene otro valor, esto no sale.')) + '</p>' +   /* fila 701 y 781 */
         ((soloSi.valores || []).length ? '' : '<p class="nota cuando-nota">Marca al menos un valor; si no, se guardará como «Siempre».</p>') +
         ((soloSi.ademas || []).length ? '<p class="nota cuando-nota">Además, solo si ' + soloSi.ademas.map(function (x) { return U.escapar(x.campo + ': ' + x.valores.join(' o ')); }).join(' y ') + '.</p>' : '');
     }

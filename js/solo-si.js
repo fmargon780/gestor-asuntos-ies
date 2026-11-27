@@ -23,6 +23,18 @@ var SoloSi = (function () {
      el «campo» se llama así y sus valores son las clases de tercero del tipo (con el nombre de la lista de Ajustes). */
   var CAMPO_TERCERO = 'Clase del tercero';
 
+  /* Fila 781: «Solo si el alumno es de E.S.O.»: la enseñanza sale sola de la unidad del alumno (la de la ficha del asunto
+     o la del Centro de datos). La Diversificación (PMAR) cuenta como E.S.O. */
+  var CAMPO_ENSENANZA = 'Enseñanza del alumno';
+  var ENSENANZAS = ['E.S.O.', 'Bachillerato', 'Formación Profesional'];
+  var ensenanzas = {};   /* clave del asunto -> enseñanza sacada de la unidad que dio el Centro de datos (se rellena en `cargarEnsenanzas`) */
+
+  function ensenanzaDeUnidad(unidad) {
+    if (!unidad || !window.Nombres || !Nombres.nivelYEnsenanza) return '';
+    var e = Nombres.nivelYEnsenanza(String(unidad)).ensenanza;
+    return e === 'PMAR' ? 'E.S.O.' : (e || '');
+  }
+
   function clasesDelTipo(tipo) {
     var t = ((window.App && App.E && App.E.tipos) || []).filter(function (x) { return x.tipo === tipo; })[0];
     if (!t || !window.Nombres) return [];
@@ -99,7 +111,10 @@ var SoloSi = (function () {
     }
     var kc = claveDe(v.campos, nombre);
     var valor = kc === undefined ? '' : String(v.campos[kc] === undefined || v.campos[kc] === null ? '' : v.campos[kc]).trim();
-    if (!valor) return 'falta';
+    if (!valor) {
+      if (c.campo === CAMPO_ENSENANZA && v.clave) pedirEnsenanza(v.clave);   /* fila 781: la unidad del Centro de datos llega aparte */
+      return 'falta';
+    }
     return c.valores.some(function (x) { return igual(x, valor); }) ? 'sale' : 'quita';
   }
 
@@ -108,6 +123,7 @@ var SoloSi = (function () {
     c = normalizar(c);
     if (!c) return '';
     if (c.campo === CAMPO_TERCERO && !(c.ademas || []).length) return 'Solo si el tercero es ' + c.valores.join(' o ');   /* fila 701 */
+    if (c.campo === CAMPO_ENSENANZA && !(c.ademas || []).length) return 'Solo si el alumno es de ' + c.valores.join(' o ');   /* fila 781 */
     return 'Solo si ' + [c].concat(c.ademas || []).map(function (x) { return x.campo + ': ' + x.valores.join(' o '); }).join(' y ');
   }
 
@@ -141,7 +157,11 @@ var SoloSi = (function () {
     listas[CAMPO_TERCERO] = clasesDelTipo(tipo);   /* fila 701 */
     var clase = claseDelAsunto(a, tipo);
     if (clase) campos[CAMPO_TERCERO] = clase;
-    return { campos: campos, camposLista: listas };
+    listas[CAMPO_ENSENANZA] = ENSENANZAS.slice();   /* fila 781 */
+    var unidadFicha = a.ficha && typeof a.ficha.grupo === 'string' ? a.ficha.grupo : '';
+    var ensenanza = ensenanzaDeUnidad(unidadFicha) || ensenanzas[a.nombre] || '';
+    if (ensenanza) campos[CAMPO_ENSENANZA] = ensenanza;
+    return { campos: campos, camposLista: listas, clave: a.nombre };
   }
 
   function asuntoDeClave(clave) {
@@ -163,6 +183,40 @@ var SoloSi = (function () {
       if (d.estado === 'falta') h.faltaCampo = d.campo;
       if (h.clase === 'decision') (h.opciones || []).forEach(function (o) { marcarLista(o.hitos, v); });
     });
+  }
+
+  /* Fila 781: un asunto que pide la enseñanza y aún no la sabe (por ejemplo, recién creado) la busca una sola vez
+     en el Centro de datos y, al llegar, vuelve a leer los hitos para que se repinte. */
+  var pedidas = {};
+  async function pedirEnsenanza(clave) {
+    if (pedidas[clave] || ensenanzas[clave] || !window.Plantillas || typeof Plantillas.valoresDeAsunto !== 'function') return;
+    pedidas[clave] = true;
+    var a = asuntoDeClave(clave);
+    if (!a) { pedidas[clave] = false; return; }
+    try { ensenanzas[clave] = ensenanzaDeUnidad((await Plantillas.valoresDeAsunto(a)).grupo) || ''; } catch (e) { return; }
+    if (ensenanzas[clave] && window.Hitos && typeof Hitos.leer === 'function') { try { Hitos.leer(); } catch (e) { /* se verá al volver a entrar */ } }
+  }
+
+  function usaEnsenanza(c) {
+    c = c || {};
+    return c.campo === CAMPO_ENSENANZA || (c.ademas || []).some(function (y) { return y && y.campo === CAMPO_ENSENANZA; });
+  }
+
+  /* Fila 781: antes de marcar, la enseñanza de los alumnos de los asuntos que la piden, con la unidad del Centro de
+     datos (`Plantillas.valoresDeAsunto(...).grupo`: la de la ficha o, si no, la de este curso o la última). */
+  async function cargarEnsenanzas(datos) {
+    if (!datos || !datos.porAsunto || !window.Plantillas || typeof Plantillas.valoresDeAsunto !== 'function') return datos;
+    var claves = Object.keys(datos.porAsunto);
+    for (var i = 0; i < claves.length; i++) {
+      var clave = claves[i], entrada = datos.porAsunto[clave], pide = false;
+      if (!entrada || ensenanzas[clave]) continue;
+      (function ver(ls) { (ls || []).forEach(function (h) { if (h && usaEnsenanza(h.soloSi)) pide = true; if (h && h.clase === 'decision') (h.opciones || []).forEach(function (o) { ver(o.hitos); }); }); })(entrada.hitos);
+      if (!pide) continue;
+      var a = asuntoDeClave(clave);
+      if (!a) continue;
+      try { ensenanzas[clave] = ensenanzaDeUnidad((await Plantillas.valoresDeAsunto(a)).grupo) || ''; } catch (e) { /* sin unidad: «Falta» */ }
+    }
+    return datos;
   }
 
   /* Tras leer hitos.json: las condiciones de todos los asuntos con lo que dice su ficha ahora. */
@@ -216,7 +270,7 @@ var SoloSi = (function () {
   function fuera(x) { return !!x && x.cond === 'quita' && x.estado !== 'hecho'; }
 
   return {
-    CAMPO_TERCERO: CAMPO_TERCERO, clasesDelTipo: clasesDelTipo,
+    CAMPO_TERCERO: CAMPO_TERCERO, clasesDelTipo: clasesDelTipo, CAMPO_ENSENANZA: CAMPO_ENSENANZA, ENSENANZAS: ENSENANZAS, ensenanzaDeUnidad: ensenanzaDeUnidad, cargarEnsenanzas: cargarEnsenanzas,
     normalizar: normalizar, sumar: sumar, estado: estado, detalle: detalle, etiqueta: etiqueta, igual: igual, faltaHTML: faltaHTML,
     tipoDe: tipoDe, valoresDe: valoresDe, asuntoDeClave: asuntoDeClave, marcarLista: marcarLista, marcarTodo: marcarTodo, fuera: fuera, ajustarEnCurso: ajustarEnCurso, recorrer: recorrer
   };
