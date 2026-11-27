@@ -217,7 +217,8 @@ Se dice en una línea en la nota de la fila.
    también sobre el `CLAUDE.md` de la app (decidido por Francisco el 30-oct-2026).
 5. **Una fila solo es HECHA cuando está en `main`, publicada y comprobada** en la dirección real.
    Después de publicar, el revisor (o la sesión, en una tarea pequeña) mira la app publicada si
-   puede entrar; si no puede, lo deja escrito. Si no se puede comprobar la publicación por una
+   puede entrar; si no puede, lo deja escrito en la nota y la fila queda HECHA igual: no se abre
+   ninguna comprobación más (decidido por Francisco el 27-nov-2026). Si no se puede comprobar la publicación por una
    causa ajena (por ejemplo, Vercel contesta 402 por el tope de publicaciones: no se reintenta),
    queda SIN PUBLICACIÓN COMPROBADA, con el motivo en una línea, y no se empieza otra fila (salvo en
    una serie, o si el `CLAUDE.md` de la app dice que la cola sigue). «En verde», en lo que se deja
@@ -273,7 +274,7 @@ y para el Centro de mando.
 | `ESPERA A LA IDEA M` | No puede terminarse hasta que la fila M esté HECHA (apartado 9) | Claude Code |
 | `EN CURSO` | Una sesión la está programando | Claude Code |
 | `ESPERA TU VISTAZO` | Programada y a la vista en una dirección de prueba; no se publica hasta que Claude en el chat (o la persona) la mire. Solo en las apps cuyo `CLAUDE.md` trabaja así | Claude Code |
-| `HECHA (fecha hora)` | En `main`, publicada y comprobada por la sesión. Cuando Claude en el chat la comprueba (o la persona, con él) y está bien, la nota lleva «mirada (fecha, por Claude)» o «mirada (fecha)»; hasta entonces, y como mucho siete días, el Centro de mando la enseña como «falta comprobarla». Si queda algo para la persona, la nota acaba en «probada por Claude (fecha) · te queda: A (motivo); B (motivo)». El Centro de mando lee «te queda:» en toda la nota, así que solo se escribe mientras algo siga sin hacerse: al resolverse, pasa a «quedaba:», y nunca se escribe «te queda: nada». Si la nota de la fila empezaba por «vista (fecha, por Claude · <commit visto>)», al marcarla HECHA conserva ese principio tal cual cuando el código publicado es el mismo que el commit visto (`git diff <commit visto>..<commit publicado> -- . ':!docs'` vacío); si no, se quita «vista (» y la nota dice por qué | Claude Code |
+| `HECHA (fecha hora)` | En `main` y publicada. **Cierra la fila**: no se espera nada más de ella (decidido por Francisco el 27-nov-2026). Lo que se vea después, en la app real o en un aparato, es una fila nueva: una `IDEA` con «Fallo (de la fila N): qué pasa» si no es lo acordado, o la idea que sea; si solo puede hacerlo la persona, un paso (apartado 9). La nota no lleva «mirada», «vista (» ni «te queda»; las notas que ya los llevan quedan como historia y la página no los lee | Claude Code |
 | `SIN PUBLICACIÓN COMPROBADA` | Terminada, pero no se pudo comprobar la publicación (apartado 6.5) | Claude Code |
 | `BLOQUEADA` | Parada. La nota empieza por «PREGUNTA PARA <nombre>», «ATASCO PARA CLAUDE» o «FALTA UN PERMISO» (apartado 3) | Claude Code |
 | `DEVUELTA` | La persona miró la app y no es lo acordado. La nota dice qué falla | La persona, o Claude en su nombre |
@@ -290,7 +291,7 @@ no lo toca, salvo las marcas que ya mandan estas reglas):
 - **Un arreglo de una parte** dice «(de la fila N)» en su texto (apartado 3.D); sin eso y sin tema,
   es un arreglo suelto.
 - **Lo que se le pide a la persona:** en la nota, «te pido: <frase llana>» y, si solo se puede en
-  un sitio, `[solo en: <sitio>]`. También cuentan «te queda:» y una IDEA «paso de <nombre>».
+  un sitio, `[solo en: <sitio>]`. También cuenta una IDEA «paso de <nombre>».
 
 **No son trabajo para Claude Code:** IDEA, DECIDIDA, EN TEMA, EN DISEÑO, APLAZADA con fecha por
 llegar, PENDIENTE con «no antes del» una fecha por llegar, ESPERA A LA IDEA cuya idea no esté
