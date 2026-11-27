@@ -43,7 +43,7 @@ de Orientación) y «Registrar el recibí» («Cuando llegue»).
 
 1. Registrar la solicitud de la familia · Papel: SOLICITUD (recorrido ya aprobado: nos llega, se registra de entrada).
 2. Enviar al Departamento de Orientación el registro de la documentación entregada · sin papel · con «Enviar ▾», el correo que ya existe · al enviarlo, queda «Esperando a Orientación».
-3. Registrar el recibí de Orientación · Papel: RECEPCIÓN (ver duda 3) · Cómo se hace: cuando llegue, con su fecha exacta.
+3. Registrar el recibí de Orientación · Papel: RECEPCIÓN · Cómo se hace: cuando llegue, con su fecha exacta.
 
 ## INFORME VALORACIÓN EQUIPO EDUCATIVO (3 hitos → 3 tareas)
 
@@ -59,14 +59,14 @@ salida «si se remite» y «dar al tutor para entregar a la familia»). Sin dato
 | Tipo de documento | Propuesta |
 |---|---|
 | SOLICITUD, INFORME | Ya tienen o no necesitan recorrido nuevo: SOLICITUD es «nos llega · se registra de entrada» (tanda 1); INFORME se queda sin recorrido (= nos llega · no se registra), porque lo usan también INFORME EDITORIAL y CERTIFICADO PERSONAL. |
-| RECEPCIÓN | Nos llega · se registra de entrada (si Francisco confirma la duda 3) |
+| RECEPCIÓN | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
 | AITE - RECIBÍ GENÉRICO | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
 1. ~~Ayuda de transporte: a quién va el aviso~~ Resuelta el 27-nov-2026: solo a la familia («1»). La tarea 3 se queda como está.
 2. ~~Ayuda de transporte: el recibí~~ Resuelta el 27-nov-2026: se imprime con la plantilla, lo firma en Secretaría quien viene y se registra de entrada (Francisco: «prefiero registrarlo de entrada»). Elegir en la ventanilla quién firma (tutor 1, tutor 2 o el alumno si es mayor de edad) es un desarrollo que Francisco lleva aparte; esta guía no depende de él.
-3. NEAE, tarea 3: ¿el recibí de Orientación es un documento que ya conoces con otro nombre? Hoy hay «RECEPCIÓN» y «REGISTRO ENTREGA» entre los tipos de documento; propongo RECEPCIÓN.
+3. ~~NEAE: tipo del recibí de Orientación~~ Resuelta el 27-nov-2026: RECEPCIÓN («1»).
 4. Informe del equipo educativo: ¿quién lo pide y a quién va cuando sale del centro (por ejemplo, a un médico o a Servicios Sociales)? Con eso se decide si la tarea 3 se parte en dos según el caso.
 5. Aparte, sin pedirlo: el correo «Abono ayuda transporte escolar» lleva escrito a mano «curso 2024/2025». Propongo que use el dato «Curso Abono AITE», como ya hace el otro correo. ¿En este tema o aparte?
 
