@@ -77,11 +77,17 @@ await nuevoVacio();
 await comprobar('no hay título «Nuevo asunto» encima del formulario',
   pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#pantalla-nuevo h2'), h => h.offsetParent !== null).length), 0);
 await comprobar('pero sigue el «← Volver» de la cabecera', visible('#pantalla-nuevo .cabecera .boton-volver'), true);
-await comprobar('tres recuadros: fecha de inicio, tipo y tercero, en este orden',
+await comprobar('tres recuadros: tercero, tipo y fecha de inicio, en este orden (fila 776)',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.nuevo-tres-recuadros > .recuadro-nuevo .recuadro-titulo'), t => t.textContent.trim())),
-  ['Fecha de inicio', 'Qué tipo de asunto', 'Tercero']);
+  ['Tercero', 'Qué tipo de asunto', 'Fecha de inicio']);
 await comprobar('van en una sola fila (misma altura de arriba)',
   pagina.evaluate(() => { const t = Array.prototype.map.call(document.querySelectorAll('.nuevo-tres-recuadros > .recuadro-nuevo'), e => Math.round(e.getBoundingClientRect().top)); return t.every(x => x === t[0]); }), true);
+await comprobar('tercero y tipo, del mismo ancho (fila 776)',
+  pagina.evaluate(() => Math.abs(document.getElementById('bloque-tercero').getBoundingClientRect().width - document.getElementById('bloque-tipos').getBoundingClientRect().width) <= 2), true);
+await comprobar('de izquierda a derecha: tercero, tipo, fecha (fila 776)',
+  pagina.evaluate(() => { const x = id => document.getElementById(id).getBoundingClientRect().left; return x('bloque-tercero') < x('bloque-tipos') && x('bloque-tipos') < x('bloque-fecha'); }), true);
+await comprobar('los tres recuadros llegan hasta el borde derecho del formulario, sin hueco (fila 776)',
+  pagina.evaluate(() => { const f = document.querySelector('#pantalla-nuevo .formulario').getBoundingClientRect(); const c = document.getElementById('bloque-fecha').getBoundingClientRect(); const pad = parseFloat(getComputedStyle(document.querySelector('#pantalla-nuevo .formulario')).paddingRight); return Math.abs((f.right - pad) - c.right) <= 2 && f.width > 1200; }), true);
 await comprobar('la fecha de inicio es estrecha',
   pagina.evaluate(() => document.getElementById('bloque-fecha').getBoundingClientRect().width < 260), true);
 await comprobar('sin rótulos de departamento', pagina.locator('#tipos-lista .tipos-grupo-organo').count(), 0);
