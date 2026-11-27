@@ -73,6 +73,4 @@ Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 2. ~~Traslado: los dos hitos sin «Solo si»~~ Resuelta el 27-nov-2026: son el expediente en papel, que se pide siempre (tareas 4 y 5; la 6 pasa a «siempre»).
 3. ~~Admisión: «Notificación matrícula»~~ Resuelta el 27-nov-2026: es avisar a la familia de que ha sido admitido y tiene que formalizar la matrícula, en 2 días hábiles (tarea 3).
 4. ~~IPASEN TUTOR LEGAL: tipo propio o desactivarlo~~ Resuelta el 27-nov-2026: se queda como tipo propio, con la guía de IPASEN ALUMNADO (arriba), para que el asunto vaya a la carpeta del tutor («1»).
-5. La plantilla «Devolución de libros de gratuidad por traslado» cuelga hoy de TRASLADO, que es
-   alias de este tipo (el alumno que llega). Ese certificado lo da el centro del que se va, no
-   este. Propuesta: quitarla de aquí en la fila 779 (que aún no se ha programado).
+5. ~~La plantilla de devolución de libros en TRASLADO~~ Resuelta el 27-nov-2026: se quita del alumno que llega; queda solo en anulación y traslado de matrícula viva. Cambiado en la instrucción de la fila 779 («1», tras explicárselo con un ejemplo).
