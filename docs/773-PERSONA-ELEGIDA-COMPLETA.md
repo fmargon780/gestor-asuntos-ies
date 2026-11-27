@@ -59,3 +59,7 @@ Tarea pequeña: sin segundo revisor. El revisor de siempre comprueba:
 
 ## Revisión y respuestas durante el trabajo
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- 27-nov-2026, revisor aparte: APROBADA. Coincide: plantilla solo con `(Nombre)`/`(DNI)` pregunta la persona una vez; «padre» según el sexo del tutor; «en calidad de» sin valor se pide («En calidad de <campo>») y escrito se guarda; en la ficha, fila «En calidad de» con su «Cambiar» (vacío vuelve al valor de la app); cambiar de persona no arrastra lo escrito; el campo entero sigue igual.
+- No lo he podido ver: la plantilla «AITE - Persona Perceptora» con datos reales (solo Francisco); la demostración no trae ninguna plantilla de Word con estos campos, se probó con `Plantillas.rellenar`. El sexo de quien lo pide y de los relacionados no se consulta (la lista es síncrona): su «alumno/a» sale sin sexo; los tutores y el tercero sí lo usan.
+- Una persona elegida antes de esta fila no lleva «en calidad de» guardado: se pide al generar, o se escribe con «Cambiar».
+- Nueva dirección: la acción de publicación terminó bien, pero la sesión no puede abrir gestor-asuntos-ies.github.io (proxy 403): versión sin comprobar allí.
