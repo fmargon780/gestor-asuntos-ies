@@ -163,3 +163,7 @@ tareas (sí en «⋯»); «Escribir la guía de …» se queda en un asunto con 
 primera del ⋮ y copia; «Vincular a una tarea» solo en un asunto con hitos y documento sin tarea; ninguno en «lista de tareas»; sin «colgar» en
 pantalla. Consola sin errores, pantallas principales abren, crear/abrir/cerrar un asunto bien. Observación: algunas filas llevan una etiqueta
 de apoyo recortada con «…» (el hito vinculado, «Registro…»); no es el nombre del documento. Sin ver: datos reales.
+
+### Parte 2 (fila 776) · 27-nov-2026 · revisor aparte, contexto limpio, en local (`http://127.0.0.1:8300/?demo=1&auto=1`)
+
+APROBADA a la primera. Coinciden los tres puntos: de izquierda a derecha Tercero, Qué tipo de asunto, Fecha de inicio; formulario a todo el ancho (tercero y tipo del mismo ancho, fecha estrecha, «Datos del asunto» y botones también a todo el ancho); se crea un asunto empezando por la persona y otro empezando por el tipo. Consola sin errores, pantallas principales abren, crear/abrir/cerrar un asunto bien. Observación: en Inicio, «Le toca a» muestra «Interesado» en dos asuntos de BAJA MEDICA de la demostración (no es de esta fila). Sin ver: datos reales.
