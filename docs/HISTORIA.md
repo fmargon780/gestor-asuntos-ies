@@ -6006,3 +6006,11 @@ Para dejar la cola por debajo de 40 KB (`docs/METODO-COMUN.md` 5.5). Texto compl
 | 691 | Tema: Quitar lo que estorba. Para qué: limpiar pantallas y textos sin cambiar ninguna regla, y decir «vincular» y no «colgar» en lo que quede. [orden: 7 · sale del calendario para que quepa el papel con recorrido; después del 8 de diciembre] | SUSTITUIDA (26-nov-2026): diseñado en las filas 775 a 776 | Etapa «Quitar» de `docs/PLAN-2026-11.md`, con su lista. Ideas que entran: 689 y 684. |
 | 693 | Tema: Hecho, una sola regla. Para qué: que una tarea se dé por hecha de una sola manera: lo que se hace con la app se marca solo, lo que la app no ve, con un botón; el hito se cierra solo, con «Deshacer»; y el papel que entra se vincula solo o se queda sin marca. Revisa lo decidido el 16-nov-2026, que era marcar a mano. [orden: 8 · el papel con su recorrido ya va dentro del molde nuevo; lo demás espera] | SUSTITUIDA (27-nov-2026): diseñado en la fila 775 | Plan: `docs/PLAN-2026-11.md`. Idea que entra: 682. |
 | 741 | Aviso de usuario: mejora en «Herramientas» | SUSTITUIDA (26-nov-2026): diseñada en el tema 758 | Enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1OydPOEXLBrjfuy0wJvgJ5unAcLtPQox2/view?usp=drivesdk |
+
+
+## Filas HECHA movidas de docs/COLA.md el 27-nov-2026 (fila 790)
+
+| Nº | Instrucción | Estado | Notas |
+|---|---|---|---|
+| 724 | `docs/724-CREAR-VARIOS-DESDE-EL-AVISO.md` (parte de 581 · «Crear de una vez los asuntos del aula de convivencia pegando el aviso de la intranet») | HECHA (25-nov-2026 10:00) | vista (20-nov-2026, por Claude, con Chrome, en la dirección de prueba, versión 20-nov-2026 · 12:21) · revisor APROBADA a la primera · fusionada en `main` (PR … (detalle en `docs/HISTORIA.md`) |
+| 737 | [docs/737-GUIA-A-TODA-LA-PANTALLA.md](737-GUIA-A-TODA-LA-PANTALLA.md) | HECHA (25-nov-2026 11:00) | vista (25-nov-2026, por Claude, con Chrome, en la dirección de prueba, versión 24-nov-2026 · 11:53) · revisor APROBADA a la primera · fusionada en `main` (PR … (detalle en `docs/HISTORIA.md`) |
