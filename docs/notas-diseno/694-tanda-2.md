@@ -48,7 +48,7 @@ Hoy: dato «¿El Expediente Académico del Alumno está en Séneca?» (Sí / No)
 «Solo si». Es el alumno que **llega** de otro centro (alias TRASLADO).
 
 1. Pedir al centro de origen el informe personal y el historial · Papel: OFICIO (plantilla «Petición del historial al centro de procedencia», ya colgada) · Solo si: expediente en Séneca = No · al enviarlo, queda «Esperando al centro de origen».
-2. Recibir la documentación del centro de origen · Papel: **por decidir** (duda 1) · Solo si: No
+2. Recibir la documentación del centro de origen · Papel: EXPEDIENTE DE TRASLADO (tipo nuevo) · Solo si: No · Cómo se hace: llega por correo postal o por la Bandeja del registro de entrada (el otro centro lo manda por la Ventanilla Electrónica); trae el informe personal y el historial.
 3. Anotar en Séneca las asignaturas pendientes · Cómo se hace: si las tiene, anotarlas como pendientes en su matrícula. (Junta «Revisar si tiene asignaturas pendientes» y «Añadir a la matrícula materias pendientes».) Siempre.
 4. Guardar la documentación en el expediente del alumno · Solo si: No
 
@@ -58,18 +58,14 @@ Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 
 | Tipo de documento | Propuesta |
 |---|---|
+| EXPEDIENTE DE TRASLADO (nuevo) | Nos llega · se registra de entrada (aprobado el 27-nov-2026: «1») |
 | DNI | Nos llega · no se registra |
 | REQUERIMIENTO | Lo hacemos · Secretaría · se registra de salida · a la familia por iPasen |
 | CREDENCIAL IPASEN | Lo hacemos · sin firma · no se registra · no se envía (la envía la tarea siguiente) |
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
-1. **El expediente que llega.** El 27-nov-2026 se aprobó que INFORME PERSONAL TRASLADO e HISTORIAL
-   ACADÉMICO son «Lo hacemos · Dirección · registro de salida · Ventanilla» (el alumno que se va). Un
-   recorrido vale para el tipo en todos los trámites, así que el que **nos llega** no puede ser de
-   esos tipos. Propuesta: lo que llega del centro de origen es un papel VENTANILLA ELECTRÓNICA
-   (nos llega · se registra de entrada), con «Cómo se hace: dentro vienen el informe personal y el
-   historial». Depende de cómo llega de verdad (Ventanilla, correo, Séneca).
+1. ~~El expediente que llega~~ Resuelta el 27-nov-2026. Francisco: unas veces llega por correo postal y otras por la Bandeja del registro de entrada (el centro de origen lo manda por la Ventanilla Electrónica). Se crea el tipo de documento EXPEDIENTE DE TRASLADO, «nos llega · se registra de entrada», para cualquier vía; INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO se quedan para el alumno que se va («1»).
 2. Traslado: los hitos «Solicitud expediente académico al Centro origen» y «Recepción del
    Expediente», sin «Solo si», ¿son los mismos que la tarea 1 y 2, o es el expediente en papel, que
    se pide siempre?
