@@ -97,7 +97,7 @@
 }
 .ficha-documentos .ficha-documento-fila > .ficha-documento:hover { background: none; }
 .ficha-documentos .ficha-documento-fila > .ficha-documento-marca { flex: 0 0 auto; min-width: 13px; }
-.ficha-documento-nombre { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ficha-documento-nombre { min-width: 0; overflow-wrap: anywhere; white-space: normal; }   /* fila 775: el nombre se ve entero; si no cabe, pasa a la línea siguiente */
 .ficha-documento-fila > .ficha-documento .ficha-documento-hito { flex: 0 1 auto; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 10em; }
 .ficha-documento-fila > .ruta-documento { flex: 0 0 auto; }
 .ficha-documento-fila > .doc-datos {

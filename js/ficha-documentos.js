@@ -331,6 +331,7 @@ var FichaDocumentos = (function () {
     cepEstados: function () { return cepEstados; },
     sinTarea: function (nombre) { return !!window.DocumentoATarea && DocumentoATarea.sinTarea(hitosDelAsunto, nombre); },   /* fila 638 */
     hayHitos: function () { return !!window.DocumentoATarea && DocumentoATarea.hitosElegibles(hitosDelAsunto).length > 0; },
+    esListaDeTareas: function () { return !!window.AsuntoSinHitos && AsuntoSinHitos.es(hitosDelAsunto); },   /* fila 775 */
     alBorrar: function () { return alBorrarActual; },
     esSinSellar: esSinSellar,
     abrirDocumento: abrirDocumento,
