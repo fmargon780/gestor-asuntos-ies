@@ -120,11 +120,11 @@ console.log('--- 4. la pestaña «Proveedores» ---');
 await p.click('[data-pestana=proveedores]');
 await p.waitForSelector('.material-barra');
 await comprobar('4a. un proveedor por cada uno con precio, con su correo', p.evaluate(() => [...document.querySelectorAll('#material-cuerpo tbody tr')].map((r) => [r.children[0].textContent, r.children[1].textContent])),
-  [['Copistería Central', 'info@copicentral-demo.es'], ['Papelería La Esquina, S.L.', 'esquina@papeleria-demo.es'], ['Suministros Escolares Dobla, S.L.', 'pedidos@dobla-demo.es']]);
-await comprobar('4b. barra verde, roja al pasar y ámbar desde el 80 %', p.evaluate(() => [...document.querySelectorAll('.material-barra')].map((b) => b.className.replace('material-barra material-barra-', ''))), ['bien', 'pasado', 'cerca']);
+  [['Copistería Central', 'info@copicentral-demo.es'], ['Papelería La Esquina, S.L.', 'esquina@papeleria-demo.es'], ['Suministros Dobla Norte, S.L.', 'sin correo'], ['Suministros Escolares Dobla, S.L.', 'pedidos@dobla-demo.es']]);
+await comprobar('4b. barra verde, roja al pasar y ámbar desde el 80 %', p.evaluate(() => [...document.querySelectorAll('.material-barra')].map((b) => b.className.replace('material-barra material-barra-', ''))), ['bien', 'pasado', 'bien', 'cerca']);
 await comprobar('4c. la barra dice «N € · N %» y la etiqueta', p.evaluate(() => [...document.querySelectorAll('.material-barra-texto')].map((b) => b.textContent.replace(/\s+/g, ' '))),
-  ['900,00 € · 6 %', '15.600,00 € · 104 % · pasado del tope', '13.000,00 € · 87 % · cerca del tope']);
-await comprobar('4d. portes: «sin apuntar» o el importe', p.evaluate(() => [...document.querySelectorAll('[data-portes]')].map((b) => b.textContent)), ['sin apuntar', 'sin apuntar', '150,00 €']);
+  ['900,00 € · 6 %', '15.600,00 € · 104 % · pasado del tope', '0,00 € · 0 %', '13.000,00 € · 87 % · cerca del tope']);
+await comprobar('4d. portes: «sin apuntar» o el importe', p.evaluate(() => [...document.querySelectorAll('[data-portes]')].map((b) => b.textContent)), ['sin apuntar', 'sin apuntar', 'sin apuntar', '150,00 €']);
 await p.locator('[data-portes="Copistería Central"]').click();
 await p.waitForSelector('#material-portes');
 await p.fill('#material-portes', '60');
@@ -139,7 +139,7 @@ await p.click('#cuadro-aceptar');
 await esperarCuadroCerrado();
 await p.waitForFunction(() => document.querySelector('[data-portes="Copistería Central"]').textContent === 'sin apuntar');
 await comprobar('4f. vaciarlo lo deja «sin apuntar»', p.locator('[data-portes="Copistería Central"]').innerText(), 'sin apuntar');
-await comprobar('4g. el número de la pestaña', p.locator('[data-pestana=proveedores]').innerText(), 'Proveedores (3)');
+await comprobar('4g. el número de la pestaña', p.locator('[data-pestana=proveedores]').innerText(), 'Proveedores (4)');
 await comprobar('5. ningún error en la consola', errores, []);
 
 await navegador.close();

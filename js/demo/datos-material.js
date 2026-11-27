@@ -73,7 +73,8 @@
       ['a1', 'Copistería Central', 1.9, 300, 'Llamada'], ['a2', 'Papelería La Esquina, S.L.', 4.8, 12, 'Llamada'],
       ['a2', 'Suministros Escolares Dobla, S.L.', 4.6, 30, 'Correo'], ['a5', 'Suministros Escolares Dobla, S.L.', 18.5, 20, 'Correo'],
       ['a7', 'Papelería La Esquina, S.L.', 14.9, 45, 'Llamada'], ['a12', 'Suministros Escolares Dobla, S.L.', 9.2, 10, 'Correo'],
-      ['a13', 'Papelería La Esquina, S.L.', 8.1, 10, 'Llamada']
+      ['a13', 'Papelería La Esquina, S.L.', 8.1, 10, 'Llamada'],
+      ['a9', 'Suministros Dobla Norte, S.L.', 31.5, 60, 'Llamada']      /* sin correo en «Personas y empresas» (fila 753) */
     ].map(function (q, i) { return { id: 'p' + i, a: q[0], p: q[1], i: q[2], f: dia(q[3]), o: q[4] }; });
     await Copias.guardar(App.E.gestor, 'material-precios.json', {
       precios: P,
