@@ -42,7 +42,7 @@ llega la petición», sin el dato «¿Quién hace la solicitud?» (aquí siempre
 3. Guardar aquí la credencial generada en Séneca · Papel: CREDENCIAL IPASEN
 4. Entregar o enviar la credencial
 
-## TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN (8 hitos → 4 tareas)
+## TRASLADO DE EXPEDIENTE ACADÉMICO SOLICITADO AL CENTRO DE ORIGEN (8 hitos → 6 tareas)
 
 Hoy: dato «¿El Expediente Académico del Alumno está en Séneca?» (Sí / No) y ocho hitos, cinco con
 «Solo si». Es el alumno que **llega** de otro centro (alias TRASLADO).
@@ -50,7 +50,11 @@ Hoy: dato «¿El Expediente Académico del Alumno está en Séneca?» (Sí / No)
 1. Pedir al centro de origen el informe personal y el historial · Papel: OFICIO (plantilla «Petición del historial al centro de procedencia», ya colgada) · Solo si: expediente en Séneca = No · al enviarlo, queda «Esperando al centro de origen».
 2. Recibir la documentación del centro de origen · Papel: EXPEDIENTE DE TRASLADO (tipo nuevo) · Solo si: No · Cómo se hace: llega por correo postal o por la Bandeja del registro de entrada (el otro centro lo manda por la Ventanilla Electrónica); trae el informe personal y el historial.
 3. Anotar en Séneca las asignaturas pendientes · Cómo se hace: si las tiene, anotarlas como pendientes en su matrícula. (Junta «Revisar si tiene asignaturas pendientes» y «Añadir a la matrícula materias pendientes».) Siempre.
-4. Guardar la documentación en el expediente del alumno · Solo si: No
+4. Pedir al centro de origen el expediente en papel · Papel: OFICIO (la misma plantilla de petición) · siempre · al enviarlo, queda «Esperando al centro de origen».
+5. Recibir el expediente en papel · Papel: EXPEDIENTE DE TRASLADO · siempre.
+6. Guardar la documentación en el expediente del alumno · siempre.
+
+(Francisco, 27-nov-2026: el expediente en papel se pide siempre, esté o no en Séneca; «2».)
 
 Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 
@@ -66,9 +70,7 @@ Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 ## Dudas de Claude (las dice Francisco al repasar)
 
 1. ~~El expediente que llega~~ Resuelta el 27-nov-2026. Francisco: unas veces llega por correo postal y otras por la Bandeja del registro de entrada (el centro de origen lo manda por la Ventanilla Electrónica). Se crea el tipo de documento EXPEDIENTE DE TRASLADO, «nos llega · se registra de entrada», para cualquier vía; INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO se quedan para el alumno que se va («1»).
-2. Traslado: los hitos «Solicitud expediente académico al Centro origen» y «Recepción del
-   Expediente», sin «Solo si», ¿son los mismos que la tarea 1 y 2, o es el expediente en papel, que
-   se pide siempre?
+2. ~~Traslado: los dos hitos sin «Solo si»~~ Resuelta el 27-nov-2026: son el expediente en papel, que se pide siempre (tareas 4 y 5; la 6 pasa a «siempre»).
 3. Admisión: «Notificación matrícula», ¿qué se notifica y a quién, y es un papel?
 4. IPASEN TUTOR LEGAL: ¿se queda como tipo propio, o se desactiva y se usa IPASEN ALUMNADO, que ya
    tiene «Tutor/a legal»?
