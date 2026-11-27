@@ -80,7 +80,7 @@ Directiva» por correo). Sin datos ni plantillas.
 
 1. ~~CONFORMIDAD: qué papel es~~ Resuelta el 27-nov-2026: la conformidad mensual al servicio de limpieza; la firma la secretaria («La secretaria»).
 2. ~~COMUNICACIÓN RECIBIDA: el registro~~ Resuelta el 27-nov-2026: llega con el registro puesto (Francisco: «llega con el registro puesto»). La app lee el sello de Séneca del PDF al guardarlo (`js/registro-lector.js`, `js/registro-sellado.js`), así que `{registro}` sale relleno sin registrar nada. Por comprobar con la primera comunicación real: que el sello de la Bandeja Electrónica tenga la forma que la app reconoce. La tarea 1 se queda como está.
-3. REUNIÓN C.M. ABSENTISMO: «Resolución del Director», ¿quiere decir que Dirección decide quién va a la reunión, o hay un papel que vuelve? Propuesta: solo se le envía, y con eso termina.
+3. ~~REUNIÓN C.M. ABSENTISMO: qué vuelve de Dirección~~ Resuelta el 27-nov-2026: nada; con enviársela al director termina el asunto («Termina el asunto»). Las dos tareas se quedan como están.
 4. INFORME EDITORIAL: la petición de la editorial, ¿se registra de entrada? Propuesta: no (es un correo comercial).
 
 ## Mirado en el código (27-nov-2026)
