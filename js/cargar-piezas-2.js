@@ -263,6 +263,7 @@
     'js/texto-condicional-cuadro.js',
     'js/plantillas-ajustes-centro.js',   // fila 560: «Datos del centro y firma», antes que js/plantillas-ajustes.js
     'js/plantillas-ajustes.js',
+    'js/plantilla-correo-pantalla.js',   // fila 771: la ventana de la plantilla de correo a toda la pantalla; la usan plantillas-ajustes.js y su editor en línea
     'js/plantillas-ajustes-editor.js',   // fila 560: el editor en línea, después de js/plantillas-ajustes.js
     'js/asunto-extracto-ajustes.js',   // fila 627: la tarjeta «Asunto y extracto» y el extracto de cada tipo de documento
     // Fila 270: «Guardar como plantilla nueva» (lo usan los cuadros de Correo y de Séneca).

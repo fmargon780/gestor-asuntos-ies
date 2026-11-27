@@ -158,6 +158,15 @@
         nombre: 'Confirmación de matrícula',
         texto: 'Le confirmamos que la matrícula ha quedado registrada correctamente.'
       });
+      /* Fila 771: una plantilla de correo con papeles (Para y Copia), saludo, firma, un asunto propio y campos variables, para ver
+         la ventana «Así le llega» completa. Va la última de su tipo: no cambia cuál se propone primero. */
+      actual.lista.push({
+        id: 'pl-demo-libros', tipo: 'MATRICULA', categoria: 'ALUMNADO', nombre: 'Aviso de recogida de libros',
+        asunto: 'Recogida de libros de {nombre}',
+        texto: 'Les informamos de que {nombre} ({grupo}) puede recoger sus libros en la secretaría del centro, de 9:00 a 14:00.\n\nSi no pueden venir, avísennos por teléfono.',
+        saludo: 'Estimadas familias:', firma: 'Un cordial saludo.\n{usuario}\n{centro}',
+        para: ['legales'], copia: ['tutor'], migradaA555: true
+      });
       /* Fila 320 (pantalla «Plantillas»): una de correo en la tarea de un hito (la usa BAJA MEDICA) y las dos de la aplicación. */
       actual.lista.push({ id: 'pl-demo-baja', tipo: 'BAJA MEDICA', categoria: 'PERSONAL', nombre: 'Acuse de recibo del parte',
         texto: 'Hemos recibido su parte de baja. Cuando tenga el parte de alta, tráigalo al centro.' });
