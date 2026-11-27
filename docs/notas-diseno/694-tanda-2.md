@@ -72,8 +72,7 @@ Desaparece «No es necesario pedir nada» (con «Sí» solo sale la tarea 3).
 1. ~~El expediente que llega~~ Resuelta el 27-nov-2026. Francisco: unas veces llega por correo postal y otras por la Bandeja del registro de entrada (el centro de origen lo manda por la Ventanilla Electrónica). Se crea el tipo de documento EXPEDIENTE DE TRASLADO, «nos llega · se registra de entrada», para cualquier vía; INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO se quedan para el alumno que se va («1»).
 2. ~~Traslado: los dos hitos sin «Solo si»~~ Resuelta el 27-nov-2026: son el expediente en papel, que se pide siempre (tareas 4 y 5; la 6 pasa a «siempre»).
 3. ~~Admisión: «Notificación matrícula»~~ Resuelta el 27-nov-2026: es avisar a la familia de que ha sido admitido y tiene que formalizar la matrícula, en 2 días hábiles (tarea 3).
-4. IPASEN TUTOR LEGAL: ¿se queda como tipo propio, o se desactiva y se usa IPASEN ALUMNADO, que ya
-   tiene «Tutor/a legal»?
+4. ~~IPASEN TUTOR LEGAL: tipo propio o desactivarlo~~ Resuelta el 27-nov-2026: se queda como tipo propio, con la guía de IPASEN ALUMNADO (arriba), para que el asunto vaya a la carpeta del tutor («1»).
 5. La plantilla «Devolución de libros de gratuidad por traslado» cuelga hoy de TRASLADO, que es
    alias de este tipo (el alumno que llega). Ese certificado lo da el centro del que se va, no
    este. Propuesta: quitarla de aquí en la fila 779 (que aún no se ha programado).
