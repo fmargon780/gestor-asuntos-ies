@@ -245,7 +245,7 @@ var CorreoFormatoEditor = (function () {
       var todas = Array.prototype.slice.call(c.closest('table').querySelectorAll('td,th')), i = todas.indexOf(c) + (ev.shiftKey ? -1 : 1);
       if (i < 0) return;
       ev.preventDefault();
-      if (i >= todas.length) { operarTabla('fila-mas'); return; }   /* el Tabulador en la última casilla añade una fila, como en Word */
+      if (i >= todas.length) { var filaActual = c.parentNode; operarTabla('fila-mas'); if (filaActual.nextElementSibling) ponerEnCasilla(filaActual.nextElementSibling.children[0]); return; }   /* el Tabulador en la última casilla añade una fila, como en Word */
       ponerEnCasilla(todas[i]);
     });
 
