@@ -65,9 +65,7 @@ la de FUNCIÓN TUTORIAL, en el grupo D2.
 
 ## Dudas de Claude (las dice Francisco al repasar)
 
-1. **El envío de CERTIFICADO.** Propuesta: cambiar el recorrido aprobado de «a la familia por
-   iPasen» a «a quien lo pide por correo electrónico», que vale para el alumnado y para el personal.
-   Por correo, la app marca «Enviado» sola.
+1. ~~El envío de CERTIFICADO~~ Resuelta el 27-nov-2026: el recorrido pasa a «a quien lo pide por correo electrónico», para alumnado y personal; lo que se mande por iPasen se marca con «Marcar enviado» («1»). Cambiado también en la tabla de `694-tanda-1.md`.
 2. **Copiar a la carpeta de Ausencias.** Propuesta: tarea pequeña de este tema, antes de aplicar las
    guías: que «Copiar a otra carpeta» salte también cuando el papel de una tarea queda registrado.
 3. Permiso: ¿se comunica la resolución al empleado (hay plantilla de correo), y entonces es una

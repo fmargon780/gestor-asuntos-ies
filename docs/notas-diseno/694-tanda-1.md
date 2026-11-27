@@ -80,7 +80,7 @@ Hoy, un tipo sin recorrido se porta como «Nos llega · no se registra». El rec
 | SOLICITUD-RESOLUCIÓN | Nos llega · se registra de entrada (la salida, a mano hasta la idea 777) |
 | RESOLUCION | Nos llega · se registra de entrada |
 | OFICIO | Lo hacemos · Secretaría, con visto bueno de Dirección · se registra de salida · a otro centro u organismo por correo electrónico |
-| CERTIFICADO | Lo hacemos · Secretaría, con visto bueno de Dirección · se registra de salida · a la familia por iPasen |
+| CERTIFICADO | Lo hacemos · Secretaría, con visto bueno de Dirección · se registra de salida · a quien lo pide por correo electrónico (cambiado el 27-nov-2026 en la tercera tanda: antes «a la familia por iPasen», que no vale para el personal) |
 | AJUSTE PLANIFICACIÓN | Lo hacemos · sin firma · no se registra · a otro centro u organismo por correo electrónico |
 | INFORME PERSONAL TRASLADO | Lo hacemos · Dirección · se registra de salida · a otro centro u organismo por Ventanilla Electrónica |
 | HISTORIAL ACADÉMICO | Igual que el anterior |
