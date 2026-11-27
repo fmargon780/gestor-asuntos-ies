@@ -22,6 +22,7 @@ var CorreoRelacionar = (function () {
       plantilla: window.CorreoCuadroNucleo ? CorreoCuadroNucleo.S.plantillaElegida : '',
       asunto: $('correo-asunto') ? $('correo-asunto').value : undefined,
       cuerpo: cuerpo ? cuerpo.value : '',
+      cuerpoHtml: cuerpo && cuerpo.esRico ? cuerpo.html : '',   /* fila 772 */
       escrito: !!cuerpo && window.CorreoCuadroNucleo && cuerpo.value !== CorreoCuadroNucleo.S.textoProgramado
     };
     var nuevo = I.comunicarHitoActual, extraHito = I.hitoActual;

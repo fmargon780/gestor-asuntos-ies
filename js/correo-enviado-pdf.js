@@ -85,6 +85,9 @@ window.CorreoEnviadoPdf = (function () {
     var doc = await PDFLib.PDFDocument.create();
     var normal = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
     var negrita = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    var conFormato = !!(d.cuerpoHtml && window.CorreoEnviadoPdfFormato);   /* fila 772 */
+    var cursiva = conFormato ? await doc.embedFont(PDFLib.StandardFonts.HelveticaOblique) : null;
+    var negritaCursiva = conFormato ? await doc.embedFont(PDFLib.StandardFonts.HelveticaBoldOblique) : null;
     var gris = PDFLib.rgb(0.35, 0.35, 0.35), negro = PDFLib.rgb(0, 0, 0), raya = PDFLib.rgb(0.75, 0.75, 0.75);
     var ANCHO = 595.28, ALTO = 841.89, M = 50, SALTO = 13.5;
     var pagina, y;
@@ -117,7 +120,14 @@ window.CorreoEnviadoPdf = (function () {
     y -= 4;
     pagina.drawLine({ start: { x: M, y: y }, end: { x: ANCHO - M, y: y }, thickness: 0.6, color: raya });
     y -= 16;
-    lineasDe(d.cuerpo, normal, 10.5, ANCHO - 2 * M).forEach(function (l) { linea(l, 10.5, normal); });
+    if (conFormato) {
+      /* Fila 772: el cuerpo con su negrita, cursiva, subrayado, listas y tablas (js/correo-enviado-pdf-formato.js). */
+      CorreoEnviadoPdfFormato.cuerpo({
+        fuentes: { normal: normal, negrita: negrita, cursiva: cursiva, negritaCursiva: negritaCursiva }, rgb: PDFLib.rgb,
+        ANCHO: ANCHO, M: M, SALTO: SALTO, TAM: 10.5, limpio: limpio,
+        pagina: function () { return pagina; }, y: function () { return y; }, ponerY: function (v) { y = v; }, sitio: sitio
+      }, d.cuerpoHtml);
+    } else lineasDe(d.cuerpo, normal, 10.5, ANCHO - 2 * M).forEach(function (l) { linea(l, 10.5, normal); });
     if (d.adjuntos && d.adjuntos.length) {
       y -= 10;
       linea('Adjuntos:', 10.5, negrita);
@@ -151,7 +161,7 @@ window.CorreoEnviadoPdf = (function () {
     }
     var bytes = await pdfDe({
       de: (respuesta && respuesta.de) || '', para: datos.para || '', cco: datos.cco || '',
-      fecha: fechaHoraLegible(ahora), asunto: datos.asunto || '', cuerpo: datos.cuerpo || '',
+      fecha: fechaHoraLegible(ahora), asunto: datos.asunto || '', cuerpo: datos.cuerpo || '', cuerpoHtml: datos.cuerpoHtml || '',
       adjuntos: datos.adjuntos || []
     });
     await Carpetas.escribirBytes(a.handle, nombre, bytes, 'application/pdf');

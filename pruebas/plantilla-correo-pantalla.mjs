@@ -33,7 +33,7 @@ const abrir = async (id) => {
 };
 const llega = () => pagina.evaluate(() => ({
   asunto: document.getElementById('pl-llega-asunto').textContent, saludo: document.getElementById('pl-llega-saludo').textContent,
-  texto: document.getElementById('pl-previa').textContent, firma: document.getElementById('pl-llega-firma').textContent }));
+  texto: document.getElementById('pl-previa').innerText, firma: document.getElementById('pl-llega-firma').textContent }));
 const cerrar = async () => { await pagina.click('#cuadro-cancelar'); await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto')); };
 
 console.log('--- la ventana a toda la pantalla ---');
@@ -69,7 +69,7 @@ console.log('--- se actualiza mientras se escribe ---');
 await pagina.fill('#pl-saludo', 'Buenos días, familia de {nombre}:');
 await pagina.fill('#pl-firma', 'Secretaría de {centro}');
 await pagina.fill('#pl-asunto', 'Libros · {nombre}');
-await pagina.fill('#pl-texto', 'Pasen por secretaría.\n\nHasta pronto.');
+await pagina.fill('#pl-texto', 'Pasen por secretaría.\nHasta pronto.');   /* fila 772: un Intro, un párrafo nuevo */
 await comprobar('6. escribir en Saludo, Firma, Asunto y Texto lo cambia a la derecha', llega().then((l) => [l.saludo.indexOf('Buenos días, familia de ') === 0 && !/[{}]/.test(l.saludo), /^Secretaría de \S/.test(l.firma),
   /^Libros · \S/.test(l.asunto), l.texto]), [true, true, true, 'Pasen por secretaría.\n\nHasta pronto.']);
 await comprobar('6. «Así sale» sigue igual que «Así le llega»', pagina.evaluate(() => document.querySelector('#pl-asunto-sale .ae-resultado').textContent === document.getElementById('pl-llega-asunto').textContent), true);
@@ -77,7 +77,7 @@ await pagina.fill('#pl-saludo', '');
 await pagina.fill('#pl-firma', '');
 await comprobar('7. con el saludo y la firma vacíos salen los de siempre', llega().then((l) => [/^Estimados tutores legales de \S.*:$/.test(l.saludo), /^Un saludo\./.test(l.firma)]), [true, true]);
 await pagina.fill('#pl-texto', 'Hola {nombre}');
-await pagina.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+await pagina.evaluate(() => { const t = document.getElementById('pl-texto'); t.focus(); const r = document.createRange(); r.selectNodeContents(t); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });   /* fila 772: el Texto es un recuadro con formato */
 await pagina.click('#pl-insertar-hueco');
 await pagina.waitForSelector('.hb-buscador input, .huecos-buscador input, [class*="buscador"] input', { timeout: 5000 }).catch(() => {});
 await pagina.keyboard.type('grupo');
@@ -90,7 +90,7 @@ await pagina.fill('#pl-texto', Array.from({ length: 60 }, (_, i) => 'Línea de p
 await comprobar('8. el Texto crece y no tiene barra de desplazamiento propia', pagina.evaluate((h0) => {
   const t = document.getElementById('pl-texto');
   return [t.getBoundingClientRect().height > h0 + 400, t.scrollHeight <= t.clientHeight + 4, getComputedStyle(t).overflowY];
-}, alturaDeAntes), [true, true, 'hidden']);
+}, alturaDeAntes), [true, true, 'visible']);   /* fila 772: el recuadro con formato no tiene barra propia: crece */
 await comprobar('8. los botones siguen a la vista y la columna izquierda se desplaza sola', pagina.evaluate(() => {
   const b = document.getElementById('cuadro-aceptar').getBoundingClientRect(), i = document.querySelector('.pcp-izq');
   return [b.top >= 0 && b.bottom <= innerHeight, i.scrollHeight > i.clientHeight, document.querySelector('#capa .cuadro').scrollHeight <= document.querySelector('#capa .cuadro').clientHeight + 2];

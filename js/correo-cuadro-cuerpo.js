@@ -112,7 +112,8 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     }
 
     var cuerpo = n().cuerpoDelMedio(a, I.S.plantillaElegida);
-    I.S.textoProgramado = cuerpo.texto;
+    /* Fila 772: el cuerpo es un recuadro con formato; «lo escrito a mano» se mira sobre su texto sencillo. */
+    I.S.textoProgramado = window.CorreoFormato ? CorreoFormato.aTexto(cuerpo.html) : cuerpo.texto;
 
     /* Fila 151: sin ninguna plantilla, «Crear plantilla»; con alguna,
        «Editar plantilla» junto al desplegable, para la elegida. */
@@ -138,7 +139,8 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
       /* Fila 530: lo que falta se escribe aquí y se guarda en el asunto (js/datos-del-asunto-cuadro.js). */
       (window.DatosDelAsuntoCuadro ? DatosDelAsuntoCuadro.html('correo', a, cuerpo.faltan)
         : (cuerpo.faltan.length ? '<p class="aviso aviso-ambar" id="correo-faltan-datos">Faltan datos: ' + U.escapar(cuerpo.faltan.join(', ')) + '</p>' : '')) +
-      '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' + U.escapar(cuerpo.texto) + '</textarea>';
+      (window.CorreoFormatoEditor ? CorreoFormatoEditor.html('correo-cuerpo-texto', cuerpo.html, { minimo: 200 })
+        : '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' + U.escapar(cuerpo.texto) + '</textarea>');
   }
 
   /* ---------- enganchar ---------- */

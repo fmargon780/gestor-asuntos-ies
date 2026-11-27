@@ -44,7 +44,7 @@ window.CorreoEnviar = (function () {
 
   /* La versión de este mismo cambio (ha de coincidir con VERSION_SCRIPT
      de apps-script/gestor-correos.gs). */
-  var SCRIPT_ESPERADO = '6-nov-2026 · fila 555';
+  var SCRIPT_ESPERADO = '27-nov-2026 · fila 772';
   var CLAVE_VERSION_CONOCIDA = 'gestor-envio-script-version';
 
   /* El número de fila de una versión ('24-sep-2026 · fila 130' -> 130):
@@ -324,7 +324,10 @@ window.CorreoEnviar = (function () {
         setTimeout(function () {
           var cuentaDemo = cuentaDeAdministracion();
           registrarVersionScript(SCRIPT_ESPERADO, cuentaDemo);   /* fila 291: el script de mentira está al día; «Probar» quita el aviso de la demostración */
-          r({ ok: true, version: SCRIPT_ESPERADO, cuenta: cuentaDemo, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() });
+          /* Fila 772: el script de mentira sabe mandar con formato solo si está «al día» (la misma marca de js/correo-version.js). */
+          var alDia = false;
+          try { alDia = window.localStorage.getItem('gestor-demo-script-al-dia') === '1'; } catch (e) { /* sin memoria: sin formato */ }
+          r({ ok: true, version: SCRIPT_ESPERADO, cuenta: cuentaDemo, demo: true, conFormato: !!(alDia && cuerpo && cuerpo.cuerpoHtml), idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() });
         }, 300);
       });
     }
@@ -584,6 +587,8 @@ window.CorreoEnviar = (function () {
     /* fila 178 */
     SCRIPT_ESPERADO: SCRIPT_ESPERADO,
     scriptDesactualizado: scriptDesactualizado,
+    /* Fila 772: ¿el correo con formato salió con formato? (el script nuevo lo dice en su respuesta: `conFormato`). */
+    salioConFormato: function (respuesta) { return !!(respuesta && respuesta.conFormato === true); },
     /* fila 411 */
     cuentaConocida: leerCuentaConocida, cuentaDeAdministracion: cuentaDeAdministracion, nombreDelRemitente: nombreDelRemitente,
     mismaCuenta: mismaCuenta, lineaDeCuenta: lineaDeCuenta, estadoDeCuenta: estadoDeCuenta, repintarCuenta: repintarCuenta,

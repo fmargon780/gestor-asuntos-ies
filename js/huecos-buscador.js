@@ -103,6 +103,8 @@
   /* ---------- meter el hueco donde toca ---------- */
 
   function insertarEn(campo, inicio, fin, texto) {
+    /* Fila 772: un recuadro con formato (js/correo-formato-editor.js) mete el texto donde está el cursor, sin tocar el formato. */
+    if (typeof campo.insertarTexto === 'function') { campo.insertarTexto(texto); return; }
     var valor = campo.value || '';
     var a = (typeof inicio === 'number' && inicio >= 0) ? Math.min(inicio, valor.length) : valor.length;
     var b = (typeof fin === 'number' && fin >= 0) ? Math.min(fin, valor.length) : a;

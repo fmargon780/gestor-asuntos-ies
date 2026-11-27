@@ -43,7 +43,7 @@ var PlantillaCorreoPantalla = (function () {
           (PP ? PP.destinatariosHTML(p, e) : '') +
           I.campoAsuntoHTML(p + '-asunto', e) +
           (PP ? PP.antesDelTextoHTML(p, e) : '') +
-          P.campoDeTextoHTML(p + '-texto', p + '-insertar-hueco', 'Texto', o.texto != null ? o.texto : ((e && e.texto) || ''), 12) +
+          P.campoDeTextoHTML(p + '-texto', p + '-insertar-hueco', 'Texto', o.texto != null ? CorreoFormato.deTexto(o.texto) : CorreoFormato.htmlDe(e), 12, true) +   /* fila 772: con formato */
           (PP ? PP.firmaHTML(p, e) : '') +
         '</div>' +
         (o.cambiosHTML || '') +
@@ -55,14 +55,14 @@ var PlantillaCorreoPantalla = (function () {
         '<div class="pcp-llega" id="' + p + '-llega">' +
           '<div class="pcp-llega-asunto"><span class="pcp-llega-rotulo">Asunto</span> <b id="' + p + '-llega-asunto"></b></div>' +
           '<div class="pcp-pre" id="' + p + '-llega-saludo"></div>' +
-          '<div class="pcp-pre" id="' + p + '-previa"></div>' +
+          '<div class="pcp-pre correo-html" id="' + p + '-previa"></div>' +
           '<div class="pcp-pre" id="' + p + '-llega-firma"></div>' +
         '</div></div></div>';
   }
 
   /* El Texto crece con lo escrito: sin barra de desplazamiento propia. */
   function crecer(ta) {
-    if (!ta || !ta.isConnected) return;
+    if (!ta || !ta.isConnected || ta.esRico) return;   /* el recuadro con formato crece solo (fila 772) */
     ta.style.height = 'auto';
     ta.style.height = (ta.scrollHeight + 2) + 'px';
   }
@@ -93,14 +93,19 @@ var PlantillaCorreoPantalla = (function () {
         var firma = valor(p + '-firma').replace(/\s+$/, '');
         $(p + '-llega-asunto').textContent = asunto;
         $(p + '-llega-saludo').textContent = saludo ? rel(saludo) : (o.saludoDeSiempre ? o.saludoDeSiempre(v) : '');
-        $(p + '-previa').textContent = rel(valor(p + '-texto')) || '(vacío)';
+        /* Fila 772: el texto se enseña con su formato (negrita, listas, tablas). */
+        var campoTexto = $(p + '-texto');
+        if (campoTexto && campoTexto.esRico) {
+          var rellenado = CorreoFormato.rellenar(campoTexto.html, v);
+          $(p + '-previa').innerHTML = CorreoFormato.aTexto(rellenado.html).trim() ? rellenado.html : '(vacío)';
+        } else $(p + '-previa').textContent = rel(valor(p + '-texto')) || '(vacío)';
         $(p + '-llega-firma').textContent = firma ? rel(firma) : (o.firmaGeneral ? o.firmaGeneral(v) : '');
         if (o.alTenerValores) o.alTenerValores(v);
       });
     }
 
     var texto = $(p + '-texto');
-    if (texto) { texto.style.overflow = 'hidden'; texto.style.resize = 'none'; }
+    if (texto && !texto.esRico) { texto.style.overflow = 'hidden'; texto.style.resize = 'none'; }
     /* Cualquier campo de la izquierda: el Texto crece y «Así le llega» se rehace (los huecos insertados lanzan `input`). */
     izq.addEventListener('input', function (ev) {
       if (ev.target === texto) crecer(texto);

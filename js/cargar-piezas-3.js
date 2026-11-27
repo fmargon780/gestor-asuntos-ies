@@ -21,6 +21,7 @@
     // (para pesar y leer los documentos) y js/correo-enviar.js (para el
     // botón "Enviar", fila 115), los cuatro ya definidos en tiempo de
     // carga.
+    'js/correo-enviado-pdf-formato.js',   // fila 772: el cuerpo con formato en el PDF del correo enviado
     'js/correo-enviado-pdf.js',
     // Fila 536: js/correo-cuadro.js partido en trozos, que van antes que él.
     'js/correo-cuadro-destinatarios.js',

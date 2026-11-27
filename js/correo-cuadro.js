@@ -85,6 +85,8 @@ var CorreoCuadro = (function () {
       cco: ccoTexto,
       asunto: $('correo-asunto') ? $('correo-asunto').value : '',
       cuerpo: $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '',
+      /* Fila 772: con formato (negrita, listas, tablas), solo si lo lleva; sin él, el correo sale como siempre. */
+      cuerpoHtml: $('correo-cuerpo-texto') && $('correo-cuerpo-texto').esRico && CorreoFormato.tieneFormato($('correo-cuerpo-texto').html) ? $('correo-cuerpo-texto').html : '',
       adjuntos: marcadas,
       falta: falta
     });
@@ -118,6 +120,7 @@ var CorreoCuadro = (function () {
         ? '<p class="aviso aviso-ambar" id="correo-copia-script">El envío de correo está anticuado y no sabe mandar «Copia»: quien va en Copia no lo recibiría. Actualiza el script en Ajustes → Enviar correo antes de enviar.</p>' : '') +
       '<p><strong>Asunto:</strong> ' + U.escapar(datos.asunto) + '</p>' +
       '<p class="nota" style="white-space:pre-wrap">' + U.escapar(primerasLineas(datos.cuerpo)) + '</p>' +
+      (datos.cuerpoHtml ? '<p class="nota">Lleva formato (negrita, listas o tablas).</p>' : '') +
       (datos.adjuntos.length
         ? '<p><strong>Documentos</strong></p><ul>' + datos.adjuntos.map(function (nombre) {
             return '<li>' + U.escapar(nombre) + (porNombre[nombre] !== undefined ? ' · ' + tl(porNombre[nombre]) : '') + '</li>';
@@ -170,6 +173,7 @@ var CorreoCuadro = (function () {
         cco: datos.cco,
         asunto: datos.asunto,
         cuerpo: datos.cuerpo,
+        cuerpoHtml: datos.cuerpoHtml ? CorreoFormato.paraEnviar(datos.cuerpoHtml) : undefined,   /* fila 772: un script anterior lo ignora y manda el texto */
         hilo: ultimoHiloDelAsunto(a),
         matriculas: matriculasDelUltimoHilo(a),
         adjuntos: adjuntosBase64,
@@ -196,7 +200,10 @@ var CorreoCuadro = (function () {
       var resumen = $('correo-resumen');
       if (resumen) {
         resumen.innerHTML = '<p class="aviso aviso-ambar"><strong>Correo enviado a ' +
-          U.escapar(datos.para || datos.cco || 'la cuenta') + '.</strong></p>';
+          U.escapar(datos.para || datos.cco || 'la cuenta') + '.</strong></p>' +
+          /* Fila 772: sin el script nuevo el correo sale como texto; el envío nunca falla por eso. */
+          (datos.cuerpoHtml && !(CorreoEnviar.salioConFormato && CorreoEnviar.salioConFormato(respuesta))
+            ? '<p class="aviso aviso-ambar" id="correo-sin-formato">El correo ha salido sin formato: falta actualizar el script de Gmail.</p>' : '');
       }
       U.aviso('Correo enviado a ' + (datos.para || datos.cco || '') + '.', 'bueno');
     } catch (e) {

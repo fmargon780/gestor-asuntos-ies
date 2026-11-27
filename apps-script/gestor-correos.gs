@@ -713,8 +713,12 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    no hace la consulta previa CORS, que Apps Script no sabe contestar.
 
    Cuerpo esperado:
-     { clave, para, cco, asunto, cuerpo, hilo,
+     { clave, para, cco, asunto, cuerpo, cuerpoHtml, hilo,
        adjuntos: [ { nombre, tipo, base64 } ], prueba }
+
+   `cuerpoHtml` (fila 772, docs/758-CORREOS-MAS-COMODOS.md): el mismo cuerpo con negrita, listas y tablas. Si llega, el correo
+   sale con ese formato (`htmlBody`) y `cuerpo` queda como texto alternativo; la respuesta lleva `conFormato: true`. Si no
+   llega, sale como siempre, en texto.
 
    `clave` se comprueba contra la propiedad del script que deja
    prepararEnvio(); si no coincide, no se manda nada. También se
@@ -732,7 +736,7 @@ function guardarHilo(hilo, carpeta, respuestaDe, desde) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '6-nov-2026 · fila 555';
+var VERSION_SCRIPT = '27-nov-2026 · fila 772';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 /* Fila 471: la app pregunta la versión sin enviar nada. Con `?k=<clave>` correcta contesta
@@ -919,6 +923,9 @@ function enviarCorreo(cuerpo) {
   var opciones = { attachments: attachments };
   if (cco) opciones.bcc = cco;
   if (cc) opciones.cc = cc;
+  /* Fila 772: con formato (negrita, listas y tablas); `texto` sigue de texto alternativo. */
+  var cuerpoHtml = esPrueba ? '' : String(cuerpo.cuerpoHtml || '');
+  if (cuerpoHtml) opciones.htmlBody = cuerpoHtml;
   /* Fila 411: el nombre que ve quien recibe el correo («Administración · IES Fuente Lucena»).
      Una app vieja no lo manda: se envía como hasta ahora. */
   var nombreRemitente = String(cuerpo.nombreRemitente || '').trim();
@@ -937,7 +944,7 @@ function enviarCorreo(cuerpo) {
     } else {
       mensaje = GmailApp.createDraft(para, asunto, texto, opciones).send();
     }
-    return { ok: true, hilo: mensaje.getThread().getId(), matricula: matricula(mensaje) };
+    return { ok: true, hilo: mensaje.getThread().getId(), matricula: matricula(mensaje), conFormato: !!cuerpoHtml };
   } catch (err) {
     return { ok: false, motivo: 'Gmail no ha podido enviarlo: ' + (err && err.message ? err.message : err) };
   }
@@ -1043,6 +1050,7 @@ function mandarUnBorrador(fichero, carpeta) {
     var opciones = { attachments: adjuntos };
     if (encargo.cco) opciones.bcc = encargo.cco;
     if (encargo.cc) opciones.cc = encargo.cc;
+    if (encargo.cuerpoHtml) opciones.htmlBody = String(encargo.cuerpoHtml);   /* fila 772: con formato */
 
     var hilo = encargo.hilo ? GmailApp.getThreadById(encargo.hilo) : null;
     if (hilo) {

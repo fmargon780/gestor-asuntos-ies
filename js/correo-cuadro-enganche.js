@@ -18,6 +18,22 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   function bloqueCuerpo() { return I.bloqueCuerpo.apply(this, arguments); }
   function engancharEnviar() { return I.engancharEnviar.apply(this, arguments); }
 
+  /* Fila 772: «Copiar Cuerpo» con formato (text/html y text/plain); si el navegador no deja, texto sencillo como siempre. */
+  function copiarConFormato(html, texto, boton) {
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([CorreoFormato.paraEnviar(html)], { type: 'text/html' }),
+          'text/plain': new Blob([texto], { type: 'text/plain' })
+        });
+        navigator.clipboard.write([item]).then(function () { U.aviso('Copiado, con su formato.', 'bueno'); },
+          function () { copiar(texto, boton); });
+        return;
+      }
+    } catch (e) { /* sin portapapeles con formato */ }
+    copiar(texto, boton);
+  }
+
   function enganchar(a) {
     var caja = $('correo-caja');
     if (window.CorreoPara) CorreoPara.enganchar();   /* fila 555 */
@@ -53,7 +69,11 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
     if (antes) {
       n()._interno.restaurar = null;
       if ($('correo-asunto') && antes.asunto !== undefined) $('correo-asunto').value = antes.asunto;
-      if (antes.escrito && $('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = antes.cuerpo;
+      if (antes.escrito && $('correo-cuerpo-texto')) {
+        var campoRestaurado = $('correo-cuerpo-texto');
+        if (campoRestaurado.esRico && antes.cuerpoHtml) campoRestaurado.ponerHtml(antes.cuerpoHtml);   /* fila 772: con su formato */
+        else campoRestaurado.value = antes.cuerpo;
+      }
     }
 
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
@@ -65,7 +85,9 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
        un envío real ("Correo enviado a X", ver textoDeLaNota en
        js/correo.js). */
     $('correo-copiar-cuerpo').onclick = function () {
-      copiar($('correo-cuerpo-texto').value, this);
+      var campoCuerpo = $('correo-cuerpo-texto');
+      if (campoCuerpo.esRico && CorreoFormato.tieneFormato(campoCuerpo.html)) copiarConFormato(campoCuerpo.html, campoCuerpo.value, this);   /* fila 772: al pegarlo en Gmail sale con su formato */
+      else copiar(campoCuerpo.value, this);
       if (n().apuntarElRastro) n().apuntarElRastro(a);
     };
     $('correo-gmail').onclick = function () { abrirGmail(); if (n().apuntarElRastro) n().apuntarElRastro(a); };
@@ -96,6 +118,7 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
   }
 
   function engancharPlantilla(a) {
+    if (window.CorreoFormatoEditor && $('correo-cuerpo-texto') && $('correo-cuerpo-texto').getAttribute('contenteditable')) CorreoFormatoEditor.enganchar('correo-cuerpo-texto');   /* fila 772 */
     var desplegable = $('correo-plantilla');
     if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
     PlantillaDeLoEscrito.engancharBotones(cfgPlantilla, a, function () { return I.S.plantillaElegida; });   /* fila 270 */
@@ -152,8 +175,12 @@ var CorreoCuadroNucleo = CorreoCuadroNucleo || {};
 
   /* Plantilla nueva desde lo escrito: queda elegida y el texto del mensaje no se toca. */
   function dejarElegida(a, id, texto) {
+    var antes = $('correo-cuerpo-texto'), conFormato = antes && antes.esRico ? antes.html : null;   /* fila 772: el cuerpo se queda con su formato */
     cambiarDePlantilla(a, id, true);
-    if ($('correo-cuerpo-texto')) $('correo-cuerpo-texto').value = texto;
+    var campo = $('correo-cuerpo-texto');
+    if (!campo) return;
+    if (campo.esRico && conFormato !== null) campo.ponerHtml(conFormato);
+    else campo.value = texto;
   }
   function recomponerAsunto(a) {
     if ($('correo-asunto')) $('correo-asunto').value = n().asuntoDelCorreo(a, I.S.plantillaElegida);   /* fila 627 */

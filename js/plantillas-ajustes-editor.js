@@ -51,7 +51,7 @@
       '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       campoAsuntoHTML('pl2-asunto', existente) +
       (window.PlantillaPapeles ? PlantillaPapeles.antesDelTextoHTML('pl2', existente) : '') +
-      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', inicial ? inicial.texto : ((existente && existente.texto) || ''), 6) +
+      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', inicial ? CorreoFormato.deTexto(inicial.texto) : CorreoFormato.htmlDe(existente), 6, true) +
       (window.PlantillaPapeles ? PlantillaPapeles.despuesDelTextoHTML('pl2', existente) : '') +
       (inicial ? '<div id="pl2-cambios"></div>' : '') +
       campoSenecaHTML('pl2', existente && existente.textoSeneca) +
@@ -92,13 +92,15 @@
         b.onclick = function (ev) {
           ev.stopPropagation();
           var campo = $('pl2-texto');
-          campo.value = campo.value.split(c.hueco).join(c.dato);
+          if (campo.reemplazarTexto) campo.reemplazarTexto(c.hueco, c.dato);   /* fila 772: recuadro con formato */
+          else campo.value = campo.value.split(c.hueco).join(c.dato);
           vivos = vivos.filter(function (x) { return x !== c; });
           pintar();
           alCambiar();
         };
         fila.onclick = function () {
           var campo = $('pl2-texto');
+          if (campo.seleccionarTexto) { campo.seleccionarTexto(c.hueco); return; }   /* fila 772 */
           var i = campo.value.indexOf(c.hueco);
           if (i === -1) return;
           campo.focus();
@@ -165,6 +167,7 @@
     $('pl2-guardar').onclick = async function () {
       var nombre = $('pl2-nombre').value.trim();
       var texto = $('pl2-texto').value;
+      var html2 = $('pl2-texto').html;   /* fila 772 */
       var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
       var asunto2 = $('pl2-asunto') ? $('pl2-asunto').value : '';
       var adjuntar2 = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl2-adjuntar') : '';
@@ -188,11 +191,11 @@
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
             if (i !== -1) {
-              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], papeles2, asunto2);
+              actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar2, actual.lista[i], papeles2, asunto2, html2);
               guardada = actual.lista[i];
             }
           } else {
-            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, papeles2, asunto2);
+            guardada = filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar2, null, papeles2, asunto2, html2);
             actual.lista.push(guardada);
           }
           return actual;

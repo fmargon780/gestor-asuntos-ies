@@ -1,0 +1,31 @@
+/* ============================================================
+   El recuadro con formato del correo (fila 772, docs/758-CORREOS-MAS-COMODOS.md, parte 2;
+   js/correo-formato-editor.js): una barra encima y el texto debajo. Colores y letras, los de la app.
+   ============================================================ */
+.cfe { margin-bottom: 6px; }
+.cfe-barra { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0 6px; }
+.cfe-en-tabla { display: inline-flex; flex-wrap: wrap; gap: 6px; padding-left: 8px; border-left: 1px solid var(--linea); }
+.cfe-en-tabla.oculto { display: none; }
+.cfe-boton[aria-pressed="true"] { background: #e4eefb; border-color: #8fb1e0; }
+.cfe-nueva { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 8px; padding: 8px 10px; border: 1px solid var(--linea); border-radius: 8px; background: #f7f9fc; }
+.cfe-nueva.oculto { display: none; }
+.cfe-nueva label { display: flex; gap: 6px; align-items: center; }
+.cfe-nueva input { width: 4.5em; }
+
+.cfe-cuerpo { overflow-wrap: anywhere; line-height: 1.45; cursor: text; }
+.cfe-cuerpo p, .cfe-cuerpo ul, .cfe-cuerpo ol { margin: 0 0 10px; }
+.cfe-cuerpo ul, .cfe-cuerpo ol { padding-left: 24px; }
+.cfe-cuerpo table, .correo-html table { border-collapse: collapse; margin: 0 0 10px; max-width: 100%; }
+.cfe-cuerpo td, .cfe-cuerpo th, .correo-html td, .correo-html th { border: 1px solid #888; padding: 4px 8px; vertical-align: top; min-width: 3em; }
+.cfe-cuerpo th, .correo-html th { background: #f0f0f0; text-align: left; }
+.cfe-cuerpo:focus { outline: 2px solid #8fb1e0; outline-offset: 0; }
+
+/* El texto con formato de «Así le llega», el resumen y la nota de lo enviado. */
+.correo-html { overflow-wrap: anywhere; line-height: 1.45; }
+.correo-html p, .correo-html ul, .correo-html ol { margin: 0 0 10px; }
+.correo-html ul, .correo-html ol { padding-left: 24px; }
+.pcp-pre.correo-html { white-space: normal; }
+
+.pcp-correo .cfe-cuerpo#pl-texto, .pcp-correo .cfe-cuerpo#pl2-texto { min-height: 260px; }
+.cfe-cuerpo div { margin: 0 0 10px; }
+.cfe-cuerpo li > div, .cfe-cuerpo td > div, .cfe-cuerpo th > div { margin: 0; }

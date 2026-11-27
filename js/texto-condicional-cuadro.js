@@ -112,11 +112,14 @@ var TextoCondicionalCuadro = (function () {
       abrir({
         ancla: boton, tipo: o.tipo,
         alPoner: function (nombre, valor) {
-          var r = TextoCondicional.ponerEnTexto(campo.value, posicion, nombre, valor);
-          campo.value = r.texto;
-          campo.focus();
-          try { campo.selectionStart = campo.selectionEnd = r.cursor; } catch (e) { /* ya está puesto */ }
-          campo.dispatchEvent(new Event('input', { bubbles: true }));
+          if (typeof campo.ponerCondicional === 'function') campo.ponerCondicional(nombre, valor);   /* fila 772: recuadro con formato */
+          else {
+            var r = TextoCondicional.ponerEnTexto(campo.value, posicion, nombre, valor);
+            campo.value = r.texto;
+            campo.focus();
+            try { campo.selectionStart = campo.selectionEnd = r.cursor; } catch (e) { /* ya está puesto */ }
+            campo.dispatchEvent(new Event('input', { bubbles: true }));
+          }
           if (o.aviso) o.aviso.textContent = TextoCondicional.avisoDeMarca(nombre, valor);
         }
       });

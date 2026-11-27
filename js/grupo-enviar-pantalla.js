@@ -25,6 +25,13 @@ var GrupoEnviarPantalla = (function () {
   }
 
   /* op: { trabajo, aviso: true (uno nuevo), conRegistro }. Devuelve una promesa que acaba al cerrarse. */
+  /* Fila 772: si la plantilla lleva formato y el texto sigue siendo el suyo, el correo sale con ese formato; al cambiar el texto a mano, sale sencillo. */
+  function htmlDeLaPlantilla(S, p) {
+    var h = p && window.CorreoFormato ? CorreoFormato.htmlDe(p) : '';
+    S.html = h && CorreoFormato.tieneFormato(h) ? h : '';
+    S.textoDelHtml = S.texto;
+  }
+
   async function abrir(a, op) {
     if (abierta) return abierta;
     op = op || {};
@@ -53,6 +60,7 @@ var GrupoEnviarPantalla = (function () {
     if (!avisoViejo) {
       S.plantillaId = propia ? propia.id : '';
       S.texto = propia ? propia.texto : (S.esAviso ? '' : 'Le enviamos adjunto el documento.');
+      htmlDeLaPlantilla(S, propia);
       /* Fila 627: el asunto lo compone la app (js/asunto-extracto.js): el de la plantilla con la que se abre o, sin ella, el general. */
       if (window.AsuntoExtracto && AsuntoExtracto.numeroDe(a)) {
         try { S.valoresDelAsunto = await Plantillas.valoresDeAsunto(a); } catch (e2) { S.valoresDelAsunto = null; }
@@ -131,6 +139,7 @@ var GrupoEnviarPantalla = (function () {
       var p = S.plantillas.filter(function (x) { return x.id === selPl.value; })[0];
       S.plantillaId = selPl.value;
       S.texto = p ? p.texto : (S.esAviso ? '' : 'Le enviamos adjunto el documento.');
+      htmlDeLaPlantilla(S, p);
       q('.ge-texto').value = S.texto;
       { S.asunto = asuntoDe(S, p); q('.ge-asunto').value = S.asunto; }   /* fila 627: el asunto cambia con la plantilla */
       pintarMuestra(); pintarPie();
@@ -139,7 +148,7 @@ var GrupoEnviarPantalla = (function () {
     campoAsunto.value = S.asunto;
     campoTexto.value = S.texto;
     campoAsunto.oninput = function () { S.asunto = campoAsunto.value; pintarMuestra(); pintarPie(); };
-    campoTexto.oninput = function () { S.texto = campoTexto.value; pintarMuestra(); pintarPie(); };
+    campoTexto.oninput = function () { S.texto = campoTexto.value; if (S.html && S.texto !== S.textoDelHtml) S.html = ''; pintarMuestra(); pintarPie(); };
     q('.ge-ant').onclick = function () { if (S.indice > 0) { S.indice--; pintarMuestra(); } };
     q('.ge-sig').onclick = function () { if (S.indice < clas.envian.length - 1) { S.indice++; pintarMuestra(); } };
 
@@ -232,6 +241,7 @@ var GrupoEnviarPantalla = (function () {
         html += '<ul class="ge-fallos">' + res.fallos.map(function (f) { return '<li><strong>' + esc(nombreLimpio(f.rel)) + '</strong>: ' + esc(f.motivo) + '</li>'; }).join('') + '</ul>';
         if (!res.tope) html += '<button type="button" class="boton ge-reintentar">Reintentar los ' + res.fallos.length + '</button>';
       }
+      if (res.sinFormato) html += '<p class="aviso-ambar ge-sin-formato">Los correos han salido sin formato: falta actualizar el script de Gmail.</p>';   /* fila 772 */
       if (res.tope) html += '<p class="aviso-ambar ge-tope">' + esc(GrupoEnviar.textoDeParada(res, quedan)) + '</p>';
       if (res.parado) html += '<p class="nota">Lo has parado. Quedan ' + quedan + ' por enviar.</p>';
       caja.innerHTML = html;
@@ -257,7 +267,7 @@ var GrupoEnviarPantalla = (function () {
         }
         var primero = items[0], valores1 = S.valores[primero.persona.categoria + '|' + primero.persona.nombre] || await GrupoEnviar.valoresDe(a, primero.persona);
         var muestra = GrupoEnviar.cuerpoPara(primero.persona, valores1, S.texto);
-        var lote = { trabajo: S.trabajo, aviso: S.esAviso ? S.avisoId : '', asunto: S.asunto.trim(), texto: S.texto,
+        var lote = { trabajo: S.trabajo, aviso: S.esAviso ? S.avisoId : '', asunto: S.asunto.trim(), texto: S.texto, html: S.html || '',
           tanda: Date.now().toString(36), items: items.map(function (x) {
             return { rel: { categoria: x.persona.categoria, nombre: x.persona.nombre }, correos: x.correos, nombreDoc: !S.esAviso && x.hecho && x.hecho.generado ? x.hecho.generado.fichero : '' };
           }) };

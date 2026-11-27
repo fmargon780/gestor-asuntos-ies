@@ -108,6 +108,12 @@ var GrupoEnviar = (function () {
     return saludoPara(rel, valores) + '\n\n' + medio + '\n\n' + ((valores && valores.firma) || '');
   }
 
+  /* Fila 772: el mismo correo con el formato de la plantilla (negrita, listas, tablas), con los estilos que lleva al enviar. */
+  function cuerpoHtmlPara(rel, valores, html) {
+    var medio = CorreoFormato.rellenar(html || '', valores || {}).html;
+    return CorreoFormato.paraEnviar(CorreoFormato.deTexto(saludoPara(rel, valores)) + medio + CorreoFormato.deTexto((valores && valores.firma) || ''));
+  }
+
   async function valoresDe(a, rel) {
     try { return await Plantillas.valoresDePersona(a, rel, { fecha: U.hoyIso() }); }
     catch (e) { return { nombreNatural: soloElNombre(rel.nombre), firma: '' }; }
@@ -167,10 +173,12 @@ var GrupoEnviar = (function () {
             adjuntos.push({ nombre: x.nombreDoc, tipo: fichero.type || 'application/pdf', base64: await CorreoAdjuntos.aBase64(fichero) });
           }
           var r = await CorreoEnviar.enviar({
-            para: x.correos.join(', '), cco: '', asunto: lote.asunto, cuerpo: cuerpoPara(x.rel, valores, lote.texto), hilo: '',
+            para: x.correos.join(', '), cco: '', asunto: lote.asunto, cuerpo: cuerpoPara(x.rel, valores, lote.texto),
+            cuerpoHtml: lote.html ? cuerpoHtmlPara(x.rel, valores, lote.html) : undefined, hilo: '',
             adjuntos: adjuntos, idEnvio: idEnvioDe(a, lote.aviso ? 'aviso:' + lote.aviso : x.nombreDoc, clave(x.rel))
           });
           if (!r || !r.ok) throw new Error(motivoDe(r));
+          if (lote.html && !(window.CorreoEnviar && CorreoEnviar.salioConFormato(r))) res.sinFormato = true;   /* fila 772: un script anterior manda el texto */
           var apunte = { persona: clave(x.rel), correo: x.correos.join(', '), cuando: U.ahora(), quien: App.E.usuario || '', tanda: lote.tanda };
           if (lote.aviso) apunte.aviso = lote.aviso; else apunte.documento = x.nombreDoc;
           res.enviados.push(apunte);
@@ -266,7 +274,7 @@ var GrupoEnviar = (function () {
 
   return {
     clasificar: clasificar, contar: contar, cargarPersonas: cargarPersonas, direccionesDe: direccionesDe,
-    idEnvioDe: idEnvioDe, cuerpoPara: cuerpoPara, saludoPara: saludoPara, valoresDe: valoresDe, plantillaPropia: plantillaPropia,
+    idEnvioDe: idEnvioDe, cuerpoPara: cuerpoPara, cuerpoHtmlPara: cuerpoHtmlPara, saludoPara: saludoPara, valoresDe: valoresDe, plantillaPropia: plantillaPropia,
     enviarTanda: enviarTanda, cerrarTanda: cerrarTanda, textoDeParada: textoDeParada,
     fallosDe: fallosDe, enMarcha: enMarcha, esAviso: esAviso, fichaDe: fichaDe, soloElNombre: soloElNombre,
     cambiarFicha: cambiarFicha, avisar: avisar, puedeEnviar: puedeEnviar

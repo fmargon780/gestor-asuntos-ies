@@ -158,13 +158,17 @@
      botón. (Hasta la fila 199 también lo usaba «Comunicación de este
      paso» del editor de la guía, `js/guias-comunicacion.js`, ya
      borrado: esa sección se convierte ahora en tareas del guion.) */
-  function campoDeTextoHTML(idTexto, idBoton, etiqueta, valor, filas) {
+  /* Fila 772: con `conFormato`, `valor` es el HTML y el recuadro lleva su barra (negrita, cursiva, listas y tablas;
+     js/correo-formato-editor.js); sin ella, un recuadro de texto sencillo (el «Texto para Séneca»). */
+  function campoDeTextoHTML(idTexto, idBoton, etiqueta, valor, filas, conFormato) {
     return '<div class="etiqueta-con-boton">' +
       '<label class="etiqueta">' + U.escapar(etiqueta) + '</label>' +
       /* Fila 510: el recuadro «Insertar», con «Campo variable» y «Texto condicional». */
       HuecosBuscador.recuadroInsertarHTML(idBoton, idTexto + '-condicional') +
       '</div>' +
-      '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(valor || '') + '</textarea>' +
+      (conFormato && window.CorreoFormatoEditor
+        ? CorreoFormatoEditor.html(idTexto, valor, { minimo: (filas || 7) * 22 })
+        : '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(conFormato ? CorreoFormato.aTexto(valor) : (valor || '')) + '</textarea>') +
       '<p class="nota texto-cond-aviso" id="' + idTexto + '-cond-aviso" aria-live="polite"></p>';
   }
 
@@ -195,8 +199,10 @@
   }
 
   /* La fila de `plantillas.json`: `textoSeneca` solo si trae algo. */
-  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa, papeles, asunto) {
+  function filaDePlantilla(id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, previa, papeles, asunto, html) {
     var fila = { id: id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+    /* Fila 772: `texto` sigue siendo el texto sencillo (lo leen Séneca y los ordenadores con la versión anterior); `html` solo si hay formato. */
+    if (html && window.CorreoFormato && CorreoFormato.tieneFormato(html)) fila.html = CorreoFormato.limpiar(html);
     if (String(asunto || '').trim()) fila.asunto = String(asunto).trim();   /* fila 627: el asunto propio de la plantilla; vacío, sale el general del centro */
     if (previa && previa.fueraDeUso) fila.fueraDeUso = previa.fueraDeUso;   /* fila 321: cambiar una plantilla no pierde la marca */
     if (String(textoSeneca || '').trim()) fila.textoSeneca = textoSeneca;
@@ -208,6 +214,7 @@
   function engancharCampoDeTexto(idTexto, idBoton, otrosCampos, tipoDeLaPlantilla) {
     var boton = $(idBoton), campo = $(idTexto);
     if (!boton || !campo) return;
+    if (campo.getAttribute('contenteditable') && window.CorreoFormatoEditor) CorreoFormatoEditor.enganchar(idTexto);   /* fila 772 */
     HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]), tipo: tipoDeLaPlantilla });
     /* Fila 510: «Texto condicional» pone {si:Campo=Valor} al principio del párrafo del cursor. */
     if (window.TextoCondicionalCuadro) {
@@ -249,7 +256,7 @@
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       campoAsuntoHTML('pl-asunto', existente) +
       (window.PlantillaPapeles ? PlantillaPapeles.antesDelTextoHTML('pl', existente) : '') +
-      campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', (existente && existente.texto) || '', 7) +
+      campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', CorreoFormato.htmlDe(existente), 7, true) +
       (window.PlantillaPapeles ? PlantillaPapeles.despuesDelTextoHTML('pl', existente) : '') +
       campoSenecaHTML('pl', existente && existente.textoSeneca) +
       (window.PlantillaAdjuntar ? PlantillaAdjuntar.selectHTML('pl-adjuntar', existente && existente.adjuntar) : '') +
@@ -321,6 +328,7 @@
     var tipo = $('pl-tipo').value;
     var categoria = $('pl-categoria').value;
     var texto = $('pl-texto').value;
+    var html = $('pl-texto').html;   /* fila 772 */
     var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
     var asunto = $('pl-asunto') ? $('pl-asunto').value : '';
     var adjuntar = window.PlantillaAdjuntar ? PlantillaAdjuntar.leer('pl-adjuntar') : '';
@@ -333,9 +341,9 @@
       await Plantillas.guardar(App.E.gestor, function (actual) {
         if (existente) {
           var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-          if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], papeles, asunto);
+          if (i !== -1) actual.lista[i] = filaDePlantilla(existente.id, tipo, categoria, nombre, texto, textoSeneca, adjuntar, actual.lista[i], papeles, asunto, html);
         } else {
-          actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, papeles, asunto));
+          actual.lista.push(filaDePlantilla(Plantillas.idNuevo(), tipo, categoria, nombre, texto, textoSeneca, adjuntar, null, papeles, asunto, html));
         }
         return actual;
       });

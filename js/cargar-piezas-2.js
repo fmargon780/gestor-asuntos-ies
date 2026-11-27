@@ -261,6 +261,8 @@
     // hueco" del editor de plantillas (docs/HUECOS-INSERTAR.md, fila 35).
     'js/huecos-buscador.js',
     'js/texto-condicional-cuadro.js',
+    'js/correo-formato.js',   // fila 772: limpiar, pasar a texto, rellenar y preparar el correo con formato
+    'js/correo-formato-editor.js',   // fila 772: el recuadro con su barra (negrita, listas, tablas)
     'js/plantillas-ajustes-centro.js',   // fila 560: «Datos del centro y firma», antes que js/plantillas-ajustes.js
     'js/plantillas-ajustes.js',
     'js/plantilla-correo-pantalla.js',   // fila 771: la ventana de la plantilla de correo a toda la pantalla; la usan plantillas-ajustes.js y su editor en línea

@@ -203,7 +203,7 @@
     var saludo = sal.texto;
     var faltanSaludo = sal.faltan.slice();
 
-    var medio = '', faltan = [];
+    var medio = '', faltan = [], medioHtml = null;   /* fila 772: el medio con formato, si la plantilla lo lleva */
 
     /* "Comunicar" desde un hito (fila 60): el medio ya viene resuelto,
        sin pasar por ninguna plantilla del tipo ni por el hueco
@@ -220,9 +220,18 @@
         : '';
       if (plantilla) {
         var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
-        var r = Plantillas.rellenar(textoPlantilla, valoresConLoQueFalta);
-        medio = r.texto;
-        faltan = r.faltan;
+        var htmlPlantilla = (!paraSeneca && window.CorreoFormato) ? CorreoFormato.htmlDe(plantilla) : '';
+        if (htmlPlantilla && CorreoFormato.tieneFormato(htmlPlantilla)) {
+          /* Fila 772: una plantilla con negrita, listas o tablas se rellena con su formato; su texto sencillo sale de ahí. */
+          var rf = CorreoFormato.rellenar(htmlPlantilla, valoresConLoQueFalta);
+          medioHtml = rf.html;
+          medio = CorreoFormato.aTexto(rf.html);
+          faltan = rf.faltan;
+        } else {
+          var r = Plantillas.rellenar(textoPlantilla, valoresConLoQueFalta);
+          medio = r.texto;
+          faltan = r.faltan;
+        }
       }
 
       /* Si "Pedir lo que falta" trae texto y la plantilla (o la falta de
@@ -232,6 +241,7 @@
          metido Plantillas.rellenar en su sitio. */
       if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(textoPlantilla))) {
         medio = medio ? (medio + '\n\n' + loQueFaltaActual) : loQueFaltaActual;
+        if (medioHtml !== null) medioHtml += CorreoFormato.deTexto(loQueFaltaActual);
       }
     }
 
@@ -240,7 +250,13 @@
     faltanSaludo = faltanSaludo.concat(fir.faltan);
     faltan = faltan.concat(faltanSaludo.filter(function (f) { return faltan.indexOf(f) === -1; }));
     var texto = medio ? (saludo + '\n\n' + medio + '\n\n' + firma) : (saludo + '\n\n\n\n' + firma);
-    return { texto: texto, faltan: faltan };
+    var html = '';
+    if (!paraSeneca && window.CorreoFormato) {
+      html = medioHtml !== null ? CorreoFormato.deTexto(saludo) + medioHtml + CorreoFormato.deTexto(firma)
+        : (medio ? CorreoFormato.deTexto(texto) : CorreoFormato.deTexto(saludo) + '<p><br></p>' + CorreoFormato.deTexto(firma));   /* sin medio: un hueco entre el saludo y la firma, donde escribir */
+      if (medioHtml !== null) texto = CorreoFormato.aTexto(html);
+    }
+    return { texto: texto, faltan: faltan, html: html };
   }
 
   /* ---------- el cuadro ----------
