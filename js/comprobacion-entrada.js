@@ -290,6 +290,7 @@
 
   async function ruta() {
     var T = 'Ruta de la nube en este ordenador';
+    if (window.RutaChromebook && RutaChromebook.activo()) return null;   /* fila 770: en un Chromebook «Ruta» copia solo el nombre */
     var arreglar = llevarA('#ruta-dropbox-lugar');
     var R = window.RutaCarpetas;
     if (!R) return resultado('ruta', T, 'omitida', '');
