@@ -73,7 +73,8 @@ Dato nuevo: «¿A quién va el informe?» (lista: «A la familia, por el tutor»
 2. ~~Ayuda de transporte: el recibí~~ Resuelta el 27-nov-2026: se imprime con la plantilla, lo firma en Secretaría quien viene y se registra de entrada (Francisco: «prefiero registrarlo de entrada»). Elegir en la ventanilla quién firma (tutor 1, tutor 2 o el alumno si es mayor de edad) es un desarrollo que Francisco lleva aparte; esta guía no depende de él.
 3. ~~NEAE: tipo del recibí de Orientación~~ Resuelta el 27-nov-2026: RECEPCIÓN («1»).
 4. ~~Informe del equipo educativo: a quién va~~ Resuelta el 27-nov-2026: a menudo va fuera del centro; dos tareas, cada una con su «Solo si» («2»).
-5. Aparte, sin pedirlo: el correo «Abono ayuda transporte escolar» lleva escrito a mano «curso 2024/2025». Propongo que use el dato «Curso Abono AITE», como ya hace el otro correo. ¿En este tema o aparte?
+5. ~~El curso escrito a mano en el correo de la ayuda~~ Resuelta el 27-nov-2026: en este tema («1»). La herramienta de aplicar cambia en «Abono ayuda transporte escolar» «curso 2024/2025» por «curso {campo:Curso Abono AITE}», y el tipo PAGO AYUDA TRANSPORTE pide ese dato antes de la tarea 1.
+6. Informe del equipo educativo: Francisco, 27-nov-2026: «daría registro de salida incluso al informe que se le da al tutor». Propuesta de Claude, sin aprobar: tipo de documento nuevo INFORME VALORACIÓN, con recorrido «lo hacemos · sin firma · se registra de salida · no se envía», en la tarea 2; así el registro se marca solo al llegar el sello y las tareas 3 y 4 quedan solo para entregarlo.
 
 ## Por mirar en el código antes de aplicar (no se ha mirado todavía)
 
