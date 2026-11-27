@@ -47,6 +47,12 @@ del tipo de documento. «Papel:» es el tipo de documento de la tarea.
 5. Certificado de entrega de libros · Papel: CERTIFICADO · Cómo se hace: a la familia, por iPasen o por correo.
 6. Enviar al centro de destino, por Ventanilla Electrónica, los documentos oficiales y el certificado de libros
 
+## Plantillas (mirado en `plantillas.json`, 27-nov-2026)
+
+- Las plantillas de documento y de correo cuelgan del tipo de asunto, no de los hitos: el paso al molde no las toca.
+- De estos cinco tipos solo hay una: el correo «Comunicación baja matrícula» (ANULACIÓN, para la tutoría). Va con la tarea 4 de ANULACIÓN, que hoy no la usa.
+- Ninguno de los cinco tiene plantilla de Word: los papeles que «hacemos» (oficio, resolución, certificado, comunicación) se generan hoy fuera de la app o con «Otra plantilla…».
+
 ## Dudas de Claude (las dice Francisco al repasar)
 
 - ANULACIÓN: el hito «Enviar al Director» iba antes de registrar la solicitud. Lo he puesto después.
