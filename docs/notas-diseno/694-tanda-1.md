@@ -1,4 +1,4 @@
-# 694 — Primera tanda: cinco tipos con guía de hitos, pasados al molde nuevo (borrador)
+# 694 — Primera tanda: cinco tipos con guía de hitos, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
 
 Borrador de Claude, 27-nov-2026, sacado de `guias.json` de la cuenta común (26-nov-2026). Sin
 aprobar. Cada hito pasa a ser una tarea; lo que explicaba el hito va a «Cómo se hace»; generar,
@@ -69,7 +69,7 @@ Recorrido de INFORME PERSONAL TRASLADO e HISTORIAL ACADÉMICO: lo hacemos · fir
 - Por mirar: si el «certificado de entrega de libros» es la ficha de entrega de libros que ya genera la app (fila 501, tipo FICHA ENTREGA LIBROS).
 - ~~El recorrido de cada tipo~~ Mirado el 27-nov-2026 (`recorridos-tipos.json`, compartido ese día): solo tienen recorrido NOTA AULA CONVIVENCIA y FIRMADO AULA CONVIVENCIA. Propuesta abajo.
 
-## Recorridos que faltan (propuesta de Claude, 27-nov-2026, sin aprobar)
+## Recorridos que faltan (aprobados por Francisco el 27-nov-2026: «Está bien»)
 
 Hoy, un tipo sin recorrido se porta como «Nos llega · no se registra». El recorrido vale para ese tipo en todos los trámites.
 
