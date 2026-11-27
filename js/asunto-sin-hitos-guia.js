@@ -45,6 +45,7 @@ var AsuntoSinHitosGuia = (function () {
     if (g.soloSi) c.soloSi = JSON.parse(JSON.stringify(g.soloSi));
     if (g.papel) c.papel = g.papel;   /* fila 703: la tarea de papel de la guía */
     if (g.grupo) c.grupo = g.grupo;   /* fila 706: el rótulo bajo el que va */
+    if (g.accion === 'copiar') { c.accion = 'copiar'; c.receta = JSON.parse(JSON.stringify(g.receta || {})); }   /* fila 783: copia el papel de la tarea de encima */
     return c;
   }
 

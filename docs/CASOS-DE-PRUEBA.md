@@ -48,6 +48,7 @@ La descripción «CASO …» solo se ve en «⋯» → «Cambiar el asunto»; el
 | Devolución de libros en dos tipos (fila 779) | `pruebas/tipos-nombre.mjs`, apartado 3b: la plantilla «Devolución de libros de gratuidad» colgada de TRASLADO con el nombre de antes pasa a ANULACIÓN MATRÍCULA con el nombre nuevo, TRAS. MATR. VIVA recibe la suya, pulsar otra vez no añade nada y cargadas por tipo no se llevan la plantilla de uno a otro |
 | «Solo si» por enseñanza (fila 781) | `pruebas/guia-como-lista-de-tareas.mjs`, apartado 8b: «Solo si el alumno es de E.S.O.» con alumno de 3º ESO (sale), de 1º Bachillerato (no sale) y sin unidad («Falta: Enseñanza del alumno»); la Diversificación cuenta como E.S.O. |
 | Envío por la Ventanilla (fila 782) | `pruebas/tarea-de-papel.mjs`, apartado 25b: un tipo «Otro centro u organismo» por «Ventanilla Electrónica»; con el documento firmado y sin registro, «Enviado» sin hacer; al llegar el registro de salida, «Registrado» y «Enviado» hechos y la tarea hecha |
+| Copiar tras una tarea de papel (fila 783) | `pruebas/guia-como-lista-de-tareas.mjs`, apartados 3 y 11: la guía de un tipo «sin hitos» con «Hacer el oficio» (papel OFICIO COPIA, que se registra) seguida de «Copiar a Ausencias»; antes del registro no se copia, tras el registro aparece el fichero en la carpeta y la tarea queda hecha |
 | Mucha gente y mucho archivo | Inicio con decenas de asuntos; «Archivo» con tres cursos |
 
 ## Todavía sin caso (se añadirán cuando una fila los necesite)

@@ -250,6 +250,20 @@ var TareaPapel = (function () {
     return n;
   }
 
+  /* Fila 783: una tarea «Copiar a otra carpeta» que sigue a una tarea de papel ya registrada copia el papel (una sola vez: queda anotado en `copia`). */
+  async function copiarLoRegistrado(a, h) {
+    if (!window.TareaCopiar) return 0;
+    var lista = Hitos.guionDe(a, h), n = 0;
+    for (var i = 1; i < lista.length; i++) {
+      var g = lista[i], previa = lista[i - 1];
+      if (g.accion !== 'copiar' || g.hecho || g.noaplica || g.copia || !previa.papel || !previa.papelDoc || !previa.papelDoc.numero) continue;
+      if (!estado(a, previa).pasos.some(function (p) { return p.k === 'registrado' && p.hecho; })) continue;
+      await TareaCopiar.intentar(a, h, g, previa.papelDoc.numero, false);
+      n++;
+    }
+    return n;
+  }
+
   /* Al pintar y al cambiar algo: une los documentos sueltos y pone hechas las tareas completas. Solo escribe si hace falta.
      Devuelve true si ha cambiado algo (quien llama repinta). */
   async function sincronizar(a, h, preferida) {
@@ -263,6 +277,8 @@ var TareaPapel = (function () {
       var de = Hitos.buscar(await Hitos.hitosDe(a.nombre), h.id) || fresco;
       if (await acabarEsperasDeFirma(a, de)) { cambio = true; de = Hitos.buscar(await Hitos.hitosDe(a.nombre), h.id) || de; }
       if (await ponerHechas(a, de)) cambio = true;
+      de = Hitos.buscar(await Hitos.hitosDe(a.nombre), h.id) || de;
+      if (await copiarLoRegistrado(a, de)) cambio = true;   /* fila 783 */
       return cambio;
     } catch (e) {
       if (U.accesorio) U.accesorio('No he podido poner al día las tareas de papel', e);

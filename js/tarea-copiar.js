@@ -93,6 +93,8 @@ window.TareaCopiar = (function () {
     var igual = lista.filter(function (f) { return f.nombre === documento; })[0];
     if (igual) return igual;
     var gemelos = lista.filter(function (f) { return TareasConDocumento.mismo(f.nombre, documento); });
+    /* Fila 783: el papel de una tarea de papel se da por su número (D26-0001): el fichero que lo lleva en el nombre, mejor el PDF. */
+    if (!gemelos.length && /^[A-Za-z]\d{2}-\d+$/.test(String(documento || ''))) gemelos = lista.filter(function (f) { return f.nombre.indexOf(documento) !== -1; });
     return gemelos.filter(function (f) { return /\.pdf$/i.test(f.nombre); })[0] || gemelos[0] || null;
   }
 
@@ -157,8 +159,13 @@ window.TareaCopiar = (function () {
     }
   }
 
-  /* El documento registrado del hito: el de su tarea de registrar ya hecha. */
-  function documentoRegistrado(h, guion) {
+  /* El documento registrado del hito: el de su tarea de registrar ya hecha; o, en una lista de tareas (fila 783), el papel de la
+     tarea de papel que tiene justo encima `g`. */
+  function documentoRegistrado(h, guion, g) {
+    if (g) {
+      var i = guion.indexOf(g), previa = i > 0 ? guion[i - 1] : null;
+      if (previa && previa.papel) return (previa.papelDoc && previa.papelDoc.numero) || '';
+    }
     var r = guion.filter(function (g) { return g.accion === 'registrar' && g.hecho && TareasConDocumento.de(h, g.id); })[0];
     return r ? TareasConDocumento.de(h, r.id).doc : '';
   }
@@ -190,7 +197,7 @@ window.TareaCopiar = (function () {
       }
       await recordar(receta, elegida);
     }
-    var doc = documentoRegistrado(h, guion);
+    var doc = documentoRegistrado(h, guion, g);
     if (!doc) { U.aviso('No encuentro el documento registrado de este hito.', 'ambar'); return; }
     var r = await intentar(a, h, g, doc, true);
     if (r === 'copiado') U.aviso('Copiado a ' + receta.carpeta + '.', 'bueno');

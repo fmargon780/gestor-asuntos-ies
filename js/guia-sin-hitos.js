@@ -35,7 +35,7 @@ var GuiaSinHitos = (function () {
     var paso = todos.filter(function (p) { return p.listaDeTareas; })[0] || null;
     var resto = todos.filter(function (p) { return !p.listaDeTareas; });
     var tareas = ((paso && paso.guion) || []).filter(function (g) { return !g.pregunta; }).map(function (g) { return Object.assign({}, g); });
-    var elegida = 0, arrastrada = null;
+    var elegida = 0, arrastrada = null, mostrada = null;
     var elegidos = {};   /* «Ver la guía para»: dato -> valor; solo para mirar, no se guarda */
     if (window.GuiasCuando) GuiasCuando.ponerTipo(nombreTipo, { conClase: true });
 
@@ -56,10 +56,21 @@ var GuiaSinHitos = (function () {
 
     function numeroDe(i) { var n = 0; for (var k = 0; k <= i; k++) if (!tareas[k].rotulo) n++; return n; }
 
+    /* La tarea de encima de la que está en `i` (los rótulos no cuentan). */
+    function encima(i) {
+      for (var k = i - 1; k >= 0; k--) if (!tareas[k].rotulo) return tareas[k];
+      return null;
+    }
+
     function marcasHTML(g) {
       if (g.rotulo) return '';
       var m = [], c = window.SoloSi ? SoloSi.normalizar(g.soloSi) : null;
       if (g.papel) m.push('<span class="gsh-marca gsh-marca-papel">📄 ' + esc(g.papel) + '</span>');
+      if (g.accion === 'copiar') {   /* fila 783: copia el papel de la tarea de encima */
+        var previa = encima(tareas.indexOf(g));
+        m.push(previa && previa.papel ? '<span class="gsh-marca gsh-marca-copiar">📁 Copia el papel de «' + esc(previa.texto) + '»' + (g.receta && g.receta.carpeta ? ' a ' + esc(g.receta.carpeta) : '') + '</span>'
+          : '<span class="gsh-marca gsh-marca-aviso">📁 Encima no hay una tarea de papel: no copia</span>');
+      }
       if (c) m.push('<span class="gsh-marca gsh-marca-solo-si">' + esc(SoloSi.etiqueta(c)) + '</span>');
       if (String(g.comoSeHace || '').trim()) m.push('<span class="gsh-marca">Cómo se hace</span>');
       return m.length ? '<div class="gsh-marcas">' + m.join('') + '</div>' : '';
@@ -147,8 +158,15 @@ var GuiaSinHitos = (function () {
     }
 
     /* La tarea elegida, en grande. Lo escrito aquí se apunta en `g` al momento y se repinta solo lo que cambia a la izquierda. */
+    function guardarCopiaMostrada() {   /* fila 783: lo escrito en el formulario de la carpeta pasa a la tarea que se estaba viendo */
+      var f = $('gsh-copiar-form');
+      if (mostrada && mostrada.accion === 'copiar' && f && f.querySelector('.tcp-form')) mostrada.receta = TareaCopiarEditor.leer(f) || {};
+    }
+
     function pintarDetalle() {
+      guardarCopiaMostrada();
       var caja = $('gsh-der'), g = tareas[elegida];
+      mostrada = g || null;
       if (!caja) return;
       if (!g) { caja.innerHTML = '<p class="vacio">Elige una tarea de la lista para verla entera.</p>'; return; }
       var rot = !!g.rotulo;
@@ -158,7 +176,9 @@ var GuiaSinHitos = (function () {
           (window.TareaPapelPintar ? TareaPapelPintar.selectorHTML('gsh-papel', g.papel, 'Papel de la tarea ' + numeroDe(elegida)) : '') +
           '<div id="gsh-recorrido"></div></div><div class="gsh-grupo" id="gsh-cuando-sitio"></div></div>' +
           '<div class="gsh-grupo"><label class="etiqueta" for="gsh-d-como">Cómo se hace <span class="gsh-opcional">(opcional)</span></label>' +   /* fila 707 */
-          '<textarea class="campo gsh-como" id="gsh-d-como" placeholder="Explicación, pasos, ruta de Séneca o normativa">' + esc(g.comoSeHace) + '</textarea></div>') +
+          '<textarea class="campo gsh-como" id="gsh-d-como" placeholder="Explicación, pasos, ruta de Séneca o normativa">' + esc(g.comoSeHace) + '</textarea></div>' +
+          (window.TareaCopiarEditor ? '<div class="gsh-grupo"><label class="rt-opcion"><input type="checkbox" id="gsh-d-copiar"' + (g.accion === 'copiar' ? ' checked' : '') + '> Copia a otra carpeta el papel de la tarea de encima</label>' +
+            '<div id="gsh-copiar-form"></div></div>' : '')) +
         '<div class="gsh-mandos"><button type="button" class="boton" id="gsh-subir"' + (elegida === 0 ? ' disabled' : '') + '>↑ Subir</button>' +
         '<button type="button" class="boton" id="gsh-bajar"' + (elegida === tareas.length - 1 ? ' disabled' : '') + '>↓ Bajar</button>' +
         '<button type="button" class="boton boton-peligro" id="gsh-quitar">' + (rot ? 'Quitar este rótulo' : 'Quitar esta tarea') + '</button></div>';
@@ -180,6 +200,19 @@ var GuiaSinHitos = (function () {
           $('gsh-cuando-sitio').appendChild(bloque);
           bloque.addEventListener('change', alCambiarCuando);
         }
+        var cop = $('gsh-d-copiar');
+        if (cop) {
+          var ponerForm = function () {
+            var f = $('gsh-copiar-form');
+            f.innerHTML = g.accion === 'copiar' ? TareaCopiarEditor.formularioHTML(g.receta, 'El papel de la tarea de encima, cuando queda registrado.') : '';
+            if (g.accion === 'copiar') TareaCopiarEditor.enganchar(f);
+          };
+          ponerForm();
+          cop.onchange = function () {
+            if (cop.checked) { g.accion = 'copiar'; g.receta = g.receta || {}; delete g.papel; } else { delete g.accion; delete g.receta; }
+            pintarDetalle(); pintarLista();
+          };
+        }
         $('gsh-d-como').oninput = function () { var tenia = !!String(g.comoSeHace || '').trim(); g.comoSeHace = this.value; if (tenia !== !!this.value.trim()) pintarLista(); };
       }
       $('gsh-subir').onclick = function () { mover(pos, pos - 1); };
@@ -191,6 +224,7 @@ var GuiaSinHitos = (function () {
 
     /* Lo que se guarda: cada tarea con lo suyo (un rótulo solo lleva su texto). */
     function limpias() {
+      guardarCopiaMostrada();
       tareas.forEach(function (g) {
         g.texto = String(g.texto || '').trim();
         if (g.rotulo) { delete g.papel; delete g.comoSeHace; delete g.soloSi; return; }
@@ -199,6 +233,7 @@ var GuiaSinHitos = (function () {
         var si = window.SoloSi ? SoloSi.normalizar(g.soloSi) : null;
         if (si) g.soloSi = si; else delete g.soloSi;
         if (!g.papel) delete g.papel;
+        if (g.accion === 'copiar') delete g.papel;   /* fila 783: la que copia no es de papel */
       });
     }
 

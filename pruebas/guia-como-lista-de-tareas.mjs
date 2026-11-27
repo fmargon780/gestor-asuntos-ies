@@ -63,6 +63,11 @@ const fila = (n) => pagina.locator('#gsh-lista .gsh-fila').nth(n);
 const der = pagina.locator('#gsh-der');   /* fila 737: la tarea elegida, a la derecha */
 await comprobar('3. «Cuándo se hace» ofrece «Siempre» y «Solo si el tercero es…»', fila(1).click().then(() => der.locator('.cuando-campo option').allTextContents()).then((l) => l.slice(0, 2)), ['Siempre', 'Solo si el tercero es…']);
 await der.locator('.cuando-campo').selectOption({ label: 'Solo si el tercero es…' });
+await der.locator('#gsh-d-copiar').check();
+await comprobar('3. «Copia a otra carpeta el papel de la tarea de encima» enseña la carpeta y el nombre', [await der.locator('#gsh-copiar-form .tcp-elegir').count(), await der.locator('#gsh-copiar-form .tcp-patron').count(), /papel de la tarea de encima/.test(await der.locator('#gsh-copiar-form').innerText())], [1, 1, true]);
+await comprobar('3. y la lista marca que encima no hay una tarea de papel', pagina.locator('#gsh-lista .gsh-fila').nth(1).locator('.gsh-marca-aviso').count(), 1);
+await der.locator('#gsh-d-copiar').uncheck();
+await comprobar('3. al desmarcarla, el formulario se va', der.locator('#gsh-copiar-form .tcp-form').count(), 0);
 await comprobar('3. salen las clases de tercero del tipo', der.locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await pagina.evaluate((t) => SoloSi.clasesDelTipo(t), TIPO));
 await der.locator('.cuando-campo').selectOption({ label: 'Solo si el alumno es de…' });
 await comprobar('3. «Solo si el alumno es de…» ofrece las tres enseñanzas y su nota', [await der.locator('.cuando-valor').evaluateAll((l) => l.map((x) => x.value)), await der.locator('.cuando-nota').first().innerText()],
@@ -218,6 +223,46 @@ await comprobar('8c. un alumno recién abierto lo pide al Centro de datos y la e
   for (let i = 0; i < 40 && despues === 'falta'; i++) { await new Promise((r) => setTimeout(r, 100)); despues = SoloSi.estado(si, SoloSi.valoresDe(SoloSi.asuntoDeClave(a.nombre))); }
   return [antes, despues];
 }), ['falta', 'sale']);
+
+console.log('--- «Copiar a otra carpeta» tras una tarea de papel (fila 783) ---');
+const cop = await pagina.evaluate(async ([t, k]) => {
+  App.E.tipos.filter((x) => x.tipo === t)[0].sinHitos = true;
+  await RecorridoTipo.poner('OFICIO COPIA', { entra: false, firma: 'Nadie', registro: true, envia: false });
+  const pasos = GuiasDelCentro.pasosDe(t);
+  const lista = pasos.filter((p) => p.listaDeTareas)[0];
+  lista.guion = [{ id: 'gp1', texto: 'Hacer el oficio', papel: 'OFICIO COPIA' },
+    { id: 'gc1', texto: 'Copiar a Ausencias', accion: 'copiar', receta: { carpeta: 'Ausencias', carpetaId: 'cp-783', patron: 'Registro {nombre}' } }];
+  await GuiasDelCentro.guardarPasos(t, pasos);
+  /* Un asunto nuevo del tipo: la tarea de copiar nace con su receta. */
+  const a = App.E.listaAbiertos.filter((x) => x.nombre === k)[0];
+  await Hitos.cambiar((d) => { const e = d.porAsunto[k]; if (e) e.hitos = e.hitos.filter((h) => !h.listaDeTareas); return d; });
+  await AsuntoSinHitos.crear(k, t);
+  await AsuntoSinHitosGuia.llevar(t, GuiasDelCentro.pasosDe(t));
+  const destino = await App.E.archivo.getDirectoryHandle('Ausencias', { create: true });
+  await TareaCopiar.recordar({ carpetaId: 'cp-783' }, destino);
+  await Carpetas.escribirBytes(a.handle, '261105 OFICIO D26-95001.pdf', new Uint8Array([37, 80, 68, 70]), 'application/pdf');
+  const h = AsuntoSinHitos.hitoDe(await Hitos.hitosDe(k));
+  const lineas = () => Hitos.guionDe(a, AsuntoSinHitos.hitoDe([]) || h);
+  const g0 = Hitos.guionDe(a, h);
+  const ids = g0.map((g) => [g.texto, g.accion, g.receta && g.receta.carpeta || '']);
+  const gPapel = g0.filter((g) => g.papel)[0];
+  await TareaPapel.asignar(a, h, gPapel, { numero: 'D26-95001', nombre: '261105 OFICIO D26-95001.pdf', firmas: 0 });
+  await DocumentosDatos.anotar(k, 'D26-95001', { tipo: 'OFICIO COPIA', fecha: U.hoyIso(), firmas: 0, registros: [], campos: [], texto: '' });
+  const estadoCopia = async () => {
+    const h2 = AsuntoSinHitos.hitoDe(await Hitos.hitosDe(k)), g = Hitos.guionDe(a, h2).filter((x) => x.accion === 'copiar')[0];
+    const l = []; for await (const [n] of destino.entries()) l.push(n);
+    return [!!g.hecho, (g.copia && g.copia.texto) || '', l.length];
+  };
+  await TareaPapel.sincronizar(a, h);
+  const antes = await estadoCopia();
+  await DocumentosDatos.anotar(k, 'D26-95001', { registros: [{ ano: 2026, sentido: 'salida', modo: 'normal', numero: 1, codigo: 'S26-0001' }] });
+  await TareaPapel.sincronizar(a, AsuntoSinHitos.hitoDe(await Hitos.hitosDe(k)));
+  const despues = await estadoCopia();
+  return { ids, antes, despues };
+}, [TIPO, NUEVO]);
+await comprobar('11. el asunto nuevo recibe la tarea de copiar con su receta', cop.ids, [['Hacer el oficio', '', ''], ['Copiar a Ausencias', 'copiar', 'Ausencias']]);
+await comprobar('11. antes de registrar el papel no se copia nada', cop.antes, [false, '', 0]);
+await comprobar('11. al registrarse el papel se copia y la tarea queda hecha con su línea', [cop.despues[0], /^Copiado a Ausencias como «Registro .*\.pdf».$/.test(cop.despues[1]), cop.despues[2]], [true, true, 1]);
 
 await comprobar('sin errores de consola', Promise.resolve(errores), []);
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
