@@ -138,6 +138,21 @@ await comprobar('25. con 1 firma de la plantilla, un documento con 1 firma da «
   return TareaPapel.estado({ nombre: k }, g2).pasos.map((p) => p.hecho);
 }, A), [true, true, false, false]);
 
+console.log('--- la Ventanilla Electrónica (fila 782) ---');
+await comprobar('25b. el recorrido ofrece «Otro centro u organismo» y «Ventanilla Electrónica»', pagina.evaluate(() => [RecorridoTipo.AQUIEN.slice(-1)[0], RecorridoTipo.vias().slice(-1)[0]]), ['Otro centro u organismo', 'Ventanilla Electrónica']);
+await comprobar('25b. «Enviado» por la Ventanilla se da solo al llegar el registro de salida, y antes no', pagina.evaluate(async (k) => {
+  await RecorridoTipo.poner('OFICIO VENT', { entra: false, firma: 'Dirección', registro: true, envia: true, aquien: 'Otro centro u organismo', via: 'Ventanilla Electrónica' });
+  const h = (await Hitos.hitosDe(k))[0];
+  await TareaPapel.anadir({ nombre: k }, h, 'Oficio por la Ventanilla', 'OFICIO VENT');
+  const h1 = (await Hitos.hitosDe(k))[0], g1 = Hitos.guionDe(null, h1).filter((x) => x.texto === 'Oficio por la Ventanilla')[0];
+  await TareaPapel.asignar({ nombre: k }, h1, g1, { numero: 'D26-90005', nombre: '', firmas: 1 });
+  const ver = async () => { const h2 = (await Hitos.hitosDe(k))[0], g2 = Hitos.guionDe(null, h2).filter((x) => x.texto === 'Oficio por la Ventanilla')[0]; const e = TareaPapel.estado({ nombre: k }, g2); return [e.pasos.map((p) => p.hecho), e.envio && e.envio.correo, TareaPapel.botonDe(e) && TareaPapel.botonDe(e).k]; };
+  await DocumentosDatos.anotar(k, 'D26-90005', { tipo: 'OFICIO VENT', fecha: U.hoyIso(), firmas: 1, registros: [], campos: [], texto: '' });
+  const antes = await ver();
+  await DocumentosDatos.anotar(k, 'D26-90005', { registros: [{ ano: 2026, sentido: 'salida', modo: 'normal', numero: 1, codigo: 'S26-0001' }] });
+  return [antes, await ver()];
+}, A), [[[true, true, false, false], false, 'registrar'], [[true, true, true, true], false, null]]);
+
 console.log('--- el papel en la guía y «Añadir documento» ---');
 await comprobar('26. la guía conserva el papel de cada frase', pagina.evaluate(() => GuiasGuion.normalizar([{ id: 'a1', texto: 'Comunicar', papel: 'COMUNICACION' }, { id: 'a2', texto: 'Otra' }]).map((g) => g.papel || '')), ['COMUNICACION', '']);
 await comprobar('27. un asunto nuevo recibe el papel de la tarea de la guía', pagina.evaluate(() => AsuntoSinHitosGuia.darTareas({}, [{ id: 'x1', texto: 'Comunicar', papel: 'COMUNICACION' }]) === 1 && (function () { const h = {}; AsuntoSinHitosGuia.darTareas(h, [{ id: 'x1', texto: 'Comunicar', papel: 'COMUNICACION' }]); return h.guionPropio[0].papel; })()), 'COMUNICACION');

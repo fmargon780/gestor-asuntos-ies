@@ -17,7 +17,9 @@ var RecorridoTipo = (function () {
 
   var FICHERO = 'recorridos-tipos.json';
   var FIRMAS = ['Nadie', 'Administración', 'Secretaría', 'Secretaría, con visto bueno de Dirección', 'Dirección', 'Jefatura de Estudios'];
-  var AQUIEN = ['Familia', 'Interesado', 'Quien lo pide', 'Tutor/a del grupo', 'Personas relacionadas'];
+  var AQUIEN = ['Familia', 'Interesado', 'Quien lo pide', 'Tutor/a del grupo', 'Personas relacionadas', 'Otro centro u organismo'];   /* fila 782: el último */
+  /* Fila 782: la Ventanilla Electrónica es una vía más de «Por dónde» (no es un sitio de la lista del centro). */
+  var VIA_VENTANILLA = 'Ventanilla Electrónica';
   /* Las vías de envío de `Sitios` (js/sitios.js): por si no está cargado, y para saber cuáles lo son. */
   var IDS_VIAS = ['st-correo', 'st-ipasen', 'st-postal', 'st-en-mano', 'st-tablon'];
   var VIAS_POR_DEFECTO = ['Correo electrónico', 'iPasen', 'Correo postal', 'En mano', 'Tablón'];
@@ -33,8 +35,10 @@ var RecorridoTipo = (function () {
       var d = window.Sitios && Sitios.datos ? Sitios.datos() : null;
       ((d && d.sitios) || []).forEach(function (s) { if (IDS_VIAS.indexOf(s.id) !== -1 && s.nombre) salida.push(s.nombre); });
     } catch (e) { salida = []; }
-    return salida.length ? salida : VIAS_POR_DEFECTO.slice();
+    return (salida.length ? salida : VIAS_POR_DEFECTO.slice()).concat([VIA_VENTANILLA]);
   }
+
+  function viaEsVentanilla(via) { return clave(via) === clave(VIA_VENTANILLA); }
 
   /* Lo guardado, limpio y con lo que no encaja quitado. */
   function limpiar(r) {
@@ -131,7 +135,7 @@ var RecorridoTipo = (function () {
   }
 
   return {
-    FICHERO: FICHERO, FIRMAS: FIRMAS, AQUIEN: AQUIEN, vias: vias,
+    FICHERO: FICHERO, FIRMAS: FIRMAS, AQUIEN: AQUIEN, vias: vias, VIA_VENTANILLA: VIA_VENTANILLA, viaEsVentanilla: viaEsVentanilla,
     cargar: cargar, tiene: tiene, de: de, pasos: pasos, resumen: resumen,
     pasosDe: pasosDe, resumenDe: resumenDe, limpiar: limpiar, poner: poner, mover: mover
   };

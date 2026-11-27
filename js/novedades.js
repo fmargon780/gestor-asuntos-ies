@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '782', fecha: '2026-11-27', texto: 'El recorrido de un tipo de documento ofrece ahora «Otro centro u organismo» en «A quién» y «Ventanilla Electrónica» en «Por dónde». Con la Ventanilla, el paso «Enviado» se marca solo cuando llega el registro de salida del documento; mientras no llega, se puede marcar a mano como siempre.' },
   { id: '781', fecha: '2026-11-27', texto: 'En la guía de un tipo «sin hitos», «Cuándo se hace» ofrece «Solo si el alumno es de…» (E.S.O., Bachillerato o Formación Profesional): la tarea sale solo si el alumno es de esa enseñanza, que la app saca de su unidad (la Diversificación cuenta como E.S.O.). Si no sabe la unidad, la tarea sale con «Falta: Enseñanza del alumno».' },
   { id: '779', fecha: '2026-11-27', texto: 'El certificado de devolución de libros de gratuidad ya no dice «por traslado» y sale en la anulación de matrícula y en el traslado de matrícula viva (el alumno que se va); al pulsar «Cargar las plantillas del centro» queda en esos dos tipos y deja de estar en «Traslado» (el alumno que llega).' },
   { id: '776', fecha: '2026-11-27', texto: 'Nuevo asunto: la persona va primero, a la izquierda, después el tipo de asunto y la fecha de inicio, y el formulario ocupa todo el ancho de la pantalla.' },
