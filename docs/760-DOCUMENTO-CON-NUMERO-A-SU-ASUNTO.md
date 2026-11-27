@@ -61,3 +61,5 @@ Tema 759: «El correo que entra va a su asunto. Para qué: que si un correo que 
 ## Revisión y respuestas durante el trabajo
 
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (26-nov-2026 20:25, Claude en el chat, con Chrome, en `https://asuntos.fmargon.com/?demo=1&auto=1`, versión 26-nov-2026 · 20:04) Visto: en «Por clasificar», «Correo de Secretaría · A26-0002.pdf» dice «Es de 261121 A26-0002 MATRICULA Aguilar Ponce, Pablo 2100002»; botón principal «Guardar en ese asunto», y «Crear asunto con él» y «Guardar en un asunto» sin destacar; al pulsarlo se abre el cuadro del nombre con ese asunto y la tarea «Recibir la solicitud de matrícula»; «Volver» deja la lista igual. Los demás documentos no llevan número y se ven como antes (el de la tarjeta de Otero Campos sigue con sus sugerencias por tercero). No pulsé «Guardar».
+- (26-nov-2026) Sin ver: el asunto archivado («Reabrir y guardar aquí» y «Guardar sin reabrir») porque la demostración no trae ningún suelto con ese caso; un número solo dentro del texto del PDF; y el correo real en PDF, que solo puede probar Francisco en el instituto.

@@ -1,0 +1,84 @@
+# 694 — Cuarta tanda: cuatro tipos de alumnado con guía de hitos, pasados al molde nuevo (repasada con Francisco el 27-nov-2026)
+
+Borrador de Claude (Sonnet), 27-nov-2026. Datos leídos ese día de `_GESTOR` de la cuenta común:
+`guias.json` (26-nov-2026), `tipos.json`, `campos.json`, `tipos-documento.json`,
+`recorridos-tipos.json` y `plantillas.json`. Sin aprobar. Misma forma que las tandas anteriores:
+cada hito pasa a ser una tarea; lo que explicaba, a «Cómo se hace»; «Papel:» es el tipo de
+documento de la tarea, que sigue su recorrido. Los hitos de relleno («Tramitar», «Esperar
+respuesta», «Archivar») desaparecen.
+
+Tanda elegida por tema: lo que pasa con la familia y el dinero o el equipo de orientación
+(seguro escolar, ayuda de transporte, evaluación psicopedagógica e informe del equipo educativo).
+Quedan cinco para la tanda 5: COMUNICACIÓN RECIBIDA, CONFORMIDAD, INFORME EDITORIAL,
+PROGRAMA DE TRÁNSITO y REUNIÓN C.M. ABSENTISMO ESCOLAR.
+
+## COBRO SEGURO ESCOLAR (1 hito → 1 tarea)
+
+Hoy: un solo hito, «Cobro», con la explicación «importe 1,12 €, de 3.º de la ESO en adelante».
+
+1. Anotar el cobro del seguro escolar · Cómo se hace: importe 1,12 €; se cobra de 3.º de la ESO en adelante.
+
+Sin papel. Los datos que ya tiene el tipo (importe cobrado, obligatorio, y unidad) no cambian.
+
+## PAGO AYUDA TRANSPORTE (4 hitos → 4 tareas)
+
+Hoy: «Solicitar número de cuenta», «Esperar respuesta» (con la tarea «Descargar documentación y
+enviar a Secretaría»), «Comunicar a la tutoría la transferencia realizada» y «Archivar». Tiene dos
+correos (pedir la cuenta; avisar de la transferencia y citar a firmar el recibí) y la plantilla de
+Word «AITE - RECIBÍ GENÉRICO». Datos: curso del abono, fecha de la transferencia, importe y
+kilómetros reconocidos.
+
+1. Pedir a la familia el número de cuenta · sin papel · con «Enviar ▾», correo «Abono ayuda transporte escolar» · al enviarlo, queda «Esperando a la familia».
+2. Pasar la documentación recibida a Secretaría para que haga la transferencia · Cómo se hace: descargar lo que manda la familia y enviárselo a Secretaría.
+3. Avisar a la familia de la transferencia y citarla a firmar el recibí en Secretaría · sin papel · con «Enviar ▾», correo «Ayuda Individualizada para el Transporte Escolar (AITE) – Firma de recibí».
+4. Guardar el recibí firmado · Papel: AITE - RECIBÍ GENÉRICO · Cómo se hace: se imprime con la plantilla, lo firma en Secretaría quien viene, se escanea y se registra de entrada.
+
+(«Archivar» desaparece.)
+
+## Evaluación psicopedagógica y alumnado NEAE (3 hitos → 3 tareas)
+
+Hoy: «Registrar la solicitud de la familia», «Enviar al Dpto. Orientación» (con el correo «Envío del
+Registro de Entrada de Documentación por los padres», que adjunta el REGISTRO ENTREGA y va al grupo
+de Orientación) y «Registrar el recibí» («Cuando llegue»).
+
+1. Registrar la solicitud de la familia · Papel: SOLICITUD (recorrido ya aprobado: nos llega, se registra de entrada).
+2. Enviar al Departamento de Orientación el registro de la documentación entregada · sin papel · con «Enviar ▾», el correo que ya existe · al enviarlo, queda «Esperando a Orientación».
+3. Registrar el recibí de Orientación · Papel: RECEPCIÓN · Cómo se hace: cuando llegue, con su fecha exacta.
+
+## INFORME VALORACIÓN EQUIPO EDUCATIVO (3 hitos → 4 tareas)
+
+Hoy: «Solicitud» (registrar de entrada), «Emisión» (espera, sin tarea) y «Envío» (registrar de
+salida «si se remite» y «dar al tutor para entregar a la familia»). Sin datos ni plantillas.
+
+Dato nuevo: «¿A quién va el informe?» (lista: «A la familia, por el tutor» / «Fuera del centro»).
+Tipo de documento nuevo: INFORME VALORACIÓN (aprobado el 27-nov-2026, «Sí»).
+
+1. Recibir la solicitud del informe · Papel: SOLICITUD.
+2. Recoger el informe del equipo educativo · Papel: INFORME VALORACIÓN · queda «Esperando al equipo educativo» hasta que llegue · se registra de salida siempre (Francisco: también el que va a la familia); «Registrado» se marca solo al llegar el sello.
+3. Dar el informe al tutor para que lo entregue a la familia · sin papel, se marca a mano · Solo si: «¿A quién va el informe?» = A la familia, por el tutor.
+4. Enviar el informe · sin papel, con «Enviar ▾», se marca a mano · Solo si: = Fuera del centro.
+
+## Recorridos que faltan
+
+| Tipo de documento | Propuesta |
+|---|---|
+| SOLICITUD | Ya aprobado en la tanda 1: nos llega · se registra de entrada |
+| INFORME VALORACIÓN (nuevo) | Lo hacemos · sin firma · se registra de salida · no se envía (lo entregan las tareas 3 y 4) · aprobado el 27-nov-2026 |
+| RECEPCIÓN | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
+| AITE - RECIBÍ GENÉRICO | Nos llega · se registra de entrada (aprobado el 27-nov-2026) |
+
+## Dudas de Claude (las dice Francisco al repasar)
+
+1. ~~Ayuda de transporte: a quién va el aviso~~ Resuelta el 27-nov-2026: solo a la familia («1»). La tarea 3 se queda como está.
+2. ~~Ayuda de transporte: el recibí~~ Resuelta el 27-nov-2026: se imprime con la plantilla, lo firma en Secretaría quien viene y se registra de entrada (Francisco: «prefiero registrarlo de entrada»). Elegir en la ventanilla quién firma (tutor 1, tutor 2 o el alumno si es mayor de edad) es un desarrollo que Francisco lleva aparte; esta guía no depende de él.
+3. ~~NEAE: tipo del recibí de Orientación~~ Resuelta el 27-nov-2026: RECEPCIÓN («1»).
+4. ~~Informe del equipo educativo: a quién va~~ Resuelta el 27-nov-2026: a menudo va fuera del centro; dos tareas, cada una con su «Solo si» («2»).
+5. ~~El curso escrito a mano en el correo de la ayuda~~ Resuelta el 27-nov-2026: en este tema («1»). La herramienta de aplicar cambia en «Abono ayuda transporte escolar» «curso 2024/2025» por «curso {campo:Curso Abono AITE}», y el tipo PAGO AYUDA TRANSPORTE pide ese dato antes de la tarea 1.
+6. ~~Informe del equipo educativo: registro de salida siempre~~ Resuelta el 27-nov-2026: tipo de documento nuevo INFORME VALORACIÓN, «lo hacemos · sin firma · se registra de salida · no se envía» («Sí»). Repasar el tipo INFORME (uno por clase de informe, con su «apellido») va aparte: idea 780.
+
+Tanda 4 repasada entera el 27-nov-2026.
+
+## Por mirar en el código antes de aplicar (no se ha mirado todavía)
+
+- Mirado: el recorrido es uno por tipo de documento (`js/tarea-papel.js`), por eso las tareas 3 y 4 del informe van sin papel.
+- De dónde sale `{registro}` en el correo de COMUNICACIÓN RECIBIDA (tanda 5).

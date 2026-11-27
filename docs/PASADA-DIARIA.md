@@ -1,1 +1,1 @@
-Última pasada completa: 20-nov-2026 15:13 (Madrid) · 34 min · verde · commit 536cc53
+Última pasada completa: 26-nov-2026 20:37 (Madrid) · 18 min · verde (435 pruebas, la nueva ruta-chromebook incluida) · commit 968e8cb (rama de la fila 770)

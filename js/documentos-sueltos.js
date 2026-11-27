@@ -288,7 +288,7 @@ App.meterSueltoEnAsunto = async function (s) {
    camino "Desde 'Por clasificar'"): opcional, con `{ hito }`. Viaja
    tal cual hasta App.verDocumentos, para que al ponerle nombre al
    documento ya movido quede apuntado al hito. */
-App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
+App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones, decision) {
   var E = window.ElegirAsunto;
 
   if (!E.estaArchivado(elegido.ficha)) {
@@ -296,7 +296,8 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
     return;
   }
 
-  var que = await E.preguntarSiReabrir(elegido, {
+  /* Fila 760: `decision` ('reabrir' o 'guardar') ya viene dicha desde la tarjeta del documento con número de asunto. */
+  var que = decision || await E.preguntarSiReabrir(elegido, {
     explica: '<p>Si el documento es de una gestión que vuelve a moverse, lo normal es ' +
              'reabrir el asunto. Si solo es papeleo que llega tarde, no hace falta.</p>',
     reabrir: 'Reabrir y guardarlo aquí',

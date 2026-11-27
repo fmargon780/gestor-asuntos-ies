@@ -78,7 +78,7 @@ window.DocumentoTareaBloque = (function () {
         '<p class="suave">' + (g.tipoDocumento ? 'Esa tarea espera un documento de tipo ' + esc(g.tipoDocumento) + '. Queda hecha.' : 'Esa tarea espera un documento. Queda hecha.') + '</p>' +
         '<button type="button" class="boton boton-chico" id="dtb-cambiar">Cambiar</button></div>';
     } else {
-      var nota = sinHitos ? 'Este asunto no tiene hitos. Añade el hito del que cuelga el documento.'
+      var nota = sinHitos ? 'Este asunto no tiene hitos. Añade el hito al que se vincula el documento.'
         : (S.aMano ? '' : 'Ninguna tarea espera un documento de tipo ' + tipo + '. Elige el hito y la tarea.');
       if (nota) t += '<p class="suave" id="dtb-nota">' + esc(nota) + '</p>';
       t += '<label class="etiqueta" for="dtb-hito">Hito</label><div class="hito-linea"><select id="dtb-hito" class="campo"' + (sinHitos ? ' disabled' : '') + '>' +

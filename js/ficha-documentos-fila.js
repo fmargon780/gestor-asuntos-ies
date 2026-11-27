@@ -56,39 +56,15 @@ var FichaDocumentosFila = (function () {
     }
     fila.appendChild(b);
 
-    /* Fila 638: un documento que ninguna tarea de ningún hito tiene colgado sale con la marca «sin tarea» y «Colgar de una
-       tarea» (la misma pregunta que «+ Añadir documento», con «Colgar»). Nadie está obligado a pulsarlo. */
-    if (!esIndice && I.sinTarea && I.sinTarea(f.nombre)) {
-      var sinTarea = document.createElement('span');
-      sinTarea.className = 'marca-sin-tarea';
-      sinTarea.textContent = 'sin tarea';
-      sinTarea.setAttribute('data-ayuda-clave', 'documento-sin-tarea');
-      fila.appendChild(sinTarea);
-      if (window.DocumentoATarea && (!window.RutaCarpetas || RutaCarpetas.modoDe(a) === 'abierto')) {
-        var colgar = document.createElement('button');
-        colgar.type = 'button';
-        colgar.className = 'boton boton-chico ficha-documento-colgar';
-        colgar.textContent = 'Colgar de una tarea';
-        if (!I.hayHitos()) { colgar.disabled = true; colgar.title = 'Para colgar un documento, crea antes el hito y su tarea.'; }
-        colgar.onclick = async function (ev) {
-          ev.stopPropagation();
-          colgar.disabled = true;
-          try { await DocumentoATarea.colgarDeCarpeta(a, f.nombre); }
-          finally { colgar.disabled = false; }
-        };
-        fila.appendChild(colgar);
-      }
-    }
-
     /* Fila 423: «Ruta», pegado al nombre: copia la ruta entera del documento. Fila 439: es lo único que
        queda a la vista; lo demás, en el menú ⋮ de la derecha, y los datos, en gris, tras «Ruta». */
     if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.botonDocumento(a, RutaCarpetas.modoDe(a), { nombre: f.nombre }));
-    /* Fila 627: «Extracto», al lado de «Ruta»: copia el extracto de este documento para el registro de Séneca (en todos, también los registrados). */
-    if (window.ExtractoDocumento) fila.appendChild(ExtractoDocumento.boton(a, f.nombre));
 
     /* Fila 439: las entradas del menú ⋮, en este orden: copiar el nombre, Registrar, Cambiar el nombre,
        Asociar a un hito, Traer a este hito, y lo que ya tenía el menú. Cada una sale solo cuando hoy saldría su botón. */
     var enMenu = [];
+    /* Fila 775: «Extracto» (fila 627: copia el extracto del documento para el registro de Séneca, en todos) va primero en el menú. */
+    if (window.ExtractoDocumento) enMenu.push(ExtractoDocumento.entradaDeMenu(a, f.nombre));
     function entrada(texto, clase, ayuda, alPulsar) {
       var e = document.createElement('button');
       e.type = 'button';
@@ -105,6 +81,19 @@ var FichaDocumentosFila = (function () {
       U.copiar(String(f.nombre).replace(/\.[A-Za-z0-9]{1,8}$/, '').trim(), copiar);
     });
     enMenu.push(copiar);
+
+    /* Fila 775 (antes «sin tarea» y «Colgar de una tarea» a la vista, fila 638): «Vincular a una tarea», solo en un asunto con hitos, abierto,
+       para un documento que ninguna tarea tiene vinculado. En un asunto «lista de tareas» no sale: el papel entra por los botones de la tarea. */
+    if (!esIndice && I.sinTarea && I.sinTarea(f.nombre) && window.DocumentoATarea && I.hayHitos() &&
+        !(I.esListaDeTareas && I.esListaDeTareas()) &&
+        (!window.RutaCarpetas || RutaCarpetas.modoDe(a) === 'abierto')) {
+      var vincular = entrada('Vincular a una tarea', 'ficha-documento-vincular', 'Elegir de qué tarea es este documento', async function () {
+        vincular.disabled = true;
+        try { await DocumentoATarea.colgarDeCarpeta(a, f.nombre); }
+        finally { vincular.disabled = false; }
+      });
+      enMenu.push(vincular);
+    }
 
     if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre, a)) {
       var pendiente = window.AvisosFalta ? AvisosFalta.sinRegistrar(a, hitosVisibles || [], f.nombre) : Registro.pendiente(a, f.nombre);   /* fila 524: también si cuelga de una tarea de registrar sin hacer */

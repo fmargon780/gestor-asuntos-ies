@@ -41,6 +41,7 @@
     { fichero: 'dni.js', nombre: 'App.pieAlumno' },
     { fichero: 'dni.js', nombre: 'Datos.destacadosAlumno' },
     { fichero: 'documentos-sueltos-lector.js', nombre: 'App.tarjetaSuelto' },
+    { fichero: 'documentos-sueltos-numero.js', nombre: 'App.tarjetaSuelto' },   /* fila 760 */
     { fichero: 'duplicados.js', nombre: 'App.refrescarVista' },
     { fichero: 'duplicados.js', nombre: 'boton(#btn-crear).onclick' },
     { fichero: 'ficha-archivo.js', nombre: 'App.cerrarAsunto' },

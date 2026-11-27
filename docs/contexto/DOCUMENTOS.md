@@ -196,6 +196,16 @@ Al elegir: `App.llevarSueltoA(s, a.nombre, a.ficha, { hito, tarea: g.id })` (fil
 entra al pulsar «Guardar». El directivo no lo ve (`body.perfil-directivo .guion-coger`). Prueba `pruebas/coger-de-por-clasificar.mjs`.
 En la copia de pruebas, los sueltos salen con `?demo=1&auto=1&latido=hoy` o `&entrada=1`; sin ellos, la lista dice que no hay.
 
+### Un suelto con el número de un asunto va a su asunto (fila 760)
+
+`js/documentos-sueltos-numero.js` (`window.SueltoConNumero`, envuelve `App.tarjetaSuelto` después del lector): si el **nombre** del suelto
+(sin extensión) lleva el número de un asunto (`Bandeja.asuntoPorNumeroEnElTexto`, la misma función de los correos, fila 627: entero y
+suelto), o el **texto del PDF** que ya lee `js/documentos-sueltos-lector.js` (guarda el asunto en `porNumero`; `LectorDeSueltos.asuntoPorNumero`),
+la tarjeta añade la línea «Es de <asunto>» (`.propuesta-numero`) y botones delante: «Guardar en ese asunto» (principal; asunto abierto) o
+«Reabrir y guardar aquí» + «Guardar sin reabrir» (cerrado), que llaman a `App.meterSueltoEnAsuntoElegido(s, elegido, opciones, decision)`
+(4.º parámetro `'reabrir'`/`'guardar'`: no pregunta). «Crear asunto con él» baja a discreto y, con número, no se calculan las sugerencias por
+tercero. Nunca guarda sin pulsar. Demo: `crearSueltosConNumero` en `js/demo/datos-resto.js` (suelto de Pablo A26-0002; el caso archivado solo está en la prueba, porque un archivado en asuntos.json sale en «Problemas»). Límite: el número solo se busca en `App.E.registro.asuntos` (igual que en los correos): un archivado cuya ficha ya está solo en el ARCHIVO no se encuentra. Prueba `pruebas/documento-con-numero-de-asunto.mjs`.
+
 ### El cuadro de elegir asunto, y "Por clasificar"
 
 El cuadro para escoger un asunto a mano vive en **`js/elegir-asunto.js`** (`window.ElegirAsunto`)

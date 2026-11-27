@@ -40,6 +40,8 @@
   /* nombre del fichero -> lo que ha devuelto analizar(), o null si no
      había nada que proponer (o el fichero no se ha podido leer). */
   var resultados = {};
+  /* Fila 760: nombre del fichero -> el asunto cuyo número lleva el texto del PDF. */
+  var porNumero = {};
   var enCola = {};
   var cola = [];
   var procesando = false;
@@ -261,6 +263,13 @@
     var propuesta = resultados[nombre];
     var s = (App.E.sueltos || []).filter(function (x) { return x.nombre === nombre; })[0];
     lineasDe(nombre).forEach(function (grupo) { rellenarLinea(grupo, s, propuesta); });
+    /* Fila 760: ya leído, el asunto del número del texto sale en la tarjeta (después de rellenar la línea, que toca los botones). */
+    var delNumero = s && window.SueltoConNumero && (porNumero[nombre] || SueltoConNumero.delNombre(nombre));
+    if (delNumero) {
+      Array.prototype.forEach.call(document.querySelectorAll('.tarjeta-suelto'), function (t) {
+        if (t.dataset.suelto === nombre) SueltoConNumero.aplicar(t, s, delNumero);
+      });
+    }
   }
 
   async function procesarUno(nombre) {
@@ -270,6 +279,9 @@
       try {
         var fichero = await s.handle.getFile();
         var texto = await RegistroLector.textoDe(fichero, 5);
+        /* Fila 760: con el número de un asunto en el texto, manda el número (sin sugerencias por tercero). */
+        var delTexto = texto && window.Bandeja && Bandeja.asuntoPorNumeroEnElTexto(texto);
+        if (delTexto) porNumero[nombre] = delTexto;
         if (texto) {
           var ctx = await contexto();
           var analisis = LectorDocumentos.analizar(texto, ctx);
@@ -285,7 +297,8 @@
          con tercero reconocido, se mira además si ya tiene asuntos.
          Mismo "mejor esfuerzo" que el análisis de arriba: si falla,
          la propuesta se queda sin sugerencias, no se rompe nada. */
-      if (propuesta && propuesta.tercero && window.SugerenciasAsuntoExistente) {
+      if (propuesta && propuesta.tercero && window.SugerenciasAsuntoExistente &&
+          !porNumero[nombre] && !(window.SueltoConNumero && SueltoConNumero.delNombre(nombre))) {
         try {
           propuesta.sugerencias = await SugerenciasAsuntoExistente.calcular(propuesta);
         } catch (e) {
@@ -370,6 +383,7 @@
      la cola: la pantalla no se ha abierto), `null` si se leyó y no
      había nada que proponer. */
   window.LectorDeSueltos = {
+    asuntoPorNumero: function (nombre) { return porNumero[nombre] || null; },   /* fila 760 */
     resultadoDe: function (nombre) {
       return resultados.hasOwnProperty(nombre) ? resultados[nombre] : undefined;
     }

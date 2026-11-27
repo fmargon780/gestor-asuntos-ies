@@ -30,5 +30,5 @@ de este repositorio una regla de Bash para `python3 -m http.server` (así no hac
 
 ## Lo que sí se comprobó sin servidor propio
 - `npm test -- material` (las pruebas de «Material», incluidas las dos nuevas): todo bien. La nueva de pantalla recorre en Chromium, con la demostración: «Comprobar recibido y factura» desde «Pedidos» abre el asunto con el bloque abierto; recibido de menos en rojo y «Volver a pedir lo no recibido (1)»; la factura con las tres comprobaciones en verde, el veredicto «✓ Factura conforme» o «Con diferencias»; un precio y un IVA distintos; juntar el otro pedido del mismo proveedor y quitarlo; volver a pedir (suma a la línea de «Lo que falta» y solo una vez); pasar los precios al catálogo con «Factura <nº>»; y «Facturado en el año» y «Pedido sin facturar» de «Proveedores» con cifras de verdad.
-- Pasada completa (`npm test`): ver la nota de la fila.
+- Pasada completa (`npm test`, 26-nov-2026): 435 pruebas, 434 bien. Falla `recorrido-del-tipo` en los dos intentos (la intermitente ya apuntada en `docs/COLA.md`, fila 747; no es de esta fila); otras cuatro pasaron al segundo intento a solas.
 - Sin ver: la mirada del segundo revisor; el bloque con datos reales (solo se probó con la demostración).

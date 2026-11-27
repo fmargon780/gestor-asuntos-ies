@@ -70,14 +70,14 @@ window.DocumentoATarea = (function () {
     /* Fila 680: sin hitos no hay nada que preguntar; el documento entra sin tarea. */
     if (!lista.length) {
       if (!o.colgar) return { sinTarea: true, hitoId: '', tareaId: null };
-      U.aviso(hitos.some(function (x) { return x && x.listaDeTareas; }) ? 'Los documentos de este asunto no se cuelgan de ninguna tarea.' : 'Para colgar un documento de una tarea, crea antes el hito.', 'ambar');
+      U.aviso(hitos.some(function (x) { return x && x.listaDeTareas; }) ? 'Los documentos de este asunto no se vinculan a ninguna tarea.' : 'Para vincular un documento a una tarea, crea antes el hito.', 'ambar');
       return null;
     }
     var numerados = Hitos.numerados ? Hitos.numerados(hitos) : lista;
     var idActual = window.EstadoHito && EstadoHito.idActual ? EstadoHito.idActual(hitos, datos.ajustes) : null;
     var elegido = lista.filter(function (x) { return x.id === idActual; })[0] || lista[lista.length - 1];
     var tipo = o.tipo || 'Documento';
-    var verbo = o.colgar ? 'Colgar' : 'Añadir';
+    var verbo = o.colgar ? 'Vincular' : 'Añadir';
 
     return new Promise(function (resolver) {
       var previo = document.activeElement;
@@ -115,7 +115,7 @@ window.DocumentoATarea = (function () {
           }).join('') + '</select><div class="etiqueta">Tarea</div>';
         /* Fila 680: «Sin tarea», solo al añadir (colgar un documento de una tarea no tiene sentido sin tarea). */
         if (!o.colgar) {
-          h += '<label class="pt-op"><input type="radio" name="pt-tarea" value="" class="pt-sin"><span>Sin tarea<br><small>Entra sin colgar de ninguna tarea.</small></span></label>';
+          h += '<label class="pt-op"><input type="radio" name="pt-tarea" value="" class="pt-sin"><span>Sin tarea<br><small>Entra sin vincular a ninguna tarea.</small></span></label>';
         }
         esperan.forEach(function (g, i) {
           h += '<label class="pt-op"><input type="radio" name="pt-tarea" value="' + esc(g.id) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(g.texto) +
@@ -192,9 +192,9 @@ window.DocumentoATarea = (function () {
       try { await HitosRequisitos.marcarPorDocumento(a.nombre, h.id, nombre); } catch (e) { /* accesorio */ }
     }
     if (window.RegistroAsunto) {
-      await RegistroAsunto.auto(a, (o.nuevo ? 'Añadido' : 'Colgado') + ' «' + nombre + '» en la tarea «' + texto + '»', h);
+      await RegistroAsunto.auto(a, (o.nuevo ? 'Añadido' : 'Vinculado') + ' «' + nombre + '» en la tarea «' + texto + '»', h);
     }
-    U.aviso('El documento queda colgado de «' + texto + '», en el hito «' + (h.titulo || '') + '».', 'bueno');
+    U.aviso('El documento queda vinculado a «' + texto + '», en el hito «' + (h.titulo || '') + '».', 'bueno');
     repintar(a);
     return { hito: h, tareaId: tareaId, texto: texto };
   }
@@ -211,7 +211,7 @@ window.DocumentoATarea = (function () {
     var destino = await preguntar(a, { nombre: nombre, tipo: leido.tipo, colgar: true });
     if (!destino) return;
     try { await colgar(a, destino, nombre, leido.tipo, { nuevo: false }); }
-    catch (e) { U.fallo('No he podido colgar el documento de la tarea', e); }
+    catch (e) { U.fallo('No he podido vincular el documento a la tarea', e); }
   }
 
   return { preguntar: preguntar, colgar: colgar, colgarDeCarpeta: colgarDeCarpeta, sinTarea: sinTarea,

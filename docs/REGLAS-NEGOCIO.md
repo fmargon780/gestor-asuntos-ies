@@ -361,6 +361,9 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 
 - (25-nov-2026, tema 745) **Una plantilla puede preguntar «¿Quién?» entre las personas que ya están en el asunto** (tercero, quien lo pide, terceros relacionados y, si el tercero es alumno, sus tutores), sin reglas de edad, de padre o madre ni de tutor. Se elige a quien se quiera y se corrige con «Cambiar». Francisco: «¿No sería más completo que… te deje elegir una de las personas relacionadas en el asunto, sin entrar a ver si es mayor o menor de edad, padre o madre, tutor o lo que sea?»
 
+- (26-nov-2026, tema 765) **La persona elegida sirve también por partes:** una plantilla que solo lleva `(nombre)`, `(DNI)`, `(teléfono)`, `(correo)` o `(en calidad de)` de una persona del asunto pregunta «¿Quién?» igual que con el campo entero.
+- (26-nov-2026, tema 765) **«En calidad de» lo pone la app y se puede cambiar:** un tutor es «padre» o «madre» según su sexo en Séneca («Si es hombre convendremos que es el padre, si mujer, la madre. Existe la posibilidad de que no fuera (cambio de género o tutoría legal). Por este motivo, sería un valor por defecto que se debería poder cambiar»); quien lo pide, su relación; el resto, su clase. Se cambia en «Campos de este asunto».
+
 ## Descargar el Word de una plantilla (idea 748, 25-nov-2026)
 
 - (25-nov-2026, idea 748) **Las plantillas de Word se pueden descargar** desde Herramientas → Plantillas («⋮» › «Descargar el Word»), para cambiarles el formato en Word y devolverlas con «Sustituir el fichero…». Francisco: «Lo que busco con esto es poder hacer cambios de formato en los documentos que no puedo hacer en la app.» Las plantillas de correo no se descargan: el correo es solo texto (idea 749 para darle formato).
@@ -373,3 +376,28 @@ Detalle y pantalla aprobada: `docs/notas-diseno/692.md`, `docs/pantallas/692.htm
 - (25-nov-2026, tema 583) **Cada pedido es un asunto COMPRA nuevo** con su documento de pedido; un pedido ya enviado no se amplía. Una factura puede juntar varios pedidos del mismo proveedor.
 - (25-nov-2026, tema 583) **Precios sin IVA; IVA al 21 %.** Tope del contrato menor de suministros que vigila la app: 15.000 € sin IVA por proveedor y año natural (aviso desde el 80 %).
 - (25-nov-2026, tema 583) La factura se sigue metiendo en Séneca: la app no lo sustituye.
+
+## La app desde un Chromebook (tema 757, 26-nov-2026)
+
+- (26-nov-2026, tema 757) **Solo en un Chromebook,** «Ruta» copia solo el nombre de la carpeta o del documento, para pegarlo en la lupa de la ventana «Abrir archivo» (Francisco comprobó que esa lupa encuentra las carpetas de Drive por su número de asunto). En la ficha del asunto hay un botón nuevo, «Abrir en Drive», que busca la carpeta en otra pestaña con la cuenta común. En «Comprobación al entrar» no sale la línea «Ruta de la nube en este ordenador». En Windows no cambia nada. Francisco: «Está bien así».
+
+## Correos con formato (tema 758, 26-nov-2026)
+
+- (26-nov-2026, tema 758) **La plantilla de correo se escribe como un correo nuevo:** ventana a toda la pantalla, el correo a la izquierda en el orden en que se lee y «Así le llega» a la derecha. Francisco (aviso del 25-nov-2026): «Mejorar la usabilidad de esta pantalla de creación de plantillas de correo.» A la propuesta: «Me vale. Adelante.»
+- (26-nov-2026, tema 758) **El texto del correo admite negrita, cursiva, subrayado, listas y tablas**, en la plantilla y al enviar; pegar desde Word conserva solo eso. Sustituye a «el correo es solo texto» de la idea 748; las plantillas de correo siguen sin descargarse. Francisco (idea 749): «poder dar formato (negrita, tablas) al cuerpo de los correos que manda la app».
+- (26-nov-2026, tema 758) **Séneca sigue en texto sencillo:** la app quita el formato y cada fila de una tabla va en una línea. Saludo y firma, sin formato.
+- (26-nov-2026, tema 758) **Sin el script de Gmail actualizado, el correo sale sin formato** y la app lo avisa en ámbar; el envío nunca falla por eso.
+
+## Quitar lo que estorba (tema 691, 26-nov-2026)
+
+- (26-nov-2026, tema 691) **Solo se limpia lo que se queda:** el asunto «lista de tareas» y lo que comparten los dos moldes. Lo que solo tienen los asuntos con hitos no se cambia de sitio: desaparecerá cuando lo largo pase al molde nuevo (Francisco: «Creo que este diseño habría que analizar como "casa" con el nuevo molde»; «Me parece bien»).
+- (26-nov-2026, tema 691) **Un documento se «vincula» a una tarea**, no se «cuelga». En un asunto «lista de tareas», un papel entra en su tarea desde los botones de la tarea; no hay «Vincular a una tarea» en la carpeta.
+- (26-nov-2026, tema 691) **Sin fecha límite, la cabecera del asunto no enseña nada;** el plazo se pone desde «⋯» › «Poner plazo…».
+
+## Hecho, una sola regla (tema 693, 27-nov-2026)
+
+- (27-nov-2026, tema 693) **El tema queda cerrado con lo que ya hay:** el molde nuevo marca solo lo que se hace con la app y con un gesto lo que no ve, y el papel suelto se queda sin marca en los dos moldes (fila 775). Cerrar el hito sigue siendo a mano hasta que se retiren los hitos: no se añade nada sobre ellos. El interruptor para volver a hacer obligatorio vincular (682) se descarta. Francisco: «Está bien».
+
+## Pasar los tipos al molde nuevo (tema 694, 27-nov-2026)
+
+- (27-nov-2026, tema 694) **El certificado de que el alumno ha devuelto los libros no es la ficha de entrega de libros** (la ficha dice que la familia los recibe). Anulación de matrícula y traslado de matrícula viva usan **una sola plantilla**, «Devolución de libros de gratuidad», con un texto que vale para los dos (eligió «1»).

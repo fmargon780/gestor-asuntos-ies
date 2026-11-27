@@ -1,11 +1,11 @@
-# 757 — La app desde un Chromebook
+# 770 — La app desde un Chromebook
 
 **Título llano:** «Ruta» y «Abrir en Drive» en el Chromebook
 **Para qué:** que desde un Chromebook se pueda encontrar la carpeta o el documento de un asunto (para adjuntarlo en Séneca o en el correo, o para verlo en Drive) y que al entrar no salga un aviso rojo de la ruta que no se puede arreglar.
 
 ## Lo que escribió Francisco
 
-Idea de la fila 756 (26-nov-2026): «el botón «Ruta» no sirve en un Chromebook. Hoy la app pide la ruta de la nube escrita como en Windows (por ejemplo `G:\Mi unidad`) y la copia así, y la ventana «Abrir archivo» del Chromebook no la entiende. Estudiar qué haría falta para abrir o enseñar la carpeta de un asunto desde un Chromebook con Drive, y mientras tanto no enseñar el aviso rojo «Ruta de la nube en este ordenador» en Comprobación al entrar.»
+Idea de la fila 756 (26-nov-2026, tema 757): «el botón «Ruta» no sirve en un Chromebook. Hoy la app pide la ruta de la nube escrita como en Windows (por ejemplo `G:\Mi unidad`) y la copia así, y la ventana «Abrir archivo» del Chromebook no la entiende. Estudiar qué haría falta para abrir o enseñar la carpeta de un asunto desde un Chromebook con Drive, y mientras tanto no enseñar el aviso rojo «Ruta de la nube en este ordenador» en Comprobación al entrar.»
 
 ## Lo que entendió Claude (acordado con Francisco el 26-nov-2026)
 
@@ -57,3 +57,7 @@ Con `window.__ES_CHROMEBOOK__ = false`:
 ## Revisión y respuestas durante el trabajo
 
 - (las apunta Claude Code, para Claude: qué ha hecho, qué no ha podido ver y sus dudas)
+- (26-nov-2026) Hecho en la rama `claude/awesome-allen-vix865` (commit 968e8cb): `js/ruta-chromebook.js` nuevo (copiar-ruta.js ya pasaba de 400 líneas) y enganches pequeños en `js/copiar-ruta.js`, `js/comprobacion-entrada.js`, `js/ficha-asunto.js` y `js/cargar-piezas-2.js`; prueba nueva `pruebas/ruta-chromebook.mjs`; línea en `js/novedades.js`. `npm test` completo en verde.
+- Segundo revisor (agente aparte, en local, `?demo=1&auto=1`): APROBADA. Puntos 1 a 7 de la lista y las tres fijas, todos coinciden: «Ruta» copia solo el nombre (ficha abierta y cerrada, documento, cuadros de Correo y de Séneca) con el aviso pedido y sin pedir ruta; «Abrir en Drive» sale junto a «Ruta» y intenta abrir `drive.google.com/drive/search?q=<nombre>&authuser=<cuenta común>` (sin seguirla: no hay red hacia Google); «Comprobación al entrar» no lleva la línea de la ruta; sin Chromebook todo sigue como antes. La app no hace nada que el texto no pida.
+- No lo he podido ver: el efecto real en un Chromebook (que la lupa de «Abrir archivo» encuentre la carpeta y que Drive enseñe la búsqueda): pasa a `docs/COMPROBAR-A-MANO.md`.
+- Fila grande: publicada la rama en la dirección de prueba (versión «26-nov-2026 · 20:19»); espera vistazo antes de fusionar en `main`.

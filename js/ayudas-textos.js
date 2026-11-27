@@ -55,7 +55,7 @@ var AyudasNucleo = AyudasNucleo || {};
     'correo-siguiente': 'Enseña el correo de la siguiente persona de la lista.',
     'cortar-aqui': 'Divide el PDF por aquí para separar el trozo de antes.',
     'crea-el-asunto-con-lo-leido': 'Crea el asunto con lo leído y guarda el documento dentro.',
-    'documento-sin-tarea': 'Este documento no cuelga de ninguna tarea. Puedes colgarlo de una; nadie te obliga.',
+    'documento-sin-tarea': 'Este documento no está vinculado a ninguna tarea. Puedes vincularlo a una; nadie te obliga.',
     'dar-por-hechos-anteriores': 'Marca como hechos los hitos anteriores que sigan sin terminar.',
     'dar-registro': 'Pide el número de registro de entrada o de salida para este documento.',
     'datos-del-asunto-plegar': 'Enseña u oculta los datos del asunto.',

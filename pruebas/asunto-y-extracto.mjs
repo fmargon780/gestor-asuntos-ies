@@ -296,17 +296,18 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('6. «Asunto» copia el asunto compuesto con el general, no el nombre de la carpeta',
   pegado(() => copiarDelMenu('Asunto')), GENERAL);
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
-await pagina.waitForSelector('.ficha-documento-fila .extracto-documento');
-await comprobar('6. «Extracto» sale junto a «Ruta», en todos los documentos de la carpeta',
-  pagina.evaluate(() => [...document.querySelectorAll('.ficha-documento-fila')].map((f) => { const r = f.querySelector('.ruta-documento'); const e = r && r.nextElementSibling;
-    return !!e && e.classList.contains('extracto-documento') && e.textContent.trim() === 'Extracto'; })), [true, true]);
+await pagina.waitForSelector('.ficha-documento-fila .extracto-documento', { state: 'attached' });
+await comprobar('6. «Extracto» es la primera entrada del menú ⋮ de cada documento de la carpeta, y no sale a la vista (fila 775)',
+  pagina.evaluate(() => [...document.querySelectorAll('.ficha-documento-fila')].map((f) => { const m = f.querySelector('.fila-menu'); const e = m && m.firstElementChild;
+    return !!e && e.classList.contains('extracto-documento') && e.textContent.trim() === 'Extracto' && !f.querySelector(':scope > .extracto-documento'); })), [true, true]);
+const abrirMenuDe = async (n) => { await pagina.waitForFunction(() => !document.querySelector('.ficha-documento-fila .fila-menu:not(.oculto)'), null, { timeout: 10000 }); await pagina.click('.ficha-documento-fila[data-doc="' + n + '"] .fila-menu-btn'); };
 const filaDe = (n) => '.ficha-documento-fila[data-doc="' + n + '"] .extracto-documento';
 await comprobar('6. copia el extracto propio de su tipo de documento, con los datos del documento, sus líneas y el número al final',
-  pegado(() => pagina.click(filaDe(DOC_RESOLUCION))), 'Resolución de CONVALIDACION\nEspejo Montes, Carla · 09/11/2026 · A26-0003');
+  pegado(async () => { await abrirMenuDe(DOC_RESOLUCION); await pagina.click(filaDe(DOC_RESOLUCION)); }), 'Resolución de CONVALIDACION\nEspejo Montes, Carla · 09/11/2026 · A26-0003');
 await comprobar('6. sale el aviso «Extracto copiado»',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#mensajes .mensaje.bueno')).map((m) => m.textContent).some((t) => t.indexOf('Extracto copiado') === 0)), true);
 await comprobar('6. un tipo sin extracto propio copia el general',
-  pegado(() => pagina.click(filaDe(DOC_FACTURA))), 'FACTURA · CONVALIDACION\nEspejo Montes, Carla · A26-0003');
+  pegado(async () => { await abrirMenuDe(DOC_FACTURA); await pagina.click(filaDe(DOC_FACTURA)); }), 'FACTURA · CONVALIDACION\nEspejo Montes, Carla · A26-0003');
 /* Fila 638: los documentos del hito ya no van en una tabla: cuelgan de su tarea. */
 await pagina.evaluate(async ([N, D1, D2]) => {
   await Hitos.anadirDocumento(N, 'h1', D1); await Hitos.anadirDocumento(N, 'h1', D2);
@@ -333,9 +334,9 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('6. un asunto de antes: «Asunto» copia el nombre de la carpeta',
   pegado(() => copiarDelMenu('Asunto')), VIEJO);
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
-await pagina.waitForSelector('.ficha-documento-fila .extracto-documento');
+await pagina.waitForSelector('.ficha-documento-fila .extracto-documento', { state: 'attached' });
 await comprobar('6. un asunto de antes: «Extracto» copia el nombre de la carpeta',
-  pegado(() => pagina.click('.ficha-documento-fila .extracto-documento')), VIEJO);
+  pegado(async () => { await pagina.click('.ficha-documento-fila .fila-menu-btn'); await pagina.click('.ficha-documento-fila .extracto-documento'); }), VIEJO);
 
 /* ================= 7. LA BANDEJA ================= */
 console.log('--- 7. la bandeja ---');
