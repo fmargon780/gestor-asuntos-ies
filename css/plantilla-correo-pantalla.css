@@ -1,0 +1,46 @@
+/* ============================================================
+   La plantilla de correo, como un correo nuevo (fila 771, docs/758-CORREOS-MAS-COMODOS.md, parte 1;
+   js/plantilla-correo-pantalla.js). A toda la pantalla: cabecera con los botones, una línea con Categoría, Tipo y Nombre,
+   el correo en su orden a la izquierda y «Así le llega» a la derecha. Cada columna se desplaza por su cuenta; la ventana no.
+   Sirve a la ventana de Ajustes (`.cuadro-pcp`, dentro de `U.preguntar`, con sus botones de siempre arriba) y al editor en línea del cuadro de Correo o de
+   Séneca (`.pcp-pantalla`, que tapa la ventana).
+   ============================================================ */
+
+/* La ventana de Ajustes (`U.preguntar`): los botones de siempre (#cuadro-cancelar y #cuadro-aceptar) suben a la derecha del título,
+   en la misma línea; no hay pie. */
+.cuadro.cuadro-pcp { position: relative; max-width: none; width: 100%; height: calc(100vh - 40px); height: calc(100dvh - 40px); }
+.capa > .cuadro.cuadro-pcp > h3 { min-height: 40px; margin: 0 0 6px; display: flex; align-items: center; }
+.capa > .cuadro.cuadro-pcp > .cuadro-botones { position: absolute; top: 24px; right: 24px; margin: 0; }
+.capa > .cuadro.cuadro-pcp > #cuadro-cuerpo { overflow: hidden; display: flex; flex-direction: column; }
+
+.pcp-pantalla { position: fixed; top: var(--franja-demo-alto, 0px); left: 0; right: 0; bottom: 0; z-index: 60;   /* por debajo de la franja fija de la copia de pruebas, como css/convertir-en-plantilla.css */
+  background: var(--papel); padding: 18px 22px; display: flex; flex-direction: column; }
+
+.pcp-cab { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; margin-bottom: 8px; }
+.pcp-titulo { margin: 0; font-size: 19px; }
+.pcp-herr { display: flex; gap: 8px; margin-left: auto; }
+
+.pcp-linea { display: flex; flex-wrap: wrap; gap: 14px; flex: 0 0 auto; align-items: flex-end; margin-bottom: 10px; }
+.pcp-linea > div { flex: 1 1 200px; min-width: 0; }
+.pcp-linea > .pcp-nombre { flex: 2 1 300px; }
+.pcp-linea .etiqueta { margin-top: 0; }
+.pcp-tipo { display: block; padding: 8px 0; }
+#pl2-aviso, #pl-aviso { flex: 0 0 auto; }
+
+.pcp-dos { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 20px; }
+.pcp-izq, .pcp-der { min-height: 0; overflow-y: auto; padding-right: 6px; }
+.pcp-correo textarea.campo { overflow: hidden; resize: none; }
+.pcp-correo textarea#pl-texto, .pcp-correo textarea#pl2-texto { min-height: 260px; }
+
+.pcp-der { background: #f7f9fc; border: 1px solid var(--linea); border-radius: 10px; padding: 14px 18px; }
+.pcp-llega-titulo { margin: 0 0 4px; font-size: 16px; }
+.pcp-llega { background: #fff; border: 1px solid var(--linea); border-radius: 8px; padding: 14px 16px; margin-top: 8px; }
+.pcp-llega-asunto { padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--linea); overflow-wrap: anywhere; }
+.pcp-llega-rotulo { color: #6a7683; margin-right: 6px; }
+.pcp-pre { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 14px; }
+.pcp-pre:empty { display: none; }
+
+@media (max-width: 900px) {
+  .pcp-dos { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
+  .pcp-izq, .pcp-der { overflow: visible; }
+}

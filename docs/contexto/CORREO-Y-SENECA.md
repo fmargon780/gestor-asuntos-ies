@@ -747,3 +747,13 @@ Sustituye a `docs/ASUNTO-SIN-ELECCION.md` (fila 55): el asunto de correos y mens
 - **Bandeja**: `asuntoQueYaExiste` (`js/bandeja-huella.js`) busca primero el número del asunto dentro del asunto del correo (entero y suelto), luego el nombre de la carpeta como antes; `asuntoDeEsteCorreo` no cambia de orden.
 - **Control del registro**: `ControlRegistro.leerCsv` lee los extractos de varias líneas (saltos dentro de comillas) y `clasificar` los une por el número.
 - Se comprueba con `pruebas/asunto-y-extracto.mjs` (`pruebas/asunto-sin-eleccion.mjs` sigue valiendo para asuntos sin número).
+
+## La plantilla de correo, como un correo nuevo (fila 771, `docs/758-CORREOS-MAS-COMODOS.md`, parte 1)
+
+- La ventana «Nueva plantilla» / «Cambiar plantilla» de Ajustes (`PlantillasAjustes.abrirCuadroDePlantilla`) y el editor en línea del cuadro de Correo o de Séneca (`montarEditorEnLinea`) ocupan toda la pantalla; el diseño es de `js/plantilla-correo-pantalla.js` (`PlantillaCorreoPantalla.cuerpoHTML` / `enganchar`) y `css/plantilla-correo-pantalla.css`. Los identificadores de los campos son los de siempre (`pl-…` en Ajustes, `pl2-…` en el editor en línea): lo que se guarda en `plantillas.json` no cambia.
+- Ajustes sigue siendo un `U.preguntar`, con la clase `cuadro-pcp` en el cuadro: sus botones de siempre (`#cuadro-cancelar`, `#cuadro-aceptar`) suben a la derecha del título. El editor en línea no abre cuadro: su bloque se pone a toda la pantalla con la clase `pcp-pantalla` (por debajo de la franja de la copia de pruebas).
+- Disposición: título y botones; una línea con Categoría, Tipo y Nombre; a la izquierda, en el orden en que se lee, Para, Copia, Copia oculta, Asunto, Saludo, Texto y Firma (el Texto crece solo, sin barra), y debajo «Texto para Séneca» plegado y el adjunto; a la derecha, «Así le llega» (asunto, saludo, texto y firma), que se rehace con cada `input`.
+- «Así sale» del Asunto y «Así le llega» comparten el asunto de ejemplo (`PlantillaCorreoPantalla.muestra`, a partir de `datosDeMuestra` y `AsuntoExtracto.muestra`); en el editor en línea, los valores reales del asunto (`Plantillas.valoresDeAsunto`). Al cambiar de tipo se rehacen los dos.
+- `PlantillaPapeles` reparte ahora `destinatariosHTML` (Para, Copia y Copia oculta) y `firmaHTML`; `despuesDelTextoHTML` los sigue juntando para el editor de la guía (`js/guias-plantilla.js`), que conserva su columna estrecha y su «Vista previa».
+- Demo: «Aviso de recogida de libros» (MATRICULA) lleva Para, Copia, saludo, firma, asunto propio y campos variables. Prueba: `pruebas/plantilla-correo-pantalla.mjs`.
+

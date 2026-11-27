@@ -201,17 +201,18 @@ await comprobar('3. vaciado: la tarjeta vuelve a «Extracto general» y el tipo 
 console.log('--- 4. plantilla de correo ---');
 await pagina.evaluate(() => PlantillasAjustes.abrirCuadroDePlantilla(null, { tipo: 'CONVALIDACION', categoria: 'ALUMNADO' }, function () {}));
 await pagina.waitForSelector('#capa:not(.oculto) #pl-asunto');
-await comprobar('4. el campo «Asunto» está justo debajo del nombre de la plantilla',
-  pagina.evaluate(() => { const n = document.getElementById('pl-nombre'); const l = n.nextElementSibling;
-    return [l.tagName, l.textContent.trim(), document.getElementById('pl-asunto').placeholder]; }),
-  ['LABEL', 'Asunto', 'Vacío: sale el asunto general del centro']);
+/* Fila 771: el Asunto va dentro del correo, tras Para, Copia y Copia oculta, no justo debajo del nombre. */
+await comprobar('4. el campo «Asunto» está en el correo, con su etiqueta, y va antes del Saludo',
+  pagina.evaluate(() => { const a = document.getElementById('pl-asunto'); const l = document.querySelector('label[for="pl-asunto"]');
+    return [l.textContent.trim(), a.placeholder, a.getBoundingClientRect().top < document.getElementById('pl-saludo').getBoundingClientRect().top]; }),
+  ['Asunto', 'Vacío: sale el asunto general del centro', true]);
 await comprobar('4. vacío, «Así sale» enseña el general y lo dice',
   pagina.evaluate(() => [document.querySelector('#pl-asunto-sale .ae-resultado').textContent, document.querySelector('#pl-asunto-sale .ae-de').textContent]),
-  ['BAJA MATRICULA · Espejo Montes, Carla · A26-0003', '(el general del centro)']);
+  ['CONVALIDACION · Pérez Ruiz, Ana · A26-0003', '(el general del centro)']);   /* fila 771: el asunto de ejemplo es del tipo de la plantilla, no uno fijo de otro tipo */
 await pagina.fill('#pl-asunto', 'Resolución · {nombre}');
 await comprobar('4. con asunto propio, «Así sale» enseña el suyo',
   pagina.evaluate(() => [document.querySelector('#pl-asunto-sale .ae-resultado').textContent, document.querySelector('#pl-asunto-sale .ae-de').textContent]),
-  ['Resolución · Espejo Montes, Carla · A26-0003', '(el de esta plantilla)']);
+  ['Resolución · Pérez Ruiz, Ana · A26-0003', '(el de esta plantilla)']);
 await pagina.fill('#pl-nombre', 'Con asunto');
 await pagina.fill('#pl-texto', 'Hola');
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
@@ -261,8 +262,8 @@ await abrir(NUEVO, false);
 await pagina.selectOption('#correo-plantilla', { label: 'Con asunto' });
 await pagina.click('#correo-plantilla-editar');
 await pagina.waitForSelector('#pl2-asunto');
-await comprobar('5. el editor de la plantilla dentro del cuadro: «Asunto» debajo del nombre y «Así sale» con los datos de este asunto',
-  pagina.evaluate(() => [document.getElementById('pl2-nombre').nextElementSibling.textContent.trim(), document.getElementById('pl2-asunto').value,
+await comprobar('5. el editor de la plantilla dentro del cuadro: «Asunto» y «Así sale» con los datos de este asunto',
+  pagina.evaluate(() => [document.querySelector('label[for="pl2-asunto"]').textContent.trim(), document.getElementById('pl2-asunto').value,
     document.querySelector('#pl2-asunto-sale .ae-resultado').textContent]),
   ['Asunto', 'Resolución · {nombre}', PROPIO]);
 await pagina.click('#pl2-cancelar');
