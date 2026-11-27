@@ -36,6 +36,15 @@
     var yaCorreo = {};
     (actual.lista || []).forEach(function (p) { yaCorreo[p.tipo + '|' + p.nombre] = true; });
 
+    /* Fila 779: una plantilla del índice con el mismo nombre y fichero en varios tipos (la devolución de
+       libros, en anulación y en traslado de matrícula viva) cuelga de todos: no se pasa de uno a otro. */
+    var compartidas = {}, reclamadas = {};
+    indice.forEach(function (x) {
+      if (x.clase !== 'documento') return;
+      var k = U.normalizar(x.nombre) + '|' + x.fichero;
+      compartidas[k] = (compartidas[k] || 0) + 1;
+    });
+
     var nuevosDocumentos = [], nuevosCorreo = [], retipar = [];
     var documentosYaEstaban = 0, correoYaEstaban = 0;
 
@@ -50,9 +59,20 @@
         /* Fila 126: la misma plantilla (nombre y fichero) colgada de otro
            tipo no se duplica: se pasa al tipo del índice, salvo que ese
            tipo sea el mismo con otro nombre (corto o de antes). */
-        var gemela = (actual.documentos || []).filter(function (p) {
+        var compartida = compartidas[U.normalizar(e.nombre) + '|' + e.fichero] > 1;
+        var gemela = compartida ? null : (actual.documentos || []).filter(function (p) {
           return U.normalizar(p.nombre) === U.normalizar(e.nombre) && p.fichero === e.fichero;
         })[0];
+        /* Fila 779: la que ya había con el nombre de antes pasa a ser esta, una sola vez. */
+        var vieja = compartida && e.antes ? (actual.documentos || []).filter(function (p) {
+          return !reclamadas[p.id] && U.normalizar(p.nombre) === U.normalizar(e.antes) && p.fichero === e.fichero;
+        })[0] : null;
+        if (vieja) {
+          reclamadas[vieja.id] = true;
+          retipar.push({ id: vieja.id, tipo: e.tipo, categoria: e.categoria, nombre: e.nombre });
+          documentosYaEstaban++;
+          continue;
+        }
         if (gemela) {
           var mismoTipo = window.TiposNombre && TiposNombre.nombresDe(e.tipo).indexOf(U.normalizar(gemela.tipo || '')) !== -1;
           if (!mismoTipo) retipar.push({ id: gemela.id, tipo: e.tipo, categoria: e.categoria });
@@ -91,7 +111,7 @@
     if (nuevosDocumentos.length || nuevosCorreo.length || retipar.length) {
       await Plantillas.guardar(App.E.gestor, function (a) {
         retipar.forEach(function (x) {
-          (a.documentos || []).forEach(function (p) { if (p.id === x.id) { p.tipo = x.tipo; p.categoria = x.categoria; } });
+          (a.documentos || []).forEach(function (p) { if (p.id === x.id) { p.tipo = x.tipo; p.categoria = x.categoria; if (x.nombre) p.nombre = x.nombre; } });
         });
         a.documentos = (a.documentos || []).concat(nuevosDocumentos);
         a.lista = (a.lista || []).concat(nuevosCorreo);

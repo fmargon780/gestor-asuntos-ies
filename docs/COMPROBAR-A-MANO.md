@@ -403,3 +403,5 @@ Después de los pasos de `docs/TE-TOCA.md` (fila 411):
 - (Fila 770) Solo en el Chromebook de Francisco: pulsar «Ruta» en un asunto, abrir «Adjuntar» en Séneca o en Gmail, pegar en la lupa y ver que sale la carpeta; pulsar «Abrir en Drive» y ver que Drive enseña la carpeta del asunto. [solo en: tu Chromebook]
 
 - (Fila 772) Con el script de Gmail actualizado (fila 799): enviar un correo con negrita, una lista y una tabla y ver cómo llega a la bandeja; abrir el PDF CORREO que queda en el asunto y mirar que lleva la negrita y la tabla con sus líneas; «Copiar Cuerpo» y pegar en Gmail. [solo en: la app real]
+
+- (Fila 779) En el centro real: «Cargar las plantillas del centro» y mirar que «Devolución de libros de gratuidad» queda una vez en ANULACIÓN MATRÍCULA y otra en TRAS. MATR. VIVA, y ya no en TRASLADO; generar el certificado desde un asunto de anulación y ver que dice «que causa baja en este centro». (La demostración no tiene el tipo TRAS. MATR. VIVA ni asuntos de anulación; el reparto entre tipos lo cubre `pruebas/tipos-nombre.mjs`, apartado 3b.) [solo en: la app real]

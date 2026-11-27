@@ -1,6 +1,8 @@
 ---
-nombre: Devolución de libros de gratuidad por traslado
-tipo: TRASLADO
+nombre: Devolución de libros de gratuidad
+tipo: ANULACIÓN MATRÍCULA
+tambien: TRAS. MATR. VIVA
+antes: Devolución de libros de gratuidad por traslado
 categoria: ALUMNADO
 tipoDocumento: CERTIFICADO
 texto: libros
@@ -14,7 +16,7 @@ vistoBueno: direccion
 
 **C E R T I F I C A:**
 
-Que **D./Dña. {{NOMBRE NATURAL}}**, del grupo {{GRUPO}}, que causa baja en este centro por traslado, ha devuelto los libros de texto del Programa de Gratuidad de Libros de Texto. Estado de los libros: {campo:Estado de los libros}.
+Que **D./Dña. {{NOMBRE NATURAL}}**, del grupo {{GRUPO}}, que causa baja en este centro, ha devuelto los libros de texto del Programa de Gratuidad de Libros de Texto. Estado de los libros: {campo:Estado de los libros}.
 
 Y para que conste y surta los efectos oportunos, a petición de la persona interesada, expido la presente con el V.º B.º del/de la:vistobueno Director/a:vistobueno, en {{LOCALIDAD}}, a {{HOY LARGO}}.
 
