@@ -43,7 +43,7 @@ var ExtractoDocumento = (function () {
     b.textContent = 'Extracto';
     b.title = 'Copiar el extracto de este documento para el registro de Séneca';
     b.setAttribute('data-ayuda-clave', 'copiar-el-extracto-de-este-documento');
-    b.onclick = function (ev) { ev.stopPropagation(); copiar(a, nombre, b); };
+    b.onclick = function () { copiar(a, nombre, b); };
     return b;
   }
 
