@@ -79,7 +79,7 @@ Directiva» por correo). Sin datos ni plantillas.
 ## Dudas de Claude (las dice Francisco al repasar)
 
 1. ~~CONFORMIDAD: qué papel es~~ Resuelta el 27-nov-2026: la conformidad mensual al servicio de limpieza; la firma la secretaria («La secretaria»).
-2. COMUNICACIÓN RECIBIDA: ¿la comunicación de la Bandeja Electrónica la registramos de entrada nosotros? El correo pone su registro, y la app solo lo sabe si el documento del asunto lo tiene (sello o listado de Séneca). COMUNICACION no puede llevar recorrido propio.
+2. ~~COMUNICACIÓN RECIBIDA: el registro~~ Resuelta el 27-nov-2026: llega con el registro puesto (Francisco: «llega con el registro puesto»). La app lee el sello de Séneca del PDF al guardarlo (`js/registro-lector.js`, `js/registro-sellado.js`), así que `{registro}` sale relleno sin registrar nada. Por comprobar con la primera comunicación real: que el sello de la Bandeja Electrónica tenga la forma que la app reconoce. La tarea 1 se queda como está.
 3. REUNIÓN C.M. ABSENTISMO: «Resolución del Director», ¿quiere decir que Dirección decide quién va a la reunión, o hay un papel que vuelve? Propuesta: solo se le envía, y con eso termina.
 4. INFORME EDITORIAL: la petición de la editorial, ¿se registra de entrada? Propuesta: no (es un correo comercial).
 
